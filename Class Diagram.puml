@@ -1,0 +1,103 @@
+@startuml
+
+skinparam classAttributeIconSize 0
+skinparam backgroundColor White
+skinparam packageBorderColor LightGrey
+skinparam class {
+	BackgroundColor White
+	ArrowColor DeepSkyBlue
+	BorderColor DodgerBlue
+}
+
+package petrinet {
+    class PetriNet {
+        String title
+        Transition[] transitions
+        Place[] places
+    }
+    abstract class Node {
+        String title
+        Arc[] arcs
+    }
+    class Transition extends Node {
+        Role authority
+    }
+    class Place extends Node {
+        int tokens
+    }
+    PetriNet "1" *-- "0..*" Place
+    PetriNet "1" *-- "0..*" Transition
+    class Arc {
+        Node source
+        Node destination
+    }
+    Arc "0..*" --* "2" Node
+    class DataSet {
+        Field[] fields
+    }
+
+    Transition "0..*" -- "0..1" DataSet : modifies
+    DataSet "1" --* "1" PetriNet : keeps
+}
+
+package management {
+    enum Country {
+        SLOVAKIA,
+        ...
+    }
+    abstract class Address {
+        final Country country
+    }
+    Country -- Address
+    class DefaultAddress extends Address {
+        ...
+    }
+    class SlovakAddress extends Address {
+        String city
+        String street
+        String streetNumber
+        String postCode
+    }
+    Company "0..*" o-- "1" Address
+    class Company {
+        String name
+        String description
+        Address address
+        User owner
+        Map<Role, User[]> employees
+    }
+    class User {
+        String login
+        String password
+        String name
+        String surname
+        String email
+    }
+    User "1" *-- "0..*" Company : owns
+    User "0..*" --o "0..*" Company : employs
+    class Role {
+        String name
+    }
+    User "0..*" --o "0..*" Role
+    Transition "0..*" --o "0..1" Role
+}
+
+package fields {
+    abstract class Field {
+        String title
+    }
+    class ShortTextField extends Field
+    class LongTextField extends Field
+    class DropdownField extends Field
+    class MultipleChoiceField extends Field
+    class BooleanField extends Field
+    class PickerField extends Field
+    class FileField extends Field
+    class DateField extends Field
+    abstract class RangeField extends Field
+    class DateRangeField extends RangeField
+    class NumberRangeField extends RangeField
+    Field "0..*" *-- "0..*" DataSet
+}
+
+@enduml
