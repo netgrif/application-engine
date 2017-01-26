@@ -1,89 +1,89 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document>
-<place>
-<id>1</id>
-<x>140</x>
-<y>111</y>
-<label>start</label>
-<tokens>1</tokens>
-<static>false</static>
-</place>
-<place>
-<id>3</id>
-<x>380</x>
-<y>44</y>
-<label>hore</label>
-<tokens>0</tokens>
-<static>false</static>
-</place>
-<place>
-<id>4</id>
-<x>390</x>
-<y>162</y>
-<label>dole</label>
-<tokens>0</tokens>
-<static>false</static>
-</place>
-<place>
-<id>6</id>
-<x>635</x>
-<y>120</y>
-<label>end</label>
-<tokens>0</tokens>
-<static>false</static>
-</place>
-<transition>
-<id>2</id>
-<x>266</x>
-<y>105</y>
-<label>vyber cestu</label>
-</transition>
-<transition>
-<id>5</id>
-<x>509</x>
-<y>113</y>
-<label>pokracuj</label>
-</transition>
-<arc>
-<id>7</id>
-<type>regular</type>
-<sourceId>1</sourceId>
-<destinationId>2</destinationId>
-<multiplicity>1</multiplicity>
-</arc>
-<arc>
-<id>8</id>
-<type>regular</type>
-<sourceId>2</sourceId>
-<destinationId>3</destinationId>
-<multiplicity>1</multiplicity>
-</arc>
-<arc>
-<id>9</id>
-<type>regular</type>
-<sourceId>2</sourceId>
-<destinationId>4</destinationId>
-<multiplicity>1</multiplicity>
-</arc>
-<arc>
-<id>10</id>
-<type>regular</type>
-<sourceId>3</sourceId>
-<destinationId>5</destinationId>
-<multiplicity>1</multiplicity>
-</arc>
-<arc>
-<id>11</id>
-<type>regular</type>
-<sourceId>4</sourceId>
-<destinationId>5</destinationId>
-<multiplicity>1</multiplicity>
-</arc>
-<arc>
-<id>12</id>
-<type>regular</type>
-<sourceId>5</sourceId>
-<destinationId>6</destinationId>
-<multiplicity>1</multiplicity>
-</arc>
+    <place>
+        <id>1</id>
+        <x>140</x>
+        <y>111</y>
+        <label>start</label>
+        <tokens>1</tokens>
+        <static>false</static>
+    </place>
+    <place>
+        <id>3</id>
+        <x>380</x>
+        <y>44</y>
+        <label>hore</label>
+        <tokens>0</tokens>
+        <static>false</static>
+    </place>
+    <place>
+        <id>4</id>
+        <x>390</x>
+        <y>162</y>
+        <label>dole</label>
+        <tokens>0</tokens>
+        <static>false</static>
+    </place>
+    <place>
+        <id>6</id>
+        <x>635</x>
+        <y>120</y>
+        <label>end</label>
+        <tokens>0</tokens>
+        <static>false</static>
+    </place>
+    <transition>
+        <id>2</id>
+        <x>266</x>
+        <y>105</y>
+        <label>vyber cestu</label>
+    </transition>
+    <transition>
+        <id>5</id>
+        <x>509</x>
+        <y>113</y>
+        <label>pokracuj</label>
+    </transition>
+    <arc>
+        <id>7</id>
+        <type>regular</type>
+        <sourceId>1</sourceId>
+        <destinationId>2</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>8</id>
+        <type>regular</type>
+        <sourceId>2</sourceId>
+        <destinationId>3</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>9</id>
+        <type>regular</type>
+        <sourceId>2</sourceId>
+        <destinationId>4</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>10</id>
+        <type>regular</type>
+        <sourceId>3</sourceId>
+        <destinationId>5</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>11</id>
+        <type>regular</type>
+        <sourceId>4</sourceId>
+        <destinationId>5</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>12</id>
+        <type>regular</type>
+        <sourceId>5</sourceId>
+        <destinationId>6</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
 </document>
