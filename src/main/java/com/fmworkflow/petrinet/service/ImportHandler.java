@@ -1,10 +1,7 @@
 package com.fmworkflow.petrinet.service;
 
 import com.fmworkflow.Persistable;
-import com.fmworkflow.petrinet.domain.Arc;
-import com.fmworkflow.petrinet.domain.Node;
-import com.fmworkflow.petrinet.domain.Place;
-import com.fmworkflow.petrinet.domain.Transition;
+import com.fmworkflow.petrinet.domain.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
@@ -102,7 +99,10 @@ public class ImportHandler extends DefaultHandler {
                 ((Place) object).setStatic(isStatic);
                 break;
             case TYPE:
-                // TODO: 26. 1. 2017
+                if (Arc.Type.valueOf(characters) == Arc.Type.reset)
+                    object = new ResetArc((Arc) object);
+                else if (Arc.Type.valueOf(characters) == Arc.Type.inhibitor)
+                    object = new InhibitorArc((Arc) object);
             default:
         }
     }
