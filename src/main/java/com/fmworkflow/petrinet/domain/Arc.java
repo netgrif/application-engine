@@ -7,6 +7,14 @@ public class Arc implements Persistable {
     private Node destination;
     private int multiplicity;
 
+    public Arc() {}
+
+    public Arc(Node source, Node destination, int multiplicity) {
+        this.source = source;
+        this.destination = destination;
+        this.multiplicity = multiplicity;
+    }
+
     @Override
     public void persist() {
         System.out.println("Persisting Arc [" + toString() + " ]");
@@ -39,5 +47,11 @@ public class Arc implements Persistable {
     @Override
     public String toString() {
         return source.getTitle() + " -(" + multiplicity + ")> " + destination.getTitle();
+    }
+
+    public enum Type {
+        regular,
+        inhibitor,
+        reset
     }
 }
