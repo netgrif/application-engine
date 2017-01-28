@@ -17,6 +17,5 @@ public class ImporterTest {
     public void testImport() throws Exception {
         Importer importer = new Importer(xmlFile);
         importer.importPetriNet();
-
     }
 }
