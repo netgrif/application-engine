@@ -1,19 +1,35 @@
 package com.fmworkflow;
 
+import com.fmworkflow.mail.IMailService;
+import com.fmworkflow.mail.MailService;
 import org.apache.velocity.app.VelocityEngine;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 
+import java.util.Properties;
+
 @SpringBootApplication
+@ComponentScan(basePackages = {"com.fmworkflow", "it.ozimov.springboot"})
+
 public class WorkflowManagementSystemApplication {
 
 	@Bean
 	public JavaMailSenderImpl mailSender() {
-		JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
-		mailSender.setHost("mail.fmworkflow.sk"); // TODO: 27. 1. 2017
-		return mailSender;
+		JavaMailSenderImpl sender = new JavaMailSenderImpl();
+		sender.setPort(587);
+		sender.setHost("smtp.mailgun.org");
+		sender.setUsername("workflow@sandbox77b26b1bdb5a40439459609a0292b926.mailgun.org");
+		sender.setPassword("workflow");
+		Properties mailProperties = new Properties();
+		mailProperties.put("mail.smtp.auth", true);
+		mailProperties.put("mail.smtp.starttls.enable", true);
+		mailProperties.put("mail.smtp.starttls.required", true);
+		sender.setJavaMailProperties(mailProperties);
+		return sender;
 	}
 
 	@Bean
@@ -25,11 +41,11 @@ public class WorkflowManagementSystemApplication {
 	}
 
 	@Bean
-	public MailSenderService mailSenderService(JavaMailSenderImpl mailSender, VelocityEngine velocityEngine) {
-		MailSenderService mailSenderService = new MailSenderService();
-		mailSenderService.setMailSender(mailSender);
-		mailSenderService.setVelocityEngine(velocityEngine);
-		return mailSenderService;
+	public IMailService mailService(VelocityEngine velocityEngine, JavaMailSender mailSender) {
+		MailService mailService = new MailService();
+		mailService.setVelocityEngine(velocityEngine);
+		mailService.setMailSender(mailSender);
+		return mailService;
 	}
 
 	public static void main(String[] args) {
