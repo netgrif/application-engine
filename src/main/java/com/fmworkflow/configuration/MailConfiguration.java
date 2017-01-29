@@ -1,4 +1,4 @@
-package com.fmworkflow;
+package com.fmworkflow.configuration;
 
 import com.fmworkflow.mail.IMailService;
 import com.fmworkflow.mail.MailService;
