@@ -8,13 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 @EnableCaching
 @SpringBootApplication
-@Controller
 public class WorkflowManagementSystemApplication {
-
-	@RequestMapping(value = "/{path:[^\\.]*}")
-	public String redirect() {
-		return "forward:/";
-	}
 
 	public static void main(String[] args) {
 		SpringApplication.run(WorkflowManagementSystemApplication.class, args);
