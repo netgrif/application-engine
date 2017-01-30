@@ -8,8 +8,9 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.web.csrf.CsrfTokenRepository;
 import org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpSession;
 import java.security.Principal;
@@ -17,9 +18,14 @@ import java.util.Collections;
 import java.util.Map;
 
 @Configuration
-@RestController
+@Controller
 @Order(SecurityProperties.ACCESS_OVERRIDE_ORDER)
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
+
+    @RequestMapping(value = "/{path:[^\\.]*}")
+    public String redirect() {
+        return "forward:/";
+    }
 
     @Bean
     CsrfTokenRepository httpSessionCsrfTokenRepository() {
@@ -29,21 +35,22 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     }
 
     @RequestMapping("/user")
+    @ResponseBody
     public Principal user(Principal user) {
         return user;
     }
 
-    @RequestMapping("/token")
-    public Map<String,String> token(HttpSession session) {
-        return Collections.singletonMap("token", session.getId());
-    }
+//    @RequestMapping("/token")
+//    public Map<String,String> token(HttpSession session) {
+//        return Collections.singletonMap("token", session.getId());
+//    }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
             .httpBasic().and()
             .authorizeRequests()
-                .antMatchers("index.html", "/", "/view/login").permitAll()
+                .antMatchers("/index.html", "/", "/login").permitAll()
                 .anyRequest().authenticated()
                 .and()
             .csrf()
