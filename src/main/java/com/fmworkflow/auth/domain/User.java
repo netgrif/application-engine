@@ -32,6 +32,8 @@ public class User implements Principal {
     @JoinTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles;
 
+    public User(){}
+
     public User(String username, String password, String email) {
         this.username = username;
         this.password = password;

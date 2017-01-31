@@ -1,5 +1,7 @@
 package com.fmworkflow.configuration;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.context.annotation.Bean;
@@ -15,12 +17,20 @@ import org.springframework.security.web.csrf.CsrfTokenRepository;
 import org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import javax.servlet.http.HttpSession;
+import java.security.Principal;
+import java.util.Collections;
+import java.util.Map;
 
 @Configuration
 @Controller
 @EnableWebSecurity
 @Order(SecurityProperties.ACCESS_OVERRIDE_ORDER)
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
+
+    private static final Logger logger = LoggerFactory.getLogger(SecurityConfiguration.class);
 
     @Autowired
     private UserDetailsService userDetailsService;
@@ -47,18 +57,30 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         return new BCryptPasswordEncoder();
     }
 
+//    @RequestMapping("/user")
+//    @ResponseBody
+//    public Principal user(Principal user) {
+//        return user;
+//    }
+
+//    @RequestMapping("/token")
+//    public Map<String,String> token(HttpSession session) {
+//        return Collections.singletonMap("token", session.getId());
+//    }
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
             .httpBasic().and()
             .authorizeRequests()
-                .antMatchers("/index.html", "/login").permitAll()
+                .antMatchers("/bower_components/**","/scripts/**","/assets/**","/styles/**","/views/**","/favicon.ico").permitAll()
+                .antMatchers("/index.html", "/", "/login").permitAll()
                 .anyRequest().authenticated()
                 .and()
-            .formLogin()
-                .loginPage("/login")
-                .permitAll()
-                .and()
+//            .formLogin()
+//                .loginPage("/login")
+//                .permitAll()
+//                .and()
             .csrf()
                 .csrfTokenRepository(httpSessionCsrfTokenRepository());
     }
