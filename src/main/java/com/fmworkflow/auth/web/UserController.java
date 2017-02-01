@@ -27,9 +27,9 @@ public class UserController {
         return "forward:/welcome";
     }
 
-    @RequestMapping("/user")
-    @ResponseBody
-    public User user(User user) {
-        return user;
-    }
+//    @RequestMapping("/user")
+//    @ResponseBody
+//    public User user(User user) {
+//        return user;
+//    }
 }
