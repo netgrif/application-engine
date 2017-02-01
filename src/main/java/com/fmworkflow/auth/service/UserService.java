@@ -20,7 +20,7 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public User findByUsername(String username) {
-        return userRepository.findByUsername(username);
+    public User findByUsername(String email) {
+        return userRepository.findByEmail(email);
     }
 }
