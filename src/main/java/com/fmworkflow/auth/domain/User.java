@@ -4,14 +4,13 @@ import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.Length;
 
 import javax.persistence.*;
-import javax.security.auth.Subject;
 import javax.validation.constraints.NotNull;
-import java.security.Principal;
 import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-public class User implements Principal {
+@Table(name = "user")
+public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
@@ -79,15 +78,5 @@ public class User implements Principal {
 
     public void setRoles(Set<Role> roles) {
         this.roles = roles;
-    }
-
-    @Override
-    public String getName() {
-        return username;
-    }
-
-    @Override
-    public boolean implies(Subject subject) {
-        return subject != null && subject.getPrincipals().contains(this);
     }
 }

@@ -13,6 +13,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfTokenRepository;
 import org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository;
 import org.springframework.stereotype.Controller;
@@ -57,11 +58,11 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         return new BCryptPasswordEncoder();
     }
 
-//    @RequestMapping("/user")
-//    @ResponseBody
-//    public Principal user(Principal user) {
-//        return user;
-//    }
+    @RequestMapping("/user")
+    @ResponseBody
+    public Principal user(Principal user) {
+        return user;
+    }
 
 //    @RequestMapping("/token")
 //    public Map<String,String> token(HttpSession session) {
@@ -77,11 +78,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .antMatchers("/index.html", "/", "/login").permitAll()
                 .anyRequest().authenticated()
                 .and()
-//            .formLogin()
-//                .loginPage("/login")
-//                .permitAll()
-//                .and()
             .csrf()
-                .csrfTokenRepository(httpSessionCsrfTokenRepository());
+                //.csrfTokenRepository(httpSessionCsrfTokenRepository());
+                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse());
     }
 }
