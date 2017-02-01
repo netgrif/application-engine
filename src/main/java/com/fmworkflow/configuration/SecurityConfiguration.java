@@ -20,10 +20,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.servlet.http.HttpSession;
 import java.security.Principal;
-import java.util.Collections;
-import java.util.Map;
 
 @Configuration
 @Controller
@@ -75,7 +72,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             .httpBasic().and()
             .authorizeRequests()
                 .antMatchers("/bower_components/**","/scripts/**","/assets/**","/styles/**","/views/**","/favicon.ico").permitAll()
-                .antMatchers("/index.html", "/", "/login").permitAll()
+                .antMatchers("/index.html", "/", "/login", "/login/token/{token}").permitAll()
                 .anyRequest().authenticated()
                 .and()
             .csrf()

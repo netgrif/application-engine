@@ -31,7 +31,7 @@ public class WorkflowManagementSystemApplication implements CommandLineRunner{
 	public void run(String... strings) throws Exception {
 		Role role = new Role("user");
 		role = roleRepository.save(role);
-		User user = new User("user", "$2a$10$fJw3A2yoqyE0t31mOECcCOTTuRw7/GlAL8qdnmYxln596D0yQ4toi", "user@fmworkflow.com");
+		User user = new User("user@fmworkflow.com", "$2a$10$fJw3A2yoqyE0t31mOECcCOTTuRw7/GlAL8qdnmYxln596D0yQ4toi", "name", "surname");
 		HashSet<Role> roles = new HashSet<>();
 		roles.add(role);
 		user.setRoles(roles);

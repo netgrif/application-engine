@@ -2,6 +2,7 @@ package com.fmworkflow.auth.domain;
 
 import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.Length;
+import org.hibernate.validator.constraints.NotBlank;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -16,28 +17,35 @@ public class User {
     private Long id;
 
     @NotNull
-    @Length(min = 3)
-    private String username;
+    @Email
+    private String email;
 
     @NotNull
     @Length(min = 6)
     private String password;
 
     @NotNull
-    @Email
-    private String email;
+    @NotBlank
+    private String name;
+
+    @NotNull
+    @NotBlank
+    private String surname;
 
     @ManyToMany
     @JoinTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles;
 
-    public User(){}
-
-    public User(String username, String password, String email) {
-        this.username = username;
-        this.password = password;
-        this.email = email;
+    public User(){
         roles = new HashSet<>();
+    }
+
+    public User(String email, String password, String name, String surname) {
+        this();
+        this.email = email;
+        this.password = password;
+        this.name = name;
+        this.surname = surname;
     }
 
     public Long getId() {
@@ -46,14 +54,6 @@ public class User {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
     }
 
     public String getPassword() {
@@ -78,5 +78,21 @@ public class User {
 
     public void setRoles(Set<Role> roles) {
         this.roles = roles;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getSurname() {
+        return surname;
+    }
+
+    public void setSurname(String surname) {
+        this.surname = surname;
     }
 }
