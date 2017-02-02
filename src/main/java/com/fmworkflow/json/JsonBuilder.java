@@ -20,12 +20,12 @@ public class JsonBuilder {
     }
 
     public JsonBuilder addSuccessMessage(String message) {
-        addString(Key.error, message);
+        addString(Key.success, message);
         return this;
     }
 
     public JsonBuilder addErrorMessage(String message) {
-        addString(Key.success, message);
+        addString(Key.error, message);
         return this;
     }
 

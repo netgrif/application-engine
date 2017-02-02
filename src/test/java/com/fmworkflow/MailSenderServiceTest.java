@@ -16,6 +16,6 @@ public class MailSenderServiceTest {
 
     @Test
     public void testSend() throws Exception {
-        service.sendRegistrationEmail("valdyreinn@gmail.com");
+        service.sendRegistrationEmail("valdyreinn@gmail.com", "token");
     }
 }
