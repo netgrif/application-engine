@@ -16,6 +16,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.security.Principal;
@@ -31,8 +32,14 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Autowired
     private UserDetailsService userDetailsService;
 
-    @RequestMapping(value = "/{path:[^\\.]*}")
+    @RequestMapping(value = "{path:[^res][^\\.]*$}")
     public String redirect() {
+        log.info("Forwarding to root");
+        return "forward:/";
+    }
+
+    @RequestMapping(value = "/login/signup", method = RequestMethod.GET)
+    public String registrationRedirect() {
         return "forward:/";
     }
 
@@ -62,8 +69,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         http
             .httpBasic().and()
             .authorizeRequests()
-                .antMatchers("/bower_components/**","/scripts/**","/assets/**","/styles/**","/views/**","/favicon.ico").permitAll()
-                .antMatchers("/index.html", "/", "/login", "/login/token/{token}").permitAll()
+                .antMatchers("/bower_components/**","/scripts/**","/assets/**","/styles/**","/views/**","/**/favicon.ico").permitAll()
+                .antMatchers("/index.html", "/", "/login", "/login/signup","/test").permitAll()
                 .anyRequest().authenticated()
                 .and()
             .csrf()
