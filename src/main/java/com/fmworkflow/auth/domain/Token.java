@@ -29,6 +29,12 @@ public class Token {
         expirationDate = DateTime.now().plusDays(3).toDate();
     }
 
+    public Token(String email, String token) {
+        this();
+        this.email = email;
+        this.hashedToken = token;
+    }
+
     public String getEmail() {
         return email;
     }

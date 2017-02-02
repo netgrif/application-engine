@@ -9,6 +9,7 @@ import org.springframework.ui.velocity.VelocityEngineUtils;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -23,10 +24,12 @@ public class MailService implements IMailService {
 
     private VelocityEngine velocityEngine;
 
-    public void sendRegistrationEmail(String recipient) throws MessagingException {
+    public void sendRegistrationEmail(String recipient, String token) throws MessagingException {
         List<String> recipients = new LinkedList<>();
         recipients.add(recipient);
-        MimeMessage email = buildEmail(EmailType.REGISTRATION, recipients, null);
+        Map<String, Object> model = new HashMap<>();
+        model.put("token", token);
+        MimeMessage email = buildEmail(EmailType.REGISTRATION, recipients, model);
         mailSender.send(email);
     }
 
