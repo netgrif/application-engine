@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.math.BigInteger;
+import java.security.SecureRandom;
 import java.util.List;
 
 @Service
@@ -35,6 +37,16 @@ public class TokenService implements ITokenService {
             return true;
         }
         return false;
+    }
+
+    @Override
+    public Token createToken(String email) {
+        String hash = new BigInteger(260, new SecureRandom()).toString(32);
+        Token token = new Token(email, hash);
+
+        tokenRepository.save(token);
+
+        return token;
     }
 
     private boolean isValid(Token token) {
