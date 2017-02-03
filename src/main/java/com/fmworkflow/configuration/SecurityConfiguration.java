@@ -16,7 +16,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.security.Principal;
@@ -38,11 +37,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         return "forward:/";
     }
 
-    @RequestMapping(value = "/login/signup", method = RequestMethod.GET)
-    public String registrationRedirect() {
-        return "forward:/";
-    }
-
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
         auth.userDetailsService(userDetailsService).passwordEncoder(bCryptPasswordEncoder());
@@ -58,11 +52,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     public Principal user(Principal user) {
         return user;
     }
-
-//    @RequestMapping("/token")
-//    public Map<String,String> token(HttpSession session) {
-//        return Collections.singletonMap("token", session.getId());
-//    }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
