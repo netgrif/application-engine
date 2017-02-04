@@ -7,6 +7,7 @@ import org.xml.sax.SAXException;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 public interface IPetriNetService {
 
@@ -15,4 +16,6 @@ public interface IPetriNetService {
     void savePetriNet(PetriNet petriNet);
 
     PetriNet loadPetriNet(String id);
+
+    List<PetriNet> loadAll();
 }

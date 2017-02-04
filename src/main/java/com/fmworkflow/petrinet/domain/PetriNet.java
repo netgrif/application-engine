@@ -78,6 +78,13 @@ public class PetriNet {
         this.arcs.add(arc);
     }
 
+    public void initializeArcs() {
+        for (Arc arc : this.arcs) {
+            arc.setSource(getNode(arc.getSourceId()));
+            arc.setDestination(getNode(arc.getDestinationId()));
+        }
+    }
+
     public Node getNode(ObjectId id) {
         Optional<Place> p = places.stream().filter(place->place.getObjectId().equals(id)).findFirst();
         if (p.isPresent())
