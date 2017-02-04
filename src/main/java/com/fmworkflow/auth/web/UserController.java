@@ -82,5 +82,7 @@ public class UserController {
         public String name;
         public String surname;
         public String password;
+
+        public RegistrationRequest() {}
     }
 }

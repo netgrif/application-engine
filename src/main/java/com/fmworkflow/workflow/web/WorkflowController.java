@@ -52,5 +52,7 @@ public class WorkflowController {
     class CreateBody {
         public String title;
         public String netId;
+
+        public CreateBody() {}
     }
 }
