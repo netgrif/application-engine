@@ -5,6 +5,7 @@ import com.fmworkflow.petrinet.domain.Place;
 import com.fmworkflow.petrinet.service.IPetriNetService;
 import com.fmworkflow.workflow.domain.Case;
 import com.fmworkflow.workflow.service.IWorkflowService;
+import com.fmworkflow.workflow.web.requestbodies.CreateBody;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -47,12 +48,5 @@ public class WorkflowController {
     @RequestMapping(value = "/all", method = RequestMethod.GET)
     public List<Case> getAll() {
         return workflowService.getAll();
-    }
-
-    class CreateBody {
-        public String title;
-        public String netId;
-
-        public CreateBody() {}
     }
 }

@@ -3,6 +3,7 @@ package com.fmworkflow.petrinet.web;
 import com.fmworkflow.json.JsonBuilder;
 import com.fmworkflow.petrinet.domain.PetriNet;
 import com.fmworkflow.petrinet.service.IPetriNetService;
+import com.fmworkflow.petrinet.web.requestbodies.ImportBody;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.xml.sax.SAXException;
@@ -38,12 +39,5 @@ public class PetriNetController {
     @RequestMapping(value = "/all", method = RequestMethod.GET)
     public List<PetriNet> getAll() {
         return service.loadAll();
-    }
-
-    class ImportBody {
-        public File xmlFile;
-        public String title;
-
-        public ImportBody() {}
     }
 }
