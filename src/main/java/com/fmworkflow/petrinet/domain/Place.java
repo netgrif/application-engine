@@ -1,12 +1,14 @@
 package com.fmworkflow.petrinet.domain;
 
+import org.springframework.data.mongodb.core.mapping.Document;
+
+@Document
 public class Place extends Node {
     private int tokens;
     private boolean isStatic;
 
-    @Override
-    public void persist() {
-        System.out.println("Persisting Place [ " + this.toString() + " ]");
+    public Place() {
+        super();
     }
 
     public int getTokens() {

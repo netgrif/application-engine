@@ -1,25 +1,16 @@
 package com.fmworkflow.petrinet.domain;
 
-import com.fmworkflow.Persistable;
+import org.springframework.data.mongodb.core.mapping.Document;
 
+@Document
 public class Transition extends Node {
-    String title;
 
-    @Override
-    public void persist() {
-        System.out.println("Persisting Transition [ " + this.toString() + " ]");
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
+    public Transition() {
+        super();
     }
 
     @Override
     public String toString() {
-        return title;
+        return this.getTitle();
     }
 }

@@ -33,6 +33,18 @@ public class JsonBuilder {
         return json.toString();
     }
 
+    public static String errorMessage(String message) {
+        return init()
+                .addErrorMessage(message)
+                .build();
+    }
+
+    public static String successMessage(String message) {
+        return init()
+                .addSuccessMessage(message)
+                .build();
+    }
+
     enum Key {
         success,
         error
