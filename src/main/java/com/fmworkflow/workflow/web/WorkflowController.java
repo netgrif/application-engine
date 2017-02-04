@@ -16,7 +16,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-@RestController("/workflow")
+@RestController()
+@RequestMapping("/workflow")
 public class WorkflowController {
 
     @Autowired
