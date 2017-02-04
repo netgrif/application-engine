@@ -1,23 +1,26 @@
 package com.fmworkflow.petrinet.domain;
 
-import com.fmworkflow.Persistable;
+import org.bson.types.ObjectId;
+import org.springframework.data.annotation.Transient;
 
-public class Arc implements Persistable {
+public class Arc extends PetriNetObject {
+    @Transient
     private Node source;
+    private ObjectId sourceId;
+    @Transient
     private Node destination;
+    private ObjectId destinationId;
     private int multiplicity;
 
-    public Arc() {}
-
-    public Arc(Node source, Node destination, int multiplicity) {
-        this.source = source;
-        this.destination = destination;
-        this.multiplicity = multiplicity;
+    public Arc() {
+        this.setObjectId(new ObjectId());
     }
 
-    @Override
-    public void persist() {
-        System.out.println("Persisting Arc [" + toString() + " ]");
+    public Arc(Node source, Node destination, int multiplicity) {
+        this();
+        this.setSource(source);
+        this.setDestination(destination);
+        this.multiplicity = multiplicity;
     }
 
     public Node getSource() {
@@ -26,6 +29,7 @@ public class Arc implements Persistable {
 
     public void setSource(Node source) {
         this.source = source;
+        this.sourceId = source.getObjectId();
     }
 
     public Node getDestination() {
@@ -34,6 +38,7 @@ public class Arc implements Persistable {
 
     public void setDestination(Node destination) {
         this.destination = destination;
+        this.destinationId = destination.getObjectId();
     }
 
     public int getMultiplicity() {
@@ -42,6 +47,22 @@ public class Arc implements Persistable {
 
     public void setMultiplicity(int multiplicity) {
         this.multiplicity = multiplicity;
+    }
+
+    public ObjectId getSourceId() {
+        return sourceId;
+    }
+
+    public void setSourceId(ObjectId sourceId) {
+        this.sourceId = sourceId;
+    }
+
+    public ObjectId getDestinationId() {
+        return destinationId;
+    }
+
+    public void setDestinationId(ObjectId destinationId) {
+        this.destinationId = destinationId;
     }
 
     @Override

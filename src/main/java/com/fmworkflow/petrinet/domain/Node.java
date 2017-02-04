@@ -1,12 +1,17 @@
 package com.fmworkflow.petrinet.domain;
 
-import com.fmworkflow.Persistable;
+import org.bson.types.ObjectId;
+import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.util.Set;
-
-public abstract class Node extends Editable2D {
+@Document
+public abstract class Node extends PetriNetObject {
+    private Position position;
     private String title;
-    private Set<Arc> arcs;
+
+    public Node() {
+        this.setObjectId(new ObjectId());
+        position = new Position();
+    }
 
     public String getTitle() {
         return title;
@@ -14,5 +19,22 @@ public abstract class Node extends Editable2D {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public Position getPosition() {
+        return position;
+    }
+
+    public void setPositionX(int x) {
+        position.setX(x);
+    }
+
+    public void setPositionY(int y) {
+        position.setY(y);
+    }
+
+    public void setPosition(int x, int y) {
+        position.setX(x);
+        position.setY(y);
     }
 }
