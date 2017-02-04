@@ -4,6 +4,7 @@ import com.fmworkflow.auth.domain.Token;
 import com.fmworkflow.auth.domain.User;
 import com.fmworkflow.auth.service.ITokenService;
 import com.fmworkflow.auth.service.IUserService;
+import com.fmworkflow.auth.web.requestbodies.RegistrationRequest;
 import com.fmworkflow.json.JsonBuilder;
 import com.fmworkflow.mail.IMailService;
 import org.slf4j.Logger;
@@ -74,15 +75,5 @@ public class UserController {
                     .addErrorMessage("Sending mail unsuccessful")
                     .build();
         }
-    }
-
-    public class RegistrationRequest {
-        public String token;
-        public String email;
-        public String name;
-        public String surname;
-        public String password;
-
-        public RegistrationRequest() {}
     }
 }
