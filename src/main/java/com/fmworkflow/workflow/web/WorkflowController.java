@@ -6,6 +6,7 @@ import com.fmworkflow.petrinet.service.IPetriNetService;
 import com.fmworkflow.workflow.domain.Case;
 import com.fmworkflow.workflow.service.IWorkflowService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -27,8 +28,8 @@ public class WorkflowController {
     private IWorkflowService workflowService;
 
     @RequestMapping(value = "/create", method = RequestMethod.POST)
-    public void createCase(@PathParam(value = "title") String title, @PathParam(value = "petriNetId") String netId) {
-        PetriNet petriNet = petriNetService.loadPetriNet(netId);
+    public void createCase(@RequestBody CreateBody body) {
+        PetriNet petriNet = petriNetService.loadPetriNet(body.netId);
         Map<String, Integer> activePlaces = new HashMap<>();
         Set<Place> places = petriNet.getPlaces();
         for (Place place : places) {
@@ -36,7 +37,7 @@ public class WorkflowController {
                 activePlaces.put(place.getObjectId().toString(), place.getTokens());
             }
         }
-        Case useCase = new Case(title);
+        Case useCase = new Case(body.title);
         useCase.setPetriNet(petriNet);
         useCase.setActivePlaces(activePlaces);
 
@@ -46,5 +47,10 @@ public class WorkflowController {
     @RequestMapping(value = "/all", method = RequestMethod.GET)
     public List<Case> getAll() {
         return workflowService.getAll();
+    }
+
+    class CreateBody {
+        public String title;
+        public String netId;
     }
 }
