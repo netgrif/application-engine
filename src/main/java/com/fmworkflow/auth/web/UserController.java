@@ -62,7 +62,7 @@ public class UserController {
     }
 
     @RequestMapping(value = "/invite", method = RequestMethod.POST)
-    public String invite(@RequestParam(name = "email") @Email String email) {
+    public String invite(@RequestParam(name = "email") String email) {
         try {
             Token token = tokenService.createToken(email);
             mailService.sendRegistrationEmail(email, token.getHashedToken());
