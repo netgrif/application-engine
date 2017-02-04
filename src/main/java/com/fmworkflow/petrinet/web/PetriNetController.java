@@ -43,5 +43,7 @@ public class PetriNetController {
     class ImportBody {
         public File xmlFile;
         public String title;
+
+        public ImportBody() {}
     }
 }
