@@ -1,9 +1,9 @@
 package com.fmworkflow.petrinet.service;
 
-import com.fmworkflow.Persistable;
 import com.fmworkflow.petrinet.domain.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
@@ -14,12 +14,17 @@ import java.util.Map;
 public class ImportHandler extends DefaultHandler {
     private final Logger log = LoggerFactory.getLogger(ImportHandler.class);
 
-    private Map<Integer, Node> nodes;
-    private Element element;
-    private Persistable object;
+    @Autowired
+    private PetriNetRepository repository;
 
-    public ImportHandler() {
-        nodes = new HashMap<>();
+    private Map<Integer, Node> nodes;
+    private PetriNet net;
+    private Element element;
+    private PetriNetObject object;
+
+    public ImportHandler(PetriNet net) {
+        this.net = net;
+        this.nodes = new HashMap<>();
     }
 
     @Override
@@ -49,13 +54,12 @@ public class ImportHandler extends DefaultHandler {
 
     @Override
     public void endElement(String uri, String localName, String qName) throws SAXException {
-        element = Element.fromString(qName);
-        switch (element) {
-            case PLACE:
-            case TRANSITION:
-            case ARC:
-                object.persist();
-        }
+        if (object instanceof Arc)
+            net.addArc((Arc) object);
+        else if (object instanceof Transition)
+            net.addTransition((Transition) object);
+        else if (object instanceof Place)
+            net.addPlace((Place) object);
         element = Element.DOCUMENT;
     }
 
