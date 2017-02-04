@@ -4,10 +4,7 @@ import com.fmworkflow.json.JsonBuilder;
 import com.fmworkflow.petrinet.domain.PetriNet;
 import com.fmworkflow.petrinet.service.IPetriNetService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -21,9 +18,9 @@ public class PetriNetController {
     private IPetriNetService service;
 
     @RequestMapping(value = "/import", method = RequestMethod.POST)
-    public String importPetriNet(@RequestParam("file") File xmlFile, @RequestParam("title") String title) {
+    public String importPetriNet(@RequestBody ImportBody body) {
         try {
-            service.importPetriNet(xmlFile, title);
+            service.importPetriNet(body.xmlFile, body.title);
             return JsonBuilder.successMessage("Petri net imported successfully");
         } catch (SAXException e) {
             e.printStackTrace();
@@ -40,5 +37,10 @@ public class PetriNetController {
     @RequestMapping(value = "/all", method = RequestMethod.GET)
     public List<PetriNet> getAll() {
         return service.loadAll();
+    }
+
+    class ImportBody {
+        public File xmlFile;
+        public String title;
     }
 }
