@@ -44,8 +44,8 @@ public class UserController {
 
     @RequestMapping(value = "/signup", method = RequestMethod.POST)
     public String registration(@RequestBody RegistrationRequest regRequest) {
-        if (tokenService.authorizeToken(regRequest.getEmail(), regRequest.getToken())) {
-            User user = new User(regRequest.getEmail(), regRequest.getPassword(), regRequest.getName(), regRequest.getSurname());
+        if (tokenService.authorizeToken(regRequest.email, regRequest.token)) {
+            User user = new User(regRequest.email, regRequest.password, regRequest.name, regRequest.surname);
             userService.save(user);
 
             return JsonBuilder.init()
@@ -77,53 +77,10 @@ public class UserController {
     }
 
     public class RegistrationRequest {
-
-        private String token;
-        private String email;
-        private String name;
-        private String surname;
-        private String password;
-
-        RegistrationRequest(){}
-
-        public String getToken() {
-            return token;
-        }
-
-        public void setToken(String token) {
-            this.token = token;
-        }
-
-        public String getEmail() {
-            return email;
-        }
-
-        public void setEmail(String email) {
-            this.email = email;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public void setName(String name) {
-            this.name = name;
-        }
-
-        public String getSurname() {
-            return surname;
-        }
-
-        public void setSurname(String surname) {
-            this.surname = surname;
-        }
-
-        public String getPassword() {
-            return password;
-        }
-
-        public void setPassword(String password) {
-            this.password = password;
-        }
+        public String token;
+        public String email;
+        public String name;
+        public String surname;
+        public String password;
     }
 }

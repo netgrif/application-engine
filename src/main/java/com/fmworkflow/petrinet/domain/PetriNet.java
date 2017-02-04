@@ -86,6 +86,13 @@ public class PetriNet {
         return t.orElse(null);
     }
 
+    public void initializeArcs() {
+        for (Arc arc : this.arcs) {
+            arc.setSource(getNode(arc.getSourceId()));
+            arc.setDestination(getNode(arc.getDestinationId()));
+        }
+    }
+
     @Override
     public String toString() {
         return title;
