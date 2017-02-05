@@ -12,6 +12,7 @@ public class Task {
     private Long id;
     private String caseId;
     private String title;
+    private String transitionId;
     @ManyToOne
     private User user;
     private DateTime startDate;
@@ -47,5 +48,29 @@ public class Task {
 
     public void setFinishDate(DateTime finishDate) {
         this.finishDate = finishDate;
+    }
+
+    public String getCaseId() {
+        return caseId;
+    }
+
+    public void setCaseId(String caseId) {
+        this.caseId = caseId;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public String getTransitionId() {
+        return transitionId;
+    }
+
+    public void setTransitionId(String transitionId) {
+        this.transitionId = transitionId;
     }
 }
