@@ -27,6 +27,10 @@ public class Arc extends PetriNetObject {
         return (source instanceof Place)?((Place) source):((Place) destination);
     }
 
+    public Transition getTransition() {
+        return (source instanceof Transition)?((Transition) source):((Transition) destination);
+    }
+
     public Node getSource() {
         return source;
     }
