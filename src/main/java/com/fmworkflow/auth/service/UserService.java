@@ -13,6 +13,8 @@ import java.util.HashSet;
 @Service
 public class UserService implements IUserService {
     @Autowired
+    private ISecurityService securityService;
+    @Autowired
     private UserRepository userRepository;
     @Autowired
     private RoleRepository roleRepository;
@@ -33,5 +35,10 @@ public class UserService implements IUserService {
     @Override
     public User findByUsername(String email) {
         return userRepository.findByEmail(email);
+    }
+
+    @Override
+    public User getLoggedInUser() {
+        return userRepository.findByEmail(securityService.findLoggedInUsername());
     }
 }
