@@ -23,6 +23,10 @@ public class Arc extends PetriNetObject {
         this.multiplicity = multiplicity;
     }
 
+    public Place getPlace() {
+        return (source instanceof Place)?((Place) source):((Place) destination);
+    }
+
     public Node getSource() {
         return source;
     }

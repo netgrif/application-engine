@@ -34,6 +34,7 @@ public class ImportHandler extends DefaultHandler {
 
     @Override
     public void endDocument() throws SAXException {
+        net.initializeArcs();
         log.debug("Parsing ended");
     }
 
@@ -55,7 +56,7 @@ public class ImportHandler extends DefaultHandler {
     @Override
     public void endElement(String uri, String localName, String qName) throws SAXException {
         if (object instanceof Arc)
-            net.addArc((Arc) object);
+            net.addArcSkelet((Arc) object);
         else if (object instanceof Transition)
             net.addTransition((Transition) object);
         else if (object instanceof Place)
