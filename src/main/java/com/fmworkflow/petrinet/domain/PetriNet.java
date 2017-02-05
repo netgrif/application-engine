@@ -1,5 +1,6 @@
 package com.fmworkflow.petrinet.domain;
 
+import com.fmworkflow.workflow.domain.dataset.DataSet;
 import org.bson.types.ObjectId;
 import org.joda.time.DateTime;
 import org.springframework.data.annotation.Id;
@@ -23,6 +24,8 @@ public class PetriNet {
     private Map<String, List<Arc>> arcs;
     @Transient
     private Set<Arc> arcsSkeleton;
+    @Field("dataset")
+    private DataSet dataSet;
 
     public PetriNet() {
         creationDate = DateTime.now();
@@ -78,6 +81,14 @@ public class PetriNet {
 
     public void setArcs(Map<String, List<Arc>> arcs) {
         this.arcs = arcs;
+    }
+
+    public DataSet getDataSet() {
+        return dataSet;
+    }
+
+    public void setDataSet(DataSet dataSet) {
+        this.dataSet = dataSet;
     }
 
     public void addArcSkelet(Arc arc) {

@@ -6,14 +6,12 @@ import com.fmworkflow.json.JsonBuilder;
 import com.fmworkflow.petrinet.domain.throwable.TransitionNotStartableException;
 import com.fmworkflow.workflow.domain.Case;
 import com.fmworkflow.workflow.domain.Task;
+import com.fmworkflow.workflow.domain.dataset.DataSet;
 import com.fmworkflow.workflow.service.ITaskService;
 import com.fmworkflow.workflow.service.IWorkflowService;
 import com.fmworkflow.workflow.web.requestbodies.CreateBody;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -80,5 +78,10 @@ public class WorkflowController {
             e.printStackTrace();
             return JsonBuilder.errorMessage("Task cannot be finished");
         }
+    }
+
+    @RequestMapping(value = "/data/{case}/{transition}", method = RequestMethod.GET)
+    public DataSet getDataSet(@PathVariable("case") String caseId, @PathVariable("transition") String transitionId){
+        return workflowService.getDataForTransition(caseId, transitionId);
     }
 }

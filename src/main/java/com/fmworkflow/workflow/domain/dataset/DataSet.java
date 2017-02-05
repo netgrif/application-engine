@@ -18,6 +18,11 @@ public class DataSet {
         fields = new ArrayList<>();
     }
 
+    public DataSet(DateTime lastUpdate) {
+        this();
+        this.lastUpdate = lastUpdate;
+    }
+
     public DateTime getLastUpdate() {
         return lastUpdate;
     }
@@ -32,5 +37,32 @@ public class DataSet {
 
     public void setFields(List<Field> fields) {
         this.fields = fields;
+    }
+
+    public void addField(Field field){
+        fields.add(field);
+    }
+
+    public DataSet getFieldsForTransition(String transitionId){
+        DataSet partial = new DataSet(this.getLastUpdate());
+        for(Field field:this.getFields()){
+            if(field.getDisplayForTransitions().contains(transitionId)){
+                partial.addField(field);
+            } else if(field.getEditableForTransitions().contains(transitionId)){
+                field.setEditable(true);
+                partial.addField(field);
+            }
+        }
+
+        return partial;
+    }
+
+    public DataSet copy(){
+        DataSet copied = new DataSet(this.getLastUpdate());
+        for(Field field:this.getFields()){
+            copied.addField(field.copy());
+        }
+
+        return copied;
     }
 }
