@@ -13,14 +13,18 @@ import java.util.Set;
 @Document
 public class TextField extends Field {
 
+    public static final int TEXTFIELD_TYPE = 1;
+
     private String value;
     private Validation validate;
 
     public TextField() {
         super();
+        this.setType(TEXTFIELD_TYPE);
     }
 
     public TextField(String value, Validation validate) {
+        this();
         this.value = value;
         this.validate = validate;
     }
@@ -45,6 +49,11 @@ public class TextField extends Field {
         EMAIL,
         TEXT,
         URL
+    }
+
+    @Override
+    public void modifyValue(String newValue) {
+        this.value = newValue;
     }
 
     @Override
