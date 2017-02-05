@@ -1,11 +1,9 @@
 package com.fmworkflow.workflow.web;
 
 import com.fmworkflow.auth.domain.User;
-import com.fmworkflow.auth.service.ISecurityService;
 import com.fmworkflow.auth.service.IUserService;
-import com.fmworkflow.petrinet.domain.PetriNet;
-import com.fmworkflow.petrinet.domain.Place;
-import com.fmworkflow.petrinet.service.IPetriNetService;
+import com.fmworkflow.json.JsonBuilder;
+import com.fmworkflow.petrinet.domain.throwable.TransitionNotStartableException;
 import com.fmworkflow.workflow.domain.Case;
 import com.fmworkflow.workflow.domain.Task;
 import com.fmworkflow.workflow.service.ITaskService;
@@ -17,11 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.websocket.server.PathParam;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 @RestController()
 @RequestMapping("/workflow")
@@ -31,29 +25,20 @@ public class WorkflowController {
     private IUserService userService;
 
     @Autowired
-    private IPetriNetService petriNetService;
-
-    @Autowired
     private IWorkflowService workflowService;
 
     @Autowired
     private ITaskService taskService;
 
     @RequestMapping(value = "/create", method = RequestMethod.POST)
-    public void createCase(@RequestBody CreateBody body) {
-        PetriNet petriNet = petriNetService.loadPetriNet(body.netId);
-        Map<String, Integer> activePlaces = new HashMap<>();
-        Map<String, Place> places = petriNet.getPlaces();
-        for (Place place : places.values()) {
-            if (place.getTokens() > 0) {
-                activePlaces.put(place.getObjectId().toString(), place.getTokens());
-            }
+    public String createCase(@RequestBody CreateBody body) {
+        try {
+            workflowService.createCase(body.netId, body.title);
+            return JsonBuilder.successMessage("Case created successfully");
+        } catch (Exception e) { // TODO: 5. 2. 2017 change to custom exception
+            e.printStackTrace();
+            return JsonBuilder.errorMessage("Failed to create case");
         }
-        Case useCase = new Case(body.title);
-        useCase.setPetriNet(petriNet);
-        useCase.setActivePlaces(activePlaces);
-
-        workflowService.saveCase(useCase);
     }
 
     @RequestMapping(value = "/all", method = RequestMethod.GET)
@@ -66,6 +51,20 @@ public class WorkflowController {
         return taskService.findByCaseId(caseId);
     }
 
+    @RequestMapping(value = "/taketask", method = RequestMethod.POST)
+    public String takeTask(@RequestBody String taskId) {
+        try {
+            taskService.takeTask(taskId);
+            return JsonBuilder.successMessage("Task taken");
+        } catch (TransitionNotStartableException tnse) {
+            tnse.printStackTrace();
+            return JsonBuilder.errorMessage("Task cannot be taken. Please check available tasks again.");
+        } catch (Exception e) { // TODO: 5. 2. 2017 change to custom exception
+            e.printStackTrace();
+            return JsonBuilder.errorMessage("Cannot take task");
+        }
+    }
+
     @RequestMapping(value = "/mytasks", method = RequestMethod.GET)
     public List<Task> viewMyTasks() {
         User user = userService.getLoggedInUser();
@@ -74,6 +73,12 @@ public class WorkflowController {
 
     @RequestMapping(value = "/finish", method = RequestMethod.POST)
     public String finishTask(@RequestBody String taskId) {
-        return ""; // TODO: 5. 2. 2017  
+        try {
+            taskService.finishTask(taskId);
+            return JsonBuilder.successMessage("Task finished successfully");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return JsonBuilder.errorMessage("Task cannot be finished");
+        }
     }
 }
