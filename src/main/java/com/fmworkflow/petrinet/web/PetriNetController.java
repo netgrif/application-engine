@@ -11,6 +11,9 @@ import org.xml.sax.SAXException;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @RestController
@@ -22,7 +25,7 @@ public class PetriNetController {
     @RequestMapping(value = "/import", method = RequestMethod.POST)
     public String importPetriNet(@RequestBody ImportBody body) {
         try {
-            service.importPetriNet(body.xmlFile, body.title);
+            service.importPetriNet(body.xmlFile, URLDecoder.decode(body.title, StandardCharsets.UTF_8.name()));
             return JsonBuilder.successMessage("Petri net imported successfully");
         } catch (SAXException e) {
             e.printStackTrace();
