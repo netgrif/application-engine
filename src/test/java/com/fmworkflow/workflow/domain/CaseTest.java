@@ -3,6 +3,7 @@ package com.fmworkflow.workflow.domain;
 import com.fmworkflow.petrinet.domain.PetriNet;
 import com.fmworkflow.petrinet.domain.Place;
 import com.fmworkflow.petrinet.service.IPetriNetService;
+import com.fmworkflow.workflow.domain.dataset.DataSet;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
