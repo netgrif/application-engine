@@ -8,4 +8,6 @@ public interface IWorkflowService {
     void saveCase(Case useCase);
 
     List<Case> getAll();
+
+    void createCase(String netId, String title);
 }

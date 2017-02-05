@@ -10,6 +10,10 @@ public abstract class PetriNetObject {
     private ObjectId _id;
     private Integer id;
 
+    public String getStringId() {
+        return id.toString();
+    }
+
     public ObjectId getObjectId() {
         return _id;
     }
