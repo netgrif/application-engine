@@ -7,10 +7,7 @@ import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @Document
 public class PetriNet {
@@ -19,19 +16,20 @@ public class PetriNet {
     private String title;
     private DateTime creationDate;
     @Field("places")
-    private Set<Place> places;
-    // TODO: 4. 2. 2017 use @Transient Map<String, Place> with @PersistenceConstructor
+    private Map<String, Place> places;
     @Field("transitions")
-    private Set<Transition> transitions;
-    // TODO: 4. 2. 2017 use @Transient Map<String, Transition> with @PersistenceConstructor
+    private Map<String, Transition> transitions;
     @Field("arcs")
-    private Set<Arc> arcs;
+    private Map<String, List<Arc>> arcs;
+    @Transient
+    private Set<Arc> arcsSkeleton;
 
     public PetriNet() {
         creationDate = DateTime.now();
-        this.places = new HashSet<>();
-        this.transitions = new HashSet<>();
-        this.arcs = new HashSet<>();
+        this.places = new HashMap<>();
+        this.transitions = new HashMap<>();
+        this.arcs = new HashMap<>();
+        this.arcsSkeleton = new HashSet<>();
     }
 
     public String getTitle() {
@@ -42,54 +40,75 @@ public class PetriNet {
         this.title = title;
     }
 
-    public Set<Place> getPlaces() {
+    public Map<String, Place> getPlaces() {
         return places;
     }
 
-    public void setPlaces(Set<Place> places) {
+    public void setPlaces(Map<String, Place> places) {
         this.places = places;
     }
 
     public void addPlace(Place place) {
-        this.places.add(place);
+        this.places.put(place.getObjectId().toString(), place);
     }
 
-    public Set<Transition> getTransitions() {
+    public Map<String, Transition> getTransitions() {
         return transitions;
     }
 
-    public void setTransitions(Set<Transition> transitions) {
+    public void setTransitions(Map<String, Transition> transitions) {
         this.transitions = transitions;
     }
 
     public void addTransition(Transition transition) {
-        this.transitions.add(transition);
+        this.transitions.put(transition.getObjectId().toString(), transition);
     }
 
-    public Set<Arc> getArcs() {
+    public Map<String, List<Arc>> getArcs() {
         return arcs;
     }
 
-    public void setArcs(Set<Arc> arcs) {
+    public void setArcs(Map<String, List<Arc>> arcs) {
         this.arcs = arcs;
     }
 
+    public void addArcSkelet(Arc arc) {
+        arcsSkeleton.add(arc);
+    }
+
     public void addArc(Arc arc) {
-        this.arcs.add(arc);
+        String placeId = arc.getPlace().getObjectId().toString();
+        if (arcs.containsKey(placeId))
+            arcs.get(placeId).add(arc);
+        else {
+            List<Arc> arcList = new LinkedList<>();
+            arcList.add(arc);
+            arcs.put(placeId, arcList);
+        }
     }
 
     public Node getNode(ObjectId id) {
-        Optional<Place> p = places.stream().filter(place->place.getObjectId().equals(id)).findFirst();
-        if (p.isPresent())
-            return p.get();
-        Optional<Transition> t = transitions.stream().filter(transition -> transition.getObjectId().equals(id)).findFirst();
-        return t.orElse(null);
+        String stringId = id.toString();
+        if (places.containsKey(stringId))
+            return getPlace(stringId);
+        if (transitions.containsKey(stringId))
+            return getTransition(stringId);
+        return null;
+    }
+
+    public Place getPlace(String id) {
+        return places.get(id);
+    }
+
+    public Transition getTransition(String id) {
+        return transitions.get(id);
     }
 
     public void initializeArcs() {
-        for (Arc arc : this.arcs) {
+        for (Arc arc : this.arcsSkeleton) {
             arc.setSource(getNode(arc.getSourceId()));
             arc.setDestination(getNode(arc.getDestinationId()));
+            addArc(arc);
         }
     }
 
