@@ -13,7 +13,9 @@ import com.fmworkflow.workflow.web.requestbodies.CreateBody;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController()
 @RequestMapping("/workflow")
@@ -83,5 +85,10 @@ public class WorkflowController {
     @RequestMapping(value = "/data/{case}/{transition}", method = RequestMethod.GET)
     public DataSet getDataSet(@PathVariable("case") String caseId, @PathVariable("transition") String transitionId){
         return workflowService.getDataForTransition(caseId, transitionId);
+    }
+
+    @RequestMapping(value = "/data/{case}", method = RequestMethod.POST)
+    public void modifyData(@PathVariable("case")String caseId, @RequestBody Map<String, String> values){
+        workflowService.modifyData(caseId, values);
     }
 }
