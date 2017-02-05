@@ -19,6 +19,7 @@ public abstract class Field {
     private ObjectId _id;
     private String name;
     private String description;
+    private int type;
     @org.springframework.data.mongodb.core.mapping.Field("show")
     private Set<String> displayForTransitions;
     @org.springframework.data.mongodb.core.mapping.Field("edit")
@@ -55,6 +56,14 @@ public abstract class Field {
         this.description = description;
     }
 
+    public int getType() {
+        return type;
+    }
+
+    public void setType(int type) {
+        this.type = type;
+    }
+
     public Set<String> getDisplayForTransitions() {
         return displayForTransitions;
     }
@@ -78,6 +87,8 @@ public abstract class Field {
     public void setEditable(boolean editable) {
         this.editable = editable;
     }
+
+    public void modifyValue(String newValue){}
 
     public Field copy(){
         return this;
