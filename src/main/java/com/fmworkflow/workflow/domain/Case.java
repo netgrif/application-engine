@@ -1,6 +1,7 @@
 package com.fmworkflow.workflow.domain;
 
 import com.fmworkflow.petrinet.domain.PetriNet;
+import com.fmworkflow.workflow.domain.dataset.DataSet;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
