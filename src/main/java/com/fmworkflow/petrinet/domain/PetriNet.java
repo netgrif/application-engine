@@ -68,6 +68,14 @@ public class PetriNet {
         return arcs;
     }
 
+    public List<Arc> getArcsOfTransition(Transition transition) {
+        return getArcsOfTransition(transition.getObjectId().toString());
+    }
+
+    public List<Arc> getArcsOfTransition(String transitionId) {
+        return arcs.get(transitionId);
+    }
+
     public void setArcs(Map<String, List<Arc>> arcs) {
         this.arcs = arcs;
     }
@@ -77,13 +85,13 @@ public class PetriNet {
     }
 
     public void addArc(Arc arc) {
-        String placeId = arc.getPlace().getObjectId().toString();
-        if (arcs.containsKey(placeId))
-            arcs.get(placeId).add(arc);
+        String transitionId = arc.getTransition().getObjectId().toString();
+        if (arcs.containsKey(transitionId))
+            arcs.get(transitionId).add(arc);
         else {
             List<Arc> arcList = new LinkedList<>();
             arcList.add(arc);
-            arcs.put(placeId, arcList);
+            arcs.put(transitionId, arcList);
         }
     }
 
