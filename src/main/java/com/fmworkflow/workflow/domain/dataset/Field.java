@@ -2,10 +2,12 @@ package com.fmworkflow.workflow.domain.dataset;
 
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Created by Milan on 5.2.2017.
@@ -18,13 +20,15 @@ public abstract class Field {
     private String name;
     private String description;
     @org.springframework.data.mongodb.core.mapping.Field("show")
-    private List<ObjectId> displayForTransitions;
+    private Set<String> displayForTransitions;
     @org.springframework.data.mongodb.core.mapping.Field("edit")
-    private List<ObjectId> editableForTransitions;
+    private Set<String> editableForTransitions;
+    @Transient
+    private boolean editable;
 
     public Field(){
-        displayForTransitions = new ArrayList<>();
-        editableForTransitions = new ArrayList<>();
+        displayForTransitions = new HashSet<>();
+        editableForTransitions = new HashSet<>();
     }
 
     public ObjectId get_id() {
@@ -51,19 +55,31 @@ public abstract class Field {
         this.description = description;
     }
 
-    public List<ObjectId> getDisplayForTransitions() {
+    public Set<String> getDisplayForTransitions() {
         return displayForTransitions;
     }
 
-    public void setDisplayForTransitions(List<ObjectId> displayForTransitions) {
+    public void setDisplayForTransitions(Set<String> displayForTransitions) {
         this.displayForTransitions = displayForTransitions;
     }
 
-    public List<ObjectId> getEditableForTransitions() {
+    public Set<String> getEditableForTransitions() {
         return editableForTransitions;
     }
 
-    public void setEditableForTransitions(List<ObjectId> editableForTransitions) {
+    public void setEditableForTransitions(Set<String> editableForTransitions) {
         this.editableForTransitions = editableForTransitions;
+    }
+
+    public boolean isEditable() {
+        return editable;
+    }
+
+    public void setEditable(boolean editable) {
+        this.editable = editable;
+    }
+
+    public Field copy(){
+        return this;
     }
 }

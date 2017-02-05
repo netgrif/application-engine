@@ -5,6 +5,7 @@ import com.fmworkflow.petrinet.domain.Place;
 import com.fmworkflow.petrinet.service.IPetriNetService;
 import com.fmworkflow.workflow.domain.Case;
 import com.fmworkflow.workflow.domain.CaseRepository;
+import com.fmworkflow.workflow.domain.dataset.DataSet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -33,6 +34,7 @@ public class WorkflowService implements IWorkflowService {
         PetriNet petriNet = petriNetService.loadPetriNet(netId);
         Map<String, Integer> activePlaces = createActivePlaces(petriNet);
         Case useCase = new Case(title, petriNet, activePlaces);
+        useCase.setDataSet(petriNet.getDataSet().copy());
         saveCase(useCase);
     }
 
@@ -46,4 +48,12 @@ public class WorkflowService implements IWorkflowService {
         }
         return activePlaces;
     }
+
+    @Override
+    public DataSet getDataForTransition(String caseId, String transitionId){
+        Case useCase = repository.findOne(caseId);
+        return useCase.getDataSet().getFieldsForTransition(transitionId);
+    }
+
+
 }
