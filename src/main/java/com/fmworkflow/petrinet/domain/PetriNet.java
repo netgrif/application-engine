@@ -120,6 +120,27 @@ public class PetriNet {
         }
     }
 
+    public Map<Place, Integer> getInputPlaces(Transition transition) {
+        return getIOPlaces(transition, true);
+    }
+
+    public Map<Place, Integer> getOutputPlaces(Transition transition) {
+        return getIOPlaces(transition, false);
+    }
+
+    private Map<Place, Integer> getIOPlaces(Transition transition, boolean input) {
+        List<Arc> transitionsArcs = getArcsOfTransition(transition);
+        Map<Place, Integer> ioPlaces = new HashMap<>();
+
+        for (Arc arc : transitionsArcs) {
+            Node node = (input)?(arc.getDestination()):(arc.getSource());
+            if (node == transition)
+                ioPlaces.put(arc.getPlace(), arc.getMultiplicity());
+        }
+
+        return ioPlaces;
+    }
+
     @Override
     public String toString() {
         return title;
