@@ -1,6 +1,7 @@
 package com.fmworkflow.workflow.service;
 
 import com.fmworkflow.auth.domain.User;
+import com.fmworkflow.petrinet.domain.throwable.TransitionNotStartableException;
 import com.fmworkflow.workflow.domain.Case;
 import com.fmworkflow.workflow.domain.Task;
 
@@ -12,4 +13,8 @@ public interface ITaskService {
     void createTasks(Case useCase);
 
     List<Task> findByUser(User user);
+
+    void finishTask(String taskId);
+
+    void takeTask(String taskId) throws TransitionNotStartableException;
 }
