@@ -3,10 +3,7 @@ package com.fmworkflow.workflow.domain;
 import com.fmworkflow.auth.domain.User;
 import org.joda.time.DateTime;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Entity
 public class Task {
@@ -15,7 +12,8 @@ public class Task {
     private Long id;
     private String caseId;
     private String title;
-//    private User user;
+    @ManyToOne
+    private User user;
     private DateTime startDate;
     private DateTime finishDate;
 
