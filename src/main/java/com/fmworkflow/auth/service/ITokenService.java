@@ -7,4 +7,6 @@ public interface ITokenService {
     void removeExpired();
 
     Token createToken(String email);
+
+    String getEmail(String token);
 }

@@ -9,5 +9,6 @@ import java.util.List;
 @Transactional
 public interface TokenRepository extends JpaRepository<Token, Long> {
     Token findByEmail(String email);
+    Token findByHashedToken(String token);
     List<Token> removeByExpirationDateBefore(Date now);
 }
