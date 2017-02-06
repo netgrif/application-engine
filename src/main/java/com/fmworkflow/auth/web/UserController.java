@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 
 @RestController
 @RequestMapping("/login")
@@ -37,7 +38,7 @@ public class UserController {
     @Autowired
     private IMailService mailService;
 
-    @RequestMapping(value = "/signup", method = RequestMethod.GET)
+    @RequestMapping(value = "/signup/{token}", method = RequestMethod.GET)
     public ModelAndView registrationForward() throws IOException {
         log.info("Forwarding to / from /login/signup");
         return new ModelAndView("forward:/");
@@ -46,6 +47,7 @@ public class UserController {
     @RequestMapping(value = "/signup", method = RequestMethod.POST)
     public String registration(@RequestBody RegistrationRequest regRequest) {
         if (tokenService.authorizeToken(regRequest.email, regRequest.token)) {
+            regRequest.password = new String(Base64.getDecoder().decode(regRequest.password));
             User user = new User(regRequest.email, regRequest.password, regRequest.name, regRequest.surname);
             userService.save(user);
 
@@ -73,6 +75,20 @@ public class UserController {
             log.error(e.toString());
             return JsonBuilder.init()
                     .addErrorMessage("Sending mail unsuccessful")
+                    .build();
+        }
+    }
+
+    @RequestMapping(value = "/token", method = RequestMethod.POST)
+    public String getEmail(@RequestBody String token){
+        String email = tokenService.getEmail(token);
+        if(email != null){
+            return JsonBuilder.init()
+                    .addSuccessMessage(email)
+                    .build();
+        } else {
+            return JsonBuilder.init()
+                    .addErrorMessage("Bad token")
                     .build();
         }
     }
