@@ -18,7 +18,9 @@ public interface ITaskService {
 
     Task findById(Long id);
 
-    void finishTask(String taskId);
+    List<Task> findUserFinishedTasks(User user);
 
-    void takeTask(String taskId) throws TransitionNotStartableException;
+    void finishTask(Long userId, Long taskId) throws Exception;
+
+    void assignTask(User user, Long taskId) throws TransitionNotStartableException;
 }

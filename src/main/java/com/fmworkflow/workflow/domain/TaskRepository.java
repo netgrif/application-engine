@@ -9,4 +9,6 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
     List<Task> findByCaseId(String id);
 
     List<Task> findByUser(User user);
+
+    List<Task> findByUserAndFinishDateNotNull(User user);
 }
