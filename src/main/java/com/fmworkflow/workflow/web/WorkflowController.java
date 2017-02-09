@@ -46,42 +46,6 @@ public class WorkflowController {
         return workflowService.getAll();
     }
 
-    @RequestMapping(value = "/tasks", method = RequestMethod.POST)
-    public List<Task> viewTasks(@RequestBody String caseId) {
-        return taskService.findByCaseId(caseId);
-    }
-
-    @RequestMapping(value = "/taketask", method = RequestMethod.POST)
-    public String takeTask(@RequestBody String taskId) {
-        try {
-            taskService.takeTask(taskId);
-            return JsonBuilder.successMessage("Task taken");
-        } catch (TransitionNotStartableException tnse) {
-            tnse.printStackTrace();
-            return JsonBuilder.errorMessage("Task cannot be taken. Please check available tasks again.");
-        } catch (Exception e) { // TODO: 5. 2. 2017 change to custom exception
-            e.printStackTrace();
-            return JsonBuilder.errorMessage("Cannot take task");
-        }
-    }
-
-    @RequestMapping(value = "/mytasks", method = RequestMethod.GET)
-    public List<Task> viewMyTasks() {
-        User user = userService.getLoggedInUser();
-        return taskService.findByUser(user);
-    }
-
-    @RequestMapping(value = "/finish", method = RequestMethod.POST)
-    public String finishTask(@RequestBody String taskId) {
-        try {
-            taskService.finishTask(taskId);
-            return JsonBuilder.successMessage("Task finished successfully");
-        } catch (Exception e) {
-            e.printStackTrace();
-            return JsonBuilder.errorMessage("Task cannot be finished");
-        }
-    }
-
     @RequestMapping(value = "/data/{case}/{transition}", method = RequestMethod.GET)
     public DataSet getDataSet(@PathVariable("case") String caseId, @PathVariable("transition") String transitionId){
         return workflowService.getDataForTransition(caseId, transitionId);

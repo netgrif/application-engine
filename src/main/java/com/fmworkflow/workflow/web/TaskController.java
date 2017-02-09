@@ -1,5 +1,8 @@
 package com.fmworkflow.workflow.web;
 
+import com.fmworkflow.auth.domain.LoggedUser;
+import com.fmworkflow.json.JsonBuilder;
+import com.fmworkflow.petrinet.domain.throwable.TransitionNotStartableException;
 import com.fmworkflow.workflow.domain.Task;
 import com.fmworkflow.workflow.domain.TaskResource;
 import com.fmworkflow.workflow.domain.TasksResource;
@@ -40,27 +43,66 @@ public class TaskController {
 
     @RequestMapping(value = "/assign/{id}", method = RequestMethod.GET)
     public String assign(Authentication auth, @PathVariable("id") Long taskId){
-        return null;
+        LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
+        try {
+            taskService.assignTask(loggedUser.transformToUser(), taskId);
+            return JsonBuilder.init()
+                    .addSuccessMessage("Task "+taskId+" assigned to "+loggedUser.getFullName())
+                    .build();
+
+        } catch (TransitionNotStartableException e){
+            return JsonBuilder.init()
+                    .addErrorMessage("Task "+taskId+" cannot be assigned")
+                    .build();
+        }
     }
 
     @RequestMapping(value = "/finish/{id}", method = RequestMethod.GET)
     public String finish(Authentication auth, @PathVariable("id") Long taskId){
-        return null;
+        LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
+        try {
+            taskService.finishTask(loggedUser.getId(), taskId);
+            return JsonBuilder.init()
+                    .addSuccessMessage("Task +"+taskId+" finished")
+                    .build();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return JsonBuilder.init()
+                    .addErrorMessage(e.getMessage())
+                    .build();
+        }
     }
 
     @RequestMapping(value = "/my")
     public TasksResource getMy(Authentication auth){
-        return null;
+        List<TaskResource> resources = new ArrayList<>();
+        for(Task task:taskService.findByUser(((LoggedUser)auth.getPrincipal()).transformToUser())){
+            resources.add(TaskResource.createFrom(task,auth));
+        }
+
+        TasksResource tasksResource = new TasksResource(resources);
+        tasksResource.addLinks("my");
+
+        return tasksResource;
     }
 
     @RequestMapping(value = "/my/finished")
     public TasksResource getMyFinished(Authentication auth){
-        return null;
+        List<TaskResource> resources = new ArrayList<>();
+        for(Task task:taskService.findByUser(((LoggedUser)auth.getPrincipal()).transformToUser())){
+            resources.add(TaskResource.createFrom(task, auth));
+        }
+
+        TasksResource tasksResources = new TasksResource(resources);
+        tasksResources.addLinks("finished");
+
+        return tasksResources;
     }
 
     @RequestMapping(value = "/search", method = RequestMethod.POST)
     public TasksResource search(@RequestBody TaskSearchBody searchBody){
-        return null;
+        return getAll(); //TODO: 9.2.2017 - search on tasks according to posted json
     }
 
 
