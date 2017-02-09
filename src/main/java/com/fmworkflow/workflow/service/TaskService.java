@@ -24,8 +24,18 @@ public class TaskService implements ITaskService {
     private CaseRepository caseRepository;
 
     @Override
+    public List<Task> getAll(){
+        return taskRepository.findAll();
+    }
+
+    @Override
     public List<Task> findByCaseId(String caseId) {
         return taskRepository.findByCaseId(caseId);
+    }
+
+    @Override
+    public Task findById(Long id) {
+        return taskRepository.findOne(id);
     }
 
     @Override
