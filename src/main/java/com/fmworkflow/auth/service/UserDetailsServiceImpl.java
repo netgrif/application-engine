@@ -1,5 +1,6 @@
 package com.fmworkflow.auth.service;
 
+import com.fmworkflow.auth.domain.LoggedUser;
 import com.fmworkflow.auth.domain.Role;
 import com.fmworkflow.auth.domain.User;
 import com.fmworkflow.auth.domain.UserRepository;
@@ -29,11 +30,15 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Transactional(readOnly = true)
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         User user = userRepository.findByEmail(email);
+
         Set<GrantedAuthority> grantedAuthorities = new HashSet<>();
         for (Role role : user.getRoles()){
             grantedAuthorities.add(new SimpleGrantedAuthority(role.getName()));
         }
 
-        return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(), grantedAuthorities);
+        LoggedUser loggedUser = new LoggedUser(user.getId(), user.getEmail(), user.getPassword(), grantedAuthorities);
+        loggedUser.setFullName(user.getName()+" "+user.getSurname());
+
+        return loggedUser;
     }
 }
