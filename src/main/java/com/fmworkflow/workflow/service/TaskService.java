@@ -16,16 +16,25 @@ import java.util.*;
 
 @Service
 public class TaskService implements ITaskService {
-    @Autowired
-    private IUserService userService;
+
     @Autowired
     private TaskRepository taskRepository;
     @Autowired
     private CaseRepository caseRepository;
 
     @Override
+    public List<Task> getAll(){
+        return taskRepository.findAll();
+    }
+
+    @Override
     public List<Task> findByCaseId(String caseId) {
         return taskRepository.findByCaseId(caseId);
+    }
+
+    @Override
+    public Task findById(Long id) {
+        return taskRepository.findOne(id);
     }
 
     @Override
@@ -64,8 +73,17 @@ public class TaskService implements ITaskService {
     }
 
     @Override
-    public void finishTask(String taskId) {
-        Task task = taskRepository.findOne(Long.valueOf(taskId));
+    public List<Task> findUserFinishedTasks(User user) {
+        return taskRepository.findByUserAndFinishDateNotNull(user);
+    }
+
+    @Override
+    public void finishTask(Long userId, Long taskId) throws Exception {
+        Task task = taskRepository.findOne(taskId);
+        if(task.getUser().getId().equals(userId)){
+            throw new Exception("User that is not assigned tried to finish task");
+        }
+
         Case useCase = caseRepository.findOne(task.getCaseId());
         Transition transition =  useCase.getPetriNet().getTransition(task.getTransitionId());
 
@@ -77,11 +95,10 @@ public class TaskService implements ITaskService {
     }
 
     @Override
-    public void takeTask(String taskId) throws TransitionNotStartableException { // TODO: 5. 2. 2017 make transactional
-        Task task = taskRepository.findOne(Long.valueOf(taskId));
+    public void assignTask(User user, Long taskId) throws TransitionNotStartableException { // TODO: 5. 2. 2017 make transactional
+        Task task = taskRepository.findOne(taskId);
         Case useCase = caseRepository.findOne(task.getCaseId());
         Transition transition =  useCase.getPetriNet().getTransition(task.getTransitionId());
-        User user = userService.getLoggedInUser();
 
         useCase.startTransition(transition);
         task.setUser(user);
