@@ -8,13 +8,19 @@ import com.fmworkflow.workflow.domain.Task;
 import java.util.List;
 
 public interface ITaskService {
+    List<Task> getAll();
+
     List<Task> findByCaseId(String caseId);
 
     void createTasks(Case useCase);
 
     List<Task> findByUser(User user);
 
-    void finishTask(String taskId);
+    Task findById(Long id);
 
-    void takeTask(String taskId) throws TransitionNotStartableException;
+    List<Task> findUserFinishedTasks(User user);
+
+    void finishTask(Long userId, Long taskId) throws Exception;
+
+    void assignTask(User user, Long taskId) throws TransitionNotStartableException;
 }
