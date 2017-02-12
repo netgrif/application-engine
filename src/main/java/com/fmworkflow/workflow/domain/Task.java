@@ -11,8 +11,11 @@ public class Task {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     private String caseId;
-    private String title;
     private String transitionId;
+    private String title;
+    private String caseColor;
+    private String visualId;
+    private int priority;
     @ManyToOne
     private User user;
     private DateTime startDate;
@@ -32,6 +35,30 @@ public class Task {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public String getCaseColor() {
+        return caseColor;
+    }
+
+    public void setCaseColor(String caseColor) {
+        this.caseColor = caseColor;
+    }
+
+    public String getVisualId() {
+        return visualId;
+    }
+
+    public void setVisualId(String visualId) {
+        this.visualId = visualId;
+    }
+
+    public int getPriority() {
+        return priority;
+    }
+
+    public void setPriority(int priority) {
+        this.priority = priority;
     }
 
     public DateTime getStartDate() {
@@ -72,5 +99,11 @@ public class Task {
 
     public void setTransitionId(String transitionId) {
         this.transitionId = transitionId;
+    }
+
+    public static class Priorities {
+        public static final int HIGH = 3;
+        public static final int MEDIUM = 2;
+        public static final int LOW = 1;
     }
 }
