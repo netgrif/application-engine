@@ -5,10 +5,10 @@ import java.io.File;
 /**
  * Created by Milan on 4.2.2017.
  */
-public class ImportBody {
+public class UploadedFileMeta {
 
-    public File xmlFile;
-    public String title;
+    public String name;
+    public String initials;
 
-    public ImportBody() {}
+    public UploadedFileMeta() {}
 }
