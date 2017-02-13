@@ -31,7 +31,7 @@ public class PetriNetController {
     @Autowired
     private IPetriNetService service;
 
-    @RequestMapping(value = "/import", method = RequestMethod.POST)
+    @RequestMapping(value = "/import", method = RequestMethod.POST, produces = "application/json")
     public @ResponseBody String importPetriNet(
             @RequestParam(value = "file", required = true) MultipartFile multipartFile,
             @RequestParam(value = "meta", required = false) String fileMetaJSON) {
@@ -59,7 +59,7 @@ public class PetriNetController {
         }
     }
 
-    @RequestMapping(value = "/all", method = RequestMethod.GET)
+    @RequestMapping(value = "/all", method = RequestMethod.GET, produces = "application/json")
     public List<PetriNet> getAll() {
         return service.loadAll();
     }

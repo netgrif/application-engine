@@ -18,7 +18,7 @@ public class WorkflowController {
     @Autowired
     private IWorkflowService workflowService;
 
-    @RequestMapping(value = "/case", method = RequestMethod.POST)
+    @RequestMapping(value = "/case", method = RequestMethod.POST, produces = "application/json")
     public String createCase(@RequestBody CreateCaseBody body) {
         try {
             workflowService.createCase(body.netId, body.title);
@@ -29,7 +29,7 @@ public class WorkflowController {
         }
     }
 
-    @RequestMapping(value = "/all", method = RequestMethod.GET)
+    @RequestMapping(value = "/all", method = RequestMethod.GET, produces = "application/json")
     public List<Case> getAll() {
         return workflowService.getAll();
     }

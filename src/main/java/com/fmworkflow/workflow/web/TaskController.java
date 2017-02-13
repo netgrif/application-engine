@@ -9,6 +9,8 @@ import com.fmworkflow.workflow.domain.TasksResource;
 import com.fmworkflow.workflow.service.ITaskService;
 import com.fmworkflow.workflow.web.requestbodies.TaskSearchBody;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.Resource;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,7 +25,7 @@ public class TaskController {
     @Autowired
     private ITaskService taskService;
 
-    @RequestMapping(method = RequestMethod.GET)
+    @RequestMapping(method = RequestMethod.GET, produces = "application/json")
     public TasksResource getAll(){
         List<TaskResource> resources = new ArrayList<>();
         for(Task task : taskService.getAll()){
@@ -36,45 +38,45 @@ public class TaskController {
         return tasksResource;
     }
 
-    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = "/{id}", method = RequestMethod.GET, produces = "application/json")
     public TaskResource getOne(@PathVariable("id") Long taskId){
         return TaskResource.createFrom(taskService.findById(taskId),null);
     }
 
-    @RequestMapping(value = "/assign/{id}", method = RequestMethod.GET)
-    public String assign(Authentication auth, @PathVariable("id") Long taskId){
+    @RequestMapping(value = "/assign/{id}", method = RequestMethod.GET, produces = "application/json")
+    public Resource<String> assign(Authentication auth, @PathVariable("id") Long taskId){
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
         try {
             taskService.assignTask(loggedUser.transformToUser(), taskId);
-            return JsonBuilder.init()
+            return new Resource<>(JsonBuilder.init()
                     .addSuccessMessage("Task "+taskId+" assigned to "+loggedUser.getFullName())
-                    .build();
+                    .build());
 
         } catch (TransitionNotStartableException e){
-            return JsonBuilder.init()
+            return new Resource<>(JsonBuilder.init()
                     .addErrorMessage("Task "+taskId+" cannot be assigned")
-                    .build();
+                    .build());
         }
     }
 
-    @RequestMapping(value = "/finish/{id}", method = RequestMethod.GET)
-    public String finish(Authentication auth, @PathVariable("id") Long taskId){
+    @RequestMapping(value = "/finish/{id}", method = RequestMethod.GET, produces = "application/json")
+    public Resource<String> finish(Authentication auth, @PathVariable("id") Long taskId){
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
         try {
             taskService.finishTask(loggedUser.getId(), taskId);
-            return JsonBuilder.init()
+            return new Resource<>(JsonBuilder.init()
                     .addSuccessMessage("Task +"+taskId+" finished")
-                    .build();
+                    .build());
 
         } catch (Exception e) {
             e.printStackTrace();
-            return JsonBuilder.init()
+            return new Resource<>(JsonBuilder.init()
                     .addErrorMessage(e.getMessage())
-                    .build();
+                    .build());
         }
     }
 
-    @RequestMapping(value = "/my")
+    @RequestMapping(value = "/my", method = RequestMethod.GET, produces = "application/json")
     public TasksResource getMy(Authentication auth){
         List<TaskResource> resources = new ArrayList<>();
         for(Task task:taskService.findByUser(((LoggedUser)auth.getPrincipal()).transformToUser())){
@@ -87,7 +89,7 @@ public class TaskController {
         return tasksResource;
     }
 
-    @RequestMapping(value = "/my/finished")
+    @RequestMapping(value = "/my/finished", method = RequestMethod.GET, produces = "application/json")
     public TasksResource getMyFinished(Authentication auth){
         List<TaskResource> resources = new ArrayList<>();
         for(Task task:taskService.findByUser(((LoggedUser)auth.getPrincipal()).transformToUser())){
@@ -100,7 +102,7 @@ public class TaskController {
         return tasksResources;
     }
 
-    @RequestMapping(value = "/search", method = RequestMethod.POST)
+    @RequestMapping(value = "/search", method = RequestMethod.POST, produces = "application/json")
     public TasksResource search(@RequestBody TaskSearchBody searchBody){
         return getAll(); //TODO: 9.2.2017 - search on tasks according to posted json
     }
