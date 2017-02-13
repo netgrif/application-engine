@@ -46,6 +46,12 @@ public class TaskService implements ITaskService {
             if (isExecutable(transition, net, useCase)) {
                 Task task = new Task();
                 task.setTitle(transition.getTitle());
+                task.setCaseId(useCase.get_id().toString());
+                task.setTransitionId(transition.getObjectId().toString());
+                task.setCaseColor(useCase.getColor());
+                task.setPriority(transition.getPriority());
+                task = taskRepository.save(task);
+                task.setVisualId(net.getInitials());
                 taskRepository.save(task);
             }
         }
