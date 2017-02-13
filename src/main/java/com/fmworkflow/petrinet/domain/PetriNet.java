@@ -35,6 +35,10 @@ public class PetriNet {
         this.arcsSkeleton = new HashSet<>();
     }
 
+    public ObjectId get_id() {
+        return _id;
+    }
+
     public String getTitle() {
         return title;
     }

@@ -19,8 +19,13 @@ import java.util.Set;
 public class WorkflowService implements IWorkflowService {
     @Autowired
     private CaseRepository repository;
+
     @Autowired
     private IPetriNetService petriNetService;
+
+    @Autowired
+    private ITaskService taskService;
+
     @Override
     public void saveCase(Case useCase) {
         repository.save(useCase);
@@ -36,8 +41,9 @@ public class WorkflowService implements IWorkflowService {
         PetriNet petriNet = petriNetService.loadPetriNet(netId);
         Map<String, Integer> activePlaces = createActivePlaces(petriNet);
         Case useCase = new Case(title, petriNet, activePlaces);
-        useCase.setDataSet(petriNet.getDataSet().copy());
+        //useCase.setDataSet(petriNet.getDataSet().copy());
         saveCase(useCase);
+        taskService.createTasks(useCase);
     }
 
     private Map<String, Integer> createActivePlaces(PetriNet petriNet) {
