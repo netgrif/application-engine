@@ -1,37 +1,25 @@
 package com.fmworkflow.workflow.web;
 
-import com.fmworkflow.auth.domain.User;
-import com.fmworkflow.auth.service.IUserService;
 import com.fmworkflow.json.JsonBuilder;
-import com.fmworkflow.petrinet.domain.throwable.TransitionNotStartableException;
 import com.fmworkflow.workflow.domain.Case;
-import com.fmworkflow.workflow.domain.Task;
 import com.fmworkflow.workflow.domain.dataset.DataSet;
-import com.fmworkflow.workflow.service.ITaskService;
 import com.fmworkflow.workflow.service.IWorkflowService;
-import com.fmworkflow.workflow.web.requestbodies.CreateBody;
+import com.fmworkflow.workflow.web.requestbodies.CreateCaseBody;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 @RestController()
-@RequestMapping("/workflow")
+@RequestMapping("/res/workflow")
 public class WorkflowController {
-
-    @Autowired
-    private IUserService userService;
 
     @Autowired
     private IWorkflowService workflowService;
 
-    @Autowired
-    private ITaskService taskService;
-
-    @RequestMapping(value = "/create", method = RequestMethod.POST)
-    public String createCase(@RequestBody CreateBody body) {
+    @RequestMapping(value = "/case", method = RequestMethod.POST)
+    public String createCase(@RequestBody CreateCaseBody body) {
         try {
             workflowService.createCase(body.netId, body.title);
             return JsonBuilder.successMessage("Case created successfully");
