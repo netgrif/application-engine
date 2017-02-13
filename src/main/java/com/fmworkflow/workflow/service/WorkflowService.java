@@ -41,7 +41,7 @@ public class WorkflowService implements IWorkflowService {
         PetriNet petriNet = petriNetService.loadPetriNet(netId);
         Map<String, Integer> activePlaces = createActivePlaces(petriNet);
         Case useCase = new Case(title, petriNet, activePlaces);
-        useCase.setDataSet(petriNet.getDataSet().copy());
+        //useCase.setDataSet(petriNet.getDataSet().copy());
         saveCase(useCase);
         taskService.createTasks(useCase);
     }
