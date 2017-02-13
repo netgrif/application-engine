@@ -31,7 +31,7 @@ public class ImporterTest {
 
     @Test
     public void testImport() throws Exception {
-        importer.importPetriNet(xmlFile, "dbref_test");
+        importer.importPetriNet(xmlFile, "dbref_test", "ref");
     }
 
     @Test
