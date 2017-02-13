@@ -7,9 +7,7 @@ import org.springframework.hateoas.mvc.ControllerLinkBuilder;
 
 import java.util.ArrayList;
 
-/**
- * Created by Milan on 9.2.2017.
- */
+
 public class TasksResource extends Resources<TaskResource> {
     public TasksResource(Iterable<TaskResource> content) {
         super(content, new ArrayList<Link>());
