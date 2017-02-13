@@ -5,15 +5,21 @@ import com.fmworkflow.auth.domain.RoleRepository;
 import com.fmworkflow.auth.domain.User;
 import com.fmworkflow.auth.domain.UserRepository;
 import com.fmworkflow.auth.service.UserService;
+import com.fmworkflow.workflow.domain.Case;
+import com.fmworkflow.workflow.service.ITaskService;
+import com.fmworkflow.workflow.service.IWorkflowService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.hateoas.config.EnableHypermediaSupport;
 
 import java.util.HashSet;
+import java.util.List;
 
 @EnableCaching
+@EnableHypermediaSupport(type = EnableHypermediaSupport.HypermediaType.HAL)
 @SpringBootApplication
 public class WorkflowManagementSystemApplication implements CommandLineRunner{
 
@@ -26,6 +32,12 @@ public class WorkflowManagementSystemApplication implements CommandLineRunner{
 
 	@Autowired
 	private RoleRepository roleRepository;
+
+	@Autowired
+	private IWorkflowService workflowService;
+
+	@Autowired
+	private ITaskService taskService;
 
 	@Override
 	public void run(String... strings) throws Exception {
@@ -45,5 +57,10 @@ public class WorkflowManagementSystemApplication implements CommandLineRunner{
 		adminRoles.add(adminRole);
 		admin.setRoles(adminRoles);
 		userService.save(admin);
+
+		List<Case> cases = workflowService.getAll();
+		if(cases != null || !cases.isEmpty()){
+			cases.forEach(aCase -> taskService.createTasks(aCase));
+		}
 	}
 }

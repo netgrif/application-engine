@@ -44,7 +44,7 @@ public class UserController {
         return new ModelAndView("forward:/");
     }
 
-    @RequestMapping(value = "/signup", method = RequestMethod.POST)
+    @RequestMapping(value = "/signup", method = RequestMethod.POST, produces = "application/json")
     public String registration(@RequestBody RegistrationRequest regRequest) {
         if (tokenService.authorizeToken(regRequest.email, regRequest.token)) {
             regRequest.password = new String(Base64.getDecoder().decode(regRequest.password));
@@ -61,7 +61,7 @@ public class UserController {
         }
     }
 
-    @RequestMapping(value = "/invite", method = RequestMethod.POST)
+    @RequestMapping(value = "/invite", method = RequestMethod.POST, produces = "application/json")
     public String invite(@RequestBody String email) {
         try {
             String mail = URLDecoder.decode(email.split("=")[1], StandardCharsets.UTF_8.name());
@@ -79,7 +79,7 @@ public class UserController {
         }
     }
 
-    @RequestMapping(value = "/token", method = RequestMethod.POST)
+    @RequestMapping(value = "/token", method = RequestMethod.POST, produces = "application/json")
     public String getEmail(@RequestBody String token){
         String email = tokenService.getEmail(token);
         if(email != null){
