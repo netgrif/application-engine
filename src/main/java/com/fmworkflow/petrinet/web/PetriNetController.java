@@ -3,6 +3,8 @@ package com.fmworkflow.petrinet.web;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fmworkflow.json.JsonBuilder;
 import com.fmworkflow.petrinet.domain.PetriNet;
+import com.fmworkflow.petrinet.domain.PetriNetReference;
+import com.fmworkflow.petrinet.domain.PetriNetReferencesResource;
 import com.fmworkflow.petrinet.service.IPetriNetService;
 import com.fmworkflow.petrinet.web.requestbodies.UploadedFileMeta;
 import org.apache.log4j.Logger;
@@ -29,7 +31,7 @@ public class PetriNetController {
     @Autowired
     private IPetriNetService service;
 
-    @RequestMapping(value = "/import", method = RequestMethod.POST)
+    @RequestMapping(value = "/import", method = RequestMethod.POST, produces = "application/json")
     public @ResponseBody String importPetriNet(
             @RequestParam(value = "file", required = true) MultipartFile multipartFile,
             @RequestParam(value = "meta", required = false) String fileMetaJSON) {
@@ -57,8 +59,14 @@ public class PetriNetController {
         }
     }
 
-    @RequestMapping(value = "/all", method = RequestMethod.GET)
+    @RequestMapping(value = "/all", method = RequestMethod.GET, produces = "application/json")
     public List<PetriNet> getAll() {
         return service.loadAll();
+    }
+
+    @RequestMapping(value = "/refs", method = RequestMethod.GET, produces = "application/json")
+    public @ResponseBody PetriNetReferencesResource getAllReferences(){
+        List<PetriNetReference> refs = service.getAllReferences();
+        return new PetriNetReferencesResource(refs);
     }
 }
