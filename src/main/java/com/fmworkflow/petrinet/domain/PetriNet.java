@@ -15,6 +15,7 @@ public class PetriNet {
     @Id
     private ObjectId _id;
     private String title;
+    private String initials;
     private DateTime creationDate;
     @Field("places")
     private Map<String, Place> places;
@@ -45,6 +46,14 @@ public class PetriNet {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public String getInitials() {
+        return initials;
+    }
+
+    public void setInitials(String initials) {
+        this.initials = initials;
     }
 
     public Map<String, Place> getPlaces() {

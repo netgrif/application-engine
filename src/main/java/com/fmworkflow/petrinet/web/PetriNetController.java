@@ -45,7 +45,7 @@ public class PetriNetController {
             ObjectMapper mapper = new ObjectMapper();
             UploadedFileMeta fileMeta = mapper.readValue(fileMetaJSON, UploadedFileMeta.class);
 
-            service.importPetriNet(file, fileMeta.name);
+            service.importPetriNet(file, fileMeta.name, fileMeta.initials);
             return JsonBuilder.successMessage("Petri net imported successfully");
         } catch (SAXException e) {
             e.printStackTrace();
