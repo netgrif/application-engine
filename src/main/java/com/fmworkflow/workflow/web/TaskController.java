@@ -25,7 +25,7 @@ public class TaskController {
     @Autowired
     private ITaskService taskService;
 
-    @RequestMapping(method = RequestMethod.GET, produces = "application/json")
+    @RequestMapping(method = RequestMethod.GET)
     public TasksResource getAll(){
         List<TaskResource> resources = new ArrayList<>();
         for(Task task : taskService.getAll()){
@@ -38,12 +38,12 @@ public class TaskController {
         return tasksResource;
     }
 
-    @RequestMapping(value = "/{id}", method = RequestMethod.GET, produces = "application/json")
+    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     public TaskResource getOne(@PathVariable("id") Long taskId){
         return TaskResource.createFrom(taskService.findById(taskId),null);
     }
 
-    @RequestMapping(value = "/assign/{id}", method = RequestMethod.GET, produces = "application/json")
+    @RequestMapping(value = "/assign/{id}", method = RequestMethod.GET)
     public Resource<String> assign(Authentication auth, @PathVariable("id") Long taskId){
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
         try {
@@ -59,7 +59,7 @@ public class TaskController {
         }
     }
 
-    @RequestMapping(value = "/finish/{id}", method = RequestMethod.GET, produces = "application/json")
+    @RequestMapping(value = "/finish/{id}", method = RequestMethod.GET)
     public Resource<String> finish(Authentication auth, @PathVariable("id") Long taskId){
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
         try {
@@ -76,7 +76,7 @@ public class TaskController {
         }
     }
 
-    @RequestMapping(value = "/my", method = RequestMethod.GET, produces = "application/json")
+    @RequestMapping(value = "/my", method = RequestMethod.GET)
     public TasksResource getMy(Authentication auth){
         List<TaskResource> resources = new ArrayList<>();
         for(Task task:taskService.findByUser(((LoggedUser)auth.getPrincipal()).transformToUser())){
@@ -89,7 +89,7 @@ public class TaskController {
         return tasksResource;
     }
 
-    @RequestMapping(value = "/my/finished", method = RequestMethod.GET, produces = "application/json")
+    @RequestMapping(value = "/my/finished", method = RequestMethod.GET)
     public TasksResource getMyFinished(Authentication auth){
         List<TaskResource> resources = new ArrayList<>();
         for(Task task:taskService.findByUser(((LoggedUser)auth.getPrincipal()).transformToUser())){
@@ -102,7 +102,7 @@ public class TaskController {
         return tasksResources;
     }
 
-    @RequestMapping(value = "/search", method = RequestMethod.POST, produces = "application/json")
+    @RequestMapping(value = "/search", method = RequestMethod.POST)
     public TasksResource search(@RequestBody TaskSearchBody searchBody){
         return getAll(); //TODO: 9.2.2017 - search on tasks according to posted json
     }
