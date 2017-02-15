@@ -1,8 +1,10 @@
 package com.fmworkflow.workflow.service;
 
 import com.fmworkflow.auth.domain.User;
-import com.fmworkflow.auth.service.IUserService;
-import com.fmworkflow.petrinet.domain.*;
+import com.fmworkflow.petrinet.domain.Arc;
+import com.fmworkflow.petrinet.domain.PetriNet;
+import com.fmworkflow.petrinet.domain.Place;
+import com.fmworkflow.petrinet.domain.Transition;
 import com.fmworkflow.petrinet.domain.throwable.TransitionNotStartableException;
 import com.fmworkflow.workflow.domain.Case;
 import com.fmworkflow.workflow.domain.CaseRepository;
@@ -12,7 +14,10 @@ import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 @Service
 public class TaskService implements ITaskService {
@@ -61,16 +66,15 @@ public class TaskService implements ITaskService {
         Map<String, Integer> activePlaces = useCase.getActivePlaces();
         Collection<Arc> arcsOfTransition = net.getArcsOfTransition(transition);
 
-        for (Arc arc : arcsOfTransition) {
-            if (arc.getDestination() == transition) {
-                Place source = (Place)arc.getSource();
-                if (source.getTokens() < activePlaces.get(source.getObjectId().toString())) {
-                    return false;
-                }
-            }
-        }
+        Optional<Arc> notAcrive = arcsOfTransition.stream()
+                .filter(arc -> arc.getDestination() == transition)
+                .filter(arc -> {
+                    Place source = (Place)arc.getSource();
+                    return source.getTokens() < activePlaces.get(source.getStringId());
+                })
+                .findAny();
 
-        return true;
+        return notAcrive.isPresent();
     }
 
     @Override
@@ -98,6 +102,8 @@ public class TaskService implements ITaskService {
 
         caseRepository.save(useCase);
         taskRepository.save(task);
+
+        createTasks(useCase);
     }
 
     @Override

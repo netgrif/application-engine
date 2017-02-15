@@ -5,15 +5,12 @@ import com.fmworkflow.petrinet.domain.Place;
 import com.fmworkflow.petrinet.service.IPetriNetService;
 import com.fmworkflow.workflow.domain.Case;
 import com.fmworkflow.workflow.domain.CaseRepository;
-import com.fmworkflow.workflow.domain.dataset.DataSet;
-import com.fmworkflow.workflow.domain.dataset.Field;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 @Service
 public class WorkflowService implements IWorkflowService {
@@ -57,23 +54,23 @@ public class WorkflowService implements IWorkflowService {
         return activePlaces;
     }
 
-    @Override
-    public DataSet getDataForTransition(String caseId, String transitionId){
-        Case useCase = repository.findOne(caseId);
-        return useCase.getDataSet().getFieldsForTransition(transitionId);
-    }
+//    @Override
+//    public DataSet getDataForTransition(String caseId, String transitionId){
+//        Case useCase = repository.findOne(caseId);
+//        return useCase.getDataSet().getFieldsForTransition(transitionId);
+//    }
 
-    @Override
-    public void modifyData(String caseId, Map<String, String> newValues){
-        Case useCase = repository.findOne(caseId);
-        for(Field field:useCase.getDataSet().getFields()){
-            if(newValues.containsKey(field.get_id().toString())){
-                field.modifyValue(newValues.get(field.get_id().toString()));
-            }
-        }
-
-        saveCase(useCase);
-    }
+//    @Override
+//    public void modifyData(String caseId, Map<String, String> newValues){
+//        Case useCase = repository.findOne(caseId);
+//        for(Field field:useCase.getDataSet().getFields()){
+//            if(newValues.containsKey(field.get_id().toString())){
+//                field.modifyValue(newValues.get(field.get_id().toString()));
+//            }
+//        }
+//
+//        saveCase(useCase);
+//    }
 
 
 }
