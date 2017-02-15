@@ -42,15 +42,15 @@ public class Task {
     }
 
     public void setCaseColor(String caseColor) {
-        this.caseColor = caseColor;
+        this.caseColor = caseColor == null || caseColor.isEmpty() ? "color-fg-indigo-500" : caseColor;
     }
 
     public String getVisualId() {
         return visualId;
     }
 
-    public void setVisualId(String visualId) {
-        this.visualId = visualId;
+    public void setVisualId(String petriNetInitials) {
+        this.visualId = petriNetInitials+"-"+this.id;
     }
 
     public int getPriority() {
@@ -58,7 +58,7 @@ public class Task {
     }
 
     public void setPriority(int priority) {
-        this.priority = priority;
+        this.priority = priority == Priorities.UNDEFINED ? Priorities.LOW : priority;
     }
 
     public DateTime getStartDate() {
@@ -105,5 +105,7 @@ public class Task {
         public static final int HIGH = 3;
         public static final int MEDIUM = 2;
         public static final int LOW = 1;
+        public static final int UNDEFINED = 0;
+
     }
 }

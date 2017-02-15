@@ -1,31 +1,33 @@
 package com.fmworkflow.petrinet.domain;
 
-import com.fmworkflow.workflow.domain.dataset.DataSet;
+import com.fmworkflow.petrinet.domain.dataset.Field;
 import org.bson.types.ObjectId;
 import org.joda.time.DateTime;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.util.*;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 @Document
 public class PetriNet {
     @Id
     private ObjectId _id;
     private String title;
+    private String initials;
     private DateTime creationDate;
-    @Field("places")
+    @org.springframework.data.mongodb.core.mapping.Field("places")
     private Map<String, Place> places;
-    @Field("transitions")
+    @org.springframework.data.mongodb.core.mapping.Field("transitions")
     private Map<String, Transition> transitions;
-    @Field("arcs")
+    @org.springframework.data.mongodb.core.mapping.Field("arcs")
     private Map<String, List<Arc>> arcs;
+    @org.springframework.data.mongodb.core.mapping.Field("dataset")
+    private Map<String, Field> dataSet;
     @Transient
     private Set<Arc> arcsSkeleton;
-    @Field("dataset")
-    private DataSet dataSet;
 
     public PetriNet() {
         creationDate = DateTime.now();
@@ -33,6 +35,7 @@ public class PetriNet {
         this.transitions = new HashMap<>();
         this.arcs = new HashMap<>();
         this.arcsSkeleton = new HashSet<>();
+        this.dataSet = new HashMap<>();
     }
 
     public ObjectId get_id() {
@@ -45,6 +48,14 @@ public class PetriNet {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public String getInitials() {
+        return initials;
+    }
+
+    public void setInitials(String initials) {
+        this.initials = initials;
     }
 
     public Map<String, Place> getPlaces() {
@@ -87,12 +98,24 @@ public class PetriNet {
         this.arcs = arcs;
     }
 
-    public DataSet getDataSet() {
+    public DateTime getCreationDate() {
+        return creationDate;
+    }
+
+    public void setCreationDate(DateTime creationDate) {
+        this.creationDate = creationDate;
+    }
+
+    public Map<String, Field> getDataSet() {
         return dataSet;
     }
 
-    public void setDataSet(DataSet dataSet) {
+    public void setDataSet(Map<String, Field> dataSet) {
         this.dataSet = dataSet;
+    }
+
+    public void addDataSetField(Field field) {
+        this.dataSet.put(field.getObjectId(), field);
     }
 
     public void addArcSkelet(Arc arc) {
@@ -128,36 +151,32 @@ public class PetriNet {
     }
 
     public void initializeArcs() {
-        for (Arc arc : this.arcsSkeleton) {
+        arcsSkeleton.forEach(arc -> {
             arc.setSource(getNode(arc.getSourceId()));
             arc.setDestination(getNode(arc.getDestinationId()));
             addArc(arc);
-        }
+        });
     }
 
     public Map<Place, Integer> getInputPlaces(Transition transition) {
-        return getIOPlaces(transition, true);
+        return getIOPlaces(transition, arc -> arc.getDestination() == transition);
     }
 
     public Map<Place, Integer> getOutputPlaces(Transition transition) {
-        return getIOPlaces(transition, false);
+        return getIOPlaces(transition, arc -> arc.getSource() == transition);
     }
 
-    private Map<Place, Integer> getIOPlaces(Transition transition, boolean input) {
+    private Map<Place, Integer> getIOPlaces(Transition transition, Predicate<Arc> predicate) {
         List<Arc> transitionsArcs = getArcsOfTransition(transition);
-        Map<Place, Integer> ioPlaces = new HashMap<>();
-
-        for (Arc arc : transitionsArcs) {
-            Node node = (input)?(arc.getDestination()):(arc.getSource());
-            if (node == transition)
-                ioPlaces.put(arc.getPlace(), arc.getMultiplicity());
-        }
-
-        return ioPlaces;
+        return transitionsArcs.stream()
+                .filter(predicate)
+                .collect(Collectors.toMap(Arc::getPlace, Arc::getMultiplicity));
     }
 
     @Override
     public String toString() {
         return title;
     }
+
+
 }
