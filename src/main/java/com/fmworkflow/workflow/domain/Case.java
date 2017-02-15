@@ -4,7 +4,6 @@ import com.fmworkflow.petrinet.domain.PetriNet;
 import com.fmworkflow.petrinet.domain.Place;
 import com.fmworkflow.petrinet.domain.Transition;
 import com.fmworkflow.petrinet.domain.throwable.TransitionNotStartableException;
-import com.fmworkflow.workflow.domain.dataset.DataSet;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
@@ -25,8 +24,6 @@ public class Case {
     private Map<String, Integer> activePlaces;
     private String title;
     private String color;
-    @Field("dataset")
-    private DataSet dataSet;
 
     public Case() {
         activePlaces = new HashMap<>();
@@ -45,14 +42,6 @@ public class Case {
 
     public ObjectId get_id() {
         return _id;
-    }
-
-    public DataSet getDataSet() {
-        return dataSet;
-    }
-
-    public void setDataSet(DataSet dataSet) {
-        this.dataSet = dataSet;
     }
 
     public PetriNet getPetriNet() {
