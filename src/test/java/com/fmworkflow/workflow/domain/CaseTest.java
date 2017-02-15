@@ -3,7 +3,6 @@ package com.fmworkflow.workflow.domain;
 import com.fmworkflow.petrinet.domain.PetriNet;
 import com.fmworkflow.petrinet.domain.Place;
 import com.fmworkflow.petrinet.service.IPetriNetService;
-import com.fmworkflow.workflow.domain.dataset.DataSet;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -34,17 +33,17 @@ public class CaseTest {
         activePlaces.put(place.getObjectId().toString(), 5);
     }
 
-    @Test
-    @Ignore
-    public void createCase() {
-        Case useCase = new Case();
-        useCase.setDataSet(new DataSet());
-        useCase.setPetriNet(petriNet);
-        useCase.setTitle("test case");
-        useCase.setActivePlaces(activePlaces);
-
-        repository.save(useCase);
-    }
+//    @Test
+//    @Ignore
+//    public void createCase() {
+//        Case useCase = new Case();
+//        useCase.setDataSet(new DataSet());
+//        useCase.setPetriNet(petriNet);
+//        useCase.setTitle("test case");
+//        useCase.setActivePlaces(activePlaces);
+//
+//        repository.save(useCase);
+//    }
 
     @Test
     @Ignore

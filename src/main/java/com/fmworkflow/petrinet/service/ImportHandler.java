@@ -1,9 +1,11 @@
 package com.fmworkflow.petrinet.service;
 
 import com.fmworkflow.petrinet.domain.*;
+import com.fmworkflow.petrinet.domain.dataset.Field;
+import com.fmworkflow.petrinet.domain.dataset.FieldType;
+import com.fmworkflow.petrinet.domain.dataset.TextField;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
@@ -14,17 +16,18 @@ import java.util.Map;
 public class ImportHandler extends DefaultHandler {
     private final Logger log = LoggerFactory.getLogger(ImportHandler.class);
 
-    @Autowired
-    private PetriNetRepository repository;
-
     private Map<Integer, Node> nodes;
+    private Map<Integer, Field> fields;
     private PetriNet net;
     private Element element;
     private PetriNetObject object;
+    private Field field;
+    private int fieldId;
 
     public ImportHandler(PetriNet net) {
         this.net = net;
         this.nodes = new HashMap<>();
+        this.fields = new HashMap<>();
     }
 
     @Override
@@ -50,17 +53,35 @@ public class ImportHandler extends DefaultHandler {
                 break;
             case ARC:
                 object = new Arc();
+                break;
+            case DATA:
+                FieldType type = FieldType.valueOf(attributes.getValue("type").toUpperCase());
+                switch (type) {
+                    case TEXT:
+                        field = new TextField();
+                }
         }
     }
 
     @Override
     public void endElement(String uri, String localName, String qName) throws SAXException {
-        if (object instanceof Arc)
-            net.addArcSkelet((Arc) object);
-        else if (object instanceof Transition)
-            net.addTransition((Transition) object);
-        else if (object instanceof Place)
-            net.addPlace((Place) object);
+        Element endElement = Element.fromString(qName);
+        switch (endElement) {
+            case TRANSITION:
+                net.addTransition((Transition) object);
+                break;
+            case PLACE:
+                net.addPlace((Place) object);
+                break;
+            case ARC:
+                net.addArcSkelet((Arc) object);
+                break;
+            case DATA:
+                fields.put(fieldId, field);
+                net.addDataSetField(field);
+                field = null;
+                break;
+        }
         element = Element.DOCUMENT;
     }
 
@@ -77,6 +98,8 @@ public class ImportHandler extends DefaultHandler {
                 ((Arc) object).setDestination(destination);
                 break;
             case ID:
+                if (field != null)
+                    fieldId = Integer.valueOf(characters);
                 if (object.getClass() != Arc.class)
                     setNodeWithId(characters);
                 break;
@@ -136,7 +159,12 @@ public class ImportHandler extends DefaultHandler {
         MULTIPLICITY ("multiplicity"),
         TOKENS ("tokens"),
         STATIC ("static"),
-        TYPE ("type");
+        TYPE ("type"),
+        DATA ("data"),
+        TITLE ("title"),
+        DESC ("desc"),
+        LOGIC ("logic"),
+        EDITABLE ("editable");
 
         String name;
 
