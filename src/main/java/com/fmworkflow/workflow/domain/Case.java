@@ -4,7 +4,8 @@ import com.fmworkflow.petrinet.domain.PetriNet;
 import com.fmworkflow.petrinet.domain.Place;
 import com.fmworkflow.petrinet.domain.Transition;
 import com.fmworkflow.petrinet.domain.throwable.TransitionNotStartableException;
-import com.fmworkflow.workflow.domain.dataset.DataSet;
+import org.bson.types.ObjectId;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
@@ -14,13 +15,15 @@ import java.util.Map;
 
 @Document
 public class Case {
+
+    @Id
+    private ObjectId _id;
     @DBRef
     private PetriNet petriNet;
     @Field("activePlaces")
     private Map<String, Integer> activePlaces;
     private String title;
-    @Field("dataset")
-    private DataSet dataSet;
+    private String color;
 
     public Case() {
         activePlaces = new HashMap<>();
@@ -37,12 +40,8 @@ public class Case {
         this.activePlaces = activePlaces;
     }
 
-    public DataSet getDataSet() {
-        return dataSet;
-    }
-
-    public void setDataSet(DataSet dataSet) {
-        this.dataSet = dataSet;
+    public ObjectId get_id() {
+        return _id;
     }
 
     public PetriNet getPetriNet() {
@@ -71,6 +70,14 @@ public class Case {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public String getColor() {
+        return color;
+    }
+
+    public void setColor(String color) {
+        this.color = color;
     }
 
     public void finishTransition(Transition transition) {

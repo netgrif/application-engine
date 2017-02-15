@@ -28,10 +28,10 @@ public class Importer {
         this.petriNet = new PetriNet();
     }
 
-    public void importPetriNet(File xml, String title) throws ParserConfigurationException, SAXException, IOException {
+    public void importPetriNet(File xml, String title, String initials) throws ParserConfigurationException, SAXException, IOException {
         initializeParser();
         parseXml(xml);
-        persistNet(title);
+        persistNet(title, initials);
     }
 
     private void parseXml(File xmlFile) throws ParserConfigurationException, SAXException, IOException {
@@ -49,8 +49,9 @@ public class Importer {
         handler = new ImportHandler(petriNet);
     }
 
-    private void persistNet(String title) {
+    private void persistNet(String title, String initials) {
         petriNet.setTitle(title);
+        petriNet.setInitials(initials);
         service.savePetriNet(petriNet);
     }
 }
