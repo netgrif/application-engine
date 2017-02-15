@@ -31,7 +31,7 @@ public class PetriNetController {
     @Autowired
     private IPetriNetService service;
 
-    @RequestMapping(value = "/import", method = RequestMethod.POST, produces = "application/json")
+    @RequestMapping(value = "/import", method = RequestMethod.POST)
     public @ResponseBody String importPetriNet(
             @RequestParam(value = "file", required = true) MultipartFile multipartFile,
             @RequestParam(value = "meta", required = false) String fileMetaJSON) {
@@ -45,7 +45,7 @@ public class PetriNetController {
             ObjectMapper mapper = new ObjectMapper();
             UploadedFileMeta fileMeta = mapper.readValue(fileMetaJSON, UploadedFileMeta.class);
 
-            service.importPetriNet(file, fileMeta.name);
+            service.importPetriNet(file, fileMeta.name, fileMeta.initials);
             return JsonBuilder.successMessage("Petri net imported successfully");
         } catch (SAXException e) {
             e.printStackTrace();
@@ -59,12 +59,12 @@ public class PetriNetController {
         }
     }
 
-    @RequestMapping(value = "/all", method = RequestMethod.GET, produces = "application/json")
+    @RequestMapping(value = "/all", method = RequestMethod.GET)
     public List<PetriNet> getAll() {
         return service.loadAll();
     }
 
-    @RequestMapping(value = "/refs", method = RequestMethod.GET, produces = "application/json")
+    @RequestMapping(value = "/refs", method = RequestMethod.GET)
     public @ResponseBody PetriNetReferencesResource getAllReferences(){
         List<PetriNetReference> refs = service.getAllReferences();
         return new PetriNetReferencesResource(refs);
