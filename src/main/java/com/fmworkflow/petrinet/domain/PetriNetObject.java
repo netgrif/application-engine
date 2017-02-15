@@ -11,7 +11,7 @@ public abstract class PetriNetObject {
     private Integer id;
 
     public String getStringId() {
-        return id.toString();
+        return _id.toString();
     }
 
     public ObjectId getObjectId() {

@@ -25,8 +25,8 @@ public class PetriNetService implements IPetriNetService {
     private PetriNetRepository repository;
 
     @Override
-    public void importPetriNet(File xmlFile, String name) throws IOException, SAXException, ParserConfigurationException {
-        importer.importPetriNet(xmlFile, name);
+    public void importPetriNet(File xmlFile, String name, String initials) throws IOException, SAXException, ParserConfigurationException {
+        importer.importPetriNet(xmlFile, name, initials);
         xmlFile.delete();
     }
 
