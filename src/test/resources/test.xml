@@ -1,5 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document>
+    <transition>
+        <id>2</id>
+        <x>266</x>
+        <y>105</y>
+        <label>vyber cestu</label>
+        <field>
+            <id>13</id>
+            <logic>
+                <editable/>
+            </logic>
+        </field>
+        <field>
+            <id>14</id>
+        </field>
+    </transition>
     <place>
         <id>1</id>
         <x>140</x>
@@ -33,39 +48,13 @@
         <static>false</static>
     </place>
     <transition>
-        <id>2</id>
-        <x>266</x>
-        <y>105</y>
-        <label>vyber cestu</label>
-        <data
-            type="text">
-            <id>13</id>
-            <title>Názov dokumentu</title>
-            <desc>Názov dokumentu, ktorý je uvedený na obale</desc>
-            <logic>
-                <editable/>
-            </logic>
-        </data>
-        <data
-            type="text">
-            <id>14</id>
-            <title>Kód dokumentu</title>
-            <desc>Kód dokumentu, ktorý je uvedený na obale</desc>
-            <logic/>
-        </data>
-    </transition>
-    <transition>
         <id>5</id>
         <x>509</x>
         <y>113</y>
         <label>pokracuj</label>
-        <data
-            type="text">
+        <field>
             <id>15</id>
-            <title>Názov firmy</title>
-            <desc>Názov firmy, ktorý je uvedený na obale</desc>
-            <logic/>
-        </data>
+        </field>
     </transition>
     <arc>
         <id>7</id>
@@ -109,4 +98,19 @@
         <destinationId>6</destinationId>
         <multiplicity>1</multiplicity>
     </arc>
+    <data type="text">
+        <id>13</id>
+        <title>Názov dokumentu</title>
+        <desc>Názov dokumentu, ktorý je uvedený na obale</desc>
+    </data>
+    <data type="text">
+        <id>14</id>
+        <title>Kód dokumentu</title>
+        <desc>Kód dokumentu, ktorý je uvedený na obale</desc>
+    </data>
+    <data type="text">
+        <id>15</id>
+        <title>Názov firmy</title>
+        <desc>Názov firmy, ktorý je uvedený na obale</desc>
+    </data>
 </document>

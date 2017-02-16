@@ -17,7 +17,6 @@ import org.springframework.stereotype.Service;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 @Service
 public class TaskService implements ITaskService {
@@ -63,18 +62,23 @@ public class TaskService implements ITaskService {
     }
 
     private boolean isExecutable(Transition transition, PetriNet net, Case useCase) {
-        Map<String, Integer> activePlaces = useCase.getActivePlaces();
         Collection<Arc> arcsOfTransition = net.getArcsOfTransition(transition);
 
-        Optional<Arc> notAcrive = arcsOfTransition.stream()
-                .filter(arc -> arc.getDestination() == transition)
-                .filter(arc -> {
-                    Place source = (Place)arc.getSource();
-                    return source.getTokens() < activePlaces.get(source.getStringId());
-                })
-                .findAny();
+        for (Arc arc : arcsOfTransition) {
+            if (arc.getDestination() == transition) {
+                Place source = (Place)arc.getSource();
+                if (hasEnoughTokens(useCase, source)) {
+                    return false;
+                }
+            }
+        }
 
-        return notAcrive.isPresent();
+        return true;
+    }
+
+    private boolean hasEnoughTokens(Case useCase, Place source) {
+        Map<String, Integer> activePlaces = useCase.getActivePlaces();
+        return source.getTokens() == 0 || (activePlaces.containsKey(source.getObjectId().toString()) && source.getTokens() < activePlaces.get(source.getObjectId().toString()));
     }
 
     @Override

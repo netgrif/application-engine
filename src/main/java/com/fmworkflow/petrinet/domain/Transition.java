@@ -27,6 +27,14 @@ public class Transition extends Node {
         this.priority = priority;
     }
 
+    public Map<String, ILogicFunction> getDataSet() {
+        return dataSet;
+    }
+
+    public void setDataSet(Map<String, ILogicFunction> dataSet) {
+        this.dataSet = dataSet;
+    }
+
     @Override
     public String toString() {
         return this.getTitle();

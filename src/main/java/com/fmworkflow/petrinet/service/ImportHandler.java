@@ -12,12 +12,14 @@ import org.xml.sax.helpers.DefaultHandler;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 public class ImportHandler extends DefaultHandler {
     private final Logger log = LoggerFactory.getLogger(ImportHandler.class);
 
     private Map<Integer, Node> nodes;
     private Map<Integer, Field> fields;
+    private Map<Transition, Set<Integer>> dataset;
     private PetriNet net;
     private Element element;
     private PetriNetObject object;
@@ -28,6 +30,7 @@ public class ImportHandler extends DefaultHandler {
         this.net = net;
         this.nodes = new HashMap<>();
         this.fields = new HashMap<>();
+        this.dataset = new HashMap<>();
     }
 
     @Override
@@ -37,7 +40,17 @@ public class ImportHandler extends DefaultHandler {
 
     @Override
     public void endDocument() throws SAXException {
-        net.initializeArcs();
+        net.initializeArcsFromSkeleton();
+//        net.getTransitions().entrySet().stream()
+//                .filter(entry -> dataset.containsKey(entry.getValue()))
+//                .forEach(entry -> {
+//                    Map<String, ILogicFunction> logic = new HashMap<>();
+//                    dataset.get(entry.getValue()).forEach(id -> {
+//                        // TODO: 16/02/2017
+////                        logic.put(, new Editable());
+//                    });
+//                    entry.getValue().setDataSet(logic);
+//                });
         log.debug("Parsing ended");
     }
 
@@ -131,6 +144,16 @@ public class ImportHandler extends DefaultHandler {
                     object = new ResetArc((Arc) object);
                 else if (Arc.Type.valueOf(characters) == Arc.Type.inhibitor)
                     object = new InhibitorArc((Arc) object);
+                break;
+            case FIELD:
+//                if (dataset.containsKey((Transition) object)) {
+//                    dataset.get((Transition) object).add(Integer.parseInt(characters));
+//                } else {
+//                    Set<Integer> fieldIds = new HashSet<>();
+//                    fieldIds.add(Integer.parseInt(characters));
+//                    dataset.put((Transition) object, fieldIds);
+//                }
+//                break;
             default:
         }
     }
@@ -164,7 +187,8 @@ public class ImportHandler extends DefaultHandler {
         TITLE ("title"),
         DESC ("desc"),
         LOGIC ("logic"),
-        EDITABLE ("editable");
+        EDITABLE ("editable"),
+        FIELD ("field");
 
         String name;
 
