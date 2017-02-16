@@ -4,15 +4,15 @@ import org.codehaus.jettison.json.JSONObject;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document
-final public class Editable extends LogicFunction {
+public class Visible extends LogicFunction {
 
-    public Editable() {
+    public Visible() {
         super();
-        this.name = Editable.class.getName();
+        this.name = Visible.class.getName();
     }
 
     @Override
     public JSONObject unsafeApply(JSONObject jsonObject) throws Exception {
-        return jsonObject.put("editable", true);
+        return jsonObject.put("visible", true);
     }
 }

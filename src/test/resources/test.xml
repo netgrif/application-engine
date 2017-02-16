@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document>
-    <transition>
-        <id>2</id>
-        <x>266</x>
-        <y>105</y>
-        <label>vyber cestu</label>
-        <field>
-            <id>13</id>
-            <logic>
-                <editable/>
-            </logic>
-        </field>
-        <field>
-            <id>14</id>
-        </field>
-    </transition>
+    <data type="text">
+        <id>13</id>
+        <title>Názov dokumentu</title>
+        <desc>Názov dokumentu, ktorý je uvedený na obale</desc>
+    </data>
+    <data type="text">
+        <id>14</id>
+        <title>Kód dokumentu</title>
+        <desc>Kód dokumentu, ktorý je uvedený na obale</desc>
+    </data>
+    <data type="text">
+        <id>15</id>
+        <title>Názov firmy</title>
+        <desc>Názov firmy, ktorý je uvedený na obale</desc>
+    </data>
     <place>
         <id>1</id>
         <x>140</x>
@@ -54,6 +54,25 @@
         <label>pokracuj</label>
         <field>
             <id>15</id>
+        </field>
+    </transition>
+    <transition>
+        <id>2</id>
+        <x>266</x>
+        <y>105</y>
+        <label>vyber cestu</label>
+        <field>
+            <id>13</id>
+            <logic>
+                <editable/>
+            </logic>
+        </field>
+        <field>
+            <id>14</id>
+            <logic>
+                <editable/>
+                <visible/>
+            </logic>
         </field>
     </transition>
     <arc>
@@ -98,19 +117,4 @@
         <destinationId>6</destinationId>
         <multiplicity>1</multiplicity>
     </arc>
-    <data type="text">
-        <id>13</id>
-        <title>Názov dokumentu</title>
-        <desc>Názov dokumentu, ktorý je uvedený na obale</desc>
-    </data>
-    <data type="text">
-        <id>14</id>
-        <title>Kód dokumentu</title>
-        <desc>Kód dokumentu, ktorý je uvedený na obale</desc>
-    </data>
-    <data type="text">
-        <id>15</id>
-        <title>Názov firmy</title>
-        <desc>Názov firmy, ktorý je uvedený na obale</desc>
-    </data>
 </document>

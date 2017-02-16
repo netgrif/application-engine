@@ -4,6 +4,9 @@ import com.fmworkflow.petrinet.domain.*;
 import com.fmworkflow.petrinet.domain.dataset.Field;
 import com.fmworkflow.petrinet.domain.dataset.FieldType;
 import com.fmworkflow.petrinet.domain.dataset.TextField;
+import com.fmworkflow.petrinet.domain.dataset.logic.Editable;
+import com.fmworkflow.petrinet.domain.dataset.logic.LogicFunction;
+import com.fmworkflow.petrinet.domain.dataset.logic.Visible;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
@@ -25,6 +28,8 @@ public class ImportHandler extends DefaultHandler {
     private PetriNetObject object;
     private Field field;
     private int fieldId;
+    private boolean fieldRef;
+    private String fieldObjectId;
 
     public ImportHandler(PetriNet net) {
         this.net = net;
@@ -73,6 +78,16 @@ public class ImportHandler extends DefaultHandler {
                     case TEXT:
                         field = new TextField();
                 }
+                break;
+            case FIELD:
+                fieldRef = true;
+                break;
+            case EDITABLE:
+                addFunctionToTransition(new Editable());
+                break;
+            case VISIBLE:
+                addFunctionToTransition(new Visible());
+                break;
         }
     }
 
@@ -94,6 +109,8 @@ public class ImportHandler extends DefaultHandler {
                 net.addDataSetField(field);
                 field = null;
                 break;
+            case FIELD:
+                fieldRef = false;
         }
         element = Element.DOCUMENT;
     }
@@ -111,9 +128,11 @@ public class ImportHandler extends DefaultHandler {
                 ((Arc) object).setDestination(destination);
                 break;
             case ID:
-                if (field != null)
+                if (fieldRef) {
+                    fieldObjectId = fields.get(Integer.parseInt(characters)).getObjectId();
+                } else if (field != null)
                     fieldId = Integer.valueOf(characters);
-                if (object.getClass() != Arc.class)
+                else if (object.getClass() != Arc.class)
                     setNodeWithId(characters);
                 break;
             case MULTIPLICITY:
@@ -145,15 +164,12 @@ public class ImportHandler extends DefaultHandler {
                 else if (Arc.Type.valueOf(characters) == Arc.Type.inhibitor)
                     object = new InhibitorArc((Arc) object);
                 break;
-            case FIELD:
-//                if (dataset.containsKey((Transition) object)) {
-//                    dataset.get((Transition) object).add(Integer.parseInt(characters));
-//                } else {
-//                    Set<Integer> fieldIds = new HashSet<>();
-//                    fieldIds.add(Integer.parseInt(characters));
-//                    dataset.put((Transition) object, fieldIds);
-//                }
-//                break;
+            case TITLE:
+                field.setName(characters);
+                break;
+            case DESC:
+                field.setDescription(characters);
+                break;
             default:
         }
     }
@@ -166,6 +182,10 @@ public class ImportHandler extends DefaultHandler {
     private Node getNodeWithId(String idString) {
         Integer id = Integer.parseInt(idString);
         return nodes.get(id);
+    }
+
+    private void addFunctionToTransition(LogicFunction function) {
+        ((Transition) object).addDataSet(fieldObjectId, function);
     }
 
     enum Element {
@@ -188,6 +208,7 @@ public class ImportHandler extends DefaultHandler {
         DESC ("desc"),
         LOGIC ("logic"),
         EDITABLE ("editable"),
+        VISIBLE ("visible"),
         FIELD ("field");
 
         String name;
