@@ -4,7 +4,6 @@ import org.codehaus.jettison.json.JSONObject;
 
 import java.util.function.Function;
 
-@FunctionalInterface
 public interface ILogicFunction extends Function<JSONObject, JSONObject> {
 
     @Override
