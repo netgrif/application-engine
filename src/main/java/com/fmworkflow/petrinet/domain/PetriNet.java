@@ -150,12 +150,19 @@ public class PetriNet {
         return transitions.get(id);
     }
 
-    public void initializeArcs() {
+    public void initializeArcsFromSkeleton() {
         arcsSkeleton.forEach(arc -> {
             arc.setSource(getNode(arc.getSourceId()));
             arc.setDestination(getNode(arc.getDestinationId()));
             addArc(arc);
         });
+    }
+
+    public void initializeArcs() {
+        arcs.values().forEach(list -> list.forEach(arc -> {
+            arc.setSource(getNode(arc.getSourceId()));
+            arc.setDestination(getNode(arc.getDestinationId()));
+        }));
     }
 
     public Map<Place, Integer> getInputPlaces(Transition transition) {

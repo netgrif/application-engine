@@ -1,11 +1,9 @@
 package com.fmworkflow.petrinet.service;
 
-import com.fmworkflow.petrinet.domain.Arc;
 import com.fmworkflow.petrinet.domain.PetriNet;
 import com.fmworkflow.petrinet.domain.PetriNetReference;
 import com.fmworkflow.petrinet.domain.PetriNetRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.xml.sax.SAXException;
 
@@ -38,7 +36,7 @@ public class PetriNetService implements IPetriNetService {
     @Override
     public PetriNet loadPetriNet(String id) {
         PetriNet net = repository.findOne(id);
-        net.initializeArcs();
+        net.initializeArcsFromSkeleton();
         return net;
     }
 
@@ -46,7 +44,7 @@ public class PetriNetService implements IPetriNetService {
     public List<PetriNet> loadAll() {
         List<PetriNet> nets = repository.findAll();
         for (PetriNet net : nets) {
-            net.initializeArcs();
+            net.initializeArcsFromSkeleton();
         }
         return nets;
     }
