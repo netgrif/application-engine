@@ -3,9 +3,7 @@ package com.fmworkflow;
 import com.fmworkflow.auth.domain.Role;
 import com.fmworkflow.auth.domain.RoleRepository;
 import com.fmworkflow.auth.domain.User;
-import com.fmworkflow.auth.domain.UserRepository;
 import com.fmworkflow.auth.service.UserService;
-import com.fmworkflow.workflow.domain.Case;
 import com.fmworkflow.workflow.service.ITaskService;
 import com.fmworkflow.workflow.service.IWorkflowService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +14,6 @@ import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.hateoas.config.EnableHypermediaSupport;
 
 import java.util.HashSet;
-import java.util.List;
 
 @EnableCaching
 @EnableHypermediaSupport(type = EnableHypermediaSupport.HypermediaType.HAL)
@@ -58,9 +55,6 @@ public class WorkflowManagementSystemApplication implements CommandLineRunner{
 		admin.setRoles(adminRoles);
 		userService.save(admin);
 
-		List<Case> cases = workflowService.getAll();
-		if(cases != null || !cases.isEmpty()){
-			cases.forEach(aCase -> taskService.createTasks(aCase));
-		}
+		workflowService.getAll().forEach(aCase -> taskService.createTasks(aCase));
 	}
 }

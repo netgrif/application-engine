@@ -30,7 +30,9 @@ public class WorkflowService implements IWorkflowService {
 
     @Override
     public List<Case> getAll() {
-        return repository.findAll();
+        List<Case> cases = repository.findAll();
+        cases.forEach(aCase -> aCase.getPetriNet().initializeArcs());
+        return cases;
     }
 
     @Override
