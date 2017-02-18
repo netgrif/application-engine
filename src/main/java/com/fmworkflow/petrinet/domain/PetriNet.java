@@ -26,6 +26,8 @@ public class PetriNet {
     private Map<String, List<Arc>> arcs;
     @org.springframework.data.mongodb.core.mapping.Field("dataset")
     private Map<String, Field> dataSet;
+    @org.springframework.data.mongodb.core.mapping.Field("roles")
+    private Map<String, ProcessRole> roles;
     @Transient
     private Set<Arc> arcsSkeleton;
 
@@ -36,6 +38,13 @@ public class PetriNet {
         this.arcs = new HashMap<>();
         this.arcsSkeleton = new HashSet<>();
         this.dataSet = new HashMap<>();
+        this.roles = new HashMap<>();
+    }
+
+    public PetriNet(String title, String initials) {
+        this();
+        this.title = title;
+        this.initials = initials;
     }
 
     public ObjectId get_id() {
@@ -84,6 +93,18 @@ public class PetriNet {
 
     public Map<String, List<Arc>> getArcs() {
         return arcs;
+    }
+
+    public Map<String, ProcessRole> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(Map<String, ProcessRole> roles) {
+        this.roles = roles;
+    }
+
+    public void addRole(ProcessRole role) {
+        this.roles.put(role.getObjectId(), role);
     }
 
     public List<Arc> getArcsOfTransition(Transition transition) {
