@@ -1,18 +1,16 @@
-package com.fmworkflow.petrinet.domain.dataset;
+package com.fmworkflow.petrinet.domain;
 
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document
-public abstract class Field {
-
+public class ProcessRole {
     @Id
-    protected ObjectId _id;
+    private ObjectId _id;
     private String name;
-    private String description;
 
-    public Field(){
+    public ProcessRole() {
         _id = new ObjectId();
     }
 
@@ -34,19 +32,5 @@ public abstract class Field {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public void modifyValue(String newValue){}
-
-    public Field copy(){
-        return this;
     }
 }

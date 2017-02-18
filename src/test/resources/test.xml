@@ -21,7 +21,7 @@
         <y>111</y>
         <label>start</label>
         <tokens>1</tokens>
-        <static>false</static>
+        <isStatic>false</isStatic>
     </place>
     <place>
         <id>3</id>
@@ -29,7 +29,7 @@
         <y>44</y>
         <label>hore</label>
         <tokens>0</tokens>
-        <static>false</static>
+        <isStatic>false</isStatic>
     </place>
     <place>
         <id>4</id>
@@ -37,7 +37,7 @@
         <y>162</y>
         <label>dole</label>
         <tokens>0</tokens>
-        <static>false</static>
+        <isStatic>false</isStatic>
     </place>
     <place>
         <id>6</id>
@@ -45,7 +45,7 @@
         <y>120</y>
         <label>end</label>
         <tokens>0</tokens>
-        <static>false</static>
+        <isStatic>false</isStatic>
     </place>
     <transition>
         <id>5</id>

@@ -79,8 +79,18 @@ public class Arc extends PetriNetObject {
     }
 
     public enum Type {
-        regular,
-        inhibitor,
-        reset
+        REGULAR ("regular"),
+        INHIBITOR ("inhibitor"),
+        RESET ("reset");
+
+        String name;
+
+        Type(String name) {
+            this.name = name;
+        }
+
+        public static Type fromString(String name) {
+            return Type.valueOf(name.toUpperCase());
+        }
     }
 }
