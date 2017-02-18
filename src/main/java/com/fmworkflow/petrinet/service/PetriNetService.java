@@ -1,5 +1,6 @@
 package com.fmworkflow.petrinet.service;
 
+import com.fmworkflow.importer.Importer;
 import com.fmworkflow.petrinet.domain.PetriNet;
 import com.fmworkflow.petrinet.domain.PetriNetReference;
 import com.fmworkflow.petrinet.domain.PetriNetRepository;
