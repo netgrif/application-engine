@@ -13,12 +13,16 @@ import java.util.function.Function;
 public class Transition extends Node {
     @Field("dataSet")
     private Map<String, Function<JSONObject, JSONObject>> dataSet;
+    @Field("roles")
+    // TODO: 18/02/2017 change Object to desired class
+    private Map<String, Function<Object, Object>> roles;
 
     private int priority;
 
     public Transition() {
         super();
         dataSet = new HashMap<>();
+        roles = new HashMap<>();
     }
 
     public int getPriority() {
@@ -42,6 +46,22 @@ public class Transition extends Node {
             dataSet.put(fieldId, dataSet.get(fieldId).compose(function));
         } else {
             dataSet.put(fieldId, function);
+        }
+    }
+
+    public Map<String, Function<Object, Object>> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(Map<String, Function<Object, Object>> roles) {
+        this.roles = roles;
+    }
+
+    public void addRole(String fieldId, Function<Object, Object> role) {
+        if (roles.containsKey(fieldId) && roles.get(fieldId) != null) {
+            roles.put(fieldId, roles.get(fieldId).compose(role));
+        } else {
+            roles.put(fieldId, role);
         }
     }
 
