@@ -1,10 +1,9 @@
 package com.fmworkflow.petrinet.web;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.fmworkflow.json.JsonBuilder;
-import com.fmworkflow.petrinet.domain.PetriNet;
-import com.fmworkflow.petrinet.domain.PetriNetReference;
-import com.fmworkflow.petrinet.domain.PetriNetReferencesResource;
+import com.fmworkflow.petrinet.domain.*;
 import com.fmworkflow.petrinet.service.IPetriNetService;
 import com.fmworkflow.petrinet.web.requestbodies.UploadedFileMeta;
 import org.apache.log4j.Logger;
@@ -18,8 +17,10 @@ import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
 
 @Controller
@@ -32,7 +33,9 @@ public class PetriNetController {
     private IPetriNetService service;
 
     @RequestMapping(value = "/import", method = RequestMethod.POST)
-    public @ResponseBody String importPetriNet(
+    public
+    @ResponseBody
+    String importPetriNet(
             @RequestParam(value = "file", required = true) MultipartFile multipartFile,
             @RequestParam(value = "meta", required = false) String fileMetaJSON) {
         try {
@@ -65,8 +68,24 @@ public class PetriNetController {
     }
 
     @RequestMapping(value = "/refs", method = RequestMethod.GET)
-    public @ResponseBody PetriNetReferencesResource getAllReferences(){
+    public
+    @ResponseBody
+    PetriNetReferencesResource getAllReferences() {
         List<PetriNetReference> refs = service.getAllReferences();
         return new PetriNetReferencesResource(refs);
+    }
+
+    @RequestMapping(value = "/transition/refs/{ids}", method = RequestMethod.GET)
+    public
+    @ResponseBody
+    TransitionReferencesResource getTransitionReferences(@PathVariable List<String> ids) {
+        ids.forEach(id -> {
+            try {
+                id = URLDecoder.decode(id, StandardCharsets.UTF_8.name());
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+        });
+        return new TransitionReferencesResource(service.getTransitionReferences(ids));
     }
 }
