@@ -1,9 +1,7 @@
 package com.fmworkflow.petrinet.service;
 
 import com.fmworkflow.importer.Importer;
-import com.fmworkflow.petrinet.domain.PetriNet;
-import com.fmworkflow.petrinet.domain.PetriNetReference;
-import com.fmworkflow.petrinet.domain.PetriNetRepository;
+import com.fmworkflow.petrinet.domain.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.xml.sax.SAXException;
@@ -58,5 +56,17 @@ public class PetriNetService implements IPetriNetService {
             refs.add(new PetriNetReference(net.get_id().toString(), net.getTitle()));
         }
         return refs;
+    }
+
+    public List<TransitionReference> getTransitionReferences(List<String> netsIds){
+        Iterable<PetriNet> nets = repository.findAll(netsIds);
+        List<TransitionReference>  transRefs = new ArrayList<>();
+
+        nets.forEach(net -> net.getTransitions().forEach((s, transition) ->
+                transRefs.add(new TransitionReference(transition.getStringId(),
+                        net.get_id().toString(),
+                        transition.getTitle()))));
+
+        return transRefs;
     }
 }

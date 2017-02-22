@@ -2,6 +2,8 @@ package com.fmworkflow.petrinet.service;
 
 import com.fmworkflow.petrinet.domain.PetriNet;
 import com.fmworkflow.petrinet.domain.PetriNetReference;
+import com.fmworkflow.petrinet.domain.PetriNetReferencesResource;
+import com.fmworkflow.petrinet.domain.TransitionReference;
 import org.springframework.stereotype.Component;
 import org.xml.sax.SAXException;
 
@@ -21,4 +23,5 @@ public interface IPetriNetService {
     List<PetriNet> loadAll();
 
     List<PetriNetReference> getAllReferences();
+    List<TransitionReference> getTransitionReferences(List<String> netsIds);
 }

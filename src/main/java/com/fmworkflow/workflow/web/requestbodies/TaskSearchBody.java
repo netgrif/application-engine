@@ -1,10 +1,11 @@
 package com.fmworkflow.workflow.web.requestbodies;
 
 
+import java.util.List;
 
 public class TaskSearchBody {
 
-    public String petrinetId;
-    public String transitionId;
+    public List<String> petrinetIds;
+    public List<String> transitionIds;
 
 }
