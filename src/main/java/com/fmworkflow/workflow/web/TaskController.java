@@ -3,10 +3,13 @@ package com.fmworkflow.workflow.web;
 import com.fmworkflow.auth.domain.LoggedUser;
 import com.fmworkflow.json.JsonBuilder;
 import com.fmworkflow.petrinet.domain.throwable.TransitionNotStartableException;
+import com.fmworkflow.workflow.domain.FiltersResource;
 import com.fmworkflow.workflow.domain.Task;
 import com.fmworkflow.workflow.domain.TaskResource;
 import com.fmworkflow.workflow.domain.TasksResource;
+import com.fmworkflow.workflow.service.IFilterService;
 import com.fmworkflow.workflow.service.ITaskService;
+import com.fmworkflow.workflow.web.requestbodies.CreateFilterBody;
 import com.fmworkflow.workflow.web.requestbodies.TaskSearchBody;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.Resource;
@@ -24,6 +27,8 @@ public class TaskController {
 
     @Autowired
     private ITaskService taskService;
+    @Autowired
+    private IFilterService filterService;
 
     @RequestMapping(method = RequestMethod.GET)
     public TasksResource getAll(){
@@ -105,6 +110,21 @@ public class TaskController {
     @RequestMapping(value = "/search", method = RequestMethod.POST)
     public TasksResource search(@RequestBody TaskSearchBody searchBody){
         return getAll(); //TODO: 9.2.2017 - search on tasks according to posted json
+    }
+
+    @RequestMapping(value = "/filter", method = RequestMethod.GET)
+    public FiltersResource getAllFilters(Authentication auth){
+        return new FiltersResource(filterService.getAll());
+    }
+
+    @RequestMapping(value = "/filter", method = RequestMethod.POST)
+    public Resource<String> saveFilter(Authentication auth, @RequestBody CreateFilterBody filterBody){
+        boolean saveSuccess = filterService.saveFilter(((LoggedUser) auth.getPrincipal()),filterBody);
+        if(saveSuccess){
+            return new Resource<>(JsonBuilder.successMessage("Filter "+filterBody.name+" saved"));
+        } else {
+            return new Resource<>(JsonBuilder.successMessage("Filter "+filterBody.name+" saving failed!"));
+        }
     }
 
 
