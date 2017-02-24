@@ -3,24 +3,24 @@ package com.fmworkflow.petrinet.domain;
 
 public class TransitionReference {
 
-    private String id;
+    private String entityId;
     private String petriNetId;
     private String title;
 
     public TransitionReference(){}
 
-    public TransitionReference(String id, String petriNetId, String title) {
-        this.id = id;
+    public TransitionReference(String entityId, String petriNetId, String title) {
+        this.entityId = entityId;
         this.petriNetId = petriNetId;
         this.title = title;
     }
 
-    public String getId() {
-        return id;
+    public String getEntityId() {
+        return entityId;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setEntityId(String entityId) {
+        this.entityId = entityId;
     }
 
     public String getPetriNetId() {
