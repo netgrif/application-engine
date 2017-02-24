@@ -3,22 +3,22 @@ package com.fmworkflow.petrinet.domain;
 
 public class PetriNetReference {
 
-    private String id;
+    private String entityId;
     private String title;
 
     public PetriNetReference(){}
 
-    public PetriNetReference(String id, String title) {
-        this.id = id;
+    public PetriNetReference(String entityId, String title) {
+        this.entityId = entityId;
         this.title = title;
     }
 
-    public String getId() {
-        return id;
+    public String getEntityId() {
+        return entityId;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setEntityId(String entityId) {
+        this.entityId = entityId;
     }
 
     public String getTitle() {
