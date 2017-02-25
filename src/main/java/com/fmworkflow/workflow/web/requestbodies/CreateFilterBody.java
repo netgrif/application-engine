@@ -1,8 +1,8 @@
 package com.fmworkflow.workflow.web.requestbodies;
 
 
-import com.fmworkflow.petrinet.domain.PetriNetReference;
-import com.fmworkflow.petrinet.domain.TransitionReference;
+import com.fmworkflow.petrinet.web.responsebodies.PetriNetReference;
+import com.fmworkflow.petrinet.web.responsebodies.TransitionReference;
 
 import java.util.List;
 

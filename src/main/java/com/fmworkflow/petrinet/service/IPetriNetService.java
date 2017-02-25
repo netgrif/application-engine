@@ -1,10 +1,8 @@
 package com.fmworkflow.petrinet.service;
 
 import com.fmworkflow.petrinet.domain.PetriNet;
-import com.fmworkflow.petrinet.domain.PetriNetReference;
-import com.fmworkflow.petrinet.domain.PetriNetReferencesResource;
-import com.fmworkflow.petrinet.domain.TransitionReference;
-import org.springframework.stereotype.Component;
+import com.fmworkflow.petrinet.web.responsebodies.PetriNetReference;
+import com.fmworkflow.petrinet.web.responsebodies.TransitionReference;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;

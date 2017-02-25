@@ -9,6 +9,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
+import java.util.List;
 
 @Service
 public class UserService implements IUserService {
@@ -40,5 +41,10 @@ public class UserService implements IUserService {
     @Override
     public User getLoggedInUser() {
         return userRepository.findByEmail(securityService.findLoggedInUsername());
+    }
+
+    @Override
+    public List<User> findAll() {
+        return userRepository.findAll();
     }
 }

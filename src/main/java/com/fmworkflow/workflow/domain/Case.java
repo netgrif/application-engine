@@ -15,7 +15,6 @@ import java.util.Map;
 
 @Document
 public class Case {
-
     @Id
     private ObjectId _id;
     @DBRef
