@@ -1,4 +1,4 @@
-package com.fmworkflow.petrinet.domain;
+package com.fmworkflow.petrinet.web.responsebodies;
 
 
 public class PetriNetReference {

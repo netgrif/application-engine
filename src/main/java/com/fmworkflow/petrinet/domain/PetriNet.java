@@ -4,10 +4,12 @@ import com.fmworkflow.petrinet.domain.dataset.Field;
 import org.bson.types.ObjectId;
 import org.joda.time.DateTime;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -28,15 +30,12 @@ public class PetriNet {
     private Map<String, Field> dataSet;
     @org.springframework.data.mongodb.core.mapping.Field("roles")
     private Map<String, ProcessRole> roles;
-    @Transient
-    private Set<Arc> arcsSkeleton;
 
     public PetriNet() {
         creationDate = DateTime.now();
         this.places = new HashMap<>();
         this.transitions = new HashMap<>();
         this.arcs = new HashMap<>();
-        this.arcsSkeleton = new HashSet<>();
         this.dataSet = new HashMap<>();
         this.roles = new HashMap<>();
     }
@@ -139,10 +138,6 @@ public class PetriNet {
         this.dataSet.put(field.getObjectId(), field);
     }
 
-    public void addArcSkelet(Arc arc) {
-        arcsSkeleton.add(arc);
-    }
-
     public void addArc(Arc arc) {
         String transitionId = arc.getTransition().getObjectId().toString();
         if (arcs.containsKey(transitionId))
@@ -171,14 +166,6 @@ public class PetriNet {
         return transitions.get(id);
     }
 
-    public void initializeArcsFromSkeleton() {
-        arcsSkeleton.forEach(arc -> {
-            arc.setSource(getNode(arc.getSourceId()));
-            arc.setDestination(getNode(arc.getDestinationId()));
-            addArc(arc);
-        });
-    }
-
     public void initializeArcs() {
         arcs.values().forEach(list -> list.forEach(arc -> {
             arc.setSource(getNode(arc.getSourceId()));
@@ -205,6 +192,4 @@ public class PetriNet {
     public String toString() {
         return title;
     }
-
-
 }

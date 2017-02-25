@@ -1,11 +1,16 @@
 package com.fmworkflow.petrinet.web;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.type.TypeFactory;
+import com.fmworkflow.auth.service.IUserService;
 import com.fmworkflow.json.JsonBuilder;
-import com.fmworkflow.petrinet.domain.*;
+import com.fmworkflow.petrinet.domain.PetriNet;
+import com.fmworkflow.petrinet.web.responsebodies.PetriNetReference;
+import com.fmworkflow.petrinet.web.responsebodies.PetriNetReferencesResource;
 import com.fmworkflow.petrinet.service.IPetriNetService;
+import com.fmworkflow.petrinet.service.IProcessRoleService;
 import com.fmworkflow.petrinet.web.requestbodies.UploadedFileMeta;
+import com.fmworkflow.petrinet.web.responsebodies.TransitionReferencesResource;
+import com.fmworkflow.petrinet.web.responsebodies.UsersRolesListResponse;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -20,7 +25,6 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.List;
 
 @Controller
@@ -31,6 +35,12 @@ public class PetriNetController {
 
     @Autowired
     private IPetriNetService service;
+
+    @Autowired
+    private IProcessRoleService roleService;
+
+    @Autowired
+    private IUserService userService;
 
     @RequestMapping(value = "/import", method = RequestMethod.POST)
     public
@@ -87,5 +97,28 @@ public class PetriNetController {
             }
         });
         return new TransitionReferencesResource(service.getTransitionReferences(ids));
+    }
+
+    @RequestMapping(value = "/roles/assign/{netId}", method = RequestMethod.GET)
+    public
+    @ResponseBody
+    UsersRolesListResponse getUsersAndRoles(@PathVariable String netId) {
+        UsersRolesListResponse response = new UsersRolesListResponse();
+        response.setUsers(userService.findAll());
+        response.setRoles(roleService.findAll(netId));
+        return response;
+    }
+
+    @RequestMapping(value = "/roles/assign/{netId}", method = RequestMethod.POST)
+    public
+    @ResponseBody
+    String assignRoleToUser(@RequestParam String userId, @RequestParam String roleId, @PathVariable String netId) {
+        try {
+            roleService.assignRoleToUser(userId, netId, roleId);
+            return JsonBuilder.successMessage("Role assigned");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return JsonBuilder.errorMessage("Unable to assign role");
+        }
     }
 }

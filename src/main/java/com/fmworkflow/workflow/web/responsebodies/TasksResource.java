@@ -1,4 +1,4 @@
-package com.fmworkflow.workflow.domain;
+package com.fmworkflow.workflow.web.responsebodies;
 
 import com.fmworkflow.workflow.web.TaskController;
 import org.springframework.hateoas.Link;
