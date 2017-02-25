@@ -1,10 +1,10 @@
 package com.fmworkflow.workflow.service;
 
+import com.fmworkflow.auth.domain.LoggedUser;
 import com.fmworkflow.auth.domain.User;
-import com.fmworkflow.petrinet.domain.Arc;
-import com.fmworkflow.petrinet.domain.PetriNet;
-import com.fmworkflow.petrinet.domain.Place;
-import com.fmworkflow.petrinet.domain.Transition;
+import com.fmworkflow.auth.domain.UserRepository;
+import com.fmworkflow.petrinet.domain.*;
+import com.fmworkflow.petrinet.domain.roles.ProcessRole;
 import com.fmworkflow.petrinet.domain.throwable.TransitionNotStartableException;
 import com.fmworkflow.workflow.domain.Case;
 import com.fmworkflow.workflow.domain.CaseRepository;
@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -25,10 +26,14 @@ public class TaskService implements ITaskService {
     private TaskRepository taskRepository;
     @Autowired
     private CaseRepository caseRepository;
+    @Autowired
+    private UserRepository userRepository;
 
     @Override
-    public List<Task> getAll(){
-        return taskRepository.findAll();
+    public List<Task> getAll(LoggedUser loggedUser){
+        User user = userRepository.findOne(loggedUser.getId());
+        List<ProcessRole> roles = new LinkedList<>(user.getProcessRoles());
+        return taskRepository.findAllByAssignRoleIn(roles);
     }
 
     @Override
@@ -56,6 +61,7 @@ public class TaskService implements ITaskService {
                 task.setPriority(transition.getPriority());
                 task = taskRepository.save(task);
                 task.setVisualId(net.getInitials());
+                task.setAssignRole(net.getRoles().get(transition.getRoles().keySet().stream().findFirst().orElseGet(null)));
                 taskRepository.save(task);
             }
         }

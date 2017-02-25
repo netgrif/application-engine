@@ -1,5 +1,6 @@
 package com.fmworkflow.workflow.service;
 
+import com.fmworkflow.auth.domain.LoggedUser;
 import com.fmworkflow.auth.domain.User;
 import com.fmworkflow.petrinet.domain.throwable.TransitionNotStartableException;
 import com.fmworkflow.workflow.domain.Case;
@@ -8,7 +9,7 @@ import com.fmworkflow.workflow.domain.Task;
 import java.util.List;
 
 public interface ITaskService {
-    List<Task> getAll();
+    List<Task> getAll(LoggedUser loggedUser);
 
     List<Task> findByCaseId(String caseId);
 

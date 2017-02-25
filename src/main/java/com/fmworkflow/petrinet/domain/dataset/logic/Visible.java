@@ -1,18 +1,17 @@
 package com.fmworkflow.petrinet.domain.dataset.logic;
 
-import org.codehaus.jettison.json.JSONObject;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document
-public class Visible extends LogicFunction {
+public class Visible implements LogicFunction {
 
     public Visible() {
         super();
-        this.name = Visible.class.getName();
     }
 
     @Override
-    public JSONObject unsafeApply(JSONObject jsonObject) throws Exception {
+    public ObjectNode unsafeApply(ObjectNode jsonObject) throws Exception {
         return jsonObject.put("visible", true);
     }
 }

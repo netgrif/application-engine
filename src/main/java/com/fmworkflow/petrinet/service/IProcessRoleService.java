@@ -1,6 +1,6 @@
 package com.fmworkflow.petrinet.service;
 
-import com.fmworkflow.petrinet.domain.ProcessRole;
+import com.fmworkflow.petrinet.domain.roles.ProcessRole;
 
 import java.util.List;
 
