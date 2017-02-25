@@ -1,8 +1,8 @@
 package com.fmworkflow.workflow.domain;
 
 import com.fmworkflow.auth.domain.LoggedUser;
-import com.fmworkflow.petrinet.domain.PetriNetReference;
-import com.fmworkflow.petrinet.domain.TransitionReference;
+import com.fmworkflow.petrinet.web.responsebodies.PetriNetReference;
+import com.fmworkflow.petrinet.web.responsebodies.TransitionReference;
 import com.fmworkflow.workflow.web.requestbodies.CreateFilterBody;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
