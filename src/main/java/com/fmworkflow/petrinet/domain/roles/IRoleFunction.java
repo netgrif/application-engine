@@ -1,10 +1,11 @@
-package com.fmworkflow.petrinet.domain.dataset.logic;
+package com.fmworkflow.petrinet.domain.roles;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fmworkflow.petrinet.domain.dataset.logic.LogicNotApplicableException;
 
 import java.util.function.Function;
 
-public interface LogicFunction extends Function<ObjectNode, ObjectNode> {
+public interface IRoleFunction extends Function<ObjectNode, ObjectNode> {
 
     @Override
     default ObjectNode apply(ObjectNode jsonObject) {

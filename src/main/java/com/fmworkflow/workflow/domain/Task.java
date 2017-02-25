@@ -1,6 +1,7 @@
 package com.fmworkflow.workflow.domain;
 
 import com.fmworkflow.auth.domain.User;
+import com.fmworkflow.petrinet.domain.roles.ProcessRole;
 import org.joda.time.DateTime;
 
 import javax.persistence.*;
@@ -18,6 +19,8 @@ public class Task {
     private int priority;
     @ManyToOne
     private User user;
+    @ManyToOne
+    private ProcessRole assignRole;
     private DateTime startDate;
     private DateTime finishDate;
 
@@ -99,6 +102,14 @@ public class Task {
 
     public void setTransitionId(String transitionId) {
         this.transitionId = transitionId;
+    }
+
+    public ProcessRole getAssignRole() {
+        return assignRole;
+    }
+
+    public void setAssignRole(ProcessRole assignRole) {
+        this.assignRole = assignRole;
     }
 
     public static class Priorities {

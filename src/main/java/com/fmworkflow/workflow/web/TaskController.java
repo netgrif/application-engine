@@ -3,14 +3,14 @@ package com.fmworkflow.workflow.web;
 import com.fmworkflow.auth.domain.LoggedUser;
 import com.fmworkflow.json.JsonBuilder;
 import com.fmworkflow.petrinet.domain.throwable.TransitionNotStartableException;
-import com.fmworkflow.workflow.web.responsebodies.FiltersResource;
 import com.fmworkflow.workflow.domain.Task;
-import com.fmworkflow.workflow.web.responsebodies.TaskResource;
-import com.fmworkflow.workflow.web.responsebodies.TasksResource;
 import com.fmworkflow.workflow.service.IFilterService;
 import com.fmworkflow.workflow.service.ITaskService;
 import com.fmworkflow.workflow.web.requestbodies.CreateFilterBody;
 import com.fmworkflow.workflow.web.requestbodies.TaskSearchBody;
+import com.fmworkflow.workflow.web.responsebodies.FiltersResource;
+import com.fmworkflow.workflow.web.responsebodies.TaskResource;
+import com.fmworkflow.workflow.web.responsebodies.TasksResource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.Resource;
 import org.springframework.security.core.Authentication;
@@ -29,9 +29,10 @@ public class TaskController {
     private IFilterService filterService;
 
     @RequestMapping(method = RequestMethod.GET)
-    public TasksResource getAll(){
+    public TasksResource getAll(Authentication auth){
         List<TaskResource> resources = new ArrayList<>();
-        for(Task task : taskService.getAll()){
+        LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
+        for(Task task : taskService.getAll(loggedUser)){
             resources.add(TaskResource.createFrom(task, null));
         }
 
@@ -80,7 +81,7 @@ public class TaskController {
     }
 
     @RequestMapping(value = "/my", method = RequestMethod.GET)
-    public TasksResource getMy(Authentication auth){
+    public TasksResource getMy(Authentication auth) {
         List<TaskResource> resources = new ArrayList<>();
         for(Task task:taskService.findByUser(((LoggedUser)auth.getPrincipal()).transformToUser())){
             resources.add(TaskResource.createFrom(task,auth));
@@ -106,8 +107,8 @@ public class TaskController {
     }
 
     @RequestMapping(value = "/search", method = RequestMethod.POST)
-    public TasksResource search(@RequestBody TaskSearchBody searchBody){
-        return getAll(); //TODO: 9.2.2017 - search on tasks according to posted json
+    public TasksResource search(Authentication auth, @RequestBody TaskSearchBody searchBody){
+        return getAll(auth); //TODO: 9.2.2017 - search on tasks according to posted json
     }
 
     @RequestMapping(value = "/filter", method = RequestMethod.GET)

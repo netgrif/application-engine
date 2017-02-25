@@ -1,18 +1,17 @@
 package com.fmworkflow.petrinet.domain.dataset.logic;
 
-import org.codehaus.jettison.json.JSONObject;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document
-final public class Editable extends LogicFunction {
+final public class Editable implements LogicFunction {
 
     public Editable() {
         super();
-        this.name = Editable.class.getName();
     }
 
     @Override
-    public JSONObject unsafeApply(JSONObject jsonObject) throws Exception {
+    public ObjectNode unsafeApply(ObjectNode jsonObject) throws Exception {
         return jsonObject.put("editable", true);
     }
 }

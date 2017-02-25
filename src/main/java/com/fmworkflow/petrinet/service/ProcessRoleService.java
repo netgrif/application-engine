@@ -4,7 +4,7 @@ import com.fmworkflow.auth.domain.User;
 import com.fmworkflow.auth.domain.UserRepository;
 import com.fmworkflow.petrinet.domain.PetriNet;
 import com.fmworkflow.petrinet.domain.PetriNetRepository;
-import com.fmworkflow.petrinet.domain.ProcessRole;
+import com.fmworkflow.petrinet.domain.roles.ProcessRole;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
