@@ -391,7 +391,9 @@
         <label>Odovzdanie UJ do RS-FMS</label>
         <roleRef>
             <id>1</id>
-            <logic></logic>
+            <logic>
+                <assignToSelf>true</assignToSelf>
+            </logic>
         </roleRef>
     </transition>
     <transition>
@@ -401,7 +403,9 @@
         <label>Návrh miesta a termínu odovzdania</label>
         <roleRef>
             <id>1</id>
-            <logic></logic>
+            <logic>
+                <assignToSelf>true</assignToSelf>
+            </logic>
         </roleRef>
     </transition>
     <transition>
@@ -411,7 +415,9 @@
         <label>Vrátenie UJ</label>
         <roleRef>
             <id>1</id>
-            <logic></logic>
+            <logic>
+                <assignToSelf>true</assignToSelf>
+            </logic>
         </roleRef>
     </transition>
     <transition>
@@ -421,7 +427,9 @@
         <label>Vypožičanie UJ</label>
         <roleRef>
             <id>1</id>
-            <logic></logic>
+            <logic>
+                <assignToSelf>true</assignToSelf>
+            </logic>
         </roleRef>
         <dataRef>
             <id>22</id>
@@ -473,7 +481,9 @@
         <label>Potvrdenie terminu</label>
         <roleRef>
             <id>2</id>
-            <logic></logic>
+            <logic>
+                <assignToSelf>true</assignToSelf>
+            </logic>
         </roleRef>
     </transition>
     <transition>
@@ -483,7 +493,9 @@
         <label>Upresnenie miesta a termínu odovzdania</label>
         <roleRef>
             <id>2</id>
-            <logic></logic>
+            <logic>
+                <assignToSelf>true</assignToSelf>
+            </logic>
         </roleRef>
     </transition>
     <transition>
@@ -493,7 +505,9 @@
         <label>Upresnenie miesta a termínu odovzdania</label>
         <roleRef>
             <id>1</id>
-            <logic></logic>
+            <logic>
+                <assignToSelf>true</assignToSelf>
+            </logic>
         </roleRef>
     </transition>
     <transition>
@@ -503,7 +517,9 @@
         <label>Odovzdanie</label>
         <roleRef>
             <id>1</id>
-            <logic></logic>
+            <logic>
+                <assignToSelf>true</assignToSelf>
+            </logic>
         </roleRef>
     </transition>
     <transition>
@@ -513,7 +529,7 @@
         <label>Zaevidovanie UJ</label>
         <roleRef>
             <id>2</id>
-            <logic></logic>
+            <logic><assignToSelf>true</assignToSelf></logic>
         </roleRef>
     </transition>
     <transition>
@@ -523,7 +539,7 @@
         <label>Riešenie spornej veci</label>
         <roleRef>
             <id>2</id>
-            <logic></logic>
+            <logic><assignToSelf>true</assignToSelf></logic>
         </roleRef>
     </transition>
     <transition>
@@ -533,7 +549,7 @@
         <label>Riešenie spornej veci</label>
         <roleRef>
             <id>1</id>
-            <logic></logic>
+            <logic><assignToSelf>true</assignToSelf></logic>
         </roleRef>
     </transition>
     <transition>
@@ -543,7 +559,7 @@
         <label>Požiadavka na vypožičanie</label>
         <roleRef>
             <id>1</id>
-            <logic></logic>
+            <logic><assignToSelf>true</assignToSelf></logic>
         </roleRef>
     </transition>
     <transition>
@@ -553,7 +569,7 @@
         <label>Odovzdanie vypožičanej UJ</label>
         <roleRef>
             <id>2</id>
-            <logic></logic>
+            <logic><assignToSelf>true</assignToSelf></logic>
         </roleRef>
     </transition>
     <transition>
@@ -563,7 +579,7 @@
         <label>Skartácia</label>
         <roleRef>
             <id>2</id>
-            <logic></logic>
+            <logic><assignToSelf>true</assignToSelf></logic>
         </roleRef>
     </transition>
     <transition>
@@ -573,7 +589,7 @@
         <label>Prebratie požičanej UJ</label>
         <roleRef>
             <id>1</id>
-            <logic></logic>
+            <logic><assignToSelf>true</assignToSelf></logic>
         </roleRef>
     </transition>
     <transition>

@@ -1,6 +1,7 @@
 package com.fmworkflow.petrinet.domain;
 
 import com.fmworkflow.petrinet.domain.dataset.Field;
+import com.fmworkflow.petrinet.domain.roles.ProcessRole;
 import org.bson.types.ObjectId;
 import org.joda.time.DateTime;
 import org.springframework.data.annotation.Id;
