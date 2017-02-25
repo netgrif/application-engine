@@ -3,6 +3,8 @@ package com.fmworkflow.importer;
 import com.fmworkflow.importer.model.*;
 import com.fmworkflow.petrinet.domain.*;
 import com.fmworkflow.petrinet.domain.dataset.Field;
+import com.fmworkflow.petrinet.domain.roles.AssignToSelfFunction;
+import com.fmworkflow.petrinet.domain.roles.ProcessRole;
 import com.fmworkflow.petrinet.service.ArcFactory;
 import com.fmworkflow.petrinet.service.FieldFactory;
 import com.fmworkflow.petrinet.domain.dataset.logic.Editable;
@@ -91,7 +93,7 @@ public class Importer {
         if (importTransition.getRoleRef() != null)
             Arrays.stream(importTransition.getRoleRef()).forEach(roleRef ->
                     // TODO: 18/02/2017 add Role logic
-                    transition.addRole(roles.get(roleRef.getId()).getObjectId(), null)
+                    transition.addRole(roles.get(roleRef.getId()).getObjectId(), new AssignToSelfFunction(roles.get(roleRef.getId()).getObjectId()))
             );
         if (importTransition.getDataRef() != null)
             Arrays.stream(importTransition.getDataRef()).forEach(dataRef ->

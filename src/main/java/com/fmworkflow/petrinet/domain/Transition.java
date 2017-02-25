@@ -1,7 +1,7 @@
 package com.fmworkflow.petrinet.domain;
 
-import com.fmworkflow.petrinet.domain.dataset.logic.ILogicFunction;
-import org.codehaus.jettison.json.JSONObject;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fmworkflow.petrinet.domain.dataset.logic.LogicFunction;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
@@ -12,10 +12,9 @@ import java.util.function.Function;
 @Document
 public class Transition extends Node {
     @Field("dataSet")
-    private Map<String, Function<JSONObject, JSONObject>> dataSet;
+    private Map<String, Function<ObjectNode, ObjectNode>> dataSet;
     @Field("roles")
-    // TODO: 18/02/2017 change Object to desired class
-    private Map<String, Function<Object, Object>> roles;
+    private Map<String, Function<ObjectNode, ObjectNode>> roles;
 
     private int priority;
 
@@ -33,15 +32,15 @@ public class Transition extends Node {
         this.priority = priority;
     }
 
-    public Map<String, Function<JSONObject, JSONObject>> getDataSet() {
+    public Map<String, Function<ObjectNode, ObjectNode>> getDataSet() {
         return dataSet;
     }
 
-    public void setDataSet(Map<String, Function<JSONObject, JSONObject>> dataSet) {
+    public void setDataSet(Map<String, Function<ObjectNode, ObjectNode>> dataSet) {
         this.dataSet = dataSet;
     }
 
-    public void addDataSet(String fieldId, ILogicFunction function) {
+    public void addDataSet(String fieldId, LogicFunction function) {
         if (dataSet.containsKey(fieldId) && dataSet.get(fieldId) != null) {
             dataSet.put(fieldId, dataSet.get(fieldId).compose(function));
         } else {
@@ -49,15 +48,15 @@ public class Transition extends Node {
         }
     }
 
-    public Map<String, Function<Object, Object>> getRoles() {
+    public Map<String, Function<ObjectNode, ObjectNode>> getRoles() {
         return roles;
     }
 
-    public void setRoles(Map<String, Function<Object, Object>> roles) {
+    public void setRoles(Map<String, Function<ObjectNode, ObjectNode>> roles) {
         this.roles = roles;
     }
 
-    public void addRole(String fieldId, Function<Object, Object> role) {
+    public void addRole(String fieldId, Function<ObjectNode, ObjectNode> role) {
         if (roles.containsKey(fieldId) && roles.get(fieldId) != null) {
             roles.put(fieldId, roles.get(fieldId).compose(role));
         } else {

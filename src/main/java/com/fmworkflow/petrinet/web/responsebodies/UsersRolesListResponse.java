@@ -1,7 +1,7 @@
 package com.fmworkflow.petrinet.web.responsebodies;
 
 import com.fmworkflow.auth.domain.User;
-import com.fmworkflow.petrinet.domain.ProcessRole;
+import com.fmworkflow.petrinet.domain.roles.ProcessRole;
 
 import java.util.LinkedList;
 import java.util.List;

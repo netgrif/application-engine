@@ -1,4 +1,4 @@
-package com.fmworkflow.petrinet.domain;
+package com.fmworkflow.petrinet.domain.roles;
 
 import com.fmworkflow.auth.domain.User;
 import org.bson.types.ObjectId;

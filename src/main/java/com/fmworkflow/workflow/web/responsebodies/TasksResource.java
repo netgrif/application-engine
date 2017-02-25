@@ -16,10 +16,10 @@ public class TasksResource extends Resources<TaskResource> {
     public void addLinks(String selfRel){
         if(selfRel.equals("all"))
             add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
-            .getAll()).withSelfRel());
+            .getAll(null)).withSelfRel());
         else
             add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
-                    .getAll()).withRel("all"));
+                    .getAll(null)).withRel("all"));
 
         if(selfRel.equals("my"))
             add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
@@ -37,9 +37,9 @@ public class TasksResource extends Resources<TaskResource> {
 
         if(selfRel.equals("search"))
             add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
-                    .search(null)).withSelfRel());
+                    .search(null, null)).withSelfRel());
         else
             add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
-                    .search(null)).withRel("search"));
+                    .search(null, null)).withRel("search"));
     }
 }
