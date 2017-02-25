@@ -3,23 +3,21 @@ package com.fmworkflow.workflow.web;
 import com.fmworkflow.auth.domain.LoggedUser;
 import com.fmworkflow.json.JsonBuilder;
 import com.fmworkflow.petrinet.domain.throwable.TransitionNotStartableException;
-import com.fmworkflow.workflow.domain.FiltersResource;
+import com.fmworkflow.workflow.web.responsebodies.FiltersResource;
 import com.fmworkflow.workflow.domain.Task;
-import com.fmworkflow.workflow.domain.TaskResource;
-import com.fmworkflow.workflow.domain.TasksResource;
+import com.fmworkflow.workflow.web.responsebodies.TaskResource;
+import com.fmworkflow.workflow.web.responsebodies.TasksResource;
 import com.fmworkflow.workflow.service.IFilterService;
 import com.fmworkflow.workflow.service.ITaskService;
 import com.fmworkflow.workflow.web.requestbodies.CreateFilterBody;
 import com.fmworkflow.workflow.web.requestbodies.TaskSearchBody;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.Resource;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
-
 
 @RestController
 @RequestMapping("/res/task")
@@ -126,6 +124,4 @@ public class TaskController {
             return new Resource<>(JsonBuilder.successMessage("Filter "+filterBody.name+" saving failed!"));
         }
     }
-
-
 }
