@@ -70,9 +70,9 @@ public class WorkflowManagementSystemApplication implements CommandLineRunner{
 		userService.save(admin);
 
 		mongoTemplate.getDb().dropDatabase();
-		importer.importPetriNet(new File("src/test/resources/prikladFM.xml"), "fm net", "");
+		importer.importPetriNet(new File("src/test/resources/prikladFM.xml"), "fm net", "fm");
         PetriNet net = petriNetRepository.findAll().get(0);
 		workflowService.createCase(net.getStringId(), "fm use case");
-		workflowService.getAll().forEach(aCase -> taskService.createTasks(aCase));
+		//workflowService.getAll().forEach(aCase -> taskService.createTasks(aCase));
 	}
 }

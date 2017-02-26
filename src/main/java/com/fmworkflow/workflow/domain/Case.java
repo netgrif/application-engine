@@ -23,6 +23,7 @@ public class Case {
     private Map<String, Integer> activePlaces;
     private String title;
     private String color;
+    private Map<String, Object> dataSetValues;
 
     public Case() {
         activePlaces = new HashMap<>();
@@ -77,6 +78,14 @@ public class Case {
 
     public void setColor(String color) {
         this.color = color;
+    }
+
+    public Map<String, Object> getDataSetValues() {
+        return dataSetValues;
+    }
+
+    public void setDataSetValues(Map<String, Object> dataSetValues) {
+        this.dataSetValues = dataSetValues;
     }
 
     public void finishTransition(Transition transition) {

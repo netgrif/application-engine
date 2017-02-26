@@ -2,12 +2,15 @@ package com.fmworkflow.workflow.web;
 
 import com.fmworkflow.auth.domain.LoggedUser;
 import com.fmworkflow.json.JsonBuilder;
+import com.fmworkflow.petrinet.domain.dataset.Field;
 import com.fmworkflow.petrinet.domain.throwable.TransitionNotStartableException;
 import com.fmworkflow.workflow.domain.Task;
 import com.fmworkflow.workflow.service.IFilterService;
 import com.fmworkflow.workflow.service.ITaskService;
 import com.fmworkflow.workflow.web.requestbodies.CreateFilterBody;
+import com.fmworkflow.workflow.web.requestbodies.ModifyDataBody;
 import com.fmworkflow.workflow.web.requestbodies.TaskSearchBody;
+import com.fmworkflow.workflow.web.responsebodies.DataFieldsResource;
 import com.fmworkflow.workflow.web.responsebodies.FiltersResource;
 import com.fmworkflow.workflow.web.responsebodies.TaskResource;
 import com.fmworkflow.workflow.web.responsebodies.TasksResource;
@@ -18,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/res/task")
@@ -109,6 +113,18 @@ public class TaskController {
     @RequestMapping(value = "/search", method = RequestMethod.POST)
     public TasksResource search(Authentication auth, @RequestBody TaskSearchBody searchBody){
         return getAll(auth); //TODO: 9.2.2017 - search on tasks according to posted json
+    }
+
+    @RequestMapping(value = "/{id}/data", method = RequestMethod.GET)
+    public DataFieldsResource getData(@PathVariable("id") Long taskId){
+        List<Field> dataFields = taskService.getData(taskId);
+        return new DataFieldsResource(dataFields, taskId);
+    }
+
+    @RequestMapping(value = "/{id}/data", method = RequestMethod.POST)
+    public Resource<String> saveData(@PathVariable("id") Long taskId, @RequestBody ModifyDataBody dataBody){
+        taskService.setDataFieldsValues(taskId, dataBody.values);
+        return new Resource<>("data saved");
     }
 
     @RequestMapping(value = "/filter", method = RequestMethod.GET)

@@ -1,7 +1,9 @@
 package com.fmworkflow.petrinet.domain.dataset;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document
@@ -11,6 +13,10 @@ public abstract class Field {
     protected ObjectId _id;
     private String name;
     private String description;
+    @Transient
+    protected FieldType type;
+    @Transient
+    private ObjectNode logic;
 
     public Field(){
         _id = new ObjectId();
@@ -44,9 +50,21 @@ public abstract class Field {
         this.description = description;
     }
 
-    public void modifyValue(String newValue){}
-
-    public Field copy(){
-        return this;
+    public FieldType getType() {
+        return type;
     }
+
+    public void setType(FieldType type) {
+        this.type = type;
+    }
+
+    public ObjectNode getLogic() {
+        return logic;
+    }
+
+    public void setLogic(ObjectNode logic) {
+        this.logic = logic;
+    }
+
+    public void setValue(Object value){}
 }
