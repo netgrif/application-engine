@@ -1,6 +1,5 @@
 package com.fmworkflow.auth.domain;
 
-import com.fmworkflow.petrinet.domain.roles.ProcessRole;
 import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotBlank;
@@ -38,12 +37,12 @@ public class User {
     private Set<Role> roles;
 
     @ManyToMany
-    @JoinTable(name = "user_process_role", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "processrole_id"))
-    private Set<ProcessRole> processRoles;
+    @JoinTable(name = "user_process_roles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "user_process_role_id"))
+    private Set<UserProcessRole> userProcessRoles;
 
     public User(){
         roles = new HashSet<>();
-        processRoles = new HashSet<>();
+        userProcessRoles = new HashSet<>();
     }
 
     public User(String email, String password, String name, String surname) {
@@ -102,15 +101,15 @@ public class User {
         this.surname = surname;
     }
 
-    public Set<ProcessRole> getProcessRoles() {
-        return processRoles;
+    public Set<UserProcessRole> getUserProcessRoles() {
+        return userProcessRoles;
     }
 
-    public void setProcessRoles(Set<ProcessRole> processRoles) {
-        this.processRoles = processRoles;
+    public void setUserProcessRoles(Set<UserProcessRole> userProcessRoles) {
+        this.userProcessRoles = userProcessRoles;
     }
 
-    public void addProcessRole(ProcessRole role) {
-        processRoles.add(role);
+    public void addProcessRole(UserProcessRole role) {
+        userProcessRoles.add(role);
     }
 }

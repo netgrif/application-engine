@@ -1,6 +1,8 @@
 package com.fmworkflow.petrinet.service;
 
 import com.fmworkflow.auth.domain.User;
+import com.fmworkflow.auth.domain.UserProcessRole;
+import com.fmworkflow.auth.domain.UserProcessRoleRepository;
 import com.fmworkflow.auth.domain.UserRepository;
 import com.fmworkflow.petrinet.domain.PetriNet;
 import com.fmworkflow.petrinet.domain.PetriNetRepository;
@@ -16,13 +18,18 @@ public class ProcessRoleService implements IProcessRoleService {
     @Autowired
     private UserRepository userRepository;
     @Autowired
+    private UserProcessRoleRepository roleRepository;
+    @Autowired
     private PetriNetRepository netRepository;
 
     @Override
     public void assignRoleToUser(String userId, String netId, String roleId) {
         User user = userRepository.findOne(Long.valueOf(userId));
         PetriNet net = netRepository.findOne(netId);
-        user.addProcessRole(net.getRoles().get(roleId));
+        UserProcessRole role = new UserProcessRole();
+        role.setRoleId(net.getRoles().get(roleId).getStringId());
+        role = roleRepository.save(role);
+        user.addProcessRole(role);
         userRepository.save(user);
     }
 

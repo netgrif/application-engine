@@ -1,7 +1,6 @@
 package com.fmworkflow.workflow.domain;
 
 import com.fmworkflow.auth.domain.User;
-import com.fmworkflow.petrinet.domain.roles.ProcessRole;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -13,5 +12,5 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
 
     List<Task> findByUserAndFinishDateNotNull(User user);
 
-    List<Task> findAllByAssignRoleIn(List<ProcessRole> roles);
+    List<Task> findAllByAssignRoleIn(List<String> roles);
 }

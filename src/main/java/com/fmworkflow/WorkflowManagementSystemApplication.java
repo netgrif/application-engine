@@ -3,7 +3,10 @@ package com.fmworkflow;
 import com.fmworkflow.auth.domain.Role;
 import com.fmworkflow.auth.domain.RoleRepository;
 import com.fmworkflow.auth.domain.User;
-import com.fmworkflow.auth.service.UserService;
+import com.fmworkflow.auth.service.IUserService;
+import com.fmworkflow.importer.Importer;
+import com.fmworkflow.petrinet.domain.PetriNet;
+import com.fmworkflow.petrinet.domain.PetriNetRepository;
 import com.fmworkflow.workflow.service.ITaskService;
 import com.fmworkflow.workflow.service.IWorkflowService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,8 +14,10 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.hateoas.config.EnableHypermediaSupport;
 
+import java.io.File;
 import java.util.HashSet;
 
 @EnableCaching
@@ -25,7 +30,7 @@ public class WorkflowManagementSystemApplication implements CommandLineRunner{
 	}
 
 	@Autowired
-	private UserService userService;
+	private IUserService userService;
 
 	@Autowired
 	private RoleRepository roleRepository;
@@ -35,6 +40,15 @@ public class WorkflowManagementSystemApplication implements CommandLineRunner{
 
 	@Autowired
 	private ITaskService taskService;
+
+	@Autowired
+	private MongoTemplate mongoTemplate;
+
+	@Autowired
+    private Importer importer;
+
+	@Autowired
+    private PetriNetRepository petriNetRepository;
 
 	@Override
 	public void run(String... strings) throws Exception {
@@ -55,6 +69,10 @@ public class WorkflowManagementSystemApplication implements CommandLineRunner{
 		admin.setRoles(adminRoles);
 		userService.save(admin);
 
+		mongoTemplate.getDb().dropDatabase();
+		importer.importPetriNet(new File("src/test/resources/prikladFM.xml"), "fm net", "");
+        PetriNet net = petriNetRepository.findAll().get(0);
+		workflowService.createCase(net.getStringId(), "fm use case");
 		workflowService.getAll().forEach(aCase -> taskService.createTasks(aCase));
 	}
 }
