@@ -2,9 +2,13 @@ package com.fmworkflow.workflow.service;
 
 import com.fmworkflow.auth.domain.LoggedUser;
 import com.fmworkflow.auth.domain.User;
+import com.fmworkflow.auth.domain.UserProcessRole;
 import com.fmworkflow.auth.domain.UserRepository;
-import com.fmworkflow.petrinet.domain.*;
-import com.fmworkflow.petrinet.domain.roles.ProcessRole;
+import com.fmworkflow.petrinet.domain.Arc;
+import com.fmworkflow.petrinet.domain.PetriNet;
+import com.fmworkflow.petrinet.domain.Place;
+import com.fmworkflow.petrinet.domain.Transition;
+import com.fmworkflow.petrinet.domain.roles.ProcessRoleRepository;
 import com.fmworkflow.petrinet.domain.throwable.TransitionNotStartableException;
 import com.fmworkflow.workflow.domain.Case;
 import com.fmworkflow.workflow.domain.CaseRepository;
@@ -18,6 +22,7 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class TaskService implements ITaskService {
@@ -28,11 +33,13 @@ public class TaskService implements ITaskService {
     private CaseRepository caseRepository;
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private ProcessRoleRepository roleRepository;
 
     @Override
     public List<Task> getAll(LoggedUser loggedUser){
         User user = userRepository.findOne(loggedUser.getId());
-        List<ProcessRole> roles = new LinkedList<>(user.getProcessRoles());
+        List<String> roles = new LinkedList<>(user.getUserProcessRoles()).stream().map(UserProcessRole::getRoleId).collect(Collectors.toList());
         return taskRepository.findAllByAssignRoleIn(roles);
     }
 
@@ -61,7 +68,7 @@ public class TaskService implements ITaskService {
                 task.setPriority(transition.getPriority());
                 task = taskRepository.save(task);
                 task.setVisualId(net.getInitials());
-                task.setAssignRole(net.getRoles().get(transition.getRoles().keySet().stream().findFirst().orElseGet(null)));
+                task.setAssignRole(net.getRoles().get(transition.getRoles().keySet().stream().findFirst().orElseGet(null)).getStringId());
                 taskRepository.save(task);
             }
         }
@@ -69,6 +76,9 @@ public class TaskService implements ITaskService {
 
     private boolean isExecutable(Transition transition, PetriNet net, Case useCase) {
         Collection<Arc> arcsOfTransition = net.getArcsOfTransition(transition);
+
+        if (arcsOfTransition == null)
+            return true;
 
         for (Arc arc : arcsOfTransition) {
             if (arc.getDestination() == transition) {
