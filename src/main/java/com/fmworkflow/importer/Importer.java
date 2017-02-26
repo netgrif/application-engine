@@ -5,11 +5,13 @@ import com.fmworkflow.petrinet.domain.*;
 import com.fmworkflow.petrinet.domain.dataset.Field;
 import com.fmworkflow.petrinet.domain.roles.AssignToSelfFunction;
 import com.fmworkflow.petrinet.domain.roles.ProcessRole;
+import com.fmworkflow.petrinet.domain.roles.ProcessRoleRepository;
 import com.fmworkflow.petrinet.service.ArcFactory;
 import com.fmworkflow.petrinet.service.FieldFactory;
 import com.fmworkflow.petrinet.domain.dataset.logic.Editable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -31,6 +33,9 @@ public class Importer {
     @Autowired
     private PetriNetRepository repository;
 
+    @Autowired
+    private ProcessRoleRepository roleRepository;
+
     public Importer() {
         this.roles = new HashMap<>();
         this.transitions = new HashMap<>();
@@ -38,6 +43,7 @@ public class Importer {
         this.fields = new HashMap<>();
     }
 
+    @Transactional
     public void importPetriNet(File xml, String title, String initials) {
         try {
             unmarshallXml(xml);
@@ -47,6 +53,7 @@ public class Importer {
         }
     }
 
+    @Transactional
     private void unmarshallXml(File xml) throws JAXBException {
         JAXBContext jaxbContext = JAXBContext.newInstance(Document.class);
 
@@ -54,6 +61,7 @@ public class Importer {
         document = (Document) jaxbUnmarshaller.unmarshal(xml);
     }
 
+    @Transactional
     private void createPetriNet(String title, String initials) {
         net = new PetriNet();
         net.setTitle(title);
@@ -68,6 +76,7 @@ public class Importer {
         repository.save(net);
     }
 
+    @Transactional
     private void createArc(ImportArc importArc) {
         Arc arc = ArcFactory.getArc(importArc.getType());
         arc.setMultiplicity(importArc.getMultiplicity());
@@ -77,6 +86,7 @@ public class Importer {
         net.addArc(arc);
     }
 
+    @Transactional
     private void createDataSet(ImportData importData) {
         Field field = FieldFactory.getField(importData.getType());
         field.setName(importData.getTitle());
@@ -85,6 +95,7 @@ public class Importer {
         fields.put(importData.getId(), field);
     }
 
+    @Transactional
     private void createTransition(ImportTransition importTransition) {
         Transition transition = new Transition();
         transition.setTitle(importTransition.getLabel());
@@ -105,6 +116,7 @@ public class Importer {
         transitions.put(importTransition.getId(), transition);
     }
 
+    @Transactional
     private void createPlace(ImportPlace importPlace) {
         Place place = new Place();
         place.setStatic(importPlace.getIsStatic());
@@ -116,14 +128,17 @@ public class Importer {
         places.put(importPlace.getId(), place);
     }
 
+    @Transactional
     private void createRole(ImportRole importRole) {
         ProcessRole role = new ProcessRole();
         role.setName(importRole.getName());
+        role = roleRepository.save(role);
 
         net.addRole(role);
         roles.put(importRole.getId(), role);
     }
 
+    @Transactional
     private Node getNode(Long id) {
         // TODO: 18/02/2017 maybe throw exception if transitions doesn't contain id
         if (places.containsKey(id))
