@@ -5,6 +5,7 @@ import com.fmworkflow.petrinet.domain.roles.ProcessRole;
 import org.bson.types.ObjectId;
 import org.joda.time.DateTime;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.HashMap;
@@ -30,6 +31,7 @@ public class PetriNet {
     @org.springframework.data.mongodb.core.mapping.Field("dataset")
     private Map<String, Field> dataSet;
     @org.springframework.data.mongodb.core.mapping.Field("roles")
+    @DBRef
     private Map<String, ProcessRole> roles;
 
     public PetriNet() {
@@ -49,6 +51,10 @@ public class PetriNet {
 
     public ObjectId get_id() {
         return _id;
+    }
+
+    public String getStringId() {
+        return _id.toString();
     }
 
     public String getTitle() {
