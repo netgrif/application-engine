@@ -9,9 +9,7 @@ import org.springframework.security.core.Authentication;
 
 import java.util.ArrayList;
 
-/**
- * Created by Milan on 9.2.2017.
- */
+
 public class TaskResource extends Resource<Task> {
 
     public TaskResource(Task content) {
@@ -27,6 +25,10 @@ public class TaskResource extends Resource<Task> {
                 .assign(auth,task.getId())).withRel("assign"));
         resource.add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
                 .finish(auth,task.getId())).withRel("finish"));
+        resource.add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
+                .getData(task.getId())).withRel("data"));
+        resource.add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
+                .saveData(task.getId(),null)).withRel("data-edit"));
 
         return resource;
     }
