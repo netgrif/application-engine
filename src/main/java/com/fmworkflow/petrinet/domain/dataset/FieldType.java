@@ -1,5 +1,7 @@
 package com.fmworkflow.petrinet.domain.dataset;
 
+import com.fasterxml.jackson.annotation.JsonValue;
+
 public enum FieldType {
     TEXT ("text"),
     DATE ("date"),
@@ -13,5 +15,10 @@ public enum FieldType {
 
     public static FieldType fromString(String name) {
         return FieldType.valueOf(name.toUpperCase());
+    }
+
+    @JsonValue
+    public String getName() {
+        return name;
     }
 }

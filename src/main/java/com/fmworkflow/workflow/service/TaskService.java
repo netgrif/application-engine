@@ -1,5 +1,7 @@
 package com.fmworkflow.workflow.service;
 
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fmworkflow.auth.domain.LoggedUser;
 import com.fmworkflow.auth.domain.User;
 import com.fmworkflow.auth.domain.UserProcessRole;
@@ -8,6 +10,7 @@ import com.fmworkflow.petrinet.domain.Arc;
 import com.fmworkflow.petrinet.domain.PetriNet;
 import com.fmworkflow.petrinet.domain.Place;
 import com.fmworkflow.petrinet.domain.Transition;
+import com.fmworkflow.petrinet.domain.dataset.Field;
 import com.fmworkflow.petrinet.domain.roles.ProcessRoleRepository;
 import com.fmworkflow.petrinet.domain.throwable.TransitionNotStartableException;
 import com.fmworkflow.workflow.domain.Case;
@@ -18,10 +21,7 @@ import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -37,10 +37,11 @@ public class TaskService implements ITaskService {
     private ProcessRoleRepository roleRepository;
 
     @Override
-    public List<Task> getAll(LoggedUser loggedUser){
+    public List<Task> getAll(LoggedUser loggedUser) {
         User user = userRepository.findOne(loggedUser.getId());
         List<String> roles = new LinkedList<>(user.getUserProcessRoles()).stream().map(UserProcessRole::getRoleId).collect(Collectors.toList());
         return taskRepository.findAllByAssignRoleIn(roles);
+//        return taskRepository.findAll();
     }
 
     @Override
@@ -82,7 +83,7 @@ public class TaskService implements ITaskService {
 
         for (Arc arc : arcsOfTransition) {
             if (arc.getDestination() == transition) {
-                Place source = (Place)arc.getSource();
+                Place source = (Place) arc.getSource();
                 if (hasEnoughTokens(useCase, source)) {
                     return false;
                 }
@@ -110,12 +111,12 @@ public class TaskService implements ITaskService {
     @Override
     public void finishTask(Long userId, Long taskId) throws Exception {
         Task task = taskRepository.findOne(taskId);
-        if(task.getUser().getId().equals(userId)){
+        if (task.getUser().getId().equals(userId)) {
             throw new Exception("User that is not assigned tried to finish task");
         }
 
         Case useCase = caseRepository.findOne(task.getCaseId());
-        Transition transition =  useCase.getPetriNet().getTransition(task.getTransitionId());
+        Transition transition = useCase.getPetriNet().getTransition(task.getTransitionId());
 
         useCase.finishTransition(transition);
         task.setFinishDate(DateTime.now());
@@ -130,7 +131,7 @@ public class TaskService implements ITaskService {
     public void assignTask(User user, Long taskId) throws TransitionNotStartableException { // TODO: 5. 2. 2017 make transactional
         Task task = taskRepository.findOne(taskId);
         Case useCase = caseRepository.findOne(task.getCaseId());
-        Transition transition =  useCase.getPetriNet().getTransition(task.getTransitionId());
+        Transition transition = useCase.getPetriNet().getTransition(task.getTransitionId());
 
         useCase.startTransition(transition);
         task.setUser(user);
@@ -138,5 +139,35 @@ public class TaskService implements ITaskService {
 
         caseRepository.save(useCase);
         taskRepository.save(task);
+    }
+
+    @Override
+    public List<Field> getData(Long taskId) {
+        Task task = taskRepository.findOne(taskId);
+        Case useCase = caseRepository.findOne(task.getCaseId());
+        Transition transition = useCase.getPetriNet().getTransition(task.getTransitionId());
+
+        Set<String> fieldsIds = transition.getDataSet().keySet();
+        List<Field> dataSetFields = new ArrayList<>();
+        fieldsIds.forEach(fieldId -> {
+            Field field = useCase.getPetriNet().getDataSet().get(fieldId);
+            field.setType(null);
+            field.setValue(useCase.getDataSetValues().get(fieldId));
+            field.setLogic(transition.getDataSet().get(fieldId).apply(JsonNodeFactory.instance.objectNode()));
+
+            dataSetFields.add(field);
+        });
+
+        return dataSetFields;
+    }
+
+    //TODO: 26.2.2016 generalize values
+    @Override
+    public void setDataFieldsValues(Long taskId, Map<String, String> values) {
+        Task task = taskRepository.findOne(taskId);
+        Case useCase = caseRepository.findOne(task.getCaseId());
+
+        values.forEach((key, value) -> useCase.getDataSetValues().put(key, value));
+        caseRepository.save(useCase);
     }
 }

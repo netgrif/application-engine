@@ -1,41 +1,29 @@
 package com.fmworkflow.petrinet.domain.dataset;
 
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document
 public class TextField extends Field {
 
+    @Transient
     private String value;
 
     public TextField() {
         super();
     }
 
-    public TextField(String value) {
-        super();
-        this.value = value;
-    }
-
     public String getValue() {
         return value;
     }
 
-    public void setValue(String value) {
-        this.value = value;
+    @Override
+    public void setValue(Object value) {
+        this.value = (String)value;
     }
 
     @Override
-    public void modifyValue(String newValue) {
-        this.value = newValue;
-    }
-
-    @Override
-    public TextField copy(){
-        TextField copied = new TextField(this.getValue());
-        copied.set_id(this.get_id());
-        copied.setDescription(this.getDescription());
-        copied.setName(this.getName());
-
-        return copied;
+    public void setType(FieldType type){
+        this.type = FieldType.TEXT;
     }
 }
