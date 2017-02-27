@@ -7,6 +7,7 @@ public class CreateCaseBody {
 
     public String title;
     public String netId;
+    public String color;
 
     public CreateCaseBody() {}
 }

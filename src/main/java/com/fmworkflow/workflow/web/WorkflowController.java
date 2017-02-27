@@ -22,7 +22,7 @@ public class WorkflowController {
     @RequestMapping(value = "/case", method = RequestMethod.POST)
     public String createCase(@RequestBody CreateCaseBody body) {
         try {
-            workflowService.createCase(body.netId, body.title);
+            workflowService.createCase(body.netId, body.title, body.color);
             return JsonBuilder.successMessage("Case created successfully");
         } catch (Exception e) { // TODO: 5. 2. 2017 change to custom exception
             e.printStackTrace();

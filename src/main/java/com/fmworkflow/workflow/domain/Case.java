@@ -82,7 +82,7 @@ public class Case {
     }
 
     public void setColor(String color) {
-        this.color = color;
+        this.color = color == null || color.isEmpty() ? "color-fg-fm-500" : color;
     }
 
     public Map<String, Object> getDataSetValues() {
