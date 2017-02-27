@@ -9,7 +9,7 @@ public interface IWorkflowService {
 
     List<Case> getAll();
 
-    void createCase(String netId, String title);
+    void createCase(String netId, String title, String color);
 
 //    DataSet getDataForTransition(String caseId, String transitionId);
 
