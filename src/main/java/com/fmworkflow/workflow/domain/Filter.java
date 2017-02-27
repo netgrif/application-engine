@@ -92,7 +92,7 @@ public class Filter {
                 this.user = user.getId();
                 break;
             case CreateFilterBody.ORGANIZATION:
-                organization = user.getFullName(); //TODO: 24.2.2016 change to organization id
+                organization = user.getFullName(); //TODO: 24.2.2017 change to organization id
                 this.user = null;
                 break;
         }

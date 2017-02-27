@@ -35,19 +35,11 @@ public class TaskService implements ITaskService {
 
     @Override
     public List<Task> getAll(LoggedUser loggedUser) {
+        //TODO: 27/02/2017 uncommment when user can be assigned to role
 //        User user = userRepository.findOne(loggedUser.getId());
 //        List<String> roles = new LinkedList<>(user.getUserProcessRoles()).stream().map(UserProcessRole::getRoleId).collect(Collectors.toList());
 //        return taskRepository.findAllByAssignRoleIn(roles);
-        // TODO: 27/02/2017 remove when WMS-73 is done
-        List<Task> tasks =taskRepository.findAll();
-        tasks.forEach(task -> {
-            if (task.getUser() != null) {
-                User user = task.getUser();
-                user.setRoles(new HashSet<>());
-                task.setUser(user);
-            }
-        });
-        return tasks;
+        return taskRepository.findAll();
     }
 
     @Override
@@ -108,26 +100,12 @@ public class TaskService implements ITaskService {
 
     @Override
     public List<Task> findByUser(User user) {
-        List<Task> tasks =taskRepository.findByUser(user);
-        // TODO: 27/02/2017 remove when WMS-73 is done
-        tasks.forEach(task -> {
-            User user1 = task.getUser();
-            user1.setRoles(new HashSet<>());
-            task.setUser(user1);
-        });
-        return tasks;
+        return taskRepository.findByUser(user);
     }
 
     @Override
     public List<Task> findUserFinishedTasks(User user) {
-        List<Task> tasks =taskRepository.findByUserAndFinishDateNotNull(user);
-        // TODO: 27/02/2017 remove when WMS-73 is done
-        tasks.forEach(task -> {
-            User user1 = task.getUser();
-            user1.setRoles(new HashSet<>());
-            task.setUser(user1);
-        });
-        return tasks;
+        return taskRepository.findByUserAndFinishDateNotNull(user);
     }
 
     @Override
@@ -200,7 +178,7 @@ public class TaskService implements ITaskService {
         return dataSetFields;
     }
 
-    //TODO: 26.2.2016 generalize values
+    //TODO: 26.2.2017 generalize values
     @Override
     public void setDataFieldsValues(Long taskId, Map<String, String> values) {
         Task task = taskRepository.findOne(taskId);
