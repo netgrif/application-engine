@@ -13,4 +13,10 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
     List<Task> findByUserAndFinishDateNotNull(User user);
 
     List<Task> findAllByAssignRoleIn(List<String> roles);
+
+    List<Task> findAllByCaseId(String caseId);
+
+    void deleteAllByCaseIdAndUserIsNull(String caseId);
+
+    void deleteAllByCaseIdAndFinishDateIsNotNull(String caseId);
 }
