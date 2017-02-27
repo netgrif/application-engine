@@ -10,6 +10,7 @@ import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
+import javax.transaction.Transactional;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -42,6 +43,10 @@ public class Case {
 
     public ObjectId get_id() {
         return _id;
+    }
+
+    public String getStringId() {
+        return _id.toString();
     }
 
     public PetriNet getPetriNet() {
@@ -103,7 +108,7 @@ public class Case {
         activePlaces.put(id, newTokens);
     }
 
-    // TODO: 5. 2. 2017 make transactional
+    @Transactional
     public void startTransition(Transition transition) throws TransitionNotStartableException {
         Map<Place, Integer> inputPlaces = petriNet.getInputPlaces(transition);
         for (Map.Entry<Place, Integer> entry : inputPlaces.entrySet()) {

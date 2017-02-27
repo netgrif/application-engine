@@ -17,6 +17,7 @@ import com.fmworkflow.workflow.domain.TaskRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -37,6 +38,7 @@ public class TaskService implements ITaskService {
 //        User user = userRepository.findOne(loggedUser.getId());
 //        List<String> roles = new LinkedList<>(user.getUserProcessRoles()).stream().map(UserProcessRole::getRoleId).collect(Collectors.toList());
 //        return taskRepository.findAllByAssignRoleIn(roles);
+        // TODO: 27/02/2017 remove when WMS-73 is done
         List<Task> tasks =taskRepository.findAll();
         tasks.forEach(task -> {
             if (task.getUser() != null) {
@@ -107,6 +109,7 @@ public class TaskService implements ITaskService {
     @Override
     public List<Task> findByUser(User user) {
         List<Task> tasks =taskRepository.findByUser(user);
+        // TODO: 27/02/2017 remove when WMS-73 is done
         tasks.forEach(task -> {
             User user1 = task.getUser();
             user1.setRoles(new HashSet<>());
@@ -118,6 +121,7 @@ public class TaskService implements ITaskService {
     @Override
     public List<Task> findUserFinishedTasks(User user) {
         List<Task> tasks =taskRepository.findByUserAndFinishDateNotNull(user);
+        // TODO: 27/02/2017 remove when WMS-73 is done
         tasks.forEach(task -> {
             User user1 = task.getUser();
             user1.setRoles(new HashSet<>());
@@ -127,6 +131,7 @@ public class TaskService implements ITaskService {
     }
 
     @Override
+    @Transactional
     public void finishTask(Long userId, Long taskId) throws Exception {
         Task task = taskRepository.findOne(taskId);
         if (!task.getUser().getId().equals(userId)) {
@@ -142,14 +147,15 @@ public class TaskService implements ITaskService {
 
         caseRepository.save(useCase);
         taskRepository.save(task);
-
-        createTasks(useCase);
+        reloadTasks(useCase);
     }
 
     @Override
-    public void assignTask(User user, Long taskId) throws TransitionNotStartableException { // TODO: 5. 2. 2017 make transactional
+    @Transactional
+    public void assignTask(User user, Long taskId) throws TransitionNotStartableException {
         Task task = taskRepository.findOne(taskId);
         Case useCase = caseRepository.findOne(task.getCaseId());
+        useCase.getPetriNet().initializeArcs();
         Transition transition = useCase.getPetriNet().getTransition(task.getTransitionId());
 
         useCase.startTransition(transition);
@@ -158,6 +164,20 @@ public class TaskService implements ITaskService {
 
         caseRepository.save(useCase);
         taskRepository.save(task);
+        reloadTasks(useCase);
+    }
+
+    /**
+     * Reloads all tasks of given case.
+     * 1. delete unassigned tasks
+     * 2. delete finished tasks
+     * 3. generate new tasks
+     */
+    @Transactional
+    private void reloadTasks(Case useCase) {
+        taskRepository.deleteAllByCaseIdAndUserIsNull(useCase.getStringId());
+        taskRepository.deleteAllByCaseIdAndFinishDateIsNotNull(useCase.getStringId());
+        createTasks(useCase);
     }
 
     @Override
