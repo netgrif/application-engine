@@ -116,7 +116,7 @@
         <id>0</id>
         <x>100</x>
         <y>260</y>
-        <label></label>
+        <label>A</label>
         <tokens>1</tokens>
         <isStatic>false</isStatic>
     </place>
@@ -124,7 +124,7 @@
         <id>8</id>
         <x>260</x>
         <y>180</y>
-        <label></label>
+        <label>B</label>
         <tokens>0</tokens>
         <isStatic>false</isStatic>
     </place>
@@ -132,7 +132,7 @@
         <id>14</id>
         <x>260</x>
         <y>60</y>
-        <label>Vypožičané</label>
+        <label>C</label>
         <tokens>0</tokens>
         <isStatic>false</isStatic>
     </place>
@@ -140,7 +140,7 @@
         <id>22</id>
         <x>540</x>
         <y>180</y>
-        <label></label>
+        <label>E</label>
         <tokens>0</tokens>
         <isStatic>false</isStatic>
     </place>
@@ -148,7 +148,7 @@
         <id>29</id>
         <x>580</x>
         <y>260</y>
-        <label></label>
+        <label>F</label>
         <tokens>0</tokens>
         <isStatic>false</isStatic>
     </place>
@@ -156,7 +156,7 @@
         <id>34</id>
         <x>700</x>
         <y>180</y>
-        <label></label>
+        <label>G</label>
         <tokens>0</tokens>
         <isStatic>false</isStatic>
     </place>
@@ -164,7 +164,7 @@
         <id>38</id>
         <x>860</x>
         <y>180</y>
-        <label></label>
+        <label>H</label>
         <tokens>0</tokens>
         <isStatic>false</isStatic>
     </place>
@@ -172,7 +172,7 @@
         <id>44</id>
         <x>860</x>
         <y>60</y>
-        <label></label>
+        <label>I</label>
         <tokens>0</tokens>
         <isStatic>false</isStatic>
     </place>
@@ -180,7 +180,7 @@
         <id>49</id>
         <x>1060</x>
         <y>180</y>
-        <label></label>
+        <label>J</label>
         <tokens>0</tokens>
         <isStatic>false</isStatic>
     </place>
@@ -188,7 +188,7 @@
         <id>53</id>
         <x>1060</x>
         <y>340</y>
-        <label></label>
+        <label>L</label>
         <tokens>0</tokens>
         <isStatic>false</isStatic>
     </place>
@@ -196,7 +196,7 @@
         <id>64</id>
         <x>1500</x>
         <y>180</y>
-        <label></label>
+        <label>Q</label>
         <tokens>1</tokens>
         <isStatic>false</isStatic>
     </place>
@@ -204,7 +204,7 @@
         <id>69</id>
         <x>1260</x>
         <y>340</y>
-        <label></label>
+        <label>M</label>
         <tokens>0</tokens>
         <isStatic>false</isStatic>
     </place>
@@ -212,7 +212,7 @@
         <id>70</id>
         <x>1420</x>
         <y>340</y>
-        <label></label>
+        <label>N</label>
         <tokens>0</tokens>
         <isStatic>false</isStatic>
     </place>
@@ -220,7 +220,7 @@
         <id>75</id>
         <x>1500</x>
         <y>260</y>
-        <label></label>
+        <label>O</label>
         <tokens>0</tokens>
         <isStatic>false</isStatic>
     </place>
@@ -228,7 +228,7 @@
         <id>124</id>
         <x>1300</x>
         <y>100</y>
-        <label></label>
+        <label>P</label>
         <tokens>0</tokens>
         <isStatic>false</isStatic>
     </place>
@@ -236,7 +236,7 @@
         <id>237</id>
         <x>420</x>
         <y>60</y>
-        <label></label>
+        <label>D</label>
         <tokens>0</tokens>
         <isStatic>false</isStatic>
     </place>
@@ -244,7 +244,7 @@
         <id>240</id>
         <x>380</x>
         <y>340</y>
-        <label></label>
+        <label>K</label>
         <tokens>0</tokens>
         <isStatic>false</isStatic>
     </place>
