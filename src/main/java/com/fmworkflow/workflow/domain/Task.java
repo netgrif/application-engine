@@ -1,9 +1,9 @@
 package com.fmworkflow.workflow.domain;
 
 import com.fmworkflow.auth.domain.User;
-import org.joda.time.DateTime;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
 @Entity
 public class Task {
@@ -19,8 +19,8 @@ public class Task {
     @ManyToOne
     private User user;
     private String assignRole;
-    private DateTime startDate;
-    private DateTime finishDate;
+    private LocalDateTime startDate;
+    private LocalDateTime finishDate;
 
     public Long getId() {
         return id;
@@ -62,19 +62,19 @@ public class Task {
         this.priority = priority == Priorities.UNDEFINED ? Priorities.LOW : priority;
     }
 
-    public DateTime getStartDate() {
+    public LocalDateTime getStartDate() {
         return startDate;
     }
 
-    public void setStartDate(DateTime startDate) {
+    public void setStartDate(LocalDateTime startDate) {
         this.startDate = startDate;
     }
 
-    public DateTime getFinishDate() {
+    public LocalDateTime getFinishDate() {
         return finishDate;
     }
 
-    public void setFinishDate(DateTime finishDate) {
+    public void setFinishDate(LocalDateTime finishDate) {
         this.finishDate = finishDate;
     }
 
