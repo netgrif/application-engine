@@ -1,5 +1,6 @@
 package com.fmworkflow.auth.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotBlank;
@@ -20,6 +21,7 @@ public class User {
     @Email
     private String email;
 
+    @JsonIgnore
     @NotNull
     @Length(min = 6)
     private String password;

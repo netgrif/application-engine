@@ -1,5 +1,7 @@
 package com.fmworkflow.auth.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.util.Set;
@@ -12,6 +14,7 @@ public class Role {
     private Long id;
     @NotNull
     private String name;
+    @JsonIgnore
     @ManyToMany(mappedBy = "roles")
     private Set<User> users;
 
