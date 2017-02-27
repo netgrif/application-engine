@@ -2,16 +2,15 @@ package com.fmworkflow.auth.service;
 
 import com.fmworkflow.auth.domain.Token;
 import com.fmworkflow.auth.domain.TokenRepository;
-import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
 import java.security.SecureRandom;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -25,7 +24,7 @@ public class TokenService implements ITokenService {
     @Scheduled(cron = "0 0 1 * * *")
     public void removeExpired() {
         log.info("Removing expired tokens");
-        List<Token> removedTokens = tokenRepository.removeByExpirationDateBefore(DateTime.now().toDate());
+        List<Token> removedTokens = tokenRepository.removeByExpirationDateBefore(LocalDateTime.now());
         log.info("Removed " + removedTokens.size() + " tokens");
     }
 
@@ -58,6 +57,6 @@ public class TokenService implements ITokenService {
     }
 
     private boolean isValid(Token token) {
-        return token != null && token.getExpirationDate().isAfterNow();
+        return token != null && token.getExpirationDate().isAfter(LocalDateTime.now());
     }
 }

@@ -1,7 +1,6 @@
 package com.fmworkflow.workflow.service;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fmworkflow.auth.domain.LoggedUser;
 import com.fmworkflow.auth.domain.User;
 import com.fmworkflow.auth.domain.UserProcessRole;
@@ -17,10 +16,10 @@ import com.fmworkflow.workflow.domain.Case;
 import com.fmworkflow.workflow.domain.CaseRepository;
 import com.fmworkflow.workflow.domain.Task;
 import com.fmworkflow.workflow.domain.TaskRepository;
-import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -119,7 +118,7 @@ public class TaskService implements ITaskService {
         Transition transition = useCase.getPetriNet().getTransition(task.getTransitionId());
 
         useCase.finishTransition(transition);
-        task.setFinishDate(DateTime.now());
+        task.setFinishDate(LocalDateTime.now());
 
         caseRepository.save(useCase);
         taskRepository.save(task);
@@ -135,7 +134,7 @@ public class TaskService implements ITaskService {
 
         useCase.startTransition(transition);
         task.setUser(user);
-        task.setStartDate(DateTime.now());
+        task.setStartDate(LocalDateTime.now());
 
         caseRepository.save(useCase);
         taskRepository.save(task);

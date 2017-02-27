@@ -1,11 +1,10 @@
 package com.fmworkflow.auth.domain;
 
 import org.hibernate.validator.constraints.NotBlank;
-import org.joda.time.DateTime;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "token")
@@ -23,10 +22,10 @@ public class Token {
     private String hashedToken;
 
     @NotNull
-    private Date expirationDate;
+    private LocalDateTime expirationDate;
 
     public Token() {
-        expirationDate = DateTime.now().plusDays(3).toDate();
+        expirationDate = LocalDateTime.now().plusDays(3);
     }
 
     public Token(String email, String token) {
@@ -51,11 +50,11 @@ public class Token {
         this.hashedToken = hashedToken;
     }
 
-    public DateTime getExpirationDate() {
-        return new DateTime(expirationDate);
+    public LocalDateTime getExpirationDate() {
+        return expirationDate;
     }
 
-    public void setExpirationDate(DateTime expirationDate) {
-        this.expirationDate = expirationDate.toDate();
+    public void setExpirationDate(LocalDateTime expirationDate) {
+        this.expirationDate = expirationDate;
     }
 }
