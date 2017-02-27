@@ -1,5 +1,7 @@
 package com.fmworkflow.auth.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import java.util.Set;
 
@@ -9,6 +11,7 @@ public class UserProcessRole {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     private String roleId;
+    @JsonIgnore
     @ManyToMany(mappedBy = "userProcessRoles")
     private Set<User> users;
 
