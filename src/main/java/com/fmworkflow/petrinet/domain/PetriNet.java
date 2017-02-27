@@ -3,11 +3,13 @@ package com.fmworkflow.petrinet.domain;
 import com.fmworkflow.petrinet.domain.dataset.Field;
 import com.fmworkflow.petrinet.domain.roles.ProcessRole;
 import org.bson.types.ObjectId;
-import org.joda.time.DateTime;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -21,7 +23,7 @@ public class PetriNet {
     private ObjectId _id;
     private String title;
     private String initials;
-    private DateTime creationDate;
+    private LocalDateTime creationDate;
     @org.springframework.data.mongodb.core.mapping.Field("places")
     private Map<String, Place> places;
     @org.springframework.data.mongodb.core.mapping.Field("transitions")
@@ -35,7 +37,7 @@ public class PetriNet {
     private Map<String, ProcessRole> roles;
 
     public PetriNet() {
-        creationDate = DateTime.now();
+        creationDate = LocalDateTime.now();
         this.places = new HashMap<>();
         this.transitions = new HashMap<>();
         this.arcs = new HashMap<>();
@@ -125,11 +127,11 @@ public class PetriNet {
         this.arcs = arcs;
     }
 
-    public DateTime getCreationDate() {
+    public LocalDateTime getCreationDate() {
         return creationDate;
     }
 
-    public void setCreationDate(DateTime creationDate) {
+    public void setCreationDate(LocalDateTime creationDate) {
         this.creationDate = creationDate;
     }
 
