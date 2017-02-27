@@ -43,7 +43,7 @@ public class Task {
     }
 
     public void setCaseColor(String caseColor) {
-        this.caseColor = caseColor == null || caseColor.isEmpty() ? "color-fg-indigo-500" : caseColor;
+        this.caseColor = caseColor;
     }
 
     public String getVisualId() {

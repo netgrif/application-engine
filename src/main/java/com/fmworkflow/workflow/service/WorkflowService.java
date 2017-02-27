@@ -36,10 +36,11 @@ public class WorkflowService implements IWorkflowService {
     }
 
     @Override
-    public void createCase(String netId, String title) {
+    public void createCase(String netId, String title, String color) {
         PetriNet petriNet = petriNetService.loadPetriNet(netId);
         Map<String, Integer> activePlaces = createActivePlaces(petriNet);
         Case useCase = new Case(title, petriNet, activePlaces);
+        useCase.setColor(color);
         HashMap<String, Object> dataValues = new HashMap<>();
         petriNet.getDataSet().forEach((key, field) -> dataValues.put(key,null));
         useCase.setDataSetValues(dataValues);
