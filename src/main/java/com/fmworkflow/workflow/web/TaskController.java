@@ -10,10 +10,7 @@ import com.fmworkflow.workflow.service.ITaskService;
 import com.fmworkflow.workflow.web.requestbodies.CreateFilterBody;
 import com.fmworkflow.workflow.web.requestbodies.ModifyDataBody;
 import com.fmworkflow.workflow.web.requestbodies.TaskSearchBody;
-import com.fmworkflow.workflow.web.responsebodies.DataFieldsResource;
-import com.fmworkflow.workflow.web.responsebodies.FiltersResource;
-import com.fmworkflow.workflow.web.responsebodies.TaskResource;
-import com.fmworkflow.workflow.web.responsebodies.TasksResource;
+import com.fmworkflow.workflow.web.responsebodies.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.Resource;
 import org.springframework.security.core.Authentication;
@@ -52,35 +49,25 @@ public class TaskController {
     }
 
     @RequestMapping(value = "/assign/{id}", method = RequestMethod.GET)
-    public Resource<String> assign(Authentication auth, @PathVariable("id") Long taskId){
+    public MessageResource assign(Authentication auth, @PathVariable("id") Long taskId){
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
         try {
             taskService.assignTask(loggedUser.transformToUser(), taskId);
-            return new Resource<>(JsonBuilder.init()
-                    .addSuccessMessage("Task "+taskId+" assigned to "+loggedUser.getFullName())
-                    .build());
-
+            return MessageResource.successMessage("Task "+taskId+" assigned to "+loggedUser.getFullName());
         } catch (TransitionNotStartableException e){
-            return new Resource<>(JsonBuilder.init()
-                    .addErrorMessage("Task "+taskId+" cannot be assigned")
-                    .build());
+            return MessageResource.errorMessage("Task "+taskId+" cannot be assigned");
         }
     }
 
     @RequestMapping(value = "/finish/{id}", method = RequestMethod.GET)
-    public Resource<String> finish(Authentication auth, @PathVariable("id") Long taskId){
+    public MessageResource finish(Authentication auth, @PathVariable("id") Long taskId){
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
         try {
             taskService.finishTask(loggedUser.getId(), taskId);
-            return new Resource<>(JsonBuilder.init()
-                    .addSuccessMessage("Task +"+taskId+" finished")
-                    .build());
-
+            return MessageResource.successMessage("Task "+taskId+" finished");
         } catch (Exception e) {
             e.printStackTrace();
-            return new Resource<>(JsonBuilder.init()
-                    .addErrorMessage(e.getMessage())
-                    .build());
+            return MessageResource.errorMessage(e.getMessage());
         }
     }
 
@@ -122,9 +109,9 @@ public class TaskController {
     }
 
     @RequestMapping(value = "/{id}/data", method = RequestMethod.POST)
-    public Resource<String> saveData(@PathVariable("id") Long taskId, @RequestBody ModifyDataBody dataBody){
+    public MessageResource saveData(@PathVariable("id") Long taskId, @RequestBody ModifyDataBody dataBody){
         taskService.setDataFieldsValues(taskId, dataBody.values);
-        return new Resource<>("data saved");
+        return MessageResource.successMessage("Data for task "+taskId+" saved");
     }
 
     @RequestMapping(value = "/filter", method = RequestMethod.GET)
@@ -133,12 +120,12 @@ public class TaskController {
     }
 
     @RequestMapping(value = "/filter", method = RequestMethod.POST)
-    public Resource<String> saveFilter(Authentication auth, @RequestBody CreateFilterBody filterBody){
+    public MessageResource saveFilter(Authentication auth, @RequestBody CreateFilterBody filterBody){
         boolean saveSuccess = filterService.saveFilter(((LoggedUser) auth.getPrincipal()),filterBody);
         if(saveSuccess){
-            return new Resource<>(JsonBuilder.successMessage("Filter "+filterBody.name+" saved"));
+            return MessageResource.successMessage("Filter "+filterBody.name+" saved");
         } else {
-            return new Resource<>(JsonBuilder.successMessage("Filter "+filterBody.name+" saving failed!"));
+            return MessageResource.errorMessage("Filter "+filterBody.name+" saving failed!");
         }
     }
 }
