@@ -3,6 +3,7 @@ package com.fmworkflow.workflow.service;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fmworkflow.auth.domain.LoggedUser;
 import com.fmworkflow.auth.domain.User;
+import com.fmworkflow.auth.domain.UserProcessRole;
 import com.fmworkflow.auth.domain.UserRepository;
 import com.fmworkflow.petrinet.domain.Arc;
 import com.fmworkflow.petrinet.domain.PetriNet;
@@ -20,6 +21,7 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class TaskService implements ITaskService {
@@ -36,10 +38,10 @@ public class TaskService implements ITaskService {
     @Override
     public List<Task> getAll(LoggedUser loggedUser) {
         //TODO: 27/02/2017 uncommment when user can be assigned to role
-//        User user = userRepository.findOne(loggedUser.getId());
-//        List<String> roles = new LinkedList<>(user.getUserProcessRoles()).stream().map(UserProcessRole::getRoleId).collect(Collectors.toList());
-//        return taskRepository.findAllByAssignRoleIn(roles);
-        return taskRepository.findAll();
+        User user = userRepository.findOne(loggedUser.getId());
+        List<String> roles = new LinkedList<>(user.getUserProcessRoles()).stream().map(UserProcessRole::getRoleId).collect(Collectors.toList());
+        return taskRepository.findAllByAssignRoleIn(roles);
+//        return taskRepository.findAll();
     }
 
     @Override

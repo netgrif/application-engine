@@ -1,12 +1,11 @@
 package com.fmworkflow;
 
-import com.fmworkflow.auth.domain.Role;
-import com.fmworkflow.auth.domain.RoleRepository;
-import com.fmworkflow.auth.domain.User;
+import com.fmworkflow.auth.domain.*;
 import com.fmworkflow.auth.service.IUserService;
 import com.fmworkflow.importer.Importer;
 import com.fmworkflow.petrinet.domain.PetriNet;
 import com.fmworkflow.petrinet.domain.PetriNetRepository;
+import com.fmworkflow.petrinet.domain.roles.ProcessRole;
 import com.fmworkflow.workflow.service.ITaskService;
 import com.fmworkflow.workflow.service.IWorkflowService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +18,8 @@ import org.springframework.hateoas.config.EnableHypermediaSupport;
 
 import java.io.File;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 
 @EnableCaching
 @EnableHypermediaSupport(type = EnableHypermediaSupport.HypermediaType.HAL)
@@ -58,7 +59,7 @@ public class WorkflowManagementSystemApplication implements CommandLineRunner{
 		HashSet<Role> roles = new HashSet<>();
 		roles.add(role);
 		user.setRoles(roles);
-		userService.save(user);
+//		userService.save(user);
 
 		//admin account
 		Role adminRole = new Role("admin");
@@ -74,5 +75,26 @@ public class WorkflowManagementSystemApplication implements CommandLineRunner{
         PetriNet net = petriNetRepository.findAll().get(0);
 		workflowService.createCase(net.getStringId(), "fm use case", null);
 		//workflowService.getAll().forEach(aCase -> taskService.createTasks(aCase));
+
+		User client = new User("client@fmworkflow.com", "password", "name", "surname");
+		HashSet<Role> clientRoles = new HashSet<>();
+		clientRoles.add(role);
+		client.setRoles(clientRoles);
+
+		List<ProcessRole> proles = new LinkedList<>(net.getRoles().values());
+		UserProcessRole proleClient = new UserProcessRole();
+		proleClient.setRoleId(proles.get(0).getStringId());
+		proleClient = userProcessRoleRepository.save(proleClient);
+		client.addProcessRole(proleClient);
+		userService.save(client);
+
+		UserProcessRole proleFm = new UserProcessRole();
+		proleFm.setRoleId(proles.get(1).getStringId());
+		proleFm = userProcessRoleRepository.save(proleFm);
+		user.addProcessRole(proleFm);
+		userService.save(user);
 	}
+
+	@Autowired
+	private UserProcessRoleRepository userProcessRoleRepository;
 }
