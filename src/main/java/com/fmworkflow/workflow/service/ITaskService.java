@@ -30,4 +30,6 @@ public interface ITaskService {
     List<Field> getData(Long taskId);
 
     void setDataFieldsValues(Long taskId, Map<String, String> values);
+
+    void cancelTask(Long id, Long taskId);
 }

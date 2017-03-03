@@ -1,18 +1,15 @@
 package com.fmworkflow.workflow.web;
 
 import com.fmworkflow.auth.domain.LoggedUser;
-import com.fmworkflow.json.JsonBuilder;
 import com.fmworkflow.petrinet.domain.dataset.Field;
 import com.fmworkflow.petrinet.domain.throwable.TransitionNotStartableException;
 import com.fmworkflow.workflow.domain.Task;
 import com.fmworkflow.workflow.service.IFilterService;
 import com.fmworkflow.workflow.service.ITaskService;
 import com.fmworkflow.workflow.web.requestbodies.CreateFilterBody;
-import com.fmworkflow.workflow.web.requestbodies.ModifyDataBody;
 import com.fmworkflow.workflow.web.requestbodies.TaskSearchBody;
 import com.fmworkflow.workflow.web.responsebodies.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.hateoas.Resource;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
@@ -65,6 +62,18 @@ public class TaskController {
         try {
             taskService.finishTask(loggedUser.getId(), taskId);
             return MessageResource.successMessage("Task "+taskId+" finished");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return MessageResource.errorMessage(e.getMessage());
+        }
+    }
+
+    @RequestMapping(value = "/cancel/{id}", method = RequestMethod.GET)
+    public MessageResource cancel(Authentication auth, @PathVariable("id") Long taskId) {
+        LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
+        try {
+            taskService.cancelTask(loggedUser.getId(), taskId);
+            return MessageResource.successMessage("Task " + taskId + " canceled");
         } catch (Exception e) {
             e.printStackTrace();
             return MessageResource.errorMessage(e.getMessage());

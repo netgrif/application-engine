@@ -50,6 +50,8 @@ public class Case {
     }
 
     public PetriNet getPetriNet() {
+        if (petriNet.isNotInitialized())
+            petriNet.initializeArcs();
         return petriNet;
     }
 

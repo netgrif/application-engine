@@ -7,6 +7,7 @@ import com.fmworkflow.auth.domain.UserProcessRole;
 import com.fmworkflow.auth.domain.UserRepository;
 import com.fmworkflow.petrinet.domain.Arc;
 import com.fmworkflow.petrinet.domain.PetriNet;
+import com.fmworkflow.petrinet.domain.Place;
 import com.fmworkflow.petrinet.domain.Transition;
 import com.fmworkflow.petrinet.domain.dataset.Field;
 import com.fmworkflow.petrinet.domain.roles.ProcessRoleRepository;
@@ -188,5 +189,21 @@ public class TaskService implements ITaskService {
 
         values.forEach((key, value) -> useCase.getDataSetValues().put(key, value));
         caseRepository.save(useCase);
+    }
+
+    @Override
+    @org.springframework.transaction.annotation.Transactional
+    public void cancelTask(Long id, Long taskId) {
+        Task task = taskRepository.findOne(taskId);
+        Case useCase = caseRepository.findOne(task.getCaseId());
+        PetriNet net = useCase.getPetriNet();
+
+        net.getArcsOfTransition(task.getTransitionId()).stream()
+                .filter(arc -> arc.getSource() instanceof Place)
+                .forEach(arc -> useCase.addActivePlace(arc.getSource().getStringId(), arc.getMultiplicity()));
+
+        taskRepository.delete(taskId);
+        caseRepository.save(useCase);
+        reloadTasks(useCase);
     }
 }
