@@ -109,8 +109,8 @@ public class TaskController {
     }
 
     @RequestMapping(value = "/{id}/data", method = RequestMethod.POST)
-    public MessageResource saveData(@PathVariable("id") Long taskId, @RequestBody ModifyDataBody dataBody){
-        taskService.setDataFieldsValues(taskId, dataBody.values);
+    public MessageResource saveData(@PathVariable("id") Long taskId, @RequestBody Map<String, String> dataBody){
+        taskService.setDataFieldsValues(taskId, dataBody);
         return MessageResource.successMessage("Data for task "+taskId+" saved");
     }
 
