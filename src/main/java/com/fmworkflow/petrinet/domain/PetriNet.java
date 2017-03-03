@@ -4,11 +4,10 @@ import com.fmworkflow.petrinet.domain.dataset.Field;
 import com.fmworkflow.petrinet.domain.roles.ProcessRole;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -35,8 +34,11 @@ public class PetriNet {
     @org.springframework.data.mongodb.core.mapping.Field("roles")
     @DBRef
     private Map<String, ProcessRole> roles;
+    @Transient
+    private boolean initialized;
 
     public PetriNet() {
+        initialized = false;
         creationDate = LocalDateTime.now();
         this.places = new HashMap<>();
         this.transitions = new HashMap<>();
@@ -145,6 +147,10 @@ public class PetriNet {
 
     public void addDataSetField(Field field) {
         this.dataSet.put(field.getObjectId(), field);
+    }
+
+    public boolean isNotInitialized() {
+        return !initialized;
     }
 
     public void addArc(Arc arc) {
