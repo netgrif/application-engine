@@ -59,7 +59,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             .httpBasic().and()
             .authorizeRequests()
                 .antMatchers("/bower_components/**","/scripts/**","/assets/**","/styles/**","/views/**","/**/favicon.ico").permitAll()
-                .antMatchers("/index.html", "/", "/login", "/login/signup/{token}", "/login/signup", "/login/token","/test").permitAll()
+                .antMatchers("/index.html", "/", "/login", "/login/signup/{token}", "/login/signup", "/login/token","/test", "/importer/xml").permitAll()
                 .anyRequest().authenticated()
             .and()
             .formLogin()
