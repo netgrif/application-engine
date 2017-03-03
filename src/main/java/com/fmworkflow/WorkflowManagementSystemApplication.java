@@ -76,7 +76,7 @@ public class WorkflowManagementSystemApplication implements CommandLineRunner{
 		workflowService.createCase(net.getStringId(), "fm use case", null);
 		//workflowService.getAll().forEach(aCase -> taskService.createTasks(aCase));
 
-		User client = new User("client@fmworkflow.com", "password", "name", "surname");
+		User client = new User("client@fmworkflow.com", "password", "Client", "Client Client");
 		HashSet<Role> clientRoles = new HashSet<>();
 		clientRoles.add(role);
 		client.setRoles(clientRoles);
