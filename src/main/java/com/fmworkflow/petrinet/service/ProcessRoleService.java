@@ -23,13 +23,17 @@ public class ProcessRoleService implements IProcessRoleService {
     private PetriNetRepository netRepository;
 
     @Override
-    public void assignRoleToUser(String userMail, String netId, String roleId) {
-        User user = userRepository.findByEmail(userMail);
+    public void assignRoleToUser(String email, String netId, List<String> roleIds) {
+        User user = userRepository.findByEmail(email);
         PetriNet net = netRepository.findOne(netId);
-        UserProcessRole role = new UserProcessRole();
-        role.setRoleId(net.getRoles().get(roleId).getStringId());
-        role = roleRepository.save(role);
-        user.addProcessRole(role);
+
+        roleIds.forEach(roleId -> {
+            UserProcessRole role = new UserProcessRole();
+            role.setRoleId(net.getRoles().get(roleId).getStringId());
+            role = roleRepository.save(role);
+            user.addProcessRole(role);
+        });
+
         userRepository.save(user);
     }
 
