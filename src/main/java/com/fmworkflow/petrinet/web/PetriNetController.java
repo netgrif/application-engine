@@ -112,9 +112,9 @@ public class PetriNetController {
     @RequestMapping(value = "/roles/assign/{netId}", method = RequestMethod.POST)
     public
     @ResponseBody
-    String assignRoleToUser(@RequestParam String userId, @RequestParam String roleId, @PathVariable String netId) {
+    String assignRoleToUser(@RequestParam String userMail, @RequestParam String roleId, @PathVariable String netId) {
         try {
-            roleService.assignRoleToUser(userId, netId, roleId);
+            roleService.assignRoleToUser(userMail, netId, roleId);
             return JsonBuilder.successMessage("Role assigned");
         } catch (Exception e) {
             e.printStackTrace();
