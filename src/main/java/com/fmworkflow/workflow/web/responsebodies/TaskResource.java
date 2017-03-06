@@ -26,6 +26,8 @@ public class TaskResource extends Resource<Task> {
         resource.add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
                 .finish(auth,task.getId())).withRel("finish"));
         resource.add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
+                .cancel(auth,task.getId())).withRel("cancel"));
+        resource.add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
                 .getData(task.getId())).withRel("data"));
         resource.add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
                 .saveData(task.getId(),null)).withRel("data-edit"));
