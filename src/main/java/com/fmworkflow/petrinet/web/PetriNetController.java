@@ -4,11 +4,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fmworkflow.auth.service.IUserService;
 import com.fmworkflow.json.JsonBuilder;
 import com.fmworkflow.petrinet.domain.PetriNet;
-import com.fmworkflow.petrinet.web.responsebodies.PetriNetReference;
-import com.fmworkflow.petrinet.web.responsebodies.PetriNetReferencesResource;
 import com.fmworkflow.petrinet.service.IPetriNetService;
 import com.fmworkflow.petrinet.service.IProcessRoleService;
+import com.fmworkflow.petrinet.web.requestbodies.AssignedRoles;
 import com.fmworkflow.petrinet.web.requestbodies.UploadedFileMeta;
+import com.fmworkflow.petrinet.web.responsebodies.PetriNetReference;
+import com.fmworkflow.petrinet.web.responsebodies.PetriNetReferencesResource;
 import com.fmworkflow.petrinet.web.responsebodies.TransitionReferencesResource;
 import com.fmworkflow.petrinet.web.responsebodies.UsersRolesListResponse;
 import org.apache.log4j.Logger;
@@ -112,9 +113,9 @@ public class PetriNetController {
     @RequestMapping(value = "/roles/assign/{netId}", method = RequestMethod.POST)
     public
     @ResponseBody
-    String assignRoleToUser(@RequestParam String userMail, @RequestParam String roleId, @PathVariable String netId) {
+    String assignRoleToUser(@RequestBody AssignedRoles assignedRoles, @PathVariable String netId) {
         try {
-            roleService.assignRoleToUser(userMail, netId, roleId);
+            roleService.assignRoleToUser(assignedRoles.email, netId, assignedRoles.roleIds);
             return JsonBuilder.successMessage("Role assigned");
         } catch (Exception e) {
             e.printStackTrace();
