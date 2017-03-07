@@ -13,6 +13,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.hateoas.config.EnableHypermediaSupport;
 
@@ -24,6 +25,7 @@ import java.util.List;
 @EnableCaching
 @EnableHypermediaSupport(type = EnableHypermediaSupport.HypermediaType.HAL)
 @SpringBootApplication
+@EnableAspectJAutoProxy
 public class WorkflowManagementSystemApplication implements CommandLineRunner{
 
 	public static void main(String[] args) {
