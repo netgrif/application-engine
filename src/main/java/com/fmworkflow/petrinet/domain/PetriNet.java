@@ -186,6 +186,7 @@ public class PetriNet {
             arc.setSource(getNode(arc.getSourceId()));
             arc.setDestination(getNode(arc.getDestinationId()));
         }));
+        initialized = true;
     }
 
     public Map<Place, Integer> getInputPlaces(Transition transition) {
