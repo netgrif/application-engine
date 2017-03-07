@@ -6,7 +6,7 @@ import com.fmworkflow.json.JsonBuilder;
 import com.fmworkflow.petrinet.domain.PetriNet;
 import com.fmworkflow.petrinet.service.IPetriNetService;
 import com.fmworkflow.petrinet.service.IProcessRoleService;
-import com.fmworkflow.petrinet.web.requestbodies.AssignedRoles;
+import com.fmworkflow.petrinet.web.requestbodies.AssignedRolesBody;
 import com.fmworkflow.petrinet.web.requestbodies.UploadedFileMeta;
 import com.fmworkflow.petrinet.web.responsebodies.PetriNetReference;
 import com.fmworkflow.petrinet.web.responsebodies.PetriNetReferencesResource;
@@ -113,7 +113,7 @@ public class PetriNetController {
     @RequestMapping(value = "/roles/assign/{netId}", method = RequestMethod.POST)
     public
     @ResponseBody
-    String assignRoleToUser(@RequestBody AssignedRoles assignedRoles, @PathVariable String netId) {
+    String assignRoleToUser(@RequestBody AssignedRolesBody assignedRoles, @PathVariable String netId) {
         try {
             roleService.assignRoleToUser(assignedRoles.email, netId, assignedRoles.roleIds);
             return JsonBuilder.successMessage("Role assigned");
