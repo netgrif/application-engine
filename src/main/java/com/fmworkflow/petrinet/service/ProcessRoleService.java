@@ -10,6 +10,7 @@ import com.fmworkflow.petrinet.domain.roles.ProcessRole;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -27,6 +28,7 @@ public class ProcessRoleService implements IProcessRoleService {
         User user = userRepository.findByEmail(email);
         PetriNet net = netRepository.findOne(netId);
 
+        user.setUserProcessRoles(new HashSet<>());
         roleIds.forEach(roleId -> {
             UserProcessRole role = new UserProcessRole();
             role.setRoleId(net.getRoles().get(roleId).getStringId());
