@@ -5,7 +5,10 @@ import com.fasterxml.jackson.annotation.JsonValue;
 public enum FieldType {
     TEXT ("text"),
     DATE ("date"),
-    BOOLEAN ("boolean");
+    BOOLEAN ("boolean"),
+    FILE ("file"),
+    ENUMERATION ("enumeration"),
+    MULTICHOICE ("multichoice");
 
     String name;
 
