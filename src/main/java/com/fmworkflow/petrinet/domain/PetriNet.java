@@ -199,6 +199,8 @@ public class PetriNet {
 
     private Map<Place, Integer> getIOPlaces(Transition transition, Predicate<Arc> predicate) {
         List<Arc> transitionsArcs = getArcsOfTransition(transition);
+        if (transitionsArcs == null)
+            return new HashMap<>();
         return transitionsArcs.stream()
                 .filter(predicate)
                 .collect(Collectors.toMap(Arc::getPlace, Arc::getMultiplicity));
