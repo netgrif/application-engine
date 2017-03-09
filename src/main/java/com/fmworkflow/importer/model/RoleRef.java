@@ -2,7 +2,7 @@ package com.fmworkflow.importer.model;
 
 public class RoleRef {
     private Long id;
-    private String logic;
+    private Logic logic;
 
     public Long getId() {
         return id;
@@ -12,11 +12,11 @@ public class RoleRef {
         this.id = id;
     }
 
-    public String getLogic() {
+    public Logic getLogic() {
         return logic;
     }
 
-    public void setLogic(String logic) {
+    public void setLogic(Logic logic) {
         this.logic = logic;
     }
 }
