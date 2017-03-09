@@ -90,7 +90,7 @@ public class Importer {
 
     @Transactional
     private void createDataSet(ImportData importData) {
-        Field field = FieldFactory.getField(importData.getType());
+        Field field = FieldFactory.getField(importData.getType(), importData.getValues());
         field.setName(importData.getTitle());
 
         net.addDataSetField(field);
