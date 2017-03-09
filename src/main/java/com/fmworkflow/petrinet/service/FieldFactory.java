@@ -3,7 +3,7 @@ package com.fmworkflow.petrinet.service;
 import com.fmworkflow.petrinet.domain.dataset.*;
 
 public final class FieldFactory {
-    public static Field getField(FieldType type, String... values) throws IllegalArgumentException {
+    public static Field getField(FieldType type, String[] values) throws IllegalArgumentException {
         switch (type) {
             case TEXT:
                 return new TextField();
@@ -22,7 +22,7 @@ public final class FieldFactory {
         }
     }
 
-    public static Field getField(String typeString, String... values) throws IllegalArgumentException {
-        return getField(FieldType.fromString(typeString));
+    public static Field getField(String typeString, String[] values) throws IllegalArgumentException {
+        return getField(FieldType.fromString(typeString), values);
     }
 }
