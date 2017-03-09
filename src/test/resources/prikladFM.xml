@@ -113,6 +113,10 @@
         <id>2</id>
         <name>fm servis</name>
     </role>
+    <role>
+        <id>3</id>
+        <name>client manager</name>
+    </role>
     <place>
         <id>0</id>
         <x>100</x>
@@ -256,7 +260,15 @@
         <label>Zaevidovanie UJ</label>
         <roleRef>
             <id>1</id>
-            <logic></logic>
+            <logic>
+                <assignToSelf>true</assignToSelf>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>3</id>
+            <logic>
+                <assignToOther>true</assignToOther>
+            </logic>
         </roleRef>
         <dataRef>
             <id>1</id>
@@ -530,7 +542,9 @@
         <label>Zaevidovanie UJ</label>
         <roleRef>
             <id>2</id>
-            <logic><assignToSelf>true</assignToSelf></logic>
+            <logic>
+                <assignToSelf>true</assignToSelf>
+            </logic>
         </roleRef>
     </transition>
     <transition>
@@ -540,7 +554,9 @@
         <label>Riešenie spornej veci</label>
         <roleRef>
             <id>2</id>
-            <logic><assignToSelf>true</assignToSelf></logic>
+            <logic>
+                <assignToSelf>true</assignToSelf>
+            </logic>
         </roleRef>
     </transition>
     <transition>
@@ -550,7 +566,9 @@
         <label>Riešenie spornej veci</label>
         <roleRef>
             <id>1</id>
-            <logic><assignToSelf>true</assignToSelf></logic>
+            <logic>
+                <assignToSelf>true</assignToSelf>
+            </logic>
         </roleRef>
     </transition>
     <transition>
@@ -560,7 +578,9 @@
         <label>Požiadavka na vypožičanie</label>
         <roleRef>
             <id>1</id>
-            <logic><assignToSelf>true</assignToSelf></logic>
+            <logic>
+                <assignToSelf>true</assignToSelf>
+            </logic>
         </roleRef>
     </transition>
     <transition>
@@ -570,7 +590,9 @@
         <label>Odovzdanie vypožičanej UJ</label>
         <roleRef>
             <id>2</id>
-            <logic><assignToSelf>true</assignToSelf></logic>
+            <logic>
+                <assignToSelf>true</assignToSelf>
+            </logic>
         </roleRef>
     </transition>
     <transition>
@@ -580,7 +602,9 @@
         <label>Skartácia</label>
         <roleRef>
             <id>2</id>
-            <logic><assignToSelf>true</assignToSelf></logic>
+            <logic>
+                <assignToSelf>true</assignToSelf>
+            </logic>
         </roleRef>
     </transition>
     <transition>
@@ -590,7 +614,9 @@
         <label>Prebratie požičanej UJ</label>
         <roleRef>
             <id>1</id>
-            <logic><assignToSelf>true</assignToSelf></logic>
+            <logic>
+                <assignToSelf>true</assignToSelf>
+            </logic>
         </roleRef>
     </transition>
     <transition>
@@ -600,7 +626,9 @@
         <label>Vrátenie požičanej UJ</label>
         <roleRef>
             <id>1</id>
-            <logic></logic>
+            <logic>
+                <assignToSelf>true</assignToSelf>
+            </logic>
         </roleRef>
     </transition>
     <transition>
@@ -610,7 +638,9 @@
         <label>Založenie vrátenej UJ</label>
         <roleRef>
             <id>2</id>
-            <logic></logic>
+            <logic>
+                <assignToSelf>true</assignToSelf>
+            </logic>
         </roleRef>
     </transition>
     <transition>
@@ -620,7 +650,9 @@
         <label>Požiadavka na scan UJ</label>
         <roleRef>
             <id>1</id>
-            <logic></logic>
+            <logic>
+                <assignToSelf>true</assignToSelf>
+            </logic>
         </roleRef>
     </transition>
     <transition>
@@ -630,7 +662,9 @@
         <label>Zaslanie scanu UJ</label>
         <roleRef>
             <id>2</id>
-            <logic></logic>
+            <logic>
+                <assignToSelf>true</assignToSelf>
+            </logic>
         </roleRef>
     </transition>
     <transition>
@@ -640,7 +674,9 @@
         <label>Data UJ</label>
         <roleRef>
             <id>2</id>
-            <logic></logic>
+            <logic>
+                <assignToSelf>true</assignToSelf>
+            </logic>
         </roleRef>
     </transition>
     <transition>
@@ -650,7 +686,9 @@
         <label>Prve zaevidovanie UJ</label>
         <roleRef>
             <id>2</id>
-            <logic></logic>
+            <logic>
+                <assignToSelf>true</assignToSelf>
+            </logic>
         </roleRef>
     </transition>
     <arc>
