@@ -10,6 +10,7 @@ public class ImportData {
     private String title;
     @XmlAttribute
     private String type;
+    private String[] values;
 
     public Long getId() {
         return id;
@@ -33,5 +34,13 @@ public class ImportData {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public String[] getValues() {
+        return values;
+    }
+
+    public void setValues(String[] values) {
+        this.values = values;
     }
 }

@@ -13,17 +13,20 @@
         <id>3</id>
         <title>Lokalizácia</title>
     </data>
-    <data type="text">
+    <data type="date">
         <id>4</id>
-        <title>Od (rok)</title>
+        <title>Od (dátum)</title>
     </data>
-    <data type="text">
+    <data type="date">
         <id>5</id>
-        <title>Do (rok)</title>
+        <title>Do (dátum)</title>
     </data>
-    <data type="text">
+    <data type="enumeration">
         <id>6</id>
         <title>Krajina pôvodu</title>
+        <values>Slovensko</values>
+        <values>Česká Republika</values>
+        <values>Rakúsko</values>
     </data>
     <data type="text">
         <id>7</id>
@@ -65,7 +68,7 @@
         <id>16</id>
         <title>Číslo plomby</title>
     </data>
-    <data type="text">
+    <data type="date">
         <id>17</id>
         <title>Dátum udalosti</title>
     </data>
@@ -77,7 +80,7 @@
         <id>19</id>
         <title>Oddelenie</title>
     </data>
-    <data type="text">
+    <data type="date">
         <id>20</id>
         <title>Dátum odovzdania</title>
     </data>
@@ -85,7 +88,7 @@
         <id>21</id>
         <title>Typ spisu</title>
     </data>
-    <data type="text">
+    <data type="date">
         <id>22</id>
         <title>Vypožičané dňa</title>
     </data>
@@ -101,9 +104,16 @@
         <id>27</id>
         <title>Ukl. jednotka</title>
     </data>
-    <data type="text">
+    <data type="date">
         <id>28</id>
         <title>Vrátiť do</title>
+    </data>
+    <data type="multichoice">
+        <id>29</id>
+        <title>Multiple choice</title>
+        <values>A</values>
+        <values>B</values>
+        <values>C</values>
     </data>
     <role>
         <id>1</id>
@@ -270,6 +280,12 @@
                 <assignToOther>true</assignToOther>
             </logic>
         </roleRef>
+        <dataRef>
+            <id>29</id>
+            <logic>
+                <editable>true</editable>
+            </logic>
+        </dataRef>
         <dataRef>
             <id>1</id>
             <logic>
@@ -678,6 +694,168 @@
                 <assignToSelf>true</assignToSelf>
             </logic>
         </roleRef>
+        <dataRef>
+            <id>1</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>2</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>3</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>4</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>5</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>6</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>7</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>8</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>9</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>10</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>11</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>12</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>13</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>14</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>15</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>16</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>17</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>18</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>19</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>20</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>21</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>22</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>23</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>25</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>27</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>28</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>29</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
     </transition>
     <transition>
         <id>242</id>
