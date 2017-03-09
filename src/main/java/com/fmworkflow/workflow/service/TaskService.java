@@ -10,7 +10,6 @@ import com.fmworkflow.petrinet.domain.PetriNet;
 import com.fmworkflow.petrinet.domain.Place;
 import com.fmworkflow.petrinet.domain.Transition;
 import com.fmworkflow.petrinet.domain.dataset.Field;
-import com.fmworkflow.petrinet.domain.roles.ProcessRoleRepository;
 import com.fmworkflow.petrinet.domain.throwable.TransitionNotStartableException;
 import com.fmworkflow.workflow.domain.Case;
 import com.fmworkflow.workflow.domain.CaseRepository;
@@ -33,16 +32,12 @@ public class TaskService implements ITaskService {
     private CaseRepository caseRepository;
     @Autowired
     private UserRepository userRepository;
-    @Autowired
-    private ProcessRoleRepository roleRepository;
 
     @Override
     public List<Task> getAll(LoggedUser loggedUser) {
-        //TODO: 27/02/2017 uncommment when user can be assigned to role
         User user = userRepository.findOne(loggedUser.getId());
         List<String> roles = new LinkedList<>(user.getUserProcessRoles()).stream().map(UserProcessRole::getRoleId).collect(Collectors.toList());
         return taskRepository.findAllByAssignRoleIn(roles);
-//        return taskRepository.findAll();
     }
 
     @Override

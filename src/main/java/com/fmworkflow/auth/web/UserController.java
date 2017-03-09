@@ -80,9 +80,9 @@ public class UserController {
     }
 
     @RequestMapping(value = "/token", method = RequestMethod.POST)
-    public String getEmail(@RequestBody String token){
+    public String getEmail(@RequestBody String token) {
         String email = tokenService.getEmail(token);
-        if(email != null){
+        if (email != null) {
             return JsonBuilder.init()
                     .addSuccessMessage(email)
                     .build();
