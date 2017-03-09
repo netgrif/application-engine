@@ -3,12 +3,14 @@ package com.fmworkflow.importer;
 import com.fmworkflow.importer.model.*;
 import com.fmworkflow.petrinet.domain.*;
 import com.fmworkflow.petrinet.domain.dataset.Field;
+import com.fmworkflow.petrinet.domain.dataset.logic.Editable;
+import com.fmworkflow.petrinet.domain.dataset.logic.Visible;
+import com.fmworkflow.petrinet.domain.roles.AssignToOtherFunction;
 import com.fmworkflow.petrinet.domain.roles.AssignToSelfFunction;
 import com.fmworkflow.petrinet.domain.roles.ProcessRole;
 import com.fmworkflow.petrinet.domain.roles.ProcessRoleRepository;
 import com.fmworkflow.petrinet.service.ArcFactory;
 import com.fmworkflow.petrinet.service.FieldFactory;
-import com.fmworkflow.petrinet.domain.dataset.logic.Editable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -101,19 +103,47 @@ public class Importer {
         transition.setTitle(importTransition.getLabel());
         transition.setPosition(importTransition.getX(), importTransition.getY());
 
-        if (importTransition.getRoleRef() != null)
+        if (importTransition.getRoleRef() != null) {
             Arrays.stream(importTransition.getRoleRef()).forEach(roleRef ->
-                    // TODO: 18/02/2017 add Role logic
-                    transition.addRole(roles.get(roleRef.getId()).getObjectId(), new AssignToSelfFunction(roles.get(roleRef.getId()).getObjectId()))
+                    addRoleLogic(transition, roleRef)
             );
-        if (importTransition.getDataRef() != null)
+        }
+        if (importTransition.getDataRef() != null) {
             Arrays.stream(importTransition.getDataRef()).forEach(dataRef ->
-                    // TODO: 18/02/2017 add Field logic
-                    transition.addDataSet(fields.get(dataRef.getId()).getObjectId(), new Editable())
+                    addDataLogic(transition, dataRef)
             );
+        }
 
         net.addTransition(transition);
         transitions.put(importTransition.getId(), transition);
+    }
+
+    @Transactional
+    private void addRoleLogic(Transition transition, RoleRef roleRef) {
+        RoleLogic logic = roleRef.getLogic();
+        String roleId = roles.get(roleRef.getId()).getObjectId();
+
+        if (logic == null || roleId == null)
+            return;
+
+        if (logic.getAssignToSelf())
+            transition.addRole(roleId, new AssignToSelfFunction(roleId));
+        if (logic.getAssignToOther())
+            transition.addRole(roleId, new AssignToOtherFunction(roleId));
+    }
+
+    @Transactional
+    private void addDataLogic(Transition transition, DataRef dataRef) {
+        DataLogic logic = dataRef.getLogic();
+        String fieldId = fields.get(dataRef.getId()).getObjectId();
+
+        if (logic == null || fieldId == null)
+            return;
+
+        if (logic.getEditable())
+            transition.addDataSet(fieldId, new Editable());
+        if (logic.getVisible())
+            transition.addDataSet(fieldId, new Visible());
     }
 
     @Transactional

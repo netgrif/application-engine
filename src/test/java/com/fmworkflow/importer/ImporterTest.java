@@ -22,7 +22,7 @@ public class ImporterTest {
     private PetriNetRepository repository;
 
     @Test
-    @Ignore
+//    @Ignore
     public void importPetriNet() throws Exception {
         importer.importPetriNet(new File("src/test/resources/prikladFM.xml"), "jaxb_test", "initials");
     }
