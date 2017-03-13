@@ -4,6 +4,8 @@ import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.Date;
 
 @Document
 public class DateField extends Field {
@@ -26,6 +28,7 @@ public class DateField extends Field {
 
     @Override
     public void setValue(Object value) {
-        this.value = (LocalDate) value;
+        if(value instanceof  LocalDate) this.value = (LocalDate) value;
+        else if(value instanceof Date) this.value = ((Date)value).toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
     }
 }

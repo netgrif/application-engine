@@ -5,6 +5,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Document
@@ -42,6 +43,7 @@ public class MultichoiceField extends Field {
 
     @Override
     public void setValue(Object value) {
-        this.value = (HashSet<String>) value;
+        if(value instanceof Set) this.value = (HashSet<String>) value;
+        if(value instanceof List) this.value = new HashSet<>((List<String>)value);
     }
 }
