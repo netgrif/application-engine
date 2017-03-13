@@ -1,5 +1,6 @@
 package com.fmworkflow.workflow.service;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fmworkflow.auth.domain.LoggedUser;
 import com.fmworkflow.auth.domain.User;
 import com.fmworkflow.petrinet.domain.dataset.Field;
@@ -29,7 +30,7 @@ public interface ITaskService {
 
     List<Field> getData(Long taskId);
 
-    void setDataFieldsValues(Long taskId, Map<String, String> values);
+    void setDataFieldsValues(Long taskId, ObjectNode values);
 
     void cancelTask(Long id, Long taskId);
 }

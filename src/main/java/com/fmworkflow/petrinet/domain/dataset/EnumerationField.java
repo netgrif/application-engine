@@ -36,7 +36,7 @@ public class EnumerationField extends Field {
 
     @Override
     public void setType(FieldType type) {
-        this.type = FieldType.FILE;
+        this.type = FieldType.ENUMERATION;
     }
 
     @Override

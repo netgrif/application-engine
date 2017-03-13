@@ -1,6 +1,9 @@
 package com.fmworkflow.workflow.service;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fmworkflow.auth.domain.LoggedUser;
 import com.fmworkflow.auth.domain.User;
 import com.fmworkflow.auth.domain.UserProcessRole;
@@ -10,6 +13,7 @@ import com.fmworkflow.petrinet.domain.PetriNet;
 import com.fmworkflow.petrinet.domain.Place;
 import com.fmworkflow.petrinet.domain.Transition;
 import com.fmworkflow.petrinet.domain.dataset.Field;
+import com.fmworkflow.petrinet.domain.dataset.FieldType;
 import com.fmworkflow.petrinet.domain.throwable.TransitionNotStartableException;
 import com.fmworkflow.workflow.domain.Case;
 import com.fmworkflow.workflow.domain.CaseRepository;
@@ -19,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -178,12 +183,29 @@ public class TaskService implements ITaskService {
 
     //TODO: 26.2.2017 generalize values
     @Override
-    public void setDataFieldsValues(Long taskId, Map<String, String> values) {
+    public void setDataFieldsValues(Long taskId, ObjectNode values) {
         Task task = taskRepository.findOne(taskId);
         Case useCase = caseRepository.findOne(task.getCaseId());
 
-        values.forEach((key, value) -> useCase.getDataSetValues().put(key, value));
+        values.fields().forEachRemaining( entry -> useCase.getDataSetValues().put(entry.getKey(),parseFieldsValues(entry.getValue())));
         caseRepository.save(useCase);
+    }
+
+    private Object parseFieldsValues(JsonNode value){
+        ObjectNode node = (ObjectNode) value;
+        switch (node.get("type").asText()){
+            case "date":
+                return LocalDate.parse(node.get("value").asText());
+            case "boolean":
+                return node.get("value").asBoolean();
+            case "multichoice":
+                ArrayNode arrayNode = (ArrayNode) node.get("value");
+                HashSet<String> set = new HashSet<>();
+                arrayNode.forEach(item -> set.add(item.asText()));
+                return set;
+            default:
+                return node.get("value").asText();
+        }
     }
 
     @Override

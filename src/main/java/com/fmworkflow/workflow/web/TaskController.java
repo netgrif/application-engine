@@ -1,5 +1,6 @@
 package com.fmworkflow.workflow.web;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fmworkflow.auth.domain.LoggedUser;
 import com.fmworkflow.petrinet.domain.dataset.Field;
 import com.fmworkflow.petrinet.domain.throwable.TransitionNotStartableException;
@@ -118,7 +119,7 @@ public class TaskController {
     }
 
     @RequestMapping(value = "/{id}/data", method = RequestMethod.POST)
-    public MessageResource saveData(@PathVariable("id") Long taskId, @RequestBody Map<String, String> dataBody){
+    public MessageResource saveData(@PathVariable("id") Long taskId, @RequestBody ObjectNode dataBody){
         taskService.setDataFieldsValues(taskId, dataBody);
         return MessageResource.successMessage("Data for task "+taskId+" saved");
     }
