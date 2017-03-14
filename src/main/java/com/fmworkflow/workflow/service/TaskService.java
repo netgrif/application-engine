@@ -20,9 +20,14 @@ import com.fmworkflow.workflow.domain.CaseRepository;
 import com.fmworkflow.workflow.domain.Task;
 import com.fmworkflow.workflow.domain.TaskRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -181,7 +186,7 @@ public class TaskService implements ITaskService {
         return dataSetFields;
     }
 
-    //TODO: 26.2.2017 generalize values
+
     @Override
     public void setDataFieldsValues(Long taskId, ObjectNode values) {
         Task task = taskRepository.findOne(taskId);
@@ -222,5 +227,46 @@ public class TaskService implements ITaskService {
         taskRepository.delete(taskId);
         caseRepository.save(useCase);
         reloadTasks(useCase);
+    }
+
+    @Override
+    public boolean saveFile(Long taskId, String fieldId, MultipartFile multipartFile){
+        try {
+            Task task = taskRepository.findOne(taskId);
+            Case useCase = caseRepository.findOne(task.getCaseId());
+
+            String oldFile = null;
+            if((oldFile = (String)useCase.getDataSetValues().get(fieldId)) != null){
+                new File("storage/"+fieldId+"-"+oldFile).delete();
+                useCase.getDataSetValues().put(fieldId, null);
+            }
+
+            File file = new File("storage/" + fieldId +"-"+ multipartFile.getOriginalFilename());
+            file.getParentFile().mkdirs();
+            if (!file.createNewFile()) {
+                file.delete();
+                file.createNewFile();
+            }
+
+            FileOutputStream fout =new FileOutputStream(file);
+            fout.write(multipartFile.getBytes());
+            fout.close();
+
+            useCase.getDataSetValues().put(fieldId, multipartFile.getOriginalFilename());
+            caseRepository.save(useCase);
+
+            return true;
+        } catch (IOException e){
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    @Override
+    public FileSystemResource getFile(Long taskId, String fieldId){
+        Task task = taskRepository.findOne(taskId);
+        Case useCase = caseRepository.findOne(task.getCaseId());
+        if(useCase.getDataSetValues().get(fieldId) == null) return null;
+        return new FileSystemResource("storage/"+fieldId+"-"+useCase.getDataSetValues().get(fieldId));
     }
 }
