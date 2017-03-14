@@ -6,7 +6,11 @@ import org.springframework.hateoas.Link;
 import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.mvc.ControllerLinkBuilder;
 import org.springframework.security.core.Authentication;
+import org.springframework.util.ReflectionUtils;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 
 
@@ -31,7 +35,8 @@ public class TaskResource extends Resource<Task> {
                 .getData(task.getId())).withRel("data"));
         resource.add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
                 .saveData(task.getId(),null)).withRel("data-edit"));
-
+        resource.add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
+                .getFile(task.getId(),"")).withRel("file"));
         return resource;
     }
 }

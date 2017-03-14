@@ -11,8 +11,10 @@ import com.fmworkflow.workflow.web.requestbodies.CreateFilterBody;
 import com.fmworkflow.workflow.web.requestbodies.TaskSearchBody;
 import com.fmworkflow.workflow.web.responsebodies.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -122,6 +124,20 @@ public class TaskController {
     public MessageResource saveData(@PathVariable("id") Long taskId, @RequestBody ObjectNode dataBody){
         taskService.setDataFieldsValues(taskId, dataBody);
         return MessageResource.successMessage("Data for task "+taskId+" saved");
+    }
+
+    @RequestMapping(value = "/{id}/file/{field}", method = RequestMethod.POST)
+    public MessageResource saveFile(@PathVariable("id") Long taskId, @PathVariable("field") String fieldId,
+                                    @RequestParam(value = "file")MultipartFile multipartFile){
+        if(taskService.saveFile(taskId, fieldId, multipartFile))
+            return MessageResource.successMessage("File "+multipartFile.getOriginalFilename()+" successfully uploaded");
+        else
+            return  MessageResource.errorMessage("File "+multipartFile.getOriginalFilename()+" failed to upload");
+    }
+
+    @RequestMapping(value = "/{id}/file/{field}", method = RequestMethod.GET)
+    public FileSystemResource getFile(@PathVariable("id") Long taskId, @PathVariable("field") String fieldId){
+        return taskService.getFile(taskId, fieldId);
     }
 
     @RequestMapping(value = "/filter", method = RequestMethod.GET)
