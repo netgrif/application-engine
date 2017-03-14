@@ -9,13 +9,13 @@ import java.io.File;
 public class FileField extends Field {
 
     @Transient
-    private File value;
+    private String value;
 
     public FileField() {
         super();
     }
 
-    public File getValue() {
+    public String getValue() {
         return value;
     }
 
@@ -26,6 +26,6 @@ public class FileField extends Field {
 
     @Override
     public void setValue(Object value) {
-        this.value = (File) value;
+        this.value = (String) value;
     }
 }
