@@ -12,10 +12,12 @@ import com.fmworkflow.workflow.web.requestbodies.TaskSearchBody;
 import com.fmworkflow.workflow.web.responsebodies.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -135,9 +137,12 @@ public class TaskController {
             return  MessageResource.errorMessage("File "+multipartFile.getOriginalFilename()+" failed to upload");
     }
 
-    @RequestMapping(value = "/{id}/file/{field}", method = RequestMethod.GET)
-    public FileSystemResource getFile(@PathVariable("id") Long taskId, @PathVariable("field") String fieldId){
-        return taskService.getFile(taskId, fieldId);
+    @RequestMapping(value = "/{id}/file/{field}", method = RequestMethod.GET, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    public FileSystemResource getFile(@PathVariable("id") Long taskId, @PathVariable("field") String fieldId, HttpServletResponse response){
+        FileSystemResource fileResource = taskService.getFile(taskId, fieldId);
+        response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
+        response.setHeader("Content-Disposition","attachment; filename="+fileResource.getFilename().substring(fileResource.getFilename().indexOf('-')+1));
+        return fileResource;
     }
 
     @RequestMapping(value = "/filter", method = RequestMethod.GET)
