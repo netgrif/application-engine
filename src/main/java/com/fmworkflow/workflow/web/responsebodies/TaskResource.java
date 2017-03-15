@@ -36,7 +36,7 @@ public class TaskResource extends Resource<Task> {
         resource.add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
                 .saveData(task.getId(),null)).withRel("data-edit"));
         resource.add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
-                .getFile(task.getId(),"")).withRel("file"));
+                .getFile(task.getId(),"",null)).withRel("file"));
         return resource;
     }
 }
