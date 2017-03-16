@@ -74,6 +74,7 @@ public class TaskService implements ITaskService {
                 task.setPriority(transition.getPriority());
                 task = taskRepository.save(task);
                 task.setVisualId(net.getInitials());
+                // TODO: 16. 3. 2017 there should be some fancy logic
                 task.setAssignRole(net.getRoles().get(transition.getRoles().keySet().stream().findFirst().orElseGet(null)).getStringId());
                 taskRepository.save(task);
             }

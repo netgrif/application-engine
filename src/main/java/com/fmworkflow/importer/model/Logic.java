@@ -4,8 +4,8 @@ public class Logic implements RoleLogic, DataLogic {
     private Boolean editable;
     private Boolean visible;
 
-    private Boolean assignToSelf;
-    private Boolean assignToOther;
+    private Boolean assign;
+    private Boolean delegate;
 
     public Boolean getEditable() {
         return editable != null && editable;
@@ -23,19 +23,19 @@ public class Logic implements RoleLogic, DataLogic {
         this.visible = visible;
     }
 
-    public Boolean getAssignToSelf() {
-        return assignToSelf != null && assignToSelf;
+    public Boolean getAssign() {
+        return assign != null && assign;
     }
 
-    public void setAssignToSelf(Boolean assignToSelf) {
-        this.assignToSelf = assignToSelf;
+    public void setAssign(Boolean assignToSelf) {
+        this.assign = assignToSelf;
     }
 
-    public Boolean getAssignToOther() {
-        return assignToOther != null && assignToOther;
+    public Boolean getDelegate() {
+        return delegate != null && delegate;
     }
 
-    public void setAssignToOther(Boolean assignToOther) {
-        this.assignToOther = assignToOther;
+    public void setDelegate(Boolean assignToOther) {
+        this.delegate = assignToOther;
     }
 }
