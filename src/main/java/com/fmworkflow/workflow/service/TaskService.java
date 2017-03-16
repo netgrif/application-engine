@@ -13,7 +13,6 @@ import com.fmworkflow.petrinet.domain.PetriNet;
 import com.fmworkflow.petrinet.domain.Place;
 import com.fmworkflow.petrinet.domain.Transition;
 import com.fmworkflow.petrinet.domain.dataset.Field;
-import com.fmworkflow.petrinet.domain.dataset.FieldType;
 import com.fmworkflow.petrinet.domain.throwable.TransitionNotStartableException;
 import com.fmworkflow.workflow.domain.Case;
 import com.fmworkflow.workflow.domain.CaseRepository;
@@ -268,5 +267,11 @@ public class TaskService implements ITaskService {
         Case useCase = caseRepository.findOne(task.getCaseId());
         if(useCase.getDataSetValues().get(fieldId) == null) return null;
         return new FileSystemResource("storage/"+fieldId+"-"+useCase.getDataSetValues().get(fieldId));
+    }
+
+    @Override
+    public void delegateTask(String delegatedEmail, Long taskId) throws TransitionNotStartableException {
+        User delegated = userRepository.findByEmail(delegatedEmail);
+        assignTask(delegated, taskId);
     }
 }

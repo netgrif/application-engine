@@ -11,7 +11,6 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-import java.util.Map;
 
 public interface ITaskService {
     List<Task> getAll(LoggedUser loggedUser);
@@ -39,4 +38,6 @@ public interface ITaskService {
     boolean saveFile(Long taskId, String fieldId, MultipartFile multipartFile);
 
     FileSystemResource getFile(Long taskId, String fieldId);
+
+    void delegateTask(String delegatedEmail, Long taskId) throws TransitionNotStartableException;
 }
