@@ -13,9 +13,11 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class WorkflowCommandLineRunner implements CommandLineRunner {
@@ -42,18 +44,18 @@ public class WorkflowCommandLineRunner implements CommandLineRunner {
 
     @Override
     public void run(String... strings) throws Exception {
-        Role role = new Role("user");
-        role = roleRepository.save(role);
+        Role roleUser = new Role("user");
+        roleUser = roleRepository.save(roleUser);
         User user = new User("user@fmworkflow.com", "password", "name", "surname");
         HashSet<Role> roles = new HashSet<>();
-        roles.add(role);
+        roles.add(roleUser);
         user.setRoles(roles);
 
-        Role adminRole = new Role("admin");
-        adminRole = roleRepository.save(adminRole);
+        Role roleAdmin = new Role("admin");
+        roleAdmin = roleRepository.save(roleAdmin);
         User admin = new User("admin@fmworkflow.com", "adminPass", "Admin", "Adminovič");
         HashSet<Role> adminRoles = new HashSet<>();
-        adminRoles.add(adminRole);
+        adminRoles.add(roleAdmin);
         admin.setRoles(adminRoles);
         userService.save(admin);
 
@@ -64,22 +66,37 @@ public class WorkflowCommandLineRunner implements CommandLineRunner {
             workflowService.createCase(net.getStringId(), "fm use case " + i, null);
         }
 
-        User client = new User("client@fmworkflow.com", "password", "Client", "Client Client");
+        User client = new User("client@client.com", "password", "Client", "Client");
         HashSet<Role> clientRoles = new HashSet<>();
-        clientRoles.add(role);
+        clientRoles.add(roleUser);
         client.setRoles(clientRoles);
 
-        List<ProcessRole> proles = new LinkedList<>(net.getRoles().values());
+        User clientManager = new User("manager@client.com", "password", "Client", "Manager");
+        HashSet<Role> managerRoles = new HashSet<>();
+        managerRoles.add(roleUser);
+        clientManager.setRoles(managerRoles);
+
+        List<ProcessRole> proles = new LinkedList<>(net.getRoles().values().stream().sorted(Comparator.comparing(ProcessRole::getName)).collect(Collectors.toList()));
+        ProcessRole clientRole = proles.get(0);
+        ProcessRole clientManagerRole = proles.get(1);
+        ProcessRole fmServiceRole = proles.get(2);
+
         UserProcessRole proleClient = new UserProcessRole();
-        proleClient.setRoleId(proles.get(0).getStringId());
+        proleClient.setRoleId(clientRole.getStringId());
         proleClient = userProcessRoleRepository.save(proleClient);
         client.addProcessRole(proleClient);
         userService.save(client);
 
         UserProcessRole proleFm = new UserProcessRole();
-        proleFm.setRoleId(proles.get(1).getStringId());
+        proleFm.setRoleId(fmServiceRole.getStringId());
         proleFm = userProcessRoleRepository.save(proleFm);
         user.addProcessRole(proleFm);
         userService.save(user);
+
+        UserProcessRole proleManager = new UserProcessRole();
+        proleManager.setRoleId(clientManagerRole.getStringId());
+        proleManager = userProcessRoleRepository.save(proleManager);
+        clientManager.addProcessRole(proleManager);
+        userService.save(clientManager);
     }
 }
