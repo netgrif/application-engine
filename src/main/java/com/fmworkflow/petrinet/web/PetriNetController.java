@@ -8,12 +8,10 @@ import com.fmworkflow.petrinet.service.IPetriNetService;
 import com.fmworkflow.petrinet.service.IProcessRoleService;
 import com.fmworkflow.petrinet.web.requestbodies.AssignedRolesBody;
 import com.fmworkflow.petrinet.web.requestbodies.UploadedFileMeta;
-import com.fmworkflow.petrinet.web.responsebodies.PetriNetReference;
-import com.fmworkflow.petrinet.web.responsebodies.PetriNetReferencesResource;
-import com.fmworkflow.petrinet.web.responsebodies.TransitionReferencesResource;
-import com.fmworkflow.petrinet.web.responsebodies.UsersRolesListResponse;
+import com.fmworkflow.petrinet.web.responsebodies.*;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -27,6 +25,9 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+
+import static org.springframework.web.bind.annotation.RequestMethod.GET;
+import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
 @Controller
 @RequestMapping("/res/petrinet")
@@ -43,7 +44,7 @@ public class PetriNetController {
     @Autowired
     private IUserService userService;
 
-    @RequestMapping(value = "/import", method = RequestMethod.POST)
+    @RequestMapping(value = "/import", method = POST)
     public
     @ResponseBody
     String importPetriNet(
@@ -73,12 +74,12 @@ public class PetriNetController {
         }
     }
 
-    @RequestMapping(value = "/all", method = RequestMethod.GET)
+    @RequestMapping(value = "/all", method = GET)
     public List<PetriNet> getAll() {
         return service.loadAll();
     }
 
-    @RequestMapping(value = "/refs", method = RequestMethod.GET)
+    @RequestMapping(value = "/refs", method = GET)
     public
     @ResponseBody
     PetriNetReferencesResource getAllReferences() {
@@ -86,7 +87,7 @@ public class PetriNetController {
         return new PetriNetReferencesResource(refs);
     }
 
-    @RequestMapping(value = "/transition/refs/{ids}", method = RequestMethod.GET)
+    @RequestMapping(value = "/transition/refs/{ids}", method = GET)
     public
     @ResponseBody
     TransitionReferencesResource getTransitionReferences(@PathVariable List<String> ids) {
@@ -100,7 +101,7 @@ public class PetriNetController {
         return new TransitionReferencesResource(service.getTransitionReferences(ids));
     }
 
-    @RequestMapping(value = "/roles/assign/{netId}", method = RequestMethod.GET)
+    @RequestMapping(value = "/roles/assign/{netId}", method = GET)
     public
     @ResponseBody
     UsersRolesListResponse getUsersAndRoles(@PathVariable String netId) {
@@ -110,7 +111,7 @@ public class PetriNetController {
         return response;
     }
 
-    @RequestMapping(value = "/roles/assign/{netId}", method = RequestMethod.POST)
+    @RequestMapping(value = "/roles/assign/{netId}", method = POST)
     public
     @ResponseBody
     String assignRoleToUser(@RequestBody AssignedRolesBody assignedRoles, @PathVariable String netId) {
@@ -120,6 +121,19 @@ public class PetriNetController {
         } catch (Exception e) {
             e.printStackTrace();
             return JsonBuilder.errorMessage("Unable to assign role");
+        }
+    }
+
+    @RequestMapping(value = "/roles/users/{id}", method = GET)
+    public @ResponseBody
+    ProcessRolesUsersListResponse getUsersWithProcessRole(Authentication auth, @PathVariable("id") String roleId) {
+        try {
+            ProcessRolesUsersListResponse response = new ProcessRolesUsersListResponse();
+            response.setUsers(userService.findByProcessRole(roleId));
+            return response;
+        } catch (Exception ignored) {
+            ignored.printStackTrace();
+            return null;
         }
     }
 }
