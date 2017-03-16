@@ -5,8 +5,8 @@ import com.fmworkflow.petrinet.domain.*;
 import com.fmworkflow.petrinet.domain.dataset.Field;
 import com.fmworkflow.petrinet.domain.dataset.logic.Editable;
 import com.fmworkflow.petrinet.domain.dataset.logic.Visible;
-import com.fmworkflow.petrinet.domain.roles.AssignToOtherFunction;
-import com.fmworkflow.petrinet.domain.roles.AssignToSelfFunction;
+import com.fmworkflow.petrinet.domain.roles.DelegateFunction;
+import com.fmworkflow.petrinet.domain.roles.AssignFunction;
 import com.fmworkflow.petrinet.domain.roles.ProcessRole;
 import com.fmworkflow.petrinet.domain.roles.ProcessRoleRepository;
 import com.fmworkflow.petrinet.service.ArcFactory;
@@ -127,9 +127,9 @@ public class Importer {
             return;
 
         if (logic.getAssignToSelf())
-            transition.addRole(roleId, new AssignToSelfFunction(roleId));
+            transition.addRole(roleId, new AssignFunction(roleId));
         if (logic.getAssignToOther())
-            transition.addRole(roleId, new AssignToOtherFunction(roleId));
+            transition.addRole(roleId, new DelegateFunction(roleId));
     }
 
     @Transactional
