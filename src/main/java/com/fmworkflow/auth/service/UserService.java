@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService implements IUserService {
@@ -25,7 +26,7 @@ public class UserService implements IUserService {
     @Override
     public void save(User user) {
         user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
-        if(user.getRoles().isEmpty()) {
+        if (user.getRoles().isEmpty()) {
             HashSet<Role> roles = new HashSet<Role>();
             roles.add(roleRepository.findByName("user"));
             user.setRoles(roles);
@@ -46,5 +47,15 @@ public class UserService implements IUserService {
     @Override
     public List<User> findAll() {
         return userRepository.findAll();
+    }
+
+    @Override
+    public List<User> findByProcessRole(String roleId) {
+        return userRepository.findAll()
+                .stream()
+                .filter(user -> user.getUserProcessRoles()
+                        .stream()
+                        .anyMatch(role -> role.getRoleId().equals(roleId)))
+                .collect(Collectors.toList());
     }
 }
