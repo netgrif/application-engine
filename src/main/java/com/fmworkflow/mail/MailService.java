@@ -9,6 +9,7 @@ import org.springframework.ui.velocity.VelocityEngineUtils;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -29,6 +30,7 @@ public class MailService implements IMailService {
         recipients.add(recipient);
         Map<String, Object> model = new HashMap<>();
         model.put("token", token);
+        model.put("date", LocalDate.now().plusDays(3).toString());
         MimeMessage email = buildEmail(EmailType.REGISTRATION, recipients, model);
         mailSender.send(email);
     }
