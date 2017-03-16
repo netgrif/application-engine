@@ -58,4 +58,15 @@ public class UserService implements IUserService {
                         .anyMatch(role -> role.getRoleId().equals(roleId)))
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public void assignRole(String userEmail, Long roleId) {
+        User user = userRepository.findByEmail(userEmail);
+        Role role = roleRepository.findOne(roleId);
+
+        user.addRole(role);
+        role.addUser(user);
+
+        userRepository.save(user);
+    }
 }
