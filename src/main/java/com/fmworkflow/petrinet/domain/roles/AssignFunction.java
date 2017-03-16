@@ -2,13 +2,13 @@ package com.fmworkflow.petrinet.domain.roles;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-public class AssignToSelfFunction extends RoleFunction {
-    public AssignToSelfFunction(String roleId) {
+public class AssignFunction extends RoleFunction {
+    public AssignFunction(String roleId) {
         super(roleId);
     }
 
     @Override
     public ObjectNode unsafeApply(ObjectNode jsonObject) throws Exception {
-        return jsonObject.put("assignToSelf", getRoleId().equals(jsonObject.get("roleId").asText()));
+        return jsonObject.put("assign", jsonObject.get("roleIds").asText().contains(getRoleId()));
     }
 }
