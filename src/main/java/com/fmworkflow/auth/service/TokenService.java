@@ -44,15 +44,16 @@ public class TokenService implements ITokenService {
         String hash = new BigInteger(260, new SecureRandom()).toString(32);
         Token token = new Token(email, hash);
 
+        tokenRepository.deleteAllByEmail(email);
         tokenRepository.save(token);
 
         return token;
     }
 
     @Override
-    public String getEmail(String token){
+    public String getEmail(String token) {
         Token entity = tokenRepository.findByHashedToken(token);
-        if(entity != null) return entity.getEmail();
+        if (entity != null) return entity.getEmail();
         return null;
     }
 
