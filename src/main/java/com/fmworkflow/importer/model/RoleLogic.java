@@ -1,11 +1,11 @@
 package com.fmworkflow.importer.model;
 
 public interface RoleLogic {
-    public Boolean getAssignToSelf();
+    public Boolean getAssign();
 
-    public void setAssignToSelf(Boolean assignToSelf);
+    public void setAssign(Boolean assignToSelf);
 
-    public Boolean getAssignToOther();
+    public Boolean getDelegate();
 
-    public void setAssignToOther(Boolean assignToOther);
+    public void setDelegate(Boolean assignToOther);
 }
