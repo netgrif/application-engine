@@ -17,4 +17,6 @@ public interface IUserService {
     List<User> findAll();
 
     List<User> findByProcessRole(String roleId);
+
+    void assignRole(String userEmail, Long roleId);
 }
