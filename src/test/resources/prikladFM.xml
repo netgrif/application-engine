@@ -271,13 +271,13 @@
         <roleRef>
             <id>1</id>
             <logic>
-                <assignToSelf>true</assignToSelf>
+                <assign>true</assign>
             </logic>
         </roleRef>
         <roleRef>
             <id>3</id>
             <logic>
-                <assignToOther>true</assignToOther>
+                <delegate>true</delegate>
             </logic>
         </roleRef>
         <dataRef>
@@ -421,7 +421,7 @@
         <roleRef>
             <id>1</id>
             <logic>
-                <assignToSelf>true</assignToSelf>
+                <assign>true</assign>
             </logic>
         </roleRef>
     </transition>
@@ -433,7 +433,7 @@
         <roleRef>
             <id>1</id>
             <logic>
-                <assignToSelf>true</assignToSelf>
+                <assign>true</assign>
             </logic>
         </roleRef>
     </transition>
@@ -445,7 +445,7 @@
         <roleRef>
             <id>1</id>
             <logic>
-                <assignToSelf>true</assignToSelf>
+                <assign>true</assign>
             </logic>
         </roleRef>
     </transition>
@@ -457,7 +457,7 @@
         <roleRef>
             <id>1</id>
             <logic>
-                <assignToSelf>true</assignToSelf>
+                <assign>true</assign>
             </logic>
         </roleRef>
         <dataRef>
@@ -511,7 +511,7 @@
         <roleRef>
             <id>2</id>
             <logic>
-                <assignToSelf>true</assignToSelf>
+                <assign>true</assign>
             </logic>
         </roleRef>
     </transition>
@@ -523,7 +523,7 @@
         <roleRef>
             <id>2</id>
             <logic>
-                <assignToSelf>true</assignToSelf>
+                <assign>true</assign>
             </logic>
         </roleRef>
     </transition>
@@ -535,7 +535,7 @@
         <roleRef>
             <id>1</id>
             <logic>
-                <assignToSelf>true</assignToSelf>
+                <assign>true</assign>
             </logic>
         </roleRef>
     </transition>
@@ -547,7 +547,7 @@
         <roleRef>
             <id>1</id>
             <logic>
-                <assignToSelf>true</assignToSelf>
+                <assign>true</assign>
             </logic>
         </roleRef>
     </transition>
@@ -559,7 +559,7 @@
         <roleRef>
             <id>2</id>
             <logic>
-                <assignToSelf>true</assignToSelf>
+                <assign>true</assign>
             </logic>
         </roleRef>
     </transition>
@@ -571,7 +571,7 @@
         <roleRef>
             <id>2</id>
             <logic>
-                <assignToSelf>true</assignToSelf>
+                <assign>true</assign>
             </logic>
         </roleRef>
     </transition>
@@ -583,7 +583,7 @@
         <roleRef>
             <id>1</id>
             <logic>
-                <assignToSelf>true</assignToSelf>
+                <assign>true</assign>
             </logic>
         </roleRef>
     </transition>
@@ -595,7 +595,7 @@
         <roleRef>
             <id>1</id>
             <logic>
-                <assignToSelf>true</assignToSelf>
+                <assign>true</assign>
             </logic>
         </roleRef>
     </transition>
@@ -607,7 +607,7 @@
         <roleRef>
             <id>2</id>
             <logic>
-                <assignToSelf>true</assignToSelf>
+                <assign>true</assign>
             </logic>
         </roleRef>
     </transition>
@@ -619,7 +619,7 @@
         <roleRef>
             <id>2</id>
             <logic>
-                <assignToSelf>true</assignToSelf>
+                <assign>true</assign>
             </logic>
         </roleRef>
     </transition>
@@ -631,7 +631,7 @@
         <roleRef>
             <id>1</id>
             <logic>
-                <assignToSelf>true</assignToSelf>
+                <assign>true</assign>
             </logic>
         </roleRef>
     </transition>
@@ -643,7 +643,7 @@
         <roleRef>
             <id>1</id>
             <logic>
-                <assignToSelf>true</assignToSelf>
+                <assign>true</assign>
             </logic>
         </roleRef>
     </transition>
@@ -655,7 +655,7 @@
         <roleRef>
             <id>2</id>
             <logic>
-                <assignToSelf>true</assignToSelf>
+                <assign>true</assign>
             </logic>
         </roleRef>
     </transition>
@@ -667,7 +667,7 @@
         <roleRef>
             <id>1</id>
             <logic>
-                <assignToSelf>true</assignToSelf>
+                <assign>true</assign>
             </logic>
         </roleRef>
     </transition>
@@ -679,7 +679,7 @@
         <roleRef>
             <id>2</id>
             <logic>
-                <assignToSelf>true</assignToSelf>
+                <assign>true</assign>
             </logic>
         </roleRef>
     </transition>
@@ -691,7 +691,7 @@
         <roleRef>
             <id>2</id>
             <logic>
-                <assignToSelf>true</assignToSelf>
+                <assign>true</assign>
             </logic>
         </roleRef>
         <dataRef>
@@ -865,7 +865,7 @@
         <roleRef>
             <id>2</id>
             <logic>
-                <assignToSelf>true</assignToSelf>
+                <assign>true</assign>
             </logic>
         </roleRef>
     </transition>
