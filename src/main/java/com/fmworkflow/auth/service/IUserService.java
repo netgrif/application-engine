@@ -7,6 +7,7 @@ import java.util.List;
 
 @Service
 public interface IUserService {
+
     void save(User user);
 
     User findByUsername(String username);
@@ -14,4 +15,6 @@ public interface IUserService {
     User getLoggedInUser();
 
     List<User> findAll();
+
+    List<User> findByProcessRole(String roleId);
 }
