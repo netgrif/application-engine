@@ -19,6 +19,7 @@ public class Task {
     @ManyToOne
     private User user;
     private String assignRole;
+    private String delegateRole;
     private LocalDateTime startDate;
     private LocalDateTime finishDate;
 
@@ -108,6 +109,14 @@ public class Task {
 
     public void setAssignRole(String assignRole) {
         this.assignRole = assignRole;
+    }
+
+    public String getDelegateRole() {
+        return delegateRole;
+    }
+
+    public void setDelegateRole(String delegateRole) {
+        this.delegateRole = delegateRole;
     }
 
     public static class Priorities {

@@ -3,22 +3,19 @@ package com.fmworkflow.auth.domain;
 import org.springframework.security.core.GrantedAuthority;
 
 import javax.jws.soap.SOAPBinding;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 public class LoggedUser extends org.springframework.security.core.userdetails.User {
 
     private Long id;
     private String fullName;
-    private Map<String, List<String>> workflowRoles;
+    private Set<String> processRoles;
 
     public LoggedUser(Long id, String username, String password, Collection<? extends GrantedAuthority> authorities) {
         super(username, password, authorities);
         this.id = id;
-        this.workflowRoles = new HashMap<>();
+        this.processRoles = new HashSet<>();
     }
 
     public Long getId() {
@@ -37,12 +34,16 @@ public class LoggedUser extends org.springframework.security.core.userdetails.Us
         this.fullName = fullName;
     }
 
-    public Map<String, List<String>> getWorkflowRoles() {
-        return workflowRoles;
+    public Set<String> getProcessRoles() {
+        return processRoles;
     }
 
-    public void setWorkflowRoles(Map<String, List<String>> workflowRoles) {
-        this.workflowRoles = workflowRoles;
+    public void setProcessRoles(Set<String> processRoles) {
+        this.processRoles = processRoles;
+    }
+
+    public void parseProcessRoles(Set<UserProcessRole> processRoles){
+        processRoles.forEach(role -> this.processRoles.add(role.getRoleId()));
     }
 
     public User transformToUser(){
