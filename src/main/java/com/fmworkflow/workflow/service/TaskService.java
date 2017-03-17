@@ -46,7 +46,7 @@ public class TaskService implements ITaskService {
     public List<Task> getAll(LoggedUser loggedUser) {
         User user = userRepository.findOne(loggedUser.getId());
         List<String> roles = new LinkedList<>(user.getUserProcessRoles()).stream().map(UserProcessRole::getRoleId).collect(Collectors.toList());
-        return taskRepository.findAllByAssignRoleIn(roles);
+        return taskRepository.findAllByAssignRoleOrDelegateRoleIn(roles,roles);
     }
 
     @Override
@@ -75,10 +75,19 @@ public class TaskService implements ITaskService {
                 task = taskRepository.save(task);
                 task.setVisualId(net.getInitials());
                 // TODO: 16. 3. 2017 there should be some fancy logic
-                task.setAssignRole(net.getRoles().get(transition.getRoles().keySet().stream().findFirst().orElseGet(null)).getStringId());
+//                task.setAssignRole(net.getRoles().get(transition.getRoles().keySet().stream().findFirst().orElseGet(null)).getStringId());
+                figureOutProcessRoles(task,transition);
                 taskRepository.save(task);
             }
         }
+    }
+
+    private void figureOutProcessRoles(Task task, Transition transition){
+        transition.getRoles().forEach((key, item) -> {
+            ObjectNode node = item.apply(JsonNodeFactory.instance.objectNode().put("roleIds",key));
+            if(node.get("assign") != null && node.get("assign").asBoolean()) task.setAssignRole(key);
+            if(node.get("delegate") != null && node.get("delegate").asBoolean()) task.setDelegateRole(key);
+        });
     }
 
     private boolean isExecutable(Transition transition, PetriNet net, Case useCase) {
@@ -214,7 +223,7 @@ public class TaskService implements ITaskService {
     }
 
     @Override
-    @org.springframework.transaction.annotation.Transactional
+    @Transactional
     public void cancelTask(Long id, Long taskId) {
         Task task = taskRepository.findOne(taskId);
         Case useCase = caseRepository.findOne(task.getCaseId());
@@ -271,6 +280,7 @@ public class TaskService implements ITaskService {
     }
 
     @Override
+    @Transactional
     public void delegateTask(String delegatedEmail, Long taskId) throws TransitionNotStartableException {
         User delegated = userRepository.findByEmail(delegatedEmail);
         assignTask(delegated, taskId);
