@@ -28,6 +28,8 @@ public class TaskResource extends Resource<Task> {
         resource.add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
                 .assign(auth,task.getId())).withRel("assign"));
         resource.add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
+                .delegate(auth,task.getId(),null)).withRel("delegate"));
+        resource.add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
                 .finish(auth,task.getId())).withRel("finish"));
         resource.add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
                 .cancel(auth,task.getId())).withRel("cancel"));

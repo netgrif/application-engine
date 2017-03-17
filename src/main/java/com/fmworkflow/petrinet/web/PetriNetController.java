@@ -129,6 +129,7 @@ public class PetriNetController {
     ProcessRolesUsersListResponse getUsersWithProcessRole(Authentication auth, @PathVariable("id") String roleId) {
         try {
             ProcessRolesUsersListResponse response = new ProcessRolesUsersListResponse();
+            roleId = URLDecoder.decode(roleId, StandardCharsets.UTF_8.name());
             response.setUsers(userService.findByProcessRole(roleId));
             return response;
         } catch (Exception ignored) {

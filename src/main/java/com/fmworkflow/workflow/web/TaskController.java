@@ -18,6 +18,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -62,9 +64,10 @@ public class TaskController {
     }
 
     @RequestMapping(value = "/delegate/{id}", method = RequestMethod.POST)
-    public MessageResource delegate(Authentication auth, @PathVariable("id") Long taskId, @RequestParam("email") String delegatedEmail) {
+    public MessageResource delegate(Authentication auth, @PathVariable("id") Long taskId, @RequestBody String delegatedEmail) {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
         try {
+            delegatedEmail = URLDecoder.decode(delegatedEmail, StandardCharsets.UTF_8.name());
             taskService.delegateTask(delegatedEmail, taskId);
             return MessageResource.successMessage("Task " + taskId + " assigned to " + delegatedEmail);
         } catch (Exception ignored) {
