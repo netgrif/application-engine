@@ -1,12 +1,14 @@
 package com.fmworkflow.importer;
 
 import com.fmworkflow.importer.model.*;
+import com.fmworkflow.importer.model.datalogic.ImportPlusYears;
 import com.fmworkflow.petrinet.domain.*;
 import com.fmworkflow.petrinet.domain.dataset.Field;
 import com.fmworkflow.petrinet.domain.dataset.logic.Editable;
+import com.fmworkflow.petrinet.domain.dataset.logic.PlusYears;
 import com.fmworkflow.petrinet.domain.dataset.logic.Visible;
-import com.fmworkflow.petrinet.domain.roles.DelegateFunction;
 import com.fmworkflow.petrinet.domain.roles.AssignFunction;
+import com.fmworkflow.petrinet.domain.roles.DelegateFunction;
 import com.fmworkflow.petrinet.domain.roles.ProcessRole;
 import com.fmworkflow.petrinet.domain.roles.ProcessRoleRepository;
 import com.fmworkflow.petrinet.service.ArcFactory;
@@ -144,6 +146,11 @@ public class Importer {
             transition.addDataSet(fieldId, new Editable());
         if (logic.getVisible())
             transition.addDataSet(fieldId, new Visible());
+        if (logic.getPlusYears() != null) {
+            ImportPlusYears plusYears = logic.getPlusYears();
+            transition.addDataSet(fieldId, new PlusYears(fields.get(plusYears.getRef()), plusYears.getValue()));
+        }
+
     }
 
     @Transactional
