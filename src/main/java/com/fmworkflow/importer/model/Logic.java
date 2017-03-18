@@ -1,8 +1,11 @@
 package com.fmworkflow.importer.model;
 
+import com.fmworkflow.importer.model.datalogic.ImportPlusYears;
+
 public class Logic implements RoleLogic, DataLogic {
     private Boolean editable;
     private Boolean visible;
+    private ImportPlusYears plusYears;
 
     private Boolean assign;
     private Boolean delegate;
@@ -21,6 +24,14 @@ public class Logic implements RoleLogic, DataLogic {
 
     public void setVisible(Boolean visible) {
         this.visible = visible;
+    }
+
+    public ImportPlusYears getPlusYears() {
+        return plusYears;
+    }
+
+    public void setPlusYears(ImportPlusYears plusYears) {
+        this.plusYears = plusYears;
     }
 
     public Boolean getAssign() {

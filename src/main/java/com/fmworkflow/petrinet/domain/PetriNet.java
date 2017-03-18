@@ -22,6 +22,7 @@ public class PetriNet {
     private ObjectId _id;
     private String title;
     private String initials;
+    // TODO: 18. 3. 2017 replace with Spring auditing
     private LocalDateTime creationDate;
     @org.springframework.data.mongodb.core.mapping.Field("places")
     private Map<String, Place> places;
