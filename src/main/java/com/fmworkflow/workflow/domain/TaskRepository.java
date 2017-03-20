@@ -12,7 +12,7 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
 
     List<Task> findByUserAndFinishDateNotNull(User user);
 
-    List<Task> findAllByAssignRoleOrDelegateRoleIn(List<String> roles, List<String> roles2);
+    List<Task> findAllByAssignRoleInOrDelegateRoleIn(List<String> roles, List<String> roles2);
 
     List<Task> findAllByCaseId(String caseId);
 
