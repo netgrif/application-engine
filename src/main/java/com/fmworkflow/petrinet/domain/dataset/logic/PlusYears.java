@@ -1,32 +1,31 @@
 package com.fmworkflow.petrinet.domain.dataset.logic;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fmworkflow.petrinet.domain.dataset.Field;
-import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
+
+import javax.validation.constraints.NotNull;
 
 @Document
 public class PlusYears implements LogicFunction {
-    @DBRef
-    private Field referredField;
+    private String ref;
     private Integer value;
 
-    public PlusYears(Field referredField, Integer value) {
+    public PlusYears(@NotNull String ref, @NotNull Integer value) {
         super();
-        this.referredField = referredField;
+        this.ref = ref;
         this.value = value;
     }
 
     @Override
     public ObjectNode unsafeApply(ObjectNode jsonObject) throws Exception {
         ObjectNode json = jsonObject.putObject("plusYears");
-        json.put("ref", referredField.getObjectId());
+        json.put("ref", ref);
         json.put("value", value);
         return jsonObject;
     }
 
-    public Field getReferredField() {
-        return referredField;
+    public String getReferredField() {
+        return ref;
     }
 
     public Integer getValue() {

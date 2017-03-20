@@ -148,7 +148,7 @@ public class Importer {
             transition.addDataSet(fieldId, new Visible());
         if (logic.getPlusYears() != null) {
             ImportPlusYears plusYears = logic.getPlusYears();
-            transition.addDataSet(fieldId, new PlusYears(fields.get(plusYears.getRef()), plusYears.getValue()));
+            transition.addDataSet(fieldId, new PlusYears(String.valueOf(plusYears.getRef()), plusYears.getContent()));
         }
 
     }
