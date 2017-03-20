@@ -46,7 +46,7 @@ public class TaskService implements ITaskService {
     public List<Task> getAll(LoggedUser loggedUser) {
         User user = userRepository.findOne(loggedUser.getId());
         List<String> roles = new LinkedList<>(user.getUserProcessRoles()).stream().map(UserProcessRole::getRoleId).collect(Collectors.toList());
-        return taskRepository.findAllByAssignRoleOrDelegateRoleIn(roles,roles);
+        return taskRepository.findAllByAssignRoleInOrDelegateRoleIn(roles,roles);
     }
 
     @Override
