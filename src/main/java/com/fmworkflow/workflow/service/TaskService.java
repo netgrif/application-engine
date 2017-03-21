@@ -84,10 +84,10 @@ public class TaskService implements ITaskService {
     }
 
     private void figureOutProcessRoles(Task task, Transition transition){
-        transition.getRoles().forEach((key, item) -> {
-            ObjectNode node = item.apply(JsonNodeFactory.instance.objectNode().put("roleIds",key));
-            if(node.get("assign") != null && node.get("assign").asBoolean()) task.setAssignRole(key);
-            if(node.get("delegate") != null && node.get("delegate").asBoolean()) task.setDelegateRole(key);
+        transition.getRoles().keySet().forEach((id) -> {
+            ObjectNode node = transition.applyRoleLogic(id, JsonNodeFactory.instance.objectNode().put("roleIds",id));
+            if(node.get("assign") != null && node.get("assign").asBoolean()) task.setAssignRole(id);
+            if(node.get("delegate") != null && node.get("delegate").asBoolean()) task.setDelegateRole(id);
         });
     }
 
@@ -188,7 +188,7 @@ public class TaskService implements ITaskService {
             Field field = useCase.getPetriNet().getDataSet().get(fieldId);
             field.setType(null);
             field.setValue(useCase.getDataSetValues().get(fieldId));
-            field.setLogic(transition.getDataSet().get(fieldId).apply(JsonNodeFactory.instance.objectNode()));
+            field.setLogic(transition.applyDataLogic(fieldId, JsonNodeFactory.instance.objectNode()));
 
             dataSetFields.add(field);
         });
