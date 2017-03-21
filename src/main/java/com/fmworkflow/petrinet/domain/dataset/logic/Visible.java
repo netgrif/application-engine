@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document
-public class Visible implements LogicFunction {
+public class Visible implements IDataFunction {
 
     public Visible() {
         super();
