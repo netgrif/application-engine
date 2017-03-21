@@ -5,6 +5,7 @@ import com.fmworkflow.importer.model.datalogic.ImportPlusYears;
 import com.fmworkflow.petrinet.domain.*;
 import com.fmworkflow.petrinet.domain.dataset.Field;
 import com.fmworkflow.petrinet.domain.dataset.logic.Editable;
+import com.fmworkflow.petrinet.domain.dataset.logic.Required;
 import com.fmworkflow.petrinet.domain.dataset.logic.PlusYears;
 import com.fmworkflow.petrinet.domain.dataset.logic.Visible;
 import com.fmworkflow.petrinet.domain.roles.AssignFunction;
@@ -142,6 +143,9 @@ public class Importer {
         if (logic == null || fieldId == null)
             return;
 
+        if (logic.getRequired() != null) {
+            transition.addDataSet(fieldId, new Required());
+        }
         if (logic.getEditable())
             transition.addDataSet(fieldId, new Editable());
         if (logic.getVisible())

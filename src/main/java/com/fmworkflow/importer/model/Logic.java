@@ -6,10 +6,12 @@ public class Logic implements RoleLogic, DataLogic {
     private Boolean editable;
     private Boolean visible;
     private ImportPlusYears plusYears;
+    private Boolean required;
 
     private Boolean assign;
     private Boolean delegate;
 
+//  DATA
     public Boolean getEditable() {
         return editable != null && editable;
     }
@@ -34,6 +36,15 @@ public class Logic implements RoleLogic, DataLogic {
         this.plusYears = plusYears;
     }
 
+    public Boolean getRequired() {
+        return required;
+    }
+
+    public void setRequired(Boolean required) {
+        this.required = required;
+    }
+
+    //  ROLE
     public Boolean getAssign() {
         return assign != null && assign;
     }

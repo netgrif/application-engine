@@ -6,7 +6,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import javax.validation.constraints.NotNull;
 
 @Document
-public class PlusYears implements LogicFunction {
+public class PlusYears implements IDataFunction {
     private String ref;
     private Integer value;
 
