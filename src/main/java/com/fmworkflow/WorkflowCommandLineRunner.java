@@ -17,6 +17,7 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 @Component
@@ -63,7 +64,7 @@ public class WorkflowCommandLineRunner implements CommandLineRunner {
         importer.importPetriNet(new File("src/test/resources/prikladFM.xml"), "fm net", "fm");
         PetriNet net = petriNetRepository.findAll().get(0);
         for (int i = 0; i < 10; i++) {
-            workflowService.createCase(net.getStringId(), "fm use case " + i, null);
+            workflowService.createCase(net.getStringId(), "Storage Unit " + i, randomColor());
         }
 
         User client = new User("client@client.com", "password", "Client", "Client");
@@ -98,5 +99,23 @@ public class WorkflowCommandLineRunner implements CommandLineRunner {
         proleManager = userProcessRoleRepository.save(proleManager);
         clientManager.addProcessRole(proleManager);
         userService.save(clientManager);
+    }
+
+    private String randomColor() {
+        int randomNum = ThreadLocalRandom.current().nextInt(0, 5);
+        switch (randomNum) {
+            case 0:
+                return "color-fg-fm-500";
+            case 1:
+                return "color-fg-blue-grey-500";
+            case 2:
+                return "color-fg-amber-500";
+            case 3:
+                return "color-fg-indigo-500";
+            case 4:
+                return "color-fg-teal-500";
+            default:
+                return "color-fg-fm-500";
+        }
     }
 }
