@@ -3,10 +3,10 @@ package com.fmworkflow.petrinet.domain.dataset.logic;
 import java.util.List;
 
 public class LogicFunctionBuilder {
-    public LogicFunction build(List<String> names) throws ClassNotFoundException, IllegalAccessException, InstantiationException {
-        LogicFunction logic = null;
+    public IDataFunction build(List<String> names) throws ClassNotFoundException, IllegalAccessException, InstantiationException {
+        IDataFunction logic = null;
         for (String name : names) {
-            LogicFunction newFunction = (LogicFunction) Class.forName(name).newInstance();
+            IDataFunction newFunction = (IDataFunction) Class.forName(name).newInstance();
             if (logic == null)
                 logic = newFunction;
             else

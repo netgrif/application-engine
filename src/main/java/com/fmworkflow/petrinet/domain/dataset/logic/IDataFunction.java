@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import java.util.function.Function;
 
-public interface LogicFunction extends Function<ObjectNode, ObjectNode> {
+public interface IDataFunction extends Function<ObjectNode, ObjectNode> {
 
     @Override
     default ObjectNode apply(ObjectNode jsonObject) {

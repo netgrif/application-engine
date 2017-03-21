@@ -14,4 +14,8 @@ public interface DataLogic {
     ImportPlusYears getPlusYears();
 
     void setPlusYears(ImportPlusYears plusYears);
+
+    Boolean getRequired();
+
+    void setRequired(Boolean required);
 }

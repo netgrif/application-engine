@@ -290,12 +290,14 @@
             <id>1</id>
             <logic>
                 <editable>true</editable>
+                <required>true</required>
             </logic>
         </dataRef>
         <dataRef>
             <id>2</id>
             <logic>
                 <editable>true</editable>
+                <required>true</required>
             </logic>
         </dataRef>
         <dataRef>
