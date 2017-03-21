@@ -14,6 +14,7 @@ public class Task {
     private String transitionId;
     private String title;
     private String caseColor;
+    private String caseTitle;
     private String visualId;
     private int priority;
     @ManyToOne
@@ -45,6 +46,14 @@ public class Task {
 
     public void setCaseColor(String caseColor) {
         this.caseColor = caseColor;
+    }
+
+    public String getCaseTitle() {
+        return caseTitle;
+    }
+
+    public void setCaseTitle(String caseTitle) {
+        this.caseTitle = caseTitle;
     }
 
     public String getVisualId() {
