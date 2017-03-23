@@ -1,6 +1,6 @@
 package com.fmworkflow.importer.model;
 
-import com.fmworkflow.importer.model.datalogic.ImportPlusYears;
+import com.fmworkflow.importer.model.datalogic.ImportAutoPlus;
 
 public interface DataLogic {
     Boolean getEditable();
@@ -11,9 +11,9 @@ public interface DataLogic {
 
     void setVisible(Boolean visible);
 
-    ImportPlusYears getPlusYears();
+    ImportAutoPlus getAutoPlus();
 
-    void setPlusYears(ImportPlusYears plusYears);
+    void setAutoPlus(ImportAutoPlus autoPlus);
 
     Boolean getRequired();
 

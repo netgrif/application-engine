@@ -6,17 +6,17 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlValue;
 
 @XmlAccessorType(XmlAccessType.FIELD)
-public class ImportPlusYears {
+public class ImportAutoPlus {
     @XmlValue
-    private Integer content;
+    private String content;
     @XmlAttribute
     private Long ref;
 
-    public Integer getContent() {
+    public String getContent() {
         return content;
     }
 
-    public void setContent(Integer value) {
+    public void setContent(String value) {
         this.content = value;
     }
 

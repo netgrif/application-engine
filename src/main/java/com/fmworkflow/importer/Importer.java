@@ -1,12 +1,12 @@
 package com.fmworkflow.importer;
 
 import com.fmworkflow.importer.model.*;
-import com.fmworkflow.importer.model.datalogic.ImportPlusYears;
+import com.fmworkflow.importer.model.datalogic.ImportAutoPlus;
 import com.fmworkflow.petrinet.domain.*;
 import com.fmworkflow.petrinet.domain.dataset.Field;
 import com.fmworkflow.petrinet.domain.dataset.logic.Editable;
 import com.fmworkflow.petrinet.domain.dataset.logic.Required;
-import com.fmworkflow.petrinet.domain.dataset.logic.PlusYears;
+import com.fmworkflow.petrinet.domain.dataset.logic.AutoPlus;
 import com.fmworkflow.petrinet.domain.dataset.logic.Visible;
 import com.fmworkflow.petrinet.domain.roles.AssignFunction;
 import com.fmworkflow.petrinet.domain.roles.DelegateFunction;
@@ -143,16 +143,15 @@ public class Importer {
         if (logic == null || fieldId == null)
             return;
 
-        if (logic.getRequired() != null) {
+        if (logic.getRequired() != null)
             transition.addDataSet(fieldId, new Required());
-        }
         if (logic.getEditable())
             transition.addDataSet(fieldId, new Editable());
         if (logic.getVisible())
             transition.addDataSet(fieldId, new Visible());
-        if (logic.getPlusYears() != null) {
-            ImportPlusYears plusYears = logic.getPlusYears();
-            transition.addDataSet(fieldId, new PlusYears(String.valueOf(plusYears.getRef()), plusYears.getContent()));
+        if (logic.getAutoPlus() != null) {
+            ImportAutoPlus autoPlus = logic.getAutoPlus();
+            transition.addDataSet(fieldId, new AutoPlus(fields.get(autoPlus.getRef()).getObjectId(), autoPlus.getContent()));
         }
 
     }
