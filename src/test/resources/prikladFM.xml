@@ -316,7 +316,7 @@
             <id>5</id>
             <logic>
                 <editable>false</editable>
-                <plusYears ref="4">10</plusYears>
+                <autoPlus ref="4">10y</autoPlus>
             </logic>
         </dataRef>
         <dataRef>
