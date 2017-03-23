@@ -45,12 +45,14 @@ public class WorkflowCommandLineRunner implements CommandLineRunner {
 
     @Override
     public void run(String... strings) throws Exception {
+
         Role roleUser = new Role("user");
         roleUser = roleRepository.save(roleUser);
         User user = new User("user@fmworkflow.com", "password", "name", "surname");
         HashSet<Role> roles = new HashSet<>();
         roles.add(roleUser);
         user.setRoles(roles);
+        userService.save(user);
 
         Role roleAdmin = new Role("admin");
         roleAdmin = roleRepository.save(roleAdmin);
@@ -67,6 +69,12 @@ public class WorkflowCommandLineRunner implements CommandLineRunner {
             workflowService.createCase(net.getStringId(), "Storage Unit " + i, randomColor());
         }
 
+        User superAdmin = new User("super@fmworkflow.com", "password", "Super", "Truuper");
+        HashSet<Role> superRoles = new HashSet<>();
+        superRoles.add(roleAdmin);
+        superAdmin.setRoles(superRoles);
+
+
         User client = new User("client@client.com", "password", "Client", "Client");
         HashSet<Role> clientRoles = new HashSet<>();
         clientRoles.add(roleUser);
@@ -82,23 +90,30 @@ public class WorkflowCommandLineRunner implements CommandLineRunner {
         ProcessRole clientManagerRole = proles.get(1);
         ProcessRole fmServiceRole = proles.get(2);
 
+
         UserProcessRole proleClient = new UserProcessRole();
         proleClient.setRoleId(clientRole.getStringId());
         proleClient = userProcessRoleRepository.save(proleClient);
         client.addProcessRole(proleClient);
+        superAdmin.addProcessRole(proleClient);
         userService.save(client);
+       // userService.save(superAdmin);
 
         UserProcessRole proleFm = new UserProcessRole();
         proleFm.setRoleId(fmServiceRole.getStringId());
         proleFm = userProcessRoleRepository.save(proleFm);
         user.addProcessRole(proleFm);
+        superAdmin.addProcessRole(proleFm);
         userService.save(user);
+       // userService.save(superAdmin);
 
         UserProcessRole proleManager = new UserProcessRole();
         proleManager.setRoleId(clientManagerRole.getStringId());
         proleManager = userProcessRoleRepository.save(proleManager);
         clientManager.addProcessRole(proleManager);
+        superAdmin.addProcessRole(proleManager);
         userService.save(clientManager);
+        userService.save(superAdmin);
     }
 
     private String randomColor() {
