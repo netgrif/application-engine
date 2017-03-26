@@ -8,7 +8,8 @@ public enum FieldType {
     BOOLEAN ("boolean"),
     FILE ("file"),
     ENUMERATION ("enumeration"),
-    MULTICHOICE ("multichoice");
+    MULTICHOICE ("multichoice"),
+    NUMBER("number");
 
     String name;
 

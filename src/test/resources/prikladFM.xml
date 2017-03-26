@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- version 1.0.0 -->
 <document>
-    <data type="text">
+    <data type="number">
         <id>1</id>
         <title>Poradové číslo</title>
     </data>
@@ -48,7 +48,7 @@
         <id>11</id>
         <title>Vecný obsah UJ</title>
     </data>
-    <data type="text">
+    <data type="number">
         <id>12</id>
         <title>Čiarový kód</title>
     </data>
