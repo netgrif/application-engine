@@ -17,6 +17,8 @@ public final class FieldFactory {
                 return new EnumerationField(values);
             case MULTICHOICE:
                 return new MultichoiceField(values);
+            case NUMBER:
+                return new NumberField();
             default:
                 throw new IllegalArgumentException(type + " is not a valid Field type");
         }
