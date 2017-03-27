@@ -206,21 +206,31 @@ public class TaskService implements ITaskService {
         caseRepository.save(useCase);
     }
 
-    private Object parseFieldsValues(JsonNode value){
-        ObjectNode node = (ObjectNode) value;
+    private Object parseFieldsValues(JsonNode jsonNode){
+        ObjectNode node = (ObjectNode) jsonNode;
+        Object value;
         switch (node.get("type").asText()){
             case "date":
-                return LocalDate.parse(node.get("value").asText());
+                value = LocalDate.parse(node.get("value").asText());
+                break;
             case "boolean":
-                return node.get("value").asBoolean();
+                value = node.get("value").asBoolean();
+                break;
             case "multichoice":
                 ArrayNode arrayNode = (ArrayNode) node.get("value");
                 HashSet<String> set = new HashSet<>();
                 arrayNode.forEach(item -> set.add(item.asText()));
-                return set;
+                value = set;
+                break;
+            case "number":
+                value = node.get("value").asDouble();
+                break;
             default:
-                return node.get("value").asText();
+                value = node.get("value").asText();
+                break;
         }
+        if(value instanceof String && ((String)value).equalsIgnoreCase("null")) return null;
+        else return value;
     }
 
     @Override
