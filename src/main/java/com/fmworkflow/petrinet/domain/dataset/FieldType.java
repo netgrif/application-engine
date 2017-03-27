@@ -9,7 +9,8 @@ public enum FieldType {
     FILE ("file"),
     ENUMERATION ("enumeration"),
     MULTICHOICE ("multichoice"),
-    NUMBER("number");
+    NUMBER("number"),
+    USER("user");
 
     String name;
 
