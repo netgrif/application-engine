@@ -92,7 +92,7 @@
         <id>22</id>
         <title>Vypožičané dňa</title>
     </data>
-    <data type="text">
+    <data type="user">
         <id>23</id>
         <title>Vybral</title>
     </data>

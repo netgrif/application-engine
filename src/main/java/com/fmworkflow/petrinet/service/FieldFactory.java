@@ -19,6 +19,8 @@ public final class FieldFactory {
                 return new MultichoiceField(values);
             case NUMBER:
                 return new NumberField();
+            case USER:
+                return new UserField();
             default:
                 throw new IllegalArgumentException(type + " is not a valid Field type");
         }
