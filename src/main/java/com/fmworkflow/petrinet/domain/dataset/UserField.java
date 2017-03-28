@@ -4,23 +4,40 @@ package com.fmworkflow.petrinet.domain.dataset;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
 @Document
 public class UserField extends Field{
 
+    private Set<String> roles;
     @Transient
-    private Long value;
+    private String value;
 
     public UserField(){
         super();
+        this.roles = new HashSet<>();
     }
 
-    public Long getValue() {
+    public UserField(String[] values){
+        this();
+        if(values != null){
+            this.roles.addAll(Arrays.asList(values));
+        }
+    }
+
+    public String getValue() {
         return value;
+    }
+
+    public Set<String> getRoles() {
+        return roles;
     }
 
     @Override
     public void setValue(Object value) {
-        this.value = (Long)value;
+        this.value = (String)value;
     }
 
     @Override
