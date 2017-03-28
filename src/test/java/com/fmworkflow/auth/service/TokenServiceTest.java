@@ -8,13 +8,14 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
 import java.time.LocalDateTime;
 
 @RunWith(SpringRunner.class)
+@ActiveProfiles({"test"})
 @SpringBootTest
 public class TokenServiceTest {
 
@@ -27,13 +28,13 @@ public class TokenServiceTest {
     private final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
 
     @Before
-    public void setUpStreams() {
-        System.setOut(new PrintStream(outContent));
+    public void setUp() {
+        repository.deleteAll();
     }
 
     @After
-    public void cleanUpStreams() {
-        System.setOut(null);
+    public void cleanUp() {
+        repository.deleteAll();
     }
 
     @Test
@@ -50,7 +51,7 @@ public class TokenServiceTest {
 
         service.removeExpired();
 
-        assertContains(outContent, "Removed 1 tokens");
+        assert repository.findAll().size() == 1;
     }
 
     @Test
@@ -69,10 +70,5 @@ public class TokenServiceTest {
     private void assertTokenRemoved(boolean authorized, Token token) {
         assert authorized;
         assert token == null;
-    }
-
-
-    private void assertContains(ByteArrayOutputStream haystack, String needle) {
-        assert haystack.toString().contains(needle);
     }
 }
