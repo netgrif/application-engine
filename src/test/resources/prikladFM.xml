@@ -36,9 +36,11 @@
         <id>8</id>
         <title>Miestnosť</title>
     </data>
-    <data type="text">
+    <data type="user">
         <id>9</id>
         <title>Odovzdávajúci</title>
+        <values>1</values>
+        <values>2</values>
     </data>
     <data type="text">
         <id>10</id>
@@ -92,7 +94,7 @@
         <id>22</id>
         <title>Vypožičané dňa</title>
     </data>
-    <data type="user">
+    <data type="text">
         <id>23</id>
         <title>Vybral</title>
     </data>
