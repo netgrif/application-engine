@@ -5,9 +5,11 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
 @SpringBootTest
+@ActiveProfiles({"test"})
 @RunWith(SpringRunner.class)
 public class MailSenderServiceTest {
 
@@ -16,6 +18,13 @@ public class MailSenderServiceTest {
 
     @Test
     public void testSend() throws Exception {
-        service.sendRegistrationEmail("valdyreinn@gmail.com", "token");
+        Exception exception = null;
+        try {
+            service.sendRegistrationEmail("valdyreinn@gmail.com", "token");
+        } catch (Exception e) {
+            exception = e;
+        }
+
+        assert exception == null;
     }
 }
