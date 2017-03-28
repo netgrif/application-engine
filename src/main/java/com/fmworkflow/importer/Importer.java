@@ -4,6 +4,7 @@ import com.fmworkflow.importer.model.*;
 import com.fmworkflow.importer.model.datalogic.ImportAutoPlus;
 import com.fmworkflow.petrinet.domain.*;
 import com.fmworkflow.petrinet.domain.dataset.Field;
+import com.fmworkflow.petrinet.domain.dataset.FieldType;
 import com.fmworkflow.petrinet.domain.dataset.logic.Editable;
 import com.fmworkflow.petrinet.domain.dataset.logic.Required;
 import com.fmworkflow.petrinet.domain.dataset.logic.AutoPlus;
@@ -72,8 +73,8 @@ public class Importer {
         net.setTitle(title);
         net.setInitials(initials);
 
-        Arrays.stream(document.getImportData()).forEach(this::createDataSet);
         Arrays.stream(document.getImportRoles()).forEach(this::createRole);
+        Arrays.stream(document.getImportData()).forEach(this::createDataSet);
         Arrays.stream(document.getImportPlaces()).forEach(this::createPlace);
         Arrays.stream(document.getImportTransitions()).forEach(this::createTransition);
         Arrays.stream(document.getImportArc()).forEach(this::createArc);
@@ -93,6 +94,11 @@ public class Importer {
 
     @Transactional
     private void createDataSet(ImportData importData) {
+        if(importData.getType().equalsIgnoreCase(FieldType.USER.getName())){
+            importData.setValues(Arrays.stream(importData.getValues())
+                    .map(value -> this.roles.get(Long.parseLong(value)).getObjectId()).toArray(String[]::new));
+        }
+
         Field field = FieldFactory.getField(importData.getType(), importData.getValues());
         field.setName(importData.getTitle());
 
