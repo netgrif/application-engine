@@ -7,6 +7,7 @@ import com.fmworkflow.petrinet.domain.PetriNet;
 import com.fmworkflow.petrinet.service.IPetriNetService;
 import com.fmworkflow.petrinet.service.IProcessRoleService;
 import com.fmworkflow.petrinet.web.requestbodies.AssignedRolesBody;
+import com.fmworkflow.petrinet.web.requestbodies.PetriNetReferenceBody;
 import com.fmworkflow.petrinet.web.requestbodies.UploadedFileMeta;
 import com.fmworkflow.petrinet.web.responsebodies.*;
 import org.apache.log4j.Logger;
@@ -87,18 +88,21 @@ public class PetriNetController {
         return new PetriNetReferencesResource(refs);
     }
 
-    @RequestMapping(value = "/transition/refs/{ids}", method = GET)
+    @RequestMapping(value = "/transition/refs", method = POST)
     public
     @ResponseBody
-    TransitionReferencesResource getTransitionReferences(@PathVariable List<String> ids) {
-        ids.forEach(id -> {
-            try {
-                id = URLDecoder.decode(id, StandardCharsets.UTF_8.name());
-            } catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
-            }
-        });
+    TransitionReferencesResource getTransitionReferences(@RequestBody List<String> ids) {
+        ids.forEach(id -> id = decodeUrl(id));
         return new TransitionReferencesResource(service.getTransitionReferences(ids));
+    }
+
+    @RequestMapping(value = "/data/refs", method = POST)
+    public
+    @ResponseBody
+    DataFieldReferencesResource getDataFieldReferences(@RequestBody PetriNetReferenceBody referenceBody){
+        referenceBody.petriNets.forEach(net -> net = decodeUrl(net));
+        referenceBody.transitions.forEach(trans -> trans = decodeUrl(trans));
+        return new DataFieldReferencesResource(service.getDataFieldReferences(referenceBody.petriNets, referenceBody.transitions));
     }
 
     @RequestMapping(value = "/roles/assign/{netId}", method = GET)
@@ -134,6 +138,15 @@ public class PetriNetController {
             return response;
         } catch (Exception ignored) {
             ignored.printStackTrace();
+            return null;
+        }
+    }
+
+    private String decodeUrl(String s1){
+        try {
+            return URLDecoder.decode(s1, StandardCharsets.UTF_8.name());
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
             return null;
         }
     }
