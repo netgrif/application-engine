@@ -1,26 +1,15 @@
 package com.fmworkflow.petrinet.web.responsebodies;
 
 
-public class TransitionReference {
+public class TransitionReference extends PetriNetReference{
 
-    private String entityId;
-    private String petriNetId;
-    private String title;
+    protected String petriNetId;
 
     public TransitionReference(){}
 
-    public TransitionReference(String entityId, String petriNetId, String title) {
-        this.entityId = entityId;
+    public TransitionReference(String entityId, String title, String petriNetId) {
+        super(entityId, title);
         this.petriNetId = petriNetId;
-        this.title = title;
-    }
-
-    public String getEntityId() {
-        return entityId;
-    }
-
-    public void setEntityId(String entityId) {
-        this.entityId = entityId;
     }
 
     public String getPetriNetId() {
@@ -29,13 +18,5 @@ public class TransitionReference {
 
     public void setPetriNetId(String petriNetId) {
         this.petriNetId = petriNetId;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
     }
 }
