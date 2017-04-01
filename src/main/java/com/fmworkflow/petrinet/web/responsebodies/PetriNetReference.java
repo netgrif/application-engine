@@ -3,8 +3,8 @@ package com.fmworkflow.petrinet.web.responsebodies;
 
 public class PetriNetReference {
 
-    private String entityId;
-    private String title;
+    protected String entityId;
+    protected String title;
 
     public PetriNetReference(){}
 

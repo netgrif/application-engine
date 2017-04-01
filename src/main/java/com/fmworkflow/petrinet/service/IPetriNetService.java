@@ -1,6 +1,7 @@
 package com.fmworkflow.petrinet.service;
 
 import com.fmworkflow.petrinet.domain.PetriNet;
+import com.fmworkflow.petrinet.web.responsebodies.DataFieldReference;
 import com.fmworkflow.petrinet.web.responsebodies.PetriNetReference;
 import com.fmworkflow.petrinet.web.responsebodies.TransitionReference;
 import org.xml.sax.SAXException;
@@ -22,4 +23,5 @@ public interface IPetriNetService {
 
     List<PetriNetReference> getAllReferences();
     List<TransitionReference> getTransitionReferences(List<String> netsIds);
+    List<DataFieldReference> getDataFieldReferences(List<String> petriNetIds, List<String> transitionIds);
 }
