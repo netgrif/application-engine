@@ -25,6 +25,10 @@ public interface ITaskService {
 
     List<Task> findUserFinishedTasks(User user);
 
+    List<Task> findByPetriNets(List<String> petriNets);
+
+    List<Task> findByTransitions(List<String> transitions);
+
     void finishTask(Long userId, Long taskId) throws Exception;
 
     void assignTask(User user, Long taskId) throws TransitionNotStartableException;
