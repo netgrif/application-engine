@@ -11,6 +11,7 @@ public class ImportData {
     @XmlAttribute
     private String type;
     private String[] values;
+    private Columns columns;
 
     public Long getId() {
         return id;
@@ -42,5 +43,13 @@ public class ImportData {
 
     public void setValues(String[] values) {
         this.values = values;
+    }
+
+    public Columns getColumns() {
+        return columns;
+    }
+
+    public void setColumns(Columns columns) {
+        this.columns = columns;
     }
 }
