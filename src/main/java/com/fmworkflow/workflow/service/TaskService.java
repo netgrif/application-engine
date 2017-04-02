@@ -20,6 +20,8 @@ import com.fmworkflow.workflow.domain.Task;
 import com.fmworkflow.workflow.domain.TaskRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.BasicQuery;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -41,6 +43,8 @@ public class TaskService implements ITaskService {
     private CaseRepository caseRepository;
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private MongoTemplate mongoTemplate;
 
     @Override
     public List<Task> getAll(LoggedUser loggedUser) {
@@ -51,7 +55,7 @@ public class TaskService implements ITaskService {
 
     @Override
     public List<Task> findByCaseId(String caseId) {
-        return taskRepository.findByCaseId(caseId);
+        return null;//taskRepository.findByCaseId(caseId);
     }
 
     @Override
@@ -92,6 +96,27 @@ public class TaskService implements ITaskService {
     public List<Task> findUserFinishedTasks(User user) {
         return taskRepository.findByUserAndFinishDateNotNull(user);
     }
+
+    @Override
+    public List<Task> findByPetriNets(List<String> petriNets){
+        StringBuilder caseQueryBuilder = new StringBuilder();
+        petriNets.forEach(net -> {
+            caseQueryBuilder.append("{$ref:\"petriNet\",$id:{$oid:\"");
+            caseQueryBuilder.append(net);
+            caseQueryBuilder.append("\"}},");
+        });
+        caseQueryBuilder.deleteCharAt(caseQueryBuilder.length()-1);
+        BasicQuery caseQuery = new BasicQuery("{petriNet:{$in:["+caseQueryBuilder.toString()+"]}}","{_id:1}");
+        List<Case> useCases = mongoTemplate.find(caseQuery,Case.class);
+        return taskRepository.findByCaseIdIn(useCases.stream().map(Case::getStringId).collect(Collectors.toList()));
+    }
+
+    @Override
+    public List<Task> findByTransitions(List<String> transitions){
+        return taskRepository.findByTransitionIdIn(transitions);
+    }
+
+    //TODO: 2/4/2017 findByDataFields
 
     @Override
     @Transactional

@@ -22,6 +22,7 @@ import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/res/task")
@@ -128,7 +129,24 @@ public class TaskController {
 
     @RequestMapping(value = "/search", method = RequestMethod.POST)
     public TasksResource search(Authentication auth, @RequestBody TaskSearchBody searchBody) {
-        return getAll(auth); //TODO: 9.2.2017 - search on tasks according to posted json
+        List<TaskResource> resources = new ArrayList<>();
+        if(searchBody.searchTier == TaskSearchBody.SEARCH_TIER_1){
+            taskService.findByPetriNets(searchBody.petriNets
+                    .stream()
+                    .map(net -> net.petriNet)
+                    .collect(Collectors.toList()))
+                    .forEach(task -> resources.add(TaskResource.createFrom(task,auth)));
+        } else if (searchBody.searchTier == TaskSearchBody.SEARCH_TIER_2){
+            List<String> transitions = new ArrayList<>();
+            searchBody.petriNets.forEach(net -> transitions.addAll(net.transitions));
+            taskService.findByTransitions(transitions).forEach(task -> resources.add(TaskResource.createFrom(task,auth)));
+        } else if (searchBody.searchTier == TaskSearchBody.SEARCH_TIER_3){
+
+        }
+
+        TasksResource taskResources = new TasksResource(resources);
+        taskResources.addLinks("search");
+        return taskResources;
     }
 
     @RequestMapping(value = "/{id}/data", method = RequestMethod.GET)
