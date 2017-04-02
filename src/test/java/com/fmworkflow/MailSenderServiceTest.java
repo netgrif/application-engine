@@ -1,6 +1,7 @@
 package com.fmworkflow;
 
 import com.fmworkflow.mail.IMailService;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -16,9 +17,9 @@ public class MailSenderServiceTest {
     private IMailService service;
 
     // TODO: 28/03/2017 allow when mail server
-//    @Test
+    @Test
 //    @Ignore
-//    public void testSend() throws Exception {
+    public void testSend() throws Exception {
 //        Exception exception = null;
 //        try {
 //            service.sendRegistrationEmail("valdyreinn@gmail.com", "token");
@@ -27,5 +28,5 @@ public class MailSenderServiceTest {
 //        }
 //
 //        assert exception == null;
-//    }
+    }
 }
