@@ -83,39 +83,6 @@ public class TaskService implements ITaskService {
         }
     }
 
-    private void figureOutProcessRoles(Task task, Transition transition){
-        transition.getRoles().keySet().forEach((id) -> {
-            ObjectNode node = transition.applyRoleLogic(id, JsonNodeFactory.instance.objectNode().put("roleIds",id));
-            if(node.get("assign") != null && node.get("assign").asBoolean()) task.setAssignRole(id);
-            if(node.get("delegate") != null && node.get("delegate").asBoolean()) task.setDelegateRole(id);
-        });
-    }
-
-    private boolean isExecutable(Transition transition, PetriNet net, Case useCase) {
-        Collection<Arc> arcsOfTransition = net.getArcsOfTransition(transition);
-        Map<String, Integer> activePlaces = useCase.getActivePlaces();
-
-        if (arcsOfTransition == null)
-            return true;
-
-        for (Arc arc : arcsOfTransition) {
-            if (arc.getDestination() == transition) {
-                if (placeIsNotActive(activePlaces, arc) || placeHasInsufficientTokens(activePlaces, arc))
-                    return false;
-            }
-        }
-
-        return true;
-    }
-
-    private boolean placeHasInsufficientTokens(Map<String, Integer> activePlaces, Arc arc) {
-        return activePlaces.get(arc.getSourceId().toString()) < arc.getMultiplicity();
-    }
-
-    private boolean placeIsNotActive(Map<String, Integer> activePlaces, Arc arc) {
-        return !activePlaces.containsKey(arc.getSourceId().toString());
-    }
-
     @Override
     public List<Task> findByUser(User user) {
         return taskRepository.findByUser(user);
@@ -163,19 +130,6 @@ public class TaskService implements ITaskService {
         reloadTasks(useCase);
     }
 
-    /**
-     * Reloads all tasks of given case.
-     * 1. delete unassigned tasks
-     * 2. delete finished tasks
-     * 3. generate new tasks
-     */
-    @Transactional
-    private void reloadTasks(Case useCase) {
-        taskRepository.deleteAllByCaseIdAndUserIsNull(useCase.getStringId());
-        taskRepository.deleteAllByCaseIdAndFinishDateIsNotNull(useCase.getStringId());
-        createTasks(useCase);
-    }
-
     @Override
     public List<Field> getData(Long taskId) {
         Task task = taskRepository.findOne(taskId);
@@ -196,7 +150,6 @@ public class TaskService implements ITaskService {
         return dataSetFields;
     }
 
-
     @Override
     public void setDataFieldsValues(Long taskId, ObjectNode values) {
         Task task = taskRepository.findOne(taskId);
@@ -204,33 +157,6 @@ public class TaskService implements ITaskService {
 
         values.fields().forEachRemaining( entry -> useCase.getDataSetValues().put(entry.getKey(),parseFieldsValues(entry.getValue())));
         caseRepository.save(useCase);
-    }
-
-    private Object parseFieldsValues(JsonNode jsonNode){
-        ObjectNode node = (ObjectNode) jsonNode;
-        Object value;
-        switch (node.get("type").asText()){
-            case "date":
-                value = LocalDate.parse(node.get("value").asText());
-                break;
-            case "boolean":
-                value = node.get("value").asBoolean();
-                break;
-            case "multichoice":
-                ArrayNode arrayNode = (ArrayNode) node.get("value");
-                HashSet<String> set = new HashSet<>();
-                arrayNode.forEach(item -> set.add(item.asText()));
-                value = set;
-                break;
-            case "number":
-                value = node.get("value").asDouble();
-                break;
-            default:
-                value = node.get("value").asText();
-                break;
-        }
-        if(value instanceof String && ((String)value).equalsIgnoreCase("null")) return null;
-        else return value;
     }
 
     @Override
@@ -247,6 +173,21 @@ public class TaskService implements ITaskService {
         taskRepository.delete(taskId);
         caseRepository.save(useCase);
         reloadTasks(useCase);
+    }
+
+    @Override
+    public FileSystemResource getFile(Long taskId, String fieldId){
+        Task task = taskRepository.findOne(taskId);
+        Case useCase = caseRepository.findOne(task.getCaseId());
+        if(useCase.getDataSetValues().get(fieldId) == null) return null;
+        return new FileSystemResource("storage/"+fieldId+"-"+useCase.getDataSetValues().get(fieldId));
+    }
+
+    @Override
+    @Transactional
+    public void delegateTask(String delegatedEmail, Long taskId) throws TransitionNotStartableException {
+        User delegated = userRepository.findByEmail(delegatedEmail);
+        assignTask(delegated, taskId);
     }
 
     @Override
@@ -282,18 +223,76 @@ public class TaskService implements ITaskService {
         }
     }
 
-    @Override
-    public FileSystemResource getFile(Long taskId, String fieldId){
-        Task task = taskRepository.findOne(taskId);
-        Case useCase = caseRepository.findOne(task.getCaseId());
-        if(useCase.getDataSetValues().get(fieldId) == null) return null;
-        return new FileSystemResource("storage/"+fieldId+"-"+useCase.getDataSetValues().get(fieldId));
+    /**
+     * Reloads all tasks of given case.
+     * 1. delete unassigned tasks
+     * 2. delete finished tasks
+     * 3. generate new tasks
+     */
+    @Transactional
+    private void reloadTasks(Case useCase) {
+        taskRepository.deleteAllByCaseIdAndUserIsNull(useCase.getStringId());
+        taskRepository.deleteAllByCaseIdAndFinishDateIsNotNull(useCase.getStringId());
+        createTasks(useCase);
     }
 
-    @Override
-    @Transactional
-    public void delegateTask(String delegatedEmail, Long taskId) throws TransitionNotStartableException {
-        User delegated = userRepository.findByEmail(delegatedEmail);
-        assignTask(delegated, taskId);
+    private Object parseFieldsValues(JsonNode jsonNode){
+        ObjectNode node = (ObjectNode) jsonNode;
+        Object value;
+        switch (node.get("type").asText()){
+            case "date":
+                value = LocalDate.parse(node.get("value").asText());
+                break;
+            case "boolean":
+                value = node.get("value").asBoolean();
+                break;
+            case "multichoice":
+                ArrayNode arrayNode = (ArrayNode) node.get("value");
+                HashSet<String> set = new HashSet<>();
+                arrayNode.forEach(item -> set.add(item.asText()));
+                value = set;
+                break;
+            case "number":
+                value = node.get("value").asDouble();
+                break;
+            default:
+                value = node.get("value").asText();
+                break;
+        }
+        if(value instanceof String && ((String)value).equalsIgnoreCase("null")) return null;
+        else return value;
+    }
+
+    private void figureOutProcessRoles(Task task, Transition transition){
+        transition.getRoles().keySet().forEach((id) -> {
+            ObjectNode node = transition.applyRoleLogic(id, JsonNodeFactory.instance.objectNode().put("roleIds",id));
+            if(node.get("assign") != null && node.get("assign").asBoolean()) task.setAssignRole(id);
+            if(node.get("delegate") != null && node.get("delegate").asBoolean()) task.setDelegateRole(id);
+        });
+    }
+
+    private boolean isExecutable(Transition transition, PetriNet net, Case useCase) {
+        Collection<Arc> arcsOfTransition = net.getArcsOfTransition(transition);
+        Map<String, Integer> activePlaces = useCase.getActivePlaces();
+
+        if (arcsOfTransition == null)
+            return true;
+
+        for (Arc arc : arcsOfTransition) {
+            if (arc.getDestination() == transition) {
+                if (placeIsNotActive(activePlaces, arc) || placeHasInsufficientTokens(activePlaces, arc))
+                    return false;
+            }
+        }
+
+        return true;
+    }
+
+    private boolean placeHasInsufficientTokens(Map<String, Integer> activePlaces, Arc arc) {
+        return activePlaces.get(arc.getSourceId().toString()) < arc.getMultiplicity();
+    }
+
+    private boolean placeIsNotActive(Map<String, Integer> activePlaces, Arc arc) {
+        return !activePlaces.containsKey(arc.getSourceId().toString());
     }
 }

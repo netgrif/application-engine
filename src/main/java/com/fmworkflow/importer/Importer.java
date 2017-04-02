@@ -4,17 +4,15 @@ import com.fmworkflow.importer.model.*;
 import com.fmworkflow.importer.model.datalogic.ImportAutoPlus;
 import com.fmworkflow.petrinet.domain.*;
 import com.fmworkflow.petrinet.domain.dataset.Field;
-import com.fmworkflow.petrinet.domain.dataset.FieldType;
+import com.fmworkflow.petrinet.domain.dataset.logic.AutoPlus;
 import com.fmworkflow.petrinet.domain.dataset.logic.Editable;
 import com.fmworkflow.petrinet.domain.dataset.logic.Required;
-import com.fmworkflow.petrinet.domain.dataset.logic.AutoPlus;
 import com.fmworkflow.petrinet.domain.dataset.logic.Visible;
 import com.fmworkflow.petrinet.domain.roles.AssignFunction;
 import com.fmworkflow.petrinet.domain.roles.DelegateFunction;
 import com.fmworkflow.petrinet.domain.roles.ProcessRole;
 import com.fmworkflow.petrinet.domain.roles.ProcessRoleRepository;
 import com.fmworkflow.petrinet.service.ArcFactory;
-import com.fmworkflow.petrinet.service.FieldFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,6 +34,8 @@ public class Importer {
     private Map<Long, Transition> transitions;
     private Map<Long, Place> places;
 
+    private ImportFieldFactory fieldFactory;
+
     @Autowired
     private PetriNetRepository repository;
 
@@ -47,6 +47,7 @@ public class Importer {
         this.transitions = new HashMap<>();
         this.places = new HashMap<>();
         this.fields = new HashMap<>();
+        this.fieldFactory = new ImportFieldFactory(this);
     }
 
     @Transactional
@@ -94,12 +95,7 @@ public class Importer {
 
     @Transactional
     private void createDataSet(ImportData importData) {
-        if(importData.getType().equalsIgnoreCase(FieldType.USER.getName())){
-            importData.setValues(Arrays.stream(importData.getValues())
-                    .map(value -> this.roles.get(Long.parseLong(value)).getObjectId()).toArray(String[]::new));
-        }
-
-        Field field = FieldFactory.getField(importData.getType(), importData.getValues());
+        Field field = fieldFactory.getField(importData);
         field.setName(importData.getTitle());
 
         net.addDataSetField(field);
@@ -191,5 +187,69 @@ public class Importer {
             return places.get(id);
         else
             return transitions.get(id);
+    }
+
+    public Document getDocument() {
+        return document;
+    }
+
+    public void setDocument(Document document) {
+        this.document = document;
+    }
+
+    public PetriNet getNet() {
+        return net;
+    }
+
+    public void setNet(PetriNet net) {
+        this.net = net;
+    }
+
+    public Map<Long, ProcessRole> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(Map<Long, ProcessRole> roles) {
+        this.roles = roles;
+    }
+
+    public Map<Long, Field> getFields() {
+        return fields;
+    }
+
+    public void setFields(Map<Long, Field> fields) {
+        this.fields = fields;
+    }
+
+    public Map<Long, Transition> getTransitions() {
+        return transitions;
+    }
+
+    public void setTransitions(Map<Long, Transition> transitions) {
+        this.transitions = transitions;
+    }
+
+    public Map<Long, Place> getPlaces() {
+        return places;
+    }
+
+    public void setPlaces(Map<Long, Place> places) {
+        this.places = places;
+    }
+
+    public PetriNetRepository getRepository() {
+        return repository;
+    }
+
+    public void setRepository(PetriNetRepository repository) {
+        this.repository = repository;
+    }
+
+    public ProcessRoleRepository getRoleRepository() {
+        return roleRepository;
+    }
+
+    public void setRoleRepository(ProcessRoleRepository roleRepository) {
+        this.roleRepository = roleRepository;
     }
 }

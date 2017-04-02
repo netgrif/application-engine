@@ -7,7 +7,7 @@ import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document
-public abstract class Field {
+public abstract class Field<T> {
 
     @Id
     protected ObjectId _id;
@@ -66,5 +66,5 @@ public abstract class Field {
         this.logic = logic;
     }
 
-    public void setValue(Object value){}
+    public void setValue(T value){}
 }

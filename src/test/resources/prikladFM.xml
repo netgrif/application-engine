@@ -117,6 +117,24 @@
         <values>B</values>
         <values>C</values>
     </data>
+    <data type="tabular">
+        <id>30</id>
+        <title>Tabular data</title>
+        <columns>
+            <data type="text">
+                <id>1</id>
+                <title>Column 1</title>
+            </data>
+            <data type="text">
+                <id>2</id>
+                <title>Column 2</title>
+            </data>
+            <data type="text">
+                <id>3</id>
+                <title>Column 3</title>
+            </data>
+        </columns>
+    </data>
     <role>
         <id>1</id>
         <name>client</name>
@@ -857,6 +875,12 @@
         </dataRef>
         <dataRef>
             <id>29</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>30</id>
             <logic>
                 <visible>true</visible>
             </logic>
