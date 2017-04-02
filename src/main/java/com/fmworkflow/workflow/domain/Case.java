@@ -11,6 +11,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 import javax.transaction.Transactional;
+import javax.validation.constraints.NotNull;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -19,9 +20,11 @@ public class Case {
     @Id
     private ObjectId _id;
     @DBRef
+    @NotNull
     private PetriNet petriNet;
     @Field("activePlaces")
     private Map<String, Integer> activePlaces;
+    @NotNull
     private String title;
     private String color;
     private Map<String, Object> dataSetValues;
