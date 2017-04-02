@@ -10,7 +10,8 @@ public enum FieldType {
     ENUMERATION ("enumeration"),
     MULTICHOICE ("multichoice"),
     NUMBER("number"),
-    USER("user");
+    USER("user"),
+    TABULAR("tabular");
 
     String name;
 

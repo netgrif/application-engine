@@ -4,7 +4,7 @@ import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document
-public class TextField extends Field {
+public class TextField extends Field<String> {
 
     @Transient
     private String value;
@@ -18,8 +18,8 @@ public class TextField extends Field {
     }
 
     @Override
-    public void setValue(Object value) {
-        this.value = (String)value;
+    public void setValue(String value) {
+        this.value = value;
     }
 
     @Override
