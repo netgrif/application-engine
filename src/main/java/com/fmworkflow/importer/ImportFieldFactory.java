@@ -38,7 +38,11 @@ public final class ImportFieldFactory {
     }
 
     private TabularField buildTabularField(ImportData data) {
-        return new TabularField();
+        TabularField field = new TabularField();
+        Arrays.stream(data.getColumns().getData()).forEach(dataField -> {
+            field.addField(getField(dataField));
+        });
+        return field;
     }
 
     private UserField buildUserField(ImportData data) {
