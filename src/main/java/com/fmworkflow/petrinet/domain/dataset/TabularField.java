@@ -3,16 +3,18 @@ package com.fmworkflow.petrinet.domain.dataset;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.ArrayList;
 
 @Document
-public class TabularField extends Field<List<Field>> {
+public class TabularField extends Field {
+    @org.springframework.data.mongodb.core.mapping.Field
+    private ArrayList<Field> fields;
+
     @Transient
-    private List<Field> fields;
+    private ArrayList<ArrayList<Object>> values;
 
     public TabularField() {
-        this.fields = new LinkedList<>();
+        this.fields = new ArrayList<>();
     }
 
     @Override
@@ -20,12 +22,21 @@ public class TabularField extends Field<List<Field>> {
         this.type = FieldType.TABULAR;
     }
 
-    public List<Field> getValue() {
+    public ArrayList<ArrayList<Object>> getValues() {
+        return values;
+    }
+
+    public ArrayList<Field> getFields() {
         return fields;
     }
 
+    public void addField(Field field) {
+        this.fields.add(field);
+    }
+
     @Override
-    public void setValue(List<Field> value) {
-        super.setValue(value);
+    public void setValue(Object value) {
+        if (value != null)
+            System.out.println(value.getClass());
     }
 }
