@@ -18,4 +18,4 @@ target/
 ### Work folder ###
 _issues/
 
-wms.log
+wms.log*
