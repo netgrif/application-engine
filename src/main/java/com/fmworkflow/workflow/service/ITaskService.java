@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fmworkflow.auth.domain.LoggedUser;
 import com.fmworkflow.auth.domain.User;
 import com.fmworkflow.petrinet.domain.dataset.Field;
-import com.fmworkflow.petrinet.domain.throwable.TransitionNotStartableException;
+import com.fmworkflow.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.fmworkflow.workflow.domain.Case;
 import com.fmworkflow.workflow.domain.Task;
 import org.springframework.core.io.FileSystemResource;
@@ -31,7 +31,7 @@ public interface ITaskService {
 
     void finishTask(Long userId, Long taskId) throws Exception;
 
-    void assignTask(User user, Long taskId) throws TransitionNotStartableException;
+    void assignTask(User user, Long taskId) throws TransitionNotExecutableException;
 
     List<Field> getData(Long taskId);
 
@@ -43,5 +43,5 @@ public interface ITaskService {
 
     FileSystemResource getFile(Long taskId, String fieldId);
 
-    void delegateTask(String delegatedEmail, Long taskId) throws TransitionNotStartableException;
+    void delegateTask(String delegatedEmail, Long taskId) throws TransitionNotExecutableException;
 }

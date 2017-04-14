@@ -2,15 +2,12 @@ package com.fmworkflow.workflow.domain;
 
 import com.fmworkflow.petrinet.domain.PetriNet;
 import com.fmworkflow.petrinet.domain.Place;
-import com.fmworkflow.petrinet.domain.Transition;
-import com.fmworkflow.petrinet.domain.throwable.TransitionNotStartableException;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
-import javax.transaction.Transactional;
 import javax.validation.constraints.NotNull;
 import java.util.HashMap;
 import java.util.Map;
@@ -98,13 +95,6 @@ public class Case {
         this.dataSetValues = dataSetValues;
     }
 
-    public void finishTransition(Transition transition) {
-        Map<Place, Integer> outputPlaces = petriNet.getOutputPlaces(transition);
-        for (Map.Entry<Place, Integer> entry : outputPlaces.entrySet()) {
-            addTokensToPlace(entry.getKey(), entry.getValue());
-        }
-    }
-
     private void addTokensToPlace(Place place, Integer tokens) {
         Integer newTokens = tokens;
         String id = place.getStringId();
@@ -113,14 +103,8 @@ public class Case {
         activePlaces.put(id, newTokens);
     }
 
-    @Transactional
-    public void startTransition(Transition transition) throws TransitionNotStartableException {
-        Map<Place, Integer> inputPlaces = petriNet.getInputPlaces(transition);
-        for (Map.Entry<Place, Integer> entry : inputPlaces.entrySet()) {
-            if (isNotActivePlace(entry.getKey()))
-                throw new TransitionNotStartableException();
-            removeTokensFromActivePlace(entry.getKey(), entry.getValue());
-        }
+    public void updateActivePlaces() {
+        activePlaces = petriNet.getActivePlaces();
     }
 
     private void removeTokensFromActivePlace(Place place, Integer tokens) {

@@ -13,7 +13,7 @@ import com.fmworkflow.petrinet.domain.PetriNet;
 import com.fmworkflow.petrinet.domain.Place;
 import com.fmworkflow.petrinet.domain.Transition;
 import com.fmworkflow.petrinet.domain.dataset.Field;
-import com.fmworkflow.petrinet.domain.throwable.TransitionNotStartableException;
+import com.fmworkflow.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.fmworkflow.workflow.domain.Case;
 import com.fmworkflow.workflow.domain.CaseRepository;
 import com.fmworkflow.workflow.domain.Task;
@@ -23,16 +23,19 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.BasicQuery;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.transaction.Transactional;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class TaskService implements ITaskService {
@@ -64,21 +67,14 @@ public class TaskService implements ITaskService {
     }
 
     @Override
+    @Transactional
     public void createTasks(Case useCase) {
         PetriNet net = useCase.getPetriNet();
         Collection<Transition> transitions = net.getTransitions().values();
 
         for (Transition transition : transitions) {
-            if (isExecutable(transition, net, useCase)) {
-                Task task = new Task();
-                task.setTitle(transition.getTitle());
-                task.setCaseId(useCase.get_id().toString());
-                task.setTransitionId(transition.getObjectId().toString());
-                task.setCaseColor(useCase.getColor());
-                task.setCaseTitle(useCase.getTitle());
-                task.setPriority(transition.getPriority());
-                task = taskRepository.save(task);
-                task.setVisualId(net.getInitials());
+            if (isExecutable(transition, net)) {
+                Task task = createFromTransition(transition, useCase);
                 // TODO: 16. 3. 2017 there should be some fancy logic
 //                task.setAssignRole(net.getRoles().get(transition.getRoles().keySet().stream().findFirst().orElseGet(null)).getStringId());
                 figureOutProcessRoles(task,transition);
@@ -122,15 +118,15 @@ public class TaskService implements ITaskService {
     @Transactional
     public void finishTask(Long userId, Long taskId) throws Exception {
         Task task = taskRepository.findOne(taskId);
+        // TODO: 14. 4. 2017 replace with @PreAuthorize
         if (!task.getUser().getId().equals(userId)) {
             throw new Exception("User that is not assigned tried to finish task");
         }
 
         Case useCase = caseRepository.findOne(task.getCaseId());
-        useCase.getPetriNet().initializeArcs();
         Transition transition = useCase.getPetriNet().getTransition(task.getTransitionId());
 
-        useCase.finishTransition(transition);
+        finishExecution(transition, useCase);
         task.setFinishDate(LocalDateTime.now());
 
         caseRepository.save(useCase);
@@ -140,13 +136,13 @@ public class TaskService implements ITaskService {
 
     @Override
     @Transactional
-    public void assignTask(User user, Long taskId) throws TransitionNotStartableException {
+    public void assignTask(User user, Long taskId) throws TransitionNotExecutableException {
         Task task = taskRepository.findOne(taskId);
         Case useCase = caseRepository.findOne(task.getCaseId());
         useCase.getPetriNet().initializeArcs();
         Transition transition = useCase.getPetriNet().getTransition(task.getTransitionId());
 
-        useCase.startTransition(transition);
+        startExecution(transition, useCase);
         task.setUser(user);
         task.setStartDate(LocalDateTime.now());
 
@@ -191,6 +187,7 @@ public class TaskService implements ITaskService {
         Case useCase = caseRepository.findOne(task.getCaseId());
         PetriNet net = useCase.getPetriNet();
 
+        // TODO: 14. 4. 2017 arc.cancelExecute
         net.getArcsOfTransition(task.getTransitionId()).stream()
                 .filter(arc -> arc.getSource() instanceof Place)
                 .forEach(arc -> useCase.addActivePlace(arc.getSource().getStringId(), arc.getMultiplicity()));
@@ -210,7 +207,7 @@ public class TaskService implements ITaskService {
 
     @Override
     @Transactional
-    public void delegateTask(String delegatedEmail, Long taskId) throws TransitionNotStartableException {
+    public void delegateTask(String delegatedEmail, Long taskId) throws TransitionNotExecutableException {
         User delegated = userRepository.findByEmail(delegatedEmail);
         assignTask(delegated, taskId);
     }
@@ -296,28 +293,51 @@ public class TaskService implements ITaskService {
         });
     }
 
-    private boolean isExecutable(Transition transition, PetriNet net, Case useCase) {
+    @Transactional
+    private boolean isExecutable(Transition transition, PetriNet net) {
         Collection<Arc> arcsOfTransition = net.getArcsOfTransition(transition);
-        Map<String, Integer> activePlaces = useCase.getActivePlaces();
 
         if (arcsOfTransition == null)
             return true;
 
-        for (Arc arc : arcsOfTransition) {
-            if (arc.getDestination() == transition) {
-                if (placeIsNotActive(activePlaces, arc) || placeHasInsufficientTokens(activePlaces, arc))
-                    return false;
-            }
-        }
-
-        return true;
+        return arcsOfTransition.stream()
+                .filter(arc -> arc.getDestination() == transition)
+                .allMatch(Arc::isExecutable);
     }
 
-    private boolean placeHasInsufficientTokens(Map<String, Integer> activePlaces, Arc arc) {
-        return activePlaces.get(arc.getSourceId().toString()) < arc.getMultiplicity();
+    @Transactional
+    private void finishExecution(Transition transition, Case useCase) throws TransitionNotExecutableException {
+        execute(transition, useCase, arc -> arc.getSource() == transition);
     }
 
-    private boolean placeIsNotActive(Map<String, Integer> activePlaces, Arc arc) {
-        return !activePlaces.containsKey(arc.getSourceId().toString());
+    @Transactional
+    public void startExecution(Transition transition, Case useCase) throws TransitionNotExecutableException {
+        execute(transition, useCase, arc -> arc.getDestination() == transition);
+    }
+
+    private void execute(Transition transition, Case useCase, Predicate<Arc> predicate) throws TransitionNotExecutableException {
+        Supplier<Stream<Arc>> filteredSupplier = () -> useCase.getPetriNet().getArcsOfTransition(transition.getStringId()).stream().filter(predicate);
+
+        if (!filteredSupplier.get().allMatch(Arc::isExecutable))
+            throw new TransitionNotExecutableException("Not all arcs can be executed.");
+
+        filteredSupplier.get().forEach(Arc::execute);
+
+        useCase.updateActivePlaces();
+    }
+
+    private Task createFromTransition(Transition transition, Case useCase) {
+        Task task = new Task();
+
+        task.setTitle(transition.getTitle());
+        task.setCaseId(useCase.get_id().toString());
+        task.setTransitionId(transition.getObjectId().toString());
+        task.setCaseColor(useCase.getColor());
+        task.setCaseTitle(useCase.getTitle());
+        task.setPriority(transition.getPriority());
+        task = taskRepository.save(task);
+        task.setVisualId(useCase.getPetriNet().getInitials());
+
+        return task;
     }
 }

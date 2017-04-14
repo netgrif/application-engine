@@ -19,6 +19,20 @@ public class Place extends Node {
         this.tokens = tokens;
     }
 
+    public void addTokens(int tokens) {
+        this.tokens += tokens;
+    }
+
+    public void removeTokens(int tokens) throws IllegalArgumentException {
+        if (this.tokens - tokens < 0)
+            throw new IllegalArgumentException("Place can not have negative number of tokens.");
+        this.tokens -= tokens;
+    }
+
+    public void removeAllTokens() {
+        this.tokens = 0;
+    }
+
     public boolean isStatic() {
         return isStatic;
     }
