@@ -3,7 +3,7 @@ package com.fmworkflow.workflow.web;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fmworkflow.auth.domain.LoggedUser;
 import com.fmworkflow.petrinet.domain.dataset.Field;
-import com.fmworkflow.petrinet.domain.throwable.TransitionNotStartableException;
+import com.fmworkflow.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.fmworkflow.workflow.domain.Task;
 import com.fmworkflow.workflow.service.IFilterService;
 import com.fmworkflow.workflow.service.ITaskService;
@@ -59,7 +59,7 @@ public class TaskController {
         try {
             taskService.assignTask(loggedUser.transformToUser(), taskId);
             return MessageResource.successMessage("Task " + taskId + " assigned to " + loggedUser.getFullName());
-        } catch (TransitionNotStartableException e) {
+        } catch (TransitionNotExecutableException e) {
             return MessageResource.errorMessage("Task " + taskId + " cannot be assigned");
         }
     }

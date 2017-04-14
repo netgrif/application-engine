@@ -1,7 +1,10 @@
 package com.fmworkflow.petrinet.domain;
 
 public class InhibitorArc extends Arc {
-    public InhibitorArc(Arc object) {
-        super(object.getSource(), object.getDestination(), object.getMultiplicity());
+    @Override
+    public boolean isExecutable() {
+        if (source instanceof Transition)
+            return true;
+        return ((Place) source).getTokens() < multiplicity;
     }
 }

@@ -1,7 +1,17 @@
 package com.fmworkflow.petrinet.domain;
 
 public class ResetArc extends Arc {
-    public ResetArc(Arc object) {
-        super(object.getSource(), object.getDestination(), object.getMultiplicity());
+    private Integer removedTokens;
+
+    @Override
+    public void execute() {
+        Place place = ((Place) source);
+        removedTokens = place.getTokens();
+        place.removeAllTokens();
+    }
+
+    @Override
+    public void rollbackExecution() {
+        ((Place) source).addTokens(removedTokens);
     }
 }
