@@ -207,6 +207,20 @@ public class PetriNet {
                 .collect(Collectors.toMap(Arc::getPlace, Arc::getMultiplicity));
     }
 
+    public void initializeTokens(Map<String, Integer> activePlaces) {
+        places.values().forEach(place -> place.setTokens(activePlaces.getOrDefault(place.getStringId(), 0)));
+    }
+
+    public Map<String, Integer> getActivePlaces() {
+        Map<String, Integer> activePlaces = new HashMap<>();
+        for (Place place : places.values()) {
+            if (place.getTokens() > 0) {
+                activePlaces.put(place.getObjectId().toString(), place.getTokens());
+            }
+        }
+        return activePlaces;
+    }
+
     @Override
     public String toString() {
         return title;
