@@ -1,7 +1,6 @@
 package com.fmworkflow.workflow.service;
 
 import com.fmworkflow.petrinet.domain.PetriNet;
-import com.fmworkflow.petrinet.domain.Place;
 import com.fmworkflow.petrinet.service.IPetriNetService;
 import com.fmworkflow.workflow.domain.Case;
 import com.fmworkflow.workflow.domain.CaseRepository;
@@ -38,7 +37,7 @@ public class WorkflowService implements IWorkflowService {
     @Override
     public void createCase(String netId, String title, String color) {
         PetriNet petriNet = petriNetService.loadPetriNet(netId);
-        Map<String, Integer> activePlaces = createActivePlaces(petriNet);
+        Map<String, Integer> activePlaces = petriNet.getActivePlaces();
         Case useCase = new Case(title, petriNet, activePlaces);
         useCase.setColor(color);
         HashMap<String, Object> dataValues = new HashMap<>();
@@ -46,17 +45,6 @@ public class WorkflowService implements IWorkflowService {
         useCase.setDataSetValues(dataValues);
         saveCase(useCase);
         taskService.createTasks(useCase);
-    }
-
-    private Map<String, Integer> createActivePlaces(PetriNet petriNet) {
-        Map<String, Integer> activePlaces = new HashMap<>();
-        Map<String, Place> places = petriNet.getPlaces();
-        for (Place place : places.values()) {
-            if (place.getTokens() > 0) {
-                activePlaces.put(place.getObjectId().toString(), place.getTokens());
-            }
-        }
-        return activePlaces;
     }
 
 //    @Override

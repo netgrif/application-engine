@@ -15,5 +15,6 @@ public class CaseMonitor {
     public void afterFindOne(JoinPoint joinPoint, Object result) {
         Case useCase = (Case) result;
         useCase.getPetriNet().initializeArcs();
+        useCase.getPetriNet().initializeTokens(useCase.getActivePlaces());
     }
 }

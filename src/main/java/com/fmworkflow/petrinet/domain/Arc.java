@@ -5,12 +5,12 @@ import org.springframework.data.annotation.Transient;
 
 public class Arc extends PetriNetObject {
     @Transient
-    private Node source;
-    private ObjectId sourceId;
+    protected Node source;
+    protected ObjectId sourceId;
     @Transient
-    private Node destination;
-    private ObjectId destinationId;
-    private int multiplicity;
+    protected Node destination;
+    protected ObjectId destinationId;
+    protected int multiplicity;
 
     public Arc() {
         this.setObjectId(new ObjectId());
@@ -24,11 +24,11 @@ public class Arc extends PetriNetObject {
     }
 
     public Place getPlace() {
-        return (source instanceof Place)?((Place) source):((Place) destination);
+        return (source instanceof Place) ? ((Place) source) : ((Place) destination);
     }
 
     public Transition getTransition() {
-        return (source instanceof Transition)?((Transition) source):((Transition) destination);
+        return (source instanceof Transition) ? ((Transition) source) : ((Transition) destination);
     }
 
     public Node getSource() {
@@ -78,19 +78,21 @@ public class Arc extends PetriNetObject {
         return source.getTitle() + " -(" + multiplicity + ")> " + destination.getTitle();
     }
 
-    public enum Type {
-        REGULAR ("regular"),
-        INHIBITOR ("inhibitor"),
-        RESET ("reset");
+    public boolean isExecutable() {
+        if (source instanceof Transition)
+            return true;
+        return ((Place) source).getTokens() >= multiplicity;
+    }
 
-        String name;
-
-        Type(String name) {
-            this.name = name;
+    public void execute() {
+        if (source instanceof Transition) {
+            ((Place) destination).addTokens(multiplicity);
+        } else {
+            ((Place) source).removeTokens(multiplicity);
         }
+    }
 
-        public static Type fromString(String name) {
-            return Type.valueOf(name.toUpperCase());
-        }
+    public void rollbackExecution() {
+        ((Place) source).addTokens(multiplicity);
     }
 }
