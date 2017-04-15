@@ -5,7 +5,7 @@ import com.fmworkflow.petrinet.domain.InhibitorArc;
 import com.fmworkflow.petrinet.domain.ResetArc;
 
 public final class ArcFactory {
-    public static Arc getArc(Type type) throws IllegalArgumentException {
+    private static Arc getArc(Type type) throws IllegalArgumentException {
         switch (type) {
             case REGULAR:
                 return new Arc();

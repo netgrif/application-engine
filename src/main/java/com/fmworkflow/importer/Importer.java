@@ -74,6 +74,7 @@ public class Importer {
         net.setTitle(title);
         net.setInitials(initials);
 
+        // TODO: 15. 4. 2017 check if document contains any roles, data, etc. (NullPointerException)
         Arrays.stream(document.getImportRoles()).forEach(this::createRole);
         Arrays.stream(document.getImportData()).forEach(this::createDataSet);
         Arrays.stream(document.getImportPlaces()).forEach(this::createPlace);
