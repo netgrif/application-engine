@@ -25,9 +25,9 @@ public class ImporterTest {
 
     private static final String NET_TITLE = "jaxb_test";
     private static final String NET_INITIALS = "TST";
-    private static final Integer NET_PLACES = 17;
-    private static final Integer NET_TRANSITIONS = 22;
-    private static final Integer NET_ARCS = 21;
+    private static final Integer NET_PLACES = 19;
+    private static final Integer NET_TRANSITIONS = 24;
+    private static final Integer NET_ARCS = 23;
     private static final Integer NET_FIELDS = 28;
     private static final Integer NET_ROLES = 3;
 
