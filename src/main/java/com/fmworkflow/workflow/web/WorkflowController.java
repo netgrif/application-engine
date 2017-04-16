@@ -2,7 +2,7 @@ package com.fmworkflow.workflow.web;
 
 import com.fmworkflow.json.JsonBuilder;
 import com.fmworkflow.workflow.domain.Case;
-import com.fmworkflow.workflow.service.IWorkflowService;
+import com.fmworkflow.workflow.service.interfaces.IWorkflowService;
 import com.fmworkflow.workflow.web.requestbodies.CreateCaseBody;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;

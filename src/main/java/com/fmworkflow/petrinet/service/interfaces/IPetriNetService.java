@@ -1,4 +1,4 @@
-package com.fmworkflow.petrinet.service;
+package com.fmworkflow.petrinet.service.interfaces;
 
 import com.fmworkflow.petrinet.domain.PetriNet;
 import com.fmworkflow.petrinet.web.responsebodies.DataFieldReference;

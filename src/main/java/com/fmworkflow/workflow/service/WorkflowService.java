@@ -1,9 +1,11 @@
 package com.fmworkflow.workflow.service;
 
 import com.fmworkflow.petrinet.domain.PetriNet;
-import com.fmworkflow.petrinet.service.IPetriNetService;
+import com.fmworkflow.petrinet.service.interfaces.IPetriNetService;
 import com.fmworkflow.workflow.domain.Case;
-import com.fmworkflow.workflow.domain.CaseRepository;
+import com.fmworkflow.workflow.domain.repositories.CaseRepository;
+import com.fmworkflow.workflow.service.interfaces.ITaskService;
+import com.fmworkflow.workflow.service.interfaces.IWorkflowService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

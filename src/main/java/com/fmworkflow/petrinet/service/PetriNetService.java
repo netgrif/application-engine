@@ -2,7 +2,8 @@ package com.fmworkflow.petrinet.service;
 
 import com.fmworkflow.importer.Importer;
 import com.fmworkflow.petrinet.domain.*;
-import com.fmworkflow.petrinet.domain.dataset.Field;
+import com.fmworkflow.petrinet.domain.repositories.PetriNetRepository;
+import com.fmworkflow.petrinet.service.interfaces.IPetriNetService;
 import com.fmworkflow.petrinet.web.responsebodies.DataFieldReference;
 import com.fmworkflow.petrinet.web.responsebodies.PetriNetReference;
 import com.fmworkflow.petrinet.web.responsebodies.TransitionReference;

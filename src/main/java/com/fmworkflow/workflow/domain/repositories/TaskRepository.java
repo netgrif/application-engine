@@ -1,6 +1,7 @@
-package com.fmworkflow.workflow.domain;
+package com.fmworkflow.workflow.domain.repositories;
 
 import com.fmworkflow.auth.domain.User;
+import com.fmworkflow.workflow.domain.Task;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Collection;

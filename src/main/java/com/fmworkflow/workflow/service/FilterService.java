@@ -3,7 +3,8 @@ package com.fmworkflow.workflow.service;
 
 import com.fmworkflow.auth.domain.LoggedUser;
 import com.fmworkflow.workflow.domain.Filter;
-import com.fmworkflow.workflow.domain.FilterRepository;
+import com.fmworkflow.workflow.domain.repositories.FilterRepository;
+import com.fmworkflow.workflow.service.interfaces.IFilterService;
 import com.fmworkflow.workflow.web.requestbodies.CreateFilterBody;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -11,7 +12,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-public class FilterService implements IFilterService{
+public class FilterService implements IFilterService {
 
     @Autowired
     private FilterRepository repository;
