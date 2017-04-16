@@ -1,7 +1,7 @@
 package com.fmworkflow.importer;
 
 import com.fmworkflow.petrinet.domain.PetriNet;
-import com.fmworkflow.petrinet.domain.PetriNetRepository;
+import com.fmworkflow.petrinet.domain.repositories.PetriNetRepository;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

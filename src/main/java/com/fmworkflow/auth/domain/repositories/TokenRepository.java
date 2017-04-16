@@ -1,8 +1,10 @@
-package com.fmworkflow.auth.domain;
+package com.fmworkflow.auth.domain.repositories;
 
+
+import com.fmworkflow.auth.domain.Token;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 

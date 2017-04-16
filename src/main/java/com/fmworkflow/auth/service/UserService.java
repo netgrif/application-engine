@@ -1,9 +1,11 @@
 package com.fmworkflow.auth.service;
 
 import com.fmworkflow.auth.domain.Role;
-import com.fmworkflow.auth.domain.RoleRepository;
+import com.fmworkflow.auth.domain.repositories.RoleRepository;
 import com.fmworkflow.auth.domain.User;
-import com.fmworkflow.auth.domain.UserRepository;
+import com.fmworkflow.auth.domain.repositories.UserRepository;
+import com.fmworkflow.auth.service.interfaces.ISecurityService;
+import com.fmworkflow.auth.service.interfaces.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;

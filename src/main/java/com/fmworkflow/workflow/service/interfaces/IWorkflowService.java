@@ -1,4 +1,4 @@
-package com.fmworkflow.workflow.service;
+package com.fmworkflow.workflow.service.interfaces;
 
 import com.fmworkflow.workflow.domain.Case;
 

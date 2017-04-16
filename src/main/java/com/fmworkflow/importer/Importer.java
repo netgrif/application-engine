@@ -8,6 +8,7 @@ import com.fmworkflow.petrinet.domain.dataset.logic.AutoPlus;
 import com.fmworkflow.petrinet.domain.dataset.logic.Editable;
 import com.fmworkflow.petrinet.domain.dataset.logic.Required;
 import com.fmworkflow.petrinet.domain.dataset.logic.Visible;
+import com.fmworkflow.petrinet.domain.repositories.PetriNetRepository;
 import com.fmworkflow.petrinet.domain.roles.AssignFunction;
 import com.fmworkflow.petrinet.domain.roles.DelegateFunction;
 import com.fmworkflow.petrinet.domain.roles.ProcessRole;

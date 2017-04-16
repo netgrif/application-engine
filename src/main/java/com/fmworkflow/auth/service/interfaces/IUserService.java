@@ -1,4 +1,4 @@
-package com.fmworkflow.auth.service;
+package com.fmworkflow.auth.service.interfaces;
 
 import com.fmworkflow.auth.domain.User;
 import org.springframework.stereotype.Service;
