@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class CaseMonitor {
     @AfterReturning(
-            pointcut = "execution(* com.fmworkflow.workflow.domain.CaseRepository.findOne(..))",
+            pointcut = "execution(* com.fmworkflow.workflow.domain.repositories.CaseRepository.findOne(..))",
             returning= "result")
     public void afterFindOne(JoinPoint joinPoint, Object result) {
         Case useCase = (Case) result;

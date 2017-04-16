@@ -1,4 +1,4 @@
-package com.fmworkflow.auth.service;
+package com.fmworkflow.auth.service.interfaces;
 
 public interface ISecurityService {
     String findLoggedInUsername();

@@ -1,5 +1,6 @@
-package com.fmworkflow.auth.domain;
+package com.fmworkflow.auth.domain.repositories;
 
+import com.fmworkflow.auth.domain.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

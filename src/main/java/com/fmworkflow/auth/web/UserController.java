@@ -2,8 +2,8 @@ package com.fmworkflow.auth.web;
 
 import com.fmworkflow.auth.domain.Token;
 import com.fmworkflow.auth.domain.User;
-import com.fmworkflow.auth.service.ITokenService;
-import com.fmworkflow.auth.service.IUserService;
+import com.fmworkflow.auth.service.interfaces.ITokenService;
+import com.fmworkflow.auth.service.interfaces.IUserService;
 import com.fmworkflow.auth.web.requestbodies.RegistrationRequest;
 import com.fmworkflow.json.JsonBuilder;
 import com.fmworkflow.mail.IMailService;

@@ -1,11 +1,11 @@
 package com.fmworkflow.petrinet.web;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fmworkflow.auth.service.IUserService;
+import com.fmworkflow.auth.service.interfaces.IUserService;
 import com.fmworkflow.json.JsonBuilder;
 import com.fmworkflow.petrinet.domain.PetriNet;
-import com.fmworkflow.petrinet.service.IPetriNetService;
-import com.fmworkflow.petrinet.service.IProcessRoleService;
+import com.fmworkflow.petrinet.service.interfaces.IPetriNetService;
+import com.fmworkflow.petrinet.service.interfaces.IProcessRoleService;
 import com.fmworkflow.petrinet.web.requestbodies.AssignedRolesBody;
 import com.fmworkflow.petrinet.web.requestbodies.PetriNetReferenceBody;
 import com.fmworkflow.petrinet.web.requestbodies.UploadedFileMeta;

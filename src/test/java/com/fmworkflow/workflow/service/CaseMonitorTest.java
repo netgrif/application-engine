@@ -1,9 +1,10 @@
 package com.fmworkflow.workflow.service;
 
 import com.fmworkflow.importer.Importer;
-import com.fmworkflow.petrinet.domain.PetriNetRepository;
+import com.fmworkflow.petrinet.domain.repositories.PetriNetRepository;
 import com.fmworkflow.workflow.domain.Case;
-import com.fmworkflow.workflow.domain.CaseRepository;
+import com.fmworkflow.workflow.domain.repositories.CaseRepository;
+import com.fmworkflow.workflow.service.interfaces.IWorkflowService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

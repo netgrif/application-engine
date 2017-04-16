@@ -1,12 +1,14 @@
 package com.fmworkflow;
 
 import com.fmworkflow.auth.domain.*;
-import com.fmworkflow.auth.service.IUserService;
+import com.fmworkflow.auth.domain.repositories.RoleRepository;
+import com.fmworkflow.auth.domain.repositories.UserProcessRoleRepository;
+import com.fmworkflow.auth.service.interfaces.IUserService;
 import com.fmworkflow.importer.Importer;
 import com.fmworkflow.petrinet.domain.PetriNet;
-import com.fmworkflow.petrinet.domain.PetriNetRepository;
+import com.fmworkflow.petrinet.domain.repositories.PetriNetRepository;
 import com.fmworkflow.petrinet.domain.roles.ProcessRole;
-import com.fmworkflow.workflow.service.IWorkflowService;
+import com.fmworkflow.workflow.service.interfaces.IWorkflowService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;

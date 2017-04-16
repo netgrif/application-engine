@@ -1,5 +1,6 @@
 package com.fmworkflow.auth.service;
 
+import com.fmworkflow.auth.service.interfaces.ISecurityService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
