@@ -1,7 +1,7 @@
-package com.fmworkflow.petrinet.domain;
+package com.fmworkflow.petrinet.domain.repositories;
 
+import com.fmworkflow.petrinet.domain.PetriNet;
 import org.springframework.data.mongodb.repository.MongoRepository;
-import org.springframework.data.mongodb.repository.Query;
 
 import java.util.List;
 

@@ -1,7 +1,7 @@
 package com.fmworkflow.auth.web;
 
-import com.fmworkflow.auth.service.IRoleService;
-import com.fmworkflow.auth.service.IUserService;
+import com.fmworkflow.auth.service.interfaces.IRoleService;
+import com.fmworkflow.auth.service.interfaces.IUserService;
 import com.fmworkflow.auth.web.responsebodies.UsersSystemRolesListResponse;
 import com.fmworkflow.json.JsonBuilder;
 import org.springframework.beans.factory.annotation.Autowired;

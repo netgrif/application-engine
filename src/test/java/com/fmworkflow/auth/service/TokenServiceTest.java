@@ -1,7 +1,8 @@
 package com.fmworkflow.auth.service;
 
 import com.fmworkflow.auth.domain.Token;
-import com.fmworkflow.auth.domain.TokenRepository;
+import com.fmworkflow.auth.domain.repositories.TokenRepository;
+import com.fmworkflow.auth.service.interfaces.ITokenService;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

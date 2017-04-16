@@ -3,7 +3,7 @@ package com.fmworkflow.auth.service;
 import com.fmworkflow.auth.domain.LoggedUser;
 import com.fmworkflow.auth.domain.Role;
 import com.fmworkflow.auth.domain.User;
-import com.fmworkflow.auth.domain.UserRepository;
+import com.fmworkflow.auth.domain.repositories.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
