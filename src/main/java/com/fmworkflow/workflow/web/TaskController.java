@@ -130,17 +130,17 @@ public class TaskController {
     @RequestMapping(value = "/search", method = RequestMethod.POST)
     public TasksResource search(Authentication auth, @RequestBody TaskSearchBody searchBody) {
         List<TaskResource> resources = new ArrayList<>();
-        if(searchBody.searchTier == TaskSearchBody.SEARCH_TIER_1){
+        if (searchBody.searchTier == TaskSearchBody.SEARCH_TIER_1) {
             taskService.findByPetriNets(searchBody.petriNets
                     .stream()
                     .map(net -> net.petriNet)
                     .collect(Collectors.toList()))
-                    .forEach(task -> resources.add(TaskResource.createFrom(task,auth)));
-        } else if (searchBody.searchTier == TaskSearchBody.SEARCH_TIER_2){
+                    .forEach(task -> resources.add(TaskResource.createFrom(task, auth)));
+        } else if (searchBody.searchTier == TaskSearchBody.SEARCH_TIER_2) {
             List<String> transitions = new ArrayList<>();
             searchBody.petriNets.forEach(net -> transitions.addAll(net.transitions));
-            taskService.findByTransitions(transitions).forEach(task -> resources.add(TaskResource.createFrom(task,auth)));
-        } else if (searchBody.searchTier == TaskSearchBody.SEARCH_TIER_3){
+            taskService.findByTransitions(transitions).forEach(task -> resources.add(TaskResource.createFrom(task, auth)));
+        } else if (searchBody.searchTier == TaskSearchBody.SEARCH_TIER_3) {
 
         }
 
@@ -180,7 +180,12 @@ public class TaskController {
 
     @RequestMapping(value = "/filter", method = RequestMethod.GET)
     public FiltersResource getAllFilters(Authentication auth) {
-        return new FiltersResource(filterService.getAll());
+        return new FiltersResource(filterService.getAll(),0);
+    }
+
+    @RequestMapping(value = "/filter/roles", method = RequestMethod.POST)
+    public FiltersResource getFiltersWithRoles(@RequestBody List<String> roles) {
+        return new FiltersResource(filterService.getWithRoles(roles),1);
     }
 
     @RequestMapping(value = "/filter", method = RequestMethod.POST)
