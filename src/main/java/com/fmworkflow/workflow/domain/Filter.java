@@ -21,10 +21,12 @@ public class Filter {
     private Long user;
     private List<PetriNetReference> petriNets;
     private List<TransitionReference> transitions;
+    private List<String> roles;
 
     public Filter() {
         petriNets = new ArrayList<>();
         transitions = new ArrayList<>();
+        roles = new ArrayList<>();
     }
 
     public Filter(String name) {
@@ -79,6 +81,14 @@ public class Filter {
 
     public void setTransitions(List<TransitionReference> transitions) {
         this.transitions = transitions;
+    }
+
+    public List<String> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(List<String> roles) {
+        this.roles = roles;
     }
 
     public void resolveVisibility(int visibility, LoggedUser user){
