@@ -21,11 +21,16 @@ public class FilterService implements IFilterService {
         return repository.findAll();
     }
 
+    public List<Filter> getForRoles(List<String> roles){
+        return repository.findByRolesIn(roles);
+    }
+
     public boolean saveFilter(LoggedUser user, CreateFilterBody filterBody){
         Filter filter = new Filter(filterBody.name);
         filter.resolveVisibility(filterBody.visibility, user);
         filter.setPetriNets(filterBody.petriNets);
         filter.setTransitions(filterBody.transitions);
+        filter.setRoles(filterBody.roles);
 
         filter = repository.save(filter);
         return filter.get_id() != null;
