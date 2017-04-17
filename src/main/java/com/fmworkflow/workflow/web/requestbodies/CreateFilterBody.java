@@ -16,5 +16,6 @@ public class CreateFilterBody {
     public int visibility;
     public List<PetriNetReference> petriNets;
     public List<TransitionReference> transitions;
+    public List<String> roles;
 
 }
