@@ -21,7 +21,7 @@ public class FilterService implements IFilterService {
         return repository.findAll();
     }
 
-    public List<Filter> getForRoles(List<String> roles){
+    public List<Filter> getWithRoles(List<String> roles){
         return repository.findByRolesIn(roles);
     }
 
