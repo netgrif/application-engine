@@ -124,7 +124,7 @@ public class WorkflowCommandLineRunner implements CommandLineRunner {
         int randomNum = ThreadLocalRandom.current().nextInt(0, 5);
         switch (randomNum) {
             case 0:
-                return "color-fg-fm-500";
+                return "color-fg-primary-500";
             case 1:
                 return "color-fg-blue-grey-500";
             case 2:
