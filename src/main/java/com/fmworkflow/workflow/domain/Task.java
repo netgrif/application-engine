@@ -4,6 +4,7 @@ import com.fmworkflow.auth.domain.User;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 public class Task {
@@ -19,6 +20,8 @@ public class Task {
     private int priority;
     @ManyToOne
     private User user;
+    @OneToMany(cascade = CascadeType.ALL)
+    private List<Trigger> triggers;
     private String assignRole;
     private String delegateRole;
     private LocalDateTime startDate;
@@ -128,11 +131,26 @@ public class Task {
         this.delegateRole = delegateRole;
     }
 
+    public List<Trigger> getTriggers() {
+        return triggers;
+    }
+
+    public void setTriggers(List<Trigger> triggers) {
+        this.triggers = triggers;
+    }
+
     public static class Priorities {
         public static final int HIGH = 3;
         public static final int MEDIUM = 2;
         public static final int LOW = 1;
         public static final int UNDEFINED = 0;
 
+    }
+
+    public enum Type {
+        USER,
+        AUTO,
+        TIME,
+        MESSAGE,
     }
 }
