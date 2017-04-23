@@ -7,6 +7,7 @@ public class ImportTransition {
     private DataRef[] dataRef;
     private Integer y;
     private Integer x;
+    private ImportTrigger[] trigger;
 
     public Long getId() {
         return id;
@@ -54,5 +55,13 @@ public class ImportTransition {
 
     public void setX(Integer x) {
         this.x = x;
+    }
+
+    public ImportTrigger[] getTrigger() {
+        return trigger;
+    }
+
+    public void setTrigger(ImportTrigger[] trigger) {
+        this.trigger = trigger;
     }
 }

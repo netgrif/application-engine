@@ -310,6 +310,8 @@
                 <assign>true</assign>
             </logic>
         </roleRef>
+        <trigger type="user"></trigger>
+        <trigger type="user"></trigger>
     </transition>
     <transition>
         <id>253</id>
@@ -322,12 +324,14 @@
                 <assign>true</assign>
             </logic>
         </roleRef>
+        <trigger type="user"></trigger>
     </transition>
     <transition>
         <id>1</id>
         <x>180</x>
         <y>180</y>
         <label>Zaevidovanie UJ</label>
+        <trigger type="user"></trigger>
         <roleRef>
             <id>1</id>
             <logic>
@@ -487,6 +491,7 @@
                 <assign>true</assign>
             </logic>
         </roleRef>
+        <trigger type="user"></trigger>
     </transition>
     <transition>
         <id>10</id>
@@ -499,6 +504,7 @@
                 <assign>true</assign>
             </logic>
         </roleRef>
+        <trigger type="user"></trigger>
     </transition>
     <transition>
         <id>13</id>
@@ -511,12 +517,14 @@
                 <assign>true</assign>
             </logic>
         </roleRef>
+        <trigger type="user"></trigger>
     </transition>
     <transition>
         <id>19</id>
         <x>180</x>
         <y>60</y>
         <label>Vypožičanie UJ</label>
+        <trigger type="user"></trigger>
         <roleRef>
             <id>1</id>
             <logic>
@@ -577,6 +585,7 @@
                 <assign>true</assign>
             </logic>
         </roleRef>
+        <trigger type="user"></trigger>
     </transition>
     <transition>
         <id>26</id>
@@ -589,6 +598,7 @@
                 <assign>true</assign>
             </logic>
         </roleRef>
+        <trigger type="user"></trigger>
     </transition>
     <transition>
         <id>31</id>
@@ -601,6 +611,7 @@
                 <assign>true</assign>
             </logic>
         </roleRef>
+        <trigger type="user"></trigger>
     </transition>
     <transition>
         <id>36</id>
@@ -613,6 +624,7 @@
                 <assign>true</assign>
             </logic>
         </roleRef>
+        <trigger type="user"></trigger>
     </transition>
     <transition>
         <id>39</id>
@@ -625,6 +637,7 @@
                 <assign>true</assign>
             </logic>
         </roleRef>
+        <trigger type="user"></trigger>
     </transition>
     <transition>
         <id>42</id>
@@ -637,6 +650,7 @@
                 <assign>true</assign>
             </logic>
         </roleRef>
+        <trigger type="user"></trigger>
     </transition>
     <transition>
         <id>45</id>
@@ -649,6 +663,7 @@
                 <assign>true</assign>
             </logic>
         </roleRef>
+        <trigger type="user"></trigger>
     </transition>
     <transition>
         <id>51</id>
@@ -661,6 +676,7 @@
                 <assign>true</assign>
             </logic>
         </roleRef>
+        <trigger type="user"></trigger>
     </transition>
     <transition>
         <id>52</id>
@@ -673,6 +689,7 @@
                 <assign>true</assign>
             </logic>
         </roleRef>
+        <trigger type="user"></trigger>
     </transition>
     <transition>
         <id>54</id>
@@ -685,6 +702,7 @@
                 <assign>true</assign>
             </logic>
         </roleRef>
+        <trigger type="user"></trigger>
     </transition>
     <transition>
         <id>66</id>
@@ -697,6 +715,7 @@
                 <assign>true</assign>
             </logic>
         </roleRef>
+        <trigger type="user"></trigger>
     </transition>
     <transition>
         <id>67</id>
@@ -709,6 +728,7 @@
                 <assign>true</assign>
             </logic>
         </roleRef>
+        <trigger type="user"></trigger>
     </transition>
     <transition>
         <id>68</id>
@@ -721,6 +741,7 @@
                 <assign>true</assign>
             </logic>
         </roleRef>
+        <trigger type="user"></trigger>
     </transition>
     <transition>
         <id>122</id>
@@ -733,6 +754,7 @@
                 <assign>true</assign>
             </logic>
         </roleRef>
+        <trigger type="user"></trigger>
     </transition>
     <transition>
         <id>125</id>
@@ -745,12 +767,14 @@
                 <assign>true</assign>
             </logic>
         </roleRef>
+        <trigger type="user"></trigger>
     </transition>
     <transition>
         <id>181</id>
         <x>660</x>
         <y>460</y>
         <label>Data UJ</label>
+        <trigger type="user"></trigger>
         <roleRef>
             <id>2</id>
             <logic>
@@ -937,6 +961,7 @@
                 <assign>true</assign>
             </logic>
         </roleRef>
+        <trigger type="user"></trigger>
     </transition>
     <arc>
         <id>4</id>

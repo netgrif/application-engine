@@ -14,6 +14,7 @@ import com.fmworkflow.petrinet.domain.roles.DelegateFunction;
 import com.fmworkflow.petrinet.domain.roles.ProcessRole;
 import com.fmworkflow.petrinet.domain.roles.ProcessRoleRepository;
 import com.fmworkflow.petrinet.service.ArcFactory;
+import com.fmworkflow.workflow.domain.Trigger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,6 +37,7 @@ public class Importer {
     private Map<Long, Place> places;
 
     private ImportFieldFactory fieldFactory;
+    private ImportTriggerFactory triggerFactory;
 
     @Autowired
     private PetriNetRepository repository;
@@ -49,6 +51,7 @@ public class Importer {
         this.places = new HashMap<>();
         this.fields = new HashMap<>();
         this.fieldFactory = new ImportFieldFactory(this);
+        this.triggerFactory = new ImportTriggerFactory(this);
     }
 
     @Transactional
@@ -120,6 +123,11 @@ public class Importer {
                     addDataLogic(transition, dataRef)
             );
         }
+        if (importTransition.getTrigger() != null) {
+            Arrays.stream(importTransition.getTrigger()).forEach(trigger ->
+                    addTrigger(transition, trigger)
+            );
+        }
 
         net.addTransition(transition);
         transitions.put(importTransition.getId(), transition);
@@ -157,7 +165,13 @@ public class Importer {
             ImportAutoPlus autoPlus = logic.getAutoPlus();
             transition.addDataSet(fieldId, new AutoPlus(fields.get(autoPlus.getRef()).getObjectId(), autoPlus.getContent()));
         }
+    }
 
+    @Transactional
+    private void addTrigger(Transition transition, ImportTrigger importTrigger) {
+        Trigger trigger = triggerFactory.buildTrigger(importTrigger);
+
+        transition.addTrigger(trigger);
     }
 
     @Transactional
