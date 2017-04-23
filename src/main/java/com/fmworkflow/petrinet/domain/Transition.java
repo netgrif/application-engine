@@ -3,13 +3,12 @@ package com.fmworkflow.petrinet.domain;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fmworkflow.petrinet.domain.dataset.logic.IDataFunction;
 import com.fmworkflow.petrinet.domain.roles.IRoleFunction;
+import com.fmworkflow.workflow.domain.Trigger;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @Document
 public class Transition extends Node {
@@ -17,13 +16,15 @@ public class Transition extends Node {
     private Map<String, Set<IDataFunction>> dataSet;
     @Field("roles")
     private Map<String, Set<IRoleFunction>> roles;
-
+    @DBRef
+    private List<Trigger> triggers;
     private int priority;
 
     public Transition() {
         super();
         dataSet = new HashMap<>();
         roles = new HashMap<>();
+        triggers = new LinkedList<>();
     }
 
     public ObjectNode applyDataLogic(String id, ObjectNode json) {
@@ -82,6 +83,18 @@ public class Transition extends Node {
             logic.add(function);
             roles.put(fieldId, logic);
         }
+    }
+
+    public List<Trigger> getTriggers() {
+        return triggers;
+    }
+
+    public void setTriggers(List<Trigger> triggers) {
+        this.triggers = triggers;
+    }
+
+    public void addTrigger(Trigger trigger) {
+        this.triggers.add(trigger);
     }
 
     @Override
