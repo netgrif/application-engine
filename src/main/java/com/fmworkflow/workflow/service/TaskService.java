@@ -58,8 +58,8 @@ public class TaskService implements ITaskService {
     }
 
     @Override
-    public List<Task> findByCaseId(String caseId) {
-        return null;//taskRepository.findByCaseId(caseId);
+    public List<Task> findByCases(List<String> cases) {
+        return taskRepository.findByCaseIdIn(cases);
     }
 
     @Override
