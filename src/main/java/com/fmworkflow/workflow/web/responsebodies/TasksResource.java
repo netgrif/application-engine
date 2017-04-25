@@ -21,6 +21,13 @@ public class TasksResource extends Resources<TaskResource> {
             add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
                     .getAll(null)).withRel("all"));
 
+        if(selfRel.equalsIgnoreCase("case"))
+            add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
+                    .getAllByCases(new ArrayList<>())).withSelfRel());
+        else
+            add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
+                    .getAllByCases(new ArrayList<>())).withRel("case"));
+
         if(selfRel.equals("my"))
             add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
                     .getMy(null)).withSelfRel());
