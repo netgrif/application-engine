@@ -7,6 +7,8 @@ import com.fmworkflow.workflow.domain.repositories.CaseRepository;
 import com.fmworkflow.workflow.service.interfaces.ITaskService;
 import com.fmworkflow.workflow.service.interfaces.IWorkflowService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.BasicQuery;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -17,6 +19,8 @@ import java.util.Map;
 public class WorkflowService implements IWorkflowService {
     @Autowired
     private CaseRepository repository;
+    @Autowired
+    private MongoTemplate mongoTemplate;
 
     @Autowired
     private IPetriNetService petriNetService;
@@ -34,6 +38,20 @@ public class WorkflowService implements IWorkflowService {
         List<Case> cases = repository.findAll();
         cases.forEach(aCase -> aCase.getPetriNet().initializeArcs());
         return cases;
+    }
+
+    public List<Case> searchCase(List<String> nets){
+        StringBuilder queryBuilder = new StringBuilder();
+        nets.forEach(net -> {
+            queryBuilder.append("{$ref:\"petriNet\",$id:{$oid:\"");
+            queryBuilder.append(net);
+            queryBuilder.append("\"}},");
+        });
+        if(queryBuilder.length() > 0)
+            queryBuilder.deleteCharAt(queryBuilder.length()-1);
+        String queryString = nets.isEmpty() ? "{}" : "{petriNet:{$in:["+queryBuilder.toString()+"]}}";
+        BasicQuery query = new BasicQuery(queryString,"{petriNet:0, dataSetValues:0}");
+        return mongoTemplate.find(query,Case.class);
     }
 
     @Override
