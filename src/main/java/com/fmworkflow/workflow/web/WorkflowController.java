@@ -35,6 +35,11 @@ public class WorkflowController {
         return workflowService.getAll();
     }
 
+    @RequestMapping(value = "/case/search", method = RequestMethod.POST)
+    public String searchCases(@RequestBody List<String> petriNets){
+        return "";
+    }
+
 //    @RequestMapping(value = "/data/{case}/{transition}", method = RequestMethod.GET)
 //    public DataSet getDataSet(@PathVariable("case") String caseId, @PathVariable("transition") String transitionId){
 //        return workflowService.getDataForTransition(caseId, transitionId);
