@@ -4,12 +4,16 @@ import com.fmworkflow.json.JsonBuilder;
 import com.fmworkflow.workflow.domain.Case;
 import com.fmworkflow.workflow.service.interfaces.IWorkflowService;
 import com.fmworkflow.workflow.web.requestbodies.CreateCaseBody;
+import com.fmworkflow.workflow.web.responsebodies.CaseResource;
+import com.fmworkflow.workflow.web.responsebodies.CasesResource;
+import com.fmworkflow.workflow.web.responsebodies.MessageResource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController()
@@ -20,13 +24,13 @@ public class WorkflowController {
     private IWorkflowService workflowService;
 
     @RequestMapping(value = "/case", method = RequestMethod.POST)
-    public String createCase(@RequestBody CreateCaseBody body) {
+    public MessageResource createCase(@RequestBody CreateCaseBody body) {
         try {
             workflowService.createCase(body.netId, body.title, body.color);
-            return JsonBuilder.successMessage("Case created successfully");
+            return MessageResource.successMessage("Case created successfully");
         } catch (Exception e) { // TODO: 5. 2. 2017 change to custom exception
             e.printStackTrace();
-            return JsonBuilder.errorMessage("Failed to create case");
+            return MessageResource.errorMessage("Failed to create case");
         }
     }
 
@@ -36,8 +40,10 @@ public class WorkflowController {
     }
 
     @RequestMapping(value = "/case/search", method = RequestMethod.POST)
-    public String searchCases(@RequestBody List<String> petriNets){
-        return "";
+    public CasesResource searchCases(@RequestBody List<String> petriNets){
+        List<CaseResource> resources = new ArrayList<>();
+        workflowService.searchCase(petriNets).forEach(useCase -> resources.add(new CaseResource(useCase)));
+        return new CasesResource(resources,"search");
     }
 
 //    @RequestMapping(value = "/data/{case}/{transition}", method = RequestMethod.GET)
