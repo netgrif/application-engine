@@ -48,6 +48,16 @@ public class TaskController {
         return tasksResource;
     }
 
+    @RequestMapping(value = "/case", method = RequestMethod.POST)
+    public TasksResource getAllByCases(@RequestBody List<String> cases){
+        List<TaskResource> resources = new ArrayList<>();
+        taskService.findByCases(cases).forEach(task -> resources.add(TaskResource.createFrom(task,null)));
+        TasksResource tasksResource = new TasksResource(resources);
+        tasksResource.addLinks("case");
+
+        return tasksResource;
+    }
+
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     public TaskResource getOne(@PathVariable("id") Long taskId) {
         return TaskResource.createFrom(taskService.findById(taskId), null);
