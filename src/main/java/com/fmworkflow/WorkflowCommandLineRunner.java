@@ -75,7 +75,7 @@ public class WorkflowCommandLineRunner implements CommandLineRunner {
             workflowService.createCase(net.getStringId(), "Poisťovací prípad " + i, randomColor());
         }
 
-        User superAdmin = new User("super@fmworkflow.com", "password", "Super", "Truuper");
+        User superAdmin = new User("super@netgrif.com", "password", "Super", "Truuper");
         HashSet<Role> superRoles = new HashSet<>();
         superRoles.add(roleAdmin);
         superAdmin.setRoles(superRoles);
