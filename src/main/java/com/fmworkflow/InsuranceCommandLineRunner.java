@@ -12,7 +12,10 @@ import com.fmworkflow.petrinet.domain.repositories.PetriNetRepository;
 import com.fmworkflow.petrinet.domain.roles.ProcessRole;
 import com.fmworkflow.workflow.service.interfaces.IWorkflowService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Profile;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.util.Comparator;
@@ -22,9 +25,10 @@ import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
-//@Component
-//@Profile({"!test"})
-public class WorkflowCommandLineRunner /*implements CommandLineRunner*/ {
+@Component
+@Profile({"!test"})
+public class InsuranceCommandLineRunner implements CommandLineRunner {
+
     @Autowired
     private UserProcessRoleRepository userProcessRoleRepository;
 
@@ -46,77 +50,52 @@ public class WorkflowCommandLineRunner /*implements CommandLineRunner*/ {
     @Autowired
     private PetriNetRepository petriNetRepository;
 
-   /* @Override*/
+    @Override
     public void run(String... strings) throws Exception {
-
         Role roleUser = new Role("user");
         roleUser = roleRepository.save(roleUser);
-        User user = new User("user@fmworkflow.com", "password", "name", "surname");
+        Role roleAdmin = new Role("admin");
+        roleAdmin = roleRepository.save(roleAdmin);
+
+        User user = new User("poistenec@gmail.com", "password", "Jožko", "Poistenec");
         HashSet<Role> roles = new HashSet<>();
         roles.add(roleUser);
         user.setRoles(roles);
         userService.save(user);
-
-        Role roleAdmin = new Role("admin");
-        roleAdmin = roleRepository.save(roleAdmin);
-        User admin = new User("admin@fmworkflow.com", "adminPass", "Admin", "Adminovič");
+        User admin = new User("agent@gmail.com", "password", "Agent", "Smith");
         HashSet<Role> adminRoles = new HashSet<>();
         adminRoles.add(roleAdmin);
         admin.setRoles(adminRoles);
         userService.save(admin);
 
         mongoTemplate.getDb().dropDatabase();
-        importer.importPetriNet(new File("src/test/resources/prikladFM.xml"), "fm net", "fm");
+        // TODO: 26/04/2017 title, initials
+        importer.importPetriNet(new File("src/test/resources/poistenie_rozsirene.xml"), "p", "p");
         PetriNet net = petriNetRepository.findAll().get(0);
-        for (int i = 0; i < 10; i++) {
-            workflowService.createCase(net.getStringId(), "Storage Unit " + i, randomColor());
+        for (int i = 0; i < 5; i++) {
+            workflowService.createCase(net.getStringId(), "Poisťovací prípad " + i, randomColor());
         }
+
+        List<ProcessRole> proles = new LinkedList<>(net.getRoles().values().stream().sorted(Comparator.comparing(ProcessRole::getName)).collect(Collectors.toList()));
+        ProcessRole userPR = proles.get(0);
+        ProcessRole agentPR = proles.get(1);
+
+        UserProcessRole proleClient = new UserProcessRole();
+        proleClient.setRoleId(userPR.getStringId());
+        proleClient = userProcessRoleRepository.save(proleClient);
+        user.addProcessRole(proleClient);
+        userService.save(user);
+
+        UserProcessRole proleFm = new UserProcessRole();
+        proleFm.setRoleId(agentPR.getStringId());
+        proleFm = userProcessRoleRepository.save(proleFm);
+        admin.addProcessRole(proleFm);
+        userService.save(admin);
 
         User superAdmin = new User("super@fmworkflow.com", "password", "Super", "Truuper");
         HashSet<Role> superRoles = new HashSet<>();
         superRoles.add(roleAdmin);
         superAdmin.setRoles(superRoles);
-
-
-        User client = new User("client@client.com", "password", "Client", "Client");
-        HashSet<Role> clientRoles = new HashSet<>();
-        clientRoles.add(roleUser);
-        client.setRoles(clientRoles);
-
-        User clientManager = new User("manager@client.com", "password", "Client", "Manager");
-        HashSet<Role> managerRoles = new HashSet<>();
-        managerRoles.add(roleUser);
-        clientManager.setRoles(managerRoles);
-
-        List<ProcessRole> proles = new LinkedList<>(net.getRoles().values().stream().sorted(Comparator.comparing(ProcessRole::getName)).collect(Collectors.toList()));
-        ProcessRole clientRole = proles.get(0);
-        ProcessRole clientManagerRole = proles.get(1);
-        ProcessRole fmServiceRole = proles.get(2);
-
-
-        UserProcessRole proleClient = new UserProcessRole();
-        proleClient.setRoleId(clientRole.getStringId());
-        proleClient = userProcessRoleRepository.save(proleClient);
-        client.addProcessRole(proleClient);
-        superAdmin.addProcessRole(proleClient);
-        userService.save(client);
-       // userService.save(superAdmin);
-
-        UserProcessRole proleFm = new UserProcessRole();
-        proleFm.setRoleId(fmServiceRole.getStringId());
-        proleFm = userProcessRoleRepository.save(proleFm);
-        user.addProcessRole(proleFm);
-        superAdmin.addProcessRole(proleFm);
-        userService.save(user);
-       // userService.save(superAdmin);
-
-        UserProcessRole proleManager = new UserProcessRole();
-        proleManager.setRoleId(clientManagerRole.getStringId());
-        proleManager = userProcessRoleRepository.save(proleManager);
-        clientManager.addProcessRole(proleManager);
-        superAdmin.addProcessRole(proleManager);
-        userService.save(clientManager);
-        userService.save(superAdmin);
     }
 
     private String randomColor() {
