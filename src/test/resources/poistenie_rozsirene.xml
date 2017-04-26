@@ -1319,25 +1319,25 @@
             </logic>
         </dataRef>
     </transition>
-    <transition>
-        <id>97</id>
-        <x>620</x>
-        <y>340</y>
-        <label>Automatické doplnenie osobných údajov</label>
-        <roleRef>
-            <id>1</id>
-            <logic>
-                <assign>true</assign>
-            </logic>
-        </roleRef>
-        <dataRef>
-            <id>27</id>
-            <logic>
-                <editable>true</editable>
-                <required>true</required>
-            </logic>
-        </dataRef>
-    </transition>
+    <!--<transition>-->
+        <!--<id>97</id>-->
+        <!--<x>620</x>-->
+        <!--<y>340</y>-->
+        <!--<label>Automatické doplnenie osobných údajov</label>-->
+        <!--<roleRef>-->
+            <!--<id>1</id>-->
+            <!--<logic>-->
+                <!--<assign>true</assign>-->
+            <!--</logic>-->
+        <!--</roleRef>-->
+        <!--<dataRef>-->
+            <!--<id>27</id>-->
+            <!--<logic>-->
+                <!--<editable>true</editable>-->
+                <!--<required>true</required>-->
+            <!--</logic>-->
+        <!--</dataRef>-->
+    <!--</transition>-->
     <transition>
         <id>98</id>
         <x>620</x>
@@ -1645,13 +1645,13 @@
         <destinationId>53</destinationId>
         <multiplicity>1</multiplicity>
     </arc>
-    <arc>
-        <id>106</id>
-        <type>regular</type>
-        <sourceId>99</sourceId>
-        <destinationId>97</destinationId>
-        <multiplicity>1</multiplicity>
-    </arc>
+    <!--<arc>-->
+        <!--<id>106</id>-->
+        <!--<type>regular</type>-->
+        <!--<sourceId>99</sourceId>-->
+        <!--<destinationId>97</destinationId>-->
+        <!--<multiplicity>1</multiplicity>-->
+    <!--</arc>-->
     <arc>
         <id>107</id>
         <type>regular</type>
@@ -1666,11 +1666,11 @@
         <destinationId>53</destinationId>
         <multiplicity>1</multiplicity>
     </arc>
-    <arc>
-        <id>109</id>
-        <type>regular</type>
-        <sourceId>97</sourceId>
-        <destinationId>53</destinationId>
-        <multiplicity>1</multiplicity>
-    </arc>
+    <!--<arc>-->
+        <!--<id>109</id>-->
+        <!--<type>regular</type>-->
+        <!--<sourceId>97</sourceId>-->
+        <!--<destinationId>53</destinationId>-->
+        <!--<multiplicity>1</multiplicity>-->
+    <!--</arc>-->
 </document>
