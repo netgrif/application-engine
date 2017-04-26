@@ -15,7 +15,7 @@ import java.util.List;
 public interface ITaskService {
     List<Task> getAll(LoggedUser loggedUser);
 
-    List<Task> findByCaseId(String caseId);
+    List<Task> findByCases(List<String> cases);
 
     void createTasks(Case useCase);
 
