@@ -160,9 +160,9 @@ public class WorkflowCommandLineRunner implements CommandLineRunner {
             case 3:
                 return "color-fg-indigo-500";
             case 4:
-                return "color-fg-teal-500";
+                return "color-fg-success";
             default:
-                return "color-fg-fm-500";
+                return "color-fg-primary-500";
         }
     }
 }
