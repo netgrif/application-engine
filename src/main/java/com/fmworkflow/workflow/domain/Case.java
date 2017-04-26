@@ -1,5 +1,6 @@
 package com.fmworkflow.workflow.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fmworkflow.petrinet.domain.PetriNet;
 import com.fmworkflow.petrinet.domain.Place;
 import org.bson.types.ObjectId;
@@ -18,6 +19,7 @@ public class Case {
     private ObjectId _id;
     @DBRef
     @NotNull
+    @JsonIgnore
     private PetriNet petriNet;
     @Field("activePlaces")
     private Map<String, Integer> activePlaces;

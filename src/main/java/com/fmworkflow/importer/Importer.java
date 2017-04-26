@@ -123,11 +123,11 @@ public class Importer {
                     addDataLogic(transition, dataRef)
             );
         }
-        if (importTransition.getTrigger() != null) {
-            Arrays.stream(importTransition.getTrigger()).forEach(trigger ->
-                    addTrigger(transition, trigger)
-            );
-        }
+//        if (importTransition.getTrigger() != null) {
+//            Arrays.stream(importTransition.getTrigger()).forEach(trigger ->
+//                    addTrigger(transition, trigger)
+//            );
+//        }
 
         net.addTransition(transition);
         transitions.put(importTransition.getId(), transition);
