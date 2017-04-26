@@ -12,7 +12,7 @@
         <id>3</id>
         <title>Ulica</title>
     </data>
-    <data type="text">
+    <data type="number">
         <id>4</id>
         <title>PSČ</title>
     </data>
@@ -26,7 +26,7 @@
     </data>
     <data type="number">
         <id>6</id>
-        <title>Počet poshodí</title>
+        <title>Počet poschodí</title>
     </data>
     <data type="number">
         <id>7</id>
@@ -45,7 +45,7 @@
     </data>
     <data type="text">
         <id>10</id>
-        <title>Ostatné miestnosti</title>
+        <title>Ostatné miestnosti (garáž, kotolňa a iné)</title>
     </data>
     <data type="enumeration">
         <id>11</id>
@@ -64,13 +64,13 @@
     <data type="enumeration">
         <id>14</id>
         <title>Typ konštrukcie</title>
-        <values>Tehlová</values>
+        <values>Tehla</values>
         <values>Panel</values>
         <values>Drevo</values>
     </data>
     <data type="text">
         <id>15</id>
-        <title>Popis nehnutelnosti</title>
+        <title>Popis nehnuteľnosti</title>
     </data>
     <data type="boolean">
         <id>16</id>
@@ -96,21 +96,29 @@
         <id>21</id>
         <title>Poistiť indivuduálne predmety o hodnote viac ako 1500€</title>
     </data>
-    <data type="text">
+    <data type="multichoice">
         <id>22</id>
         <title>Poistenie elektroniky v domácnosti</title>
+        <values>Televízor</values>
+        <values>Počítač</values>
+        <values>Domáce kino</values>
+        <values>Hifi sústava</values>
     </data>
     <data type="text">
         <id>23</id>
         <title>Poistenie bicykla</title>
     </data>
-    <data type="text">
+    <data type="multichoice">
         <id>24</id>
         <title>Typ zámkov na dverách domácnosti</title>
+        <values>5 pákový Mortice zámok</values>
+        <values>zárubňový automatický s kľúčom</values>
+        <values>dvere s viacerými bodmi zámkov</values>
+        <values>iné</values>
     </data>
     <data type="boolean">
         <id>25</id>
-        <title>Máte namontovaný poplachový systém narušenia?</title>
+        <title>Máte namontovaný poplašný systém narušenia?</title>
     </data>
     <data type="number">
         <id>26</id>
@@ -161,6 +169,10 @@
     <data type="date">
         <id>37</id>
         <title>Dátum narodenia</title>
+    </data>
+    <data type="number">
+        <id>38</id>
+        <title>Výška poistky</title>
     </data>
     <!-- ========== ROLES ========== -->
     <role>
@@ -328,30 +340,35 @@
             <id>5</id>
             <logic>
                 <editable>true</editable>
+                <required>true</required>
             </logic>
         </dataRef>
         <dataRef>
             <id>6</id>
             <logic>
                 <editable>true</editable>
+                <required>true</required>
             </logic>
         </dataRef>
         <dataRef>
             <id>7</id>
             <logic>
                 <editable>true</editable>
+                <required>true</required>
             </logic>
         </dataRef>
         <dataRef>
             <id>8</id>
             <logic>
                 <editable>true</editable>
+                <required>true</required>
             </logic>
         </dataRef>
         <dataRef>
             <id>9</id>
             <logic>
                 <editable>true</editable>
+                <required>true</required>
             </logic>
         </dataRef>
         <dataRef>
@@ -364,12 +381,14 @@
             <id>11</id>
             <logic>
                 <editable>true</editable>
+                <required>true</required>
             </logic>
         </dataRef>
         <dataRef>
             <id>12</id>
             <logic>
                 <editable>true</editable>
+                <required>true</required>
             </logic>
         </dataRef>
         <dataRef>
@@ -382,6 +401,7 @@
             <id>14</id>
             <logic>
                 <editable>true</editable>
+                <required>true</required>
             </logic>
         </dataRef>
         <dataRef>
@@ -394,24 +414,28 @@
             <id>16</id>
             <logic>
                 <editable>true</editable>
+                <required>true</required>
             </logic>
         </dataRef>
         <dataRef>
             <id>17</id>
             <logic>
                 <editable>true</editable>
+                <required>true</required>
             </logic>
         </dataRef>
         <dataRef>
             <id>18</id>
             <logic>
                 <editable>true</editable>
+                <required>true</required>
             </logic>
         </dataRef>
         <dataRef>
             <id>19</id>
             <logic>
                 <editable>true</editable>
+                <required>true</required>
             </logic>
         </dataRef>
     </transition>
@@ -430,6 +454,7 @@
             <id>20</id>
             <logic>
                 <editable>true</editable>
+                <required>true</required>
             </logic>
         </dataRef>
         <dataRef>
@@ -454,18 +479,21 @@
             <id>24</id>
             <logic>
                 <editable>true</editable>
+                <required>true</required>
             </logic>
         </dataRef>
         <dataRef>
             <id>25</id>
             <logic>
                 <editable>true</editable>
+                <required>true</required>
             </logic>
         </dataRef>
         <dataRef>
             <id>26</id>
             <logic>
                 <editable>true</editable>
+                <required>true</required>
             </logic>
         </dataRef>
     </transition>
@@ -480,6 +508,235 @@
                 <assign>true</assign>
             </logic>
         </roleRef>
+        <dataRef>
+            <id>1</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>2</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>3</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>4</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>5</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>6</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>7</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>8</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>9</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>10</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>11</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>12</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>13</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>14</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>15</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>16</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>17</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>18</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>19</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>20</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>21</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>22</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>23</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>24</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>25</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>26</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>27</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>28</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>29</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>30</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>31</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>32</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>33</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>34</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>35</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>36</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>37</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>38</id>
+            <logic>
+                <editable>true</editable>
+                <required>true</required>
+            </logic>
+        </dataRef>
     </transition>
     <transition>
         <id>30</id>
@@ -492,6 +749,235 @@
                 <assign>true</assign>
             </logic>
         </roleRef>
+        <dataRef>
+            <id>1</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>2</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>3</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>4</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>5</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>6</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>7</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>8</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>9</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>10</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>11</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>12</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>13</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>14</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>15</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>16</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>17</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>18</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>19</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>20</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>21</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>22</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>23</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>24</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>25</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>26</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>27</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>28</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>29</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>30</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>31</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>32</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>33</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>34</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>35</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>36</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>37</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>38</id>
+            <logic>
+                <editable>true</editable>
+                <required>true</required>
+            </logic>
+        </dataRef>
     </transition>
     <transition>
         <id>33</id>
@@ -504,6 +990,235 @@
                 <assign>true</assign>
             </logic>
         </roleRef>
+        <dataRef>
+            <id>1</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>2</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>3</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>4</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>5</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>6</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>7</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>8</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>9</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>10</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>11</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>12</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>13</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>14</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>15</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>16</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>17</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>18</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>19</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>20</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>21</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>22</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>23</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>24</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>25</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>26</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>27</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>28</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>29</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>30</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>31</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>32</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>33</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>34</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>35</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>36</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>37</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>38</id>
+            <logic>
+                <editable>true</editable>
+                <required>true</required>
+            </logic>
+        </dataRef>
     </transition>
     <transition>
         <id>36</id>
@@ -544,54 +1259,63 @@
             <id>1</id>
             <logic>
                 <editable>true</editable>
+                <required>true</required>
             </logic>
         </dataRef>
         <dataRef>
             <id>2</id>
             <logic>
                 <editable>true</editable>
+                <required>true</required>
             </logic>
         </dataRef>
         <dataRef>
             <id>3</id>
             <logic>
                 <editable>true</editable>
+                <required>true</required>
             </logic>
         </dataRef>
         <dataRef>
             <id>4</id>
             <logic>
                 <editable>true</editable>
+                <required>true</required>
             </logic>
         </dataRef>
         <dataRef>
             <id>28</id>
             <logic>
                 <editable>true</editable>
+                <required>true</required>
             </logic>
         </dataRef>
         <dataRef>
             <id>29</id>
             <logic>
                 <editable>true</editable>
+                <required>true</required>
             </logic>
         </dataRef>
         <dataRef>
             <id>30</id>
             <logic>
                 <editable>true</editable>
+                <required>true</required>
             </logic>
         </dataRef>
         <dataRef>
             <id>31</id>
             <logic>
                 <editable>true</editable>
+                <required>true</required>
             </logic>
         </dataRef>
         <dataRef>
             <id>32</id>
             <logic>
                 <editable>true</editable>
+                <required>true</required>
             </logic>
         </dataRef>
     </transition>
@@ -610,6 +1334,7 @@
             <id>27</id>
             <logic>
                 <editable>true</editable>
+                <required>true</required>
             </logic>
         </dataRef>
     </transition>
@@ -628,30 +1353,35 @@
             <id>33</id>
             <logic>
                 <editable>true</editable>
+                <required>true</required>
             </logic>
         </dataRef>
         <dataRef>
             <id>34</id>
             <logic>
                 <editable>true</editable>
+                <required>true</required>
             </logic>
         </dataRef>
         <dataRef>
             <id>35</id>
             <logic>
                 <editable>true</editable>
+                <required>true</required>
             </logic>
         </dataRef>
         <dataRef>
             <id>36</id>
             <logic>
                 <editable>true</editable>
+                <required>true</required>
             </logic>
         </dataRef>
         <dataRef>
             <id>37</id>
             <logic>
                 <editable>true</editable>
+                <required>true</required>
             </logic>
         </dataRef>
     </transition>

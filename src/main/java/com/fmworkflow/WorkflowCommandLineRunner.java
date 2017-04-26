@@ -51,72 +51,101 @@ public class WorkflowCommandLineRunner implements CommandLineRunner {
 
     @Override
     public void run(String... strings) throws Exception {
-        Role roleUser = new Role("user");
-        roleUser = roleRepository.save(roleUser);
-        User user = new User("poistenec@gmail.com", "password", "name", "surname");
-        HashSet<Role> roles = new HashSet<>();
-        roles.add(roleUser);
-        user.setRoles(roles);
-        userService.save(user);
-
-        Role roleAdmin = new Role("admin");
-        roleAdmin = roleRepository.save(roleAdmin);
-        User admin = new User("agent@gmail.com", "pass", "Admin", "Adminovič");
-        HashSet<Role> adminRoles = new HashSet<>();
-        adminRoles.add(roleAdmin);
-        admin.setRoles(adminRoles);
-        userService.save(admin);
-
         mongoTemplate.getDb().dropDatabase();
         // TODO: 26/04/2017 title, initials
-        importer.importPetriNet(new File("src/test/resources/poistenie_rozsirene.xml"), "p", "p");
+        importer.importPetriNet(new File("src/test/resources/poistenie_rozsirene.xml"), "Poistenie", "INS");
         PetriNet net = petriNetRepository.findAll().get(0);
         for (int i = 0; i < 5; i++) {
-            workflowService.createCase(net.getStringId(), "Poisťovací prípad " + i, randomColor());
+            workflowService.createCase(net.getStringId(), "Poistka " + i, randomColor());
         }
 
-        User superAdmin = new User("super@netgrif.com", "password", "Super", "Truuper");
-        HashSet<Role> superRoles = new HashSet<>();
-        superRoles.add(roleAdmin);
-        superAdmin.setRoles(superRoles);
+//        Role roleUser = new Role("user");
+//        roleUser = roleRepository.save(roleUser);
+//        User user = new User("poistenec@gmail.com", "password", "name", "surname");
+//        HashSet<Role> roles = new HashSet<>();
+//        roles.add(roleUser);
+//        user.setRoles(roles);
+//        userService.save(user);
+//
+//        Role roleAdmin = new Role("admin");
+//        roleAdmin = roleRepository.save(roleAdmin);
+//        User admin = new User("agent@gmail.com", "pass", "Admin", "Adminovič");
+//        HashSet<Role> adminRoles = new HashSet<>();
+//        adminRoles.add(roleAdmin);
+//        admin.setRoles(adminRoles);
+//        userService.save(admin);
+//
+//        User superAdmin = new User("super@netgrif.com", "password", "Super", "Truuper");
+//        HashSet<Role> superRoles = new HashSet<>();
+//        superRoles.add(roleAdmin);
+//        superAdmin.setRoles(superRoles);
+//
+//        User client = new User("client@client.com", "password", "Client", "Client");
+//        HashSet<Role> clientRoles = new HashSet<>();
+//        clientRoles.add(roleUser);
+//        client.setRoles(clientRoles);
+//
+//        User clientManager = new User("agent@agent.com", "password", "Agent", "Smith");
+//        HashSet<Role> managerRoles = new HashSet<>();
+//        managerRoles.add(roleUser);
+//        clientManager.setRoles(managerRoles);
+//
+//        List<ProcessRole> proles = new LinkedList<>(net.getRoles().values().stream().sorted(Comparator.comparing(ProcessRole::getName)).collect(Collectors.toList()));
+//        ProcessRole clientRole = proles.get(0);
+//        ProcessRole clientManagerRole = proles.get(1);
+//
+//        UserProcessRole proleClient = new UserProcessRole();
+//        proleClient.setRoleId(clientRole.getStringId());
+//        proleClient = userProcessRoleRepository.save(proleClient);
+//        client.addProcessRole(proleClient);
+//        superAdmin.addProcessRole(proleClient);
+//        userService.save(client);
+//       // userService.save(superAdmin);
+//
+//        UserProcessRole proleFm = new UserProcessRole();
+//        proleFm.setRoleId(clientManagerRole.getStringId());
+//        proleFm = userProcessRoleRepository.save(proleFm);
+//        user.addProcessRole(proleFm);
+//        superAdmin.addProcessRole(proleFm);
+//        userService.save(user);
+//       // userService.save(superAdmin);
+//
+//        UserProcessRole proleManager = new UserProcessRole();
+//        proleManager.setRoleId(clientManagerRole.getStringId());
+//        proleManager = userProcessRoleRepository.save(proleManager);
+//        clientManager.addProcessRole(proleManager);
+//        superAdmin.addProcessRole(proleManager);
+//        userService.save(clientManager);
+//        userService.save(superAdmin);
 
-        User client = new User("client@client.com", "password", "Client", "Client");
-        HashSet<Role> clientRoles = new HashSet<>();
-        clientRoles.add(roleUser);
-        client.setRoles(clientRoles);
-
-        User clientManager = new User("agent@agent.com", "password", "Agent", "Smith");
-        HashSet<Role> managerRoles = new HashSet<>();
-        managerRoles.add(roleUser);
-        clientManager.setRoles(managerRoles);
-
+        Role roleUser = new Role("user");
+        roleUser = roleRepository.save(roleUser);
+        Role roleAdmin = new Role("admin");
+        roleAdmin = roleRepository.save(roleAdmin);
         List<ProcessRole> proles = new LinkedList<>(net.getRoles().values().stream().sorted(Comparator.comparing(ProcessRole::getName)).collect(Collectors.toList()));
-        ProcessRole clientRole = proles.get(0);
-        ProcessRole clientManagerRole = proles.get(1);
 
-        UserProcessRole proleClient = new UserProcessRole();
-        proleClient.setRoleId(clientRole.getStringId());
-        proleClient = userProcessRoleRepository.save(proleClient);
-        client.addProcessRole(proleClient);
-        superAdmin.addProcessRole(proleClient);
-        userService.save(client);
-       // userService.save(superAdmin);
+        List<ProcessRole> usePRoles = new LinkedList<>();
+        usePRoles.add(proles.get(0));
+        createUser(new User("poistenec@gmail.com", "password", "Fero", "Poistenec"),roleUser,usePRoles);
+        usePRoles.add(proles.get(1));
+        createUser(new User("agent@gmail.com", "password", "Jano", "Poisťovák"),roleAdmin,usePRoles);
+        createUser(new User("super@netgrif.com","password","Super","Trooper"), roleAdmin, proles);
+    }
 
-        UserProcessRole proleFm = new UserProcessRole();
-        proleFm.setRoleId(clientManagerRole.getStringId());
-        proleFm = userProcessRoleRepository.save(proleFm);
-        user.addProcessRole(proleFm);
-        superAdmin.addProcessRole(proleFm);
+    private void createUser(User user, Role role, List<ProcessRole> processRoles){
+        HashSet<Role> roleSet = new HashSet<>();
+        roleSet.add(role);
+        user.setRoles(roleSet);
+
+        processRoles.forEach(processRole -> {
+            UserProcessRole userProcessRole = new UserProcessRole();
+            userProcessRole.setRoleId(processRole.getStringId());
+            userProcessRole = userProcessRoleRepository.save(userProcessRole);
+            user.addProcessRole(userProcessRole);
+        });
+        processRoles.clear();
+
         userService.save(user);
-       // userService.save(superAdmin);
-
-        UserProcessRole proleManager = new UserProcessRole();
-        proleManager.setRoleId(clientManagerRole.getStringId());
-        proleManager = userProcessRoleRepository.save(proleManager);
-        clientManager.addProcessRole(proleManager);
-        superAdmin.addProcessRole(proleManager);
-        userService.save(clientManager);
-        userService.save(superAdmin);
     }
 
     private String randomColor() {
