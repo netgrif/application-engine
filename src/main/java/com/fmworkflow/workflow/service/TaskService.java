@@ -15,8 +15,8 @@ import com.fmworkflow.petrinet.domain.Transition;
 import com.fmworkflow.petrinet.domain.dataset.Field;
 import com.fmworkflow.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.fmworkflow.workflow.domain.Case;
-import com.fmworkflow.workflow.domain.repositories.CaseRepository;
 import com.fmworkflow.workflow.domain.Task;
+import com.fmworkflow.workflow.domain.repositories.CaseRepository;
 import com.fmworkflow.workflow.domain.repositories.TaskRepository;
 import com.fmworkflow.workflow.service.interfaces.ITaskService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -188,10 +188,10 @@ public class TaskService implements ITaskService {
         Case useCase = caseRepository.findOne(task.getCaseId());
         PetriNet net = useCase.getPetriNet();
 
-        // TODO: 14. 4. 2017 arc.cancelExecute
         net.getArcsOfTransition(task.getTransitionId()).stream()
                 .filter(arc -> arc.getSource() instanceof Place)
-                .forEach(arc -> useCase.addActivePlace(arc.getSource().getStringId(), arc.getMultiplicity()));
+                .forEach(Arc::rollbackExecution);
+        useCase.updateActivePlaces();
 
         taskRepository.delete(taskId);
         caseRepository.save(useCase);
