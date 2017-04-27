@@ -6,6 +6,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Document
@@ -13,7 +14,7 @@ public class UserField extends Field{
 
     private Set<String> roles;
     @Transient
-    private String value;
+    private List<String> value;
 
     public UserField(){
         super();
@@ -27,7 +28,7 @@ public class UserField extends Field{
         }
     }
 
-    public String getValue() {
+    public List<String> getValue() {
         return value;
     }
 
@@ -37,7 +38,7 @@ public class UserField extends Field{
 
     @Override
     public void setValue(Object value) {
-        this.value = (String)value;
+        this.value = (List<String>) value;
     }
 
     @Override

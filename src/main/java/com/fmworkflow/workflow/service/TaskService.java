@@ -275,6 +275,12 @@ public class TaskService implements ITaskService {
                 arrayNode.forEach(item -> set.add(item.asText()));
                 value = set;
                 break;
+            case "user":
+                ArrayNode valArray = (ArrayNode) node.get("value");
+                ArrayList<String> list = new ArrayList<>();
+                valArray.forEach(item -> list.add(item.asText()));
+                value = list;
+                break;
             case "number":
                 value = node.get("value").asDouble();
                 break;
