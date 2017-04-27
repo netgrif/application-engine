@@ -112,7 +112,7 @@
         <id>24</id>
         <title>Typ zámkov na dverách domácnosti</title>
         <values>5 pákový Mortice zámok</values>
-        <values>zárubňový automatický s kľúčom</values>
+        <values>automatický zárubňový s kľúčom</values>
         <values>dvere s viacerými bodmi zámkov</values>
         <values>iné</values>
     </data>
@@ -700,36 +700,36 @@
                 <visible>true</visible>
             </logic>
         </dataRef>
-        <dataRef>
-            <id>33</id>
-            <logic>
-                <visible>true</visible>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>34</id>
-            <logic>
-                <visible>true</visible>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>35</id>
-            <logic>
-                <visible>true</visible>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>36</id>
-            <logic>
-                <visible>true</visible>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>37</id>
-            <logic>
-                <visible>true</visible>
-            </logic>
-        </dataRef>
+        <!--<dataRef>-->
+            <!--<id>33</id>-->
+            <!--<logic>-->
+                <!--<visible>true</visible>-->
+            <!--</logic>-->
+        <!--</dataRef>-->
+        <!--<dataRef>-->
+            <!--<id>34</id>-->
+            <!--<logic>-->
+                <!--<visible>true</visible>-->
+            <!--</logic>-->
+        <!--</dataRef>-->
+        <!--<dataRef>-->
+            <!--<id>35</id>-->
+            <!--<logic>-->
+                <!--<visible>true</visible>-->
+            <!--</logic>-->
+        <!--</dataRef>-->
+        <!--<dataRef>-->
+            <!--<id>36</id>-->
+            <!--<logic>-->
+                <!--<visible>true</visible>-->
+            <!--</logic>-->
+        <!--</dataRef>-->
+        <!--<dataRef>-->
+            <!--<id>37</id>-->
+            <!--<logic>-->
+                <!--<visible>true</visible>-->
+            <!--</logic>-->
+        <!--</dataRef>-->
         <dataRef>
             <id>38</id>
             <logic>
@@ -941,36 +941,36 @@
                 <visible>true</visible>
             </logic>
         </dataRef>
-        <dataRef>
-            <id>33</id>
-            <logic>
-                <visible>true</visible>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>34</id>
-            <logic>
-                <visible>true</visible>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>35</id>
-            <logic>
-                <visible>true</visible>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>36</id>
-            <logic>
-                <visible>true</visible>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>37</id>
-            <logic>
-                <visible>true</visible>
-            </logic>
-        </dataRef>
+        <!--<dataRef>-->
+            <!--<id>33</id>-->
+            <!--<logic>-->
+                <!--<visible>true</visible>-->
+            <!--</logic>-->
+        <!--</dataRef>-->
+        <!--<dataRef>-->
+            <!--<id>34</id>-->
+            <!--<logic>-->
+                <!--<visible>true</visible>-->
+            <!--</logic>-->
+        <!--</dataRef>-->
+        <!--<dataRef>-->
+            <!--<id>35</id>-->
+            <!--<logic>-->
+                <!--<visible>true</visible>-->
+            <!--</logic>-->
+        <!--</dataRef>-->
+        <!--<dataRef>-->
+            <!--<id>36</id>-->
+            <!--<logic>-->
+                <!--<visible>true</visible>-->
+            <!--</logic>-->
+        <!--</dataRef>-->
+        <!--<dataRef>-->
+            <!--<id>37</id>-->
+            <!--<logic>-->
+                <!--<visible>true</visible>-->
+            <!--</logic>-->
+        <!--</dataRef>-->
         <dataRef>
             <id>38</id>
             <logic>
@@ -1182,36 +1182,36 @@
                 <visible>true</visible>
             </logic>
         </dataRef>
-        <dataRef>
-            <id>33</id>
-            <logic>
-                <visible>true</visible>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>34</id>
-            <logic>
-                <visible>true</visible>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>35</id>
-            <logic>
-                <visible>true</visible>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>36</id>
-            <logic>
-                <visible>true</visible>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>37</id>
-            <logic>
-                <visible>true</visible>
-            </logic>
-        </dataRef>
+        <!--<dataRef>-->
+            <!--<id>33</id>-->
+            <!--<logic>-->
+                <!--<visible>true</visible>-->
+            <!--</logic>-->
+        <!--</dataRef>-->
+        <!--<dataRef>-->
+            <!--<id>34</id>-->
+            <!--<logic>-->
+                <!--<visible>true</visible>-->
+            <!--</logic>-->
+        <!--</dataRef>-->
+        <!--<dataRef>-->
+            <!--<id>35</id>-->
+            <!--<logic>-->
+                <!--<visible>true</visible>-->
+            <!--</logic>-->
+        <!--</dataRef>-->
+        <!--<dataRef>-->
+            <!--<id>36</id>-->
+            <!--<logic>-->
+                <!--<visible>true</visible>-->
+            <!--</logic>-->
+        <!--</dataRef>-->
+        <!--<dataRef>-->
+            <!--<id>37</id>-->
+            <!--<logic>-->
+                <!--<visible>true</visible>-->
+            <!--</logic>-->
+        <!--</dataRef>-->
         <dataRef>
             <id>38</id>
             <logic>
@@ -1284,6 +1284,13 @@
             </logic>
         </dataRef>
         <dataRef>
+            <id>27</id>
+            <logic>
+                <editable>true</editable>
+                <required>true</required>
+            </logic>
+        </dataRef>
+        <dataRef>
             <id>28</id>
             <logic>
                 <editable>true</editable>
@@ -1338,53 +1345,53 @@
             <!--</logic>-->
         <!--</dataRef>-->
     <!--</transition>-->
-    <transition>
-        <id>98</id>
-        <x>620</x>
-        <y>420</y>
-        <label>Manuálne doplnenie osobných údajov</label>
-        <roleRef>
-            <id>1</id>
-            <logic>
-                <assign>true</assign>
-            </logic>
-        </roleRef>
-        <dataRef>
-            <id>33</id>
-            <logic>
-                <editable>true</editable>
-                <required>true</required>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>34</id>
-            <logic>
-                <editable>true</editable>
-                <required>true</required>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>35</id>
-            <logic>
-                <editable>true</editable>
-                <required>true</required>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>36</id>
-            <logic>
-                <editable>true</editable>
-                <required>true</required>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>37</id>
-            <logic>
-                <editable>true</editable>
-                <required>true</required>
-            </logic>
-        </dataRef>
-    </transition>
+    <!--<transition>-->
+        <!--<id>98</id>-->
+        <!--<x>620</x>-->
+        <!--<y>420</y>-->
+        <!--<label>Manuálne doplnenie osobných údajov</label>-->
+        <!--<roleRef>-->
+            <!--<id>1</id>-->
+            <!--<logic>-->
+                <!--<assign>true</assign>-->
+            <!--</logic>-->
+        <!--</roleRef>-->
+        <!--<dataRef>-->
+            <!--<id>33</id>-->
+            <!--<logic>-->
+                <!--<editable>true</editable>-->
+                <!--<required>true</required>-->
+            <!--</logic>-->
+        <!--</dataRef>-->
+        <!--<dataRef>-->
+            <!--<id>34</id>-->
+            <!--<logic>-->
+                <!--<editable>true</editable>-->
+                <!--<required>true</required>-->
+            <!--</logic>-->
+        <!--</dataRef>-->
+        <!--<dataRef>-->
+            <!--<id>35</id>-->
+            <!--<logic>-->
+                <!--<editable>true</editable>-->
+                <!--<required>true</required>-->
+            <!--</logic>-->
+        <!--</dataRef>-->
+        <!--<dataRef>-->
+            <!--<id>36</id>-->
+            <!--<logic>-->
+                <!--<editable>true</editable>-->
+                <!--<required>true</required>-->
+            <!--</logic>-->
+        <!--</dataRef>-->
+        <!--<dataRef>-->
+            <!--<id>37</id>-->
+            <!--<logic>-->
+                <!--<editable>true</editable>-->
+                <!--<required>true</required>-->
+            <!--</logic>-->
+        <!--</dataRef>-->
+    <!--</transition>-->
     <!-- ========== TRANSITIONS ========== -->
     <arc>
         <id>7</id>
@@ -1573,21 +1580,21 @@
         <type>regular</type>
         <sourceId>53</sourceId>
         <destinationId>30</destinationId>
-        <multiplicity>2</multiplicity>
+        <multiplicity>1</multiplicity>
     </arc>
     <arc>
         <id>57</id>
         <type>regular</type>
         <sourceId>53</sourceId>
         <destinationId>27</destinationId>
-        <multiplicity>2</multiplicity>
+        <multiplicity>1</multiplicity>
     </arc>
     <arc>
         <id>58</id>
         <type>regular</type>
         <sourceId>53</sourceId>
         <destinationId>33</destinationId>
-        <multiplicity>2</multiplicity>
+        <multiplicity>1</multiplicity>
     </arc>
     <arc>
         <id>60</id>
@@ -1652,20 +1659,20 @@
         <!--<destinationId>97</destinationId>-->
         <!--<multiplicity>1</multiplicity>-->
     <!--</arc>-->
-    <arc>
-        <id>107</id>
-        <type>regular</type>
-        <sourceId>99</sourceId>
-        <destinationId>98</destinationId>
-        <multiplicity>1</multiplicity>
-    </arc>
-    <arc>
-        <id>108</id>
-        <type>regular</type>
-        <sourceId>98</sourceId>
-        <destinationId>53</destinationId>
-        <multiplicity>1</multiplicity>
-    </arc>
+    <!--<arc>-->
+        <!--<id>107</id>-->
+        <!--<type>regular</type>-->
+        <!--<sourceId>99</sourceId>-->
+        <!--<destinationId>98</destinationId>-->
+        <!--<multiplicity>1</multiplicity>-->
+    <!--</arc>-->
+    <!--<arc>-->
+        <!--<id>108</id>-->
+        <!--<type>regular</type>-->
+        <!--<sourceId>98</sourceId>-->
+        <!--<destinationId>53</destinationId>-->
+        <!--<multiplicity>1</multiplicity>-->
+    <!--</arc>-->
     <!--<arc>-->
         <!--<id>109</id>-->
         <!--<type>regular</type>-->
