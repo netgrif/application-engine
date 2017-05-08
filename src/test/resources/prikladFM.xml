@@ -15,11 +15,11 @@
     </data>
     <data type="date">
         <id>4</id>
-        <title>Od (dátum)</title>
+        <title>Od (rok)</title>
     </data>
     <data type="date">
         <id>5</id>
-        <title>Do (dátum)</title>
+        <title>Do (rok)</title>
     </data>
     <data type="enumeration">
         <id>6</id>
@@ -46,11 +46,11 @@
         <id>10</id>
         <title>Forma</title>
     </data>
-    <data type="file">
+    <data type="text">
         <id>11</id>
         <title>Vecný obsah UJ</title>
     </data>
-    <data type="number">
+    <data type="text">
         <id>12</id>
         <title>Čiarový kód</title>
     </data>
@@ -134,6 +134,30 @@
                 <title>Column 3</title>
             </data>
         </columns>
+    </data>
+    <data type="text">
+        <id>31</id>
+        <title>Firma</title>
+    </data>
+    <data type="text">
+        <id>32</id>
+        <title>Poznámka</title>
+    </data>
+    <data type="text">
+        <id>33</id>
+        <title>Číslo plomby</title>
+    </data>
+    <data type="text">
+        <id>34</id>
+        <title>Čísla spisov</title>
+    </data>
+    <data type="text">
+        <id>35</id>
+        <title>Box</title>
+    </data>
+    <data type="text">
+        <id>36</id>
+        <title>LU</title>
     </data>
     <role>
         <id>1</id>
@@ -945,6 +969,42 @@
         </dataRef>
         <dataRef>
             <id>30</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>31</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>32</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>33</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>34</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>35</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>36</id>
             <logic>
                 <visible>true</visible>
             </logic>
