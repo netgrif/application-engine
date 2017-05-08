@@ -28,7 +28,7 @@ public class ImporterTest {
     private static final Integer NET_PLACES = 19;
     private static final Integer NET_TRANSITIONS = 24;
     private static final Integer NET_ARCS = 23;
-    private static final Integer NET_FIELDS = 28;
+    private static final Integer NET_FIELDS = 34;
     private static final Integer NET_ROLES = 3;
 
     @Before
