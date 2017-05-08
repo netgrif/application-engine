@@ -37,7 +37,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         }
 
         LoggedUser loggedUser = new LoggedUser(user.getId(), user.getEmail(), user.getPassword(), grantedAuthorities);
-        loggedUser.setFullName(user.getName()+" "+user.getSurname());
+        loggedUser.setFullName(user.getFullName());
 
         if(!user.getUserProcessRoles().isEmpty())
             loggedUser.parseProcessRoles(user.getUserProcessRoles());

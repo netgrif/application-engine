@@ -55,13 +55,14 @@ public class Importer {
     }
 
     @Transactional
-    public void importPetriNet(File xml, String title, String initials) {
+    public PetriNet importPetriNet(File xml, String title, String initials) {
         try {
             unmarshallXml(xml);
-            createPetriNet(title, initials);
+            return createPetriNet(title, initials);
         } catch (JAXBException e) {
             e.printStackTrace();
         }
+        return null;
     }
 
     @Transactional
@@ -73,7 +74,7 @@ public class Importer {
     }
 
     @Transactional
-    private void createPetriNet(String title, String initials) {
+    private PetriNet createPetriNet(String title, String initials) {
         net = new PetriNet();
         net.setTitle(title);
         net.setInitials(initials);
@@ -85,7 +86,7 @@ public class Importer {
         Arrays.stream(document.getImportTransitions()).forEach(this::createTransition);
         Arrays.stream(document.getImportArc()).forEach(this::createArc);
 
-        repository.save(net);
+        return repository.save(net);
     }
 
     @Transactional

@@ -29,7 +29,9 @@ public class Case {
     private Map<String, Object> dataSetValues;
 
     public Case() {
+        _id = new ObjectId();
         activePlaces = new HashMap<>();
+        dataSetValues = new HashMap<>();
     }
 
     public Case(String title) {
