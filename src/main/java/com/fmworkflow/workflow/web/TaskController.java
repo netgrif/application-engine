@@ -9,9 +9,17 @@ import com.fmworkflow.workflow.service.interfaces.IFilterService;
 import com.fmworkflow.workflow.service.interfaces.ITaskService;
 import com.fmworkflow.workflow.web.requestbodies.CreateFilterBody;
 import com.fmworkflow.workflow.web.requestbodies.TaskSearchBody;
-import com.fmworkflow.workflow.web.responsebodies.*;
+import com.fmworkflow.workflow.web.responsebodies.DataFieldsResource;
+import com.fmworkflow.workflow.web.responsebodies.FiltersResource;
+import com.fmworkflow.workflow.web.responsebodies.MessageResource;
+import com.fmworkflow.workflow.web.responsebodies.TaskResource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.PagedResources;
+import org.springframework.hateoas.mvc.ControllerLinkBuilder;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -35,27 +43,26 @@ public class TaskController {
     private IFilterService filterService;
 
     @RequestMapping(method = RequestMethod.GET)
-    public TasksResource getAll(Authentication auth) {
-        List<TaskResource> resources = new ArrayList<>();
+    public PagedResources<Task> getAll(Authentication auth, Pageable pageable, PagedResourcesAssembler assembler) {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
-        for (Task task : taskService.getAll(loggedUser)) {
-            resources.add(TaskResource.createFrom(task, null));
-        }
+        Page<Task> page = taskService.getAll(loggedUser, pageable);
 
-        TasksResource tasksResource = new TasksResource(resources);
-        tasksResource.addLinks("all");
-
-        return tasksResource;
+        PagedResources<Task> resources = assembler.toResource(page);
+        resources.add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class).getAll(null, null, assembler)).withSelfRel());
+        resources.add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class).getAllByCases(null, null, assembler)).withRel("case"));
+        resources.add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class).getMy(null, null, assembler)).withRel("my"));
+        resources.add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class).getMyFinished(null, null, assembler)).withRel("finished"));
+        resources.add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class).search(null, null, null, assembler)).withRel("search"));
+        return resources;
     }
 
     @RequestMapping(value = "/case", method = RequestMethod.POST)
-    public TasksResource getAllByCases(@RequestBody List<String> cases){
-        List<TaskResource> resources = new ArrayList<>();
-        taskService.findByCases(cases).forEach(task -> resources.add(TaskResource.createFrom(task,null)));
-        TasksResource tasksResource = new TasksResource(resources);
-        tasksResource.addLinks("case");
+    public PagedResources<Task> getAllByCases(@RequestBody List<String> cases, Pageable pageable, PagedResourcesAssembler assembler) {
+        Page<Task> page = taskService.findByCases(pageable, cases);
 
-        return tasksResource;
+        PagedResources<Task> resources = assembler.toResource(page);
+        resources.add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class).getAllByCases(null, null, assembler)).withSelfRel());
+        return resources;
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
@@ -112,51 +119,39 @@ public class TaskController {
     }
 
     @RequestMapping(value = "/my", method = RequestMethod.GET)
-    public TasksResource getMy(Authentication auth) {
-        List<TaskResource> resources = new ArrayList<>();
-        for (Task task : taskService.findByUser(((LoggedUser) auth.getPrincipal()).transformToUser())) {
-            resources.add(TaskResource.createFrom(task, auth));
-        }
-
-        TasksResource tasksResource = new TasksResource(resources);
-        tasksResource.addLinks("my");
-
-        return tasksResource;
+    public PagedResources<Task> getMy(Authentication auth, Pageable pageable, PagedResourcesAssembler assembler) {
+        Page<Task> page = taskService.findByUser(pageable, ((LoggedUser) auth.getPrincipal()).transformToUser());
+        PagedResources<Task> resources = assembler.toResource(page);
+        resources.add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class).getMy(null, null, assembler)).withSelfRel());
+        return resources;
     }
 
     @RequestMapping(value = "/my/finished", method = RequestMethod.GET)
-    public TasksResource getMyFinished(Authentication auth) {
-        List<TaskResource> resources = new ArrayList<>();
-        for (Task task : taskService.findByUser(((LoggedUser) auth.getPrincipal()).transformToUser())) {
-            resources.add(TaskResource.createFrom(task, auth));
-        }
-
-        TasksResource tasksResources = new TasksResource(resources);
-        tasksResources.addLinks("finished");
-
-        return tasksResources;
+    public PagedResources<Task> getMyFinished(Pageable pageable, Authentication auth, PagedResourcesAssembler assembler) {
+        Page<Task> page = taskService.findByUser(pageable, ((LoggedUser) auth.getPrincipal()).transformToUser());
+        PagedResources<Task> resources = assembler.toResource(page);
+        resources.add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class).getMyFinished(null, null, assembler)).withSelfRel());
+        return resources;
     }
 
     @RequestMapping(value = "/search", method = RequestMethod.POST)
-    public TasksResource search(Authentication auth, @RequestBody TaskSearchBody searchBody) {
-        List<TaskResource> resources = new ArrayList<>();
+    public PagedResources<Task> search(Authentication auth, Pageable pageable, @RequestBody TaskSearchBody searchBody, PagedResourcesAssembler assembler) {
+        Page<Task> page = null;
         if (searchBody.searchTier == TaskSearchBody.SEARCH_TIER_1) {
-            taskService.findByPetriNets(searchBody.petriNets
+            page = taskService.findByPetriNets(pageable, searchBody.petriNets
                     .stream()
                     .map(net -> net.petriNet)
-                    .collect(Collectors.toList()))
-                    .forEach(task -> resources.add(TaskResource.createFrom(task, auth)));
+                    .collect(Collectors.toList()));
         } else if (searchBody.searchTier == TaskSearchBody.SEARCH_TIER_2) {
             List<String> transitions = new ArrayList<>();
             searchBody.petriNets.forEach(net -> transitions.addAll(net.transitions));
-            taskService.findByTransitions(transitions).forEach(task -> resources.add(TaskResource.createFrom(task, auth)));
+            page = taskService.findByTransitions(pageable, transitions);
         } else if (searchBody.searchTier == TaskSearchBody.SEARCH_TIER_3) {
 
         }
-
-        TasksResource taskResources = new TasksResource(resources);
-        taskResources.addLinks("search");
-        return taskResources;
+        PagedResources<Task> resources = assembler.toResource(page);
+        addLinks(resources, "search");
+        return resources;
     }
 
     @RequestMapping(value = "/{id}/data", method = RequestMethod.GET)
@@ -190,12 +185,12 @@ public class TaskController {
 
     @RequestMapping(value = "/filter", method = RequestMethod.GET)
     public FiltersResource getAllFilters(Authentication auth) {
-        return new FiltersResource(filterService.getAll(),0);
+        return new FiltersResource(filterService.getAll(), 0);
     }
 
     @RequestMapping(value = "/filter/roles", method = RequestMethod.POST)
     public FiltersResource getFiltersWithRoles(@RequestBody List<String> roles) {
-        return new FiltersResource(filterService.getWithRoles(roles),1);
+        return new FiltersResource(filterService.getWithRoles(roles), 1);
     }
 
     @RequestMapping(value = "/filter", method = RequestMethod.POST)
@@ -205,6 +200,24 @@ public class TaskController {
             return MessageResource.successMessage("Filter " + filterBody.name + " saved");
         } else {
             return MessageResource.errorMessage("Filter " + filterBody.name + " saving failed!");
+        }
+    }
+
+    private void addLinks(PagedResources resources, String rel) {
+        if ("all".equals(rel)) {
+            resources.add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class).getAll(null, null, null)).withRel("all"));
+        }
+        if ("case".equals(rel)) {
+            resources.add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class).getAllByCases(null, null, null)).withRel("case"));
+        }
+        if ("my".equals(rel)) {
+            resources.add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class).getMy(null, null, null)).withRel("my"));
+        }
+        if ("finished".equals(rel)) {
+            resources.add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class).getMyFinished(null, null, null)).withRel("finished"));
+        }
+        if ("search".equals(rel)) {
+            resources.add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class).search(null, null, null, null)).withRel("search"));
         }
     }
 }
