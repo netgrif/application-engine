@@ -1,6 +1,5 @@
 package com.fmworkflow.workflow.web;
 
-import com.fmworkflow.json.JsonBuilder;
 import com.fmworkflow.workflow.domain.Case;
 import com.fmworkflow.workflow.service.interfaces.IWorkflowService;
 import com.fmworkflow.workflow.web.requestbodies.CreateCaseBody;
@@ -8,6 +7,7 @@ import com.fmworkflow.workflow.web.responsebodies.CaseResource;
 import com.fmworkflow.workflow.web.responsebodies.CasesResource;
 import com.fmworkflow.workflow.web.responsebodies.MessageResource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -35,12 +35,13 @@ public class WorkflowController {
     }
 
     @RequestMapping(value = "/all", method = RequestMethod.GET)
-    public List<Case> getAll() {
-        return workflowService.getAll();
+    public List<Case> getAll(Pageable pageable) {
+        return workflowService.getAll(pageable);
     }
 
     @RequestMapping(value = "/case/search", method = RequestMethod.POST)
     public CasesResource searchCases(@RequestBody List<String> petriNets){
+        // TODO: 09/05/2017 pagination
         List<CaseResource> resources = new ArrayList<>();
         workflowService.searchCase(petriNets).forEach(useCase -> resources.add(new CaseResource(useCase)));
         return new CasesResource(resources,"search");

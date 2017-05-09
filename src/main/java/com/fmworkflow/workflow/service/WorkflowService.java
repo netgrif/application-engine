@@ -7,6 +7,8 @@ import com.fmworkflow.workflow.domain.repositories.CaseRepository;
 import com.fmworkflow.workflow.service.interfaces.ITaskService;
 import com.fmworkflow.workflow.service.interfaces.IWorkflowService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.BasicQuery;
 import org.springframework.stereotype.Service;
@@ -34,8 +36,9 @@ public class WorkflowService implements IWorkflowService {
     }
 
     @Override
-    public List<Case> getAll() {
-        List<Case> cases = repository.findAll();
+    public List<Case> getAll(Pageable pageable) {
+        Page<Case> page = repository.findAll(pageable);
+        List<Case> cases = page.getContent();
         cases.forEach(aCase -> aCase.getPetriNet().initializeArcs());
         return cases;
     }
