@@ -102,7 +102,7 @@ public class TaskServiceTest {
     public void getData() throws Exception {
         Task task = repository.findAll().stream().filter(t -> t.getTitle().equals("Data UJ")).findFirst().get();
 
-        List<Field> fields = service.getData(task.getId());
+        List<Field> fields = service.getData(task.getStringId());
 
         assert fields != null && !fields.isEmpty();
     }

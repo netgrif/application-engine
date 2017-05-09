@@ -1,6 +1,7 @@
 package com.fmworkflow
 
 import com.fmworkflow.auth.domain.User
+import com.fmworkflow.auth.domain.repositories.UserProcessRoleRepository
 import com.fmworkflow.auth.domain.repositories.UserRepository
 import com.fmworkflow.importer.Importer
 import com.fmworkflow.petrinet.domain.PetriNet
@@ -9,7 +10,6 @@ import com.fmworkflow.petrinet.domain.repositories.PetriNetRepository
 import com.fmworkflow.workflow.domain.Case
 import com.fmworkflow.workflow.domain.repositories.CaseRepository
 import com.fmworkflow.workflow.service.TaskService
-import com.fmworkflow.workflow.service.WorkflowService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.CommandLineRunner
 import org.springframework.context.annotation.Profile
@@ -32,11 +32,15 @@ class XlsImporter implements CommandLineRunner {
     private CaseRepository caseRepository
 
     @Autowired
+    private UserProcessRoleRepository userProcessRoleRepository
+
+    @Autowired
     private TaskService taskService
 
     @Autowired
     private Importer importer
 
+    def email_id = 1
     def header_fields = [
             ["Box", FieldType.TEXT],
             ["Ukl. jednotka", FieldType.TEXT],
@@ -65,6 +69,10 @@ class XlsImporter implements CommandLineRunner {
     @Override
     void run(String... strings) throws Exception {
         net = importer.importPetriNet(new File("src/test/resources/prikladFM.xml"), "Archiv", "FMS")
+
+        def user = userRepository.findByEmail("super@netgrif.com")
+        user.setUserProcessRoles(userProcessRoleRepository.findAll() as Set)
+        userRepository.save(user)
 
         new File("src/test/resources/Vzor preberacieho protokolu.csv").splitEachLine("\t") { fields ->
             useCase = new Case(petriNet: net, title: "Ukladacia jednotka ${fields[1]}")
@@ -95,7 +103,7 @@ class XlsImporter implements CommandLineRunner {
                 User user = userRepository.findBySurname(value)
                 if (!user) {
                     user = userRepository.save(new User(
-                            email: "user${EMAIL_TEMPLATE}",
+                            email: "user${email_id++}${EMAIL_TEMPLATE}",
                             password: "password",
                             name: "Jozko",
                             surname: value,

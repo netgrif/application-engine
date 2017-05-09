@@ -21,7 +21,7 @@ public interface ITaskService {
 
     List<Task> findByUser(User user);
 
-    Task findById(Long id);
+    Task findById(String id);
 
     List<Task> findUserFinishedTasks(User user);
 
@@ -29,19 +29,19 @@ public interface ITaskService {
 
     List<Task> findByTransitions(List<String> transitions);
 
-    void finishTask(Long userId, Long taskId) throws Exception;
+    void finishTask(Long userId, String taskId) throws Exception;
 
-    void assignTask(User user, Long taskId) throws TransitionNotExecutableException;
+    void assignTask(User user, String taskId) throws TransitionNotExecutableException;
 
-    List<Field> getData(Long taskId);
+    List<Field> getData(String taskId);
 
-    void setDataFieldsValues(Long taskId, ObjectNode values);
+    void setDataFieldsValues(String taskId, ObjectNode values);
 
-    void cancelTask(Long id, Long taskId);
+    void cancelTask(Long id, String taskId);
 
-    boolean saveFile(Long taskId, String fieldId, MultipartFile multipartFile);
+    boolean saveFile(String taskId, String fieldId, MultipartFile multipartFile);
 
-    FileSystemResource getFile(Long taskId, String fieldId);
+    FileSystemResource getFile(String taskId, String fieldId);
 
-    void delegateTask(String delegatedEmail, Long taskId) throws TransitionNotExecutableException;
+    void delegateTask(String delegatedEmail, String taskId) throws TransitionNotExecutableException;
 }

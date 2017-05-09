@@ -19,6 +19,7 @@ public class User {
 
     @NotNull
     @Email
+    @Column(unique = true)
     private String email;
 
     @JsonIgnore

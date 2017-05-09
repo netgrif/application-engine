@@ -59,12 +59,12 @@ public class TaskController {
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
-    public TaskResource getOne(@PathVariable("id") Long taskId) {
+    public TaskResource getOne(@PathVariable("id") String taskId) {
         return TaskResource.createFrom(taskService.findById(taskId), null);
     }
 
     @RequestMapping(value = "/assign/{id}", method = RequestMethod.GET)
-    public MessageResource assign(Authentication auth, @PathVariable("id") Long taskId) {
+    public MessageResource assign(Authentication auth, @PathVariable("id") String taskId) {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
         try {
             taskService.assignTask(loggedUser.transformToUser(), taskId);
@@ -75,7 +75,7 @@ public class TaskController {
     }
 
     @RequestMapping(value = "/delegate/{id}", method = RequestMethod.POST)
-    public MessageResource delegate(Authentication auth, @PathVariable("id") Long taskId, @RequestBody String delegatedEmail) {
+    public MessageResource delegate(Authentication auth, @PathVariable("id") String taskId, @RequestBody String delegatedEmail) {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
         try {
             delegatedEmail = URLDecoder.decode(delegatedEmail, StandardCharsets.UTF_8.name());
@@ -88,7 +88,7 @@ public class TaskController {
     }
 
     @RequestMapping(value = "/finish/{id}", method = RequestMethod.GET)
-    public MessageResource finish(Authentication auth, @PathVariable("id") Long taskId) {
+    public MessageResource finish(Authentication auth, @PathVariable("id") String taskId) {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
         try {
             taskService.finishTask(loggedUser.getId(), taskId);
@@ -100,7 +100,7 @@ public class TaskController {
     }
 
     @RequestMapping(value = "/cancel/{id}", method = RequestMethod.GET)
-    public MessageResource cancel(Authentication auth, @PathVariable("id") Long taskId) {
+    public MessageResource cancel(Authentication auth, @PathVariable("id") String taskId) {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
         try {
             taskService.cancelTask(loggedUser.getId(), taskId);
@@ -160,19 +160,19 @@ public class TaskController {
     }
 
     @RequestMapping(value = "/{id}/data", method = RequestMethod.GET)
-    public DataFieldsResource getData(@PathVariable("id") Long taskId) {
+    public DataFieldsResource getData(@PathVariable("id") String taskId) {
         List<Field> dataFields = taskService.getData(taskId);
         return new DataFieldsResource(dataFields, taskId);
     }
 
     @RequestMapping(value = "/{id}/data", method = RequestMethod.POST)
-    public MessageResource saveData(@PathVariable("id") Long taskId, @RequestBody ObjectNode dataBody) {
+    public MessageResource saveData(@PathVariable("id") String taskId, @RequestBody ObjectNode dataBody) {
         taskService.setDataFieldsValues(taskId, dataBody);
         return MessageResource.successMessage("Data for task " + taskId + " saved");
     }
 
     @RequestMapping(value = "/{id}/file/{field}", method = RequestMethod.POST)
-    public MessageResource saveFile(@PathVariable("id") Long taskId, @PathVariable("field") String fieldId,
+    public MessageResource saveFile(@PathVariable("id") String taskId, @PathVariable("field") String fieldId,
                                     @RequestParam(value = "file") MultipartFile multipartFile) {
         if (taskService.saveFile(taskId, fieldId, multipartFile))
             return MessageResource.successMessage("File " + multipartFile.getOriginalFilename() + " successfully uploaded");
@@ -181,7 +181,7 @@ public class TaskController {
     }
 
     @RequestMapping(value = "/{id}/file/{field}", method = RequestMethod.GET, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
-    public FileSystemResource getFile(@PathVariable("id") Long taskId, @PathVariable("field") String fieldId, HttpServletResponse response) {
+    public FileSystemResource getFile(@PathVariable("id") String taskId, @PathVariable("field") String fieldId, HttpServletResponse response) {
         FileSystemResource fileResource = taskService.getFile(taskId, fieldId);
         response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
         response.setHeader("Content-Disposition", "attachment; filename=" + fileResource.getFilename().substring(fileResource.getFilename().indexOf('-') + 1));
