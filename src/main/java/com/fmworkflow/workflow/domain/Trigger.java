@@ -8,13 +8,9 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import javax.persistence.Entity;
 
 @Document
-@Entity(name = "task_trigger")
 public abstract class Trigger {
     @Id
     protected ObjectId _id;
-
-    @javax.persistence.Id
-    protected Long id;
 
     public String getObjectId() {
         return _id.toString();
@@ -26,14 +22,6 @@ public abstract class Trigger {
 
     public void set_id(ObjectId _id) {
         this._id = _id;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public enum Type {

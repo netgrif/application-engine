@@ -63,7 +63,7 @@ public class TaskService implements ITaskService {
     }
 
     @Override
-    public Task findById(Long id) {
+    public Task findById(String id) {
         return taskRepository.findOne(id);
     }
 
@@ -86,12 +86,12 @@ public class TaskService implements ITaskService {
 
     @Override
     public List<Task> findByUser(User user) {
-        return taskRepository.findByUser(user);
+        return taskRepository.findByUserId(user.getId());
     }
 
     @Override
     public List<Task> findUserFinishedTasks(User user) {
-        return taskRepository.findByUserAndFinishDateNotNull(user);
+        return taskRepository.findByUserIdAndFinishDateNotNull(user.getId());
     }
 
     @Override
@@ -117,10 +117,10 @@ public class TaskService implements ITaskService {
 
     @Override
     @Transactional
-    public void finishTask(Long userId, Long taskId) throws Exception {
+    public void finishTask(Long userId, String taskId) throws Exception {
         Task task = taskRepository.findOne(taskId);
         // TODO: 14. 4. 2017 replace with @PreAuthorize
-        if (!task.getUser().getId().equals(userId)) {
+        if (!task.getUserId().equals(userId)) {
             throw new Exception("User that is not assigned tried to finish task");
         }
 
@@ -137,14 +137,14 @@ public class TaskService implements ITaskService {
 
     @Override
     @Transactional
-    public void assignTask(User user, Long taskId) throws TransitionNotExecutableException {
+    public void assignTask(User user, String taskId) throws TransitionNotExecutableException {
         Task task = taskRepository.findOne(taskId);
         Case useCase = caseRepository.findOne(task.getCaseId());
         useCase.getPetriNet().initializeArcs();
         Transition transition = useCase.getPetriNet().getTransition(task.getTransitionId());
 
         startExecution(transition, useCase);
-        task.setUser(user);
+        task.setUserId(user.getId());
         task.setStartDate(LocalDateTime.now());
 
         caseRepository.save(useCase);
@@ -153,7 +153,7 @@ public class TaskService implements ITaskService {
     }
 
     @Override
-    public List<Field> getData(Long taskId) {
+    public List<Field> getData(String taskId) {
         Task task = taskRepository.findOne(taskId);
         Case useCase = caseRepository.findOne(task.getCaseId());
         Transition transition = useCase.getPetriNet().getTransition(task.getTransitionId());
@@ -173,7 +173,7 @@ public class TaskService implements ITaskService {
     }
 
     @Override
-    public void setDataFieldsValues(Long taskId, ObjectNode values) {
+    public void setDataFieldsValues(String taskId, ObjectNode values) {
         Task task = taskRepository.findOne(taskId);
         Case useCase = caseRepository.findOne(task.getCaseId());
 
@@ -183,7 +183,7 @@ public class TaskService implements ITaskService {
 
     @Override
     @Transactional
-    public void cancelTask(Long id, Long taskId) {
+    public void cancelTask(Long id, String taskId) {
         Task task = taskRepository.findOne(taskId);
         Case useCase = caseRepository.findOne(task.getCaseId());
         PetriNet net = useCase.getPetriNet();
@@ -199,7 +199,7 @@ public class TaskService implements ITaskService {
     }
 
     @Override
-    public FileSystemResource getFile(Long taskId, String fieldId){
+    public FileSystemResource getFile(String taskId, String fieldId){
         Task task = taskRepository.findOne(taskId);
         Case useCase = caseRepository.findOne(task.getCaseId());
         if(useCase.getDataSetValues().get(fieldId) == null) return null;
@@ -208,13 +208,13 @@ public class TaskService implements ITaskService {
 
     @Override
     @Transactional
-    public void delegateTask(String delegatedEmail, Long taskId) throws TransitionNotExecutableException {
+    public void delegateTask(String delegatedEmail, String taskId) throws TransitionNotExecutableException {
         User delegated = userRepository.findByEmail(delegatedEmail);
         assignTask(delegated, taskId);
     }
 
     @Override
-    public boolean saveFile(Long taskId, String fieldId, MultipartFile multipartFile){
+    public boolean saveFile(String taskId, String fieldId, MultipartFile multipartFile){
         try {
             Task task = taskRepository.findOne(taskId);
             Case useCase = caseRepository.findOne(task.getCaseId());
@@ -253,8 +253,8 @@ public class TaskService implements ITaskService {
      * 3. generate new tasks
      */
     @Transactional
-    private void reloadTasks(Case useCase) {
-        taskRepository.deleteAllByCaseIdAndUserIsNull(useCase.getStringId());
+    void reloadTasks(Case useCase) {
+        taskRepository.deleteAllByCaseIdAndUserIdIsNull(useCase.getStringId());
         taskRepository.deleteAllByCaseIdAndFinishDateIsNotNull(useCase.getStringId());
         createTasks(useCase);
     }
@@ -301,7 +301,7 @@ public class TaskService implements ITaskService {
     }
 
     @Transactional
-    private boolean isExecutable(Transition transition, PetriNet net) {
+    boolean isExecutable(Transition transition, PetriNet net) {
         Collection<Arc> arcsOfTransition = net.getArcsOfTransition(transition);
 
         if (arcsOfTransition == null)
@@ -313,7 +313,7 @@ public class TaskService implements ITaskService {
     }
 
     @Transactional
-    private void finishExecution(Transition transition, Case useCase) throws TransitionNotExecutableException {
+    void finishExecution(Transition transition, Case useCase) throws TransitionNotExecutableException {
         execute(transition, useCase, arc -> arc.getSource() == transition);
     }
 
