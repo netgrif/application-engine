@@ -16,10 +16,10 @@ public class CasesResource extends Resources<CaseResource>{
     private void buildLinks(String method){
         if(method.equalsIgnoreCase("all"))
             add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder
-                    .methodOn(WorkflowController.class).getAll()).withSelfRel());
+                    .methodOn(WorkflowController.class).getAll(null)).withSelfRel());
         else
             add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder
-                    .methodOn(WorkflowController.class).getAll()).withRel("all"));
+                    .methodOn(WorkflowController.class).getAll(null)).withRel("all"));
 
         if(method.equalsIgnoreCase("search"))
             add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder
