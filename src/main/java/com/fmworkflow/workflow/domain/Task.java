@@ -1,16 +1,21 @@
 package com.fmworkflow.workflow.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fmworkflow.auth.domain.User;
+import org.bson.types.ObjectId;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.DBRef;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.LinkedList;
 import java.util.List;
 
-@Entity
+@Document
 public class Task {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+    private ObjectId _id;
     private String caseId;
     private String transitionId;
     private String title;
@@ -18,21 +23,30 @@ public class Task {
     private String caseTitle;
     private String visualId;
     private int priority;
-    @ManyToOne
-    private User user;
-    @OneToMany(cascade = CascadeType.ALL)
+    private Long userId;
+    @DBRef
     private List<Trigger> triggers;
     private String assignRole;
     private String delegateRole;
     private LocalDateTime startDate;
     private LocalDateTime finishDate;
 
-    public Long getId() {
-        return id;
+    public Task() {
+        this._id = new ObjectId();
+        this.triggers = new LinkedList<>();
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    @JsonIgnore
+    public ObjectId getObjectId() {
+        return _id;
+    }
+
+    public void setObjectId(ObjectId id) {
+        this._id = id;
+    }
+
+    public String getStringId() {
+        return _id.toString();
     }
 
     public String getTitle() {
@@ -64,7 +78,8 @@ public class Task {
     }
 
     public void setVisualId(String petriNetInitials) {
-        this.visualId = petriNetInitials+"-"+this.id;
+        // TODO: 9.5.2017 bullshit
+        this.visualId = petriNetInitials+"-"+this._id;
     }
 
     public int getPriority() {
@@ -99,14 +114,7 @@ public class Task {
         this.caseId = caseId;
     }
 
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-
+    @JsonIgnore
     public String getTransitionId() {
         return transitionId;
     }
@@ -131,12 +139,21 @@ public class Task {
         this.delegateRole = delegateRole;
     }
 
+    @JsonIgnore
     public List<Trigger> getTriggers() {
         return triggers;
     }
 
     public void setTriggers(List<Trigger> triggers) {
         this.triggers = triggers;
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 
     public static class Priorities {

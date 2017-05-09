@@ -24,21 +24,21 @@ public class TaskResource extends Resource<Task> {
         TaskResource resource = new TaskResource(task);
 
         resource.add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
-                .getOne(task.getId())).withSelfRel());
+                .getOne(task.getStringId())).withSelfRel());
         resource.add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
-                .assign(auth,task.getId())).withRel("assign"));
+                .assign(auth,task.getStringId())).withRel("assign"));
         resource.add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
-                .delegate(auth,task.getId(),null)).withRel("delegate"));
+                .delegate(auth,task.getStringId(),null)).withRel("delegate"));
         resource.add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
-                .finish(auth,task.getId())).withRel("finish"));
+                .finish(auth,task.getStringId())).withRel("finish"));
         resource.add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
-                .cancel(auth,task.getId())).withRel("cancel"));
+                .cancel(auth,task.getStringId())).withRel("cancel"));
         resource.add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
-                .getData(task.getId())).withRel("data"));
+                .getData(task.getStringId())).withRel("data"));
         resource.add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
-                .saveData(task.getId(),null)).withRel("data-edit"));
+                .saveData(task.getStringId(),null)).withRel("data-edit"));
         resource.add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
-                .getFile(task.getId(),"",null)).withRel("file"));
+                .getFile(task.getStringId(),"",null)).withRel("file"));
         return resource;
     }
 }
