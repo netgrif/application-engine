@@ -11,12 +11,12 @@ import java.util.ArrayList;
 
 public class DataFieldsResource extends Resources<Field> {
 
-    public DataFieldsResource(Iterable<Field> content, Long taskId) {
+    public DataFieldsResource(Iterable<Field> content, String taskId) {
         super(content, new ArrayList<Link>());
         buildLinks(taskId);
     }
 
-    private void buildLinks(Long taskId){
+    private void buildLinks(String taskId){
         add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
             .getData(taskId)).withSelfRel());
         add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)

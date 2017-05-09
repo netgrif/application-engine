@@ -1,24 +1,23 @@
 package com.fmworkflow.workflow.domain.repositories;
 
-import com.fmworkflow.auth.domain.User;
 import com.fmworkflow.workflow.domain.Task;
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.mongodb.repository.MongoRepository;
 
 import java.util.Collection;
 import java.util.List;
 
-public interface TaskRepository extends JpaRepository<Task, Long> {
+public interface TaskRepository extends MongoRepository<Task, String> {
     List<Task> findByCaseIdIn(Collection<String> ids);
 
     List<Task> findByTransitionIdIn(Collection<String> ids);
 
-    List<Task> findByUser(User user);
+    List<Task> findByUserId(Long userId);
 
-    List<Task> findByUserAndFinishDateNotNull(User user);
+    List<Task> findByUserIdAndFinishDateNotNull(Long userId);
 
     List<Task> findAllByAssignRoleInOrDelegateRoleIn(List<String> roles, List<String> roles2);
 
-    void deleteAllByCaseIdAndUserIsNull(String caseId);
+    void deleteAllByCaseIdAndUserIdIsNull(String caseId);
 
     void deleteAllByCaseIdAndFinishDateIsNotNull(String caseId);
 }
