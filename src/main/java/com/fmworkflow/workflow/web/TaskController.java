@@ -9,15 +9,13 @@ import com.fmworkflow.workflow.service.interfaces.IFilterService;
 import com.fmworkflow.workflow.service.interfaces.ITaskService;
 import com.fmworkflow.workflow.web.requestbodies.CreateFilterBody;
 import com.fmworkflow.workflow.web.requestbodies.TaskSearchBody;
-import com.fmworkflow.workflow.web.responsebodies.DataFieldsResource;
-import com.fmworkflow.workflow.web.responsebodies.FiltersResource;
-import com.fmworkflow.workflow.web.responsebodies.MessageResource;
-import com.fmworkflow.workflow.web.responsebodies.TaskResource;
+import com.fmworkflow.workflow.web.responsebodies.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.Link;
 import org.springframework.hateoas.PagedResources;
 import org.springframework.hateoas.mvc.ControllerLinkBuilder;
 import org.springframework.http.MediaType;
@@ -43,16 +41,14 @@ public class TaskController {
     private IFilterService filterService;
 
     @RequestMapping(method = RequestMethod.GET)
-    public PagedResources<Task> getAll(Authentication auth, Pageable pageable, PagedResourcesAssembler assembler) {
+    public PagedResources<TaskResource> getAll(Authentication auth, Pageable pageable, PagedResourcesAssembler<Task> assembler) {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
         Page<Task> page = taskService.getAll(loggedUser, pageable);
 
-        PagedResources<Task> resources = assembler.toResource(page);
-        resources.add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class).getAll(null, null, assembler)).withSelfRel());
-        resources.add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class).getAllByCases(null, null, assembler)).withRel("case"));
-        resources.add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class).getMy(null, null, assembler)).withRel("my"));
-        resources.add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class).getMyFinished(null, null, assembler)).withRel("finished"));
-        resources.add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class).search(null, null, null, assembler)).withRel("search"));
+        Link selfLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
+                .getAll(auth, pageable, assembler)).withRel("all");
+        PagedResources<TaskResource> resources = assembler.toResource(page,new TaskResourceAssembler(),selfLink);
+        ResourceLinkAssembler.addLinks(resources,Task.class,selfLink.getRel());
         return resources;
     }
 
@@ -67,7 +63,7 @@ public class TaskController {
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     public TaskResource getOne(@PathVariable("id") String taskId) {
-        return TaskResource.createFrom(taskService.findById(taskId), null);
+        return new TaskResource(taskService.findById(taskId));
     }
 
     @RequestMapping(value = "/assign/{id}", method = RequestMethod.GET)
