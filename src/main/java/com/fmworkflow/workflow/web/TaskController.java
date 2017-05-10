@@ -53,11 +53,13 @@ public class TaskController {
     }
 
     @RequestMapping(value = "/case", method = RequestMethod.POST)
-    public PagedResources<Task> getAllByCases(@RequestBody List<String> cases, Pageable pageable, PagedResourcesAssembler assembler) {
+    public PagedResources<TaskResource> getAllByCases(@RequestBody List<String> cases, Pageable pageable, PagedResourcesAssembler<Task> assembler) {
         Page<Task> page = taskService.findByCases(pageable, cases);
 
-        PagedResources<Task> resources = assembler.toResource(page);
-        resources.add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class).getAllByCases(null, null, assembler)).withSelfRel());
+        Link selfLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
+                .getAllByCases(cases, pageable, assembler)).withRel("case");
+        PagedResources<TaskResource> resources = assembler.toResource(page, new TaskResourceAssembler(), selfLink);
+        ResourceLinkAssembler.addLinks(resources,Task.class,selfLink.getRel());
         return resources;
     }
 
@@ -115,23 +117,29 @@ public class TaskController {
     }
 
     @RequestMapping(value = "/my", method = RequestMethod.GET)
-    public PagedResources<Task> getMy(Authentication auth, Pageable pageable, PagedResourcesAssembler assembler) {
+    public PagedResources<TaskResource> getMy(Authentication auth, Pageable pageable, PagedResourcesAssembler<Task> assembler) {
         Page<Task> page = taskService.findByUser(pageable, ((LoggedUser) auth.getPrincipal()).transformToUser());
-        PagedResources<Task> resources = assembler.toResource(page);
-        resources.add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class).getMy(null, null, assembler)).withSelfRel());
+
+        Link selfLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
+                .getMy(auth, pageable, assembler)).withRel("my");
+        PagedResources<TaskResource> resources = assembler.toResource(page, new TaskResourceAssembler(), selfLink);
+        ResourceLinkAssembler.addLinks(resources,Task.class,selfLink.getRel());
         return resources;
     }
 
     @RequestMapping(value = "/my/finished", method = RequestMethod.GET)
-    public PagedResources<Task> getMyFinished(Pageable pageable, Authentication auth, PagedResourcesAssembler assembler) {
+    public PagedResources<TaskResource> getMyFinished(Pageable pageable, Authentication auth, PagedResourcesAssembler<Task> assembler) {
         Page<Task> page = taskService.findByUser(pageable, ((LoggedUser) auth.getPrincipal()).transformToUser());
-        PagedResources<Task> resources = assembler.toResource(page);
-        resources.add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class).getMyFinished(null, null, assembler)).withSelfRel());
+
+        Link selfLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
+                .getMyFinished(pageable, auth, assembler)).withRel("finished");
+        PagedResources<TaskResource> resources = assembler.toResource(page, new TaskResourceAssembler(), selfLink);
+        ResourceLinkAssembler.addLinks(resources,Task.class,selfLink.getRel());
         return resources;
     }
 
     @RequestMapping(value = "/search", method = RequestMethod.POST)
-    public PagedResources<Task> search(Authentication auth, Pageable pageable, @RequestBody TaskSearchBody searchBody, PagedResourcesAssembler assembler) {
+    public PagedResources<TaskResource> search(Authentication auth, Pageable pageable, @RequestBody TaskSearchBody searchBody, PagedResourcesAssembler<Task> assembler) {
         Page<Task> page = null;
         if (searchBody.searchTier == TaskSearchBody.SEARCH_TIER_1) {
             page = taskService.findByPetriNets(pageable, searchBody.petriNets
@@ -145,8 +153,10 @@ public class TaskController {
         } else if (searchBody.searchTier == TaskSearchBody.SEARCH_TIER_3) {
 
         }
-        PagedResources<Task> resources = assembler.toResource(page);
-        addLinks(resources, "search");
+        Link selfLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
+                .search(auth, pageable, searchBody, assembler)).withRel("search");
+        PagedResources<TaskResource> resources = assembler.toResource(page,new TaskResourceAssembler(),selfLink);
+        ResourceLinkAssembler.addLinks(resources,Task.class,selfLink.getRel());
         return resources;
     }
 
@@ -181,12 +191,12 @@ public class TaskController {
 
     @RequestMapping(value = "/filter", method = RequestMethod.GET)
     public FiltersResource getAllFilters(Authentication auth) {
-        return new FiltersResource(filterService.getAll(), 0);
+        return new FiltersResource(filterService.getAll(), false);
     }
 
     @RequestMapping(value = "/filter/roles", method = RequestMethod.POST)
     public FiltersResource getFiltersWithRoles(@RequestBody List<String> roles) {
-        return new FiltersResource(filterService.getWithRoles(roles), 1);
+        return new FiltersResource(filterService.getWithRoles(roles), true);
     }
 
     @RequestMapping(value = "/filter", method = RequestMethod.POST)
@@ -196,24 +206,6 @@ public class TaskController {
             return MessageResource.successMessage("Filter " + filterBody.name + " saved");
         } else {
             return MessageResource.errorMessage("Filter " + filterBody.name + " saving failed!");
-        }
-    }
-
-    private void addLinks(PagedResources resources, String rel) {
-        if ("all".equals(rel)) {
-            resources.add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class).getAll(null, null, null)).withRel("all"));
-        }
-        if ("case".equals(rel)) {
-            resources.add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class).getAllByCases(null, null, null)).withRel("case"));
-        }
-        if ("my".equals(rel)) {
-            resources.add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class).getMy(null, null, null)).withRel("my"));
-        }
-        if ("finished".equals(rel)) {
-            resources.add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class).getMyFinished(null, null, null)).withRel("finished"));
-        }
-        if ("search".equals(rel)) {
-            resources.add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class).search(null, null, null, null)).withRel("search"));
         }
     }
 }

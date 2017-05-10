@@ -1,8 +1,10 @@
 package com.fmworkflow.workflow.web.responsebodies;
 
 
+import com.fmworkflow.workflow.domain.Case;
 import com.fmworkflow.workflow.domain.Task;
 import com.fmworkflow.workflow.web.TaskController;
+import com.fmworkflow.workflow.web.WorkflowController;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.PagedResources;
 import org.springframework.hateoas.mvc.ControllerLinkBuilder;
@@ -12,6 +14,7 @@ public class ResourceLinkAssembler {
 
     public static void addLinks(PagedResources pagedResources, Class type, String selfRel) {
         if (type.equals(Task.class)) addTasksLinks(pagedResources, selfRel);
+        if (type.equals(Case.class)) addCasesLinks(pagedResources, selfRel);
 
     }
 
@@ -31,6 +34,15 @@ public class ResourceLinkAssembler {
         if (!selfRel.equalsIgnoreCase("search"))
             pagedResources.add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
                     .search(null, null, null, null)).withRel("search"));
+    }
+
+    private static void addCasesLinks(PagedResources pagedResources, String selfRel){
+        if(!selfRel.equalsIgnoreCase("all"))
+            pagedResources.add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(WorkflowController.class)
+                    .getAll(null,null)).withRel("all"));
+        if(!selfRel.equalsIgnoreCase("search"))
+            pagedResources.add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(WorkflowController.class)
+                    .searchCases(null,null,null)).withRel("search"));
     }
 
 
