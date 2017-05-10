@@ -8,6 +8,7 @@ import com.fmworkflow.workflow.service.interfaces.ITaskService;
 import com.fmworkflow.workflow.service.interfaces.IWorkflowService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.BasicQuery;
@@ -36,14 +37,13 @@ public class WorkflowService implements IWorkflowService {
     }
 
     @Override
-    public List<Case> getAll(Pageable pageable) {
+    public Page<Case> getAll(Pageable pageable) {
         Page<Case> page = repository.findAll(pageable);
-        List<Case> cases = page.getContent();
-        cases.forEach(aCase -> aCase.getPetriNet().initializeArcs());
-        return cases;
+        page.getContent().forEach(aCase -> aCase.getPetriNet().initializeArcs());
+        return page;
     }
 
-    public List<Case> searchCase(List<String> nets){
+    public Page<Case> searchCase(List<String> nets, Pageable pageable){
         StringBuilder queryBuilder = new StringBuilder();
         nets.forEach(net -> {
             queryBuilder.append("{$ref:\"petriNet\",$id:{$oid:\"");
@@ -54,7 +54,9 @@ public class WorkflowService implements IWorkflowService {
             queryBuilder.deleteCharAt(queryBuilder.length()-1);
         String queryString = nets.isEmpty() ? "{}" : "{petriNet:{$in:["+queryBuilder.toString()+"]}}";
         BasicQuery query = new BasicQuery(queryString,"{petriNet:0, dataSetValues:0}");
-        return mongoTemplate.find(query,Case.class);
+        query = (BasicQuery) query.with(pageable);
+        List<Case> useCases = mongoTemplate.find(query,Case.class);
+        return new PageImpl<Case>(useCases,pageable,mongoTemplate.count(new BasicQuery(queryString,"{petriNet:0, dataSetValues:0}"),Case.class));
     }
 
     @Override
