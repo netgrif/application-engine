@@ -3,11 +3,14 @@ package com.fmworkflow.workflow.web;
 import com.fmworkflow.workflow.domain.Case;
 import com.fmworkflow.workflow.service.interfaces.IWorkflowService;
 import com.fmworkflow.workflow.web.requestbodies.CreateCaseBody;
-import com.fmworkflow.workflow.web.responsebodies.CaseResource;
-import com.fmworkflow.workflow.web.responsebodies.CasesResource;
-import com.fmworkflow.workflow.web.responsebodies.MessageResource;
+import com.fmworkflow.workflow.web.responsebodies.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.Link;
+import org.springframework.hateoas.PagedResources;
+import org.springframework.hateoas.mvc.ControllerLinkBuilder;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -35,16 +38,23 @@ public class WorkflowController {
     }
 
     @RequestMapping(value = "/all", method = RequestMethod.GET)
-    public List<Case> getAll(Pageable pageable) {
-        return workflowService.getAll(pageable);
+    public PagedResources<CaseResource> getAll(Pageable pageable, PagedResourcesAssembler<Case> assembler) {
+        Page<Case> cases = workflowService.getAll(pageable);
+        Link selfLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(WorkflowController.class)
+                .getAll(pageable,assembler)).withRel("all");
+        PagedResources<CaseResource> resources = assembler.toResource(cases,new CaseResourceAssembler(),selfLink);
+        ResourceLinkAssembler.addLinks(resources,Case.class,selfLink.getRel());
+        return resources;
     }
 
     @RequestMapping(value = "/case/search", method = RequestMethod.POST)
-    public CasesResource searchCases(@RequestBody List<String> petriNets){
-        // TODO: 09/05/2017 pagination
-        List<CaseResource> resources = new ArrayList<>();
-        workflowService.searchCase(petriNets).forEach(useCase -> resources.add(new CaseResource(useCase)));
-        return new CasesResource(resources,"search");
+    public PagedResources<CaseResource> searchCases(@RequestBody List<String> petriNets, Pageable pageable, PagedResourcesAssembler<Case> assembler){
+        Page<Case> cases = workflowService.searchCase(petriNets,pageable);
+        Link selfLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(WorkflowController.class)
+                .searchCases(petriNets,pageable,assembler)).withRel("search");
+        PagedResources<CaseResource> resources = assembler.toResource(cases,new CaseResourceAssembler(),selfLink);
+        ResourceLinkAssembler.addLinks(resources,Case.class,selfLink.getRel());
+        return resources;
     }
 
 //    @RequestMapping(value = "/data/{case}/{transition}", method = RequestMethod.GET)
