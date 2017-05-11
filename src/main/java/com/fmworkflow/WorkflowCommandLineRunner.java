@@ -55,7 +55,7 @@ public class WorkflowCommandLineRunner implements CommandLineRunner {
         // TODO: 26/04/2017 title, initials
         importer.importPetriNet(new File("src/test/resources/poistenie_rozsirene.xml"), "Poistenie", "INS");
         PetriNet net = petriNetRepository.findAll().get(0);
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < 10; i++) {
             workflowService.createCase(net.getStringId(), "Poistka " + i, randomColor());
         }
 
