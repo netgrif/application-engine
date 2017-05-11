@@ -21,6 +21,8 @@ import com.fmworkflow.workflow.domain.repositories.TaskRepository;
 import com.fmworkflow.workflow.service.interfaces.ITaskService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.BasicQuery;
 import org.springframework.stereotype.Service;
@@ -51,15 +53,15 @@ public class TaskService implements ITaskService {
     private MongoTemplate mongoTemplate;
 
     @Override
-    public List<Task> getAll(LoggedUser loggedUser) {
+    public Page<Task> getAll(LoggedUser loggedUser, Pageable pageable) {
         User user = userRepository.findOne(loggedUser.getId());
         List<String> roles = new LinkedList<>(user.getUserProcessRoles()).stream().map(UserProcessRole::getRoleId).collect(Collectors.toList());
-        return taskRepository.findAllByAssignRoleInOrDelegateRoleIn(roles,roles);
+        return taskRepository.findAllByAssignRoleInOrDelegateRoleIn(pageable, roles, roles);
     }
 
     @Override
-    public List<Task> findByCases(List<String> cases) {
-        return taskRepository.findByCaseIdIn(cases);
+    public Page<Task> findByCases(Pageable pageable, List<String> cases) {
+        return taskRepository.findByCaseIdIn(pageable, cases);
     }
 
     @Override
@@ -78,15 +80,15 @@ public class TaskService implements ITaskService {
                 Task task = createFromTransition(transition, useCase);
                 // TODO: 16. 3. 2017 there should be some fancy logic
 //                task.setAssignRole(net.getRoles().get(transition.getRoles().keySet().stream().findFirst().orElseGet(null)).getStringId());
-                figureOutProcessRoles(task,transition);
+                figureOutProcessRoles(task, transition);
                 taskRepository.save(task);
             }
         }
     }
 
     @Override
-    public List<Task> findByUser(User user) {
-        return taskRepository.findByUserId(user.getId());
+    public Page<Task> findByUser(Pageable pageable, User user) {
+        return taskRepository.findByUserId(pageable, user.getId());
     }
 
     @Override
@@ -95,22 +97,22 @@ public class TaskService implements ITaskService {
     }
 
     @Override
-    public List<Task> findByPetriNets(List<String> petriNets){
+    public Page<Task> findByPetriNets(Pageable pageable, List<String> petriNets) {
         StringBuilder caseQueryBuilder = new StringBuilder();
         petriNets.forEach(net -> {
             caseQueryBuilder.append("{$ref:\"petriNet\",$id:{$oid:\"");
             caseQueryBuilder.append(net);
             caseQueryBuilder.append("\"}},");
         });
-        caseQueryBuilder.deleteCharAt(caseQueryBuilder.length()-1);
-        BasicQuery caseQuery = new BasicQuery("{petriNet:{$in:["+caseQueryBuilder.toString()+"]}}","{_id:1}");
-        List<Case> useCases = mongoTemplate.find(caseQuery,Case.class);
-        return taskRepository.findByCaseIdIn(useCases.stream().map(Case::getStringId).collect(Collectors.toList()));
+        caseQueryBuilder.deleteCharAt(caseQueryBuilder.length() - 1);
+        BasicQuery caseQuery = new BasicQuery("{petriNet:{$in:[" + caseQueryBuilder.toString() + "]}}", "{_id:1}");
+        List<Case> useCases = mongoTemplate.find(caseQuery, Case.class);
+        return taskRepository.findByCaseIdIn(pageable, useCases.stream().map(Case::getStringId).collect(Collectors.toList()));
     }
 
     @Override
-    public List<Task> findByTransitions(List<String> transitions){
-        return taskRepository.findByTransitionIdIn(transitions);
+    public Page<Task> findByTransitions(Pageable pageable, List<String> transitions) {
+        return taskRepository.findByTransitionIdIn(pageable, transitions);
     }
 
     //TODO: 2/4/2017 findByDataFields
@@ -177,7 +179,7 @@ public class TaskService implements ITaskService {
         Task task = taskRepository.findOne(taskId);
         Case useCase = caseRepository.findOne(task.getCaseId());
 
-        values.fields().forEachRemaining( entry -> useCase.getDataSetValues().put(entry.getKey(),parseFieldsValues(entry.getValue())));
+        values.fields().forEachRemaining(entry -> useCase.getDataSetValues().put(entry.getKey(), parseFieldsValues(entry.getValue())));
         caseRepository.save(useCase);
     }
 
@@ -199,11 +201,11 @@ public class TaskService implements ITaskService {
     }
 
     @Override
-    public FileSystemResource getFile(String taskId, String fieldId){
+    public FileSystemResource getFile(String taskId, String fieldId) {
         Task task = taskRepository.findOne(taskId);
         Case useCase = caseRepository.findOne(task.getCaseId());
-        if(useCase.getDataSetValues().get(fieldId) == null) return null;
-        return new FileSystemResource("storage/"+fieldId+"-"+useCase.getDataSetValues().get(fieldId));
+        if (useCase.getDataSetValues().get(fieldId) == null) return null;
+        return new FileSystemResource("storage/" + fieldId + "-" + useCase.getDataSetValues().get(fieldId));
     }
 
     @Override
@@ -214,25 +216,25 @@ public class TaskService implements ITaskService {
     }
 
     @Override
-    public boolean saveFile(String taskId, String fieldId, MultipartFile multipartFile){
+    public boolean saveFile(String taskId, String fieldId, MultipartFile multipartFile) {
         try {
             Task task = taskRepository.findOne(taskId);
             Case useCase = caseRepository.findOne(task.getCaseId());
 
             String oldFile = null;
-            if((oldFile = (String)useCase.getDataSetValues().get(fieldId)) != null){
-                new File("storage/"+fieldId+"-"+oldFile).delete();
+            if ((oldFile = (String) useCase.getDataSetValues().get(fieldId)) != null) {
+                new File("storage/" + fieldId + "-" + oldFile).delete();
                 useCase.getDataSetValues().put(fieldId, null);
             }
 
-            File file = new File("storage/" + fieldId +"-"+ multipartFile.getOriginalFilename());
+            File file = new File("storage/" + fieldId + "-" + multipartFile.getOriginalFilename());
             file.getParentFile().mkdirs();
             if (!file.createNewFile()) {
                 file.delete();
                 file.createNewFile();
             }
 
-            FileOutputStream fout =new FileOutputStream(file);
+            FileOutputStream fout = new FileOutputStream(file);
             fout.write(multipartFile.getBytes());
             fout.close();
 
@@ -240,7 +242,7 @@ public class TaskService implements ITaskService {
             caseRepository.save(useCase);
 
             return true;
-        } catch (IOException e){
+        } catch (IOException e) {
             e.printStackTrace();
             return false;
         }
@@ -259,10 +261,10 @@ public class TaskService implements ITaskService {
         createTasks(useCase);
     }
 
-    private Object parseFieldsValues(JsonNode jsonNode){
+    private Object parseFieldsValues(JsonNode jsonNode) {
         ObjectNode node = (ObjectNode) jsonNode;
         Object value;
-        switch (node.get("type").asText()){
+        switch (node.get("type").asText()) {
             case "date":
                 value = LocalDate.parse(node.get("value").asText());
                 break;
@@ -288,15 +290,15 @@ public class TaskService implements ITaskService {
                 value = node.get("value").asText();
                 break;
         }
-        if(value instanceof String && ((String)value).equalsIgnoreCase("null")) return null;
+        if (value instanceof String && ((String) value).equalsIgnoreCase("null")) return null;
         else return value;
     }
 
-    private void figureOutProcessRoles(Task task, Transition transition){
+    private void figureOutProcessRoles(Task task, Transition transition) {
         transition.getRoles().keySet().forEach((id) -> {
-            ObjectNode node = transition.applyRoleLogic(id, JsonNodeFactory.instance.objectNode().put("roleIds",id));
-            if(node.get("assign") != null && node.get("assign").asBoolean()) task.setAssignRole(id);
-            if(node.get("delegate") != null && node.get("delegate").asBoolean()) task.setDelegateRole(id);
+            ObjectNode node = transition.applyRoleLogic(id, JsonNodeFactory.instance.objectNode().put("roleIds", id));
+            if (node.get("assign") != null && node.get("assign").asBoolean()) task.setAssignRole(id);
+            if (node.get("delegate") != null && node.get("delegate").asBoolean()) task.setDelegateRole(id);
         });
     }
 
