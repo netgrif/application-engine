@@ -8,26 +8,28 @@ import com.fmworkflow.petrinet.domain.throwable.TransitionNotExecutableException
 import com.fmworkflow.workflow.domain.Case;
 import com.fmworkflow.workflow.domain.Task;
 import org.springframework.core.io.FileSystemResource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
 public interface ITaskService {
-    List<Task> getAll(LoggedUser loggedUser);
+    Page<Task> getAll(LoggedUser loggedUser, Pageable pageable);
 
-    List<Task> findByCases(List<String> cases);
+    Page<Task> findByCases(Pageable pageable, List<String> cases);
 
     void createTasks(Case useCase);
 
-    List<Task> findByUser(User user);
+    Page<Task> findByUser(Pageable pageable, User user);
 
     Task findById(String id);
 
     List<Task> findUserFinishedTasks(User user);
 
-    List<Task> findByPetriNets(List<String> petriNets);
+    Page<Task> findByPetriNets(Pageable pageable, List<String> petriNets);
 
-    List<Task> findByTransitions(List<String> transitions);
+    Page<Task> findByTransitions(Pageable pageable, List<String> transitions);
 
     void finishTask(Long userId, String taskId) throws Exception;
 
