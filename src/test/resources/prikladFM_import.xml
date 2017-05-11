@@ -284,54 +284,7 @@
         <y>60</y>
         <label>Vypožičanie UJ</label>
         <trigger type="user"></trigger>
-        <roleRef>
-            <id>1</id>
-            <logic>
-                <assign>true</assign>
-            </logic>
-        </roleRef>
-        <dataRef>
-            <id>22</id>
-            <logic>
-                <editable>true</editable>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>23</id>
-            <logic>
-                <editable>true</editable>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>13</id>
-            <logic>
-                <editable>true</editable>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>19</id>
-            <logic>
-                <editable>true</editable>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>3</id>
-            <logic>
-                <editable>true</editable>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>7</id>
-            <logic>
-                <editable>true</editable>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>28</id>
-            <logic>
-                <editable>true</editable>
-            </logic>
-        </dataRef>
+
     </transition>
     <transition>
         <id>23</id>
