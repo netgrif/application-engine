@@ -1,15 +1,17 @@
 package com.fmworkflow.workflow.service.interfaces;
 
 import com.fmworkflow.workflow.domain.Case;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
 public interface IWorkflowService {
     void saveCase(Case useCase);
 
-    List<Case> getAll();
+    Page<Case> getAll(Pageable pageable);
 
-    List<Case> searchCase(List<String> nets);
+    Page<Case> searchCase(List<String> nets, Pageable pageable);
 
     void createCase(String netId, String title, String color);
 

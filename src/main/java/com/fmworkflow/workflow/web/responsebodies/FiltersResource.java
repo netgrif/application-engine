@@ -11,22 +11,22 @@ import java.util.ArrayList;
 
 public class FiltersResource extends Resources<Filter> {
 
-    public FiltersResource(Iterable<Filter> content, int method) {
+    public FiltersResource(Iterable<Filter> content, boolean withRoles) {
         super(content, new ArrayList<Link>());
-        buildLinks(method);
+        buildLinks(withRoles);
     }
 
-    private void buildLinks(int method) {
+    private void buildLinks(boolean withRoles) {
         ControllerLinkBuilder allLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
                 .getAllFilters(null));
         ControllerLinkBuilder rolesLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
                 .getFiltersWithRoles(new ArrayList<>()));
-        if(method == 0){
-            add(allLink.withSelfRel());
-            add(rolesLink.withRel("roles"));
-        } else if(method == 1){
+        if(withRoles){
             add(allLink.withRel("all"));
             add(rolesLink.withSelfRel());
+        } else {
+            add(allLink.withSelfRel());
+            add(rolesLink.withRel("roles"));
         }
     }
 }
