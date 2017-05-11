@@ -18,27 +18,26 @@ public class TaskResource extends Resource<Task> {
 
     public TaskResource(Task content) {
         super(content, new ArrayList<Link>());
+        buildLinks();
     }
 
-    public static TaskResource createFrom(Task task, Authentication auth){
-        TaskResource resource = new TaskResource(task);
-
-        resource.add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
+    private void buildLinks(){
+        Task task = getContent();
+        add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
                 .getOne(task.getStringId())).withSelfRel());
-        resource.add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
-                .assign(auth,task.getStringId())).withRel("assign"));
-        resource.add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
-                .delegate(auth,task.getStringId(),null)).withRel("delegate"));
-        resource.add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
-                .finish(auth,task.getStringId())).withRel("finish"));
-        resource.add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
-                .cancel(auth,task.getStringId())).withRel("cancel"));
-        resource.add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
+        add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
+                .assign(null,task.getStringId())).withRel("assign"));
+        add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
+                .delegate(null,task.getStringId(),null)).withRel("delegate"));
+        add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
+                .finish(null,task.getStringId())).withRel("finish"));
+        add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
+                .cancel(null,task.getStringId())).withRel("cancel"));
+        add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
                 .getData(task.getStringId())).withRel("data"));
-        resource.add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
+        add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
                 .saveData(task.getStringId(),null)).withRel("data-edit"));
-        resource.add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
+        add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
                 .getFile(task.getStringId(),"",null)).withRel("file"));
-        return resource;
     }
 }
