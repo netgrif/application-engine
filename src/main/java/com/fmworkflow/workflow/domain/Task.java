@@ -3,6 +3,7 @@ package com.fmworkflow.workflow.domain;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fmworkflow.auth.domain.User;
 import org.bson.types.ObjectId;
+import org.springframework.data.annotation.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -24,6 +25,8 @@ public class Task {
     private String visualId;
     private int priority;
     private Long userId;
+    @org.springframework.data.annotation.Transient
+    private User user;
     @DBRef
     private List<Trigger> triggers;
     private String assignRole;
@@ -148,12 +151,21 @@ public class Task {
         this.triggers = triggers;
     }
 
+    @JsonIgnore
     public Long getUserId() {
         return userId;
     }
 
     public void setUserId(Long userId) {
         this.userId = userId;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 
     public static class Priorities {

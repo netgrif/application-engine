@@ -56,17 +56,20 @@ public class TaskService implements ITaskService {
     public Page<Task> getAll(LoggedUser loggedUser, Pageable pageable) {
         User user = userRepository.findOne(loggedUser.getId());
         List<String> roles = new LinkedList<>(user.getUserProcessRoles()).stream().map(UserProcessRole::getRoleId).collect(Collectors.toList());
-        return taskRepository.findAllByAssignRoleInOrDelegateRoleIn(pageable, roles, roles);
+        return loadUsers(taskRepository.findAllByAssignRoleInOrDelegateRoleIn(pageable, roles, roles));
     }
 
     @Override
     public Page<Task> findByCases(Pageable pageable, List<String> cases) {
-        return taskRepository.findByCaseIdIn(pageable, cases);
+        return loadUsers(taskRepository.findByCaseIdIn(pageable, cases));
     }
 
     @Override
     public Task findById(String id) {
-        return taskRepository.findOne(id);
+        Task task = taskRepository.findOne(id);
+        if(task.getUserId() != null)
+            task.setUser(userRepository.findOne(task.getUserId()));
+        return task;
     }
 
     @Override
@@ -88,7 +91,7 @@ public class TaskService implements ITaskService {
 
     @Override
     public Page<Task> findByUser(Pageable pageable, User user) {
-        return taskRepository.findByUserId(pageable, user.getId());
+        return loadUsers(taskRepository.findByUserId(pageable, user.getId()));
     }
 
     @Override
@@ -107,12 +110,12 @@ public class TaskService implements ITaskService {
         caseQueryBuilder.deleteCharAt(caseQueryBuilder.length() - 1);
         BasicQuery caseQuery = new BasicQuery("{petriNet:{$in:[" + caseQueryBuilder.toString() + "]}}", "{_id:1}");
         List<Case> useCases = mongoTemplate.find(caseQuery, Case.class);
-        return taskRepository.findByCaseIdIn(pageable, useCases.stream().map(Case::getStringId).collect(Collectors.toList()));
+        return loadUsers(taskRepository.findByCaseIdIn(pageable, useCases.stream().map(Case::getStringId).collect(Collectors.toList())));
     }
 
     @Override
     public Page<Task> findByTransitions(Pageable pageable, List<String> transitions) {
-        return taskRepository.findByTransitionIdIn(pageable, transitions);
+        return loadUsers(taskRepository.findByTransitionIdIn(pageable, transitions));
     }
 
     //TODO: 2/4/2017 findByDataFields
@@ -348,5 +351,21 @@ public class TaskService implements ITaskService {
         task.setVisualId(useCase.getPetriNet().getInitials());
 
         return task;
+    }
+
+    private Page<Task> loadUsers(Page<Task> tasks){
+        Map<Long, User> users = new HashMap<>();
+        tasks.forEach(task -> {
+            if(task.getUserId() != null) {
+                if (users.containsKey(task.getUserId()))
+                    task.setUser(users.get(task.getUserId()));
+                else {
+                    task.setUser(userRepository.findOne(task.getUserId()));
+                    users.put(task.getUserId(), task.getUser());
+                }
+            }
+        });
+
+        return tasks;
     }
 }
