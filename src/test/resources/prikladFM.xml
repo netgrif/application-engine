@@ -1,5 +1,196 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document>
+    <data type="text">
+        <id>1</id>
+        <title>Box</title>
+    </data>
+    <data type="text">
+        <id>2</id>
+        <title>Ukl. jednotka</title>
+    </data>
+    <data type="text">
+        <id>3</id>
+        <title>Čísla spisov</title>
+    </data>
+    <data type="text">
+        <id>4</id>
+        <title>Vecný obsah UJ</title>
+    </data>
+    <data type="date">
+        <id>5</id>
+        <title>Od (rok)</title>
+    </data>
+    <data type="date">
+        <id>6</id>
+        <title>Do (rok)</title>
+    </data>
+    <data type="text">
+        <id>7</id>
+        <title>Firma</title>
+    </data>
+    <data type="text">
+        <id>8</id>
+        <title>Oddelenie</title>
+    </data>
+    <data type="user">
+        <id>9</id>
+        <title>Odovzdávajúci</title>
+        <values>1</values>
+        <values>2</values>
+    </data>
+    <data type="date">
+        <id>10</id>
+        <title>Dátum odovzdania</title>
+    </data>
+    <data type="text">
+        <id>11</id>
+        <title>Forma</title>
+    </data>
+    <data type="text">
+        <id>12</id>
+        <title>Lehota uloženia</title>
+    </data>
+    <data type="text">
+        <id>13</id>
+        <title>Znak hodnoty</title>
+    </data>
+    <data type="text">
+        <id>14</id>
+        <title>Čiarový kód</title>
+    </data>
+    <data type="text">
+        <id>15</id>
+        <title>Lokalizácia</title>
+    </data>
+    <data type="text">
+        <id>16</id>
+        <title>Poznámka</title>
+    </data>
+    <data type="text">
+        <id>17</id>
+        <title>Číslo plomby</title>
+    </data>
+    <data type="date">
+        <id>18</id>
+        <title>Nový dátum skartácie</title>
+    </data>
+    <data type="date">
+        <id>19</id>
+        <title>Dátum vypožičania</title>
+    </data>
+    <data type="date">
+        <id>20</id>
+        <title>Dátum vrátenia</title>
+    </data>
+    <data type="user">
+        <id>21</id>
+        <title>Vypožičal</title>
+        <values>1</values>
+        <values>2</values>
+    </data>
+    <data type="user">
+        <id>22</id>
+        <title>Vrátil</title>
+        <values>1</values>
+        <values>2</values>
+    </data>
+    <data type="text">
+        <id>23</id>
+        <title>Názov UJ na scan</title>
+    </data>
+    <data type="text">
+        <id>24</id>
+        <title>Sporná vec</title>
+    </data>
+    <data type="text">
+        <id>25</id>
+        <title>Typ dokumentu</title>
+    </data>
+    <data type="date">
+        <id>26</id>
+        <title>Rok uloženia</title>
+    </data>
+    <data type="text">
+        <id>27</id>
+        <title>Registratúrna značka</title>
+    </data>
+    <data type="text">
+        <id>28</id>
+        <title>Poznámka</title>
+    </data>
+    <data type="text">
+        <id>29</id>
+        <title>Číslo protokolu</title>
+    </data>
+    <data type="text">
+        <id>30</id>
+        <title>Klientské číslo</title>
+    </data>
+    <data type="user">
+        <id>31</id>
+        <title>Odovzdal</title>
+        <values>1</values>
+        <values>2</values>
+    </data>
+    <data type="number">
+        <id>32</id>
+        <title>Počet škatúľ</title>
+    </data>
+    <data type="user">
+        <id>33</id>
+        <title>Kuriér</title>
+        <values>1</values>
+        <values>2</values>
+    </data>
+    <data type="user">
+        <id>34</id>
+        <title>Spracoval</title>
+        <values>1</values>
+        <values>2</values>
+    </data>
+    <data type="text">
+        <id>35</id>
+        <title>Číselný rozsah spracovaných škatúľ</title>
+    </data>
+    <data type="text">
+        <!--tabular-->
+        <id>36</id>
+        <title>Počet uvedený v systéme</title>
+    </data>
+    <data type="user">
+        <id>37</id>
+        <title>Založil</title>
+        <values>1</values>
+        <values>2</values>
+    </data>
+    <data type="user">
+        <id>38</id>
+        <title>Zapísal do systému</title>
+        <values>1</values>
+        <values>2</values>
+    </data>
+    <data type="text">
+        <id>39</id>
+        <title>Navrhované miesto odovzdania</title>
+    </data>
+    <data type="date">
+        <id>40</id>
+        <title>Navrhovaný dátum odovzdania</title>
+    </data>
+    <!-- ROLES -->
+    <role>
+        <id>1</id>
+        <name>client</name>
+    </role>
+    <role>
+        <id>2</id>
+        <name>fm servis</name>
+    </role>
+    <role>
+        <id>3</id>
+        <name>client manager</name>
+    </role>
+    <!-- PLACES -->
     <place>
         <id>0</id>
         <x>100</x>
@@ -144,6 +335,7 @@
         <tokens>0</tokens>
         <isStatic>false</isStatic>
     </place>
+    <!-- TRANSITIONS -->
     <transition>
         <id>1</id>
         <x>180</x>
@@ -162,141 +354,6 @@
                 <delegate>true</delegate>
             </logic>
         </roleRef>
-        <dataRef>
-            <id>29</id>
-            <logic>
-                <editable>true</editable>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>1</id>
-            <logic>
-                <editable>true</editable>
-                <required>true</required>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>2</id>
-            <logic>
-                <editable>true</editable>
-                <required>true</required>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>3</id>
-            <logic>
-                <editable>true</editable>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>4</id>
-            <logic>
-                <editable>true</editable>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>5</id>
-            <logic>
-                <editable>false</editable>
-                <autoPlus ref="4">10y</autoPlus>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>6</id>
-            <logic>
-                <editable>true</editable>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>7</id>
-            <logic>
-                <editable>true</editable>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>8</id>
-            <logic>
-                <editable>true</editable>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>9</id>
-            <logic>
-                <editable>true</editable>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>10</id>
-            <logic>
-                <editable>true</editable>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>11</id>
-            <logic>
-                <editable>true</editable>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>12</id>
-            <logic>
-                <editable>true</editable>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>13</id>
-            <logic>
-                <editable>true</editable>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>14</id>
-            <logic>
-                <editable>true</editable>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>15</id>
-            <logic>
-                <editable>true</editable>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>16</id>
-            <logic>
-                <editable>true</editable>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>17</id>
-            <logic>
-                <editable>true</editable>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>18</id>
-            <logic>
-                <editable>true</editable>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>19</id>
-            <logic>
-                <editable>true</editable>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>20</id>
-            <logic>
-                <editable>true</editable>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>21</id>
-            <logic>
-                <editable>true</editable>
-            </logic>
-        </dataRef>
     </transition>
     <transition>
         <id>2</id>
@@ -310,6 +367,90 @@
             </logic>
         </roleRef>
         <trigger type="user"></trigger>
+        <dataRef>
+            <id>29</id>
+            <logic>
+                <editable>true</editable>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>7</id>
+            <logic>
+                <editable>true</editable>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>30</id>
+            <logic>
+                <editable>true</editable>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>10</id>
+            <logic>
+                <editable>true</editable>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>31</id>
+            <logic>
+                <editable>true</editable>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>32</id>
+            <logic>
+                <editable>true</editable>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>8</id>
+            <logic>
+                <editable>true</editable>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>33</id>
+            <logic>
+                <editable>true</editable>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>34</id>
+            <logic>
+                <editable>true</editable>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>35</id>
+            <logic>
+                <editable>true</editable>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>36</id>
+            <logic>
+                <editable>true</editable>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>37</id>
+            <logic>
+                <editable>true</editable>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>15</id>
+            <logic>
+                <editable>true</editable>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>38</id>
+            <logic>
+                <editable>true</editable>
+            </logic>
+        </dataRef>
     </transition>
     <transition>
         <id>10</id>
@@ -323,6 +464,24 @@
             </logic>
         </roleRef>
         <trigger type="user"></trigger>
+        <dataRef>
+            <id>39</id>
+            <logic>
+                <editable>true</editable>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>40</id>
+            <logic>
+                <editable>true</editable>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>7</id>
+            <logic>
+                <editable>true</editable>
+            </logic>
+        </dataRef>
     </transition>
     <transition>
         <id>13</id>
@@ -336,6 +495,12 @@
             </logic>
         </roleRef>
         <trigger type="user"></trigger>
+        <dataRef>
+            <id>2</id>
+            <logic>
+                <editable>true</editable>
+            </logic>
+        </dataRef>
     </transition>
     <transition>
         <id>19</id>
@@ -350,43 +515,7 @@
             </logic>
         </roleRef>
         <dataRef>
-            <id>22</id>
-            <logic>
-                <editable>true</editable>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>23</id>
-            <logic>
-                <editable>true</editable>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>13</id>
-            <logic>
-                <editable>true</editable>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>19</id>
-            <logic>
-                <editable>true</editable>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>3</id>
-            <logic>
-                <editable>true</editable>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>7</id>
-            <logic>
-                <editable>true</editable>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>28</id>
+            <id>21</id>
             <logic>
                 <editable>true</editable>
             </logic>
@@ -417,6 +546,24 @@
             </logic>
         </roleRef>
         <trigger type="user"></trigger>
+        <dataRef>
+            <id>39</id>
+            <logic>
+                <editable>true</editable>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>40</id>
+            <logic>
+                <editable>true</editable>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>7</id>
+            <logic>
+                <editable>true</editable>
+            </logic>
+        </dataRef>
     </transition>
     <transition>
         <id>31</id>
@@ -430,6 +577,24 @@
             </logic>
         </roleRef>
         <trigger type="user"></trigger>
+        <dataRef>
+            <id>39</id>
+            <logic>
+                <editable>true</editable>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>40</id>
+            <logic>
+                <editable>true</editable>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>7</id>
+            <logic>
+                <editable>true</editable>
+            </logic>
+        </dataRef>
     </transition>
     <transition>
         <id>36</id>
@@ -456,6 +621,48 @@
             </logic>
         </roleRef>
         <trigger type="user"></trigger>
+        <dataRef>
+            <id>25</id>
+            <logic>
+                <editable>true</editable>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>26</id>
+            <logic>
+                <editable>true</editable>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>12</id>
+            <logic>
+                <editable>true</editable>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>27</id>
+            <logic>
+                <editable>true</editable>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>28</id>
+            <logic>
+                <editable>true</editable>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>14</id>
+            <logic>
+                <editable>true</editable>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>2</id>
+            <logic>
+                <editable>true</editable>
+            </logic>
+        </dataRef>
     </transition>
     <transition>
         <id>42</id>
@@ -469,6 +676,12 @@
             </logic>
         </roleRef>
         <trigger type="user"></trigger>
+        <dataRef>
+            <id>24</id>
+            <logic>
+                <editable>true</editable>
+            </logic>
+        </dataRef>
     </transition>
     <transition>
         <id>45</id>
@@ -482,6 +695,12 @@
             </logic>
         </roleRef>
         <trigger type="user"></trigger>
+        <dataRef>
+            <id>24</id>
+            <logic>
+                <editable>true</editable>
+            </logic>
+        </dataRef>
     </transition>
     <transition>
         <id>51</id>
@@ -738,7 +957,19 @@
             </logic>
         </dataRef>
         <dataRef>
+            <id>24</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
             <id>25</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>26</id>
             <logic>
                 <visible>true</visible>
             </logic>
@@ -803,6 +1034,30 @@
                 <visible>true</visible>
             </logic>
         </dataRef>
+        <dataRef>
+            <id>37</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>38</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>39</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>40</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
     </transition>
     <transition>
         <id>242</id>
@@ -822,6 +1077,7 @@
         <y>249</y>
         <label>Oddialit o X rokov</label>
     </transition>
+    <!-- ARCS -->
     <arc>
         <id>4</id>
         <type>regular</type>
