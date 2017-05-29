@@ -1,176 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- version 1.0.0 -->
 <document>
-    <data type="number">
-        <id>1</id>
-        <title>Poradové číslo</title>
-    </data>
-    <data type="text">
-        <id>2</id>
-        <title>Lehota uloženia</title>
-    </data>
-    <data type="text">
-        <id>3</id>
-        <title>Lokalizácia</title>
-    </data>
-    <data type="date">
-        <id>4</id>
-        <title>Od (rok)</title>
-    </data>
-    <data type="date">
-        <id>5</id>
-        <title>Do (rok)</title>
-    </data>
-    <data type="enumeration">
-        <id>6</id>
-        <title>Krajina pôvodu</title>
-        <values>Slovensko</values>
-        <values>Česká Republika</values>
-        <values>Rakúsko</values>
-    </data>
-    <data type="text">
-        <id>7</id>
-        <title>Ukl. jednotka</title>
-    </data>
-    <data type="text">
-        <id>8</id>
-        <title>Miestnosť</title>
-    </data>
-    <data type="user">
-        <id>9</id>
-        <title>Odovzdávajúci</title>
-        <values>1</values>
-        <values>2</values>
-    </data>
-    <data type="text">
-        <id>10</id>
-        <title>Forma</title>
-    </data>
-    <data type="text">
-        <id>11</id>
-        <title>Vecný obsah UJ</title>
-    </data>
-    <data type="text">
-        <id>12</id>
-        <title>Čiarový kód</title>
-    </data>
-    <data type="text">
-        <id>13</id>
-        <title>Registratúrna značka</title>
-    </data>
-    <data type="text">
-        <id>14</id>
-        <title>Pododdelenie</title>
-    </data>
-    <data type="text">
-        <id>15</id>
-        <title>Odovzdávajúci útvar</title>
-    </data>
-    <data type="boolean">
-        <id>16</id>
-        <title>Plomba</title>
-    </data>
-    <data type="date">
-        <id>17</id>
-        <title>Dátum udalosti</title>
-    </data>
-    <data type="text">
-        <id>18</id>
-        <title>Znak hodnoty</title>
-    </data>
-    <data type="text">
-        <id>19</id>
-        <title>Oddelenie</title>
-    </data>
-    <data type="date">
-        <id>20</id>
-        <title>Dátum odovzdania</title>
-    </data>
-    <data type="text">
-        <id>21</id>
-        <title>Typ spisu</title>
-    </data>
-    <data type="date">
-        <id>22</id>
-        <title>Vypožičané dňa</title>
-    </data>
-    <data type="text">
-        <id>23</id>
-        <title>Vybral</title>
-    </data>
-    <data type="text">
-        <id>25</id>
-        <title>Oddelenie</title>
-    </data>
-    <data type="text">
-        <id>27</id>
-        <title>Ukl. jednotka</title>
-    </data>
-    <data type="date">
-        <id>28</id>
-        <title>Vrátiť do</title>
-    </data>
-    <data type="multichoice">
-        <id>29</id>
-        <title>Multiple choice</title>
-        <values>A</values>
-        <values>B</values>
-        <values>C</values>
-    </data>
-    <data type="tabular">
-        <id>30</id>
-        <title>Tabular data</title>
-        <columns>
-            <data type="text">
-                <id>1</id>
-                <title>Column 1</title>
-            </data>
-            <data type="text">
-                <id>2</id>
-                <title>Column 2</title>
-            </data>
-            <data type="text">
-                <id>3</id>
-                <title>Column 3</title>
-            </data>
-        </columns>
-    </data>
-    <data type="text">
-        <id>31</id>
-        <title>Firma</title>
-    </data>
-    <data type="text">
-        <id>32</id>
-        <title>Poznámka</title>
-    </data>
-    <data type="text">
-        <id>33</id>
-        <title>Číslo plomby</title>
-    </data>
-    <data type="text">
-        <id>34</id>
-        <title>Čísla spisov</title>
-    </data>
-    <data type="text">
-        <id>35</id>
-        <title>Box</title>
-    </data>
-    <data type="text">
-        <id>36</id>
-        <title>LU</title>
-    </data>
-    <role>
-        <id>1</id>
-        <name>client</name>
-    </role>
-    <role>
-        <id>2</id>
-        <name>fm servis</name>
-    </role>
-    <role>
-        <id>3</id>
-        <name>client manager</name>
-    </role>
     <place>
         <id>0</id>
         <x>100</x>
@@ -256,7 +85,7 @@
         <x>1500</x>
         <y>180</y>
         <label>Q</label>
-        <tokens>1</tokens>
+        <tokens>0</tokens>
         <isStatic>false</isStatic>
     </place>
     <place>
@@ -308,48 +137,13 @@
         <isStatic>false</isStatic>
     </place>
     <place>
-        <id>251</id>
-        <x>274</x>
-        <y>203</y>
-        <label>start</label>
-        <tokens>5</tokens>
-        <isStatic>false</isStatic>
-    </place>
-    <place>
-        <id>254</id>
-        <x>527</x>
-        <y>197</y>
-        <label>end</label>
+        <id>346</id>
+        <x>1300</x>
+        <y>180</y>
+        <label></label>
         <tokens>0</tokens>
         <isStatic>false</isStatic>
     </place>
-    <transition>
-        <id>252</id>
-        <x>411</x>
-        <y>142</y>
-        <label>reset</label>
-        <roleRef>
-            <id>1</id>
-            <logic>
-                <assign>true</assign>
-            </logic>
-        </roleRef>
-        <trigger type="user"></trigger>
-        <trigger type="user"></trigger>
-    </transition>
-    <transition>
-        <id>253</id>
-        <x>402</x>
-        <y>257</y>
-        <label>inhibit</label>
-        <roleRef>
-            <id>1</id>
-            <logic>
-                <assign>true</assign>
-            </logic>
-        </roleRef>
-        <trigger type="user"></trigger>
-    </transition>
     <transition>
         <id>1</id>
         <x>180</x>
@@ -1015,13 +809,18 @@
         <x>940</x>
         <y>180</y>
         <label>Prve zaevidovanie UJ</label>
-        <roleRef>
-            <id>2</id>
-            <logic>
-                <assign>true</assign>
-            </logic>
-        </roleRef>
-        <trigger type="user"></trigger>
+    </transition>
+    <transition>
+        <id>345</id>
+        <x>1180</x>
+        <y>180</y>
+        <label>Navrh na skartaciu</label>
+    </transition>
+    <transition>
+        <id>350</id>
+        <x>1221</x>
+        <y>249</y>
+        <label>Oddialit o X rokov</label>
     </transition>
     <arc>
         <id>4</id>
@@ -1354,31 +1153,38 @@
         <multiplicity>1</multiplicity>
     </arc>
     <arc>
-        <id>249</id>
-        <type>inhibitor</type>
-        <sourceId>251</sourceId>
-        <destinationId>253</destinationId>
-        <multiplicity>1</multiplicity>
-    </arc>
-    <arc>
-        <id>248</id>
-        <type>reset</type>
-        <sourceId>251</sourceId>
-        <destinationId>252</destinationId>
-        <multiplicity>1</multiplicity>
-    </arc>
-    <arc>
-        <id>247</id>
+        <id>347</id>
         <type>regular</type>
-        <sourceId>252</sourceId>
-        <destinationId>254</destinationId>
+        <sourceId>49</sourceId>
+        <destinationId>345</destinationId>
         <multiplicity>1</multiplicity>
     </arc>
     <arc>
-        <id>246</id>
+        <id>348</id>
         <type>regular</type>
-        <sourceId>253</sourceId>
-        <destinationId>254</destinationId>
+        <sourceId>345</sourceId>
+        <destinationId>346</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>349</id>
+        <type>regular</type>
+        <sourceId>346</sourceId>
+        <destinationId>54</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>351</id>
+        <type>regular</type>
+        <sourceId>346</sourceId>
+        <destinationId>350</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>352</id>
+        <type>regular</type>
+        <sourceId>350</sourceId>
+        <destinationId>49</destinationId>
         <multiplicity>1</multiplicity>
     </arc>
 </document>
