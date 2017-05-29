@@ -25,10 +25,10 @@ public class ImporterTest {
 
     private static final String NET_TITLE = "jaxb_test";
     private static final String NET_INITIALS = "TST";
-    private static final Integer NET_PLACES = 19;
-    private static final Integer NET_TRANSITIONS = 24;
-    private static final Integer NET_ARCS = 23;
-    private static final Integer NET_FIELDS = 34;
+    private static final Integer NET_PLACES = 17;
+    private static final Integer NET_TRANSITIONS = 22;
+    private static final Integer NET_ARCS = 21;
+    private static final Integer NET_FIELDS = 28;
     private static final Integer NET_ROLES = 3;
 
     @Before
@@ -38,7 +38,7 @@ public class ImporterTest {
 
     @Test
     public void importPetriNet() throws Exception {
-        importer.importPetriNet(new File("src/test/resources/prikladFM.xml"), NET_TITLE, NET_INITIALS);
+        importer.importPetriNet(new File("src/test/resources/prikladFM_test.xml"), NET_TITLE, NET_INITIALS);
 
         assertNetProperlyImported();
     }
