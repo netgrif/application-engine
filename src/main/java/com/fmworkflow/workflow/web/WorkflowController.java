@@ -3,7 +3,10 @@ package com.fmworkflow.workflow.web;
 import com.fmworkflow.workflow.domain.Case;
 import com.fmworkflow.workflow.service.interfaces.IWorkflowService;
 import com.fmworkflow.workflow.web.requestbodies.CreateCaseBody;
-import com.fmworkflow.workflow.web.responsebodies.*;
+import com.fmworkflow.workflow.web.responsebodies.CaseResource;
+import com.fmworkflow.workflow.web.responsebodies.CaseResourceAssembler;
+import com.fmworkflow.workflow.web.responsebodies.MessageResource;
+import com.fmworkflow.workflow.web.responsebodies.ResourceLinkAssembler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -16,7 +19,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController()

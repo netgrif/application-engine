@@ -335,6 +335,14 @@
         <tokens>0</tokens>
         <isStatic>false</isStatic>
     </place>
+    <place>
+        <id>423</id>
+        <x>1460</x>
+        <y>180</y>
+        <label>S</label>
+        <tokens>0</tokens>
+        <isStatic>false</isStatic>
+    </place>
     <!-- TRANSITIONS -->
     <transition>
         <id>1</id>
@@ -1077,6 +1085,12 @@
         <y>249</y>
         <label>Oddialit o X rokov</label>
     </transition>
+    <transition>
+        <id>422</id>
+        <x>1340</x>
+        <y>180</y>
+        <label>Potvrdiť skartáciu</label>
+    </transition>
     <!-- ARCS -->
     <arc>
         <id>4</id>
@@ -1261,13 +1275,6 @@
         <multiplicity>1</multiplicity>
     </arc>
     <arc>
-        <id>61</id>
-        <type>regular</type>
-        <sourceId>49</sourceId>
-        <destinationId>54</destinationId>
-        <multiplicity>1</multiplicity>
-    </arc>
-    <arc>
         <id>65</id>
         <type>regular</type>
         <sourceId>54</sourceId>
@@ -1423,13 +1430,6 @@
         <multiplicity>1</multiplicity>
     </arc>
     <arc>
-        <id>349</id>
-        <type>regular</type>
-        <sourceId>346</sourceId>
-        <destinationId>54</destinationId>
-        <multiplicity>1</multiplicity>
-    </arc>
-    <arc>
         <id>351</id>
         <type>regular</type>
         <sourceId>346</sourceId>
@@ -1441,6 +1441,27 @@
         <type>regular</type>
         <sourceId>350</sourceId>
         <destinationId>49</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>424</id>
+        <type>regular</type>
+        <sourceId>346</sourceId>
+        <destinationId>422</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>425</id>
+        <type>regular</type>
+        <sourceId>422</sourceId>
+        <destinationId>423</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>426</id>
+        <type>regular</type>
+        <sourceId>423</sourceId>
+        <destinationId>54</destinationId>
         <multiplicity>1</multiplicity>
     </arc>
 </document>
