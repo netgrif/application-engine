@@ -25,9 +25,9 @@ import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
-@Component
-@Profile({"!test"})
-public class WorkflowCommandLineRunner implements CommandLineRunner {
+//@Component
+//@Profile({"!test"})
+public class WorkflowCommandLineRunner {//implements CommandLineRunner {
     @Autowired
     private UserProcessRoleRepository userProcessRoleRepository;
 
@@ -49,15 +49,16 @@ public class WorkflowCommandLineRunner implements CommandLineRunner {
     @Autowired
     private PetriNetRepository petriNetRepository;
 
-    @Override
+
     public void run(String... strings) throws Exception {
         mongoTemplate.getDb().dropDatabase();
         // TODO: 26/04/2017 title, initials
-        importer.importPetriNet(new File("src/test/resources/poistenie_rozsirene.xml"), "Poistenie", "INS");
+        //importer.importPetriNet(new File("src/test/resources/poistenie_rozsirene.xml"), "Poistenie", "INS");
+        importer.importPetriNet(new File("src/test/resources/prikladFM.xml"),"FM Servis","FM");
         PetriNet net = petriNetRepository.findAll().get(0);
-        for (int i = 0; i < 10; i++) {
-            workflowService.createCase(net.getStringId(), "Poistka " + i, randomColor());
-        }
+//        for (int i = 0; i < 10; i++) {
+//            workflowService.createCase(net.getStringId(), " " + i, randomColor());
+//        }
 
 //        Role roleUser = new Role("user");
 //        roleUser = roleRepository.save(roleUser);
@@ -125,10 +126,15 @@ public class WorkflowCommandLineRunner implements CommandLineRunner {
         List<ProcessRole> proles = new LinkedList<>(net.getRoles().values().stream().sorted(Comparator.comparing(ProcessRole::getName)).collect(Collectors.toList()));
 
         List<ProcessRole> usePRoles = new LinkedList<>();
-        usePRoles.add(proles.get(0));
-        createUser(new User("poistenec@gmail.com", "password", "Fero", "Poistenec"),roleUser,usePRoles);
-        usePRoles.add(proles.get(1));
-        createUser(new User("agent@gmail.com", "password", "Jano", "Poisťovák"),roleAdmin,usePRoles);
+//        usePRoles.add(proles.get(0));
+//        createUser(new User("poistenec@gmail.com", "password", "Fero", "Poistenec"),roleUser,usePRoles);
+//        usePRoles.add(proles.get(1));
+//        createUser(new User("agent@gmail.com", "password", "Jano", "Poisťovák"),roleAdmin,usePRoles);
+//        createUser(new User("super@netgrif.com","password","Super","Trooper"), roleAdmin, proles);
+        createUser(new User("client@gmail.com","password","Mária","Kováčová"),roleUser,usePRoles);
+        createUser(new User("manager.client@gmail.com","password","Jano","Mrkvička"),roleUser,usePRoles);
+        createUser(new User("employee@fmservis.sk","password","Štefan","Horváth"),roleUser,usePRoles);
+        createUser(new User("manager@fmservis.sk","password","Peter","Molnár"),roleAdmin,usePRoles);
         createUser(new User("super@netgrif.com","password","Super","Trooper"), roleAdmin, proles);
     }
 
