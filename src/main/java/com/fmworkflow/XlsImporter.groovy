@@ -78,7 +78,7 @@ class XlsImporter implements CommandLineRunner {
 
     @Override
     void run(String... strings) throws Exception {
-        net = importer.importPetriNet(new File("src/test/resources/prikladFM_import.xml"), "Archiv", "FMS")
+        net = importer.importPetriNet(new File("src/test/resources/prikladFM.xml"), "Archiv", "FMS")
 
         def user = userRepository.findByEmail("super@netgrif.com")
         user.setUserProcessRoles(userProcessRoleRepository.findAll() as Set)
@@ -153,6 +153,7 @@ class XlsImporter implements CommandLineRunner {
             }
 
             caseRepository.save(useCase)
+            net.initializeTokens(useCase.activePlaces)
             taskService.createTasks(useCase)
 
             index++
