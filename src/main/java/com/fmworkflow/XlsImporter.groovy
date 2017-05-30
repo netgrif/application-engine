@@ -80,12 +80,20 @@ class XlsImporter implements CommandLineRunner {
     void run(String... strings) throws Exception {
         net = importer.importPetriNet(new File("src/test/resources/prikladFM.xml"), "Archiv", "FMS")
 
-        def user = userRepository.findByEmail("super@netgrif.com")
-        user.setUserProcessRoles(userProcessRoleRepository.findAll() as Set)
-        user.setRoles(roleRepository.findAll() as Set)
+        Role userRole = new Role("user")
+        userRole = roleRepository.save(userRole)
+        Role roleAdmin = new Role("admin")
+        roleRepository.save(roleAdmin)
+
+        def user = new User(
+                email: "super@netgrif.com",
+                name: "Super",
+                surname: "Trooper",
+                password: "password",
+                roles: roleRepository.findAll() as Set,
+                userProcessRoles: userProcessRoleRepository.findAll() as Set)
         userService.save(user)
 
-        def userRole = roleRepository.findByName("user")
         def client_manager = new User(
                 email: "manager@client.com",
                 name: "Manager",
