@@ -412,7 +412,7 @@
         <y>340</y>
         <label>Odovzdanie UJ do RS-FMS</label>
         <roleRef>
-            <id>1</id>
+            <id>2</id>
             <logic>
                 <assign>true</assign>
             </logic>
@@ -1135,6 +1135,12 @@
         </dataRef>
         <dataRef>
             <id>40</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>41</id>
             <logic>
                 <visible>true</visible>
             </logic>

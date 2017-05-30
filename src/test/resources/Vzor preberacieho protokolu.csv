@@ -5,14 +5,8 @@
 669	20020174	174/02	Reporty, manuály, Budget plan 1996 - 2002	1996	2002	Spoločnosť XY, a.s.	Finančné oddelenie	Nováková	1.11.2009	šanón	10		O1A 0000077733	P-X2/R3/P1	
 653	20030185	151/03	Štatistické výkazy	2003	2003	Spoločnosť XY, a.s.	Finančné oddelenie	Nováková	1.11.2009	šanón		A	O1A 0000077840	P-F1/R2/P1	
 652	20040267	267/04	DPH	2004	2004	Spoločnosť XY, a.s.	Finančné oddelenie	Nováková	1.11.2009	šanón	10		O1A 0000077844	P-F1/R2/P1	
-653	20040268	268/04	Uzávierky, kalkulácie  2003 - 2004	2003	2004	Spoločnosť XY, a.s.	Finančné oddelenie	Nováková	1.11.2009	šanón	10		O1A 0000077843	P-F1/R2/P1	
-672	20040273	273/04	Kniha jázd, vnútropodnikové smernice, účtovné doklady, zálohové faktúry 1997 - 2004	1997	2004	Spoločnosť XY, a.s.	Finančné oddelenie	Nováková	1.11.2009	šanón	10		O1A 0000079559	P-X2/R2/P1	
-35	20110066	66/11	"Zápis zo zasadnutia predstavenstva spoločnosti zo dňa 4.3.2011, 3.6.2011, 7.9.2011, 2.11.2011, 13.1.2011; Zápis zo zasadnutia predstavenstva a dozornej rady spoločnosti zo dňa 26.3.2011, 31.5.2011, 17.8.2011, 16.11.2011"	2011	2011	Spoločnosť XY, a.s.	Právne oddelenie	Lazarová	8.11.2012	šanon		A	O1A 0000172300	2R3/R2/P2	
-36	20110067	68/11	Výročná správa za rok 2011, Zápis zo zasadnutia dozornej rady spoločnosti zo dňa 11.7.2011 a 14.4.2011,  Zápis zo zasadnutia predstavenstva spoločnosti  zo dňa 22.11.2011 	2011	2011	Spoločnosť XY, a.s.	Právne oddelenie	Lazarová	8.11.2012	šanon		A	O1A 0000172301	2T3/R2/P2	
-36	20110068	69/11	Výročná správa za rok 2010 a 2011, Zápis zo zasadnutia dozornej rady spoločnosti  zo dňa 16.12.2011, Podklady pre rozhodnutie akcionára spoločnosti  pri výkone pôsobnosti riadneho valného zhromaždenia Praha 27.5.2011	2011	2011	Spoločnosť XY, a.s.	Právne oddelenie	Lazarová	8.11.2012	šanon		A	O1A 0000172302	2T3/R2/P2	
-36	20110069	70/11	Smernice spoločnosti, Registratúrny plán spoločnosti, Zápisnica o priebehu riadneho valného zhromaždenia spoločnosti  zo dňa 26.6.2009	2011	2011	Spoločnosť XY, a.s.	Právne oddelenie	Lazarová	8.11.2012	šanon		A	O1A 0000172303	2T3/R2/P2	
-36	20110070	71/11	Advokátska kancelária, Stanovy spoločnosti, Správy o výkone kontroly a o faktických zisteniach + súvisiace dokumenty (27.10.2015, 25.9.2014,9.10.2013, 2.5.2012, 18.3.2011), Podnikateľský zámer za rok 2011 , Pracovné zmluvy o výkone funkcie člena predstavenstva a dozornej rady, Správa dozornej rady spoločnosti za rok 2009-2011, Výpis zo zápisu zo zasadnutia spoločnosti zo dňa 26.3.2011	2011	2011	Spoločnosť XY, a.s.	Právne oddelenie	Lazarová	8.11.2012	šanon	5		O1A 0000172304	2T3/R2/P2	
-39	20110080	81/11	Dodacie listy SK 8.12. - 15.12.2011	2011	2011	Spoločnosť XY, a.s.	Skladové oddelenie	Spesková	8.11.2012	škatulka	10		O1A 0000172314	2J2/R2/P2	
+653	20040268	268/04	Uzávierky, kalkulácie  2003 - 2004	2003	2004	Spoločnosť XY, a.s.	Finančné oddelenie	Nováková	1.11.2009	šanón	10		O1A 0000077843	P-F1/R2/P1
+39	20110080	81/11	Dodacie listy SK 8.12. - 15.12.2011	2011	2011	Spoločnosť XY, a.s.	Skladové oddelenie	Spesková	8.11.2012	škatulka	10		O1A 0000172314	2J2/R2/P2
 40	20110081	82/11	Dodacie listy SK 4.1. - 18.1.2011	2011	2011	Spoločnosť XY, a.s.	Skladové oddelenie	Spesková	8.11.2012	šanon	10		O1A 0000172315	2J2/R2/P2	
 40	20110082	83/11	Dodacie listy SK 19.1. - 27.1.2011	2011	2011	Spoločnosť XY, a.s.	Skladové oddelenie	Spesková	8.11.2012	šanon	10		O1A 0000172316	2J2/R2/P2	
 40	20110083	84/11	Dodacie listy SK  31.1. - 8.2.2011	2011	2011	Spoločnosť XY, a.s.	Skladové oddelenie	Spesková	8.11.2012	šanon	10		O1A 0000172317	2J2/R2/P2	
@@ -60,18 +54,11 @@ HR74	PERS0435	435	Výplatné pásky 2008(šanón č.6)	2008	2008	Spoločnosť XY
 HR75	PERS0436	436	Výplatné pásky 2008(šanón č.7)	2008	2008	Spoločnosť XY, a.s.	Personálne oddelenie	Vlková	30.1.2014	šanón	10		O1A 0000243645	2D1/R3/P1	ELANOR Slovakia spol. s r.o.
 HR75	PERS0437	437	Výplatné pásky 2009(šanón č.8)	2009	2009	Spoločnosť XY, a.s.	Personálne oddelenie	Vlková	30.1.2014	šanón	10		O1A 0000243646	2D1/R3/P1	ELANOR Slovakia spol. s r.o.
 HR75	PERS0438	438	Mzdové listy 2004(zväzok č.9)	2004	2004	Spoločnosť XY, a.s.	Personálne oddelenie	Vlková	30.1.2014	šanón	50		O1A 0000243647	2D1/R3/P1	ELANOR Slovakia spol. s r.o.
-HR78	PERS0454	454	Vyhlásenia k zdaneniu príjmov FO zo závislej činnnosti, Daňové vyhlásenia zamestnancov 2001 - 2009	2001	2009	Spoločnosť XY, a.s.	Personálne oddelenie	Vlková	30.1.2014	šanón	10		O1A 0000243663	2D1/R3/P1	ELANOR Slovakia spol. s r.o.
-HR78	PERS0455	455	Vyhlásenia k zdaneniu príjmov FO zo závislej činnnosti, Daňové vyhlásenia zamestnancov 2001 - 2010	2001	2009	Spoločnosť XY, a.s.	Personálne oddelenie	Vlková	30.1.2014	šanón	10		O1A 0000243664	2D1/R3/P1	ELANOR Slovakia spol. s r.o.
-HR78	PERS0456	456	Vyhlásenia k zdaneniu príjmov FO zo závislej činnnosti, Daňové vyhlásenia zamestnancov 2001 - 2011	2001	2009	Spoločnosť XY, a.s.	Personálne oddelenie	Vlková	30.1.2014	šanón	10		O1A 0000243665	2D1/R3/P1	ELANOR Slovakia spol. s r.o.
 HR79	PERS0458	458	Daňové podklady, Ročné zúčtovanie dane zo závislej činnosti  A-F	2001	2009	Spoločnosť XY, a.s.	Personálne oddelenie	Vlková	30.1.2014	šanón	10		O1A 0000243667	2D1/R3/P1	ELANOR Slovakia spol. s r.o.
 HR79	PERS0459	459	Daňové podklady, Ročné zúčtovanie dane zo závislej činnosti G - K	2001	2009	Spoločnosť XY, a.s.	Personálne oddelenie	Vlková	30.1.2014	šanón	10		O1A 0000243668	2D1/R3/P1	ELANOR Slovakia spol. s r.o.
 HR79	PERS0460	460	Daňové podklady, Ročné zúčtovanie dane zo závislej činnosti L - P	2001	2009	Spoločnosť XY, a.s.	Personálne oddelenie	Vlková	30.1.2014	šanón	10		O1A 0000243669	2D1/R3/P1	ELANOR Slovakia spol. s r.o.
 HR79	PERS0461	461	Daňové podklady, Ročné zúčtovanie dane zo závislej činnosti R - Z	2001	2009	Spoločnosť XY, a.s.	Personálne oddelenie	Vlková	30.1.2014	šanón	10		O1A 0000243670	2D1/R3/P1	ELANOR Slovakia spol. s r.o.
-HR19	20050001	1.5	Mzdy a odvody 2005, Rekapitulácia miezd 2005, Podklady k mzdám 2005, Mesačné výkazy do SP ,RLFO 2005, Mesačné výkazy ZP, Daňové hlásenia 2005,Nemoc 2005	2005	2005	Spoločnosť XY, a.s.	Personálne oddelenie	Vlková	30.1.2014	šanón	10		O1A 0000243673	2D1/R3/P1	
-HR19	20050002	2.5	Výplatné pásky 2005, Výplatné pásky 2005, Mzdové listy 2004	2004	2005	Spoločnosť XY, a.s.	Personálne oddelenie	Vlková	30.1.2014	šanón	50		O1A 0000243674	2D1/R3/P1	
-HR19	20060001	1.6	Mzdy a odvody 2006, Rekapitulácia miezd 2006,Mesačné výkazy do SP, RLFO, ELDP 2006, RZZP 2005, Mesačné výkauy ZP 2006, Daňové hlásenia 2005+2006, Ročný výkaz o ZTP 2005, Ročný výkaz o práceneschopnosti 2005, Výplatné pásky 2006, Podklady zo spracovania miezd 2005	2005	2006	Spoločnosť XY, a.s.	Personálne oddelenie	Vlková	30.1.2014	šanón	10		O1A 0000243675	2D1/R3/P1	
-HR19	20070001	1.7	Mzdy a odvody 2007, Rekapitulácia miezd 2007, Mesačné výkazy do SP, RLFO, ELDP 2007, RZZP 2006, Mesačné výkazy a hlásenia do ZP 2007, Daňové hlásenia 2007+2006, Príspevky DDS 2007, Ročný výkaz o pracovnej neschopnosti 2006, Výplatné pásky 2007, Mzdové listy 2007, Podklady zo spracovania miezd 2007	2006	2007	Spoločnosť XY, a.s.	Personálne oddelenie	Vlková	30.1.2014	šanón	50		O1A 0000243676	2D1/R3/P1	
-98	20130007	7.13	Príjem na sklad od 1.1.2013 - 12.2.2013  XVII	2013	2013	Spoločnosť XY, a.s.	Skladové oddelenie	Spesková	16.1.2014	šanón	10		O1A 0000243751	VJ 1	
+98	20130007	7.13	Príjem na sklad od 1.1.2013 - 12.2.2013  XVII	2013	2013	Spoločnosť XY, a.s.	Skladové oddelenie	Spesková	16.1.2014	šanón	10		O1A 0000243751	VJ 1
 98	20130008	8.13	Príjem na sklad od 14.2. - 21.3.2013   XVIII	2013	2013	Spoločnosť XY, a.s.	Skladové oddelenie	Spesková	16.1.2014	šanón	10		O1A 0000243752	VJ 1	
 98	20130009	9.13	Príjem na sklad od 26.4.2013 - 21.5.2013  XIX	2013	2013	Spoločnosť XY, a.s.	Skladové oddelenie	Spesková	16.1.2014	šanón	10		O1A 0000243753	VJ 1	
 98	20130010	10.13	Príjem na sklad od 27.3.2013 - 25.4.2013   XX	2013	2013	Spoločnosť XY, a.s.	Skladové oddelenie	Spesková	16.1.2014	šanón	10		O1A 0000243754	VJ 1	
@@ -88,8 +75,7 @@ HR22	20090014	14.9	Talent Management	2008	2009	Spoločnosť XY, a.s.	Personálne
 HR22	20100001	1.10	Talent Review	2010	2010	Spoločnosť XY, a.s.	Personálne oddelenie	Vlková	12.3.2014	šanón	10		O1A 0000248976	K1/R2/P3	
 HR22	20120001	1.12	Talent Review 2011,2012	2012	2012	Spoločnosť XY, a.s.	Personálne oddelenie	Vlková	12.3.2014	šanón	10		O1A 0000248977	K1/R2/P3	
 HR22	20100002	2.10	Stav zamestnancov fluktoácia 2010	2010	2010	Spoločnosť XY, a.s.	Personálne oddelenie	Vlková	12.3.2014	šanón	10		O1A 0000248978	K1/R2/P3	
-HR22	20120002	2.12	Stav zamestnancov fluktoácia 2010 -2012	2010	2012	Spoločnosť XY, a.s.	Personálne oddelenie	Vlková	12.3.2014	šanón	10		O1A 0000248979	K1/R2/P3	
-HR23	20090015	15.9	Sociálna poisťovňa -nahlásenia noví zam.,brigádnici,DVP	2008	2009	Spoločnosť XY, a.s.	Personálne oddelenie	Vlková	12.3.2014	šanón	10		O1A 0000248980	K1/R2/P3	
+HR22	20120002	2.12	Stav zamestnancov fluktoácia 2010 -2012	2010	2012	Spoločnosť XY, a.s.	Personálne oddelenie	Vlková	12.3.2014	šanón	10		O1A 0000248979	K1/R2/P3
 HR23	20080002	2.8	Recruitment 2008	2008	2008	Spoločnosť XY, a.s.	Personálne oddelenie	Vlková	12.3.2014	šanón	10		O1A 0000248983	K1/R2/P3	
 HR23	20090016	16.9	Recruitment 2009	2009	2009	Spoločnosť XY, a.s.	Personálne oddelenie	Vlková	12.3.2014	šanón	10		O1A 0000248984	K1/R2/P3	
 HR23	20100003	3.10	Recruitment 2010	2010	2010	Spoločnosť XY, a.s.	Personálne oddelenie	Vlková	12.3.2014	šanón	10		O1A 0000248985	K1/R2/P3	
