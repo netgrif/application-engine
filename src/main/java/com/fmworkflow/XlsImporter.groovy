@@ -17,14 +17,20 @@ import com.fmworkflow.workflow.service.TaskService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.CommandLineRunner
 import org.springframework.context.annotation.Profile
+import org.springframework.data.mongodb.core.MongoTemplate
 import org.springframework.stereotype.Component
 
+import java.text.Normalizer
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import java.util.concurrent.ThreadLocalRandom
 
 @Component
 @Profile("!test")
 class XlsImporter implements CommandLineRunner {
+
+    @Autowired
+    private MongoTemplate mongoTemplate
 
     @Autowired
     private PetriNetRepository petriNetRepository
@@ -71,16 +77,19 @@ class XlsImporter implements CommandLineRunner {
             ["Číslo plomby", FieldType.TEXT]
     ]
 
-    private final String EMAIL_TEMPLATE = "@fmservis.sk"
+    private final String EMAIL_TEMPLATE = "@company.com"
 
     private PetriNet net
     private Case useCase
+    private UserProcessRole clientRole
+    private Role userRole
 
     @Override
     void run(String... strings) throws Exception {
-        net = importer.importPetriNet(new File("src/test/resources/prikladFM.xml"), "Archiv", "FMS")
+        mongoTemplate.getDb().dropDatabase()
+        net = importer.importPetriNet(new File("src/test/resources/prikladFM.xml"), "Ukladacia jednotka", "FMS")
 
-        Role userRole = new Role("user")
+        userRole = new Role("user")
         userRole = roleRepository.save(userRole)
         Role roleAdmin = new Role("admin")
         roleRepository.save(roleAdmin)
@@ -95,33 +104,33 @@ class XlsImporter implements CommandLineRunner {
         userService.save(user)
 
         def client_manager = new User(
-                email: "manager@client.com",
-                name: "Manager",
-                surname: "Client",
+                email: "manager@company.com",
+                name: "Jano",
+                surname: "Mrkvička",
                 password: "password",
                 roles: [userRole] as Set<Role>)
         client_manager.addProcessRole(userProcessRoleRepository.save(new UserProcessRole(
                 roleId: net.roles.values().find { it -> it.name == "client manager" }.stringId)))
         def client_worker = new User(
-                email: "worker@client.com",
-                name: "Worker",
-                surname: "Client",
+                email: "worker@company.com",
+                name: "Mária",
+                surname: "Kováčová",
                 password: "password",
                 roles: [userRole] as Set<Role>)
         client_worker.addProcessRole(userProcessRoleRepository.save(new UserProcessRole(
                 roleId: net.roles.values().find { it -> it.name == "client" }.stringId)))
         def fm_manager = new User(
-                email: "manager@fmservis.com",
-                name: "Manager",
-                surname: "FM Servis",
+                email: "manager@fmservis.sk",
+                name: "Peter",
+                surname: "Molnár",
                 password: "password",
-                roles: [userRole] as Set<Role>)
+                roles: [roleAdmin] as Set<Role>)
         fm_manager.addProcessRole(userProcessRoleRepository.save(new UserProcessRole(
-                roleId: net.roles.values().find { it -> it.name == "fm servis" }.stringId)))
+                roleId: net.roles.values().find { it -> it.name == "fm manager" }.stringId)))
         def fm_worker = new User(
-                email: "worker@fmservis.com",
-                name: "Worker",
-                surname: "FM Servis",
+                email: "worker@fmservis.sk",
+                name: "Štefan",
+                surname: "Horváth",
                 password: "password",
                 roles: [userRole] as Set<Role>)
         fm_worker.addProcessRole(userProcessRoleRepository.save(new UserProcessRole(
@@ -131,9 +140,11 @@ class XlsImporter implements CommandLineRunner {
         userService.save(fm_manager)
         userService.save(fm_worker)
 
+        clientRole = client_worker.userProcessRoles.first()
+
         def index = 0
         new File("src/test/resources/Vzor preberacieho protokolu.csv").splitEachLine("\t") { fields ->
-            useCase = new Case(petriNet: net, title: "Ukladacia jednotka ${fields[1]}")
+            useCase = new Case(petriNet: net, title: fields[3], color: randomColor())
 
 
             if (index < 10) {
@@ -183,12 +194,15 @@ class XlsImporter implements CommandLineRunner {
             case FieldType.USER:
                 User user = userRepository.findBySurname(value)
                 if (!user) {
-                    user = userRepository.save(new User(
-                            email: "user${email_id++}${EMAIL_TEMPLATE}",
+                    user = new User(
+                            email: generateEmail(value),
                             password: "password",
-                            name: "Jozko",
+                            name: randomName(),
                             surname: value,
-                    ))
+                            roles: [userRole] as Set<Role>
+                    )
+                    user.addProcessRole(clientRole)
+                    user = userRepository.save(user)
                 } else {
                     user.roles.size()
                     user.userProcessRoles.size()
@@ -203,5 +217,51 @@ class XlsImporter implements CommandLineRunner {
         useCase.dataSetValues.put(net.dataSet.find { it ->
             it.value.name == fieldName
         }.getKey(), value)
+    }
+
+    String generateEmail(String name) {
+        name = Normalizer.normalize(name, Normalizer.Form.NFD);
+        name = name.replaceAll("[^\\p{ASCII}]", "")
+        return name + EMAIL_TEMPLATE
+    }
+
+    String randomName() {
+        int randomNum = ThreadLocalRandom.current().nextInt(0, 5)
+        switch (randomNum) {
+            case 0:
+                return "Ema"
+
+            case 1:
+                return "Jana"
+
+            case 2:
+                return "Natália"
+
+            case 3:
+                return "Katarína"
+
+            case 4:
+                return "Zuzana"
+            default:
+                return "Eva"
+        }
+    }
+
+    private String randomColor() {
+        int randomNum = ThreadLocalRandom.current().nextInt(0, 5);
+        switch (randomNum) {
+            case 0:
+                return "color-fg-primary-500";
+            case 1:
+                return "color-fg-blue-grey-500";
+            case 2:
+                return "color-fg-amber-500";
+            case 3:
+                return "color-fg-indigo-500";
+            case 4:
+                return "color-fg-success";
+            default:
+                return "color-fg-primary-500";
+        }
     }
 }
