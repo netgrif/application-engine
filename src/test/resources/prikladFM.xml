@@ -177,6 +177,10 @@
         <id>40</id>
         <title>Navrhovaný dátum odovzdania</title>
     </data>
+    <data type="file">
+        <id>41</id>
+        <title>Scan</title>
+    </data>
     <!-- ROLES -->
     <role>
         <id>1</id>
@@ -189,6 +193,14 @@
     <role>
         <id>3</id>
         <name>client manager</name>
+    </role>
+    <role>
+        <id>4</id>
+        <name>fm manager</name>
+    </role>
+    <role>
+        <id>5</id>
+        <name>system</name>
     </role>
     <!-- PLACES -->
     <place>
@@ -356,12 +368,43 @@
                 <assign>true</assign>
             </logic>
         </roleRef>
-        <roleRef>
-            <id>3</id>
+        <trigger type="user"></trigger>
+        <dataRef>
+            <id>25</id>
             <logic>
-                <delegate>true</delegate>
+                <editable>true</editable>
             </logic>
-        </roleRef>
+        </dataRef>
+        <dataRef>
+            <id>26</id>
+            <logic>
+                <editable>true</editable>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>12</id>
+            <logic>
+                <editable>true</editable>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>27</id>
+            <logic>
+                <editable>true</editable>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>28</id>
+            <logic>
+                <editable>true</editable>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>2</id>
+            <logic>
+                <editable>true</editable>
+            </logic>
+        </dataRef>
     </transition>
     <transition>
         <id>2</id>
@@ -541,6 +584,18 @@
             </logic>
         </roleRef>
         <trigger type="user"></trigger>
+        <dataRef>
+            <id>39</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>40</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
     </transition>
     <transition>
         <id>26</id>
@@ -735,6 +790,12 @@
             </logic>
         </roleRef>
         <trigger type="user"></trigger>
+        <dataRef>
+            <id>21</id>
+            <logic>
+                <editable>true</editable>
+            </logic>
+        </dataRef>
     </transition>
     <transition>
         <id>54</id>
@@ -787,6 +848,12 @@
             </logic>
         </roleRef>
         <trigger type="user"></trigger>
+        <dataRef>
+            <id>24</id>
+            <logic>
+                <editable>true</editable>
+            </logic>
+        </dataRef>
     </transition>
     <transition>
         <id>122</id>
@@ -813,6 +880,12 @@
             </logic>
         </roleRef>
         <trigger type="user"></trigger>
+        <dataRef>
+            <id>41</id>
+            <logic>
+                <editable>true</editable>
+            </logic>
+        </dataRef>
     </transition>
     <transition>
         <id>181</id>
@@ -1078,6 +1151,49 @@
                 <assign>true</assign>
             </logic>
         </roleRef>
+        <trigger type="user"></trigger>
+        <dataRef>
+            <id>25</id>
+            <logic>
+                <editable>true</editable>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>26</id>
+            <logic>
+                <editable>true</editable>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>12</id>
+            <logic>
+                <editable>true</editable>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>27</id>
+            <logic>
+                <editable>true</editable>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>28</id>
+            <logic>
+                <editable>true</editable>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>14</id>
+            <logic>
+                <editable>true</editable>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>2</id>
+            <logic>
+                <editable>true</editable>
+            </logic>
+        </dataRef>
     </transition>
     <transition>
         <id>345</id>
@@ -1085,7 +1201,7 @@
         <y>180</y>
         <label>Navrh na skartaciu</label>
         <roleRef>
-            <id>2</id>
+            <id>5</id>
             <logic>
                 <assign>true</assign>
             </logic>
@@ -1095,9 +1211,15 @@
         <id>350</id>
         <x>1221</x>
         <y>249</y>
+        <dataRef>
+            <id>18</id>
+            <logic>
+                <visible>true</visible>
+            </logic>
+        </dataRef>
         <label>Oddialit o X rokov</label>
         <roleRef>
-            <id>1</id>
+            <id>3</id>
             <logic>
                 <assign>true</assign>
             </logic>
@@ -1109,7 +1231,7 @@
         <y>180</y>
         <label>Potvrdiť skartáciu</label>
         <roleRef>
-            <id>1</id>
+            <id>3</id>
             <logic>
                 <assign>true</assign>
             </logic>
