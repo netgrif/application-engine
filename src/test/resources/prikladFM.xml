@@ -1072,24 +1072,48 @@
         <x>940</x>
         <y>180</y>
         <label>Prve zaevidovanie UJ</label>
+        <roleRef>
+            <id>2</id>
+            <logic>
+                <assign>true</assign>
+            </logic>
+        </roleRef>
     </transition>
     <transition>
         <id>345</id>
         <x>1180</x>
         <y>180</y>
         <label>Navrh na skartaciu</label>
+        <roleRef>
+            <id>2</id>
+            <logic>
+                <assign>true</assign>
+            </logic>
+        </roleRef>
     </transition>
     <transition>
         <id>350</id>
         <x>1221</x>
         <y>249</y>
         <label>Oddialit o X rokov</label>
+        <roleRef>
+            <id>1</id>
+            <logic>
+                <assign>true</assign>
+            </logic>
+        </roleRef>
     </transition>
     <transition>
         <id>422</id>
         <x>1340</x>
         <y>180</y>
         <label>Potvrdiť skartáciu</label>
+        <roleRef>
+            <id>1</id>
+            <logic>
+                <assign>true</assign>
+            </logic>
+        </roleRef>
     </transition>
     <!-- ARCS -->
     <arc>
