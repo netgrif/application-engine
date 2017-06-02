@@ -10,12 +10,14 @@ public class LoggedUser extends org.springframework.security.core.userdetails.Us
 
     private Long id;
     private String fullName;
+    private Set<Long> organizations;
     private Set<String> processRoles;
 
     public LoggedUser(Long id, String username, String password, Collection<? extends GrantedAuthority> authorities) {
         super(username, password, authorities);
         this.id = id;
         this.processRoles = new HashSet<>();
+        this.organizations = new HashSet<>();
     }
 
     public Long getId() {
@@ -32,6 +34,18 @@ public class LoggedUser extends org.springframework.security.core.userdetails.Us
 
     public void setFullName(String fullName) {
         this.fullName = fullName;
+    }
+
+    public Set<Long> getOrganizations() {
+        return organizations;
+    }
+
+    public void setOrganizations(Set<Long> organizations) {
+        this.organizations = organizations;
+    }
+
+    public void parseOrganizations(Iterable<Organization> organizations){
+        organizations.forEach(org -> this.organizations.add(org.getId()));
     }
 
     public Set<String> getProcessRoles() {
