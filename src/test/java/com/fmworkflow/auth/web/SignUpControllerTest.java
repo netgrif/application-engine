@@ -10,9 +10,9 @@ import org.springframework.test.context.junit4.SpringRunner;
 @RunWith(SpringRunner.class)
 @ActiveProfiles({"test"})
 @SpringBootTest
-public class UserControllerTest {
+public class SignUpControllerTest {
     @Autowired
-    UserController controller;
+    SignUpController controller;
 
     @Test
     public void inviteTest() {
