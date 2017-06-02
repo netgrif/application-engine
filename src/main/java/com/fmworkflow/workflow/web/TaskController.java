@@ -81,7 +81,6 @@ public class TaskController {
 
     @RequestMapping(value = "/delegate/{id}", method = RequestMethod.POST)
     public MessageResource delegate(Authentication auth, @PathVariable("id") String taskId, @RequestBody String delegatedEmail) {
-        LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
         try {
             delegatedEmail = URLDecoder.decode(delegatedEmail, StandardCharsets.UTF_8.name());
             taskService.delegateTask(delegatedEmail, taskId);
@@ -189,6 +188,7 @@ public class TaskController {
         return fileResource;
     }
 
+    //TODO: Paged filters resource
     @RequestMapping(value = "/filter", method = RequestMethod.GET)
     public FiltersResource getAllFilters(Authentication auth) {
         return new FiltersResource(filterService.getAll(), false);
