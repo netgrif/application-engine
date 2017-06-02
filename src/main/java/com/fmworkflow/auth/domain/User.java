@@ -22,6 +22,10 @@ public class User {
     @Column(unique = true)
     private String email;
 
+    private String telNumber;
+
+    private String avatar;
+
     @JsonIgnore
     @NotNull
     @Length(min = 6)
@@ -36,6 +40,10 @@ public class User {
     private String surname;
 
     @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "user_organizations", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "organization_id"))
+    private Set<Organization> organizations;
+
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles;
 
@@ -43,7 +51,8 @@ public class User {
     @JoinTable(name = "user_process_roles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "user_process_role_id"))
     private Set<UserProcessRole> userProcessRoles;
 
-    public User(){
+    public User() {
+        organizations = new HashSet<>();
         roles = new HashSet<>();
         userProcessRoles = new HashSet<>();
     }
@@ -122,5 +131,33 @@ public class User {
 
     public String getFullName() {
         return name + " " + surname;
+    }
+
+    public String getTelNumber() {
+        return telNumber;
+    }
+
+    public void setTelNumber(String telNumber) {
+        this.telNumber = telNumber;
+    }
+
+    public String getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(String avatar) {
+        this.avatar = avatar;
+    }
+
+    public Set<Organization> getOrganizations() {
+        return organizations;
+    }
+
+    public void setOrganizations(Set<Organization> organizations) {
+        this.organizations = organizations;
+    }
+
+    public void addOrganization(Organization org){
+        this.organizations.add(org);
     }
 }
