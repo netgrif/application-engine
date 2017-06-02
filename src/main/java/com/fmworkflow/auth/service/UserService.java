@@ -1,8 +1,9 @@
 package com.fmworkflow.auth.service;
 
+import com.fmworkflow.auth.domain.Organization;
 import com.fmworkflow.auth.domain.Role;
-import com.fmworkflow.auth.domain.repositories.RoleRepository;
 import com.fmworkflow.auth.domain.User;
+import com.fmworkflow.auth.domain.repositories.RoleRepository;
 import com.fmworkflow.auth.domain.repositories.UserRepository;
 import com.fmworkflow.auth.service.interfaces.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -49,8 +51,12 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public List<User> findByOrganizations(List<Long> org){
-        return userRepository.findByOrganizationsIn(org);
+    public List<User> findByOrganizations(Set<Long> org){
+        return userRepository.findByOrganizationsIn(org.stream().map(orgaz -> {
+            Organization organization = new Organization();
+            organization.setId(orgaz);
+            return organization;
+        }).collect(Collectors.toList()));
     }
 
     @Override
