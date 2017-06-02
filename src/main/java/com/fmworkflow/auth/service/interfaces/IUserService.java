@@ -1,10 +1,10 @@
 package com.fmworkflow.auth.service.interfaces;
 
-import com.fmworkflow.auth.domain.Organization;
 import com.fmworkflow.auth.domain.User;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
 
 @Service
 public interface IUserService {
@@ -17,7 +17,7 @@ public interface IUserService {
 
     List<User> findAll();
 
-    List<User> findByOrganizations(List<Long> org);
+    List<User> findByOrganizations(Set<Long> org);
 
     List<User> findByProcessRole(String roleId);
 
