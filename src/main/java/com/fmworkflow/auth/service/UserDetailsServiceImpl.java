@@ -41,6 +41,8 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
         if(!user.getUserProcessRoles().isEmpty())
             loggedUser.parseProcessRoles(user.getUserProcessRoles());
+        if(!user.getOrganizations().isEmpty())
+            loggedUser.parseOrganizations(user.getOrganizations());
 
         return loggedUser;
     }
