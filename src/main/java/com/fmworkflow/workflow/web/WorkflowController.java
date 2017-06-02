@@ -58,14 +58,4 @@ public class WorkflowController {
         ResourceLinkAssembler.addLinks(resources,Case.class,selfLink.getRel());
         return resources;
     }
-
-//    @RequestMapping(value = "/data/{case}/{transition}", method = RequestMethod.GET)
-//    public DataSet getDataSet(@PathVariable("case") String caseId, @PathVariable("transition") String transitionId){
-//        return workflowService.getDataForTransition(caseId, transitionId);
-//    }
-//
-//    @RequestMapping(value = "/data/{case}", method = RequestMethod.POST)
-//    public void modifyData(@PathVariable("case")String caseId, @RequestBody Map<String, String> values){
-//        workflowService.modifyData(caseId, values);
-//    }
 }

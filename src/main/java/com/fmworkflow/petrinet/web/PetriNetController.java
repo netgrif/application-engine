@@ -10,6 +10,7 @@ import com.fmworkflow.petrinet.web.requestbodies.AssignedRolesBody;
 import com.fmworkflow.petrinet.web.requestbodies.PetriNetReferenceBody;
 import com.fmworkflow.petrinet.web.requestbodies.UploadedFileMeta;
 import com.fmworkflow.petrinet.web.responsebodies.*;
+import com.fmworkflow.workflow.web.responsebodies.MessageResource;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -48,7 +49,7 @@ public class PetriNetController {
     @RequestMapping(value = "/import", method = POST)
     public
     @ResponseBody
-    String importPetriNet(
+    MessageResource importPetriNet(
             @RequestParam(value = "file", required = true) MultipartFile multipartFile,
             @RequestParam(value = "meta", required = false) String fileMetaJSON) {
         try {
@@ -62,16 +63,16 @@ public class PetriNetController {
             UploadedFileMeta fileMeta = mapper.readValue(fileMetaJSON, UploadedFileMeta.class);
 
             service.importPetriNet(file, fileMeta.name, fileMeta.initials);
-            return JsonBuilder.successMessage("Petri net imported successfully");
+            return MessageResource.successMessage("Petri net imported successfully");
         } catch (SAXException e) {
             e.printStackTrace();
-            return JsonBuilder.errorMessage("Invalid xml file");
+            return MessageResource.errorMessage("Invalid xml file");
         } catch (ParserConfigurationException e) {
             e.printStackTrace();
-            return JsonBuilder.errorMessage("Invalid parser configuration");
+            return MessageResource.errorMessage("Invalid parser configuration");
         } catch (IOException e) {
             e.printStackTrace();
-            return JsonBuilder.errorMessage("IO error");
+            return MessageResource.errorMessage("IO error");
         }
     }
 
@@ -105,6 +106,7 @@ public class PetriNetController {
         return new DataFieldReferencesResource(service.getDataFieldReferences(referenceBody.petriNets, referenceBody.transitions));
     }
 
+    //TODO: prerobiť! nemôže jeden endpoint vraciat dve rôzne veci
     @RequestMapping(value = "/roles/assign/{netId}", method = GET)
     public
     @ResponseBody
@@ -118,13 +120,13 @@ public class PetriNetController {
     @RequestMapping(value = "/roles/assign/{netId}", method = POST)
     public
     @ResponseBody
-    String assignRoleToUser(@RequestBody AssignedRolesBody assignedRoles, @PathVariable String netId) {
+    MessageResource assignRoleToUser(@RequestBody AssignedRolesBody assignedRoles, @PathVariable String netId) {
         try {
             roleService.assignRoleToUser(assignedRoles.email, netId, assignedRoles.roleIds);
-            return JsonBuilder.successMessage("Role assigned");
+            return MessageResource.successMessage("Role assigned");
         } catch (Exception e) {
             e.printStackTrace();
-            return JsonBuilder.errorMessage("Unable to assign role");
+            return MessageResource.errorMessage("Unable to assign role");
         }
     }
 
@@ -142,12 +144,12 @@ public class PetriNetController {
         }
     }
 
-    private String decodeUrl(String s1){
+    public static String decodeUrl(String s1){
         try {
             return URLDecoder.decode(s1, StandardCharsets.UTF_8.name());
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
-            return null;
+            return "";
         }
     }
 }
