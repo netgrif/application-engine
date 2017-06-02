@@ -155,18 +155,24 @@ public class WorkflowCommandLineRunner {//implements CommandLineRunner {
     }
 
     private String randomColor() {
-        int randomNum = ThreadLocalRandom.current().nextInt(0, 5);
+        int randomNum = ThreadLocalRandom.current().nextInt(0, 7);
         switch (randomNum) {
             case 0:
                 return "color-fg-primary-500";
             case 1:
-                return "color-fg-blue-grey-500";
-            case 2:
-                return "color-fg-amber-500";
-            case 3:
                 return "color-fg-indigo-500";
+            case 2:
+                return "color-fg-deep-purple-500";
+            case 3:
+                return "color-fg-lime-500";
             case 4:
-                return "color-fg-success";
+                return "color-fg-amber-500";
+            case 5:
+                return "color-fg-deep-orange-500";
+            case 6:
+                return "color-fg-blue-grey-500";
+            case 7:
+                return "color-fg-brown-500";
             default:
                 return "color-fg-primary-500";
         }
