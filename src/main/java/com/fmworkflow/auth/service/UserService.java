@@ -4,7 +4,6 @@ import com.fmworkflow.auth.domain.Role;
 import com.fmworkflow.auth.domain.repositories.RoleRepository;
 import com.fmworkflow.auth.domain.User;
 import com.fmworkflow.auth.domain.repositories.UserRepository;
-import com.fmworkflow.auth.service.interfaces.ISecurityService;
 import com.fmworkflow.auth.service.interfaces.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -17,8 +16,6 @@ import java.util.stream.Collectors;
 @Service
 public class UserService implements IUserService {
     @Autowired
-    private ISecurityService securityService;
-    @Autowired
     private UserRepository userRepository;
     @Autowired
     private RoleRepository roleRepository;
@@ -26,29 +23,34 @@ public class UserService implements IUserService {
     private BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @Override
-    public void save(User user) {
+    public User saveNew(User user) {
         user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
         if (user.getRoles().isEmpty()) {
             HashSet<Role> roles = new HashSet<Role>();
             roles.add(roleRepository.findByName("user"));
             user.setRoles(roles);
         }
-        userRepository.save(user);
+        return userRepository.save(user);
     }
 
     @Override
-    public User findByUsername(String email) {
-        return userRepository.findByEmail(email);
+    public User save(User user){
+        return userRepository.save(user);
     }
 
     @Override
-    public User getLoggedInUser() {
-        return userRepository.findByEmail(securityService.findLoggedInUsername());
+    public User findById(Long id){
+        return userRepository.getOne(id);
     }
 
     @Override
     public List<User> findAll() {
         return userRepository.findAll();
+    }
+
+    @Override
+    public List<User> findByOrganizations(List<Long> org){
+        return userRepository.findByOrganizationsIn(org);
     }
 
     @Override

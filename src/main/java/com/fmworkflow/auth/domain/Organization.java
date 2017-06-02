@@ -8,6 +8,7 @@ import javax.validation.constraints.NotNull;
 import java.util.HashSet;
 import java.util.Set;
 
+@Entity
 public class Organization {
 
     @Id

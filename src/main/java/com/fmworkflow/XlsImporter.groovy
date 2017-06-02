@@ -1,8 +1,10 @@
 package com.fmworkflow
 
+import com.fmworkflow.auth.domain.Organization
 import com.fmworkflow.auth.domain.Role
 import com.fmworkflow.auth.domain.User
 import com.fmworkflow.auth.domain.UserProcessRole
+import com.fmworkflow.auth.domain.repositories.OrganizationRepository
 import com.fmworkflow.auth.domain.repositories.RoleRepository
 import com.fmworkflow.auth.domain.repositories.UserProcessRoleRepository
 import com.fmworkflow.auth.domain.repositories.UserRepository
@@ -40,6 +42,9 @@ class XlsImporter implements CommandLineRunner {
 
     @Autowired
     private UserRepository userRepository
+
+    @Autowired
+    private OrganizationRepository organizationRepository
 
     @Autowired
     private CaseRepository caseRepository
@@ -83,11 +88,17 @@ class XlsImporter implements CommandLineRunner {
     private Case useCase
     private UserProcessRole clientRole
     private Role userRole
+    private Organization ClientOrg
 
     @Override
     void run(String... strings) throws Exception {
         mongoTemplate.getDb().dropDatabase()
         net = importer.importPetriNet(new File("src/test/resources/prikladFM.xml"), "Ukladacia jednotka", "FMS")
+
+        Organization FMOrg = new Organization("FM Servis")
+        FMOrg = organizationRepository.save(FMOrg)
+        ClientOrg = new Organization("Client Company")
+        ClientOrg = organizationRepository.save(ClientOrg)
 
         userRole = new Role("user")
         userRole = roleRepository.save(userRole)
@@ -100,15 +111,17 @@ class XlsImporter implements CommandLineRunner {
                 surname: "Trooper",
                 password: "password",
                 roles: roleRepository.findAll() as Set,
-                userProcessRoles: userProcessRoleRepository.findAll() as Set)
-        userService.save(user)
+                userProcessRoles: userProcessRoleRepository.findAll() as Set,
+                organizations: organizationRepository.findAll() as Set)
+        userService.saveNew(user)
 
         def client_manager = new User(
                 email: "manager@company.com",
                 name: "Jano",
                 surname: "Mrkvička",
                 password: "password",
-                roles: [userRole] as Set<Role>)
+                roles: [userRole] as Set<Role>,
+                organizations: [ClientOrg] as Set<Organization>)
         client_manager.addProcessRole(userProcessRoleRepository.save(new UserProcessRole(
                 roleId: net.roles.values().find { it -> it.name == "client manager" }.stringId)))
         def client_worker = new User(
@@ -116,7 +129,8 @@ class XlsImporter implements CommandLineRunner {
                 name: "Mária",
                 surname: "Kováčová",
                 password: "password",
-                roles: [userRole] as Set<Role>)
+                roles: [userRole] as Set<Role>,
+                organizations: [ClientOrg] as Set<Organization>)
         client_worker.addProcessRole(userProcessRoleRepository.save(new UserProcessRole(
                 roleId: net.roles.values().find { it -> it.name == "client" }.stringId)))
         def fm_manager = new User(
@@ -124,7 +138,8 @@ class XlsImporter implements CommandLineRunner {
                 name: "Peter",
                 surname: "Molnár",
                 password: "password",
-                roles: [roleAdmin] as Set<Role>)
+                roles: [roleAdmin] as Set<Role>,
+                organizations: [FMOrg] as Set<Organization>)
         fm_manager.addProcessRole(userProcessRoleRepository.save(new UserProcessRole(
                 roleId: net.roles.values().find { it -> it.name == "fm manager" }.stringId)))
         def fm_worker = new User(
@@ -132,13 +147,14 @@ class XlsImporter implements CommandLineRunner {
                 name: "Štefan",
                 surname: "Horváth",
                 password: "password",
-                roles: [userRole] as Set<Role>)
+                roles: [userRole] as Set<Role>,
+                organizations: [FMOrg] as Set<Organization>)
         fm_worker.addProcessRole(userProcessRoleRepository.save(new UserProcessRole(
                 roleId: net.roles.values().find { it -> it.name == "fm servis" }.stringId)))
-        userService.save(client_manager)
-        userService.save(client_worker)
-        userService.save(fm_manager)
-        userService.save(fm_worker)
+        userService.saveNew(client_manager)
+        userService.saveNew(client_worker)
+        userService.saveNew(fm_manager)
+        userService.saveNew(fm_worker)
 
         clientRole = client_worker.userProcessRoles.first()
 
@@ -199,10 +215,11 @@ class XlsImporter implements CommandLineRunner {
                             password: "password",
                             name: randomName(),
                             surname: value,
-                            roles: [userRole] as Set<Role>
+                            roles: [userRole] as Set<Role>,
+                            organizations: [ClientOrg] as Set<Organization>
                     )
                     user.addProcessRole(clientRole)
-                    user = userRepository.save(user)
+                    user = userService.saveNew(user)
                 } else {
                     user.roles.size()
                     user.userProcessRoles.size()
@@ -220,8 +237,8 @@ class XlsImporter implements CommandLineRunner {
     }
 
     String generateEmail(String name) {
-        name = Normalizer.normalize(name, Normalizer.Form.NFD);
-        name = name.replaceAll("[^\\p{ASCII}]", "")
+        name = Normalizer.normalize(name, Normalizer.Form.NFD)
+        name = name.replaceAll("[^\\p{ASCII}]", "").toLowerCase()
         return name + EMAIL_TEMPLATE
     }
 
@@ -230,16 +247,12 @@ class XlsImporter implements CommandLineRunner {
         switch (randomNum) {
             case 0:
                 return "Ema"
-
             case 1:
                 return "Jana"
-
             case 2:
                 return "Natália"
-
             case 3:
                 return "Katarína"
-
             case 4:
                 return "Zuzana"
             default:
@@ -248,26 +261,26 @@ class XlsImporter implements CommandLineRunner {
     }
 
     private String randomColor() {
-        int randomNum = ThreadLocalRandom.current().nextInt(0, 7);
+        int randomNum = ThreadLocalRandom.current().nextInt(0, 7)
         switch (randomNum) {
             case 0:
-                return "color-fg-primary-500";
+                return "color-fg-primary-500"
             case 1:
-                return "color-fg-indigo-500";
+                return "color-fg-indigo-500"
             case 2:
-                return "color-fg-deep-purple-500";
+                return "color-fg-deep-purple-500"
             case 3:
-                return "color-fg-lime-500";
+                return "color-fg-lime-500"
             case 4:
-                return "color-fg-amber-500";
+                return "color-fg-amber-500"
             case 5:
-                return "color-fg-deep-orange-500";
+                return "color-fg-deep-orange-500"
             case 6:
-                return "color-fg-blue-grey-500";
+                return "color-fg-blue-grey-500"
             case 7:
-                return "color-fg-brown-500";
+                return "color-fg-brown-500"
             default:
-                return "color-fg-primary-500";
+                return "color-fg-primary-500"
         }
     }
 }
