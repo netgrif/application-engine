@@ -37,7 +37,7 @@ public class UserResource extends Resource<User>{
         add(selfRel.equalsIgnoreCase("assignProcessRole") ? roleLink.withSelfRel() : roleLink.withRel("assignProcessRole"));
 
         ControllerLinkBuilder authorityLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(UserController.class)
-                .assignAuthorityToUser(getContent().getId(), 0L));
+                .assignAuthorityToUser(getContent().getId(), null));
         add(selfRel.equalsIgnoreCase("assignRole") ? authorityLink.withSelfRel() : authorityLink.withRel("assignRole"));
     }
 }
