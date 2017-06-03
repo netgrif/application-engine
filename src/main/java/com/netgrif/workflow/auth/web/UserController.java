@@ -77,7 +77,7 @@ public class UserController {
     }
 
     @RequestMapping(value = "/{id}/authority/assign", method = RequestMethod.POST)
-    public MessageResource assignAuthorityToUser(@PathVariable("id") Long userId, @RequestParam("roleId") Long authorityId){
+    public MessageResource assignAuthorityToUser(@PathVariable("id") Long userId, @RequestBody Long authorityId){
         userService.assignRole(userId,authorityId);
         return MessageResource.successMessage("Role "+authorityId+" assigned to user "+userId);
     }
