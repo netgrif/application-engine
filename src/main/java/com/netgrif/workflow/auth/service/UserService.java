@@ -61,7 +61,7 @@ public class UserService implements IUserService {
 
     @Override
     public List<User> findByProcessRole(String roleId) {
-        return userRepository.findByUserProcessRolesId(roleId);
+        return userRepository.findByUserProcessRoles_RoleId(roleId);
     }
 
     @Override
