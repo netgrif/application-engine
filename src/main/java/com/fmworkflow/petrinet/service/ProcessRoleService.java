@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class ProcessRoleService implements IProcessRoleService {
@@ -25,19 +26,15 @@ public class ProcessRoleService implements IProcessRoleService {
     private PetriNetRepository netRepository;
 
     @Override
-    public void assignRoleToUser(String email, String netId, List<String> roleIds) {
-        User user = userRepository.findByEmail(email);
-        PetriNet net = netRepository.findOne(netId);
+    public boolean assignRolesToUser(Long userId, Set<String> roleIds){
+        User user = userRepository.findOne(userId);
+        List<UserProcessRole> processRoles = roleRepository.findByRoleIdIn(roleIds);
+        if(processRoles.isEmpty()) return false;
 
-        user.setUserProcessRoles(new HashSet<>());
-        roleIds.forEach(roleId -> {
-            UserProcessRole role = new UserProcessRole();
-            role.setRoleId(net.getRoles().get(roleId).getStringId());
-            role = roleRepository.save(role);
-            user.addProcessRole(role);
-        });
+        user.getUserProcessRoles().clear();
+        user.getUserProcessRoles().addAll(processRoles);
 
-        userRepository.save(user);
+        return userRepository.save(user) != null;
     }
 
     @Override

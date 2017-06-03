@@ -106,42 +106,6 @@ public class PetriNetController {
         return new RolesResource(roleService.findAll(netId),netId);
     }
 
-//    @RequestMapping(value = "/roles/assign/{netId}", method = GET)
-//    public
-//    @ResponseBody
-//    UsersRolesListResponse getUsersAndRoles(@PathVariable String netId) {
-//        UsersRolesListResponse response = new UsersRolesListResponse();
-//        response.setUsers(userService.findAll());
-//        response.setRoles(roleService.findAll(netId));
-//        return response;
-//    }
-//
-//    @RequestMapping(value = "/roles/assign/{netId}", method = POST)
-//    public
-//    @ResponseBody
-//    MessageResource assignRoleToUser(@RequestBody AssignedRolesBody assignedRoles, @PathVariable String netId) {
-//        try {
-//            roleService.assignRoleToUser(assignedRoles.email, netId, assignedRoles.roleIds);
-//            return MessageResource.successMessage("Role assigned");
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            return MessageResource.errorMessage("Unable to assign role");
-//        }
-//    }
-//
-//    @RequestMapping(value = "/roles/users/{id}", method = GET)
-//    public @ResponseBody
-//    ProcessRolesUsersListResponse getUsersWithProcessRole(Authentication auth, @PathVariable("id") String roleId) {
-//        try {
-//            ProcessRolesUsersListResponse response = new ProcessRolesUsersListResponse();
-//            roleId = URLDecoder.decode(roleId, StandardCharsets.UTF_8.name());
-//            response.setUsers(userService.findByProcessRole(roleId));
-//            return response;
-//        } catch (Exception ignored) {
-//            ignored.printStackTrace();
-//            return null;
-//        }
-//    }
 
     public static String decodeUrl(String s1) {
         try {
