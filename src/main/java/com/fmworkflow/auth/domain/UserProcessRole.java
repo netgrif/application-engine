@@ -10,10 +10,14 @@ public class UserProcessRole {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
+    @Column(unique = true)
     private String roleId;
     @JsonIgnore
     @ManyToMany(mappedBy = "userProcessRoles")
     private Set<User> users;
+
+    public UserProcessRole() {
+    }
 
     public Long getId() {
         return id;
