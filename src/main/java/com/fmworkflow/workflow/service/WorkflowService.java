@@ -71,24 +71,4 @@ public class WorkflowService implements IWorkflowService {
         saveCase(useCase);
         taskService.createTasks(useCase);
     }
-
-//    @Override
-//    public DataSet getDataForTransition(String caseId, String transitionId){
-//        Case useCase = repository.findOne(caseId);
-//        return useCase.getDataSet().getFieldsForTransition(transitionId);
-//    }
-
-//    @Override
-//    public void modifyData(String caseId, Map<String, String> newValues){
-//        Case useCase = repository.findOne(caseId);
-//        for(Field field:useCase.getDataSet().getFields()){
-//            if(newValues.containsKey(field.get_id().toString())){
-//                field.modifyValue(newValues.get(field.get_id().toString()));
-//            }
-//        }
-//
-//        saveCase(useCase);
-//    }
-
-
 }

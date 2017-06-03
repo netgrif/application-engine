@@ -42,7 +42,7 @@ public class UserService implements IUserService {
 
     @Override
     public User findById(Long id){
-        return userRepository.getOne(id);
+        return userRepository.findOne(id);
     }
 
     @Override
@@ -61,17 +61,12 @@ public class UserService implements IUserService {
 
     @Override
     public List<User> findByProcessRole(String roleId) {
-        return userRepository.findAll()
-                .stream()
-                .filter(user -> user.getUserProcessRoles()
-                        .stream()
-                        .anyMatch(role -> role.getRoleId().equals(roleId)))
-                .collect(Collectors.toList());
+        return userRepository.findByUserProcessRolesId(roleId);
     }
 
     @Override
-    public void assignRole(String userEmail, Long roleId) {
-        User user = userRepository.findByEmail(userEmail);
+    public void assignRole(Long userId, Long roleId) {
+        User user = userRepository.findOne(userId);
         Role role = roleRepository.findOne(roleId);
 
         user.addRole(role);

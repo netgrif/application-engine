@@ -21,5 +21,5 @@ public interface IUserService {
 
     List<User> findByProcessRole(String roleId);
 
-    void assignRole(String userEmail, Long roleId);
+    void assignRole(Long userId, Long roleId);
 }
