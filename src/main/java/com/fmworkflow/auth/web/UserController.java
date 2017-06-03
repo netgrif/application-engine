@@ -1,16 +1,19 @@
 package com.fmworkflow.auth.web;
 
 import com.fmworkflow.auth.domain.LoggedUser;
+import com.fmworkflow.auth.service.interfaces.IRoleService;
 import com.fmworkflow.auth.service.interfaces.IUserService;
+import com.fmworkflow.auth.web.responsebodies.AuthoritiesResources;
 import com.fmworkflow.auth.web.responsebodies.UserResource;
 import com.fmworkflow.auth.web.responsebodies.UsersResource;
+import com.fmworkflow.petrinet.service.interfaces.IProcessRoleService;
+import com.fmworkflow.petrinet.web.PetriNetController;
 import com.fmworkflow.workflow.web.responsebodies.MessageResource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Set;
 
 @RestController
 @RequestMapping("/res/user")
@@ -18,41 +21,66 @@ public class UserController {
 
     @Autowired
     private IUserService userService;
+    @Autowired
+    private IProcessRoleService processRoleService;
+    @Autowired
+    private IRoleService roleService;
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     public UserResource getUser(@PathVariable("id") Long userId) {
-        return new UserResource(userService.findById(userId));
+        return new UserResource(userService.findById(userId),"profile");
     }
 
     @RequestMapping(value = "/me", method = RequestMethod.GET)
     public UserResource getLoggedUser(Authentication auth) {
-        return getUser(((LoggedUser) auth.getPrincipal()).getId());
+        return new UserResource(userService.findById(((LoggedUser) auth.getPrincipal()).getId()),"profile");
     }
 
     @RequestMapping(value = "/{id}/small", method = RequestMethod.GET)
     public UserResource getSmallUser(@PathVariable("id") Long userId) {
-        return new UserResource(userService.findById(userId),true);
+        return new UserResource(userService.findById(userId), "small",true);
     }
 
     @RequestMapping(method = RequestMethod.GET)
     public UsersResource getAll(Authentication auth) {
-        return new UsersResource(userService.findByOrganizations(((LoggedUser) auth.getPrincipal()).getOrganizations()),false);
+        return new UsersResource(userService.findByOrganizations(((LoggedUser) auth.getPrincipal()).getOrganizations()), "all",false);
     }
 
     @RequestMapping(value = "/small", method = RequestMethod.GET)
-    public UsersResource getAllSmall(Authentication auth){
-        return new UsersResource(userService.findByOrganizations(((LoggedUser) auth.getPrincipal()).getOrganizations()),true);
+    public UsersResource getAllSmall(Authentication auth) {
+        return new UsersResource(userService.findByOrganizations(((LoggedUser) auth.getPrincipal()).getOrganizations()), "small",true);
+    }
+
+    @RequestMapping(value = "/role/{id}/small", method = RequestMethod.GET)
+    public UsersResource getAllWithRole(@PathVariable("id") String roleId) {
+        return new UsersResource(userService.findByProcessRole(PetriNetController.decodeUrl(roleId)), "small",true);
     }
 
     //TODO: 2.6.2017 edit user profile
 
-    //TODO: 2.6.2017 assign system roles to user
-//    @RequestMapping(value = "/{id}/authority/assign", method = RequestMethod.POST)
-//    public MessageResource assignRolesToUser()
 
-    //TODO: 2.6.2017 assign process roles to user
+    @RequestMapping(value = "/{id}/role/assign", method = RequestMethod.POST)
+    public MessageResource assignRolesToUser(@PathVariable("id") Long userId, @RequestBody Set<String> roleIds){
+        if(processRoleService.assignRolesToUser(userId,roleIds))
+            return MessageResource.successMessage("Selected roles assigned to user "+userId);
+        else
+            return MessageResource.errorMessage("Assigning roles to user "+userId+" has failed!");
+    }
 
-    //TODO: 2.6.2017 get all system roles
+    @RequestMapping(value = "/authority", method = RequestMethod.GET)
+    public AuthoritiesResources getAllAuthorities(Authentication auth){
+        if(((LoggedUser)auth.getPrincipal()).getAuthorities().stream()
+                .anyMatch(authority -> authority.getAuthority().equalsIgnoreCase("admin")))
+            return new AuthoritiesResources(roleService.findAll());
+        else
+            return new AuthoritiesResources();
+    }
+
+    @RequestMapping(value = "/{id}/authority/assign", method = RequestMethod.POST)
+    public MessageResource assignAuthorityToUser(@PathVariable("id") Long userId, @RequestParam("roleId") Long authorityId){
+        userService.assignRole(userId,authorityId);
+        return MessageResource.successMessage("Role "+authorityId+" assigned to user "+userId);
+    }
 
 
 }
