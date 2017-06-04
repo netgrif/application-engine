@@ -150,7 +150,7 @@ public class TaskController {
             searchBody.petriNets.forEach(net -> transitions.addAll(net.transitions));
             page = taskService.findByTransitions(pageable, transitions);
         } else if (searchBody.searchTier == TaskSearchBody.SEARCH_TIER_3) {
-
+            //TODO: 4.6.2017 vyhľadanie na základe dát
         }
         Link selfLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
                 .search(auth, pageable, searchBody, assembler)).withRel("search");

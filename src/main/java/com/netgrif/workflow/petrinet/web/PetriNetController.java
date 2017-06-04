@@ -1,6 +1,7 @@
 package com.netgrif.workflow.petrinet.web;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.workflow.petrinet.service.interfaces.IProcessRoleService;
@@ -10,6 +11,7 @@ import com.netgrif.workflow.petrinet.web.responsebodies.*;
 import com.netgrif.workflow.workflow.web.responsebodies.MessageResource;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -85,9 +87,9 @@ public class PetriNetController {
     @RequestMapping(value = "/transition/refs", method = POST)
     public
     @ResponseBody
-    TransitionReferencesResource getTransitionReferences(@RequestBody List<String> ids) {
+    TransitionReferencesResource getTransitionReferences(Authentication auth, @RequestBody List<String> ids) {
         ids.forEach(id -> id = decodeUrl(id));
-        return new TransitionReferencesResource(service.getTransitionReferences(ids));
+        return new TransitionReferencesResource(service.getTransitionReferences(ids,(LoggedUser)auth.getPrincipal()));
     }
 
     @RequestMapping(value = "/data/refs", method = POST)

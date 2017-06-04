@@ -1,5 +1,6 @@
 package com.netgrif.workflow.petrinet.service.interfaces;
 
+import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.web.responsebodies.DataFieldReference;
 import com.netgrif.workflow.petrinet.web.responsebodies.PetriNetReference;
@@ -22,6 +23,6 @@ public interface IPetriNetService {
     List<PetriNet> loadAll();
 
     List<PetriNetReference> getAllReferences();
-    List<TransitionReference> getTransitionReferences(List<String> netsIds);
+    List<TransitionReference> getTransitionReferences(List<String> netsIds, LoggedUser user);
     List<DataFieldReference> getDataFieldReferences(List<String> petriNetIds, List<String> transitionIds);
 }
