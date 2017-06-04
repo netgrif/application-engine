@@ -15,7 +15,7 @@ public final class ImportFieldFactory {
     public Field getField(ImportData data) throws IllegalArgumentException {
         switch (FieldType.fromString(data.getType())) {
             case TEXT:
-                return new TextField();
+                return new TextField(data.getValues());
             case BOOLEAN:
                 return new BooleanField();
             case DATE:
