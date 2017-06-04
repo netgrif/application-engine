@@ -1,9 +1,9 @@
 package com.netgrif.workflow.importer.model;
 
 public interface RoleLogic {
-    public Boolean getAssign();
+    public Boolean getPerform();
 
-    public void setAssign(Boolean assignToSelf);
+    public void setPerform(Boolean assignToSelf);
 
     public Boolean getDelegate();
 

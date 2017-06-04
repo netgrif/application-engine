@@ -6,13 +6,13 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.auth.domain.User;
-import com.netgrif.workflow.auth.domain.UserProcessRole;
 import com.netgrif.workflow.auth.domain.repositories.UserRepository;
 import com.netgrif.workflow.petrinet.domain.Arc;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.Place;
 import com.netgrif.workflow.petrinet.domain.Transition;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
+import com.netgrif.workflow.petrinet.domain.roles.RolePermission;
 import com.netgrif.workflow.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.Task;
@@ -22,6 +22,7 @@ import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.BasicQuery;
@@ -52,11 +53,27 @@ public class TaskService implements ITaskService {
     @Autowired
     private MongoTemplate mongoTemplate;
 
+    //    @Override
+//    public Page<Task> getAll(LoggedUser loggedUser, Pageable pageable) {
+//        User user = userRepository.findOne(loggedUser.getId());
+//        List<String> roles = new LinkedList<>(user.getUserProcessRoles()).stream().map(UserProcessRole::getRoleId).collect(Collectors.toList());
+//        return loadUsers(taskRepository.findAllByAssignRoleInOrDelegateRoleIn(pageable, roles, roles));
+//    }
     @Override
     public Page<Task> getAll(LoggedUser loggedUser, Pageable pageable) {
-        User user = userRepository.findOne(loggedUser.getId());
-        List<String> roles = new LinkedList<>(user.getUserProcessRoles()).stream().map(UserProcessRole::getRoleId).collect(Collectors.toList());
-        return loadUsers(taskRepository.findAllByAssignRoleInOrDelegateRoleIn(pageable, roles, roles));
+        StringBuilder queryBuilder = new StringBuilder();
+        queryBuilder.append("{$or:[");
+        loggedUser.getProcessRoles().forEach(role -> {
+            queryBuilder.append("{\"roles.");
+            queryBuilder.append(role);
+            queryBuilder.append("\":{$exists:true}},");
+        });
+        queryBuilder.deleteCharAt(queryBuilder.length() - 1);
+        queryBuilder.append("]}");
+        BasicQuery query = new BasicQuery(queryBuilder.toString());
+        query = (BasicQuery) query.with(pageable);
+        List<Task> tasks = mongoTemplate.find(query, Task.class);
+        return loadUsers(new PageImpl<Task>(tasks, pageable, mongoTemplate.count(new BasicQuery(queryBuilder.toString(), "{_id:1}"), Task.class)));
     }
 
     @Override
@@ -83,7 +100,7 @@ public class TaskService implements ITaskService {
                 Task task = createFromTransition(transition, useCase);
                 // TODO: 16. 3. 2017 there should be some fancy logic
 //                task.setAssignRole(net.getRoles().get(transition.getRoles().keySet().stream().findFirst().orElseGet(null)).getStringId());
-                figureOutProcessRoles(task, transition);
+                //figureOutProcessRoles(task, transition);
                 taskRepository.save(task);
             }
         }
@@ -295,13 +312,13 @@ public class TaskService implements ITaskService {
         else return value;
     }
 
-    private void figureOutProcessRoles(Task task, Transition transition) {
-        transition.getRoles().keySet().forEach((id) -> {
-            ObjectNode node = transition.applyRoleLogic(id, JsonNodeFactory.instance.objectNode().put("roleIds", id));
-            if (node.get("assign") != null && node.get("assign").asBoolean()) task.setAssignRole(id);
-            if (node.get("delegate") != null && node.get("delegate").asBoolean()) task.setDelegateRole(id);
-        });
-    }
+//    private void figureOutProcessRoles(Task task, Transition transition) {
+//        transition.getRoles().keySet().forEach((id) -> {
+//            ObjectNode node = transition.applyRoleLogic(id, JsonNodeFactory.instance.objectNode().put("roleIds", id));
+//            if (node.get("assign") != null && node.get("assign").asBoolean()) task.setAssignRole(id);
+//            if (node.get("delegate") != null && node.get("delegate").asBoolean()) task.setDelegateRole(id);
+//        });
+//    }
 
     @Transactional
     boolean isExecutable(Transition transition, PetriNet net) {
@@ -345,6 +362,9 @@ public class TaskService implements ITaskService {
         task.setCaseColor(useCase.getColor());
         task.setCaseTitle(useCase.getTitle());
         task.setPriority(transition.getPriority());
+        for (Map.Entry<String, Set<RolePermission>> entry : transition.getRoles().entrySet()) {
+            task.addRole(entry.getKey(), entry.getValue());
+        }
         task = taskRepository.save(task);
         task.setVisualId(useCase.getPetriNet().getInitials());
 
