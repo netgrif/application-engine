@@ -1,5 +1,6 @@
 package com.netgrif.workflow.petrinet.service;
 
+import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.importer.Importer;
 import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository;
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
@@ -53,37 +54,39 @@ public class PetriNetService implements IPetriNetService {
     }
 
     @Override
-    public List<PetriNetReference> getAllReferences(){
+    public List<PetriNetReference> getAllReferences() {
         List<PetriNet> nets = loadAll();
         List<PetriNetReference> refs = new ArrayList<>();
-        for(PetriNet net: nets){
+        for (PetriNet net : nets) {
             refs.add(new PetriNetReference(net.get_id().toString(), net.getTitle()));
         }
         return refs;
     }
 
     @Override
-    public List<TransitionReference> getTransitionReferences(List<String> netsIds){
+    public List<TransitionReference> getTransitionReferences(List<String> netsIds, LoggedUser user) {
         Iterable<PetriNet> nets = repository.findAll(netsIds);
-        List<TransitionReference>  transRefs = new ArrayList<>();
+        List<TransitionReference> transRefs = new ArrayList<>();
 
-        nets.forEach(net -> net.getTransitions().forEach((s, transition) ->
-                transRefs.add(new TransitionReference(transition.getStringId(),
-                        transition.getTitle(),net.getStringId()))));
+        nets.forEach(net -> net.getTransitions().forEach((s, transition) -> {
+            //TODO: 4.6.2017 ošetriť pridanie len referencii s rolou usera
+            transRefs.add(new TransitionReference(transition.getStringId(),
+                    transition.getTitle(), net.getStringId()));
+        }));
 
         return transRefs;
     }
 
     @Override
-    public List<DataFieldReference> getDataFieldReferences(List<String> petriNetIds, List<String> transitionIds){
+    public List<DataFieldReference> getDataFieldReferences(List<String> petriNetIds, List<String> transitionIds) {
         Iterable<PetriNet> nets = repository.findAll(petriNetIds);
         List<DataFieldReference> dataRefs = new ArrayList<>();
 
         transitionIds.forEach(transId -> nets.forEach(net -> {
             Transition trans;
-            if((trans = net.getTransition(transId)) != null){
+            if ((trans = net.getTransition(transId)) != null) {
                 trans.getDataSet().forEach((key, value) ->
-                    dataRefs.add(new DataFieldReference(key,net.getDataSet().get(key).getName(),net.getStringId(),transId))
+                        dataRefs.add(new DataFieldReference(key, net.getDataSet().get(key).getName(), net.getStringId(), transId))
                 );
             }
         }));

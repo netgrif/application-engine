@@ -17,6 +17,6 @@ public class TransitionReferencesResource extends Resources<TransitionReference>
 
     private void buildLinks(){
         add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(PetriNetController.class)
-                .getTransitionReferences(new ArrayList<>())).withSelfRel());
+                .getTransitionReferences(null, new ArrayList<>())).withSelfRel());
     }
 }
