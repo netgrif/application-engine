@@ -28,7 +28,7 @@ public class Task {
     private User user;
     @DBRef
     private List<Trigger> triggers;
-    private Map<String, Map<RolePermission, Boolean>> roles;
+    private Map<String, Map<String, Boolean>> roles;
     private LocalDateTime startDate;
     private LocalDateTime finishDate;
 
@@ -125,11 +125,11 @@ public class Task {
         this.transitionId = transitionId;
     }
 
-    public Map<String, Map<RolePermission, Boolean>> getRoles() {
+    public Map<String, Map<String, Boolean>> getRoles() {
         return roles;
     }
 
-    public void setRoles(Map<String, Map<RolePermission, Boolean>> roles) {
+    public void setRoles(Map<String, Map<String, Boolean>> roles) {
         this.roles = roles;
     }
 
@@ -140,9 +140,9 @@ public class Task {
             roles.put(roleId,parsePermissionMap(permissions));
     }
 
-    private Map<RolePermission, Boolean> parsePermissionMap(Set<RolePermission> permissions){
-        Map<RolePermission, Boolean> map = new HashMap<>();
-        permissions.forEach(perm -> map.put(perm,true));
+    private Map<String, Boolean> parsePermissionMap(Set<RolePermission> permissions){
+        Map<String, Boolean> map = new HashMap<>();
+        permissions.forEach(perm -> map.put(perm.toString(),true));
         return map;
     }
 
