@@ -67,7 +67,7 @@ public class TaskService implements ITaskService {
     @Override
     public Task findById(String id) {
         Task task = taskRepository.findOne(id);
-        if(task.getUserId() != null)
+        if (task.getUserId() != null)
             task.setUser(userRepository.findOne(task.getUserId()));
         return task;
     }
@@ -281,10 +281,8 @@ public class TaskService implements ITaskService {
                 value = set;
                 break;
             case "user":
-                ArrayNode valArray = (ArrayNode) node.get("value");
-                ArrayList<String> list = new ArrayList<>();
-                valArray.forEach(item -> list.add(item.asText()));
-                value = list;
+                ObjectNode jsonUser = (ObjectNode) node.get("value");
+                value = new User(jsonUser);
                 break;
             case "number":
                 value = node.get("value").asDouble();
@@ -353,10 +351,10 @@ public class TaskService implements ITaskService {
         return task;
     }
 
-    private Page<Task> loadUsers(Page<Task> tasks){
+    private Page<Task> loadUsers(Page<Task> tasks) {
         Map<Long, User> users = new HashMap<>();
         tasks.forEach(task -> {
-            if(task.getUserId() != null) {
+            if (task.getUserId() != null) {
                 if (users.containsKey(task.getUserId()))
                     task.setUser(users.get(task.getUserId()));
                 else {
