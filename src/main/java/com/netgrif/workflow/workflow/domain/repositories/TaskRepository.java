@@ -17,8 +17,6 @@ public interface TaskRepository extends MongoRepository<Task, String> {
 
     List<Task> findByUserIdAndFinishDateNotNull(Long userId);
 
-    Page<Task> findAllByAssignRoleInOrDelegateRoleIn(Pageable pageable, List<String> roles, List<String> roles2);
-
     void deleteAllByCaseIdAndUserIdIsNull(String caseId);
 
     void deleteAllByCaseIdAndFinishDateIsNotNull(String caseId);

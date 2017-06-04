@@ -8,7 +8,7 @@ public class Logic implements RoleLogic, DataLogic {
     private ImportAutoPlus autoPlus;
     private Boolean required;
 
-    private Boolean assign;
+    private Boolean perform;
     private Boolean delegate;
 
 //  DATA
@@ -45,12 +45,12 @@ public class Logic implements RoleLogic, DataLogic {
     }
 
     //  ROLE
-    public Boolean getAssign() {
-        return assign != null && assign;
+    public Boolean getPerform() {
+        return perform != null && perform;
     }
 
-    public void setAssign(Boolean assignToSelf) {
-        this.assign = assignToSelf;
+    public void setPerform(Boolean assignToSelf) {
+        this.perform = assignToSelf;
     }
 
     public Boolean getDelegate() {

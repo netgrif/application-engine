@@ -1,15 +1,16 @@
 package com.netgrif.workflow.workflow.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.netgrif.workflow.auth.domain.Role;
 import com.netgrif.workflow.auth.domain.User;
+import com.netgrif.workflow.petrinet.domain.roles.RolePermission;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 @Document
 public class Task {
@@ -27,13 +28,13 @@ public class Task {
     private User user;
     @DBRef
     private List<Trigger> triggers;
-    private String assignRole;
-    private String delegateRole;
+    private Map<String, Map<RolePermission, Boolean>> roles;
     private LocalDateTime startDate;
     private LocalDateTime finishDate;
 
     public Task() {
         this._id = new ObjectId();
+        roles = new HashMap<>();
         this.triggers = new LinkedList<>();
     }
 
@@ -79,7 +80,7 @@ public class Task {
     }
 
     public void setVisualId(String petriNetInitials) {
-        // TODO: 9.5.2017 bullshit
+        // TODO: 9.5.2017 bullshit remove now!
         this.visualId = petriNetInitials+"-"+this._id;
     }
 
@@ -124,20 +125,25 @@ public class Task {
         this.transitionId = transitionId;
     }
 
-    public String getAssignRole() {
-        return assignRole;
+    public Map<String, Map<RolePermission, Boolean>> getRoles() {
+        return roles;
     }
 
-    public void setAssignRole(String assignRole) {
-        this.assignRole = assignRole;
+    public void setRoles(Map<String, Map<RolePermission, Boolean>> roles) {
+        this.roles = roles;
     }
 
-    public String getDelegateRole() {
-        return delegateRole;
+    public void addRole(String roleId, Set<RolePermission> permissions){
+        if(roles.containsKey(roleId) && roles.get(roleId) != null)
+            roles.get(roleId).putAll(parsePermissionMap(permissions));
+        else
+            roles.put(roleId,parsePermissionMap(permissions));
     }
 
-    public void setDelegateRole(String delegateRole) {
-        this.delegateRole = delegateRole;
+    private Map<RolePermission, Boolean> parsePermissionMap(Set<RolePermission> permissions){
+        Map<RolePermission, Boolean> map = new HashMap<>();
+        permissions.forEach(perm -> map.put(perm,true));
+        return map;
     }
 
     @JsonIgnore
