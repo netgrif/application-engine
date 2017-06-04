@@ -142,10 +142,11 @@ public class Importer {
         if (logic == null || roleId == null)
             return;
 
-        if (logic.getAssign())
-            transition.addRole(roleId, new AssignFunction(roleId));
-        if (logic.getDelegate())
-            transition.addRole(roleId, new DelegateFunction(roleId));
+        transition.addRole(roleId,ImportRoleFactory.getPermissions(logic));
+//        if (logic.getPerform())
+//            transition.addRole(roleId, new AssignFunction(roleId));
+//        if (logic.getDelegate())
+//            transition.addRole(roleId, new DelegateFunction(roleId));
     }
 
     @Transactional
