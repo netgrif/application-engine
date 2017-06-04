@@ -1,6 +1,8 @@
 package com.netgrif.workflow.auth.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotBlank;
@@ -63,6 +65,12 @@ public class User {
         this.password = password;
         this.name = name;
         this.surname = surname;
+    }
+
+    public User(ObjectNode json){
+        this(json.get("email").asText(),null,json.get("name").asText(),json.get("surname").asText());
+        ((ArrayNode)json.get("userProcessRoles"))
+                .forEach(node -> userProcessRoles.add(new UserProcessRole( node.get("roleId").asText())));
     }
 
     public Long getId() {

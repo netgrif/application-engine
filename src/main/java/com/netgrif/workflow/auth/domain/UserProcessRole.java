@@ -19,6 +19,10 @@ public class UserProcessRole {
     public UserProcessRole() {
     }
 
+    public UserProcessRole(String roleId) {
+        this.roleId = roleId;
+    }
+
     public Long getId() {
         return id;
     }
