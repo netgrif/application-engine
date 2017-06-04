@@ -1,12 +1,13 @@
 package com.netgrif.workflow.petrinet.domain.dataset;
 
 
+import com.netgrif.workflow.auth.domain.User;
+import com.netgrif.workflow.auth.web.responsebodies.UserResource;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 @Document
@@ -14,7 +15,7 @@ public class UserField extends Field{
 
     private Set<String> roles;
     @Transient
-    private List<String> value;
+    private User value;
 
     public UserField(){
         super();
@@ -28,8 +29,8 @@ public class UserField extends Field{
         }
     }
 
-    public List<String> getValue() {
-        return value;
+    public UserResource getValue() {
+        return new UserResource(this.value,"small",true);
     }
 
     public Set<String> getRoles() {
@@ -38,7 +39,7 @@ public class UserField extends Field{
 
     @Override
     public void setValue(Object value) {
-        this.value = (List<String>) value;
+        this.value = (User) value;
     }
 
     @Override
