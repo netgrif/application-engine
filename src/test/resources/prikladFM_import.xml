@@ -229,7 +229,7 @@
         <roleRef>
             <id>1</id>
             <logic>
-                <assign>true</assign>
+                <perform>true</perform>
             </logic>
         </roleRef>
         <roleRef>
@@ -247,7 +247,7 @@
         <roleRef>
             <id>1</id>
             <logic>
-                <assign>true</assign>
+                <perform>true</perform>
             </logic>
         </roleRef>
         <trigger type="user"></trigger>
@@ -260,7 +260,7 @@
         <roleRef>
             <id>1</id>
             <logic>
-                <assign>true</assign>
+                <perform>true</perform>
             </logic>
         </roleRef>
         <trigger type="user"></trigger>
@@ -273,7 +273,7 @@
         <roleRef>
             <id>1</id>
             <logic>
-                <assign>true</assign>
+                <perform>true</perform>
             </logic>
         </roleRef>
         <trigger type="user"></trigger>
@@ -294,7 +294,7 @@
         <roleRef>
             <id>2</id>
             <logic>
-                <assign>true</assign>
+                <perform>true</perform>
             </logic>
         </roleRef>
         <trigger type="user"></trigger>
@@ -307,7 +307,7 @@
         <roleRef>
             <id>2</id>
             <logic>
-                <assign>true</assign>
+                <perform>true</perform>
             </logic>
         </roleRef>
         <trigger type="user"></trigger>
@@ -320,7 +320,7 @@
         <roleRef>
             <id>1</id>
             <logic>
-                <assign>true</assign>
+                <perform>true</perform>
             </logic>
         </roleRef>
         <trigger type="user"></trigger>
@@ -333,7 +333,7 @@
         <roleRef>
             <id>1</id>
             <logic>
-                <assign>true</assign>
+                <perform>true</perform>
             </logic>
         </roleRef>
         <trigger type="user"></trigger>
@@ -346,7 +346,7 @@
         <roleRef>
             <id>2</id>
             <logic>
-                <assign>true</assign>
+                <perform>true</perform>
             </logic>
         </roleRef>
         <trigger type="user"></trigger>
@@ -359,7 +359,7 @@
         <roleRef>
             <id>2</id>
             <logic>
-                <assign>true</assign>
+                <perform>true</perform>
             </logic>
         </roleRef>
         <trigger type="user"></trigger>
@@ -372,7 +372,7 @@
         <roleRef>
             <id>1</id>
             <logic>
-                <assign>true</assign>
+                <perform>true</perform>
             </logic>
         </roleRef>
         <trigger type="user"></trigger>
@@ -385,7 +385,7 @@
         <roleRef>
             <id>1</id>
             <logic>
-                <assign>true</assign>
+                <perform>true</perform>
             </logic>
         </roleRef>
         <trigger type="user"></trigger>
@@ -398,7 +398,7 @@
         <roleRef>
             <id>2</id>
             <logic>
-                <assign>true</assign>
+                <perform>true</perform>
             </logic>
         </roleRef>
         <trigger type="user"></trigger>
@@ -411,7 +411,7 @@
         <roleRef>
             <id>2</id>
             <logic>
-                <assign>true</assign>
+                <perform>true</perform>
             </logic>
         </roleRef>
         <trigger type="user"></trigger>
@@ -424,7 +424,7 @@
         <roleRef>
             <id>1</id>
             <logic>
-                <assign>true</assign>
+                <perform>true</perform>
             </logic>
         </roleRef>
         <trigger type="user"></trigger>
@@ -437,7 +437,7 @@
         <roleRef>
             <id>1</id>
             <logic>
-                <assign>true</assign>
+                <perform>true</perform>
             </logic>
         </roleRef>
         <trigger type="user"></trigger>
@@ -450,7 +450,7 @@
         <roleRef>
             <id>2</id>
             <logic>
-                <assign>true</assign>
+                <perform>true</perform>
             </logic>
         </roleRef>
         <trigger type="user"></trigger>
@@ -463,7 +463,7 @@
         <roleRef>
             <id>1</id>
             <logic>
-                <assign>true</assign>
+                <perform>true</perform>
             </logic>
         </roleRef>
         <trigger type="user"></trigger>
@@ -476,7 +476,7 @@
         <roleRef>
             <id>2</id>
             <logic>
-                <assign>true</assign>
+                <perform>true</perform>
             </logic>
         </roleRef>
         <trigger type="user"></trigger>
@@ -490,7 +490,7 @@
         <roleRef>
             <id>2</id>
             <logic>
-                <assign>true</assign>
+                <perform>true</perform>
             </logic>
         </roleRef>
         <dataRef>
@@ -604,7 +604,7 @@
         <roleRef>
             <id>2</id>
             <logic>
-                <assign>true</assign>
+                <perform>true</perform>
             </logic>
         </roleRef>
         <trigger type="user"></trigger>

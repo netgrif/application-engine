@@ -3,6 +3,7 @@ package com.netgrif.workflow.petrinet.domain;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.IDataFunction;
 import com.netgrif.workflow.petrinet.domain.roles.IRoleFunction;
+import com.netgrif.workflow.petrinet.domain.roles.RolePermission;
 import com.netgrif.workflow.workflow.domain.Trigger;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -15,7 +16,7 @@ public class Transition extends Node {
     @Field("dataSet")
     private Map<String, Set<IDataFunction>> dataSet;
     @Field("roles")
-    private Map<String, Set<IRoleFunction>> roles;
+    private Map<String, Set<RolePermission>> roles;
     @DBRef
     private List<Trigger> triggers;
     private int priority;
@@ -34,12 +35,12 @@ public class Transition extends Node {
         return json;
     }
 
-    public ObjectNode applyRoleLogic(String id, ObjectNode json) {
-        for (IRoleFunction function : roles.get(id)) {
-            json = function.apply(json);
-        }
-        return json;
-    }
+//    public ObjectNode applyRoleLogic(String id, ObjectNode json) {
+//        for (IRoleFunction function : roles.get(id)) {
+//            json = function.apply(json);
+//        }
+//        return json;
+//    }
 
     public int getPriority() {
         return priority;
@@ -67,21 +68,19 @@ public class Transition extends Node {
         }
     }
 
-    public Map<String, Set<IRoleFunction>> getRoles() {
+    public Map<String, Set<RolePermission>> getRoles() {
         return roles;
     }
 
-    public void setRoles(Map<String, Set<IRoleFunction>> roles) {
+    public void setRoles(Map<String, Set<RolePermission>> roles) {
         this.roles = roles;
     }
 
-    public void addRole(String fieldId, IRoleFunction function) {
-        if (roles.containsKey(fieldId) && roles.get(fieldId) != null) {
-            roles.get(fieldId).add(function);
+    public void addRole(String roleId, Set<RolePermission> permissions) {
+        if (roles.containsKey(roleId) && roles.get(roleId) != null) {
+            roles.get(roleId).addAll(permissions);
         } else {
-            Set<IRoleFunction> logic = new HashSet<>();
-            logic.add(function);
-            roles.put(fieldId, logic);
+            roles.put(roleId, permissions);
         }
     }
 
