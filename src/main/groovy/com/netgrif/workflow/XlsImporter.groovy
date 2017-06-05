@@ -100,9 +100,9 @@ class XlsImporter implements CommandLineRunner {
         ClientOrg = new Organization("Client Company")
         ClientOrg = organizationRepository.save(ClientOrg)
 
-        userRole = new Authority("user")
+        userRole = new Authority(Authority.user)
         userRole = roleRepository.save(userRole)
-        Authority roleAdmin = new Authority("admin")
+        Authority roleAdmin = new Authority(Authority.admin)
         roleRepository.save(roleAdmin)
 
         def user = new User(
