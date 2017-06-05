@@ -2,6 +2,8 @@ package com.netgrif.workflow.petrinet.domain;
 
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRole;
+import lombok.Getter;
+import lombok.Setter;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
@@ -18,23 +20,49 @@ import java.util.stream.Collectors;
 
 @Document
 public class PetriNet {
+
     @Id
     private ObjectId _id;
+
+    @Getter
+    @Setter
     private String title;
+
+    @Getter
+    @Setter
     private String initials;
+
     // TODO: 18. 3. 2017 replace with Spring auditing
+    @Getter
+    @Setter
     private LocalDateTime creationDate;
+
     @org.springframework.data.mongodb.core.mapping.Field("places")
+    @Getter
+    @Setter
     private Map<String, Place> places;
+
     @org.springframework.data.mongodb.core.mapping.Field("transitions")
+    @Getter
+    @Setter
     private Map<String, Transition> transitions;
+
     @org.springframework.data.mongodb.core.mapping.Field("arcs")
+    @Getter
+    @Setter
     private Map<String, List<Arc>> arcs;
+
     @org.springframework.data.mongodb.core.mapping.Field("dataset")
+    @Getter
+    @Setter
     private Map<String, Field> dataSet;
+
     @org.springframework.data.mongodb.core.mapping.Field("roles")
     @DBRef
+    @Getter
+    @Setter
     private Map<String, ProcessRole> roles;
+
     @Transient
     private boolean initialized;
 
@@ -62,56 +90,12 @@ public class PetriNet {
         return _id.toString();
     }
 
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getInitials() {
-        return initials;
-    }
-
-    public void setInitials(String initials) {
-        this.initials = initials;
-    }
-
-    public Map<String, Place> getPlaces() {
-        return places;
-    }
-
-    public void setPlaces(Map<String, Place> places) {
-        this.places = places;
-    }
-
     public void addPlace(Place place) {
         this.places.put(place.getObjectId().toString(), place);
     }
 
-    public Map<String, Transition> getTransitions() {
-        return transitions;
-    }
-
-    public void setTransitions(Map<String, Transition> transitions) {
-        this.transitions = transitions;
-    }
-
     public void addTransition(Transition transition) {
         this.transitions.put(transition.getObjectId().toString(), transition);
-    }
-
-    public Map<String, List<Arc>> getArcs() {
-        return arcs;
-    }
-
-    public Map<String, ProcessRole> getRoles() {
-        return roles;
-    }
-
-    public void setRoles(Map<String, ProcessRole> roles) {
-        this.roles = roles;
     }
 
     public void addRole(ProcessRole role) {
@@ -124,26 +108,6 @@ public class PetriNet {
 
     public List<Arc> getArcsOfTransition(String transitionId) {
         return arcs.get(transitionId);
-    }
-
-    public void setArcs(Map<String, List<Arc>> arcs) {
-        this.arcs = arcs;
-    }
-
-    public LocalDateTime getCreationDate() {
-        return creationDate;
-    }
-
-    public void setCreationDate(LocalDateTime creationDate) {
-        this.creationDate = creationDate;
-    }
-
-    public Map<String, Field> getDataSet() {
-        return dataSet;
-    }
-
-    public void setDataSet(Map<String, Field> dataSet) {
-        this.dataSet = dataSet;
     }
 
     public void addDataSetField(Field field) {
