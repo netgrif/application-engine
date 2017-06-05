@@ -49,7 +49,7 @@ public class SignUpController {
         if (tokenService.authorizeToken(regRequest.email, regRequest.token)) {
             regRequest.password = new String(Base64.getDecoder().decode(regRequest.password));
             User user = new User(regRequest.email, regRequest.password, regRequest.name, regRequest.surname);
-            userService.save(user);
+            userService.saveNew(user);
 
             return MessageResource.successMessage("Registration complete");
         } else {
