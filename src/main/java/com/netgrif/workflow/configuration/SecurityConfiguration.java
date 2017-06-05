@@ -47,6 +47,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         return new BCryptPasswordEncoder();
     }
 
+    //TODO: 5.6.2017 remap to login
     @RequestMapping("/user")
     @ResponseBody
     public Principal user(Principal user) {

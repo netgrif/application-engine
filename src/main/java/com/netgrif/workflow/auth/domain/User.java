@@ -46,8 +46,8 @@ public class User {
     private Set<Organization> organizations;
 
     @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
-    private Set<Role> roles;
+    @JoinTable(name = "user_authorities", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "authority_id"))
+    private Set<Authority> authorities;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "user_process_roles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "user_process_role_id"))
@@ -55,7 +55,7 @@ public class User {
 
     public User() {
         organizations = new HashSet<>();
-        roles = new HashSet<>();
+        authorities = new HashSet<>();
         userProcessRoles = new HashSet<>();
     }
 
@@ -97,16 +97,16 @@ public class User {
         this.email = email;
     }
 
-    public Set<Role> getRoles() {
-        return roles;
+    public Set<Authority> getAuthorities() {
+        return authorities;
     }
 
-    public void setRoles(Set<Role> roles) {
-        this.roles = roles;
+    public void setAuthorities(Set<Authority> authorities) {
+        this.authorities = authorities;
     }
 
-    public void addRole(Role role) {
-        roles.add(role);
+    public void addAuthority(Authority authority) {
+        authorities.add(authority);
     }
 
     public String getName() {
