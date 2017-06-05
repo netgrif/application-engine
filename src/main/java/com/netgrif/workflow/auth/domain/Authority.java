@@ -1,14 +1,19 @@
 package com.netgrif.workflow.auth.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.springframework.security.core.GrantedAuthority;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.util.Set;
 
 @Entity
-@Table(name = "role")
-public class Role {
+@Table(name = "authority")
+public class Authority implements GrantedAuthority {
+
+    public static final String admin = "ROLE_ADMIN";
+    public static final String user = "ROLE_USER";
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
@@ -16,12 +21,12 @@ public class Role {
     @Column(unique = true)
     private String name;
     @JsonIgnore
-    @ManyToMany(mappedBy = "roles")
+    @ManyToMany(mappedBy = "authorities")
     private Set<User> users;
 
-    public Role(){}
+    public Authority(){}
 
-    public Role(String name) {
+    public Authority(String name) {
         this.name = name;
     }
 
@@ -51,5 +56,10 @@ public class Role {
 
     public void addUser(User user) {
         users.add(user);
+    }
+
+    @Override
+    public String getAuthority() {
+        return this.name;
     }
 }
