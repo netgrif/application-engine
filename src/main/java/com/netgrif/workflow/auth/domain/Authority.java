@@ -19,6 +19,7 @@ public class Authority implements GrantedAuthority {
     private Long id;
     @NotNull
     @Column(unique = true)
+    @JsonIgnore
     private String name;
     @JsonIgnore
     @ManyToMany(mappedBy = "authorities")

@@ -10,6 +10,7 @@ import com.netgrif.workflow.petrinet.service.interfaces.IProcessRoleService;
 import com.netgrif.workflow.petrinet.web.PetriNetController;
 import com.netgrif.workflow.workflow.web.responsebodies.MessageResource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
@@ -67,12 +68,13 @@ public class UserController {
             return MessageResource.errorMessage("Assigning roles to user " + userId + " has failed!");
     }
 
-    //TODO: 5.6. preauthorize for admin
+    @PreAuthorize("hasRole('ADMIN')")
     @RequestMapping(value = "/authority", method = RequestMethod.GET)
     public AuthoritiesResources getAllAuthorities(Authentication auth) {
         return new AuthoritiesResources(authorityService.findAll());
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @RequestMapping(value = "/{id}/authority/assign", method = RequestMethod.POST)
     public MessageResource assignAuthorityToUser(@PathVariable("id") Long userId, @RequestBody Long authorityId) {
         userService.assignAuthority(userId, authorityId);
