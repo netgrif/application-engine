@@ -53,7 +53,7 @@ class XlsImporter implements CommandLineRunner {
     private UserProcessRoleRepository userProcessRoleRepository
 
     @Autowired
-    private RoleRepository roleRepository;
+    private RoleRepository roleRepository
 
     @Autowired
     private TaskService taskService
