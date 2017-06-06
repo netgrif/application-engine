@@ -61,19 +61,26 @@ public class TaskService implements ITaskService {
 //    }
     @Override
     public Page<Task> getAll(LoggedUser loggedUser, Pageable pageable) {
-        StringBuilder queryBuilder = new StringBuilder();
-        queryBuilder.append("{$or:[");
-        loggedUser.getProcessRoles().forEach(role -> {
-            queryBuilder.append("{\"roles.");
-            queryBuilder.append(role);
-            queryBuilder.append("\":{$exists:true}},");
-        });
-        queryBuilder.deleteCharAt(queryBuilder.length() - 1);
-        queryBuilder.append("]}");
-        BasicQuery query = new BasicQuery(queryBuilder.toString());
-        query = (BasicQuery) query.with(pageable);
-        List<Task> tasks = mongoTemplate.find(query, Task.class);
-        return loadUsers(new PageImpl<Task>(tasks, pageable, mongoTemplate.count(new BasicQuery(queryBuilder.toString(), "{_id:1}"), Task.class)));
+        List<Task> tasks;
+        if(loggedUser.getProcessRoles().isEmpty()){
+            tasks = new ArrayList<>();
+            return new PageImpl<Task>(tasks,pageable,0L);
+        } else {
+            StringBuilder queryBuilder = new StringBuilder();
+            queryBuilder.append("{$or:[");
+            loggedUser.getProcessRoles().forEach(role -> {
+                queryBuilder.append("{\"roles.");
+                queryBuilder.append(role);
+                queryBuilder.append("\":{$exists:true}},");
+            });
+            queryBuilder.deleteCharAt(queryBuilder.length() - 1);
+            queryBuilder.append("]}");
+            BasicQuery query = new BasicQuery(queryBuilder.toString());
+            query = (BasicQuery) query.with(pageable);
+            tasks = mongoTemplate.find(query, Task.class);
+            return loadUsers(new PageImpl<Task>(tasks, pageable,
+                    mongoTemplate.count(new BasicQuery(queryBuilder.toString(), "{_id:1}"), Task.class)));
+        }
     }
 
     @Override
