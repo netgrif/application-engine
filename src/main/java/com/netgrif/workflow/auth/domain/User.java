@@ -3,7 +3,8 @@ package com.netgrif.workflow.auth.domain;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotBlank;
@@ -15,51 +16,65 @@ import java.util.Set;
 
 @Entity
 @Table(name = "user")
-@Data
 public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
+    @Getter
     private Long id;
 
     @NotNull
     @Email
     @Column(unique = true)
+    @Getter @Setter
     private String email;
 
+    @Getter @Setter
     private String telNumber;
 
+    @Getter @Setter
     private String avatar;
 
     @JsonIgnore
     @NotNull
     @Length(min = 6)
+    @Getter @Setter
     private String password;
 
     @NotNull
     @NotBlank
+    @Getter @Setter
     private String name;
 
     @NotNull
     @NotBlank
+    @Getter @Setter
     private String surname;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "user_organizations", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "organization_id"))
+    @Getter @Setter
     private Set<Organization> organizations;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "user_authorities", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "authority_id"))
+    @Getter @Setter
     private Set<Authority> authorities;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "user_process_roles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "user_process_role_id"))
+    @Getter @Setter
     private Set<UserProcessRole> userProcessRoles;
 
     public User() {
         organizations = new HashSet<>();
         authorities = new HashSet<>();
         userProcessRoles = new HashSet<>();
+    }
+
+    public User(Long id) {
+        this();
+        this.id = id;
     }
 
     public User(String email, String password, String name, String surname) {
