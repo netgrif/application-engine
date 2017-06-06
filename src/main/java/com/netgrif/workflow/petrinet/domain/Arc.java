@@ -1,15 +1,25 @@
 package com.netgrif.workflow.petrinet.domain;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Transient;
 
 public class Arc extends PetriNetObject {
+
     @Transient
     protected Node source;
+
+    @Getter @Setter
     protected ObjectId sourceId;
+
     @Transient
     protected Node destination;
+
+    @Getter @Setter
     protected ObjectId destinationId;
+
+    @Getter @Setter
     protected int multiplicity;
 
     public Arc() {
@@ -47,30 +57,6 @@ public class Arc extends PetriNetObject {
     public void setDestination(Node destination) {
         this.destination = destination;
         this.destinationId = destination.getObjectId();
-    }
-
-    public int getMultiplicity() {
-        return multiplicity;
-    }
-
-    public void setMultiplicity(int multiplicity) {
-        this.multiplicity = multiplicity;
-    }
-
-    public ObjectId getSourceId() {
-        return sourceId;
-    }
-
-    public void setSourceId(ObjectId sourceId) {
-        this.sourceId = sourceId;
-    }
-
-    public ObjectId getDestinationId() {
-        return destinationId;
-    }
-
-    public void setDestinationId(ObjectId destinationId) {
-        this.destinationId = destinationId;
     }
 
     @Override
