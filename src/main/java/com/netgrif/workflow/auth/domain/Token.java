@@ -1,5 +1,7 @@
 package com.netgrif.workflow.auth.domain;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.validator.constraints.NotBlank;
 
 import javax.persistence.*;
@@ -9,19 +11,23 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "token")
 public class Token {
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
     @NotNull
     @NotBlank
+    @Getter @Setter
     private String email;
 
     @NotNull
     @NotBlank
+    @Getter @Setter
     private String hashedToken;
 
     @NotNull
+    @Getter @Setter
     private LocalDateTime expirationDate;
 
     public Token() {
@@ -32,29 +38,5 @@ public class Token {
         this();
         this.email = email;
         this.hashedToken = token;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getHashedToken() {
-        return hashedToken;
-    }
-
-    public void setHashedToken(String hashedToken) {
-        this.hashedToken = hashedToken;
-    }
-
-    public LocalDateTime getExpirationDate() {
-        return expirationDate;
-    }
-
-    public void setExpirationDate(LocalDateTime expirationDate) {
-        this.expirationDate = expirationDate;
     }
 }

@@ -7,12 +7,10 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document
 public class Place extends Node {
 
-    @Getter
-    @Setter
+    @Getter @Setter
     private int tokens;
 
-    @Getter
-    @Setter
+    @Getter @Setter
     private boolean isStatic;
 
     public Place() {
