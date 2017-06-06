@@ -105,16 +105,6 @@ class XlsImporter implements CommandLineRunner {
         Authority roleAdmin = new Authority(Authority.admin)
         authorityRepository.save(roleAdmin)
 
-        def user = new User(
-                email: "super@netgrif.com",
-                name: "Super",
-                surname: "Trooper",
-                password: "password",
-                authorities: authorityRepository.findAll() as Set<Authority>,
-                userProcessRoles: userProcessRoleRepository.findAll() as Set<UserProcessRole>,
-                organizations: organizationRepository.findAll() as Set<Organization>)
-        userService.saveNew(user)
-
         def client_manager = new User(
                 email: "manager@company.com",
                 name: "Jano",
@@ -123,7 +113,7 @@ class XlsImporter implements CommandLineRunner {
                 authorities: [userRole] as Set<Authority>,
                 organizations: [ClientOrg] as Set<Organization>)
         client_manager.addProcessRole(userProcessRoleRepository.save(new UserProcessRole(
-                roleId: net.roles.values().find { it -> it.name == "client manager" }.stringId)))
+                roleId: net.roles.values().find { it -> it.name == "client manager" }.objectId)))
         def client_worker = new User(
                 email: "worker@company.com",
                 name: "Mária",
@@ -132,7 +122,7 @@ class XlsImporter implements CommandLineRunner {
                 authorities: [userRole] as Set<Authority>,
                 organizations: [ClientOrg] as Set<Organization>)
         client_worker.addProcessRole(userProcessRoleRepository.save(new UserProcessRole(
-                roleId: net.roles.values().find { it -> it.name == "client" }.stringId)))
+                roleId: net.roles.values().find { it -> it.name == "client" }.objectId)))
         def fm_manager = new User(
                 email: "manager@fmservis.sk",
                 name: "Peter",
@@ -141,7 +131,7 @@ class XlsImporter implements CommandLineRunner {
                 authorities: [roleAdmin] as Set<Authority>,
                 organizations: [FMOrg] as Set<Organization>)
         fm_manager.addProcessRole(userProcessRoleRepository.save(new UserProcessRole(
-                roleId: net.roles.values().find { it -> it.name == "fm manager" }.stringId)))
+                roleId: net.roles.values().find { it -> it.name == "fm manager" }.objectId)))
         def fm_worker = new User(
                 email: "worker@fmservis.sk",
                 name: "Štefan",
@@ -150,7 +140,16 @@ class XlsImporter implements CommandLineRunner {
                 authorities: [userRole] as Set<Authority>,
                 organizations: [FMOrg] as Set<Organization>)
         fm_worker.addProcessRole(userProcessRoleRepository.save(new UserProcessRole(
-                roleId: net.roles.values().find { it -> it.name == "fm servis" }.stringId)))
+                roleId: net.roles.values().find { it -> it.name == "fm servis" }.objectId)))
+        def superUser = new User(
+                email: "super@netgrif.com",
+                name: "Super",
+                surname: "Trooper",
+                password: "password",
+                authorities: authorityRepository.findAll() as Set<Authority>,
+                userProcessRoles: userProcessRoleRepository.findAll() as Set<UserProcessRole>,
+                organizations: organizationRepository.findAll() as Set<Organization>)
+        userService.saveNew(superUser)
         userService.saveNew(client_manager)
         userService.saveNew(client_worker)
         userService.saveNew(fm_manager)

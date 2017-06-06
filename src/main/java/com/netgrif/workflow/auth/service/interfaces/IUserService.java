@@ -17,9 +17,9 @@ public interface IUserService {
 
     List<User> findAll();
 
-    List<User> findByOrganizations(Set<Long> org);
+    Set<User> findByOrganizations(Set<Long> org);
 
-    List<User> findByProcessRole(String roleId);
+    Set<User> findByProcessRoles(Set<String> roleIds);
 
     void assignAuthority(Long userId, Long authorityId);
 }
