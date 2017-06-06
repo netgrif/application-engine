@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -51,16 +52,14 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public List<User> findByOrganizations(Set<Long> org){
-        return userRepository.findByOrganizationsIn(org.stream().map(orgaz -> {
-            Organization organization = new Organization(orgaz);
-            return organization;
-        }).collect(Collectors.toList()));
+    public Set<User> findByOrganizations(Set<Long> org){
+        return new HashSet<>(userRepository.findByOrganizationsIn(org.stream()
+                .map(Organization::new).collect(Collectors.toList())));
     }
 
     @Override
-    public List<User> findByProcessRole(String roleId) {
-        return userRepository.findByUserProcessRoles_RoleId(roleId);
+    public Set<User> findByProcessRoles(Set<String> roleIds) {
+        return new HashSet<>(userRepository.findByUserProcessRoles_RoleIdIn(new ArrayList<>(roleIds)));
     }
 
     @Override

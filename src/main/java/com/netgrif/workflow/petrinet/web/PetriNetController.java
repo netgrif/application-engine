@@ -73,7 +73,7 @@ public class PetriNetController {
         }
     }
 
-    @RequestMapping(value = "/all", method = GET)
+    @RequestMapping(method = GET)
     public List<PetriNet> getAll() {
         return service.loadAll();
     }
@@ -103,7 +103,7 @@ public class PetriNetController {
         return new DataFieldReferencesResource(service.getDataFieldReferences(referenceBody.petriNets, referenceBody.transitions));
     }
 
-    @RequestMapping(value = "/roles/{netId}", method = GET)
+    @RequestMapping(value = "/{netId}/roles", method = GET)
     public @ResponseBody
     RolesResource getRoles(@PathVariable("netId") String netId) {
         netId = decodeUrl(netId);
