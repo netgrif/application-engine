@@ -2,6 +2,8 @@ package com.netgrif.workflow.auth.domain;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -13,14 +15,17 @@ public class Organization {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
+    @Getter
     private Long id;
 
     @NotNull
     @Column(unique = true)
+    @Getter @Setter
     private String name;
 
     @JsonIgnore
     @ManyToMany(mappedBy = "organizations")
+    @Getter @Setter
     private Set<User> users;
 
     public Organization() {
@@ -32,28 +37,9 @@ public class Organization {
         this.name = name;
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
+    public Organization(Long id) {
+        this();
         this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public Set<User> getUsers() {
-        return users;
-    }
-
-    public void setUsers(Set<User> users) {
-        this.users = users;
     }
 
     public void addUser(User user){
