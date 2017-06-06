@@ -11,6 +11,7 @@ import com.netgrif.workflow.petrinet.web.responsebodies.*;
 import com.netgrif.workflow.workflow.web.responsebodies.MessageResource;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -41,6 +42,7 @@ public class PetriNetController {
     @Autowired
     private IProcessRoleService roleService;
 
+    @PreAuthorize("hasRole('ADMIN')")
     @RequestMapping(value = "/import", method = POST)
     public
     @ResponseBody
