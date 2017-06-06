@@ -81,8 +81,8 @@ public class PetriNetController {
     @RequestMapping(value = "/refs", method = GET)
     public
     @ResponseBody
-    PetriNetReferencesResource getAllReferences() {
-        List<PetriNetReference> refs = service.getAllReferences();
+    PetriNetReferencesResource getAllReferences(Authentication auth) {
+        List<PetriNetReference> refs = service.getAllReferences((LoggedUser)auth.getPrincipal());
         return new PetriNetReferencesResource(refs);
     }
 
