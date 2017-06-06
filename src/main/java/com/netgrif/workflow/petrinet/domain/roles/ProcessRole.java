@@ -42,8 +42,4 @@ public class ProcessRole {
     public void setDescription(String description) {
         this.description = description;
     }
-
-    public String getStringId() {
-        return _id.toString();
-    }
 }

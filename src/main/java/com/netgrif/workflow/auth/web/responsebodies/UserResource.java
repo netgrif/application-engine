@@ -20,6 +20,7 @@ public class UserResource extends Resource<User>{
             getContent().setTelNumber(null);
             getContent().setOrganizations(null);
             getContent().setAuthorities(null);
+            getContent().setPassword(null);
         }
     }
 

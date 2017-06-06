@@ -30,6 +30,7 @@ public class UserField extends Field{
     }
 
     public UserResource getValue() {
+        if(this.value == null) return null;
         return new UserResource(this.value,"small",true);
     }
 

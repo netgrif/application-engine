@@ -142,7 +142,7 @@ public class WorkflowCommandLineRunner {//implements CommandLineRunner {
 
         processRoles.forEach(processRole -> {
             UserProcessRole userProcessRole = new UserProcessRole();
-            userProcessRole.setRoleId(processRole.getStringId());
+            userProcessRole.setRoleId(processRole.getObjectId());
             userProcessRole = userProcessRoleRepository.save(userProcessRole);
             user.addProcessRole(userProcessRole);
         });

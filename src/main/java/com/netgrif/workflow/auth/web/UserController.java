@@ -52,9 +52,9 @@ public class UserController {
         return new UsersResource(userService.findByOrganizations(((LoggedUser) auth.getPrincipal()).getOrganizations()), "small", true);
     }
 
-    @RequestMapping(value = "/role/{id}/small", method = RequestMethod.GET)
-    public UsersResource getAllWithRole(@PathVariable("id") String roleId) {
-        return new UsersResource(userService.findByProcessRole(PetriNetController.decodeUrl(roleId)), "small", true);
+    @RequestMapping(value = "/role/small", method = RequestMethod.POST)
+    public UsersResource getAllWithRole(@RequestBody Set<String> roleIds) {
+        return new UsersResource(userService.findByProcessRoles(roleIds), "small", true);
     }
 
     //TODO: 2.6.2017 edit user profile
