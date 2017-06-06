@@ -1,9 +1,9 @@
 package com.netgrif.workflow.auth.service;
 
 import com.netgrif.workflow.auth.domain.Organization;
-import com.netgrif.workflow.auth.domain.Role;
+import com.netgrif.workflow.auth.domain.Authority;
 import com.netgrif.workflow.auth.domain.User;
-import com.netgrif.workflow.auth.domain.repositories.RoleRepository;
+import com.netgrif.workflow.auth.domain.repositories.AuthorityRepository;
 import com.netgrif.workflow.auth.domain.repositories.UserRepository;
 import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,17 +20,17 @@ public class UserService implements IUserService {
     @Autowired
     private UserRepository userRepository;
     @Autowired
-    private RoleRepository roleRepository;
+    private AuthorityRepository authorityRepository;
     @Autowired
     private BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @Override
     public User saveNew(User user) {
         user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
-        if (user.getRoles().isEmpty()) {
-            HashSet<Role> roles = new HashSet<Role>();
-            roles.add(roleRepository.findByName("user"));
-            user.setRoles(roles);
+        if (user.getAuthorities().isEmpty()) {
+            HashSet<Authority> authorities = new HashSet<Authority>();
+            authorities.add(authorityRepository.findByName(Authority.user));
+            user.setAuthorities(authorities);
         }
         return userRepository.save(user);
     }
@@ -65,12 +65,12 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void assignRole(Long userId, Long roleId) {
+    public void assignAuthority(Long userId, Long authorityId) {
         User user = userRepository.findOne(userId);
-        Role role = roleRepository.findOne(roleId);
+        Authority authority = authorityRepository.findOne(authorityId);
 
-        user.addRole(role);
-        role.addUser(user);
+        user.addAuthority(authority);
+        authority.addUser(user);
 
         userRepository.save(user);
     }
