@@ -24,43 +24,35 @@ public class PetriNet {
     @Id
     private ObjectId _id;
 
-    @Getter
-    @Setter
+    @Getter @Setter
     private String title;
 
-    @Getter
-    @Setter
+    @Getter @Setter
     private String initials;
 
     // TODO: 18. 3. 2017 replace with Spring auditing
-    @Getter
-    @Setter
+    @Getter @Setter
     private LocalDateTime creationDate;
 
     @org.springframework.data.mongodb.core.mapping.Field("places")
-    @Getter
-    @Setter
+    @Getter @Setter
     private Map<String, Place> places;
 
     @org.springframework.data.mongodb.core.mapping.Field("transitions")
-    @Getter
-    @Setter
+    @Getter @Setter
     private Map<String, Transition> transitions;
 
     @org.springframework.data.mongodb.core.mapping.Field("arcs")
-    @Getter
-    @Setter
+    @Getter @Setter
     private Map<String, List<Arc>> arcs;
 
     @org.springframework.data.mongodb.core.mapping.Field("dataset")
-    @Getter
-    @Setter
+    @Getter @Setter
     private Map<String, Field> dataSet;
 
     @org.springframework.data.mongodb.core.mapping.Field("roles")
     @DBRef
-    @Getter
-    @Setter
+    @Getter @Setter
     private Map<String, ProcessRole> roles;
 
     @Transient

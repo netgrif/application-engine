@@ -3,6 +3,8 @@ package com.netgrif.workflow.auth.domain;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotBlank;
@@ -15,6 +17,7 @@ import java.util.Set;
 @Entity
 @Table(name = "user")
 public class User {
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
@@ -22,35 +25,44 @@ public class User {
     @NotNull
     @Email
     @Column(unique = true)
+    @Getter @Setter
     private String email;
 
+    @Getter @Setter
     private String telNumber;
 
+    @Getter @Setter
     private String avatar;
 
     @JsonIgnore
     @NotNull
     @Length(min = 6)
+    @Getter @Setter
     private String password;
 
     @NotNull
     @NotBlank
+    @Getter @Setter
     private String name;
 
     @NotNull
     @NotBlank
+    @Getter @Setter
     private String surname;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "user_organizations", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "organization_id"))
+    @Getter @Setter
     private Set<Organization> organizations;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
+    @Getter @Setter
     private Set<Role> roles;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "user_process_roles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "user_process_role_id"))
+    @Getter @Setter
     private Set<UserProcessRole> userProcessRoles;
 
     public User() {
@@ -73,64 +85,8 @@ public class User {
                 .forEach(node -> userProcessRoles.add(new UserProcessRole( node.get("roleId").asText())));
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public Set<Role> getRoles() {
-        return roles;
-    }
-
-    public void setRoles(Set<Role> roles) {
-        this.roles = roles;
-    }
-
     public void addRole(Role role) {
         roles.add(role);
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getSurname() {
-        return surname;
-    }
-
-    public void setSurname(String surname) {
-        this.surname = surname;
-    }
-
-    public Set<UserProcessRole> getUserProcessRoles() {
-        return userProcessRoles;
-    }
-
-    public void setUserProcessRoles(Set<UserProcessRole> userProcessRoles) {
-        this.userProcessRoles = userProcessRoles;
     }
 
     public void addProcessRole(UserProcessRole role) {
@@ -139,30 +95,6 @@ public class User {
 
     public String getFullName() {
         return name + " " + surname;
-    }
-
-    public String getTelNumber() {
-        return telNumber;
-    }
-
-    public void setTelNumber(String telNumber) {
-        this.telNumber = telNumber;
-    }
-
-    public String getAvatar() {
-        return avatar;
-    }
-
-    public void setAvatar(String avatar) {
-        this.avatar = avatar;
-    }
-
-    public Set<Organization> getOrganizations() {
-        return organizations;
-    }
-
-    public void setOrganizations(Set<Organization> organizations) {
-        this.organizations = organizations;
     }
 
     public void addOrganization(Organization org){
