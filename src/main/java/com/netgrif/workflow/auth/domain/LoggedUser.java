@@ -37,8 +37,7 @@ public class LoggedUser extends org.springframework.security.core.userdetails.Us
     }
 
     public User transformToUser(){
-        User user = new User();
-        user.setId(this.id);
+        User user = new User(this.id);
         user.setEmail(getUsername());
         String[] names = this.fullName.split(" ");
         user.setName(names[0]);
