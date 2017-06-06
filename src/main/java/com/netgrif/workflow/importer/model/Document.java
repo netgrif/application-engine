@@ -1,12 +1,9 @@
 package com.netgrif.workflow.importer.model;
 
-import lombok.Data;
-
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
-@Data
 public class Document {
 
     @XmlElement(name = "arc")
@@ -23,4 +20,44 @@ public class Document {
 
     @XmlElement(name = "place")
     private ImportPlace[] places;
+
+    public ImportArc[] getImportArc() {
+        return arcs;
+    }
+
+    public void setImportArc(ImportArc[] importArc) {
+        this.arcs = importArc;
+    }
+
+    public ImportData[] getImportData() {
+        return data;
+    }
+
+    public void setImportData(ImportData[] importData) {
+        this.data = importData;
+    }
+
+    public ImportRole[] getImportRoles() {
+        return roles;
+    }
+
+    public void setImportRoles(ImportRole[] role) {
+        this.roles = role;
+    }
+
+    public ImportTransition[] getImportTransitions() {
+        return transitions;
+    }
+
+    public void setImportTransitions(ImportTransition[] importTransitions) {
+        this.transitions = importTransitions;
+    }
+
+    public ImportPlace[] getImportPlaces() {
+        return places;
+    }
+
+    public void setImportPlaces(ImportPlace[] place) {
+        this.places = place;
+    }
 }
