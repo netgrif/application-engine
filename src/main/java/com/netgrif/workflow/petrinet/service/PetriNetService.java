@@ -18,6 +18,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class PetriNetService implements IPetriNetService {
@@ -54,26 +55,20 @@ public class PetriNetService implements IPetriNetService {
     }
 
     @Override
-    public List<PetriNetReference> getAllReferences() {
+    public List<PetriNetReference> getAllReferences(LoggedUser user) {
         List<PetriNet> nets = loadAll();
-        List<PetriNetReference> refs = new ArrayList<>();
-        for (PetriNet net : nets) {
-            refs.add(new PetriNetReference(net.get_id().toString(), net.getTitle()));
-        }
-        return refs;
+        return nets.stream().filter(net -> net.getRoles().keySet().stream().anyMatch(user.getProcessRoles()::contains))
+                .map(net -> new PetriNetReference(net.get_id().toString(), net.getTitle())).collect(Collectors.toList());
     }
 
     @Override
     public List<TransitionReference> getTransitionReferences(List<String> netsIds, LoggedUser user) {
         Iterable<PetriNet> nets = repository.findAll(netsIds);
         List<TransitionReference> transRefs = new ArrayList<>();
-
-        nets.forEach(net -> net.getTransitions().forEach((s, transition) -> {
-            //TODO: 4.6.2017 ošetriť pridanie len referencii s rolou usera
-            transRefs.add(new TransitionReference(transition.getStringId(),
-                    transition.getTitle(), net.getStringId()));
-        }));
-
+        nets.forEach(net -> transRefs.addAll(net.getTransitions().entrySet().stream()
+                .filter(entry -> entry.getValue().getRoles().keySet().stream().anyMatch(user.getProcessRoles()::contains))
+                .map(entry -> new TransitionReference(entry.getKey(),entry.getValue().getTitle(),net.getStringId()))
+                .collect(Collectors.toList())));
         return transRefs;
     }
 
