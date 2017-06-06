@@ -1,7 +1,8 @@
 package com.netgrif.workflow.auth.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 
 import javax.persistence.*;
@@ -10,7 +11,6 @@ import java.util.Set;
 
 @Entity
 @Table(name = "authority")
-@Data
 public class Authority implements GrantedAuthority {
 
     public static final String admin = "ROLE_ADMIN";
@@ -18,15 +18,18 @@ public class Authority implements GrantedAuthority {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
+    @Getter
     private Long id;
 
     @NotNull
     @Column(unique = true)
     @JsonIgnore
+    @Getter @Setter
     private String name;
 
     @JsonIgnore
     @ManyToMany(mappedBy = "authorities")
+    @Getter @Setter
     private Set<User> users;
 
     public Authority(){}
