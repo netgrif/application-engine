@@ -9,8 +9,6 @@ import com.netgrif.workflow.petrinet.domain.dataset.logic.Editable;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.Required;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.Visible;
 import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository;
-import com.netgrif.workflow.petrinet.domain.roles.AssignFunction;
-import com.netgrif.workflow.petrinet.domain.roles.DelegateFunction;
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRole;
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRoleRepository;
 import com.netgrif.workflow.petrinet.service.ArcFactory;
@@ -80,11 +78,11 @@ public class Importer {
         net.setInitials(initials);
 
         // TODO: 15. 4. 2017 check if document contains any roles, data, etc. (NullPointerException)
-        Arrays.stream(document.getImportRoles()).forEach(this::createRole);
-        Arrays.stream(document.getImportData()).forEach(this::createDataSet);
-        Arrays.stream(document.getImportPlaces()).forEach(this::createPlace);
-        Arrays.stream(document.getImportTransitions()).forEach(this::createTransition);
-        Arrays.stream(document.getImportArc()).forEach(this::createArc);
+        Arrays.stream(document.getRoles()).forEach(this::createRole);
+        Arrays.stream(document.getData()).forEach(this::createDataSet);
+        Arrays.stream(document.getPlaces()).forEach(this::createPlace);
+        Arrays.stream(document.getTransitions()).forEach(this::createTransition);
+        Arrays.stream(document.getArcs()).forEach(this::createArc);
 
         return repository.save(net);
     }
