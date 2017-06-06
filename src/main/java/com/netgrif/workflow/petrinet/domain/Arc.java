@@ -10,19 +10,16 @@ public class Arc extends PetriNetObject {
     @Transient
     protected Node source;
 
-    @Getter
-    @Setter
+    @Getter @Setter
     protected ObjectId sourceId;
 
     @Transient
     protected Node destination;
 
-    @Getter
-    @Setter
+    @Getter @Setter
     protected ObjectId destinationId;
 
-    @Getter
-    @Setter
+    @Getter @Setter
     protected int multiplicity;
 
     public Arc() {

@@ -11,8 +11,7 @@ public abstract class Node extends PetriNetObject {
     @Getter
     private Position position;
 
-    @Getter
-    @Setter
+    @Getter @Setter
     private String title;
 
     public Node() {

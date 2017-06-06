@@ -16,22 +16,18 @@ import java.util.*;
 public class Transition extends Node {
 
     @Field("dataSet")
-    @Getter
-    @Setter
+    @Getter @Setter
     private Map<String, Set<IDataFunction>> dataSet;
 
     @Field("roles")
-    @Getter
-    @Setter
+    @Getter @Setter
     private Map<String, Set<RolePermission>> roles;
 
     @DBRef
-    @Getter
-    @Setter
+    @Getter @Setter
     private List<Trigger> triggers;
 
-    @Getter
-    @Setter
+    @Getter @Setter
     private int priority;
 
     public Transition() {
