@@ -53,8 +53,7 @@ public class UserService implements IUserService {
     @Override
     public List<User> findByOrganizations(Set<Long> org){
         return userRepository.findByOrganizationsIn(org.stream().map(orgaz -> {
-            Organization organization = new Organization();
-            organization.setId(orgaz);
+            Organization organization = new Organization(orgaz);
             return organization;
         }).collect(Collectors.toList()));
     }
