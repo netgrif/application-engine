@@ -53,7 +53,7 @@ class XlsImporter implements CommandLineRunner {
     private UserProcessRoleRepository userProcessRoleRepository
 
     @Autowired
-    private AuthorityRepository roleRepository
+    private AuthorityRepository authorityRepository
 
     @Autowired
     private TaskService taskService
@@ -101,18 +101,18 @@ class XlsImporter implements CommandLineRunner {
         ClientOrg = organizationRepository.save(ClientOrg)
 
         userRole = new Authority(Authority.user)
-        userRole = roleRepository.save(userRole)
+        userRole = authorityRepository.save(userRole)
         Authority roleAdmin = new Authority(Authority.admin)
-        roleRepository.save(roleAdmin)
+        authorityRepository.save(roleAdmin)
 
         def user = new User(
                 email: "super@netgrif.com",
                 name: "Super",
                 surname: "Trooper",
                 password: "password",
-                authorities: roleRepository.findAll() as Set,
-                userProcessRoles: userProcessRoleRepository.findAll() as Set,
-                organizations: organizationRepository.findAll() as Set)
+                authorities: authorityRepository.findAll() as Set<Authority>,
+                userProcessRoles: userProcessRoleRepository.findAll() as Set<UserProcessRole>,
+                organizations: organizationRepository.findAll() as Set<Organization>)
         userService.saveNew(user)
 
         def client_manager = new User(

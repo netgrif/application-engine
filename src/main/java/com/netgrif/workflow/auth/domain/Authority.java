@@ -1,6 +1,8 @@
 package com.netgrif.workflow.auth.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 
 import javax.persistence.*;
@@ -16,43 +18,24 @@ public class Authority implements GrantedAuthority {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
+    @Getter
     private Long id;
+
     @NotNull
     @Column(unique = true)
     @JsonIgnore
+    @Getter @Setter
     private String name;
+
     @JsonIgnore
     @ManyToMany(mappedBy = "authorities")
+    @Getter @Setter
     private Set<User> users;
 
     public Authority(){}
 
     public Authority(String name) {
         this.name = name;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public Set<User> getUsers() {
-        return users;
-    }
-
-    public void setUsers(Set<User> users) {
-        this.users = users;
     }
 
     public void addUser(User user) {
