@@ -78,11 +78,11 @@ public class Importer {
         net.setInitials(initials);
 
         // TODO: 15. 4. 2017 check if document contains any roles, data, etc. (NullPointerException)
-        Arrays.stream(document.getRoles()).forEach(this::createRole);
-        Arrays.stream(document.getData()).forEach(this::createDataSet);
-        Arrays.stream(document.getPlaces()).forEach(this::createPlace);
-        Arrays.stream(document.getTransitions()).forEach(this::createTransition);
-        Arrays.stream(document.getArcs()).forEach(this::createArc);
+        Arrays.stream(document.getImportRoles()).forEach(this::createRole);
+        Arrays.stream(document.getImportData()).forEach(this::createDataSet);
+        Arrays.stream(document.getImportPlaces()).forEach(this::createPlace);
+        Arrays.stream(document.getImportTransitions()).forEach(this::createTransition);
+        Arrays.stream(document.getImportArc()).forEach(this::createArc);
 
         return repository.save(net);
     }
