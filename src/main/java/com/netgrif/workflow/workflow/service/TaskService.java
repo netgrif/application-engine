@@ -305,8 +305,12 @@ public class TaskService implements ITaskService {
                 value = set;
                 break;
             case "user":
-                ObjectNode jsonUser = (ObjectNode) node.get("value");
-                value = new User(jsonUser);
+                User user = userRepository.findByEmail(node.get("value").asText());
+                user.setPassword(null);
+                user.setOrganizations(null);
+                user.setAuthorities(null);
+                user.setUserProcessRoles(null);
+                value = user;
                 break;
             case "number":
                 value = node.get("value").asDouble();
