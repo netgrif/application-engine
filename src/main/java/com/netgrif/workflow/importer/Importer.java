@@ -9,8 +9,6 @@ import com.netgrif.workflow.petrinet.domain.dataset.logic.Editable;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.Required;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.Visible;
 import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository;
-import com.netgrif.workflow.petrinet.domain.roles.AssignFunction;
-import com.netgrif.workflow.petrinet.domain.roles.DelegateFunction;
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRole;
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRoleRepository;
 import com.netgrif.workflow.petrinet.service.ArcFactory;

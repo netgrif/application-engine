@@ -3,12 +3,18 @@ package com.netgrif.workflow.importer.model;
 import com.netgrif.workflow.importer.model.datalogic.ImportAutoPlus;
 
 public class Logic implements RoleLogic, DataLogic {
+
     private Boolean editable;
+
     private Boolean visible;
+
     private ImportAutoPlus autoPlus;
+
     private Boolean required;
 
+
     private Boolean perform;
+
     private Boolean delegate;
 
 //  DATA
