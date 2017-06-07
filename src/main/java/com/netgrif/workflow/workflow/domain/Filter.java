@@ -4,6 +4,8 @@ import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.petrinet.web.responsebodies.PetriNetReference;
 import com.netgrif.workflow.petrinet.web.responsebodies.TransitionReference;
 import com.netgrif.workflow.workflow.web.requestbodies.CreateFilterBody;
+import lombok.Getter;
+import lombok.Setter;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -16,11 +18,23 @@ public class Filter {
 
     @Id
     private ObjectId _id;
+
+    @Getter @Setter
     private String name;
+
+    @Getter @Setter
     private String organization;
+
+    @Getter @Setter
     private Long user;
+
+    @Getter @Setter
     private List<PetriNetReference> petriNets;
+
+    @Getter @Setter
     private List<TransitionReference> transitions;
+
+    @Getter @Setter
     private List<String> roles;
 
     public Filter() {
@@ -41,54 +55,6 @@ public class Filter {
 
     public ObjectId get_id() {
         return _id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getOrganization() {
-        return organization;
-    }
-
-    public void setOrganization(String organization) {
-        this.organization = organization;
-    }
-
-    public Long getUser() {
-        return user;
-    }
-
-    public void setUser(Long user) {
-        this.user = user;
-    }
-
-    public List<PetriNetReference> getPetriNets() {
-        return petriNets;
-    }
-
-    public void setPetriNets(List<PetriNetReference> petriNets) {
-        this.petriNets = petriNets;
-    }
-
-    public List<TransitionReference> getTransitions() {
-        return transitions;
-    }
-
-    public void setTransitions(List<TransitionReference> transitions) {
-        this.transitions = transitions;
-    }
-
-    public List<String> getRoles() {
-        return roles;
-    }
-
-    public void setRoles(List<String> roles) {
-        this.roles = roles;
     }
 
     public void resolveVisibility(int visibility, LoggedUser user){
