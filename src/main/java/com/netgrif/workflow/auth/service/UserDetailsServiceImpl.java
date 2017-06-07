@@ -1,7 +1,7 @@
 package com.netgrif.workflow.auth.service;
 
 import com.netgrif.workflow.auth.domain.LoggedUser;
-import com.netgrif.workflow.auth.domain.Role;
+import com.netgrif.workflow.auth.domain.Authority;
 import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.auth.domain.repositories.UserRepository;
 import org.slf4j.Logger;
@@ -31,12 +31,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         User user = userRepository.findByEmail(email);
 
-        Set<GrantedAuthority> grantedAuthorities = new HashSet<>();
-        for (Role role : user.getRoles()){
-            grantedAuthorities.add(new SimpleGrantedAuthority(role.getName()));
-        }
-
-        LoggedUser loggedUser = new LoggedUser(user.getId(), user.getEmail(), user.getPassword(), grantedAuthorities);
+        LoggedUser loggedUser = new LoggedUser(user.getId(), user.getEmail(), user.getPassword(), user.getAuthorities());
         loggedUser.setFullName(user.getFullName());
 
         if(!user.getUserProcessRoles().isEmpty())

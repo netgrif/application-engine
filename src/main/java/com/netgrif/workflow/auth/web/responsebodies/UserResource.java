@@ -19,7 +19,8 @@ public class UserResource extends Resource<User>{
         if(small) {
             getContent().setTelNumber(null);
             getContent().setOrganizations(null);
-            getContent().setRoles(null);
+            getContent().setAuthorities(null);
+            getContent().setPassword(null);
         }
     }
 
