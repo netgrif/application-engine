@@ -1,15 +1,9 @@
 package com.netgrif.workflow.importer.model;
 
+import lombok.Data;
+
+@Data
 public class Columns {
+
     private ImportData[] data;
-
-    public ImportData[] getData ()
-    {
-        return data;
-    }
-
-    public void setData (ImportData[] data)
-    {
-        this.data = data;
-    }
 }

@@ -1,9 +1,9 @@
 package com.netgrif.workflow;
 
-import com.netgrif.workflow.auth.domain.Role;
+import com.netgrif.workflow.auth.domain.Authority;
 import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.auth.domain.UserProcessRole;
-import com.netgrif.workflow.auth.domain.repositories.RoleRepository;
+import com.netgrif.workflow.auth.domain.repositories.AuthorityRepository;
 import com.netgrif.workflow.auth.domain.repositories.UserProcessRoleRepository;
 import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.importer.Importer;
@@ -32,7 +32,7 @@ public class WorkflowCommandLineRunner {//implements CommandLineRunner {
     private IUserService userService;
 
     @Autowired
-    private RoleRepository roleRepository;
+    private AuthorityRepository authorityRepository;
 
     @Autowired
     private IWorkflowService workflowService;
@@ -57,38 +57,38 @@ public class WorkflowCommandLineRunner {//implements CommandLineRunner {
 //            workflowService.createCase(net.getStringId(), " " + i, randomColor());
 //        }
 
-//        Role roleUser = new Role("user");
-//        roleUser = roleRepository.save(roleUser);
+//        Authority authorityUser = new Authority("user");
+//        authorityUser = roleRepository.save(authorityUser);
 //        User user = new User("poistenec@gmail.com", "password", "name", "surname");
-//        HashSet<Role> roles = new HashSet<>();
-//        roles.add(roleUser);
-//        user.setRoles(roles);
+//        HashSet<Authority> roles = new HashSet<>();
+//        roles.add(authorityUser);
+//        user.setAuthorities(roles);
 //        userService.save(user);
 //
-//        Role roleAdmin = new Role("admin");
-//        roleAdmin = roleRepository.save(roleAdmin);
+//        Authority authorityAdmin = new Authority("admin");
+//        authorityAdmin = roleRepository.save(authorityAdmin);
 //        User admin = new User("agent@gmail.com", "pass", "Admin", "Adminovič");
-//        HashSet<Role> adminRoles = new HashSet<>();
-//        adminRoles.add(roleAdmin);
-//        admin.setRoles(adminRoles);
+//        HashSet<Authority> adminRoles = new HashSet<>();
+//        adminRoles.add(authorityAdmin);
+//        admin.setAuthorities(adminRoles);
 //        userService.save(admin);
 //
 //        User superAdmin = new User("super@netgrif.com", "password", "Super", "Truuper");
-//        HashSet<Role> superRoles = new HashSet<>();
-//        superRoles.add(roleAdmin);
-//        superAdmin.setRoles(superRoles);
+//        HashSet<Authority> superRoles = new HashSet<>();
+//        superRoles.add(authorityAdmin);
+//        superAdmin.setAuthorities(superRoles);
 //
 //        User client = new User("client@client.com", "password", "Client", "Client");
-//        HashSet<Role> clientRoles = new HashSet<>();
-//        clientRoles.add(roleUser);
-//        client.setRoles(clientRoles);
+//        HashSet<Authority> clientRoles = new HashSet<>();
+//        clientRoles.add(authorityUser);
+//        client.setAuthorities(clientRoles);
 //
 //        User clientManager = new User("agent@agent.com", "password", "Agent", "Smith");
-//        HashSet<Role> managerRoles = new HashSet<>();
-//        managerRoles.add(roleUser);
-//        clientManager.setRoles(managerRoles);
+//        HashSet<Authority> managerRoles = new HashSet<>();
+//        managerRoles.add(authorityUser);
+//        clientManager.setAuthorities(managerRoles);
 //
-//        List<ProcessRole> proles = new LinkedList<>(net.getRoles().values().stream().sorted(Comparator.comparing(ProcessRole::getName)).collect(Collectors.toList()));
+//        List<ProcessRole> proles = new LinkedList<>(net.getAuthorities().values().stream().sorted(Comparator.comparing(ProcessRole::getName)).collect(Collectors.toList()));
 //        ProcessRole clientRole = proles.get(0);
 //        ProcessRole clientManagerRole = proles.get(1);
 //
@@ -116,33 +116,33 @@ public class WorkflowCommandLineRunner {//implements CommandLineRunner {
 //        userService.save(clientManager);
 //        userService.save(superAdmin);
 
-        Role roleUser = new Role("user");
-        roleUser = roleRepository.save(roleUser);
-        Role roleAdmin = new Role("admin");
-        roleAdmin = roleRepository.save(roleAdmin);
+        Authority authorityUser = new Authority("user");
+        authorityUser = authorityRepository.save(authorityUser);
+        Authority authorityAdmin = new Authority("admin");
+        authorityAdmin = authorityRepository.save(authorityAdmin);
         List<ProcessRole> proles = new LinkedList<>(net.getRoles().values().stream().sorted(Comparator.comparing(ProcessRole::getName)).collect(Collectors.toList()));
 
         List<ProcessRole> usePRoles = new LinkedList<>();
 //        usePRoles.add(proles.get(0));
-//        createUser(new User("poistenec@gmail.com", "password", "Fero", "Poistenec"),roleUser,usePRoles);
+//        createUser(new User("poistenec@gmail.com", "password", "Fero", "Poistenec"),authorityUser,usePRoles);
 //        usePRoles.add(proles.get(1));
-//        createUser(new User("agent@gmail.com", "password", "Jano", "Poisťovák"),roleAdmin,usePRoles);
-//        createUser(new User("super@netgrif.com","password","Super","Trooper"), roleAdmin, proles);
-        createUser(new User("client@gmail.com","password","Mária","Kováčová"),roleUser,usePRoles);
-        createUser(new User("manager.client@gmail.com","password","Jano","Mrkvička"),roleUser,usePRoles);
-        createUser(new User("employee@fmservis.sk","password","Štefan","Horváth"),roleUser,usePRoles);
-        createUser(new User("manager@fmservis.sk","password","Peter","Molnár"),roleAdmin,usePRoles);
-        createUser(new User("super@netgrif.com","password","Super","Trooper"), roleAdmin, proles);
+//        createUser(new User("agent@gmail.com", "password", "Jano", "Poisťovák"),authorityAdmin,usePRoles);
+//        createUser(new User("super@netgrif.com","password","Super","Trooper"), authorityAdmin, proles);
+        createUser(new User("client@gmail.com","password","Mária","Kováčová"), authorityUser,usePRoles);
+        createUser(new User("manager.client@gmail.com","password","Jano","Mrkvička"), authorityUser,usePRoles);
+        createUser(new User("employee@fmservis.sk","password","Štefan","Horváth"), authorityUser,usePRoles);
+        createUser(new User("manager@fmservis.sk","password","Peter","Molnár"), authorityAdmin,usePRoles);
+        createUser(new User("super@netgrif.com","password","Super","Trooper"), authorityAdmin, proles);
     }
 
-    private void createUser(User user, Role role, List<ProcessRole> processRoles){
-        HashSet<Role> roleSet = new HashSet<>();
-        roleSet.add(role);
-        user.setRoles(roleSet);
+    private void createUser(User user, Authority authority, List<ProcessRole> processRoles){
+        HashSet<Authority> authoritySet = new HashSet<>();
+        authoritySet.add(authority);
+        user.setAuthorities(authoritySet);
 
         processRoles.forEach(processRole -> {
             UserProcessRole userProcessRole = new UserProcessRole();
-            userProcessRole.setRoleId(processRole.getStringId());
+            userProcessRole.setRoleId(processRole.getObjectId());
             userProcessRole = userProcessRoleRepository.save(userProcessRole);
             user.addProcessRole(userProcessRole);
         });

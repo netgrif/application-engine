@@ -1,12 +1,12 @@
 package com.netgrif.workflow
 
-import com.netgrif.workflow.auth.domain.Role
+import com.netgrif.workflow.auth.domain.Authority
 import com.netgrif.workflow.auth.domain.repositories.UserProcessRoleRepository
 import com.netgrif.workflow.auth.domain.Organization
 import com.netgrif.workflow.auth.domain.User
 import com.netgrif.workflow.auth.domain.UserProcessRole
 import com.netgrif.workflow.auth.domain.repositories.OrganizationRepository
-import com.netgrif.workflow.auth.domain.repositories.RoleRepository
+import com.netgrif.workflow.auth.domain.repositories.AuthorityRepository
 import com.netgrif.workflow.auth.domain.repositories.UserRepository
 import com.netgrif.workflow.auth.service.interfaces.IUserService
 import com.netgrif.workflow.importer.Importer
@@ -53,7 +53,7 @@ class XlsImporter implements CommandLineRunner {
     private UserProcessRoleRepository userProcessRoleRepository
 
     @Autowired
-    private RoleRepository roleRepository
+    private AuthorityRepository authorityRepository
 
     @Autowired
     private TaskService taskService
@@ -87,7 +87,7 @@ class XlsImporter implements CommandLineRunner {
     private PetriNet net
     private Case useCase
     private UserProcessRole clientRole
-    private Role userRole
+    private Authority userRole
     private Organization ClientOrg
 
     @Override
@@ -100,57 +100,56 @@ class XlsImporter implements CommandLineRunner {
         ClientOrg = new Organization("Client Company")
         ClientOrg = organizationRepository.save(ClientOrg)
 
-        userRole = new Role("user")
-        userRole = roleRepository.save(userRole)
-        Role roleAdmin = new Role("admin")
-        roleRepository.save(roleAdmin)
-
-        def user = new User(
-                email: "super@netgrif.com",
-                name: "Super",
-                surname: "Trooper",
-                password: "password",
-                roles: roleRepository.findAll() as Set,
-                userProcessRoles: userProcessRoleRepository.findAll() as Set,
-                organizations: organizationRepository.findAll() as Set)
-        userService.saveNew(user)
+        userRole = new Authority(Authority.user)
+        userRole = authorityRepository.save(userRole)
+        Authority roleAdmin = new Authority(Authority.admin)
+        authorityRepository.save(roleAdmin)
 
         def client_manager = new User(
                 email: "manager@company.com",
                 name: "Jano",
                 surname: "Mrkvička",
                 password: "password",
-                roles: [userRole] as Set<Role>,
+                authorities: [userRole] as Set<Authority>,
                 organizations: [ClientOrg] as Set<Organization>)
         client_manager.addProcessRole(userProcessRoleRepository.save(new UserProcessRole(
-                roleId: net.roles.values().find { it -> it.name == "client manager" }.stringId)))
+                roleId: net.roles.values().find { it -> it.name == "client manager" }.objectId)))
         def client_worker = new User(
                 email: "worker@company.com",
                 name: "Mária",
                 surname: "Kováčová",
                 password: "password",
-                roles: [userRole] as Set<Role>,
+                authorities: [userRole] as Set<Authority>,
                 organizations: [ClientOrg] as Set<Organization>)
         client_worker.addProcessRole(userProcessRoleRepository.save(new UserProcessRole(
-                roleId: net.roles.values().find { it -> it.name == "client" }.stringId)))
+                roleId: net.roles.values().find { it -> it.name == "client" }.objectId)))
         def fm_manager = new User(
                 email: "manager@fmservis.sk",
                 name: "Peter",
                 surname: "Molnár",
                 password: "password",
-                roles: [roleAdmin] as Set<Role>,
+                authorities: [roleAdmin] as Set<Authority>,
                 organizations: [FMOrg] as Set<Organization>)
         fm_manager.addProcessRole(userProcessRoleRepository.save(new UserProcessRole(
-                roleId: net.roles.values().find { it -> it.name == "fm manager" }.stringId)))
+                roleId: net.roles.values().find { it -> it.name == "fm manager" }.objectId)))
         def fm_worker = new User(
                 email: "worker@fmservis.sk",
                 name: "Štefan",
                 surname: "Horváth",
                 password: "password",
-                roles: [userRole] as Set<Role>,
+                authorities: [userRole] as Set<Authority>,
                 organizations: [FMOrg] as Set<Organization>)
         fm_worker.addProcessRole(userProcessRoleRepository.save(new UserProcessRole(
-                roleId: net.roles.values().find { it -> it.name == "fm servis" }.stringId)))
+                roleId: net.roles.values().find { it -> it.name == "fm servis" }.objectId)))
+        def superUser = new User(
+                email: "super@netgrif.com",
+                name: "Super",
+                surname: "Trooper",
+                password: "password",
+                authorities: authorityRepository.findAll() as Set<Authority>,
+                userProcessRoles: userProcessRoleRepository.findAll() as Set<UserProcessRole>,
+                organizations: organizationRepository.findAll() as Set<Organization>)
+        userService.saveNew(superUser)
         userService.saveNew(client_manager)
         userService.saveNew(client_worker)
         userService.saveNew(fm_manager)
@@ -173,7 +172,7 @@ class XlsImporter implements CommandLineRunner {
                 }
             } else if (index < 20) {
                 useCase.activePlaces.put(net.places.find { it -> it.value.title == "K" }.key, 1)
-                useCase.activePlaces.put(net.places.find { it -> it.value.title == "H" }.key, 1)
+                useCase.activePlaces.put(net.places.find { it -> it.value.title == "E" }.key, 1)
 
                 header_fields.eachWithIndex { entry, int i ->
                     if (i in [0, 5, 8, 14,])
@@ -181,7 +180,7 @@ class XlsImporter implements CommandLineRunner {
                     putValue(entry[0] as String, getValue(fields[i], entry[1] as FieldType))
                 }
             } else {
-                useCase.activePlaces.put(net.places.find { it -> it.value.title == "J" }.key, 1)
+                useCase.activePlaces.put(net.places.find { it -> it.value.title == "L" }.key, 1)
 
                 header_fields.eachWithIndex { entry, int i ->
                     putValue(entry[0] as String, getValue(fields[i], entry[1] as FieldType))
@@ -215,16 +214,20 @@ class XlsImporter implements CommandLineRunner {
                             password: "password",
                             name: randomName(),
                             surname: value,
-                            roles: [userRole] as Set<Role>,
+                            authorities: [userRole] as Set<Authority>,
                             organizations: [ClientOrg] as Set<Organization>
                     )
                     user.addProcessRole(clientRole)
                     user = userService.saveNew(user)
                 } else {
-                    user.roles.size()
+                    user.authorities.size()
                     user.userProcessRoles.size()
                 }
-                return [user.getEmail(), user.getFullName()] as List
+                user.setPassword(null)
+                user.setOrganizations(null)
+                user.setAuthorities(null)
+                user.setUserProcessRoles(null)
+                return user
             default:
                 return value
         }

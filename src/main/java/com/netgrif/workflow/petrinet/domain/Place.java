@@ -1,22 +1,20 @@
 package com.netgrif.workflow.petrinet.domain;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document
 public class Place extends Node {
+
+    @Getter @Setter
     private int tokens;
+
+    @Getter @Setter
     private boolean isStatic;
 
     public Place() {
         super();
-    }
-
-    public int getTokens() {
-        return tokens;
-    }
-
-    public void setTokens(int tokens) {
-        this.tokens = tokens;
     }
 
     public void addTokens(int tokens) {
@@ -31,14 +29,6 @@ public class Place extends Node {
 
     public void removeAllTokens() {
         this.tokens = 0;
-    }
-
-    public boolean isStatic() {
-        return isStatic;
-    }
-
-    public void setStatic(boolean aStatic) {
-        isStatic = aStatic;
     }
 
     @Override
