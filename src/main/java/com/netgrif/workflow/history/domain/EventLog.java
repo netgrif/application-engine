@@ -1,5 +1,7 @@
 package com.netgrif.workflow.history.domain;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -10,33 +12,20 @@ import java.time.LocalDateTime;
 public class EventLog {
 
     @Id
+    @Getter
     protected ObjectId id;
 
+    @Getter
     protected LocalDateTime created;
 
+    @Getter @Setter
     protected String message;
 
     public EventLog() {
         this.id = new ObjectId();
     }
 
-    public ObjectId getId() {
-        return id;
-    }
-
     public String getStringId() {
         return id.toString();
-    }
-
-    public LocalDateTime getCreated() {
-        return created;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
     }
 }
