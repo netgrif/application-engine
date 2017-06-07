@@ -1,9 +1,10 @@
 package com.netgrif.workflow.workflow.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.netgrif.workflow.auth.domain.Role;
 import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.petrinet.domain.roles.RolePermission;
+import lombok.Getter;
+import lombok.Setter;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
@@ -14,22 +15,49 @@ import java.util.*;
 
 @Document
 public class Task {
+
     @Id
     private ObjectId _id;
+
+    @Getter @Setter
     private String caseId;
+
+    @Setter
     private String transitionId;
+
+    @Getter @Setter
     private String title;
+
+    @Getter @Setter
     private String caseColor;
+
+    @Getter @Setter
     private String caseTitle;
+
+    @Getter
     private String visualId;
+
+    @Getter
     private int priority;
+
+    @Setter
     private Long userId;
+
     @org.springframework.data.annotation.Transient
+    @Getter @Setter
     private User user;
+
     @DBRef
+    @Setter
     private List<Trigger> triggers;
+
+    @Getter @Setter
     private Map<String, Map<String, Boolean>> roles;
+
+    @Getter @Setter
     private LocalDateTime startDate;
+
+    @Getter @Setter
     private LocalDateTime finishDate;
 
     public Task() {
@@ -51,86 +79,18 @@ public class Task {
         return _id.toString();
     }
 
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getCaseColor() {
-        return caseColor;
-    }
-
-    public void setCaseColor(String caseColor) {
-        this.caseColor = caseColor;
-    }
-
-    public String getCaseTitle() {
-        return caseTitle;
-    }
-
-    public void setCaseTitle(String caseTitle) {
-        this.caseTitle = caseTitle;
-    }
-
-    public String getVisualId() {
-        return visualId;
-    }
-
     public void setVisualId(String petriNetInitials) {
         // TODO: 9.5.2017 bullshit remove now!
         this.visualId = petriNetInitials+"-"+this._id;
-    }
-
-    public int getPriority() {
-        return priority;
     }
 
     public void setPriority(int priority) {
         this.priority = priority == Priorities.UNDEFINED ? Priorities.LOW : priority;
     }
 
-    public LocalDateTime getStartDate() {
-        return startDate;
-    }
-
-    public void setStartDate(LocalDateTime startDate) {
-        this.startDate = startDate;
-    }
-
-    public LocalDateTime getFinishDate() {
-        return finishDate;
-    }
-
-    public void setFinishDate(LocalDateTime finishDate) {
-        this.finishDate = finishDate;
-    }
-
-    public String getCaseId() {
-        return caseId;
-    }
-
-    public void setCaseId(String caseId) {
-        this.caseId = caseId;
-    }
-
     @JsonIgnore
     public String getTransitionId() {
         return transitionId;
-    }
-
-    public void setTransitionId(String transitionId) {
-        this.transitionId = transitionId;
-    }
-
-    public Map<String, Map<String, Boolean>> getRoles() {
-        return roles;
-    }
-
-    public void setRoles(Map<String, Map<String, Boolean>> roles) {
-        this.roles = roles;
     }
 
     public void addRole(String roleId, Set<RolePermission> permissions){
@@ -151,25 +111,9 @@ public class Task {
         return triggers;
     }
 
-    public void setTriggers(List<Trigger> triggers) {
-        this.triggers = triggers;
-    }
-
     @JsonIgnore
     public Long getUserId() {
         return userId;
-    }
-
-    public void setUserId(Long userId) {
-        this.userId = userId;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
     }
 
     public static class Priorities {
