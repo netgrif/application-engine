@@ -172,7 +172,7 @@ class XlsImporter implements CommandLineRunner {
                 }
             } else if (index < 20) {
                 useCase.activePlaces.put(net.places.find { it -> it.value.title == "K" }.key, 1)
-                useCase.activePlaces.put(net.places.find { it -> it.value.title == "H" }.key, 1)
+                useCase.activePlaces.put(net.places.find { it -> it.value.title == "E" }.key, 1)
 
                 header_fields.eachWithIndex { entry, int i ->
                     if (i in [0, 5, 8, 14,])
@@ -180,7 +180,7 @@ class XlsImporter implements CommandLineRunner {
                     putValue(entry[0] as String, getValue(fields[i], entry[1] as FieldType))
                 }
             } else {
-                useCase.activePlaces.put(net.places.find { it -> it.value.title == "J" }.key, 1)
+                useCase.activePlaces.put(net.places.find { it -> it.value.title == "L" }.key, 1)
 
                 header_fields.eachWithIndex { entry, int i ->
                     putValue(entry[0] as String, getValue(fields[i], entry[1] as FieldType))
@@ -223,7 +223,11 @@ class XlsImporter implements CommandLineRunner {
                     user.authorities.size()
                     user.userProcessRoles.size()
                 }
-                return [user.getEmail(), user.getFullName()] as List
+                user.setPassword(null)
+                user.setOrganizations(null)
+                user.setAuthorities(null)
+                user.setUserProcessRoles(null)
+                return user
             default:
                 return value
         }
