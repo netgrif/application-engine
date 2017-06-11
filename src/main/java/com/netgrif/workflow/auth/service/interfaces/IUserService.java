@@ -13,11 +13,11 @@ public interface IUserService {
 
     User saveNew(User user);
 
-    User findById(Long id);
+    User findById(Long id, boolean small);
 
-    List<User> findAll();
+    List<User> findAll(boolean small);
 
-    Set<User> findByOrganizations(Set<Long> org);
+    Set<User> findByOrganizations(Set<Long> org, boolean small);
 
     Set<User> findByProcessRoles(Set<String> roleIds);
 
