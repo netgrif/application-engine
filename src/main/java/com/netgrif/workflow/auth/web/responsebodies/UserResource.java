@@ -21,6 +21,9 @@ public class UserResource extends Resource<User>{
             getContent().setOrganizations(null);
             getContent().setAuthorities(null);
             getContent().setPassword(null);
+            getContent().setProcessRoles(null);
+        } else {
+            getContent().setUserProcessRoles(null);
         }
     }
 
