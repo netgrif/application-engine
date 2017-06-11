@@ -1,8 +1,10 @@
 package com.netgrif.workflow.auth.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.netgrif.workflow.petrinet.domain.roles.ProcessRole;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.validator.constraints.Email;
@@ -65,6 +67,10 @@ public class User {
     @JoinTable(name = "user_process_roles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "user_process_role_id"))
     @Getter @Setter
     private Set<UserProcessRole> userProcessRoles;
+
+    @Transient
+    @Getter @Setter
+    private Set<ProcessRole> processRoles;
 
     public User() {
         organizations = new HashSet<>();
