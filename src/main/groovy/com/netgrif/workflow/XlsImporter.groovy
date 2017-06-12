@@ -108,7 +108,7 @@ class XlsImporter implements CommandLineRunner {
                 name: "prof. RNDr. Gabriel",
                 surname: "Juhás, PhD.",
                 password: "password",
-                authorities: [authority] as Set<Authority>,
+                authorities: [authority, admin] as Set<Authority>,
                 organizations: [school] as Set<Organization>)
         veduci.addProcessRole(userProcessRoleRepository.save(new UserProcessRole(
                 roleId: net.roles.values().find {it -> it.name == "Vedúci"}.objectId
