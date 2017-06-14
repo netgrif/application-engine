@@ -86,7 +86,7 @@ class XlsImporter {
     private Authority userRole
     private Organization ClientOrg
 
-    @Override
+
     void run(String... strings) throws Exception {
         net = importer.importPetriNet(new File("src/test/resources/prikladFM.xml"), "Ukladacia jednotka", "FMS")
 
