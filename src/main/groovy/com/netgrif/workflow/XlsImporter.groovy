@@ -28,11 +28,7 @@ import java.time.format.DateTimeFormatter
 import java.util.concurrent.ThreadLocalRandom
 
 @Component
-@Profile("!test")
-class XlsImporter implements CommandLineRunner {
-
-    @Autowired
-    private MongoTemplate mongoTemplate
+class XlsImporter {
 
     @Autowired
     private PetriNetRepository petriNetRepository
@@ -92,227 +88,98 @@ class XlsImporter implements CommandLineRunner {
 
     @Override
     void run(String... strings) throws Exception {
-        mongoTemplate.getDb().dropDatabase()
-        net = importer.importPetriNet(new File("src/test/resources/zaverecna_praca.xml"),"Zaverecna praca","ZP")
+        net = importer.importPetriNet(new File("src/test/resources/prikladFM.xml"), "Ukladacia jednotka", "FMS")
 
-        Organization school = new Organization("FEI STU")
-        school = organizationRepository.save(school)
+        Organization FMOrg = new Organization("FM Servis")
+        FMOrg = organizationRepository.save(FMOrg)
+        ClientOrg = new Organization("Client Company")
+        ClientOrg = organizationRepository.save(ClientOrg)
 
-        Authority authority = new Authority(Authority.user)
-        Authority admin = new Authority(Authority.admin)
-        authority = authorityRepository.save(authority)
-        admin = authorityRepository.save(admin)
+        userRole = new Authority(Authority.user)
+        userRole = authorityRepository.save(userRole)
+        Authority roleAdmin = new Authority(Authority.admin)
+        authorityRepository.save(roleAdmin)
 
-        def veduci = new User(
-                email: "gabriel.juhas@stuba.sk",
-                name: "prof. RNDr. Gabriel",
-                surname: "Juhás, PhD.",
+        def client_manager = new User(
+                email: "manager@company.com",
+                name: "Jano",
+                surname: "Mrkvička",
                 password: "password",
-                authorities: [authority, admin] as Set<Authority>,
-                organizations: [school] as Set<Organization>)
-        veduci.addProcessRole(userProcessRoleRepository.save(new UserProcessRole(
-                roleId: net.roles.values().find {it -> it.name == "Vedúci"}.objectId
-        )))
-
-        UserProcessRole student = userProcessRoleRepository.save(new UserProcessRole(
-                roleId: net.roles.values().find {it -> it.name == "Študent"}.objectId
-        ))
-        def milan = new User(
-                email: "xmladoniczky@stuba.sk",
-                name: "Milan",
-                surname: "Mladoniczky",
+                authorities: [userRole] as Set<Authority>,
+                organizations: [ClientOrg] as Set<Organization>)
+        client_manager.addProcessRole(userProcessRoleRepository.save(new UserProcessRole(
+                roleId: net.roles.values().find { it -> it.name == "client manager" }.objectId)))
+        def client_worker = new User(
+                email: "worker@company.com",
+                name: "Mária",
+                surname: "Kováčová",
                 password: "password",
-                authorities: [authority] as Set<Authority>,
-                organizations: [school] as Set<Organization>
-        )
-        milan.addProcessRole(student)
-        def tomas = new User(
-                email: "xgazot@stuba.sk",
-                name: "Tomáš",
-                surname: "Gažo",
+                authorities: [userRole] as Set<Authority>,
+                organizations: [ClientOrg] as Set<Organization>)
+        client_worker.addProcessRole(userProcessRoleRepository.save(new UserProcessRole(
+                roleId: net.roles.values().find { it -> it.name == "client" }.objectId)))
+        def fm_manager = new User(
+                email: "manager@fmservis.sk",
+                name: "Peter",
+                surname: "Molnár",
                 password: "password",
-                authorities: [authority] as Set<Authority>,
-                organizations: [school] as Set<Organization>
-        )
-        tomas.addProcessRole(student)
-        def duri = new User(
-                email: "xmazari@stuba.sk",
-                name: "Juraj",
-                surname: "Mažári",
+                authorities: [roleAdmin] as Set<Authority>,
+                organizations: [FMOrg] as Set<Organization>)
+        fm_manager.addProcessRole(userProcessRoleRepository.save(new UserProcessRole(
+                roleId: net.roles.values().find { it -> it.name == "fm manager" }.objectId)))
+        def fm_worker = new User(
+                email: "worker@fmservis.sk",
+                name: "Štefan",
+                surname: "Horváth",
                 password: "password",
-                authorities: [authority] as Set<Authority>,
-                organizations: [school] as Set<Organization>
-        )
-        duri.addProcessRole(student)
-        def martin = new User(
-                email: "xmakan@stuba.sk",
-                name: "Martin",
-                surname: "Makáň",
-                password: "password",
-                authorities: [authority] as Set<Authority>,
-                organizations: [school] as Set<Organization>
-        )
-        martin.addProcessRole(student)
+                authorities: [userRole] as Set<Authority>,
+                organizations: [FMOrg] as Set<Organization>)
+        fm_worker.addProcessRole(userProcessRoleRepository.save(new UserProcessRole(
+                roleId: net.roles.values().find { it -> it.name == "fm servis" }.objectId)))
+        userService.saveNew(client_manager)
+        userService.saveNew(client_worker)
+        userService.saveNew(fm_manager)
+        userService.saveNew(fm_worker)
 
-        userService.saveNew(veduci)
-        userService.saveNew(milan)
-        userService.saveNew(tomas)
-        userService.saveNew(duri)
-        userService.saveNew(martin)
+        clientRole = client_worker.userProcessRoles.first()
 
-        useCase = new Case(
-                petriNet: net,
-                title: "Záverečná práca",
-                color: randomColor()
-        )
-        useCase.activePlaces.put(net.places.find {it -> it.value.title == "E"}.key,1)
-        caseRepository.save(useCase)
-        net.initializeTokens(useCase.activePlaces)
-        taskService.createTasks(useCase)
+        def index = 0
+        new File("src/test/resources/Vzor preberacieho protokolu.csv").splitEachLine("\t") { fields ->
+            useCase = new Case(petriNet: net, title: fields[3], color: StartRunner.randomColor())
 
-        useCase = new Case(
-                petriNet: net,
-                title: "Server pre správu dát",
-                color: randomColor()
-        )
-        useCase.activePlaces.put(net.places.find {it -> it.value.title == "A"}.key,1)
-        caseRepository.save(useCase)
-        net.initializeTokens(useCase.activePlaces)
-        taskService.createTasks(useCase)
-        useCase = new Case(
-                petriNet: net,
-                title: "Server pre správu rolí",
-                color: randomColor()
-        )
-        useCase.activePlaces.put(net.places.find {it -> it.value.title == "F"}.key,1)
-        caseRepository.save(useCase)
-        net.initializeTokens(useCase.activePlaces)
-        taskService.createTasks(useCase)
-        useCase = new Case(
-                petriNet: net,
-                title: "Server pre správu procesov",
-                color: randomColor()
-        )
-        useCase.activePlaces.put(net.places.find {it -> it.value.title == "G"}.key,1)
-        caseRepository.save(useCase)
-        net.initializeTokens(useCase.activePlaces)
-        taskService.createTasks(useCase)
-        useCase = new Case(
-                petriNet: net,
-                title: "Portál pre správu procesov",
-                color: randomColor()
-        )
-        useCase.activePlaces.put(net.places.find {it -> it.value.title == "D"}.key,1)
-        caseRepository.save(useCase)
-        net.initializeTokens(useCase.activePlaces)
-        taskService.createTasks(useCase)
+
+            if (index < 10) {
+                useCase.activePlaces.put(net.places.find { it -> it.value.title == "B" }.key, 1)
+
+                header_fields.eachWithIndex { entry, int i ->
+                    if (i in [0, 5, 8, 14,])
+                        return
+                    putValue(entry[0] as String, getValue(fields[i], entry[1] as FieldType))
+                }
+            } else if (index < 20) {
+                useCase.activePlaces.put(net.places.find { it -> it.value.title == "K" }.key, 1)
+                useCase.activePlaces.put(net.places.find { it -> it.value.title == "E" }.key, 1)
+
+                header_fields.eachWithIndex { entry, int i ->
+                    if (i in [0, 5, 8, 14,])
+                        return
+                    putValue(entry[0] as String, getValue(fields[i], entry[1] as FieldType))
+                }
+            } else {
+                useCase.activePlaces.put(net.places.find { it -> it.value.title == "L" }.key, 1)
+
+                header_fields.eachWithIndex { entry, int i ->
+                    putValue(entry[0] as String, getValue(fields[i], entry[1] as FieldType))
+                }
+            }
+
+            caseRepository.save(useCase)
+            net.initializeTokens(useCase.activePlaces)
+            taskService.createTasks(useCase)
+
+            index++
+        }
     }
-
-
-//    @Override
-//    void run(String... strings) throws Exception {
-//        mongoTemplate.getDb().dropDatabase()
-//        net = importer.importPetriNet(new File("src/test/resources/prikladFM.xml"), "Ukladacia jednotka", "FMS")
-//
-//        Organization FMOrg = new Organization("FM Servis")
-//        FMOrg = organizationRepository.save(FMOrg)
-//        ClientOrg = new Organization("Client Company")
-//        ClientOrg = organizationRepository.save(ClientOrg)
-//
-//        userRole = new Authority(Authority.user)
-//        userRole = authorityRepository.save(userRole)
-//        Authority roleAdmin = new Authority(Authority.admin)
-//        authorityRepository.save(roleAdmin)
-//
-//        def client_manager = new User(
-//                email: "manager@company.com",
-//                name: "Jano",
-//                surname: "Mrkvička",
-//                password: "password",
-//                authorities: [userRole] as Set<Authority>,
-//                organizations: [ClientOrg] as Set<Organization>)
-//        client_manager.addProcessRole(userProcessRoleRepository.save(new UserProcessRole(
-//                roleId: net.roles.values().find { it -> it.name == "client manager" }.objectId)))
-//        def client_worker = new User(
-//                email: "worker@company.com",
-//                name: "Mária",
-//                surname: "Kováčová",
-//                password: "password",
-//                authorities: [userRole] as Set<Authority>,
-//                organizations: [ClientOrg] as Set<Organization>)
-//        client_worker.addProcessRole(userProcessRoleRepository.save(new UserProcessRole(
-//                roleId: net.roles.values().find { it -> it.name == "client" }.objectId)))
-//        def fm_manager = new User(
-//                email: "manager@fmservis.sk",
-//                name: "Peter",
-//                surname: "Molnár",
-//                password: "password",
-//                authorities: [roleAdmin] as Set<Authority>,
-//                organizations: [FMOrg] as Set<Organization>)
-//        fm_manager.addProcessRole(userProcessRoleRepository.save(new UserProcessRole(
-//                roleId: net.roles.values().find { it -> it.name == "fm manager" }.objectId)))
-//        def fm_worker = new User(
-//                email: "worker@fmservis.sk",
-//                name: "Štefan",
-//                surname: "Horváth",
-//                password: "password",
-//                authorities: [userRole] as Set<Authority>,
-//                organizations: [FMOrg] as Set<Organization>)
-//        fm_worker.addProcessRole(userProcessRoleRepository.save(new UserProcessRole(
-//                roleId: net.roles.values().find { it -> it.name == "fm servis" }.objectId)))
-//        def superUser = new User(
-//                email: "super@netgrif.com",
-//                name: "Super",
-//                surname: "Trooper",
-//                password: "password",
-//                authorities: authorityRepository.findAll() as Set<Authority>,
-//                userProcessRoles: userProcessRoleRepository.findAll() as Set<UserProcessRole>,
-//                organizations: organizationRepository.findAll() as Set<Organization>)
-//        userService.saveNew(superUser)
-//        userService.saveNew(client_manager)
-//        userService.saveNew(client_worker)
-//        userService.saveNew(fm_manager)
-//        userService.saveNew(fm_worker)
-//
-//        clientRole = client_worker.userProcessRoles.first()
-//
-//        def index = 0
-//        new File("src/test/resources/Vzor preberacieho protokolu.csv").splitEachLine("\t") { fields ->
-//            useCase = new Case(petriNet: net, title: fields[3], color: randomColor())
-//
-//
-//            if (index < 10) {
-//                useCase.activePlaces.put(net.places.find { it -> it.value.title == "B" }.key, 1)
-//
-//                header_fields.eachWithIndex { entry, int i ->
-//                    if (i in [0, 5, 8, 14,])
-//                        return
-//                    putValue(entry[0] as String, getValue(fields[i], entry[1] as FieldType))
-//                }
-//            } else if (index < 20) {
-//                useCase.activePlaces.put(net.places.find { it -> it.value.title == "K" }.key, 1)
-//                useCase.activePlaces.put(net.places.find { it -> it.value.title == "E" }.key, 1)
-//
-//                header_fields.eachWithIndex { entry, int i ->
-//                    if (i in [0, 5, 8, 14,])
-//                        return
-//                    putValue(entry[0] as String, getValue(fields[i], entry[1] as FieldType))
-//                }
-//            } else {
-//                useCase.activePlaces.put(net.places.find { it -> it.value.title == "L" }.key, 1)
-//
-//                header_fields.eachWithIndex { entry, int i ->
-//                    putValue(entry[0] as String, getValue(fields[i], entry[1] as FieldType))
-//                }
-//            }
-//
-//            caseRepository.save(useCase)
-//            net.initializeTokens(useCase.activePlaces)
-//            taskService.createTasks(useCase)
-//
-//            index++
-//        }
-//    }
 
     private Object getValue(String value, FieldType type) {
         switch (type) {
@@ -364,7 +231,7 @@ class XlsImporter implements CommandLineRunner {
         return name + EMAIL_TEMPLATE
     }
 
-    String randomName() {
+    static String randomName() {
         int randomNum = ThreadLocalRandom.current().nextInt(0, 5)
         switch (randomNum) {
             case 0:
@@ -379,30 +246,6 @@ class XlsImporter implements CommandLineRunner {
                 return "Zuzana"
             default:
                 return "Eva"
-        }
-    }
-
-    private String randomColor() {
-        int randomNum = ThreadLocalRandom.current().nextInt(0, 7)
-        switch (randomNum) {
-            case 0:
-                return "color-fg-primary-500"
-            case 1:
-                return "color-fg-indigo-500"
-            case 2:
-                return "color-fg-deep-purple-500"
-            case 3:
-                return "color-fg-lime-500"
-            case 4:
-                return "color-fg-amber-500"
-            case 5:
-                return "color-fg-deep-orange-500"
-            case 6:
-                return "color-fg-blue-grey-500"
-            case 7:
-                return "color-fg-brown-500"
-            default:
-                return "color-fg-primary-500"
         }
     }
 }
