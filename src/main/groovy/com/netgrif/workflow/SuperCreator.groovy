@@ -8,6 +8,7 @@ import com.netgrif.workflow.auth.domain.repositories.AuthorityRepository
 import com.netgrif.workflow.auth.domain.repositories.OrganizationRepository
 import com.netgrif.workflow.auth.domain.repositories.UserProcessRoleRepository
 import com.netgrif.workflow.auth.domain.repositories.UserRepository
+import com.netgrif.workflow.auth.service.interfaces.IUserService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 
@@ -21,14 +22,14 @@ class SuperCreator {
     @Autowired
     private UserProcessRoleRepository processRoleRepository
     @Autowired
-    private UserRepository userRepository
+    private IUserService userService
 
     void run(String... strings) {
         Authority adminAuthority = authorityRepository.findByName(Authority.admin)
         if (adminAuthority == null)
             adminAuthority = authorityRepository.save(new Authority(Authority.admin))
 
-        userRepository.save(new User(
+        userService.saveNew(new User(
                 name: "Super",
                 surname: "Trooper",
                 email: "super@netgrif.com",

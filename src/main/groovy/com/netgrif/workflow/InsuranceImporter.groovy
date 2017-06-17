@@ -39,7 +39,8 @@ class InsuranceImporter {
 
 
     void run(String... strings) throws Exception {
-        def net = importer.importPetriNet(new File("src/test/resources/poistenie_rozsirene.xml"), "Poistenie", "INS")
+        //def net = importer.importPetriNet(new File("src/test/resources/poistenie_rozsirene.xml"), "Poistenie", "INS")
+        def net = importer.importPetriNet(new File("petriNets/poistenie_rozsirene.xml"), "Poistenie", "INS")
 
         def orgs = createOrganizations()
         def auths = createAuthorities()
