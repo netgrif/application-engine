@@ -28,11 +28,7 @@ import java.time.format.DateTimeFormatter
 import java.util.concurrent.ThreadLocalRandom
 
 @Component
-@Profile("!test")
-class XlsImporter implements CommandLineRunner {
-
-    @Autowired
-    private MongoTemplate mongoTemplate
+class XlsImporter {
 
     @Autowired
     private PetriNetRepository petriNetRepository
@@ -90,9 +86,8 @@ class XlsImporter implements CommandLineRunner {
     private Authority userRole
     private Organization ClientOrg
 
-    @Override
+
     void run(String... strings) throws Exception {
-        mongoTemplate.getDb().dropDatabase()
         net = importer.importPetriNet(new File("src/test/resources/prikladFM.xml"), "Ukladacia jednotka", "FMS")
 
         Organization FMOrg = new Organization("FM Servis")
@@ -141,15 +136,6 @@ class XlsImporter implements CommandLineRunner {
                 organizations: [FMOrg] as Set<Organization>)
         fm_worker.addProcessRole(userProcessRoleRepository.save(new UserProcessRole(
                 roleId: net.roles.values().find { it -> it.name == "fm servis" }.objectId)))
-        def superUser = new User(
-                email: "super@netgrif.com",
-                name: "Super",
-                surname: "Trooper",
-                password: "password",
-                authorities: authorityRepository.findAll() as Set<Authority>,
-                userProcessRoles: userProcessRoleRepository.findAll() as Set<UserProcessRole>,
-                organizations: organizationRepository.findAll() as Set<Organization>)
-        userService.saveNew(superUser)
         userService.saveNew(client_manager)
         userService.saveNew(client_worker)
         userService.saveNew(fm_manager)
@@ -159,7 +145,7 @@ class XlsImporter implements CommandLineRunner {
 
         def index = 0
         new File("src/test/resources/Vzor preberacieho protokolu.csv").splitEachLine("\t") { fields ->
-            useCase = new Case(petriNet: net, title: fields[3], color: randomColor())
+            useCase = new Case(petriNet: net, title: fields[3], color: StartRunner.randomColor())
 
 
             if (index < 10) {
@@ -245,7 +231,7 @@ class XlsImporter implements CommandLineRunner {
         return name + EMAIL_TEMPLATE
     }
 
-    String randomName() {
+    static String randomName() {
         int randomNum = ThreadLocalRandom.current().nextInt(0, 5)
         switch (randomNum) {
             case 0:
@@ -260,30 +246,6 @@ class XlsImporter implements CommandLineRunner {
                 return "Zuzana"
             default:
                 return "Eva"
-        }
-    }
-
-    private String randomColor() {
-        int randomNum = ThreadLocalRandom.current().nextInt(0, 7)
-        switch (randomNum) {
-            case 0:
-                return "color-fg-primary-500"
-            case 1:
-                return "color-fg-indigo-500"
-            case 2:
-                return "color-fg-deep-purple-500"
-            case 3:
-                return "color-fg-lime-500"
-            case 4:
-                return "color-fg-amber-500"
-            case 5:
-                return "color-fg-deep-orange-500"
-            case 6:
-                return "color-fg-blue-grey-500"
-            case 7:
-                return "color-fg-brown-500"
-            default:
-                return "color-fg-primary-500"
         }
     }
 }
