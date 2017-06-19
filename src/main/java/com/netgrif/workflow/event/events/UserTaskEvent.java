@@ -4,36 +4,26 @@ import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.Task;
 import lombok.Getter;
-import lombok.Setter;
 
-public class UserTaskEvent extends Event {
+public abstract class UserTaskEvent extends Event {
 
-    @Getter @Setter
-    private User user;
-
-    @Getter @Setter
+    @Getter
     private Task task;
 
-    @Getter @Setter
+    @Getter
     private Case useCase;
 
-    @Getter @Setter
-    private Activity activityType;
+    public UserTaskEvent(Object user, Task task, Case useCase) {
+        super(user);
+        this.task = task;
+        this.useCase = useCase;
+    }
 
-    public UserTaskEvent(Object source, User user, Activity activityType) {
-        super(source);
-        this.user = user;
-        this.activityType = activityType;
+    public User getUser() {
+        return (User) source;
     }
 
     public String getEmail() {
         return getUser().getEmail();
-    }
-
-    public enum Activity {
-        ASSIGN,
-        FINISH,
-        CANCEL,
-        DELEGATE
     }
 }
