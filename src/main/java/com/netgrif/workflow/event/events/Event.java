@@ -1,11 +1,13 @@
 package com.netgrif.workflow.event.events;
 
+import lombok.Getter;
 import org.springframework.context.ApplicationEvent;
 
 import java.time.LocalDateTime;
 
-public class Event extends ApplicationEvent {
+public abstract class Event extends ApplicationEvent {
 
+    @Getter
     protected LocalDateTime time;
 
     public Event(Object source) {
@@ -13,11 +15,5 @@ public class Event extends ApplicationEvent {
         this.time = LocalDateTime.now();
     }
 
-    public LocalDateTime getTime() {
-        return time;
-    }
-
-    public void setTime(LocalDateTime time) {
-        this.time = time;
-    }
+    public abstract String getMessage();
 }

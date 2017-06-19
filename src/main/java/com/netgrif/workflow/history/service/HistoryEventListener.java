@@ -1,6 +1,6 @@
 package com.netgrif.workflow.history.service;
 
-import com.netgrif.workflow.event.events.UserTaskEvent;
+import com.netgrif.workflow.event.events.UserFinishTaskEvent;
 import com.netgrif.workflow.history.domain.EventLogRepository;
 import com.netgrif.workflow.history.domain.UserEventLog;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,25 +14,10 @@ public class HistoryEventListener {
     private EventLogRepository repository;
 
     @EventListener(condition = "#event.user != null")
-    public void onUserFinishTaskEvent(UserTaskEvent event) {
+    public void onUserFinishTaskEvent(UserFinishTaskEvent event) {
         UserEventLog log = new UserEventLog();
         log.setEmail(event.getEmail());
-        log.setMessage(getMessageByUserActivity(event.getActivityType(), event.getEmail()));
+        log.setMessage(event.getMessage());
         repository.save(log);
-    }
-
-    private String getMessageByUserActivity(UserTaskEvent.Activity activity, String email) {
-        switch (activity) {
-            case DELEGATE:
-                return "";
-            case CANCEL:
-                return "";
-            case ASSIGN:
-                return "";
-            case FINISH:
-                return "User finished task";
-            default:
-                return "";
-        }
     }
 }
