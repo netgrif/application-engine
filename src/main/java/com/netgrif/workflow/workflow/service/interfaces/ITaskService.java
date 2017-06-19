@@ -45,5 +45,5 @@ public interface ITaskService {
 
     FileSystemResource getFile(String taskId, String fieldId);
 
-    void delegateTask(String delegatedEmail, String taskId) throws TransitionNotExecutableException;
+    void delegateTask(Long userId, String delegatedEmail, String taskId) throws TransitionNotExecutableException;
 }
