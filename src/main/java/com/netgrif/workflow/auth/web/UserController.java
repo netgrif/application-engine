@@ -29,27 +29,27 @@ public class UserController {
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     public UserResource getUser(@PathVariable("id") Long userId) {
-        return new UserResource(userService.findById(userId), "profile");
+        return new UserResource(userService.findById(userId,false), "profile");
     }
 
     @RequestMapping(value = "/me", method = RequestMethod.GET)
     public UserResource getLoggedUser(Authentication auth) {
-        return new UserResource(userService.findById(((LoggedUser) auth.getPrincipal()).getId()), "profile");
+        return new UserResource(userService.findById(((LoggedUser) auth.getPrincipal()).getId(),false), "profile");
     }
 
     @RequestMapping(value = "/{id}/small", method = RequestMethod.GET)
     public UserResource getSmallUser(@PathVariable("id") Long userId) {
-        return new UserResource(userService.findById(userId), "small", true);
+        return new UserResource(userService.findById(userId,true), "small", true);
     }
 
     @RequestMapping(method = RequestMethod.GET)
     public UsersResource getAll(Authentication auth) {
-        return new UsersResource(userService.findByOrganizations(((LoggedUser) auth.getPrincipal()).getOrganizations()), "all", false);
+        return new UsersResource(userService.findByOrganizations(((LoggedUser) auth.getPrincipal()).getOrganizations(),false), "all", false);
     }
 
     @RequestMapping(value = "/small", method = RequestMethod.GET)
     public UsersResource getAllSmall(Authentication auth) {
-        return new UsersResource(userService.findByOrganizations(((LoggedUser) auth.getPrincipal()).getOrganizations()), "small", true);
+        return new UsersResource(userService.findByOrganizations(((LoggedUser) auth.getPrincipal()).getOrganizations(),true), "small", true);
     }
 
     @RequestMapping(value = "/role/small", method = RequestMethod.POST)
