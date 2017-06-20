@@ -12,7 +12,7 @@ import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository;
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRole;
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRoleRepository;
 import com.netgrif.workflow.petrinet.service.ArcFactory;
-import com.netgrif.workflow.workflow.domain.Trigger;
+import com.netgrif.workflow.workflow.domain.triggers.Trigger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,6 +27,7 @@ import java.util.Map;
 
 @Component
 public class Importer {
+
     private Document document;
     private PetriNet net;
     private Map<Long, ProcessRole> roles;
@@ -64,7 +65,7 @@ public class Importer {
     }
 
     @Transactional
-    private void unmarshallXml(File xml) throws JAXBException {
+    protected void unmarshallXml(File xml) throws JAXBException {
         JAXBContext jaxbContext = JAXBContext.newInstance(Document.class);
 
         Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
@@ -72,7 +73,7 @@ public class Importer {
     }
 
     @Transactional
-    private PetriNet createPetriNet(String title, String initials) {
+    protected PetriNet createPetriNet(String title, String initials) {
         net = new PetriNet();
         net.setTitle(title);
         net.setInitials(initials);
@@ -88,7 +89,7 @@ public class Importer {
     }
 
     @Transactional
-    private void createArc(ImportArc importArc) {
+    protected void createArc(ImportArc importArc) {
         Arc arc = ArcFactory.getArc(importArc.getType());
         arc.setMultiplicity(importArc.getMultiplicity());
         arc.setSource(getNode(importArc.getSourceId()));
@@ -98,7 +99,7 @@ public class Importer {
     }
 
     @Transactional
-    private void createDataSet(ImportData importData) {
+    protected void createDataSet(ImportData importData) {
         Field field = fieldFactory.getField(importData);
         field.setName(importData.getTitle());
 
@@ -107,7 +108,7 @@ public class Importer {
     }
 
     @Transactional
-    private void createTransition(ImportTransition importTransition) {
+    protected void createTransition(ImportTransition importTransition) {
         Transition transition = new Transition();
         transition.setTitle(importTransition.getLabel());
         transition.setPosition(importTransition.getX(), importTransition.getY());
@@ -122,18 +123,18 @@ public class Importer {
                     addDataLogic(transition, dataRef)
             );
         }
-//        if (importTransition.getTrigger() != null) {
-//            Arrays.stream(importTransition.getTrigger()).forEach(trigger ->
-//                    addTrigger(transition, trigger)
-//            );
-//        }
+        if (importTransition.getTrigger() != null) {
+            Arrays.stream(importTransition.getTrigger()).forEach(trigger ->
+                    addTrigger(transition, trigger)
+            );
+        }
 
         net.addTransition(transition);
         transitions.put(importTransition.getId(), transition);
     }
 
     @Transactional
-    private void addRoleLogic(Transition transition, RoleRef roleRef) {
+    protected void addRoleLogic(Transition transition, RoleRef roleRef) {
         RoleLogic logic = roleRef.getLogic();
         String roleId = roles.get(roleRef.getId()).getObjectId();
 
@@ -141,14 +142,10 @@ public class Importer {
             return;
 
         transition.addRole(roleId,ImportRoleFactory.getPermissions(logic));
-//        if (logic.getPerform())
-//            transition.addRole(roleId, new AssignFunction(roleId));
-//        if (logic.getDelegate())
-//            transition.addRole(roleId, new DelegateFunction(roleId));
     }
 
     @Transactional
-    private void addDataLogic(Transition transition, DataRef dataRef) {
+    protected void addDataLogic(Transition transition, DataRef dataRef) {
         DataLogic logic = dataRef.getLogic();
         String fieldId = fields.get(dataRef.getId()).getObjectId();
 
@@ -168,14 +165,14 @@ public class Importer {
     }
 
     @Transactional
-    private void addTrigger(Transition transition, ImportTrigger importTrigger) {
+    protected void addTrigger(Transition transition, ImportTrigger importTrigger) {
         Trigger trigger = triggerFactory.buildTrigger(importTrigger);
 
         transition.addTrigger(trigger);
     }
 
     @Transactional
-    private void createPlace(ImportPlace importPlace) {
+    protected void createPlace(ImportPlace importPlace) {
         Place place = new Place();
         place.setStatic(importPlace.getIsStatic());
         place.setTokens(importPlace.getTokens());
@@ -187,7 +184,7 @@ public class Importer {
     }
 
     @Transactional
-    private void createRole(ImportRole importRole) {
+    protected void createRole(ImportRole importRole) {
         ProcessRole role = new ProcessRole();
         role.setName(importRole.getName());
         role = roleRepository.save(role);
@@ -197,7 +194,7 @@ public class Importer {
     }
 
     @Transactional
-    private Node getNode(Long id) {
+    protected Node getNode(Long id) {
         // TODO: 18/02/2017 maybe throw exception if transitions doesn't contain id
         if (places.containsKey(id))
             return places.get(id);
