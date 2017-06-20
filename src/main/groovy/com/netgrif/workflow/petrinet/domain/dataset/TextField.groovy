@@ -1,7 +1,5 @@
 package com.netgrif.workflow.petrinet.domain.dataset
 
-import lombok.Getter
-import lombok.Setter
 import org.springframework.data.mongodb.core.mapping.Document
 
 @Document
@@ -10,7 +8,6 @@ public class TextField extends Field<String> {
     public static final String SIMPLE_SUBTYPE = "simple";
     public static final String AREA_SUBTYPE = "area";
 
-    @Getter
     private String subType;
 
     public TextField() {
@@ -20,5 +17,9 @@ public class TextField extends Field<String> {
     public TextField(String[] values) {
         this();
         this.subType = values != null ? values[0] : SIMPLE_SUBTYPE;
+    }
+
+    String getSubType() {
+        return subType
     }
 }

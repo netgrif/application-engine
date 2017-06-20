@@ -1,12 +1,10 @@
 package com.netgrif.workflow.petrinet.domain.dataset
 
-import lombok.Getter
 import org.springframework.data.mongodb.core.mapping.Document
 
 @Document
 public class EnumerationField extends Field<String> {
 
-    @Getter
     private Set<String> choices;
 
     public EnumerationField() {
@@ -19,5 +17,9 @@ public class EnumerationField extends Field<String> {
         if (values != null) {
             choices.addAll(Arrays.asList(values));
         }
+    }
+
+    Set<String> getChoices() {
+        return choices
     }
 }
