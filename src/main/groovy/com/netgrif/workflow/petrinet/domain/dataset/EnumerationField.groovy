@@ -1,18 +1,13 @@
-package com.netgrif.workflow.petrinet.domain.dataset;
+package com.netgrif.workflow.petrinet.domain.dataset
 
-import org.springframework.data.annotation.Transient;
-import org.springframework.data.mongodb.core.mapping.Document;
-
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+import lombok.Getter
+import org.springframework.data.mongodb.core.mapping.Document
 
 @Document
-public class EnumerationField extends Field {
+public class EnumerationField extends Field<String> {
 
+    @Getter
     private Set<String> choices;
-    @Transient
-    private String value;
 
     public EnumerationField() {
         super();
@@ -24,23 +19,5 @@ public class EnumerationField extends Field {
         if (values != null) {
             choices.addAll(Arrays.asList(values));
         }
-    }
-
-    public String getValue() {
-        return value;
-    }
-
-    public Set<String> getChoices() {
-        return choices;
-    }
-
-    @Override
-    public void setType(FieldType type) {
-        this.type = FieldType.ENUMERATION;
-    }
-
-    @Override
-    public void setValue(Object value) {
-        this.value = (String) value;
     }
 }
