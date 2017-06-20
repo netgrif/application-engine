@@ -21,6 +21,18 @@ public class Document {
     @XmlElement(name = "place")
     private ImportPlace[] places;
 
+    @XmlElement(name = "transaction")
+    private ImportTransaction[] transactions;
+
+    public Document() {
+        arcs = new ImportArc[0];
+        data = new ImportData[0];
+        roles = new ImportRole[0];
+        transitions = new ImportTransition[0];
+        places = new ImportPlace[0];
+        transactions = new ImportTransaction[0];
+    }
+
     public ImportArc[] getImportArc() {
         return arcs;
     }
@@ -59,5 +71,13 @@ public class Document {
 
     public void setImportPlaces(ImportPlace[] place) {
         this.places = place;
+    }
+
+    public ImportTransaction[] getImportTransactions() {
+        return transactions;
+    }
+
+    public void setImportTransactions(ImportTransaction[] transactions) {
+        this.transactions = transactions;
     }
 }

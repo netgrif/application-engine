@@ -23,6 +23,8 @@ public interface IPetriNetService {
     List<PetriNet> loadAll();
 
     List<PetriNetReference> getAllReferences(LoggedUser user);
+
     List<TransitionReference> getTransitionReferences(List<String> netsIds, LoggedUser user);
+
     List<DataFieldReference> getDataFieldReferences(List<String> petriNetIds, List<String> transitionIds);
 }
