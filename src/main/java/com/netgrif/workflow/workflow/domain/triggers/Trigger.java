@@ -1,4 +1,4 @@
-package com.netgrif.workflow.workflow.domain;
+package com.netgrif.workflow.workflow.domain.triggers;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 import org.bson.types.ObjectId;
