@@ -60,6 +60,9 @@ public class Task {
     @Getter @Setter
     private LocalDateTime finishDate;
 
+    @Getter @Setter
+    private String transactionId;
+
     public Task() {
         this._id = new ObjectId();
         roles = new HashMap<>();

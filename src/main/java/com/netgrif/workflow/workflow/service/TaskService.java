@@ -7,10 +7,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.auth.domain.repositories.UserRepository;
-import com.netgrif.workflow.petrinet.domain.Arc;
-import com.netgrif.workflow.petrinet.domain.PetriNet;
-import com.netgrif.workflow.petrinet.domain.Place;
-import com.netgrif.workflow.petrinet.domain.Transition;
+import com.netgrif.workflow.petrinet.domain.*;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.petrinet.domain.roles.RolePermission;
 import com.netgrif.workflow.petrinet.domain.throwable.TransitionNotExecutableException;
@@ -378,6 +375,11 @@ public class TaskService implements ITaskService {
         }
         task = taskRepository.save(task);
         task.setVisualId(useCase.getPetriNet().getInitials());
+
+        Transaction transaction = useCase.getPetriNet().getTransactionByTransition(transition);
+        if (transaction != null) {
+            task.setTransactionId(transaction.getStringId());
+        }
 
         return task;
     }
