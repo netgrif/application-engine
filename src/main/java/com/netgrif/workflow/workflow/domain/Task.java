@@ -3,6 +3,7 @@ package com.netgrif.workflow.workflow.domain;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.petrinet.domain.roles.RolePermission;
+import com.netgrif.workflow.workflow.domain.triggers.Trigger;
 import lombok.Getter;
 import lombok.Setter;
 import org.bson.types.ObjectId;
