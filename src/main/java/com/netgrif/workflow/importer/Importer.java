@@ -1,19 +1,17 @@
 package com.netgrif.workflow.importer;
 
 import com.netgrif.workflow.importer.model.*;
-import com.netgrif.workflow.importer.model.datalogic.ImportAutoPlus;
+import com.netgrif.workflow.importer.model.DataLogic;
 import com.netgrif.workflow.petrinet.domain.*;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
-import com.netgrif.workflow.petrinet.domain.dataset.logic.AutoPlus;
-import com.netgrif.workflow.petrinet.domain.dataset.logic.Editable;
-import com.netgrif.workflow.petrinet.domain.dataset.logic.Required;
-import com.netgrif.workflow.petrinet.domain.dataset.logic.Visible;
+import com.netgrif.workflow.petrinet.domain.dataset.logic.DataBehavior;
 import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository;
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRole;
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRoleRepository;
 import com.netgrif.workflow.petrinet.service.ArcFactory;
 import com.netgrif.workflow.workflow.domain.Trigger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Required;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,9 +19,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import java.io.File;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 @Component
 public class Importer {
@@ -100,7 +96,6 @@ public class Importer {
     @Transactional
     private void createDataSet(ImportData importData) {
         Field field = fieldFactory.getField(importData);
-        field.setName(importData.getTitle());
 
         net.addDataSetField(field);
         fields.put(importData.getId(), field);
@@ -155,16 +150,15 @@ public class Importer {
         if (logic == null || fieldId == null)
             return;
 
-        if (logic.getRequired() != null)
-            transition.addDataSet(fieldId, new Required());
-        if (logic.getEditable())
-            transition.addDataSet(fieldId, new Editable());
-        if (logic.getVisible())
-            transition.addDataSet(fieldId, new Visible());
-        if (logic.getAutoPlus() != null) {
-            ImportAutoPlus autoPlus = logic.getAutoPlus();
-            transition.addDataSet(fieldId, new AutoPlus(fields.get(autoPlus.getRef()).getObjectId(), autoPlus.getContent()));
-        }
+        Set<DataBehavior> behavior = new HashSet<>();
+        if(logic.getBehavior() != null)
+            Arrays.stream(logic.getBehavior()).forEach(b -> behavior.add(DataBehavior.fromString(b)));
+
+        Set<String> actions = null;
+        if(logic.getActions() != null)
+            actions = new HashSet<>(Arrays.asList(logic.getActions()));
+
+        transition.addDataSet(fieldId,behavior,actions);
     }
 
     @Transactional
