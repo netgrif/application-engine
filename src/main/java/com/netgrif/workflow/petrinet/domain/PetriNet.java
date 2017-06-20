@@ -167,6 +167,13 @@ public class PetriNet {
         this.transactions.put(transaction.getStringId(), transaction);
     }
 
+    public Transaction getTransactionByTransition(Transition transition) {
+        return transactions.values().stream()
+                .filter(transaction ->
+                        transaction.getTransitions().contains(transition.getObjectId())
+                ).findAny().orElse(null);
+    }
+
     @Override
     public String toString() {
         return title;
