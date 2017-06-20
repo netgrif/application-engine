@@ -16,7 +16,7 @@ import java.util.List;
 public class Transaction extends PetriNetObject {
 
     @Getter @Setter
-    private List<ObjectId> transitions;
+    private List<String> transitions;
 
     @Getter @Setter
     private String title;
@@ -31,6 +31,6 @@ public class Transaction extends PetriNetObject {
      * @param transition
      */
     public void addTransition(Transition transition) {
-        transitions.add(transition.getObjectId());
+        transitions.add(transition.getStringId());
     }
 }
