@@ -15,8 +15,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 @Document
 public class PetriNet {
@@ -55,17 +53,22 @@ public class PetriNet {
     @Getter @Setter
     private Map<String, ProcessRole> roles;
 
+    @org.springframework.data.mongodb.core.mapping.Field("transactions")
+    @Getter @Setter
+    private Map<String, Transaction> transactions;
+
     @Transient
     private boolean initialized;
 
     public PetriNet() {
         initialized = false;
         creationDate = LocalDateTime.now();
-        this.places = new HashMap<>();
-        this.transitions = new HashMap<>();
-        this.arcs = new HashMap<>();
-        this.dataSet = new HashMap<>();
-        this.roles = new HashMap<>();
+        places = new HashMap<>();
+        transitions = new HashMap<>();
+        arcs = new HashMap<>();
+        dataSet = new HashMap<>();
+        roles = new HashMap<>();
+        transactions = new HashMap<>();
     }
 
     public PetriNet(String title, String initials) {
@@ -146,23 +149,6 @@ public class PetriNet {
         initialized = true;
     }
 
-    public Map<Place, Integer> getInputPlaces(Transition transition) {
-        return getIOPlaces(transition, arc -> arc.getDestination() == transition);
-    }
-
-    public Map<Place, Integer> getOutputPlaces(Transition transition) {
-        return getIOPlaces(transition, arc -> arc.getSource() == transition);
-    }
-
-    private Map<Place, Integer> getIOPlaces(Transition transition, Predicate<Arc> predicate) {
-        List<Arc> transitionsArcs = getArcsOfTransition(transition);
-        if (transitionsArcs == null)
-            return new HashMap<>();
-        return transitionsArcs.stream()
-                .filter(predicate)
-                .collect(Collectors.toMap(Arc::getPlace, Arc::getMultiplicity));
-    }
-
     public void initializeTokens(Map<String, Integer> activePlaces) {
         places.values().forEach(place -> place.setTokens(activePlaces.getOrDefault(place.getStringId(), 0)));
     }
@@ -175,6 +161,10 @@ public class PetriNet {
             }
         }
         return activePlaces;
+    }
+
+    public void addTransaction(Transaction transaction) {
+        this.transactions.put(transaction.getStringId(), transaction);
     }
 
     @Override
