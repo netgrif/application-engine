@@ -82,7 +82,7 @@ public class PetriNetController {
     public
     @ResponseBody
     PetriNetReferencesResource getAllReferences(Authentication auth) {
-        List<PetriNetReference> refs = service.getAllReferences((LoggedUser)auth.getPrincipal());
+        List<PetriNetReference> refs = service.getAllReferences((LoggedUser) auth.getPrincipal());
         return new PetriNetReferencesResource(refs);
     }
 
@@ -91,7 +91,7 @@ public class PetriNetController {
     @ResponseBody
     TransitionReferencesResource getTransitionReferences(Authentication auth, @RequestBody List<String> ids) {
         ids.forEach(id -> id = decodeUrl(id));
-        return new TransitionReferencesResource(service.getTransitionReferences(ids,(LoggedUser)auth.getPrincipal()));
+        return new TransitionReferencesResource(service.getTransitionReferences(ids, (LoggedUser) auth.getPrincipal()));
     }
 
     @RequestMapping(value = "/data/refs", method = POST)
@@ -107,9 +107,15 @@ public class PetriNetController {
     public @ResponseBody
     RolesResource getRoles(@PathVariable("netId") String netId) {
         netId = decodeUrl(netId);
-        return new RolesResource(roleService.findAll(netId),netId);
+        return new RolesResource(roleService.findAll(netId), netId);
     }
 
+    @RequestMapping(value = "/{netId}/transactions", method = GET)
+    public @ResponseBody
+    TransactionsResource getTransactions(@PathVariable("netId") String netId) {
+        PetriNet net = service.loadPetriNet(decodeUrl(netId));
+        return new TransactionsResource(net.getTransactions().values(), netId);
+    }
 
     public static String decodeUrl(String s1) {
         try {
