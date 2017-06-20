@@ -3,7 +3,7 @@ package com.netgrif.workflow.petrinet.domain;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.IDataFunction;
 import com.netgrif.workflow.petrinet.domain.roles.RolePermission;
-import com.netgrif.workflow.workflow.domain.Trigger;
+import com.netgrif.workflow.workflow.domain.triggers.Trigger;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.mongodb.core.mapping.DBRef;
@@ -43,13 +43,6 @@ public class Transition extends Node {
         }
         return json;
     }
-
-//    public ObjectNode applyRoleLogic(String id, ObjectNode json) {
-//        for (IRoleFunction function : roles.get(id)) {
-//            json = function.apply(json);
-//        }
-//        return json;
-//    }
 
     public void addDataSet(String fieldId, IDataFunction function) {
         if (dataSet.containsKey(fieldId) && dataSet.get(fieldId) != null) {

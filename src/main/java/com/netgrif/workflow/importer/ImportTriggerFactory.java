@@ -1,7 +1,7 @@
 package com.netgrif.workflow.importer;
 
 import com.netgrif.workflow.importer.model.ImportTrigger;
-import com.netgrif.workflow.workflow.domain.*;
+import com.netgrif.workflow.workflow.domain.triggers.*;
 
 public class ImportTriggerFactory {
     private Importer importer;
