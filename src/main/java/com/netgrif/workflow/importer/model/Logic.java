@@ -1,16 +1,10 @@
 package com.netgrif.workflow.importer.model;
 
-import com.netgrif.workflow.importer.model.datalogic.ImportAutoPlus;
-
 public class Logic implements RoleLogic, DataLogic {
 
-    private Boolean editable;
+    private String[] behavior;
 
-    private Boolean visible;
-
-    private ImportAutoPlus autoPlus;
-
-    private Boolean required;
+    private String[] actions;
 
 
     private Boolean perform;
@@ -18,36 +12,24 @@ public class Logic implements RoleLogic, DataLogic {
     private Boolean delegate;
 
 //  DATA
-    public Boolean getEditable() {
-        return editable != null && editable;
+    @Override
+    public String[] getBehavior() {
+        return behavior;
     }
 
-    public void setEditable(Boolean editable) {
-        this.editable = editable;
+    @Override
+    public void setBehavior(String[] behavior) {
+        this.behavior = behavior;
     }
 
-    public Boolean getVisible() {
-        return visible != null && visible;
+    @Override
+    public String[] getActions() {
+        return actions;
     }
 
-    public void setVisible(Boolean visible) {
-        this.visible = visible;
-    }
-
-    public ImportAutoPlus getAutoPlus() {
-        return autoPlus;
-    }
-
-    public void setAutoPlus(ImportAutoPlus autoPlus) {
-        this.autoPlus = autoPlus;
-    }
-
-    public Boolean getRequired() {
-        return required;
-    }
-
-    public void setRequired(Boolean required) {
-        this.required = required;
+    @Override
+    public void setActions(String[] actions) {
+        this.actions = actions;
     }
 
     //  ROLE

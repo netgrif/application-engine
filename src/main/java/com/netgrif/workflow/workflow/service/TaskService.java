@@ -191,9 +191,8 @@ public class TaskService implements ITaskService {
         List<Field> dataSetFields = new ArrayList<>();
         fieldsIds.forEach(fieldId -> {
             Field field = useCase.getPetriNet().getDataSet().get(fieldId);
-            field.setType(null);
             field.setValue(useCase.getDataSetValues().get(fieldId));
-            field.setLogic(transition.applyDataLogic(fieldId, JsonNodeFactory.instance.objectNode()));
+            field.setBehavior(transition.getDataSet().get(fieldId).applyBehavior());
 
             dataSetFields.add(field);
         });
