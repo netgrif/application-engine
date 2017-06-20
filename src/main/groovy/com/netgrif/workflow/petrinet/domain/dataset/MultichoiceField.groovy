@@ -1,12 +1,10 @@
 package com.netgrif.workflow.petrinet.domain.dataset
 
-import lombok.Getter
 import org.springframework.data.mongodb.core.mapping.Document
 
 @Document
 public class MultichoiceField extends Field<Set<String>> {
 
-    @Getter
     private Set<String> choices;
 
     public MultichoiceField() {
@@ -24,5 +22,9 @@ public class MultichoiceField extends Field<Set<String>> {
 
     public void setValue(List<String> value) {
         this.value = new HashSet<>(value);
+    }
+
+    Set<String> getChoices() {
+        return choices
     }
 }

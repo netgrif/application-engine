@@ -14,7 +14,6 @@ import java.util.Set;
 @Document
 public class UserField extends Field<User>{
 
-    @Getter
     private Set<String> roles;
 
     public UserField(){
@@ -29,8 +28,13 @@ public class UserField extends Field<User>{
         }
     }
 
+    //TODO 20.6.2017 - call when get data fields values
     public UserResource toResource() {
         if(this.value == null) return null;
         return new UserResource(this.value,"small",true);
+    }
+
+    Set<String> getRoles() {
+        return roles
     }
 }
