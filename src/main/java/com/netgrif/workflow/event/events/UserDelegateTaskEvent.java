@@ -10,7 +10,7 @@ public class UserDelegateTaskEvent extends UserTaskEvent {
     @Getter
     private User delegated;
 
-    public UserDelegateTaskEvent(Object delegate, Task task, Case useCase, User delegated) {
+    public UserDelegateTaskEvent(User delegate, Task task, Case useCase, User delegated) {
         super(delegate, task, useCase);
         this.delegated = delegated;
     }
