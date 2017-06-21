@@ -1,7 +1,6 @@
 package com.netgrif.workflow.petrinet.domain;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.netgrif.workflow.petrinet.domain.dataset.logic.DataBehavior;
+import com.netgrif.workflow.petrinet.domain.dataset.logic.FieldBehavior;
 import com.netgrif.workflow.petrinet.domain.roles.RolePermission;
 import com.netgrif.workflow.workflow.domain.Trigger;
 import lombok.Getter;
@@ -17,7 +16,7 @@ public class Transition extends Node {
 
     @Field("dataSet")
     @Getter @Setter
-    private Map<String, DataLogic> dataSet;
+    private Map<String, DataFieldLogic> dataSet;
 
     @Field("roles")
     @Getter @Setter
@@ -51,7 +50,7 @@ public class Transition extends Node {
 //        return json;
 //    }
 
-    public void addDataSet(String fieldId, DataLogic logic) {
+    public void addDataSet(String fieldId, DataFieldLogic logic) {
         if (dataSet.containsKey(fieldId) && dataSet.get(fieldId) != null) {
             dataSet.get(fieldId).merge(logic);
         } else {
@@ -59,12 +58,12 @@ public class Transition extends Node {
         }
     }
 
-    public void addDataSet(String field, Set<DataBehavior> behavior, Set<String> actions){
+    public void addDataSet(String field, Set<FieldBehavior> behavior, Set<String> actions){
         if(dataSet.containsKey(field) && dataSet.get(field) != null){
             if(behavior != null) dataSet.get(field).getBehavior().addAll(behavior);
             if(behavior != null) dataSet.get(field).getActions().addAll(actions);
         } else {
-            dataSet.put(field,new DataLogic(behavior, actions));
+            dataSet.put(field,new DataFieldLogic(behavior, actions));
         }
     }
 

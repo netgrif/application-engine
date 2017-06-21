@@ -1,6 +1,6 @@
 package com.netgrif.workflow.petrinet.domain.dataset.logic
 
-enum DataBehavior {
+enum FieldBehavior {
     REQUIRED("required"),
     OPTIONAL("optional"),
     VISIBLE("visible"),
@@ -9,12 +9,12 @@ enum DataBehavior {
 
     private String name
 
-    DataBehavior(String name) {
+    FieldBehavior(String name) {
         this.name = name
     }
 
-    public static DataBehavior fromString(String string){
-        return DataBehavior.valueOf(string.toUpperCase());
+    public static FieldBehavior fromString(String string){
+        return FieldBehavior.valueOf(string.toUpperCase());
     }
 
     public String toString(){
