@@ -6,7 +6,6 @@ import com.netgrif.workflow.petrinet.domain.roles.RolePermission;
 import com.netgrif.workflow.workflow.domain.triggers.Trigger;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
@@ -23,7 +22,7 @@ public class Transition extends Node {
     @Getter @Setter
     private Map<String, Set<RolePermission>> roles;
 
-    @DBRef
+    @Field("triggers")
     @Getter @Setter
     private List<Trigger> triggers;
 
