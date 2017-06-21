@@ -11,6 +11,10 @@ public abstract class Trigger {
     @Id
     protected ObjectId _id;
 
+    protected Trigger() {
+        this._id = new ObjectId();
+    }
+
     public String getObjectId() {
         return _id.toString();
     }
