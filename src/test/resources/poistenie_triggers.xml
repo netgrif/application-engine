@@ -720,6 +720,7 @@
                 <editable>true</editable>
             </logic>
         </dataRef>
+        <trigger type="auto"></trigger>
     </transition>
     <transition>
         <id>33</id>
