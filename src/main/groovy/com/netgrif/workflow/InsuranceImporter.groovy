@@ -10,6 +10,8 @@ import com.netgrif.workflow.auth.domain.repositories.UserProcessRoleRepository
 import com.netgrif.workflow.auth.service.interfaces.IUserService
 import com.netgrif.workflow.importer.Importer
 import com.netgrif.workflow.petrinet.domain.PetriNet
+import com.netgrif.workflow.petrinet.domain.Transition
+import com.netgrif.workflow.petrinet.domain.dataset.logic.DataActionsRunner
 import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository
 import com.netgrif.workflow.workflow.domain.Case
 import com.netgrif.workflow.workflow.domain.repositories.CaseRepository
@@ -114,8 +116,14 @@ class InsuranceImporter {
         useCase.activePlaces.put(net.places.find { it -> it.value.title == "L" }.key, 1)
         useCase.activePlaces.put(net.places.find { it -> it.value.title == "C" }.key, 1)
         useCase.activePlaces.put(net.places.find { it -> it.value.title == "E" }.key, 1)
-        caseRepository.save(useCase)
+        useCase = caseRepository.save(useCase)
         net.initializeTokens(useCase.activePlaces)
         taskService.createTasks(useCase)
+
+        Transition trans = useCase.petriNet.transitions.find { transEntry -> transEntry.value.dataSet.find { entry -> !entry.value.actions.isEmpty()} != null}.value
+        String script = trans.dataSet.find {entry -> !entry.value.actions.isEmpty()}.value.actions.first()
+        new DataActionsRunner(useCase).run(script)
+        caseRepository.save(useCase)
+        petriNetRepository.save(useCase.petriNet)
     }
 }
