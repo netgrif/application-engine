@@ -12,7 +12,16 @@ public abstract class TimeTrigger extends Trigger {
     @Setter
     protected LocalDateTime startDate;
 
-    protected TimeTrigger() {
+    @Getter
+    protected String timeString;
+
+    protected TimeTrigger(String timeString) {
         this._id = new ObjectId();
+        this.timeString = timeString;
+    }
+
+    @Override
+    public Trigger clone() {
+        return new DelayTimeTrigger(timeString);
     }
 }

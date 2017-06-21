@@ -18,7 +18,7 @@ public class DateTimeTrigger extends TimeTrigger {
      * @see <a href="https://en.wikipedia.org/wiki/ISO_8601#Dates">ISO-8601</a>
      */
     public DateTimeTrigger(String dateTime) throws DateTimeParseException {
-        super();
+        super(dateTime);
         startDate = LocalDateTime.parse(dateTime);
     }
 }
