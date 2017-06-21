@@ -4,7 +4,7 @@ import com.netgrif.workflow.importer.model.*;
 import com.netgrif.workflow.importer.model.DataLogic;
 import com.netgrif.workflow.petrinet.domain.*;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
-import com.netgrif.workflow.petrinet.domain.dataset.logic.DataBehavior;
+import com.netgrif.workflow.petrinet.domain.dataset.logic.FieldBehavior;
 import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository;
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRole;
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRoleRepository;
@@ -153,9 +153,9 @@ public class Importer {
         if (logic == null || fieldId == null)
             return;
 
-        Set<DataBehavior> behavior = new HashSet<>();
+        Set<FieldBehavior> behavior = new HashSet<>();
         if(logic.getBehavior() != null)
-            Arrays.stream(logic.getBehavior()).forEach(b -> behavior.add(DataBehavior.fromString(b)));
+            Arrays.stream(logic.getBehavior()).forEach(b -> behavior.add(FieldBehavior.fromString(b)));
 
         final Set<String> actions = new HashSet<>();
         if(logic.getAction() != null) {
