@@ -7,4 +7,9 @@ public class UserTrigger extends Trigger {
     public UserTrigger() {
         this._id = new ObjectId();
     }
+
+    @Override
+    public Trigger clone() {
+        return null;
+    }
 }

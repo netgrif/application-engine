@@ -7,4 +7,9 @@ public class MessageTrigger extends Trigger {
     public MessageTrigger() {
         this._id = new ObjectId();
     }
+
+    @Override
+    public Trigger clone() {
+        return null;
+    }
 }
