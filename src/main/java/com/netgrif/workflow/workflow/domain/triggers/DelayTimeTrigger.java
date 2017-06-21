@@ -12,13 +12,13 @@ public class DelayTimeTrigger extends TimeTrigger {
 
     /**
      * Creates new DelayTimeTrigger from specified string in ISO-8601 duration format PnDTnHnMn.nS
-     * @param delay delay string in format PnDTnHnMn.nS
+     * @param timeString delay string in format PnDTnHnMn.nS
      * @throws DateTimeParseException if the string cannot be parsed into duration
      * @see <a href="https://en.wikipedia.org/wiki/ISO_8601#Durations">ISO-8601</a>
      */
-    public DelayTimeTrigger(String delay) throws DateTimeParseException {
-        super();
-        Duration delayFromNow = Duration.parse(delay);
+    public DelayTimeTrigger(String timeString) throws DateTimeParseException {
+        super(timeString);
+        Duration delayFromNow = Duration.parse(timeString);
         startDate = LocalDateTime.now().plus(delayFromNow);
     }
 }

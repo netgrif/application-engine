@@ -112,6 +112,10 @@ public class Task {
         return triggers;
     }
 
+    public void addTrigger(Trigger trigger) {
+        triggers.add(trigger);
+    }
+
     @JsonIgnore
     public Long getUserId() {
         return userId;

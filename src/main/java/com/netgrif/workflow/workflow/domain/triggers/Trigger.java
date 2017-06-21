@@ -5,10 +5,9 @@ import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import javax.persistence.Entity;
-
 @Document
 public abstract class Trigger {
+
     @Id
     protected ObjectId _id;
 
@@ -23,6 +22,8 @@ public abstract class Trigger {
     public void set_id(ObjectId _id) {
         this._id = _id;
     }
+
+    public abstract Trigger clone();
 
     public enum Type {
         AUTO ("auto"),
