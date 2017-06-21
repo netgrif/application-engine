@@ -7,20 +7,19 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.auth.domain.repositories.UserRepository;
-import com.netgrif.workflow.event.events.UserAssignTaskEvent;
-import com.netgrif.workflow.event.events.UserCancelTaskEvent;
-import com.netgrif.workflow.event.events.UserDelegateTaskEvent;
-import com.netgrif.workflow.event.events.UserFinishTaskEvent;
+import com.netgrif.workflow.event.events.*;
 import com.netgrif.workflow.petrinet.domain.Arc;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.Place;
 import com.netgrif.workflow.petrinet.domain.Transition;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.petrinet.domain.throwable.TransitionNotExecutableException;
+import com.netgrif.workflow.utils.DateUtils;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.Task;
 import com.netgrif.workflow.workflow.domain.repositories.CaseRepository;
 import com.netgrif.workflow.workflow.domain.repositories.TaskRepository;
+import com.netgrif.workflow.workflow.domain.triggers.AutoTrigger;
 import com.netgrif.workflow.workflow.domain.triggers.TimeTrigger;
 import com.netgrif.workflow.workflow.domain.triggers.Trigger;
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
@@ -43,7 +42,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -128,6 +126,8 @@ public class TaskService implements ITaskService {
                 // TODO: 16. 3. 2017 there should be some fancy logic
 //                task.setAssignRole(net.getRoles().get(transition.getRoles().keySet().stream().findFirst().orElseGet(null)).getStringId());
                 //figureOutProcessRoles(task, transition);
+                if (task == null)
+                    break;
                 taskRepository.save(task);
             }
         }
@@ -403,14 +403,19 @@ public class TaskService implements ITaskService {
         task.setCaseTitle(useCase.getTitle());
         task.setPriority(transition.getPriority());
         task.setVisualId(useCase.getPetriNet().getInitials());
-        transition.getTriggers().forEach(trigger -> {
+        for (Trigger trigger : transition.getTriggers()) {
             Trigger taskTrigger = trigger.clone();
             task.addTrigger(taskTrigger);
 
             if (taskTrigger instanceof TimeTrigger) {
-                scheduler.schedule(() -> executeTransition(transition, useCase), Date.from(((TimeTrigger) taskTrigger).getStartDate().atZone(ZoneId.systemDefault()).toInstant()));
+                TimeTrigger timeTrigger = (TimeTrigger) taskTrigger;
+                scheduleTaskExecution(task, timeTrigger.getStartDate(), useCase);
+            } else if (taskTrigger instanceof AutoTrigger) {
+                executeTransition(task, useCase);
+                log.info("Auto trigger triggered");
+                return null;
             }
-        });
+        }
         transition.getRoles().forEach(task::addRole);
 
         return taskRepository.save(task);
@@ -447,7 +452,9 @@ public class TaskService implements ITaskService {
     }
 
     @Transactional
-    protected void executeTransition(Transition transition, Case useCase) {
+    protected void executeTransition(Task task, Case useCase) {
+        log.info("executeTransition");
+        Transition transition = useCase.getPetriNet().getTransition(task.getTransitionId());
         try {
             startExecution(transition, useCase);
             finishExecution(transition, useCase);
@@ -456,5 +463,11 @@ public class TaskService implements ITaskService {
         } catch (TransitionNotExecutableException e) {
             e.printStackTrace();
         }
+    }
+
+    @Transactional
+    protected void scheduleTaskExecution(Task task, LocalDateTime time, Case useCase) {
+        scheduler.schedule(() -> executeTransition(task, useCase), DateUtils.localDateTimeToDate(time));
+        publisher.publishEvent(new TimeFinishTaskEvent(time, task, useCase));
     }
 }
