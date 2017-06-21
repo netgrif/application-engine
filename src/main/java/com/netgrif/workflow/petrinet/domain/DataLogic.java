@@ -44,4 +44,24 @@ public class DataLogic {
         this.behavior.addAll(other.behavior);
         this.actions.addAll(other.actions);
     }
+
+    public void makeVisible(){
+        this.behavior.remove(DataBehavior.EDITABLE);
+        this.behavior.add(DataBehavior.VISIBLE);
+    }
+
+    public void makeEditable(){
+        this.behavior.remove(DataBehavior.VISIBLE);
+        this.behavior.add(DataBehavior.EDITABLE);
+    }
+
+    public void makeRequired(){
+        this.behavior.remove(DataBehavior.OPTIONAL);
+        this.behavior.add(DataBehavior.REQUIRED);
+    }
+
+    public void makeOptional(){
+        this.behavior.remove(DataBehavior.REQUIRED);
+        this.behavior.add(DataBehavior.OPTIONAL);
+    }
 }

@@ -6,6 +6,6 @@ public interface DataLogic {
     void setBehavior(String[] behavior);
     String[] getBehavior();
 
-    void setActions(String[] actions);
-    String[] getActions();
+    void setAction(String[] action);
+    String[] getAction();
 }
