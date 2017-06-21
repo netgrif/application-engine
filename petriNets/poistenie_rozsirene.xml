@@ -22,6 +22,7 @@
         <values>Byt</values>
         <values>Dom</values>
         <values>Radový dom</values>
+        <values>Bungalov</values>
         <values>Iné</values>
     </data>
     <data type="number">
@@ -339,6 +340,12 @@
             <id>5</id>
             <logic>
                 <behavior>editable</behavior>
+                <action>
+                    target: f.6,
+                    current: f.this,
+                    trans: t.this;
+                    make target,visible on trans when { current.value != "Bungalov" }
+                </action>
             </logic>
         </dataRef>
         <dataRef>

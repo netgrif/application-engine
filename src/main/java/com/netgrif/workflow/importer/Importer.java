@@ -11,7 +11,6 @@ import com.netgrif.workflow.petrinet.domain.roles.ProcessRoleRepository;
 import com.netgrif.workflow.petrinet.service.ArcFactory;
 import com.netgrif.workflow.workflow.domain.Trigger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,6 +22,10 @@ import java.util.*;
 
 @Component
 public class Importer {
+
+    public static final String FIELD_KEYWORD = "f";
+    public static final String TRANSITION_KEYWORD = "t";
+
     private Document document;
     private PetriNet net;
     private Map<Long, ProcessRole> roles;
@@ -154,11 +157,44 @@ public class Importer {
         if(logic.getBehavior() != null)
             Arrays.stream(logic.getBehavior()).forEach(b -> behavior.add(DataBehavior.fromString(b)));
 
-        Set<String> actions = null;
-        if(logic.getActions() != null)
-            actions = new HashSet<>(Arrays.asList(logic.getActions()));
+        final Set<String> actions = new HashSet<>();
+        if(logic.getAction() != null) {
+            Arrays.asList(logic.getAction()).forEach(action -> {
+                action = parseObjectIds(action, fieldId, FIELD_KEYWORD);
+                action = parseObjectIds(action, transition.getStringId(),TRANSITION_KEYWORD);
+                actions.add(action);
+            });
+        }
 
         transition.addDataSet(fieldId,behavior,actions);
+    }
+
+    @Transactional
+    private String parseObjectIds(String action, String currentId, String processedObject){
+        action = action.replace("\n","").replace("  ","");
+        int last = 0;
+        while(true){
+            int start = action.indexOf(processedObject+".",last);
+            if(start == -1) break;
+            int coma = action.indexOf(',',start);
+            int semicolon = action.indexOf(';',start);
+            int delimeter = coma < semicolon && coma != -1 ? coma : semicolon;
+
+            String id = action.substring(start+2,delimeter);
+            String objectId = id.equalsIgnoreCase("this") ? currentId : getObjectId(processedObject,Long.parseLong(id));
+
+            action = action.replace(processedObject+"."+id, processedObject+"."+objectId);
+
+            if(delimeter == semicolon) break;
+            else last = coma + (objectId.length() - id.length());
+        }
+        return action;
+    }
+
+    private String getObjectId(String processedObject, Long xmlId){
+        if(processedObject.equalsIgnoreCase(FIELD_KEYWORD)) return fields.get(xmlId).getObjectId();
+        if(processedObject.equalsIgnoreCase(TRANSITION_KEYWORD)) return transitions.get(xmlId).getStringId();
+        return "";
     }
 
     @Transactional
