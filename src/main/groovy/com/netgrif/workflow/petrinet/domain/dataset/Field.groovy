@@ -74,4 +74,17 @@ public abstract class Field<T> {
     void setValue(T value) {
         this.value = value
     }
+
+    //operators overloading
+    T plus(final Field field){
+        return this.value + field.value
+    }
+
+    T minus(final Field field){
+        return this.value - field.value
+    }
+
+    T multiply(final Field field) {
+        return this.value * field.value
+    }
 }
