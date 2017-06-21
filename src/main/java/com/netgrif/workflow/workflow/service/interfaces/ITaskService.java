@@ -37,7 +37,7 @@ public interface ITaskService {
 
     List<Field> getData(String taskId);
 
-    void setDataFieldsValues(String taskId, ObjectNode values);
+    ObjectNode setDataFieldsValues(String taskId, ObjectNode values);
 
     void cancelTask(Long id, String taskId);
 

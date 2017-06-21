@@ -3,6 +3,7 @@ package com.netgrif.workflow.workflow.service;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.workflow.workflow.domain.Case;
+import com.netgrif.workflow.workflow.domain.DataField;
 import com.netgrif.workflow.workflow.domain.repositories.CaseRepository;
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
@@ -53,21 +54,20 @@ public class WorkflowService implements IWorkflowService {
         if(queryBuilder.length() > 0)
             queryBuilder.deleteCharAt(queryBuilder.length()-1);
         String queryString = nets.isEmpty() ? "{}" : "{petriNet:{$in:["+queryBuilder.toString()+"]}}";
-        BasicQuery query = new BasicQuery(queryString,"{petriNet:0, dataSetValues:0}");
+        BasicQuery query = new BasicQuery(queryString,"{petriNet:0, dataSet:0}");
         query = (BasicQuery) query.with(pageable);
         List<Case> useCases = mongoTemplate.find(query,Case.class);
-        return new PageImpl<Case>(useCases,pageable,mongoTemplate.count(new BasicQuery(queryString,"{petriNet:0, dataSetValues:0}"),Case.class));
+        return new PageImpl<Case>(useCases,pageable,mongoTemplate.count(new BasicQuery(queryString,"{petriNet:0, dataSet:0}"),Case.class));
     }
 
     @Override
     public void createCase(String netId, String title, String color) {
         PetriNet petriNet = petriNetService.loadPetriNet(netId);
-        Map<String, Integer> activePlaces = petriNet.getActivePlaces();
-        Case useCase = new Case(title, petriNet, activePlaces);
+        Case useCase = new Case(title, petriNet, petriNet.getActivePlaces());
         useCase.setColor(color);
-        HashMap<String, Object> dataValues = new HashMap<>();
-        petriNet.getDataSet().forEach((key, field) -> dataValues.put(key,null));
-        useCase.setDataSetValues(dataValues);
+        HashMap<String, DataField> dataValues = new HashMap<>();
+        petriNet.getDataSet().forEach((key, field) -> dataValues.put(key,new DataField()));
+        useCase.setDataSet(dataValues);
         saveCase(useCase);
         taskService.createTasks(useCase);
     }
