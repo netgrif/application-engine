@@ -17,12 +17,13 @@ import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Service
 public class WorkflowService implements IWorkflowService {
+
     @Autowired
     private CaseRepository repository;
+
     @Autowired
     private MongoTemplate mongoTemplate;
 
@@ -61,14 +62,20 @@ public class WorkflowService implements IWorkflowService {
     }
 
     @Override
-    public void createCase(String netId, String title, String color) {
+    public void createCase(String netId, String title, String color, Long authorId) {
         PetriNet petriNet = petriNetService.loadPetriNet(netId);
         Case useCase = new Case(title, petriNet, petriNet.getActivePlaces());
         useCase.setColor(color);
         HashMap<String, DataField> dataValues = new HashMap<>();
         petriNet.getDataSet().forEach((key, field) -> dataValues.put(key,new DataField()));
         useCase.setDataSet(dataValues);
+        useCase.setAuthor(authorId);
         saveCase(useCase);
         taskService.createTasks(useCase);
+    }
+
+    @Override
+    public Page<Case> findAllByAuthor(Long authorId, Pageable pageable) {
+        return repository.findAllByAuthor(authorId, pageable);
     }
 }
