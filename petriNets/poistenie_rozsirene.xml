@@ -1,178 +1,124 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document>
-    <data type="date">
+    <!-- ========== TRANSACTIONS ========== -->
+    <transaction>
         <id>1</id>
-        <title>Dátum začiatku poistky</title>
-    </data>
-    <data type="text">
+        <title>Kalkulácia poistného</title>
+    </transaction>
+    <transaction>
         <id>2</id>
-        <title>Mesto</title>
-    </data>
-    <data type="text">
+        <title>Sumarizácia</title>
+    </transaction>
+    <transaction>
         <id>3</id>
-        <title>Ulica</title>
+        <title>Návrh zmluvy</title>
+    </transaction>
+    <!-- ========== DATA ========== -->
+    <data type="text">
+        <id>1</id>
+        <title>Meno klienta</title>
+    </data>
+    <data type="enumeration">
+        <id>2</id>
+        <title>Vzťah k nehnuteľnosti</title>
+        <values>vlastník nehnuteľnosti</values>
+        <values>vlastník má úver</values>
+        <values>prenájom</values>
+        <values>iné</values>
+    </data>
+    <data type="enumeration">
+        <id>3</id>
+        <title>Poistený je</title>
+        <values>Právnická osoba</values>
+        <values>Fyzická osoba</values>
+        <values>FO - podnikateľ</values>
     </data>
     <data type="number">
         <id>4</id>
-        <title>PSČ</title>
+        <title>Koľko ľudí žije v domácnosti</title>
     </data>
     <data type="enumeration">
         <id>5</id>
-        <title>Typ stavby</title>
+        <title>Predmet poistenia</title>
         <values>Byt</values>
-        <values>Dom</values>
-        <values>Radový dom</values>
-        <values>Bungalov</values>
-        <values>Iné</values>
+        <values>Rodinný dom</values>
+        <values>Chata</values>
+        <values>Bytový dom</values>
+        <values>Bungallow</values>
     </data>
-    <data type="number">
+    <data type="enumeration">
         <id>6</id>
-        <title>Počet poschodí</title>
+        <title>Konštrukcia múrov</title>
+        <values>tehla, beton</values>
+        <values>porobeton</values>
+        <values>škvarobeton</values>
+        <values>iné</values>
     </data>
-    <data type="number">
+    <data type="enumeration">
         <id>7</id>
-        <title>Počet izieb (spálňa, obývačka)</title>
+        <title>Konštrukcia strechy</title>
+        <values>škridla</values>
+        <values>plech</values>
+        <values>asfalt</values>
+        <values>iné</values>
     </data>
     <data type="number">
         <id>8</id>
-        <title>Počet kúpeľní</title>
+        <title>Koľko izieb má nehnuteľnosť</title>
     </data>
-    <data type="enumeration">
+    <data type="number">
         <id>9</id>
-        <title>Typ kuchyne</title>
-        <values>Samostatná kuchyňa</values>
-        <values>Súčasťou obývačky</values>
-        <values>Bez kuchyne</values>
+        <title>Altánok</title>
     </data>
-    <data type="text">
+    <data type="number">
         <id>10</id>
-        <title>Ostatné miestnosti (garáž, kotolňa a iné)</title>
+        <title>Sauna</title>
     </data>
-    <data type="enumeration">
+    <data type="number">
         <id>11</id>
-        <title>Nájomný pomer</title>
-        <values>Vlastník</values>
-        <values>Prenájom</values>
+        <title>Studňa</title>
     </data>
     <data type="number">
         <id>12</id>
-        <title>Rok kolaudácie</title>
+        <title>Iné</title>
     </data>
     <data type="number">
         <id>13</id>
-        <title>Ako dlho v nehnuteľnosti bývate?</title>
+        <title>Stavebný materiál</title>
+    </data>
+    <data type="number">
+        <id>14</id>
+        <title>Stavebné/záhradné mechanizmy</title>
     </data>
     <data type="enumeration">
-        <id>14</id>
-        <title>Typ konštrukcie</title>
-        <values>Tehla</values>
-        <values>Panel</values>
-        <values>Drevo</values>
-    </data>
-    <data type="text">
         <id>15</id>
-        <title>Popis nehnuteľnosti</title>
+        <title>Zodpovednosť z vlastníctva nehnuteľnosti</title>
+        <values>15000</values>
+        <values>30000</values>
+        <values>60000</values>
+        <values>120000</values>
     </data>
-    <data type="boolean">
+    <data type="enumeration">
         <id>16</id>
-        <title>Nachádzajú sa v okolí vysoké stromy?</title>
+        <title>Spoluúčasť</title>
+        <values>0 EUR</values>
+        <values>50 EUR</values>
+        <values>150 EUR</values>
     </data>
-    <data type="boolean">
+    <data type="enumeration">
         <id>17</id>
-        <title>Nachádza sa v okolí 400m vodná plocha?</title>
+        <title>Frekvencia platenia</title>
+        <values>ročne</values>
+        <values>polročne</values>
+        <values>štvrťročne</values>
     </data>
-    <data type="number">
+    <data type="boolean">
         <id>18</id>
-        <title>Veľkosť obytnej plochy</title>
+        <title>Kompletné poistenie</title>
     </data>
-    <data type="number">
+    <data type="boolean">
         <id>19</id>
-        <title>Veľkosť zastavanej plochy</title>
-    </data>
-    <data type="number">
-        <id>20</id>
-        <title>Celková hodnota domácnosti</title>
-    </data>
-    <data type="text">
-        <id>21</id>
-        <title>Poistiť indivuduálne predmety o hodnote viac ako 1500€</title>
-    </data>
-    <data type="multichoice">
-        <id>22</id>
-        <title>Poistenie elektroniky v domácnosti</title>
-        <values>Televízor</values>
-        <values>Počítač</values>
-        <values>Domáce kino</values>
-        <values>Hifi sústava</values>
-    </data>
-    <data type="text">
-        <id>23</id>
-        <title>Poistenie bicykla</title>
-    </data>
-    <data type="multichoice">
-        <id>24</id>
-        <title>Typ zámkov na dverách domácnosti</title>
-        <values>5 pákový Mortice zámok</values>
-        <values>automatický zárubňový s kľúčom</values>
-        <values>dvere s viacerými bodmi zámkov</values>
-        <values>iné</values>
-    </data>
-    <data type="boolean">
-        <id>25</id>
-        <title>Máte namontovaný poplašný systém narušenia?</title>
-    </data>
-    <data type="number">
-        <id>26</id>
-        <title>Koľko rokov ste nemali poisťovací prípad?</title>
-    </data>
-    <data type="user">
-        <id>27</id>
-        <title>Vlastník poistenia</title>
-        <values>1</values>
-    </data>
-    <data type="boolean">
-        <id>28</id>
-        <title>Je to vaše hlavné bydlisko?</title>
-    </data>
-    <data type="number">
-        <id>29</id>
-        <title>Počet obyvateľov nad 18 rokov</title>
-    </data>
-    <data type="number">
-        <id>30</id>
-        <title>Počet obyvateľov pod 18 rokov</title>
-    </data>
-    <data type="boolean">
-        <id>31</id>
-        <title>Chováte domáce zvieratá?</title>
-    </data>
-    <data type="boolean">
-        <id>32</id>
-        <title>Je niekto z obyvateľov fajčiar?</title>
-    </data>
-    <data type="text">
-        <id>33</id>
-        <title>Meno</title>
-    </data>
-    <data type="text">
-        <id>34</id>
-        <title>Priezvisko</title>
-    </data>
-    <data type="text">
-        <id>35</id>
-        <title>Email</title>
-    </data>
-    <data type="text">
-        <id>36</id>
-        <title>Telefónne číslo</title>
-    </data>
-    <data type="date">
-        <id>37</id>
-        <title>Dátum narodenia</title>
-    </data>
-    <data type="number">
-        <id>38</id>
-        <title>Výška poistky</title>
+        <title>Zľava za iné poistenie</title>
     </data>
     <!-- ========== ROLES ========== -->
     <role>
@@ -193,105 +139,145 @@
         <isStatic>false</isStatic>
     </place>
     <place>
-        <id>5</id>
-        <x>460</x>
-        <y>180</y>
-        <label>B</label>
-        <tokens>0</tokens>
-        <isStatic>false</isStatic>
-    </place>
-    <place>
         <id>6</id>
-        <x>460</x>
-        <y>420</y>
+        <x>260</x>
+        <y>340</y>
         <label>C</label>
         <tokens>0</tokens>
         <isStatic>false</isStatic>
     </place>
     <place>
-        <id>19</id>
-        <x>620</x>
-        <y>100</y>
-        <label>D</label>
-        <tokens>0</tokens>
-        <isStatic>false</isStatic>
-    </place>
-    <place>
-        <id>21</id>
-        <x>620</x>
-        <y>580</y>
-        <label>E</label>
-        <tokens>0</tokens>
-        <isStatic>false</isStatic>
-    </place>
-    <place>
-        <id>23</id>
-        <x>780</x>
-        <y>180</y>
-        <label>F</label>
-        <tokens>0</tokens>
-        <isStatic>false</isStatic>
-    </place>
-    <place>
-        <id>24</id>
-        <x>780</x>
-        <y>340</y>
-        <label>G</label>
-        <tokens>0</tokens>
-        <isStatic>false</isStatic>
-    </place>
-    <place>
         <id>37</id>
-        <x>1140</x>
-        <y>260</y>
-        <label>H</label>
+        <x>1020</x>
+        <y>180</y>
+        <label>S</label>
         <tokens>0</tokens>
         <isStatic>false</isStatic>
     </place>
     <place>
         <id>42</id>
-        <x>1420</x>
-        <y>260</y>
-        <label>I</label>
+        <x>1300</x>
+        <y>180</y>
+        <label>T</label>
         <tokens>0</tokens>
         <isStatic>false</isStatic>
     </place>
     <place>
         <id>48</id>
-        <x>1420</x>
-        <y>340</y>
-        <label>J</label>
-        <tokens>0</tokens>
-        <isStatic>false</isStatic>
-    </place>
-    <place>
-        <id>53</id>
-        <x>780</x>
-        <y>260</y>
-        <label>K</label>
+        <x>1300</x>
+        <y>300</y>
+        <label>U</label>
         <tokens>0</tokens>
         <isStatic>false</isStatic>
     </place>
     <place>
         <id>59</id>
-        <x>460</x>
+        <x>260</x>
         <y>260</y>
-        <label>L</label>
+        <label>B</label>
         <tokens>0</tokens>
         <isStatic>false</isStatic>
     </place>
     <place>
-        <id>99</id>
-        <x>460</x>
+        <id>148</id>
+        <x>500</x>
+        <y>260</y>
+        <label>E</label>
+        <tokens>0</tokens>
+        <isStatic>false</isStatic>
+    </place>
+    <place>
+        <id>149</id>
+        <x>500</x>
         <y>340</y>
+        <label>F</label>
+        <tokens>0</tokens>
+        <isStatic>false</isStatic>
+    </place>
+    <place>
+        <id>150</id>
+        <x>500</x>
+        <y>420</y>
+        <label>G</label>
+        <tokens>0</tokens>
+        <isStatic>false</isStatic>
+    </place>
+    <place>
+        <id>151</id>
+        <x>500</x>
+        <y>500</y>
+        <label>I</label>
+        <tokens>0</tokens>
+        <isStatic>false</isStatic>
+    </place>
+    <place>
+        <id>177</id>
+        <x>500</x>
+        <y>580</y>
+        <label>J</label>
+        <tokens>0</tokens>
+        <isStatic>false</isStatic>
+    </place>
+    <place>
+        <id>182</id>
+        <x>500</x>
+        <y>660</y>
+        <label>K</label>
+        <tokens>0</tokens>
+        <isStatic>false</isStatic>
+    </place>
+    <place>
+        <id>188</id>
+        <x>740</x>
+        <y>260</y>
         <label>M</label>
+        <tokens>0</tokens>
+        <isStatic>false</isStatic>
+    </place>
+    <place>
+        <id>189</id>
+        <x>740</x>
+        <y>340</y>
+        <label>N</label>
+        <tokens>0</tokens>
+        <isStatic>false</isStatic>
+    </place>
+    <place>
+        <id>190</id>
+        <x>740</x>
+        <y>420</y>
+        <label>O</label>
+        <tokens>0</tokens>
+        <isStatic>false</isStatic>
+    </place>
+    <place>
+        <id>191</id>
+        <x>740</x>
+        <y>500</y>
+        <label>P</label>
+        <tokens>0</tokens>
+        <isStatic>false</isStatic>
+    </place>
+    <place>
+        <id>192</id>
+        <x>740</x>
+        <y>580</y>
+        <label>Q</label>
+        <tokens>0</tokens>
+        <isStatic>false</isStatic>
+    </place>
+    <place>
+        <id>193</id>
+        <x>740</x>
+        <y>660</y>
+        <label>R</label>
         <tokens>0</tokens>
         <isStatic>false</isStatic>
     </place>
     <!-- ========== TRANSITIONS ========== -->
     <transition>
         <id>2</id>
-        <x>300</x>
+        <x>140</x>
         <y>180</y>
         <label>Poistenie nehnuteľnosti</label>
         <roleRef>
@@ -300,10 +286,13 @@
                 <perform>true</perform>
             </logic>
         </roleRef>
+        <transactionRef>
+            <id>1</id>
+        </transactionRef>
     </transition>
     <transition>
         <id>3</id>
-        <x>300</x>
+        <x>140</x>
         <y>260</y>
         <label>Poistenie nehnuteľnosti a domácnosti</label>
         <roleRef>
@@ -312,11 +301,14 @@
                 <perform>true</perform>
             </logic>
         </roleRef>
+        <transactionRef>
+            <id>1</id>
+        </transactionRef>
     </transition>
     <transition>
         <id>4</id>
-        <x>300</x>
-        <y>420</y>
+        <x>140</x>
+        <y>340</y>
         <label>Poistenie domácnosti</label>
         <roleRef>
             <id>1</id>
@@ -324,122 +316,14 @@
                 <perform>true</perform>
             </logic>
         </roleRef>
-    </transition>
-    <transition>
-        <id>14</id>
-        <x>620</x>
-        <y>180</y>
-        <label>Údaje o nehnuteľnosti</label>
-        <roleRef>
+        <transactionRef>
             <id>1</id>
-            <logic>
-                <perform>true</perform>
-            </logic>
-        </roleRef>
-        <dataRef>
-            <id>5</id>
-            <logic>
-                <behavior>editable</behavior>
-                <action>
-                    target: f.6,
-                    current: f.this,
-                    trans: t.this;
-                    make target,visible on trans when { current.value != "Bungalov" }
-                </action>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>6</id>
-            <logic>
-                <behavior>editable</behavior>
-
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>7</id>
-            <logic>
-                <behavior>editable</behavior>
-
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>8</id>
-            <logic>
-                <behavior>editable</behavior>
-
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>9</id>
-            <logic>
-                <behavior>editable</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>10</id>
-            <logic>
-                <behavior>editable</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>11</id>
-            <logic>
-                <behavior>editable</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>12</id>
-            <logic>
-                <behavior>editable</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>13</id>
-            <logic>
-                <behavior>editable</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>14</id>
-            <logic>
-                <behavior>editable</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>15</id>
-            <logic>
-                <behavior>editable</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>16</id>
-            <logic>
-                <behavior>editable</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>17</id>
-            <logic>
-                <behavior>editable</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>18</id>
-            <logic>
-                <behavior>editable</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>19</id>
-            <logic>
-                <behavior>editable</behavior>
-            </logic>
-        </dataRef>
+        </transactionRef>
     </transition>
     <transition>
         <id>15</id>
-        <x>620</x>
-        <y>500</y>
+        <x>380</x>
+        <y>340</y>
         <label>Údaje o domácnosti</label>
         <roleRef>
             <id>1</id>
@@ -447,293 +331,13 @@
                 <perform>true</perform>
             </logic>
         </roleRef>
-        <dataRef>
-            <id>20</id>
-            <logic>
-                <behavior>editable</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>21</id>
-            <logic>
-                <behavior>editable</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>22</id>
-            <logic>
-                <behavior>editable</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>23</id>
-            <logic>
-                <behavior>editable</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>24</id>
-            <logic>
-                <behavior>editable</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>25</id>
-            <logic>
-                <behavior>editable</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>26</id>
-            <logic>
-                <behavior>editable</behavior>
-            </logic>
-        </dataRef>
-    </transition>
-    <transition>
-        <id>27</id>
-        <x>980</x>
-        <y>260</y>
-        <label>Výpočet poistného nehnuteľnosti a domácnosti</label>
-        <roleRef>
-            <id>2</id>
-            <logic>
-                <perform>true</perform>
-            </logic>
-        </roleRef>
-        <dataRef>
+        <transactionRef>
             <id>1</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>2</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>3</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>4</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>5</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>6</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>7</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>8</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>9</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>10</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>11</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>12</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>13</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>14</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>15</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>16</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>17</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>18</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>19</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>20</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>21</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>22</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>23</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>24</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>25</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>26</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>27</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>28</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>29</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>30</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>31</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>32</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--<dataRef>-->
-            <!--<id>33</id>-->
-            <!--<logic>-->
-                <!--<behavior>visible</behavior>-->
-            <!--</logic>-->
-        <!--</dataRef>-->
-        <!--<dataRef>-->
-            <!--<id>34</id>-->
-            <!--<logic>-->
-                <!--<behavior>visible</behavior>-->
-            <!--</logic>-->
-        <!--</dataRef>-->
-        <!--<dataRef>-->
-            <!--<id>35</id>-->
-            <!--<logic>-->
-                <!--<behavior>visible</behavior>-->
-            <!--</logic>-->
-        <!--</dataRef>-->
-        <!--<dataRef>-->
-            <!--<id>36</id>-->
-            <!--<logic>-->
-                <!--<behavior>visible</behavior>-->
-            <!--</logic>-->
-        <!--</dataRef>-->
-        <!--<dataRef>-->
-            <!--<id>37</id>-->
-            <!--<logic>-->
-                <!--<behavior>visible</behavior>-->
-            <!--</logic>-->
-        <!--</dataRef>-->
-        <dataRef>
-            <id>38</id>
-            <logic>
-                <behavior>editable</behavior>
-                <behavior>required</behavior>
-            </logic>
-        </dataRef>
+        </transactionRef>
     </transition>
     <transition>
         <id>30</id>
-        <x>980</x>
+        <x>860</x>
         <y>180</y>
         <label>Výpočet poistného nehnuteľnoosti</label>
         <roleRef>
@@ -742,481 +346,14 @@
                 <perform>true</perform>
             </logic>
         </roleRef>
-        <dataRef>
-            <id>1</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
+        <transactionRef>
             <id>2</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>3</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>4</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>5</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>6</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>7</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>8</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>9</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>10</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>11</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>12</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>13</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>14</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>15</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>16</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>17</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>18</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>19</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>20</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>21</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>22</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>23</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>24</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>25</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>26</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>27</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>28</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>29</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>30</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>31</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>32</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--<dataRef>-->
-            <!--<id>33</id>-->
-            <!--<logic>-->
-                <!--<behavior>visible</behavior>-->
-            <!--</logic>-->
-        <!--</dataRef>-->
-        <!--<dataRef>-->
-            <!--<id>34</id>-->
-            <!--<logic>-->
-                <!--<behavior>visible</behavior>-->
-            <!--</logic>-->
-        <!--</dataRef>-->
-        <!--<dataRef>-->
-            <!--<id>35</id>-->
-            <!--<logic>-->
-                <!--<behavior>visible</behavior>-->
-            <!--</logic>-->
-        <!--</dataRef>-->
-        <!--<dataRef>-->
-            <!--<id>36</id>-->
-            <!--<logic>-->
-                <!--<behavior>visible</behavior>-->
-            <!--</logic>-->
-        <!--</dataRef>-->
-        <!--<dataRef>-->
-            <!--<id>37</id>-->
-            <!--<logic>-->
-                <!--<behavior>visible</behavior>-->
-            <!--</logic>-->
-        <!--</dataRef>-->
-        <dataRef>
-            <id>38</id>
-            <logic>
-                <behavior>editable</behavior>
-                <behavior>required</behavior>
-            </logic>
-        </dataRef>
-    </transition>
-    <transition>
-        <id>33</id>
-        <x>980</x>
-        <y>340</y>
-        <label>Výpočet poistného domácnosti</label>
-        <roleRef>
-            <id>2</id>
-            <logic>
-                <perform>true</perform>
-            </logic>
-        </roleRef>
-        <dataRef>
-            <id>1</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>2</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>3</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>4</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>5</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>6</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>7</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>8</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>9</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>10</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>11</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>12</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>13</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>14</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>15</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>16</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>17</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>18</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>19</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>20</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>21</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>22</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>23</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>24</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>25</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>26</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>27</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>28</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>29</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>30</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>31</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>32</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--<dataRef>-->
-            <!--<id>33</id>-->
-            <!--<logic>-->
-                <!--<behavior>visible</behavior>-->
-            <!--</logic>-->
-        <!--</dataRef>-->
-        <!--<dataRef>-->
-            <!--<id>34</id>-->
-            <!--<logic>-->
-                <!--<behavior>visible</behavior>-->
-            <!--</logic>-->
-        <!--</dataRef>-->
-        <!--<dataRef>-->
-            <!--<id>35</id>-->
-            <!--<logic>-->
-                <!--<behavior>visible</behavior>-->
-            <!--</logic>-->
-        <!--</dataRef>-->
-        <!--<dataRef>-->
-            <!--<id>36</id>-->
-            <!--<logic>-->
-                <!--<behavior>visible</behavior>-->
-            <!--</logic>-->
-        <!--</dataRef>-->
-        <!--<dataRef>-->
-            <!--<id>37</id>-->
-            <!--<logic>-->
-                <!--<behavior>visible</behavior>-->
-            <!--</logic>-->
-        <!--</dataRef>-->
-        <dataRef>
-            <id>38</id>
-            <logic>
-                <behavior>editable</behavior>
-                <behavior>required</behavior>
-            </logic>
-        </dataRef>
+        </transactionRef>
     </transition>
     <transition>
         <id>36</id>
-        <x>1260</x>
-        <y>260</y>
+        <x>1140</x>
+        <y>180</y>
         <label>Úhrada poistného</label>
         <roleRef>
             <id>1</id>
@@ -1224,11 +361,14 @@
                 <perform>true</perform>
             </logic>
         </roleRef>
+        <transactionRef>
+            <id>3</id>
+        </transactionRef>
     </transition>
     <transition>
         <id>49</id>
-        <x>1260</x>
-        <y>340</y>
+        <x>1020</x>
+        <y>300</y>
         <label>Vypršanie ponuky</label>
         <roleRef>
             <id>2</id>
@@ -1236,10 +376,13 @@
                 <perform>true</perform>
             </logic>
         </roleRef>
+        <transactionRef>
+            <id>3</id>
+        </transactionRef>
     </transition>
     <transition>
         <id>96</id>
-        <x>620</x>
+        <x>380</x>
         <y>260</y>
         <label>Základné údaje a údaje o rezidentoch</label>
         <roleRef>
@@ -1248,6 +391,24 @@
                 <perform>true</perform>
             </logic>
         </roleRef>
+        <transactionRef>
+            <id>1</id>
+        </transactionRef>
+    </transition>
+    <transition>
+        <id>154</id>
+        <x>620</x>
+        <y>260</y>
+        <label>BASIC INFO nehnuteľnosť</label>
+        <roleRef>
+            <id>1</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <transactionRef>
+            <id>1</id>
+        </transactionRef>
         <dataRef>
             <id>1</id>
             <logic>
@@ -1272,110 +433,173 @@
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
+    </transition>
+    <transition>
+        <id>155</id>
+        <x>620</x>
+        <y>340</y>
+        <label>Nehnuteľnosť</label>
+        <roleRef>
+            <id>1</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <transactionRef>
+            <id>1</id>
+        </transactionRef>
         <dataRef>
-            <id>27</id>
+            <id>5</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
         <dataRef>
-            <id>28</id>
+            <id>6</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
         <dataRef>
-            <id>29</id>
+            <id>7</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
         <dataRef>
-            <id>30</id>
-            <logic>
-                <behavior>editable</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>31</id>
-            <logic>
-                <behavior>editable</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>32</id>
+            <id>8</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
     </transition>
-    <!--<transition>-->
-        <!--<id>97</id>-->
-        <!--<x>620</x>-->
-        <!--<y>340</y>-->
-        <!--<label>Automatické doplnenie osobných údajov</label>-->
-        <!--<roleRef>-->
-            <!--<id>1</id>-->
-            <!--<logic>-->
-                <!--<perform>true</perform>-->
-            <!--</logic>-->
-        <!--</roleRef>-->
-        <!--<dataRef>-->
-            <!--<id>27</id>-->
-            <!--<logic>-->
-                <!--<behavior>editable</behavior>-->
-                <!--<behavior>required</behavior>-->
-            <!--</logic>-->
-        <!--</dataRef>-->
-    <!--</transition>-->
-    <!--<transition>-->
-        <!--<id>98</id>-->
-        <!--<x>620</x>-->
-        <!--<y>420</y>-->
-        <!--<label>Manuálne doplnenie osobných údajov</label>-->
-        <!--<roleRef>-->
-            <!--<id>1</id>-->
-            <!--<logic>-->
-                <!--<perform>true</perform>-->
-            <!--</logic>-->
-        <!--</roleRef>-->
-        <!--<dataRef>-->
-            <!--<id>33</id>-->
-            <!--<logic>-->
-                <!--<behavior>editable</behavior>-->
-                <!--<behavior>required</behavior>-->
-            <!--</logic>-->
-        <!--</dataRef>-->
-        <!--<dataRef>-->
-            <!--<id>34</id>-->
-            <!--<logic>-->
-                <!--<behavior>editable</behavior>-->
-                <!--<behavior>required</behavior>-->
-            <!--</logic>-->
-        <!--</dataRef>-->
-        <!--<dataRef>-->
-            <!--<id>35</id>-->
-            <!--<logic>-->
-                <!--<behavior>editable</behavior>-->
-                <!--<behavior>required</behavior>-->
-            <!--</logic>-->
-        <!--</dataRef>-->
-        <!--<dataRef>-->
-            <!--<id>36</id>-->
-            <!--<logic>-->
-                <!--<behavior>editable</behavior>-->
-                <!--<behavior>required</behavior>-->
-            <!--</logic>-->
-        <!--</dataRef>-->
-        <!--<dataRef>-->
-            <!--<id>37</id>-->
-            <!--<logic>-->
-                <!--<behavior>editable</behavior>-->
-                <!--<behavior>required</behavior>-->
-            <!--</logic>-->
-        <!--</dataRef>-->
-    <!--</transition>-->
-    <!-- ========== TRANSITIONS ========== -->
+    <transition>
+        <id>156</id>
+        <x>620</x>
+        <y>420</y>
+        <label>Poistenie vedľajších stavieb</label>
+        <roleRef>
+            <id>1</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <transactionRef>
+            <id>1</id>
+        </transactionRef>
+        <dataRef>
+            <id>9</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>10</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>11</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>12</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+    </transition>
+    <transition>
+        <id>157</id>
+        <x>620</x>
+        <y>500</y>
+        <label>Doplnkové poistenie k nehnuteľnosti</label>
+        <roleRef>
+            <id>1</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <transactionRef>
+            <id>1</id>
+        </transactionRef>
+        <dataRef>
+            <id>13</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>14</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+    </transition>
+    <transition>
+        <id>178</id>
+        <x>620</x>
+        <y>580</y>
+        <label>Poistenie zodpovednosti - nehnuteľnosť</label>
+        <roleRef>
+            <id>1</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <transactionRef>
+            <id>1</id>
+        </transactionRef>
+        <dataRef>
+            <id>15</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+    </transition>
+    <transition>
+        <id>183</id>
+        <x>620</x>
+        <y>660</y>
+        <label>Ostatné</label>
+        <roleRef>
+            <id>1</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <transactionRef>
+            <id>1</id>
+        </transactionRef>
+        <dataRef>
+            <id>16</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>17</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>18</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>19</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+    </transition>
+    <!-- ========== ARCS ========== -->
     <arc>
         <id>7</id>
         <type>regular</type>
@@ -1384,24 +608,10 @@
         <multiplicity>1</multiplicity>
     </arc>
     <arc>
-        <id>8</id>
-        <type>regular</type>
-        <sourceId>2</sourceId>
-        <destinationId>5</destinationId>
-        <multiplicity>1</multiplicity>
-    </arc>
-    <arc>
         <id>9</id>
         <type>regular</type>
         <sourceId>1</sourceId>
         <destinationId>3</destinationId>
-        <multiplicity>1</multiplicity>
-    </arc>
-    <arc>
-        <id>10</id>
-        <type>regular</type>
-        <sourceId>3</sourceId>
-        <destinationId>5</destinationId>
         <multiplicity>1</multiplicity>
     </arc>
     <arc>
@@ -1426,13 +636,6 @@
         <multiplicity>1</multiplicity>
     </arc>
     <arc>
-        <id>17</id>
-        <type>regular</type>
-        <sourceId>5</sourceId>
-        <destinationId>14</destinationId>
-        <multiplicity>1</multiplicity>
-    </arc>
-    <arc>
         <id>18</id>
         <type>regular</type>
         <sourceId>6</sourceId>
@@ -1440,93 +643,9 @@
         <multiplicity>1</multiplicity>
     </arc>
     <arc>
-        <id>20</id>
-        <type>regular</type>
-        <sourceId>2</sourceId>
-        <destinationId>19</destinationId>
-        <multiplicity>1</multiplicity>
-    </arc>
-    <arc>
-        <id>22</id>
-        <type>regular</type>
-        <sourceId>4</sourceId>
-        <destinationId>21</destinationId>
-        <multiplicity>1</multiplicity>
-    </arc>
-    <arc>
-        <id>25</id>
-        <type>regular</type>
-        <sourceId>14</sourceId>
-        <destinationId>23</destinationId>
-        <multiplicity>1</multiplicity>
-    </arc>
-    <arc>
-        <id>26</id>
-        <type>regular</type>
-        <sourceId>15</sourceId>
-        <destinationId>24</destinationId>
-        <multiplicity>1</multiplicity>
-    </arc>
-    <arc>
-        <id>28</id>
-        <type>regular</type>
-        <sourceId>23</sourceId>
-        <destinationId>27</destinationId>
-        <multiplicity>1</multiplicity>
-    </arc>
-    <arc>
-        <id>29</id>
-        <type>regular</type>
-        <sourceId>24</sourceId>
-        <destinationId>27</destinationId>
-        <multiplicity>1</multiplicity>
-    </arc>
-    <arc>
-        <id>31</id>
-        <type>regular</type>
-        <sourceId>23</sourceId>
-        <destinationId>30</destinationId>
-        <multiplicity>1</multiplicity>
-    </arc>
-    <arc>
-        <id>32</id>
-        <type>regular</type>
-        <sourceId>19</sourceId>
-        <destinationId>30</destinationId>
-        <multiplicity>1</multiplicity>
-    </arc>
-    <arc>
-        <id>34</id>
-        <type>regular</type>
-        <sourceId>24</sourceId>
-        <destinationId>33</destinationId>
-        <multiplicity>1</multiplicity>
-    </arc>
-    <arc>
-        <id>35</id>
-        <type>regular</type>
-        <sourceId>21</sourceId>
-        <destinationId>33</destinationId>
-        <multiplicity>1</multiplicity>
-    </arc>
-    <arc>
         <id>38</id>
         <type>regular</type>
         <sourceId>30</sourceId>
-        <destinationId>37</destinationId>
-        <multiplicity>1</multiplicity>
-    </arc>
-    <arc>
-        <id>39</id>
-        <type>regular</type>
-        <sourceId>27</sourceId>
-        <destinationId>37</destinationId>
-        <multiplicity>1</multiplicity>
-    </arc>
-    <arc>
-        <id>40</id>
-        <type>regular</type>
-        <sourceId>33</sourceId>
         <destinationId>37</destinationId>
         <multiplicity>1</multiplicity>
     </arc>
@@ -1559,34 +678,6 @@
         <multiplicity>1</multiplicity>
     </arc>
     <arc>
-        <id>56</id>
-        <type>regular</type>
-        <sourceId>53</sourceId>
-        <destinationId>30</destinationId>
-        <multiplicity>1</multiplicity>
-    </arc>
-    <arc>
-        <id>57</id>
-        <type>regular</type>
-        <sourceId>53</sourceId>
-        <destinationId>27</destinationId>
-        <multiplicity>1</multiplicity>
-    </arc>
-    <arc>
-        <id>58</id>
-        <type>regular</type>
-        <sourceId>53</sourceId>
-        <destinationId>33</destinationId>
-        <multiplicity>1</multiplicity>
-    </arc>
-    <arc>
-        <id>60</id>
-        <type>regular</type>
-        <sourceId>2</sourceId>
-        <destinationId>59</destinationId>
-        <multiplicity>1</multiplicity>
-    </arc>
-    <arc>
         <id>61</id>
         <type>regular</type>
         <sourceId>3</sourceId>
@@ -1601,27 +692,6 @@
         <multiplicity>1</multiplicity>
     </arc>
     <arc>
-        <id>101</id>
-        <type>regular</type>
-        <sourceId>2</sourceId>
-        <destinationId>99</destinationId>
-        <multiplicity>1</multiplicity>
-    </arc>
-    <arc>
-        <id>102</id>
-        <type>regular</type>
-        <sourceId>3</sourceId>
-        <destinationId>99</destinationId>
-        <multiplicity>1</multiplicity>
-    </arc>
-    <arc>
-        <id>103</id>
-        <type>regular</type>
-        <sourceId>4</sourceId>
-        <destinationId>99</destinationId>
-        <multiplicity>1</multiplicity>
-    </arc>
-    <arc>
         <id>104</id>
         <type>regular</type>
         <sourceId>59</sourceId>
@@ -1629,38 +699,331 @@
         <multiplicity>1</multiplicity>
     </arc>
     <arc>
-        <id>105</id>
+        <id>160</id>
         <type>regular</type>
-        <sourceId>96</sourceId>
-        <destinationId>53</destinationId>
+        <sourceId>148</sourceId>
+        <destinationId>154</destinationId>
         <multiplicity>1</multiplicity>
     </arc>
-    <!--<arc>-->
-        <!--<id>106</id>-->
-        <!--<type>regular</type>-->
-        <!--<sourceId>99</sourceId>-->
-        <!--<destinationId>97</destinationId>-->
-        <!--<multiplicity>1</multiplicity>-->
-    <!--</arc>-->
-    <!--<arc>-->
-        <!--<id>107</id>-->
-        <!--<type>regular</type>-->
-        <!--<sourceId>99</sourceId>-->
-        <!--<destinationId>98</destinationId>-->
-        <!--<multiplicity>1</multiplicity>-->
-    <!--</arc>-->
-    <!--<arc>-->
-        <!--<id>108</id>-->
-        <!--<type>regular</type>-->
-        <!--<sourceId>98</sourceId>-->
-        <!--<destinationId>53</destinationId>-->
-        <!--<multiplicity>1</multiplicity>-->
-    <!--</arc>-->
-    <!--<arc>-->
-        <!--<id>109</id>-->
-        <!--<type>regular</type>-->
-        <!--<sourceId>97</sourceId>-->
-        <!--<destinationId>53</destinationId>-->
-        <!--<multiplicity>1</multiplicity>-->
-    <!--</arc>-->
+    <arc>
+        <id>161</id>
+        <type>regular</type>
+        <sourceId>154</sourceId>
+        <destinationId>148</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>162</id>
+        <type>regular</type>
+        <sourceId>149</sourceId>
+        <destinationId>155</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>163</id>
+        <type>regular</type>
+        <sourceId>155</sourceId>
+        <destinationId>149</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>164</id>
+        <type>regular</type>
+        <sourceId>150</sourceId>
+        <destinationId>156</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>165</id>
+        <type>regular</type>
+        <sourceId>156</sourceId>
+        <destinationId>150</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>166</id>
+        <type>regular</type>
+        <sourceId>151</sourceId>
+        <destinationId>157</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>167</id>
+        <type>regular</type>
+        <sourceId>157</sourceId>
+        <destinationId>151</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>173</id>
+        <type>regular</type>
+        <sourceId>2</sourceId>
+        <destinationId>148</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>174</id>
+        <type>regular</type>
+        <sourceId>2</sourceId>
+        <destinationId>149</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>175</id>
+        <type>regular</type>
+        <sourceId>2</sourceId>
+        <destinationId>150</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>176</id>
+        <type>regular</type>
+        <sourceId>2</sourceId>
+        <destinationId>151</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>179</id>
+        <type>regular</type>
+        <sourceId>2</sourceId>
+        <destinationId>177</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>180</id>
+        <type>regular</type>
+        <sourceId>177</sourceId>
+        <destinationId>178</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>181</id>
+        <type>regular</type>
+        <sourceId>178</sourceId>
+        <destinationId>177</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>184</id>
+        <type>regular</type>
+        <sourceId>2</sourceId>
+        <destinationId>182</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>185</id>
+        <type>regular</type>
+        <sourceId>182</sourceId>
+        <destinationId>183</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>186</id>
+        <type>regular</type>
+        <sourceId>183</sourceId>
+        <destinationId>182</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>195</id>
+        <type>regular</type>
+        <sourceId>154</sourceId>
+        <destinationId>188</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>196</id>
+        <type>regular</type>
+        <sourceId>155</sourceId>
+        <destinationId>189</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>197</id>
+        <type>regular</type>
+        <sourceId>156</sourceId>
+        <destinationId>190</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>198</id>
+        <type>regular</type>
+        <sourceId>157</sourceId>
+        <destinationId>191</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>199</id>
+        <type>regular</type>
+        <sourceId>178</sourceId>
+        <destinationId>192</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>200</id>
+        <type>regular</type>
+        <sourceId>183</sourceId>
+        <destinationId>193</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>246</id>
+        <type>regular</type>
+        <sourceId>188</sourceId>
+        <destinationId>30</destinationId>
+        <multiplicity>1</multiplicity>
+        <breakPoint>
+            <x>860</x>
+            <y>260</y>
+        </breakPoint>
+    </arc>
+    <arc>
+        <id>248</id>
+        <type>regular</type>
+        <sourceId>148</sourceId>
+        <destinationId>30</destinationId>
+        <multiplicity>1</multiplicity>
+        <breakPoint>
+            <x>500</x>
+            <y>20</y>
+        </breakPoint>
+        <breakPoint>
+            <x>860</x>
+            <y>20</y>
+        </breakPoint>
+    </arc>
+    <arc>
+        <id>249</id>
+        <type>regular</type>
+        <sourceId>149</sourceId>
+        <destinationId>30</destinationId>
+        <multiplicity>1</multiplicity>
+        <breakPoint>
+            <x>500</x>
+            <y>20</y>
+        </breakPoint>
+        <breakPoint>
+            <x>860</x>
+            <y>20</y>
+        </breakPoint>
+    </arc>
+    <arc>
+        <id>250</id>
+        <type>regular</type>
+        <sourceId>189</sourceId>
+        <destinationId>30</destinationId>
+        <multiplicity>1</multiplicity>
+        <breakPoint>
+            <x>860</x>
+            <y>340</y>
+        </breakPoint>
+    </arc>
+    <arc>
+        <id>251</id>
+        <type>regular</type>
+        <sourceId>190</sourceId>
+        <destinationId>30</destinationId>
+        <multiplicity>1</multiplicity>
+        <breakPoint>
+            <x>860</x>
+            <y>420</y>
+        </breakPoint>
+    </arc>
+    <arc>
+        <id>252</id>
+        <type>regular</type>
+        <sourceId>191</sourceId>
+        <destinationId>30</destinationId>
+        <multiplicity>1</multiplicity>
+        <breakPoint>
+            <x>860</x>
+            <y>500</y>
+        </breakPoint>
+    </arc>
+    <arc>
+        <id>253</id>
+        <type>regular</type>
+        <sourceId>192</sourceId>
+        <destinationId>30</destinationId>
+        <multiplicity>1</multiplicity>
+        <breakPoint>
+            <x>860</x>
+            <y>580</y>
+        </breakPoint>
+    </arc>
+    <arc>
+        <id>254</id>
+        <type>regular</type>
+        <sourceId>193</sourceId>
+        <destinationId>30</destinationId>
+        <multiplicity>1</multiplicity>
+        <breakPoint>
+            <x>860</x>
+            <y>660</y>
+        </breakPoint>
+    </arc>
+    <arc>
+        <id>255</id>
+        <type>regular</type>
+        <sourceId>150</sourceId>
+        <destinationId>30</destinationId>
+        <multiplicity>1</multiplicity>
+        <breakPoint>
+            <x>500</x>
+            <y>20</y>
+        </breakPoint>
+        <breakPoint>
+            <x>860</x>
+            <y>20</y>
+        </breakPoint>
+    </arc>
+    <arc>
+        <id>256</id>
+        <type>regular</type>
+        <sourceId>151</sourceId>
+        <destinationId>30</destinationId>
+        <multiplicity>1</multiplicity>
+        <breakPoint>
+            <x>500</x>
+            <y>20</y>
+        </breakPoint>
+        <breakPoint>
+            <x>860</x>
+            <y>20</y>
+        </breakPoint>
+    </arc>
+    <arc>
+        <id>257</id>
+        <type>regular</type>
+        <sourceId>177</sourceId>
+        <destinationId>30</destinationId>
+        <multiplicity>1</multiplicity>
+        <breakPoint>
+            <x>500</x>
+            <y>20</y>
+        </breakPoint>
+        <breakPoint>
+            <x>860</x>
+            <y>20</y>
+        </breakPoint>
+    </arc>
+    <arc>
+        <id>258</id>
+        <type>regular</type>
+        <sourceId>182</sourceId>
+        <destinationId>30</destinationId>
+        <multiplicity>1</multiplicity>
+        <breakPoint>
+            <x>500</x>
+            <y>260</y>
+        </breakPoint>
+        <breakPoint>
+            <x>500</x>
+            <y>20</y>
+        </breakPoint>
+        <breakPoint>
+            <x>860</x>
+            <y>20</y>
+        </breakPoint>
+    </arc>
 </document>
