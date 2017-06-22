@@ -167,9 +167,8 @@ public class TaskController {
     }
 
     @RequestMapping(value = "/{id}/data", method = RequestMethod.POST)
-    public MessageResource saveData(@PathVariable("id") String taskId, @RequestBody ObjectNode dataBody) {
-        taskService.setDataFieldsValues(taskId, dataBody);
-        return MessageResource.successMessage("Data for task " + taskId + " saved");
+    public ObjectNode saveData(@PathVariable("id") String taskId, @RequestBody ObjectNode dataBody) {
+        return taskService.setDataFieldsValues(taskId, dataBody);
     }
 
     @RequestMapping(value = "/{id}/file/{field}", method = RequestMethod.POST)

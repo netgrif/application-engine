@@ -6,9 +6,11 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document
 public abstract class PetriNetObject {
+
     @Id
-    private ObjectId _id;
-    private Integer id;
+    protected ObjectId _id;
+
+    protected Integer id;
 
     public String getStringId() {
         return _id.toString();
