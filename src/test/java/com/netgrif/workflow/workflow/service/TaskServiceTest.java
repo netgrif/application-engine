@@ -58,7 +58,7 @@ public class TaskServiceTest {
 
         importer.importPetriNet(new File("src/test/resources/prikladFM.xml"), "fm net", "fm");
         PetriNet net = petriNetRepository.findAll().get(0);
-        workflowService.createCase(net.getStringId(), "Storage Unit", "color");
+        workflowService.createCase(net.getStringId(), "Storage Unit", "color", 1L);
     }
 
 //    @Test
