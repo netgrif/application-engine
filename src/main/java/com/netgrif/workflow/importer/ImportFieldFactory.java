@@ -13,28 +13,43 @@ public final class ImportFieldFactory {
     }
 
     public Field getField(ImportData data) throws IllegalArgumentException {
-        switch (FieldType.fromString(data.getType())) {
+        Field field;
+        FieldType type = FieldType.fromString(data.getType());
+        switch (type) {
             case TEXT:
-                return new TextField(data.getValues());
+                field = new TextField(data.getValues());
+                break;
             case BOOLEAN:
-                return new BooleanField();
+                field = new BooleanField();
+                break;
             case DATE:
-                return new DateField();
+                field = new DateField();
+                break;
             case FILE:
-                return new FileField();
+                field = new FileField();
+                break;
             case ENUMERATION:
-                return new EnumerationField(data.getValues());
+                field = new EnumerationField(data.getValues());
+                break;
             case MULTICHOICE:
-                return new MultichoiceField(data.getValues());
+                field = new MultichoiceField(data.getValues());
+                break;
             case NUMBER:
-                return new NumberField();
+                field = new NumberField();
+                break;
             case USER:
-                return buildUserField(data);
+                field = buildUserField(data);
+                break;
             case TABULAR:
-                return buildTabularField(data);
+                field = buildTabularField(data);
+                break;
             default:
                 throw new IllegalArgumentException(data.getType() + " is not a valid Field type");
         }
+        field.setName(data.getTitle());
+        field.setType(type);
+
+        return field;
     }
 
     private TabularField buildTabularField(ImportData data) {
