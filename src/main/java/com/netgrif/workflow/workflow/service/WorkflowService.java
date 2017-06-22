@@ -34,8 +34,8 @@ public class WorkflowService implements IWorkflowService {
     private ITaskService taskService;
 
     @Override
-    public void saveCase(Case useCase) {
-        repository.save(useCase);
+    public Case saveCase(Case useCase) {
+        return repository.save(useCase);
     }
 
     @Override
@@ -62,7 +62,7 @@ public class WorkflowService implements IWorkflowService {
     }
 
     @Override
-    public void createCase(String netId, String title, String color, Long authorId) {
+    public Case createCase(String netId, String title, String color, Long authorId) {
         PetriNet petriNet = petriNetService.loadPetriNet(netId);
         Case useCase = new Case(title, petriNet, petriNet.getActivePlaces());
         useCase.setColor(color);
@@ -70,8 +70,9 @@ public class WorkflowService implements IWorkflowService {
         petriNet.getDataSet().forEach((key, field) -> dataValues.put(key,new DataField()));
         useCase.setDataSet(dataValues);
         useCase.setAuthor(authorId);
-        saveCase(useCase);
+        useCase = saveCase(useCase);
         taskService.createTasks(useCase);
+        return useCase;
     }
 
     @Override
