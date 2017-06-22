@@ -16,7 +16,7 @@ public class Transition extends Node {
 
     @Field("dataSet")
     @Getter @Setter
-    private Map<String, DataFieldLogic> dataSet;
+    private LinkedHashMap<String, DataFieldLogic> dataSet;
 
     @Field("roles")
     @Getter @Setter
@@ -31,7 +31,7 @@ public class Transition extends Node {
 
     public Transition() {
         super();
-        dataSet = new HashMap<>();
+        dataSet = new LinkedHashMap<>();
         roles = new HashMap<>();
         triggers = new LinkedList<>();
     }
