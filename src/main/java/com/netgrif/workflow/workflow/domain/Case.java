@@ -39,12 +39,12 @@ public class Case {
     private String color;
 
     @Getter @Setter
-    private Map<String, Object> dataSetValues;
+    private Map<String, DataField> dataSet;
 
     public Case() {
         _id = new ObjectId();
         activePlaces = new HashMap<>();
-        dataSetValues = new HashMap<>();
+        dataSet = new HashMap<>();
     }
 
     public Case(String title) {
@@ -86,6 +86,10 @@ public class Case {
         if (activePlaces.containsKey(id))
             newTokens += activePlaces.get(id);
         activePlaces.put(id, newTokens);
+    }
+
+    public boolean hasFieldBehavior(String field, String transition){
+        return this.dataSet.get(field).hasDefinedBehavior(transition);
     }
 
     public void updateActivePlaces() {
