@@ -14,7 +14,6 @@ import com.netgrif.workflow.petrinet.domain.dataset.logic.FieldActionsRunner;
 import com.netgrif.workflow.petrinet.domain.roles.RolePermission;
 import com.netgrif.workflow.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.workflow.workflow.domain.Case;
-import com.netgrif.workflow.workflow.domain.DataField;
 import com.netgrif.workflow.workflow.domain.Task;
 import com.netgrif.workflow.workflow.domain.repositories.CaseRepository;
 import com.netgrif.workflow.workflow.domain.repositories.TaskRepository;
@@ -39,6 +38,7 @@ import java.util.*;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
+import java.util.stream.LongStream;
 import java.util.stream.Stream;
 
 @Service
@@ -200,6 +200,8 @@ public class TaskService implements ITaskService {
 
             dataSetFields.add(field);
         });
+        LongStream.range(0L, dataSetFields.size())
+                .forEach(index -> dataSetFields.get((int) index).setOrder(index));
 
         return dataSetFields;
     }
