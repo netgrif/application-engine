@@ -18,4 +18,6 @@ public class ImportTransition {
     private Integer x;
 
     private ImportTrigger[] trigger;
+
+    private TransactionRef transactionRef;
 }

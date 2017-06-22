@@ -13,10 +13,11 @@ public abstract class Field<T> {
     protected ObjectId _id;
     private String name;
     private String description;
-    @Transient
     protected FieldType type;
     @Transient
-    private ObjectNode logic;
+    private ObjectNode behavior;
+    @Transient
+    private T value;
 
     public Field(){
         _id = new ObjectId();
@@ -58,13 +59,32 @@ public abstract class Field<T> {
         this.type = type;
     }
 
-    public ObjectNode getLogic() {
-        return logic;
+    ObjectNode getBehavior() {
+        return behavior
     }
 
-    public void setLogic(ObjectNode logic) {
-        this.logic = logic;
+    void setBehavior(ObjectNode behavior) {
+        this.behavior = behavior
     }
 
-    public void setValue(T value){}
+    T getValue() {
+        return value
+    }
+
+    void setValue(T value) {
+        this.value = value
+    }
+
+    //operators overloading
+    T plus(final Field field){
+        return this.value + field.value
+    }
+
+    T minus(final Field field){
+        return this.value - field.value
+    }
+
+    T multiply(final Field field) {
+        return this.value * field.value
+    }
 }

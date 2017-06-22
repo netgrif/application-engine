@@ -1,7 +1,7 @@
 package com.netgrif.workflow.petrinet.domain.roles;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.netgrif.workflow.petrinet.domain.dataset.logic.LogicNotApplicableException;
+import com.netgrif.workflow.petrinet.domain.roles.LogicNotApplicableException;
 
 import java.util.function.Function;
 

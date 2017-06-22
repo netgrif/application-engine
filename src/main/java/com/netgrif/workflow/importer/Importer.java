@@ -1,13 +1,10 @@
 package com.netgrif.workflow.importer;
 
 import com.netgrif.workflow.importer.model.*;
-import com.netgrif.workflow.importer.model.datalogic.ImportAutoPlus;
+import com.netgrif.workflow.importer.model.DataLogic;
 import com.netgrif.workflow.petrinet.domain.*;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
-import com.netgrif.workflow.petrinet.domain.dataset.logic.AutoPlus;
-import com.netgrif.workflow.petrinet.domain.dataset.logic.Editable;
-import com.netgrif.workflow.petrinet.domain.dataset.logic.Required;
-import com.netgrif.workflow.petrinet.domain.dataset.logic.Visible;
+import com.netgrif.workflow.petrinet.domain.dataset.logic.FieldBehavior;
 import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository;
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRole;
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRoleRepository;
@@ -21,12 +18,13 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import java.io.File;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 @Component
 public class Importer {
+
+    public static final String FIELD_KEYWORD = "f";
+    public static final String TRANSITION_KEYWORD = "t";
 
     private Document document;
     private PetriNet net;
@@ -34,6 +32,7 @@ public class Importer {
     private Map<Long, Field> fields;
     private Map<Long, Transition> transitions;
     private Map<Long, Place> places;
+    private Map<Long, Transaction> transactions;
 
     private ImportFieldFactory fieldFactory;
     private ImportTriggerFactory triggerFactory;
@@ -51,6 +50,7 @@ public class Importer {
         this.fields = new HashMap<>();
         this.fieldFactory = new ImportFieldFactory(this);
         this.triggerFactory = new ImportTriggerFactory(this);
+        this.transactions = new HashMap<>();
     }
 
     @Transactional
@@ -78,9 +78,9 @@ public class Importer {
         net.setTitle(title);
         net.setInitials(initials);
 
-        // TODO: 15. 4. 2017 check if document contains any roles, data, etc. (NullPointerException)
         Arrays.stream(document.getImportRoles()).forEach(this::createRole);
         Arrays.stream(document.getImportData()).forEach(this::createDataSet);
+        Arrays.stream(document.getImportTransactions()).forEach(this::createTransaction);
         Arrays.stream(document.getImportPlaces()).forEach(this::createPlace);
         Arrays.stream(document.getImportTransitions()).forEach(this::createTransition);
         Arrays.stream(document.getImportArc()).forEach(this::createArc);
@@ -101,7 +101,6 @@ public class Importer {
     @Transactional
     protected void createDataSet(ImportData importData) {
         Field field = fieldFactory.getField(importData);
-        field.setName(importData.getTitle());
 
         net.addDataSetField(field);
         fields.put(importData.getId(), field);
@@ -128,9 +127,18 @@ public class Importer {
                     addTrigger(transition, trigger)
             );
         }
+        if (importTransition.getTransactionRef() != null) {
+            addToTransaction(transition, importTransition.getTransactionRef());
+        }
 
         net.addTransition(transition);
         transitions.put(importTransition.getId(), transition);
+    }
+
+    @Transactional
+    protected void addToTransaction(Transition transition, TransactionRef transactionRef) {
+        Transaction transaction = transactions.get(transactionRef.getId());
+        transaction.addTransition(transition);
     }
 
     @Transactional
@@ -152,16 +160,48 @@ public class Importer {
         if (logic == null || fieldId == null)
             return;
 
-        if (logic.getRequired() != null)
-            transition.addDataSet(fieldId, new Required());
-        if (logic.getEditable())
-            transition.addDataSet(fieldId, new Editable());
-        if (logic.getVisible())
-            transition.addDataSet(fieldId, new Visible());
-        if (logic.getAutoPlus() != null) {
-            ImportAutoPlus autoPlus = logic.getAutoPlus();
-            transition.addDataSet(fieldId, new AutoPlus(fields.get(autoPlus.getRef()).getObjectId(), autoPlus.getContent()));
+        Set<FieldBehavior> behavior = new HashSet<>();
+        if(logic.getBehavior() != null)
+            Arrays.stream(logic.getBehavior()).forEach(b -> behavior.add(FieldBehavior.fromString(b)));
+
+        final Set<String> actions = new HashSet<>();
+        if(logic.getAction() != null) {
+            Arrays.asList(logic.getAction()).forEach(action -> {
+                action = parseObjectIds(action, fieldId, FIELD_KEYWORD);
+                action = parseObjectIds(action, transition.getStringId(),TRANSITION_KEYWORD);
+                actions.add(action);
+            });
         }
+
+        transition.addDataSet(fieldId,behavior,actions);
+    }
+
+    @Transactional
+    protected String parseObjectIds(String action, String currentId, String processedObject){
+        action = action.replace("\n","").replace("  ","");
+        int last = 0;
+        while(true){
+            int start = action.indexOf(processedObject+".",last);
+            if(start == -1) break;
+            int coma = action.indexOf(',',start);
+            int semicolon = action.indexOf(';',start);
+            int delimeter = coma < semicolon && coma != -1 ? coma : semicolon;
+
+            String id = action.substring(start+2,delimeter);
+            String objectId = id.equalsIgnoreCase("this") ? currentId : getObjectId(processedObject,Long.parseLong(id));
+
+            action = action.replace(processedObject+"."+id, processedObject+"."+objectId);
+
+            if(delimeter == semicolon) break;
+            else last = coma + (objectId.length() - id.length());
+        }
+        return action;
+    }
+
+    private String getObjectId(String processedObject, Long xmlId){
+        if(processedObject.equalsIgnoreCase(FIELD_KEYWORD)) return fields.get(xmlId).getObjectId();
+        if(processedObject.equalsIgnoreCase(TRANSITION_KEYWORD)) return transitions.get(xmlId).getStringId();
+        return "";
     }
 
     @Transactional
@@ -191,6 +231,15 @@ public class Importer {
 
         net.addRole(role);
         roles.put(importRole.getId(), role);
+    }
+
+    @Transactional
+    protected void createTransaction(ImportTransaction importTransaction) {
+        Transaction transaction = new Transaction();
+        transaction.setTitle(importTransaction.getTitle());
+
+        net.addTransaction(transaction);
+        transactions.put(importTransaction.getId(), transaction);
     }
 
     @Transactional
