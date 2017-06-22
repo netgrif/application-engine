@@ -13,9 +13,7 @@ public interface IWorkflowService {
 
     Page<Case> searchCase(List<String> nets, Pageable pageable);
 
-    void createCase(String netId, String title, String color);
+    void createCase(String netId, String title, String color, Long authorId);
 
-//    DataSet getDataForTransition(String caseId, String transitionId);
-
-//    void modifyData(String caseId, Map<String, String> newValues);
+    Page<Case> findAllByAuthor(Long authorId, Pageable pageable);
 }

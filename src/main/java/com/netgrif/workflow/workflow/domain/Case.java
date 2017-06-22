@@ -41,6 +41,9 @@ public class Case {
     @Getter @Setter
     private Map<String, DataField> dataSet;
 
+    @Getter @Setter
+    private Long author;
+
     public Case() {
         _id = new ObjectId();
         activePlaces = new HashMap<>();
