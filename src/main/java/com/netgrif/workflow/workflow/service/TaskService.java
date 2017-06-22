@@ -9,9 +9,12 @@ import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.auth.domain.repositories.UserRepository;
 import com.netgrif.workflow.petrinet.domain.*;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
+import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedField;
+import com.netgrif.workflow.petrinet.domain.dataset.logic.FieldActionsRunner;
 import com.netgrif.workflow.petrinet.domain.roles.RolePermission;
 import com.netgrif.workflow.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.workflow.workflow.domain.Case;
+import com.netgrif.workflow.workflow.domain.DataField;
 import com.netgrif.workflow.workflow.domain.Task;
 import com.netgrif.workflow.workflow.domain.repositories.CaseRepository;
 import com.netgrif.workflow.workflow.domain.repositories.TaskRepository;
@@ -188,9 +191,12 @@ public class TaskService implements ITaskService {
         List<Field> dataSetFields = new ArrayList<>();
         fieldsIds.forEach(fieldId -> {
             Field field = useCase.getPetriNet().getDataSet().get(fieldId);
-            field.setType(null);
-            field.setValue(useCase.getDataSetValues().get(fieldId));
-            field.setLogic(transition.applyDataLogic(fieldId, JsonNodeFactory.instance.objectNode()));
+            field.setValue(useCase.getDataSet().get(fieldId).getValue());
+
+            if(useCase.hasFieldBehavior(fieldId,transition.getStringId()))
+                field.setBehavior(useCase.getDataSet().get(fieldId).applyBehavior(transition.getStringId()));
+            else
+                field.setBehavior(transition.getDataSet().get(fieldId).applyBehavior());
 
             dataSetFields.add(field);
         });
@@ -199,12 +205,28 @@ public class TaskService implements ITaskService {
     }
 
     @Override
-    public void setDataFieldsValues(String taskId, ObjectNode values) {
+    public ObjectNode setDataFieldsValues(String taskId, ObjectNode values) {
         Task task = taskRepository.findOne(taskId);
         Case useCase = caseRepository.findOne(task.getCaseId());
 
-        values.fields().forEachRemaining(entry -> useCase.getDataSetValues().put(entry.getKey(), parseFieldsValues(entry.getValue())));
+        Map<String,ChangedField> changedFields = new HashMap<>();
+        values.fields().forEachRemaining(entry -> {
+            useCase.getDataSet().get(entry.getKey()).setValue(parseFieldsValues(entry.getValue()));
+            useCase.getPetriNet().getTransition(task.getTransitionId()).getDataSet()
+                    .get(entry.getKey()).getActions().forEach(action -> {
+                        ChangedField field = FieldActionsRunner.run(action,useCase);
+                        if(changedFields.containsKey(field.getId()))
+                            changedFields.get(field.getId()).merge(field);
+                        else
+                            changedFields.put(field.getId(),field);
+            });
+        });
+
         caseRepository.save(useCase);
+
+        ObjectNode node = JsonNodeFactory.instance.objectNode();
+        changedFields.forEach((id, field) -> node.set(id,field.toJson()));
+        return node;
     }
 
     @Override
@@ -228,8 +250,8 @@ public class TaskService implements ITaskService {
     public FileSystemResource getFile(String taskId, String fieldId) {
         Task task = taskRepository.findOne(taskId);
         Case useCase = caseRepository.findOne(task.getCaseId());
-        if (useCase.getDataSetValues().get(fieldId) == null) return null;
-        return new FileSystemResource("storage/" + fieldId + "-" + useCase.getDataSetValues().get(fieldId));
+        if (useCase.getDataSet().get(fieldId).getValue() == null) return null;
+        return new FileSystemResource("storage/" + fieldId + "-" + useCase.getDataSet().get(fieldId).getValue());
     }
 
     @Override
@@ -246,9 +268,9 @@ public class TaskService implements ITaskService {
             Case useCase = caseRepository.findOne(task.getCaseId());
 
             String oldFile = null;
-            if ((oldFile = (String) useCase.getDataSetValues().get(fieldId)) != null) {
+            if ((oldFile = (String) useCase.getDataSet().get(fieldId).getValue()) != null) {
                 new File("storage/" + fieldId + "-" + oldFile).delete();
-                useCase.getDataSetValues().put(fieldId, null);
+                useCase.getDataSet().get(fieldId).setValue(null);
             }
 
             File file = new File("storage/" + fieldId + "-" + multipartFile.getOriginalFilename());
@@ -262,7 +284,7 @@ public class TaskService implements ITaskService {
             fout.write(multipartFile.getBytes());
             fout.close();
 
-            useCase.getDataSetValues().put(fieldId, multipartFile.getOriginalFilename());
+            useCase.getDataSet().get(fieldId).setValue(multipartFile.getOriginalFilename());
             caseRepository.save(useCase);
 
             return true;

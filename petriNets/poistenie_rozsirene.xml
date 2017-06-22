@@ -22,6 +22,7 @@
         <values>Byt</values>
         <values>Dom</values>
         <values>Radový dom</values>
+        <values>Bungalov</values>
         <values>Iné</values>
     </data>
     <data type="number">
@@ -338,94 +339,100 @@
         <dataRef>
             <id>5</id>
             <logic>
-                <editable>true</editable>
+                <behavior>editable</behavior>
+                <action>
+                    target: f.6,
+                    current: f.this,
+                    trans: t.this;
+                    make target,visible on trans when { current.value != "Bungalov" }
+                </action>
             </logic>
         </dataRef>
         <dataRef>
             <id>6</id>
             <logic>
-                <editable>true</editable>
+                <behavior>editable</behavior>
 
             </logic>
         </dataRef>
         <dataRef>
             <id>7</id>
             <logic>
-                <editable>true</editable>
+                <behavior>editable</behavior>
 
             </logic>
         </dataRef>
         <dataRef>
             <id>8</id>
             <logic>
-                <editable>true</editable>
+                <behavior>editable</behavior>
 
             </logic>
         </dataRef>
         <dataRef>
             <id>9</id>
             <logic>
-                <editable>true</editable>
+                <behavior>editable</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>10</id>
             <logic>
-                <editable>true</editable>
+                <behavior>editable</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>11</id>
             <logic>
-                <editable>true</editable>
+                <behavior>editable</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>12</id>
             <logic>
-                <editable>true</editable>
+                <behavior>editable</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>13</id>
             <logic>
-                <editable>true</editable>
+                <behavior>editable</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>14</id>
             <logic>
-                <editable>true</editable>
+                <behavior>editable</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>15</id>
             <logic>
-                <editable>true</editable>
+                <behavior>editable</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>16</id>
             <logic>
-                <editable>true</editable>
+                <behavior>editable</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>17</id>
             <logic>
-                <editable>true</editable>
+                <behavior>editable</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>18</id>
             <logic>
-                <editable>true</editable>
+                <behavior>editable</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>19</id>
             <logic>
-                <editable>true</editable>
+                <behavior>editable</behavior>
             </logic>
         </dataRef>
     </transition>
@@ -443,43 +450,43 @@
         <dataRef>
             <id>20</id>
             <logic>
-                <editable>true</editable>
+                <behavior>editable</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>21</id>
             <logic>
-                <editable>true</editable>
+                <behavior>editable</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>22</id>
             <logic>
-                <editable>true</editable>
+                <behavior>editable</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>23</id>
             <logic>
-                <editable>true</editable>
+                <behavior>editable</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>24</id>
             <logic>
-                <editable>true</editable>
+                <behavior>editable</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>25</id>
             <logic>
-                <editable>true</editable>
+                <behavior>editable</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>26</id>
             <logic>
-                <editable>true</editable>
+                <behavior>editable</behavior>
             </logic>
         </dataRef>
     </transition>
@@ -497,230 +504,230 @@
         <dataRef>
             <id>1</id>
             <logic>
-                <visible>true</visible>
+                <behavior>visible</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>2</id>
             <logic>
-                <visible>true</visible>
+                <behavior>visible</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>3</id>
             <logic>
-                <visible>true</visible>
+                <behavior>visible</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>4</id>
             <logic>
-                <visible>true</visible>
+                <behavior>visible</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>5</id>
             <logic>
-                <visible>true</visible>
+                <behavior>visible</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>6</id>
             <logic>
-                <visible>true</visible>
+                <behavior>visible</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>7</id>
             <logic>
-                <visible>true</visible>
+                <behavior>visible</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>8</id>
             <logic>
-                <visible>true</visible>
+                <behavior>visible</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>9</id>
             <logic>
-                <visible>true</visible>
+                <behavior>visible</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>10</id>
             <logic>
-                <visible>true</visible>
+                <behavior>visible</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>11</id>
             <logic>
-                <visible>true</visible>
+                <behavior>visible</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>12</id>
             <logic>
-                <visible>true</visible>
+                <behavior>visible</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>13</id>
             <logic>
-                <visible>true</visible>
+                <behavior>visible</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>14</id>
             <logic>
-                <visible>true</visible>
+                <behavior>visible</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>15</id>
             <logic>
-                <visible>true</visible>
+                <behavior>visible</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>16</id>
             <logic>
-                <visible>true</visible>
+                <behavior>visible</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>17</id>
             <logic>
-                <visible>true</visible>
+                <behavior>visible</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>18</id>
             <logic>
-                <visible>true</visible>
+                <behavior>visible</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>19</id>
             <logic>
-                <visible>true</visible>
+                <behavior>visible</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>20</id>
             <logic>
-                <visible>true</visible>
+                <behavior>visible</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>21</id>
             <logic>
-                <visible>true</visible>
+                <behavior>visible</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>22</id>
             <logic>
-                <visible>true</visible>
+                <behavior>visible</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>23</id>
             <logic>
-                <visible>true</visible>
+                <behavior>visible</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>24</id>
             <logic>
-                <visible>true</visible>
+                <behavior>visible</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>25</id>
             <logic>
-                <visible>true</visible>
+                <behavior>visible</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>26</id>
             <logic>
-                <visible>true</visible>
+                <behavior>visible</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>27</id>
             <logic>
-                <visible>true</visible>
+                <behavior>visible</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>28</id>
             <logic>
-                <visible>true</visible>
+                <behavior>visible</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>29</id>
             <logic>
-                <visible>true</visible>
+                <behavior>visible</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>30</id>
             <logic>
-                <visible>true</visible>
+                <behavior>visible</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>31</id>
             <logic>
-                <visible>true</visible>
+                <behavior>visible</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>32</id>
             <logic>
-                <visible>true</visible>
+                <behavior>visible</behavior>
             </logic>
         </dataRef>
         <!--<dataRef>-->
             <!--<id>33</id>-->
             <!--<logic>-->
-                <!--<visible>true</visible>-->
+                <!--<behavior>visible</behavior>-->
             <!--</logic>-->
         <!--</dataRef>-->
         <!--<dataRef>-->
             <!--<id>34</id>-->
             <!--<logic>-->
-                <!--<visible>true</visible>-->
+                <!--<behavior>visible</behavior>-->
             <!--</logic>-->
         <!--</dataRef>-->
         <!--<dataRef>-->
             <!--<id>35</id>-->
             <!--<logic>-->
-                <!--<visible>true</visible>-->
+                <!--<behavior>visible</behavior>-->
             <!--</logic>-->
         <!--</dataRef>-->
         <!--<dataRef>-->
             <!--<id>36</id>-->
             <!--<logic>-->
-                <!--<visible>true</visible>-->
+                <!--<behavior>visible</behavior>-->
             <!--</logic>-->
         <!--</dataRef>-->
         <!--<dataRef>-->
             <!--<id>37</id>-->
             <!--<logic>-->
-                <!--<visible>true</visible>-->
+                <!--<behavior>visible</behavior>-->
             <!--</logic>-->
         <!--</dataRef>-->
         <dataRef>
             <id>38</id>
             <logic>
-                <editable>true</editable>
-                <required>true</required>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
             </logic>
         </dataRef>
     </transition>
@@ -738,230 +745,230 @@
         <dataRef>
             <id>1</id>
             <logic>
-                <visible>true</visible>
+                <behavior>visible</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>2</id>
             <logic>
-                <visible>true</visible>
+                <behavior>visible</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>3</id>
             <logic>
-                <visible>true</visible>
+                <behavior>visible</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>4</id>
             <logic>
-                <visible>true</visible>
+                <behavior>visible</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>5</id>
             <logic>
-                <visible>true</visible>
+                <behavior>visible</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>6</id>
             <logic>
-                <visible>true</visible>
+                <behavior>visible</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>7</id>
             <logic>
-                <visible>true</visible>
+                <behavior>visible</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>8</id>
             <logic>
-                <visible>true</visible>
+                <behavior>visible</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>9</id>
             <logic>
-                <visible>true</visible>
+                <behavior>visible</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>10</id>
             <logic>
-                <visible>true</visible>
+                <behavior>visible</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>11</id>
             <logic>
-                <visible>true</visible>
+                <behavior>visible</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>12</id>
             <logic>
-                <visible>true</visible>
+                <behavior>visible</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>13</id>
             <logic>
-                <visible>true</visible>
+                <behavior>visible</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>14</id>
             <logic>
-                <visible>true</visible>
+                <behavior>visible</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>15</id>
             <logic>
-                <visible>true</visible>
+                <behavior>visible</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>16</id>
             <logic>
-                <visible>true</visible>
+                <behavior>visible</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>17</id>
             <logic>
-                <visible>true</visible>
+                <behavior>visible</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>18</id>
             <logic>
-                <visible>true</visible>
+                <behavior>visible</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>19</id>
             <logic>
-                <visible>true</visible>
+                <behavior>visible</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>20</id>
             <logic>
-                <visible>true</visible>
+                <behavior>visible</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>21</id>
             <logic>
-                <visible>true</visible>
+                <behavior>visible</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>22</id>
             <logic>
-                <visible>true</visible>
+                <behavior>visible</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>23</id>
             <logic>
-                <visible>true</visible>
+                <behavior>visible</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>24</id>
             <logic>
-                <visible>true</visible>
+                <behavior>visible</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>25</id>
             <logic>
-                <visible>true</visible>
+                <behavior>visible</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>26</id>
             <logic>
-                <visible>true</visible>
+                <behavior>visible</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>27</id>
             <logic>
-                <visible>true</visible>
+                <behavior>visible</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>28</id>
             <logic>
-                <visible>true</visible>
+                <behavior>visible</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>29</id>
             <logic>
-                <visible>true</visible>
+                <behavior>visible</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>30</id>
             <logic>
-                <visible>true</visible>
+                <behavior>visible</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>31</id>
             <logic>
-                <visible>true</visible>
+                <behavior>visible</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>32</id>
             <logic>
-                <visible>true</visible>
+                <behavior>visible</behavior>
             </logic>
         </dataRef>
         <!--<dataRef>-->
             <!--<id>33</id>-->
             <!--<logic>-->
-                <!--<visible>true</visible>-->
+                <!--<behavior>visible</behavior>-->
             <!--</logic>-->
         <!--</dataRef>-->
         <!--<dataRef>-->
             <!--<id>34</id>-->
             <!--<logic>-->
-                <!--<visible>true</visible>-->
+                <!--<behavior>visible</behavior>-->
             <!--</logic>-->
         <!--</dataRef>-->
         <!--<dataRef>-->
             <!--<id>35</id>-->
             <!--<logic>-->
-                <!--<visible>true</visible>-->
+                <!--<behavior>visible</behavior>-->
             <!--</logic>-->
         <!--</dataRef>-->
         <!--<dataRef>-->
             <!--<id>36</id>-->
             <!--<logic>-->
-                <!--<visible>true</visible>-->
+                <!--<behavior>visible</behavior>-->
             <!--</logic>-->
         <!--</dataRef>-->
         <!--<dataRef>-->
             <!--<id>37</id>-->
             <!--<logic>-->
-                <!--<visible>true</visible>-->
+                <!--<behavior>visible</behavior>-->
             <!--</logic>-->
         <!--</dataRef>-->
         <dataRef>
             <id>38</id>
             <logic>
-                <editable>true</editable>
-                <required>true</required>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
             </logic>
         </dataRef>
     </transition>
@@ -979,230 +986,230 @@
         <dataRef>
             <id>1</id>
             <logic>
-                <visible>true</visible>
+                <behavior>visible</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>2</id>
             <logic>
-                <visible>true</visible>
+                <behavior>visible</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>3</id>
             <logic>
-                <visible>true</visible>
+                <behavior>visible</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>4</id>
             <logic>
-                <visible>true</visible>
+                <behavior>visible</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>5</id>
             <logic>
-                <visible>true</visible>
+                <behavior>visible</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>6</id>
             <logic>
-                <visible>true</visible>
+                <behavior>visible</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>7</id>
             <logic>
-                <visible>true</visible>
+                <behavior>visible</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>8</id>
             <logic>
-                <visible>true</visible>
+                <behavior>visible</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>9</id>
             <logic>
-                <visible>true</visible>
+                <behavior>visible</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>10</id>
             <logic>
-                <visible>true</visible>
+                <behavior>visible</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>11</id>
             <logic>
-                <visible>true</visible>
+                <behavior>visible</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>12</id>
             <logic>
-                <visible>true</visible>
+                <behavior>visible</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>13</id>
             <logic>
-                <visible>true</visible>
+                <behavior>visible</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>14</id>
             <logic>
-                <visible>true</visible>
+                <behavior>visible</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>15</id>
             <logic>
-                <visible>true</visible>
+                <behavior>visible</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>16</id>
             <logic>
-                <visible>true</visible>
+                <behavior>visible</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>17</id>
             <logic>
-                <visible>true</visible>
+                <behavior>visible</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>18</id>
             <logic>
-                <visible>true</visible>
+                <behavior>visible</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>19</id>
             <logic>
-                <visible>true</visible>
+                <behavior>visible</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>20</id>
             <logic>
-                <visible>true</visible>
+                <behavior>visible</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>21</id>
             <logic>
-                <visible>true</visible>
+                <behavior>visible</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>22</id>
             <logic>
-                <visible>true</visible>
+                <behavior>visible</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>23</id>
             <logic>
-                <visible>true</visible>
+                <behavior>visible</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>24</id>
             <logic>
-                <visible>true</visible>
+                <behavior>visible</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>25</id>
             <logic>
-                <visible>true</visible>
+                <behavior>visible</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>26</id>
             <logic>
-                <visible>true</visible>
+                <behavior>visible</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>27</id>
             <logic>
-                <visible>true</visible>
+                <behavior>visible</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>28</id>
             <logic>
-                <visible>true</visible>
+                <behavior>visible</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>29</id>
             <logic>
-                <visible>true</visible>
+                <behavior>visible</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>30</id>
             <logic>
-                <visible>true</visible>
+                <behavior>visible</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>31</id>
             <logic>
-                <visible>true</visible>
+                <behavior>visible</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>32</id>
             <logic>
-                <visible>true</visible>
+                <behavior>visible</behavior>
             </logic>
         </dataRef>
         <!--<dataRef>-->
             <!--<id>33</id>-->
             <!--<logic>-->
-                <!--<visible>true</visible>-->
+                <!--<behavior>visible</behavior>-->
             <!--</logic>-->
         <!--</dataRef>-->
         <!--<dataRef>-->
             <!--<id>34</id>-->
             <!--<logic>-->
-                <!--<visible>true</visible>-->
+                <!--<behavior>visible</behavior>-->
             <!--</logic>-->
         <!--</dataRef>-->
         <!--<dataRef>-->
             <!--<id>35</id>-->
             <!--<logic>-->
-                <!--<visible>true</visible>-->
+                <!--<behavior>visible</behavior>-->
             <!--</logic>-->
         <!--</dataRef>-->
         <!--<dataRef>-->
             <!--<id>36</id>-->
             <!--<logic>-->
-                <!--<visible>true</visible>-->
+                <!--<behavior>visible</behavior>-->
             <!--</logic>-->
         <!--</dataRef>-->
         <!--<dataRef>-->
             <!--<id>37</id>-->
             <!--<logic>-->
-                <!--<visible>true</visible>-->
+                <!--<behavior>visible</behavior>-->
             <!--</logic>-->
         <!--</dataRef>-->
         <dataRef>
             <id>38</id>
             <logic>
-                <editable>true</editable>
-                <required>true</required>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
             </logic>
         </dataRef>
     </transition>
@@ -1244,61 +1251,61 @@
         <dataRef>
             <id>1</id>
             <logic>
-                <editable>true</editable>
+                <behavior>editable</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>2</id>
             <logic>
-                <editable>true</editable>
+                <behavior>editable</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>3</id>
             <logic>
-                <editable>true</editable>
+                <behavior>editable</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>4</id>
             <logic>
-                <editable>true</editable>
+                <behavior>editable</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>27</id>
             <logic>
-                <editable>true</editable>
+                <behavior>editable</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>28</id>
             <logic>
-                <editable>true</editable>
+                <behavior>editable</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>29</id>
             <logic>
-                <editable>true</editable>
+                <behavior>editable</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>30</id>
             <logic>
-                <editable>true</editable>
+                <behavior>editable</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>31</id>
             <logic>
-                <editable>true</editable>
+                <behavior>editable</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>32</id>
             <logic>
-                <editable>true</editable>
+                <behavior>editable</behavior>
             </logic>
         </dataRef>
     </transition>
@@ -1316,8 +1323,8 @@
         <!--<dataRef>-->
             <!--<id>27</id>-->
             <!--<logic>-->
-                <!--<editable>true</editable>-->
-                <!--<required>true</required>-->
+                <!--<behavior>editable</behavior>-->
+                <!--<behavior>required</behavior>-->
             <!--</logic>-->
         <!--</dataRef>-->
     <!--</transition>-->
@@ -1335,36 +1342,36 @@
         <!--<dataRef>-->
             <!--<id>33</id>-->
             <!--<logic>-->
-                <!--<editable>true</editable>-->
-                <!--<required>true</required>-->
+                <!--<behavior>editable</behavior>-->
+                <!--<behavior>required</behavior>-->
             <!--</logic>-->
         <!--</dataRef>-->
         <!--<dataRef>-->
             <!--<id>34</id>-->
             <!--<logic>-->
-                <!--<editable>true</editable>-->
-                <!--<required>true</required>-->
+                <!--<behavior>editable</behavior>-->
+                <!--<behavior>required</behavior>-->
             <!--</logic>-->
         <!--</dataRef>-->
         <!--<dataRef>-->
             <!--<id>35</id>-->
             <!--<logic>-->
-                <!--<editable>true</editable>-->
-                <!--<required>true</required>-->
+                <!--<behavior>editable</behavior>-->
+                <!--<behavior>required</behavior>-->
             <!--</logic>-->
         <!--</dataRef>-->
         <!--<dataRef>-->
             <!--<id>36</id>-->
             <!--<logic>-->
-                <!--<editable>true</editable>-->
-                <!--<required>true</required>-->
+                <!--<behavior>editable</behavior>-->
+                <!--<behavior>required</behavior>-->
             <!--</logic>-->
         <!--</dataRef>-->
         <!--<dataRef>-->
             <!--<id>37</id>-->
             <!--<logic>-->
-                <!--<editable>true</editable>-->
-                <!--<required>true</required>-->
+                <!--<behavior>editable</behavior>-->
+                <!--<behavior>required</behavior>-->
             <!--</logic>-->
         <!--</dataRef>-->
     <!--</transition>-->
