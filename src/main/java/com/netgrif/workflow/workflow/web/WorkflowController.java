@@ -31,8 +31,8 @@ public class WorkflowController {
     public MessageResource createCase(@RequestBody CreateCaseBody body, Authentication auth) {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
         try {
-            workflowService.createCase(body.netId, body.title, body.color, loggedUser.getId());
-            return MessageResource.successMessage("Case created successfully");
+            Case useCase = workflowService.createCase(body.netId, body.title, body.color, loggedUser.getId());
+            return MessageResource.successMessage(useCase.getStringId());
         } catch (Exception e) { // TODO: 5. 2. 2017 change to custom exception
             e.printStackTrace();
             return MessageResource.errorMessage("Failed to create case");
