@@ -63,7 +63,7 @@ public class WorkflowController {
     public PagedResources<CaseResource> findAllByAuthor(@PathVariable("id") Long authorId, Pageable pageable, PagedResourcesAssembler<Case> assembler) {
         Page<Case> cases = workflowService.findAllByAuthor(authorId, pageable);
         Link selfLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(WorkflowController.class)
-                .findAllByAuthor(authorId, pageable, assembler)).withRel("author/" + authorId);
+                .findAllByAuthor(authorId, pageable, assembler)).withRel("author");
         PagedResources<CaseResource> resources = assembler.toResource(cases, new CaseResourceAssembler(), selfLink);
         ResourceLinkAssembler.addLinks(resources, Case.class, selfLink.getRel());
         return resources;
