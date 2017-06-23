@@ -114,7 +114,7 @@ class InsuranceImporter {
         taskService.createTasks(useCase)
 
         useCase = new Case(
-                title: "Poistenie bytu",
+                title: "Poistenie domácnosti",
                 petriNet: net,
                 color: StartRunner.randomColor())
         useCase.dataSet = new HashMap<>(net.dataSet.collectEntries {[(it.key): new DataField()]})
