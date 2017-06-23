@@ -104,6 +104,11 @@ public class Case {
         return n+"";
     }
 
+    public String getPetriNetId(){
+        if(this.petriNet != null) return petriNet.getStringId();
+        return null;
+    }
+
     public void updateActivePlaces() {
         activePlaces = petriNet.getActivePlaces();
     }
