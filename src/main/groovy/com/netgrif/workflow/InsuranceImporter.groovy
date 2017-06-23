@@ -62,6 +62,12 @@ class InsuranceImporter {
     }
 
     private void createUsers(Map<String, Organization> orgs, Map<String, Authority> auths, PetriNet net){
+        def agentRole = userProcessRoleRepository.save(new UserProcessRole(
+                roleId: net.roles.values().find { it -> it.name == "Agent" }.objectId
+        ))
+        def systemRole = userProcessRoleRepository.save(new UserProcessRole(
+                roleId: net.roles.values().find { it -> it.name == "System" }.objectId
+        ))
         User agent = new User(
                 name: "Fero",
                 surname: "Poisťovák",
@@ -69,20 +75,24 @@ class InsuranceImporter {
                 password: "password",
                 authorities: [auths.get(Authority.user)] as Set<Authority>,
                 organizations: [orgs.get("premium")] as Set<Organization>)
-        agent.addProcessRole(userProcessRoleRepository.save(new UserProcessRole(
-                roleId: net.roles.values().find { it -> it.name == "Poisťovací agent" }.objectId
-        )))
+        agent.addProcessRole(agentRole)
         User user = new User(
                 name: "Ján",
                 surname: "Kováč",
                 email: "kovac@gmail.com",
                 password: "password",
                 authorities: [auths.get(Authority.user)] as Set<Authority>)
-        user.addProcessRole(userProcessRoleRepository.save(new UserProcessRole(
-                roleId: net.roles.values().find { it -> it.name == "Poistenec" }.objectId
-        )))
+        user.addProcessRole(agentRole)
+        User system = new User(
+                name: "System",
+                surname: "System",
+                email: "system@premium.com",
+                password: "password",
+                authorities: [auths.get(Authority.user)] as Set<Authority>)
+        system.addProcessRole(systemRole)
         userService.saveNew(agent)
         userService.saveNew(user)
+        userService.saveNew(system)
     }
 
     private void createCases(PetriNet net){
