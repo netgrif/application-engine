@@ -38,18 +38,12 @@ class StartRunner  implements CommandLineRunner{
             case 0:
                 return "color-fg-primary-500"
             case 1:
-                return "color-fg-indigo-500"
+                return "color-fg-light-blue-A700"
             case 2:
-                return "color-fg-deep-purple-500"
+                return "color-fg-deep-purple-600"
             case 3:
-                return "color-fg-lime-500"
-            case 4:
                 return "color-fg-amber-500"
-            case 5:
-                return "color-fg-deep-orange-500"
-            case 6:
-                return "color-fg-blue-grey-500"
-            case 7:
+            case 4:
                 return "color-fg-brown-500"
             default:
                 return "color-fg-primary-500"
