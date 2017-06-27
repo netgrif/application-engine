@@ -14,6 +14,7 @@ import org.springframework.data.mongodb.core.mapping.Field;
 import javax.validation.constraints.NotNull;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ThreadLocalRandom;
 
 @Document
 public class Case {
@@ -29,6 +30,7 @@ public class Case {
 
     @Field("activePlaces")
     @Getter @Setter
+    @JsonIgnore
     private Map<String, Integer> activePlaces;
 
     @NotNull
@@ -39,6 +41,7 @@ public class Case {
     private String color;
 
     @Getter @Setter
+    @JsonIgnore
     private Map<String, DataField> dataSet;
 
     @Getter @Setter
@@ -93,6 +96,17 @@ public class Case {
 
     public boolean hasFieldBehavior(String field, String transition){
         return this.dataSet.get(field).hasDefinedBehavior(transition);
+    }
+
+    public String getVisualId(){
+        int n = _id.getTimestamp()+title.length();
+        if(this.petriNet != null) return petriNet.getInitials()+"-"+n;
+        return n+"";
+    }
+
+    public String getPetriNetId(){
+        if(this.petriNet != null) return petriNet.getStringId();
+        return null;
     }
 
     public void updateActivePlaces() {
