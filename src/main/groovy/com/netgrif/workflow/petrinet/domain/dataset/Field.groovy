@@ -18,6 +18,7 @@ public abstract class Field<T> {
     private ObjectNode behavior;
     @Transient
     private T value;
+    private Long order
 
     public Field(){
         _id = new ObjectId();
@@ -75,7 +76,14 @@ public abstract class Field<T> {
         this.value = value
     }
 
-    //operators overloading
+    Long getOrder() {
+        return order
+    }
+
+    void setOrder(Long order) {
+        this.order = order
+    }
+//operators overloading
     T plus(final Field field){
         return this.value + field.value
     }
