@@ -63,21 +63,22 @@
         <dataRef>
             <id>1</id>
             <logic>
-                <editable>true</editable>
-                <required>true</required>
+                <behavior>required</behavior>
+                <behavior>editable</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>2</id>
             <logic>
-                <editable>true</editable>
-                <required>true</required>
+                <behavior>required</behavior>
+                <behavior>editable</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>3</id>
             <logic>
-                <editable>true</editable>
+                <behavior>optional</behavior>
+                <behavior>editable</behavior>
             </logic>
         </dataRef>
     </transition>
@@ -131,8 +132,8 @@
         <dataRef>
             <id>2</id>
             <logic>
-                <editable>true</editable>
-                <required>true</required>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
             </logic>
         </dataRef>
     </transition>
@@ -150,19 +151,19 @@
         <dataRef>
             <id>1</id>
             <logic>
-                <visible>true</visible>
+                <behavior>visible</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>2</id>
             <logic>
-                <visible>true</visible>
+                <behavior>visible</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>3</id>
             <logic>
-                <visible>true</visible>
+                <behavior>visible</behavior>
             </logic>
         </dataRef>
     </transition>
