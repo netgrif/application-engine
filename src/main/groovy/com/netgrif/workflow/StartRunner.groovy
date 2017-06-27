@@ -33,7 +33,7 @@ class StartRunner  implements CommandLineRunner{
     }
 
     static String randomColor() {
-        int randomNum = ThreadLocalRandom.current().nextInt(0, 7)
+        int randomNum = ThreadLocalRandom.current().nextInt(0, 4)
         switch (randomNum) {
             case 0:
                 return "color-fg-primary-500"
