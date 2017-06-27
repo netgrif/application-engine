@@ -91,7 +91,6 @@ public class Task {
         this.priority = priority == Priorities.UNDEFINED ? Priorities.LOW : priority;
     }
 
-    @JsonIgnore
     public String getTransitionId() {
         return transitionId;
     }
