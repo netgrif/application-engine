@@ -15,4 +15,10 @@ public class DateField extends Field<LocalDate> {
     public void setValue(Date value) {
         this.value = ((Date)value).toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
     }
+
+    public void convertValue(){
+        if(this.value instanceof Date){
+            this.value = ((Date)this.value).toInstant().atZone(ZoneId.systemDefault()).toLocalDate()
+        }
+    }
 }

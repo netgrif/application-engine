@@ -222,31 +222,28 @@
             </logic>
         </roleRef>
         <dataRef>
-        <id>5</id>
-        <logic>
-            <behavior>editable</behavior>
-            <behavior>required</behavior>
-        </logic>
-    </dataRef>
+            <id>5</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+            </logic>
+        </dataRef>
         <dataRef>
             <id>11</id>
             <logic>
                 <behavior>editable</behavior>
-                <behavior>required</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>14</id>
             <logic>
                 <behavior>editable</behavior>
-                <behavior>required</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>18</id>
             <logic>
                 <behavior>editable</behavior>
-                <behavior>required</behavior>
             </logic>
         </dataRef>
     </transition>
@@ -272,21 +269,18 @@
             <id>22</id>
             <logic>
                 <behavior>editable</behavior>
-                <behavior>required</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>24</id>
             <logic>
                 <behavior>editable</behavior>
-                <behavior>required</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>25</id>
             <logic>
                 <behavior>editable</behavior>
-                <behavior>required</behavior>
             </logic>
         </dataRef>
     </transition>
@@ -301,6 +295,84 @@
                 <perform>true</perform>
             </logic>
         </roleRef>
+        <dataRef>
+            <id>1</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>2</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>27</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>29</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>30</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>5</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>11</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>14</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>18</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>20</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>22</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>24</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>25</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
         <dataRef>
             <id>38</id>
             <logic>
@@ -321,6 +393,60 @@
             </logic>
         </roleRef>
         <dataRef>
+            <id>1</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>2</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>27</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>29</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>30</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>5</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>11</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>14</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>18</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
             <id>38</id>
             <logic>
                 <behavior>editable</behavior>
@@ -339,6 +465,60 @@
                 <perform>true</perform>
             </logic>
         </roleRef>
+        <dataRef>
+            <id>1</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>2</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>27</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>29</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>30</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>20</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>22</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>24</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>25</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
         <dataRef>
             <id>38</id>
             <logic>
@@ -393,28 +573,24 @@
             <id>2</id>
             <logic>
                 <behavior>editable</behavior>
-                <behavior>required</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>27</id>
             <logic>
                 <behavior>editable</behavior>
-                <behavior>required</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>29</id>
             <logic>
                 <behavior>editable</behavior>
-                <behavior>required</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>30</id>
             <logic>
                 <behavior>editable</behavior>
-                <behavior>required</behavior>
             </logic>
         </dataRef>
     </transition>
