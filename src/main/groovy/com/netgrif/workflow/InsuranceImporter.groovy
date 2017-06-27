@@ -40,33 +40,39 @@ class InsuranceImporter {
 
 
     void run(String... strings) throws Exception {
-        //def net = importer.importPetriNet(new File("src/test/resources/poistenie_rozsirene.xml"), "Poistenie", "INS")
-        def net = importer.importPetriNet(new File("petriNets/poistenie_rozsirene.xml"), "Poistenie", "INS")
+        def net = importer.importPetriNet(new File("src/main/resources/petriNets/poistenie_rozsirene.xml"), "Poistenie", "INS")
+        def documentLifeCycleNet = importer.importPetriNet(new File("src/main/resources/petriNets/document-lifecycle.xml"), "Dokument", "DOC")
 
         def orgs = createOrganizations()
         def auths = createAuthorities()
-        createUsers(orgs,auths,net)
+        createUsers(orgs, auths, net, documentLifeCycleNet)
         createCases(net)
     }
 
-    private Map<String, Organization> createOrganizations(){
+    private Map<String, Organization> createOrganizations() {
         Map<String, Organization> orgs = new HashMap<>()
-        orgs.put("premium",organizationRepository.save(new Organization("PREMIUM Insurance Company Limited")))
+        orgs.put("premium", organizationRepository.save(new Organization("PREMIUM Insurance Company Limited")))
         return orgs
     }
 
-    private Map<String, Authority> createAuthorities(){
+    private Map<String, Authority> createAuthorities() {
         Map<String, Authority> auths = new HashMap<>()
-        auths.put(Authority.user,authorityRepository.save(new Authority(Authority.user)))
+        auths.put(Authority.user, authorityRepository.save(new Authority(Authority.user)))
         return auths
     }
 
-    private void createUsers(Map<String, Organization> orgs, Map<String, Authority> auths, PetriNet net){
+    private void createUsers(Map<String, Organization> orgs, Map<String, Authority> auths, PetriNet net, PetriNet documentNet) {
         def agentRole = userProcessRoleRepository.save(new UserProcessRole(
                 roleId: net.roles.values().find { it -> it.name == "Agent" }.objectId
         ))
         def systemRole = userProcessRoleRepository.save(new UserProcessRole(
                 roleId: net.roles.values().find { it -> it.name == "System" }.objectId
+        ))
+        def documentAdminRole = userProcessRoleRepository.save(new UserProcessRole(
+                roleId: documentNet.roles.values().find { it -> it.name == "Admin" }.objectId
+        ))
+        def documentAgentRole = userProcessRoleRepository.save(new UserProcessRole(
+                roleId: documentNet.roles.values().find { it -> it.name == "Agent" }.objectId
         ))
         User agent = new User(
                 name: "Fero",
@@ -76,13 +82,16 @@ class InsuranceImporter {
                 authorities: [auths.get(Authority.user)] as Set<Authority>,
                 organizations: [orgs.get("premium")] as Set<Organization>)
         agent.addProcessRole(agentRole)
+        agent.addProcessRole(documentAgentRole)
         User user = new User(
                 name: "Ján",
                 surname: "Kováč",
-                email: "kovac@gmail.com",
+                email: "admin@premium.com",
                 password: "password",
-                authorities: [auths.get(Authority.user)] as Set<Authority>)
+                authorities: [auths.get(Authority.user)] as Set<Authority>,
+                organizations: [orgs.get("premium")] as Set<Organization>)
         user.addProcessRole(agentRole)
+        user.addProcessRole(documentAdminRole)
         User system = new User(
                 name: "System",
                 surname: "System",
@@ -95,12 +104,12 @@ class InsuranceImporter {
         userService.saveNew(system)
     }
 
-    private void createCases(PetriNet net){
+    private void createCases(PetriNet net) {
         Case useCase = new Case(
                 title: "Poistenie nehnuteľnosti",
                 petriNet: net,
                 color: StartRunner.randomColor())
-        useCase.dataSet = new HashMap<>(net.dataSet.collectEntries {[(it.key): new DataField()]})
+        useCase.dataSet = new HashMap<>(net.dataSet.collectEntries { [(it.key): new DataField()] })
         useCase.activePlaces.put(net.places.find { it -> it.value.title == "E" }.key, 1)
         useCase.activePlaces.put(net.places.find { it -> it.value.title == "F" }.key, 1)
         useCase.activePlaces.put(net.places.find { it -> it.value.title == "G" }.key, 1)
@@ -116,7 +125,7 @@ class InsuranceImporter {
                 title: "Poistenie domu",
                 petriNet: net,
                 color: StartRunner.randomColor())
-        useCase.dataSet = new HashMap<>(net.dataSet.collectEntries {[(it.key): new DataField()]})
+        useCase.dataSet = new HashMap<>(net.dataSet.collectEntries { [(it.key): new DataField()] })
         useCase.activePlaces.put(net.places.find { it -> it.value.title == "B" }.key, 1)
         useCase.setAuthor(1L)
         caseRepository.save(useCase)
@@ -127,7 +136,7 @@ class InsuranceImporter {
                 title: "Poistenie domácnosti",
                 petriNet: net,
                 color: StartRunner.randomColor())
-        useCase.dataSet = new HashMap<>(net.dataSet.collectEntries {[(it.key): new DataField()]})
+        useCase.dataSet = new HashMap<>(net.dataSet.collectEntries { [(it.key): new DataField()] })
         useCase.activePlaces.put(net.places.find { it -> it.value.title == "C" }.key, 1)
         useCase.setAuthor(1L)
         useCase = caseRepository.save(useCase)
