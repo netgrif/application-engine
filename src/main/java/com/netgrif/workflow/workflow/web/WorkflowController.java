@@ -6,7 +6,6 @@ import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
 import com.netgrif.workflow.workflow.web.requestbodies.CreateCaseBody;
 import com.netgrif.workflow.workflow.web.responsebodies.CaseResource;
 import com.netgrif.workflow.workflow.web.responsebodies.CaseResourceAssembler;
-import com.netgrif.workflow.workflow.web.responsebodies.MessageResource;
 import com.netgrif.workflow.workflow.web.responsebodies.ResourceLinkAssembler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -28,14 +27,14 @@ public class WorkflowController {
     private IWorkflowService workflowService;
 
     @RequestMapping(value = "/case", method = RequestMethod.POST)
-    public MessageResource createCase(@RequestBody CreateCaseBody body, Authentication auth) {
+    public CaseResource createCase(@RequestBody CreateCaseBody body, Authentication auth) {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
         try {
-            workflowService.createCase(body.netId, body.title, body.color, loggedUser.getId());
-            return MessageResource.successMessage("Case created successfully");
+            Case useCase = workflowService.createCase(body.netId, body.title, body.color, loggedUser.getId());
+            return new CaseResource(useCase);
         } catch (Exception e) { // TODO: 5. 2. 2017 change to custom exception
             e.printStackTrace();
-            return MessageResource.errorMessage("Failed to create case");
+            return null;
         }
     }
 
@@ -63,7 +62,7 @@ public class WorkflowController {
     public PagedResources<CaseResource> findAllByAuthor(@PathVariable("id") Long authorId, Pageable pageable, PagedResourcesAssembler<Case> assembler) {
         Page<Case> cases = workflowService.findAllByAuthor(authorId, pageable);
         Link selfLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(WorkflowController.class)
-                .findAllByAuthor(authorId, pageable, assembler)).withRel("author/" + authorId);
+                .findAllByAuthor(authorId, pageable, assembler)).withRel("author");
         PagedResources<CaseResource> resources = assembler.toResource(cases, new CaseResourceAssembler(), selfLink);
         ResourceLinkAssembler.addLinks(resources, Case.class, selfLink.getRel());
         return resources;
