@@ -8,6 +8,7 @@ import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.auth.domain.repositories.UserRepository;
 import com.netgrif.workflow.petrinet.domain.*;
+import com.netgrif.workflow.petrinet.domain.dataset.DateField;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedField;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.FieldActionsRunner;
@@ -198,12 +199,19 @@ public class TaskService implements ITaskService {
             else
                 field.setBehavior(transition.getDataSet().get(fieldId).applyBehavior());
 
+            resolveDataValues(field);
             dataSetFields.add(field);
         });
         LongStream.range(0L, dataSetFields.size())
                 .forEach(index -> dataSetFields.get((int) index).setOrder(index));
 
         return dataSetFields;
+    }
+
+    private void resolveDataValues(Field field){
+        if(field instanceof DateField){
+            ((DateField)field).convertValue();
+        }
     }
 
     @Override
@@ -258,9 +266,13 @@ public class TaskService implements ITaskService {
 
     @Override
     @Transactional
-    public void delegateTask(String delegatedEmail, String taskId) throws TransitionNotExecutableException {
+    public void delegateTask(Long userId, String delegatedEmail, String taskId) throws TransitionNotExecutableException {
         User delegated = userRepository.findByEmail(delegatedEmail);
-        assignTask(delegated, taskId);
+        User delegate = userRepository.findOne(userId);
+
+        Task task = taskRepository.findOne(taskId);
+        task.setUserId(delegated.getId());
+        taskRepository.save(task);
     }
 
     @Override

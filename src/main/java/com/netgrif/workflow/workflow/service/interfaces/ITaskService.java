@@ -10,6 +10,7 @@ import com.netgrif.workflow.workflow.domain.Task;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -41,9 +42,9 @@ public interface ITaskService {
 
     void cancelTask(Long id, String taskId);
 
+    void delegateTask(Long userId, String delegatedEmail, String taskId) throws TransitionNotExecutableException;
+
     boolean saveFile(String taskId, String fieldId, MultipartFile multipartFile);
 
     FileSystemResource getFile(String taskId, String fieldId);
-
-    void delegateTask(String delegatedEmail, String taskId) throws TransitionNotExecutableException;
 }
