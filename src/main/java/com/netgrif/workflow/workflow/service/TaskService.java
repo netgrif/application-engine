@@ -12,6 +12,7 @@ import com.netgrif.workflow.petrinet.domain.dataset.DateField;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedField;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.FieldActionsRunner;
+import com.netgrif.workflow.petrinet.domain.dataset.logic.FieldBehavior;
 import com.netgrif.workflow.petrinet.domain.roles.RolePermission;
 import com.netgrif.workflow.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.workflow.workflow.domain.Case;
@@ -63,9 +64,9 @@ public class TaskService implements ITaskService {
     @Override
     public Page<Task> getAll(LoggedUser loggedUser, Pageable pageable) {
         List<Task> tasks;
-        if(loggedUser.getProcessRoles().isEmpty()){
+        if (loggedUser.getProcessRoles().isEmpty()) {
             tasks = new ArrayList<>();
-            return new PageImpl<Task>(tasks,pageable,0L);
+            return new PageImpl<Task>(tasks, pageable, 0L);
         } else {
             StringBuilder queryBuilder = new StringBuilder();
             queryBuilder.append("{$or:[");
@@ -180,6 +181,8 @@ public class TaskService implements ITaskService {
         caseRepository.save(useCase);
         taskRepository.save(task);
         reloadTasks(useCase);
+
+//        moveAttributes(task);
     }
 
     @Override
@@ -194,7 +197,7 @@ public class TaskService implements ITaskService {
             Field field = useCase.getPetriNet().getDataSet().get(fieldId);
             field.setValue(useCase.getDataSet().get(fieldId).getValue());
 
-            if(useCase.hasFieldBehavior(fieldId,transition.getStringId()))
+            if (useCase.hasFieldBehavior(fieldId, transition.getStringId()))
                 field.setBehavior(useCase.getDataSet().get(fieldId).applyBehavior(transition.getStringId()));
             else
                 field.setBehavior(transition.getDataSet().get(fieldId).applyBehavior());
@@ -208,9 +211,9 @@ public class TaskService implements ITaskService {
         return dataSetFields;
     }
 
-    private void resolveDataValues(Field field){
-        if(field instanceof DateField){
-            ((DateField)field).convertValue();
+    private void resolveDataValues(Field field) {
+        if (field instanceof DateField) {
+            ((DateField) field).convertValue();
         }
     }
 
@@ -219,23 +222,27 @@ public class TaskService implements ITaskService {
         Task task = taskRepository.findOne(taskId);
         Case useCase = caseRepository.findOne(task.getCaseId());
 
-        Map<String,ChangedField> changedFields = new HashMap<>();
+        Map<String, ChangedField> changedFields = new HashMap<>();
         values.fields().forEachRemaining(entry -> {
             useCase.getDataSet().get(entry.getKey()).setValue(parseFieldsValues(entry.getValue()));
             useCase.getPetriNet().getTransition(task.getTransitionId()).getDataSet()
                     .get(entry.getKey()).getActions().forEach(action -> {
-                        ChangedField field = FieldActionsRunner.run(action,useCase);
-                        if(changedFields.containsKey(field.getId()))
-                            changedFields.get(field.getId()).merge(field);
-                        else
-                            changedFields.put(field.getId(),field);
+                ChangedField field = FieldActionsRunner.run(action, useCase);
+                if (changedFields.containsKey(field.getId()))
+                    changedFields.get(field.getId()).merge(field);
+                else
+                    changedFields.put(field.getId(), field);
             });
         });
 
+        task.setRequiredFilled(useCase.getPetriNet().getTransition(task.getTransitionId()).getDataSet().entrySet().stream().allMatch(entry ->
+                !entry.getValue().getBehavior().contains(FieldBehavior.REQUIRED) || useCase.getDataSet().get(entry.getKey()).getValue() != null));
+
+        taskRepository.save(task);
         caseRepository.save(useCase);
 
         ObjectNode node = JsonNodeFactory.instance.objectNode();
-        changedFields.forEach((id, field) -> node.set(id,field.toJson()));
+        changedFields.forEach((id, field) -> node.set(id, field.toJson()));
         return node;
     }
 
@@ -254,6 +261,16 @@ public class TaskService implements ITaskService {
         taskRepository.delete(taskId);
         caseRepository.save(useCase);
         reloadTasks(useCase);
+
+//        moveAttributes(task);
+    }
+
+    @Transactional
+    private void moveAttributes(Task oldTask){
+        Task newTask = taskRepository.findByTransitionIdAndCaseId(oldTask.getTransitionId(),oldTask.getCaseId());
+        newTask.setRequiredFilled(oldTask.getRequiredFilled());
+
+        taskRepository.save(newTask);
     }
 
     @Override
@@ -410,7 +427,6 @@ public class TaskService implements ITaskService {
             task.addRole(entry.getKey(), entry.getValue());
         }
         task = taskRepository.save(task);
-        task.setVisualId(useCase.getPetriNet().getInitials());
 
         Transaction transaction = useCase.getPetriNet().getTransactionByTransition(transition);
         if (transaction != null) {
