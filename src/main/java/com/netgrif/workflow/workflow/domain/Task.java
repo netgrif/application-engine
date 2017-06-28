@@ -35,9 +35,6 @@ public class Task {
     private String caseTitle;
 
     @Getter
-    private String visualId;
-
-    @Getter
     private int priority;
 
     @Setter
@@ -63,6 +60,12 @@ public class Task {
     @Getter @Setter
     private String transactionId;
 
+    @Getter @Setter
+    private Boolean requiredFilled;
+
+//    @Getter @Setter
+//    private String icon;
+
     public Task() {
         this._id = new ObjectId();
         roles = new HashMap<>();
@@ -80,11 +83,6 @@ public class Task {
 
     public String getStringId() {
         return _id.toString();
-    }
-
-    public void setVisualId(String petriNetInitials) {
-        // TODO: 9.5.2017 bullshit remove now!
-        this.visualId = petriNetInitials+"-"+this._id;
     }
 
     public void setPriority(int priority) {
