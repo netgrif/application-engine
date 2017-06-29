@@ -11,7 +11,7 @@ import com.netgrif.workflow.petrinet.domain.*;
 import com.netgrif.workflow.petrinet.domain.dataset.DateField;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedField;
-import com.netgrif.workflow.petrinet.domain.dataset.logic.FieldActionsRunner;
+import com.netgrif.workflow.petrinet.domain.dataset.logic.action.FieldActionsRunner;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.FieldBehavior;
 import com.netgrif.workflow.petrinet.domain.roles.RolePermission;
 import com.netgrif.workflow.petrinet.domain.throwable.TransitionNotExecutableException;
