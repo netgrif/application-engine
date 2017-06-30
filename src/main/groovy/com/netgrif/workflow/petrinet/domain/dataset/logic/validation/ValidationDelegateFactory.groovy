@@ -16,7 +16,7 @@ class ValidationDelegateFactory {
             case FieldType.DATE:
                 return new DateValidationDelegate(field)
             default:
-                throw new UnsupportedFieldType(field.type)
+                throw new UnsupportedFieldTypeException(field.type)
         }
     }
 
