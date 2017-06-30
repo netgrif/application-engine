@@ -20,4 +20,6 @@ public class ImportData {
     private String[] values;
 
     private Columns columns;
+
+    private String[] valid;
 }

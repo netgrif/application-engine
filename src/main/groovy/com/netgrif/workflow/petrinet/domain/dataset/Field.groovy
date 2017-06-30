@@ -1,5 +1,6 @@
-package com.netgrif.workflow.petrinet.domain.dataset;
+package com.netgrif.workflow.petrinet.domain.dataset
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
@@ -19,6 +20,10 @@ public abstract class Field<T> {
     @Transient
     private T value;
     private Long order
+    @JsonIgnore
+    private String validationRules
+    @Transient
+    private String validationJS
 
     public Field(){
         _id = new ObjectId();
@@ -83,6 +88,33 @@ public abstract class Field<T> {
     void setOrder(Long order) {
         this.order = order
     }
+
+    String getValidationRules() {
+        return validationRules
+    }
+
+    void setValidationRules(String validationRules) {
+        this.validationRules = validationRules
+    }
+
+    void setValidationRules(String[] rules){
+        StringBuilder builder = new StringBuilder()
+        Arrays.stream(rules).each {rule ->
+            if(rule.contains(" ") || rule.contains("(")) builder.append("{${rule}},")
+            else builder.append(rule+",")
+        }
+        builder.deleteCharAt(builder.length()-1)
+        this.validationRules = builder.toString()
+    }
+
+    String getValidation() {
+        return validationJS
+    }
+
+    void setValidation(String validation) {
+        this.validationJS = validation
+    }
+
 //operators overloading
     T plus(final Field field){
         return this.value + field.value
