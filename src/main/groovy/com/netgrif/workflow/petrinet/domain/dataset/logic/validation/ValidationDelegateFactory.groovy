@@ -4,7 +4,7 @@ import com.netgrif.workflow.petrinet.domain.dataset.Field
 import com.netgrif.workflow.petrinet.domain.dataset.FieldType
 
 
-class ValidationDelefateFactory {
+class ValidationDelegateFactory {
 
 
     static ValidationDelegate getDelegate(Field field){
@@ -14,7 +14,7 @@ class ValidationDelefateFactory {
             case FieldType.TEXT:
                 return new TextValidationDelegate(field)
             case FieldType.DATE:
-                return null
+                return new DateValidationDelegate(field)
             default:
                 throw new UnsupportedFieldType(field.type)
         }
