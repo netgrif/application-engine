@@ -20,4 +20,17 @@ class ValidationDelegateFactory {
         }
     }
 
+    static ValidationDelegate getJavascriptDelegate(Field field){
+        switch (field.type){
+            case FieldType.NUMBER:
+                return new NumberValidationJavascriptDelegate(field)
+            case FieldType.TEXT:
+                return new TextValidationJavascriptDelegate(field)
+            case FieldType.DATE:
+                return new DateValidationJavascriptDelegate(field)
+            default:
+                throw new UnsupportedFieldTypeException(field.type)
+        }
+    }
+
 }
