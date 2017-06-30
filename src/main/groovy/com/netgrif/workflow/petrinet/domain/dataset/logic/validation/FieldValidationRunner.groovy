@@ -14,7 +14,12 @@ class FieldValidationRunner {
     static boolean validate(Field field, String rules){
         def shell = new GroovyShell()
         def code = (Closure) shell.evaluate("{-> validate(${rules})}")
-        code.delegate = ValidationDelefateFactory.getDelegate(field)
+        code.delegate = ValidationDelegateFactory.getDelegate(field)
         return code()
+    }
+
+    static String toJavascript(Field field, String rules){
+
+        return ""
     }
 }
