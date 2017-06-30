@@ -168,7 +168,7 @@ public class Importer {
         if(logic.getBehavior() != null)
             Arrays.stream(logic.getBehavior()).forEach(b -> behavior.add(FieldBehavior.fromString(b)));
 
-        final Set<String> actions = new HashSet<>();
+        final LinkedHashSet<String> actions = new LinkedHashSet<>();
         if(logic.getAction() != null) {
             Arrays.asList(logic.getAction()).forEach(action -> {
                 action = parseObjectIds(action, fieldId, FIELD_KEYWORD);
