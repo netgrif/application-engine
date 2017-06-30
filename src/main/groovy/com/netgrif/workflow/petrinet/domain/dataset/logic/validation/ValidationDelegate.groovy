@@ -17,4 +17,13 @@ abstract class ValidationDelegate {
         }
         return true
     }
+
+    def javascript(Closure... cls){
+        StringBuilder builder = new StringBuilder()
+        for(cl in cls){
+            builder.append(cl())
+        }
+        builder.append("return true;")
+        return builder.toString()
+    }
 }

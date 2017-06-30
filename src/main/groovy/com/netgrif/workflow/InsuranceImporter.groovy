@@ -10,6 +10,7 @@ import com.netgrif.workflow.auth.domain.repositories.UserProcessRoleRepository
 import com.netgrif.workflow.auth.service.interfaces.IUserService
 import com.netgrif.workflow.importer.Importer
 import com.netgrif.workflow.petrinet.domain.PetriNet
+import com.netgrif.workflow.petrinet.domain.dataset.logic.validation.FieldValidationRunner
 import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository
 import com.netgrif.workflow.workflow.domain.Case
 import com.netgrif.workflow.workflow.domain.DataField
@@ -130,5 +131,11 @@ class InsuranceImporter {
         useCase = caseRepository.save(useCase)
         net.initializeTokens(useCase.activePlaces)
         taskService.createTasks(useCase)
+
+        def field = net.dataSet.find {it.value.name == "City"}.value
+        field.value = "milan@gmail.com"
+        def js = FieldValidationRunner.toJavascript(field,field.validationRules)
+        def valid = FieldValidationRunner.validate(field,field.validationRules)
+        field.javascriptValidation(js)
     }
 }
