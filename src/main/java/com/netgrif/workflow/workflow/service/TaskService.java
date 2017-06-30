@@ -232,9 +232,13 @@ public class TaskService implements ITaskService {
                     changedFields.get(field.getId()).merge(field);
                 else
                     changedFields.put(field.getId(), field);
+                        useCase.getDataSet().get(field.getId()).setValue(changedFields.get(field.getId()).getValue());
             });
         });
 
+        changedFields.forEach( (id, field) ->
+                useCase.getDataSet().get(id).setValue(field.getValue())
+        );
         task.setRequiredFilled(useCase.getPetriNet().getTransition(task.getTransitionId()).getDataSet().entrySet().stream().allMatch(entry ->
                 !entry.getValue().getBehavior().contains(FieldBehavior.REQUIRED) || useCase.getDataSet().get(entry.getKey()).getValue() != null));
 
@@ -346,7 +350,7 @@ public class TaskService implements ITaskService {
                 value = LocalDate.parse(node.get("value").asText());
                 break;
             case "boolean":
-                value = node.get("value").asBoolean();
+                value = node.get("value") != null && node.get("value").asBoolean();
                 break;
             case "multichoice":
                 ArrayNode arrayNode = (ArrayNode) node.get("value");

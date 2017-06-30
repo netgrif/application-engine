@@ -31,7 +31,7 @@ class FieldActionsRunner {
     }
 
     static String getExpression(String script) {
-        return script.split(";")[1].trim()
+        return script.split(";", 2)[1].trim()
     }
 
     static String getVarName(String variable) {

@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 
@@ -18,11 +19,11 @@ public class DataFieldLogic {
 
     @Getter
     @Setter
-    private Set<String> actions;
+    private LinkedHashSet<String> actions;
 
     public DataFieldLogic() {
         this.behavior = new HashSet<>();
-        this.actions = new HashSet<>();
+        this.actions = new LinkedHashSet<>();
     }
 
     public DataFieldLogic(Set<FieldBehavior> behavior, Set<String> actions) {
