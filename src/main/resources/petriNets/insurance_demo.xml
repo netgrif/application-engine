@@ -8,6 +8,7 @@
     <data type="text">
         <id>2</id>
         <title>City</title>
+        <valid>email</valid>
     </data>
     <data type="enumeration">
         <id>5</id>
@@ -66,6 +67,9 @@
     <data type="number">
         <id>29</id>
         <title>How many adults 18 or over live in the property</title>
+        <valid>positive</valid>
+        <valid>decimal</valid>
+        <valid>inrange 1,inf</valid>
     </data>
     <data type="number">
         <id>30</id>

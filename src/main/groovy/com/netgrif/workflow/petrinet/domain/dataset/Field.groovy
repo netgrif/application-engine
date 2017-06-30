@@ -100,6 +100,7 @@ public abstract class Field<T> {
     void setValidationRules(String[] rules){
         StringBuilder builder = new StringBuilder()
         Arrays.stream(rules).each {rule ->
+            rule = rule.trim()
             if(rule.contains(" ") || rule.contains("(")) builder.append("{${rule}},")
             else builder.append(rule+",")
         }
@@ -107,11 +108,11 @@ public abstract class Field<T> {
         this.validationRules = builder.toString()
     }
 
-    String getValidation() {
+    String getJavascriptValidation() {
         return validationJS
     }
 
-    void setValidation(String validation) {
+    void setJavascriptValidation(String validation) {
         this.validationJS = validation
     }
 

@@ -5,7 +5,7 @@ import com.netgrif.workflow.petrinet.domain.dataset.Field
 
 class NumberValidationDelegate extends ValidationDelegate {
 
-    private static final int INFINITY = 0
+    protected static final int INFINITY = 0
 
     NumberValidationDelegate(Field field) {
         super(field)

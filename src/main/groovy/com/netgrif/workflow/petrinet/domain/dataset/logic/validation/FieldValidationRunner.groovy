@@ -19,7 +19,25 @@ class FieldValidationRunner {
     }
 
     static String toJavascript(Field field, String rules){
+        def shell = new GroovyShell()
+        def code = (Closure) shell.evaluate("{-> javascript(${rules})}")
+        code.delegate = ValidationDelegateFactory.getJavascriptDelegate(field)
+        return code()
+    }
 
-        return ""
+    @Deprecated
+    static String buildJSAlternatives(String rules){
+        StringBuilder builder = new StringBuilder()
+        rules.split(",").each {rule ->
+            if(rule.charAt(0) == '{' as char){
+                builder.append(rule.replaceFirst(" ","JS "))
+                builder.append(",")
+            } else {
+                builder.append(rule)
+                builder.append("JS,")
+            }
+        }
+        builder.deleteCharAt(builder.length()-1)
+        return builder.toString()
     }
 }
