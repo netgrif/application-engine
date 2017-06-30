@@ -4,17 +4,17 @@ import com.netgrif.workflow.petrinet.domain.dataset.Field
 
 import java.time.LocalDate
 
-class DateValidationDelegate extends ValidationDelegate{
 
-    protected static final int INFINITY = 0
+class DateValidationJavascriptDelegate extends DateValidationDelegate{
 
-    DateValidationDelegate(Field field) {
+    DateValidationJavascriptDelegate(Field field) {
         super(field)
     }
 
-    def inf = { return INFINITY }
-
     def between = { start, end ->
+        
+
+
         LocalDate val = (LocalDate)field.value
         if(start instanceof Closure && start() == INFINITY) return val.isBefore(LocalDate.parse((String)end))
         if(end instanceof Closure && end() == INFINITY) return val.isAfter(LocalDate.parse((String)start))
