@@ -1,5 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document>
+    <!-- ========== TRANSACTIONS ========== -->
+    <transaction>
+        <id>1</id>
+        <title>Insurance selection</title>
+    </transaction>
+    <transaction>
+        <id>2</id>
+        <title>Insurance calculation</title>
+    </transaction>
+    <transaction>
+        <id>3</id>
+        <title>Contract proposal</title>
+    </transaction>
     <!-- ========== DATA ========== -->
     <data type="date">
         <id>1</id>
@@ -185,6 +198,9 @@
                 <perform>true</perform>
             </logic>
         </roleRef>
+        <transactionRef>
+            <id>1</id>
+        </transactionRef>
     </transition>
     <transition>
         <id>3</id>
@@ -197,6 +213,9 @@
                 <perform>true</perform>
             </logic>
         </roleRef>
+        <transactionRef>
+            <id>1</id>
+        </transactionRef>
     </transition>
     <transition>
         <id>4</id>
@@ -209,6 +228,9 @@
                 <perform>true</perform>
             </logic>
         </roleRef>
+        <transactionRef>
+            <id>1</id>
+        </transactionRef>
     </transition>
     <transition>
         <id>14</id>
@@ -246,6 +268,9 @@
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
+        <transactionRef>
+            <id>1</id>
+        </transactionRef>
     </transition>
     <transition>
         <id>15</id>
@@ -283,6 +308,9 @@
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
+        <transactionRef>
+            <id>1</id>
+        </transactionRef>
     </transition>
     <transition>
         <id>27</id>
@@ -290,7 +318,7 @@
         <y>260</y>
         <label>Buildings and contents cover calculation</label>
         <roleRef>
-            <id>2</id>
+            <id>1</id>
             <logic>
                 <perform>true</perform>
             </logic>
@@ -380,6 +408,9 @@
                 <behavior>required</behavior>
             </logic>
         </dataRef>
+        <transactionRef>
+            <id>2</id>
+        </transactionRef>
     </transition>
     <transition>
         <id>30</id>
@@ -387,7 +418,7 @@
         <y>140</y>
         <label>Buildings cover calculation</label>
         <roleRef>
-            <id>2</id>
+            <id>1</id>
             <logic>
                 <perform>true</perform>
             </logic>
@@ -453,6 +484,9 @@
                 <behavior>required</behavior>
             </logic>
         </dataRef>
+        <transactionRef>
+            <id>2</id>
+        </transactionRef>
     </transition>
     <transition>
         <id>33</id>
@@ -460,7 +494,7 @@
         <y>380</y>
         <label>Contents cover calculation</label>
         <roleRef>
-            <id>2</id>
+            <id>1</id>
             <logic>
                 <perform>true</perform>
             </logic>
@@ -526,6 +560,9 @@
                 <behavior>required</behavior>
             </logic>
         </dataRef>
+        <transactionRef>
+            <id>2</id>
+        </transactionRef>
     </transition>
     <transition>
         <id>36</id>
@@ -538,6 +575,9 @@
                 <perform>true</perform>
             </logic>
         </roleRef>
+        <transactionRef>
+            <id>3</id>
+        </transactionRef>
     </transition>
     <transition>
         <id>49</id>
@@ -545,11 +585,14 @@
         <y>340</y>
         <label>Expiration</label>
         <roleRef>
-            <id>2</id>
+            <id>1</id>
             <logic>
                 <perform>true</perform>
             </logic>
         </roleRef>
+        <transactionRef>
+            <id>3</id>
+        </transactionRef>
     </transition>
     <transition>
         <id>96</id>
@@ -593,6 +636,9 @@
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
+        <transactionRef>
+            <id>1</id>
+        </transactionRef>
     </transition>
     <!-- ========== ARCS ========== -->
     <arc>
