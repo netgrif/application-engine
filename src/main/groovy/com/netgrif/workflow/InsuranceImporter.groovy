@@ -101,6 +101,7 @@ class InsuranceImporter {
         useCase.dataSet = new HashMap<>(net.dataSet.collectEntries {[(it.key): new DataField()]})
         useCase.activePlaces.put(net.places.find { it -> it.value.title == "B" }.key, 1)
         useCase.activePlaces.put(net.places.find { it -> it.value.title == "L" }.key, 1)
+        useCase.activePlaces.put(net.places.find { it -> it.value.title == "D" }.key, 1)
         useCase.setAuthor(1L)
         caseRepository.save(useCase)
         net.initializeTokens(useCase.activePlaces)
@@ -111,6 +112,7 @@ class InsuranceImporter {
                 petriNet: net,
                 color: StartRunner.randomColor())
         useCase.dataSet = new HashMap<>(net.dataSet.collectEntries {[(it.key): new DataField()]})
+        useCase.activePlaces.put(net.places.find { it -> it.value.title == "E" }.key, 1)
         useCase.activePlaces.put(net.places.find { it -> it.value.title == "C" }.key, 1)
         useCase.activePlaces.put(net.places.find { it -> it.value.title == "L" }.key, 1)
         useCase.setAuthor(1L)
