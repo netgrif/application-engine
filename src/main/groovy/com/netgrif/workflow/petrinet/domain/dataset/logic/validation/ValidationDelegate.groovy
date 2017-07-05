@@ -23,7 +23,25 @@ abstract class ValidationDelegate {
         for(cl in cls){
             builder.append(cl())
         }
-        builder.append("return true;")
+        builder.append(" return true;")
         return builder.toString()
+    }
+
+    def setupJavascriptValidation(String validation, String condition){
+        field.addValidationError(validation)
+        StringBuilder builder = new StringBuilder()
+        builder.append("if(")
+        builder.append(condition)
+        builder.append("){ if(this.validationErrors) this.validationErrors.")
+        builder.append(validation)
+        builder.append("=true; return false;} else { if(this.validationErrors) this.validationErrors.")
+        builder.append(validation)
+        builder.append("=false;}")
+
+        return builder.toString()
+    }
+
+    def javascriptNullControl(String value, String returnValue){
+        return "if(!${value}) return ${returnValue};"
     }
 }
