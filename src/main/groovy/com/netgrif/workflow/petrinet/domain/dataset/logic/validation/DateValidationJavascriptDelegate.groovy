@@ -1,9 +1,7 @@
 package com.netgrif.workflow.petrinet.domain.dataset.logic.validation
 
+import com.netgrif.workflow.petrinet.domain.dataset.DateField
 import com.netgrif.workflow.petrinet.domain.dataset.Field
-
-import java.time.LocalDate
-
 
 class DateValidationJavascriptDelegate extends DateValidationDelegate{
 
@@ -12,22 +10,25 @@ class DateValidationJavascriptDelegate extends DateValidationDelegate{
     }
 
     def between = { start, end ->
-        
-
-
-        LocalDate val = (LocalDate)field.value
-        if(start instanceof Closure && start() == INFINITY) return val.isBefore(LocalDate.parse((String)end))
-        if(end instanceof Closure && end() == INFINITY) return val.isAfter(LocalDate.parse((String)start))
-        return val.isAfter(LocalDate.parse((String)start)) && val.isBefore(LocalDate.parse((String)end))
+        DateField field = (DateField)this.field
+        if(start instanceof Closure && start() == INFINITY) {
+            field.setMaxDate((String)end)
+            return "const endDate = new Date('${end}'); ${setupJavascriptValidation("between","(value - endDate) > 0")}"
+        }
+        if(end instanceof Closure && end() == INFINITY) {
+            field.setMinDate((String)start)
+            return "const startDate = new Date('${start}'); ${setupJavascriptValidation( "between","(value - startDate) < 0")}"
+        }
+        field.setMinDate((String)start)
+        field.setMaxDate((String)end)
+        return "const endDate = new Date('${end}'); const startDate = new Date('${start}'); ${setupJavascriptValidation("between","(value - endDate) > 0 || (value - startDate) < 0")}"
     }
 
     def workday = {
-        int dayOfWeek = ((LocalDate)field.value).getDayOfWeek().value
-        return dayOfWeek >= 1 && dayOfWeek <= 5
+        "const dayOfWeek = value.getDay(); ${setupJavascriptValidation("workday","dayOfWeek === 6 || dayOfWeek === 0")}"
     }
 
     def weekend = {
-        int dayOfWeek = ((LocalDate)field.value).getDayOfWeek().value
-        return dayOfWeek == 6 || dayOfWeek == 7
+        "const dayOfWeek = value.getDay(); ${setupJavascriptValidation("weekend","dayOfWeek >= 1 && dayOfWeek <= 5 && dayOfWeek !== 0")}"
     }
 }
