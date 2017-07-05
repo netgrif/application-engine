@@ -24,6 +24,8 @@ public abstract class Field<T> {
     private String validationRules
     @Transient
     private String validationJS
+    @Transient
+    private Map<String, Boolean> validationErrors
 
     public Field(){
         _id = new ObjectId();
@@ -108,14 +110,30 @@ public abstract class Field<T> {
         this.validationRules = builder.toString()
     }
 
-    String getJavascriptValidation() {
+    String getValidationJS() {
         return validationJS
     }
 
-    void setJavascriptValidation(String validation) {
-        this.validationJS = validation
+    void setValidationJS(String validationJS) {
+        this.validationJS = validationJS
     }
 
+    Map<String, Boolean> getValidationErrors() {
+        return validationErrors
+    }
+
+    void setValidationErrors(Map<String, Boolean> validationErrors) {
+        this.validationErrors = validationErrors
+    }
+
+    void addValidationError(String key, Boolean value){
+        if(this.validationErrors == null) this.validationErrors = new HashMap<>()
+        this.validationErrors.put(key,value)
+    }
+
+    void addValidationError(String key){
+        this.addValidationError(key,false)
+    }
 //operators overloading
     T plus(final Field field){
         return this.value + field.value

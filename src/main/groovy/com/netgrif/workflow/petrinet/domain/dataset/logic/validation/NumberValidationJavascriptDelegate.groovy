@@ -1,6 +1,7 @@
 package com.netgrif.workflow.petrinet.domain.dataset.logic.validation
 
 import com.netgrif.workflow.petrinet.domain.dataset.Field
+import com.netgrif.workflow.petrinet.domain.dataset.NumberField
 
 
 class NumberValidationJavascriptDelegate extends NumberValidationDelegate{
@@ -9,19 +10,28 @@ class NumberValidationJavascriptDelegate extends NumberValidationDelegate{
         super(field)
     }
 
-    def odd = { "if((field.value % 2) === 0) return false;" }
+    def odd = { setupJavascriptValidation("odd","(value % 2) === 0") }
 
-    def even = { "if((field.value % 2) !== 0) return false;" }
+    def even = { setupJavascriptValidation("even","(value % 2) !== 0") }
 
-    def positive = { "if(field.value < 0) return false;" }
+    def positive = { setupJavascriptValidation("positive","value < 0") }
 
-    def negative = { "if(field.value >= 0) return false;" }
+    def negative = { setupJavascriptValidation("negative","value >= 0") }
 
-    def decimal = { "if((field.value % 1) !== 0) return false;" }
+    def decimal = { setupJavascriptValidation("decimal", "value % 1 !== 0") }
 
     def inrange = { n, m ->
-        if (n instanceof Closure && n() == INFINITY) return "if(field.value > ${m}) return false;"
-        if (m instanceof Closure && m() == INFINITY) return "if(field.value < ${n}) return false;"
-        return "if(field.value < ${n} || field.value > ${m}) return false;"
+        NumberField field = (NumberField)this.field
+        if (n instanceof Closure && n() == INFINITY) {
+            field.setMaxValue((Double)m)
+            return setupJavascriptValidation("inrange","value > ${m}")
+        }
+        if (m instanceof Closure && m() == INFINITY) {
+            field.setMinValue((Double)n)
+            return setupJavascriptValidation("inrange","value < ${n}")
+        }
+        field.setMinValue((Double)n)
+        field.setMaxValue((Double)m)
+        return setupJavascriptValidation("inrange","value < ${n} || value > ${m}")
     }
 }
