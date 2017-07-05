@@ -12,6 +12,8 @@ public class TextField extends Field<String> {
     private String subType;
     @Transient
     private int maxLength
+    @Transient
+    private String formating
 
     public TextField() {
         super();
@@ -32,5 +34,13 @@ public class TextField extends Field<String> {
 
     void setMaxLength(int maxLength) {
         this.maxLength = maxLength
+    }
+
+    String getFormating() {
+        return formating
+    }
+
+    void setFormating(String formating) {
+        this.formating = formating
     }
 }
