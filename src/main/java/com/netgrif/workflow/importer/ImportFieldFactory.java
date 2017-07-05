@@ -48,6 +48,8 @@ public final class ImportFieldFactory {
         }
         field.setName(data.getTitle());
         field.setType(type);
+        if(data.getValid() != null)
+            field.setValidationRules(data.getValid());
 
         return field;
     }

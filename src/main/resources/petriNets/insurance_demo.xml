@@ -17,10 +17,13 @@
     <data type="date">
         <id>1</id>
         <title>On which date would you like your cover to start?</title>
+        <valid>between "2017-07-01","2017-07-30"</valid>
+        <valid>workday</valid>
     </data>
     <data type="text">
         <id>2</id>
         <title>City</title>
+        <valid>length 20</valid>
     </data>
     <data type="enumeration">
         <id>5</id>
@@ -79,6 +82,9 @@
     <data type="number">
         <id>29</id>
         <title>How many adults 18 or over live in the property</title>
+        <valid>positive</valid>
+        <valid>decimal</valid>
+        <valid>inrange 1,50</valid>
     </data>
     <data type="number">
         <id>30</id>
