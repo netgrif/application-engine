@@ -13,6 +13,7 @@ import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedField;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.FieldActionsRunner;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.FieldBehavior;
+import com.netgrif.workflow.petrinet.domain.dataset.logic.validation.FieldValidationRunner;
 import com.netgrif.workflow.petrinet.domain.roles.RolePermission;
 import com.netgrif.workflow.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.workflow.workflow.domain.Case;
@@ -201,6 +202,9 @@ public class TaskService implements ITaskService {
                 field.setBehavior(useCase.getDataSet().get(fieldId).applyBehavior(transition.getStringId()));
             else
                 field.setBehavior(transition.getDataSet().get(fieldId).applyBehavior());
+
+            if(field.getValidationRules() != null)
+                field.setValidationJS(FieldValidationRunner.toJavascript(field,field.getValidationRules()));
 
             resolveDataValues(field);
             dataSetFields.add(field);

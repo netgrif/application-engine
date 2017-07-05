@@ -132,10 +132,10 @@ class InsuranceImporter {
         net.initializeTokens(useCase.activePlaces)
         taskService.createTasks(useCase)
 
-        def field = net.dataSet.find {it.value.name == "City"}.value
-        field.value = "milan@gmail.com"
-        def js = FieldValidationRunner.toJavascript(field,field.validationRules)
-        def valid = FieldValidationRunner.validate(field,field.validationRules)
-        field.javascriptValidation(js)
+//        def field = net.dataSet.find {it.value.name == "How many adults 18 or over live in the property"}.value
+//        field.value = 5
+//        def js = FieldValidationRunner.toJavascript(field,field.validationRules)
+//        def valid = FieldValidationRunner.validate(field,field.validationRules)
+//        field.validationJS(js)
     }
 }
