@@ -1,8 +1,10 @@
-package com.netgrif.workflow.petrinet.domain.dataset.logic
+package com.netgrif.workflow.petrinet.domain.dataset.logic.action
 
 import com.netgrif.workflow.importer.Importer
 import com.netgrif.workflow.petrinet.domain.Transition
 import com.netgrif.workflow.petrinet.domain.dataset.Field
+import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedField
+import com.netgrif.workflow.petrinet.domain.dataset.logic.IllegalVariableTypeException
 import com.netgrif.workflow.workflow.domain.Case
 
 class FieldActionsRunner {
