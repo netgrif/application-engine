@@ -15,5 +15,17 @@ class TextValidationJavascriptDelegate extends TextValidationDelegate{
         return javascriptNullControl("value","true")+setupJavascriptValidation("length","value.length > ${n}")
     }
 
-    def regex = { r -> setupJavascriptValidation("regex","!(new RegExp(\"${r}\").test(value))") }
+    def regex = { r, String v = "regex" ->
+        return setupJavascriptValidation(v,"!(new RegExp(\"${r}\").test(value))")
+    }
+
+    def email = {
+        ((TextField)this.field).setFormating("example@example.com")
+        return regex(/[a-z0-9!#\u0024%&'*+\/=?^_`{|}~-]+(?:\.[a-z0-9!#\u0024%&'*+\/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/,"email")
+    }
+
+    def telnumber = {
+        ((TextField)this.field).setFormating("+421 907 123 456")
+        return regex(/^\s*(?:\+?(\d{1,3}))?([-. (]*(\d{3})[-. )]*)?((\d{3})[-. ]*(\d{2,4})(?:[-.x ]*(\d+))?)\s*$/,"telnumber")
+    }
 }
