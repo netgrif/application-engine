@@ -10,6 +10,7 @@ import com.netgrif.workflow.auth.domain.repositories.UserRepository;
 import com.netgrif.workflow.petrinet.domain.*;
 import com.netgrif.workflow.petrinet.domain.dataset.DateField;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
+import com.netgrif.workflow.petrinet.domain.dataset.ValidableField;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedField;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.FieldActionsRunner;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.FieldBehavior;
@@ -203,8 +204,8 @@ public class TaskService implements ITaskService {
             else
                 field.setBehavior(transition.getDataSet().get(fieldId).applyBehavior());
 
-            if(field.getValidationRules() != null)
-                field.setValidationJS(FieldValidationRunner.toJavascript(field,field.getValidationRules()));
+            if(field instanceof ValidableField && ((ValidableField<Object>)field).getValidationRules() != null)
+                ((ValidableField<Object>)field).setValidationJS(FieldValidationRunner.toJavascript(field,((ValidableField<Object>)field).getValidationRules()));
 
             resolveDataValues(field);
             dataSetFields.add(field);
