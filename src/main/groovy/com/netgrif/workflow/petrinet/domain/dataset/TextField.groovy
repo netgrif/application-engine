@@ -4,7 +4,7 @@ import org.springframework.data.annotation.Transient
 import org.springframework.data.mongodb.core.mapping.Document
 
 @Document
-public class TextField extends Field<String> {
+public class TextField extends ValidableField<String> {
 
     public static final String SIMPLE_SUBTYPE = "simple";
     public static final String AREA_SUBTYPE = "area";
