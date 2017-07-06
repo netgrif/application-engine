@@ -49,6 +49,10 @@ public class DataField {
         return this.behavior.containsKey(transition);
     }
 
+    public boolean isDisplayable(String transition){
+        return behavior.containsKey(transition) && behavior.get(transition).contains(FieldBehavior.VISIBLE) && behavior.get(transition).contains(FieldBehavior.EDITABLE);
+    }
+
     public void makeVisible(String transition){
         this.behavior.get(transition).remove(FieldBehavior.EDITABLE);
         this.behavior.get(transition).add(FieldBehavior.VISIBLE);
