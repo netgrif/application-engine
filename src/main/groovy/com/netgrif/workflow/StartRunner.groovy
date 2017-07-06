@@ -20,6 +20,10 @@ class StartRunner  implements CommandLineRunner{
     private XlsImporter xlsImporter
     @Autowired
     private SuperCreator superCreator
+    @Autowired
+    private FlushSessionsRunner sessionsRunner
+    @Autowired
+    private JMeterExport export
 
     @Override
     void run(String... strings) throws Exception {
@@ -30,6 +34,9 @@ class StartRunner  implements CommandLineRunner{
         //xlsImporter.run(strings)
 
         superCreator.run(strings)
+
+        sessionsRunner.run(strings)
+//        export.run(strings)
     }
 
     static String randomColor() {

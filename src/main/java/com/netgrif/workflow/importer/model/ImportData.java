@@ -22,4 +22,6 @@ public class ImportData {
     private Columns columns;
 
     private String[] valid;
+
+    private String init;
 }
