@@ -45,4 +45,8 @@ public class DataFieldLogic {
         this.behavior.addAll(other.behavior);
         this.actions.addAll(other.actions);
     }
+
+    public boolean isDisplayable(){
+        return behavior.contains(FieldBehavior.EDITABLE) || behavior.contains(FieldBehavior.VISIBLE);
+    }
 }
