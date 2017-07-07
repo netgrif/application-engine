@@ -1,8 +1,10 @@
 package com.netgrif.workflow
 
+import org.apache.log4j.Logger
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.CommandLineRunner
 import org.springframework.context.annotation.Profile
+import org.springframework.core.env.Environment
 import org.springframework.data.mongodb.core.MongoTemplate
 import org.springframework.stereotype.Component
 
@@ -11,6 +13,11 @@ import java.util.concurrent.ThreadLocalRandom
 @Component
 @Profile("!test")
 class StartRunner  implements CommandLineRunner{
+
+    static Logger log = Logger.getLogger(StartRunner.class.getName())
+
+    @Autowired
+    private Environment environment
 
     @Autowired
     private MongoTemplate mongoTemplate
@@ -25,6 +32,8 @@ class StartRunner  implements CommandLineRunner{
     @Autowired
     private JMeterExport export
 
+
+
     @Override
     void run(String... strings) throws Exception {
         mongoTemplate.getDb().dropDatabase()
@@ -37,6 +46,13 @@ class StartRunner  implements CommandLineRunner{
 
         sessionsRunner.run(strings)
 //        export.run(strings)
+
+        host()
+    }
+
+    private void host(){
+        log.info("HOST ADDRESS: "+InetAddress.loopbackAddress.hostAddress)
+        log.info("HOST NAME: "+InetAddress.loopbackAddress.hostName)
     }
 
     static String randomColor() {
