@@ -486,4 +486,8 @@ public class TaskService implements ITaskService {
 
         return tasks;
     }
+
+    public void deleteTasksByCase(String caseId){
+        taskRepository.deleteAllByCaseId(caseId);
+    }
 }
