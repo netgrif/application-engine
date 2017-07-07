@@ -9,6 +9,7 @@ import org.springframework.ui.velocity.VelocityEngineUtils;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
+import java.net.InetAddress;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
@@ -18,6 +19,8 @@ import java.util.Map;
 
 @Component
 public class MailService implements IMailService {
+
+    private final String port = "8080";
 
     @Value("${mail.from}")
     String mailFrom;
@@ -33,6 +36,7 @@ public class MailService implements IMailService {
         model.put("token", token);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
         model.put("date", LocalDate.now().plusDays(3).format(formatter).toString());
+        model.put("serverName","http://"+ InetAddress.getLoopbackAddress().getHostName()+":"+port);
         MimeMessage email = buildEmail(EmailType.REGISTRATION, recipients, model);
         mailSender.send(email);
     }
