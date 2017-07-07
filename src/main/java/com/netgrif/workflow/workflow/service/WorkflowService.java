@@ -85,4 +85,9 @@ public class WorkflowService implements IWorkflowService {
     public Page<Case> findAllByAuthor(Long authorId, Pageable pageable) {
         return repository.findAllByAuthor(authorId, pageable);
     }
+
+    @Override
+    public void deleteCase(String caseId){
+        repository.delete(caseId);
+    }
 }
