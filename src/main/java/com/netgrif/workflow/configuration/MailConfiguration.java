@@ -15,10 +15,10 @@ public class MailConfiguration {
     @Bean
     public JavaMailSenderImpl mailSender() {
         JavaMailSenderImpl sender = new JavaMailSenderImpl();
-        sender.setPort(587);
-        sender.setHost("smtp.mailgun.org");
-        sender.setUsername("workflow@sandbox77b26b1bdb5a40439459609a0292b926.mailgun.org");
-        sender.setPassword("workflow");
+        sender.setPort(465);
+        sender.setHost("smtp.websupport.sk");
+        sender.setUsername("noreply@netgrif.com");
+        sender.setPassword("Superstar38");
         Properties mailProperties = new Properties();
         mailProperties.put("mail.smtp.auth", true);
         mailProperties.put("mail.smtp.starttls.enable", true);
