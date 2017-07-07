@@ -198,15 +198,15 @@ public class TaskService implements ITaskService {
         List<Field> dataSetFields = new ArrayList<>();
 
         fieldsIds.forEach(fieldId -> {
-            if(useCase.hasFieldBehavior(fieldId, transition.getStringId())){
-                if(useCase.getDataSet().get(fieldId).isDisplayable(transition.getStringId())){
-                    Field field = buildField(useCase,fieldId);
+            if (useCase.hasFieldBehavior(fieldId, transition.getStringId())) {
+                if (useCase.getDataSet().get(fieldId).isDisplayable(transition.getStringId())) {
+                    Field field = buildField(useCase, fieldId);
                     field.setBehavior(useCase.getDataSet().get(fieldId).applyBehavior(transition.getStringId()));
                     dataSetFields.add(field);
                 }
             } else {
-                if(transition.getDataSet().get(fieldId).isDisplayable()){
-                    Field field = buildField(useCase,fieldId);
+                if (transition.getDataSet().get(fieldId).isDisplayable()) {
+                    Field field = buildField(useCase, fieldId);
                     field.setBehavior(transition.getDataSet().get(fieldId).applyBehavior());
                     dataSetFields.add(field);
                 }
@@ -218,12 +218,12 @@ public class TaskService implements ITaskService {
         return dataSetFields;
     }
 
-    private Field buildField(Case useCase, String fieldId){
+    private Field buildField(Case useCase, String fieldId) {
         Field field = useCase.getPetriNet().getDataSet().get(fieldId);
         field.setValue(useCase.getDataSet().get(fieldId).getValue());
-        if(field instanceof ValidableField && ((ValidableField)field).getValidationRules() != null)
-            ((ValidableField)field).setValidationJS(FieldValidationRunner
-                    .toJavascript(field,((ValidableField)field).getValidationRules()));
+        if (field instanceof ValidableField && ((ValidableField) field).getValidationRules() != null)
+            ((ValidableField) field).setValidationJS(FieldValidationRunner
+                    .toJavascript(field, ((ValidableField) field).getValidationRules()));
         resolveDataValues(field);
         return field;
     }
@@ -231,42 +231,89 @@ public class TaskService implements ITaskService {
     private void resolveDataValues(Field field) {
         if (field instanceof DateField) {
             ((DateField) field).convertValue();
-        } else if(field instanceof NumberField && field.getValue() instanceof Integer) {
-            field.setValue(((Integer)field.getValue()).doubleValue());
+        } else if (field instanceof NumberField && field.getValue() instanceof Integer) {
+            field.setValue(((Integer) field.getValue()).doubleValue());
         }
     }
 
     @Override
-    public ObjectNode setDataFieldsValues(String taskId, ObjectNode values) {
+    public ObjectNode setData(String taskId, ObjectNode values) {
         Task task = taskRepository.findOne(taskId);
         Case useCase = caseRepository.findOne(task.getCaseId());
 
         Map<String, ChangedField> changedFields = new HashMap<>();
         values.fields().forEachRemaining(entry -> {
             useCase.getDataSet().get(entry.getKey()).setValue(parseFieldsValues(entry.getValue()));
-            useCase.getPetriNet().getTransition(task.getTransitionId()).getDataSet()
-                    .get(entry.getKey()).getActions().forEach(action -> {
-                ChangedField field = FieldActionsRunner.run(action, useCase);
-                if (changedFields.containsKey(field.getId()))
-                    changedFields.get(field.getId()).merge(field);
-                else
-                    changedFields.put(field.getId(), field);
-                        useCase.getDataSet().get(field.getId()).setValue(changedFields.get(field.getId()).getValue());
-            });
+            changedFields.put(entry.getKey(), new ChangedField(entry.getKey()));
+            runActions(useCase.getPetriNet().getTransition(task.getTransitionId()).getDataSet().get(entry.getKey()).getActions(), useCase, changedFields);
+            changedFields.remove(entry.getKey());
         });
 
-        changedFields.forEach( (id, field) ->
-                useCase.getDataSet().get(id).setValue(field.getValue())
-        );
-        task.setRequiredFilled(useCase.getPetriNet().getTransition(task.getTransitionId()).getDataSet().entrySet().stream().allMatch(entry ->
-                !entry.getValue().getBehavior().contains(FieldBehavior.REQUIRED) || useCase.getDataSet().get(entry.getKey()).getValue() != null));
-
-        taskRepository.save(task);
         caseRepository.save(useCase);
 
         ObjectNode node = JsonNodeFactory.instance.objectNode();
         changedFields.forEach((id, field) -> node.set(id, field.toJson()));
         return node;
+    }
+
+    private void runActions(Set<String> actions, Case useCase, Map<String, ChangedField> changedFields) {
+        actions.forEach(action -> {
+            ChangedField field = FieldActionsRunner.run(action, useCase);
+
+            if (changedFields.containsKey(field.getId()))
+                changedFields.get(field.getId()).merge(field);
+            else
+                changedFields.put(field.getId(), field);
+
+            if (field.getValue() != null)
+                getTransitionsByField(field.getId(), useCase.getPetriNet()).forEach(transition ->
+                        runActions(transition.getDataSet().get(field.getId()).getActions(), useCase, changedFields)
+                );
+        });
+    }
+
+    private Object parseFieldsValues(JsonNode jsonNode) {
+        ObjectNode node = (ObjectNode) jsonNode;
+        Object value;
+        switch (node.get("type").asText()) {
+            case "date":
+                value = LocalDate.parse(node.get("value").asText());
+                break;
+            case "boolean":
+                value = node.get("value") != null && node.get("value").asBoolean();
+                break;
+            case "multichoice":
+                ArrayNode arrayNode = (ArrayNode) node.get("value");
+                HashSet<String> set = new HashSet<>();
+                arrayNode.forEach(item -> set.add(item.asText()));
+                value = set;
+                break;
+            case "user":
+                User user = userRepository.findByEmail(node.get("value").asText());
+                user.setPassword(null);
+                user.setOrganizations(null);
+                user.setAuthorities(null);
+                user.setUserProcessRoles(null);
+                value = user;
+                break;
+            case "number":
+                value = node.get("value").asDouble();
+                break;
+            default:
+                value = node.get("value").asText();
+                break;
+        }
+        if (value instanceof String && ((String) value).equalsIgnoreCase("null")) return null;
+        else return value;
+    }
+
+    private List<Transition> getTransitionsByField(String field, PetriNet net) {
+        List<Transition> transitions = new ArrayList<>();
+        net.getTransitions().forEach((transId, trans) -> {
+            if (trans.getDataSet().containsKey(field))
+                transitions.add(trans);
+        });
+        return transitions;
     }
 
     @Override
@@ -289,8 +336,8 @@ public class TaskService implements ITaskService {
     }
 
     @Transactional
-    private void moveAttributes(Task oldTask){
-        Task newTask = taskRepository.findByTransitionIdAndCaseId(oldTask.getTransitionId(),oldTask.getCaseId());
+    private void moveAttributes(Task oldTask) {
+        Task newTask = taskRepository.findByTransitionIdAndCaseId(oldTask.getTransitionId(), oldTask.getCaseId());
         newTask.setRequiredFilled(oldTask.getRequiredFilled());
 
         taskRepository.save(newTask);
@@ -359,41 +406,6 @@ public class TaskService implements ITaskService {
         taskRepository.deleteAllByCaseIdAndUserIdIsNull(useCase.getStringId());
         taskRepository.deleteAllByCaseIdAndFinishDateIsNotNull(useCase.getStringId());
         createTasks(useCase);
-    }
-
-    private Object parseFieldsValues(JsonNode jsonNode) {
-        ObjectNode node = (ObjectNode) jsonNode;
-        Object value;
-        switch (node.get("type").asText()) {
-            case "date":
-                value = LocalDate.parse(node.get("value").asText());
-                break;
-            case "boolean":
-                value = node.get("value") != null && node.get("value").asBoolean();
-                break;
-            case "multichoice":
-                ArrayNode arrayNode = (ArrayNode) node.get("value");
-                HashSet<String> set = new HashSet<>();
-                arrayNode.forEach(item -> set.add(item.asText()));
-                value = set;
-                break;
-            case "user":
-                User user = userRepository.findByEmail(node.get("value").asText());
-                user.setPassword(null);
-                user.setOrganizations(null);
-                user.setAuthorities(null);
-                user.setUserProcessRoles(null);
-                value = user;
-                break;
-            case "number":
-                value = node.get("value").asDouble();
-                break;
-            default:
-                value = node.get("value").asText();
-                break;
-        }
-        if (value instanceof String && ((String) value).equalsIgnoreCase("null")) return null;
-        else return value;
     }
 
 //    private void figureOutProcessRoles(Task task, Transition transition) {
