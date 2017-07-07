@@ -57,6 +57,7 @@ class ActionDelegate {
             def value = cl()
             if (value != null){
                 field.value = value
+                useCase.dataSet.get(field.objectId).value = value
                 changedField = new ChangedField(field.objectId)
                 changedField.value = field.value
             }
