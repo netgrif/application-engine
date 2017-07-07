@@ -47,4 +47,6 @@ public interface ITaskService {
     boolean saveFile(String taskId, String fieldId, MultipartFile multipartFile);
 
     FileSystemResource getFile(String taskId, String fieldId);
+
+    void deleteTasksByCase(String caseId);
 }
