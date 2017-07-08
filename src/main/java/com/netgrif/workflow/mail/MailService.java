@@ -1,8 +1,10 @@
 package com.netgrif.workflow.mail;
 
+import org.apache.log4j.Logger;
 import org.apache.velocity.app.VelocityEngine;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
 import org.springframework.ui.velocity.VelocityEngineUtils;
@@ -20,8 +22,10 @@ import java.util.Map;
 @Component
 public class MailService implements IMailService {
 
-    private final String port = "8080";
+    static final Logger log = Logger.getLogger(MailService.class.getName());
 
+    @Value("${mail.server.port}")
+    String port;
     @Value("${mail.from}")
     String mailFrom;
 
@@ -29,16 +33,28 @@ public class MailService implements IMailService {
 
     private VelocityEngine velocityEngine;
 
+    @Override
     public void sendRegistrationEmail(String recipient, String token) throws MessagingException {
         List<String> recipients = new LinkedList<>();
         recipients.add(recipient);
         Map<String, Object> model = new HashMap<>();
         model.put("token", token);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
-        model.put("date", LocalDate.now().plusDays(3).format(formatter).toString());
+        model.put("date", LocalDate.now().plusDays(3).format(formatter));
         model.put("serverName","http://"+ InetAddress.getLoopbackAddress().getHostName()+":"+port);
         MimeMessage email = buildEmail(EmailType.REGISTRATION, recipients, model);
         mailSender.send(email);
+    }
+
+    @Override
+    public void testConnection(){
+        try {
+            ((JavaMailSenderImpl)mailSender).testConnection();
+            log.info("MAIL: Connection to mail server is stable");
+        } catch (MessagingException e) {
+            e.printStackTrace();
+            log.error("MAIL: Connection failed!");
+        }
     }
 
     private MimeMessage buildEmail(EmailType type, List<String> recipients, Map<String, Object> model) throws MessagingException {
