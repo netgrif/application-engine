@@ -13,10 +13,11 @@ public class MultichoiceField extends FieldWithDefault<Set<String>> {
         choices = new HashSet<>();
     }
 
+    @Override
     public void setDefaultValue(String value){
         String[] vls = value.split(",")
         vls.each {s -> s.trim()}
-        setDefaultValue(new HashSet<String>(vls as Set))
+        super.defaultValue = new HashSet<String>(vls as Set)
     }
 
     public MultichoiceField(String[] values) {

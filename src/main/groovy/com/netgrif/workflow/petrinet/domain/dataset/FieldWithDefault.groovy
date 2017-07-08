@@ -6,8 +6,7 @@ import org.springframework.data.mongodb.core.mapping.Document
 @Document
 abstract class FieldWithDefault<T> extends Field<T> {
 
-    @JsonIgnore
-    private T defaultValue
+    protected T defaultValue
 
     FieldWithDefault() {
         super()
@@ -17,7 +16,7 @@ abstract class FieldWithDefault<T> extends Field<T> {
         return defaultValue
     }
 
-    void setDefaultValue(T defaultValue) {
+    void setDefaultValue(String defaultValue) {
         this.defaultValue = defaultValue
     }
 }
