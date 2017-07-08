@@ -48,12 +48,12 @@ class InsuranceImporter {
 
 
     void run(String... strings) throws Exception {
-        def net = importer.importPetriNet(new File("src/main/resources/petriNets/insurance_demo.xml"), "Insurance", "INS")
+        def net = importer.importPetriNet(new File("src/main/resources/petriNets/poistenie_hhi.xml"), "Insurance", "INS")
 
         def orgs = createOrganizations()
         def auths = createAuthorities()
         createUsers(orgs,auths,net)
-        createCases(net)
+//        createCases(net)
     }
 
     private Map<String, Organization> createOrganizations(){
@@ -72,9 +72,7 @@ class InsuranceImporter {
         def agentRole = userProcessRoleRepository.save(new UserProcessRole(
                 roleId: net.roles.values().find { it -> it.name == "Agent" }.objectId
         ))
-        def systemRole = userProcessRoleRepository.save(new UserProcessRole(
-                roleId: net.roles.values().find { it -> it.name == "System" }.objectId
-        ))
+
         User agent = new User(
                 name: "Agent",
                 surname: "Smith",
@@ -83,15 +81,7 @@ class InsuranceImporter {
                 authorities: [auths.get(Authority.user)] as Set<Authority>,
                 organizations: [orgs.get("insurance")] as Set<Organization>)
         agent.addProcessRole(agentRole)
-        User system = new User(
-                name: "System",
-                surname: "System",
-                email: "system@company.com",
-                password: "password",
-                authorities: [auths.get(Authority.user)] as Set<Authority>)
-        system.addProcessRole(systemRole)
         userService.saveNew(agent)
-        userService.saveNew(system)
     }
 
     private void createCases(PetriNet net){
