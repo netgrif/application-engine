@@ -1,6 +1,7 @@
 package com.netgrif.workflow.workflow.service;
 
 import com.netgrif.workflow.petrinet.domain.PetriNet;
+import com.netgrif.workflow.petrinet.domain.dataset.FieldWithDefault;
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.DataField;
@@ -45,20 +46,20 @@ public class WorkflowService implements IWorkflowService {
         return page;
     }
 
-    public Page<Case> searchCase(List<String> nets, Pageable pageable){
+    public Page<Case> searchCase(List<String> nets, Pageable pageable) {
         StringBuilder queryBuilder = new StringBuilder();
         nets.forEach(net -> {
             queryBuilder.append("{$ref:\"petriNet\",$id:{$oid:\"");
             queryBuilder.append(net);
             queryBuilder.append("\"}},");
         });
-        if(queryBuilder.length() > 0)
-            queryBuilder.deleteCharAt(queryBuilder.length()-1);
-        String queryString = nets.isEmpty() ? "{}" : "{petriNet:{$in:["+queryBuilder.toString()+"]}}";
-        BasicQuery query = new BasicQuery(queryString,"{petriNet:0, dataSet:0}");
+        if (queryBuilder.length() > 0)
+            queryBuilder.deleteCharAt(queryBuilder.length() - 1);
+        String queryString = nets.isEmpty() ? "{}" : "{petriNet:{$in:[" + queryBuilder.toString() + "]}}";
+        BasicQuery query = new BasicQuery(queryString, "{petriNet:0, dataSet:0}");
         query = (BasicQuery) query.with(pageable);
-        List<Case> useCases = mongoTemplate.find(query,Case.class);
-        return new PageImpl<Case>(useCases,pageable,mongoTemplate.count(new BasicQuery(queryString,"{petriNet:0, dataSet:0}"),Case.class));
+        List<Case> useCases = mongoTemplate.find(query, Case.class);
+        return new PageImpl<Case>(useCases, pageable, mongoTemplate.count(new BasicQuery(queryString, "{petriNet:0, dataSet:0}"), Case.class));
     }
 
     @Override
@@ -67,7 +68,12 @@ public class WorkflowService implements IWorkflowService {
         Case useCase = new Case(title, petriNet, petriNet.getActivePlaces());
         useCase.setColor(color);
         HashMap<String, DataField> dataValues = new HashMap<>();
-        petriNet.getDataSet().forEach((key, field) -> dataValues.put(key,new DataField()));
+        petriNet.getDataSet().forEach((key, field) -> {
+            if (field instanceof FieldWithDefault)
+                dataValues.put(key, new DataField(((FieldWithDefault) field).getDefaultValue()));
+            else
+                dataValues.put(key, new DataField());
+        });
         useCase.setDataSet(dataValues);
         useCase.setAuthor(authorId);
         useCase = saveCase(useCase);
@@ -78,5 +84,11 @@ public class WorkflowService implements IWorkflowService {
     @Override
     public Page<Case> findAllByAuthor(Long authorId, Pageable pageable) {
         return repository.findAllByAuthor(authorId, pageable);
+    }
+
+    @Override
+    public void deleteCase(String caseId){
+        repository.delete(caseId);
+        taskService.deleteTasksByCase(caseId);
     }
 }
