@@ -38,7 +38,7 @@ public interface ITaskService {
 
     List<Field> getData(String taskId);
 
-    ObjectNode setDataFieldsValues(String taskId, ObjectNode values);
+    ObjectNode setData(String taskId, ObjectNode values);
 
     void cancelTask(Long id, String taskId);
 
@@ -47,4 +47,6 @@ public interface ITaskService {
     boolean saveFile(String taskId, String fieldId, MultipartFile multipartFile);
 
     FileSystemResource getFile(String taskId, String fieldId);
+
+    void deleteTasksByCase(String caseId);
 }

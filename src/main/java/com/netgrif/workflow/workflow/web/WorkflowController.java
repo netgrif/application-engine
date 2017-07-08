@@ -6,6 +6,7 @@ import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
 import com.netgrif.workflow.workflow.web.requestbodies.CreateCaseBody;
 import com.netgrif.workflow.workflow.web.responsebodies.CaseResource;
 import com.netgrif.workflow.workflow.web.responsebodies.CaseResourceAssembler;
+import com.netgrif.workflow.workflow.web.responsebodies.MessageResource;
 import com.netgrif.workflow.workflow.web.responsebodies.ResourceLinkAssembler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -17,6 +18,9 @@ import org.springframework.hateoas.mvc.ControllerLinkBuilder;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @RestController()
@@ -66,5 +70,17 @@ public class WorkflowController {
         PagedResources<CaseResource> resources = assembler.toResource(cases, new CaseResourceAssembler(), selfLink);
         ResourceLinkAssembler.addLinks(resources, Case.class, selfLink.getRel());
         return resources;
+    }
+
+    @RequestMapping(value = "/case/{id}", method = RequestMethod.DELETE)
+    public MessageResource deleteCase(@PathVariable("id") String caseId){
+        try {
+            caseId = URLDecoder.decode(caseId, StandardCharsets.UTF_8.name());
+            workflowService.deleteCase(caseId);
+            return MessageResource.successMessage("Case "+caseId+" was deleted");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+            return MessageResource.errorMessage("Deleting case "+caseId+" has failed!");
+        }
     }
 }
