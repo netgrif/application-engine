@@ -14,6 +14,8 @@ public class ImportData {
 
     private String title;
 
+    private String desc;
+
     @XmlAttribute
     private String type;
 
