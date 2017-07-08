@@ -640,6 +640,12 @@
             <id>2</id>
             <logic>
                 <behavior>editable</behavior>
+                <action>
+                    self: f.this,
+                    trans: t.this,
+                    other: f.39;
+                    make other,visible on trans when { self.value == "Zalesie" }
+                </action>
             </logic>
         </dataRef>
         <dataRef>
@@ -663,7 +669,7 @@
         <dataRef>
             <id>39</id>
             <logic>
-                <behavior>editable</behavior>
+                <behavior>hidden</behavior>
             </logic>
         </dataRef>
         <transactionRef>

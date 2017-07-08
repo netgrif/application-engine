@@ -47,6 +47,6 @@ public class DataFieldLogic {
     }
 
     public boolean isDisplayable(){
-        return behavior.contains(FieldBehavior.EDITABLE) || behavior.contains(FieldBehavior.VISIBLE);
+        return behavior.contains(FieldBehavior.EDITABLE) || behavior.contains(FieldBehavior.VISIBLE) || behavior.contains(FieldBehavior.HIDDEN);
     }
 }
