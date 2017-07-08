@@ -16,4 +16,6 @@ public interface IWorkflowService {
     Case createCase(String netId, String title, String color, Long authorId);
 
     Page<Case> findAllByAuthor(Long authorId, Pageable pageable);
+
+    void deleteCase(String caseId);
 }
