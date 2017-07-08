@@ -8,11 +8,11 @@ import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.auth.domain.repositories.UserRepository;
 import com.netgrif.workflow.petrinet.domain.*;
-import com.netgrif.workflow.petrinet.domain.dataset.DateField;
-import com.netgrif.workflow.petrinet.domain.dataset.Field;
+import com.netgrif.workflow.petrinet.domain.dataset.*;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedField;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.FieldActionsRunner;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.FieldBehavior;
+import com.netgrif.workflow.petrinet.domain.dataset.logic.logic.FileFieldLogic;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.validation.FieldValidationRunner;
 import com.netgrif.workflow.petrinet.domain.roles.RolePermission;
 import com.netgrif.workflow.petrinet.domain.throwable.TransitionNotExecutableException;
@@ -194,20 +194,21 @@ public class TaskService implements ITaskService {
 
         Set<String> fieldsIds = transition.getDataSet().keySet();
         List<Field> dataSetFields = new ArrayList<>();
+
         fieldsIds.forEach(fieldId -> {
-            Field field = useCase.getPetriNet().getDataSet().get(fieldId);
-            field.setValue(useCase.getDataSet().get(fieldId).getValue());
-
-            if (useCase.hasFieldBehavior(fieldId, transition.getStringId()))
-                field.setBehavior(useCase.getDataSet().get(fieldId).applyBehavior(transition.getStringId()));
-            else
-                field.setBehavior(transition.getDataSet().get(fieldId).applyBehavior());
-
-            if(field.getValidationRules() != null)
-                field.setValidationJS(FieldValidationRunner.toJavascript(field,field.getValidationRules()));
-
-            resolveDataValues(field);
-            dataSetFields.add(field);
+            if (useCase.hasFieldBehavior(fieldId, transition.getStringId())) {
+                if (useCase.getDataSet().get(fieldId).isDisplayable(transition.getStringId())) {
+                    Field field = buildField(useCase, fieldId);
+                    field.setBehavior(useCase.getDataSet().get(fieldId).applyBehavior(transition.getStringId()));
+                    dataSetFields.add(field);
+                }
+            } else {
+                if (transition.getDataSet().get(fieldId).isDisplayable()) {
+                    Field field = buildField(useCase, fieldId);
+                    field.setBehavior(transition.getDataSet().get(fieldId).applyBehavior());
+                    dataSetFields.add(field);
+                }
+            }
         });
         LongStream.range(0L, dataSetFields.size())
                 .forEach(index -> dataSetFields.get((int) index).setOrder(index));
@@ -215,38 +216,37 @@ public class TaskService implements ITaskService {
         return dataSetFields;
     }
 
+    private Field buildField(Case useCase, String fieldId) {
+        Field field = useCase.getPetriNet().getDataSet().get(fieldId);
+        field.setValue(useCase.getDataSet().get(fieldId).getValue());
+        if (field instanceof ValidableField && ((ValidableField) field).getValidationRules() != null)
+            ((ValidableField) field).setValidationJS(FieldValidationRunner
+                    .toJavascript(field, ((ValidableField) field).getValidationRules()));
+        resolveDataValues(field);
+        return field;
+    }
+
     private void resolveDataValues(Field field) {
         if (field instanceof DateField) {
             ((DateField) field).convertValue();
+        } else if (field instanceof NumberField && field.getValue() instanceof Integer) {
+            field.setValue(((Integer) field.getValue()).doubleValue());
         }
     }
 
     @Override
-    public ObjectNode setDataFieldsValues(String taskId, ObjectNode values) {
+    public ObjectNode setData(String taskId, ObjectNode values) {
         Task task = taskRepository.findOne(taskId);
         Case useCase = caseRepository.findOne(task.getCaseId());
 
         Map<String, ChangedField> changedFields = new HashMap<>();
         values.fields().forEachRemaining(entry -> {
             useCase.getDataSet().get(entry.getKey()).setValue(parseFieldsValues(entry.getValue()));
-            useCase.getPetriNet().getTransition(task.getTransitionId()).getDataSet()
-                    .get(entry.getKey()).getActions().forEach(action -> {
-                ChangedField field = FieldActionsRunner.run(action, useCase);
-                if (changedFields.containsKey(field.getId()))
-                    changedFields.get(field.getId()).merge(field);
-                else
-                    changedFields.put(field.getId(), field);
-                        useCase.getDataSet().get(field.getId()).setValue(changedFields.get(field.getId()).getValue());
-            });
+            changedFields.put(entry.getKey(), new ChangedField(entry.getKey()));
+            runActions(useCase.getPetriNet().getTransition(task.getTransitionId()).getDataSet().get(entry.getKey()).getActions(), useCase, changedFields);
+            changedFields.remove(entry.getKey());
         });
 
-        changedFields.forEach( (id, field) ->
-                useCase.getDataSet().get(id).setValue(field.getValue())
-        );
-        task.setRequiredFilled(useCase.getPetriNet().getTransition(task.getTransitionId()).getDataSet().entrySet().stream().allMatch(entry ->
-                !entry.getValue().getBehavior().contains(FieldBehavior.REQUIRED) || useCase.getDataSet().get(entry.getKey()).getValue() != null));
-
-        taskRepository.save(task);
         caseRepository.save(useCase);
 
         ObjectNode node = JsonNodeFactory.instance.objectNode();
@@ -254,96 +254,20 @@ public class TaskService implements ITaskService {
         return node;
     }
 
-    @Override
-    @Transactional
-    public void cancelTask(Long id, String taskId) {
-        Task task = taskRepository.findOne(taskId);
-        Case useCase = caseRepository.findOne(task.getCaseId());
-        PetriNet net = useCase.getPetriNet();
+    private void runActions(Set<String> actions, Case useCase, Map<String, ChangedField> changedFields) {
+        actions.forEach(action -> {
+            ChangedField field = FieldActionsRunner.run(action, useCase);
 
-        net.getArcsOfTransition(task.getTransitionId()).stream()
-                .filter(arc -> arc.getSource() instanceof Place)
-                .forEach(Arc::rollbackExecution);
-        useCase.updateActivePlaces();
+            if (changedFields.containsKey(field.getId()))
+                changedFields.get(field.getId()).merge(field);
+            else
+                changedFields.put(field.getId(), field);
 
-        taskRepository.delete(taskId);
-        caseRepository.save(useCase);
-        reloadTasks(useCase);
-
-//        moveAttributes(task);
-    }
-
-    @Transactional
-    private void moveAttributes(Task oldTask){
-        Task newTask = taskRepository.findByTransitionIdAndCaseId(oldTask.getTransitionId(),oldTask.getCaseId());
-        newTask.setRequiredFilled(oldTask.getRequiredFilled());
-
-        taskRepository.save(newTask);
-    }
-
-    @Override
-    public FileSystemResource getFile(String taskId, String fieldId) {
-        Task task = taskRepository.findOne(taskId);
-        Case useCase = caseRepository.findOne(task.getCaseId());
-        if (useCase.getDataSet().get(fieldId).getValue() == null) return null;
-        return new FileSystemResource("storage/" + fieldId + "-" + useCase.getDataSet().get(fieldId).getValue());
-    }
-
-    @Override
-    @Transactional
-    public void delegateTask(Long userId, String delegatedEmail, String taskId) throws TransitionNotExecutableException {
-        User delegated = userRepository.findByEmail(delegatedEmail);
-        User delegate = userRepository.findOne(userId);
-
-        Task task = taskRepository.findOne(taskId);
-        task.setUserId(delegated.getId());
-        taskRepository.save(task);
-    }
-
-    @Override
-    public boolean saveFile(String taskId, String fieldId, MultipartFile multipartFile) {
-        try {
-            Task task = taskRepository.findOne(taskId);
-            Case useCase = caseRepository.findOne(task.getCaseId());
-
-            String oldFile = null;
-            if ((oldFile = (String) useCase.getDataSet().get(fieldId).getValue()) != null) {
-                new File("storage/" + fieldId + "-" + oldFile).delete();
-                useCase.getDataSet().get(fieldId).setValue(null);
-            }
-
-            File file = new File("storage/" + fieldId + "-" + multipartFile.getOriginalFilename());
-            file.getParentFile().mkdirs();
-            if (!file.createNewFile()) {
-                file.delete();
-                file.createNewFile();
-            }
-
-            FileOutputStream fout = new FileOutputStream(file);
-            fout.write(multipartFile.getBytes());
-            fout.close();
-
-            useCase.getDataSet().get(fieldId).setValue(multipartFile.getOriginalFilename());
-            caseRepository.save(useCase);
-
-            return true;
-        } catch (IOException e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-
-    /**
-     * Reloads all tasks of given case.
-     * 1. delete unassigned tasks
-     * 2. delete finished tasks
-     * 3. generate new tasks
-     */
-    @Transactional
-    void reloadTasks(Case useCase) {
-        taskRepository.deleteAllByCaseIdAndUserIdIsNull(useCase.getStringId());
-        taskRepository.deleteAllByCaseIdAndFinishDateIsNotNull(useCase.getStringId());
-        createTasks(useCase);
+            if (field.getValue() != null)
+                getTransitionsByField(field.getId(), useCase.getPetriNet()).forEach(transition ->
+                        runActions(transition.getDataSet().get(field.getId()).getActions(), useCase, changedFields)
+                );
+        });
     }
 
     private Object parseFieldsValues(JsonNode jsonNode) {
@@ -379,6 +303,120 @@ public class TaskService implements ITaskService {
         }
         if (value instanceof String && ((String) value).equalsIgnoreCase("null")) return null;
         else return value;
+    }
+
+    private List<Transition> getTransitionsByField(String field, PetriNet net) {
+        List<Transition> transitions = new ArrayList<>();
+        net.getTransitions().forEach((transId, trans) -> {
+            if (trans.getDataSet().containsKey(field))
+                transitions.add(trans);
+        });
+        return transitions;
+    }
+
+    @Override
+    @Transactional
+    public void cancelTask(Long id, String taskId) {
+        Task task = taskRepository.findOne(taskId);
+        Case useCase = caseRepository.findOne(task.getCaseId());
+        PetriNet net = useCase.getPetriNet();
+
+        net.getArcsOfTransition(task.getTransitionId()).stream()
+                .filter(arc -> arc.getSource() instanceof Place)
+                .forEach(Arc::rollbackExecution);
+        useCase.updateActivePlaces();
+
+        taskRepository.delete(taskId);
+        caseRepository.save(useCase);
+        reloadTasks(useCase);
+
+//        moveAttributes(task);
+    }
+
+    @Transactional
+    private void moveAttributes(Task oldTask) {
+        Task newTask = taskRepository.findByTransitionIdAndCaseId(oldTask.getTransitionId(), oldTask.getCaseId());
+        newTask.setRequiredFilled(oldTask.getRequiredFilled());
+
+        taskRepository.save(newTask);
+    }
+
+    @Override
+    public FileSystemResource getFile(String taskId, String fieldId) {
+        Task task = taskRepository.findOne(taskId);
+        Case useCase = caseRepository.findOne(task.getCaseId());
+        FileField field = (FileField) useCase.getPetriNet().getDataSet().get(fieldId);
+
+        if(field.isGenerated()){
+            List<Object> result = new FileFieldLogic(useCase,field).executeLogic();
+            if(result == null) return null;
+            if(result.isEmpty()) return null;
+
+            caseRepository.save(useCase);
+            return new FileSystemResource((File)result.get(0));
+
+        } else {
+            if (useCase.getDataSet().get(fieldId).getValue() == null) return null;
+            return new FileSystemResource(field.getFilePath((String)useCase.getDataSet().get(fieldId).getValue()));
+        }
+    }
+
+    @Override
+    @Transactional
+    public void delegateTask(Long userId, String delegatedEmail, String taskId) throws TransitionNotExecutableException {
+        User delegated = userRepository.findByEmail(delegatedEmail);
+        User delegate = userRepository.findOne(userId);
+
+        Task task = taskRepository.findOne(taskId);
+        task.setUserId(delegated.getId());
+        taskRepository.save(task);
+    }
+
+    @Override
+    public boolean saveFile(String taskId, String fieldId, MultipartFile multipartFile) {
+        try {
+            Task task = taskRepository.findOne(taskId);
+            Case useCase = caseRepository.findOne(task.getCaseId());
+            FileField field = (FileField) useCase.getPetriNet().getDataSet().get(fieldId);
+
+            String oldFile = null;
+            if ((oldFile = (String) useCase.getDataSet().get(fieldId).getValue()) != null) {
+                new File(field.getFilePath(oldFile)).delete();
+                useCase.getDataSet().get(fieldId).setValue(null);
+            }
+
+            File file = new File(field.getFilePath(multipartFile.getOriginalFilename()));
+            file.getParentFile().mkdirs();
+            if (!file.createNewFile()) {
+                file.delete();
+                file.createNewFile();
+            }
+
+            FileOutputStream fout = new FileOutputStream(file);
+            fout.write(multipartFile.getBytes());
+            fout.close();
+
+            useCase.getDataSet().get(fieldId).setValue(multipartFile.getOriginalFilename());
+            caseRepository.save(useCase);
+
+            return true;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    /**
+     * Reloads all tasks of given case.
+     * 1. delete unassigned tasks
+     * 2. delete finished tasks
+     * 3. generate new tasks
+     */
+    @Transactional
+    void reloadTasks(Case useCase) {
+        taskRepository.deleteAllByCaseIdAndUserIdIsNull(useCase.getStringId());
+        taskRepository.deleteAllByCaseIdAndFinishDateIsNotNull(useCase.getStringId());
+        createTasks(useCase);
     }
 
 //    private void figureOutProcessRoles(Task task, Transition transition) {
@@ -458,5 +496,9 @@ public class TaskService implements ITaskService {
         });
 
         return tasks;
+    }
+
+    public void deleteTasksByCase(String caseId){
+        taskRepository.deleteAllByCaseId(caseId);
     }
 }

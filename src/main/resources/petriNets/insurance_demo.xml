@@ -19,11 +19,13 @@
         <title>On which date would you like your cover to start?</title>
         <valid>between "2017-07-01","2017-07-30"</valid>
         <valid>workday</valid>
+        <init>2017-07-01</init>
     </data>
     <data type="text">
         <id>2</id>
         <title>City</title>
         <valid>length 20</valid>
+        <init>Bratislava</init>
     </data>
     <data type="enumeration">
         <id>5</id>
@@ -50,6 +52,7 @@
     <data type="number">
         <id>18</id>
         <title>Size of living area</title>
+        <init>200</init>
     </data>
     <data type="number">
         <id>20</id>
@@ -61,6 +64,7 @@
         <values>Television</values>
         <values>Computer</values>
         <values>Home cinema</values>
+        <init>Television,Computer</init>
     </data>
     <data type="enumeration">
         <id>24</id>
@@ -93,6 +97,12 @@
     <data type="number">
         <id>38</id>
         <title>Quote</title>
+    </data>
+    <data type="file">
+        <id>39</id>
+        <title>PDF document</title>
+        <!--<init>Automatically generated</init>-->
+        <!--<logic>generate Insurance.offerPDF always</logic>-->
     </data>
     <!-- ========== ROLES ========== -->
     <role>
@@ -254,6 +264,10 @@
             <logic>
                 <behavior>editable</behavior>
                 <behavior>required</behavior>
+                <action>
+                    other: f.14;
+                    change other about { "Brick" }
+                </action>
             </logic>
         </dataRef>
         <dataRef>
@@ -266,6 +280,10 @@
             <id>14</id>
             <logic>
                 <behavior>editable</behavior>
+                <action>
+                    other: f.18;
+                    change other about { 100000 as Double }
+                </action>
             </logic>
         </dataRef>
         <dataRef>
@@ -622,6 +640,12 @@
             <id>2</id>
             <logic>
                 <behavior>editable</behavior>
+                <action>
+                    self: f.this,
+                    trans: t.this,
+                    other: f.39;
+                    make other,visible on trans when { self.value == "Zalesie" }
+                </action>
             </logic>
         </dataRef>
         <dataRef>
@@ -640,6 +664,12 @@
             <id>30</id>
             <logic>
                 <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>39</id>
+            <logic>
+                <behavior>hidden</behavior>
             </logic>
         </dataRef>
         <transactionRef>

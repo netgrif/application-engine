@@ -8,7 +8,7 @@ import java.time.LocalDate
 import java.time.ZoneId
 
 @Document
-public class DateField extends Field<LocalDate> {
+public class DateField extends ValidableField<LocalDate> {
 
     @Transient
     private String minDate
@@ -17,6 +17,11 @@ public class DateField extends Field<LocalDate> {
 
     public DateField() {
         super();
+    }
+
+    @Override
+    public void setDefaultValue(String value){
+        super.superSetDefaultValue(LocalDate.parse(value))
     }
 
     public void setValue(Date value) {

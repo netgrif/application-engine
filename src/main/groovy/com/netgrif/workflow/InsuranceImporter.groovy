@@ -10,6 +10,7 @@ import com.netgrif.workflow.auth.domain.repositories.UserProcessRoleRepository
 import com.netgrif.workflow.auth.service.interfaces.IUserService
 import com.netgrif.workflow.importer.Importer
 import com.netgrif.workflow.petrinet.domain.PetriNet
+import com.netgrif.workflow.petrinet.domain.dataset.FieldWithDefault
 import com.netgrif.workflow.petrinet.domain.dataset.logic.validation.FieldValidationRunner
 import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository
 import com.netgrif.workflow.workflow.domain.Case
@@ -17,6 +18,7 @@ import com.netgrif.workflow.workflow.domain.DataField
 import com.netgrif.workflow.workflow.domain.repositories.CaseRepository
 import com.netgrif.workflow.workflow.service.TaskService
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Component
 
 @Component
@@ -94,6 +96,12 @@ class InsuranceImporter {
         useCase.activePlaces.put(net.places.find { it -> it.value.title == "L" }.key, 1)
         useCase.activePlaces.put(net.places.find { it -> it.value.title == "D" }.key, 1)
         useCase.setAuthor(1L)
+        useCase.petriNet.dataSet.each {id, field ->
+            if(field instanceof FieldWithDefault)
+                useCase.dataSet.put(id,new DataField(field.getDefaultValue()))
+            else
+                useCase.dataSet.put(id,new DataField())
+        }
         caseRepository.save(useCase)
         net.initializeTokens(useCase.activePlaces)
         taskService.createTasks(useCase)
@@ -107,6 +115,12 @@ class InsuranceImporter {
         useCase.activePlaces.put(net.places.find { it -> it.value.title == "C" }.key, 1)
         useCase.activePlaces.put(net.places.find { it -> it.value.title == "L" }.key, 1)
         useCase.setAuthor(1L)
+        useCase.petriNet.dataSet.each {id, field ->
+            if(field instanceof FieldWithDefault)
+                useCase.dataSet.put(id,new DataField(field.getDefaultValue()))
+            else
+                useCase.dataSet.put(id,new DataField())
+        }
         caseRepository.save(useCase)
         net.initializeTokens(useCase.activePlaces)
         taskService.createTasks(useCase)
@@ -120,6 +134,12 @@ class InsuranceImporter {
         useCase.activePlaces.put(net.places.find { it -> it.value.title == "L" }.key, 1)
         useCase.activePlaces.put(net.places.find { it -> it.value.title == "C" }.key, 1)
         useCase.setAuthor(1L)
+        useCase.petriNet.dataSet.each {id, field ->
+            if(field instanceof FieldWithDefault)
+                useCase.dataSet.put(id,new DataField(field.getDefaultValue()))
+            else
+                useCase.dataSet.put(id,new DataField())
+        }
         useCase = caseRepository.save(useCase)
         net.initializeTokens(useCase.activePlaces)
         taskService.createTasks(useCase)
