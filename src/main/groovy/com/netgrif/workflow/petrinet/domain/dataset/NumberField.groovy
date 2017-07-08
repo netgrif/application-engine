@@ -13,11 +13,12 @@ public class NumberField extends ValidableField<Double> {
 
     public NumberField() {
         super();
-        setDefaultValue(0)
+        super.superSetDefaultValue(0)
     }
 
+    @Override
     public void setDefaultValue(String value){
-        setDefaultValue(Double.parseDouble(value))
+        super.superSetDefaultValue(Double.parseDouble(value))
     }
 
     Double getMinValue() {
