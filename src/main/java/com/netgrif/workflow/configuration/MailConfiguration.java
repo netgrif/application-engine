@@ -15,14 +15,17 @@ public class MailConfiguration {
     @Bean
     public JavaMailSenderImpl mailSender() {
         JavaMailSenderImpl sender = new JavaMailSenderImpl();
-        sender.setPort(465);
+        //sender.setPort(465);
+        sender.setPort(25);
         sender.setHost("smtp.websupport.sk");
         sender.setUsername("noreply@netgrif.com");
         sender.setPassword("Superstar38");
+        sender.setProtocol("smtp");
         Properties mailProperties = new Properties();
         mailProperties.put("mail.smtp.auth", true);
         mailProperties.put("mail.smtp.starttls.enable", true);
         mailProperties.put("mail.smtp.starttls.required", true);
+        //mailProperties.put("mail.debug",true);
         sender.setJavaMailProperties(mailProperties);
         return sender;
     }
