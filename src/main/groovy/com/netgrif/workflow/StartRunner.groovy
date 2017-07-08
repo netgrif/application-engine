@@ -1,5 +1,6 @@
 package com.netgrif.workflow
 
+import com.netgrif.workflow.mail.IMailService
 import org.apache.log4j.Logger
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.CommandLineRunner
@@ -21,6 +22,9 @@ class StartRunner  implements CommandLineRunner{
 
     @Autowired
     private MongoTemplate mongoTemplate
+    @Autowired
+    private IMailService mailService
+
     @Autowired
     private InsuranceImporter insuranceImporter
     @Autowired
@@ -47,6 +51,7 @@ class StartRunner  implements CommandLineRunner{
         sessionsRunner.run(strings)
 //        export.run(strings)
 
+        mailService.testConnection()
         host()
     }
 
