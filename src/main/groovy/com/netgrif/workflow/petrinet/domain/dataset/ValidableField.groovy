@@ -1,6 +1,7 @@
 package com.netgrif.workflow.petrinet.domain.dataset
 
 import com.fasterxml.jackson.annotation.JsonIgnore
+import com.mongodb.util.JSON
 import org.springframework.data.annotation.Transient
 import org.springframework.data.mongodb.core.mapping.Document
 
@@ -60,5 +61,15 @@ abstract class ValidableField<T> extends FieldWithDefault<T> {
 
     void addValidationError(String key){
         this.addValidationError(key,false)
+    }
+
+    @JsonIgnore
+    T superGetDefaultValue(){
+        return super.defaultValue
+    }
+
+    @JsonIgnore
+    void superSetDefaultValue(T value){
+        super.defaultValue = value
     }
 }

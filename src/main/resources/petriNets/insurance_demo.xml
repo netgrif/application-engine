@@ -98,6 +98,12 @@
         <id>38</id>
         <title>Quote</title>
     </data>
+    <data type="file">
+        <id>39</id>
+        <title>PDF document</title>
+        <init>Automatically generated</init>
+        <logic>generate Insurance.offerPDF always</logic>
+    </data>
     <!-- ========== ROLES ========== -->
     <role>
         <id>1</id>
@@ -652,6 +658,12 @@
             <id>30</id>
             <logic>
                 <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>39</id>
+            <logic>
+                <behavior>visible</behavior>
             </logic>
         </dataRef>
         <transactionRef>
