@@ -7,11 +7,12 @@ public class BooleanField extends FieldWithDefault<Boolean> {
 
     public BooleanField() {
         super();
-        setDefaultValue(false)
+        super.defaultValue = false
     }
 
+    @Override
     void setDefaultValue(String defaultValue) {
-        super.setDefaultValue(Boolean.parseBoolean(defaultValue))
+        super.defaultValue = Boolean.parseBoolean(defaultValue)
     }
 
     Boolean or(final BooleanField field){

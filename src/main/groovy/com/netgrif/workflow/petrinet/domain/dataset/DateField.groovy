@@ -19,8 +19,9 @@ public class DateField extends ValidableField<LocalDate> {
         super();
     }
 
+    @Override
     public void setDefaultValue(String value){
-        setDefaultValue(LocalDate.parse(value))
+        super.superSetDefaultValue(LocalDate.parse(value))
     }
 
     public void setValue(Date value) {

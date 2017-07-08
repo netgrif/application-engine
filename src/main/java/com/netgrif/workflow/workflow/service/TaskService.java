@@ -8,13 +8,11 @@ import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.auth.domain.repositories.UserRepository;
 import com.netgrif.workflow.petrinet.domain.*;
-import com.netgrif.workflow.petrinet.domain.dataset.DateField;
-import com.netgrif.workflow.petrinet.domain.dataset.Field;
-import com.netgrif.workflow.petrinet.domain.dataset.NumberField;
-import com.netgrif.workflow.petrinet.domain.dataset.ValidableField;
+import com.netgrif.workflow.petrinet.domain.dataset.*;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedField;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.FieldActionsRunner;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.FieldBehavior;
+import com.netgrif.workflow.petrinet.domain.dataset.logic.logic.FileFieldLogic;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.validation.FieldValidationRunner;
 import com.netgrif.workflow.petrinet.domain.roles.RolePermission;
 import com.netgrif.workflow.petrinet.domain.throwable.TransitionNotExecutableException;
@@ -347,8 +345,20 @@ public class TaskService implements ITaskService {
     public FileSystemResource getFile(String taskId, String fieldId) {
         Task task = taskRepository.findOne(taskId);
         Case useCase = caseRepository.findOne(task.getCaseId());
-        if (useCase.getDataSet().get(fieldId).getValue() == null) return null;
-        return new FileSystemResource("storage/" + fieldId + "-" + useCase.getDataSet().get(fieldId).getValue());
+        FileField field = (FileField) useCase.getPetriNet().getDataSet().get(fieldId);
+
+        if(field.isGenerated()){
+            List<Object> result = new FileFieldLogic(useCase,field).executeLogic();
+            if(result == null) return null;
+            if(result.isEmpty()) return null;
+
+            caseRepository.save(useCase);
+            return new FileSystemResource((File)result.get(0));
+
+        } else {
+            if (useCase.getDataSet().get(fieldId).getValue() == null) return null;
+            return new FileSystemResource(field.getFilePath((String)useCase.getDataSet().get(fieldId).getValue()));
+        }
     }
 
     @Override
@@ -367,14 +377,15 @@ public class TaskService implements ITaskService {
         try {
             Task task = taskRepository.findOne(taskId);
             Case useCase = caseRepository.findOne(task.getCaseId());
+            FileField field = (FileField) useCase.getPetriNet().getDataSet().get(fieldId);
 
             String oldFile = null;
             if ((oldFile = (String) useCase.getDataSet().get(fieldId).getValue()) != null) {
-                new File("storage/" + fieldId + "-" + oldFile).delete();
+                new File(field.getFilePath(oldFile)).delete();
                 useCase.getDataSet().get(fieldId).setValue(null);
             }
 
-            File file = new File("storage/" + fieldId + "-" + multipartFile.getOriginalFilename());
+            File file = new File(field.getFilePath(multipartFile.getOriginalFilename()));
             file.getParentFile().mkdirs();
             if (!file.createNewFile()) {
                 file.delete();

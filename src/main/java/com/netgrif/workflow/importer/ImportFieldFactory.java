@@ -18,34 +18,26 @@ public final class ImportFieldFactory {
         switch (type) {
             case TEXT:
                 field = new TextField(data.getValues());
-                if(data.getInit() != null)
-                    ((TextField)field).setDefaultValue(data.getInit());
                 break;
             case BOOLEAN:
                 field = new BooleanField();
-                if(data.getInit() != null)
-                    ((BooleanField)field).setDefaultValue(data.getInit());
                 break;
             case DATE:
                 field = new DateField();
-                if(data.getInit() != null)
-                    ((DateField)field).setDefaultValue(data.getInit());
                 break;
             case FILE:
                 field = new FileField();
+                if(data.getLogic() != null && data.getLogic().length != 0)
+                    Arrays.stream(data.getLogic()).forEach(((FileField) field)::addLogic);
                 break;
             case ENUMERATION:
                 field = new EnumerationField(data.getValues());
                 break;
             case MULTICHOICE:
                 field = new MultichoiceField(data.getValues());
-                if(data.getInit() != null)
-                    ((MultichoiceField)field).setDefaultValue(data.getInit());
                 break;
             case NUMBER:
                 field = new NumberField();
-                if(data.getInit() != null)
-                    ((NumberField)field).setDefaultValue(data.getInit());
                 break;
             case USER:
                 field = buildUserField(data);
@@ -58,8 +50,10 @@ public final class ImportFieldFactory {
         }
         field.setName(data.getTitle());
         field.setType(type);
-        if(data.getValid() != null)
+        if(data.getValid() != null && field instanceof ValidableField)
             ((ValidableField)field).setValidationRules(data.getValid());
+        if(data.getInit() != null && field instanceof FieldWithDefault)
+            ((FieldWithDefault)field).setDefaultValue(data.getInit());
         return field;
     }
 

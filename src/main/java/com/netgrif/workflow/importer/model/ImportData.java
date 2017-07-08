@@ -24,4 +24,6 @@ public class ImportData {
     private String[] valid;
 
     private String init;
+
+    private String[] logic;
 }
