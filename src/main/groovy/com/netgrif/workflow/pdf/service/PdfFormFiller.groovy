@@ -12,7 +12,7 @@ class PdfFormFiller {
     File fillPdfForm(String outPdfName, InputStream pdfFile, InputStream xmlFile) throws IllegalArgumentException {
         try {
             PDDocument document = PDDocument.load(pdfFile)
-            OutputStream outputStream = new FileOutputStream(outPdfName)
+            File file = new File(outPdfName)
             PDDocumentCatalog docCatalog = document.getDocumentCatalog()
             PDAcroForm acroForm = docCatalog.getAcroForm()
             def fieldValues = new XmlSlurper().parseText(xmlFile.getText())
@@ -22,8 +22,8 @@ class PdfFormFiller {
             }
 
             acroForm.flatten()
-            document.save(outputStream)
-            return outputStream
+            document.save(file)
+            return file
         } catch (IOException e) {
             e.printStackTrace()
             throw new IllegalArgumentException(e)
