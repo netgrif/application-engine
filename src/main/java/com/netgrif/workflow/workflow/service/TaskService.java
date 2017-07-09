@@ -242,9 +242,9 @@ public class TaskService implements ITaskService {
         Map<String, ChangedField> changedFields = new HashMap<>();
         values.fields().forEachRemaining(entry -> {
             useCase.getDataSet().get(entry.getKey()).setValue(parseFieldsValues(entry.getValue()));
-            changedFields.put(entry.getKey(), new ChangedField(entry.getKey()));
+            //changedFields.put(entry.getKey(), new ChangedField(entry.getKey()));
             runActions(useCase.getPetriNet().getTransition(task.getTransitionId()).getDataSet().get(entry.getKey()).getActions(), useCase, changedFields);
-            changedFields.remove(entry.getKey());
+            //changedFields.remove(entry.getKey());
         });
 
         caseRepository.save(useCase);
