@@ -81,9 +81,10 @@ public class TaskController {
 
     @RequestMapping(value = "/delegate/{id}", method = RequestMethod.POST)
     public MessageResource delegate(Authentication auth, @PathVariable("id") String taskId, @RequestBody String delegatedEmail) {
+        LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
         try {
             delegatedEmail = URLDecoder.decode(delegatedEmail, StandardCharsets.UTF_8.name());
-            taskService.delegateTask(delegatedEmail, taskId);
+            taskService.delegateTask(loggedUser.getId(), delegatedEmail, taskId);
             return MessageResource.successMessage("Task " + taskId + " assigned to " + delegatedEmail);
         } catch (Exception ignored) {
             ignored.printStackTrace();
@@ -167,7 +168,7 @@ public class TaskController {
 
     @RequestMapping(value = "/{id}/data", method = RequestMethod.POST)
     public ObjectNode saveData(@PathVariable("id") String taskId, @RequestBody ObjectNode dataBody) {
-        return taskService.setDataFieldsValues(taskId, dataBody);
+        return taskService.setData(taskId, dataBody);
     }
 
     @RequestMapping(value = "/{id}/file/{field}", method = RequestMethod.POST)

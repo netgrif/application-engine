@@ -14,15 +14,12 @@ class ChangedField {
         behavior = new HashMap<>()
     }
 
-    void merge(ChangedField changedField){
-        if(changedField.value != null)
+    void merge(ChangedField changedField) {
+        if (changedField.value != null)
             this.value = changedField.value
-        if(changedField.behavior != null && !changedField.behavior.isEmpty()){
-            changedField.behavior.each {trans, behav ->
-                if(behavior.containsKey(trans))
-                    behavior.get(trans).addAll(behav)
-                else
-                    behavior.put(trans, new HashSet<FieldBehavior>(behav))
+        if (changedField.behavior != null && !changedField.behavior.isEmpty()) {
+            changedField.behavior.each { trans, behav ->
+                behavior.put(trans, new HashSet<FieldBehavior>(behav))
             }
         }
     }

@@ -2,8 +2,8 @@ package com.netgrif.workflow.workflow.service;
 
 import com.netgrif.workflow.importer.Importer;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
-import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
+import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.repositories.CaseRepository;
 import com.netgrif.workflow.workflow.domain.Task;
@@ -98,17 +98,17 @@ public class TaskServiceTest {
 //    public void assignTask() throws Exception {
 //    }
 
-    @Test
+    /*@Test
     public void getData() throws Exception {
         Task task = repository.findAll().stream().filter(t -> t.getTitle().equals("Data UJ")).findFirst().get();
 
         List<Field> fields = service.getData(task.getStringId());
 
         assert fields != null && !fields.isEmpty();
-    }
+    }*/
 
 //    @Test
-//    public void setDataFieldsValues() throws Exception {
+//    public void setData() throws Exception {
 //    }
 //
 //    @Test
