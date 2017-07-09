@@ -19,6 +19,9 @@ public class ImportData {
     @XmlAttribute
     private String type;
 
+    @XmlAttribute
+    private boolean immediate;
+
     private String[] values;
 
     private Columns columns;
