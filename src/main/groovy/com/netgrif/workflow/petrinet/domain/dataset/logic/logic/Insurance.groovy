@@ -1,7 +1,9 @@
 package com.netgrif.workflow.petrinet.domain.dataset.logic.logic
 
+import com.netgrif.workflow.pdf.service.PdfFormFiller
 import com.netgrif.workflow.petrinet.domain.dataset.FileField
 import com.netgrif.workflow.workflow.domain.Case
+import groovy.xml.MarkupBuilder
 
 
 class Insurance {
@@ -15,23 +17,13 @@ class Insurance {
     }
 
     File offerPDF(){
-        String name = "offer.txt"
+        String name = "offer.pdf"
+        File input = new File("src/main/resources/pdf/zmluva_editovatelna.pdf")
+        File xml = new File("src/main/resources/pdf/zmluva_editovatelna.xml")
 
-        File f = new File(field.getFilePath(name))
-        f.parentFile.mkdirs()
-        if(!f.createNewFile()){
-            f.delete()
-            f.createNewFile()
-        }
-
-        f << "Timestamp"+new Date()+"\n"
-        f << "Toto je generovaný súbor.\n"
-        f << "Vytvorený iba na testovanie\n"
-        f << "\n Nejaka hodnota:\n\t"
-        f << useCase.dataSet.values().first().value
-
+        File pdf = PdfFormFiller.fillPdfForm(name, new FileInputStream(input), new FileInputStream(xml))
         useCase.dataSet.get(field.objectId).value = name
 
-        return f
+        return pdf
     }
 }
