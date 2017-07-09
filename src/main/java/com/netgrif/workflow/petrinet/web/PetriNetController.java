@@ -5,6 +5,7 @@ import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.workflow.petrinet.service.interfaces.IProcessRoleService;
+import com.netgrif.workflow.petrinet.web.requestbodies.PetriNetCriteria;
 import com.netgrif.workflow.petrinet.web.requestbodies.PetriNetReferenceBody;
 import com.netgrif.workflow.petrinet.web.requestbodies.UploadedFileMeta;
 import com.netgrif.workflow.petrinet.web.responsebodies.*;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.xml.sax.SAXException;
+import sun.rmi.runtime.Log;
 
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
@@ -84,6 +86,13 @@ public class PetriNetController {
     PetriNetReferencesResource getAllReferences(Authentication auth) {
         List<PetriNetReference> refs = service.getAllReferences((LoggedUser) auth.getPrincipal());
         return new PetriNetReferencesResource(refs);
+    }
+
+    @RequestMapping(value = "/ref", method = POST)
+    public @ResponseBody PetriNetReference getReference(Authentication auth, @RequestBody PetriNetCriteria criteria){
+        if(criteria.title != null)
+            return service.getReferenceByTitle((LoggedUser) auth.getPrincipal(),criteria.title);
+        return new PetriNetReference(null,null);
     }
 
     @RequestMapping(value = "/transition/refs", method = POST)
