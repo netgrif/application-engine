@@ -10,12 +10,15 @@ import com.netgrif.workflow.auth.domain.repositories.UserProcessRoleRepository
 import com.netgrif.workflow.auth.service.interfaces.IUserService
 import com.netgrif.workflow.importer.Importer
 import com.netgrif.workflow.petrinet.domain.PetriNet
+import com.netgrif.workflow.petrinet.domain.dataset.FieldWithDefault
+import com.netgrif.workflow.petrinet.domain.dataset.logic.validation.FieldValidationRunner
 import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository
 import com.netgrif.workflow.workflow.domain.Case
 import com.netgrif.workflow.workflow.domain.DataField
 import com.netgrif.workflow.workflow.domain.repositories.CaseRepository
 import com.netgrif.workflow.workflow.service.TaskService
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Component
 
 @Component
@@ -23,35 +26,41 @@ class InsuranceImporter {
 
     @Autowired
     private PetriNetRepository petriNetRepository
+
     @Autowired
     private IUserService userService
+
     @Autowired
     private OrganizationRepository organizationRepository
+
     @Autowired
     private CaseRepository caseRepository
+
     @Autowired
     private UserProcessRoleRepository userProcessRoleRepository
+
     @Autowired
     private AuthorityRepository authorityRepository
+
     @Autowired
     private TaskService taskService
+
     @Autowired
     private Importer importer
 
 
     void run(String... strings) throws Exception {
-        //def net = importer.importPetriNet(new File("src/test/resources/poistenie_rozsirene.xml"), "Poistenie", "INS")
-        def net = importer.importPetriNet(new File("petriNets/poistenie_rozsirene.xml"), "Poistenie", "INS")
+        def net = importer.importPetriNet(new File("src/main/resources/petriNets/poistenie_hhi.xml"), "Insurance", "INS")
 
         def orgs = createOrganizations()
         def auths = createAuthorities()
         createUsers(orgs,auths,net)
-        createCases(net)
+//        createCases(net)
     }
 
     private Map<String, Organization> createOrganizations(){
         Map<String, Organization> orgs = new HashMap<>()
-        orgs.put("premium",organizationRepository.save(new Organization("PREMIUM Insurance Company Limited")))
+        orgs.put("insurance",organizationRepository.save(new Organization("Insurance Company")))
         return orgs
     }
 
@@ -65,73 +74,80 @@ class InsuranceImporter {
         def agentRole = userProcessRoleRepository.save(new UserProcessRole(
                 roleId: net.roles.values().find { it -> it.name == "Agent" }.objectId
         ))
-        def systemRole = userProcessRoleRepository.save(new UserProcessRole(
-                roleId: net.roles.values().find { it -> it.name == "System" }.objectId
-        ))
+
         User agent = new User(
-                name: "Fero",
-                surname: "Poisťovák",
-                email: "agent@premium.com",
+                name: "Agent",
+                surname: "Smith",
+                email: "agent@company.com",
                 password: "password",
                 authorities: [auths.get(Authority.user)] as Set<Authority>,
-                organizations: [orgs.get("premium")] as Set<Organization>)
+                organizations: [orgs.get("insurance")] as Set<Organization>)
         agent.addProcessRole(agentRole)
-        User user = new User(
-                name: "Ján",
-                surname: "Kováč",
-                email: "kovac@gmail.com",
-                password: "password",
-                authorities: [auths.get(Authority.user)] as Set<Authority>)
-        user.addProcessRole(agentRole)
-        User system = new User(
-                name: "System",
-                surname: "System",
-                email: "system@premium.com",
-                password: "password",
-                authorities: [auths.get(Authority.user)] as Set<Authority>)
-        system.addProcessRole(systemRole)
         userService.saveNew(agent)
-        userService.saveNew(user)
-        userService.saveNew(system)
     }
 
     private void createCases(PetriNet net){
         Case useCase = new Case(
-                title: "Poistenie nehnuteľnosti",
-                petriNet: net,
-                color: StartRunner.randomColor())
-        useCase.dataSet = new HashMap<>(net.dataSet.collectEntries {[(it.key): new DataField()]})
-        useCase.activePlaces.put(net.places.find { it -> it.value.title == "E" }.key, 1)
-        useCase.activePlaces.put(net.places.find { it -> it.value.title == "F" }.key, 1)
-        useCase.activePlaces.put(net.places.find { it -> it.value.title == "G" }.key, 1)
-        useCase.activePlaces.put(net.places.find { it -> it.value.title == "K" }.key, 1)
-        useCase.activePlaces.put(net.places.find { it -> it.value.title == "I" }.key, 1)
-        useCase.activePlaces.put(net.places.find { it -> it.value.title == "J" }.key, 1)
-        useCase.setAuthor(1L)
-        caseRepository.save(useCase)
-        net.initializeTokens(useCase.activePlaces)
-        taskService.createTasks(useCase)
-
-        useCase = new Case(
-                title: "Poistenie domu",
+                title: "Buildings cover",
                 petriNet: net,
                 color: StartRunner.randomColor())
         useCase.dataSet = new HashMap<>(net.dataSet.collectEntries {[(it.key): new DataField()]})
         useCase.activePlaces.put(net.places.find { it -> it.value.title == "B" }.key, 1)
+        useCase.activePlaces.put(net.places.find { it -> it.value.title == "L" }.key, 1)
+        useCase.activePlaces.put(net.places.find { it -> it.value.title == "D" }.key, 1)
         useCase.setAuthor(1L)
+        useCase.petriNet.dataSet.each {id, field ->
+            if(field instanceof FieldWithDefault)
+                useCase.dataSet.put(id,new DataField(field.getDefaultValue()))
+            else
+                useCase.dataSet.put(id,new DataField())
+        }
         caseRepository.save(useCase)
         net.initializeTokens(useCase.activePlaces)
         taskService.createTasks(useCase)
 
         useCase = new Case(
-                title: "Poistenie domácnosti",
+                title: "Contents cover",
                 petriNet: net,
                 color: StartRunner.randomColor())
         useCase.dataSet = new HashMap<>(net.dataSet.collectEntries {[(it.key): new DataField()]})
+        useCase.activePlaces.put(net.places.find { it -> it.value.title == "E" }.key, 1)
+        useCase.activePlaces.put(net.places.find { it -> it.value.title == "C" }.key, 1)
+        useCase.activePlaces.put(net.places.find { it -> it.value.title == "L" }.key, 1)
+        useCase.setAuthor(1L)
+        useCase.petriNet.dataSet.each {id, field ->
+            if(field instanceof FieldWithDefault)
+                useCase.dataSet.put(id,new DataField(field.getDefaultValue()))
+            else
+                useCase.dataSet.put(id,new DataField())
+        }
+        caseRepository.save(useCase)
+        net.initializeTokens(useCase.activePlaces)
+        taskService.createTasks(useCase)
+
+        useCase = new Case(
+                title: "Buildings & contents cover",
+                petriNet: net,
+                color: StartRunner.randomColor())
+        useCase.dataSet = new HashMap<>(net.dataSet.collectEntries {[(it.key): new DataField()]})
+        useCase.activePlaces.put(net.places.find { it -> it.value.title == "B" }.key, 1)
+        useCase.activePlaces.put(net.places.find { it -> it.value.title == "L" }.key, 1)
         useCase.activePlaces.put(net.places.find { it -> it.value.title == "C" }.key, 1)
         useCase.setAuthor(1L)
+        useCase.petriNet.dataSet.each {id, field ->
+            if(field instanceof FieldWithDefault)
+                useCase.dataSet.put(id,new DataField(field.getDefaultValue()))
+            else
+                useCase.dataSet.put(id,new DataField())
+        }
         useCase = caseRepository.save(useCase)
         net.initializeTokens(useCase.activePlaces)
         taskService.createTasks(useCase)
+
+//        def field = net.dataSet.find {it.value.name == "How many adults 18 or over live in the property"}.value
+//        field.value = 5
+//        def js = FieldValidationRunner.toJavascript(field,field.validationRules)
+//        def valid = FieldValidationRunner.validate(field,field.validationRules)
+//        field.validationJS(js)
     }
 }
