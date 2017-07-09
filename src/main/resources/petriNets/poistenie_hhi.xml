@@ -253,12 +253,24 @@
         <values>150.00 €</values>
     </data>
     <data type="number">
+        <id>189</id>
+        <title>Poistenie nehnuteľnosti - spoluúčasť - koeficient</title>
+    </data>
+    <data type="number">
         <id>36</id>
         <title>Poistenie nehnuteľnosti - poistná suma</title>
     </data>
     <data type="number">
+        <id>36</id>
+        <title>Poistenie nehnuteľnosti - poistné</title>
+    </data>
+    <data type="number">
         <id>37</id>
-        <title>Garáž</title>
+        <title>Garáž - poistná suma</title>
+    </data>
+    <data type="number">
+        <id>174</id>
+        <title>Garáž - poistné</title>
     </data>
     <data type="boolean">
         <id>38</id>
@@ -266,47 +278,91 @@
     </data>
     <data type="number">
         <id>39</id>
-        <title>Hospodárska budova</title>
+        <title>Hospodárska budova - poistná suma</title>
+    </data>
+    <data type="number">
+        <id>175</id>
+        <title>Hospodárska budova - poistné</title>
     </data>
     <data type="number">
         <id>40</id>
-        <title>Altánok</title>
+        <title>Altánok - poistná suma</title>
+    </data>
+    <data type="number">
+        <id>176</id>
+        <title>Altánok - poistné</title>
     </data>
     <data type="number">
         <id>41</id>
-        <title>Prístrešok</title>
+        <title>Prístrešok - poistná suma</title>
+    </data>
+    <data type="number">
+        <id>177</id>
+        <title>Prístrešok - poistné</title>
     </data>
     <data type="number">
         <id>42</id>
-        <title>Chodník, parkovacia plocha</title>
+        <title>Chodník, parkovacia plocha - poistná suma</title>
+    </data>
+    <data type="number">
+        <id>178</id>
+        <title>Chodník, parkovacia plocha - poistné</title>
     </data>
     <data type="number">
         <id>43</id>
-        <title>Sauna</title>
+        <title>Sauna - poistná suma</title>
+    </data>
+    <data type="number">
+        <id>179</id>
+        <title>Sauna - poistné</title>
     </data>
     <data type="number">
         <id>44</id>
-        <title>Elektrická brána, oplotenie</title>
+        <title>Elektrická brána, oplotenie - poistná suma</title>
+    </data>
+    <data type="number">
+        <id>180</id>
+        <title>Elektrická brána, oplotenie - poistné</title>
     </data>
     <data type="number">
         <id>45</id>
-        <title>Tenisový kurt</title>
+        <title>Tenisový kurt - poistná suma</title>
+    </data>
+    <data type="number">
+        <id>181</id>
+        <title>Tenisový kurt - poistné</title>
     </data>
     <data type="number">
         <id>46</id>
-        <title>Vonkajší bazén</title>
+        <title>Vonkajší bazén - poistná suma</title>
+    </data>
+    <data type="number">
+        <id>182</id>
+        <title>Vonkajší bazén - poistné</title>
     </data>
     <data type="number">
         <id>47</id>
-        <title>Studňa</title>
+        <title>Studňa - poistná suma</title>
+    </data>
+    <data type="number">
+        <id>183</id>
+        <title>Studňa - poistné</title>
     </data>
     <data type="number">
         <id>48</id>
-        <title>Žumpa, septik</title>
+        <title>Žumpa, septik - poistná suma</title>
+    </data>
+    <data type="number">
+        <id>184</id>
+        <title>Žumpa, septik - poistné</title>
     </data>
     <data type="number">
         <id>49</id>
-        <title>Iné</title>
+        <title>Iné - poistná suma</title>
+    </data>
+    <data type="number">
+        <id>185</id>
+        <title>Iné - poistné</title>
     </data>
     <!-- ===== Doplnkové poistenie nehnuteľnosti ===== -->
     <data type="number">
@@ -507,6 +563,10 @@
     </data>
     <!-- ===== Nehnuteľnosť koeficienty ===== -->
     <data type="number">
+        <id>166</id>
+        <title>Koeficient - Predmet poistenia</title>
+    </data>
+    <data type="number">
         <id>92</id>
         <title>Koeficient - Konštrukcia múrov</title>
     </data>
@@ -521,6 +581,14 @@
     <data type="number">
         <id>95</id>
         <title>Koeficient - Má nehnuteľnosť praskliny na vonkajšej fasáde?</title>
+    </data>
+    <data type="number">
+        <id>164</id>
+        <title>Koeficient - Koľko izieb má nehnuteľnosť?</title>
+    </data>
+    <data type="number">
+        <id>165</id>
+        <title>Koeficient - Koľko kúpeľní má nehnuteľnosť?</title>
     </data>
     <data type="number">
         <id>96</id>
@@ -563,6 +631,10 @@
     <data type="number">
         <id>105</id>
         <title>Koeficient - Územná platnosť poistenia</title>
+    </data>
+    <data type="number">
+        <id>172</id>
+        <title>Koeficient - Zodpovednosť celkovo</title>
     </data>
     <!-- ===== Sumár koeficienty ===== -->
     <data type="number">
@@ -1174,17 +1246,12 @@
         <transactionRef>
             <id>2</id>
         </transactionRef>
-        <roleRef>
-            <id>1</id>
-            <logic>
-                <perform>true</perform>
-            </logic>
-        </roleRef>
         <dataRef>
             <id>1</id>
             <logic>
                 <behavior>editable</behavior>
                 <behavior>required</behavior>
+                <!--todo: psc and lokalita lookup -->
             </logic>
         </dataRef>
         <dataRef>
@@ -1204,6 +1271,36 @@
             <logic>
                 <behavior>editable</behavior>
                 <behavior>required</behavior>
+                <action>
+                    field: f.this,
+                    coeff: f.76;
+                    change coeff about {
+                        if (field.value)
+                            return 1.2 as Double;
+                        return 1.0 as Double;
+                    }
+                </action>
+                <action>
+                    c4: f.76,
+                    c5: f.77,
+                    c6: f.78,
+                    c7: f.79,
+                    c8: f.80,
+                    c9: f.81,
+                    c10: f.82,
+                    c11: f.83,
+                    c12: f.84,
+                    c13: f.85,
+                    c14: f.86,
+                    c15: f.87,
+                    c16: f.88,
+                    c17: f.89,
+                    c68: f.90,
+                    coeff: f.91;
+                    change coeff about {
+                    return c4?.value*c5?.value*c6?.value*c7?.value*c8?.value*c9?.value*c10?.value*c11?.value*c12?.value*c13?.value*c14?.value*c15?.value*c16?.value*c17?.value*c68?.value;
+                    }
+                </action>
             </logic>
         </dataRef>
         <dataRef>
@@ -1211,6 +1308,36 @@
             <logic>
                 <behavior>editable</behavior>
                 <behavior>required</behavior>
+                <action>
+                    field: f.this,
+                    coeff: f.77;
+                    change coeff about {
+                    if (field.value)
+                    return 1.5 as Double;
+                    return 1.0 as Double;
+                    }
+                </action>
+                <action>
+                    c4: f.76,
+                    c5: f.77,
+                    c6: f.78,
+                    c7: f.79,
+                    c8: f.80,
+                    c9: f.81,
+                    c10: f.82,
+                    c11: f.83,
+                    c12: f.84,
+                    c13: f.85,
+                    c14: f.86,
+                    c15: f.87,
+                    c16: f.88,
+                    c17: f.89,
+                    c68: f.90,
+                    coeff: f.91;
+                    change coeff about {
+                    return c4?.value*c5?.value*c6?.value*c7?.value*c8?.value*c9?.value*c10?.value*c11?.value*c12?.value*c13?.value*c14?.value*c15?.value*c16?.value*c17?.value*c68?.value;
+                    }
+                </action>
             </logic>
         </dataRef>
         <dataRef>
@@ -1218,6 +1345,36 @@
             <logic>
                 <behavior>editable</behavior>
                 <behavior>required</behavior>
+                <action>
+                    field: f.this,
+                    coeff: f.78;
+                    change coeff about {
+                    if (field.value)
+                    return 1.5 as Double;
+                    return 1.0 as Double;
+                    }
+                </action>
+                <action>
+                    c4: f.76,
+                    c5: f.77,
+                    c6: f.78,
+                    c7: f.79,
+                    c8: f.80,
+                    c9: f.81,
+                    c10: f.82,
+                    c11: f.83,
+                    c12: f.84,
+                    c13: f.85,
+                    c14: f.86,
+                    c15: f.87,
+                    c16: f.88,
+                    c17: f.89,
+                    c68: f.90,
+                    coeff: f.91;
+                    change coeff about {
+                    return c4?.value*c5?.value*c6?.value*c7?.value*c8?.value*c9?.value*c10?.value*c11?.value*c12?.value*c13?.value*c14?.value*c15?.value*c16?.value*c17?.value*c68?.value;
+                    }
+                </action>
             </logic>
         </dataRef>
         <dataRef>
@@ -1225,6 +1382,34 @@
             <logic>
                 <behavior>editable</behavior>
                 <behavior>required</behavior>
+                <action>
+                    field: f.this,
+                    coeff: f.79;
+                    change coeff about {
+                    return 1.0 as Double;
+                    }
+                </action>
+                <action>
+                    c4: f.76,
+                    c5: f.77,
+                    c6: f.78,
+                    c7: f.79,
+                    c8: f.80,
+                    c9: f.81,
+                    c10: f.82,
+                    c11: f.83,
+                    c12: f.84,
+                    c13: f.85,
+                    c14: f.86,
+                    c15: f.87,
+                    c16: f.88,
+                    c17: f.89,
+                    c68: f.90,
+                    coeff: f.91;
+                    change coeff about {
+                    return c4?.value*c5?.value*c6?.value*c7?.value*c8?.value*c9?.value*c10?.value*c11?.value*c12?.value*c13?.value*c14?.value*c15?.value*c16?.value*c17?.value*c68?.value;
+                    }
+                </action>
             </logic>
         </dataRef>
         <dataRef>
@@ -1232,6 +1417,34 @@
             <logic>
                 <behavior>editable</behavior>
                 <behavior>required</behavior>
+                <action>
+                    field: f.this,
+                    coeff: f.80;
+                    change coeff about {
+                        return 1.0 as Double;
+                    }
+                </action>
+                <action>
+                    c4: f.76,
+                    c5: f.77,
+                    c6: f.78,
+                    c7: f.79,
+                    c8: f.80,
+                    c9: f.81,
+                    c10: f.82,
+                    c11: f.83,
+                    c12: f.84,
+                    c13: f.85,
+                    c14: f.86,
+                    c15: f.87,
+                    c16: f.88,
+                    c17: f.89,
+                    c68: f.90,
+                    coeff: f.91;
+                    change coeff about {
+                    return c4?.value*c5?.value*c6?.value*c7?.value*c8?.value*c9?.value*c10?.value*c11?.value*c12?.value*c13?.value*c14?.value*c15?.value*c16?.value*c17?.value*c68?.value;
+                    }
+                </action>
             </logic>
         </dataRef>
         <dataRef>
@@ -1239,6 +1452,40 @@
             <logic>
                 <behavior>editable</behavior>
                 <behavior>required</behavior>
+                <action>
+                    field: f.this,
+                    coeff: f.81;
+                    change coeff about {
+                        if (field.value == "1")
+                            return 0.95 as Double;
+                        if (field.value == "2")
+                            return 1.0 as Double;
+                        if (field.value == "3")
+                            return 1.05 as Double;
+                        return 1.1 as Double;
+                    }
+                </action>
+                <action>
+                    c4: f.76,
+                    c5: f.77,
+                    c6: f.78,
+                    c7: f.79,
+                    c8: f.80,
+                    c9: f.81,
+                    c10: f.82,
+                    c11: f.83,
+                    c12: f.84,
+                    c13: f.85,
+                    c14: f.86,
+                    c15: f.87,
+                    c16: f.88,
+                    c17: f.89,
+                    c68: f.90,
+                    coeff: f.91;
+                    change coeff about {
+                    return c4?.value*c5?.value*c6?.value*c7?.value*c8?.value*c9?.value*c10?.value*c11?.value*c12?.value*c13?.value*c14?.value*c15?.value*c16?.value*c17?.value*c68?.value;
+                    }
+                </action>
             </logic>
         </dataRef>
         <dataRef>
@@ -1246,6 +1493,38 @@
             <logic>
                 <behavior>editable</behavior>
                 <behavior>required</behavior>
+                <action>
+                    field: f.this,
+                    coeff: f.82;
+                    change coeff about {
+                        if (field.value == "2")
+                            return 1.05 as Double;
+                        if (field.value == "viac")
+                            return 1.1 as Double;
+                        return 1.0 as Double;
+                    }
+                </action>
+                <action>
+                    c4: f.76,
+                    c5: f.77,
+                    c6: f.78,
+                    c7: f.79,
+                    c8: f.80,
+                    c9: f.81,
+                    c10: f.82,
+                    c11: f.83,
+                    c12: f.84,
+                    c13: f.85,
+                    c14: f.86,
+                    c15: f.87,
+                    c16: f.88,
+                    c17: f.89,
+                    c68: f.90,
+                    coeff: f.91;
+                    change coeff about {
+                    return c4?.value*c5?.value*c6?.value*c7?.value*c8?.value*c9?.value*c10?.value*c11?.value*c12?.value*c13?.value*c14?.value*c15?.value*c16?.value*c17?.value*c68?.value;
+                    }
+                </action>
             </logic>
         </dataRef>
         <dataRef>
@@ -1253,6 +1532,36 @@
             <logic>
                 <behavior>editable</behavior>
                 <behavior>required</behavior>
+                <action>
+                    field: f.this,
+                    coeff: f.83;
+                    change coeff about {
+                        if (field.value)
+                            return 1.5 as Double;
+                        return 1.0 as Double;
+                    }
+                </action>
+                <action>
+                    c4: f.76,
+                    c5: f.77,
+                    c6: f.78,
+                    c7: f.79,
+                    c8: f.80,
+                    c9: f.81,
+                    c10: f.82,
+                    c11: f.83,
+                    c12: f.84,
+                    c13: f.85,
+                    c14: f.86,
+                    c15: f.87,
+                    c16: f.88,
+                    c17: f.89,
+                    c68: f.90,
+                    coeff: f.91;
+                    change coeff about {
+                    return c4?.value*c5?.value*c6?.value*c7?.value*c8?.value*c9?.value*c10?.value*c11?.value*c12?.value*c13?.value*c14?.value*c15?.value*c16?.value*c17?.value*c68?.value;
+                    }
+                </action>
             </logic>
         </dataRef>
         <dataRef>
@@ -1260,6 +1569,37 @@
             <logic>
                 <behavior>editable</behavior>
                 <behavior>required</behavior>
+                <!-- todo if field.value == ano stop process -->
+                <action>
+                    field: f.this,
+                    coeff: f.84;
+                    change coeff about {
+                    if (field.value)
+                    return -1 as Double;
+                    return 1.0 as Double;
+                    }
+                </action>
+                <action>
+                    c4: f.76,
+                    c5: f.77,
+                    c6: f.78,
+                    c7: f.79,
+                    c8: f.80,
+                    c9: f.81,
+                    c10: f.82,
+                    c11: f.83,
+                    c12: f.84,
+                    c13: f.85,
+                    c14: f.86,
+                    c15: f.87,
+                    c16: f.88,
+                    c17: f.89,
+                    c68: f.90,
+                    coeff: f.91;
+                    change coeff about {
+                    return c4?.value*c5?.value*c6?.value*c7?.value*c8?.value*c9?.value*c10?.value*c11?.value*c12?.value*c13?.value*c14?.value*c15?.value*c16?.value*c17?.value*c68?.value;
+                    }
+                </action>
             </logic>
         </dataRef>
         <dataRef>
@@ -1267,6 +1607,36 @@
             <logic>
                 <behavior>editable</behavior>
                 <behavior>required</behavior>
+                <action>
+                    field: f.this,
+                    coeff: f.85;
+                    change coeff about {
+                    if (field.value)
+                    return 1.2 as Double;
+                    return 1.0 as Double;
+                    }
+                </action>
+                <action>
+                    c4: f.76,
+                    c5: f.77,
+                    c6: f.78,
+                    c7: f.79,
+                    c8: f.80,
+                    c9: f.81,
+                    c10: f.82,
+                    c11: f.83,
+                    c12: f.84,
+                    c13: f.85,
+                    c14: f.86,
+                    c15: f.87,
+                    c16: f.88,
+                    c17: f.89,
+                    c68: f.90,
+                    coeff: f.91;
+                    change coeff about {
+                    return c4?.value*c5?.value*c6?.value*c7?.value*c8?.value*c9?.value*c10?.value*c11?.value*c12?.value*c13?.value*c14?.value*c15?.value*c16?.value*c17?.value*c68?.value;
+                    }
+                </action>
             </logic>
         </dataRef>
         <dataRef>
@@ -1274,6 +1644,36 @@
             <logic>
                 <behavior>editable</behavior>
                 <behavior>required</behavior>
+                <action>
+                    field: f.this,
+                    coeff: f.86;
+                    change coeff about {
+                    if (field.value)
+                    return 1.05 as Double;
+                    return 1.0 as Double;
+                    }
+                </action>
+                <action>
+                    c4: f.76,
+                    c5: f.77,
+                    c6: f.78,
+                    c7: f.79,
+                    c8: f.80,
+                    c9: f.81,
+                    c10: f.82,
+                    c11: f.83,
+                    c12: f.84,
+                    c13: f.85,
+                    c14: f.86,
+                    c15: f.87,
+                    c16: f.88,
+                    c17: f.89,
+                    c68: f.90,
+                    coeff: f.91;
+                    change coeff about {
+                    return c4?.value*c5?.value*c6?.value*c7?.value*c8?.value*c9?.value*c10?.value*c11?.value*c12?.value*c13?.value*c14?.value*c15?.value*c16?.value*c17?.value*c68?.value;
+                    }
+                </action>
             </logic>
         </dataRef>
         <dataRef>
@@ -1281,6 +1681,38 @@
             <logic>
                 <behavior>editable</behavior>
                 <behavior>required</behavior>
+                <action>
+                    field: f.this,
+                    coeff: f.87;
+                    change coeff about {
+                    if (field.value == "cez deň")
+                    return 1.05 as Double;
+                    if (field.value == "večer a v noci")
+                    return 1.02 as Double;
+                    return 1.0 as Double;
+                    }
+                </action>
+                <action>
+                    c4: f.76,
+                    c5: f.77,
+                    c6: f.78,
+                    c7: f.79,
+                    c8: f.80,
+                    c9: f.81,
+                    c10: f.82,
+                    c11: f.83,
+                    c12: f.84,
+                    c13: f.85,
+                    c14: f.86,
+                    c15: f.87,
+                    c16: f.88,
+                    c17: f.89,
+                    c68: f.90,
+                    coeff: f.91;
+                    change coeff about {
+                    return c4?.value*c5?.value*c6?.value*c7?.value*c8?.value*c9?.value*c10?.value*c11?.value*c12?.value*c13?.value*c14?.value*c15?.value*c16?.value*c17?.value*c68?.value;
+                    }
+                </action>
             </logic>
         </dataRef>
         <dataRef>
@@ -1288,13 +1720,36 @@
             <logic>
                 <behavior>editable</behavior>
                 <behavior>required</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>16</id>
-            <logic>
-                <behavior>editable</behavior>
-                <behavior>required</behavior>
+                <action>
+                    field: f.this,
+                    coeff: f.88;
+                    change coeff about {
+                    if (field.value)
+                    return 1.1 as Double;
+                    return 1.0 as Double;
+                    }
+                </action>
+                <action>
+                    c4: f.76,
+                    c5: f.77,
+                    c6: f.78,
+                    c7: f.79,
+                    c8: f.80,
+                    c9: f.81,
+                    c10: f.82,
+                    c11: f.83,
+                    c12: f.84,
+                    c13: f.85,
+                    c14: f.86,
+                    c15: f.87,
+                    c16: f.88,
+                    c17: f.89,
+                    c68: f.90,
+                    coeff: f.91;
+                    change coeff about {
+                    return c4?.value*c5?.value*c6?.value*c7?.value*c8?.value*c9?.value*c10?.value*c11?.value*c12?.value*c13?.value*c14?.value*c15?.value*c16?.value*c17?.value*c68?.value;
+                    }
+                </action>
             </logic>
         </dataRef>
         <dataRef>
@@ -1302,6 +1757,36 @@
             <logic>
                 <behavior>editable</behavior>
                 <behavior>required</behavior>
+                <action>
+                    field: f.this,
+                    coeff: f.89;
+                    change coeff about {
+                    if (field.value == "fyzická osoba")
+                    return 1.0 as Double;
+                    return 1.1 as Double;
+                    }
+                </action>
+                <action>
+                    c4: f.76,
+                    c5: f.77,
+                    c6: f.78,
+                    c7: f.79,
+                    c8: f.80,
+                    c9: f.81,
+                    c10: f.82,
+                    c11: f.83,
+                    c12: f.84,
+                    c13: f.85,
+                    c14: f.86,
+                    c15: f.87,
+                    c16: f.88,
+                    c17: f.89,
+                    c68: f.90,
+                    coeff: f.91;
+                    change coeff about {
+                    return c4?.value*c5?.value*c6?.value*c7?.value*c8?.value*c9?.value*c10?.value*c11?.value*c12?.value*c13?.value*c14?.value*c15?.value*c16?.value*c17?.value*c68?.value;
+                    }
+                </action>
             </logic>
         </dataRef>
         <dataRef>
@@ -1309,6 +1794,38 @@
             <logic>
                 <behavior>editable</behavior>
                 <behavior>required</behavior>
+                <action>
+                    field: f.this,
+                    coeff: f.90;
+                    change coeff about {
+                    if (field.value == "0")
+                    return 1.0 as Double;
+                    if (field.value == "1")
+                    return 1.1 as Double;
+                    return 1.2 as Double;
+                    }
+                </action>
+                <action>
+                    c4: f.76,
+                    c5: f.77,
+                    c6: f.78,
+                    c7: f.79,
+                    c8: f.80,
+                    c9: f.81,
+                    c10: f.82,
+                    c11: f.83,
+                    c12: f.84,
+                    c13: f.85,
+                    c14: f.86,
+                    c15: f.87,
+                    c16: f.88,
+                    c17: f.89,
+                    c68: f.90,
+                    coeff: f.91;
+                    change coeff about {
+                    return c4?.value*c5?.value*c6?.value*c7?.value*c8?.value*c9?.value*c10?.value*c11?.value*c12?.value*c13?.value*c14?.value*c15?.value*c16?.value*c17?.value*c68?.value;
+                    }
+                </action>
             </logic>
         </dataRef>
     </transition>
@@ -1317,15 +1834,15 @@
         <x>260</x>
         <y>300</y>
         <label>Poistenie nehnuteľnosti</label>
+        <transactionRef>
+            <id>1</id>
+        </transactionRef>
         <roleRef>
             <id>1</id>
             <logic>
                 <perform>true</perform>
             </logic>
         </roleRef>
-        <transactionRef>
-            <id>1</id>
-        </transactionRef>
     </transition>
     <transition>
         <id>4</id>
@@ -1386,6 +1903,307 @@
         <transactionRef>
             <id>2</id>
         </transactionRef>
+        <dataRef>
+            <id>19</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+                <action>
+                    field: f.this,
+                    coeff: f.166;
+                    change coeff about {
+                    if (field.value == "chata")
+                    return 1.2 as Double;
+                    if (field.value == "bytový dom")
+                    return 0.75 as Double;
+                    return 0.9 as Double;
+                    }
+                </action>
+                <action>
+                    c1: f.166,
+                    c2: f.92,
+                    c3: f.93,
+                    c4: f.94,
+                    c5: f.95,
+                    c6a: f.164,
+                    c6b: f.165,
+                    c7: f.96,
+                    coeff: f.97;
+                    change coeff about {
+                    return c1.value*c2.value*c3.value*c4.value*c5.value*c6a.value*c6b.value*c7.value;
+                    }
+                </action>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>20</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+                <action>
+                    field: f.this,
+                    coeff: f.92;
+                    change coeff about {
+                    if (field.value == "tehla a/alebo betón")
+                    return 1.0 as Double;
+                    if (field.value == "porobetón (ytong)")
+                    return 1.05 as Double;
+                    if (field.value == "škvarobatón")
+                    return 1.05 as Double;
+                    if (field.value == "sklo")
+                    return 1.3 as Double;
+                    return 1.5 as Double;
+                    }
+                </action>
+                <action>
+                    c1: f.166,
+                    c2: f.92,
+                    c3: f.93,
+                    c4: f.94,
+                    c5: f.95,
+                    c6a: f.164,
+                    c6b: f.165,
+                    c7: f.96,
+                    coeff: f.97;
+                    change coeff about {
+                    return c1.value*c2.value*c3.value*c4.value*c5.value*c6a.value*c6b.value*c7.value;
+                    }
+                </action>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>21</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+                <action>
+                    field: f.this,
+                    coeff: f.93;
+                    change coeff about {
+                    if (field.value == "škridla")
+                    return 1.0 as Double;
+                    if (field.value == "plech")
+                    return 1.05 as Double;
+                    if (field.value == "asfalt")
+                    return 1.1 as Double;
+                    if (field.value == "hydroizolačné fólie")
+                    return 1.1 as Double;
+                    if (field.value == "sklo")
+                    return 1.15 as Double;
+                    if (field.value == "šindel")
+                    return 1.05 as Double;
+                    return 1.1 as Double;
+                    }
+                </action>
+                <action>
+                    c1: f.166,
+                    c2: f.92,
+                    c3: f.93,
+                    c4: f.94,
+                    c5: f.95,
+                    c6a: f.164,
+                    c6b: f.165,
+                    c7: f.96,
+                    coeff: f.97;
+                    change coeff about {
+                    return c1.value*c2.value*c3.value*c4.value*c5.value*c6a.value*c6b.value*c7.value;
+                    }
+                </action>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>22</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+                <action>
+                    field: f.this,
+                    coeff: f.94;
+                    change coeff about {
+                    if (field.value == "menej ako 5")
+                    return 1.0 as Double;
+                    if (field.value == "6 až 10")
+                    return 1.05 as Double;
+                    if (field.value == "11 až 20")
+                    return 1.1 as Double;
+                    return 1.2 as Double;
+                    }
+                </action>
+                <action>
+                    c1: f.166,
+                    c2: f.92,
+                    c3: f.93,
+                    c4: f.94,
+                    c5: f.95,
+                    c6a: f.164,
+                    c6b: f.165,
+                    c7: f.96,
+                    coeff: f.97;
+                    change coeff about {
+                    return c1.value*c2.value*c3.value*c4.value*c5.value*c6a.value*c6b.value*c7.value;
+                    }
+                </action>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>23</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+                <action>
+                    field: f.this,
+                    coeff: f.95;
+                    change coeff about {
+                    if (field.value)
+                    return 1.5 as Double;
+                    return 1.0 as Double;
+                    }
+                </action>
+                <action>
+                    c1: f.166,
+                    c2: f.92,
+                    c3: f.93,
+                    c4: f.94,
+                    c5: f.95,
+                    c6a: f.164,
+                    c6b: f.165,
+                    c7: f.96,
+                    coeff: f.97;
+                    change coeff about {
+                    return c1.value*c2.value*c3.value*c4.value*c5.value*c6a.value*c6b.value*c7.value;
+                    }
+                </action>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>24</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+                <action>
+                    field: f.this,
+                    coeff: f.164;
+                    change coeff about {
+                    if (field.value == "1")
+                    return 0.9 as Double;
+                    if (field.value == "2")
+                    return 1.0 as Double;
+                    if (field.value == "3")
+                    return 	1.1 as Double;
+                    if (field.value == "4")
+                    return 	1.15 as Double;
+                    return 1.2 as Double;
+                    }
+                </action>
+                <action>
+                    c1: f.166,
+                    c2: f.92,
+                    c3: f.93,
+                    c4: f.94,
+                    c5: f.95,
+                    c6a: f.164,
+                    c6b: f.165,
+                    c7: f.96,
+                    coeff: f.97;
+                    change coeff about {
+                    return c1.value*c2.value*c3.value*c4.value*c5.value*c6a.value*c6b.value*c7.value;
+                    }
+                </action>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>25</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+                <action>
+                    field: f.this,
+                    coeff: f.165;
+                    change coeff about {
+                    if (field.value == "1")
+                    return 	1.0 as Double;
+                    if (field.value == "2")
+                    return 	1.1 as Double;
+                    if (field.value == "viac ako 2")
+                    return 	1.2 as Double;
+                    }
+                </action>
+                <action>
+                    c1: f.166,
+                    c2: f.92,
+                    c3: f.93,
+                    c4: f.94,
+                    c5: f.95,
+                    c6a: f.164,
+                    c6b: f.165,
+                    c7: f.96,
+                    coeff: f.97;
+                    change coeff about {
+                    return c1.value*c2.value*c3.value*c4.value*c5.value*c6a.value*c6b.value*c7.value;
+                    }
+                </action>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>26</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+                <action>
+                    field: f.this,
+                    coeff: f.96;
+                    change coeff about {
+                    if (field.value == "bez rekonštrukcií")
+                    return	1.0 as Double;
+                    if (field.value == "do 20 000 EUR")
+                    return	0.95 as Double;
+                    if (field.value == "do 50 000 EUR")
+                    return	0.9 as Double;
+                    return 0.85 as Double;
+                    }
+                </action>
+                <action>
+                    c1: f.166,
+                    c2: f.92,
+                    c3: f.93,
+                    c4: f.94,
+                    c5: f.95,
+                    c6a: f.164,
+                    c6b: f.165,
+                    c7: f.96,
+                    coeff: f.97;
+                    change coeff about {
+                    return c1.value*c2.value*c3.value*c4.value*c5.value*c6a.value*c6b.value*c7.value;
+                    }
+                </action>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>35</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+                <action>
+                    field: f.this,
+                    coeff: f.189;
+                    change coeff about {
+                        if (field.value == "0,00 €")
+                            return 1.1 as Double;
+                        if (field.value == "50,00 €")
+                            return 1.0 as Double;
+                        return 0.9 as Double;
+                    }
+                </action>
+                <action>
+                    field: f.50,
+                    exces: f.189,
+                    coeff: f.186;
+                    change coeff about {
+                        return (field.value*3.5*exces.value)/1000.0 as Double;
+                    }
+                </action>
+            </logic>
+        </dataRef>
     </transition>
     <transition>
         <id>178</id>
@@ -1401,6 +2219,70 @@
         <transactionRef>
             <id>2</id>
         </transactionRef>
+        <dataRef>
+            <id>32</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+                <action>
+                    field: f.this,
+                    coeff: f.103;
+                    change coeff about {
+                        if (field.value)
+                            return 0.1 as Double;
+                        return 0.0 as Double;
+                    }
+                </action>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>33</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+                <action>
+                    field: f.this,
+                    coeff: f.104;
+                    change coeff about {
+                        if (field.value)
+                            return 0.3 as Double;
+                        return 0.0 as Double;
+                    }
+                </action>
+                <action>
+                    c1: f.104,
+                    c2: f.105,
+                    coeff: f.172;
+                    change coeff about {
+                        return c1.value*c2.value;
+                    }
+                </action>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>34</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+                <action>
+                    field: f.this,
+                    coeff: f.105;
+                    change coeff about {
+                        if (field.value == "Slovenská republika")
+                            return 1.0 as Double;
+                        return 1.2 as Double;
+                    }
+                </action>
+                <action>
+                    c1: f.104,
+                    c2: f.105,
+                    coeff: f.172;
+                    change coeff about {
+                        return c1.value*c2.value;
+                    }
+                </action>
+            </logic>
+        </dataRef>
     </transition>
     <transition>
         <id>259</id>
@@ -2263,6 +3145,145 @@
         <transactionRef>
             <id>2</id>
         </transactionRef>
+        <dataRef>
+            <id>27</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+                <action>
+                    field: f.this,
+                    coeff: f.171;
+                    change coeff about {
+                    if (field.value == "byt")
+                    return 1.0 as Double;
+                    if (field.value == "rodinný dom")
+                    return 1.0 as Double;
+                    if (field.value == "chata")
+                    return 1.25 as Double;
+                    return 1.25 as Double;
+                    }
+                </action>
+                <action>
+                    c1: f.168,
+                    c2: f.98,
+                    c3: f.99,
+                    c4: f.100,
+                    c5: f.101,
+                    coeff: f.102;
+                    change coeff about {
+                    return c1.value*c2.value*c3.value*c4.value*c5.value;
+                    }
+                </action>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>28</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+                <action>
+                    field: f.this,
+                    coeff: f.98;
+                    change coeff about {
+                    if (field.value == "trvalá")
+                    return 1.0 as Double;
+                    return 2.5 as Double;
+                    }
+                </action>
+                <action>
+                    c1: f.168,
+                    c2: f.98,
+                    c3: f.99,
+                    c4: f.100,
+                    c5: f.101,
+                    coeff: f.102;
+                    change coeff about {
+                    return c1.value*c2.value*c3.value*c4.value*c5.value;
+                    }
+                </action>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>29</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+                <action>
+                    field: f.this,
+                    coeff: f.99;
+                    change coeff about {
+                    if (field.value)
+                    return 0.95 as Double;
+                    return 1.0 as Double;
+                    }
+                </action>
+                <action>
+                    c1: f.168,
+                    c2: f.98,
+                    c3: f.99,
+                    c4: f.100,
+                    c5: f.101,
+                    coeff: f.102;
+                    change coeff about {
+                    return c1.value*c2.value*c3.value*c4.value*c5.value;
+                    }
+                </action>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>30</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+                <action>
+                    field: f.this,
+                    coeff: f.100;
+                    change coeff about {
+                    if (field.value)
+                    return 0.97 as Double;
+                    return 1.0 as Double;
+                    }
+                </action>
+                <action>
+                    c1: f.168,
+                    c2: f.98,
+                    c3: f.99,
+                    c4: f.100,
+                    c5: f.101,
+                    coeff: f.102;
+                    change coeff about {
+                    return c1.value*c2.value*c3.value*c4.value*c5.value;
+                    }
+                </action>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>31</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+                <action>
+                    field: f.this,
+                    coeff: f.101;
+                    change coeff about {
+                    if (field.value)
+                    return 0.97 as Double;
+                    return 1.0 as Double;
+                    }
+                </action>
+                <action>
+                    c1: f.168,
+                    c2: f.98,
+                    c3: f.99,
+                    c4: f.100,
+                    c5: f.101,
+                    coeff: f.102;
+                    change coeff about {
+                    return c1.value*c2.value*c3.value*c4.value*c5.value;
+                    }
+                </action>
+            </logic>
+        </dataRef>
     </transition>
     <transition>
         <id>364</id>
@@ -2293,6 +3314,7 @@
         <transactionRef>
             <id>2</id>
         </transactionRef>
+
     </transition>
     <transition>
         <id>414</id>
@@ -2308,6 +3330,48 @@
         <transactionRef>
             <id>2</id>
         </transactionRef>
+        <dataRef>
+            <id>50</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+                <action>
+                    field: f.this,
+                    exces: f.189,
+                    coeff: f.186;
+                    change coeff about {
+                        return (field.value*3.5*exces.value)/1000.0 as Double;
+                    }
+                </action>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>186</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>51</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+                <action>
+                    field: f.this,
+                    exces: f.189,
+                    coeff: f.187;
+                    change coeff about {
+                        return (field.value*3.5*exces.value)/1000.0 as Double;
+                    }
+                </action>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>187</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
     </transition>
     <transition>
         <id>421</id>
