@@ -60,11 +60,11 @@ public class WorkflowController {
         return resources;
     }
 
-    @RequestMapping(value = "/case/author/{id}", method = RequestMethod.GET)
-    public PagedResources<CaseResource> findAllByAuthor(@PathVariable("id") Long authorId, Pageable pageable, PagedResourcesAssembler<Case> assembler) {
-        Page<Case> cases = workflowService.findAllByAuthor(authorId, pageable);
+    @RequestMapping(value = "/case/author/{id}", method = RequestMethod.POST)
+    public PagedResources<CaseResource> findAllByAuthor(@PathVariable("id") Long authorId, @RequestBody String petriNet, Pageable pageable, PagedResourcesAssembler<Case> assembler) {
+        Page<Case> cases = workflowService.findAllByAuthor(authorId, petriNet, pageable);
         Link selfLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(WorkflowController.class)
-                .findAllByAuthor(authorId, pageable, assembler)).withRel("author");
+                .findAllByAuthor(authorId, petriNet, pageable, assembler)).withRel("author");
         PagedResources<CaseResource> resources = assembler.toResource(cases, new CaseResourceAssembler(), selfLink);
         ResourceLinkAssembler.addLinks(resources, Case.class, selfLink.getRel());
         return resources;
