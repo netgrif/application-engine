@@ -272,6 +272,10 @@
         <id>174</id>
         <title>Garáž - poistné</title>
     </data>
+    <data type="number">
+        <id>190</id>
+        <title>Garáž - koeficient</title>
+    </data>
     <data type="boolean">
         <id>38</id>
         <title>Rovnaké miesto poistenia garáže?</title>
@@ -367,11 +371,19 @@
     <!-- ===== Doplnkové poistenie nehnuteľnosti ===== -->
     <data type="number">
         <id>50</id>
-        <title>Stavebné materiály</title>
+        <title>Stavebné materiály - poistná suma</title>
+    </data>
+    <data type="number">
+        <id>186</id>
+        <title>Stavebné materiály - poistné</title>
     </data>
     <data type="number">
         <id>51</id>
         <title>Stavebné a záhradné mechanizmy</title>
+    </data>
+    <data type="number">
+        <id>187</id>
+        <title>Stavebné materiály - poistná suma</title>
     </data>
     <!-- ===== Poistenie domácnosti ===== -->
     <data type="enumeration">
@@ -599,6 +611,10 @@
         <title>NEHNUTEĽNOSŤ koeficient</title>
     </data>
     <!-- ===== Domácnosť koeficienty ===== -->
+    <data type="number">
+        <id>171</id>
+        <title>Koeficient - Umiestnenie domácnosti</title>
+    </data>
     <data type="number">
         <id>98</id>
         <title>Koeficient - Obývanosť domácnosti</title>
@@ -2202,6 +2218,15 @@
                         return (field.value*3.5*exces.value)/1000.0 as Double;
                     }
                 </action>
+                <action>
+                    field: f.37,
+                    exces: f.189,
+                    garage: f.190,
+                    coeff: f.174;
+                    change coeff about {
+                        return (field.value*garage.value*exces.value)/1000.0 as Double;
+                    }
+                </action>
             </logic>
         </dataRef>
     </transition>
@@ -3314,7 +3339,284 @@
         <transactionRef>
             <id>2</id>
         </transactionRef>
-
+        <dataRef>
+            <id>38</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+                <action>
+                    field: f.38,
+                    coeff: f.190;
+                    change coeff about {
+                        if (field.value)
+                            return 1.0 as Double;
+                        return 1.1 as Double;
+                    }
+                </action>
+                <action>
+                    field: f.37,
+                    exces: f.189,
+                    garage: f.190,
+                    coeff: f.174;
+                    change coeff about {
+                        return (field.value*garage.value*exces.value)/1000.0 as Double;
+                    }
+                </action>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>37</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+                <action>
+                    field: f.this,
+                    exces: f.189,
+                    garage: f.190,
+                    coeff: f.174;
+                    change coeff about {
+                        return (field.value*garage.value*exces.value)/1000.0 as Double;
+                    }
+                </action>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>174</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>39</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+                <action>
+                    field: f.this,
+                    exces: f.189,
+                    coeff: f.175;
+                    change coeff about {
+                        return (field.value*exces.value)/1000.0 as Double;
+                    }
+                </action>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>175</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>40</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+                <action>
+                    field: f.this,
+                    exces: f.189,
+                    coeff: f.176;
+                    change coeff about {
+                        return (field.value*exces.value)/1000.0 as Double;
+                    }
+                </action>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>176</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>41</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+                <action>
+                    field: f.this,
+                    exces: f.189,
+                    coeff: f.177;
+                    change coeff about {
+                        return (field.value*exces.value)/1000.0 as Double;
+                    }
+                </action>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>177</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>42</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+                <action>
+                    field: f.this,
+                    exces: f.189,
+                    coeff: f.178;
+                    change coeff about {
+                        return (field.value*exces.value)/1000.0 as Double;
+                    }
+                </action>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>178</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>43</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+                <action>
+                    field: f.this,
+                    exces: f.189,
+                    coeff: f.179;
+                    change coeff about {
+                        return (field.value*exces.value)/1000.0 as Double;
+                    }
+                </action>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>179</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>44</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+                <action>
+                    field: f.this,
+                    exces: f.189,
+                    coeff: f.180;
+                    change coeff about {
+                        return (field.value*exces.value)/1000.0 as Double;
+                    }
+                </action>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>180</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>45</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+                <action>
+                    field: f.this,
+                    exces: f.189,
+                    coeff: f.181;
+                    change coeff about {
+                        return (field.value*exces.value)/1000.0 as Double;
+                    }
+                </action>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>181</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>46</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+                <action>
+                    field: f.this,
+                    exces: f.189,
+                    coeff: f.182;
+                    change coeff about {
+                        return (field.value*exces.value)/1000.0 as Double;
+                    }
+                </action>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>182</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>47</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+                <action>
+                    field: f.this,
+                    exces: f.189,
+                    coeff: f.183;
+                    change coeff about {
+                        return (field.value*exces.value)/1000.0 as Double;
+                    }
+                </action>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>183</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>48</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+                <action>
+                    field: f.this,
+                    exces: f.189,
+                    coeff: f.184;
+                    change coeff about {
+                        return (field.value*exces.value)/1000.0 as Double;
+                    }
+                </action>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>184</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>49</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+                <action>
+                    field: f.this,
+                    exces: f.189,
+                    coeff: f.185;
+                    change coeff about {
+                        return (field.value*exces.value)/1000.0 as Double;
+                    }
+                </action>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>185</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
     </transition>
     <transition>
         <id>414</id>
