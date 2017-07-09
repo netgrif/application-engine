@@ -1,6 +1,7 @@
 package com.netgrif.workflow.workflow.service;
 
 import com.netgrif.workflow.petrinet.domain.PetriNet;
+import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.petrinet.domain.dataset.FieldWithDefault;
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.workflow.workflow.domain.Case;
@@ -17,8 +18,10 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.BasicQuery;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.stream.LongStream;
 
 @Service
 public class WorkflowService implements IWorkflowService {
@@ -82,6 +85,21 @@ public class WorkflowService implements IWorkflowService {
     public void deleteCase(String caseId){
         repository.delete(caseId);
         taskService.deleteTasksByCase(caseId);
+    }
+
+    public List<Field> getData(String caseId){
+        Case useCase = repository.findOne(caseId);
+        List<Field> fields = new ArrayList<>();
+        useCase.getDataSet().forEach((id, dataField) -> {
+            if(dataField.isDisplayable() || useCase.getPetriNet().isDisplayableInAnyTransition(id)){
+                Field field = TaskService.buildField(useCase,id,false);
+                field.setBehavior(dataField.applyOnlyVisibleBehavior());
+                fields.add(field);
+            }
+        });
+
+        LongStream.range(0L,fields.size()).forEach(l -> fields.get((int)l).setOrder(l));
+        return fields;
     }
 
     private Page<Case> setImmediateDataFields(Page<Case> cases){
