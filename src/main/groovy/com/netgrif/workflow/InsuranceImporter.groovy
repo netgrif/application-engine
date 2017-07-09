@@ -74,6 +74,9 @@ class InsuranceImporter {
         def agentRole = userProcessRoleRepository.save(new UserProcessRole(
                 roleId: net.roles.values().find { it -> it.name == "Agent" }.objectId
         ))
+        def premiumRole = userProcessRoleRepository.save(new UserProcessRole(
+                roleId: net.roles.values().find { it -> it.name == "Premium" }.objectId
+        ))
 
         User agent = new User(
                 name: "Agent",
@@ -84,6 +87,16 @@ class InsuranceImporter {
                 organizations: [orgs.get("insurance")] as Set<Organization>)
         agent.addProcessRole(agentRole)
         userService.saveNew(agent)
+        User premium = new User(
+                name: "Premium",
+                surname: "Worker",
+                email: "premium@company.com",
+                password: "password",
+                authorities: [auths.get(Authority.user)] as Set<Authority>,
+                organizations: [orgs.get("insurance")] as Set<Organization>)
+        agent.addProcessRole(premiumRole)
+        userService.saveNew(agent)
+        userService.saveNew(premium)
     }
 
     private void createCases(PetriNet net){
