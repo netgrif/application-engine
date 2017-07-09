@@ -14,7 +14,7 @@
         <title>Contract proposal</title>
     </transaction>
     <!-- ========== DATA ========== -->
-    <data type="date">
+    <data type="date" immediate="true">
         <id>1</id>
         <title>On which date would you like your cover to start?</title>
         <valid>between "2017-07-01","2017-07-30"</valid>
@@ -94,7 +94,7 @@
         <id>30</id>
         <title>How many children under 18 live in the property</title>
     </data>
-    <data type="number">
+    <data type="number" immediate="true">
         <id>38</id>
         <title>Quote</title>
     </data>
@@ -111,7 +111,7 @@
     </role>
     <role>
         <id>2</id>
-        <name>System</name>
+        <name>Premium</name>
     </role>
     <!-- ========== PLACES ========== -->
     <place>

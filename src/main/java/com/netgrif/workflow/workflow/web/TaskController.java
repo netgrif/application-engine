@@ -75,6 +75,7 @@ public class TaskController {
             taskService.assignTask(loggedUser.transformToUser(), taskId);
             return MessageResource.successMessage("Task " + taskId + " assigned to " + loggedUser.getFullName());
         } catch (TransitionNotExecutableException e) {
+            e.printStackTrace();
             return MessageResource.errorMessage("Task " + taskId + " cannot be assigned");
         }
     }
