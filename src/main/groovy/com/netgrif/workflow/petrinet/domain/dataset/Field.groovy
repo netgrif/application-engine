@@ -1,5 +1,6 @@
-package com.netgrif.workflow.petrinet.domain.dataset;
+package com.netgrif.workflow.petrinet.domain.dataset
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
@@ -83,6 +84,7 @@ public abstract class Field<T> {
     void setOrder(Long order) {
         this.order = order
     }
+
 //operators overloading
     T plus(final Field field){
         return this.value + field.value
