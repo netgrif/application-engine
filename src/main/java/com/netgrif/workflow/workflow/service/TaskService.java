@@ -231,6 +231,8 @@ public class TaskService implements ITaskService {
             ((DateField) field).convertValue();
         } else if (field instanceof NumberField && field.getValue() instanceof Integer) {
             field.setValue(((Integer) field.getValue()).doubleValue());
+        } else if (field instanceof MultichoiceField && field.getValue() instanceof List) {
+            field.setValue(new HashSet<String>(((MultichoiceField) field).getValue()));
         }
     }
 

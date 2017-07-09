@@ -836,7 +836,7 @@
         <title>Číslo preukazu</title>
         <desc>Poistník</desc>
     </data>
-    <data type="text">
+    <data type="boolean">
         <id>128</id>
         <title>Poistený je iná osoba</title>
         <desc>Poistený a poistenec sú rôzne osoby</desc>
@@ -2358,9 +2358,6 @@
         <x>1180</x>
         <y>500</y>
         <label>Ponuka</label>
-        <transactionRef>
-            <id>3</id>
-        </transactionRef>
         <roleRef>
             <id>1</id>
             <logic>
