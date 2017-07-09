@@ -11,7 +11,7 @@ public class TextField extends ValidableField<String> {
 
     private String subType;
     @Transient
-    private int maxLength
+    private Integer maxLength
     @Transient
     private String formating
 
@@ -28,11 +28,11 @@ public class TextField extends ValidableField<String> {
         return subType
     }
 
-    int getMaxLength() {
+    Integer getMaxLength() {
         return maxLength
     }
 
-    void setMaxLength(int maxLength) {
+    void setMaxLength(Integer maxLength) {
         this.maxLength = maxLength
     }
 
