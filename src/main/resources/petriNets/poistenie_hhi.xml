@@ -26,6 +26,10 @@
         <id>1</id>
         <name>Agent</name>
     </role>
+    <role>
+        <id>2</id>
+        <name>Premium</name>
+    </role>
     <!-- ========== DATA ========== -->
     <!-- ===== Základné informácie ===== -->
     <data type="text">
@@ -1135,15 +1139,146 @@
         <x>620</x>
         <y>500</y>
         <label>Základné informácie</label>
+        <transactionRef>
+            <id>2</id>
+        </transactionRef>
         <roleRef>
             <id>1</id>
             <logic>
                 <perform>true</perform>
             </logic>
         </roleRef>
-        <transactionRef>
+        <dataRef>
+            <id>1</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
             <id>2</id>
-        </transactionRef>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>3</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>4</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>5</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>6</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>7</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>8</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>9</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>10</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>11</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>12</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>13</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>14</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>15</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>16</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>16</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>17</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>18</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+            </logic>
+        </dataRef>
     </transition>
     <transition>
         <id>2</id>
@@ -1531,6 +1666,12 @@
                 <perform>true</perform>
             </logic>
         </roleRef>
+        <roleRef>
+            <id>2</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
         <transactionRef>
             <id>5</id>
         </transactionRef>
@@ -1541,7 +1682,7 @@
         <y>180</y>
         <label>Napárovanie platby</label>
         <roleRef>
-            <id>1</id>
+            <id>2</id>
             <logic>
                 <perform>true</perform>
             </logic>
