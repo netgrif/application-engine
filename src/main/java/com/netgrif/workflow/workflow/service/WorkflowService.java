@@ -77,8 +77,12 @@ public class WorkflowService implements IWorkflowService {
     }
 
     @Override
-    public Page<Case> findAllByAuthor(Long authorId, Pageable pageable) {
-        return setImmediateDataFields(repository.findAllByAuthor(authorId, pageable));
+    public Page<Case> findAllByAuthor(Long authorId, String petriNet, Pageable pageable) {
+        String queryString = "{author:"+authorId+", petriNet:{$ref:\"petriNet\",$id:{$oid:\""+petriNet+"\"}}}";
+        BasicQuery query = new BasicQuery(queryString);
+        query = (BasicQuery)query.with(pageable);
+        List<Case> cases = mongoTemplate.find(query,Case.class);
+        return setImmediateDataFields(new PageImpl<Case>(cases,pageable,mongoTemplate.count(new BasicQuery(queryString,"{_id:1}"),Case.class)));
     }
 
     @Override
