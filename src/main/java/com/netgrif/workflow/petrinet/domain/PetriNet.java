@@ -176,6 +176,10 @@ public class PetriNet {
         return this.dataSet.values().stream().filter(Field::isImmediate).collect(Collectors.toList());
     }
 
+    public boolean isDisplayableInAnyTransition(String fieldId){
+        return transitions.values().stream().parallel().anyMatch(trans -> trans.isDisplayable(fieldId));
+    }
+
     @Override
     public String toString() {
         return title;
