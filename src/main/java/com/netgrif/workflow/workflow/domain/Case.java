@@ -67,7 +67,7 @@ public class Case {
     public Case() {
         _id = new ObjectId();
         activePlaces = new HashMap<>();
-        dataSet = new HashMap<>();
+        dataSet = new LinkedHashMap<>();
         immediateDataFields = new LinkedHashSet<>();
     }
 

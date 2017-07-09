@@ -79,6 +79,10 @@ public class Transition extends Node {
         this.triggers.add(trigger);
     }
 
+    public boolean isDisplayable(String fieldId){
+        return dataSet.get(fieldId).isDisplayable();
+    }
+
     @Override
     public String toString() {
         return this.getTitle();
