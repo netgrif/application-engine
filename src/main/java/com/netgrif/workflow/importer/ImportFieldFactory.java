@@ -50,6 +50,7 @@ public final class ImportFieldFactory {
         }
         field.setName(data.getTitle());
         field.setType(type);
+        field.setImmediate(data.isImmediate());
         if(data.getDesc() != null)
             field.setDescription(data.getDesc());
         if(data.getValid() != null && field instanceof ValidableField)

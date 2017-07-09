@@ -1,11 +1,11 @@
 package com.netgrif.workflow.petrinet.domain.dataset
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.bson.types.ObjectId;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.annotation.Transient;
-import org.springframework.data.mongodb.core.mapping.Document;
+import com.fasterxml.jackson.annotation.JsonIgnore
+import com.fasterxml.jackson.databind.node.ObjectNode
+import org.bson.types.ObjectId
+import org.springframework.data.annotation.Id
+import org.springframework.data.annotation.Transient
+import org.springframework.data.mongodb.core.mapping.Document
 
 @Document
 public abstract class Field<T> {
@@ -15,11 +15,16 @@ public abstract class Field<T> {
     private String name;
     private String description;
     protected FieldType type;
+
     @Transient
     private ObjectNode behavior;
+
     @Transient
     private T value;
     private Long order
+
+    @JsonIgnore
+    private Boolean immediate
 
     public Field(){
         _id = new ObjectId();
@@ -85,6 +90,13 @@ public abstract class Field<T> {
         this.order = order
     }
 
+    Boolean isImmediate() {
+        return immediate
+    }
+
+    void setImmediate(Boolean immediate) {
+        this.immediate = immediate
+    }
 //operators overloading
     T plus(final Field field){
         return this.value + field.value
