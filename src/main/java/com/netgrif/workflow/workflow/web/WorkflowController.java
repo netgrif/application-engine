@@ -4,10 +4,7 @@ import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
 import com.netgrif.workflow.workflow.web.requestbodies.CreateCaseBody;
-import com.netgrif.workflow.workflow.web.responsebodies.CaseResource;
-import com.netgrif.workflow.workflow.web.responsebodies.CaseResourceAssembler;
-import com.netgrif.workflow.workflow.web.responsebodies.MessageResource;
-import com.netgrif.workflow.workflow.web.responsebodies.ResourceLinkAssembler;
+import com.netgrif.workflow.workflow.web.responsebodies.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -21,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController()
@@ -62,11 +60,11 @@ public class WorkflowController {
         return resources;
     }
 
-    @RequestMapping(value = "/case/author/{id}", method = RequestMethod.GET)
-    public PagedResources<CaseResource> findAllByAuthor(@PathVariable("id") Long authorId, Pageable pageable, PagedResourcesAssembler<Case> assembler) {
-        Page<Case> cases = workflowService.findAllByAuthor(authorId, pageable);
+    @RequestMapping(value = "/case/author/{id}", method = RequestMethod.POST)
+    public PagedResources<CaseResource> findAllByAuthor(@PathVariable("id") Long authorId, @RequestBody String petriNet, Pageable pageable, PagedResourcesAssembler<Case> assembler) {
+        Page<Case> cases = workflowService.findAllByAuthor(authorId, petriNet, pageable);
         Link selfLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(WorkflowController.class)
-                .findAllByAuthor(authorId, pageable, assembler)).withRel("author");
+                .findAllByAuthor(authorId, petriNet, pageable, assembler)).withRel("author");
         PagedResources<CaseResource> resources = assembler.toResource(cases, new CaseResourceAssembler(), selfLink);
         ResourceLinkAssembler.addLinks(resources, Case.class, selfLink.getRel());
         return resources;
@@ -81,6 +79,17 @@ public class WorkflowController {
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
             return MessageResource.errorMessage("Deleting case "+caseId+" has failed!");
+        }
+    }
+
+    @RequestMapping(value= "/case/{id}/data", method = RequestMethod.GET)
+    public DataFieldsResource getAllCaseData(@PathVariable("id") String caseId){
+        try {
+            caseId = URLDecoder.decode(caseId, StandardCharsets.UTF_8.name());
+            return new DataFieldsResource(workflowService.getData(caseId),null);
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+            return new DataFieldsResource(new ArrayList<>(),null);
         }
     }
 }
