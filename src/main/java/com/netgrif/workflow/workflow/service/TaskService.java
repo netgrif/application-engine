@@ -198,13 +198,13 @@ public class TaskService implements ITaskService {
         fieldsIds.forEach(fieldId -> {
             if (useCase.hasFieldBehavior(fieldId, transition.getStringId())) {
                 if (useCase.getDataSet().get(fieldId).isDisplayable(transition.getStringId())) {
-                    Field field = buildField(useCase, fieldId);
+                    Field field = buildField(useCase, fieldId,true);
                     field.setBehavior(useCase.getDataSet().get(fieldId).applyBehavior(transition.getStringId()));
                     dataSetFields.add(field);
                 }
             } else {
                 if (transition.getDataSet().get(fieldId).isDisplayable()) {
-                    Field field = buildField(useCase, fieldId);
+                    Field field = buildField(useCase, fieldId,true);
                     field.setBehavior(transition.getDataSet().get(fieldId).applyBehavior());
                     dataSetFields.add(field);
                 }
@@ -216,21 +216,23 @@ public class TaskService implements ITaskService {
         return dataSetFields;
     }
 
-    private Field buildField(Case useCase, String fieldId) {
+    public static Field buildField(Case useCase, String fieldId, boolean withValidation) {
         Field field = useCase.getPetriNet().getDataSet().get(fieldId);
         field.setValue(useCase.getDataSet().get(fieldId).getValue());
-        if (field instanceof ValidableField && ((ValidableField) field).getValidationRules() != null)
+        if (withValidation && field instanceof ValidableField && ((ValidableField) field).getValidationRules() != null)
             ((ValidableField) field).setValidationJS(FieldValidationRunner
                     .toJavascript(field, ((ValidableField) field).getValidationRules()));
         resolveDataValues(field);
         return field;
     }
 
-    private void resolveDataValues(Field field) {
+    public static void resolveDataValues(Field field) {
         if (field instanceof DateField) {
             ((DateField) field).convertValue();
         } else if (field instanceof NumberField && field.getValue() instanceof Integer) {
             field.setValue(((Integer) field.getValue()).doubleValue());
+        } else if (field instanceof MultichoiceField && field.getValue() instanceof List) {
+            field.setValue(new HashSet<String>(((MultichoiceField) field).getValue()));
         }
     }
 
@@ -242,9 +244,9 @@ public class TaskService implements ITaskService {
         Map<String, ChangedField> changedFields = new HashMap<>();
         values.fields().forEachRemaining(entry -> {
             useCase.getDataSet().get(entry.getKey()).setValue(parseFieldsValues(entry.getValue()));
-            changedFields.put(entry.getKey(), new ChangedField(entry.getKey()));
+            //changedFields.put(entry.getKey(), new ChangedField(entry.getKey()));
             runActions(useCase.getPetriNet().getTransition(task.getTransitionId()).getDataSet().get(entry.getKey()).getActions(), useCase, changedFields);
-            changedFields.remove(entry.getKey());
+            //changedFields.remove(entry.getKey());
         });
 
         caseRepository.save(useCase);

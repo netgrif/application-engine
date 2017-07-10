@@ -65,6 +65,14 @@ public class PetriNetService implements IPetriNetService {
     }
 
     @Override
+    public PetriNetReference getReferenceByTitle(LoggedUser user, String title){
+        List<PetriNet> nets = repository.findByTitle(title);
+        return nets.stream().filter(net -> net.getRoles().keySet().stream().anyMatch(user.getProcessRoles()::contains))
+                .map(net -> new PetriNetReference(net.get_id().toString(), net.getTitle())).findFirst().orElse(new PetriNetReference("",""));
+
+    }
+
+    @Override
     public List<TransitionReference> getTransitionReferences(List<String> netsIds, LoggedUser user) {
         Iterable<PetriNet> nets = repository.findAll(netsIds);
         List<TransitionReference> transRefs = new ArrayList<>();

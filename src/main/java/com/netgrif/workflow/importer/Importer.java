@@ -203,8 +203,14 @@ public class Importer {
     }
 
     private String getObjectId(String processedObject, Long xmlId){
-        if(processedObject.equalsIgnoreCase(FIELD_KEYWORD)) return fields.get(xmlId).getObjectId();
-        if(processedObject.equalsIgnoreCase(TRANSITION_KEYWORD)) return transitions.get(xmlId).getStringId();
+        try {
+            if (processedObject.equalsIgnoreCase(FIELD_KEYWORD)) return fields.get(xmlId).getObjectId();
+            if (processedObject.equalsIgnoreCase(TRANSITION_KEYWORD)) return transitions.get(xmlId).getStringId();
+        } catch (Exception e) {
+            // TODO: 9.7.2017 remove
+            System.out.println("Processed object: " + processedObject + ", xml id: " + xmlId);
+            throw e;
+        }
         return "";
     }
 
