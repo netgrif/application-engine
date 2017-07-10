@@ -35,7 +35,7 @@ class Insurance {
             field('xfdf:original': "Text Field 50", "${value(17)}")
             field('xfdf:original': "Text Field 51", "${value(119)}")
             field('xfdf:original': "Text Field 52", "${value(121)} ${value(122)}")
-//            field('xfdf:original': "Text Field 53", "${value()}")
+//            field('xfdf:original': "Text Field 55", "${value()}") 7
             field('xfdf:original': "Text Field 57", "${value(135)}")
             field('xfdf:original': "Text Field 58", "${value(120)}")
             field('xfdf:original': "Text Field 59", "${value(124)}")
@@ -55,10 +55,10 @@ class Insurance {
 //            field('xfdf:original': "Text Field 73", "${value()}") 25
 //            field('xfdf:original': "Text Field 74", "${value()}") 26
 //            field('xfdf:original': "Text Field 75", "${value()}") 27
-//            field('xfdf:original': "Text Field 76", "${value()}") 28
-//            field('xfdf:original': "Text Field 77", "${value()}") 29
-//            field('xfdf:original': "Text Field 78", "${value()}") 30
-//            field('xfdf:original': "Text Field 79", "${value()}") 31
+            field('xfdf:original': "Text Field 76", "${value(147)}")
+            field('xfdf:original': "Text Field 77", "${value(148)}")
+            field('xfdf:original': "Text Field 78", "${value(149)}")
+            field('xfdf:original': "Text Field 79", "${value(150)}")
             field('xfdf:original': "Text Field 150", "${value(163)}")
             field('xfdf:original': "Text Field 4", "${value(19)}")
             field('xfdf:original': "Text Field 5", "${value(20)}")
@@ -97,13 +97,13 @@ class Insurance {
             field('xfdf:original': "Text Field 40", "${value(185)}")
 //            field('xfdf:original': "Text Field 41", "${value()}") 68
             field('xfdf:original': "Text Field 42", "${value(37)}")
-//            field('xfdf:original': "Text Field 43", "${value()}") 70
-//            field('xfdf:original': "Text Field 44", "${value()}") 71
-//            field('xfdf:original': "Text Field 45", "${value()}") 72
-//            field('xfdf:original': "Text Field 46", "${value()}") 73
+            field('xfdf:original': "Text Field 43", "${value(170)}")
+            field('xfdf:original': "Text Field 44", "${value(167)}")
+            field('xfdf:original': "Text Field 45", "${value(168)}")
+            field('xfdf:original': "Text Field 46", "${value(169)}")
 //            field('xfdf:original': "Text Field 47", "${value()}") 74
 //            field('xfdf:original': "Text Field 48", "${value()}") 75
-//            field('xfdf:original': "Text Field 49", "${value()}") 76
+            field('xfdf:original': "Text Field 49", "${value(32)}")
             field('xfdf:original': "Text Field 151", "${value(163)}")
             field('xfdf:original': "Text Field 80", "${value(27)}")
             field('xfdf:original': "Text Field 81", "${value(28)}")
@@ -143,22 +143,22 @@ class Insurance {
             field('xfdf:original': "Text Field 116", "${value(197)}")
             field('xfdf:original': "Text Field 117", "${value(60)}")
             field('xfdf:original': "Text Field 118", "${value(198)}")
-//            field('xfdf:original': "Text Field 104", "${value()}") 116
+            field('xfdf:original': "Text Field 104", "${value(32)}")
             field('xfdf:original': "Text Field 152", "${value(163)}")
-//            field('xfdf:original': "Text Field 119", "${value()}") 118
+            field('xfdf:original': "Text Field 119", "${value(162)}")
             field('xfdf:original': "Text Field 120", "${value(112)}")
             field('xfdf:original': "Text Field 121", "${value(114)}")
             field('xfdf:original': "Text Field 122", "${value(70)}")
-//            field('xfdf:original': "Text Field 123", "${value()}") 122
+            field('xfdf:original': "Text Field 123", "${value(36)}")
 //            field('xfdf:original': "Text Field 124", "${value()}") 123
-//            field('xfdf:original': "Text Field 125", "${value()}") 124
-//            field('xfdf:original': "Text Field 126", "${value()}") 125
+            field('xfdf:original': "Text Field 125", "${value(53)}")
+            field('xfdf:original': "Text Field 126", "${value(68)}")
 //            field('xfdf:original': "Text Field 127", "${value()}") 126
-//            field('xfdf:original': "Text Field 128", "${value()}") 127
-//            field('xfdf:original': "Text Field 129", "${value()}") 128
-//            field('xfdf:original': "Text Field 130", "${value()}") 129
+            field('xfdf:original': "Text Field 128", "${value(69)}")
+            field('xfdf:original': "Text Field 129", "${value(109)}")
+            field('xfdf:original': "Text Field 130", "${value(106)}")
 //            field('xfdf:original': "Text Field 131", "${value()}") 130
-//            field('xfdf:original': "Text Field 132", "${value()}") 131
+            field('xfdf:original': "Text Field 132", "${value(107)}")
 //            field('xfdf:original': "Text Field 133", "${value()}") 132
 //            field('xfdf:original': "Text Field 134", "${value()}") 133
 //            field('xfdf:original': "Text Field 135", "${value()}") 134
@@ -166,7 +166,7 @@ class Insurance {
 //            field('xfdf:original': "Text Field 137", "${value()}") 136
             field('xfdf:original': "Text Field 138", "${value(161)}")
 //            field('xfdf:original': "Text Field 139", "${value()}") 138
-//            field('xfdf:original': "Text Field 140", "${value()}") 139
+            field('xfdf:original': "Text Field 140", "${value(115)}")
             field('xfdf:original': "Text Field 141", "${value(116)}")
 //            field('xfdf:original': "Text Field 142", "${value()}") 141
             field('xfdf:original': "Text Field 153", "${value(163)}")
