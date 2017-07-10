@@ -1330,13 +1330,15 @@
         <dataRef>
             <id>2</id>
             <logic>
-                <behavior>visible</behavior>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>3</id>
             <logic>
-                <behavior>visible</behavior>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
             </logic>
         </dataRef>
         <dataRef>
