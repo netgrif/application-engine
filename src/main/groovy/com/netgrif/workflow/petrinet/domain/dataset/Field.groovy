@@ -12,7 +12,8 @@ abstract class Field<T> {
 
     @Id
     protected ObjectId _id
-    protected Long importIdprivate String name
+    protected Long importId
+    private String name
     private String description
     protected FieldType type
     @Transient
