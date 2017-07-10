@@ -1,64 +1,77 @@
 package com.netgrif.workflow.petrinet.domain.dataset
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.bson.types.ObjectId;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.annotation.Transient;
-import org.springframework.data.mongodb.core.mapping.Document;
+import com.fasterxml.jackson.databind.node.ObjectNode
+import org.bson.types.ObjectId
+import org.springframework.data.annotation.Id
+import org.springframework.data.annotation.Transient
+import org.springframework.data.mongodb.core.mapping.Document
 
 @Document
-public abstract class Field<T> {
+abstract class Field<T> {
 
     @Id
-    protected ObjectId _id;
-    private String name;
-    private String description;
-    protected FieldType type;
+    protected ObjectId _id
+    protected Long importId
+    private String name
+    private String description
+    protected FieldType type
     @Transient
-    private ObjectNode behavior;
+    private ObjectNode behavior
     @Transient
-    private T value;
+    private T value
     private Long order
 
-    public Field(){
-        _id = new ObjectId();
+    Field() {
+        _id = new ObjectId()
     }
 
-    public String getObjectId() {
-        return _id.toString();
+    Field(Long importId) {
+        this()
+        this.importId = importId
     }
 
-    public ObjectId get_id() {
-        return _id;
+    String getObjectId() {
+        return _id.toString()
     }
 
-    public void set_id(ObjectId _id) {
-        this._id = _id;
+    ObjectId get_id() {
+        return _id
     }
 
-    public String getName() {
-        return name;
+    void set_id(ObjectId _id) {
+        this._id = _id
     }
 
-    public void setName(String name) {
-        this.name = name;
+    Long getImportId() {
+        return importId
     }
 
-    public String getDescription() {
-        return description;
+    void setImportId(Long importId) {
+        this.importId = importId
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    String getName() {
+        return name
     }
 
-    public FieldType getType() {
-        return type;
+    void setName(String name) {
+        this.name = name
     }
 
-    public void setType(FieldType type) {
-        this.type = type;
+    String getDescription() {
+        return description
+    }
+
+    void setDescription(String description) {
+        this.description = description
+    }
+
+    FieldType getType() {
+        return type
+    }
+
+    void setType(FieldType type) {
+        this.type = type
     }
 
     ObjectNode getBehavior() {
@@ -86,11 +99,11 @@ public abstract class Field<T> {
     }
 
 //operators overloading
-    T plus(final Field field){
+    T plus(final Field field) {
         return this.value + field.value
     }
 
-    T minus(final Field field){
+    T minus(final Field field) {
         return this.value - field.value
     }
 
