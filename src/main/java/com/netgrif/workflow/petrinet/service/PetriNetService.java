@@ -68,7 +68,7 @@ public class PetriNetService implements IPetriNetService {
     public PetriNetReference getReferenceByTitle(LoggedUser user, String title){
         List<PetriNet> nets = repository.findByTitle(title);
         return nets.stream().filter(net -> net.getRoles().keySet().stream().anyMatch(user.getProcessRoles()::contains))
-                .map(net -> new PetriNetReference(net.get_id().toString(), net.getTitle())).collect(Collectors.toList()).get(0);
+                .map(net -> new PetriNetReference(net.get_id().toString(), net.getTitle())).findFirst().orElse(new PetriNetReference("",""));
 
     }
 
