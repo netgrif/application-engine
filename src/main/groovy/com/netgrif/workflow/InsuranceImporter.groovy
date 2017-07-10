@@ -50,8 +50,8 @@ class InsuranceImporter {
 
 
     void run(String... strings) throws Exception {
-        //def net = importer.importPetriNet(new File("src/main/resources/petriNets/poistenie_hhi.xml"), "Insurance", "INS")
-        def net = importer.importPetriNet(new File("src/main/resources/petriNets/insurance_demo.xml"), "Insurance", "INS")
+        def net = importer.importPetriNet(new File("src/main/resources/petriNets/poistenie_hhi.xml"), "Insurance", "INS")
+//        def net = importer.importPetriNet(new File("src/main/resources/petriNets/insurance_demo.xml"), "Insurance", "INS")
 
         def orgs = createOrganizations()
         def auths = createAuthorities()
@@ -101,8 +101,8 @@ class InsuranceImporter {
     }
 
     private void createCases(PetriNet net){
-        createCase("Test Insurance",net,1L)
-        createCase("Test 2",net,1L)
+        createCase("Prvé poistenie",net,1L)
+        createCase("Druhé poistenie",net,1L)
 
 //        def field = net.dataSet.find {it.value.name == "How many adults 18 or over live in the property"}.value
 //        field.value = 5
