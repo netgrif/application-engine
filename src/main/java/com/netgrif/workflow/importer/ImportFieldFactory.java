@@ -6,6 +6,7 @@ import com.netgrif.workflow.petrinet.domain.dataset.*;
 import java.util.Arrays;
 
 public final class ImportFieldFactory {
+
     private Importer importer;
 
     public ImportFieldFactory(Importer importer) {
@@ -49,6 +50,7 @@ public final class ImportFieldFactory {
                 throw new IllegalArgumentException(data.getType() + " is not a valid Field type");
         }
         field.setName(data.getTitle());
+        field.setImportId(data.getId());
         field.setType(type);
         if(data.getDesc() != null)
             field.setDescription(data.getDesc());
