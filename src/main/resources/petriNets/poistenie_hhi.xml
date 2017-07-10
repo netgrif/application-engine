@@ -26,6 +26,10 @@
         <id>1</id>
         <name>Agent</name>
     </role>
+    <role>
+        <id>2</id>
+        <name>Premium</name>
+    </role>
     <!-- ========== DATA ========== -->
     <!-- ===== Základné informácie ===== -->
     <data type="text">
@@ -249,12 +253,28 @@
         <values>150.00 €</values>
     </data>
     <data type="number">
+        <id>189</id>
+        <title>Poistenie nehnuteľnosti - spoluúčasť - koeficient</title>
+    </data>
+    <data type="number">
         <id>36</id>
         <title>Poistenie nehnuteľnosti - poistná suma</title>
     </data>
     <data type="number">
+        <id>36</id>
+        <title>Poistenie nehnuteľnosti - poistné</title>
+    </data>
+    <data type="number">
         <id>37</id>
-        <title>Garáž</title>
+        <title>Garáž - poistná suma</title>
+    </data>
+    <data type="number">
+        <id>174</id>
+        <title>Garáž - poistné</title>
+    </data>
+    <data type="number">
+        <id>190</id>
+        <title>Garáž - koeficient</title>
     </data>
     <data type="boolean">
         <id>38</id>
@@ -262,56 +282,108 @@
     </data>
     <data type="number">
         <id>39</id>
-        <title>Hospodárska budova</title>
+        <title>Hospodárska budova - poistná suma</title>
+    </data>
+    <data type="number">
+        <id>175</id>
+        <title>Hospodárska budova - poistné</title>
     </data>
     <data type="number">
         <id>40</id>
-        <title>Altánok</title>
+        <title>Altánok - poistná suma</title>
+    </data>
+    <data type="number">
+        <id>176</id>
+        <title>Altánok - poistné</title>
     </data>
     <data type="number">
         <id>41</id>
-        <title>Prístrešok</title>
+        <title>Prístrešok - poistná suma</title>
+    </data>
+    <data type="number">
+        <id>177</id>
+        <title>Prístrešok - poistné</title>
     </data>
     <data type="number">
         <id>42</id>
-        <title>Chodník, parkovacia plocha</title>
+        <title>Chodník, parkovacia plocha - poistná suma</title>
+    </data>
+    <data type="number">
+        <id>178</id>
+        <title>Chodník, parkovacia plocha - poistné</title>
     </data>
     <data type="number">
         <id>43</id>
-        <title>Sauna</title>
+        <title>Sauna - poistná suma</title>
+    </data>
+    <data type="number">
+        <id>179</id>
+        <title>Sauna - poistné</title>
     </data>
     <data type="number">
         <id>44</id>
-        <title>Elektrická brána, oplotenie</title>
+        <title>Elektrická brána, oplotenie - poistná suma</title>
+    </data>
+    <data type="number">
+        <id>180</id>
+        <title>Elektrická brána, oplotenie - poistné</title>
     </data>
     <data type="number">
         <id>45</id>
-        <title>Tenisový kurt</title>
+        <title>Tenisový kurt - poistná suma</title>
+    </data>
+    <data type="number">
+        <id>181</id>
+        <title>Tenisový kurt - poistné</title>
     </data>
     <data type="number">
         <id>46</id>
-        <title>Vonkajší bazén</title>
+        <title>Vonkajší bazén - poistná suma</title>
+    </data>
+    <data type="number">
+        <id>182</id>
+        <title>Vonkajší bazén - poistné</title>
     </data>
     <data type="number">
         <id>47</id>
-        <title>Studňa</title>
+        <title>Studňa - poistná suma</title>
+    </data>
+    <data type="number">
+        <id>183</id>
+        <title>Studňa - poistné</title>
     </data>
     <data type="number">
         <id>48</id>
-        <title>Žumpa, septik</title>
+        <title>Žumpa, septik - poistná suma</title>
+    </data>
+    <data type="number">
+        <id>184</id>
+        <title>Žumpa, septik - poistné</title>
     </data>
     <data type="number">
         <id>49</id>
-        <title>Iné</title>
+        <title>Iné - poistná suma</title>
+    </data>
+    <data type="number">
+        <id>185</id>
+        <title>Iné - poistné</title>
     </data>
     <!-- ===== Doplnkové poistenie nehnuteľnosti ===== -->
     <data type="number">
         <id>50</id>
-        <title>Stavebné materiály</title>
+        <title>Stavebné materiály - poistná suma</title>
+    </data>
+    <data type="number">
+        <id>186</id>
+        <title>Stavebné materiály - poistné</title>
     </data>
     <data type="number">
         <id>51</id>
         <title>Stavebné a záhradné mechanizmy</title>
+    </data>
+    <data type="number">
+        <id>187</id>
+        <title>Stavebné materiály - poistná suma</title>
     </data>
     <!-- ===== Poistenie domácnosti ===== -->
     <data type="enumeration">
@@ -322,45 +394,89 @@
         <values>150.00 €</values>
     </data>
     <data type="number">
+        <id>201</id>
+        <title>Poistenie domácnosti - koeficient</title>
+    </data>
+    <data type="number">
         <id>53</id>
         <title>Poistenie domácnosti - poistná suma</title>
+    </data>
+    <data type="number">
+        <id>191</id>
+        <title>Poistenie domácnosti - poistné</title>
     </data>
     <!-- ===== Doplnkové poistenie domácnosti ===== -->
     <data type="number">
         <id>54</id>
-        <title>cennosti</title>
+        <title>cennosti - poistná suma</title>
     </data>
     <data type="number">
         <id>55</id>
-        <title>umelecké diela</title>
+        <title>umelecké diela - poistná suma</title>
     </data>
     <data type="number">
         <id>56</id>
-        <title>elektronické a optické zariadenia</title>
+        <title>elektronické a optické zariadenia - poistná suma</title>
     </data>
     <data type="number">
         <id>57</id>
-        <title>špeciálne sklá a presklenie</title>
+        <title>špeciálne sklá a presklenie - poistná suma</title>
     </data>
     <data type="number">
         <id>58</id>
-        <title>záhradé vybavenie a nábytok</title>
+        <title>záhradé vybavenie a nábytok - poistná suma</title>
     </data>
     <data type="number">
         <id>59</id>
-        <title>elektromotory v domácich spotrebičoch</title>
+        <title>elektromotory v domácich spotrebičoch - poistná suma</title>
     </data>
     <data type="number">
         <id>60</id>
-        <title>stavebné súčasti domácností</title>
+        <title>stavebné súčasti domácností - poistná suma</title>
     </data>
     <data type="number">
         <id>61</id>
-        <title>športové náradie</title>
+        <title>športové náradie - poistná suma</title>
     </data>
     <data type="number">
         <id>62</id>
-        <title>iné</title>
+        <title>iné - poistná suma</title>
+    </data>
+    <data type="number">
+        <id>192</id>
+        <title>cennosti - poistné</title>
+    </data>
+    <data type="number">
+        <id>193</id>
+        <title>umelecké diela - poistné</title>
+    </data>
+    <data type="number">
+        <id>194</id>
+        <title>elektronické a optické zariadenia - poistné</title>
+    </data>
+    <data type="number">
+        <id>195</id>
+        <title>špeciálne sklá a presklenie - poistné</title>
+    </data>
+    <data type="number">
+        <id>196</id>
+        <title>záhradé vybavenie a nábytok - poistné</title>
+    </data>
+    <data type="number">
+        <id>197</id>
+        <title>elektromotory v domácich spotrebičoch - poistné</title>
+    </data>
+    <data type="number">
+        <id>198</id>
+        <title>stavebné súčasti domácností - poistné</title>
+    </data>
+    <data type="number">
+        <id>199</id>
+        <title>športové náradie - poistné</title>
+    </data>
+    <data type="number">
+        <id>200</id>
+        <title>iné - poistné</title>
     </data>
     <!-- ===== Poistenie zodpovednosti za škodu ===== -->
     <data type="enumeration">
@@ -503,6 +619,10 @@
     </data>
     <!-- ===== Nehnuteľnosť koeficienty ===== -->
     <data type="number">
+        <id>166</id>
+        <title>Koeficient - Predmet poistenia</title>
+    </data>
+    <data type="number">
         <id>92</id>
         <title>Koeficient - Konštrukcia múrov</title>
     </data>
@@ -519,6 +639,14 @@
         <title>Koeficient - Má nehnuteľnosť praskliny na vonkajšej fasáde?</title>
     </data>
     <data type="number">
+        <id>164</id>
+        <title>Koeficient - Koľko izieb má nehnuteľnosť?</title>
+    </data>
+    <data type="number">
+        <id>165</id>
+        <title>Koeficient - Koľko kúpeľní má nehnuteľnosť?</title>
+    </data>
+    <data type="number">
         <id>96</id>
         <title>Koeficient - Uveďte celkovú hodnotu rekonštrukcií, ak boli vykonané</title>
     </data>
@@ -527,6 +655,10 @@
         <title>NEHNUTEĽNOSŤ koeficient</title>
     </data>
     <!-- ===== Domácnosť koeficienty ===== -->
+    <data type="number">
+        <id>171</id>
+        <title>Koeficient - Umiestnenie domácnosti</title>
+    </data>
     <data type="number">
         <id>98</id>
         <title>Koeficient - Obývanosť domácnosti</title>
@@ -559,6 +691,10 @@
     <data type="number">
         <id>105</id>
         <title>Koeficient - Územná platnosť poistenia</title>
+    </data>
+    <data type="number">
+        <id>172</id>
+        <title>Koeficient - Zodpovednosť celkovo</title>
     </data>
     <!-- ===== Sumár koeficienty ===== -->
     <data type="number">
@@ -593,6 +729,10 @@
         <values>distance contracts conditions</values>
     </data>
     <!-- ===== Údaje k zmluve ===== -->
+    <data type="text">
+        <id>163</id>
+        <title>Číslo ponuky</title>
+    </data>
     <data type="date">
         <id>112</id>
         <title>Začiatok poistenia</title>
@@ -608,10 +748,12 @@
     <data type="text">
         <id>115</id>
         <title>V prospech</title>
+        <desc>Údaje o vinkulácii</desc>
     </data>
     <data type="number">
         <id>116</id>
         <title>Číslo úverovej zmluvy</title>
+        <desc>Údaje o vinkulácii</desc>
     </data>
     <data type="enumeration">
         <id>117</id>
@@ -694,7 +836,7 @@
         <title>Číslo preukazu</title>
         <desc>Poistník</desc>
     </data>
-    <data type="text">
+    <data type="boolean">
         <id>128</id>
         <title>Poistený je iná osoba</title>
         <desc>Poistený a poistenec sú rôzne osoby</desc>
@@ -777,8 +919,8 @@
     <data type="enumeration">
         <id>139</id>
         <title>Adresa</title>
-        <values>rovnaká ako poistencova</values>
         <values>rovnaká ako poistníkova</values>
+        <values>rovnaká ako poisteného</values>
         <values>iná</values>
     </data>
     <!-- Adresa poistníka -->
@@ -891,10 +1033,49 @@
         <id>160</id>
         <title>Číslo parcely</title>
     </data>
+    <!-- Adresa garáže -->
+    <data type="text">
+        <id>167</id>
+        <title>Ulica</title>
+        <desc>Garáž</desc>
+    </data>
+    <data type="text">
+        <id>168</id>
+        <title>Súpisné a orientačné číslo</title>
+        <desc>Garáž</desc>
+    </data>
+    <data type="text">
+        <id>169</id>
+        <title>PSČ</title>
+        <desc>Garáž</desc>
+    </data>
+    <data type="text">
+        <id>170</id>
+        <title>Obec</title>
+        <desc>Garáž</desc>
+    </data>
     <!-- ===== Napárovanie platby ===== -->
     <data type="text">
         <id>161</id>
         <title>Variabilný symbol</title>
+    </data>
+    <!-- ===== TODO ===== -->
+    <data type="date">
+        <id>162</id>
+        <title>Dátum dojednania návrhu na uzavretie poistnej zmluvy</title>
+    </data>
+    <!-- ===== PDF ===== -->
+    <data type="file">
+        <id>1001</id>
+        <title>Ponuka PDF</title>
+        <init>Automaticky generované</init>
+        <logic>generate Insurance.offerPDF always</logic>
+    </data>
+    <data type="file">
+        <id>1002</id>
+        <title>Zmluva PDF</title>
+        <init>Automaticky generované</init>
+        <logic>generate Insurance.offerPDF always</logic>
     </data>
     <!-- ========== PLACES ========== -->
     <place>
@@ -1135,30 +1316,608 @@
         <x>620</x>
         <y>500</y>
         <label>Základné informácie</label>
-        <roleRef>
-            <id>1</id>
-            <logic>
-                <perform>true</perform>
-            </logic>
-        </roleRef>
         <transactionRef>
             <id>2</id>
         </transactionRef>
+        <dataRef>
+            <id>1</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+                <!--todo: psc and lokalita lookup -->
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>2</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>3</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>4</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+                <action>
+                    field: f.this,
+                    coeff: f.76;
+                    change coeff about {
+                    if (field.value)
+                    return 1.2 as Double;
+                    return 1.0 as Double;
+                    }
+                </action>
+                <action>
+                    c4: f.76,
+                    c5: f.77,
+                    c6: f.78,
+                    c7: f.79,
+                    c8: f.80,
+                    c9: f.81,
+                    c10: f.82,
+                    c11: f.83,
+                    c12: f.84,
+                    c13: f.85,
+                    c14: f.86,
+                    c15: f.87,
+                    c16: f.88,
+                    c17: f.89,
+                    c68: f.90,
+                    coeff: f.91;
+                    change coeff about {
+                    return c4?.value*c5?.value*c6?.value*c7?.value*c8?.value*c9?.value*c10?.value*c11?.value*c12?.value*c13?.value*c14?.value*c15?.value*c16?.value*c17?.value*c68?.value;
+                    }
+                </action>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>5</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+                <action>
+                    field: f.this,
+                    coeff: f.77;
+                    change coeff about {
+                    if (field.value)
+                    return 1.5 as Double;
+                    return 1.0 as Double;
+                    }
+                </action>
+                <action>
+                    c4: f.76,
+                    c5: f.77,
+                    c6: f.78,
+                    c7: f.79,
+                    c8: f.80,
+                    c9: f.81,
+                    c10: f.82,
+                    c11: f.83,
+                    c12: f.84,
+                    c13: f.85,
+                    c14: f.86,
+                    c15: f.87,
+                    c16: f.88,
+                    c17: f.89,
+                    c68: f.90,
+                    coeff: f.91;
+                    change coeff about {
+                    return c4?.value*c5?.value*c6?.value*c7?.value*c8?.value*c9?.value*c10?.value*c11?.value*c12?.value*c13?.value*c14?.value*c15?.value*c16?.value*c17?.value*c68?.value;
+                    }
+                </action>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>6</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+                <action>
+                    field: f.this,
+                    coeff: f.78;
+                    change coeff about {
+                    if (field.value)
+                    return 1.5 as Double;
+                    return 1.0 as Double;
+                    }
+                </action>
+                <action>
+                    c4: f.76,
+                    c5: f.77,
+                    c6: f.78,
+                    c7: f.79,
+                    c8: f.80,
+                    c9: f.81,
+                    c10: f.82,
+                    c11: f.83,
+                    c12: f.84,
+                    c13: f.85,
+                    c14: f.86,
+                    c15: f.87,
+                    c16: f.88,
+                    c17: f.89,
+                    c68: f.90,
+                    coeff: f.91;
+                    change coeff about {
+                    return c4?.value*c5?.value*c6?.value*c7?.value*c8?.value*c9?.value*c10?.value*c11?.value*c12?.value*c13?.value*c14?.value*c15?.value*c16?.value*c17?.value*c68?.value;
+                    }
+                </action>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>7</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+                <action>
+                    field: f.this,
+                    coeff: f.79;
+                    change coeff about {
+                    return 1.0 as Double;
+                    }
+                </action>
+                <action>
+                    c4: f.76,
+                    c5: f.77,
+                    c6: f.78,
+                    c7: f.79,
+                    c8: f.80,
+                    c9: f.81,
+                    c10: f.82,
+                    c11: f.83,
+                    c12: f.84,
+                    c13: f.85,
+                    c14: f.86,
+                    c15: f.87,
+                    c16: f.88,
+                    c17: f.89,
+                    c68: f.90,
+                    coeff: f.91;
+                    change coeff about {
+                    return c4?.value*c5?.value*c6?.value*c7?.value*c8?.value*c9?.value*c10?.value*c11?.value*c12?.value*c13?.value*c14?.value*c15?.value*c16?.value*c17?.value*c68?.value;
+                    }
+                </action>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>8</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+                <action>
+                    field: f.this,
+                    coeff: f.80;
+                    change coeff about {
+                    return 1.0 as Double;
+                    }
+                </action>
+                <action>
+                    c4: f.76,
+                    c5: f.77,
+                    c6: f.78,
+                    c7: f.79,
+                    c8: f.80,
+                    c9: f.81,
+                    c10: f.82,
+                    c11: f.83,
+                    c12: f.84,
+                    c13: f.85,
+                    c14: f.86,
+                    c15: f.87,
+                    c16: f.88,
+                    c17: f.89,
+                    c68: f.90,
+                    coeff: f.91;
+                    change coeff about {
+                    return c4?.value*c5?.value*c6?.value*c7?.value*c8?.value*c9?.value*c10?.value*c11?.value*c12?.value*c13?.value*c14?.value*c15?.value*c16?.value*c17?.value*c68?.value;
+                    }
+                </action>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>9</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+                <action>
+                    field: f.this,
+                    coeff: f.81;
+                    change coeff about {
+                    if (field.value == "1")
+                    return 0.95 as Double;
+                    if (field.value == "2")
+                    return 1.0 as Double;
+                    if (field.value == "3")
+                    return 1.05 as Double;
+                    return 1.1 as Double;
+                    }
+                </action>
+                <action>
+                    c4: f.76,
+                    c5: f.77,
+                    c6: f.78,
+                    c7: f.79,
+                    c8: f.80,
+                    c9: f.81,
+                    c10: f.82,
+                    c11: f.83,
+                    c12: f.84,
+                    c13: f.85,
+                    c14: f.86,
+                    c15: f.87,
+                    c16: f.88,
+                    c17: f.89,
+                    c68: f.90,
+                    coeff: f.91;
+                    change coeff about {
+                    return c4?.value*c5?.value*c6?.value*c7?.value*c8?.value*c9?.value*c10?.value*c11?.value*c12?.value*c13?.value*c14?.value*c15?.value*c16?.value*c17?.value*c68?.value;
+                    }
+                </action>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>10</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+                <action>
+                    field: f.this,
+                    coeff: f.82;
+                    change coeff about {
+                    if (field.value == "2")
+                    return 1.05 as Double;
+                    if (field.value == "viac")
+                    return 1.1 as Double;
+                    return 1.0 as Double;
+                    }
+                </action>
+                <action>
+                    c4: f.76,
+                    c5: f.77,
+                    c6: f.78,
+                    c7: f.79,
+                    c8: f.80,
+                    c9: f.81,
+                    c10: f.82,
+                    c11: f.83,
+                    c12: f.84,
+                    c13: f.85,
+                    c14: f.86,
+                    c15: f.87,
+                    c16: f.88,
+                    c17: f.89,
+                    c68: f.90,
+                    coeff: f.91;
+                    change coeff about {
+                    return c4?.value*c5?.value*c6?.value*c7?.value*c8?.value*c9?.value*c10?.value*c11?.value*c12?.value*c13?.value*c14?.value*c15?.value*c16?.value*c17?.value*c68?.value;
+                    }
+                </action>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>11</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+                <action>
+                    field: f.this,
+                    coeff: f.83;
+                    change coeff about {
+                    if (field.value)
+                    return 1.5 as Double;
+                    return 1.0 as Double;
+                    }
+                </action>
+                <action>
+                    c4: f.76,
+                    c5: f.77,
+                    c6: f.78,
+                    c7: f.79,
+                    c8: f.80,
+                    c9: f.81,
+                    c10: f.82,
+                    c11: f.83,
+                    c12: f.84,
+                    c13: f.85,
+                    c14: f.86,
+                    c15: f.87,
+                    c16: f.88,
+                    c17: f.89,
+                    c68: f.90,
+                    coeff: f.91;
+                    change coeff about {
+                    return c4?.value*c5?.value*c6?.value*c7?.value*c8?.value*c9?.value*c10?.value*c11?.value*c12?.value*c13?.value*c14?.value*c15?.value*c16?.value*c17?.value*c68?.value;
+                    }
+                </action>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>12</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+                <!-- todo if field.value == ano stop process -->
+                <action>
+                    field: f.this,
+                    coeff: f.84;
+                    change coeff about {
+                    if (field.value)
+                    return -1 as Double;
+                    return 1.0 as Double;
+                    }
+                </action>
+                <action>
+                    c4: f.76,
+                    c5: f.77,
+                    c6: f.78,
+                    c7: f.79,
+                    c8: f.80,
+                    c9: f.81,
+                    c10: f.82,
+                    c11: f.83,
+                    c12: f.84,
+                    c13: f.85,
+                    c14: f.86,
+                    c15: f.87,
+                    c16: f.88,
+                    c17: f.89,
+                    c68: f.90,
+                    coeff: f.91;
+                    change coeff about {
+                    return c4?.value*c5?.value*c6?.value*c7?.value*c8?.value*c9?.value*c10?.value*c11?.value*c12?.value*c13?.value*c14?.value*c15?.value*c16?.value*c17?.value*c68?.value;
+                    }
+                </action>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>13</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+                <action>
+                    field: f.this,
+                    coeff: f.85;
+                    change coeff about {
+                    if (field.value)
+                    return 1.2 as Double;
+                    return 1.0 as Double;
+                    }
+                </action>
+                <action>
+                    c4: f.76,
+                    c5: f.77,
+                    c6: f.78,
+                    c7: f.79,
+                    c8: f.80,
+                    c9: f.81,
+                    c10: f.82,
+                    c11: f.83,
+                    c12: f.84,
+                    c13: f.85,
+                    c14: f.86,
+                    c15: f.87,
+                    c16: f.88,
+                    c17: f.89,
+                    c68: f.90,
+                    coeff: f.91;
+                    change coeff about {
+                    return c4?.value*c5?.value*c6?.value*c7?.value*c8?.value*c9?.value*c10?.value*c11?.value*c12?.value*c13?.value*c14?.value*c15?.value*c16?.value*c17?.value*c68?.value;
+                    }
+                </action>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>14</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+                <action>
+                    field: f.this,
+                    coeff: f.86;
+                    change coeff about {
+                    if (field.value)
+                    return 1.05 as Double;
+                    return 1.0 as Double;
+                    }
+                </action>
+                <action>
+                    c4: f.76,
+                    c5: f.77,
+                    c6: f.78,
+                    c7: f.79,
+                    c8: f.80,
+                    c9: f.81,
+                    c10: f.82,
+                    c11: f.83,
+                    c12: f.84,
+                    c13: f.85,
+                    c14: f.86,
+                    c15: f.87,
+                    c16: f.88,
+                    c17: f.89,
+                    c68: f.90,
+                    coeff: f.91;
+                    change coeff about {
+                    return c4?.value*c5?.value*c6?.value*c7?.value*c8?.value*c9?.value*c10?.value*c11?.value*c12?.value*c13?.value*c14?.value*c15?.value*c16?.value*c17?.value*c68?.value;
+                    }
+                </action>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>15</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+                <action>
+                    field: f.this,
+                    coeff: f.87;
+                    change coeff about {
+                    if (field.value == "cez deň")
+                    return 1.05 as Double;
+                    if (field.value == "večer a v noci")
+                    return 1.02 as Double;
+                    return 1.0 as Double;
+                    }
+                </action>
+                <action>
+                    c4: f.76,
+                    c5: f.77,
+                    c6: f.78,
+                    c7: f.79,
+                    c8: f.80,
+                    c9: f.81,
+                    c10: f.82,
+                    c11: f.83,
+                    c12: f.84,
+                    c13: f.85,
+                    c14: f.86,
+                    c15: f.87,
+                    c16: f.88,
+                    c17: f.89,
+                    c68: f.90,
+                    coeff: f.91;
+                    change coeff about {
+                    return c4?.value*c5?.value*c6?.value*c7?.value*c8?.value*c9?.value*c10?.value*c11?.value*c12?.value*c13?.value*c14?.value*c15?.value*c16?.value*c17?.value*c68?.value;
+                    }
+                </action>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>16</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+                <action>
+                    field: f.this,
+                    coeff: f.88;
+                    change coeff about {
+                    if (field.value)
+                    return 1.1 as Double;
+                    return 1.0 as Double;
+                    }
+                </action>
+                <action>
+                    c4: f.76,
+                    c5: f.77,
+                    c6: f.78,
+                    c7: f.79,
+                    c8: f.80,
+                    c9: f.81,
+                    c10: f.82,
+                    c11: f.83,
+                    c12: f.84,
+                    c13: f.85,
+                    c14: f.86,
+                    c15: f.87,
+                    c16: f.88,
+                    c17: f.89,
+                    c68: f.90,
+                    coeff: f.91;
+                    change coeff about {
+                    return c4?.value*c5?.value*c6?.value*c7?.value*c8?.value*c9?.value*c10?.value*c11?.value*c12?.value*c13?.value*c14?.value*c15?.value*c16?.value*c17?.value*c68?.value;
+                    }
+                </action>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>17</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+                <action>
+                    field: f.this,
+                    coeff: f.89;
+                    change coeff about {
+                    if (field.value == "fyzická osoba")
+                    return 1.0 as Double;
+                    return 1.1 as Double;
+                    }
+                </action>
+                <action>
+                    c4: f.76,
+                    c5: f.77,
+                    c6: f.78,
+                    c7: f.79,
+                    c8: f.80,
+                    c9: f.81,
+                    c10: f.82,
+                    c11: f.83,
+                    c12: f.84,
+                    c13: f.85,
+                    c14: f.86,
+                    c15: f.87,
+                    c16: f.88,
+                    c17: f.89,
+                    c68: f.90,
+                    coeff: f.91;
+                    change coeff about {
+                    return c4?.value*c5?.value*c6?.value*c7?.value*c8?.value*c9?.value*c10?.value*c11?.value*c12?.value*c13?.value*c14?.value*c15?.value*c16?.value*c17?.value*c68?.value;
+                    }
+                </action>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>18</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+                <action>
+                    field: f.this,
+                    coeff: f.90;
+                    change coeff about {
+                    if (field.value == "0")
+                    return 1.0 as Double;
+                    if (field.value == "1")
+                    return 1.1 as Double;
+                    return 1.2 as Double;
+                    }
+                </action>
+                <action>
+                    c4: f.76,
+                    c5: f.77,
+                    c6: f.78,
+                    c7: f.79,
+                    c8: f.80,
+                    c9: f.81,
+                    c10: f.82,
+                    c11: f.83,
+                    c12: f.84,
+                    c13: f.85,
+                    c14: f.86,
+                    c15: f.87,
+                    c16: f.88,
+                    c17: f.89,
+                    c68: f.90,
+                    coeff: f.91;
+                    change coeff about {
+                    return c4?.value*c5?.value*c6?.value*c7?.value*c8?.value*c9?.value*c10?.value*c11?.value*c12?.value*c13?.value*c14?.value*c15?.value*c16?.value*c17?.value*c68?.value;
+                    }
+                </action>
+            </logic>
+        </dataRef>
     </transition>
     <transition>
         <id>2</id>
         <x>260</x>
         <y>300</y>
         <label>Poistenie nehnuteľnosti</label>
+        <transactionRef>
+            <id>1</id>
+        </transactionRef>
         <roleRef>
             <id>1</id>
             <logic>
                 <perform>true</perform>
             </logic>
         </roleRef>
-        <transactionRef>
-            <id>1</id>
-        </transactionRef>
     </transition>
     <transition>
         <id>4</id>
@@ -1219,6 +1978,316 @@
         <transactionRef>
             <id>2</id>
         </transactionRef>
+        <dataRef>
+            <id>19</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+                <action>
+                    field: f.this,
+                    coeff: f.166;
+                    change coeff about {
+                    if (field.value == "chata")
+                    return 1.2 as Double;
+                    if (field.value == "bytový dom")
+                    return 0.75 as Double;
+                    return 0.9 as Double;
+                    }
+                </action>
+                <action>
+                    c1: f.166,
+                    c2: f.92,
+                    c3: f.93,
+                    c4: f.94,
+                    c5: f.95,
+                    c6a: f.164,
+                    c6b: f.165,
+                    c7: f.96,
+                    coeff: f.97;
+                    change coeff about {
+                    return c1.value*c2.value*c3.value*c4.value*c5.value*c6a.value*c6b.value*c7.value;
+                    }
+                </action>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>20</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+                <action>
+                    field: f.this,
+                    coeff: f.92;
+                    change coeff about {
+                    if (field.value == "tehla a/alebo betón")
+                    return 1.0 as Double;
+                    if (field.value == "porobetón (ytong)")
+                    return 1.05 as Double;
+                    if (field.value == "škvarobatón")
+                    return 1.05 as Double;
+                    if (field.value == "sklo")
+                    return 1.3 as Double;
+                    return 1.5 as Double;
+                    }
+                </action>
+                <action>
+                    c1: f.166,
+                    c2: f.92,
+                    c3: f.93,
+                    c4: f.94,
+                    c5: f.95,
+                    c6a: f.164,
+                    c6b: f.165,
+                    c7: f.96,
+                    coeff: f.97;
+                    change coeff about {
+                    return c1.value*c2.value*c3.value*c4.value*c5.value*c6a.value*c6b.value*c7.value;
+                    }
+                </action>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>21</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+                <action>
+                    field: f.this,
+                    coeff: f.93;
+                    change coeff about {
+                    if (field.value == "škridla")
+                    return 1.0 as Double;
+                    if (field.value == "plech")
+                    return 1.05 as Double;
+                    if (field.value == "asfalt")
+                    return 1.1 as Double;
+                    if (field.value == "hydroizolačné fólie")
+                    return 1.1 as Double;
+                    if (field.value == "sklo")
+                    return 1.15 as Double;
+                    if (field.value == "šindel")
+                    return 1.05 as Double;
+                    return 1.1 as Double;
+                    }
+                </action>
+                <action>
+                    c1: f.166,
+                    c2: f.92,
+                    c3: f.93,
+                    c4: f.94,
+                    c5: f.95,
+                    c6a: f.164,
+                    c6b: f.165,
+                    c7: f.96,
+                    coeff: f.97;
+                    change coeff about {
+                    return c1.value*c2.value*c3.value*c4.value*c5.value*c6a.value*c6b.value*c7.value;
+                    }
+                </action>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>22</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+                <action>
+                    field: f.this,
+                    coeff: f.94;
+                    change coeff about {
+                    if (field.value == "menej ako 5")
+                    return 1.0 as Double;
+                    if (field.value == "6 až 10")
+                    return 1.05 as Double;
+                    if (field.value == "11 až 20")
+                    return 1.1 as Double;
+                    return 1.2 as Double;
+                    }
+                </action>
+                <action>
+                    c1: f.166,
+                    c2: f.92,
+                    c3: f.93,
+                    c4: f.94,
+                    c5: f.95,
+                    c6a: f.164,
+                    c6b: f.165,
+                    c7: f.96,
+                    coeff: f.97;
+                    change coeff about {
+                    return c1.value*c2.value*c3.value*c4.value*c5.value*c6a.value*c6b.value*c7.value;
+                    }
+                </action>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>23</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+                <action>
+                    field: f.this,
+                    coeff: f.95;
+                    change coeff about {
+                    if (field.value)
+                    return 1.5 as Double;
+                    return 1.0 as Double;
+                    }
+                </action>
+                <action>
+                    c1: f.166,
+                    c2: f.92,
+                    c3: f.93,
+                    c4: f.94,
+                    c5: f.95,
+                    c6a: f.164,
+                    c6b: f.165,
+                    c7: f.96,
+                    coeff: f.97;
+                    change coeff about {
+                    return c1.value*c2.value*c3.value*c4.value*c5.value*c6a.value*c6b.value*c7.value;
+                    }
+                </action>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>24</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+                <action>
+                    field: f.this,
+                    coeff: f.164;
+                    change coeff about {
+                    if (field.value == "1")
+                    return 0.9 as Double;
+                    if (field.value == "2")
+                    return 1.0 as Double;
+                    if (field.value == "3")
+                    return 	1.1 as Double;
+                    if (field.value == "4")
+                    return 	1.15 as Double;
+                    return 1.2 as Double;
+                    }
+                </action>
+                <action>
+                    c1: f.166,
+                    c2: f.92,
+                    c3: f.93,
+                    c4: f.94,
+                    c5: f.95,
+                    c6a: f.164,
+                    c6b: f.165,
+                    c7: f.96,
+                    coeff: f.97;
+                    change coeff about {
+                    return c1.value*c2.value*c3.value*c4.value*c5.value*c6a.value*c6b.value*c7.value;
+                    }
+                </action>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>25</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+                <action>
+                    field: f.this,
+                    coeff: f.165;
+                    change coeff about {
+                    if (field.value == "1")
+                    return 	1.0 as Double;
+                    if (field.value == "2")
+                    return 	1.1 as Double;
+                    if (field.value == "viac ako 2")
+                    return 	1.2 as Double;
+                    }
+                </action>
+                <action>
+                    c1: f.166,
+                    c2: f.92,
+                    c3: f.93,
+                    c4: f.94,
+                    c5: f.95,
+                    c6a: f.164,
+                    c6b: f.165,
+                    c7: f.96,
+                    coeff: f.97;
+                    change coeff about {
+                    return c1.value*c2.value*c3.value*c4.value*c5.value*c6a.value*c6b.value*c7.value;
+                    }
+                </action>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>26</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+                <action>
+                    field: f.this,
+                    coeff: f.96;
+                    change coeff about {
+                    if (field.value == "bez rekonštrukcií")
+                    return	1.0 as Double;
+                    if (field.value == "do 20 000 EUR")
+                    return	0.95 as Double;
+                    if (field.value == "do 50 000 EUR")
+                    return	0.9 as Double;
+                    return 0.85 as Double;
+                    }
+                </action>
+                <action>
+                    c1: f.166,
+                    c2: f.92,
+                    c3: f.93,
+                    c4: f.94,
+                    c5: f.95,
+                    c6a: f.164,
+                    c6b: f.165,
+                    c7: f.96,
+                    coeff: f.97;
+                    change coeff about {
+                    return c1.value*c2.value*c3.value*c4.value*c5.value*c6a.value*c6b.value*c7.value;
+                    }
+                </action>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>35</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+                <action>
+                    field: f.this,
+                    coeff: f.189;
+                    change coeff about {
+                    if (field.value == "0,00 €")
+                    return 1.1 as Double;
+                    if (field.value == "50,00 €")
+                    return 1.0 as Double;
+                    return 0.9 as Double;
+                    }
+                </action>
+                <action>
+                    field: f.50,
+                    exces: f.189,
+                    coeff: f.186;
+                    change coeff about {
+                    return (field.value*3.5*exces.value)/1000.0 as Double;
+                    }
+                </action>
+                <action>
+                    field: f.37,
+                    exces: f.189,
+                    garage: f.190,
+                    coeff: f.174;
+                    change coeff about {
+                    return (field.value*garage.value*exces.value)/1000.0 as Double;
+                    }
+                </action>
+            </logic>
+        </dataRef>
     </transition>
     <transition>
         <id>178</id>
@@ -1234,6 +2303,70 @@
         <transactionRef>
             <id>2</id>
         </transactionRef>
+        <dataRef>
+            <id>32</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+                <action>
+                    field: f.this,
+                    coeff: f.103;
+                    change coeff about {
+                    if (field.value)
+                    return 0.1 as Double;
+                    return 0.0 as Double;
+                    }
+                </action>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>33</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+                <action>
+                    field: f.this,
+                    coeff: f.104;
+                    change coeff about {
+                    if (field.value)
+                    return 0.3 as Double;
+                    return 0.0 as Double;
+                    }
+                </action>
+                <action>
+                    c1: f.104,
+                    c2: f.105,
+                    coeff: f.172;
+                    change coeff about {
+                    return c1.value*c2.value;
+                    }
+                </action>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>34</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+                <action>
+                    field: f.this,
+                    coeff: f.105;
+                    change coeff about {
+                    if (field.value == "Slovenská republika")
+                    return 1.0 as Double;
+                    return 1.2 as Double;
+                    }
+                </action>
+                <action>
+                    c1: f.104,
+                    c2: f.105,
+                    coeff: f.172;
+                    change coeff about {
+                    return c1.value*c2.value;
+                    }
+                </action>
+            </logic>
+        </dataRef>
     </transition>
     <transition>
         <id>259</id>
@@ -1246,9 +2379,472 @@
                 <perform>true</perform>
             </logic>
         </roleRef>
-        <transactionRef>
+        <!-- ===== Základné informácie ===== -->
+        <dataRef>
+            <id>1001</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>1</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>2</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
             <id>3</id>
-        </transactionRef>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>4</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>5</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>6</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>7</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>8</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>9</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>10</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>11</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>12</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>13</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>14</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>15</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>16</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>17</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>18</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <!-- ===== Nehnuteľnosť ===== -->
+        <dataRef>
+            <id>19</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>20</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>21</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>22</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>23</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>24</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>25</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>26</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <!-- ===== Domácnosť ===== -->
+        <dataRef>
+            <id>27</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>28</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>29</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>30</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>31</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <!-- ===== Zodpovednosť ===== -->
+        <dataRef>
+            <id>32</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>33</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>34</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <!-- ===== Poistenie nehnuteľnosti ===== -->
+        <dataRef>
+            <id>35</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>36</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>37</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>38</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>39</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>40</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>41</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>42</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>43</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>44</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>45</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>46</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>47</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>48</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>49</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <!-- ===== Doplnkové poistenie nehnuteľnosti ===== -->
+        <dataRef>
+            <id>50</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>51</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <!-- ===== Poistenie domácnosti ===== -->
+        <dataRef>
+            <id>52</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>53</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <!-- ===== Doplnkové poistenie domácnosti ===== -->
+        <dataRef>
+            <id>54</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>55</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>56</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>57</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>58</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>59</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>60</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>61</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>62</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <!-- ===== Poistenie zodpovednosti za škodu ===== -->
+        <dataRef>
+            <id>63</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>64</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>65</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <!-- ===== Sumár ===== -->
+        <dataRef>
+            <id>66</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>67</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>68</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>69</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>70</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>71</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>72</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>73</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>74</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>75</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
     </transition>
     <transition>
         <id>332</id>
@@ -1321,6 +2917,306 @@
                 <perform>true</perform>
             </logic>
         </roleRef>
+        <dataRef>
+            <id>118</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>119</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>120</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>121</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>122</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>123</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>124</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>125</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>126</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>127</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>128</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>129</id>
+            <logic>
+                <behavior>hidden</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>130</id>
+            <logic>
+                <behavior>hidden</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>131</id>
+            <logic>
+                <behavior>hidden</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>132</id>
+            <logic>
+                <behavior>hidden</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>133</id>
+            <logic>
+                <behavior>hidden</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>134</id>
+            <logic>
+                <behavior>hidden</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>135</id>
+            <logic>
+                <behavior>hidden</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>136</id>
+            <logic>
+                <behavior>hidden</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>137</id>
+            <logic>
+                <behavior>hidden</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>138</id>
+            <logic>
+                <behavior>hidden</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>139</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>140</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>141</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>142</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>143</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>144</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>145</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>146</id>
+            <logic>
+                <behavior>hidden</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>147</id>
+            <logic>
+                <behavior>hidden</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>148</id>
+            <logic>
+                <behavior>hidden</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>149</id>
+            <logic>
+                <behavior>hidden</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>150</id>
+            <logic>
+                <behavior>hidden</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>151</id>
+            <logic>
+                <behavior>hidden</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>152</id>
+            <logic>
+                <behavior>hidden</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>153</id>
+            <logic>
+                <behavior>hidden</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>154</id>
+            <logic>
+                <behavior>hidden</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>155</id>
+            <logic>
+                <behavior>hidden</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>156</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>157</id>
+            <logic>
+                <behavior>hidden</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>158</id>
+            <logic>
+                <behavior>hidden</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>159</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>160</id>
+            <logic>
+                <behavior>hidden</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>167</id>
+            <logic>
+                <behavior>hidden</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>168</id>
+            <logic>
+                <behavior>hidden</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>169</id>
+            <logic>
+                <behavior>hidden</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>170</id>
+            <logic>
+                <behavior>hidden</behavior>
+            </logic>
+        </dataRef>
     </transition>
     <transition>
         <id>363</id>
@@ -1336,6 +3232,163 @@
         <transactionRef>
             <id>2</id>
         </transactionRef>
+        <dataRef>
+            <id>27</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+                <action>
+                    field: f.this,
+                    coeff: f.171;
+                    change coeff about {
+                    if (field.value == "byt")
+                    return 1.0 as Double;
+                    if (field.value == "rodinný dom")
+                    return 1.0 as Double;
+                    if (field.value == "chata")
+                    return 1.25 as Double;
+                    return 1.25 as Double;
+                    }
+                </action>
+                <action>
+                    c1: f.168,
+                    c2: f.98,
+                    c3: f.99,
+                    c4: f.100,
+                    c5: f.101,
+                    coeff: f.102;
+                    change coeff about {
+                    return c1.value*c2.value*c3.value*c4.value*c5.value;
+                    }
+                </action>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>28</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+                <action>
+                    field: f.this,
+                    coeff: f.98;
+                    change coeff about {
+                    if (field.value == "trvalá")
+                    return 1.0 as Double;
+                    return 2.5 as Double;
+                    }
+                </action>
+                <action>
+                    c1: f.168,
+                    c2: f.98,
+                    c3: f.99,
+                    c4: f.100,
+                    c5: f.101,
+                    coeff: f.102;
+                    change coeff about {
+                    return c1.value*c2.value*c3.value*c4.value*c5.value;
+                    }
+                </action>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>29</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+                <action>
+                    field: f.this,
+                    coeff: f.99;
+                    change coeff about {
+                    if (field.value)
+                    return 0.95 as Double;
+                    return 1.0 as Double;
+                    }
+                </action>
+                <action>
+                    c1: f.168,
+                    c2: f.98,
+                    c3: f.99,
+                    c4: f.100,
+                    c5: f.101,
+                    coeff: f.102;
+                    change coeff about {
+                    return c1.value*c2.value*c3.value*c4.value*c5.value;
+                    }
+                </action>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>30</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+                <action>
+                    field: f.this,
+                    coeff: f.100;
+                    change coeff about {
+                    if (field.value)
+                    return 0.97 as Double;
+                    return 1.0 as Double;
+                    }
+                </action>
+                <action>
+                    c1: f.168,
+                    c2: f.98,
+                    c3: f.99,
+                    c4: f.100,
+                    c5: f.101,
+                    coeff: f.102;
+                    change coeff about {
+                    return c1.value*c2.value*c3.value*c4.value*c5.value;
+                    }
+                </action>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>31</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+                <action>
+                    field: f.this,
+                    coeff: f.101;
+                    change coeff about {
+                    if (field.value)
+                    return 0.97 as Double;
+                    return 1.0 as Double;
+                    }
+                </action>
+                <action>
+                    c1: f.168,
+                    c2: f.98,
+                    c3: f.99,
+                    c4: f.100,
+                    c5: f.101,
+                    coeff: f.102;
+                    change coeff about {
+                    return c1.value*c2.value*c3.value*c4.value*c5.value;
+                    }
+                </action>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>52</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+                <action>
+                    field: f.this,
+                    coeff: f.201;
+                    change coeff about {
+                    if (field.value == "0,00 €")
+                    return 1.1 as Double;
+                    if (field.value == "50,00 €")
+                    return 1.0 as Double;
+                    return 0.9 as Double;
+                    }
+                </action>
+            </logic>
+        </dataRef>
     </transition>
     <transition>
         <id>364</id>
@@ -1366,6 +3419,284 @@
         <transactionRef>
             <id>2</id>
         </transactionRef>
+        <dataRef>
+            <id>38</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+                <action>
+                    field: f.38,
+                    coeff: f.190;
+                    change coeff about {
+                    if (field.value)
+                    return 1.0 as Double;
+                    return 1.1 as Double;
+                    }
+                </action>
+                <action>
+                    field: f.37,
+                    exces: f.189,
+                    garage: f.190,
+                    coeff: f.174;
+                    change coeff about {
+                    return (field.value*garage.value*exces.value)/1000.0 as Double;
+                    }
+                </action>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>37</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+                <action>
+                    field: f.this,
+                    exces: f.189,
+                    garage: f.190,
+                    coeff: f.174;
+                    change coeff about {
+                    return (field.value*garage.value*exces.value)/1000.0 as Double;
+                    }
+                </action>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>174</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>39</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+                <action>
+                    field: f.this,
+                    exces: f.189,
+                    coeff: f.175;
+                    change coeff about {
+                    return (field.value*exces.value)/1000.0 as Double;
+                    }
+                </action>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>175</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>40</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+                <action>
+                    field: f.this,
+                    exces: f.189,
+                    coeff: f.176;
+                    change coeff about {
+                    return (field.value*exces.value)/1000.0 as Double;
+                    }
+                </action>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>176</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>41</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+                <action>
+                    field: f.this,
+                    exces: f.189,
+                    coeff: f.177;
+                    change coeff about {
+                    return (field.value*exces.value)/1000.0 as Double;
+                    }
+                </action>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>177</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>42</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+                <action>
+                    field: f.this,
+                    exces: f.189,
+                    coeff: f.178;
+                    change coeff about {
+                    return (field.value*exces.value)/1000.0 as Double;
+                    }
+                </action>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>178</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>43</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+                <action>
+                    field: f.this,
+                    exces: f.189,
+                    coeff: f.179;
+                    change coeff about {
+                    return (field.value*exces.value)/1000.0 as Double;
+                    }
+                </action>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>179</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>44</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+                <action>
+                    field: f.this,
+                    exces: f.189,
+                    coeff: f.180;
+                    change coeff about {
+                    return (field.value*exces.value)/1000.0 as Double;
+                    }
+                </action>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>180</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>45</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+                <action>
+                    field: f.this,
+                    exces: f.189,
+                    coeff: f.181;
+                    change coeff about {
+                    return (field.value*exces.value)/1000.0 as Double;
+                    }
+                </action>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>181</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>46</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+                <action>
+                    field: f.this,
+                    exces: f.189,
+                    coeff: f.182;
+                    change coeff about {
+                    return (field.value*exces.value)/1000.0 as Double;
+                    }
+                </action>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>182</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>47</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+                <action>
+                    field: f.this,
+                    exces: f.189,
+                    coeff: f.183;
+                    change coeff about {
+                    return (field.value*exces.value)/1000.0 as Double;
+                    }
+                </action>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>183</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>48</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+                <action>
+                    field: f.this,
+                    exces: f.189,
+                    coeff: f.184;
+                    change coeff about {
+                    return (field.value*exces.value)/1000.0 as Double;
+                    }
+                </action>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>184</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>49</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+                <action>
+                    field: f.this,
+                    exces: f.189,
+                    coeff: f.185;
+                    change coeff about {
+                    return (field.value*exces.value)/1000.0 as Double;
+                    }
+                </action>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>185</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
     </transition>
     <transition>
         <id>414</id>
@@ -1381,6 +3712,48 @@
         <transactionRef>
             <id>2</id>
         </transactionRef>
+        <dataRef>
+            <id>50</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+                <action>
+                    field: f.this,
+                    exces: f.189,
+                    coeff: f.186;
+                    change coeff about {
+                    return (field.value*3.5*exces.value)/1000.0 as Double;
+                    }
+                </action>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>186</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>51</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+                <action>
+                    field: f.this,
+                    exces: f.189,
+                    coeff: f.187;
+                    change coeff about {
+                    return (field.value*3.5*exces.value)/1000.0 as Double;
+                    }
+                </action>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>187</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
     </transition>
     <transition>
         <id>421</id>
@@ -1396,51 +3769,634 @@
         <transactionRef>
             <id>2</id>
         </transactionRef>
+        <dataRef>
+            <id>54</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+                <action>
+                    field: f.this,
+                    exces: f.201,
+                    coeff: f.192;
+                    change coeff about {
+                    return (field.value*exces.value)/1000.0 as Double;
+                    }
+                </action>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>192</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>55</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+                <action>
+                    field: f.this,
+                    exces: f.201,
+                    coeff: f.193;
+                    change coeff about {
+                    return (field.value*exces.value)/1000.0 as Double;
+                    }
+                </action>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>193</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>56</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+                <action>
+                    field: f.this,
+                    exces: f.201,
+                    coeff: f.194;
+                    change coeff about {
+                    return (field.value*exces.value)/1000.0 as Double;
+                    }
+                </action>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>194</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>57</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+                <action>
+                    field: f.this,
+                    exces: f.201,
+                    coeff: f.195;
+                    change coeff about {
+                    return (field.value*exces.value)/1000.0 as Double;
+                    }
+                </action>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>195</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>58</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+                <action>
+                    field: f.this,
+                    exces: f.201,
+                    coeff: f.196;
+                    change coeff about {
+                    return (field.value*exces.value)/1000.0 as Double;
+                    }
+                </action>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>196</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>59</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+                <action>
+                    field: f.this,
+                    exces: f.201,
+                    coeff: f.197;
+                    change coeff about {
+                    return (field.value*exces.value)/1000.0 as Double;
+                    }
+                </action>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>197</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>60</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+                <action>
+                    field: f.this,
+                    exces: f.201,
+                    coeff: f.198;
+                    change coeff about {
+                    return (field.value*exces.value)/1000.0 as Double;
+                    }
+                </action>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>198</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>61</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+                <action>
+                    field: f.this,
+                    exces: f.201,
+                    coeff: f.199;
+                    change coeff about {
+                    return (field.value*exces.value)/1000.0 as Double;
+                    }
+                </action>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>199</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>62</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+                <action>
+                    field: f.this,
+                    exces: f.201,
+                    coeff: f.200;
+                    change coeff about {
+                    return (field.value*exces.value)/1000.0 as Double;
+                    }
+                </action>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>200</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
     </transition>
     <transition>
         <id>580</id>
         <x>1860</x>
         <y>380</y>
         <label>Údaje o zmluve</label>
+        <transactionRef>
+            <id>4</id>
+        </transactionRef>
         <roleRef>
             <id>1</id>
             <logic>
                 <perform>true</perform>
             </logic>
         </roleRef>
-        <transactionRef>
-            <id>4</id>
-        </transactionRef>
+        <dataRef>
+            <id>163</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>112</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>113</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>114</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>115</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>116</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>117</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+            </logic>
+        </dataRef>
     </transition>
     <transition>
         <id>588</id>
         <x>1940</x>
         <y>620</y>
         <label>Dokumenty</label>
+        <transactionRef>
+            <id>4</id>
+        </transactionRef>
         <roleRef>
             <id>1</id>
             <logic>
                 <perform>true</perform>
             </logic>
         </roleRef>
-        <transactionRef>
-            <id>4</id>
-        </transactionRef>
+        <dataRef>
+            <id>111</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
     </transition>
     <transition>
         <id>596</id>
         <x>2060</x>
         <y>260</y>
         <label>Zmluva</label>
+        <transactionRef>
+            <id>4</id>
+        </transactionRef>
         <roleRef>
             <id>1</id>
             <logic>
                 <perform>true</perform>
             </logic>
         </roleRef>
-        <transactionRef>
-            <id>4</id>
-        </transactionRef>
+        <!-- ===== PDF ===== -->
+        <dataRef>
+            <id>1002</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <!-- ===== Údaje k zmluve ===== -->
+        <dataRef>
+            <id>163</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>112</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>113</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>114</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>115</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>116</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>117</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <!-- ===== Údaje o poistníkovi ===== -->
+        <dataRef>
+            <id>118</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>119</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>120</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>121</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>122</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>123</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>124</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>125</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>126</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>127</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>128</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>129</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>130</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>131</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>132</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>133</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>134</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>135</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>136</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>137</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>138</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>139</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>140</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>141</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>142</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>143</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>144</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>145</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>146</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>147</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>148</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>149</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>150</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>151</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>152</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>153</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>154</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>155</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>156</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>157</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>158</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>159</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>160</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>167</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>168</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>169</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>170</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <!-- ===== Dokumenty ===== -->
+        <dataRef>
+            <id>111</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
     </transition>
     <transition>
         <id>609</id>
@@ -1495,30 +4451,480 @@
         <x>2340</x>
         <y>500</y>
         <label>Zamietnuta ponuka</label>
+        <transactionRef>
+            <id>3</id>
+        </transactionRef>
         <roleRef>
             <id>1</id>
             <logic>
                 <perform>true</perform>
             </logic>
         </roleRef>
-        <transactionRef>
+        <dataRef>
+            <id>1</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>2</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
             <id>3</id>
-        </transactionRef>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>4</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>5</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>6</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>7</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>8</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>9</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>10</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>11</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>12</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>13</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>14</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>15</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>16</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>17</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>18</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>19</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>20</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>21</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>22</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>23</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>24</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>25</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>26</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>27</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>28</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>29</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>30</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>31</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>32</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>33</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>34</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>35</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>36</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>37</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>38</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>39</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>40</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>41</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>42</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>43</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>44</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>45</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>46</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>47</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>48</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>49</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>50</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>51</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>52</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>53</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>54</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>55</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>56</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>57</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>58</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>59</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>60</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>61</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>62</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>63</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>64</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>65</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>66</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>67</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>68</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>69</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>70</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>71</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>72</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>73</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>74</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>75</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
     </transition>
     <transition>
         <id>670</id>
         <x>2300</x>
         <y>260</y>
         <label>Zmluva zaslaná</label>
+        <transactionRef>
+            <id>4</id>
+        </transactionRef>
         <roleRef>
             <id>1</id>
             <logic>
                 <perform>true</perform>
             </logic>
         </roleRef>
-        <transactionRef>
-            <id>4</id>
-        </transactionRef>
     </transition>
     <transition>
         <id>674</id>
@@ -1527,6 +4933,12 @@
         <label>Zrušenie návrhu poistky (po vypršaní lehoty) </label>
         <roleRef>
             <id>1</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>2</id>
             <logic>
                 <perform>true</perform>
             </logic>
@@ -1540,15 +4952,22 @@
         <x>2460</x>
         <y>180</y>
         <label>Napárovanie platby</label>
+        <transactionRef>
+            <id>5</id>
+        </transactionRef>
         <roleRef>
-            <id>1</id>
+            <id>2</id>
             <logic>
                 <perform>true</perform>
             </logic>
         </roleRef>
-        <transactionRef>
-            <id>5</id>
-        </transactionRef>
+        <dataRef>
+            <id>161</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+            </logic>
+        </dataRef>
     </transition>
     <transition>
         <id>686</id>
@@ -1561,6 +4980,347 @@
                 <perform>true</perform>
             </logic>
         </roleRef>
+        <!-- ===== Údaje k zmluve ===== -->
+        <dataRef>
+            <id>163</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>112</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>113</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>114</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>115</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>116</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>117</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <!-- ===== Údaje o poistníkovi ===== -->
+        <dataRef>
+            <id>118</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>119</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>120</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>121</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>122</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>123</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>124</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>125</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>126</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>127</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>128</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>129</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>130</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>131</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>132</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>133</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>134</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>135</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>136</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>137</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>138</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>139</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>140</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>141</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>142</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>143</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>144</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>145</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>146</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>147</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>148</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>149</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>150</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>151</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>152</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>153</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>154</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>155</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>156</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>157</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>158</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>159</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>160</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>167</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>168</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>169</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>170</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <!-- ===== Dokumenty ===== -->
+        <dataRef>
+            <id>111</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <!-- ===== Napárovanie platby ===== -->
+        <dataRef>
+            <id>161</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+            </logic>
+        </dataRef>
     </transition>
     <transition>
         <id>687</id>
@@ -1573,6 +5333,339 @@
                 <perform>true</perform>
             </logic>
         </roleRef>
+        <!-- ===== Údaje k zmluve ===== -->
+        <dataRef>
+            <id>163</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>112</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>113</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>114</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>115</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>116</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>117</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <!-- ===== Údaje o poistníkovi ===== -->
+        <dataRef>
+            <id>118</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>119</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>120</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>121</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>122</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>123</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>124</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>125</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>126</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>127</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>128</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>129</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>130</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>131</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>132</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>133</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>134</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>135</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>136</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>137</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>138</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>139</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>140</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>141</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>142</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>143</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>144</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>145</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>146</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>147</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>148</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>149</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>150</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>151</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>152</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>153</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>154</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>155</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>156</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>157</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>158</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>159</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>160</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>167</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>168</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>169</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>170</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <!-- ===== Dokumenty ===== -->
+        <dataRef>
+            <id>111</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
     </transition>
     <transition>
         <id>692</id>
@@ -1597,6 +5690,347 @@
                 <perform>true</perform>
             </logic>
         </roleRef>
+        <!-- ===== Údaje k zmluve ===== -->
+        <dataRef>
+            <id>163</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>112</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>113</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>114</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>115</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>116</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>117</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <!-- ===== Údaje o poistníkovi ===== -->
+        <dataRef>
+            <id>118</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>119</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>120</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>121</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>122</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>123</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>124</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>125</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>126</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>127</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>128</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>129</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>130</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>131</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>132</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>133</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>134</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>135</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>136</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>137</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>138</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>139</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>140</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>141</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>142</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>143</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>144</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>145</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>146</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>147</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>148</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>149</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>150</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>151</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>152</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>153</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>154</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>155</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>156</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>157</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>158</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>159</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>160</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>167</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>168</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>169</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>170</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <!-- ===== Dokumenty ===== -->
+        <dataRef>
+            <id>111</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <!-- ===== Napárovanie platby ===== -->
+        <dataRef>
+            <id>161</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+            </logic>
+        </dataRef>
     </transition>
     <transition>
         <id>901</id>

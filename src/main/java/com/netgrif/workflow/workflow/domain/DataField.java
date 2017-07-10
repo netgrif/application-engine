@@ -44,6 +44,12 @@ public class DataField {
             this.behavior.put(transition, new HashSet<>(behavior));
     }
 
+    public ObjectNode applyOnlyVisibleBehavior(){
+        ObjectNode node = JsonNodeFactory.instance.objectNode();
+        node.put(FieldBehavior.VISIBLE.toString(),true);
+        return node;
+    }
+
     public boolean hasDefinedBehavior(String transition) {
         return this.behavior.containsKey(transition);
     }
@@ -52,6 +58,11 @@ public class DataField {
         return behavior.containsKey(transition) && (behavior.get(transition).contains(FieldBehavior.VISIBLE) ||
                 behavior.get(transition).contains(FieldBehavior.EDITABLE) ||
                 behavior.get(transition).contains(FieldBehavior.HIDDEN));
+    }
+
+    public boolean isDisplayable(){
+        return behavior.values().stream().parallel()
+                .anyMatch(bs -> bs.contains(FieldBehavior.VISIBLE) || bs.contains(FieldBehavior.EDITABLE));
     }
 
     public void makeVisible(String transition) {
