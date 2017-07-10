@@ -1,5 +1,6 @@
 package com.netgrif.workflow.workflow.service.interfaces;
 
+import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.workflow.domain.Case;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -15,7 +16,9 @@ public interface IWorkflowService {
 
     Case createCase(String netId, String title, String color, Long authorId);
 
-    Page<Case> findAllByAuthor(Long authorId, Pageable pageable);
+    Page<Case> findAllByAuthor(Long authorId, String petriNet, Pageable pageable);
 
     void deleteCase(String caseId);
+
+    List<Field> getData(String caseId);
 }
