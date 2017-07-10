@@ -1064,6 +1064,19 @@
         <id>162</id>
         <title>Dátum dojednania návrhu na uzavretie poistnej zmluvy</title>
     </data>
+    <!-- ===== PDF ===== -->
+    <data type="file">
+        <id>1001</id>
+        <title>Ponuka PDF</title>
+        <init>Automaticky generované</init>
+        <logic>generate Insurance.offerPDF always</logic>
+    </data>
+    <data type="file">
+        <id>1002</id>
+        <title>Zmluva PDF</title>
+        <init>Automaticky generované</init>
+        <logic>generate Insurance.offerPDF always</logic>
+    </data>
     <!-- ========== PLACES ========== -->
     <place>
         <id>1</id>
@@ -1335,9 +1348,9 @@
                     field: f.this,
                     coeff: f.76;
                     change coeff about {
-                        if (field.value)
-                            return 1.2 as Double;
-                        return 1.0 as Double;
+                    if (field.value)
+                    return 1.2 as Double;
+                    return 1.0 as Double;
                     }
                 </action>
                 <action>
@@ -1481,7 +1494,7 @@
                     field: f.this,
                     coeff: f.80;
                     change coeff about {
-                        return 1.0 as Double;
+                    return 1.0 as Double;
                     }
                 </action>
                 <action>
@@ -1516,13 +1529,13 @@
                     field: f.this,
                     coeff: f.81;
                     change coeff about {
-                        if (field.value == "1")
-                            return 0.95 as Double;
-                        if (field.value == "2")
-                            return 1.0 as Double;
-                        if (field.value == "3")
-                            return 1.05 as Double;
-                        return 1.1 as Double;
+                    if (field.value == "1")
+                    return 0.95 as Double;
+                    if (field.value == "2")
+                    return 1.0 as Double;
+                    if (field.value == "3")
+                    return 1.05 as Double;
+                    return 1.1 as Double;
                     }
                 </action>
                 <action>
@@ -1557,11 +1570,11 @@
                     field: f.this,
                     coeff: f.82;
                     change coeff about {
-                        if (field.value == "2")
-                            return 1.05 as Double;
-                        if (field.value == "viac")
-                            return 1.1 as Double;
-                        return 1.0 as Double;
+                    if (field.value == "2")
+                    return 1.05 as Double;
+                    if (field.value == "viac")
+                    return 1.1 as Double;
+                    return 1.0 as Double;
                     }
                 </action>
                 <action>
@@ -1596,9 +1609,9 @@
                     field: f.this,
                     coeff: f.83;
                     change coeff about {
-                        if (field.value)
-                            return 1.5 as Double;
-                        return 1.0 as Double;
+                    if (field.value)
+                    return 1.5 as Double;
+                    return 1.0 as Double;
                     }
                 </action>
                 <action>
@@ -2247,11 +2260,11 @@
                     field: f.this,
                     coeff: f.189;
                     change coeff about {
-                        if (field.value == "0,00 €")
-                            return 1.1 as Double;
-                        if (field.value == "50,00 €")
-                            return 1.0 as Double;
-                        return 0.9 as Double;
+                    if (field.value == "0,00 €")
+                    return 1.1 as Double;
+                    if (field.value == "50,00 €")
+                    return 1.0 as Double;
+                    return 0.9 as Double;
                     }
                 </action>
                 <action>
@@ -2259,7 +2272,7 @@
                     exces: f.189,
                     coeff: f.186;
                     change coeff about {
-                        return (field.value*3.5*exces.value)/1000.0 as Double;
+                    return (field.value*3.5*exces.value)/1000.0 as Double;
                     }
                 </action>
                 <action>
@@ -2268,7 +2281,7 @@
                     garage: f.190,
                     coeff: f.174;
                     change coeff about {
-                        return (field.value*garage.value*exces.value)/1000.0 as Double;
+                    return (field.value*garage.value*exces.value)/1000.0 as Double;
                     }
                 </action>
             </logic>
@@ -2297,9 +2310,9 @@
                     field: f.this,
                     coeff: f.103;
                     change coeff about {
-                        if (field.value)
-                            return 0.1 as Double;
-                        return 0.0 as Double;
+                    if (field.value)
+                    return 0.1 as Double;
+                    return 0.0 as Double;
                     }
                 </action>
             </logic>
@@ -2313,9 +2326,9 @@
                     field: f.this,
                     coeff: f.104;
                     change coeff about {
-                        if (field.value)
-                            return 0.3 as Double;
-                        return 0.0 as Double;
+                    if (field.value)
+                    return 0.3 as Double;
+                    return 0.0 as Double;
                     }
                 </action>
                 <action>
@@ -2323,7 +2336,7 @@
                     c2: f.105,
                     coeff: f.172;
                     change coeff about {
-                        return c1.value*c2.value;
+                    return c1.value*c2.value;
                     }
                 </action>
             </logic>
@@ -2337,9 +2350,9 @@
                     field: f.this,
                     coeff: f.105;
                     change coeff about {
-                        if (field.value == "Slovenská republika")
-                            return 1.0 as Double;
-                        return 1.2 as Double;
+                    if (field.value == "Slovenská republika")
+                    return 1.0 as Double;
+                    return 1.2 as Double;
                     }
                 </action>
                 <action>
@@ -2347,7 +2360,7 @@
                     c2: f.105,
                     coeff: f.172;
                     change coeff about {
-                        return c1.value*c2.value;
+                    return c1.value*c2.value;
                     }
                 </action>
             </logic>
@@ -2365,6 +2378,12 @@
             </logic>
         </roleRef>
         <!-- ===== Základné informácie ===== -->
+        <dataRef>
+            <id>1001</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
         <dataRef>
             <id>1</id>
             <logic>
@@ -3359,11 +3378,11 @@
                     field: f.this,
                     coeff: f.201;
                     change coeff about {
-                        if (field.value == "0,00 €")
-                            return 1.1 as Double;
-                        if (field.value == "50,00 €")
-                            return 1.0 as Double;
-                        return 0.9 as Double;
+                    if (field.value == "0,00 €")
+                    return 1.1 as Double;
+                    if (field.value == "50,00 €")
+                    return 1.0 as Double;
+                    return 0.9 as Double;
                     }
                 </action>
             </logic>
@@ -3407,9 +3426,9 @@
                     field: f.38,
                     coeff: f.190;
                     change coeff about {
-                        if (field.value)
-                            return 1.0 as Double;
-                        return 1.1 as Double;
+                    if (field.value)
+                    return 1.0 as Double;
+                    return 1.1 as Double;
                     }
                 </action>
                 <action>
@@ -3418,7 +3437,7 @@
                     garage: f.190,
                     coeff: f.174;
                     change coeff about {
-                        return (field.value*garage.value*exces.value)/1000.0 as Double;
+                    return (field.value*garage.value*exces.value)/1000.0 as Double;
                     }
                 </action>
             </logic>
@@ -3434,7 +3453,7 @@
                     garage: f.190,
                     coeff: f.174;
                     change coeff about {
-                        return (field.value*garage.value*exces.value)/1000.0 as Double;
+                    return (field.value*garage.value*exces.value)/1000.0 as Double;
                     }
                 </action>
             </logic>
@@ -3455,7 +3474,7 @@
                     exces: f.189,
                     coeff: f.175;
                     change coeff about {
-                        return (field.value*exces.value)/1000.0 as Double;
+                    return (field.value*exces.value)/1000.0 as Double;
                     }
                 </action>
             </logic>
@@ -3476,7 +3495,7 @@
                     exces: f.189,
                     coeff: f.176;
                     change coeff about {
-                        return (field.value*exces.value)/1000.0 as Double;
+                    return (field.value*exces.value)/1000.0 as Double;
                     }
                 </action>
             </logic>
@@ -3497,7 +3516,7 @@
                     exces: f.189,
                     coeff: f.177;
                     change coeff about {
-                        return (field.value*exces.value)/1000.0 as Double;
+                    return (field.value*exces.value)/1000.0 as Double;
                     }
                 </action>
             </logic>
@@ -3518,7 +3537,7 @@
                     exces: f.189,
                     coeff: f.178;
                     change coeff about {
-                        return (field.value*exces.value)/1000.0 as Double;
+                    return (field.value*exces.value)/1000.0 as Double;
                     }
                 </action>
             </logic>
@@ -3539,7 +3558,7 @@
                     exces: f.189,
                     coeff: f.179;
                     change coeff about {
-                        return (field.value*exces.value)/1000.0 as Double;
+                    return (field.value*exces.value)/1000.0 as Double;
                     }
                 </action>
             </logic>
@@ -3560,7 +3579,7 @@
                     exces: f.189,
                     coeff: f.180;
                     change coeff about {
-                        return (field.value*exces.value)/1000.0 as Double;
+                    return (field.value*exces.value)/1000.0 as Double;
                     }
                 </action>
             </logic>
@@ -3581,7 +3600,7 @@
                     exces: f.189,
                     coeff: f.181;
                     change coeff about {
-                        return (field.value*exces.value)/1000.0 as Double;
+                    return (field.value*exces.value)/1000.0 as Double;
                     }
                 </action>
             </logic>
@@ -3602,7 +3621,7 @@
                     exces: f.189,
                     coeff: f.182;
                     change coeff about {
-                        return (field.value*exces.value)/1000.0 as Double;
+                    return (field.value*exces.value)/1000.0 as Double;
                     }
                 </action>
             </logic>
@@ -3623,7 +3642,7 @@
                     exces: f.189,
                     coeff: f.183;
                     change coeff about {
-                        return (field.value*exces.value)/1000.0 as Double;
+                    return (field.value*exces.value)/1000.0 as Double;
                     }
                 </action>
             </logic>
@@ -3644,7 +3663,7 @@
                     exces: f.189,
                     coeff: f.184;
                     change coeff about {
-                        return (field.value*exces.value)/1000.0 as Double;
+                    return (field.value*exces.value)/1000.0 as Double;
                     }
                 </action>
             </logic>
@@ -3665,7 +3684,7 @@
                     exces: f.189,
                     coeff: f.185;
                     change coeff about {
-                        return (field.value*exces.value)/1000.0 as Double;
+                    return (field.value*exces.value)/1000.0 as Double;
                     }
                 </action>
             </logic>
@@ -3701,7 +3720,7 @@
                     exces: f.189,
                     coeff: f.186;
                     change coeff about {
-                        return (field.value*3.5*exces.value)/1000.0 as Double;
+                    return (field.value*3.5*exces.value)/1000.0 as Double;
                     }
                 </action>
             </logic>
@@ -3722,7 +3741,7 @@
                     exces: f.189,
                     coeff: f.187;
                     change coeff about {
-                        return (field.value*3.5*exces.value)/1000.0 as Double;
+                    return (field.value*3.5*exces.value)/1000.0 as Double;
                     }
                 </action>
             </logic>
@@ -3758,7 +3777,7 @@
                     exces: f.201,
                     coeff: f.192;
                     change coeff about {
-                        return (field.value*exces.value)/1000.0 as Double;
+                    return (field.value*exces.value)/1000.0 as Double;
                     }
                 </action>
             </logic>
@@ -3779,7 +3798,7 @@
                     exces: f.201,
                     coeff: f.193;
                     change coeff about {
-                        return (field.value*exces.value)/1000.0 as Double;
+                    return (field.value*exces.value)/1000.0 as Double;
                     }
                 </action>
             </logic>
@@ -3800,7 +3819,7 @@
                     exces: f.201,
                     coeff: f.194;
                     change coeff about {
-                        return (field.value*exces.value)/1000.0 as Double;
+                    return (field.value*exces.value)/1000.0 as Double;
                     }
                 </action>
             </logic>
@@ -3821,7 +3840,7 @@
                     exces: f.201,
                     coeff: f.195;
                     change coeff about {
-                        return (field.value*exces.value)/1000.0 as Double;
+                    return (field.value*exces.value)/1000.0 as Double;
                     }
                 </action>
             </logic>
@@ -3842,7 +3861,7 @@
                     exces: f.201,
                     coeff: f.196;
                     change coeff about {
-                        return (field.value*exces.value)/1000.0 as Double;
+                    return (field.value*exces.value)/1000.0 as Double;
                     }
                 </action>
             </logic>
@@ -3863,7 +3882,7 @@
                     exces: f.201,
                     coeff: f.197;
                     change coeff about {
-                        return (field.value*exces.value)/1000.0 as Double;
+                    return (field.value*exces.value)/1000.0 as Double;
                     }
                 </action>
             </logic>
@@ -3884,7 +3903,7 @@
                     exces: f.201,
                     coeff: f.198;
                     change coeff about {
-                        return (field.value*exces.value)/1000.0 as Double;
+                    return (field.value*exces.value)/1000.0 as Double;
                     }
                 </action>
             </logic>
@@ -3905,7 +3924,7 @@
                     exces: f.201,
                     coeff: f.199;
                     change coeff about {
-                        return (field.value*exces.value)/1000.0 as Double;
+                    return (field.value*exces.value)/1000.0 as Double;
                     }
                 </action>
             </logic>
@@ -3926,7 +3945,7 @@
                     exces: f.201,
                     coeff: f.200;
                     change coeff about {
-                        return (field.value*exces.value)/1000.0 as Double;
+                    return (field.value*exces.value)/1000.0 as Double;
                     }
                 </action>
             </logic>
@@ -4036,6 +4055,13 @@
                 <perform>true</perform>
             </logic>
         </roleRef>
+        <!-- ===== PDF ===== -->
+        <dataRef>
+            <id>1002</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
         <!-- ===== Údaje k zmluve ===== -->
         <dataRef>
             <id>163</id>
@@ -4888,15 +4914,15 @@
         <x>2300</x>
         <y>260</y>
         <label>Zmluva zaslaná</label>
+        <transactionRef>
+            <id>4</id>
+        </transactionRef>
         <roleRef>
             <id>1</id>
             <logic>
                 <perform>true</perform>
             </logic>
         </roleRef>
-        <transactionRef>
-            <id>4</id>
-        </transactionRef>
     </transition>
     <transition>
         <id>674</id>

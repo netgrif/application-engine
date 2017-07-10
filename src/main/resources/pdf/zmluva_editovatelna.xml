@@ -15,13 +15,13 @@
     <TextField47 xfdf:original="Text Field 47">72</TextField47>
     <TextField48 xfdf:original="Text Field 48">120000</TextField48>
     <TextField5 xfdf:original="Text Field 5">beton</TextField5>
-    <TextField50 xfdf:original="Text Field 50">fyzická osoba</TextField50>
+    <TextField50 xfdf:original="Text Field 50">fyzicka osoba</TextField50>
     <TextField51 xfdf:original="Text Field 51">Bc.</TextField51>
     <TextField52 xfdf:original="Text Field 52">Peter Mach</TextField52>
     <TextField57 xfdf:original="Text Field 57">1.1.1993</TextField57>
     <TextField6 xfdf:original="Text Field 6">nie</TextField6>
     <TextField60 xfdf:original="Text Field 60">930101/8250</TextField60>
-    <TextField61 xfdf:original="Text Field 61">slovenská</TextField61>
+    <TextField61 xfdf:original="Text Field 61">slovenska</TextField61>
     <TextField62 xfdf:original="Text Field 62">OP</TextField62>
     <TextField63 xfdf:original="Text Field 63">AB123456</TextField63>
     <TextField64 xfdf:original="Text Field 64">+421948 123 456</TextField64>
@@ -41,6 +41,6 @@
     <TextField78 xfdf:original="Text Field 78">03601</TextField78>
     <TextField79 xfdf:original="Text Field 79">Martin</TextField79>
     <TextField8 xfdf:original="Text Field 8">10</TextField8>
-    <TextField82 xfdf:original="Text Field 82">áno</TextField82>
+    <TextField82 xfdf:original="Text Field 82">ano</TextField82>
     <field157 xfdf:original="field 157">Bratislave</field157>
 </fields>
