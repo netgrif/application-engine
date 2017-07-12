@@ -60,9 +60,11 @@ public class Case {
     @Transient
     private List<Field> immediateData;
 
-    @Getter
-    @Setter
+    @Getter @Setter
     private Long author;
+
+    @Getter @Setter
+    private Map<String, Integer> resetArcTokens;
 
     public Case() {
         _id = new ObjectId();
