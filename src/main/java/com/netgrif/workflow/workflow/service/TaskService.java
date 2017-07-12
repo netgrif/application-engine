@@ -328,6 +328,7 @@ public class TaskService implements ITaskService {
                 .forEach(arc -> {
                     if (arc instanceof ResetArc) {
                         ((ResetArc) arc).setRemovedTokens(useCase.getResetArcTokens().get(arc.getStringId()));
+                        useCase.getResetArcTokens().remove(arc.getStringId());
                     }
                     arc.rollbackExecution();
                 });
@@ -467,7 +468,7 @@ public class TaskService implements ITaskService {
 
         filteredSupplier.get().forEach(arc -> {
             if (arc instanceof ResetArc) {
-                useCase.getResetArcTokens().put(arc.getStringId(), arc.getMultiplicity());
+                useCase.getResetArcTokens().put(arc.getStringId(), ((Place)arc.getSource()).getTokens());
             }
             arc.execute();
         });
