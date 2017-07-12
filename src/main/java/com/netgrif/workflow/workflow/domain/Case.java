@@ -71,6 +71,7 @@ public class Case {
         activePlaces = new HashMap<>();
         dataSet = new LinkedHashMap<>();
         immediateDataFields = new LinkedHashSet<>();
+        resetArcTokens = new HashMap<>();
     }
 
     public Case(String title) {
