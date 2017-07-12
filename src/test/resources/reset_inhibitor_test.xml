@@ -6,7 +6,7 @@
     </data>
     <role>
         <id>1</id>
-        <name>client</name>
+        <name>Agent</name>
     </role>
     <place>
         <id>1</id>
