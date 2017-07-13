@@ -9,7 +9,9 @@ import lombok.Setter;
 
 import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 
 public class DataFieldLogic {
@@ -53,5 +55,9 @@ public class DataFieldLogic {
 
     public boolean isDisplayableForCase(){
         return behavior.contains(FieldBehavior.EDITABLE) || behavior.contains(FieldBehavior.VISIBLE);
+    }
+
+    public static List<Action> getActionByTrigger(Set<Action> actions, Action.ActionTrigger trigger){
+        return actions.stream().filter(action -> action.isTriggeredBy(trigger)).collect(Collectors.toList());
     }
 }

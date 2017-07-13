@@ -27,6 +27,10 @@
         <valid>length 20</valid>
         <init>Bratislava</init>
         <placeholder>Mesto</placeholder>
+        <action trigger="set">
+            self: f.30;
+            change self about { 5 as Double }
+        </action>
     </data>
     <data type="enumeration">
         <id>5</id>

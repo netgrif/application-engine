@@ -10,8 +10,8 @@ import com.netgrif.workflow.auth.domain.repositories.UserRepository;
 import com.netgrif.workflow.petrinet.domain.*;
 import com.netgrif.workflow.petrinet.domain.dataset.*;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedField;
+import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.FieldActionsRunner;
-import com.netgrif.workflow.petrinet.domain.dataset.logic.FieldBehavior;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.logic.FileFieldLogic;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.validation.FieldValidationRunner;
 import com.netgrif.workflow.petrinet.domain.roles.RolePermission;
@@ -196,6 +196,9 @@ public class TaskService implements ITaskService {
         List<Field> dataSetFields = new ArrayList<>();
 
         fieldsIds.forEach(fieldId -> {
+            resolveActions(useCase.getPetriNet().getDataSet().get(fieldId),
+                    Action.ActionTrigger.GET, useCase, transition);
+
             if (useCase.hasFieldBehavior(fieldId, transition.getStringId())) {
                 if (useCase.getDataSet().get(fieldId).isDisplayable(transition.getStringId())) {
                     Field field = buildField(useCase, fieldId,true);
@@ -245,7 +248,8 @@ public class TaskService implements ITaskService {
         values.fields().forEachRemaining(entry -> {
             useCase.getDataSet().get(entry.getKey()).setValue(parseFieldsValues(entry.getValue()));
             //changedFields.put(entry.getKey(), new ChangedField(entry.getKey()));
-            //runActions(useCase.getPetriNet().getTransition(task.getTransitionId()).getDataSet().get(entry.getKey()).getActions(), useCase, changedFields);
+            changedFields.putAll(resolveActions(useCase.getPetriNet().getDataSet().get(entry.getKey()),
+                    Action.ActionTrigger.SET, useCase, useCase.getPetriNet().getTransition(task.getTransitionId())));
             //changedFields.remove(entry.getKey());
         });
 
@@ -256,21 +260,43 @@ public class TaskService implements ITaskService {
         return node;
     }
 
-    private void runActions(Set<String> actions, Case useCase, Map<String, ChangedField> changedFields) {
+    private Map<String, ChangedField> resolveActions(Field field, Action.ActionTrigger actionTrigger, Case useCase, Transition transition){
+        Map<String, ChangedField> changedFields = new HashMap<>();
+        processActions(field, actionTrigger, useCase, transition, changedFields);
+        return changedFields;
+    }
+
+    private void processActions(Field field, Action.ActionTrigger actionTrigger, Case useCase, Transition transition, Map<String, ChangedField> changedFields){
+        LinkedHashSet<Action> fieldActions = new LinkedHashSet<>();
+        if(field.getActions() != null)
+            fieldActions.addAll(DataFieldLogic.getActionByTrigger(field.getActions(), actionTrigger));
+        if(transition.getDataSet().containsKey(field.getObjectId()) && !transition.getDataSet().get(field.getObjectId()).getActions().isEmpty())
+            fieldActions.addAll(DataFieldLogic.getActionByTrigger(transition.getDataSet().get(field.getObjectId()).getActions(),actionTrigger));
+
+        if(fieldActions.isEmpty()) return;
+
+        runActions(fieldActions.stream().map(Action::getDefinition).collect(Collectors.toList()),
+                actionTrigger, useCase, transition, changedFields, actionTrigger == Action.ActionTrigger.SET);
+    }
+
+    private void runActions(List<String> actions, Action.ActionTrigger trigger, Case useCase, Transition transition, Map<String, ChangedField> changedFields, boolean recursive) {
         actions.forEach(action -> {
-            ChangedField field = FieldActionsRunner.run(action, useCase);
+            ChangedField changedField = FieldActionsRunner.run(action, useCase);
 
-            if(field == null) return;
+            if(changedField.getId() == null) return;
 
-            if (changedFields.containsKey(field.getId()))
-                changedFields.get(field.getId()).merge(field);
+            if (changedFields.containsKey(changedField.getId()))
+                changedFields.get(changedField.getId()).merge(changedField);
             else
-                changedFields.put(field.getId(), field);
+                changedFields.put(changedField.getId(), changedField);
 
-            if (field.getValue() != null)
-                getTransitionsByField(field.getId(), useCase.getPetriNet()).forEach(transition -> System.out.print(transition)
-                        //runActions(transition.getDataSet().get(field.getId()).getActions(), useCase, changedFields)
-                );
+            if (changedField.getValue() != null && recursive)
+                processActions(useCase.getPetriNet().getDataSet().get(changedField.getId()), trigger,
+                        useCase, transition, changedFields);
+
+                //getTransitionsByField(field.getId(), useCase.getPetriNet()).forEach(transition ->
+                //        runActions(transition.getDataSet().get(field.getId()).getActions(), useCase, changedFields, recursive)
+                //);
         });
     }
 
