@@ -41,7 +41,7 @@ public class CaseMonitorTest {
     @Test
     public void afterFindOne() throws Exception {
         importer.importPetriNet(new File("src/test/resources/prikladFM.xml"), "net", "NET");
-        workflowService.createCase(netRepository.findAll().get(0).getStringId(), "Storage Unit", "color-fg-fm-500");
+        workflowService.createCase(netRepository.findAll().get(0).getStringId(), "Storage Unit", "color-fg-fm-500", 1L);
 
         List<Case> cases = repository.findAll();
         Case useCase = repository.findOne(cases.get(0).getStringId());

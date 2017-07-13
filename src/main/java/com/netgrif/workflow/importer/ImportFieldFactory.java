@@ -6,6 +6,7 @@ import com.netgrif.workflow.petrinet.domain.dataset.*;
 import java.util.Arrays;
 
 public final class ImportFieldFactory {
+
     private Importer importer;
 
     public ImportFieldFactory(Importer importer) {
@@ -27,6 +28,8 @@ public final class ImportFieldFactory {
                 break;
             case FILE:
                 field = new FileField();
+                if(data.getLogic() != null && data.getLogic().length != 0)
+                    Arrays.stream(data.getLogic()).forEach(((FileField) field)::addLogic);
                 break;
             case ENUMERATION:
                 field = new EnumerationField(data.getValues());
@@ -47,8 +50,17 @@ public final class ImportFieldFactory {
                 throw new IllegalArgumentException(data.getType() + " is not a valid Field type");
         }
         field.setName(data.getTitle());
+        field.setImportId(data.getId());
         field.setType(type);
-
+        field.setImmediate(data.isImmediate());
+        if(data.getDesc() != null)
+            field.setDescription(data.getDesc());
+        if(data.getPlaceholder() != null)
+            field.setPlaceholder(data.getPlaceholder());
+        if(data.getValid() != null && field instanceof ValidableField)
+            ((ValidableField)field).setValidationRules(data.getValid());
+        if(data.getInit() != null && field instanceof FieldWithDefault)
+            ((FieldWithDefault)field).setDefaultValue(data.getInit());
         return field;
     }
 
