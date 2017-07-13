@@ -26,6 +26,7 @@
         <title>City</title>
         <valid>length 20</valid>
         <init>Bratislava</init>
+        <placeholder>Mesto</placeholder>
     </data>
     <data type="enumeration">
         <id>5</id>
@@ -57,6 +58,7 @@
     <data type="number">
         <id>20</id>
         <title>How much would it cost to replace the entire contents of your home as new?</title>
+        <placeholder>Age</placeholder>
     </data>
     <data type="multichoice">
         <id>22</id>
@@ -89,6 +91,7 @@
         <valid>positive</valid>
         <valid>decimal</valid>
         <valid>inrange 1,50</valid>
+        <placeholder>Age</placeholder>
     </data>
     <data type="number">
         <id>30</id>
