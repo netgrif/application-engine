@@ -34,15 +34,15 @@
     <!-- ===== Základné informácie  ===== -->
     <data type="text">
         <title>Obec</title>
-        <id></id>
+        <id>301001</id>
     </data>
     <data type="text">
         <title>PSČ</title>
-        <id></id>
+        <id>101001</id>
     </data>
     <data type="enumeration">
         <title>Lokalita</title>
-        <id></id>
+        <id>301002</id>
         <values>BA</values>
         <values>Dedina</values>
         <values>Mesto</values>
@@ -50,19 +50,19 @@
     </data>
     <data type="boolean">
         <title>Nachádza sa mimo obce (extravilán)?</title>
-        <id></id>
+        <id>101002</id>
     </data>
     <data type="boolean">
         <title>Bolo miesto poistenia postihnuté povodňou za posledných 10 rokov?</title>
-        <id></id>
+        <id>101003</id>
     </data>
     <data type="boolean">
         <title>Nachádza nehnuteľnosť sa vo vzdialenosti kratšej ako 300 m od vodného toku?</title>
-        <id></id>
+        <id>101004</id>
     </data>
     <data type="enumeration">
         <title>Koľko rokov žijete v poisťovanej nehnuteľnosti?</title>
-        <id></id>
+        <id>101005</id>
         <values>menej ako 1</values>
         <values>1 až 5</values>
         <values>6 až 10</values>
@@ -70,7 +70,7 @@
     </data>
     <data type="enumeration">
         <title>Aký je vzťah poisteného k poisťovanej nehnuteľnosti?</title>
-        <id></id>
+        <id>101006</id>
         <values>vlastník nehnuteľnosti</values>
         <values>vlastník ma hypotéku na nehnuteľnosť</values>
         <values>poistený je v prenájme</values>
@@ -78,7 +78,7 @@
     </data>
     <data type="enumeration">
         <title>Koľko dospelých žije v domácnosti?</title>
-        <id></id>
+        <id>101007</id>
         <values>1</values>
         <values>2</values>
         <values>3</values>
@@ -86,7 +86,7 @@
     </data>
     <data type="enumeration">
         <title>Koľko detí žije v domácnosti?</title>
-        <id></id>
+        <id>101008</id>
         <values>0</values>
         <values>1</values>
         <values>2</values>
@@ -94,41 +94,41 @@
     </data>
     <data type="boolean">
         <title>Bolo poistenému alebo spolupoistenej osobe niekedy v minulosti zamiestnuté poistné plnenie alebo vypovedaná poistná zmluva?</title>
-        <id></id>
+        <id>101009</id>
     </data>
     <data type="boolean">
         <title>Bol poistený alebo spolupoistená osoba niekedy trestné stihaný / vyhlásil osobný bankrot / stíhaný za dlhy alebo odsúdený za podvodné alebo obdobné konanie.</title>
-        <id></id>
+        <id>101010</id>
     </data>
     <data type="boolean">
         <title>Je plánovaná rekonštrukcia alebo prestavba poisťovanej nehnuteľnosti v priebehu najbližších 3 mesiacov?</title>
-        <id></id>
+        <id>101011</id>
     </data>
     <data type="boolean">
         <title>Žije v poisťovanej domácnosti pes alebo mačka?</title>
-        <id></id>
+        <id>101012</id>
     </data>
     <data type="enumeration">
         <title>Kedy je nehnuteľnosť najviac obývaná?</title>
-        <id></id>
+        <id>101013</id>
         <values>cez deň</values>
         <values>večer a v noci</values>
         <values>počas celého dňa</values>
     </data>
     <data type="boolean">
         <title>Je nehnuteľnosť využívaná aj na podnikanie?</title>
-        <id></id>
+        <id>101014</id>
     </data>
     <data type="enumeration">
         <title>Právna subjektivita poisteného?</title>
-        <id></id>
+        <id>101015</id>
         <values>fyzická osoba</values>
         <values>právnická osoba</values>
         <values>fyzická osoba - podnikateľ</values>
     </data>
     <data type="enumeration">
         <title>Počet poistných udalostí za posledné 3 roky?</title>
-        <id></id>
+        <id>101016</id>
         <values>0</values>
         <values>1</values>
         <values>2 a viac</values>
@@ -136,7 +136,7 @@
     <!-- ===== Nehnuteľnosť ===== -->
     <data type="enumeration">
         <title>Predmet poistenia</title>
-        <id></id>
+        <id>102001</id>
         <values>byt</values>
         <values>rodinný dom</values>
         <values>chata</values>
@@ -146,7 +146,7 @@
     </data>
     <data type="enumeration">
         <title>Konštrukcia múrov</title>
-        <id></id>
+        <id>102002</id>
         <values>tehla a/alebo betón</values>
         <values>porobetón (ytong)</values>
         <values>škvarobatón</values>
@@ -155,7 +155,7 @@
     </data>
     <data type="enumeration">
         <title>Konštrukcia strechy</title>
-        <id></id>
+        <id>102003</id>
         <values>škridla</values>
         <values>plech</values>
         <values>asfalt</values>
@@ -166,7 +166,7 @@
     </data>
     <data type="enumeration">
         <title>Koľko rokov má nehnuteľnosť?</title>
-        <id></id>
+        <id>102004</id>
         <values>menej ako 5</values>
         <values>6 až 10</values>
         <values>11 až 20</values>
@@ -174,11 +174,11 @@
     </data>
     <data type="boolean">
         <title>Má nehnuteľnosť praskliny na vonkajšej fasáde?</title>
-        <id></id>
+        <id>102005</id>
     </data>
     <data type="enumeration">
         <title>Koľko izieb má nehnuteľnosť?</title>
-        <id></id>
+        <id>102006</id>
         <values>1</values>
         <values>2</values>
         <values>3</values>
@@ -187,7 +187,7 @@
     </data>
     <data type="enumeration">
         <title>Koľko kúpeľní má nehnuteľnosť?</title>
-        <id></id>
+        <id>102007</id>
         <values>1</values>
         <values>2</values>
         <values>3</values>
@@ -196,7 +196,7 @@
     </data>
     <data type="enumeration">
         <title>Uveďte celkovú hodnotu rekonštrukcií, ak boli vykonané</title>
-        <id></id>
+        <id>102008</id>
         <values>bez rekonštrukcií</values>
         <values>do 20 000 EUR</values>
         <values>do 50 000 EUR</values>
@@ -205,7 +205,7 @@
     <!-- ===== Domácnosť ===== -->
     <data type="enumeration">
         <title>Umiestnenie domácnosti</title>
-        <id></id>
+        <id>103001</id>
         <values>byt</values>
         <values>rodinný dom</values>
         <values>chata</values>
@@ -213,376 +213,376 @@
     </data>
     <data type="enumeration">
         <title>Obývanosť domácnosti</title>
-        <id></id>
+        <id>103002</id>
         <values>trvalá</values>
         <values>dočasná</values>
     </data>
     <data type="boolean">
         <title>Je nehnuteľnosť, v ktorej sa nachádza poisťovaná domácnosť v blízkom susedstve s inou obývanou nehnuteľnosťou?</title>
-        <id></id>
+        <id>103003</id>
     </data>
     <data type="boolean">
         <title>Je domácnosť zabezpečená funkčným alarmom?</title>
-        <id></id>
+        <id>103004</id>
     </data>
     <data type="boolean">
         <title>Má domácnosť na oknách vo výške do 3 metrov od okolitého terénu mreže / vonkajšie žalúzie alebo rolety?</title>
-        <id></id>
+        <id>103005</id>
     </data>
     <!-- ===== Zodpovednosť ===== -->
     <data type="boolean">
         <title>Poistenie zodpovednosti z vlastníctva nehnuteľnosti</title>
-        <id></id>
+        <id>104001</id>
     </data>
     <data type="boolean">
         <title>Zodpovednosť za škodu členov domácnosti</title>
-        <id></id>
+        <id>104002</id>
     </data>
     <data type="enumeration">
         <title>Územná platnosť poistenia</title>
-        <id></id>
+        <id>104003</id>
         <values>Slovenská republika</values>
         <values>Európa</values>
     </data>
     <!-- ===== Poistenie nehnuteľnosti ===== -->
     <data type="number">
         <title>Podlahová plocha pivnice</title>
-        <id></id>
+        <id>105001</id>
     </data>
     <data type="number">
         <title>Podlahová plocha prízemia</title>
-        <id></id>
+        <id>105002</id>
     </data>
     <data type="number">
         <title>Podlahová plocha vštkých obytných poschodí</title>
-        <id></id>
+        <id>105003</id>
         <desc>Okrem prízemia</desc>
     </data>
     <data type="number">
         <title>Podlahová plocha garáže</title>
-        <id></id>
+        <id>105004</id>
     </data>
     <data type="number">
         <title>Celková podlahová plocha</title>
-        <id></id>
+        <id>305001</id>
     </data>
     <data type="enumeration">
         <title>Poistenie nehnuteľnosti - spoluúčasť</title>
-        <id></id>
+        <id>105005</id>
         <values>0.00 €</values>
         <values>50.00 €</values>
         <values>150.00 €</values>
     </data>
     <data type="number">
         <title>Poistenie nehnuteľnosti - poistná suma</title>
-        <id></id>
+        <id>105006</id>
     </data>
     <data type="number">
         <title>Poistenie nehnuteľnosti - poistné</title>
-        <id></id>
+        <id>305002</id>
     </data>
     <data type="number">
         <title>Garáž - poistná suma</title>
-        <id></id>
+        <id>105007</id>
     </data>
     <data type="number">
         <title>Garáž - poistné</title>
-        <id></id>
+        <id>305003</id>
     </data>
     <data type="boolean">
         <title>Rovnaké miesto poistenia garáže?</title>
-        <id></id>
+        <id>105008</id>
     </data>
     <data type="boolean">
         <title>Hospodárska budova</title>
-        <id></id>
+        <id>105009</id>
     </data>
     <data type="number">
         <title>Hospodárska budova - poistná suma</title>
-        <id></id>
+        <id>105010</id>
     </data>
     <data type="number">
         <title>Hospodárska budova - poistné</title>
-        <id></id>
+        <id>305004</id>
     </data>
     <data type="boolean">
         <title>Altánok</title>
-        <id></id>
+        <id>105011</id>
     </data>
     <data type="number">
         <title>Altánok - poistná suma</title>
-        <id></id>
+        <id>105012</id>
     </data>
     <data type="number">
         <title>Altánok - poistné</title>
-        <id></id>
+        <id>305005</id>
     </data>
     <data type="boolean">
         <title>Prístrešok</title>
-        <id></id>
+        <id>105013</id>
     </data>
     <data type="number">
         <title>Prístrešok - poistná suma</title>
-        <id></id>
+        <id>105014</id>
     </data>
     <data type="number">
         <title>Prístrešok - poistné</title>
-        <id></id>
+        <id>305006</id>
     </data>
     <data type="boolean">
         <title>Chodník</title>
-        <id></id>
+        <id>105015</id>
     </data>
     <data type="number">
         <title>Chodník, parkovacia plocha - poistná suma</title>
-        <id></id>
+        <id>105016</id>
     </data>
     <data type="number">
         <title>Chodník, parkovacia plocha - poistné</title>
-        <id></id>
+        <id>305007</id>
     </data>
     <data type="boolean">
         <title>Sauna</title>
-        <id></id>
+        <id>105017</id>
     </data>
     <data type="number">
         <title>Sauna - poistná suma</title>
-        <id></id>
+        <id>105018</id>
     </data>
     <data type="number">
         <title>Sauna - poistné</title>
-        <id></id>
+        <id>305008</id>
     </data>
     <data type="boolean">
         <title>Elektrická brána</title>
-        <id></id>
+        <id>105019</id>
     </data>
     <data type="number">
         <title>Elektrická brána, oplotenie - poistná suma</title>
-        <id></id>
+        <id>105020</id>
     </data>
     <data type="number">
         <title>Elektrická brána, oplotenie - poistné</title>
-        <id></id>
+        <id>305009</id>
     </data>
     <data type="boolean">
         <title>Tenisový kurt</title>
-        <id></id>
+        <id>105021</id>
     </data>
     <data type="number">
         <title>Tenisový kurt - poistná suma</title>
-        <id></id>
+        <id>105022</id>
     </data>
     <data type="number">
         <title>Tenisový kurt - poistné</title>
-        <id></id>
+        <id>305010</id>
     </data>
     <data type="boolean">
         <title>Vonkajší bazén</title>
-        <id></id>
+        <id>105023</id>
     </data>
     <data type="number">
         <title>Vonkajší bazén - poistná suma</title>
-        <id></id>
+        <id>105024</id>
     </data>
     <data type="number">
         <title>Vonkajší bazén - poistné</title>
-        <id></id>
+        <id>305011</id>
     </data>
     <data type="boolean">
         <title>Studňa</title>
-        <id></id>
+        <id>105025</id>
     </data>
     <data type="number">
         <title>Studňa - poistná suma</title>
-        <id></id>
+        <id>105026</id>
     </data>
     <data type="number">
         <title>Studňa - poistné</title>
-        <id></id>
+        <id>305012</id>
     </data>
     <data type="boolean">
         <title>Žumpa, septik</title>
-        <id></id>
+        <id>105027</id>
     </data>
     <data type="number">
         <title>Žumpa, septik - poistná suma</title>
-        <id></id>
+        <id>105028</id>
     </data>
     <data type="number">
         <title>Žumpa, septik - poistné</title>
-        <id></id>
+        <id>305013</id>
     </data>
     <data type="boolean">
         <title>Iné</title>
-        <id></id>
+        <id>105029</id>
     </data>
     <data type="number">
         <title>Iné - poistná suma</title>
-        <id></id>
+        <id>105030</id>
     </data>
     <data type="number">
         <title>Iné - poistné</title>
-        <id></id>
+        <id>305014</id>
     </data>
     <!-- ===== Doplnkové poistenie nehnuteľnosti ===== -->
     <data type="boolean">
         <title>Stavebné materialy</title>
-        <id></id>
+        <id>105031</id>
     </data>
     <data type="number">
         <title>Stavebné materiály - poistná suma</title>
-        <id></id>
+        <id>105032</id>
     </data>
     <data type="number">
         <title>Stavebné materiály - poistné</title>
-        <id></id>
+        <id>305015</id>
     </data>
     <data type="boolean">
         <title>Stavebné a záhradné mechanizmy</title>
-        <id></id>
+        <id>105033</id>
     </data>
     <data type="number">
         <title>Stavebné a záhradné mechanizmy</title>
-        <id></id>
+        <id>105034</id>
     </data>
     <data type="number">
         <title>Stavebné a záhradné mechanizmy - poistná suma</title>
-        <id></id>
+        <id>305016</id>
     </data>
     <!-- ===== Poistenie domácnosti ===== -->
     <data type="enumeration">
         <title>Poistenie domácnosti - spoluúčasť</title>
-        <id></id>
+        <id>106001</id>
         <values>0.00 €</values>
         <values>50.00 €</values>
         <values>150.00 €</values>
     </data>
     <data type="number">
         <title>Poistenie domácnosti - poistná suma</title>
-        <id></id>
+        <id>106002</id>
     </data>
     <data type="number">
         <title>Poistenie domácnosti - poistné</title>
-        <id></id>
+        <id>306001</id>
     </data>
     <!-- ===== Doplnkové poistenie domácnosti ===== -->
     <data type="number">
         <title>Celková podlahová plocha</title>
-        <id></id>
+        <id>106003</id>
     </data>
     <data type="boolean">
         <title>Cennosti</title>
-        <id></id>
+        <id>106004</id>
     </data>
     <data type="number">
         <title>Cennosti - poistná suma</title>
-        <id></id>
+        <id>106005</id>
     </data>
     <data type="number">
         <title>Cennosti - poistné</title>
-        <id></id>
+        <id>306002</id>
     </data>
     <data type="boolean">
         <title>Umelecké diela</title>
-        <id></id>
+        <id>106006</id>
     </data>
     <data type="number">
         <title>Umelecké diela - poistná suma</title>
-        <id></id>
+        <id>106007</id>
     </data>
     <data type="number">
         <title>Umelecké diela - poistné</title>
-        <id></id>
+        <id>306003</id>
     </data>
     <data type="boolean">
         <title>Elektronické a optické zariadenia</title>
-        <id></id>
+        <id>106008</id>
     </data>
     <data type="number">
         <title>Elektronické a optické zariadenia - poistná suma</title>
-        <id></id>
+        <id>106009</id>
     </data>
     <data type="number">
         <title>Elektronické a optické zariadenia - poistné</title>
-        <id></id>
+        <id>306004</id>
     </data>
     <data type="boolean">
         <title>Špecialne sklá a presklenie</title>
-        <id></id>
+        <id>106010</id>
     </data>
     <data type="number">
         <title>Špeciálne sklá a presklenie - poistná suma</title>
-        <id></id>
+        <id>106011</id>
     </data>
     <data type="number">
         <title>Špeciálne sklá a presklenie - poistné</title>
-        <id></id>
+        <id>306005</id>
     </data>
     <data type="boolean">
         <title>Záhradné vybavenie a nábytok</title>
-        <id></id>
+        <id>106012</id>
     </data>
     <data type="number">
         <title>Záhradé vybavenie a nábytok - poistná suma</title>
-        <id></id>
+        <id>106013</id>
     </data>
     <data type="number">
         <title>Záhradé vybavenie a nábytok - poistné</title>
-        <id></id>
+        <id>306006</id>
     </data>
     <data type="boolean">
         <title>Elektromotory v domácich spotrebičoch</title>
-        <id></id>
+        <id>106014</id>
     </data>
     <data type="number">
         <title>Elektromotory v domácich spotrebičoch - poistná suma</title>
-        <id></id>
+        <id>106015</id>
     </data>
     <data type="number">
         <title>Elektromotory v domácich spotrebičoch - poistné</title>
-        <id></id>
+        <id>306007</id>
     </data>
     <data type="boolean">
         <title>Stavebné súčasti domácnosti</title>
-        <id></id>
+        <id>106016</id>
     </data>
     <data type="number">
         <title>Stavebné súčasti domácností - poistná suma</title>
-        <id></id>
+        <id>106017</id>
     </data>
     <data type="number">
         <title>Stavebné súčasti domácností - poistné</title>
-        <id></id>
+        <id>306008</id>
     </data>
     <data type="boolean">
         <title>Športové náradie</title>
-        <id></id>
+        <id>106018</id>
     </data>
     <data type="number">
         <title>Športové náradie - poistná suma</title>
-        <id></id>
+        <id>106019</id>
     </data>
     <data type="number">
         <title>športové náradie - poistné</title>
-        <id></id>
+        <id>306009</id>
     </data>
     <data type="boolean">
         <title>Iné</title>
-        <id></id>
+        <id>106020</id>
     </data>
     <data type="number">
         <title>Iné - poistná suma</title>
-        <id></id>
+        <id>106021</id>
     </data>
     <data type="number">
         <title>iné - poistné</title>
-        <id></id>
+        <id>306010</id>
     </data>
     <!-- ===== Poistenie zodpovednosti za škodu ===== -->
     <data type="enumeration">
         <title>Poistenie zodpovednosti z vlastníctva nehnuteľnosti - poistná suma</title>
-        <id></id>
+        <id>107001</id>
         <values>15,000.00 €</values>
         <values>30,000.00 €</values>
         <values>60,000.00 €</values>
@@ -590,14 +590,14 @@
     </data>
     <data type="enumeration">
         <title>Poistenie zodpovednosti z vlastníctva nehnuteľnosti - spoluúčasť</title>
-        <id></id>
+        <id>107002</id>
         <values>0.00 €</values>
         <values>50.00 €</values>
         <values>150.00 €</values>
     </data>
     <data type="enumeration">
         <title>Zodpovednosť za škodu členov domácnosti</title>
-        <id></id>
+        <id>107003</id>
         <values>15,000.00 €</values>
         <values>30,000.00 €</values>
         <values>60,000.00 €</values>
@@ -606,38 +606,38 @@
     <!-- ===== Sumár ===== -->
     <data type="number">
         <title>Poistenie nehnuteľnosti - poistné</title>
-        <id></id>
+        <id>308001</id>
     </data>
     <data type="number">
         <title>Poistenie domácnosti - poistné</title>
-        <id></id>
+        <id>308002</id>
     </data>
     <data type="number">
         <title>Poistenie zodpovednosti za škodu - poistné</title>
-        <id></id>
+        <id>308003</id>
     </data>
     <data type="number">
         <title>ROČNÉ POISTNÉ CELKOM</title>
-        <id></id>
+        <id>308004</id>
     </data>
     <data type="enumeration">
         <title>PERIODICITA PLATBY POISTNÉHO</title>
-        <id></id>
+        <id>108001</id>
         <values>ročná</values>
         <values>polročná</values>
         <values>štvrťročná</values>
     </data>
     <data type="boolean">
         <title>KOMPLETNÉ POISTENIE</title>
-        <id></id>
+        <id>308005</id>
     </data>
     <data type="boolean">
         <title>ZĽAVA ZA INÉ POISTENIE V PREMIUM</title>
-        <id></id>
+        <id>108002</id>
     </data>
     <data type="enumeration">
         <title>OBCHODNÁ ZĽAVA</title>
-        <id></id>
+        <id>108003</id>
         <values>0%</values>
         <values>5%</values>
         <values>10%</values>
@@ -647,342 +647,342 @@
     </data>
     <data type="boolean">
         <title>AKCIOVÁ ZĽAVA</title>
-        <id></id>
+        <id>108004</id>
     </data>
     <data type="number">
         <title>BEŽNÉ POISTNÉ</title>
-        <id></id>
+        <id>308006</id>
     </data>
     <!-- ===== Základné informácie koeficienty ===== -->
     <data type="number">
         <title>Koeficient - Lokalita</title>
-        <id></id>
+        <id>201001</id>
     </data>
     <data type="number">
         <title>Koeficient - Nachádza sa mimo obce (extravilán)?</title>
-        <id></id>
+        <id>201002</id>
     </data>
     <data type="number">
         <title>Koeficient - Bolo miesto poistenia postihnuté povodňou za posledných 10 rokov?</title>
-        <id></id>
+        <id>201003</id>
     </data>
     <data type="number">
         <title>Koeficient - Nachádza nehnuteľnosť sa vo vzdialenosti kratšej ako 300 m od vodného toku?</title>
-        <id></id>
+        <id>201004</id>
     </data>
     <data type="number">
         <title>Koeficient - Koľko rokov žijete v poisťovanej nehnuteľnosti?</title>
-        <id></id>
+        <id>201005</id>
     </data>
     <data type="number">
         <title>Koeficient - Aký je vzťah poisteného k poisťovanej nehnuteľnosti?</title>
-        <id></id>
+        <id>201006</id>
     </data>
     <data type="number">
         <title>Koeficient - Koľko dospelých žije v domácnosti?</title>
-        <id></id>
+        <id>201007</id>
     </data>
     <data type="number">
         <title>Koeficient - Koľko detí žije v domácnosti?</title>
-        <id></id>
+        <id>201008</id>
     </data>
     <data type="number">
         <title>Koeficient - Bolo poistenému alebo spolupoistenej osobe niekedy v minulosti zamiestnuté poistné plnenie alebo vypovedaná poistná zmluva?</title>
-        <id></id>
+        <id>201009</id>
     </data>
     <data type="number">
         <title>Koeficient - Bol poistený alebo spolupoistená osoba niekedy trestné stihaný / vyhlásil osobný bankrot / stíhaný za dlhy alebo odsúdený za podvodné alebo obdobné konanie.</title>
-        <id></id>
+        <id>201010</id>
     </data>
     <data type="number">
         <title>Koeficient - Je plánovaná rekonštrukcia alebo prestavba poisťovanej nehnuteľnosti v priebehu najbližších 3 mesiacov?</title>
-        <id></id>
+        <id>201011</id>
     </data>
     <data type="number">
         <title>Koeficient - Žije v poisťovanej domácnosti pes alebo mačka?</title>
-        <id></id>
+        <id>201012</id>
     </data>
     <data type="number">
         <title>Koeficient - Kedy je nehnuteľnosť najviac obývaná?</title>
-        <id></id>
+        <id>201013</id>
     </data>
     <data type="number">
         <title>Koeficient - Je nehnuteľnosť využívaná aj na podnikanie?</title>
-        <id></id>
+        <id>201014</id>
     </data>
     <data type="number">
         <title>Koeficient - Právna subjektivita poisteného?</title>
-        <id></id>
+        <id>201015</id>
     </data>
     <data type="number">
         <title>Koeficient - Počet poistných udalostí za posledné 3 roky?</title>
-        <id></id>
+        <id>201016</id>
     </data>
     <data type="number">
         <title>ZÁKLADNÉ INFORMÁCIE koeficient</title>
-        <id></id>
+        <id>201017</id>
     </data>
     <!-- ===== Nehnuteľnosť koeficienty ===== -->
     <data type="number">
         <title>Koeficient - Predmet poistenia</title>
-        <id></id>
+        <id>202001</id>
     </data>
     <data type="number">
         <title>Koeficient - Konštrukcia múrov</title>
-        <id></id>
+        <id>202002</id>
     </data>
     <data type="number">
         <title>Koeficient - Konštrukcia strechy</title>
-        <id></id>
+        <id>202003</id>
     </data>
     <data type="number">
         <title>Koeficient - Koľko rokov má nehnuteľnosť?</title>
-        <id></id>
+        <id>202004</id>
     </data>
     <data type="number">
         <title>Koeficient - Má nehnuteľnosť praskliny na vonkajšej fasáde?</title>
-        <id></id>
+        <id>202005</id>
     </data>
     <data type="number">
         <title>Koeficient - Koľko izieb má nehnuteľnosť?</title>
-        <id></id>
+        <id>202006</id>
     </data>
     <data type="number">
         <title>Koeficient - Koľko kúpeľní má nehnuteľnosť?</title>
-        <id></id>
+        <id>202007</id>
     </data>
     <data type="number">
         <title>Koeficient - Uveďte celkovú hodnotu rekonštrukcií, ak boli vykonané</title>
-        <id></id>
+        <id>202008</id>
     </data>
     <data type="number">
         <title>NEHNUTEĽNOSŤ koeficient</title>
-        <id></id>
+        <id>202009</id>
     </data>
     <!-- ===== Domácnosť koeficienty ===== -->
     <data type="number">
         <title>Koeficient - Umiestnenie domácnosti</title>
-        <id></id>
+        <id>203001</id>
     </data>
     <data type="number">
         <title>Koeficient - Obývanosť domácnosti</title>
-        <id></id>
+        <id>203002</id>
     </data>
     <data type="number">
         <title>Koeficient - Je nehnuteľnosť, v ktorej sa nachádza poisťovaná domácnosť v blízkom susedstve s inou obývanou nehnuteľnosťou?</title>
-        <id></id>
+        <id>203003</id>
     </data>
     <data type="number">
         <title>Koeficient - Je domácnosť zabezpečená funkčným alarmom?</title>
-        <id></id>
+        <id>203004</id>
     </data>
     <data type="number">
         <title>Koeficient - Má domácnosť na oknách vo výške do 3 metrov od okolitého terénu mreže / vonkajšie žalúzie alebo rolety?</title>
-        <id></id>
+        <id>203005</id>
     </data>
     <data type="number">
         <title>DOMÁCNOSŤ koeficient</title>
-        <id></id>
+        <id>203006</id>
     </data>
     <!-- ===== Zodpovednosť koeficienty ===== -->
     <data type="number">
         <title>Koeficient - Poistenie zodpovednosti z vlastníctva nehnuteľnosti</title>
-        <id></id>
+        <id>204001</id>
     </data>
     <data type="number">
         <title>Koeficient - Zodpovednosť za škodu členov domácnosti</title>
-        <id></id>
+        <id>204002</id>
     </data>
     <data type="number">
         <title>Koeficient - Územná platnosť poistenia</title>
-        <id></id>
+        <id>204003</id>
     </data>
     <data type="number">
         <title>Koeficient - Zodpovednosť celkovo</title>
-        <id></id>
+        <id>204004</id>
     </data>
     <!-- ===== Sumár koeficienty ===== -->
     <data type="number">
         <title>Koeficient - Poistenie nehnuteľnosti - spoluúčasť</title>
-        <id></id>
+        <id>208001</id>
     </data>
     <data type="number">
         <title>Koeficient - Poistenie domácnosti - spoluúčasť</title>
-        <id></id>
+        <id>208002</id>
     </data>
     <data type="number">
         <title>Koeficient - Garáž umiestnenie</title>
-        <id></id>
+        <id>208003</id>
     </data>
     <data type="number">
         <title>Koeficient - PERIODICITA PLATBY POISTNÉHO</title>
-        <id></id>
+        <id>208004</id>
     </data>
     <data type="number">
         <title>Koeficient - ZĽAVA ZA INÉ POISTENIE V PREMIUM</title>
-        <id></id>
+        <id>208005</id>
     </data>
     <data type="number">
         <title>Koeficient - OBCHODNÁ ZĽAVA</title>
-        <id></id>
+        <id>208006</id>
     </data>
     <data type="number">
         <title>Koeficient - AKCIOVÁ ZĽAVA</title>
-        <id></id>
+        <id>208007</id>
     </data>
     <data type="number">
         <title>Koeficient - KOMPLETNÉ POISTENIE</title>
-        <id></id>
+        <id>208008</id>
     </data>
     <!-- ===== Poistenie nehnuteľností koeficienty ===== -->
     <data type="number">
         <title>Koeficient - Lokalita - byt</title>
-        <id></id>
+        <id>205001</id>
     </data>
     <data type="number">
         <title>Koeficient - Lokalita - pivnica</title>
-        <id></id>
+        <id>205002</id>
     </data>
     <data type="number">
         <title>Koeficient - Lokalita - prízemie</title>
-        <id></id>
+        <id>205003</id>
     </data>
     <data type="number">
         <title>Koeficient - Lokalita - obytné poschodie</title>
-        <id></id>
+        <id>205004</id>
     </data>
     <data type="number">
         <title>Koeficient - Lokalita - garáž</title>
-        <id></id>
+        <id>205005</id>
     </data>
     <data type="number">
         <title>Koeficient - Garáž</title>
-        <id></id>
+        <id>205006</id>
     </data>
     <data type="number">
         <title>Koeficient - Hospodárska budova</title>
-        <id></id>
+        <id>205007</id>
     </data>
     <data type="number">
         <title>Koeficient - Altánok</title>
-        <id></id>
+        <id>205008</id>
     </data>
     <data type="number">
         <title>Koeficient - Prístrešok</title>
-        <id></id>
+        <id>205009</id>
     </data>
     <data type="number">
         <title>Koeficient - Chodník, parkovacia plocha</title>
-        <id></id>
+        <id>205010</id>
     </data>
     <data type="number">
         <title>Koeficient - Sauna</title>
-        <id></id>
+        <id>205011</id>
     </data>
     <data type="number">
         <title>Koeficient - Elektrická brána, oplotenie</title>
-        <id></id>
+        <id>205012</id>
     </data>
     <data type="number">
         <title>Koeficient - Tenisový kurt</title>
-        <id></id>
+        <id>205013</id>
     </data>
     <data type="number">
         <title>Koeficient - Vonkajší bazén</title>
-        <id></id>
+        <id>205014</id>
     </data>
     <data type="number">
         <title>Koeficient - Studňa</title>
-        <id></id>
+        <id>205015</id>
     </data>
     <data type="number">
         <title>Koeficient - Žumpa, septik</title>
-        <id></id>
+        <id>205016</id>
     </data>
     <data type="number">
         <title>Koeficient - Iné</title>
-        <id></id>
+        <id>205017</id>
     </data>
     <data type="number">
         <title>Koeficient - Stavebné materiály</title>
-        <id></id>
+        <id>205018</id>
     </data>
     <data type="number">
         <title>Koeficient - Stavebné a záhradné mechanizmy</title>
-        <id></id>
+        <id>205019</id>
     </data>
     <!-- ===== Poistenie domácností koeficienty ===== -->
     <data type="number">
         <title>Koeficient - Cennosti</title>
-        <id></id>
+        <id>206001</id>
     </data>
     <data type="number">
         <title>Koeficient - Umelecké diela</title>
-        <id></id>
+        <id>206002</id>
     </data>
     <data type="number">
         <title>Koeficient - Elektronické a optické zariadneia</title>
-        <id></id>
+        <id>206003</id>
     </data>
     <data type="number">
         <title>Koeficient - Špecialne sklá a presklenie</title>
-        <id></id>
+        <id>206004</id>
     </data>
     <data type="number">
         <title>Koeficient - Záhradné vybavenie a nábytok</title>
-        <id></id>
+        <id>206005</id>
     </data>
     <data type="number">
         <title>Koeficient - Elektromotory v domácich spotrebičoch</title>
-        <id></id>
+        <id>206006</id>
     </data>
     <data type="number">
         <title>Koeficient - Stavebné súčasti domácností</title>
-        <id></id>
+        <id>206007</id>
     </data>
     <data type="number">
         <title>Koeficient - Športové náradie</title>
-        <id></id>
+        <id>206008</id>
     </data>
     <data type="number">
         <title>Koeficient - Iné</title>
-        <id></id>
+        <id>206009</id>
     </data>
     <!-- ===== Poistenie zodpovednosti za škodu koeficienty ===== -->
     <data type="number">
         <title>Koeficient - Poistenie zodpovednosti z vlastníctva nehnuteľnosti</title>
-        <id></id>
+        <id>207001</id>
     </data>
     <!-- ===== Údaje k zmluve ===== -->
     <data type="text">
         <title>Číslo ponuky</title>
-        <id></id>
+        <id>309001</id>
     </data>
     <data type="date">
         <title>Začiatok poistenia</title>
-        <id></id>
+        <id>109001</id>
     </data>
     <data type="boolean">
         <title>Poistenie na dobu určitú</title>
-        <id></id>
+        <id>109002</id>
     </data>
     <data type="date">
         <title>Koniec poistenia</title>
-        <id></id>
+        <id>109003</id>
     </data>
     <data type="text">
         <title>V prospech</title>
-        <id></id>
+        <id>109004</id>
         <desc>Údaje o vinkulácii</desc>
     </data>
     <data type="number">
         <title>Číslo úverovej zmluvy</title>
-        <id></id>
+        <id>109005</id>
         <desc>Údaje o vinkulácii</desc>
     </data>
     <data type="enumeration">
         <title>Spôsob platenia</title>
-        <id></id>
+        <id>109006</id>
         <values>z účtu</values>
         <values>poštovou poukážkou</values>
     </data>
@@ -990,14 +990,14 @@
     <!-- Poistník -->
     <data type="enumeration">
         <title>Typ subjektu</title>
-        <id></id>
+        <id>109007</id>
         <desc>Poistník</desc>
         <values>právnická osoba</values>
         <values>fyzická osoba podnikateľ (SZČO)</values>
     </data>
     <data type="enumeration">
         <title>Titul pred menom</title>
-        <id></id>
+        <id>109008</id>
         <desc>Poistník</desc>
         <values>Bc.</values>
         <values>Mgr.</values>
@@ -1017,44 +1017,44 @@
     </data>
     <data type="enumeration">
         <title>Titul za menom</title>
-        <id></id>
+        <id>109009</id>
         <desc>Poistník</desc>
         <values>Ph.D.</values>
         <values>CSc.</values>
     </data>
     <data type="text">
         <title>Meno</title>
-        <id></id>
+        <id>109010</id>
         <desc>Poistník</desc>
     </data>
     <data type="text">
         <title>Priezvisko</title>
-        <id></id>
+        <id>109011</id>
         <desc>Poistník</desc>
     </data>
     <data type="text">
         <title>Obchodné meno</title>
-        <id></id>
+        <id>109012</id>
     </data>
     <data type="text">
         <title>Štátna príslušnosť</title>
-        <id></id>
+        <id>109013</id>
         <desc>Poistník</desc>
     </data>
     <data type="date">
         <title>Dátum narodenia</title>
-        <id></id>
+        <id>109014</id>
         <desc>Poistník</desc>
     </data>
     <data type="text">
         <title>Rodné číslo</title>
-        <id></id>
+        <id>109015</id>
         <desc>Poistník</desc>
         <valid>length 10</valid>
     </data>
     <data type="enumeration">
         <title>Typ preukazu</title>
-        <id></id>
+        <id>109016</id>
         <desc>Poistník</desc>
         <values>pas</values>
         <values>OP</values>
@@ -1062,33 +1062,33 @@
     </data>
     <data type="text">
         <title>Číslo preukazu</title>
-        <id></id>
+        <id>109017</id>
         <desc>Poistník</desc>
     </data>
     <data type="text">
         <title>Telefónne číslo</title>
-        <id></id>
+        <id>109018</id>
     </data>
     <data type="text">
         <title>Email</title>
-        <id></id>
+        <id>109019</id>
     </data>
     <data type="boolean">
         <title>Poistený je iná osoba</title>
-        <id></id>
+        <id>109020</id>
         <desc>Poistený a poistenec sú rôzne osoby</desc>
     </data>
     <!-- Poistený -->
     <data type="enumeration">
         <title>Typ subjektu</title>
-        <id></id>
+        <id>109021</id>
         <desc>Poistený</desc>
         <values>právnická osoba</values>
         <values>fyzická osoba podnikateľ (SZČO)</values>
     </data>
     <data type="enumeration">
         <title>Titul pred menom</title>
-        <id></id>
+        <id>109022</id>
         <desc>Poistený</desc>
         <values>Bc.</values>
         <values>Mgr.</values>
@@ -1108,44 +1108,44 @@
     </data>
     <data type="enumeration">
         <title>Titul za menom</title>
-        <id></id>
+        <id>109023</id>
         <desc>Poistený</desc>
         <values>Ph.D.</values>
         <values>CSc.</values>
     </data>
     <data type="text">
         <title>Meno</title>
-        <id></id>
+        <id>109024</id>
         <desc>Poistený</desc>
     </data>
     <data type="text">
         <title>Priezvisko</title>
-        <id></id>
+        <id>109025</id>
         <desc>Poistený</desc>
     </data>
     <data type="text">
         <title>Obchodné meno</title>
-        <id></id>
+        <id>109026</id>
     </data>
     <data type="text">
         <title>Štátna príslušnosť</title>
-        <id></id>
+        <id>109027</id>
         <desc>Poistený</desc>
     </data>
     <data type="date">
         <title>Dátum narodenia</title>
-        <id></id>
+        <id>109028</id>
         <desc>Poistený</desc>
     </data>
     <data type="text">
         <title>Rodné číslo</title>
-        <id></id>
+        <id>109029</id>
         <desc>Poistený</desc>
         <valid>length 10</valid>
     </data>
     <data type="enumeration">
         <title>Typ preukazu</title>
-        <id></id>
+        <id>109030</id>
         <desc>Poistený</desc>
         <values>pas</values>
         <values>OP</values>
@@ -1153,21 +1153,21 @@
     </data>
     <data type="text">
         <title>Číslo preukazu</title>
-        <id></id>
+        <id>109031</id>
         <desc>Poistený</desc>
     </data>
     <data type="text">
         <title>Telefónne číslo</title>
-        <id></id>
+        <id>109032</id>
     </data>
     <data type="text">
         <title>Email</title>
-        <id></id>
+        <id>109033</id>
     </data>
     <!-- ===== Údaje o mieste poistenia ===== -->
     <data type="enumeration">
         <title>Adresa</title>
-        <id></id>
+        <id>109034</id>
         <values>rovnaká ako poistníkova</values>
         <values>rovnaká ako poisteného</values>
         <values>iná</values>
@@ -1175,154 +1175,142 @@
     <!-- Adresa poistníka -->
     <data type="enumeration">
         <title>Typ adresy</title>
-        <id></id>
+        <id>109035</id>
         <desc>Poistník</desc>
         <values>trvalé bydlisko</values>
         <values>korešpondenčná adresa</values>
     </data>
     <data type="text">
         <title>Ulica</title>
-        <id></id>
+        <id>109036</id>
         <desc>Poistník</desc>
     </data>
     <data type="text">
         <title>Súpisné a orientačné číslo</title>
-        <id></id>
+        <id>109037</id>
         <desc>Poistník</desc>
     </data>
     <data type="text">
         <title>PSČ</title>
-        <id></id>
+        <id>109038</id>
         <desc>Poistník</desc>
     </data>
     <data type="text">
         <title>Obec</title>
-        <id></id>
-        <desc>Poistník</desc>
-    </data>
-    <!-- Účet poistníka -->
-    <data type="text">
-        <title>číslo účtu/IBAN</title>
-        <id></id>
+        <id>109039</id>
         <desc>Poistník</desc>
     </data>
     <!-- Adresa poisteného -->
     <data type="enumeration">
         <title>Typ adresy</title>
-        <id></id>
+        <id>109040</id>
         <desc>Poistený</desc>
         <values>trvalé bydlisko</values>
         <values>korešpondenčná adresa</values>
     </data>
     <data type="text">
         <title>Ulica</title>
-        <id></id>
+        <id>109041</id>
         <desc>Poistený</desc>
     </data>
     <data type="text">
         <title>Súpisné a orientačné číslo</title>
-        <id></id>
+        <id>109042</id>
         <desc>Poistený</desc>
     </data>
     <data type="text">
         <title>PSČ</title>
-        <id></id>
+        <id>109043</id>
         <desc>Poistený</desc>
     </data>
     <data type="text">
         <title>Obec</title>
-        <id></id>
-        <desc>Poistený</desc>
-    </data>
-    <!-- Účet poisteného -->
-    <data type="text">
-        <title>číslo účtu/IBAN</title>
-        <id></id>
+        <id>109044</id>
         <desc>Poistený</desc>
     </data>
     <!-- Iná adresa -->
     <data type="text">
         <title>Ulica</title>
-        <id></id>
+        <id>109045</id>
         <desc>Iná</desc>
     </data>
     <data type="text">
         <title>Súpisné a orientačné číslo</title>
-        <id></id>
+        <id>109046</id>
         <desc>Iná</desc>
     </data>
     <data type="text">
         <title>PSČ</title>
-        <id></id>
+        <id>109047</id>
         <desc>Iná</desc>
     </data>
     <data type="text">
         <title>Obec</title>
-        <id></id>
+        <id>109048</id>
         <desc>Iná</desc>
     </data>
     <!-- Adresa dodatočné info -->
     <data type="boolean">
         <title>Byt</title>
-        <id></id>
+        <id>109049</id>
     </data>
     <data type="number">
         <title>Poschodie</title>
-        <id></id>
+        <id>109050</id>
     </data>
     <data type="number">
         <title>Číslo bytu</title>
-        <id></id>
+        <id>109051</id>
     </data>
     <data type="boolean">
         <title>Rozostavaná stavba</title>
-        <id></id>
+        <id>109052</id>
     </data>
     <data type="text">
         <title>Číslo parcely</title>
-        <id></id>
+        <id>109053</id>
     </data>
     <!-- Adresa garáže -->
     <data type="text">
         <title>Ulica</title>
-        <id></id>
+        <id>109054</id>
         <desc>Garáž</desc>
     </data>
     <data type="text">
         <title>Súpisné a orientačné číslo</title>
-        <id></id>
+        <id>109055</id>
         <desc>Garáž</desc>
     </data>
     <data type="text">
         <title>PSČ</title>
-        <id></id>
+        <id>109056</id>
         <desc>Garáž</desc>
     </data>
     <data type="text">
         <title>Obec</title>
-        <id></id>
+        <id>109057</id>
         <desc>Garáž</desc>
     </data>
     <!-- ===== Napárovanie platby ===== -->
     <data type="text">
         <title>Variabilný symbol</title>
-        <id></id>
+        <id>308007</id>
     </data>
     <!-- ===== TODO ===== -->
     <data type="date">
         <title>Dátum dojednania návrhu na uzavretie poistnej zmluvy</title>
-        <id></id>
+        <id>309002</id>
     </data>
     <!-- ===== PDF ===== -->
     <data type="file">
         <title>Ponuka PDF</title>
-        <id></id>
+        <id>309003</id>
         <init>Automaticky generované</init>
         <logic>generate Insurance.offerPDF always</logic>
     </data>
     <data type="file">
         <title>Zmluva PDF</title>
-        <id></id>
+        <id>309004</id>
         <init>Automaticky generované</init>
         <logic>generate Insurance.offerPDF always</logic>
     </data>
