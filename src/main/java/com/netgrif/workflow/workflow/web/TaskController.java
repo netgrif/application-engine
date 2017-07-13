@@ -75,6 +75,7 @@ public class TaskController {
             taskService.assignTask(loggedUser.transformToUser(), taskId);
             return MessageResource.successMessage("Task " + taskId + " assigned to " + loggedUser.getFullName());
         } catch (TransitionNotExecutableException e) {
+            e.printStackTrace();
             return MessageResource.errorMessage("Task " + taskId + " cannot be assigned");
         }
     }
@@ -168,7 +169,7 @@ public class TaskController {
 
     @RequestMapping(value = "/{id}/data", method = RequestMethod.POST)
     public ObjectNode saveData(@PathVariable("id") String taskId, @RequestBody ObjectNode dataBody) {
-        return taskService.setDataFieldsValues(taskId, dataBody);
+        return taskService.setData(taskId, dataBody);
     }
 
     @RequestMapping(value = "/{id}/file/{field}", method = RequestMethod.POST)

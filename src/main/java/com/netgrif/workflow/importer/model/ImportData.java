@@ -14,10 +14,23 @@ public class ImportData {
 
     private String title;
 
+    private String desc;
+
+    private String placeholder;
+
     @XmlAttribute
     private String type;
+
+    @XmlAttribute
+    private boolean immediate;
 
     private String[] values;
 
     private Columns columns;
+
+    private String[] valid;
+
+    private String init;
+
+    private String[] logic;
 }

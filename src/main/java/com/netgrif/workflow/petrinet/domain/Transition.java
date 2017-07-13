@@ -15,7 +15,7 @@ public class Transition extends Node {
 
     @Field("dataSet")
     @Getter @Setter
-    private Map<String, DataFieldLogic> dataSet;
+    private LinkedHashMap<String, DataFieldLogic> dataSet;
 
     @Field("roles")
     @Getter @Setter
@@ -30,7 +30,7 @@ public class Transition extends Node {
 
     public Transition() {
         super();
-        dataSet = new HashMap<>();
+        dataSet = new LinkedHashMap<>();
         roles = new HashMap<>();
         triggers = new LinkedList<>();
     }
@@ -62,6 +62,10 @@ public class Transition extends Node {
 
     public void addTrigger(Trigger trigger) {
         this.triggers.add(trigger);
+    }
+
+    public boolean isDisplayable(String fieldId){
+        return dataSet.get(fieldId).isDisplayable();
     }
 
     @Override
