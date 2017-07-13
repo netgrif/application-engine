@@ -15,15 +15,12 @@ import java.io.FileInputStream;
 @RunWith(SpringRunner.class)
 public class PdfFormFillerTest {
 
-    @Autowired
-    private PdfFormFiller formFiller;
-
     @Test
     public void fillPdfForm() throws Exception {
         File input = new File("src/test/resources/pdf/zmluva_editovatelna.pdf");
         File xml = new File("src/test/resources/pdf/zmluva_editovatelna.xml");
 
-        File out = formFiller.fillPdfForm("test_out.pdf", new FileInputStream(input), new FileInputStream(xml));
+        File out = PdfFormFiller.fillPdfForm("test_out.pdf", new FileInputStream(input), new FileInputStream(xml));
 
         assert out != null;
     }
