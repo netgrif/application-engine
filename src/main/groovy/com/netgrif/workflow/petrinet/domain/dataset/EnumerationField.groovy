@@ -19,6 +19,12 @@ public class EnumerationField extends FieldWithDefault<String> {
         }
     }
 
+    @Override
+    void clearValue() {
+        super.clearValue()
+        setValue(getDefaultValue())
+    }
+
     Set<String> getChoices() {
         return choices
     }

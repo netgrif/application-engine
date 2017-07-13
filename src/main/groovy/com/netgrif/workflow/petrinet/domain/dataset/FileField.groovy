@@ -14,6 +14,12 @@ public class FileField extends FieldWithDefault<String> {
         super();
     }
 
+    @Override
+    void clearValue() {
+        super.clearValue()
+        setValue(getDefaultValue())
+    }
+
     public void addLogic(String logic){
         if(this.logic == null)
             this.logic = new LinkedHashSet<>()
