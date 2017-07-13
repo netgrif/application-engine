@@ -35,14 +35,17 @@
     <data type="text">
         <title>Obec</title>
         <id>301001</id>
+        <placeholder>Názov</placeholder>
     </data>
     <data type="text">
         <title>PSČ</title>
         <id>101001</id>
+        <placeholder>PSČ</placeholder>
     </data>
     <data type="enumeration">
         <title>Lokalita</title>
         <id>301002</id>
+        <placeholder>Typ</placeholder>
         <values>BA</values>
         <values>Dedina</values>
         <values>Mesto</values>
@@ -63,6 +66,7 @@
     <data type="enumeration">
         <title>Koľko rokov žijete v poisťovanej nehnuteľnosti?</title>
         <id>101005</id>
+        <placeholder>Počet rokov</placeholder>
         <values>menej ako 1</values>
         <values>1 až 5</values>
         <values>6 až 10</values>
@@ -71,6 +75,7 @@
     <data type="enumeration">
         <title>Aký je vzťah poisteného k poisťovanej nehnuteľnosti?</title>
         <id>101006</id>
+        <placeholder>Vzťah</placeholder>
         <values>vlastník nehnuteľnosti</values>
         <values>vlastník ma hypotéku na nehnuteľnosť</values>
         <values>poistený je v prenájme</values>
@@ -79,6 +84,7 @@
     <data type="enumeration">
         <title>Koľko dospelých žije v domácnosti?</title>
         <id>101007</id>
+        <placeholder>Počet</placeholder>
         <values>1</values>
         <values>2</values>
         <values>3</values>
@@ -87,6 +93,7 @@
     <data type="enumeration">
         <title>Koľko detí žije v domácnosti?</title>
         <id>101008</id>
+        <placeholder>Počet</placeholder>
         <values>0</values>
         <values>1</values>
         <values>2</values>
@@ -111,6 +118,7 @@
     <data type="enumeration">
         <title>Kedy je nehnuteľnosť najviac obývaná?</title>
         <id>101013</id>
+        <placeholder>Čas</placeholder>
         <values>cez deň</values>
         <values>večer a v noci</values>
         <values>počas celého dňa</values>
@@ -122,6 +130,7 @@
     <data type="enumeration">
         <title>Právna subjektivita poisteného?</title>
         <id>101015</id>
+        <placeholder>Typ</placeholder>
         <values>fyzická osoba</values>
         <values>právnická osoba</values>
         <values>fyzická osoba - podnikateľ</values>
@@ -129,6 +138,7 @@
     <data type="enumeration">
         <title>Počet poistných udalostí za posledné 3 roky?</title>
         <id>101016</id>
+        <placeholder>Počet</placeholder>
         <values>0</values>
         <values>1</values>
         <values>2 a viac</values>
@@ -137,6 +147,7 @@
     <data type="enumeration">
         <title>Predmet poistenia</title>
         <id>102001</id>
+        <placeholder>Typ</placeholder>
         <values>byt</values>
         <values>rodinný dom</values>
         <values>chata</values>
@@ -147,6 +158,7 @@
     <data type="enumeration">
         <title>Konštrukcia múrov</title>
         <id>102002</id>
+        <placeholder>Typ</placeholder>
         <values>tehla a/alebo betón</values>
         <values>porobetón (ytong)</values>
         <values>škvarobatón</values>
@@ -156,6 +168,7 @@
     <data type="enumeration">
         <title>Konštrukcia strechy</title>
         <id>102003</id>
+        <placeholder>Typ</placeholder>
         <values>škridla</values>
         <values>plech</values>
         <values>asfalt</values>
@@ -167,6 +180,7 @@
     <data type="enumeration">
         <title>Koľko rokov má nehnuteľnosť?</title>
         <id>102004</id>
+        <placeholder>Typ</placeholder>
         <values>menej ako 5</values>
         <values>6 až 10</values>
         <values>11 až 20</values>
@@ -179,6 +193,7 @@
     <data type="enumeration">
         <title>Koľko izieb má nehnuteľnosť?</title>
         <id>102006</id>
+        <placeholder>Počet</placeholder>
         <values>1</values>
         <values>2</values>
         <values>3</values>
@@ -188,6 +203,7 @@
     <data type="enumeration">
         <title>Koľko kúpeľní má nehnuteľnosť?</title>
         <id>102007</id>
+        <placeholder>Počet</placeholder>
         <values>1</values>
         <values>2</values>
         <values>3</values>
@@ -197,6 +213,7 @@
     <data type="enumeration">
         <title>Uveďte celkovú hodnotu rekonštrukcií, ak boli vykonané</title>
         <id>102008</id>
+        <placeholder>Hodnota</placeholder>
         <values>bez rekonštrukcií</values>
         <values>do 20 000 EUR</values>
         <values>do 50 000 EUR</values>
@@ -206,6 +223,7 @@
     <data type="enumeration">
         <title>Umiestnenie domácnosti</title>
         <id>103001</id>
+        <placeholder>Typ</placeholder>
         <values>byt</values>
         <values>rodinný dom</values>
         <values>chata</values>
@@ -248,50 +266,61 @@
     <data type="number">
         <title>Podlahová plocha pivnice</title>
         <id>105001</id>
+        <placeholder>m2</placeholder>
     </data>
     <data type="number">
         <title>Podlahová plocha prízemia</title>
         <id>105002</id>
+        <placeholder>m2</placeholder>
     </data>
     <data type="number">
         <title>Podlahová plocha vštkých obytných poschodí</title>
         <id>105003</id>
+        <placeholder>m2</placeholder>
         <desc>Okrem prízemia</desc>
     </data>
     <data type="number">
         <title>Podlahová plocha garáže</title>
         <id>105004</id>
+        <placeholder>m2</placeholder>
     </data>
     <data type="number">
         <title>Celková podlahová plocha</title>
         <id>305001</id>
+        <placeholder>m2</placeholder>
     </data>
     <data type="enumeration">
-        <title>Poistenie nehnuteľnosti - spoluúčasť</title>
+        <title>Poistenie nehnuteľnosti</title>
         <id>105005</id>
+        <placeholder>Spoluúčasť</placeholder>
         <values>0.00 €</values>
         <values>50.00 €</values>
         <values>150.00 €</values>
     </data>
     <data type="number">
-        <title>Poistenie nehnuteľnosti - poistná suma</title>
+        <title>Poistenie nehnuteľnosti</title>
         <id>105006</id>
+        <placeholder>Poistná suma</placeholder>
     </data>
     <data type="number">
-        <title>Poistenie nehnuteľnosti - poistné</title>
+        <title>Poistenie nehnuteľnosti</title>
         <id>305002</id>
+        <placeholder>Poistné</placeholder>
     </data>
-    <data type="number">
+    <!-- ===== Doplnkové poistenie nehnuteľnosti ===== -->
+    <data type="boolean">
         <title>Garáž</title>
         <id>105035</id>
     </data>
     <data type="number">
-        <title>Garáž - poistná suma</title>
+        <title>Garáž</title>
         <id>105007</id>
+        <placeholder>Poistná suma</placeholder>
     </data>
     <data type="number">
-        <title>Garáž - poistné</title>
+        <title>Garáž</title>
         <id>305003</id>
+        <placeholder>Poistné</placeholder>
     </data>
     <data type="boolean">
         <title>Rovnaké miesto poistenia garáže?</title>
@@ -302,157 +331,184 @@
         <id>105009</id>
     </data>
     <data type="number">
-        <title>Hospodárska budova - poistná suma</title>
+        <title>Hospodárska budova</title>
         <id>105010</id>
+        <placeholder>Poistná suma</placeholder>
     </data>
     <data type="number">
-        <title>Hospodárska budova - poistné</title>
+        <title>Hospodárska budova</title>
         <id>305004</id>
+        <placeholder>Poistné</placeholder>
     </data>
     <data type="boolean">
         <title>Altánok</title>
         <id>105011</id>
     </data>
     <data type="number">
-        <title>Altánok - poistná suma</title>
+        <title>Altánok</title>
         <id>105012</id>
+        <placeholder>Poistná suma</placeholder>
     </data>
     <data type="number">
-        <title>Altánok - poistné</title>
+        <title>Altánok</title>
         <id>305005</id>
+        <placeholder>Poistné</placeholder>
     </data>
     <data type="boolean">
         <title>Prístrešok</title>
         <id>105013</id>
     </data>
     <data type="number">
-        <title>Prístrešok - poistná suma</title>
+        <title>Prístrešok</title>
         <id>105014</id>
+        <placeholder>Poistná suma</placeholder>
     </data>
     <data type="number">
-        <title>Prístrešok - poistné</title>
+        <title>Prístrešok</title>
         <id>305006</id>
+        <placeholder>Poistné</placeholder>
     </data>
     <data type="boolean">
         <title>Chodník</title>
         <id>105015</id>
     </data>
     <data type="number">
-        <title>Chodník, parkovacia plocha - poistná suma</title>
+        <title>Chodník, parkovacia plocha</title>
         <id>105016</id>
+        <placeholder>Poistná suma</placeholder>
     </data>
     <data type="number">
-        <title>Chodník, parkovacia plocha - poistné</title>
+        <title>Chodník, parkovacia plocha</title>
         <id>305007</id>
+        <placeholder>Poistné</placeholder>
     </data>
     <data type="boolean">
         <title>Sauna</title>
         <id>105017</id>
     </data>
     <data type="number">
-        <title>Sauna - poistná suma</title>
+        <title>Sauna</title>
         <id>105018</id>
+        <placeholder>Poistná suma</placeholder>
     </data>
     <data type="number">
-        <title>Sauna - poistné</title>
+        <title>Sauna</title>
         <id>305008</id>
+        <placeholder>Poistné</placeholder>
     </data>
     <data type="boolean">
         <title>Elektrická brána</title>
         <id>105019</id>
     </data>
     <data type="number">
-        <title>Elektrická brána, oplotenie - poistná suma</title>
+        <title>Elektrická brána, oplotenie</title>
         <id>105020</id>
+        <placeholder>Poistná suma</placeholder>
     </data>
     <data type="number">
-        <title>Elektrická brána, oplotenie - poistné</title>
+        <title>Elektrická brána, oplotenie</title>
         <id>305009</id>
+        <placeholder>Poistné</placeholder>
     </data>
     <data type="boolean">
         <title>Tenisový kurt</title>
         <id>105021</id>
     </data>
     <data type="number">
-        <title>Tenisový kurt - poistná suma</title>
+        <title>Tenisový kurt</title>
         <id>105022</id>
+        <placeholder>Poistná suma</placeholder>
     </data>
     <data type="number">
-        <title>Tenisový kurt - poistné</title>
+        <title>Tenisový kurt</title>
         <id>305010</id>
+        <placeholder>Poistné</placeholder>
     </data>
     <data type="boolean">
         <title>Vonkajší bazén</title>
         <id>105023</id>
     </data>
     <data type="number">
-        <title>Vonkajší bazén - poistná suma</title>
+        <title>Vonkajší bazén</title>
         <id>105024</id>
+        <placeholder>Poistná suma</placeholder>
     </data>
     <data type="number">
-        <title>Vonkajší bazén - poistné</title>
+        <title>Vonkajší bazén</title>
         <id>305011</id>
+        <placeholder>Poistné</placeholder>
     </data>
     <data type="boolean">
         <title>Studňa</title>
         <id>105025</id>
     </data>
     <data type="number">
-        <title>Studňa - poistná suma</title>
+        <title>Studňa</title>
         <id>105026</id>
+        <placeholder>Poistná suma</placeholder>
     </data>
     <data type="number">
-        <title>Studňa - poistné</title>
+        <title>Studňa</title>
         <id>305012</id>
+        <placeholder>Poistné</placeholder>
     </data>
     <data type="boolean">
         <title>Žumpa, septik</title>
         <id>105027</id>
     </data>
     <data type="number">
-        <title>Žumpa, septik - poistná suma</title>
+        <title>Žumpa, septik</title>
         <id>105028</id>
+        <placeholder>Poistná suma</placeholder>
     </data>
     <data type="number">
-        <title>Žumpa, septik - poistné</title>
+        <title>Žumpa, septik</title>
         <id>305013</id>
+        <placeholder>Poistné</placeholder>
     </data>
     <data type="boolean">
         <title>Iné</title>
         <id>105029</id>
     </data>
     <data type="number">
-        <title>Iné - poistná suma</title>
+        <title>Iné</title>
         <id>105030</id>
+        <placeholder>Poistná suma</placeholder>
     </data>
     <data type="number">
-        <title>Iné - poistné</title>
+        <title>Iné</title>
         <id>305014</id>
+        <placeholder>Poistné</placeholder>
     </data>
-    <!-- ===== Doplnkové poistenie nehnuteľnosti ===== -->
     <data type="boolean">
         <title>Stavebné materialy</title>
         <id>105031</id>
+        <placeholder></placeholder>
     </data>
     <data type="number">
         <title>Stavebné materiály - poistná suma</title>
         <id>105032</id>
+        <placeholder></placeholder>
     </data>
     <data type="number">
         <title>Stavebné materiály - poistné</title>
         <id>305015</id>
+        <placeholder></placeholder>
     </data>
     <data type="boolean">
         <title>Stavebné a záhradné mechanizmy</title>
         <id>105033</id>
+        <placeholder></placeholder>
     </data>
     <data type="number">
         <title>Stavebné a záhradné mechanizmy</title>
         <id>105034</id>
+        <placeholder></placeholder>
     </data>
     <data type="number">
         <title>Stavebné a záhradné mechanizmy - poistná suma</title>
         <id>305016</id>
+        <placeholder></placeholder>
     </data>
     <!-- ===== Poistenie domácnosti ===== -->
     <data type="enumeration">
@@ -585,16 +641,18 @@
     </data>
     <!-- ===== Poistenie zodpovednosti za škodu ===== -->
     <data type="enumeration">
-        <title>Poistenie zodpovednosti z vlastníctva nehnuteľnosti - poistná suma</title>
+        <title>Poistenie zodpovednosti z vlastníctva nehnuteľnosti</title>
         <id>107001</id>
+        <placeholder>Poistná suma</placeholder>
         <values>15,000.00 €</values>
         <values>30,000.00 €</values>
         <values>60,000.00 €</values>
         <values>120,000.00 €</values>
     </data>
     <data type="enumeration">
-        <title>Poistenie zodpovednosti z vlastníctva nehnuteľnosti - spoluúčasť</title>
+        <title>Poistenie zodpovednosti z vlastníctva nehnuteľnosti</title>
         <id>107002</id>
+        <placeholder>Spoluúčasť</placeholder>
         <values>0.00 €</values>
         <values>50.00 €</values>
         <values>150.00 €</values>
@@ -602,6 +660,7 @@
     <data type="enumeration">
         <title>Zodpovednosť za škodu členov domácnosti</title>
         <id>107003</id>
+        <placeholder>Eur</placeholder>
         <values>15,000.00 €</values>
         <values>30,000.00 €</values>
         <values>60,000.00 €</values>
@@ -609,16 +668,19 @@
     </data>
     <!-- ===== Sumár ===== -->
     <data type="number">
-        <title>Poistenie nehnuteľnosti - poistné</title>
+        <title>Poistenie nehnuteľnosti</title>
         <id>308001</id>
+        <placeholder>Poistné</placeholder>
     </data>
     <data type="number">
-        <title>Poistenie domácnosti - poistné</title>
+        <title>Poistenie domácnosti</title>
         <id>308002</id>
+        <placeholder>Poistné</placeholder>
     </data>
     <data type="number">
-        <title>Poistenie zodpovednosti za škodu - poistné</title>
+        <title>Poistenie zodpovednosti za škodu</title>
         <id>308003</id>
+        <placeholder>Poistné</placeholder>
     </data>
     <data type="number">
         <title>ROČNÉ POISTNÉ CELKOM</title>
@@ -2737,10 +2799,10 @@
                     field: f.109007,
                     other: f.109021;
                     change other about {
-                        if (check.value == false) {
-                            return field.value as String;
-                        }
-                        return other.value as String;
+                    if (check.value == false) {
+                    return field.value as String;
+                    }
+                    return other.value as String;
                     }
                 </action>
             </logic>
@@ -2755,10 +2817,10 @@
                     field: f.109008,
                     other: f.109022;
                     change other about {
-                        if (check.value == false) {
-                            return field.value as String;
-                        }
-                        return other.value as String;
+                    if (check.value == false) {
+                    return field.value as String;
+                    }
+                    return other.value as String;
                     }
                 </action>
             </logic>
@@ -2773,10 +2835,10 @@
                     field: f.109009,
                     other: f.109023;
                     change other about {
-                        if (check.value == false) {
-                            return field.value as String;
-                        }
-                        return other.value as String;
+                    if (check.value == false) {
+                    return field.value as String;
+                    }
+                    return other.value as String;
                     }
                 </action>
             </logic>
@@ -2791,10 +2853,10 @@
                     field: f.109010,
                     other: f.109024;
                     change other about {
-                        if (check.value == false) {
-                            return field.value as String;
-                        }
-                        return other.value as String;
+                    if (check.value == false) {
+                    return field.value as String;
+                    }
+                    return other.value as String;
                     }
                 </action>
             </logic>
@@ -2809,10 +2871,10 @@
                     field: f.109011,
                     other: f.109025;
                     change other about {
-                        if (check.value == false) {
-                            return field.value as String;
-                        }
-                        return other.value as String;
+                    if (check.value == false) {
+                    return field.value as String;
+                    }
+                    return other.value as String;
                     }
                 </action>
             </logic>
@@ -2827,10 +2889,10 @@
                     field: f.109012,
                     other: f.109026;
                     change other about {
-                        if (check.value == false) {
-                            return field.value as String;
-                        }
-                        return other.value as String;
+                    if (check.value == false) {
+                    return field.value as String;
+                    }
+                    return other.value as String;
                     }
                 </action>
             </logic>
@@ -2845,10 +2907,10 @@
                     field: f.109013,
                     other: f.109027;
                     change other about {
-                        if (check.value == false) {
-                            return field.value as String;
-                        }
-                        return other.value as String;
+                    if (check.value == false) {
+                    return field.value as String;
+                    }
+                    return other.value as String;
                     }
                 </action>
             </logic>
@@ -2863,10 +2925,10 @@
                     field: f.109014,
                     other: f.109028;
                     change other about {
-                        if (check.value == false) {
-                            return field.value as LocalDate;
-                        }
-                        return other.value as LocalDate;
+                    if (check.value == false) {
+                    return field.value as LocalDate;
+                    }
+                    return other.value as LocalDate;
                     }
                 </action>
             </logic>
@@ -2881,10 +2943,10 @@
                     field: f.109015,
                     other: f.109029;
                     change other about {
-                        if (check.value == false) {
-                            return field.value as String;
-                        }
-                        return other.value as String;
+                    if (check.value == false) {
+                    return field.value as String;
+                    }
+                    return other.value as String;
                     }
                 </action>
             </logic>
@@ -2899,10 +2961,10 @@
                     field: f.109016,
                     other: f.109030;
                     change other about {
-                        if (check.value == false) {
-                            return field.value as String;
-                        }
-                        return other.value as String;
+                    if (check.value == false) {
+                    return field.value as String;
+                    }
+                    return other.value as String;
                     }
                 </action>
             </logic>
@@ -2917,10 +2979,10 @@
                     field: f.109017,
                     other: f.109031;
                     change other about {
-                        if (check.value == false) {
-                            return field.value as String;
-                        }
-                        return other.value as String;
+                    if (check.value == false) {
+                    return field.value as String;
+                    }
+                    return other.value as String;
                     }
                 </action>
             </logic>
@@ -2935,10 +2997,10 @@
                     field: f.109018,
                     other: f.109032;
                     change other about {
-                        if (check.value == false) {
-                            return field.value as String;
-                        }
-                        return other.value as String;
+                    if (check.value == false) {
+                    return field.value as String;
+                    }
+                    return other.value as String;
                     }
                 </action>
             </logic>
@@ -2953,10 +3015,10 @@
                     field: f.109019,
                     other: f.109033;
                     change other about {
-                        if (check.value == false) {
-                            return field.value as String;
-                        }
-                        return other.value as String;
+                    if (check.value == false) {
+                    return field.value as String;
+                    }
+                    return other.value as String;
                     }
                 </action>
             </logic>
@@ -3129,10 +3191,10 @@
                     f_1: f.109007,
                     f_2: f.109021;
                     change f_2 about {
-                        if (field.value == false) {
-                            return f_1.value as String;
-                        }
-                        return f_2.value as String;
+                    if (field.value == false) {
+                    return f_1.value as String;
+                    }
+                    return f_2.value as String;
                     }
                 </action>
                 <action trigger="set">
@@ -3140,10 +3202,10 @@
                     f_1: f.109008,
                     f_2: f.109022;
                     change f_2 about {
-                        if (field.value == false) {
-                            return f_1.value as String;
-                        }
-                        return f_2.value as String;
+                    if (field.value == false) {
+                    return f_1.value as String;
+                    }
+                    return f_2.value as String;
                     }
                 </action>
                 <action trigger="set">
@@ -3151,10 +3213,10 @@
                     f_1: f.109009,
                     f_2: f.109023;
                     change f_2 about {
-                        if (field.value == false) {
-                            return f_1.value as String;
-                        }
-                        return f_2.value as String;
+                    if (field.value == false) {
+                    return f_1.value as String;
+                    }
+                    return f_2.value as String;
                     }
                 </action>
                 <action trigger="set">
@@ -3162,10 +3224,10 @@
                     f_1: f.109010,
                     f_2: f.109024;
                     change f_2 about {
-                        if (field.value == false) {
-                            return f_1.value as String;
-                        }
-                        return f_2.value as String;
+                    if (field.value == false) {
+                    return f_1.value as String;
+                    }
+                    return f_2.value as String;
                     }
                 </action>
                 <action trigger="set">
@@ -3173,10 +3235,10 @@
                     f_1: f.109011,
                     f_2: f.109025;
                     change f_2 about {
-                        if (field.value == false) {
-                            return f_1.value as String;
-                        }
-                        return f_2.value as String;
+                    if (field.value == false) {
+                    return f_1.value as String;
+                    }
+                    return f_2.value as String;
                     }
                 </action>
                 <action trigger="set">
@@ -3184,10 +3246,10 @@
                     f_1: f.109012,
                     f_2: f.109026;
                     change f_2 about {
-                        if (field.value == false) {
-                            return f_1.value as String;
-                        }
-                        return f_2.value as String;
+                    if (field.value == false) {
+                    return f_1.value as String;
+                    }
+                    return f_2.value as String;
                     }
                 </action>
                 <action trigger="set">
@@ -3195,10 +3257,10 @@
                     f_1: f.109013,
                     f_2: f.109027;
                     change f_2 about {
-                        if (field.value == false) {
-                            return f_1.value as String;
-                        }
-                        return f_2.value as String;
+                    if (field.value == false) {
+                    return f_1.value as String;
+                    }
+                    return f_2.value as String;
                     }
                 </action>
                 <action trigger="set">
@@ -3206,10 +3268,10 @@
                     f_1: f.109014,
                     f_2: f.109028;
                     change f_2 about {
-                        if (field.value == false) {
-                            return f_1.value as LocalDate;
-                        }
-                        return f_2.value as LocalDate;
+                    if (field.value == false) {
+                    return f_1.value as LocalDate;
+                    }
+                    return f_2.value as LocalDate;
                     }
                 </action>
                 <action trigger="set">
@@ -3217,10 +3279,10 @@
                     f_1: f.109015,
                     f_2: f.109029;
                     change f_2 about {
-                        if (field.value == false) {
-                            return f_1.value as String;
-                        }
-                        return f_2.value as String;
+                    if (field.value == false) {
+                    return f_1.value as String;
+                    }
+                    return f_2.value as String;
                     }
                 </action>
                 <action trigger="set">
@@ -3228,10 +3290,10 @@
                     f_1: f.109016,
                     f_2: f.109030;
                     change f_2 about {
-                        if (field.value == false) {
-                            return f_1.value as String;
-                        }
-                        return f_2.value as String;
+                    if (field.value == false) {
+                    return f_1.value as String;
+                    }
+                    return f_2.value as String;
                     }
                 </action>
                 <action trigger="set">
@@ -3239,10 +3301,10 @@
                     f_1: f.109017,
                     f_2: f.109031;
                     change f_2 about {
-                        if (field.value == false) {
-                            return f_1.value as String;
-                        }
-                        return f_2.value as String;
+                    if (field.value == false) {
+                    return f_1.value as String;
+                    }
+                    return f_2.value as String;
                     }
                 </action>
                 <action trigger="set">
@@ -3250,10 +3312,10 @@
                     f_1: f.109018,
                     f_2: f.109032;
                     change f_2 about {
-                        if (field.value == false) {
-                            return f_1.value as String;
-                        }
-                        return f_2.value as String;
+                    if (field.value == false) {
+                    return f_1.value as String;
+                    }
+                    return f_2.value as String;
                     }
                 </action>
                 <action trigger="set">
@@ -3261,10 +3323,10 @@
                     f_1: f.109019,
                     f_2: f.109033;
                     change f_2 about {
-                        if (field.value == false) {
-                            return f_1.value as String;
-                        }
-                        return f_2.value as String;
+                    if (field.value == false) {
+                    return f_1.value as String;
+                    }
+                    return f_2.value as String;
                     }
                 </action>
             </logic>
