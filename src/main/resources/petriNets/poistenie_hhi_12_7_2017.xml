@@ -2732,7 +2732,7 @@
             <logic>
                 <behavior>required</behavior>
                 <behavior>editable</behavior>
-                <action>
+                <action trigger="set">
                     check: f.109020,
                     field: f.109007,
                     other: f.109021;
@@ -2750,7 +2750,7 @@
             <logic>
                 <behavior>required</behavior>
                 <behavior>editable</behavior>
-                <action>
+                <action trigger="set">
                     check: f.109020,
                     field: f.109008,
                     other: f.109022;
@@ -2768,7 +2768,7 @@
             <logic>
                 <behavior>required</behavior>
                 <behavior>editable</behavior>
-                <action>
+                <action trigger="set">
                     check: f.109020,
                     field: f.109009,
                     other: f.109023;
@@ -2786,7 +2786,7 @@
             <logic>
                 <behavior>required</behavior>
                 <behavior>editable</behavior>
-                <action>
+                <action trigger="set">
                     check: f.109020,
                     field: f.109010,
                     other: f.109024;
@@ -2804,7 +2804,7 @@
             <logic>
                 <behavior>required</behavior>
                 <behavior>editable</behavior>
-                <action>
+                <action trigger="set">
                     check: f.109020,
                     field: f.109011,
                     other: f.109025;
@@ -2822,7 +2822,7 @@
             <logic>
                 <behavior>required</behavior>
                 <behavior>editable</behavior>
-                <action>
+                <action trigger="set">
                     check: f.109020,
                     field: f.109012,
                     other: f.109026;
@@ -2840,7 +2840,7 @@
             <logic>
                 <behavior>required</behavior>
                 <behavior>editable</behavior>
-                <action>
+                <action trigger="set">
                     check: f.109020,
                     field: f.109013,
                     other: f.109027;
@@ -2858,7 +2858,7 @@
             <logic>
                 <behavior>required</behavior>
                 <behavior>editable</behavior>
-                <action>
+                <action trigger="set">
                     check: f.109020,
                     field: f.109014,
                     other: f.109028;
@@ -2876,7 +2876,7 @@
             <logic>
                 <behavior>required</behavior>
                 <behavior>editable</behavior>
-                <action>
+                <action trigger="set">
                     check: f.109020,
                     field: f.109015,
                     other: f.109029;
@@ -2894,7 +2894,7 @@
             <logic>
                 <behavior>required</behavior>
                 <behavior>editable</behavior>
-                <action>
+                <action trigger="set">
                     check: f.109020,
                     field: f.109016,
                     other: f.109030;
@@ -2912,7 +2912,7 @@
             <logic>
                 <behavior>required</behavior>
                 <behavior>editable</behavior>
-                <action>
+                <action trigger="set">
                     check: f.109020,
                     field: f.109017,
                     other: f.109031;
@@ -2930,7 +2930,7 @@
             <logic>
                 <behavior>required</behavior>
                 <behavior>editable</behavior>
-                <action>
+                <action trigger="set">
                     check: f.109020,
                     field: f.109018,
                     other: f.109032;
@@ -2948,7 +2948,7 @@
             <logic>
                 <behavior>required</behavior>
                 <behavior>editable</behavior>
-                <action>
+                <action trigger="set">
                     check: f.109020,
                     field: f.109019,
                     other: f.109033;
@@ -2966,168 +2966,168 @@
             <logic>
                 <behavior>editable</behavior>
                 <!-- Show poisteny when true -->
-                <action>
+                <action trigger="set">
                     field: f.this,
                     other: f.109021,
                     trans: t.588;
                     make other,visible on trans when { field.value }
                 </action>
-                <action>
+                <action trigger="set">
                     field: f.this,
                     other: f.109022,
                     trans: t.588;
                     make other,visible on trans when { field.value }
                 </action>
-                <action>
+                <action trigger="set">
                     field: f.this,
                     other: f.109023,
                     trans: t.588;
                     make other,visible on trans when { field.value }
                 </action>
-                <action>
+                <action trigger="set">
                     field: f.this,
                     other: f.109024,
                     trans: t.588;
                     make other,visible on trans when { field.value }
                 </action>
-                <action>
+                <action trigger="set">
                     field: f.this,
                     other: f.109025,
                     trans: t.588;
                     make other,visible on trans when { field.value }
                 </action>
-                <action>
+                <action trigger="set">
                     field: f.this,
                     other: f.109026,
                     trans: t.588;
                     make other,visible on trans when { field.value }
                 </action>
-                <action>
+                <action trigger="set">
                     field: f.this,
                     other: f.109027,
                     trans: t.588;
                     make other,visible on trans when { field.value }
                 </action>
-                <action>
+                <action trigger="set">
                     field: f.this,
                     other: f.109028,
                     trans: t.588;
                     make other,visible on trans when { field.value }
                 </action>
-                <action>
+                <action trigger="set">
                     field: f.this,
                     other: f.109029,
                     trans: t.588;
                     make other,visible on trans when { field.value }
                 </action>
-                <action>
+                <action trigger="set">
                     field: f.this,
                     other: f.109030,
                     trans: t.588;
                     make other,visible on trans when { field.value }
                 </action>
-                <action>
+                <action trigger="set">
                     field: f.this,
                     other: f.109031,
                     trans: t.588;
                     make other,visible on trans when { field.value }
                 </action>
-                <action>
+                <action trigger="set">
                     field: f.this,
                     other: f.109032,
                     trans: t.588;
                     make other,visible on trans when { field.value }
                 </action>
-                <action>
+                <action trigger="set">
                     field: f.this,
                     other: f.109033,
                     trans: t.588;
                     make other,visible on trans when { field.value }
                 </action>
                 <!-- Hide poisteny when false -->
-                <action>
+                <action trigger="set">
                     field: f.this,
                     other: f.109021,
                     trans: t.588;
                     make other,hidden on trans when { return !field.value }
                 </action>
-                <action>
+                <action trigger="set">
                     field: f.this,
                     other: f.109022,
                     trans: t.588;
                     make other,hidden on trans when { return !field.value }
                 </action>
-                <action>
+                <action trigger="set">
                     field: f.this,
                     other: f.109023,
                     trans: t.588;
                     make other,hidden on trans when { return !field.value }
                 </action>
-                <action>
+                <action trigger="set">
                     field: f.this,
                     other: f.109024,
                     trans: t.588;
                     make other,hidden on trans when { return !field.value }
                 </action>
-                <action>
+                <action trigger="set">
                     field: f.this,
                     other: f.109025,
                     trans: t.588;
                     make other,hidden on trans when { return !field.value }
                 </action>
-                <action>
+                <action trigger="set">
                     field: f.this,
                     other: f.109026,
                     trans: t.588;
                     make other,hidden on trans when { return !field.value }
                 </action>
-                <action>
+                <action trigger="set">
                     field: f.this,
                     other: f.109027,
                     trans: t.588;
                     make other,hidden on trans when { return !field.value }
                 </action>
-                <action>
+                <action trigger="set">
                     field: f.this,
                     other: f.109028,
                     trans: t.588;
                     make other,hidden on trans when { return !field.value }
                 </action>
-                <action>
+                <action trigger="set">
                     field: f.this,
                     other: f.109029,
                     trans: t.588;
                     make other,hidden on trans when { return !field.value }
                 </action>
-                <action>
+                <action trigger="set">
                     field: f.this,
                     other: f.109030,
                     trans: t.588;
                     make other,hidden on trans when { return !field.value }
                 </action>
-                <action>
+                <action trigger="set">
                     field: f.this,
                     other: f.109031,
                     trans: t.588;
                     make other,hidden on trans when { return !field.value }
                 </action>
-                <action>
+                <action trigger="set">
                     field: f.this,
                     other: f.109032,
                     trans: t.588;
                     make other,hidden on trans when { return !field.value }
                 </action>
-                <action>
+                <action trigger="set">
                     field: f.this,
                     other: f.109033,
                     trans: t.588;
                     make other,hidden on trans when { return !field.value }
                 </action>
                 <!-- Fill poisteny when false -->
-                <action>
+                <action trigger="set">
                     field: f.this,
                     f_1: f.109007,
-                    f_2: t.109021;
+                    f_2: f.109021;
                     change f_2 about {
                         if (field.value == false) {
                             return f_1.value as String;
@@ -3135,10 +3135,10 @@
                         return f_2.value as String;
                     }
                 </action>
-                <action>
+                <action trigger="set">
                     field: f.this,
                     f_1: f.109008,
-                    f_2: t.109022;
+                    f_2: f.109022;
                     change f_2 about {
                         if (field.value == false) {
                             return f_1.value as String;
@@ -3146,10 +3146,10 @@
                         return f_2.value as String;
                     }
                 </action>
-                <action>
+                <action trigger="set">
                     field: f.this,
                     f_1: f.109009,
-                    f_2: t.109023;
+                    f_2: f.109023;
                     change f_2 about {
                         if (field.value == false) {
                             return f_1.value as String;
@@ -3157,10 +3157,10 @@
                         return f_2.value as String;
                     }
                 </action>
-                <action>
+                <action trigger="set">
                     field: f.this,
                     f_1: f.109010,
-                    f_2: t.109024;
+                    f_2: f.109024;
                     change f_2 about {
                         if (field.value == false) {
                             return f_1.value as String;
@@ -3168,10 +3168,10 @@
                         return f_2.value as String;
                     }
                 </action>
-                <action>
+                <action trigger="set">
                     field: f.this,
                     f_1: f.109011,
-                    f_2: t.109025;
+                    f_2: f.109025;
                     change f_2 about {
                         if (field.value == false) {
                             return f_1.value as String;
@@ -3179,10 +3179,10 @@
                         return f_2.value as String;
                     }
                 </action>
-                <action>
+                <action trigger="set">
                     field: f.this,
                     f_1: f.109012,
-                    f_2: t.109026;
+                    f_2: f.109026;
                     change f_2 about {
                         if (field.value == false) {
                             return f_1.value as String;
@@ -3190,10 +3190,10 @@
                         return f_2.value as String;
                     }
                 </action>
-                <action>
+                <action trigger="set">
                     field: f.this,
                     f_1: f.109013,
-                    f_2: t.109027;
+                    f_2: f.109027;
                     change f_2 about {
                         if (field.value == false) {
                             return f_1.value as String;
@@ -3201,10 +3201,10 @@
                         return f_2.value as String;
                     }
                 </action>
-                <action>
+                <action trigger="set">
                     field: f.this,
                     f_1: f.109014,
-                    f_2: t.109028;
+                    f_2: f.109028;
                     change f_2 about {
                         if (field.value == false) {
                             return f_1.value as LocalDate;
@@ -3212,10 +3212,10 @@
                         return f_2.value as LocalDate;
                     }
                 </action>
-                <action>
+                <action trigger="set">
                     field: f.this,
                     f_1: f.109015,
-                    f_2: t.109029;
+                    f_2: f.109029;
                     change f_2 about {
                         if (field.value == false) {
                             return f_1.value as String;
@@ -3223,10 +3223,10 @@
                         return f_2.value as String;
                     }
                 </action>
-                <action>
+                <action trigger="set">
                     field: f.this,
                     f_1: f.109016,
-                    f_2: t.109030;
+                    f_2: f.109030;
                     change f_2 about {
                         if (field.value == false) {
                             return f_1.value as String;
@@ -3234,10 +3234,10 @@
                         return f_2.value as String;
                     }
                 </action>
-                <action>
+                <action trigger="set">
                     field: f.this,
                     f_1: f.109017,
-                    f_2: t.109031;
+                    f_2: f.109031;
                     change f_2 about {
                         if (field.value == false) {
                             return f_1.value as String;
@@ -3245,10 +3245,10 @@
                         return f_2.value as String;
                     }
                 </action>
-                <action>
+                <action trigger="set">
                     field: f.this,
                     f_1: f.109018,
-                    f_2: t.109032;
+                    f_2: f.109032;
                     change f_2 about {
                         if (field.value == false) {
                             return f_1.value as String;
@@ -3256,10 +3256,10 @@
                         return f_2.value as String;
                     }
                 </action>
-                <action>
+                <action trigger="set">
                     field: f.this,
                     f_1: f.109019,
-                    f_2: t.109033;
+                    f_2: f.109033;
                     change f_2 about {
                         if (field.value == false) {
                             return f_1.value as String;
