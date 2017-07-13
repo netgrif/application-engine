@@ -148,6 +148,8 @@ abstract class Field<T> {
     void addAction(String action, String trigger){
         this.addAction(new Action(action,trigger))
     }
+
+    void clearValue(){}
 //operators overloading
     T plus(final Field field) {
         return this.value + field.value

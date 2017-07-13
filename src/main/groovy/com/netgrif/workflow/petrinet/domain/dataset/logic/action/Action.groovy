@@ -4,7 +4,7 @@ package com.netgrif.workflow.petrinet.domain.dataset.logic.action
 class Action {
 
     private String definition
-    private ActionTigger trigger
+    private ActionTrigger trigger
 
     static Action buildAction(String action, String trigger){
         if(action == null || action.equalsIgnoreCase("") || action.equalsIgnoreCase(" ")
@@ -16,10 +16,10 @@ class Action {
 
     Action(String definition, String trigger){
         this.definition = definition
-        this.trigger = ActionTigger.fromString(trigger)
+        this.trigger = ActionTrigger.fromString(trigger)
     }
 
-    Action(String definition, ActionTigger trigger) {
+    Action(String definition, ActionTrigger trigger) {
         this.definition = definition
         this.trigger = trigger
     }
@@ -31,16 +31,16 @@ class Action {
         return definition
     }
 
-    Boolean runOn(ActionTigger trigger){
+    Boolean isTriggeredBy(ActionTrigger trigger){
         return this.trigger == trigger
     }
 
-    enum ActionTigger {
+    enum ActionTrigger {
         GET,
         SET
 
-        static ActionTigger fromString(String val){
-            return ActionTigger.valueOf(val.toUpperCase())
+        static ActionTrigger fromString(String val){
+            return ActionTrigger.valueOf(val.toUpperCase())
         }
     }
 }
