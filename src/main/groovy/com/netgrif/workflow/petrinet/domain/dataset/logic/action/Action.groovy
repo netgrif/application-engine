@@ -14,9 +14,17 @@ class Action {
         return new Action(action, trigger)
     }
 
-    Action(String action, String trigger){
-        this.definition = action
+    Action(String definition, String trigger){
+        this.definition = definition
         this.trigger = ActionTigger.fromString(trigger)
+    }
+
+    Action(String definition, ActionTigger trigger) {
+        this.definition = definition
+        this.trigger = trigger
+    }
+
+    Action() {
     }
 
     String getDefinition() {
