@@ -4,7 +4,7 @@ public class Logic implements RoleLogic, DataLogic {
 
     private String[] behavior;
 
-    private String[] action;
+    private ImportAction[] action;
 
 
     private Boolean perform;
@@ -23,12 +23,12 @@ public class Logic implements RoleLogic, DataLogic {
     }
 
     @Override
-    public String[] getAction() {
+    public ImportAction[] getAction() {
         return action;
     }
 
     @Override
-    public void setAction(String[] action) {
+    public void setAction(ImportAction[] action) {
         this.action = action;
     }
 
