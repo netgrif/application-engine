@@ -245,7 +245,7 @@ public class TaskService implements ITaskService {
         values.fields().forEachRemaining(entry -> {
             useCase.getDataSet().get(entry.getKey()).setValue(parseFieldsValues(entry.getValue()));
             //changedFields.put(entry.getKey(), new ChangedField(entry.getKey()));
-            runActions(useCase.getPetriNet().getTransition(task.getTransitionId()).getDataSet().get(entry.getKey()).getActions(), useCase, changedFields);
+            //runActions(useCase.getPetriNet().getTransition(task.getTransitionId()).getDataSet().get(entry.getKey()).getActions(), useCase, changedFields);
             //changedFields.remove(entry.getKey());
         });
 
@@ -259,6 +259,8 @@ public class TaskService implements ITaskService {
     private void runActions(Set<String> actions, Case useCase, Map<String, ChangedField> changedFields) {
         actions.forEach(action -> {
             ChangedField field = FieldActionsRunner.run(action, useCase);
+
+            if(field == null) return;
 
             if (changedFields.containsKey(field.getId()))
                 changedFields.get(field.getId()).merge(field);
