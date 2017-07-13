@@ -12,20 +12,27 @@ abstract class Field<T> {
 
     @Id
     protected ObjectId _id
+
+    @JsonIgnore
     protected Long importId
+
     private String name
     private String description
+    private String placeholder
     protected FieldType type
+
     @Transient
     private ObjectNode behavior
+
     @Transient
     private T value
+
     private Long order
 
     @JsonIgnore
     private Boolean immediate
 
-    Field(){
+    Field() {
         _id = new ObjectId()
     }
 
@@ -68,6 +75,14 @@ abstract class Field<T> {
 
     void setDescription(String description) {
         this.description = description
+    }
+
+    String getPlaceholder() {
+        return placeholder
+    }
+
+    void setPlaceholder(String placeholder) {
+        this.placeholder = placeholder
     }
 
     FieldType getType() {
