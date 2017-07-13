@@ -2,16 +2,20 @@ package com.netgrif.workflow.petrinet.domain.dataset.logic.action
 
 import com.netgrif.workflow.petrinet.domain.Transition
 import com.netgrif.workflow.petrinet.domain.dataset.Field
+import com.netgrif.workflow.petrinet.domain.dataset.FieldWithDefault
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedField
 import com.netgrif.workflow.workflow.domain.Case
 
 class ActionDelegate {
+
+    private static final String UNCHANGED_VALUE = "unchangedooo"
 
     private Case useCase
     ChangedField changedField
 
     ActionDelegate(Case useCase) {
         this.useCase = useCase
+        this.changedField = new ChangedField()
     }
 
     def copyBehavior(Field field, Transition transition) {
@@ -45,26 +49,45 @@ class ActionDelegate {
         useCase.dataSet.get(field.objectId).makeHidden(trans.stringId)
     }
 
+    def unchanged = { return UNCHANGED_VALUE }
+
     def make(Field field, Closure behavior) {
         [on: { Transition trans ->
             [when: { Closure condition ->
                 if (condition()) {
                     behavior(field, trans)
-                    changedField = new ChangedField(field.objectId)
+                    changedField.id = field.objectId
                     changedField.behavior = useCase.dataSet.get(field.objectId).behavior
                 }
             }]
         }]
     }
 
+    def saveChangedValue(Field field){
+        useCase.dataSet.get(field.objectId).value = field.value
+        changedField.id = field.objectId
+        changedField.value = field.value
+    }
+
     def change(Field field) {
         [about: { cl ->
             def value = cl()
+            if(value instanceof Closure && value() == UNCHANGED_VALUE){
+                return
+            }
+            if(value == null){
+                if(field instanceof FieldWithDefault && field.defaultValue != useCase.dataSet.get(field.objectId).value){
+                    field.clearValue()
+                    saveChangedValue(field)
+                } else if(!(field instanceof FieldWithDefault) && useCase.dataSet.get(field.objectId).value != null){
+                    field.clearValue()
+                    saveChangedValue(field)
+                }
+                return
+            }
             if (value != null) {
                 field.value = value
-                useCase.dataSet.get(field.objectId).value = value
-                changedField = new ChangedField(field.objectId)
-                changedField.value = field.value
+                saveChangedValue(field)
             }
         }]
     }

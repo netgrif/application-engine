@@ -20,6 +20,12 @@ public class MultichoiceField extends FieldWithDefault<Set<String>> {
         super.defaultValue = new HashSet<String>(vls as Set)
     }
 
+    @Override
+    void clearValue() {
+        super.clearValue()
+        setValue(getDefaultValue())
+    }
+
     public MultichoiceField(String[] values) {
         this();
         if (values != null) {
