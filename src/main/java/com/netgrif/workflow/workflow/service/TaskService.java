@@ -268,8 +268,8 @@ public class TaskService implements ITaskService {
                 changedFields.put(field.getId(), field);
 
             if (field.getValue() != null)
-                getTransitionsByField(field.getId(), useCase.getPetriNet()).forEach(transition ->
-                        runActions(transition.getDataSet().get(field.getId()).getActions(), useCase, changedFields)
+                getTransitionsByField(field.getId(), useCase.getPetriNet()).forEach(transition -> System.out.print(transition)
+                        //runActions(transition.getDataSet().get(field.getId()).getActions(), useCase, changedFields)
                 );
         });
     }
