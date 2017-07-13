@@ -56,8 +56,8 @@ class StartRunner  implements CommandLineRunner{
     }
 
     private void host(){
-        log.info("HOST ADDRESS: "+InetAddress.loopbackAddress.hostAddress)
-        log.info("HOST NAME: "+InetAddress.loopbackAddress.hostName)
+        log.info("HOST ADDRESS: "+InetAddress.localHost.hostAddress)
+        log.info("HOST NAME: "+InetAddress.localHost.hostName)
     }
 
     static String randomColor() {
