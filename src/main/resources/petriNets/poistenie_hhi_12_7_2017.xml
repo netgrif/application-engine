@@ -798,6 +798,10 @@
         <desc>Poistník</desc>
     </data>
     <data type="text">
+        <title>Obchodné meno</title>
+        <id></id>
+    </data>
+    <data type="text">
         <id></id>
         <title>Štátna príslušnosť</title>
         <desc>Poistník</desc>
@@ -825,6 +829,14 @@
         <id></id>
         <title>Číslo preukazu</title>
         <desc>Poistník</desc>
+    </data>
+    <data type="text">
+        <title>Telefónne číslo</title>
+        <id></id>
+    </data>
+    <data type="text">
+        <title>Email</title>
+        <id></id>
     </data>
     <data type="boolean">
         <id></id>
@@ -877,6 +889,10 @@
         <desc>Poistený</desc>
     </data>
     <data type="text">
+        <title>Obchodné meno</title>
+        <id></id>
+    </data>
+    <data type="text">
         <id></id>
         <title>Štátna príslušnosť</title>
         <desc>Poistený</desc>
@@ -904,6 +920,14 @@
         <id></id>
         <title>Číslo preukazu</title>
         <desc>Poistený</desc>
+    </data>
+    <data type="text">
+        <title>Telefónne číslo</title>
+        <id></id>
+    </data>
+    <data type="text">
+        <title>Email</title>
+        <id></id>
     </data>
     <!-- ===== Údaje o mieste poistenia ===== -->
     <data type="enumeration">
