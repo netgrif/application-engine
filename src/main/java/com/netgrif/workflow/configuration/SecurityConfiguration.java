@@ -59,13 +59,13 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             .httpBasic().and()
             .authorizeRequests()
                 .antMatchers("/bower_components/**","/scripts/**","/assets/**","/styles/**","/views/**","/**/favicon.ico").permitAll()
-                .antMatchers("/index.html", "/", "/login", "/login/signup/{token}", "/login/signup", "/login/token","/test", "/importer/xml").permitAll()
+                .antMatchers("/index.html", "/", "/login", "/signup/{token}", "/signup", "/signup/token").permitAll()
                 .anyRequest().authenticated()
             .and()
             .formLogin()
                 .loginPage("/login")
             .and()
-            .csrf()
+            .csrf()//.disable();
                 .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse());
     }
 }

@@ -12,7 +12,7 @@ import org.springframework.session.web.http.HttpSessionStrategy;
 public class SessionConfiguration {
 
     @Bean
-    public JedisConnectionFactory lettuceConnectionFactory() {
+    public JedisConnectionFactory jedisConnectionFactory() {
         return new JedisConnectionFactory();
     }
 
