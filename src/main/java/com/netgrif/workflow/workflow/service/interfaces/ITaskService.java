@@ -48,5 +48,5 @@ public interface ITaskService {
 
     FileSystemResource getFile(String taskId, String fieldId);
 
-    void deleteTasksByCase(Long userId, String caseId);
+    void deleteTasksByCase(String caseId);
 }
