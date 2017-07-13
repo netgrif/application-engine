@@ -11,9 +11,7 @@ import com.netgrif.workflow.event.events.*;
 import com.netgrif.workflow.petrinet.domain.*;
 import com.netgrif.workflow.petrinet.domain.dataset.*;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedField;
-import com.netgrif.workflow.petrinet.domain.dataset.logic.FieldActionsRunner;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.FieldActionsRunner;
-import com.netgrif.workflow.petrinet.domain.dataset.logic.FieldBehavior;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.logic.FileFieldLogic;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.validation.FieldValidationRunner;
 import com.netgrif.workflow.petrinet.domain.roles.RolePermission;
@@ -396,8 +394,9 @@ public class TaskService implements ITaskService {
     public void delegateTask(Long userId, String delegatedEmail, String taskId) throws TransitionNotExecutableException {
         User delegated = userRepository.findByEmail(delegatedEmail);
         User delegate = userRepository.findOne(userId);
-
         Task task = taskRepository.findOne(taskId);
+        Case useCase = caseRepository.findOne(task.getCaseId());
+
         task.setUserId(delegated.getId());
         taskRepository.save(task);
 
@@ -553,6 +552,7 @@ public class TaskService implements ITaskService {
         return tasks;
     }
 
+    @Override
     public void deleteTasksByCase(String caseId){
         taskRepository.deleteAllByCaseId(caseId);
     }
