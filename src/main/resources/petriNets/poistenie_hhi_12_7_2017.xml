@@ -54,14 +54,41 @@
     <data type="boolean">
         <title>Nachádza sa mimo obce (extravilán)?</title>
         <id>101002</id>
+        <action trigger="set">
+            field: f.this,
+            coeff: f.201002;
+            change coeff about{
+            if (field.value)
+                return 1.2 as Double;
+            return 1.0 as Double;
+            }
+        </action>
     </data>
     <data type="boolean">
         <title>Bolo miesto poistenia postihnuté povodňou za posledných 10 rokov?</title>
         <id>101003</id>
+        <action trigger="set">
+            field: f.this,
+            coeff: f.201003;
+            change coeff about{
+            if (field.value)
+                return 1.5 as Double;
+            return 1.0 as Double;
+            }
+        </action>
     </data>
     <data type="boolean">
         <title>Nachádza nehnuteľnosť sa vo vzdialenosti kratšej ako 300 m od vodného toku?</title>
         <id>101004</id>
+        <action trigger="set">
+            field: f.this,
+            coeff: f.201004;
+            change coeff about{
+            if (field.value)
+                return 1.5 as Double;
+            return 1.0 as Double;
+            }
+        </action>
     </data>
     <data type="enumeration">
         <title>Koľko rokov žijete v poisťovanej nehnuteľnosti?</title>
@@ -71,6 +98,20 @@
         <values>1 až 5</values>
         <values>6 až 10</values>
         <values>viac ako 10</values>
+        <action trigger="set">
+            field: f.this,
+            coeff: f.201005;
+            change coeff about{
+            if (field.value=="menej ako 1")
+            return 1.0 as Double;
+            if (field.value=="1 až 5")
+            return 1.0 as Double;
+            if (field.value=="6 až 10")
+            return 1.0 as Double;
+            if (field.value=="viac ako 10")
+            return 1.0 as Double;
+            }
+        </action>
     </data>
     <data type="enumeration">
         <title>Aký je vzťah poisteného k poisťovanej nehnuteľnosti?</title>
@@ -80,6 +121,20 @@
         <values>vlastník ma hypotéku na nehnuteľnosť</values>
         <values>poistený je v prenájme</values>
         <values>iné</values>
+        <action trigger="set">
+            field: f.this,
+            coeff: f.201006;
+            change coeff about{
+            if (field.value=="vlastník nehnuteľnosti")
+            return 1.0 as Double;
+            if (field.value=="vlastník ma hypotéku na nehnuteľnosť")
+            return 1.0 as Double;
+            if (field.value=="poistený je v prenájme")
+            return 1.0 as Double;
+            if (field.value=="iné")
+            return 1.0 as Double;
+            }
+        </action>
     </data>
     <data type="enumeration">
         <title>Koľko dospelých žije v domácnosti?</title>
@@ -89,6 +144,20 @@
         <values>2</values>
         <values>3</values>
         <values>viac ako 3</values>
+        <action trigger="set">
+            field: f.this,
+            coeff: f.201007;
+            change coeff about{
+            if (field.value=="1")
+            return 0.95 as Double;
+            if (field.value=="2")
+            return 1.0 as Double;
+            if (field.value=="3")
+            return 1.05 as Double;
+            if (field.value=="viac ako 3")
+            return 1.1 as Double;
+            }
+        </action>
     </data>
     <data type="enumeration">
         <title>Koľko detí žije v domácnosti?</title>
@@ -98,22 +167,72 @@
         <values>1</values>
         <values>2</values>
         <values>viac</values>
+        <action trigger="set">
+            field: f.this,
+            coeff: f.201008;
+            change coeff about{
+            if (field.value=="0")
+            return 1.0 as Double;
+            if (field.value=="1")
+            return 1.0 as Double;
+            if (field.value=="2")
+            return 1.05 as Double;
+            if (field.value=="viac")
+            return 1.1 as Double;
+            }
+        </action>
     </data>
     <data type="boolean">
         <title>Bolo poistenému alebo spolupoistenej osobe niekedy v minulosti zamiestnuté poistné plnenie alebo vypovedaná poistná zmluva?</title>
         <id>101009</id>
+        <action trigger="set">
+            field: f.this,
+            coeff: f.201009;
+            change coeff about{
+            if (field.value)
+            return 1.5 as Double;
+            return 1.0 as Double;
+            }
+        </action>
     </data>
     <data type="boolean">
         <title>Bol poistený alebo spolupoistená osoba niekedy trestné stihaný / vyhlásil osobný bankrot / stíhaný za dlhy alebo odsúdený za podvodné alebo obdobné konanie.</title>
         <id>101010</id>
+        <action trigger="set">
+            field: f.this,
+            coeff: f.201010;
+            change coeff about{
+            if (field.value)
+            return 1000000000000000000000.0 as Double;
+            return 1.0 as Double;
+            }
+        </action>
     </data>
     <data type="boolean">
         <title>Je plánovaná rekonštrukcia alebo prestavba poisťovanej nehnuteľnosti v priebehu najbližších 3 mesiacov?</title>
         <id>101011</id>
+        <action trigger="set">
+            field: f.this,
+            coeff: f.201011;
+            change coeff about{
+            if (field.value)
+            return 1.2 as Double;
+            return 1.0 as Double;
+            }
+        </action>
     </data>
     <data type="boolean">
         <title>Žije v poisťovanej domácnosti pes alebo mačka?</title>
         <id>101012</id>
+        <action trigger="set">
+            field: f.this,
+            coeff: f.201012;
+            change coeff about{
+            if (field.value)
+            return 1.05 as Double;
+            return 1.0 as Double;
+            }
+        </action>
     </data>
     <data type="enumeration">
         <title>Kedy je nehnuteľnosť najviac obývaná?</title>
@@ -122,10 +241,31 @@
         <values>cez deň</values>
         <values>večer a v noci</values>
         <values>počas celého dňa</values>
+        <action trigger="set">
+            field: f.this,
+            coeff: f.201013;
+            change coeff about{
+            if (field.value=="cez deň")
+            return 1.05 as Double;
+            if (field.value=="večer a v noci")
+            return 1.02 as Double;
+            if (field.value=="počas celého dňa")
+            return 1.0 as Double;
+            }
+        </action>
     </data>
     <data type="boolean">
         <title>Je nehnuteľnosť využívaná aj na podnikanie?</title>
         <id>101014</id>
+        <action trigger="set">
+            field: f.this,
+            coeff: f.201014;
+            change coeff about{
+            if (field.value)
+            return 1.1 as Double;
+            return 1.0 as Double;
+            }
+        </action>
     </data>
     <data type="enumeration">
         <title>Právna subjektivita poisteného?</title>
@@ -134,6 +274,18 @@
         <values>fyzická osoba</values>
         <values>právnická osoba</values>
         <values>fyzická osoba - podnikateľ</values>
+        <action trigger="set">
+            field: f.this,
+            coeff: f.201015;
+            change coeff about{
+            if (field.value=="fyzická osoba")
+            return 1.0 as Double;
+            if (field.value=="právnická osoba")
+            return 1.1 as Double;
+            if (field.value=="fyzická osoba - podnikateľ")
+            return 1.1 as Double;
+            }
+        </action>
     </data>
     <data type="enumeration">
         <title>Počet poistných udalostí za posledné 3 roky?</title>
@@ -142,6 +294,18 @@
         <values>0</values>
         <values>1</values>
         <values>2 a viac</values>
+        <action trigger="set">
+            field: f.this,
+            coeff: f.201016;
+            change coeff about{
+            if (field.value=="0")
+            return 1.0 as Double;
+            if (field.value=="1")
+            return 1.1 as Double;
+            if (field.value=="2 a viac")
+            return 1.2 as Double;
+            }
+        </action>
     </data>
     <!-- ===== Nehnuteľnosť ===== -->
     <data type="enumeration">
@@ -154,6 +318,24 @@
         <values>bytový dom</values>
         <values>bungalow</values>
         <values>rozostavaná stavba</values>
+        <action trigger="set">
+            field: f.this,
+            coeff: f.202001;
+            change coeff about{
+            if (field.value=="byt")
+            return 0.9 as Double;
+            if (field.value=="rodinný dom")
+            return 0.9 as Double;
+            if (field.value=="chata")
+            return 1.2 as Double;
+            if (field.value=="bytový dom")
+            return 0.75 as Double;
+            if (field.value=="bungalow")
+            return 0.9 as Double;
+            if (field.value=="rozostavaná stavba")
+            return 0.9 as Double;
+            }
+        </action>
     </data>
     <data type="enumeration">
         <title>Konštrukcia múrov</title>
@@ -164,6 +346,22 @@
         <values>škvarobatón</values>
         <values>sklo</values>
         <values>drevo</values>
+        <action trigger="set">
+            field: f.this,
+            coeff: f.202002;
+            change coeff about{
+            if (field.value=="tehla a/alebo betón")
+            return 1.0 as Double;
+            if (field.value=="porobetón (ytong)")
+            return 1.05 as Double;
+            if (field.value=="škvarobatón")
+            return 1.05 as Double;
+            if (field.value=="sklo")
+            return 1.3 as Double;
+            if (field.value=="drevo")
+            return 1.5 as Double;
+            }
+        </action>
     </data>
     <data type="enumeration">
         <title>Konštrukcia strechy</title>
@@ -176,6 +374,26 @@
         <values>sklo</values>
         <values>šindel</values>
         <values>iné</values>
+        <action trigger="set">
+            field: f.this,
+            coeff: f.202003;
+            change coeff about{
+            if (field.value=="škridla")
+            return 1.0 as Double;
+            if (field.value=="plech")
+            return 1.05 as Double;
+            if (field.value=="asfalt")
+            return 1.1 as Double;
+            if (field.value=="hydroizolačné fólie")
+            return 1.1 as Double;
+            if (field.value=="sklo")
+            return 1.15 as Double;
+            if (field.value=="šindel")
+            return 1.05 as Double;
+            if (field.value=="iné")
+            return 1.1 as Double;
+            }
+        </action>
     </data>
     <data type="enumeration">
         <title>Koľko rokov má nehnuteľnosť?</title>
@@ -185,10 +403,33 @@
         <values>6 až 10</values>
         <values>11 až 20</values>
         <values>viac ako 20</values>
+        <action trigger="set">
+            field: f.this,
+            coeff: f.202004;
+            change coeff about{
+            if (field.value=="menej ako 5")
+            return 1.0 as Double;
+            if (field.value=="6 až 10")
+            return 1.05 as Double;
+            if (field.value=="11 až 20")
+            return 1.1 as Double;
+            if (field.value=="viac ako 20")
+            return 1.2 as Double;
+            }
+        </action>
     </data>
     <data type="boolean">
         <title>Má nehnuteľnosť praskliny na vonkajšej fasáde?</title>
         <id>102005</id>
+        <action trigger="set">
+            field: f.this,
+            coeff: f.202005;
+            change coeff about{
+            if (field.value)
+            return 1.5 as Double;
+            return 1.2 as Double;
+            }
+        </action>
     </data>
     <data type="enumeration">
         <title>Koľko izieb má nehnuteľnosť?</title>
@@ -199,6 +440,22 @@
         <values>3</values>
         <values>4</values>
         <values>viac ako 4</values>
+        <action trigger="set">
+            field: f.this,
+            coeff: f.202006;
+            change coeff about{
+            if (field.value=="1")
+            return 0.9 as Double;
+            if (field.value=="2")
+            return 1.0 as Double;
+            if (field.value=="3")
+            return 1.1 as Double;
+            if (field.value=="4")
+            return 1.15 as Double;
+            if (field.value=="viac ako 4")
+            return 1.2 as Double;
+            }
+        </action>
     </data>
     <data type="enumeration">
         <title>Koľko kúpeľní má nehnuteľnosť?</title>
@@ -206,9 +463,19 @@
         <placeholder>Počet</placeholder>
         <values>1</values>
         <values>2</values>
-        <values>3</values>
-        <values>4</values>
-        <values>viac ako 4</values>
+        <values>viac ako 2</values>
+        <action trigger="set">
+            field: f.this,
+            coeff: f.202007;
+            change coeff about{
+            if (field.value=="1")
+            return 1.0 as Double;
+            if (field.value=="2")
+            return 1.1 as Double;
+            if (field.value=="viac ako 2")
+            return 1.2 as Double;
+            }
+        </action>
     </data>
     <data type="enumeration">
         <title>Uveďte celkovú hodnotu rekonštrukcií, ak boli vykonané</title>
@@ -218,6 +485,20 @@
         <values>do 20 000 EUR</values>
         <values>do 50 000 EUR</values>
         <values>nad 50 000 EUR</values>
+        <action trigger="set">
+            field: f.this,
+            coeff: f.202008;
+            change coeff about{
+            if (field.value=="bez rekonštrukcií")
+            return 1.0 as Double;
+            if (field.value=="do 20 000 EUR")
+            return 0.95 as Double;
+            if (field.value=="do 50 000 EUR")
+            return 0.9 as Double;
+            if (field.value=="nad 50 000 EUR")
+            return 0.85 as Double;
+            }
+        </action>
     </data>
     <!-- ===== Domácnosť ===== -->
     <data type="enumeration">
@@ -267,27 +548,102 @@
         <title>Podlahová plocha pivnice</title>
         <id>105001</id>
         <placeholder>m2</placeholder>
+        <action trigger="set">
+            field: f.this,
+            location: f.301002,
+            coeff: f.205002;
+            change coeff about{
+            if (location.value=="BA")
+            return 850*field.value as Double;
+            if (location.value=="Dedina")
+            return 400*field.value as Double;
+            if (location.value=="Mesto")
+            return 650*field.value as Double;
+            if (location.value=="Krajské mesto")
+            return 700*field.value as Double;
+            }
+        </action>
     </data>
     <data type="number">
         <title>Podlahová plocha prízemia</title>
         <id>105002</id>
         <placeholder>m2</placeholder>
+        <action trigger="set">
+            field: f.this,
+            location: f.301002,
+            coeff: f.205003;
+            change coeff about{
+            if (location.value=="BA")
+            return 1400*field.value as Double;
+            if (location.value=="Dedina")
+            return 550*field.value as Double;
+            if (location.value=="Mesto")
+            return 800*field.value as Double;
+            if (location.value=="Krajské mesto")
+            return 900*field.value as Double;
+            }
+        </action>
     </data>
     <data type="number">
         <title>Podlahová plocha vštkých obytných poschodí</title>
         <id>105003</id>
         <placeholder>m2</placeholder>
         <desc>Okrem prízemia</desc>
+        <action trigger="set">
+            field: f.this,
+            location: f.301002,
+            coeff: f.205004;
+            change coeff about{
+            if (location.value=="BA")
+            return 1200*field.value as Double;
+            if (location.value=="Dedina")
+            return 450*field.value as Double;
+            if (location.value=="Mesto")
+            return 700*field.value as Double;
+            if (location.value=="Krajské mesto")
+            return 800*field.value as Double;
+            }
+        </action>
     </data>
     <data type="number">
         <title>Podlahová plocha garáže</title>
         <id>105004</id>
         <placeholder>m2</placeholder>
+        <action trigger="set">
+            field: f.this,
+            location: f.301002,
+            coeff: f.205005;
+            change coeff about{
+            if (location.value=="BA")
+            return 850*field.value as Double;
+            if (location.value=="Dedina")
+            return 400*field.value as Double;
+            if (location.value=="Mesto")
+            return 650*field.value as Double;
+            if (location.value=="Krajské mesto")
+            return 700*field.value as Double;
+            }
+        </action>
     </data>
     <data type="number">
         <title>Celková podlahová plocha</title>
         <id>305001</id>
         <placeholder>m2</placeholder>
+        <action trigger="set">
+            field: f.this,
+            location: f.301002,
+            coeff: f.205001;
+            change coeff about{
+            if (location.value=="BA")
+            return 1900*field.value as Double;
+            if (location.value=="Dedina")
+            return 700*field.value as Double;
+            if (location.value=="Mesto")
+            return 950*field.value as Double;
+            if (location.value=="Krajské mesto")
+            return 1300*field.value as Double;
+            }
+        </action>
     </data>
     <data type="enumeration">
         <title>Poistenie nehnuteľnosti</title>
@@ -325,10 +681,28 @@
     <data type="boolean">
         <title>Rovnaké miesto poistenia garáže?</title>
         <id>105008</id>
+        <action trigger="set">
+            field: f.this,
+            coeff: f.208003;
+            change coeff about{
+            if (field.value)
+            return 1.0 as Double;
+            return 1.1 as Double;
+            }
+        </action>
     </data>
     <data type="boolean">
         <title>Hospodárska budova</title>
         <id>105009</id>
+        <action trigger="set">
+            field: f.this,
+            coeff: f.205007;
+            change coeff about{
+            if (field.value)
+            return 1.0 as Double;
+            return 0 as Double;
+            }
+        </action>
     </data>
     <data type="number">
         <title>Hospodárska budova</title>
@@ -343,6 +717,15 @@
     <data type="boolean">
         <title>Altánok</title>
         <id>105011</id>
+        <action trigger="set">
+            field: f.this,
+            coeff: f.205008;
+            change coeff about{
+            if (field.value)
+            return 1.0 as Double;
+            return 0 as Double;
+            }
+        </action>
     </data>
     <data type="number">
         <title>Altánok</title>
@@ -357,6 +740,15 @@
     <data type="boolean">
         <title>Prístrešok</title>
         <id>105013</id>
+        <action trigger="set">
+            field: f.this,
+            coeff: f.205009;
+            change coeff about{
+            if (field.value)
+            return 1.0 as Double;
+            return 0 as Double;
+            }
+        </action>
     </data>
     <data type="number">
         <title>Prístrešok</title>
@@ -371,6 +763,15 @@
     <data type="boolean">
         <title>Chodník</title>
         <id>105015</id>
+        <action trigger="set">
+            field: f.this,
+            coeff: f.205010;
+            change coeff about{
+            if (field.value)
+            return 1.0 as Double;
+            return 0 as Double;
+            }
+        </action>
     </data>
     <data type="number">
         <title>Chodník, parkovacia plocha</title>
@@ -385,6 +786,15 @@
     <data type="boolean">
         <title>Sauna</title>
         <id>105017</id>
+        <action trigger="set">
+            field: f.this,
+            coeff: f.205011;
+            change coeff about{
+            if (field.value)
+            return 1.0 as Double;
+            return 0 as Double;
+            }
+        </action>
     </data>
     <data type="number">
         <title>Sauna</title>
@@ -399,6 +809,15 @@
     <data type="boolean">
         <title>Elektrická brána</title>
         <id>105019</id>
+        <action trigger="set">
+            field: f.this,
+            coeff: f.205012;
+            change coeff about{
+            if (field.value)
+            return 1.0 as Double;
+            return 0 as Double;
+            }
+        </action>
     </data>
     <data type="number">
         <title>Elektrická brána, oplotenie</title>
@@ -413,6 +832,15 @@
     <data type="boolean">
         <title>Tenisový kurt</title>
         <id>105021</id>
+        <action trigger="set">
+            field: f.this,
+            coeff: f.205013;
+            change coeff about{
+            if (field.value)
+            return 1.0 as Double;
+            return 0 as Double;
+            }
+        </action>
     </data>
     <data type="number">
         <title>Tenisový kurt</title>
@@ -427,6 +855,15 @@
     <data type="boolean">
         <title>Vonkajší bazén</title>
         <id>105023</id>
+        <action trigger="set">
+            field: f.this,
+            coeff: f.205014;
+            change coeff about{
+            if (field.value)
+            return 1.0 as Double;
+            return 0 as Double;
+            }
+        </action>
     </data>
     <data type="number">
         <title>Vonkajší bazén</title>
@@ -441,6 +878,15 @@
     <data type="boolean">
         <title>Studňa</title>
         <id>105025</id>
+        <action trigger="set">
+            field: f.this,
+            coeff: f.205015;
+            change coeff about{
+            if (field.value)
+            return 1.0 as Double;
+            return 0 as Double;
+            }
+        </action>
     </data>
     <data type="number">
         <title>Studňa</title>
@@ -455,6 +901,15 @@
     <data type="boolean">
         <title>Žumpa, septik</title>
         <id>105027</id>
+        <action trigger="set">
+            field: f.this,
+            coeff: f.205016;
+            change coeff about{
+            if (field.value)
+            return 1.0 as Double;
+            return 0 as Double;
+            }
+        </action>
     </data>
     <data type="number">
         <title>Žumpa, septik</title>
@@ -469,6 +924,15 @@
     <data type="boolean">
         <title>Iné</title>
         <id>105029</id>
+        <action trigger="set">
+            field: f.this,
+            coeff: f.205017;
+            change coeff about{
+            if (field.value)
+            return 1.0 as Double;
+            return 0 as Double;
+            }
+        </action>
     </data>
     <data type="number">
         <title>Iné</title>
@@ -484,6 +948,15 @@
         <title>Stavebné materialy</title>
         <id>105031</id>
         <placeholder></placeholder>
+        <action trigger="set">
+            field: f.this,
+            coeff: f.205018;
+            change coeff about{
+            if (field.value)
+            return 3.5 as Double;
+            return 0 as Double;
+            }
+        </action>
     </data>
     <data type="number">
         <title>Stavebné materiály - poistná suma</title>
@@ -499,6 +972,15 @@
         <title>Stavebné a záhradné mechanizmy</title>
         <id>105033</id>
         <placeholder></placeholder>
+        <action trigger="set">
+            field: f.this,
+            coeff: f.205019;
+            change coeff about{
+            if (field.value)
+            return 3.5 as Double;
+            return 0 as Double;
+            }
+        </action>
     </data>
     <data type="number">
         <title>Stavebné a záhradné mechanizmy</title>
