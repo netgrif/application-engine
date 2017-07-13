@@ -953,7 +953,7 @@
         <title>Koeficient - Poistenie zodpovednosti z vlastníctva nehnuteľnosti</title>
         <id>207001</id>
     </data>
-    <!-- ===== Údaje k zmluve ===== -->
+    <!-- ===== Údaje o zmluve ===== -->
     <data type="text">
         <title>Číslo ponuky</title>
         <id>309001</id>
@@ -1076,6 +1076,7 @@
     <data type="boolean">
         <title>Poistený je iná osoba</title>
         <id>109020</id>
+        <init>false</init>
         <desc>Poistený a poistenec sú rôzne osoby</desc>
     </data>
     <!-- Poistený -->
@@ -1841,6 +1842,55 @@
                 <perform>true</perform>
             </logic>
         </roleRef>
+        <!-- ===== Údaje o zmluve ===== -->
+        <dataRef>
+            <id>309001</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109001</id>
+            <logic>
+                <behavior>required</behavior>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109002</id>
+            <logic>
+                <behavior>required</behavior>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109003</id>
+            <logic>
+                <behavior>required</behavior>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109004</id>
+            <logic>
+                <behavior>required</behavior>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109005</id>
+            <logic>
+                <behavior>required</behavior>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109006</id>
+            <logic>
+                <behavior>required</behavior>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
     </transition>
     <transition>
         <id>588</id>
@@ -1856,6 +1906,818 @@
                 <perform>true</perform>
             </logic>
         </roleRef>
+        <!-- ===== Údaje o poistníkovi ===== -->
+        <!-- Poistník -->
+        <dataRef>
+            <id>109007</id>
+            <logic>
+                <behavior>required</behavior>
+                <behavior>editable</behavior>
+                <action>
+                    check: f.109020,
+                    field: f.109007,
+                    other: f.109021;
+                    change other about {
+                        if (check.value == false) {
+                            return field.value as String;
+                        }
+                        return other.value as String;
+                    }
+                </action>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109008</id>
+            <logic>
+                <behavior>required</behavior>
+                <behavior>editable</behavior>
+                <action>
+                    check: f.109020,
+                    field: f.109008,
+                    other: f.109022;
+                    change other about {
+                        if (check.value == false) {
+                            return field.value as String;
+                        }
+                        return other.value as String;
+                    }
+                </action>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109009</id>
+            <logic>
+                <behavior>required</behavior>
+                <behavior>editable</behavior>
+                <action>
+                    check: f.109020,
+                    field: f.109009,
+                    other: f.109023;
+                    change other about {
+                        if (check.value == false) {
+                            return field.value as String;
+                        }
+                        return other.value as String;
+                    }
+                </action>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109010</id>
+            <logic>
+                <behavior>required</behavior>
+                <behavior>editable</behavior>
+                <action>
+                    check: f.109020,
+                    field: f.109010,
+                    other: f.109024;
+                    change other about {
+                        if (check.value == false) {
+                            return field.value as String;
+                        }
+                        return other.value as String;
+                    }
+                </action>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109011</id>
+            <logic>
+                <behavior>required</behavior>
+                <behavior>editable</behavior>
+                <action>
+                    check: f.109020,
+                    field: f.109011,
+                    other: f.109025;
+                    change other about {
+                        if (check.value == false) {
+                            return field.value as String;
+                        }
+                        return other.value as String;
+                    }
+                </action>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109012</id>
+            <logic>
+                <behavior>required</behavior>
+                <behavior>editable</behavior>
+                <action>
+                    check: f.109020,
+                    field: f.109012,
+                    other: f.109026;
+                    change other about {
+                        if (check.value == false) {
+                            return field.value as String;
+                        }
+                        return other.value as String;
+                    }
+                </action>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109013</id>
+            <logic>
+                <behavior>required</behavior>
+                <behavior>editable</behavior>
+                <action>
+                    check: f.109020,
+                    field: f.109013,
+                    other: f.109027;
+                    change other about {
+                        if (check.value == false) {
+                            return field.value as String;
+                        }
+                        return other.value as String;
+                    }
+                </action>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109014</id>
+            <logic>
+                <behavior>required</behavior>
+                <behavior>editable</behavior>
+                <!-- todo: return as wtf? -->
+                <action>
+                    check: f.109020,
+                    field: f.109014,
+                    other: f.109028;
+                    change other about {
+                        if (check.value == false) {
+                            return field.value;
+                        }
+                        return other.value;
+                    }
+                </action>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109015</id>
+            <logic>
+                <behavior>required</behavior>
+                <behavior>editable</behavior>
+                <action>
+                    check: f.109020,
+                    field: f.109015,
+                    other: f.109029;
+                    change other about {
+                        if (check.value == false) {
+                            return field.value as String;
+                        }
+                        return other.value as String;
+                    }
+                </action>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109016</id>
+            <logic>
+                <behavior>required</behavior>
+                <behavior>editable</behavior>
+                <action>
+                    check: f.109020,
+                    field: f.109016,
+                    other: f.109030;
+                    change other about {
+                        if (check.value == false) {
+                            return field.value as String;
+                        }
+                        return other.value as String;
+                    }
+                </action>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109017</id>
+            <logic>
+                <behavior>required</behavior>
+                <behavior>editable</behavior>
+                <action>
+                    check: f.109020,
+                    field: f.109017,
+                    other: f.109031;
+                    change other about {
+                        if (check.value == false) {
+                            return field.value as String;
+                        }
+                        return other.value as String;
+                    }
+                </action>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109018</id>
+            <logic>
+                <behavior>required</behavior>
+                <behavior>editable</behavior>
+                <action>
+                    check: f.109020,
+                    field: f.109018,
+                    other: f.109032;
+                    change other about {
+                        if (check.value == false) {
+                            return field.value as String;
+                        }
+                        return other.value as String;
+                    }
+                </action>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109019</id>
+            <logic>
+                <behavior>required</behavior>
+                <behavior>editable</behavior>
+                <action>
+                    check: f.109020,
+                    field: f.109019,
+                    other: f.109033;
+                    change other about {
+                        if (check.value == false) {
+                            return field.value as String;
+                        }
+                        return other.value as String;
+                    }
+                </action>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109020</id>
+            <logic>
+                <behavior>editable</behavior>
+                <!-- Show poisteny when true -->
+                <action>
+                    field: f.this,
+                    other: f.109021,
+                    trans: t.588;
+                    make other,visible on trans when { field.value }
+                </action>
+                <action>
+                    field: f.this,
+                    other: f.109022,
+                    trans: t.588;
+                    make other,visible on trans when { field.value }
+                </action>
+                <action>
+                    field: f.this,
+                    other: f.109023,
+                    trans: t.588;
+                    make other,visible on trans when { field.value }
+                </action>
+                <action>
+                    field: f.this,
+                    other: f.109024,
+                    trans: t.588;
+                    make other,visible on trans when { field.value }
+                </action>
+                <action>
+                    field: f.this,
+                    other: f.109025,
+                    trans: t.588;
+                    make other,visible on trans when { field.value }
+                </action>
+                <action>
+                    field: f.this,
+                    other: f.109026,
+                    trans: t.588;
+                    make other,visible on trans when { field.value }
+                </action>
+                <action>
+                    field: f.this,
+                    other: f.109027,
+                    trans: t.588;
+                    make other,visible on trans when { field.value }
+                </action>
+                <action>
+                    field: f.this,
+                    other: f.109028,
+                    trans: t.588;
+                    make other,visible on trans when { field.value }
+                </action>
+                <action>
+                    field: f.this,
+                    other: f.109029,
+                    trans: t.588;
+                    make other,visible on trans when { field.value }
+                </action>
+                <action>
+                    field: f.this,
+                    other: f.109030,
+                    trans: t.588;
+                    make other,visible on trans when { field.value }
+                </action>
+                <action>
+                    field: f.this,
+                    other: f.109031,
+                    trans: t.588;
+                    make other,visible on trans when { field.value }
+                </action>
+                <action>
+                    field: f.this,
+                    other: f.109032,
+                    trans: t.588;
+                    make other,visible on trans when { field.value }
+                </action>
+                <action>
+                    field: f.this,
+                    other: f.109033,
+                    trans: t.588;
+                    make other,visible on trans when { field.value }
+                </action>
+                <!-- Hide poisteny when false -->
+                <action>
+                    field: f.this,
+                    other: f.109021,
+                    trans: t.588;
+                    make other,hidden on trans when { return !field.value }
+                </action>
+                <action>
+                    field: f.this,
+                    other: f.109022,
+                    trans: t.588;
+                    make other,hidden on trans when { return !field.value }
+                </action>
+                <action>
+                    field: f.this,
+                    other: f.109023,
+                    trans: t.588;
+                    make other,hidden on trans when { return !field.value }
+                </action>
+                <action>
+                    field: f.this,
+                    other: f.109024,
+                    trans: t.588;
+                    make other,hidden on trans when { return !field.value }
+                </action>
+                <action>
+                    field: f.this,
+                    other: f.109025,
+                    trans: t.588;
+                    make other,hidden on trans when { return !field.value }
+                </action>
+                <action>
+                    field: f.this,
+                    other: f.109026,
+                    trans: t.588;
+                    make other,hidden on trans when { return !field.value }
+                </action>
+                <action>
+                    field: f.this,
+                    other: f.109027,
+                    trans: t.588;
+                    make other,hidden on trans when { return !field.value }
+                </action>
+                <action>
+                    field: f.this,
+                    other: f.109028,
+                    trans: t.588;
+                    make other,hidden on trans when { return !field.value }
+                </action>
+                <action>
+                    field: f.this,
+                    other: f.109029,
+                    trans: t.588;
+                    make other,hidden on trans when { return !field.value }
+                </action>
+                <action>
+                    field: f.this,
+                    other: f.109030,
+                    trans: t.588;
+                    make other,hidden on trans when { return !field.value }
+                </action>
+                <action>
+                    field: f.this,
+                    other: f.109031,
+                    trans: t.588;
+                    make other,hidden on trans when { return !field.value }
+                </action>
+                <action>
+                    field: f.this,
+                    other: f.109032,
+                    trans: t.588;
+                    make other,hidden on trans when { return !field.value }
+                </action>
+                <action>
+                    field: f.this,
+                    other: f.109033,
+                    trans: t.588;
+                    make other,hidden on trans when { return !field.value }
+                </action>
+                <!-- Fill poisteny when false -->
+                <action>
+                    field: f.this,
+                    f_1: f.109007,
+                    f_2: t.109021;
+                    change f_2 about {
+                        if (field.value == false) {
+                            return f_1.value as String;
+                        }
+                        return f_2.value as String;
+                    }
+                </action>
+                <action>
+                    field: f.this,
+                    f_1: f.109008,
+                    f_2: t.109022;
+                    change f_2 about {
+                        if (field.value == false) {
+                            return f_1.value as String;
+                        }
+                        return f_2.value as String;
+                    }
+                </action>
+                <action>
+                    field: f.this,
+                    f_1: f.109009,
+                    f_2: t.109023;
+                    change f_2 about {
+                        if (field.value == false) {
+                            return f_1.value as String;
+                        }
+                        return f_2.value as String;
+                    }
+                </action>
+                <action>
+                    field: f.this,
+                    f_1: f.109010,
+                    f_2: t.109024;
+                    change f_2 about {
+                        if (field.value == false) {
+                            return f_1.value as String;
+                        }
+                        return f_2.value as String;
+                    }
+                </action>
+                <action>
+                    field: f.this,
+                    f_1: f.109011,
+                    f_2: t.109025;
+                    change f_2 about {
+                        if (field.value == false) {
+                            return f_1.value as String;
+                        }
+                        return f_2.value as String;
+                    }
+                </action>
+                <action>
+                    field: f.this,
+                    f_1: f.109012,
+                    f_2: t.109026;
+                    change f_2 about {
+                        if (field.value == false) {
+                            return f_1.value as String;
+                        }
+                        return f_2.value as String;
+                    }
+                </action>
+                <action>
+                    field: f.this,
+                    f_1: f.109013,
+                    f_2: t.109027;
+                    change f_2 about {
+                        if (field.value == false) {
+                            return f_1.value as String;
+                        }
+                        return f_2.value as String;
+                    }
+                </action>
+                <!-- todo: return as wtf?-->
+                <action>
+                    field: f.this,
+                    f_1: f.109014,
+                    f_2: t.109028;
+                    change f_2 about {
+                        if (field.value == false) {
+                            return f_1.value;
+                        }
+                        return f_2.value;
+                    }
+                </action>
+                <action>
+                    field: f.this,
+                    f_1: f.109015,
+                    f_2: t.109029;
+                    change f_2 about {
+                        if (field.value == false) {
+                            return f_1.value as String;
+                        }
+                        return f_2.value as String;
+                    }
+                </action>
+                <action>
+                    field: f.this,
+                    f_1: f.109016,
+                    f_2: t.109030;
+                    change f_2 about {
+                        if (field.value == false) {
+                            return f_1.value as String;
+                        }
+                        return f_2.value as String;
+                    }
+                </action>
+                <action>
+                    field: f.this,
+                    f_1: f.109017,
+                    f_2: t.109031;
+                    change f_2 about {
+                        if (field.value == false) {
+                            return f_1.value as String;
+                        }
+                        return f_2.value as String;
+                    }
+                </action>
+                <action>
+                    field: f.this,
+                    f_1: f.109018,
+                    f_2: t.109032;
+                    change f_2 about {
+                        if (field.value == false) {
+                            return f_1.value as String;
+                        }
+                        return f_2.value as String;
+                    }
+                </action>
+                <action>
+                    field: f.this,
+                    f_1: f.109019,
+                    f_2: t.109033;
+                    change f_2 about {
+                        if (field.value == false) {
+                            return f_1.value as String;
+                        }
+                        return f_2.value as String;
+                    }
+                </action>
+            </logic>
+        </dataRef>
+        <!-- Poistený -->
+        <dataRef>
+            <id>109021</id>
+            <logic>
+                <behavior>required</behavior>
+                <behavior>hidden</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109022</id>
+            <logic>
+                <behavior>required</behavior>
+                <behavior>hidden</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109023</id>
+            <logic>
+                <behavior>required</behavior>
+                <behavior>hidden</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109024</id>
+            <logic>
+                <behavior>required</behavior>
+                <behavior>hidden</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109025</id>
+            <logic>
+                <behavior>required</behavior>
+                <behavior>hidden</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109026</id>
+            <logic>
+                <behavior>required</behavior>
+                <behavior>hidden</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109027</id>
+            <logic>
+                <behavior>required</behavior>
+                <behavior>hidden</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109028</id>
+            <logic>
+                <behavior>required</behavior>
+                <behavior>hidden</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109029</id>
+            <logic>
+                <behavior>required</behavior>
+                <behavior>hidden</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109030</id>
+            <logic>
+                <behavior>required</behavior>
+                <behavior>hidden</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109031</id>
+            <logic>
+                <behavior>required</behavior>
+                <behavior>hidden</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109032</id>
+            <logic>
+                <behavior>required</behavior>
+                <behavior>hidden</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109033</id>
+            <logic>
+                <behavior>required</behavior>
+                <behavior>hidden</behavior>
+            </logic>
+        </dataRef>
+        <!-- Údaje o mieste poistenia -->
+        <dataRef>
+            <id>109034</id>
+            <logic>
+                <behavior>editable</behavior>
+                <!--todo: action-->
+            </logic>
+        </dataRef>
+        <!-- Adresa poistníka -->
+        <dataRef>
+            <id>109035</id>
+            <logic>
+                <behavior>required</behavior>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109036</id>
+            <logic>
+                <behavior>required</behavior>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109037</id>
+            <logic>
+                <behavior>required</behavior>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109038</id>
+            <logic>
+                <behavior>required</behavior>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109039</id>
+            <logic>
+                <behavior>required</behavior>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <!-- Adresa poisteného -->
+        <dataRef>
+            <id>109040</id>
+            <logic>
+                <behavior>required</behavior>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109041</id>
+            <logic>
+                <behavior>required</behavior>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109042</id>
+            <logic>
+                <behavior>required</behavior>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109043</id>
+            <logic>
+                <behavior>required</behavior>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109044</id>
+            <logic>
+                <behavior>required</behavior>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <!-- Iná adresa -->
+        <dataRef>
+            <id>109045</id>
+            <logic>
+                <behavior>required</behavior>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109046</id>
+            <logic>
+                <behavior>required</behavior>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109047</id>
+            <logic>
+                <behavior>required</behavior>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109048</id>
+            <logic>
+                <behavior>required</behavior>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <!-- Adresa dodatočné info -->
+        <dataRef>
+            <id>109049</id>
+            <logic>
+                <behavior>required</behavior>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109050</id>
+            <logic>
+                <behavior>required</behavior>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109051</id>
+            <logic>
+                <behavior>required</behavior>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109052</id>
+            <logic>
+                <behavior>required</behavior>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109053</id>
+            <logic>
+                <behavior>required</behavior>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <!-- Adresa garáže -->
+        <dataRef>
+            <id>109054</id>
+            <logic>
+                <behavior>required</behavior>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109055</id>
+            <logic>
+                <behavior>required</behavior>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109056</id>
+            <logic>
+                <behavior>required</behavior>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109057</id>
+            <logic>
+                <behavior>required</behavior>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
     </transition>
     <transition>
         <id>596</id>
