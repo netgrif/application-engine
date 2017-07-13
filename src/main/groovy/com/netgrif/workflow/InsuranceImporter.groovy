@@ -11,6 +11,8 @@ import com.netgrif.workflow.auth.service.interfaces.IUserService
 import com.netgrif.workflow.importer.Importer
 import com.netgrif.workflow.petrinet.domain.PetriNet
 import com.netgrif.workflow.petrinet.domain.dataset.FieldWithDefault
+import com.netgrif.workflow.petrinet.domain.dataset.FileField
+import com.netgrif.workflow.petrinet.domain.dataset.logic.logic.Insurance
 import com.netgrif.workflow.petrinet.domain.dataset.logic.validation.FieldValidationRunner
 import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository
 import com.netgrif.workflow.workflow.domain.Case
@@ -50,7 +52,7 @@ class InsuranceImporter {
 
 
     void run(String... strings) throws Exception {
-        def net = importer.importPetriNet(new File("src/main/resources/petriNets/poistenie_hhi.xml"), "Insurance", "INS")
+        def net = importer.importPetriNet(new File("src/main/resources/petriNets/poistenie_hhi_12_7_2017.xml"), "Insurance", "INS")
 //        def net = importer.importPetriNet(new File("src/main/resources/petriNets/insurance_demo.xml"), "Insurance", "INS")
 
         def orgs = createOrganizations()
@@ -102,20 +104,25 @@ class InsuranceImporter {
 
     private void createCases(PetriNet net){
         createCase("Prvé poistenie",net,1L)
-        createCase("Druhé poistenie",net,1L)
+        Case useCase = createCase("Druhé poistenie",net,1L)
 
 //        def field = net.dataSet.find {it.value.name == "How many adults 18 or over live in the property"}.value
 //        field.value = 5
 //        def js = FieldValidationRunner.toJavascript(field,field.validationRules)
 //        def valid = FieldValidationRunner.validate(field,field.validationRules)
 //        field.validationJS(js)
+
+        //def field = useCase.petriNet.dataSet.values().find { v -> v.name == "Ponuka PDF"}
+        //def file = new Insurance(useCase,(FileField)field).offerPDF()
+        //println file
     }
 
-    private void createCase(String title, PetriNet net, Long author){
+    private Case createCase(String title, PetriNet net, Long author){
         Case useCase = new Case(title,net,net.getActivePlaces())
         useCase.setColor(StartRunner.randomColor())
         useCase.setAuthor(author)
         useCase = caseRepository.save(useCase)
         taskService.createTasks(useCase)
+        return useCase
     }
 }

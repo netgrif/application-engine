@@ -245,7 +245,7 @@ public class TaskService implements ITaskService {
         values.fields().forEachRemaining(entry -> {
             useCase.getDataSet().get(entry.getKey()).setValue(parseFieldsValues(entry.getValue()));
             //changedFields.put(entry.getKey(), new ChangedField(entry.getKey()));
-            runActions(useCase.getPetriNet().getTransition(task.getTransitionId()).getDataSet().get(entry.getKey()).getActions(), useCase, changedFields);
+            //runActions(useCase.getPetriNet().getTransition(task.getTransitionId()).getDataSet().get(entry.getKey()).getActions(), useCase, changedFields);
             //changedFields.remove(entry.getKey());
         });
 
@@ -259,6 +259,8 @@ public class TaskService implements ITaskService {
     private void runActions(Set<String> actions, Case useCase, Map<String, ChangedField> changedFields) {
         actions.forEach(action -> {
             ChangedField field = FieldActionsRunner.run(action, useCase);
+
+            if(field == null) return;
 
             if (changedFields.containsKey(field.getId()))
                 changedFields.get(field.getId()).merge(field);
@@ -325,7 +327,13 @@ public class TaskService implements ITaskService {
 
         net.getArcsOfTransition(task.getTransitionId()).stream()
                 .filter(arc -> arc.getSource() instanceof Place)
-                .forEach(Arc::rollbackExecution);
+                .forEach(arc -> {
+                    if (arc instanceof ResetArc) {
+                        ((ResetArc) arc).setRemovedTokens(useCase.getResetArcTokens().get(arc.getStringId()));
+                        useCase.getResetArcTokens().remove(arc.getStringId());
+                    }
+                    arc.rollbackExecution();
+                });
         useCase.updateActivePlaces();
 
         taskRepository.delete(taskId);
@@ -336,7 +344,7 @@ public class TaskService implements ITaskService {
     }
 
     @Transactional
-    private void moveAttributes(Task oldTask) {
+    protected void moveAttributes(Task oldTask) {
         Task newTask = taskRepository.findByTransitionIdAndCaseId(oldTask.getTransitionId(), oldTask.getCaseId());
         newTask.setRequiredFilled(oldTask.getRequiredFilled());
 
@@ -444,6 +452,9 @@ public class TaskService implements ITaskService {
     @Transactional
     void finishExecution(Transition transition, Case useCase) throws TransitionNotExecutableException {
         execute(transition, useCase, arc -> arc.getSource() == transition);
+        useCase.getPetriNet().getArcsOfTransition(transition.getStringId()).stream()
+                .filter(arc -> arc instanceof ResetArc)
+                .forEach(arc -> useCase.getResetArcTokens().remove(arc.getStringId()));
     }
 
     @Transactional
@@ -457,7 +468,12 @@ public class TaskService implements ITaskService {
         if (!filteredSupplier.get().allMatch(Arc::isExecutable))
             throw new TransitionNotExecutableException("Not all arcs can be executed.");
 
-        filteredSupplier.get().forEach(Arc::execute);
+        filteredSupplier.get().forEach(arc -> {
+            if (arc instanceof ResetArc) {
+                useCase.getResetArcTokens().put(arc.getStringId(), ((Place)arc.getSource()).getTokens());
+            }
+            arc.execute();
+        });
 
         useCase.updateActivePlaces();
     }
