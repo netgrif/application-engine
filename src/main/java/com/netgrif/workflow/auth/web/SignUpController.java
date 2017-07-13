@@ -21,6 +21,7 @@ import javax.mail.MessagingException;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
@@ -67,7 +68,7 @@ public class SignUpController {
             mailService.sendRegistrationEmail(mail, token.getHashedToken());
 
             return MessageResource.successMessage("Mail was sent to "+mail);
-        } catch (MessagingException | UnsupportedEncodingException e) {
+        } catch (MessagingException | UnsupportedEncodingException | UnknownHostException e) {
             log.error(e.toString());
             return MessageResource.errorMessage("Sending mail to "+email+" failed!");
         }

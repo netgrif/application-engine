@@ -55,6 +55,8 @@ public final class ImportFieldFactory {
         field.setImmediate(data.isImmediate());
         if(data.getDesc() != null)
             field.setDescription(data.getDesc());
+        if(data.getPlaceholder() != null)
+            field.setPlaceholder(data.getPlaceholder());
         if(data.getValid() != null && field instanceof ValidableField)
             ((ValidableField)field).setValidationRules(data.getValid());
         if(data.getInit() != null && field instanceof FieldWithDefault)
