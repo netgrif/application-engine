@@ -11,10 +11,8 @@ import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Document
 public class PetriNet {
@@ -66,7 +64,7 @@ public class PetriNet {
         places = new HashMap<>();
         transitions = new HashMap<>();
         arcs = new HashMap<>();
-        dataSet = new HashMap<>();
+        dataSet = new LinkedHashMap<>();
         roles = new HashMap<>();
         transactions = new HashMap<>();
     }
@@ -172,6 +170,14 @@ public class PetriNet {
                 .filter(transaction ->
                         transaction.getTransitions().contains(transition.getObjectId())
                 ).findAny().orElse(null);
+    }
+
+    public List<Field> getImmediateFields(){
+        return this.dataSet.values().stream().filter(Field::isImmediate).collect(Collectors.toList());
+    }
+
+    public boolean isDisplayableInAnyTransition(String fieldId){
+        return transitions.values().stream().parallel().anyMatch(trans -> trans.isDisplayable(fieldId));
     }
 
     @Override

@@ -18,6 +18,6 @@ public class CaseResource extends Resource<Case>{
 
     private void buildLinks(){
         add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder
-                .methodOn(WorkflowController.class).createCase(new CreateCaseBody())).withRel("create"));
+                .methodOn(WorkflowController.class).createCase(new CreateCaseBody(), null)).withRel("create"));
     }
 }
