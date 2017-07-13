@@ -2801,16 +2801,15 @@
             <logic>
                 <behavior>required</behavior>
                 <behavior>editable</behavior>
-                <!-- todo: return as wtf? -->
                 <action>
                     check: f.109020,
                     field: f.109014,
                     other: f.109028;
                     change other about {
                         if (check.value == false) {
-                            return field.value;
+                            return field.value as LocalDate;
                         }
-                        return other.value;
+                        return other.value as LocalDate;
                     }
                 </action>
             </logic>
@@ -3145,16 +3144,15 @@
                         return f_2.value as String;
                     }
                 </action>
-                <!-- todo: return as wtf?-->
                 <action>
                     field: f.this,
                     f_1: f.109014,
                     f_2: t.109028;
                     change f_2 about {
                         if (field.value == false) {
-                            return f_1.value;
+                            return f_1.value as LocalDate;
                         }
-                        return f_2.value;
+                        return f_2.value as LocalDate;
                     }
                 </action>
                 <action>
