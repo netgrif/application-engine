@@ -60,15 +60,18 @@ public class Case {
     @Transient
     private List<Field> immediateData;
 
-    @Getter
-    @Setter
+    @Getter @Setter
     private Long author;
+
+    @Getter @Setter
+    private Map<String, Integer> resetArcTokens;
 
     public Case() {
         _id = new ObjectId();
         activePlaces = new HashMap<>();
         dataSet = new LinkedHashMap<>();
         immediateDataFields = new LinkedHashSet<>();
+        resetArcTokens = new HashMap<>();
     }
 
     public Case(String title) {
