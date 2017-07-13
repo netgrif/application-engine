@@ -1540,7 +1540,7 @@
         <id>1368</id>
         <x>741</x>
         <y>301</y>
-        <label></label>
+        <label>30</label>
         <tokens>0</tokens>
         <isStatic>false</isStatic>
     </place>
@@ -1548,7 +1548,7 @@
         <id>1369</id>
         <x>742</x>
         <y>378</y>
-        <label></label>
+        <label>31</label>
         <tokens>0</tokens>
         <isStatic>false</isStatic>
     </place>
@@ -1556,7 +1556,7 @@
         <id>1370</id>
         <x>751</x>
         <y>577</y>
-        <label></label>
+        <label>32</label>
         <tokens>0</tokens>
         <isStatic>false</isStatic>
     </place>
@@ -1564,7 +1564,7 @@
         <id>1372</id>
         <x>736</x>
         <y>911</y>
-        <label></label>
+        <label>33</label>
         <tokens>0</tokens>
         <isStatic>false</isStatic>
     </place>
@@ -1572,7 +1572,7 @@
         <id>1393</id>
         <x>748</x>
         <y>661</y>
-        <label></label>
+        <label>34</label>
         <tokens>0</tokens>
         <isStatic>false</isStatic>
     </place>
