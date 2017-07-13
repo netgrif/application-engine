@@ -5,6 +5,7 @@ import com.netgrif.workflow.importer.model.DataLogic;
 import com.netgrif.workflow.petrinet.domain.*;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.FieldBehavior;
+import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository;
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRole;
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRoleRepository;
@@ -85,6 +86,24 @@ public class Importer {
         Arrays.stream(document.getImportTransitions()).forEach(this::createTransition);
         Arrays.stream(document.getImportArc()).forEach(this::createArc);
 
+        //Resolve actions after everything has object id
+        Arrays.stream(document.getImportTransitions()).forEach( trans -> {
+            if(trans.getDataRef() != null){
+                Arrays.stream(trans.getDataRef()).forEach( ref -> {
+                    if(ref.getLogic().getAction() != null){
+                        String fieldId = fields.get(ref.getId()).getObjectId();
+                        transitions.get(trans.getId()).addActions(fieldId,buildActions(ref.getLogic().getAction(),
+                                fieldId,
+                                transitions.get(trans.getId()).getStringId()));
+                    }
+                });
+            }
+        });
+        Arrays.stream(document.getImportData()).forEach( data -> {
+            if(data.getAction() != null){
+                fields.get(data.getId()).setActions(buildActions(data.getAction(),fields.get(data.getId()).getObjectId(),null));
+            }
+        });
         return repository.save(net);
     }
 
@@ -168,16 +187,19 @@ public class Importer {
         if(logic.getBehavior() != null)
             Arrays.stream(logic.getBehavior()).forEach(b -> behavior.add(FieldBehavior.fromString(b)));
 
-        final LinkedHashSet<String> actions = new LinkedHashSet<>();
-        if(logic.getAction() != null) {
-            Arrays.asList(logic.getAction()).forEach(action -> {
-                action = parseObjectIds(action, fieldId, FIELD_KEYWORD);
-                action = parseObjectIds(action, transition.getStringId(),TRANSITION_KEYWORD);
-                actions.add(action);
-            });
-        }
+        transition.addDataSet(fieldId,behavior,null);
+    }
 
-        transition.addDataSet(fieldId,behavior,actions);
+    @Transactional
+    private LinkedHashSet<Action> buildActions(ImportAction[] imported, String fieldId, String transitionId){
+        final LinkedHashSet<Action> actions = new LinkedHashSet<>();
+        Arrays.stream(imported).forEach(action -> {
+            String definition = action.getDefinition();
+            definition = parseObjectIds(definition, fieldId, FIELD_KEYWORD);
+            definition = parseObjectIds(definition, transitionId,TRANSITION_KEYWORD);
+            actions.add(new Action(definition,action.getTrigger()));
+        });
+        return actions;
     }
 
     @Transactional
