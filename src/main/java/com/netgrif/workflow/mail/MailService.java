@@ -12,6 +12,7 @@ import org.springframework.ui.velocity.VelocityEngineUtils;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
@@ -26,6 +27,10 @@ public class MailService implements IMailService {
 
     @Value("${mail.server.port}")
     String port;
+    @Value("${mail.server.host.subdomain}")
+    String subdomain;
+    @Value("${mail.server.host.toplevel}")
+    String topLevelDomain;
     @Value("${mail.from}")
     String mailFrom;
 
@@ -34,22 +39,22 @@ public class MailService implements IMailService {
     private VelocityEngine velocityEngine;
 
     @Override
-    public void sendRegistrationEmail(String recipient, String token) throws MessagingException {
+    public void sendRegistrationEmail(String recipient, String token) throws MessagingException, UnknownHostException {
         List<String> recipients = new LinkedList<>();
         recipients.add(recipient);
         Map<String, Object> model = new HashMap<>();
         model.put("token", token);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
         model.put("date", LocalDate.now().plusDays(3).format(formatter));
-        model.put("serverName","http://"+ InetAddress.getLoopbackAddress().getHostName()+":"+port);
+        model.put("serverName", "http://" + subdomain + InetAddress.getLocalHost().getHostName() + topLevelDomain + ":" + port);
         MimeMessage email = buildEmail(EmailType.REGISTRATION, recipients, model);
         mailSender.send(email);
     }
 
     @Override
-    public void testConnection(){
+    public void testConnection() {
         try {
-            ((JavaMailSenderImpl)mailSender).testConnection();
+            ((JavaMailSenderImpl) mailSender).testConnection();
             log.info("MAIL: Connection to mail server is stable");
         } catch (MessagingException e) {
             e.printStackTrace();
@@ -63,7 +68,7 @@ public class MailService implements IMailService {
         MimeMessageHelper helper = new MimeMessageHelper(message, true);
         helper.setFrom(mailFrom);
         helper.setTo(recipients.toArray(new String[recipients.size()]));
-        helper.setText(VelocityEngineUtils.mergeTemplateIntoString(velocityEngine, type.template,"UTF-8", model), true);
+        helper.setText(VelocityEngineUtils.mergeTemplateIntoString(velocityEngine, type.template, "UTF-8", model), true);
         return message;
     }
 

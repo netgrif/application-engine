@@ -4004,14 +4004,12 @@
             <id>115</id>
             <logic>
                 <behavior>editable</behavior>
-                <behavior>required</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>116</id>
             <logic>
                 <behavior>editable</behavior>
-                <behavior>required</behavior>
             </logic>
         </dataRef>
         <dataRef>

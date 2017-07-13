@@ -1,0 +1,3414 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document>
+    <!-- ========== TRANSACTIONS ========== -->
+    <transaction>
+        <id>1</id>
+        <title>Výber poistenia</title>
+    </transaction>
+    <transaction>
+        <id>2</id>
+        <title>Výpočet poistenia</title>
+    </transaction>
+    <transaction>
+        <id>3</id>
+        <title>Návrh ponuky</title>
+    </transaction>
+    <transaction>
+        <id>4</id>
+        <title>Návrh zmluvy</title>
+    </transaction>
+    <transaction>
+        <id>5</id>
+        <title>Zmluva</title>
+    </transaction>
+    <!-- ========== ROLES ========== -->
+    <role>
+        <id>1</id>
+        <name>Agent</name>
+    </role>
+    <role>
+        <id>2</id>
+        <name>Premium</name>
+    </role>
+    <!-- ========== DATA ========== -->
+    <!-- ===== Základné informácie  ===== -->
+    <data type="text">
+        <title>Obec</title>
+        <id>301001</id>
+    </data>
+    <data type="text">
+        <title>PSČ</title>
+        <id>101001</id>
+    </data>
+    <data type="enumeration">
+        <title>Lokalita</title>
+        <id>301002</id>
+        <values>BA</values>
+        <values>Dedina</values>
+        <values>Mesto</values>
+        <values>Krajské mesto</values>
+    </data>
+    <data type="boolean">
+        <title>Nachádza sa mimo obce (extravilán)?</title>
+        <id>101002</id>
+    </data>
+    <data type="boolean">
+        <title>Bolo miesto poistenia postihnuté povodňou za posledných 10 rokov?</title>
+        <id>101003</id>
+    </data>
+    <data type="boolean">
+        <title>Nachádza nehnuteľnosť sa vo vzdialenosti kratšej ako 300 m od vodného toku?</title>
+        <id>101004</id>
+    </data>
+    <data type="enumeration">
+        <title>Koľko rokov žijete v poisťovanej nehnuteľnosti?</title>
+        <id>101005</id>
+        <values>menej ako 1</values>
+        <values>1 až 5</values>
+        <values>6 až 10</values>
+        <values>viac ako 10</values>
+    </data>
+    <data type="enumeration">
+        <title>Aký je vzťah poisteného k poisťovanej nehnuteľnosti?</title>
+        <id>101006</id>
+        <values>vlastník nehnuteľnosti</values>
+        <values>vlastník ma hypotéku na nehnuteľnosť</values>
+        <values>poistený je v prenájme</values>
+        <values>iné</values>
+    </data>
+    <data type="enumeration">
+        <title>Koľko dospelých žije v domácnosti?</title>
+        <id>101007</id>
+        <values>1</values>
+        <values>2</values>
+        <values>3</values>
+        <values>viac ako 3</values>
+    </data>
+    <data type="enumeration">
+        <title>Koľko detí žije v domácnosti?</title>
+        <id>101008</id>
+        <values>0</values>
+        <values>1</values>
+        <values>2</values>
+        <values>viac</values>
+    </data>
+    <data type="boolean">
+        <title>Bolo poistenému alebo spolupoistenej osobe niekedy v minulosti zamiestnuté poistné plnenie alebo vypovedaná poistná zmluva?</title>
+        <id>101009</id>
+    </data>
+    <data type="boolean">
+        <title>Bol poistený alebo spolupoistená osoba niekedy trestné stihaný / vyhlásil osobný bankrot / stíhaný za dlhy alebo odsúdený za podvodné alebo obdobné konanie.</title>
+        <id>101010</id>
+    </data>
+    <data type="boolean">
+        <title>Je plánovaná rekonštrukcia alebo prestavba poisťovanej nehnuteľnosti v priebehu najbližších 3 mesiacov?</title>
+        <id>101011</id>
+    </data>
+    <data type="boolean">
+        <title>Žije v poisťovanej domácnosti pes alebo mačka?</title>
+        <id>101012</id>
+    </data>
+    <data type="enumeration">
+        <title>Kedy je nehnuteľnosť najviac obývaná?</title>
+        <id>101013</id>
+        <values>cez deň</values>
+        <values>večer a v noci</values>
+        <values>počas celého dňa</values>
+    </data>
+    <data type="boolean">
+        <title>Je nehnuteľnosť využívaná aj na podnikanie?</title>
+        <id>101014</id>
+    </data>
+    <data type="enumeration">
+        <title>Právna subjektivita poisteného?</title>
+        <id>101015</id>
+        <values>fyzická osoba</values>
+        <values>právnická osoba</values>
+        <values>fyzická osoba - podnikateľ</values>
+    </data>
+    <data type="enumeration">
+        <title>Počet poistných udalostí za posledné 3 roky?</title>
+        <id>101016</id>
+        <values>0</values>
+        <values>1</values>
+        <values>2 a viac</values>
+    </data>
+    <!-- ===== Nehnuteľnosť ===== -->
+    <data type="enumeration">
+        <title>Predmet poistenia</title>
+        <id>102001</id>
+        <values>byt</values>
+        <values>rodinný dom</values>
+        <values>chata</values>
+        <values>bytový dom</values>
+        <values>bungalow</values>
+        <values>rozostavaná stavba</values>
+    </data>
+    <data type="enumeration">
+        <title>Konštrukcia múrov</title>
+        <id>102002</id>
+        <values>tehla a/alebo betón</values>
+        <values>porobetón (ytong)</values>
+        <values>škvarobatón</values>
+        <values>sklo</values>
+        <values>drevo</values>
+    </data>
+    <data type="enumeration">
+        <title>Konštrukcia strechy</title>
+        <id>102003</id>
+        <values>škridla</values>
+        <values>plech</values>
+        <values>asfalt</values>
+        <values>hydroizolačné fólie</values>
+        <values>sklo</values>
+        <values>šindel</values>
+        <values>iné</values>
+    </data>
+    <data type="enumeration">
+        <title>Koľko rokov má nehnuteľnosť?</title>
+        <id>102004</id>
+        <values>menej ako 5</values>
+        <values>6 až 10</values>
+        <values>11 až 20</values>
+        <values>viac ako 20</values>
+    </data>
+    <data type="boolean">
+        <title>Má nehnuteľnosť praskliny na vonkajšej fasáde?</title>
+        <id>102005</id>
+    </data>
+    <data type="enumeration">
+        <title>Koľko izieb má nehnuteľnosť?</title>
+        <id>102006</id>
+        <values>1</values>
+        <values>2</values>
+        <values>3</values>
+        <values>4</values>
+        <values>viac ako 4</values>
+    </data>
+    <data type="enumeration">
+        <title>Koľko kúpeľní má nehnuteľnosť?</title>
+        <id>102007</id>
+        <values>1</values>
+        <values>2</values>
+        <values>3</values>
+        <values>4</values>
+        <values>viac ako 4</values>
+    </data>
+    <data type="enumeration">
+        <title>Uveďte celkovú hodnotu rekonštrukcií, ak boli vykonané</title>
+        <id>102008</id>
+        <values>bez rekonštrukcií</values>
+        <values>do 20 000 EUR</values>
+        <values>do 50 000 EUR</values>
+        <values>nad 50 000 EUR</values>
+    </data>
+    <!-- ===== Domácnosť ===== -->
+    <data type="enumeration">
+        <title>Umiestnenie domácnosti</title>
+        <id>103001</id>
+        <values>byt</values>
+        <values>rodinný dom</values>
+        <values>chata</values>
+        <values>bungalow</values>
+    </data>
+    <data type="enumeration">
+        <title>Obývanosť domácnosti</title>
+        <id>103002</id>
+        <values>trvalá</values>
+        <values>dočasná</values>
+    </data>
+    <data type="boolean">
+        <title>Je nehnuteľnosť, v ktorej sa nachádza poisťovaná domácnosť v blízkom susedstve s inou obývanou nehnuteľnosťou?</title>
+        <id>103003</id>
+    </data>
+    <data type="boolean">
+        <title>Je domácnosť zabezpečená funkčným alarmom?</title>
+        <id>103004</id>
+    </data>
+    <data type="boolean">
+        <title>Má domácnosť na oknách vo výške do 3 metrov od okolitého terénu mreže / vonkajšie žalúzie alebo rolety?</title>
+        <id>103005</id>
+    </data>
+    <!-- ===== Zodpovednosť ===== -->
+    <data type="boolean">
+        <title>Poistenie zodpovednosti z vlastníctva nehnuteľnosti</title>
+        <id>104001</id>
+    </data>
+    <data type="boolean">
+        <title>Zodpovednosť za škodu členov domácnosti</title>
+        <id>104002</id>
+    </data>
+    <data type="enumeration">
+        <title>Územná platnosť poistenia</title>
+        <id>104003</id>
+        <values>Slovenská republika</values>
+        <values>Európa</values>
+    </data>
+    <!-- ===== Poistenie nehnuteľnosti ===== -->
+    <data type="number">
+        <title>Podlahová plocha pivnice</title>
+        <id>105001</id>
+    </data>
+    <data type="number">
+        <title>Podlahová plocha prízemia</title>
+        <id>105002</id>
+    </data>
+    <data type="number">
+        <title>Podlahová plocha vštkých obytných poschodí</title>
+        <id>105003</id>
+        <desc>Okrem prízemia</desc>
+    </data>
+    <data type="number">
+        <title>Podlahová plocha garáže</title>
+        <id>105004</id>
+    </data>
+    <data type="number">
+        <title>Celková podlahová plocha</title>
+        <id>305001</id>
+    </data>
+    <data type="enumeration">
+        <title>Poistenie nehnuteľnosti - spoluúčasť</title>
+        <id>105005</id>
+        <values>0.00 €</values>
+        <values>50.00 €</values>
+        <values>150.00 €</values>
+    </data>
+    <data type="number">
+        <title>Poistenie nehnuteľnosti - poistná suma</title>
+        <id>105006</id>
+    </data>
+    <data type="number">
+        <title>Poistenie nehnuteľnosti - poistné</title>
+        <id>305002</id>
+    </data>
+    <data type="number">
+        <title>Garáž - poistná suma</title>
+        <id>105007</id>
+    </data>
+    <data type="number">
+        <title>Garáž - poistné</title>
+        <id>305003</id>
+    </data>
+    <data type="boolean">
+        <title>Rovnaké miesto poistenia garáže?</title>
+        <id>105008</id>
+    </data>
+    <data type="boolean">
+        <title>Hospodárska budova</title>
+        <id>105009</id>
+    </data>
+    <data type="number">
+        <title>Hospodárska budova - poistná suma</title>
+        <id>105010</id>
+    </data>
+    <data type="number">
+        <title>Hospodárska budova - poistné</title>
+        <id>305004</id>
+    </data>
+    <data type="boolean">
+        <title>Altánok</title>
+        <id>105011</id>
+    </data>
+    <data type="number">
+        <title>Altánok - poistná suma</title>
+        <id>105012</id>
+    </data>
+    <data type="number">
+        <title>Altánok - poistné</title>
+        <id>305005</id>
+    </data>
+    <data type="boolean">
+        <title>Prístrešok</title>
+        <id>105013</id>
+    </data>
+    <data type="number">
+        <title>Prístrešok - poistná suma</title>
+        <id>105014</id>
+    </data>
+    <data type="number">
+        <title>Prístrešok - poistné</title>
+        <id>305006</id>
+    </data>
+    <data type="boolean">
+        <title>Chodník</title>
+        <id>105015</id>
+    </data>
+    <data type="number">
+        <title>Chodník, parkovacia plocha - poistná suma</title>
+        <id>105016</id>
+    </data>
+    <data type="number">
+        <title>Chodník, parkovacia plocha - poistné</title>
+        <id>305007</id>
+    </data>
+    <data type="boolean">
+        <title>Sauna</title>
+        <id>105017</id>
+    </data>
+    <data type="number">
+        <title>Sauna - poistná suma</title>
+        <id>105018</id>
+    </data>
+    <data type="number">
+        <title>Sauna - poistné</title>
+        <id>305008</id>
+    </data>
+    <data type="boolean">
+        <title>Elektrická brána</title>
+        <id>105019</id>
+    </data>
+    <data type="number">
+        <title>Elektrická brána, oplotenie - poistná suma</title>
+        <id>105020</id>
+    </data>
+    <data type="number">
+        <title>Elektrická brána, oplotenie - poistné</title>
+        <id>305009</id>
+    </data>
+    <data type="boolean">
+        <title>Tenisový kurt</title>
+        <id>105021</id>
+    </data>
+    <data type="number">
+        <title>Tenisový kurt - poistná suma</title>
+        <id>105022</id>
+    </data>
+    <data type="number">
+        <title>Tenisový kurt - poistné</title>
+        <id>305010</id>
+    </data>
+    <data type="boolean">
+        <title>Vonkajší bazén</title>
+        <id>105023</id>
+    </data>
+    <data type="number">
+        <title>Vonkajší bazén - poistná suma</title>
+        <id>105024</id>
+    </data>
+    <data type="number">
+        <title>Vonkajší bazén - poistné</title>
+        <id>305011</id>
+    </data>
+    <data type="boolean">
+        <title>Studňa</title>
+        <id>105025</id>
+    </data>
+    <data type="number">
+        <title>Studňa - poistná suma</title>
+        <id>105026</id>
+    </data>
+    <data type="number">
+        <title>Studňa - poistné</title>
+        <id>305012</id>
+    </data>
+    <data type="boolean">
+        <title>Žumpa, septik</title>
+        <id>105027</id>
+    </data>
+    <data type="number">
+        <title>Žumpa, septik - poistná suma</title>
+        <id>105028</id>
+    </data>
+    <data type="number">
+        <title>Žumpa, septik - poistné</title>
+        <id>305013</id>
+    </data>
+    <data type="boolean">
+        <title>Iné</title>
+        <id>105029</id>
+    </data>
+    <data type="number">
+        <title>Iné - poistná suma</title>
+        <id>105030</id>
+    </data>
+    <data type="number">
+        <title>Iné - poistné</title>
+        <id>305014</id>
+    </data>
+    <!-- ===== Doplnkové poistenie nehnuteľnosti ===== -->
+    <data type="boolean">
+        <title>Stavebné materialy</title>
+        <id>105031</id>
+    </data>
+    <data type="number">
+        <title>Stavebné materiály - poistná suma</title>
+        <id>105032</id>
+    </data>
+    <data type="number">
+        <title>Stavebné materiály - poistné</title>
+        <id>305015</id>
+    </data>
+    <data type="boolean">
+        <title>Stavebné a záhradné mechanizmy</title>
+        <id>105033</id>
+    </data>
+    <data type="number">
+        <title>Stavebné a záhradné mechanizmy</title>
+        <id>105034</id>
+    </data>
+    <data type="number">
+        <title>Stavebné a záhradné mechanizmy - poistná suma</title>
+        <id>305016</id>
+    </data>
+    <!-- ===== Poistenie domácnosti ===== -->
+    <data type="enumeration">
+        <title>Poistenie domácnosti - spoluúčasť</title>
+        <id>106001</id>
+        <values>0.00 €</values>
+        <values>50.00 €</values>
+        <values>150.00 €</values>
+    </data>
+    <data type="number">
+        <title>Poistenie domácnosti - poistná suma</title>
+        <id>106002</id>
+    </data>
+    <data type="number">
+        <title>Poistenie domácnosti - poistné</title>
+        <id>306001</id>
+    </data>
+    <!-- ===== Doplnkové poistenie domácnosti ===== -->
+    <data type="number">
+        <title>Celková podlahová plocha</title>
+        <id>106003</id>
+    </data>
+    <data type="boolean">
+        <title>Cennosti</title>
+        <id>106004</id>
+    </data>
+    <data type="number">
+        <title>Cennosti - poistná suma</title>
+        <id>106005</id>
+    </data>
+    <data type="number">
+        <title>Cennosti - poistné</title>
+        <id>306002</id>
+    </data>
+    <data type="boolean">
+        <title>Umelecké diela</title>
+        <id>106006</id>
+    </data>
+    <data type="number">
+        <title>Umelecké diela - poistná suma</title>
+        <id>106007</id>
+    </data>
+    <data type="number">
+        <title>Umelecké diela - poistné</title>
+        <id>306003</id>
+    </data>
+    <data type="boolean">
+        <title>Elektronické a optické zariadenia</title>
+        <id>106008</id>
+    </data>
+    <data type="number">
+        <title>Elektronické a optické zariadenia - poistná suma</title>
+        <id>106009</id>
+    </data>
+    <data type="number">
+        <title>Elektronické a optické zariadenia - poistné</title>
+        <id>306004</id>
+    </data>
+    <data type="boolean">
+        <title>Špecialne sklá a presklenie</title>
+        <id>106010</id>
+    </data>
+    <data type="number">
+        <title>Špeciálne sklá a presklenie - poistná suma</title>
+        <id>106011</id>
+    </data>
+    <data type="number">
+        <title>Špeciálne sklá a presklenie - poistné</title>
+        <id>306005</id>
+    </data>
+    <data type="boolean">
+        <title>Záhradné vybavenie a nábytok</title>
+        <id>106012</id>
+    </data>
+    <data type="number">
+        <title>Záhradé vybavenie a nábytok - poistná suma</title>
+        <id>106013</id>
+    </data>
+    <data type="number">
+        <title>Záhradé vybavenie a nábytok - poistné</title>
+        <id>306006</id>
+    </data>
+    <data type="boolean">
+        <title>Elektromotory v domácich spotrebičoch</title>
+        <id>106014</id>
+    </data>
+    <data type="number">
+        <title>Elektromotory v domácich spotrebičoch - poistná suma</title>
+        <id>106015</id>
+    </data>
+    <data type="number">
+        <title>Elektromotory v domácich spotrebičoch - poistné</title>
+        <id>306007</id>
+    </data>
+    <data type="boolean">
+        <title>Stavebné súčasti domácnosti</title>
+        <id>106016</id>
+    </data>
+    <data type="number">
+        <title>Stavebné súčasti domácností - poistná suma</title>
+        <id>106017</id>
+    </data>
+    <data type="number">
+        <title>Stavebné súčasti domácností - poistné</title>
+        <id>306008</id>
+    </data>
+    <data type="boolean">
+        <title>Športové náradie</title>
+        <id>106018</id>
+    </data>
+    <data type="number">
+        <title>Športové náradie - poistná suma</title>
+        <id>106019</id>
+    </data>
+    <data type="number">
+        <title>športové náradie - poistné</title>
+        <id>306009</id>
+    </data>
+    <data type="boolean">
+        <title>Iné</title>
+        <id>106020</id>
+    </data>
+    <data type="number">
+        <title>Iné - poistná suma</title>
+        <id>106021</id>
+    </data>
+    <data type="number">
+        <title>iné - poistné</title>
+        <id>306010</id>
+    </data>
+    <!-- ===== Poistenie zodpovednosti za škodu ===== -->
+    <data type="enumeration">
+        <title>Poistenie zodpovednosti z vlastníctva nehnuteľnosti - poistná suma</title>
+        <id>107001</id>
+        <values>15,000.00 €</values>
+        <values>30,000.00 €</values>
+        <values>60,000.00 €</values>
+        <values>120,000.00 €</values>
+    </data>
+    <data type="enumeration">
+        <title>Poistenie zodpovednosti z vlastníctva nehnuteľnosti - spoluúčasť</title>
+        <id>107002</id>
+        <values>0.00 €</values>
+        <values>50.00 €</values>
+        <values>150.00 €</values>
+    </data>
+    <data type="enumeration">
+        <title>Zodpovednosť za škodu členov domácnosti</title>
+        <id>107003</id>
+        <values>15,000.00 €</values>
+        <values>30,000.00 €</values>
+        <values>60,000.00 €</values>
+        <values>120,000.00 €</values>
+    </data>
+    <!-- ===== Sumár ===== -->
+    <data type="number">
+        <title>Poistenie nehnuteľnosti - poistné</title>
+        <id>308001</id>
+    </data>
+    <data type="number">
+        <title>Poistenie domácnosti - poistné</title>
+        <id>308002</id>
+    </data>
+    <data type="number">
+        <title>Poistenie zodpovednosti za škodu - poistné</title>
+        <id>308003</id>
+    </data>
+    <data type="number">
+        <title>ROČNÉ POISTNÉ CELKOM</title>
+        <id>308004</id>
+    </data>
+    <data type="enumeration">
+        <title>PERIODICITA PLATBY POISTNÉHO</title>
+        <id>108001</id>
+        <values>ročná</values>
+        <values>polročná</values>
+        <values>štvrťročná</values>
+    </data>
+    <data type="boolean">
+        <title>KOMPLETNÉ POISTENIE</title>
+        <id>308005</id>
+    </data>
+    <data type="boolean">
+        <title>ZĽAVA ZA INÉ POISTENIE V PREMIUM</title>
+        <id>108002</id>
+    </data>
+    <data type="enumeration">
+        <title>OBCHODNÁ ZĽAVA</title>
+        <id>108003</id>
+        <values>0%</values>
+        <values>5%</values>
+        <values>10%</values>
+        <values>15%</values>
+        <values>20%</values>
+        <values>25%</values>
+    </data>
+    <data type="boolean">
+        <title>AKCIOVÁ ZĽAVA</title>
+        <id>108004</id>
+    </data>
+    <data type="number">
+        <title>BEŽNÉ POISTNÉ</title>
+        <id>308006</id>
+    </data>
+    <!-- ===== Základné informácie koeficienty ===== -->
+    <data type="number">
+        <title>Koeficient - Lokalita</title>
+        <id>201001</id>
+    </data>
+    <data type="number">
+        <title>Koeficient - Nachádza sa mimo obce (extravilán)?</title>
+        <id>201002</id>
+    </data>
+    <data type="number">
+        <title>Koeficient - Bolo miesto poistenia postihnuté povodňou za posledných 10 rokov?</title>
+        <id>201003</id>
+    </data>
+    <data type="number">
+        <title>Koeficient - Nachádza nehnuteľnosť sa vo vzdialenosti kratšej ako 300 m od vodného toku?</title>
+        <id>201004</id>
+    </data>
+    <data type="number">
+        <title>Koeficient - Koľko rokov žijete v poisťovanej nehnuteľnosti?</title>
+        <id>201005</id>
+    </data>
+    <data type="number">
+        <title>Koeficient - Aký je vzťah poisteného k poisťovanej nehnuteľnosti?</title>
+        <id>201006</id>
+    </data>
+    <data type="number">
+        <title>Koeficient - Koľko dospelých žije v domácnosti?</title>
+        <id>201007</id>
+    </data>
+    <data type="number">
+        <title>Koeficient - Koľko detí žije v domácnosti?</title>
+        <id>201008</id>
+    </data>
+    <data type="number">
+        <title>Koeficient - Bolo poistenému alebo spolupoistenej osobe niekedy v minulosti zamiestnuté poistné plnenie alebo vypovedaná poistná zmluva?</title>
+        <id>201009</id>
+    </data>
+    <data type="number">
+        <title>Koeficient - Bol poistený alebo spolupoistená osoba niekedy trestné stihaný / vyhlásil osobný bankrot / stíhaný za dlhy alebo odsúdený za podvodné alebo obdobné konanie.</title>
+        <id>201010</id>
+    </data>
+    <data type="number">
+        <title>Koeficient - Je plánovaná rekonštrukcia alebo prestavba poisťovanej nehnuteľnosti v priebehu najbližších 3 mesiacov?</title>
+        <id>201011</id>
+    </data>
+    <data type="number">
+        <title>Koeficient - Žije v poisťovanej domácnosti pes alebo mačka?</title>
+        <id>201012</id>
+    </data>
+    <data type="number">
+        <title>Koeficient - Kedy je nehnuteľnosť najviac obývaná?</title>
+        <id>201013</id>
+    </data>
+    <data type="number">
+        <title>Koeficient - Je nehnuteľnosť využívaná aj na podnikanie?</title>
+        <id>201014</id>
+    </data>
+    <data type="number">
+        <title>Koeficient - Právna subjektivita poisteného?</title>
+        <id>201015</id>
+    </data>
+    <data type="number">
+        <title>Koeficient - Počet poistných udalostí za posledné 3 roky?</title>
+        <id>201016</id>
+    </data>
+    <data type="number">
+        <title>ZÁKLADNÉ INFORMÁCIE koeficient</title>
+        <id>201017</id>
+    </data>
+    <!-- ===== Nehnuteľnosť koeficienty ===== -->
+    <data type="number">
+        <title>Koeficient - Predmet poistenia</title>
+        <id>202001</id>
+    </data>
+    <data type="number">
+        <title>Koeficient - Konštrukcia múrov</title>
+        <id>202002</id>
+    </data>
+    <data type="number">
+        <title>Koeficient - Konštrukcia strechy</title>
+        <id>202003</id>
+    </data>
+    <data type="number">
+        <title>Koeficient - Koľko rokov má nehnuteľnosť?</title>
+        <id>202004</id>
+    </data>
+    <data type="number">
+        <title>Koeficient - Má nehnuteľnosť praskliny na vonkajšej fasáde?</title>
+        <id>202005</id>
+    </data>
+    <data type="number">
+        <title>Koeficient - Koľko izieb má nehnuteľnosť?</title>
+        <id>202006</id>
+    </data>
+    <data type="number">
+        <title>Koeficient - Koľko kúpeľní má nehnuteľnosť?</title>
+        <id>202007</id>
+    </data>
+    <data type="number">
+        <title>Koeficient - Uveďte celkovú hodnotu rekonštrukcií, ak boli vykonané</title>
+        <id>202008</id>
+    </data>
+    <data type="number">
+        <title>NEHNUTEĽNOSŤ koeficient</title>
+        <id>202009</id>
+    </data>
+    <!-- ===== Domácnosť koeficienty ===== -->
+    <data type="number">
+        <title>Koeficient - Umiestnenie domácnosti</title>
+        <id>203001</id>
+    </data>
+    <data type="number">
+        <title>Koeficient - Obývanosť domácnosti</title>
+        <id>203002</id>
+    </data>
+    <data type="number">
+        <title>Koeficient - Je nehnuteľnosť, v ktorej sa nachádza poisťovaná domácnosť v blízkom susedstve s inou obývanou nehnuteľnosťou?</title>
+        <id>203003</id>
+    </data>
+    <data type="number">
+        <title>Koeficient - Je domácnosť zabezpečená funkčným alarmom?</title>
+        <id>203004</id>
+    </data>
+    <data type="number">
+        <title>Koeficient - Má domácnosť na oknách vo výške do 3 metrov od okolitého terénu mreže / vonkajšie žalúzie alebo rolety?</title>
+        <id>203005</id>
+    </data>
+    <data type="number">
+        <title>DOMÁCNOSŤ koeficient</title>
+        <id>203006</id>
+    </data>
+    <!-- ===== Zodpovednosť koeficienty ===== -->
+    <data type="number">
+        <title>Koeficient - Poistenie zodpovednosti z vlastníctva nehnuteľnosti</title>
+        <id>204001</id>
+    </data>
+    <data type="number">
+        <title>Koeficient - Zodpovednosť za škodu členov domácnosti</title>
+        <id>204002</id>
+    </data>
+    <data type="number">
+        <title>Koeficient - Územná platnosť poistenia</title>
+        <id>204003</id>
+    </data>
+    <data type="number">
+        <title>Koeficient - Zodpovednosť celkovo</title>
+        <id>204004</id>
+    </data>
+    <!-- ===== Sumár koeficienty ===== -->
+    <data type="number">
+        <title>Koeficient - Poistenie nehnuteľnosti - spoluúčasť</title>
+        <id>208001</id>
+    </data>
+    <data type="number">
+        <title>Koeficient - Poistenie domácnosti - spoluúčasť</title>
+        <id>208002</id>
+    </data>
+    <data type="number">
+        <title>Koeficient - Garáž umiestnenie</title>
+        <id>208003</id>
+    </data>
+    <data type="number">
+        <title>Koeficient - PERIODICITA PLATBY POISTNÉHO</title>
+        <id>208004</id>
+    </data>
+    <data type="number">
+        <title>Koeficient - ZĽAVA ZA INÉ POISTENIE V PREMIUM</title>
+        <id>208005</id>
+    </data>
+    <data type="number">
+        <title>Koeficient - OBCHODNÁ ZĽAVA</title>
+        <id>208006</id>
+    </data>
+    <data type="number">
+        <title>Koeficient - AKCIOVÁ ZĽAVA</title>
+        <id>208007</id>
+    </data>
+    <data type="number">
+        <title>Koeficient - KOMPLETNÉ POISTENIE</title>
+        <id>208008</id>
+    </data>
+    <!-- ===== Poistenie nehnuteľností koeficienty ===== -->
+    <data type="number">
+        <title>Koeficient - Lokalita - byt</title>
+        <id>205001</id>
+    </data>
+    <data type="number">
+        <title>Koeficient - Lokalita - pivnica</title>
+        <id>205002</id>
+    </data>
+    <data type="number">
+        <title>Koeficient - Lokalita - prízemie</title>
+        <id>205003</id>
+    </data>
+    <data type="number">
+        <title>Koeficient - Lokalita - obytné poschodie</title>
+        <id>205004</id>
+    </data>
+    <data type="number">
+        <title>Koeficient - Lokalita - garáž</title>
+        <id>205005</id>
+    </data>
+    <data type="number">
+        <title>Koeficient - Garáž</title>
+        <id>205006</id>
+    </data>
+    <data type="number">
+        <title>Koeficient - Hospodárska budova</title>
+        <id>205007</id>
+    </data>
+    <data type="number">
+        <title>Koeficient - Altánok</title>
+        <id>205008</id>
+    </data>
+    <data type="number">
+        <title>Koeficient - Prístrešok</title>
+        <id>205009</id>
+    </data>
+    <data type="number">
+        <title>Koeficient - Chodník, parkovacia plocha</title>
+        <id>205010</id>
+    </data>
+    <data type="number">
+        <title>Koeficient - Sauna</title>
+        <id>205011</id>
+    </data>
+    <data type="number">
+        <title>Koeficient - Elektrická brána, oplotenie</title>
+        <id>205012</id>
+    </data>
+    <data type="number">
+        <title>Koeficient - Tenisový kurt</title>
+        <id>205013</id>
+    </data>
+    <data type="number">
+        <title>Koeficient - Vonkajší bazén</title>
+        <id>205014</id>
+    </data>
+    <data type="number">
+        <title>Koeficient - Studňa</title>
+        <id>205015</id>
+    </data>
+    <data type="number">
+        <title>Koeficient - Žumpa, septik</title>
+        <id>205016</id>
+    </data>
+    <data type="number">
+        <title>Koeficient - Iné</title>
+        <id>205017</id>
+    </data>
+    <data type="number">
+        <title>Koeficient - Stavebné materiály</title>
+        <id>205018</id>
+    </data>
+    <data type="number">
+        <title>Koeficient - Stavebné a záhradné mechanizmy</title>
+        <id>205019</id>
+    </data>
+    <!-- ===== Poistenie domácností koeficienty ===== -->
+    <data type="number">
+        <title>Koeficient - Cennosti</title>
+        <id>206001</id>
+    </data>
+    <data type="number">
+        <title>Koeficient - Umelecké diela</title>
+        <id>206002</id>
+    </data>
+    <data type="number">
+        <title>Koeficient - Elektronické a optické zariadneia</title>
+        <id>206003</id>
+    </data>
+    <data type="number">
+        <title>Koeficient - Špecialne sklá a presklenie</title>
+        <id>206004</id>
+    </data>
+    <data type="number">
+        <title>Koeficient - Záhradné vybavenie a nábytok</title>
+        <id>206005</id>
+    </data>
+    <data type="number">
+        <title>Koeficient - Elektromotory v domácich spotrebičoch</title>
+        <id>206006</id>
+    </data>
+    <data type="number">
+        <title>Koeficient - Stavebné súčasti domácností</title>
+        <id>206007</id>
+    </data>
+    <data type="number">
+        <title>Koeficient - Športové náradie</title>
+        <id>206008</id>
+    </data>
+    <data type="number">
+        <title>Koeficient - Iné</title>
+        <id>206009</id>
+    </data>
+    <!-- ===== Poistenie zodpovednosti za škodu koeficienty ===== -->
+    <data type="number">
+        <title>Koeficient - Poistenie zodpovednosti z vlastníctva nehnuteľnosti</title>
+        <id>207001</id>
+    </data>
+    <!-- ===== Údaje k zmluve ===== -->
+    <data type="text">
+        <title>Číslo ponuky</title>
+        <id>309001</id>
+    </data>
+    <data type="date">
+        <title>Začiatok poistenia</title>
+        <id>109001</id>
+    </data>
+    <data type="boolean">
+        <title>Poistenie na dobu určitú</title>
+        <id>109002</id>
+    </data>
+    <data type="date">
+        <title>Koniec poistenia</title>
+        <id>109003</id>
+    </data>
+    <data type="text">
+        <title>V prospech</title>
+        <id>109004</id>
+        <desc>Údaje o vinkulácii</desc>
+    </data>
+    <data type="number">
+        <title>Číslo úverovej zmluvy</title>
+        <id>109005</id>
+        <desc>Údaje o vinkulácii</desc>
+    </data>
+    <data type="enumeration">
+        <title>Spôsob platenia</title>
+        <id>109006</id>
+        <values>z účtu</values>
+        <values>poštovou poukážkou</values>
+    </data>
+    <!-- ===== Údaje o poistníkovi ===== -->
+    <!-- Poistník -->
+    <data type="enumeration">
+        <title>Typ subjektu</title>
+        <id>109007</id>
+        <desc>Poistník</desc>
+        <values>právnická osoba</values>
+        <values>fyzická osoba podnikateľ (SZČO)</values>
+    </data>
+    <data type="enumeration">
+        <title>Titul pred menom</title>
+        <id>109008</id>
+        <desc>Poistník</desc>
+        <values>Bc.</values>
+        <values>Mgr.</values>
+        <values>Ing.</values>
+        <values>Ing. arch.</values>
+        <values>RNDr.</values>
+        <values>PharnDr.</values>
+        <values>PhDr.</values>
+        <values>JUDr.</values>
+        <values>PeaDr.</values>
+        <values>ThDr.</values>
+        <values>MUDr.</values>
+        <values>MDDr.</values>
+        <values>MVDr.</values>
+        <values>doc.</values>
+        <values>prof.</values>
+    </data>
+    <data type="enumeration">
+        <title>Titul za menom</title>
+        <id>109009</id>
+        <desc>Poistník</desc>
+        <values>Ph.D.</values>
+        <values>CSc.</values>
+    </data>
+    <data type="text">
+        <title>Meno</title>
+        <id>109010</id>
+        <desc>Poistník</desc>
+    </data>
+    <data type="text">
+        <title>Priezvisko</title>
+        <id>109011</id>
+        <desc>Poistník</desc>
+    </data>
+    <data type="text">
+        <title>Obchodné meno</title>
+        <id>109012</id>
+    </data>
+    <data type="text">
+        <title>Štátna príslušnosť</title>
+        <id>109013</id>
+        <desc>Poistník</desc>
+    </data>
+    <data type="date">
+        <title>Dátum narodenia</title>
+        <id>109014</id>
+        <desc>Poistník</desc>
+    </data>
+    <data type="text">
+        <title>Rodné číslo</title>
+        <id>109015</id>
+        <desc>Poistník</desc>
+        <valid>length 10</valid>
+    </data>
+    <data type="enumeration">
+        <title>Typ preukazu</title>
+        <id>109016</id>
+        <desc>Poistník</desc>
+        <values>pas</values>
+        <values>OP</values>
+        <values>iné</values>
+    </data>
+    <data type="text">
+        <title>Číslo preukazu</title>
+        <id>109017</id>
+        <desc>Poistník</desc>
+    </data>
+    <data type="text">
+        <title>Telefónne číslo</title>
+        <id>109018</id>
+    </data>
+    <data type="text">
+        <title>Email</title>
+        <id>109019</id>
+    </data>
+    <data type="boolean">
+        <title>Poistený je iná osoba</title>
+        <id>109020</id>
+        <desc>Poistený a poistenec sú rôzne osoby</desc>
+    </data>
+    <!-- Poistený -->
+    <data type="enumeration">
+        <title>Typ subjektu</title>
+        <id>109021</id>
+        <desc>Poistený</desc>
+        <values>právnická osoba</values>
+        <values>fyzická osoba podnikateľ (SZČO)</values>
+    </data>
+    <data type="enumeration">
+        <title>Titul pred menom</title>
+        <id>109022</id>
+        <desc>Poistený</desc>
+        <values>Bc.</values>
+        <values>Mgr.</values>
+        <values>Ing.</values>
+        <values>Ing. arch.</values>
+        <values>RNDr.</values>
+        <values>PharnDr.</values>
+        <values>PhDr.</values>
+        <values>JUDr.</values>
+        <values>PeaDr.</values>
+        <values>ThDr.</values>
+        <values>MUDr.</values>
+        <values>MDDr.</values>
+        <values>MVDr.</values>
+        <values>doc.</values>
+        <values>prof.</values>
+    </data>
+    <data type="enumeration">
+        <title>Titul za menom</title>
+        <id>109023</id>
+        <desc>Poistený</desc>
+        <values>Ph.D.</values>
+        <values>CSc.</values>
+    </data>
+    <data type="text">
+        <title>Meno</title>
+        <id>109024</id>
+        <desc>Poistený</desc>
+    </data>
+    <data type="text">
+        <title>Priezvisko</title>
+        <id>109025</id>
+        <desc>Poistený</desc>
+    </data>
+    <data type="text">
+        <title>Obchodné meno</title>
+        <id>109026</id>
+    </data>
+    <data type="text">
+        <title>Štátna príslušnosť</title>
+        <id>109027</id>
+        <desc>Poistený</desc>
+    </data>
+    <data type="date">
+        <title>Dátum narodenia</title>
+        <id>109028</id>
+        <desc>Poistený</desc>
+    </data>
+    <data type="text">
+        <title>Rodné číslo</title>
+        <id>109029</id>
+        <desc>Poistený</desc>
+        <valid>length 10</valid>
+    </data>
+    <data type="enumeration">
+        <title>Typ preukazu</title>
+        <id>109030</id>
+        <desc>Poistený</desc>
+        <values>pas</values>
+        <values>OP</values>
+        <values>iné</values>
+    </data>
+    <data type="text">
+        <title>Číslo preukazu</title>
+        <id>109031</id>
+        <desc>Poistený</desc>
+    </data>
+    <data type="text">
+        <title>Telefónne číslo</title>
+        <id>109032</id>
+    </data>
+    <data type="text">
+        <title>Email</title>
+        <id>109033</id>
+    </data>
+    <!-- ===== Údaje o mieste poistenia ===== -->
+    <data type="enumeration">
+        <title>Adresa</title>
+        <id>109034</id>
+        <values>rovnaká ako poistníkova</values>
+        <values>rovnaká ako poisteného</values>
+        <values>iná</values>
+    </data>
+    <!-- Adresa poistníka -->
+    <data type="enumeration">
+        <title>Typ adresy</title>
+        <id>109035</id>
+        <desc>Poistník</desc>
+        <values>trvalé bydlisko</values>
+        <values>korešpondenčná adresa</values>
+    </data>
+    <data type="text">
+        <title>Ulica</title>
+        <id>109036</id>
+        <desc>Poistník</desc>
+    </data>
+    <data type="text">
+        <title>Súpisné a orientačné číslo</title>
+        <id>109037</id>
+        <desc>Poistník</desc>
+    </data>
+    <data type="text">
+        <title>PSČ</title>
+        <id>109038</id>
+        <desc>Poistník</desc>
+    </data>
+    <data type="text">
+        <title>Obec</title>
+        <id>109039</id>
+        <desc>Poistník</desc>
+    </data>
+    <!-- Adresa poisteného -->
+    <data type="enumeration">
+        <title>Typ adresy</title>
+        <id>109040</id>
+        <desc>Poistený</desc>
+        <values>trvalé bydlisko</values>
+        <values>korešpondenčná adresa</values>
+    </data>
+    <data type="text">
+        <title>Ulica</title>
+        <id>109041</id>
+        <desc>Poistený</desc>
+    </data>
+    <data type="text">
+        <title>Súpisné a orientačné číslo</title>
+        <id>109042</id>
+        <desc>Poistený</desc>
+    </data>
+    <data type="text">
+        <title>PSČ</title>
+        <id>109043</id>
+        <desc>Poistený</desc>
+    </data>
+    <data type="text">
+        <title>Obec</title>
+        <id>109044</id>
+        <desc>Poistený</desc>
+    </data>
+    <!-- Iná adresa -->
+    <data type="text">
+        <title>Ulica</title>
+        <id>109045</id>
+        <desc>Iná</desc>
+    </data>
+    <data type="text">
+        <title>Súpisné a orientačné číslo</title>
+        <id>109046</id>
+        <desc>Iná</desc>
+    </data>
+    <data type="text">
+        <title>PSČ</title>
+        <id>109047</id>
+        <desc>Iná</desc>
+    </data>
+    <data type="text">
+        <title>Obec</title>
+        <id>109048</id>
+        <desc>Iná</desc>
+    </data>
+    <!-- Adresa dodatočné info -->
+    <data type="boolean">
+        <title>Byt</title>
+        <id>109049</id>
+    </data>
+    <data type="number">
+        <title>Poschodie</title>
+        <id>109050</id>
+    </data>
+    <data type="number">
+        <title>Číslo bytu</title>
+        <id>109051</id>
+    </data>
+    <data type="boolean">
+        <title>Rozostavaná stavba</title>
+        <id>109052</id>
+    </data>
+    <data type="text">
+        <title>Číslo parcely</title>
+        <id>109053</id>
+    </data>
+    <!-- Adresa garáže -->
+    <data type="text">
+        <title>Ulica</title>
+        <id>109054</id>
+        <desc>Garáž</desc>
+    </data>
+    <data type="text">
+        <title>Súpisné a orientačné číslo</title>
+        <id>109055</id>
+        <desc>Garáž</desc>
+    </data>
+    <data type="text">
+        <title>PSČ</title>
+        <id>109056</id>
+        <desc>Garáž</desc>
+    </data>
+    <data type="text">
+        <title>Obec</title>
+        <id>109057</id>
+        <desc>Garáž</desc>
+    </data>
+    <!-- ===== Napárovanie platby ===== -->
+    <data type="text">
+        <title>Variabilný symbol</title>
+        <id>308007</id>
+    </data>
+    <!-- ===== TODO ===== -->
+    <data type="date">
+        <title>Dátum dojednania návrhu na uzavretie poistnej zmluvy</title>
+        <id>309002</id>
+    </data>
+    <!-- ===== PDF ===== -->
+    <data type="file">
+        <title>Ponuka PDF</title>
+        <id>309003</id>
+        <init>Automaticky generované</init>
+        <logic>generate Insurance.offerPDF always</logic>
+    </data>
+    <data type="file">
+        <title>Zmluva PDF</title>
+        <id>309004</id>
+        <init>Automaticky generované</init>
+        <logic>generate Insurance.offerPDF always</logic>
+    </data>
+    <!-- ========== PLACES ========== -->
+    <place>
+        <id>1</id>
+        <x>60</x>
+        <y>620</y>
+        <label>1</label>
+        <tokens>1</tokens>
+        <isStatic>false</isStatic>
+    </place>
+    <place>
+        <id>260</id>
+        <x>1100</x>
+        <y>340</y>
+        <label>17</label>
+        <tokens>0</tokens>
+        <isStatic>false</isStatic>
+    </place>
+    <place>
+        <id>346</id>
+        <x>1380</x>
+        <y>540</y>
+        <label>18</label>
+        <tokens>0</tokens>
+        <isStatic>false</isStatic>
+    </place>
+    <place>
+        <id>349</id>
+        <x>1580</x>
+        <y>820</y>
+        <label>23</label>
+        <tokens>0</tokens>
+        <isStatic>false</isStatic>
+    </place>
+    <place>
+        <id>398</id>
+        <x>420</x>
+        <y>500</y>
+        <label>5</label>
+        <tokens>0</tokens>
+        <isStatic>false</isStatic>
+    </place>
+    <place>
+        <id>399</id>
+        <x>420</x>
+        <y>220</y>
+        <label>2</label>
+        <tokens>0</tokens>
+        <isStatic>false</isStatic>
+    </place>
+    <place>
+        <id>400</id>
+        <x>420</x>
+        <y>820</y>
+        <label>9</label>
+        <tokens>0</tokens>
+        <isStatic>false</isStatic>
+    </place>
+    <place>
+        <id>401</id>
+        <x>420</x>
+        <y>580</y>
+        <label>6</label>
+        <tokens>0</tokens>
+        <isStatic>false</isStatic>
+    </place>
+    <place>
+        <id>402</id>
+        <x>420</x>
+        <y>660</y>
+        <label>7</label>
+        <tokens>0</tokens>
+        <isStatic>false</isStatic>
+    </place>
+    <place>
+        <id>415</id>
+        <x>420</x>
+        <y>380</y>
+        <label>4</label>
+        <tokens>0</tokens>
+        <isStatic>false</isStatic>
+    </place>
+    <place>
+        <id>416</id>
+        <x>420</x>
+        <y>300</y>
+        <label>3</label>
+        <tokens>0</tokens>
+        <isStatic>false</isStatic>
+    </place>
+    <place>
+        <id>422</id>
+        <x>420</x>
+        <y>900</y>
+        <label>10</label>
+        <tokens>0</tokens>
+        <isStatic>false</isStatic>
+    </place>
+    <place>
+        <id>444</id>
+        <x>745</x>
+        <y>493</y>
+        <label>14</label>
+        <tokens>0</tokens>
+        <isStatic>false</isStatic>
+    </place>
+    <place>
+        <id>445</id>
+        <x>740</x>
+        <y>220</y>
+        <label>13</label>
+        <tokens>0</tokens>
+        <isStatic>false</isStatic>
+    </place>
+    <place>
+        <id>446</id>
+        <x>740</x>
+        <y>820</y>
+        <label>15</label>
+        <tokens>0</tokens>
+        <isStatic>false</isStatic>
+    </place>
+    <place>
+        <id>568</id>
+        <x>1100</x>
+        <y>580</y>
+        <label>16</label>
+        <tokens>0</tokens>
+        <isStatic>false</isStatic>
+    </place>
+    <place>
+        <id>586</id>
+        <x>1620</x>
+        <y>540</y>
+        <label>19</label>
+        <tokens>0</tokens>
+        <isStatic>false</isStatic>
+    </place>
+    <place>
+        <id>589</id>
+        <x>1380</x>
+        <y>620</y>
+        <label>20</label>
+        <tokens>0</tokens>
+        <isStatic>false</isStatic>
+    </place>
+    <place>
+        <id>594</id>
+        <x>1620</x>
+        <y>620</y>
+        <label>21</label>
+        <tokens>0</tokens>
+        <isStatic>false</isStatic>
+    </place>
+    <place>
+        <id>633</id>
+        <x>660</x>
+        <y>60</y>
+        <label>12</label>
+        <tokens>0</tokens>
+        <isStatic>false</isStatic>
+    </place>
+    <place>
+        <id>649</id>
+        <x>420</x>
+        <y>980</y>
+        <label>11</label>
+        <tokens>0</tokens>
+        <isStatic>false</isStatic>
+    </place>
+    <place>
+        <id>672</id>
+        <x>1940</x>
+        <y>460</y>
+        <label>25</label>
+        <tokens>0</tokens>
+        <isStatic>false</isStatic>
+    </place>
+    <place>
+        <id>682</id>
+        <x>2100</x>
+        <y>420</y>
+        <label>26</label>
+        <tokens>0</tokens>
+        <isStatic>false</isStatic>
+    </place>
+    <place>
+        <id>683</id>
+        <x>2180</x>
+        <y>540</y>
+        <label>27</label>
+        <tokens>0</tokens>
+        <isStatic>false</isStatic>
+    </place>
+    <place>
+        <id>693</id>
+        <x>2260</x>
+        <y>420</y>
+        <label>28</label>
+        <tokens>0</tokens>
+        <isStatic>false</isStatic>
+    </place>
+    <place>
+        <id>893</id>
+        <x>1100</x>
+        <y>460</y>
+        <label>24</label>
+        <tokens>0</tokens>
+        <isStatic>false</isStatic>
+    </place>
+    <place>
+        <id>1363</id>
+        <x>1740</x>
+        <y>380</y>
+        <label>29</label>
+        <tokens>0</tokens>
+        <isStatic>false</isStatic>
+    </place>
+    <place>
+        <id>1368</id>
+        <x>741</x>
+        <y>301</y>
+        <label></label>
+        <tokens>0</tokens>
+        <isStatic>false</isStatic>
+    </place>
+    <place>
+        <id>1369</id>
+        <x>742</x>
+        <y>378</y>
+        <label></label>
+        <tokens>0</tokens>
+        <isStatic>false</isStatic>
+    </place>
+    <place>
+        <id>1370</id>
+        <x>751</x>
+        <y>577</y>
+        <label></label>
+        <tokens>0</tokens>
+        <isStatic>false</isStatic>
+    </place>
+    <place>
+        <id>1372</id>
+        <x>736</x>
+        <y>911</y>
+        <label></label>
+        <tokens>0</tokens>
+        <isStatic>false</isStatic>
+    </place>
+    <place>
+        <id>1393</id>
+        <x>748</x>
+        <y>661</y>
+        <label></label>
+        <tokens>0</tokens>
+        <isStatic>false</isStatic>
+    </place>
+    <!-- ========== TRANSITIONS ========== -->
+    <transition>
+        <id>154</id>
+        <x>620</x>
+        <y>500</y>
+        <label>Základné informácie</label>
+        <transactionRef>
+            <id>2</id>
+        </transactionRef>
+        <roleRef>
+            <id>1</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+    </transition>
+    <transition>
+        <id>2</id>
+        <x>260</x>
+        <y>300</y>
+        <label>Poistenie nehnuteľnosti</label>
+        <transactionRef>
+            <id>1</id>
+        </transactionRef>
+        <roleRef>
+            <id>1</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+    </transition>
+    <transition>
+        <id>4</id>
+        <x>260</x>
+        <y>900</y>
+        <label>Poistenie domácnosti</label>
+        <transactionRef>
+            <id>2</id>
+        </transactionRef>
+        <roleRef>
+            <id>1</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+    </transition>
+    <transition>
+        <id>3</id>
+        <x>260</x>
+        <y>620</y>
+        <label>Poistenie nehnuteľnosti a domácnosti</label>
+        <transactionRef>
+            <id>1</id>
+        </transactionRef>
+        <roleRef>
+            <id>1</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+    </transition>
+    <transition>
+        <id>30</id>
+        <x>900</x>
+        <y>340</y>
+        <label>Výpočet poistného nehnuteľnoosti</label>
+        <transactionRef>
+            <id>2</id>
+        </transactionRef>
+        <roleRef>
+            <id>1</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+    </transition>
+    <transition>
+        <id>155</id>
+        <x>620</x>
+        <y>220</y>
+        <label>Nehnuteľnosť</label>
+        <transactionRef>
+            <id>2</id>
+        </transactionRef>
+        <roleRef>
+            <id>1</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+    </transition>
+    <transition>
+        <id>178</id>
+        <x>620</x>
+        <y>580</y>
+        <label>Poistenie zodpovednosti za škodu</label>
+        <transactionRef>
+            <id>2</id>
+        </transactionRef>
+        <roleRef>
+            <id>1</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+    </transition>
+    <transition>
+        <id>259</id>
+        <x>1100</x>
+        <y>260</y>
+        <label>Ponuka</label>
+        <transactionRef>
+            <id>3</id>
+        </transactionRef>
+        <roleRef>
+            <id>1</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+    </transition>
+    <transition>
+        <id>332</id>
+        <x>900</x>
+        <y>580</y>
+        <label>Výpočet poistného nehnuteľnosti a domácnosti</label>
+        <transactionRef>
+            <id>2</id>
+        </transactionRef>
+        <roleRef>
+            <id>1</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+    </transition>
+    <transition>
+        <id>333</id>
+        <x>900</x>
+        <y>860</y>
+        <label>Výpočet poistného domácnosti</label>
+        <transactionRef>
+            <id>2</id>
+        </transactionRef>
+        <roleRef>
+            <id>1</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+    </transition>
+    <transition>
+        <id>341</id>
+        <x>1260</x>
+        <y>820</y>
+        <label>Klient nepotvrdil</label>
+        <transactionRef>
+            <id>3</id>
+        </transactionRef>
+        <roleRef>
+            <id>1</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+    </transition>
+    <transition>
+        <id>342</id>
+        <x>1260</x>
+        <y>580</y>
+        <label>Klient potvrdil</label>
+        <transactionRef>
+            <id>3</id>
+        </transactionRef>
+        <roleRef>
+            <id>1</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+    </transition>
+    <transition>
+        <id>363</id>
+        <x>620</x>
+        <y>820</y>
+        <label>Domácnosť</label>
+        <transactionRef>
+            <id>2</id>
+        </transactionRef>
+        <roleRef>
+            <id>1</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+    </transition>
+    <transition>
+        <id>364</id>
+        <x>620</x>
+        <y>660</y>
+        <label>Sumár</label>
+        <transactionRef>
+            <id>2</id>
+        </transactionRef>
+        <roleRef>
+            <id>1</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+    </transition>
+    <transition>
+        <id>413</id>
+        <x>620</x>
+        <y>380</y>
+        <label>Vedľajšie stavby</label>
+        <transactionRef>
+            <id>2</id>
+        </transactionRef>
+        <roleRef>
+            <id>1</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+    </transition>
+    <transition>
+        <id>414</id>
+        <x>620</x>
+        <y>300</y>
+        <label>Doplnkové poistenie nehnuteľnosti</label>
+        <transactionRef>
+            <id>2</id>
+        </transactionRef>
+        <roleRef>
+            <id>1</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+    </transition>
+    <transition>
+        <id>421</id>
+        <x>620</x>
+        <y>900</y>
+        <label>Doplnkové poistenie domácnosti</label>
+        <transactionRef>
+            <id>2</id>
+        </transactionRef>
+        <roleRef>
+            <id>1</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+    </transition>
+    <transition>
+        <id>580</id>
+        <x>1500</x>
+        <y>540</y>
+        <label>Údaje o zmluve</label>
+        <transactionRef>
+            <id>4</id>
+        </transactionRef>
+        <roleRef>
+            <id>1</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+    </transition>
+    <transition>
+        <id>588</id>
+        <x>1500</x>
+        <y>620</y>
+        <label>Údaje o poistníkovi a mieste poistenia</label>
+        <transactionRef>
+            <id>4</id>
+        </transactionRef>
+        <roleRef>
+            <id>1</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+    </transition>
+    <transition>
+        <id>596</id>
+        <x>1740</x>
+        <y>540</y>
+        <label>Zmluva</label>
+        <transactionRef>
+            <id>4</id>
+        </transactionRef>
+        <roleRef>
+            <id>1</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+    </transition>
+    <transition>
+        <id>616</id>
+        <x>1180</x>
+        <y>140</y>
+        <label>Späť na poistenie nehnuteľnosti</label>
+        <roleRef>
+            <id>1</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+    </transition>
+    <transition>
+        <id>617</id>
+        <x>980</x>
+        <y>60</y>
+        <label>Späť na poistenie nehnuteľnosti a domácnosti</label>
+        <roleRef>
+            <id>1</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+    </transition>
+    <transition>
+        <id>648</id>
+        <x>1180</x>
+        <y>980</y>
+        <label>Späť na poistenie domácnosti</label>
+        <roleRef>
+            <id>1</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+    </transition>
+    <transition>
+        <id>667</id>
+        <x>1660</x>
+        <y>820</y>
+        <label>Zamietnuta ponuka</label>
+        <transactionRef>
+            <id>3</id>
+        </transactionRef>
+        <roleRef>
+            <id>1</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+    </transition>
+    <transition>
+        <id>674</id>
+        <x>2020</x>
+        <y>540</y>
+        <label>Zrušenie návrhu poistky (po vypršaní lehoty)</label>
+        <roleRef>
+            <id>1</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+    </transition>
+    <transition>
+        <id>680</id>
+        <x>2020</x>
+        <y>420</y>
+        <label>Napárovanie platby</label>
+        <transactionRef>
+            <id>5</id>
+        </transactionRef>
+        <roleRef>
+            <id>2</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+    </transition>
+    <transition>
+        <id>686</id>
+        <x>2100</x>
+        <y>340</y>
+        <label>Aktívna zmluva</label>
+        <transactionRef>
+            <id>5</id>
+        </transactionRef>
+        <roleRef>
+            <id>1</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+    </transition>
+    <transition>
+        <id>687</id>
+        <x>2180</x>
+        <y>660</y>
+        <label>Expirovaný návrh poistky</label>
+        <transactionRef>
+            <id>5</id>
+        </transactionRef>
+        <roleRef>
+            <id>1</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+    </transition>
+    <transition>
+        <id>692</id>
+        <x>2180</x>
+        <y>420</y>
+        <label>Expirácia zmluvy</label>
+        <transactionRef>
+            <id>5</id>
+        </transactionRef>
+        <roleRef>
+            <id>1</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+    </transition>
+    <transition>
+        <id>694</id>
+        <x>2260</x>
+        <y>340</y>
+        <label>Expirovaná zmluva</label>
+        <transactionRef>
+            <id>5</id>
+        </transactionRef>
+        <roleRef>
+            <id>1</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+    </transition>
+    <transition>
+        <id>1360</id>
+        <x>1940</x>
+        <y>340</y>
+        <label>Zmluva pred zaplatením</label>
+        <transactionRef>
+            <id>5</id>
+        </transactionRef>
+        <roleRef>
+            <id>1</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+    </transition>
+    <transition>
+        <id>1365</id>
+        <x>1740</x>
+        <y>260</y>
+        <label>Zaslaná zmluvy</label>
+        <roleRef>
+            <id>1</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+    </transition>
+    <!-- ========== ARCS ========== -->
+    <arc>
+        <id>7</id>
+        <type>regular</type>
+        <sourceId>1</sourceId>
+        <destinationId>2</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>9</id>
+        <type>regular</type>
+        <sourceId>1</sourceId>
+        <destinationId>3</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>12</id>
+        <type>regular</type>
+        <sourceId>1</sourceId>
+        <destinationId>4</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>262</id>
+        <type>regular</type>
+        <sourceId>260</sourceId>
+        <destinationId>259</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>263</id>
+        <type>regular</type>
+        <sourceId>259</sourceId>
+        <destinationId>260</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>334</id>
+        <type>regular</type>
+        <sourceId>332</sourceId>
+        <destinationId>260</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>335</id>
+        <type>regular</type>
+        <sourceId>333</sourceId>
+        <destinationId>260</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>356</id>
+        <type>regular</type>
+        <sourceId>342</sourceId>
+        <destinationId>346</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>403</id>
+        <type>regular</type>
+        <sourceId>398</sourceId>
+        <destinationId>154</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>404</id>
+        <type>regular</type>
+        <sourceId>154</sourceId>
+        <destinationId>398</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>405</id>
+        <type>regular</type>
+        <sourceId>399</sourceId>
+        <destinationId>155</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>406</id>
+        <type>regular</type>
+        <sourceId>155</sourceId>
+        <destinationId>399</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>407</id>
+        <type>regular</type>
+        <sourceId>400</sourceId>
+        <destinationId>363</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>408</id>
+        <type>regular</type>
+        <sourceId>363</sourceId>
+        <destinationId>400</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>409</id>
+        <type>regular</type>
+        <sourceId>401</sourceId>
+        <destinationId>178</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>410</id>
+        <type>regular</type>
+        <sourceId>178</sourceId>
+        <destinationId>401</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>411</id>
+        <type>regular</type>
+        <sourceId>402</sourceId>
+        <destinationId>364</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>412</id>
+        <type>regular</type>
+        <sourceId>364</sourceId>
+        <destinationId>402</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>417</id>
+        <type>regular</type>
+        <sourceId>415</sourceId>
+        <destinationId>413</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>418</id>
+        <type>regular</type>
+        <sourceId>413</sourceId>
+        <destinationId>415</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>419</id>
+        <type>regular</type>
+        <sourceId>416</sourceId>
+        <destinationId>414</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>420</id>
+        <type>regular</type>
+        <sourceId>414</sourceId>
+        <destinationId>416</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>423</id>
+        <type>regular</type>
+        <sourceId>422</sourceId>
+        <destinationId>421</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>424</id>
+        <type>regular</type>
+        <sourceId>421</sourceId>
+        <destinationId>422</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>425</id>
+        <type>regular</type>
+        <sourceId>2</sourceId>
+        <destinationId>398</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>426</id>
+        <type>regular</type>
+        <sourceId>3</sourceId>
+        <destinationId>398</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>427</id>
+        <type>regular</type>
+        <sourceId>4</sourceId>
+        <destinationId>398</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>428</id>
+        <type>regular</type>
+        <sourceId>2</sourceId>
+        <destinationId>399</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>429</id>
+        <type>regular</type>
+        <sourceId>3</sourceId>
+        <destinationId>399</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>430</id>
+        <type>regular</type>
+        <sourceId>3</sourceId>
+        <destinationId>400</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>431</id>
+        <type>regular</type>
+        <sourceId>4</sourceId>
+        <destinationId>400</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>432</id>
+        <type>regular</type>
+        <sourceId>2</sourceId>
+        <destinationId>401</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>433</id>
+        <type>regular</type>
+        <sourceId>3</sourceId>
+        <destinationId>401</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>434</id>
+        <type>regular</type>
+        <sourceId>4</sourceId>
+        <destinationId>401</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>435</id>
+        <type>regular</type>
+        <sourceId>3</sourceId>
+        <destinationId>402</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>436</id>
+        <type>regular</type>
+        <sourceId>4</sourceId>
+        <destinationId>402</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>437</id>
+        <type>regular</type>
+        <sourceId>2</sourceId>
+        <destinationId>402</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>438</id>
+        <type>regular</type>
+        <sourceId>2</sourceId>
+        <destinationId>415</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>439</id>
+        <type>regular</type>
+        <sourceId>3</sourceId>
+        <destinationId>415</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>440</id>
+        <type>regular</type>
+        <sourceId>2</sourceId>
+        <destinationId>416</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>441</id>
+        <type>regular</type>
+        <sourceId>3</sourceId>
+        <destinationId>416</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>442</id>
+        <type>regular</type>
+        <sourceId>4</sourceId>
+        <destinationId>422</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>443</id>
+        <type>regular</type>
+        <sourceId>3</sourceId>
+        <destinationId>422</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>452</id>
+        <type>regular</type>
+        <sourceId>154</sourceId>
+        <destinationId>444</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>453</id>
+        <type>regular</type>
+        <sourceId>155</sourceId>
+        <destinationId>445</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>454</id>
+        <type>regular</type>
+        <sourceId>363</sourceId>
+        <destinationId>446</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>479</id>
+        <type>regular</type>
+        <sourceId>341</sourceId>
+        <destinationId>349</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>480</id>
+        <type>regular</type>
+        <sourceId>260</sourceId>
+        <destinationId>341</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>503</id>
+        <type>regular</type>
+        <sourceId>398</sourceId>
+        <destinationId>30</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>505</id>
+        <type>regular</type>
+        <sourceId>416</sourceId>
+        <destinationId>30</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>506</id>
+        <type>regular</type>
+        <sourceId>399</sourceId>
+        <destinationId>30</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>507</id>
+        <type>regular</type>
+        <sourceId>401</sourceId>
+        <destinationId>30</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>508</id>
+        <type>regular</type>
+        <sourceId>402</sourceId>
+        <destinationId>30</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>509</id>
+        <type>regular</type>
+        <sourceId>415</sourceId>
+        <destinationId>30</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>510</id>
+        <type>regular</type>
+        <sourceId>398</sourceId>
+        <destinationId>332</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>511</id>
+        <type>regular</type>
+        <sourceId>399</sourceId>
+        <destinationId>332</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>512</id>
+        <type>regular</type>
+        <sourceId>416</sourceId>
+        <destinationId>332</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>513</id>
+        <type>regular</type>
+        <sourceId>401</sourceId>
+        <destinationId>332</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>514</id>
+        <type>regular</type>
+        <sourceId>402</sourceId>
+        <destinationId>332</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>515</id>
+        <type>regular</type>
+        <sourceId>415</sourceId>
+        <destinationId>332</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>516</id>
+        <type>regular</type>
+        <sourceId>400</sourceId>
+        <destinationId>332</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>517</id>
+        <type>regular</type>
+        <sourceId>422</sourceId>
+        <destinationId>332</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>518</id>
+        <type>regular</type>
+        <sourceId>422</sourceId>
+        <destinationId>333</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>520</id>
+        <type>regular</type>
+        <sourceId>402</sourceId>
+        <destinationId>333</destinationId>
+        <multiplicity>1</multiplicity>
+        <breakPoint>
+            <x>740</x>
+            <y>780</y>
+        </breakPoint>
+    </arc>
+    <arc>
+        <id>521</id>
+        <type>regular</type>
+        <sourceId>401</sourceId>
+        <destinationId>333</destinationId>
+        <multiplicity>1</multiplicity>
+        <breakPoint>
+            <x>740</x>
+            <y>740</y>
+        </breakPoint>
+    </arc>
+    <arc>
+        <id>522</id>
+        <type>regular</type>
+        <sourceId>398</sourceId>
+        <destinationId>333</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>523</id>
+        <type>regular</type>
+        <sourceId>444</sourceId>
+        <destinationId>30</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>524</id>
+        <type>regular</type>
+        <sourceId>445</sourceId>
+        <destinationId>30</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>529</id>
+        <type>regular</type>
+        <sourceId>444</sourceId>
+        <destinationId>333</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>531</id>
+        <type>regular</type>
+        <sourceId>446</sourceId>
+        <destinationId>333</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>535</id>
+        <type>regular</type>
+        <sourceId>446</sourceId>
+        <destinationId>332</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>540</id>
+        <type>regular</type>
+        <sourceId>445</sourceId>
+        <destinationId>332</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>541</id>
+        <type>regular</type>
+        <sourceId>444</sourceId>
+        <destinationId>332</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>558</id>
+        <type>regular</type>
+        <sourceId>400</sourceId>
+        <destinationId>333</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>559</id>
+        <type>regular</type>
+        <sourceId>30</sourceId>
+        <destinationId>445</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>560</id>
+        <type>regular</type>
+        <sourceId>30</sourceId>
+        <destinationId>444</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>561</id>
+        <type>regular</type>
+        <sourceId>332</sourceId>
+        <destinationId>444</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>562</id>
+        <type>regular</type>
+        <sourceId>332</sourceId>
+        <destinationId>446</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>563</id>
+        <type>regular</type>
+        <sourceId>333</sourceId>
+        <destinationId>444</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>564</id>
+        <type>regular</type>
+        <sourceId>333</sourceId>
+        <destinationId>446</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>565</id>
+        <type>regular</type>
+        <sourceId>332</sourceId>
+        <destinationId>445</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>566</id>
+        <type>regular</type>
+        <sourceId>30</sourceId>
+        <destinationId>260</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>569</id>
+        <type>regular</type>
+        <sourceId>30</sourceId>
+        <destinationId>568</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>570</id>
+        <type>regular</type>
+        <sourceId>332</sourceId>
+        <destinationId>568</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>571</id>
+        <type>regular</type>
+        <sourceId>333</sourceId>
+        <destinationId>568</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>572</id>
+        <type>regular</type>
+        <sourceId>568</sourceId>
+        <destinationId>342</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>573</id>
+        <type>regular</type>
+        <sourceId>568</sourceId>
+        <destinationId>341</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>581</id>
+        <type>regular</type>
+        <sourceId>346</sourceId>
+        <destinationId>580</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>587</id>
+        <type>regular</type>
+        <sourceId>580</sourceId>
+        <destinationId>586</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>590</id>
+        <type>regular</type>
+        <sourceId>342</sourceId>
+        <destinationId>589</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>591</id>
+        <type>regular</type>
+        <sourceId>589</sourceId>
+        <destinationId>588</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>592</id>
+        <type>regular</type>
+        <sourceId>588</sourceId>
+        <destinationId>589</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>595</id>
+        <type>regular</type>
+        <sourceId>588</sourceId>
+        <destinationId>594</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>597</id>
+        <type>regular</type>
+        <sourceId>586</sourceId>
+        <destinationId>596</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>598</id>
+        <type>regular</type>
+        <sourceId>596</sourceId>
+        <destinationId>586</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>601</id>
+        <type>regular</type>
+        <sourceId>594</sourceId>
+        <destinationId>596</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>602</id>
+        <type>regular</type>
+        <sourceId>596</sourceId>
+        <destinationId>594</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>605</id>
+        <type>regular</type>
+        <sourceId>346</sourceId>
+        <destinationId>596</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>606</id>
+        <type>regular</type>
+        <sourceId>589</sourceId>
+        <destinationId>596</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>608</id>
+        <type>regular</type>
+        <sourceId>260</sourceId>
+        <destinationId>596</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>615</id>
+        <type>regular</type>
+        <sourceId>580</sourceId>
+        <destinationId>346</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>619</id>
+        <type>regular</type>
+        <sourceId>616</sourceId>
+        <destinationId>399</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>620</id>
+        <type>regular</type>
+        <sourceId>616</sourceId>
+        <destinationId>416</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>621</id>
+        <type>regular</type>
+        <sourceId>616</sourceId>
+        <destinationId>415</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>622</id>
+        <type>regular</type>
+        <sourceId>616</sourceId>
+        <destinationId>398</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>623</id>
+        <type>regular</type>
+        <sourceId>616</sourceId>
+        <destinationId>401</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>624</id>
+        <type>regular</type>
+        <sourceId>616</sourceId>
+        <destinationId>402</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>634</id>
+        <type>regular</type>
+        <sourceId>2</sourceId>
+        <destinationId>633</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>635</id>
+        <type>regular</type>
+        <sourceId>633</sourceId>
+        <destinationId>616</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>636</id>
+        <type>regular</type>
+        <sourceId>616</sourceId>
+        <destinationId>633</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>639</id>
+        <type>regular</type>
+        <sourceId>617</sourceId>
+        <destinationId>399</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>640</id>
+        <type>regular</type>
+        <sourceId>617</sourceId>
+        <destinationId>416</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>641</id>
+        <type>regular</type>
+        <sourceId>617</sourceId>
+        <destinationId>415</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>642</id>
+        <type>regular</type>
+        <sourceId>617</sourceId>
+        <destinationId>398</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>643</id>
+        <type>regular</type>
+        <sourceId>617</sourceId>
+        <destinationId>401</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>644</id>
+        <type>regular</type>
+        <sourceId>617</sourceId>
+        <destinationId>402</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>646</id>
+        <type>regular</type>
+        <sourceId>617</sourceId>
+        <destinationId>400</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>647</id>
+        <type>regular</type>
+        <sourceId>617</sourceId>
+        <destinationId>422</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>650</id>
+        <type>regular</type>
+        <sourceId>4</sourceId>
+        <destinationId>649</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>651</id>
+        <type>reset</type>
+        <sourceId>633</sourceId>
+        <destinationId>617</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>652</id>
+        <type>reset</type>
+        <sourceId>649</sourceId>
+        <destinationId>617</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>654</id>
+        <type>regular</type>
+        <sourceId>648</sourceId>
+        <destinationId>649</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>655</id>
+        <type>regular</type>
+        <sourceId>649</sourceId>
+        <destinationId>648</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>656</id>
+        <type>regular</type>
+        <sourceId>648</sourceId>
+        <destinationId>422</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>657</id>
+        <type>regular</type>
+        <sourceId>648</sourceId>
+        <destinationId>400</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>659</id>
+        <type>regular</type>
+        <sourceId>648</sourceId>
+        <destinationId>402</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>660</id>
+        <type>regular</type>
+        <sourceId>648</sourceId>
+        <destinationId>401</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>661</id>
+        <type>regular</type>
+        <sourceId>648</sourceId>
+        <destinationId>398</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>663</id>
+        <type>regular</type>
+        <sourceId>633</sourceId>
+        <destinationId>30</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>664</id>
+        <type>regular</type>
+        <sourceId>30</sourceId>
+        <destinationId>633</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>665</id>
+        <type>regular</type>
+        <sourceId>333</sourceId>
+        <destinationId>649</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>666</id>
+        <type>regular</type>
+        <sourceId>649</sourceId>
+        <destinationId>333</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>668</id>
+        <type>regular</type>
+        <sourceId>349</sourceId>
+        <destinationId>667</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>669</id>
+        <type>regular</type>
+        <sourceId>667</sourceId>
+        <destinationId>349</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>677</id>
+        <type>regular</type>
+        <sourceId>672</sourceId>
+        <destinationId>674</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>681</id>
+        <type>regular</type>
+        <sourceId>672</sourceId>
+        <destinationId>680</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>684</id>
+        <type>regular</type>
+        <sourceId>674</sourceId>
+        <destinationId>683</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>685</id>
+        <type>regular</type>
+        <sourceId>680</sourceId>
+        <destinationId>682</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>688</id>
+        <type>regular</type>
+        <sourceId>683</sourceId>
+        <destinationId>687</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>689</id>
+        <type>regular</type>
+        <sourceId>687</sourceId>
+        <destinationId>683</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>690</id>
+        <type>regular</type>
+        <sourceId>682</sourceId>
+        <destinationId>686</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>691</id>
+        <type>regular</type>
+        <sourceId>686</sourceId>
+        <destinationId>682</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>695</id>
+        <type>regular</type>
+        <sourceId>682</sourceId>
+        <destinationId>692</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>696</id>
+        <type>regular</type>
+        <sourceId>692</sourceId>
+        <destinationId>693</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>697</id>
+        <type>regular</type>
+        <sourceId>693</sourceId>
+        <destinationId>694</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>698</id>
+        <type>regular</type>
+        <sourceId>694</sourceId>
+        <destinationId>693</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>894</id>
+        <type>regular</type>
+        <sourceId>30</sourceId>
+        <destinationId>893</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>895</id>
+        <type>regular</type>
+        <sourceId>332</sourceId>
+        <destinationId>893</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>896</id>
+        <type>regular</type>
+        <sourceId>333</sourceId>
+        <destinationId>893</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>897</id>
+        <type>regular</type>
+        <sourceId>893</sourceId>
+        <destinationId>616</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>898</id>
+        <type>regular</type>
+        <sourceId>893</sourceId>
+        <destinationId>617</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>899</id>
+        <type>regular</type>
+        <sourceId>893</sourceId>
+        <destinationId>648</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>904</id>
+        <type>reset</type>
+        <sourceId>568</sourceId>
+        <destinationId>616</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>905</id>
+        <type>reset</type>
+        <sourceId>568</sourceId>
+        <destinationId>617</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>906</id>
+        <type>reset</type>
+        <sourceId>568</sourceId>
+        <destinationId>648</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>907</id>
+        <type>reset</type>
+        <sourceId>260</sourceId>
+        <destinationId>617</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>908</id>
+        <type>reset</type>
+        <sourceId>260</sourceId>
+        <destinationId>616</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>909</id>
+        <type>reset</type>
+        <sourceId>260</sourceId>
+        <destinationId>648</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>910</id>
+        <type>reset</type>
+        <sourceId>346</sourceId>
+        <destinationId>616</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>911</id>
+        <type>reset</type>
+        <sourceId>589</sourceId>
+        <destinationId>616</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>912</id>
+        <type>reset</type>
+        <sourceId>589</sourceId>
+        <destinationId>617</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>913</id>
+        <type>reset</type>
+        <sourceId>589</sourceId>
+        <destinationId>617</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>914</id>
+        <type>reset</type>
+        <sourceId>346</sourceId>
+        <destinationId>648</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>915</id>
+        <type>reset</type>
+        <sourceId>589</sourceId>
+        <destinationId>648</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>916</id>
+        <type>regular</type>
+        <sourceId>893</sourceId>
+        <destinationId>341</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>1358</id>
+        <type>regular</type>
+        <sourceId>893</sourceId>
+        <destinationId>596</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>1359</id>
+        <type>regular</type>
+        <sourceId>596</sourceId>
+        <destinationId>672</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>1361</id>
+        <type>regular</type>
+        <sourceId>672</sourceId>
+        <destinationId>1360</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>1362</id>
+        <type>regular</type>
+        <sourceId>1360</sourceId>
+        <destinationId>672</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>1364</id>
+        <type>regular</type>
+        <sourceId>596</sourceId>
+        <destinationId>1363</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>1366</id>
+        <type>regular</type>
+        <sourceId>1363</sourceId>
+        <destinationId>1365</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>1367</id>
+        <type>regular</type>
+        <sourceId>1365</sourceId>
+        <destinationId>1363</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>1373</id>
+        <type>regular</type>
+        <sourceId>414</sourceId>
+        <destinationId>1368</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>1374</id>
+        <type>regular</type>
+        <sourceId>413</sourceId>
+        <destinationId>1369</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>1375</id>
+        <type>regular</type>
+        <sourceId>1368</sourceId>
+        <destinationId>30</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>1376</id>
+        <type>regular</type>
+        <sourceId>1369</sourceId>
+        <destinationId>30</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>1377</id>
+        <type>regular</type>
+        <sourceId>1368</sourceId>
+        <destinationId>332</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>1378</id>
+        <type>regular</type>
+        <sourceId>1369</sourceId>
+        <destinationId>332</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>1379</id>
+        <type>regular</type>
+        <sourceId>30</sourceId>
+        <destinationId>1368</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>1380</id>
+        <type>regular</type>
+        <sourceId>332</sourceId>
+        <destinationId>1368</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>1381</id>
+        <type>regular</type>
+        <sourceId>30</sourceId>
+        <destinationId>1369</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>1382</id>
+        <type>regular</type>
+        <sourceId>332</sourceId>
+        <destinationId>1369</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>1383</id>
+        <type>regular</type>
+        <sourceId>178</sourceId>
+        <destinationId>1370</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>1384</id>
+        <type>regular</type>
+        <sourceId>1370</sourceId>
+        <destinationId>332</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>1385</id>
+        <type>regular</type>
+        <sourceId>332</sourceId>
+        <destinationId>1370</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>1386</id>
+        <type>regular</type>
+        <sourceId>1370</sourceId>
+        <destinationId>30</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>1387</id>
+        <type>regular</type>
+        <sourceId>30</sourceId>
+        <destinationId>1370</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>1394</id>
+        <type>regular</type>
+        <sourceId>364</sourceId>
+        <destinationId>1393</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>1395</id>
+        <type>regular</type>
+        <sourceId>1370</sourceId>
+        <destinationId>333</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>1396</id>
+        <type>regular</type>
+        <sourceId>333</sourceId>
+        <destinationId>1370</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>1397</id>
+        <type>regular</type>
+        <sourceId>421</sourceId>
+        <destinationId>1372</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>1398</id>
+        <type>regular</type>
+        <sourceId>1372</sourceId>
+        <destinationId>333</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>1399</id>
+        <type>regular</type>
+        <sourceId>333</sourceId>
+        <destinationId>1372</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>1400</id>
+        <type>regular</type>
+        <sourceId>1372</sourceId>
+        <destinationId>332</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>1401</id>
+        <type>regular</type>
+        <sourceId>332</sourceId>
+        <destinationId>1372</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+</document>
