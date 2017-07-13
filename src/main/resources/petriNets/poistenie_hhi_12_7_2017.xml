@@ -495,32 +495,30 @@
     <data type="boolean">
         <title>Stavebné materialy</title>
         <id>105031</id>
-        <placeholder></placeholder>
     </data>
     <data type="number">
-        <title>Stavebné materiály - poistná suma</title>
+        <title>Stavebné materiály</title>
         <id>105032</id>
-        <placeholder></placeholder>
+        <placeholder>Poistná suma</placeholder>
     </data>
     <data type="number">
-        <title>Stavebné materiály - poistné</title>
+        <title>Stavebné materiály</title>
         <id>305015</id>
-        <placeholder></placeholder>
+        <placeholder>Poistné</placeholder>
     </data>
     <data type="boolean">
         <title>Stavebné a záhradné mechanizmy</title>
         <id>105033</id>
-        <placeholder></placeholder>
     </data>
     <data type="number">
         <title>Stavebné a záhradné mechanizmy</title>
         <id>105034</id>
-        <placeholder></placeholder>
+        <placeholder>Poistná suma</placeholder>
     </data>
     <data type="number">
-        <title>Stavebné a záhradné mechanizmy - poistná suma</title>
+        <title>Stavebné a záhradné mechanizmy</title>
         <id>305016</id>
-        <placeholder></placeholder>
+        <placeholder>Poistné</placeholder>
     </data>
     <!-- ===== Poistenie domácnosti ===== -->
     <data type="enumeration">
@@ -1677,6 +1675,7 @@
         <isStatic>false</isStatic>
     </place>
     <!-- ========== TRANSITIONS ========== -->
+    <!-- ========== Základné informácie ========== -->
     <transition>
         <id>154</id>
         <x>620</x>
@@ -1824,7 +1823,7 @@
             </logic>
         </dataRef>
     </transition>
-    <!-- ============== Poistenie nehnutelnosťi============== -->
+    <!-- ========== Poistenie nehnuteľnosti ========== -->
     <transition>
         <id>2</id>
         <x>260</x>
@@ -1840,7 +1839,7 @@
             </logic>
         </roleRef>
     </transition>
-    <!--====================== Poistenie domacnosti==============-->
+    <!-- ========== Poistenie domácnosti ========== -->
     <transition>
         <id>4</id>
         <x>260</x>
@@ -1856,7 +1855,7 @@
             </logic>
         </roleRef>
     </transition>
-    <!--====================Poistenie nehnutelnosti a domacnosti===================-->
+    <!-- ========== Poistenie nehnuteľnosti a domácnosti ========== -->
     <transition>
         <id>3</id>
         <x>260</x>
@@ -1872,6 +1871,7 @@
             </logic>
         </roleRef>
     </transition>
+    <!-- ========== Výpočet poistného nehnuteľnoosti ========== -->
     <transition>
         <id>30</id>
         <x>900</x>
@@ -1887,6 +1887,7 @@
             </logic>
         </roleRef>
     </transition>
+    <!-- ========== Nehnuteľnosť ========== -->
     <transition>
         <id>155</id>
         <x>620</x>
@@ -1992,7 +1993,7 @@
             </logic>
         </dataRef>
     </transition>
-    <!--===================Zodpovednost================-->
+    <!-- ========== Poistenie zodpovednosti za škodu ========== -->
     <transition>
         <id>178</id>
         <x>620</x>
@@ -2029,6 +2030,7 @@
             </logic>
         </dataRef>
     </transition>
+    <!-- ========== Ponuka ========== -->
     <transition>
         <id>259</id>
         <x>1100</x>
@@ -2044,6 +2046,7 @@
             </logic>
         </roleRef>
     </transition>
+    <!-- ========== Výpočet poistného nehnuteľnosti a domácnosti ========== -->
     <transition>
         <id>332</id>
         <x>900</x>
@@ -2059,6 +2062,7 @@
             </logic>
         </roleRef>
     </transition>
+    <!-- ========== Výpočet poistného domácnosti ========== -->
     <transition>
         <id>333</id>
         <x>900</x>
@@ -2074,6 +2078,7 @@
             </logic>
         </roleRef>
     </transition>
+    <!-- ========== Klient nepotvrdil ========== -->
     <transition>
         <id>341</id>
         <x>1260</x>
@@ -2089,6 +2094,7 @@
             </logic>
         </roleRef>
     </transition>
+    <!-- ========== Klient potvrdil ========== -->
     <transition>
         <id>342</id>
         <x>1260</x>
@@ -2104,6 +2110,7 @@
             </logic>
         </roleRef>
     </transition>
+    <!-- ========== Domácnosť ========== -->
     <transition>
         <id>363</id>
         <x>620</x>
@@ -2161,6 +2168,7 @@
             </logic>
         </dataRef>
     </transition>
+    <!-- ========== Sumár ========== -->
     <transition>
         <id>364</id>
         <x>620</x>
@@ -2233,6 +2241,7 @@
             </logic>
         </dataRef>
     </transition>
+    <!-- ========== Vedľajšie stavby ========== -->
     <transition>
         <id>413</id>
         <x>620</x>
@@ -2496,7 +2505,7 @@
             </logic>
         </dataRef>
     </transition>
-    <!--============================Doplnkove poistenie nehnutelnosti=====================-->
+    <!-- ========== Doplnkové poistenie nehnuteľnosti ========== -->
     <transition>
         <id>414</id>
         <x>620</x>
@@ -2515,14 +2524,12 @@
             <id>105031</id>
             <logic>
                 <behavior>editable</behavior>
-                <behavior>required</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>105032</id>
             <logic>
                 <behavior>editable</behavior>
-                <behavior>required</behavior>
             </logic>
         </dataRef>
         <dataRef>
@@ -2535,14 +2542,12 @@
             <id>105033</id>
             <logic>
                 <behavior>editable</behavior>
-                <behavior>required</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>105034</id>
             <logic>
                 <behavior>editable</behavior>
-                <behavior>required</behavior>
             </logic>
         </dataRef>
         <dataRef>
@@ -2552,6 +2557,7 @@
             </logic>
         </dataRef>
     </transition>
+    <!-- ========== Doplnkové poistenie domácnosti ========== -->
     <transition>
         <id>421</id>
         <x>620</x>
@@ -2570,14 +2576,12 @@
             <id>106004</id>
             <logic>
                 <behavior>editable</behavior>
-                <behavior>required</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>106005</id>
             <logic>
                 <behavior>editable</behavior>
-                <behavior>required</behavior>
             </logic>
         </dataRef>
         <dataRef>
@@ -2590,14 +2594,12 @@
             <id>106006</id>
             <logic>
                 <behavior>editable</behavior>
-                <behavior>required</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>106007</id>
             <logic>
                 <behavior>editable</behavior>
-                <behavior>required</behavior>
             </logic>
         </dataRef>
         <dataRef>
@@ -2610,14 +2612,12 @@
             <id>106008</id>
             <logic>
                 <behavior>editable</behavior>
-                <behavior>required</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>106009</id>
             <logic>
                 <behavior>editable</behavior>
-                <behavior>required</behavior>
             </logic>
         </dataRef>
         <dataRef>
@@ -2630,14 +2630,12 @@
             <id>106010</id>
             <logic>
                 <behavior>editable</behavior>
-                <behavior>required</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>106011</id>
             <logic>
                 <behavior>editable</behavior>
-                <behavior>required</behavior>
             </logic>
         </dataRef>
         <dataRef>
@@ -2650,14 +2648,12 @@
             <id>106012</id>
             <logic>
                 <behavior>editable</behavior>
-                <behavior>required</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>106013</id>
             <logic>
                 <behavior>editable</behavior>
-                <behavior>required</behavior>
             </logic>
         </dataRef>
         <dataRef>
@@ -2670,14 +2666,12 @@
             <id>106014</id>
             <logic>
                 <behavior>editable</behavior>
-                <behavior>required</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>106015</id>
             <logic>
                 <behavior>editable</behavior>
-                <behavior>required</behavior>
             </logic>
         </dataRef>
         <dataRef>
@@ -2690,14 +2684,12 @@
             <id>106016</id>
             <logic>
                 <behavior>editable</behavior>
-                <behavior>required</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>106017</id>
             <logic>
                 <behavior>editable</behavior>
-                <behavior>required</behavior>
             </logic>
         </dataRef>
         <dataRef>
@@ -2710,14 +2702,12 @@
             <id>106018</id>
             <logic>
                 <behavior>editable</behavior>
-                <behavior>required</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>106019</id>
             <logic>
                 <behavior>editable</behavior>
-                <behavior>required</behavior>
             </logic>
         </dataRef>
         <dataRef>
@@ -2730,14 +2720,12 @@
             <id>106020</id>
             <logic>
                 <behavior>editable</behavior>
-                <behavior>required</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>106021</id>
             <logic>
                 <behavior>editable</behavior>
-                <behavior>required</behavior>
             </logic>
         </dataRef>
         <dataRef>
@@ -2747,6 +2735,7 @@
             </logic>
         </dataRef>
     </transition>
+    <!-- ========== Údaje o zmluve ========== -->
     <transition>
         <id>580</id>
         <x>1500</x>
@@ -2811,6 +2800,7 @@
             </logic>
         </dataRef>
     </transition>
+    <!-- ========== Údaje o poistníkovi a mieste poistenia ========== -->
     <transition>
         <id>588</id>
         <x>1500</x>
@@ -3636,6 +3626,7 @@
             </logic>
         </dataRef>
     </transition>
+    <!-- ========== Zmluva ========== -->
     <transition>
         <id>596</id>
         <x>1740</x>
@@ -3651,6 +3642,7 @@
             </logic>
         </roleRef>
     </transition>
+    <!-- ========== Späť na poistenie nehnuteľnosti ========== -->
     <transition>
         <id>616</id>
         <x>1180</x>
@@ -3663,6 +3655,7 @@
             </logic>
         </roleRef>
     </transition>
+    <!-- ========== Späť na poistenie nehnuteľnosti a domácnosti ========== -->
     <transition>
         <id>617</id>
         <x>980</x>
@@ -3675,6 +3668,7 @@
             </logic>
         </roleRef>
     </transition>
+    <!-- ========== Späť na poistenie domácnosti ========== -->
     <transition>
         <id>648</id>
         <x>1180</x>
@@ -3687,6 +3681,7 @@
             </logic>
         </roleRef>
     </transition>
+    <!-- ========== Zamietnuta ponuka ========== -->
     <transition>
         <id>667</id>
         <x>1660</x>
@@ -3702,6 +3697,7 @@
             </logic>
         </roleRef>
     </transition>
+    <!-- ========== Zrušenie návrhu poistky (po vypršaní lehoty) ========== -->
     <transition>
         <id>674</id>
         <x>2020</x>
@@ -3714,6 +3710,7 @@
             </logic>
         </roleRef>
     </transition>
+    <!-- ========== Napárovanie platby ========== -->
     <transition>
         <id>680</id>
         <x>2020</x>
@@ -3729,6 +3726,7 @@
             </logic>
         </roleRef>
     </transition>
+    <!-- ========== Aktívna zmluva ========== -->
     <transition>
         <id>686</id>
         <x>2100</x>
@@ -3744,6 +3742,7 @@
             </logic>
         </roleRef>
     </transition>
+    <!-- ========== Expirovaný návrh poistky ========== -->
     <transition>
         <id>687</id>
         <x>2180</x>
@@ -3759,6 +3758,7 @@
             </logic>
         </roleRef>
     </transition>
+    <!-- ========== Expirácia zmluvy ========== -->
     <transition>
         <id>692</id>
         <x>2180</x>
@@ -3774,6 +3774,7 @@
             </logic>
         </roleRef>
     </transition>
+    <!-- ========== Expirovaná zmluva ========== -->
     <transition>
         <id>694</id>
         <x>2260</x>
@@ -3789,6 +3790,7 @@
             </logic>
         </roleRef>
     </transition>
+    <!-- ========== Zmluva pred zaplatením ========== -->
     <transition>
         <id>1360</id>
         <x>1940</x>
@@ -3804,6 +3806,7 @@
             </logic>
         </roleRef>
     </transition>
+    <!-- ========== Zaslaná zmluvy ========== -->
     <transition>
         <id>1365</id>
         <x>1740</x>
