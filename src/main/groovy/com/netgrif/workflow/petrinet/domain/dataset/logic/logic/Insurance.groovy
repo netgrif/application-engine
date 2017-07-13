@@ -17,7 +17,7 @@ class Insurance {
 
     File offerPDF() {
         String name = "offer.pdf"
-        File input = new File("src/main/resources/pdf/zmluva_editovatelna.pdf")
+        File input = new File("src/main/resources/pdf/test.pdf")
         String xml = datasetToXml()
 
         File pdf = PdfFormFiller.fillPdfForm(name, input, xml)
@@ -31,163 +31,83 @@ class Insurance {
         def builder = new MarkupBuilder(writer)
 
         builder.fields() {
-            field('xfdf:original': "Text Field 143", "${value(163)}")
-            field('xfdf:original': "Text Field 50", "${value(17)}")
-            field('xfdf:original': "Text Field 51", "${value(119)}")
-            field('xfdf:original': "Text Field 52", "${value(121)} ${value(122)}")
-//            field('xfdf:original': "Text Field 55", "${value()}") 7
-            field('xfdf:original': "Text Field 57", "${value(135)}")
-            field('xfdf:original': "Text Field 58", "${value(120)}")
-            field('xfdf:original': "Text Field 59", "${value(124)}")
-            field('xfdf:original': "Text Field 60", "${value(125)}")
-            field('xfdf:original': "Text Field 61", "${value(134)}")
-            field('xfdf:original': "Text Field 62", "${value(137)}")
-            field('xfdf:original': "Text Field 63", "${value(138)}")
-//            field('xfdf:original': "Text Field 64", "${value()}") 16
-//            field('xfdf:original': "Text Field 65", "${value()}") 17
-//            field('xfdf:original': "Text Field 66", "${value()}") 18
-//            field('xfdf:original': "Text Field 67", "${value()}") 19
-//            field('xfdf:original': "Text Field 68", "${value()}") 20
-//            field('xfdf:original': "Text Field 69", "${value()}") 21
-//            field('xfdf:original': "Text Field 70", "${value()}") 22
-//            field('xfdf:original': "Text Field 71", "${value()}") 23
-//            field('xfdf:original': "Text Field 72", "${value()}") 24
-//            field('xfdf:original': "Text Field 73", "${value()}") 25
-//            field('xfdf:original': "Text Field 74", "${value()}") 26
-//            field('xfdf:original': "Text Field 75", "${value()}") 27
-            field('xfdf:original': "Text Field 76", "${value(147)}")
-            field('xfdf:original': "Text Field 77", "${value(148)}")
-            field('xfdf:original': "Text Field 78", "${value(149)}")
-            field('xfdf:original': "Text Field 79", "${value(150)}")
-            field('xfdf:original': "Text Field 150", "${value(163)}")
-            field('xfdf:original': "Text Field 4", "${value(19)}")
-            field('xfdf:original': "Text Field 5", "${value(20)}")
-            field('xfdf:original': "Text Field 6", "${value(23)}")
-            field('xfdf:original': "Text Field 8", "${value(22)}")
-            field('xfdf:original': "Text Field 10", "${value(24)}")
-            field('xfdf:original': "Text Field 11", "${value(25)}")
-            field('xfdf:original': "Text Field 12", "${value(26)}")
-//            field('xfdf:original': "Text Field 13", "${value()}") 40
-//            field('xfdf:original': "Text Field 14", "${value()}") 41
-//            field('xfdf:original': "Text Field 15", "${value()}") 42
-//            field('xfdf:original': "Text Field 16", "${value()}") 43
-//            field('xfdf:original': "Text Field 17", "${value()}") 44
-//            field('xfdf:original': "Text Field 18", "${value()}") 45
-            field('xfdf:original': "Text Field 19", "${value(39)}")
-            field('xfdf:original': "Text Field 20", "${value(40)}")
-            field('xfdf:original': "Text Field 21", "${value(41)}")
-            field('xfdf:original': "Text Field 22", "${value(42)}")
-            field('xfdf:original': "Text Field 23", "${value(43)}")
-            field('xfdf:original': "Text Field 24", "${value(44)}")
-            field('xfdf:original': "Text Field 25", "${value(45)}")
-            field('xfdf:original': "Text Field 26", "${value(46)}")
-            field('xfdf:original': "Text Field 27", "${value(47)}")
-            field('xfdf:original': "Text Field 28", "${value(48)}")
-            field('xfdf:original': "Text Field 29", "${value(49)}")
-            field('xfdf:original': "Text Field 30", "${value(175)}")
-            field('xfdf:original': "Text Field 31", "${value(176)}")
-            field('xfdf:original': "Text Field 32", "${value(177)}")
-            field('xfdf:original': "Text Field 33", "${value(178)}")
-            field('xfdf:original': "Text Field 34", "${value(179)}")
-            field('xfdf:original': "Text Field 35", "${value(180)}")
-            field('xfdf:original': "Text Field 36", "${value(181)}")
-            field('xfdf:original': "Text Field 37", "${value(182)}")
-            field('xfdf:original': "Text Field 38", "${value(183)}")
-            field('xfdf:original': "Text Field 39", "${value(184)}")
-            field('xfdf:original': "Text Field 40", "${value(185)}")
-//            field('xfdf:original': "Text Field 41", "${value()}") 68
-            field('xfdf:original': "Text Field 42", "${value(37)}")
-            field('xfdf:original': "Text Field 43", "${value(170)}")
-            field('xfdf:original': "Text Field 44", "${value(167)}")
-            field('xfdf:original': "Text Field 45", "${value(168)}")
-            field('xfdf:original': "Text Field 46", "${value(169)}")
-//            field('xfdf:original': "Text Field 47", "${value()}") 74
-//            field('xfdf:original': "Text Field 48", "${value()}") 75
-            field('xfdf:original': "Text Field 49", "${value(32)}")
-            field('xfdf:original': "Text Field 151", "${value(163)}")
-            field('xfdf:original': "Text Field 80", "${value(27)}")
-            field('xfdf:original': "Text Field 81", "${value(28)}")
-            field('xfdf:original': "Text Field 82", "${value(29)}")
-            field('xfdf:original': "Text Field 83", "${value(30)}")
-            field('xfdf:original': "Text Field 84", "${value(31)}")
-//            field('xfdf:original': "Text Field 85", "${value()}") 83
-            field('xfdf:original': "Text Field 86", "${value(53)}")
-            field('xfdf:original': "Text Field 87", "${value(191)}")
-//            field('xfdf:original': "Text Field 88", "${value()}") 86
-//            field('xfdf:original': "Text Field 89", "${value()}") 87
-//            field('xfdf:original': "Text Field 90", "${value()}") 88
-//            field('xfdf:original': "Text Field 91", "${value()}") 89
-//            field('xfdf:original': "Text Field 92", "${value()}") 90
-//            field('xfdf:original': "Text Field 93", "${value()}") 91
-//            field('xfdf:original': "Text Field 94", "${value()}") 92
-//            field('xfdf:original': "Text Field 95", "${value()}") 93
-//            field('xfdf:original': "Text Field 96", "${value()}") 94
-//            field('xfdf:original': "Text Field 97", "${value()}") 95
-//            field('xfdf:original': "Text Field 98", "${value()}") 96
-//            field('xfdf:original': "Text Field 99", "${value()}") 97
-//            field('xfdf:original': "Text Field 100", "${value()}") 98
-//            field('xfdf:original': "Text Field 101", "${value()}") 99
-//            field('xfdf:original': "Text Field 102", "${value()}") 100
-//            field('xfdf:original': "Text Field 103", "${value()}") 101
-            field('xfdf:original': "Text Field 105", "${value(54)}")
-            field('xfdf:original': "Text Field 106", "${value(192)}")
-            field('xfdf:original': "Text Field 107", "${value(55)}")
-            field('xfdf:original': "Text Field 108", "${value(193)}")
-            field('xfdf:original': "Text Field 109", "${value(56)}")
-            field('xfdf:original': "Text Field 110", "${value(194)}")
-            field('xfdf:original': "Text Field 111", "${value(57)}")
-            field('xfdf:original': "Text Field 112", "${value(195)}")
-            field('xfdf:original': "Text Field 113", "${value(58)}")
-            field('xfdf:original': "Text Field 114", "${value(196)}")
-            field('xfdf:original': "Text Field 115", "${value(59)}")
-            field('xfdf:original': "Text Field 116", "${value(197)}")
-            field('xfdf:original': "Text Field 117", "${value(60)}")
-            field('xfdf:original': "Text Field 118", "${value(198)}")
-            field('xfdf:original': "Text Field 104", "${value(32)}")
-            field('xfdf:original': "Text Field 152", "${value(163)}")
-            field('xfdf:original': "Text Field 119", "${value(162)}")
-            field('xfdf:original': "Text Field 120", "${value(112)}")
-            field('xfdf:original': "Text Field 121", "${value(114)}")
-            field('xfdf:original': "Text Field 122", "${value(70)}")
-            field('xfdf:original': "Text Field 123", "${value(36)}")
-//            field('xfdf:original': "Text Field 124", "${value()}") 123
-            field('xfdf:original': "Text Field 125", "${value(53)}")
-            field('xfdf:original': "Text Field 126", "${value(68)}")
-//            field('xfdf:original': "Text Field 127", "${value()}") 126
-            field('xfdf:original': "Text Field 128", "${value(69)}")
-            field('xfdf:original': "Text Field 129", "${value(109)}")
-            field('xfdf:original': "Text Field 130", "${value(106)}")
-//            field('xfdf:original': "Text Field 131", "${value()}") 130
-            field('xfdf:original': "Text Field 132", "${value(107)}")
-//            field('xfdf:original': "Text Field 133", "${value()}") 132
-//            field('xfdf:original': "Text Field 134", "${value()}") 133
-//            field('xfdf:original': "Text Field 135", "${value()}") 134
-            field('xfdf:original': "Text Field 136", "${value(145)}")
-//            field('xfdf:original': "Text Field 137", "${value()}") 136
-            field('xfdf:original': "Text Field 138", "${value(161)}")
-//            field('xfdf:original': "Text Field 139", "${value()}") 138
-            field('xfdf:original': "Text Field 140", "${value(115)}")
-            field('xfdf:original': "Text Field 141", "${value(116)}")
-//            field('xfdf:original': "Text Field 142", "${value()}") 141
-            field('xfdf:original': "Text Field 153", "${value(163)}")
-//            field('xfdf:original': "Text Field 157", "${value()}") 143
-//            field('xfdf:original': "Text Field 159", "${value()}") 144
-//            field('xfdf:original': "Text Field 160", "${value()}") 145
-//            field('xfdf:original': "Text Field 144", "${value()}") 146
-//            field('xfdf:original': "Text Field 145", "${value()}") 147
-//            field('xfdf:original': "Text Field 147", "${value()}") 148
-//            field('xfdf:original': "Text Field 148", "${value()}") 149
-//            field('xfdf:original': "Text Field 149", "${value()}") 150
-            field('xfdf:original': "Text Field 154", "${value(163)}")
-//            field('xfdf:original': "Text Field 156", "${value()}") 152
-//            field('xfdf:original': "field 157", "${value()}") 153
-            field('xfdf:original': "Text Field 155", "${value(163)}")
+            field('xfdf:original': "Text Field 143", "${value(309001)}")
+//            Poistník
+            field('xfdf:original': "Text Field 50", "${value(109007)}")
+            field('xfdf:original': "Text Field 51", "${value(109008)}")
+            field('xfdf:original': "1", "${value(109010)} ${value(109011)}")
+            field('xfdf:original': "2", "${value(109012)}")
+            field('xfdf:original': "3", "${value(109009)}")
+            field('xfdf:original': "4", "${value(109014)}")
+            field('xfdf:original': "5", "${value(109015)}") // todo: IČO
+            field('xfdf:original': "6", "${value(109013)}")
+            field('xfdf:original': "7", "${value(109016)}")
+            field('xfdf:original': "8", "${value(109017)}")
+            field('xfdf:original': "9", "${value(109018)}")
+            field('xfdf:original': "10", "${value(109019)}")
+//            Poistený
+            field('xfdf:original': "400", "${value(109021)}")
+            field('xfdf:original': "401", "${value(109022)}")
+            field('xfdf:original': "402", "${value(109024)} ${value(109025)}")
+            field('xfdf:original': "403", "${value(109026)}")
+            field('xfdf:original': "404", "${value(109023)}")
+            field('xfdf:original': "405", "${value(109028)}")
+            field('xfdf:original': "406", "${value(109029)}") // todo: IČO
+            field('xfdf:original': "407", "${value(109027)}")
+            field('xfdf:original': "408", "${value(109030)}")
+            field('xfdf:original': "409", "${value(109031)}")
+            field('xfdf:original': "410", "${value(109032)}")
+            field('xfdf:original': "411", "${value(109033)}")
+//            Adresa trvalého bydliska / Sídlo // todo: ?
+//            field('xfdf:original': "11", "${value()}")
+//            field('xfdf:original': "12", "${value()}")
+//            field('xfdf:original': "13", "${value()}")
+//            field('xfdf:original': "14", "${value()}")
+//            Korešpondenčná adresa // todo: ?
+//            field('xfdf:original': "16", "${value()}")
+//            field('xfdf:original': "17", "${value()}")
+//            field('xfdf:original': "18", "${value()}")
+//            field('xfdf:original': "19", "${value()}")
+//            Miesto poistenia
+//            field('xfdf:original': "21", "${value()}")
+//            field('xfdf:original': "22", "${value()}")
+//            field('xfdf:original': "23", "${value()}")
+//            field('xfdf:original': "24", "${value()}")
+//           Údaje o poistení
+            field('xfdf:original': "106", "${value(309002)}")
+            field('xfdf:original': "107", "${value(109001)}")
+            field('xfdf:original': "108", "${value(109003)}")
+//            Údaje o poistnom
+            field('xfdf:original': "109", "${value(108001)}")
+//            Spoluúčasť pri poistnom plnení
+            field('xfdf:original': "453", "${value(105005)}")
+            field('xfdf:original': "775", "${value(106001)}")
+//            Rekapitulácia poistného
+            field('xfdf:original': "110", "${value(308001)}")
+            field('xfdf:original': "111", "${value(208006)}")
+            field('xfdf:original': "112", "${value(305003)}")
+            field('xfdf:original': "113", "${value(208004)}")
+            field('xfdf:original': "114", "${value(308002)}")
+            field('xfdf:original': "115", "${value(203004)}")
+            field('xfdf:original': "116", "${value(308003)}")
+            field('xfdf:original': "117", "${value(208008)}")
+//            field('xfdf:original': "118", "${value()}") // todo: Doplnkové poistenie
+            field('xfdf:original': "119", "${value(308006)}")
+            field('xfdf:original': "120", "${value(308004)}")
+//            field('xfdf:original': "121", "${value()}") // todo: Výška splátky poistného
+//            Informácie na úhradu poistného
+            field('xfdf:original': "126", "${value(308007)}")
+//            Vinkulácia poistného plnenia
+            field('xfdf:original': "129", "${value(109004)}")
+            field('xfdf:original': "130", "${value(109005)}")
+//            field('xfdf:original': "131", "${value()}") // todo: Zriaďuje sa indexácia poistnej sumy?
+            field('xfdf:original': "Text Field 153", "${value(309001)}")
         }
 
         return writer.toString()
     }
 
     private String value(Long id) {
-        return useCase.dataSet[useCase.petriNet.dataSet.find {it.value.importId == id}?.key]?.value?.toString()
+        return useCase.dataSet[useCase.petriNet.dataSet.find { it.value.importId == id }?.key]?.value?.toString()
     }
 }
