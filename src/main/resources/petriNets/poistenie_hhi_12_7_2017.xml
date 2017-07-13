@@ -50,6 +50,7 @@
         <values>Dedina</values>
         <values>Mesto</values>
         <values>Krajské mesto</values>
+        <init>Krajské mesto</init>
     </data>
     <data type="boolean">
         <title>Nachádza sa mimo obce (extravilán)?</title>
@@ -71,6 +72,7 @@
         <values>1 až 5</values>
         <values>6 až 10</values>
         <values>viac ako 10</values>
+        <init>6 až 10</init>
     </data>
     <data type="enumeration">
         <title>Aký je vzťah poisteného k poisťovanej nehnuteľnosti?</title>
@@ -80,6 +82,7 @@
         <values>vlastník ma hypotéku na nehnuteľnosť</values>
         <values>poistený je v prenájme</values>
         <values>iné</values>
+        <init>vlastník nehnuteľnosti</init>
     </data>
     <data type="enumeration">
         <title>Koľko dospelých žije v domácnosti?</title>
@@ -89,6 +92,7 @@
         <values>2</values>
         <values>3</values>
         <values>viac ako 3</values>
+        <init>1</init>
     </data>
     <data type="enumeration">
         <title>Koľko detí žije v domácnosti?</title>
@@ -98,6 +102,7 @@
         <values>1</values>
         <values>2</values>
         <values>viac</values>
+        <init>0</init>
     </data>
     <data type="boolean">
         <title>Bolo poistenému alebo spolupoistenej osobe niekedy v minulosti zamiestnuté poistné plnenie alebo vypovedaná poistná zmluva?</title>
@@ -134,6 +139,7 @@
         <values>fyzická osoba</values>
         <values>právnická osoba</values>
         <values>fyzická osoba - podnikateľ</values>
+        <init>fyzická osoba</init>
     </data>
     <data type="enumeration">
         <title>Počet poistných udalostí za posledné 3 roky?</title>
@@ -142,6 +148,7 @@
         <values>0</values>
         <values>1</values>
         <values>2 a viac</values>
+        <init>0</init>
     </data>
     <!-- ===== Nehnuteľnosť ===== -->
     <data type="enumeration">
@@ -154,6 +161,7 @@
         <values>bytový dom</values>
         <values>bungalow</values>
         <values>rozostavaná stavba</values>
+        <init>rodinný dom</init>
     </data>
     <data type="enumeration">
         <title>Konštrukcia múrov</title>
@@ -164,6 +172,7 @@
         <values>škvarobatón</values>
         <values>sklo</values>
         <values>drevo</values>
+        <init>tehla a/alebo betón</init>
     </data>
     <data type="enumeration">
         <title>Konštrukcia strechy</title>
@@ -176,6 +185,7 @@
         <values>sklo</values>
         <values>šindel</values>
         <values>iné</values>
+        <init>škridla</init>
     </data>
     <data type="enumeration">
         <title>Koľko rokov má nehnuteľnosť?</title>
@@ -185,6 +195,7 @@
         <values>6 až 10</values>
         <values>11 až 20</values>
         <values>viac ako 20</values>
+        <init>6 až 10</init>
     </data>
     <data type="boolean">
         <title>Má nehnuteľnosť praskliny na vonkajšej fasáde?</title>
@@ -218,6 +229,7 @@
         <values>do 20 000 EUR</values>
         <values>do 50 000 EUR</values>
         <values>nad 50 000 EUR</values>
+        <init>bez rekonštrukcií</init>
     </data>
     <!-- ===== Domácnosť ===== -->
     <data type="enumeration">
@@ -723,107 +735,133 @@
     <data type="number">
         <title>Koeficient - Lokalita</title>
         <id>201001</id>
+        <init>1</init>
     </data>
     <data type="number">
         <title>Koeficient - Nachádza sa mimo obce (extravilán)?</title>
         <id>201002</id>
+        <init>1</init>
     </data>
     <data type="number">
         <title>Koeficient - Bolo miesto poistenia postihnuté povodňou za posledných 10 rokov?</title>
         <id>201003</id>
+        <init>1</init>
     </data>
     <data type="number">
         <title>Koeficient - Nachádza nehnuteľnosť sa vo vzdialenosti kratšej ako 300 m od vodného toku?</title>
         <id>201004</id>
+        <init>1</init>
     </data>
     <data type="number">
         <title>Koeficient - Koľko rokov žijete v poisťovanej nehnuteľnosti?</title>
         <id>201005</id>
+        <init>1</init>
     </data>
     <data type="number">
         <title>Koeficient - Aký je vzťah poisteného k poisťovanej nehnuteľnosti?</title>
         <id>201006</id>
+        <init>1</init>
     </data>
     <data type="number">
         <title>Koeficient - Koľko dospelých žije v domácnosti?</title>
         <id>201007</id>
+        <init>0.95</init>
     </data>
     <data type="number">
         <title>Koeficient - Koľko detí žije v domácnosti?</title>
         <id>201008</id>
+        <init>1</init>
     </data>
     <data type="number">
-        <title>Koeficient - Bolo poistenému alebo spolupoistenej osobe niekedy v minulosti zamiestnuté poistné plnenie alebo vypovedaná poistná zmluva?</title>
+        <title>Koeficient - Bolo poistenému alebo spolupoistenej osobe niekedy v minulosti zamietnuté poistné plnenie alebo vypovedaná poistná zmluva?</title>
         <id>201009</id>
+        <init>1</init>
     </data>
     <data type="number">
         <title>Koeficient - Bol poistený alebo spolupoistená osoba niekedy trestné stihaný / vyhlásil osobný bankrot / stíhaný za dlhy alebo odsúdený za podvodné alebo obdobné konanie.</title>
         <id>201010</id>
+        <init>1</init>
     </data>
     <data type="number">
         <title>Koeficient - Je plánovaná rekonštrukcia alebo prestavba poisťovanej nehnuteľnosti v priebehu najbližších 3 mesiacov?</title>
         <id>201011</id>
+        <init>1</init>
     </data>
     <data type="number">
         <title>Koeficient - Žije v poisťovanej domácnosti pes alebo mačka?</title>
         <id>201012</id>
+        <init>1</init>
     </data>
     <data type="number">
         <title>Koeficient - Kedy je nehnuteľnosť najviac obývaná?</title>
         <id>201013</id>
+        <init>1</init>
     </data>
     <data type="number">
         <title>Koeficient - Je nehnuteľnosť využívaná aj na podnikanie?</title>
         <id>201014</id>
+        <init>1</init>
     </data>
     <data type="number">
         <title>Koeficient - Právna subjektivita poisteného?</title>
         <id>201015</id>
+        <init>1</init>
     </data>
     <data type="number">
         <title>Koeficient - Počet poistných udalostí za posledné 3 roky?</title>
         <id>201016</id>
+        <init>1</init>
     </data>
     <data type="number">
         <title>ZÁKLADNÉ INFORMÁCIE koeficient</title>
         <id>201017</id>
+        <int>0.95</int>
     </data>
     <!-- ===== Nehnuteľnosť koeficienty ===== -->
     <data type="number">
         <title>Koeficient - Predmet poistenia</title>
         <id>202001</id>
+        <init>1</init>
     </data>
     <data type="number">
         <title>Koeficient - Konštrukcia múrov</title>
         <id>202002</id>
+        <init>1</init>
     </data>
     <data type="number">
         <title>Koeficient - Konštrukcia strechy</title>
         <id>202003</id>
+        <init>1</init>
     </data>
     <data type="number">
         <title>Koeficient - Koľko rokov má nehnuteľnosť?</title>
         <id>202004</id>
+        <init>1.05</init>
     </data>
     <data type="number">
         <title>Koeficient - Má nehnuteľnosť praskliny na vonkajšej fasáde?</title>
         <id>202005</id>
+        <init>1</init>
     </data>
     <data type="number">
         <title>Koeficient - Koľko izieb má nehnuteľnosť?</title>
         <id>202006</id>
+        <init>1</init>
     </data>
     <data type="number">
         <title>Koeficient - Koľko kúpeľní má nehnuteľnosť?</title>
         <id>202007</id>
+        <init>1</init>
     </data>
     <data type="number">
         <title>Koeficient - Uveďte celkovú hodnotu rekonštrukcií, ak boli vykonané</title>
         <id>202008</id>
+        <init>1</init>
     </data>
     <data type="number">
         <title>NEHNUTEĽNOSŤ koeficient</title>
         <id>202009</id>
+        <init>0.945</init>
     </data>
     <!-- ===== Domácnosť koeficienty ===== -->
     <data type="number">
