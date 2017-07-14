@@ -4349,7 +4349,6 @@
         <dataRef>
             <id>109004</id>
             <logic>
-                <behavior>required</behavior>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
@@ -4406,7 +4405,6 @@
         <dataRef>
             <id>109008</id>
             <logic>
-                <behavior>required</behavior>
                 <behavior>editable</behavior>
                 <!--<action trigger="set">-->
                     <!--check: f.109020,-->
@@ -4424,7 +4422,6 @@
         <dataRef>
             <id>109009</id>
             <logic>
-                <behavior>required</behavior>
                 <behavior>editable</behavior>
                 <!--<action trigger="set">-->
                     <!--check: f.109020,-->
@@ -4931,91 +4928,78 @@
         <dataRef>
             <id>109021</id>
             <logic>
-                <behavior>required</behavior>
                 <behavior>hidden</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>109022</id>
             <logic>
-                <behavior>required</behavior>
                 <behavior>hidden</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>109023</id>
             <logic>
-                <behavior>required</behavior>
                 <behavior>hidden</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>109024</id>
             <logic>
-                <behavior>required</behavior>
                 <behavior>hidden</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>109025</id>
             <logic>
-                <behavior>required</behavior>
                 <behavior>hidden</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>109026</id>
             <logic>
-                <behavior>required</behavior>
                 <behavior>hidden</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>109027</id>
             <logic>
-                <behavior>required</behavior>
                 <behavior>hidden</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>109028</id>
             <logic>
-                <behavior>required</behavior>
                 <behavior>hidden</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>109029</id>
             <logic>
-                <behavior>required</behavior>
                 <behavior>hidden</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>109030</id>
             <logic>
-                <behavior>required</behavior>
                 <behavior>hidden</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>109031</id>
             <logic>
-                <behavior>required</behavior>
                 <behavior>hidden</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>109032</id>
             <logic>
-                <behavior>required</behavior>
                 <behavior>hidden</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>109033</id>
             <logic>
-                <behavior>required</behavior>
                 <behavior>hidden</behavior>
             </logic>
         </dataRef>
