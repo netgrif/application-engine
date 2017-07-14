@@ -602,7 +602,7 @@
         </action>
     </data>
     <data type="number">
-        <title>Podlahová plocha vštkých obytných poschodí</title>
+        <title>Podlahová plocha všetkých obytných poschodí</title>
         <id>105003</id>
         <placeholder>m2</placeholder>
         <desc>Okrem prízemia</desc>
