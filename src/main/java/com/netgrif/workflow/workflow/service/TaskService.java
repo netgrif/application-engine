@@ -12,7 +12,7 @@ import com.netgrif.workflow.petrinet.domain.dataset.*;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedField;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.FieldActionsRunner;
-import com.netgrif.workflow.petrinet.domain.dataset.logic.logic.FileFieldLogic;
+import com.netgrif.workflow.petrinet.domain.dataset.logic.action.FileGenerateReflection;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.validation.FieldValidationRunner;
 import com.netgrif.workflow.petrinet.domain.roles.RolePermission;
 import com.netgrif.workflow.petrinet.domain.throwable.TransitionNotExecutableException;
@@ -196,18 +196,18 @@ public class TaskService implements ITaskService {
         List<Field> dataSetFields = new ArrayList<>();
 
         fieldsIds.forEach(fieldId -> {
-            resolveActions(useCase.getPetriNet().getDataSet().get(fieldId),
-                    Action.ActionTrigger.GET, useCase, transition);
+            //resolveActions(useCase.getPetriNet().getDataSet().get(fieldId),
+            //        Action.ActionTrigger.GET, useCase, transition);
 
             if (useCase.hasFieldBehavior(fieldId, transition.getStringId())) {
                 if (useCase.getDataSet().get(fieldId).isDisplayable(transition.getStringId())) {
-                    Field field = buildField(useCase, fieldId,true);
+                    Field field = buildField(useCase, fieldId, true);
                     field.setBehavior(useCase.getDataSet().get(fieldId).applyBehavior(transition.getStringId()));
                     dataSetFields.add(field);
                 }
             } else {
                 if (transition.getDataSet().get(fieldId).isDisplayable()) {
-                    Field field = buildField(useCase, fieldId,true);
+                    Field field = buildField(useCase, fieldId, true);
                     field.setBehavior(transition.getDataSet().get(fieldId).applyBehavior());
                     dataSetFields.add(field);
                 }
@@ -260,20 +260,20 @@ public class TaskService implements ITaskService {
         return node;
     }
 
-    private Map<String, ChangedField> resolveActions(Field field, Action.ActionTrigger actionTrigger, Case useCase, Transition transition){
+    private Map<String, ChangedField> resolveActions(Field field, Action.ActionTrigger actionTrigger, Case useCase, Transition transition) {
         Map<String, ChangedField> changedFields = new HashMap<>();
         processActions(field, actionTrigger, useCase, transition, changedFields);
         return changedFields;
     }
 
-    private void processActions(Field field, Action.ActionTrigger actionTrigger, Case useCase, Transition transition, Map<String, ChangedField> changedFields){
+    private void processActions(Field field, Action.ActionTrigger actionTrigger, Case useCase, Transition transition, Map<String, ChangedField> changedFields) {
         LinkedHashSet<Action> fieldActions = new LinkedHashSet<>();
-        if(field.getActions() != null)
+        if (field.getActions() != null)
             fieldActions.addAll(DataFieldLogic.getActionByTrigger(field.getActions(), actionTrigger));
-        if(transition.getDataSet().containsKey(field.getObjectId()) && !transition.getDataSet().get(field.getObjectId()).getActions().isEmpty())
-            fieldActions.addAll(DataFieldLogic.getActionByTrigger(transition.getDataSet().get(field.getObjectId()).getActions(),actionTrigger));
+        if (transition.getDataSet().containsKey(field.getObjectId()) && !transition.getDataSet().get(field.getObjectId()).getActions().isEmpty())
+            fieldActions.addAll(DataFieldLogic.getActionByTrigger(transition.getDataSet().get(field.getObjectId()).getActions(), actionTrigger));
 
-        if(fieldActions.isEmpty()) return;
+        if (fieldActions.isEmpty()) return;
 
         runActions(fieldActions.stream().map(Action::getDefinition).collect(Collectors.toList()),
                 actionTrigger, useCase, transition, changedFields, actionTrigger == Action.ActionTrigger.SET);
@@ -283,7 +283,7 @@ public class TaskService implements ITaskService {
         actions.forEach(action -> {
             ChangedField changedField = FieldActionsRunner.run(action, useCase);
 
-            if(changedField.getId() == null) return;
+            if (changedField.getId() == null) return;
 
             if (changedFields.containsKey(changedField.getId()))
                 changedFields.get(changedField.getId()).merge(changedField);
@@ -294,9 +294,9 @@ public class TaskService implements ITaskService {
                 processActions(useCase.getPetriNet().getDataSet().get(changedField.getId()), trigger,
                         useCase, transition, changedFields);
 
-                //getTransitionsByField(field.getId(), useCase.getPetriNet()).forEach(transition ->
-                //        runActions(transition.getDataSet().get(field.getId()).getActions(), useCase, changedFields, recursive)
-                //);
+            //getTransitionsByField(field.getId(), useCase.getPetriNet()).forEach(transition ->
+            //        runActions(transition.getDataSet().get(field.getId()).getActions(), useCase, changedFields, recursive)
+            //);
         });
     }
 
@@ -383,17 +383,18 @@ public class TaskService implements ITaskService {
         Case useCase = caseRepository.findOne(task.getCaseId());
         FileField field = (FileField) useCase.getPetriNet().getDataSet().get(fieldId);
 
-        if(field.isGenerated()){
-            List<Object> result = new FileFieldLogic(useCase,field).executeLogic();
-            if(result == null) return null;
-            if(result.isEmpty()) return null;
+        if (field.isGenerated()) {
+            field.getActions().forEach(action ->
+                    FieldActionsRunner.run(action.getDefinition(), useCase)
+            );
+            if (useCase.getDataSet().get(fieldId).getValue() == null) return null;
 
             caseRepository.save(useCase);
-            return new FileSystemResource((File)result.get(0));
+            return new FileSystemResource(field.getFilePath((String) useCase.getDataSet().get(fieldId).getValue()));
 
         } else {
             if (useCase.getDataSet().get(fieldId).getValue() == null) return null;
-            return new FileSystemResource(field.getFilePath((String)useCase.getDataSet().get(fieldId).getValue()));
+            return new FileSystemResource(field.getFilePath((String) useCase.getDataSet().get(fieldId).getValue()));
         }
     }
 
@@ -496,7 +497,7 @@ public class TaskService implements ITaskService {
 
         filteredSupplier.get().forEach(arc -> {
             if (arc instanceof ResetArc) {
-                useCase.getResetArcTokens().put(arc.getStringId(), ((Place)arc.getSource()).getTokens());
+                useCase.getResetArcTokens().put(arc.getStringId(), ((Place) arc.getSource()).getTokens());
             }
             arc.execute();
         });
@@ -542,7 +543,7 @@ public class TaskService implements ITaskService {
         return tasks;
     }
 
-    public void deleteTasksByCase(String caseId){
+    public void deleteTasksByCase(String caseId) {
         taskRepository.deleteAllByCaseId(caseId);
     }
 }
