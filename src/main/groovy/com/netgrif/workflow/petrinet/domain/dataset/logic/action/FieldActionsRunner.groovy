@@ -25,6 +25,9 @@ class FieldActionsRunner {
 
     static void bindVariables(String script, Binding binding, Case useCase) {
         String[] vars = getVariables(script)
+        if(vars.length == 1.intValue() && !vars[0].contains(":"))
+            return
+
         vars.each { binding.setVariable(getVarName(it), getVarValue(it, useCase)) }
     }
 
