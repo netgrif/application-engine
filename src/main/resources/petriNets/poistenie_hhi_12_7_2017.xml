@@ -4355,7 +4355,6 @@
         <dataRef>
             <id>109005</id>
             <logic>
-                <behavior>required</behavior>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
