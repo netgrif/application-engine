@@ -2990,15 +2990,19 @@
         <title>Ponuka PDF</title>
         <id>309003</id>
         <init>Automaticky generované</init>
-        <!--<action trigger="get">-->
-            <!--self: f.this;-->
-            <!--generate "Insurance.offerPdf",always into self-->
-        <!--</action>-->
+        <action trigger="get">
+            self: f.this;
+            generate "Insurance.offerPDF",always into self
+        </action>
     </data>
     <data type="file">
         <title>Zmluva PDF</title>
         <id>309004</id>
         <init>Automaticky generované</init>
+        <action trigger="get">
+            self: f.this;
+            generate "Insurance.offerPDF",always into self
+        </action>
     </data>
     <!-- ========== PLACES ========== -->
     <place>
@@ -3618,6 +3622,12 @@
                 <perform>true</perform>
             </logic>
         </roleRef>
+        <dataRef>
+            <id>309003</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
     </transition>
     <!-- ========== Výpočet poistného nehnuteľnosti a domácnosti ========== -->
     <transition>

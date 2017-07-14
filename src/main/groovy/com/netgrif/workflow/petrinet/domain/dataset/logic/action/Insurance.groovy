@@ -17,10 +17,12 @@ class Insurance {
 
     File offerPDF() {
         String name = "offer.pdf"
-        File input = new File("src/main/resources/pdf/test.pdf")
-        String xml = datasetToXml()
+        //File input = new File("src/main/resources/pdf/test.pdf")
+        File input = new File("src/main/resources/pdf/zmluva_editovatelna.pdf")
+        File xml  = new File("src/main/resources/pdf/zmluva_editovatelna.xml")
+        //String xml = datasetToXml()
 
-        File pdf = PdfFormFiller.fillPdfForm(name, input, xml)
+        File pdf = PdfFormFiller.fillPdfForm(name, new FileInputStream(input), new FileInputStream(xml))
         useCase.dataSet.get(field.objectId).value = name
 
         return pdf
