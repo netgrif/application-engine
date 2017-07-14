@@ -36,11 +36,39 @@
         <title>Obec</title>
         <id>301001</id>
         <placeholder>Názov</placeholder>
+        <action trigger="set">
+            field: f.this,
+            lokal: f.301002;
+            change lokal about {
+            if (field.value=="Bratislava")
+            return "BA";
+            if (field.value=="Levice")
+            return "Mesto";
+            if (field.value=="Zelenec")
+            return "Dedina";
+            if (field.value=="(Nitra")
+            return "Krajské mesto";
+            }
+        </action>
     </data>
     <data type="text">
         <title>PSČ</title>
         <id>101001</id>
         <placeholder>PSČ</placeholder>
+        <action trigger="set">
+            field: f.this,
+            obec: f.301001;
+            change obec about {
+            if (field.value=="83106")
+            return "Bratislava";
+            if (field.value=="93401")
+            return "Levice";
+            if (field.value=="91921")
+            return "Zelenec";
+            if (field.value=="(94901")
+            return "Nitra";
+            }
+        </action>
     </data>
     <data type="enumeration">
         <title>Lokalita</title>
@@ -51,6 +79,20 @@
         <values>Mesto</values>
         <values>Krajské mesto</values>
         <init>Krajské mesto</init>
+        <action trigger="set">
+            field: f.this,
+            coeff: f.201001;
+            change coeff about {
+            if (field.value=="BA")
+            return 3.5 as Double;
+            if (field.value=="Mesto")
+            return 3.7 as Double;
+            if (field.value=="Dedina")
+            return 2.5 as Double;
+            if (field.value=="(Krajské mesto")
+            return 3.1 as Double;
+            }
+        </action>
     </data>
     <data type="boolean">
         <title>Nachádza sa mimo obce (extravilán)?</title>
@@ -59,9 +101,8 @@
             field: f.this,
             coeff: f.201002;
             change coeff about {
-            if (field.value) {
+            if (field.value)
             return 1.2 as Double;
-            }
             return 1.0 as Double;
             }
         </action>
@@ -73,9 +114,8 @@
             field: f.this,
             coeff: f.201003;
             change coeff about {
-            if (field.value) {
+            if (field.value)
             return 1.5 as Double;
-            }
             return 1.0 as Double;
             }
         </action>
@@ -87,9 +127,8 @@
             field: f.this,
             coeff: f.201004;
             change coeff about {
-            if (field.value) {
+            if (field.value)
             return 1.5 as Double;
-            }
             return 1.0 as Double;
             }
         </action>
@@ -661,6 +700,15 @@
             return 1300*field.value as Double;
             }
         </action>
+        <action trigger="set">
+            p1: f.105001,
+            p2: f.105002,
+            p3: f.105003,
+            field: f.this;
+            change field about {
+            return p1.value+p2.value+p3.value as Double;
+            }
+        </action>
     </data>
     <data type="enumeration">
         <title>Poistenie nehnuteľnosti</title>
@@ -669,11 +717,34 @@
         <values>0.00 €</values>
         <values>50.00 €</values>
         <values>150.00 €</values>
+        <init>50.00 €</init>
+        <action trigger="set">
+            field: f.this,
+            coeff: f.208001;
+            change coeff about {
+            if (field.value=="0.00 €")
+            return 1.1 as Double;
+            if (field.value=="50.00 €")
+            return 1.0 as Double;
+            if (field.value=="150.00 €")
+            return 0.9 as Double;
+            }
+        </action>
     </data>
     <data type="number">
         <title>Poistenie nehnuteľnosti</title>
         <id>105006</id>
         <placeholder>Poistná suma</placeholder>
+        <action trigger="set">
+            field: f.this,
+            excess: f.208001,
+            hhc: f.202009,
+            bic: f.201017,
+            sum: f.305002;
+            change sum about {
+            return (field.value*excess.value*hhc.value*bic.value)/1000 as Double;
+            }
+        </action>
     </data>
     <data type="number">
         <title>Poistenie nehnuteľnosti</title>
@@ -725,6 +796,15 @@
         <title>Hospodárska budova</title>
         <id>105010</id>
         <placeholder>Poistná suma</placeholder>
+        <action trigger="set">
+            field: f.this,
+            coeff: f.205007,
+            excess: f.208001,
+            sum: f.305004;
+            change sum about {
+            return field.value*coeff.value*excess.value/1000 as Double;
+            }
+        </action>
     </data>
     <data type="number">
         <title>Hospodárska budova</title>
@@ -748,6 +828,15 @@
         <title>Altánok</title>
         <id>105012</id>
         <placeholder>Poistná suma</placeholder>
+        <action trigger="set">
+            field: f.this,
+            coeff: f.205008,
+            excess: f.208001,
+            sum: f.305005;
+            change sum about {
+            return field.value*coeff.value*excess.value/1000 as Double;
+            }
+        </action>
     </data>
     <data type="number">
         <title>Altánok</title>
@@ -771,6 +860,15 @@
         <title>Prístrešok</title>
         <id>105014</id>
         <placeholder>Poistná suma</placeholder>
+        <action trigger="set">
+            field: f.this,
+            coeff: f.205009,
+            excess: f.208001,
+            sum: f.305006;
+            change sum about {
+            return field.value*coeff.value*excess.value/1000 as Double;
+            }
+        </action>
     </data>
     <data type="number">
         <title>Prístrešok</title>
@@ -794,6 +892,15 @@
         <title>Chodník, parkovacia plocha</title>
         <id>105016</id>
         <placeholder>Poistná suma</placeholder>
+        <action trigger="set">
+            field: f.this,
+            coeff: f.205010,
+            excess: f.208001,
+            sum: f.305007;
+            change sum about {
+            return field.value*coeff.value*excess.value/1000 as Double;
+            }
+        </action>
     </data>
     <data type="number">
         <title>Chodník, parkovacia plocha</title>
@@ -817,6 +924,15 @@
         <title>Sauna</title>
         <id>105018</id>
         <placeholder>Poistná suma</placeholder>
+        <action trigger="set">
+            field: f.this,
+            coeff: f.205011,
+            excess: f.208001,
+            sum: f.305008;
+            change sum about {
+            return field.value*coeff.value*excess.value/1000 as Double;
+            }
+        </action>
     </data>
     <data type="number">
         <title>Sauna</title>
@@ -840,6 +956,15 @@
         <title>Elektrická brána, oplotenie</title>
         <id>105020</id>
         <placeholder>Poistná suma</placeholder>
+        <action trigger="set">
+            field: f.this,
+            coeff: f.205012,
+            excess: f.208001,
+            sum: f.305009;
+            change sum about {
+            return field.value*coeff.value*excess.value/1000 as Double;
+            }
+        </action>
     </data>
     <data type="number">
         <title>Elektrická brána, oplotenie</title>
@@ -863,6 +988,15 @@
         <title>Tenisový kurt</title>
         <id>105022</id>
         <placeholder>Poistná suma</placeholder>
+        <action trigger="set">
+            field: f.this,
+            coeff: f.205013,
+            excess: f.208001,
+            sum: f.305010;
+            change sum about {
+            return field.value*coeff.value*excess.value/1000 as Double;
+            }
+        </action>
     </data>
     <data type="number">
         <title>Tenisový kurt</title>
@@ -886,6 +1020,15 @@
         <title>Vonkajší bazén</title>
         <id>105024</id>
         <placeholder>Poistná suma</placeholder>
+        <action trigger="set">
+            field: f.this,
+            coeff: f.205014,
+            excess: f.208001,
+            sum: f.305011;
+            change sum about {
+            return field.value*coeff.value*excess.value/1000 as Double;
+            }
+        </action>
     </data>
     <data type="number">
         <title>Vonkajší bazén</title>
@@ -909,6 +1052,15 @@
         <title>Studňa</title>
         <id>105026</id>
         <placeholder>Poistná suma</placeholder>
+        <action trigger="set">
+            field: f.this,
+            coeff: f.205015,
+            excess: f.208001,
+            sum: f.305012;
+            change sum about {
+            return field.value*coeff.value*excess.value/1000 as Double;
+            }
+        </action>
     </data>
     <data type="number">
         <title>Studňa</title>
@@ -932,6 +1084,15 @@
         <title>Žumpa, septik</title>
         <id>105028</id>
         <placeholder>Poistná suma</placeholder>
+        <action trigger="set">
+            field: f.this,
+            coeff: f.205016,
+            excess: f.208001,
+            sum: f.305013;
+            change sum about {
+            return field.value*coeff.value*excess.value/1000 as Double;
+            }
+        </action>
     </data>
     <data type="number">
         <title>Žumpa, septik</title>
@@ -955,6 +1116,15 @@
         <title>Iné</title>
         <id>105030</id>
         <placeholder>Poistná suma</placeholder>
+        <action trigger="set">
+            field: f.this,
+            coeff: f.205017,
+            excess: f.208001,
+            sum: f.305014;
+            change sum about {
+            return field.value*coeff.value*excess.value/1000 as Double;
+            }
+        </action>
     </data>
     <data type="number">
         <title>Iné</title>
@@ -978,6 +1148,15 @@
         <title>Stavebné materiály</title>
         <id>105032</id>
         <placeholder>Poistná suma</placeholder>
+        <action trigger="set">
+            field: f.this,
+            coeff: f.205018,
+            excess: f.208001,
+            sum: f.305015;
+            change sum about {
+            return field.value*coeff.value*excess.value/1000 as Double;
+            }
+        </action>
     </data>
     <data type="number">
         <title>Stavebné materiály</title>
@@ -1001,6 +1180,15 @@
         <title>Stavebné a záhradné mechanizmy</title>
         <id>105034</id>
         <placeholder>Poistná suma</placeholder>
+        <action trigger="set">
+            field: f.this,
+            coeff: f.205019,
+            excess: f.208001,
+            sum: f.305016;
+            change sum about {
+            return field.value*coeff.value*excess.value/1000 as Double;
+            }
+        </action>
     </data>
     <data type="number">
         <title>Stavebné a záhradné mechanizmy</title>
@@ -1221,81 +1409,433 @@
         <title>Koeficient - Lokalita</title>
         <id>201001</id>
         <init>1</init>
+        <action trigger="set">
+            c1: f.201001,
+            c2: f.201002,
+            c3: f.201003,
+            c4: f.201004,
+            c5: f.201005,
+            c6: f.201006,
+            c7: f.201007,
+            c8: f.201008,
+            c9: f.201009,
+            c10: f.201010,
+            c11: f.201011,
+            c12: f.201012,
+            c13: f.201013,
+            c14: f.201014,
+            c15: f.201015,
+            c16: f.201016,
+            sum: f.201017;
+            change sum about {
+            return c1.value*c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c9.value*c10.value*c11.value*c12.value*c13.value*c14.value*c15.value*c16.value;
+            }
+        </action>
     </data>
     <data type="number">
         <title>Koeficient - Nachádza sa mimo obce (extravilán)?</title>
         <id>201002</id>
         <init>1</init>
+        <action trigger="set">
+            c1: f.201001,
+            c2: f.201002,
+            c3: f.201003,
+            c4: f.201004,
+            c5: f.201005,
+            c6: f.201006,
+            c7: f.201007,
+            c8: f.201008,
+            c9: f.201009,
+            c10: f.201010,
+            c11: f.201011,
+            c12: f.201012,
+            c13: f.201013,
+            c14: f.201014,
+            c15: f.201015,
+            c16: f.201016,
+            sum: f.201017;
+            change sum about {
+            return c1.value*c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c9.value*c10.value*c11.value*c12.value*c13.value*c14.value*c15.value*c16.value;
+            }
+        </action>
     </data>
     <data type="number">
         <title>Koeficient - Bolo miesto poistenia postihnuté povodňou za posledných 10 rokov?</title>
         <id>201003</id>
         <init>1</init>
+        <action trigger="set">
+            c1: f.201001,
+            c2: f.201002,
+            c3: f.201003,
+            c4: f.201004,
+            c5: f.201005,
+            c6: f.201006,
+            c7: f.201007,
+            c8: f.201008,
+            c9: f.201009,
+            c10: f.201010,
+            c11: f.201011,
+            c12: f.201012,
+            c13: f.201013,
+            c14: f.201014,
+            c15: f.201015,
+            c16: f.201016,
+            sum: f.201017;
+            change sum about {
+            return c1.value*c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c9.value*c10.value*c11.value*c12.value*c13.value*c14.value*c15.value*c16.value;
+            }
+        </action>
     </data>
     <data type="number">
         <title>Koeficient - Nachádza nehnuteľnosť sa vo vzdialenosti kratšej ako 300 m od vodného toku?</title>
         <id>201004</id>
         <init>1</init>
+        <action trigger="set">
+            c1: f.201001,
+            c2: f.201002,
+            c3: f.201003,
+            c4: f.201004,
+            c5: f.201005,
+            c6: f.201006,
+            c7: f.201007,
+            c8: f.201008,
+            c9: f.201009,
+            c10: f.201010,
+            c11: f.201011,
+            c12: f.201012,
+            c13: f.201013,
+            c14: f.201014,
+            c15: f.201015,
+            c16: f.201016,
+            sum: f.201017;
+            change sum about {
+            return c1.value*c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c9.value*c10.value*c11.value*c12.value*c13.value*c14.value*c15.value*c16.value;
+            }
+        </action>
     </data>
     <data type="number">
         <title>Koeficient - Koľko rokov žijete v poisťovanej nehnuteľnosti?</title>
         <id>201005</id>
         <init>1</init>
+        <action trigger="set">
+            c1: f.201001,
+            c2: f.201002,
+            c3: f.201003,
+            c4: f.201004,
+            c5: f.201005,
+            c6: f.201006,
+            c7: f.201007,
+            c8: f.201008,
+            c9: f.201009,
+            c10: f.201010,
+            c11: f.201011,
+            c12: f.201012,
+            c13: f.201013,
+            c14: f.201014,
+            c15: f.201015,
+            c16: f.201016,
+            sum: f.201017;
+            change sum about {
+            return c1.value*c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c9.value*c10.value*c11.value*c12.value*c13.value*c14.value*c15.value*c16.value;
+            }
+        </action>
     </data>
     <data type="number">
         <title>Koeficient - Aký je vzťah poisteného k poisťovanej nehnuteľnosti?</title>
         <id>201006</id>
         <init>1</init>
+        <action trigger="set">
+            c1: f.201001,
+            c2: f.201002,
+            c3: f.201003,
+            c4: f.201004,
+            c5: f.201005,
+            c6: f.201006,
+            c7: f.201007,
+            c8: f.201008,
+            c9: f.201009,
+            c10: f.201010,
+            c11: f.201011,
+            c12: f.201012,
+            c13: f.201013,
+            c14: f.201014,
+            c15: f.201015,
+            c16: f.201016,
+            sum: f.201017;
+            change sum about {
+            return c1.value*c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c9.value*c10.value*c11.value*c12.value*c13.value*c14.value*c15.value*c16.value;
+            }
+        </action>
     </data>
     <data type="number">
         <title>Koeficient - Koľko dospelých žije v domácnosti?</title>
         <id>201007</id>
         <init>0.95</init>
+        <action trigger="set">
+            c1: f.201001,
+            c2: f.201002,
+            c3: f.201003,
+            c4: f.201004,
+            c5: f.201005,
+            c6: f.201006,
+            c7: f.201007,
+            c8: f.201008,
+            c9: f.201009,
+            c10: f.201010,
+            c11: f.201011,
+            c12: f.201012,
+            c13: f.201013,
+            c14: f.201014,
+            c15: f.201015,
+            c16: f.201016,
+            sum: f.201017;
+            change sum about {
+            return c1.value*c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c9.value*c10.value*c11.value*c12.value*c13.value*c14.value*c15.value*c16.value;
+            }
+        </action>
     </data>
     <data type="number">
         <title>Koeficient - Koľko detí žije v domácnosti?</title>
         <id>201008</id>
         <init>1</init>
+        <action trigger="set">
+            c1: f.201001,
+            c2: f.201002,
+            c3: f.201003,
+            c4: f.201004,
+            c5: f.201005,
+            c6: f.201006,
+            c7: f.201007,
+            c8: f.201008,
+            c9: f.201009,
+            c10: f.201010,
+            c11: f.201011,
+            c12: f.201012,
+            c13: f.201013,
+            c14: f.201014,
+            c15: f.201015,
+            c16: f.201016,
+            sum: f.201017;
+            change sum about {
+            return c1.value*c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c9.value*c10.value*c11.value*c12.value*c13.value*c14.value*c15.value*c16.value;
+            }
+        </action>
     </data>
     <data type="number">
         <title>Koeficient - Bolo poistenému alebo spolupoistenej osobe niekedy v minulosti zamietnuté poistné plnenie alebo vypovedaná poistná zmluva?</title>
         <id>201009</id>
         <init>1</init>
+        <action trigger="set">
+            c1: f.201001,
+            c2: f.201002,
+            c3: f.201003,
+            c4: f.201004,
+            c5: f.201005,
+            c6: f.201006,
+            c7: f.201007,
+            c8: f.201008,
+            c9: f.201009,
+            c10: f.201010,
+            c11: f.201011,
+            c12: f.201012,
+            c13: f.201013,
+            c14: f.201014,
+            c15: f.201015,
+            c16: f.201016,
+            sum: f.201017;
+            change sum about {
+            return c1.value*c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c9.value*c10.value*c11.value*c12.value*c13.value*c14.value*c15.value*c16.value;
+            }
+        </action>
     </data>
     <data type="number">
         <title>Koeficient - Bol poistený alebo spolupoistená osoba niekedy trestné stihaný / vyhlásil osobný bankrot / stíhaný za dlhy alebo odsúdený za podvodné alebo obdobné konanie.</title>
         <id>201010</id>
         <init>1</init>
+        <action trigger="set">
+            c1: f.201001,
+            c2: f.201002,
+            c3: f.201003,
+            c4: f.201004,
+            c5: f.201005,
+            c6: f.201006,
+            c7: f.201007,
+            c8: f.201008,
+            c9: f.201009,
+            c10: f.201010,
+            c11: f.201011,
+            c12: f.201012,
+            c13: f.201013,
+            c14: f.201014,
+            c15: f.201015,
+            c16: f.201016,
+            sum: f.201017;
+            change sum about {
+            return c1.value*c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c9.value*c10.value*c11.value*c12.value*c13.value*c14.value*c15.value*c16.value;
+            }
+        </action>
     </data>
     <data type="number">
         <title>Koeficient - Je plánovaná rekonštrukcia alebo prestavba poisťovanej nehnuteľnosti v priebehu najbližších 3 mesiacov?</title>
         <id>201011</id>
         <init>1</init>
+        <action trigger="set">
+            c1: f.201001,
+            c2: f.201002,
+            c3: f.201003,
+            c4: f.201004,
+            c5: f.201005,
+            c6: f.201006,
+            c7: f.201007,
+            c8: f.201008,
+            c9: f.201009,
+            c10: f.201010,
+            c11: f.201011,
+            c12: f.201012,
+            c13: f.201013,
+            c14: f.201014,
+            c15: f.201015,
+            c16: f.201016,
+            sum: f.201017;
+            change sum about {
+            return c1.value*c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c9.value*c10.value*c11.value*c12.value*c13.value*c14.value*c15.value*c16.value;
+            }
+        </action>
     </data>
     <data type="number">
         <title>Koeficient - Žije v poisťovanej domácnosti pes alebo mačka?</title>
         <id>201012</id>
         <init>1</init>
+        <action trigger="set">
+            c1: f.201001,
+            c2: f.201002,
+            c3: f.201003,
+            c4: f.201004,
+            c5: f.201005,
+            c6: f.201006,
+            c7: f.201007,
+            c8: f.201008,
+            c9: f.201009,
+            c10: f.201010,
+            c11: f.201011,
+            c12: f.201012,
+            c13: f.201013,
+            c14: f.201014,
+            c15: f.201015,
+            c16: f.201016,
+            sum: f.201017;
+            change sum about {
+            return c1.value*c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c9.value*c10.value*c11.value*c12.value*c13.value*c14.value*c15.value*c16.value;
+            }
+        </action>
     </data>
     <data type="number">
         <title>Koeficient - Kedy je nehnuteľnosť najviac obývaná?</title>
         <id>201013</id>
         <init>1</init>
+        <action trigger="set">
+            c1: f.201001,
+            c2: f.201002,
+            c3: f.201003,
+            c4: f.201004,
+            c5: f.201005,
+            c6: f.201006,
+            c7: f.201007,
+            c8: f.201008,
+            c9: f.201009,
+            c10: f.201010,
+            c11: f.201011,
+            c12: f.201012,
+            c13: f.201013,
+            c14: f.201014,
+            c15: f.201015,
+            c16: f.201016,
+            sum: f.201017;
+            change sum about {
+            return c1.value*c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c9.value*c10.value*c11.value*c12.value*c13.value*c14.value*c15.value*c16.value;
+            }
+        </action>
     </data>
     <data type="number">
         <title>Koeficient - Je nehnuteľnosť využívaná aj na podnikanie?</title>
         <id>201014</id>
         <init>1</init>
+        <action trigger="set">
+            c1: f.201001,
+            c2: f.201002,
+            c3: f.201003,
+            c4: f.201004,
+            c5: f.201005,
+            c6: f.201006,
+            c7: f.201007,
+            c8: f.201008,
+            c9: f.201009,
+            c10: f.201010,
+            c11: f.201011,
+            c12: f.201012,
+            c13: f.201013,
+            c14: f.201014,
+            c15: f.201015,
+            c16: f.201016,
+            sum: f.201017;
+            change sum about {
+            return c1.value*c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c9.value*c10.value*c11.value*c12.value*c13.value*c14.value*c15.value*c16.value;
+            }
+        </action>
     </data>
     <data type="number">
         <title>Koeficient - Právna subjektivita poisteného?</title>
         <id>201015</id>
         <init>1</init>
+        <action trigger="set">
+            c1: f.201001,
+            c2: f.201002,
+            c3: f.201003,
+            c4: f.201004,
+            c5: f.201005,
+            c6: f.201006,
+            c7: f.201007,
+            c8: f.201008,
+            c9: f.201009,
+            c10: f.201010,
+            c11: f.201011,
+            c12: f.201012,
+            c13: f.201013,
+            c14: f.201014,
+            c15: f.201015,
+            c16: f.201016,
+            sum: f.201017;
+            change sum about {
+            return c1.value*c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c9.value*c10.value*c11.value*c12.value*c13.value*c14.value*c15.value*c16.value;
+            }
+        </action>
     </data>
     <data type="number">
         <title>Koeficient - Počet poistných udalostí za posledné 3 roky?</title>
         <id>201016</id>
         <init>1</init>
+        <action trigger="set">
+            c1: f.201001,
+            c2: f.201002,
+            c3: f.201003,
+            c4: f.201004,
+            c5: f.201005,
+            c6: f.201006,
+            c7: f.201007,
+            c8: f.201008,
+            c9: f.201009,
+            c10: f.201010,
+            c11: f.201011,
+            c12: f.201012,
+            c13: f.201013,
+            c14: f.201014,
+            c15: f.201015,
+            c16: f.201016,
+            sum: f.201017;
+            change sum about {
+            return c1.value*c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c9.value*c10.value*c11.value*c12.value*c13.value*c14.value*c15.value*c16.value;
+            }
+        </action>
     </data>
     <data type="number">
         <title>ZÁKLADNÉ INFORMÁCIE koeficient</title>
@@ -1307,41 +1847,153 @@
         <title>Koeficient - Predmet poistenia</title>
         <id>202001</id>
         <init>1</init>
+        <action trigger="set">
+            c1: f.202001,
+            c2: f.202002,
+            c3: f.202003,
+            c4: f.202004,
+            c5: f.202005,
+            c6: f.202006,
+            c7: f.202007,
+            c8: f.202008,
+            sum: f.201009;
+            change sum about {
+            return c1.value*c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value;
+            }
+        </action>
     </data>
     <data type="number">
         <title>Koeficient - Konštrukcia múrov</title>
         <id>202002</id>
         <init>1</init>
+        <action trigger="set">
+            c1: f.202001,
+            c2: f.202002,
+            c3: f.202003,
+            c4: f.202004,
+            c5: f.202005,
+            c6: f.202006,
+            c7: f.202007,
+            c8: f.202008,
+            sum: f.201009;
+            change sum about {
+            return c1.value*c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value;
+            }
+        </action>
     </data>
     <data type="number">
         <title>Koeficient - Konštrukcia strechy</title>
         <id>202003</id>
         <init>1</init>
+        <action trigger="set">
+            c1: f.202001,
+            c2: f.202002,
+            c3: f.202003,
+            c4: f.202004,
+            c5: f.202005,
+            c6: f.202006,
+            c7: f.202007,
+            c8: f.202008,
+            sum: f.201009;
+            change sum about {
+            return c1.value*c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value;
+            }
+        </action>
     </data>
     <data type="number">
         <title>Koeficient - Koľko rokov má nehnuteľnosť?</title>
         <id>202004</id>
         <init>1.05</init>
+        <action trigger="set">
+            c1: f.202001,
+            c2: f.202002,
+            c3: f.202003,
+            c4: f.202004,
+            c5: f.202005,
+            c6: f.202006,
+            c7: f.202007,
+            c8: f.202008,
+            sum: f.201009;
+            change sum about {
+            return c1.value*c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value;
+            }
+        </action>
     </data>
     <data type="number">
         <title>Koeficient - Má nehnuteľnosť praskliny na vonkajšej fasáde?</title>
         <id>202005</id>
         <init>1</init>
+        <action trigger="set">
+            c1: f.202001,
+            c2: f.202002,
+            c3: f.202003,
+            c4: f.202004,
+            c5: f.202005,
+            c6: f.202006,
+            c7: f.202007,
+            c8: f.202008,
+            sum: f.201009;
+            change sum about {
+            return c1.value*c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value;
+            }
+        </action>
     </data>
     <data type="number">
         <title>Koeficient - Koľko izieb má nehnuteľnosť?</title>
         <id>202006</id>
         <init>1</init>
+        <action trigger="set">
+            c1: f.202001,
+            c2: f.202002,
+            c3: f.202003,
+            c4: f.202004,
+            c5: f.202005,
+            c6: f.202006,
+            c7: f.202007,
+            c8: f.202008,
+            sum: f.201009;
+            change sum about {
+            return c1.value*c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value;
+            }
+        </action>
     </data>
     <data type="number">
         <title>Koeficient - Koľko kúpeľní má nehnuteľnosť?</title>
         <id>202007</id>
         <init>1</init>
+        <action trigger="set">
+            c1: f.202001,
+            c2: f.202002,
+            c3: f.202003,
+            c4: f.202004,
+            c5: f.202005,
+            c6: f.202006,
+            c7: f.202007,
+            c8: f.202008,
+            sum: f.201009;
+            change sum about {
+            return c1.value*c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value;
+            }
+        </action>
     </data>
     <data type="number">
         <title>Koeficient - Uveďte celkovú hodnotu rekonštrukcií, ak boli vykonané</title>
         <id>202008</id>
         <init>1</init>
+        <action trigger="set">
+            c1: f.202001,
+            c2: f.202002,
+            c3: f.202003,
+            c4: f.202004,
+            c5: f.202005,
+            c6: f.202006,
+            c7: f.202007,
+            c8: f.202008,
+            sum: f.201009;
+            change sum about {
+            return c1.value*c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value;
+            }
+        </action>
     </data>
     <data type="number">
         <title>NEHNUTEĽNOSŤ koeficient</title>
@@ -1451,54 +2103,327 @@
     <data type="number">
         <title>Koeficient - Hospodárska budova</title>
         <id>205007</id>
+        <action trigger="set">
+            c1: f.305002,
+            c2: f.205006,
+            c3: f.205007,
+            c4: f.205008,
+            c5: f.205009,
+            c6: f.205010,
+            c7: f.205011,
+            c8: f.205012,
+            c9: f.205013,
+            c10: f.205014,
+            c11: f.205015,
+            c12: f.205016,
+            c13: f.205017,
+            c14: f.205018,
+            c15: f.205019,
+            sum: f.308001;
+            change sum about {
+            return c1.value+c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
+            }
+        </action>
     </data>
     <data type="number">
         <title>Koeficient - Altánok</title>
         <id>205008</id>
+        <action trigger="set">
+            c1: f.305002,
+            c2: f.205006,
+            c3: f.205007,
+            c4: f.205008,
+            c5: f.205009,
+            c6: f.205010,
+            c7: f.205011,
+            c8: f.205012,
+            c9: f.205013,
+            c10: f.205014,
+            c11: f.205015,
+            c12: f.205016,
+            c13: f.205017,
+            c14: f.205018,
+            c15: f.205019,
+            sum: f.308001;
+            change sum about {
+            return c1.value+c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
+            }
+        </action>
     </data>
     <data type="number">
         <title>Koeficient - Prístrešok</title>
         <id>205009</id>
+        <action trigger="set">
+            c1: f.305002,
+            c2: f.205006,
+            c3: f.205007,
+            c4: f.205008,
+            c5: f.205009,
+            c6: f.205010,
+            c7: f.205011,
+            c8: f.205012,
+            c9: f.205013,
+            c10: f.205014,
+            c11: f.205015,
+            c12: f.205016,
+            c13: f.205017,
+            c14: f.205018,
+            c15: f.205019,
+            sum: f.308001;
+            change sum about {
+            return c1.value+c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
+            }
+        </action>
     </data>
     <data type="number">
         <title>Koeficient - Chodník, parkovacia plocha</title>
         <id>205010</id>
+        <action trigger="set">
+            c1: f.305002,
+            c2: f.205006,
+            c3: f.205007,
+            c4: f.205008,
+            c5: f.205009,
+            c6: f.205010,
+            c7: f.205011,
+            c8: f.205012,
+            c9: f.205013,
+            c10: f.205014,
+            c11: f.205015,
+            c12: f.205016,
+            c13: f.205017,
+            c14: f.205018,
+            c15: f.205019,
+            sum: f.308001;
+            change sum about {
+            return c1.value+c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
+            }
+        </action>
     </data>
     <data type="number">
         <title>Koeficient - Sauna</title>
         <id>205011</id>
+        <action trigger="set">
+            c1: f.305002,
+            c2: f.205006,
+            c3: f.205007,
+            c4: f.205008,
+            c5: f.205009,
+            c6: f.205010,
+            c7: f.205011,
+            c8: f.205012,
+            c9: f.205013,
+            c10: f.205014,
+            c11: f.205015,
+            c12: f.205016,
+            c13: f.205017,
+            c14: f.205018,
+            c15: f.205019,
+            sum: f.308001;
+            change sum about {
+            return c1.value+c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
+            }
+        </action>
     </data>
     <data type="number">
         <title>Koeficient - Elektrická brána, oplotenie</title>
         <id>205012</id>
+        <action trigger="set">
+            c1: f.305002,
+            c2: f.205006,
+            c3: f.205007,
+            c4: f.205008,
+            c5: f.205009,
+            c6: f.205010,
+            c7: f.205011,
+            c8: f.205012,
+            c9: f.205013,
+            c10: f.205014,
+            c11: f.205015,
+            c12: f.205016,
+            c13: f.205017,
+            c14: f.205018,
+            c15: f.205019,
+            sum: f.308001;
+            change sum about {
+            return c1.value+c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
+            }
+        </action>
     </data>
     <data type="number">
         <title>Koeficient - Tenisový kurt</title>
         <id>205013</id>
+        <action trigger="set">
+            c1: f.305002,
+            c2: f.205006,
+            c3: f.205007,
+            c4: f.205008,
+            c5: f.205009,
+            c6: f.205010,
+            c7: f.205011,
+            c8: f.205012,
+            c9: f.205013,
+            c10: f.205014,
+            c11: f.205015,
+            c12: f.205016,
+            c13: f.205017,
+            c14: f.205018,
+            c15: f.205019,
+            sum: f.308001;
+            change sum about {
+            return c1.value+c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
+            }
+        </action>
     </data>
     <data type="number">
         <title>Koeficient - Vonkajší bazén</title>
         <id>205014</id>
+        <action trigger="set">
+            c1: f.305002,
+            c2: f.205006,
+            c3: f.205007,
+            c4: f.205008,
+            c5: f.205009,
+            c6: f.205010,
+            c7: f.205011,
+            c8: f.205012,
+            c9: f.205013,
+            c10: f.205014,
+            c11: f.205015,
+            c12: f.205016,
+            c13: f.205017,
+            c14: f.205018,
+            c15: f.205019,
+            sum: f.308001;
+            change sum about {
+            return c1.value+c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
+            }
+        </action>
     </data>
     <data type="number">
         <title>Koeficient - Studňa</title>
         <id>205015</id>
+        <action trigger="set">
+            c1: f.305002,
+            c2: f.205006,
+            c3: f.205007,
+            c4: f.205008,
+            c5: f.205009,
+            c6: f.205010,
+            c7: f.205011,
+            c8: f.205012,
+            c9: f.205013,
+            c10: f.205014,
+            c11: f.205015,
+            c12: f.205016,
+            c13: f.205017,
+            c14: f.205018,
+            c15: f.205019,
+            sum: f.308001;
+            change sum about {
+            return c1.value+c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
+            }
+        </action>
     </data>
     <data type="number">
         <title>Koeficient - Žumpa, septik</title>
         <id>205016</id>
+        <action trigger="set">
+            c1: f.305002,
+            c2: f.205006,
+            c3: f.205007,
+            c4: f.205008,
+            c5: f.205009,
+            c6: f.205010,
+            c7: f.205011,
+            c8: f.205012,
+            c9: f.205013,
+            c10: f.205014,
+            c11: f.205015,
+            c12: f.205016,
+            c13: f.205017,
+            c14: f.205018,
+            c15: f.205019,
+            sum: f.308001;
+            change sum about {
+            return c1.value+c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
+            }
+        </action>
     </data>
     <data type="number">
         <title>Koeficient - Iné</title>
         <id>205017</id>
+        <action trigger="set">
+            c1: f.305002,
+            c2: f.205006,
+            c3: f.205007,
+            c4: f.205008,
+            c5: f.205009,
+            c6: f.205010,
+            c7: f.205011,
+            c8: f.205012,
+            c9: f.205013,
+            c10: f.205014,
+            c11: f.205015,
+            c12: f.205016,
+            c13: f.205017,
+            c14: f.205018,
+            c15: f.205019,
+            sum: f.308001;
+            change sum about {
+            return c1.value+c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
+            }
+        </action>
     </data>
     <data type="number">
         <title>Koeficient - Stavebné materiály</title>
         <id>205018</id>
+        <action trigger="set">
+            c1: f.305002,
+            c2: f.205006,
+            c3: f.205007,
+            c4: f.205008,
+            c5: f.205009,
+            c6: f.205010,
+            c7: f.205011,
+            c8: f.205012,
+            c9: f.205013,
+            c10: f.205014,
+            c11: f.205015,
+            c12: f.205016,
+            c13: f.205017,
+            c14: f.205018,
+            c15: f.205019,
+            sum: f.308001;
+            change sum about {
+            return c1.value+c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
+            }
+        </action>
     </data>
     <data type="number">
         <title>Koeficient - Stavebné a záhradné mechanizmy</title>
         <id>205019</id>
+        <action trigger="set">
+            c1: f.305002,
+            c2: f.205006,
+            c3: f.205007,
+            c4: f.205008,
+            c5: f.205009,
+            c6: f.205010,
+            c7: f.205011,
+            c8: f.205012,
+            c9: f.205013,
+            c10: f.205014,
+            c11: f.205015,
+            c12: f.205016,
+            c13: f.205017,
+            c14: f.205018,
+            c15: f.205019,
+            sum: f.308001;
+            change sum about {
+            return c1.value+c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
+            }
+        </action>
     </data>
     <!-- ===== Poistenie domácností koeficienty ===== -->
     <data type="number">
@@ -1896,13 +2821,15 @@
         <title>Ponuka PDF</title>
         <id>309003</id>
         <init>Automaticky generované</init>
-        <logic>generate Insurance.offerPDF always</logic>
+        <!--<action trigger="get">-->
+            <!--self: f.this;-->
+            <!--generate "Insurance.offerPdf",always into self-->
+        <!--</action>-->
     </data>
     <data type="file">
         <title>Zmluva PDF</title>
         <id>309004</id>
         <init>Automaticky generované</init>
-        <logic>generate Insurance.offerPDF always</logic>
     </data>
     <!-- ========== PLACES ========== -->
     <place>
@@ -2670,6 +3597,33 @@
                 <perform>true</perform>
             </logic>
         </roleRef>
+        <dataRef>
+            <id>105005</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>105006</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>105006</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>305002</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
         <dataRef>
             <id>308001</id>
             <logic>
