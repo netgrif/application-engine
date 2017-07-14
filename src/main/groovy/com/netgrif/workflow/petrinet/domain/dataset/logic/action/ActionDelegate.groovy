@@ -101,11 +101,10 @@ class ActionDelegate {
     def generate(String methods, Closure repeated){
         [into: { Field field ->
             File f = new FileGenerateReflection(useCase, field as FileField,repeated() == ALWAYS_GENERATE).callMethod(methods) as File
-            if(f != null) {
+            /*if(f != null) {
                 useCase.dataSet.get(field.objectId).value = f.name
                 field.value = f.name
-            }
-            useCase.dataSet.get(field.objectId).value = null
+            }*/
         }]
     }
 }
