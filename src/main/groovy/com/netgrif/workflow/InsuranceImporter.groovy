@@ -10,17 +10,11 @@ import com.netgrif.workflow.auth.domain.repositories.UserProcessRoleRepository
 import com.netgrif.workflow.auth.service.interfaces.IUserService
 import com.netgrif.workflow.importer.Importer
 import com.netgrif.workflow.petrinet.domain.PetriNet
-import com.netgrif.workflow.petrinet.domain.dataset.FieldWithDefault
-import com.netgrif.workflow.petrinet.domain.dataset.FileField
-import com.netgrif.workflow.petrinet.domain.dataset.logic.logic.Insurance
-import com.netgrif.workflow.petrinet.domain.dataset.logic.validation.FieldValidationRunner
 import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository
 import com.netgrif.workflow.workflow.domain.Case
-import com.netgrif.workflow.workflow.domain.DataField
 import com.netgrif.workflow.workflow.domain.repositories.CaseRepository
 import com.netgrif.workflow.workflow.service.TaskService
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Component
 
 @Component
