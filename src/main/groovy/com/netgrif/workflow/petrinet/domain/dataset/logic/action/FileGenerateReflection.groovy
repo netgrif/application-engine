@@ -1,22 +1,25 @@
-package com.netgrif.workflow.petrinet.domain.dataset.logic.logic
+package com.netgrif.workflow.petrinet.domain.dataset.logic.action
 
 import com.netgrif.workflow.petrinet.domain.dataset.FileField
 import com.netgrif.workflow.workflow.domain.Case
 
 import java.lang.reflect.Method
 
+class FileGenerateReflection{
 
-class FileFieldLogic extends FieldLogic{
+    private static final String GENERATION_METHODS_PACKAGE = "com.netgrif.workflow.petrinet.domain.dataset.logic.action."
 
-    private static final String GENERATION_METHODS_PACKAGE = "com.netgrif.workflow.petrinet.domain.dataset.logic.logic."
+    private Case useCase
+    private FileField field
+    private Boolean alwaysGenerate
 
-    protected FileField field
-
-    FileFieldLogic(Case useCase, FileField field) {
-        super(useCase)
+    FileGenerateReflection(Case useCase, FileField field, Boolean always) {
+        this.useCase = useCase
         this.field = field
+        this.alwaysGenerate = always
     }
 
+    @Deprecated
     public List<Object> executeLogic(){
         if(field.logic == null) return null
         if(field.logic.isEmpty()) return null
@@ -33,10 +36,12 @@ class FileFieldLogic extends FieldLogic{
         return results
     }
 
-    private Object callMethod(String logicMember){
+    public Object callMethod(String calledMethod){
         try {
-            logicMember = logicMember.replace("always","").trim()
-            String[] parts = logicMember.split("\\.")
+            if(!alwaysGenerate && useCase.dataSet.get(field.objectId).value != field.getDefaultValue())
+                return new File(field.getFilePath(useCase.dataSet.get(field.objectId).value as String))
+
+            String[] parts = calledMethod.split("\\.")
             Class clazz = Class.forName(GENERATION_METHODS_PACKAGE + parts[0])
 
             Object t = clazz.newInstance(useCase, field)
@@ -47,10 +52,5 @@ class FileFieldLogic extends FieldLogic{
             e.printStackTrace()
             return null
         }
-    }
-
-    private boolean shouldExecute(String logic){
-        if(logic.contains("always")) return true
-        return useCase.dataSet.get(field.objectId).value == field.getDefaultValue()
     }
 }

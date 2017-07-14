@@ -1,4 +1,4 @@
-package com.netgrif.workflow.petrinet.domain.dataset.logic.logic
+package com.netgrif.workflow.petrinet.domain.dataset.logic.action
 
 import com.netgrif.workflow.pdf.service.PdfFormFiller
 import com.netgrif.workflow.petrinet.domain.dataset.FileField

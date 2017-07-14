@@ -17,8 +17,8 @@ public class PdfFormFillerTest {
 
     @Test
     public void fillPdfForm() throws Exception {
-        File input = new File("src/test/resources/pdf/zmluva_editovatelna.pdf");
-        File xml = new File("src/test/resources/pdf/zmluva_editovatelna.xml");
+        File input = new File("src/test/resources/pdf/test.pdf");
+        File xml = new File("src/test/resources/pdf/test.xml");
 
         File out = PdfFormFiller.fillPdfForm("test_out.pdf", new FileInputStream(input), new FileInputStream(xml));
 
