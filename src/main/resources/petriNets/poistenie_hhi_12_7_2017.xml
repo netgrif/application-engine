@@ -3549,12 +3549,14 @@
             <id>102006</id>
             <logic>
                 <behavior>editable</behavior>
+                <behavior>required</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>102007</id>
             <logic>
                 <behavior>editable</behavior>
+                <behavior>required</behavior>
             </logic>
         </dataRef>
         <dataRef>
