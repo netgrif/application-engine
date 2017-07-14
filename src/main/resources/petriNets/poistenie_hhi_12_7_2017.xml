@@ -604,6 +604,7 @@
         <title>Podlahová plocha pivnice</title>
         <id>105001</id>
         <placeholder>m2</placeholder>
+        <init>0</init>
         <action trigger="set">
             field: f.this,
             location: f.301002,
@@ -619,11 +620,30 @@
             return 700*field.value as Double;
             }
         </action>
+        <action trigger="set">
+        p1: f.205002,
+        p2: f.205003,
+        p3: f.205004,
+        field: f.105006;
+        change field about {
+        return p1.value+p2.value+p3.value as Double;
+        }
+        </action>
+        <action trigger="set">
+            p1: f.105001,
+            p2: f.105002,
+            p3: f.105003,
+            field: f.305001;
+            change field about {
+            return p1.value+p2.value+p3.value as Double;
+            }
+        </action>
     </data>
     <data type="number">
         <title>Podlahová plocha prízemia</title>
         <id>105002</id>
         <placeholder>m2</placeholder>
+        <init>0</init>
         <action trigger="set">
             field: f.this,
             location: f.301002,
@@ -639,12 +659,31 @@
             return 900*field.value as Double;
             }
         </action>
+        <action trigger="set">
+            p1: f.205002,
+            p2: f.205003,
+            p3: f.205004,
+            field: f.105006;
+            change field about {
+            return p1.value+p2.value+p3.value as Double;
+            }
+        </action>
+        <action trigger="set">
+            p1: f.105001,
+            p2: f.105002,
+            p3: f.105003,
+            field: f.305001;
+            change field about {
+            return p1.value+p2.value+p3.value as Double;
+            }
+        </action>
     </data>
     <data type="number">
         <title>Podlahová plocha všetkých obytných poschodí</title>
         <id>105003</id>
         <placeholder>m2</placeholder>
         <desc>Okrem prízemia</desc>
+        <init>0</init>
         <action trigger="set">
             field: f.this,
             location: f.301002,
@@ -660,11 +699,30 @@
             return 800*field.value as Double;
             }
         </action>
+        <action trigger="set">
+            p1: f.205002,
+            p2: f.205003,
+            p3: f.205004,
+            field: f.105006;
+            change field about {
+            return p1.value+p2.value+p3.value as Double;
+            }
+        </action>
+        <action trigger="set">
+            p1: f.105001,
+            p2: f.105002,
+            p3: f.105003,
+            field: f.305001;
+            change field about {
+            return p1.value+p2.value+p3.value as Double;
+            }
+        </action>
     </data>
     <data type="number">
         <title>Podlahová plocha garáže</title>
         <id>105004</id>
         <placeholder>m2</placeholder>
+        <init>0</init>
         <action trigger="set">
             field: f.this,
             location: f.301002,
@@ -685,6 +743,7 @@
         <title>Celková podlahová plocha</title>
         <id>305001</id>
         <placeholder>m2</placeholder>
+        <init>0</init>
         <action trigger="set">
             field: f.this,
             location: f.301002,
@@ -700,18 +759,18 @@
             return 1300*field.value as Double;
             }
         </action>
-        <action trigger="set">
-            p1: f.105001,
-            p2: f.105002,
-            p3: f.105003,
-            field: f.this;
-            change field about {
-            return p1.value+p2.value+p3.value as Double;
-            }
-        </action>
+        <!--<action trigger="set">-->
+            <!--p1: f.105001,-->
+            <!--p2: f.105002,-->
+            <!--p3: f.105003,-->
+            <!--field: f.305001;-->
+            <!--change field about {-->
+            <!--return p1.value+p2.value+p3.value as Double;-->
+            <!--}-->
+        <!--</action>-->
     </data>
     <data type="enumeration">
-        <title>Poistenie nehnuteľnosti</title>
+        <title>Poistenie nehnuteľnosti-Spoluúčasť</title>
         <id>105005</id>
         <placeholder>Spoluúčasť</placeholder>
         <values>0.00 €</values>
@@ -732,7 +791,7 @@
         </action>
     </data>
     <data type="number">
-        <title>Poistenie nehnuteľnosti</title>
+        <title>Poistenie nehnuteľnosti - Poistná suma</title>
         <id>105006</id>
         <placeholder>Poistná suma</placeholder>
         <action trigger="set">
@@ -747,7 +806,7 @@
         </action>
     </data>
     <data type="number">
-        <title>Poistenie nehnuteľnosti</title>
+        <title>Poistenie nehnuteľnosti - Poistné</title>
         <id>305002</id>
         <placeholder>Poistné</placeholder>
     </data>
@@ -755,6 +814,42 @@
     <data type="boolean">
         <title>Garáž</title>
         <id>105035</id>
+        <action trigger="set">
+            field: f.this,
+            other: f.105007,
+            trans: t.413;
+            make other,visible on trans when { field.value }
+        </action>
+        <action trigger="set">
+            field: f.this,
+            other: f.305003,
+            trans: t.413;
+            make other,visible on trans when { field.value }
+        </action>
+        <action trigger="set">
+            field: f.this,
+            other: f.105008,
+            trans: t.413;
+            make other,visible on trans when { field.value }
+        </action>
+        <action trigger="set">
+            field: f.this,
+            other: f.105007,
+            trans: t.413;
+            make other,hidden on trans when { field.value == false }
+        </action>
+        <action trigger="set">
+            field: f.this,
+            other: f.305003,
+            trans: t.413;
+            make other,hidden on trans when { field.value == false }
+        </action>
+        <action trigger="set">
+            field: f.this,
+            other: f.105008,
+            trans: t.413;
+            make other,hidden on trans when { field.value == false }
+        </action>
     </data>
     <data type="number">
         <title>Garáž</title>
@@ -791,6 +886,31 @@
             return 0 as Double;
             }
         </action>
+        <action trigger="set">
+            field: f.this,
+            other: f.105010,
+            trans: t.413;
+            make other,editable on trans when { field.value }
+        </action>
+        <action trigger="set">
+            field: f.this,
+            other: f.305004,
+            trans: t.413;
+            make other,visible on trans when { field.value }
+        </action>
+        <action trigger="set">
+            field: f.this,
+            other: f.105010,
+            trans: t.413;
+            make other,hidden on trans when { !field.value }
+        </action>
+        <action trigger="set">
+            field: f.this,
+            other: f.305004,
+            trans: t.413;
+            make other,hidden on trans when { !field.value }
+        </action>
+
     </data>
     <data type="number">
         <title>Hospodárska budova</title>
@@ -822,6 +942,30 @@
             return 1.0 as Double;
             return 0 as Double;
             }
+        </action>
+        <action trigger="set">
+            field: f.this,
+            other: f.105012,
+            trans: t.413;
+            make other,editable on trans when { field.value }
+        </action>
+        <action trigger="set">
+            field: f.this,
+            other: f.305005,
+            trans: t.413;
+            make other,visible on trans when { field.value }
+        </action>
+        <action trigger="set">
+            field: f.this,
+            other: f.105012,
+            trans: t.413;
+            make other,hidden on trans when { return !field.value }
+        </action>
+        <action trigger="set">
+            field: f.this,
+            other: f.305005,
+            trans: t.413;
+            make other,hidden on trans when { return !field.value }
         </action>
     </data>
     <data type="number">
@@ -1377,10 +1521,31 @@
         <values>ročná</values>
         <values>polročná</values>
         <values>štvrťročná</values>
+        <action trigger="set">
+            field: f.this,
+            coeff: f.208004;
+            change coeff about {
+            if (field.value == "ročná")
+            return 0.95 as Double;
+            if (field.value == "polročná")
+            return 0.99 as Double;
+            if (field.value == "štvrťročná")
+            return 1.0 as Double;
+            }
+        </action>
     </data>
     <data type="boolean">
         <title>KOMPLETNÉ POISTENIE</title>
         <id>308005</id>
+        <!--<action trigger="set">-->
+            <!--field: f.103001,-->
+            <!--coeff: f.208004;-->
+            <!--change coeff about {-->
+            <!--if (field.value == "bungalow")-->
+            <!--return true ;-->
+            <!--return false ;-->
+            <!--}-->
+        <!--</action>-->
     </data>
     <data type="boolean">
         <title>ZĽAVA ZA INÉ POISTENIE V PREMIUM</title>
@@ -2046,6 +2211,7 @@
     <data type="number">
         <title>Koeficient - Poistenie nehnuteľnosti - spoluúčasť</title>
         <id>208001</id>
+        <init>1</init>
     </data>
     <data type="number">
         <title>Koeficient - Poistenie domácnosti - spoluúčasť</title>
@@ -2083,14 +2249,17 @@
     <data type="number">
         <title>Koeficient - Lokalita - pivnica</title>
         <id>205002</id>
+        <init>0</init>
     </data>
     <data type="number">
         <title>Koeficient - Lokalita - prízemie</title>
         <id>205003</id>
+        <init>0</init>
     </data>
     <data type="number">
         <title>Koeficient - Lokalita - obytné poschodie</title>
         <id>205004</id>
+        <init>0</init>
     </data>
     <data type="number">
         <title>Koeficient - Lokalita - garáž</title>
@@ -3320,35 +3489,30 @@
             <id>102001</id>
             <logic>
                 <behavior>editable</behavior>
-                <behavior>required</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>105001</id>
             <logic>
                 <behavior>editable</behavior>
-                <behavior>required</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>105002</id>
             <logic>
                 <behavior>editable</behavior>
-                <behavior>required</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>105003</id>
             <logic>
                 <behavior>editable</behavior>
-                <behavior>required</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>105004</id>
             <logic>
                 <behavior>editable</behavior>
-                <behavior>required</behavior>
             </logic>
         </dataRef>
         <dataRef>
@@ -3361,49 +3525,42 @@
             <id>102002</id>
             <logic>
                 <behavior>editable</behavior>
-                <behavior>required</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>102003</id>
             <logic>
                 <behavior>editable</behavior>
-                <behavior>required</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>102004</id>
             <logic>
                 <behavior>editable</behavior>
-                <behavior>required</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>102005</id>
             <logic>
                 <behavior>editable</behavior>
-                <behavior>required</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>102006</id>
             <logic>
                 <behavior>editable</behavior>
-                <behavior>required</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>102007</id>
             <logic>
                 <behavior>editable</behavior>
-                <behavior>required</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>102008</id>
             <logic>
                 <behavior>editable</behavior>
-                <behavior>required</behavior>
             </logic>
         </dataRef>
     </transition>
@@ -3598,6 +3755,7 @@
             </logic>
         </roleRef>
         <dataRef>
+            <!--spoluucast nehjnutelnost-->
             <id>105005</id>
             <logic>
                 <behavior>editable</behavior>
@@ -3605,6 +3763,7 @@
             </logic>
         </dataRef>
         <dataRef>
+            <!--nehnutelnost poistna suma-->
             <id>105006</id>
             <logic>
                 <behavior>editable</behavior>
@@ -3612,13 +3771,7 @@
             </logic>
         </dataRef>
         <dataRef>
-            <id>105006</id>
-            <logic>
-                <behavior>editable</behavior>
-                <behavior>required</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
+            <!--nehnutelnost poistne-->
             <id>305002</id>
             <logic>
                 <behavior>visible</behavior>
@@ -3701,248 +3854,222 @@
             <id>105035</id>
             <logic>
                 <behavior>editable</behavior>
-                <behavior>required</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>105007</id>
             <logic>
-                <behavior>editable</behavior>
-                <behavior>required</behavior>
+                <behavior>hidden</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>105008</id>
             <logic>
-                <behavior>editable</behavior>
-                <behavior>required</behavior>
+                <behavior>hidden</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>305003</id>
             <logic>
-                <behavior>visible</behavior>
+                <behavior>hidden</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>105009</id>
             <logic>
                 <behavior>editable</behavior>
-                <behavior>required</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>105010</id>
             <logic>
-                <behavior>editable</behavior>
-                <behavior>required</behavior>
+                <behavior>hidden</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>305004</id>
             <logic>
-                <behavior>visible</behavior>
+                <behavior>hidden</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>105011</id>
             <logic>
                 <behavior>editable</behavior>
-                <behavior>required</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>105012</id>
             <logic>
-                <behavior>editable</behavior>
-                <behavior>required</behavior>
+                <behavior>hidden</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>305005</id>
             <logic>
-                <behavior>visible</behavior>
+                <behavior>hidden</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>105013</id>
             <logic>
                 <behavior>editable</behavior>
-                <behavior>required</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>105014</id>
             <logic>
-                <behavior>editable</behavior>
-                <behavior>required</behavior>
+                <behavior>hidden</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>305006</id>
             <logic>
-                <behavior>visible</behavior>
+                <behavior>hidden</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>105015</id>
             <logic>
                 <behavior>editable</behavior>
-                <behavior>required</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>105016</id>
             <logic>
-                <behavior>editable</behavior>
-                <behavior>required</behavior>
+                <behavior>hidden</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>305007</id>
             <logic>
-                <behavior>visible</behavior>
+                <behavior>hidden</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>105017</id>
             <logic>
                 <behavior>editable</behavior>
-                <behavior>required</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>105018</id>
             <logic>
-                <behavior>editable</behavior>
-                <behavior>required</behavior>
+                <behavior>hidden</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>305008</id>
             <logic>
-                <behavior>visible</behavior>
+                <behavior>hidden</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>105019</id>
             <logic>
                 <behavior>editable</behavior>
-                <behavior>required</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>105020</id>
             <logic>
-                <behavior>editable</behavior>
-                <behavior>required</behavior>
+                <behavior>hidden</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>305009</id>
             <logic>
-                <behavior>editable</behavior>
-                <behavior>required</behavior>
+                <behavior>hidden</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>105021</id>
             <logic>
                 <behavior>editable</behavior>
-                <behavior>required</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>105022</id>
             <logic>
-                <behavior>editable</behavior>
-                <behavior>required</behavior>
+                <behavior>hidden</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>305010</id>
             <logic>
-                <behavior>visible</behavior>
+                <behavior>hidden</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>105023</id>
             <logic>
                 <behavior>editable</behavior>
-                <behavior>required</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>105024</id>
             <logic>
-                <behavior>editable</behavior>
-                <behavior>required</behavior>
+                <behavior>hidden</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>305011</id>
             <logic>
-                <behavior>visible</behavior>
+                <behavior>hidden</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>105025</id>
             <logic>
                 <behavior>editable</behavior>
-                <behavior>required</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>105026</id>
             <logic>
-                <behavior>editable</behavior>
-                <behavior>required</behavior>
+                <behavior>hidden</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>305012</id>
             <logic>
-                <behavior>visible</behavior>
+                <behavior>hidden</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>105027</id>
             <logic>
                 <behavior>editable</behavior>
-                <behavior>required</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>105028</id>
             <logic>
-                <behavior>editable</behavior>
-                <behavior>required</behavior>
+                <behavior>hidden</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>305013</id>
             <logic>
-                <behavior>visible</behavior>
+                <behavior>hidden</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>105029</id>
             <logic>
                 <behavior>editable</behavior>
-                <behavior>required</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>105030</id>
             <logic>
-                <behavior>editable</behavior>
-                <behavior>required</behavior>
+                <behavior>hidden</behavior>
             </logic>
         </dataRef>
         <dataRef>
             <id>305014</id>
             <logic>
-                <behavior>visible</behavior>
+                <behavior>hidden</behavior>
             </logic>
         </dataRef>
     </transition>
@@ -4263,17 +4390,17 @@
             <logic>
                 <behavior>required</behavior>
                 <behavior>editable</behavior>
-                <action trigger="set">
-                    check: f.109020,
-                    field: f.109007,
-                    other: f.109021;
-                    change other about {
-                    if (check.value == false) {
-                    return field.value as String;
-                    }
-                    return other.value as String;
-                    }
-                </action>
+                <!--<action trigger="set">-->
+                    <!--check: f.109020,-->
+                    <!--field: f.109007,-->
+                    <!--other: f.109021;-->
+                    <!--change other about {-->
+                    <!--if (check.value == false) {-->
+                    <!--return field.value as String;-->
+                    <!--}-->
+                    <!--return other.value as String;-->
+                    <!--}-->
+                <!--</action>-->
             </logic>
         </dataRef>
         <dataRef>
@@ -4281,17 +4408,17 @@
             <logic>
                 <behavior>required</behavior>
                 <behavior>editable</behavior>
-                <action trigger="set">
-                    check: f.109020,
-                    field: f.109008,
-                    other: f.109022;
-                    change other about {
-                    if (check.value == false) {
-                    return field.value as String;
-                    }
-                    return other.value as String;
-                    }
-                </action>
+                <!--<action trigger="set">-->
+                    <!--check: f.109020,-->
+                    <!--field: f.109008,-->
+                    <!--other: f.109022;-->
+                    <!--change other about {-->
+                    <!--if (check.value == false) {-->
+                    <!--return field.value as String;-->
+                    <!--}-->
+                    <!--return other.value as String;-->
+                    <!--}-->
+                <!--</action>-->
             </logic>
         </dataRef>
         <dataRef>
@@ -4299,17 +4426,17 @@
             <logic>
                 <behavior>required</behavior>
                 <behavior>editable</behavior>
-                <action trigger="set">
-                    check: f.109020,
-                    field: f.109009,
-                    other: f.109023;
-                    change other about {
-                    if (check.value == false) {
-                    return field.value as String;
-                    }
-                    return other.value as String;
-                    }
-                </action>
+                <!--<action trigger="set">-->
+                    <!--check: f.109020,-->
+                    <!--field: f.109009,-->
+                    <!--other: f.109023;-->
+                    <!--change other about {-->
+                    <!--if (check.value == false) {-->
+                    <!--return field.value as String;-->
+                    <!--}-->
+                    <!--return other.value as String;-->
+                    <!--}-->
+                <!--</action>-->
             </logic>
         </dataRef>
         <dataRef>
@@ -4317,17 +4444,17 @@
             <logic>
                 <behavior>required</behavior>
                 <behavior>editable</behavior>
-                <action trigger="set">
-                    check: f.109020,
-                    field: f.109010,
-                    other: f.109024;
-                    change other about {
-                    if (check.value == false) {
-                    return field.value as String;
-                    }
-                    return other.value as String;
-                    }
-                </action>
+                <!--<action trigger="set">-->
+                    <!--check: f.109020,-->
+                    <!--field: f.109010,-->
+                    <!--other: f.109024;-->
+                    <!--change other about {-->
+                    <!--if (check.value == false) {-->
+                    <!--return field.value as String;-->
+                    <!--}-->
+                    <!--return other.value as String;-->
+                    <!--}-->
+                <!--</action>-->
             </logic>
         </dataRef>
         <dataRef>
@@ -4335,17 +4462,17 @@
             <logic>
                 <behavior>required</behavior>
                 <behavior>editable</behavior>
-                <action trigger="set">
-                    check: f.109020,
-                    field: f.109011,
-                    other: f.109025;
-                    change other about {
-                    if (check.value == false) {
-                    return field.value as String;
-                    }
-                    return other.value as String;
-                    }
-                </action>
+                <!--<action trigger="set">-->
+                    <!--check: f.109020,-->
+                    <!--field: f.109011,-->
+                    <!--other: f.109025;-->
+                    <!--change other about {-->
+                    <!--if (check.value == false) {-->
+                    <!--return field.value as String;-->
+                    <!--}-->
+                    <!--return other.value as String;-->
+                    <!--}-->
+                <!--</action>-->
             </logic>
         </dataRef>
         <dataRef>
@@ -4353,17 +4480,17 @@
             <logic>
                 <behavior>required</behavior>
                 <behavior>editable</behavior>
-                <action trigger="set">
-                    check: f.109020,
-                    field: f.109012,
-                    other: f.109026;
-                    change other about {
-                    if (check.value == false) {
-                    return field.value as String;
-                    }
-                    return other.value as String;
-                    }
-                </action>
+                <!--<action trigger="set">-->
+                    <!--check: f.109020,-->
+                    <!--field: f.109012,-->
+                    <!--other: f.109026;-->
+                    <!--change other about {-->
+                    <!--if (check.value == false) {-->
+                    <!--return field.value as String;-->
+                    <!--}-->
+                    <!--return other.value as String;-->
+                    <!--}-->
+                <!--</action>-->
             </logic>
         </dataRef>
         <dataRef>
@@ -4371,17 +4498,17 @@
             <logic>
                 <behavior>required</behavior>
                 <behavior>editable</behavior>
-                <action trigger="set">
-                    check: f.109020,
-                    field: f.109013,
-                    other: f.109027;
-                    change other about {
-                    if (check.value == false) {
-                    return field.value as String;
-                    }
-                    return other.value as String;
-                    }
-                </action>
+                <!--<action trigger="set">-->
+                    <!--check: f.109020,-->
+                    <!--field: f.109013,-->
+                    <!--other: f.109027;-->
+                    <!--change other about {-->
+                    <!--if (check.value == false) {-->
+                    <!--return field.value as String;-->
+                    <!--}-->
+                    <!--return other.value as String;-->
+                    <!--}-->
+                <!--</action>-->
             </logic>
         </dataRef>
         <dataRef>
@@ -4389,17 +4516,17 @@
             <logic>
                 <behavior>required</behavior>
                 <behavior>editable</behavior>
-                <action trigger="set">
-                    check: f.109020,
-                    field: f.109014,
-                    other: f.109028;
-                    change other about {
-                    if (check.value == false) {
-                    return field.value as LocalDate;
-                    }
-                    return other.value as LocalDate;
-                    }
-                </action>
+                <!--<action trigger="set">-->
+                    <!--check: f.109020,-->
+                    <!--field: f.109014,-->
+                    <!--other: f.109028;-->
+                    <!--change other about {-->
+                    <!--if (check.value == false) {-->
+                    <!--return field.value as LocalDate;-->
+                    <!--}-->
+                    <!--return other.value as LocalDate;-->
+                    <!--}-->
+                <!--</action>-->
             </logic>
         </dataRef>
         <dataRef>
@@ -4407,17 +4534,17 @@
             <logic>
                 <behavior>required</behavior>
                 <behavior>editable</behavior>
-                <action trigger="set">
-                    check: f.109020,
-                    field: f.109015,
-                    other: f.109029;
-                    change other about {
-                    if (check.value == false) {
-                    return field.value as String;
-                    }
-                    return other.value as String;
-                    }
-                </action>
+                <!--<action trigger="set">-->
+                    <!--check: f.109020,-->
+                    <!--field: f.109015,-->
+                    <!--other: f.109029;-->
+                    <!--change other about {-->
+                    <!--if (check.value == false) {-->
+                    <!--return field.value as String;-->
+                    <!--}-->
+                    <!--return other.value as String;-->
+                    <!--}-->
+                <!--</action>-->
             </logic>
         </dataRef>
         <dataRef>
@@ -4425,17 +4552,17 @@
             <logic>
                 <behavior>required</behavior>
                 <behavior>editable</behavior>
-                <action trigger="set">
-                    check: f.109020,
-                    field: f.109016,
-                    other: f.109030;
-                    change other about {
-                    if (check.value == false) {
-                    return field.value as String;
-                    }
-                    return other.value as String;
-                    }
-                </action>
+                <!--<action trigger="set">-->
+                    <!--check: f.109020,-->
+                    <!--field: f.109016,-->
+                    <!--other: f.109030;-->
+                    <!--change other about {-->
+                    <!--if (check.value == false) {-->
+                    <!--return field.value as String;-->
+                    <!--}-->
+                    <!--return other.value as String;-->
+                    <!--}-->
+                <!--</action>-->
             </logic>
         </dataRef>
         <dataRef>
@@ -4443,17 +4570,17 @@
             <logic>
                 <behavior>required</behavior>
                 <behavior>editable</behavior>
-                <action trigger="set">
-                    check: f.109020,
-                    field: f.109017,
-                    other: f.109031;
-                    change other about {
-                    if (check.value == false) {
-                    return field.value as String;
-                    }
-                    return other.value as String;
-                    }
-                </action>
+                <!--<action trigger="set">-->
+                    <!--check: f.109020,-->
+                    <!--field: f.109017,-->
+                    <!--other: f.109031;-->
+                    <!--change other about {-->
+                    <!--if (check.value == false) {-->
+                    <!--return field.value as String;-->
+                    <!--}-->
+                    <!--return other.value as String;-->
+                    <!--}-->
+                <!--</action>-->
             </logic>
         </dataRef>
         <dataRef>
@@ -4461,17 +4588,17 @@
             <logic>
                 <behavior>required</behavior>
                 <behavior>editable</behavior>
-                <action trigger="set">
-                    check: f.109020,
-                    field: f.109018,
-                    other: f.109032;
-                    change other about {
-                    if (check.value == false) {
-                    return field.value as String;
-                    }
-                    return other.value as String;
-                    }
-                </action>
+                <!--<action trigger="set">-->
+                    <!--check: f.109020,-->
+                    <!--field: f.109018,-->
+                    <!--other: f.109032;-->
+                    <!--change other about {-->
+                    <!--if (check.value == false) {-->
+                    <!--return field.value as String;-->
+                    <!--}-->
+                    <!--return other.value as String;-->
+                    <!--}-->
+                <!--</action>-->
             </logic>
         </dataRef>
         <dataRef>
@@ -4479,17 +4606,17 @@
             <logic>
                 <behavior>required</behavior>
                 <behavior>editable</behavior>
-                <action trigger="set">
-                    check: f.109020,
-                    field: f.109019,
-                    other: f.109033;
-                    change other about {
-                    if (check.value == false) {
-                    return field.value as String;
-                    }
-                    return other.value as String;
-                    }
-                </action>
+                <!--<action trigger="set">-->
+                    <!--check: f.109020,-->
+                    <!--field: f.109019,-->
+                    <!--other: f.109033;-->
+                    <!--change other about {-->
+                    <!--if (check.value == false) {-->
+                    <!--return field.value as String;-->
+                    <!--}-->
+                    <!--return other.value as String;-->
+                    <!--}-->
+                <!--</action>-->
             </logic>
         </dataRef>
         <dataRef>
@@ -4497,307 +4624,307 @@
             <logic>
                 <behavior>editable</behavior>
                 <!-- Show poisteny when true -->
-                <action trigger="set">
-                    field: f.this,
-                    other: f.109021,
-                    trans: t.588;
-                    make other,visible on trans when { field.value }
-                </action>
-                <action trigger="set">
-                    field: f.this,
-                    other: f.109022,
-                    trans: t.588;
-                    make other,visible on trans when { field.value }
-                </action>
-                <action trigger="set">
-                    field: f.this,
-                    other: f.109023,
-                    trans: t.588;
-                    make other,visible on trans when { field.value }
-                </action>
-                <action trigger="set">
-                    field: f.this,
-                    other: f.109024,
-                    trans: t.588;
-                    make other,visible on trans when { field.value }
-                </action>
-                <action trigger="set">
-                    field: f.this,
-                    other: f.109025,
-                    trans: t.588;
-                    make other,visible on trans when { field.value }
-                </action>
-                <action trigger="set">
-                    field: f.this,
-                    other: f.109026,
-                    trans: t.588;
-                    make other,visible on trans when { field.value }
-                </action>
-                <action trigger="set">
-                    field: f.this,
-                    other: f.109027,
-                    trans: t.588;
-                    make other,visible on trans when { field.value }
-                </action>
-                <action trigger="set">
-                    field: f.this,
-                    other: f.109028,
-                    trans: t.588;
-                    make other,visible on trans when { field.value }
-                </action>
-                <action trigger="set">
-                    field: f.this,
-                    other: f.109029,
-                    trans: t.588;
-                    make other,visible on trans when { field.value }
-                </action>
-                <action trigger="set">
-                    field: f.this,
-                    other: f.109030,
-                    trans: t.588;
-                    make other,visible on trans when { field.value }
-                </action>
-                <action trigger="set">
-                    field: f.this,
-                    other: f.109031,
-                    trans: t.588;
-                    make other,visible on trans when { field.value }
-                </action>
-                <action trigger="set">
-                    field: f.this,
-                    other: f.109032,
-                    trans: t.588;
-                    make other,visible on trans when { field.value }
-                </action>
-                <action trigger="set">
-                    field: f.this,
-                    other: f.109033,
-                    trans: t.588;
-                    make other,visible on trans when { field.value }
-                </action>
-                <!-- Hide poisteny when false -->
-                <action trigger="set">
-                    field: f.this,
-                    other: f.109021,
-                    trans: t.588;
-                    make other,hidden on trans when { return !field.value }
-                </action>
-                <action trigger="set">
-                    field: f.this,
-                    other: f.109022,
-                    trans: t.588;
-                    make other,hidden on trans when { return !field.value }
-                </action>
-                <action trigger="set">
-                    field: f.this,
-                    other: f.109023,
-                    trans: t.588;
-                    make other,hidden on trans when { return !field.value }
-                </action>
-                <action trigger="set">
-                    field: f.this,
-                    other: f.109024,
-                    trans: t.588;
-                    make other,hidden on trans when { return !field.value }
-                </action>
-                <action trigger="set">
-                    field: f.this,
-                    other: f.109025,
-                    trans: t.588;
-                    make other,hidden on trans when { return !field.value }
-                </action>
-                <action trigger="set">
-                    field: f.this,
-                    other: f.109026,
-                    trans: t.588;
-                    make other,hidden on trans when { return !field.value }
-                </action>
-                <action trigger="set">
-                    field: f.this,
-                    other: f.109027,
-                    trans: t.588;
-                    make other,hidden on trans when { return !field.value }
-                </action>
-                <action trigger="set">
-                    field: f.this,
-                    other: f.109028,
-                    trans: t.588;
-                    make other,hidden on trans when { return !field.value }
-                </action>
-                <action trigger="set">
-                    field: f.this,
-                    other: f.109029,
-                    trans: t.588;
-                    make other,hidden on trans when { return !field.value }
-                </action>
-                <action trigger="set">
-                    field: f.this,
-                    other: f.109030,
-                    trans: t.588;
-                    make other,hidden on trans when { return !field.value }
-                </action>
-                <action trigger="set">
-                    field: f.this,
-                    other: f.109031,
-                    trans: t.588;
-                    make other,hidden on trans when { return !field.value }
-                </action>
-                <action trigger="set">
-                    field: f.this,
-                    other: f.109032,
-                    trans: t.588;
-                    make other,hidden on trans when { return !field.value }
-                </action>
-                <action trigger="set">
-                    field: f.this,
-                    other: f.109033,
-                    trans: t.588;
-                    make other,hidden on trans when { return !field.value }
-                </action>
-                <!-- Fill poisteny when false -->
-                <action trigger="set">
-                    field: f.this,
-                    f_1: f.109007,
-                    f_2: f.109021;
-                    change f_2 about {
-                    if (field.value == false) {
-                    return f_1.value as String;
-                    }
-                    return f_2.value as String;
-                    }
-                </action>
-                <action trigger="set">
-                    field: f.this,
-                    f_1: f.109008,
-                    f_2: f.109022;
-                    change f_2 about {
-                    if (field.value == false) {
-                    return f_1.value as String;
-                    }
-                    return f_2.value as String;
-                    }
-                </action>
-                <action trigger="set">
-                    field: f.this,
-                    f_1: f.109009,
-                    f_2: f.109023;
-                    change f_2 about {
-                    if (field.value == false) {
-                    return f_1.value as String;
-                    }
-                    return f_2.value as String;
-                    }
-                </action>
-                <action trigger="set">
-                    field: f.this,
-                    f_1: f.109010,
-                    f_2: f.109024;
-                    change f_2 about {
-                    if (field.value == false) {
-                    return f_1.value as String;
-                    }
-                    return f_2.value as String;
-                    }
-                </action>
-                <action trigger="set">
-                    field: f.this,
-                    f_1: f.109011,
-                    f_2: f.109025;
-                    change f_2 about {
-                    if (field.value == false) {
-                    return f_1.value as String;
-                    }
-                    return f_2.value as String;
-                    }
-                </action>
-                <action trigger="set">
-                    field: f.this,
-                    f_1: f.109012,
-                    f_2: f.109026;
-                    change f_2 about {
-                    if (field.value == false) {
-                    return f_1.value as String;
-                    }
-                    return f_2.value as String;
-                    }
-                </action>
-                <action trigger="set">
-                    field: f.this,
-                    f_1: f.109013,
-                    f_2: f.109027;
-                    change f_2 about {
-                    if (field.value == false) {
-                    return f_1.value as String;
-                    }
-                    return f_2.value as String;
-                    }
-                </action>
-                <action trigger="set">
-                    field: f.this,
-                    f_1: f.109014,
-                    f_2: f.109028;
-                    change f_2 about {
-                    if (field.value == false) {
-                    return f_1.value as LocalDate;
-                    }
-                    return f_2.value as LocalDate;
-                    }
-                </action>
-                <action trigger="set">
-                    field: f.this,
-                    f_1: f.109015,
-                    f_2: f.109029;
-                    change f_2 about {
-                    if (field.value == false) {
-                    return f_1.value as String;
-                    }
-                    return f_2.value as String;
-                    }
-                </action>
-                <action trigger="set">
-                    field: f.this,
-                    f_1: f.109016,
-                    f_2: f.109030;
-                    change f_2 about {
-                    if (field.value == false) {
-                    return f_1.value as String;
-                    }
-                    return f_2.value as String;
-                    }
-                </action>
-                <action trigger="set">
-                    field: f.this,
-                    f_1: f.109017,
-                    f_2: f.109031;
-                    change f_2 about {
-                    if (field.value == false) {
-                    return f_1.value as String;
-                    }
-                    return f_2.value as String;
-                    }
-                </action>
-                <action trigger="set">
-                    field: f.this,
-                    f_1: f.109018,
-                    f_2: f.109032;
-                    change f_2 about {
-                    if (field.value == false) {
-                    return f_1.value as String;
-                    }
-                    return f_2.value as String;
-                    }
-                </action>
-                <action trigger="set">
-                    field: f.this,
-                    f_1: f.109019,
-                    f_2: f.109033;
-                    change f_2 about {
-                    if (field.value == false) {
-                    return f_1.value as String;
-                    }
-                    return f_2.value as String;
-                    }
-                </action>
+                <!--<action trigger="set">-->
+                    <!--field: f.this,-->
+                    <!--other: f.109021,-->
+                    <!--trans: t.588;-->
+                    <!--make other,visible on trans when { field.value }-->
+                <!--</action>-->
+                <!--<action trigger="set">-->
+                    <!--field: f.this,-->
+                    <!--other: f.109022,-->
+                    <!--trans: t.588;-->
+                    <!--make other,visible on trans when { field.value }-->
+                <!--</action>-->
+                <!--<action trigger="set">-->
+                    <!--field: f.this,-->
+                    <!--other: f.109023,-->
+                    <!--trans: t.588;-->
+                    <!--make other,visible on trans when { field.value }-->
+                <!--</action>-->
+                <!--<action trigger="set">-->
+                    <!--field: f.this,-->
+                    <!--other: f.109024,-->
+                    <!--trans: t.588;-->
+                    <!--make other,visible on trans when { field.value }-->
+                <!--</action>-->
+                <!--<action trigger="set">-->
+                    <!--field: f.this,-->
+                    <!--other: f.109025,-->
+                    <!--trans: t.588;-->
+                    <!--make other,visible on trans when { field.value }-->
+                <!--</action>-->
+                <!--<action trigger="set">-->
+                    <!--field: f.this,-->
+                    <!--other: f.109026,-->
+                    <!--trans: t.588;-->
+                    <!--make other,visible on trans when { field.value }-->
+                <!--</action>-->
+                <!--<action trigger="set">-->
+                    <!--field: f.this,-->
+                    <!--other: f.109027,-->
+                    <!--trans: t.588;-->
+                    <!--make other,visible on trans when { field.value }-->
+                <!--</action>-->
+                <!--<action trigger="set">-->
+                    <!--field: f.this,-->
+                    <!--other: f.109028,-->
+                    <!--trans: t.588;-->
+                    <!--make other,visible on trans when { field.value }-->
+                <!--</action>-->
+                <!--<action trigger="set">-->
+                    <!--field: f.this,-->
+                    <!--other: f.109029,-->
+                    <!--trans: t.588;-->
+                    <!--make other,visible on trans when { field.value }-->
+                <!--</action>-->
+                <!--<action trigger="set">-->
+                    <!--field: f.this,-->
+                    <!--other: f.109030,-->
+                    <!--trans: t.588;-->
+                    <!--make other,visible on trans when { field.value }-->
+                <!--</action>-->
+                <!--<action trigger="set">-->
+                    <!--field: f.this,-->
+                    <!--other: f.109031,-->
+                    <!--trans: t.588;-->
+                    <!--make other,visible on trans when { field.value }-->
+                <!--</action>-->
+                <!--<action trigger="set">-->
+                    <!--field: f.this,-->
+                    <!--other: f.109032,-->
+                    <!--trans: t.588;-->
+                    <!--make other,visible on trans when { field.value }-->
+                <!--</action>-->
+                <!--<action trigger="set">-->
+                    <!--field: f.this,-->
+                    <!--other: f.109033,-->
+                    <!--trans: t.588;-->
+                    <!--make other,visible on trans when { field.value }-->
+                <!--</action>-->
+                <!--&lt;!&ndash; Hide poisteny when false &ndash;&gt;-->
+                <!--<action trigger="set">-->
+                    <!--field: f.this,-->
+                    <!--other: f.109021,-->
+                    <!--trans: t.588;-->
+                    <!--make other,hidden on trans when { return !field.value }-->
+                <!--</action>-->
+                <!--<action trigger="set">-->
+                    <!--field: f.this,-->
+                    <!--other: f.109022,-->
+                    <!--trans: t.588;-->
+                    <!--make other,hidden on trans when { return !field.value }-->
+                <!--</action>-->
+                <!--<action trigger="set">-->
+                    <!--field: f.this,-->
+                    <!--other: f.109023,-->
+                    <!--trans: t.588;-->
+                    <!--make other,hidden on trans when { return !field.value }-->
+                <!--</action>-->
+                <!--<action trigger="set">-->
+                    <!--field: f.this,-->
+                    <!--other: f.109024,-->
+                    <!--trans: t.588;-->
+                    <!--make other,hidden on trans when { return !field.value }-->
+                <!--</action>-->
+                <!--<action trigger="set">-->
+                    <!--field: f.this,-->
+                    <!--other: f.109025,-->
+                    <!--trans: t.588;-->
+                    <!--make other,hidden on trans when { return !field.value }-->
+                <!--</action>-->
+                <!--<action trigger="set">-->
+                    <!--field: f.this,-->
+                    <!--other: f.109026,-->
+                    <!--trans: t.588;-->
+                    <!--make other,hidden on trans when { return !field.value }-->
+                <!--</action>-->
+                <!--<action trigger="set">-->
+                    <!--field: f.this,-->
+                    <!--other: f.109027,-->
+                    <!--trans: t.588;-->
+                    <!--make other,hidden on trans when { return !field.value }-->
+                <!--</action>-->
+                <!--<action trigger="set">-->
+                    <!--field: f.this,-->
+                    <!--other: f.109028,-->
+                    <!--trans: t.588;-->
+                    <!--make other,hidden on trans when { return !field.value }-->
+                <!--</action>-->
+                <!--<action trigger="set">-->
+                    <!--field: f.this,-->
+                    <!--other: f.109029,-->
+                    <!--trans: t.588;-->
+                    <!--make other,hidden on trans when { return !field.value }-->
+                <!--</action>-->
+                <!--<action trigger="set">-->
+                    <!--field: f.this,-->
+                    <!--other: f.109030,-->
+                    <!--trans: t.588;-->
+                    <!--make other,hidden on trans when { return !field.value }-->
+                <!--</action>-->
+                <!--<action trigger="set">-->
+                    <!--field: f.this,-->
+                    <!--other: f.109031,-->
+                    <!--trans: t.588;-->
+                    <!--make other,hidden on trans when { return !field.value }-->
+                <!--</action>-->
+                <!--<action trigger="set">-->
+                    <!--field: f.this,-->
+                    <!--other: f.109032,-->
+                    <!--trans: t.588;-->
+                    <!--make other,hidden on trans when { return !field.value }-->
+                <!--</action>-->
+                <!--<action trigger="set">-->
+                    <!--field: f.this,-->
+                    <!--other: f.109033,-->
+                    <!--trans: t.588;-->
+                    <!--make other,hidden on trans when { return !field.value }-->
+                <!--</action>-->
+                <!--&lt;!&ndash; Fill poisteny when false &ndash;&gt;-->
+                <!--<action trigger="set">-->
+                    <!--field: f.this,-->
+                    <!--f_1: f.109007,-->
+                    <!--f_2: f.109021;-->
+                    <!--change f_2 about {-->
+                    <!--if (field.value == false) {-->
+                    <!--return f_1.value as String;-->
+                    <!--}-->
+                    <!--return f_2.value as String;-->
+                    <!--}-->
+                <!--</action>-->
+                <!--<action trigger="set">-->
+                    <!--field: f.this,-->
+                    <!--f_1: f.109008,-->
+                    <!--f_2: f.109022;-->
+                    <!--change f_2 about {-->
+                    <!--if (field.value == false) {-->
+                    <!--return f_1.value as String;-->
+                    <!--}-->
+                    <!--return f_2.value as String;-->
+                    <!--}-->
+                <!--</action>-->
+                <!--<action trigger="set">-->
+                    <!--field: f.this,-->
+                    <!--f_1: f.109009,-->
+                    <!--f_2: f.109023;-->
+                    <!--change f_2 about {-->
+                    <!--if (field.value == false) {-->
+                    <!--return f_1.value as String;-->
+                    <!--}-->
+                    <!--return f_2.value as String;-->
+                    <!--}-->
+                <!--</action>-->
+                <!--<action trigger="set">-->
+                    <!--field: f.this,-->
+                    <!--f_1: f.109010,-->
+                    <!--f_2: f.109024;-->
+                    <!--change f_2 about {-->
+                    <!--if (field.value == false) {-->
+                    <!--return f_1.value as String;-->
+                    <!--}-->
+                    <!--return f_2.value as String;-->
+                    <!--}-->
+                <!--</action>-->
+                <!--<action trigger="set">-->
+                    <!--field: f.this,-->
+                    <!--f_1: f.109011,-->
+                    <!--f_2: f.109025;-->
+                    <!--change f_2 about {-->
+                    <!--if (field.value == false) {-->
+                    <!--return f_1.value as String;-->
+                    <!--}-->
+                    <!--return f_2.value as String;-->
+                    <!--}-->
+                <!--</action>-->
+                <!--<action trigger="set">-->
+                    <!--field: f.this,-->
+                    <!--f_1: f.109012,-->
+                    <!--f_2: f.109026;-->
+                    <!--change f_2 about {-->
+                    <!--if (field.value == false) {-->
+                    <!--return f_1.value as String;-->
+                    <!--}-->
+                    <!--return f_2.value as String;-->
+                    <!--}-->
+                <!--</action>-->
+                <!--<action trigger="set">-->
+                    <!--field: f.this,-->
+                    <!--f_1: f.109013,-->
+                    <!--f_2: f.109027;-->
+                    <!--change f_2 about {-->
+                    <!--if (field.value == false) {-->
+                    <!--return f_1.value as String;-->
+                    <!--}-->
+                    <!--return f_2.value as String;-->
+                    <!--}-->
+                <!--</action>-->
+                <!--<action trigger="set">-->
+                    <!--field: f.this,-->
+                    <!--f_1: f.109014,-->
+                    <!--f_2: f.109028;-->
+                    <!--change f_2 about {-->
+                    <!--if (field.value == false) {-->
+                    <!--return f_1.value as LocalDate;-->
+                    <!--}-->
+                    <!--return f_2.value as LocalDate;-->
+                    <!--}-->
+                <!--</action>-->
+                <!--<action trigger="set">-->
+                    <!--field: f.this,-->
+                    <!--f_1: f.109015,-->
+                    <!--f_2: f.109029;-->
+                    <!--change f_2 about {-->
+                    <!--if (field.value == false) {-->
+                    <!--return f_1.value as String;-->
+                    <!--}-->
+                    <!--return f_2.value as String;-->
+                    <!--}-->
+                <!--</action>-->
+                <!--<action trigger="set">-->
+                    <!--field: f.this,-->
+                    <!--f_1: f.109016,-->
+                    <!--f_2: f.109030;-->
+                    <!--change f_2 about {-->
+                    <!--if (field.value == false) {-->
+                    <!--return f_1.value as String;-->
+                    <!--}-->
+                    <!--return f_2.value as String;-->
+                    <!--}-->
+                <!--</action>-->
+                <!--<action trigger="set">-->
+                    <!--field: f.this,-->
+                    <!--f_1: f.109017,-->
+                    <!--f_2: f.109031;-->
+                    <!--change f_2 about {-->
+                    <!--if (field.value == false) {-->
+                    <!--return f_1.value as String;-->
+                    <!--}-->
+                    <!--return f_2.value as String;-->
+                    <!--}-->
+                <!--</action>-->
+                <!--<action trigger="set">-->
+                    <!--field: f.this,-->
+                    <!--f_1: f.109018,-->
+                    <!--f_2: f.109032;-->
+                    <!--change f_2 about {-->
+                    <!--if (field.value == false) {-->
+                    <!--return f_1.value as String;-->
+                    <!--}-->
+                    <!--return f_2.value as String;-->
+                    <!--}-->
+                <!--</action>-->
+                <!--<action trigger="set">-->
+                    <!--field: f.this,-->
+                    <!--f_1: f.109019,-->
+                    <!--f_2: f.109033;-->
+                    <!--change f_2 about {-->
+                    <!--if (field.value == false) {-->
+                    <!--return f_1.value as String;-->
+                    <!--}-->
+                    <!--return f_2.value as String;-->
+                    <!--}-->
+                <!--</action>-->
             </logic>
         </dataRef>
         <!-- Poistený -->
