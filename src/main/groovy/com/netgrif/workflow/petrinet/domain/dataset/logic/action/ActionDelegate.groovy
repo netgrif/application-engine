@@ -3,12 +3,15 @@ package com.netgrif.workflow.petrinet.domain.dataset.logic.action
 import com.netgrif.workflow.petrinet.domain.Transition
 import com.netgrif.workflow.petrinet.domain.dataset.Field
 import com.netgrif.workflow.petrinet.domain.dataset.FieldWithDefault
+import com.netgrif.workflow.petrinet.domain.dataset.FileField
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedField
 import com.netgrif.workflow.workflow.domain.Case
 
 class ActionDelegate {
 
     private static final String UNCHANGED_VALUE = "unchangedooo"
+    private static final String ALWAYS_GENERATE = "always"
+    private static final String ONCE_GENERATE = "once"
 
     private Case useCase
     ChangedField changedField
@@ -89,6 +92,20 @@ class ActionDelegate {
                 field.value = value
                 saveChangedValue(field)
             }
+        }]
+    }
+
+    def always = { return ALWAYS_GENERATE }
+    def once = { return ONCE_GENERATE }
+
+    def generate(String methods, Closure repeated){
+        [into: { Field field ->
+            File f = new FileGenerateReflection(useCase, field as FileField,repeated() == ALWAYS_GENERATE).callMethod(methods) as File
+            if(f != null) {
+                useCase.dataSet.get(field.objectId).value = f.name
+                field.value = f.name
+            }
+            useCase.dataSet.get(field.objectId).value = null
         }]
     }
 }

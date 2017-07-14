@@ -114,7 +114,10 @@
         <id>39</id>
         <title>PDF document</title>
         <init>Automatically generated</init>
-        <!--<logic>generate Insurance.offerPDF always</logic>-->
+        <action trigger="get">
+            self: f.this;
+            generate "Insurance.offerPDF",always into self
+        </action>
     </data>
     <!-- ========== ROLES ========== -->
     <role>

@@ -28,8 +28,6 @@ public final class ImportFieldFactory {
                 break;
             case FILE:
                 field = new FileField();
-                //if(data.getAction() != null && data.getAction().length != 0)
-                //    Arrays.stream(data.getAction()).forEach(((FileField) field)::addLogic);
                 break;
             case ENUMERATION:
                 field = new EnumerationField(data.getValues());
