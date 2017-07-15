@@ -1,12 +1,12 @@
 package com.netgrif.workflow.pdf.service
 
+import org.apache.pdfbox.io.MemoryUsageSetting
+import org.apache.pdfbox.multipdf.PDFMergerUtility
 import org.apache.pdfbox.pdmodel.PDDocument
 import org.apache.pdfbox.pdmodel.PDDocumentCatalog
 import org.apache.pdfbox.pdmodel.interactive.form.PDAcroForm
-import org.springframework.stereotype.Component
 
-
-class PdfFormFiller {
+class PdfUtils {
 
     static File fillPdfForm(String outPdfName, InputStream pdfFile, InputStream xmlFile) throws IllegalArgumentException {
         try {
@@ -48,5 +48,18 @@ class PdfFormFiller {
             e.printStackTrace()
             throw new IllegalArgumentException(e)
         }
+    }
+
+    static File mergePdfFiles(String outPdfName, File... files) {
+        PDFMergerUtility pdfMerger = new PDFMergerUtility()
+        pdfMerger.setDestinationFileName(outPdfName)
+
+        files.each {
+            pdfMerger.addSource(it)
+        }
+
+        pdfMerger.mergeDocuments(MemoryUsageSetting.setupMixed(100_000_000L, 500_000_000L))
+
+        return new File(pdfMerger.getDestinationFileName())
     }
 }
