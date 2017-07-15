@@ -2,6 +2,7 @@ package com.netgrif.workflow.petrinet.domain.dataset
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.databind.node.ObjectNode
+import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action
 import org.bson.types.ObjectId
 import org.springframework.data.annotation.Id
 import org.springframework.data.annotation.Transient
@@ -31,6 +32,9 @@ abstract class Field<T> {
 
     @JsonIgnore
     private Boolean immediate
+
+    @JsonIgnore
+    private LinkedHashSet<Action> actions
 
     Field() {
         _id = new ObjectId()
@@ -124,6 +128,28 @@ abstract class Field<T> {
     void setImmediate(Boolean immediate) {
         this.immediate = immediate
     }
+
+    LinkedHashSet<Action> getActions() {
+        return actions
+    }
+
+    void setActions(LinkedHashSet<Action> actions) {
+        this.actions = actions
+    }
+
+    void addAction(Action action){
+        if(this.actions == null)
+            this.actions = new LinkedHashSet<>()
+        if(action == null) return
+
+        this.actions.add(action)
+    }
+
+    void addAction(String action, String trigger){
+        this.addAction(new Action(action,trigger))
+    }
+
+    void clearValue(){}
 //operators overloading
     T plus(final Field field) {
         return this.value + field.value

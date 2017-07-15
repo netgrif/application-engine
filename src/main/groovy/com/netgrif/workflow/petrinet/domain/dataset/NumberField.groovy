@@ -21,6 +21,12 @@ public class NumberField extends ValidableField<Double> {
         super.superSetDefaultValue(Double.parseDouble(value))
     }
 
+    @Override
+    void clearValue() {
+        super.clearValue()
+        setValue(getDefaultValue())
+    }
+
     Double getMinValue() {
         return minValue
     }

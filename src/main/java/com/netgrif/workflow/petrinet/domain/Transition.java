@@ -1,6 +1,7 @@
 package com.netgrif.workflow.petrinet.domain;
 
 import com.netgrif.workflow.petrinet.domain.dataset.logic.FieldBehavior;
+import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.workflow.petrinet.domain.roles.RolePermission;
 import com.netgrif.workflow.workflow.domain.triggers.Trigger;
 import lombok.Getter;
@@ -43,12 +44,18 @@ public class Transition extends Node {
         }
     }
 
-    public void addDataSet(String field, Set<FieldBehavior> behavior, Set<String> actions){
+    public void addDataSet(String field, Set<FieldBehavior> behavior, Set<Action> actions){
         if(dataSet.containsKey(field) && dataSet.get(field) != null){
             if(behavior != null) dataSet.get(field).getBehavior().addAll(behavior);
-            if(behavior != null) dataSet.get(field).getActions().addAll(actions);
+            if(actions != null) dataSet.get(field).getActions().addAll(actions);
         } else {
             dataSet.put(field,new DataFieldLogic(behavior, actions));
+        }
+    }
+
+    public void addActions(String field, LinkedHashSet<Action> actions){
+        if(dataSet.containsKey(field)){
+            dataSet.get(field).setActions(actions);
         }
     }
 

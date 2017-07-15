@@ -33,129 +33,391 @@
     <!-- ========== DATA ========== -->
     <!-- ===== Základné informácie  ===== -->
     <data type="text">
-        <id></id>
         <title>Obec</title>
+        <id>301001</id>
+        <placeholder>Názov</placeholder>
+        <action trigger="set">
+            field: f.this,
+            lokal: f.301002;
+            change lokal about {
+            if (field.value=="Bratislava")
+            return "BA";
+            if (field.value=="Levice")
+            return "Mesto";
+            if (field.value=="Zelenec")
+            return "Dedina";
+            if (field.value=="(Nitra")
+            return "Krajské mesto";
+            }
+        </action>
     </data>
     <data type="text">
-        <id></id>
         <title>PSČ</title>
+        <id>101001</id>
+        <placeholder>PSČ</placeholder>
+        <action trigger="set">
+            field: f.this,
+            obec: f.301001;
+            change obec about {
+            if (field.value=="83106")
+            return "Bratislava";
+            if (field.value=="93401")
+            return "Levice";
+            if (field.value=="91921")
+            return "Zelenec";
+            if (field.value=="(94901")
+            return "Nitra";
+            }
+        </action>
     </data>
     <data type="enumeration">
-        <id></id>
         <title>Lokalita</title>
+        <id>301002</id>
+        <placeholder>Typ</placeholder>
         <values>BA</values>
         <values>Dedina</values>
         <values>Mesto</values>
         <values>Krajské mesto</values>
+        <init>Krajské mesto</init>
+        <action trigger="set">
+            field: f.this,
+            coeff: f.201001;
+            change coeff about {
+            if (field.value=="BA")
+            return 3.5 as Double;
+            if (field.value=="Mesto")
+            return 3.7 as Double;
+            if (field.value=="Dedina")
+            return 2.5 as Double;
+            if (field.value=="(Krajské mesto")
+            return 3.1 as Double;
+            }
+        </action>
     </data>
     <data type="boolean">
-        <id></id>
         <title>Nachádza sa mimo obce (extravilán)?</title>
+        <id>101002</id>
+        <action trigger="set">
+            field: f.this,
+            coeff: f.201002;
+            change coeff about {
+            if (field.value)
+            return 1.2 as Double;
+            return 1.0 as Double;
+            }
+        </action>
     </data>
     <data type="boolean">
-        <id></id>
         <title>Bolo miesto poistenia postihnuté povodňou za posledných 10 rokov?</title>
+        <id>101003</id>
+        <action trigger="set">
+            field: f.this,
+            coeff: f.201003;
+            change coeff about {
+            if (field.value)
+            return 1.5 as Double;
+            return 1.0 as Double;
+            }
+        </action>
     </data>
     <data type="boolean">
-        <id></id>
         <title>Nachádza nehnuteľnosť sa vo vzdialenosti kratšej ako 300 m od vodného toku?</title>
+        <id>101004</id>
+        <action trigger="set">
+            field: f.this,
+            coeff: f.201004;
+            change coeff about {
+            if (field.value)
+            return 1.5 as Double;
+            return 1.0 as Double;
+            }
+        </action>
     </data>
     <data type="enumeration">
-        <id></id>
         <title>Koľko rokov žijete v poisťovanej nehnuteľnosti?</title>
+        <id>101005</id>
+        <placeholder>Počet rokov</placeholder>
         <values>menej ako 1</values>
         <values>1 až 5</values>
         <values>6 až 10</values>
         <values>viac ako 10</values>
+        <init>6 až 10</init>
+        <action trigger="set">
+            field: f.this,
+            coeff: f.201005;
+            change coeff about {
+            if (field.value=="menej ako 1")
+            return 1.0 as Double;
+            if (field.value=="1 až 5")
+            return 1.0 as Double;
+            if (field.value=="6 až 10")
+            return 1.0 as Double;
+            if (field.value=="viac ako 10")
+            return 1.0 as Double;
+            }
+        </action>
     </data>
     <data type="enumeration">
-        <id></id>
         <title>Aký je vzťah poisteného k poisťovanej nehnuteľnosti?</title>
+        <id>101006</id>
+        <placeholder>Vzťah</placeholder>
         <values>vlastník nehnuteľnosti</values>
         <values>vlastník ma hypotéku na nehnuteľnosť</values>
         <values>poistený je v prenájme</values>
         <values>iné</values>
+        <init>vlastník nehnuteľnosti</init>
+        <action trigger="set">
+            field: f.this,
+            coeff: f.201006;
+            change coeff about {
+            if (field.value=="vlastník nehnuteľnosti")
+            return 1.0 as Double;
+            if (field.value=="vlastník ma hypotéku na nehnuteľnosť")
+            return 1.0 as Double;
+            if (field.value=="poistený je v prenájme")
+            return 1.0 as Double;
+            if (field.value=="iné")
+            return 1.0 as Double;
+            }
+        </action>
     </data>
     <data type="enumeration">
-        <id></id>
         <title>Koľko dospelých žije v domácnosti?</title>
+        <id>101007</id>
+        <placeholder>Počet</placeholder>
         <values>1</values>
         <values>2</values>
         <values>3</values>
         <values>viac ako 3</values>
+        <init>1</init>
+        <action trigger="set">
+            field: f.this,
+            coeff: f.201007;
+            change coeff about {
+            if (field.value=="1")
+            return 0.95 as Double;
+            if (field.value=="2")
+            return 1.0 as Double;
+            if (field.value=="3")
+            return 1.05 as Double;
+            if (field.value=="viac ako 3")
+            return 1.1 as Double;
+            }
+        </action>
     </data>
     <data type="enumeration">
-        <id></id>
         <title>Koľko detí žije v domácnosti?</title>
+        <id>101008</id>
+        <placeholder>Počet</placeholder>
         <values>0</values>
         <values>1</values>
         <values>2</values>
         <values>viac</values>
+        <init>0</init>
+        <action trigger="set">
+            field: f.this,
+            coeff: f.201008;
+            change coeff about {
+            if (field.value=="0")
+            return 1.0 as Double;
+            if (field.value=="1")
+            return 1.0 as Double;
+            if (field.value=="2")
+            return 1.05 as Double;
+            if (field.value=="viac")
+            return 1.1 as Double;
+            }
+        </action>
     </data>
     <data type="boolean">
-        <id></id>
         <title>Bolo poistenému alebo spolupoistenej osobe niekedy v minulosti zamiestnuté poistné plnenie alebo vypovedaná poistná zmluva?</title>
+        <id>101009</id>
+        <action trigger="set">
+            field: f.this,
+            coeff: f.201009;
+            change coeff about {
+            if (field.value)
+            return 1.5 as Double;
+            return 1.0 as Double;
+            }
+        </action>
     </data>
     <data type="boolean">
-        <id></id>
         <title>Bol poistený alebo spolupoistená osoba niekedy trestné stihaný / vyhlásil osobný bankrot / stíhaný za dlhy alebo odsúdený za podvodné alebo obdobné konanie.</title>
+        <id>101010</id>
+        <action trigger="set">
+            field: f.this,
+            coeff: f.201010;
+            change coeff about {
+            if (field.value)
+            return 1000000000000000000000.0 as Double;
+            return 1.0 as Double;
+            }
+        </action>
     </data>
     <data type="boolean">
-        <id></id>
         <title>Je plánovaná rekonštrukcia alebo prestavba poisťovanej nehnuteľnosti v priebehu najbližších 3 mesiacov?</title>
+        <id>101011</id>
+        <action trigger="set">
+            field: f.this,
+            coeff: f.201011;
+            change coeff about {
+            if (field.value)
+            return 1.2 as Double;
+            return 1.0 as Double;
+            }
+        </action>
     </data>
     <data type="boolean">
-        <id></id>
         <title>Žije v poisťovanej domácnosti pes alebo mačka?</title>
+        <id>101012</id>
+        <action trigger="set">
+            field: f.this,
+            coeff: f.201012;
+            change coeff about {
+            if (field.value)
+            return 1.05 as Double;
+            return 1.0 as Double;
+            }
+        </action>
     </data>
     <data type="enumeration">
-        <id></id>
         <title>Kedy je nehnuteľnosť najviac obývaná?</title>
+        <id>101013</id>
+        <placeholder>Čas</placeholder>
         <values>cez deň</values>
         <values>večer a v noci</values>
         <values>počas celého dňa</values>
+        <action trigger="set">
+            field: f.this,
+            coeff: f.201013;
+            change coeff about {
+            if (field.value=="cez deň")
+            return 1.05 as Double;
+            if (field.value=="večer a v noci")
+            return 1.02 as Double;
+            if (field.value=="počas celého dňa")
+            return 1.0 as Double;
+            }
+        </action>
     </data>
     <data type="boolean">
-        <id></id>
         <title>Je nehnuteľnosť využívaná aj na podnikanie?</title>
+        <id>101014</id>
+        <action trigger="set">
+            field: f.this,
+            coeff: f.201014;
+            change coeff about {
+            if (field.value)
+            return 1.1 as Double;
+            return 1.0 as Double;
+            }
+        </action>
     </data>
     <data type="enumeration">
-        <id></id>
         <title>Právna subjektivita poisteného?</title>
+        <id>101015</id>
+        <placeholder>Typ</placeholder>
         <values>fyzická osoba</values>
         <values>právnická osoba</values>
         <values>fyzická osoba - podnikateľ</values>
+        <init>fyzická osoba</init>
+        <action trigger="set">
+            field: f.this,
+            coeff: f.201015;
+            change coeff about {
+            if (field.value=="fyzická osoba")
+            return 1.0 as Double;
+            if (field.value=="právnická osoba")
+            return 1.1 as Double;
+            if (field.value=="fyzická osoba - podnikateľ")
+            return 1.1 as Double;
+            }
+        </action>
     </data>
     <data type="enumeration">
-        <id></id>
         <title>Počet poistných udalostí za posledné 3 roky?</title>
+        <id>101016</id>
+        <placeholder>Počet</placeholder>
         <values>0</values>
         <values>1</values>
         <values>2 a viac</values>
+        <init>0</init>
+        <action trigger="set">
+            field: f.this,
+            coeff: f.201016;
+            change coeff about{
+            if (field.value=="0")
+            return 1.0 as Double;
+            if (field.value=="1")
+            return 1.1 as Double;
+            if (field.value=="2 a viac")
+            return 1.2 as Double;
+            }
+        </action>
     </data>
     <!-- ===== Nehnuteľnosť ===== -->
     <data type="enumeration">
-        <id></id>
         <title>Predmet poistenia</title>
+        <id>102001</id>
+        <placeholder>Typ</placeholder>
         <values>byt</values>
         <values>rodinný dom</values>
         <values>chata</values>
         <values>bytový dom</values>
         <values>bungalow</values>
         <values>rozostavaná stavba</values>
+        <init>rodinný dom</init>
+        <action trigger="set">
+            field: f.this,
+            coeff: f.202001;
+            change coeff about {
+            if (field.value=="byt")
+            return 0.9 as Double;
+            if (field.value=="rodinný dom")
+            return 0.9 as Double;
+            if (field.value=="chata")
+            return 1.2 as Double;
+            if (field.value=="bytový dom")
+            return 0.75 as Double;
+            if (field.value=="bungalow")
+            return 0.9 as Double;
+            if (field.value=="rozostavaná stavba")
+            return 0.9 as Double;
+            }
+        </action>
     </data>
     <data type="enumeration">
-        <id></id>
         <title>Konštrukcia múrov</title>
+        <id>102002</id>
+        <placeholder>Typ</placeholder>
         <values>tehla a/alebo betón</values>
         <values>porobetón (ytong)</values>
         <values>škvarobatón</values>
         <values>sklo</values>
         <values>drevo</values>
+        <init>tehla a/alebo betón</init>
+        <action trigger="set">
+            field: f.this,
+            coeff: f.202002;
+            change coeff about {
+            if (field.value=="tehla a/alebo betón")
+            return 1.0 as Double;
+            if (field.value=="porobetón (ytong)")
+            return 1.05 as Double;
+            if (field.value=="škvarobatón")
+            return 1.05 as Double;
+            if (field.value=="sklo")
+            return 1.3 as Double;
+            if (field.value=="drevo")
+            return 1.5 as Double;
+            }
+        </action>
     </data>
     <data type="enumeration">
-        <id></id>
         <title>Konštrukcia strechy</title>
+        <id>102003</id>
+        <placeholder>Typ</placeholder>
         <values>škridla</values>
         <values>plech</values>
         <values>asfalt</values>
@@ -163,328 +425,1071 @@
         <values>sklo</values>
         <values>šindel</values>
         <values>iné</values>
+        <init>škridla</init>
+        <action trigger="set">
+            field: f.this,
+            coeff: f.202003;
+            change coeff about {
+            if (field.value=="škridla")
+            return 1.0 as Double;
+            if (field.value=="plech")
+            return 1.05 as Double;
+            if (field.value=="asfalt")
+            return 1.1 as Double;
+            if (field.value=="hydroizolačné fólie")
+            return 1.1 as Double;
+            if (field.value=="sklo")
+            return 1.15 as Double;
+            if (field.value=="šindel")
+            return 1.05 as Double;
+            if (field.value=="iné")
+            return 1.1 as Double;
+            }
+        </action>
     </data>
     <data type="enumeration">
-        <id></id>
         <title>Koľko rokov má nehnuteľnosť?</title>
+        <id>102004</id>
+        <placeholder>Typ</placeholder>
         <values>menej ako 5</values>
         <values>6 až 10</values>
         <values>11 až 20</values>
         <values>viac ako 20</values>
+        <init>6 až 10</init>
+        <action trigger="set">
+            field: f.this,
+            coeff: f.202004;
+            change coeff about {
+            if (field.value=="menej ako 5")
+            return 1.0 as Double;
+            if (field.value=="6 až 10")
+            return 1.05 as Double;
+            if (field.value=="11 až 20")
+            return 1.1 as Double;
+            if (field.value=="viac ako 20")
+            return 1.2 as Double;
+            }
+        </action>
     </data>
     <data type="boolean">
-        <id></id>
         <title>Má nehnuteľnosť praskliny na vonkajšej fasáde?</title>
+        <id>102005</id>
+        <action trigger="set">
+            field: f.this,
+            coeff: f.202005;
+            change coeff about {
+            if (field.value)
+            return 1.5 as Double;
+            return 1.2 as Double;
+            }
+        </action>
     </data>
     <data type="enumeration">
-        <id></id>
         <title>Koľko izieb má nehnuteľnosť?</title>
+        <id>102006</id>
+        <placeholder>Počet</placeholder>
         <values>1</values>
         <values>2</values>
         <values>3</values>
         <values>4</values>
         <values>viac ako 4</values>
+        <action trigger="set">
+            field: f.this,
+            coeff: f.202006;
+            change coeff about {
+            if (field.value=="1")
+            return 0.9 as Double;
+            if (field.value=="2")
+            return 1.0 as Double;
+            if (field.value=="3")
+            return 1.1 as Double;
+            if (field.value=="4")
+            return 1.15 as Double;
+            if (field.value=="viac ako 4")
+            return 1.2 as Double;
+            }
+        </action>
     </data>
     <data type="enumeration">
-        <id></id>
         <title>Koľko kúpeľní má nehnuteľnosť?</title>
+        <id>102007</id>
+        <placeholder>Počet</placeholder>
         <values>1</values>
         <values>2</values>
         <values>3</values>
         <values>4</values>
         <values>viac ako 4</values>
+        <action trigger="set">
+            field: f.this,
+            coeff: f.202007;
+            change coeff about {
+            if (field.value=="1")
+            return 1.0 as Double;
+            if (field.value=="2")
+            return 1.1 as Double;
+            if (field.value=="viac ako 2")
+            return 1.2 as Double;
+            }
+        </action>
     </data>
     <data type="enumeration">
-        <id></id>
         <title>Uveďte celkovú hodnotu rekonštrukcií, ak boli vykonané</title>
+        <id>102008</id>
+        <placeholder>Hodnota</placeholder>
         <values>bez rekonštrukcií</values>
         <values>do 20 000 EUR</values>
         <values>do 50 000 EUR</values>
         <values>nad 50 000 EUR</values>
+        <init>bez rekonštrukcií</init>
+        <action trigger="set">
+            field: f.this,
+            coeff: f.202008;
+            change coeff about {
+            if (field.value=="bez rekonštrukcií")
+            return 1.0 as Double;
+            if (field.value=="do 20 000 EUR")
+            return 0.95 as Double;
+            if (field.value=="do 50 000 EUR")
+            return 0.9 as Double;
+            if (field.value=="nad 50 000 EUR")
+            return 0.85 as Double;
+            }
+        </action>
     </data>
     <!-- ===== Domácnosť ===== -->
     <data type="enumeration">
-        <id></id>
         <title>Umiestnenie domácnosti</title>
+        <id>103001</id>
+        <placeholder>Typ</placeholder>
         <values>byt</values>
         <values>rodinný dom</values>
         <values>chata</values>
         <values>bungalow</values>
     </data>
     <data type="enumeration">
-        <id></id>
         <title>Obývanosť domácnosti</title>
+        <id>103002</id>
         <values>trvalá</values>
         <values>dočasná</values>
     </data>
     <data type="boolean">
-        <id></id>
         <title>Je nehnuteľnosť, v ktorej sa nachádza poisťovaná domácnosť v blízkom susedstve s inou obývanou nehnuteľnosťou?</title>
+        <id>103003</id>
     </data>
     <data type="boolean">
-        <id></id>
         <title>Je domácnosť zabezpečená funkčným alarmom?</title>
+        <id>103004</id>
     </data>
     <data type="boolean">
-        <id></id>
         <title>Má domácnosť na oknách vo výške do 3 metrov od okolitého terénu mreže / vonkajšie žalúzie alebo rolety?</title>
+        <id>103005</id>
     </data>
     <!-- ===== Zodpovednosť ===== -->
     <data type="boolean">
-        <id></id>
         <title>Poistenie zodpovednosti z vlastníctva nehnuteľnosti</title>
+        <id>104001</id>
     </data>
     <data type="boolean">
-        <id></id>
         <title>Zodpovednosť za škodu členov domácnosti</title>
+        <id>104002</id>
     </data>
     <data type="enumeration">
-        <id></id>
         <title>Územná platnosť poistenia</title>
+        <id>104003</id>
         <values>Slovenská republika</values>
         <values>Európa</values>
     </data>
     <!-- ===== Poistenie nehnuteľnosti ===== -->
+    <data type="number">
+        <title>Podlahová plocha pivnice</title>
+        <id>105001</id>
+        <placeholder>m2</placeholder>
+        <init>0</init>
+        <action trigger="set">
+            field: f.this,
+            location: f.301002,
+            coeff: f.205002;
+            change coeff about {
+            if (location.value=="BA")
+            return 850*field.value as Double;
+            if (location.value=="Dedina")
+            return 400*field.value as Double;
+            if (location.value=="Mesto")
+            return 650*field.value as Double;
+            if (location.value=="Krajské mesto")
+            return 700*field.value as Double;
+            }
+        </action>
+        <action trigger="set">
+        p1: f.205002,
+        p2: f.205003,
+        p3: f.205004,
+        field: f.105006;
+        change field about {
+        return p1.value+p2.value+p3.value as Double;
+        }
+        </action>
+        <action trigger="set">
+            p1: f.105001,
+            p2: f.105002,
+            p3: f.105003,
+            field: f.305001;
+            change field about {
+            return p1.value+p2.value+p3.value as Double;
+            }
+        </action>
+    </data>
+    <data type="number">
+        <title>Podlahová plocha prízemia</title>
+        <id>105002</id>
+        <placeholder>m2</placeholder>
+        <init>0</init>
+        <action trigger="set">
+            field: f.this,
+            location: f.301002,
+            coeff: f.205003;
+            change coeff about {
+            if (location.value=="BA")
+            return 1400*field.value as Double;
+            if (location.value=="Dedina")
+            return 550*field.value as Double;
+            if (location.value=="Mesto")
+            return 800*field.value as Double;
+            if (location.value=="Krajské mesto")
+            return 900*field.value as Double;
+            }
+        </action>
+        <action trigger="set">
+            p1: f.205002,
+            p2: f.205003,
+            p3: f.205004,
+            field: f.105006;
+            change field about {
+            return p1.value+p2.value+p3.value as Double;
+            }
+        </action>
+        <action trigger="set">
+            p1: f.105001,
+            p2: f.105002,
+            p3: f.105003,
+            field: f.305001;
+            change field about {
+            return p1.value+p2.value+p3.value as Double;
+            }
+        </action>
+    </data>
+    <data type="number">
+        <title>Podlahová plocha všetkých obytných poschodí</title>
+        <id>105003</id>
+        <placeholder>m2</placeholder>
+        <desc>Okrem prízemia</desc>
+        <init>0</init>
+        <action trigger="set">
+            field: f.this,
+            location: f.301002,
+            coeff: f.205004;
+            change coeff about {
+            if (location.value=="BA")
+            return 1200*field.value as Double;
+            if (location.value=="Dedina")
+            return 450*field.value as Double;
+            if (location.value=="Mesto")
+            return 700*field.value as Double;
+            if (location.value=="Krajské mesto")
+            return 800*field.value as Double;
+            }
+        </action>
+        <action trigger="set">
+            p1: f.205002,
+            p2: f.205003,
+            p3: f.205004,
+            field: f.105006;
+            change field about {
+            return p1.value+p2.value+p3.value as Double;
+            }
+        </action>
+        <action trigger="set">
+            p1: f.105001,
+            p2: f.105002,
+            p3: f.105003,
+            field: f.305001;
+            change field about {
+            return p1.value+p2.value+p3.value as Double;
+            }
+        </action>
+    </data>
+    <data type="number">
+        <title>Podlahová plocha garáže</title>
+        <id>105004</id>
+        <placeholder>m2</placeholder>
+        <init>0</init>
+        <action trigger="set">
+            field: f.this,
+            location: f.301002,
+            coeff: f.205005;
+            change coeff about {
+            if (location.value=="BA")
+            return 850*field.value as Double;
+            if (location.value=="Dedina")
+            return 400*field.value as Double;
+            if (location.value=="Mesto")
+            return 650*field.value as Double;
+            if (location.value=="Krajské mesto")
+            return 700*field.value as Double;
+            }
+        </action>
+    </data>
+    <data type="number">
+        <title>Celková podlahová plocha</title>
+        <id>305001</id>
+        <placeholder>m2</placeholder>
+        <init>0</init>
+        <action trigger="set">
+            field: f.this,
+            location: f.301002,
+            coeff: f.205001;
+            change coeff about {
+            if (location.value=="BA")
+            return 1900*field.value as Double;
+            if (location.value=="Dedina")
+            return 700*field.value as Double;
+            if (location.value=="Mesto")
+            return 950*field.value as Double;
+            if (location.value=="Krajské mesto")
+            return 1300*field.value as Double;
+            }
+        </action>
+        <!--<action trigger="set">-->
+            <!--p1: f.105001,-->
+            <!--p2: f.105002,-->
+            <!--p3: f.105003,-->
+            <!--field: f.305001;-->
+            <!--change field about {-->
+            <!--return p1.value+p2.value+p3.value as Double;-->
+            <!--}-->
+        <!--</action>-->
+    </data>
     <data type="enumeration">
-        <id></id>
-        <title>Poistenie nehnuteľnosti - spoluúčasť</title>
+        <title>Poistenie nehnuteľnosti-Spoluúčasť</title>
+        <id>105005</id>
+        <placeholder>Spoluúčasť</placeholder>
         <values>0.00 €</values>
         <values>50.00 €</values>
         <values>150.00 €</values>
+        <init>50.00 €</init>
+        <action trigger="set">
+            field: f.this,
+            coeff: f.208001;
+            change coeff about {
+            if (field.value=="0.00 €")
+            return 1.1 as Double;
+            if (field.value=="50.00 €")
+            return 1.0 as Double;
+            if (field.value=="150.00 €")
+            return 0.9 as Double;
+            }
+        </action>
     </data>
     <data type="number">
-        <id></id>
-        <title>Poistenie nehnuteľnosti - poistná suma</title>
+        <title>Poistenie nehnuteľnosti - Poistná suma</title>
+        <id>105006</id>
+        <placeholder>Poistná suma</placeholder>
+        <action trigger="set">
+            field: f.this,
+            excess: f.208001,
+            hhc: f.202009,
+            bic: f.201017,
+            sum: f.305002;
+            change sum about {
+            return (field.value*excess.value*hhc.value*bic.value)/1000 as Double;
+            }
+        </action>
     </data>
     <data type="number">
-        <id></id>
-        <title>Poistenie nehnuteľnosti - poistné</title>
-    </data>
-    <data type="number">
-        <id></id>
-        <title>Garáž - poistná suma</title>
-    </data>
-    <data type="number">
-        <id></id>
-        <title>Garáž - poistné</title>
-    </data>
-    <data type="boolean">
-        <id></id>
-        <title>Rovnaké miesto poistenia garáže?</title>
-    </data>
-    <data type="number">
-        <id></id>
-        <title>Hospodárska budova - poistná suma</title>
-    </data>
-    <data type="number">
-        <id></id>
-        <title>Hospodárska budova - poistné</title>
-    </data>
-    <data type="number">
-        <id></id>
-        <title>Altánok - poistná suma</title>
-    </data>
-    <data type="number">
-        <id></id>
-        <title>Altánok - poistné</title>
-    </data>
-    <data type="number">
-        <id></id>
-        <title>Prístrešok - poistná suma</title>
-    </data>
-    <data type="number">
-        <id></id>
-        <title>Prístrešok - poistné</title>
-    </data>
-    <data type="number">
-        <id></id>
-        <title>Chodník, parkovacia plocha - poistná suma</title>
-    </data>
-    <data type="number">
-        <id></id>
-        <title>Chodník, parkovacia plocha - poistné</title>
-    </data>
-    <data type="number">
-        <id></id>
-        <title>Sauna - poistná suma</title>
-    </data>
-    <data type="number">
-        <id></id>
-        <title>Sauna - poistné</title>
-    </data>
-    <data type="number">
-        <id></id>
-        <title>Elektrická brána, oplotenie - poistná suma</title>
-    </data>
-    <data type="number">
-        <id></id>
-        <title>Elektrická brána, oplotenie - poistné</title>
-    </data>
-    <data type="number">
-        <id></id>
-        <title>Tenisový kurt - poistná suma</title>
-    </data>
-    <data type="number">
-        <id></id>
-        <title>Tenisový kurt - poistné</title>
-    </data>
-    <data type="number">
-        <id></id>
-        <title>Vonkajší bazén - poistná suma</title>
-    </data>
-    <data type="number">
-        <id></id>
-        <title>Vonkajší bazén - poistné</title>
-    </data>
-    <data type="number">
-        <id></id>
-        <title>Studňa - poistná suma</title>
-    </data>
-    <data type="number">
-        <id></id>
-        <title>Studňa - poistné</title>
-    </data>
-    <data type="number">
-        <id></id>
-        <title>Žumpa, septik - poistná suma</title>
-    </data>
-    <data type="number">
-        <id></id>
-        <title>Žumpa, septik - poistné</title>
-    </data>
-    <data type="number">
-        <id></id>
-        <title>Iné - poistná suma</title>
-    </data>
-    <data type="number">
-        <id></id>
-        <title>Iné - poistné</title>
+        <title>Poistenie nehnuteľnosti - Poistné</title>
+        <id>305002</id>
+        <placeholder>Poistné</placeholder>
     </data>
     <!-- ===== Doplnkové poistenie nehnuteľnosti ===== -->
-    <data type="number">
-        <id></id>
-        <title>Stavebné materiály - poistná suma</title>
+    <data type="boolean">
+        <title>Garáž</title>
+        <id>105035</id>
+        <action trigger="set">
+            field: f.this,
+            other: f.105007,
+            trans: t.413;
+            make other,visible on trans when { field.value }
+        </action>
+        <action trigger="set">
+            field: f.this,
+            other: f.305003,
+            trans: t.413;
+            make other,visible on trans when { field.value }
+        </action>
+        <action trigger="set">
+            field: f.this,
+            other: f.105008,
+            trans: t.413;
+            make other,visible on trans when { field.value }
+        </action>
+        <action trigger="set">
+            field: f.this,
+            other: f.105007,
+            trans: t.413;
+            make other,hidden on trans when { field.value == false }
+        </action>
+        <action trigger="set">
+            field: f.this,
+            other: f.305003,
+            trans: t.413;
+            make other,hidden on trans when { field.value == false }
+        </action>
+        <action trigger="set">
+            field: f.this,
+            other: f.105008,
+            trans: t.413;
+            make other,hidden on trans when { field.value == false }
+        </action>
     </data>
     <data type="number">
-        <id></id>
-        <title>Stavebné materiály - poistné</title>
+        <title>Garáž</title>
+        <id>105007</id>
+        <placeholder>Poistná suma</placeholder>
     </data>
     <data type="number">
-        <id></id>
+        <title>Garáž</title>
+        <id>305003</id>
+        <placeholder>Poistné</placeholder>
+    </data>
+    <data type="boolean">
+        <title>Rovnaké miesto poistenia garáže?</title>
+        <id>105008</id>
+        <action trigger="set">
+            field: f.this,
+            coeff: f.208003;
+            change coeff about {
+            if (field.value)
+            return 1.0 as Double;
+            return 1.1 as Double;
+            }
+        </action>
+    </data>
+    <data type="boolean">
+        <title>Hospodárska budova</title>
+        <id>105009</id>
+        <action trigger="set">
+            field: f.this,
+            coeff: f.205007;
+            change coeff about {
+            if (field.value)
+            return 1.0 as Double;
+            return 0 as Double;
+            }
+        </action>
+        <action trigger="set">
+            field: f.this,
+            other: f.105010,
+            trans: t.413;
+            make other,editable on trans when { field.value }
+        </action>
+        <action trigger="set">
+            field: f.this,
+            other: f.305004,
+            trans: t.413;
+            make other,visible on trans when { field.value }
+        </action>
+        <action trigger="set">
+            field: f.this,
+            other: f.105010,
+            trans: t.413;
+            make other,hidden on trans when { !field.value }
+        </action>
+        <action trigger="set">
+            field: f.this,
+            other: f.305004,
+            trans: t.413;
+            make other,hidden on trans when { !field.value }
+        </action>
+
+    </data>
+    <data type="number">
+        <title>Hospodárska budova</title>
+        <id>105010</id>
+        <placeholder>Poistná suma</placeholder>
+        <action trigger="set">
+            field: f.this,
+            coeff: f.205007,
+            excess: f.208001,
+            sum: f.305004;
+            change sum about {
+            return field.value*coeff.value*excess.value/1000 as Double;
+            }
+        </action>
+    </data>
+    <data type="number">
+        <title>Hospodárska budova</title>
+        <id>305004</id>
+        <placeholder>Poistné</placeholder>
+    </data>
+    <data type="boolean">
+        <title>Altánok</title>
+        <id>105011</id>
+        <action trigger="set">
+            field: f.this,
+            coeff: f.205008;
+            change coeff about {
+            if (field.value)
+            return 1.0 as Double;
+            return 0 as Double;
+            }
+        </action>
+        <action trigger="set">
+            field: f.this,
+            other: f.105012,
+            trans: t.413;
+            make other,editable on trans when { field.value }
+        </action>
+        <action trigger="set">
+            field: f.this,
+            other: f.305005,
+            trans: t.413;
+            make other,visible on trans when { field.value }
+        </action>
+        <action trigger="set">
+            field: f.this,
+            other: f.105012,
+            trans: t.413;
+            make other,hidden on trans when { return !field.value }
+        </action>
+        <action trigger="set">
+            field: f.this,
+            other: f.305005,
+            trans: t.413;
+            make other,hidden on trans when { return !field.value }
+        </action>
+    </data>
+    <data type="number">
+        <title>Altánok</title>
+        <id>105012</id>
+        <placeholder>Poistná suma</placeholder>
+        <action trigger="set">
+            field: f.this,
+            coeff: f.205008,
+            excess: f.208001,
+            sum: f.305005;
+            change sum about {
+            return field.value*coeff.value*excess.value/1000 as Double;
+            }
+        </action>
+    </data>
+    <data type="number">
+        <title>Altánok</title>
+        <id>305005</id>
+        <placeholder>Poistné</placeholder>
+    </data>
+    <data type="boolean">
+        <title>Prístrešok</title>
+        <id>105013</id>
+        <action trigger="set">
+            field: f.this,
+            coeff: f.205009;
+            change coeff about {
+            if (field.value)
+            return 1.0 as Double;
+            return 0 as Double;
+            }
+        </action>
+    </data>
+    <data type="number">
+        <title>Prístrešok</title>
+        <id>105014</id>
+        <placeholder>Poistná suma</placeholder>
+        <action trigger="set">
+            field: f.this,
+            coeff: f.205009,
+            excess: f.208001,
+            sum: f.305006;
+            change sum about {
+            return field.value*coeff.value*excess.value/1000 as Double;
+            }
+        </action>
+    </data>
+    <data type="number">
+        <title>Prístrešok</title>
+        <id>305006</id>
+        <placeholder>Poistné</placeholder>
+    </data>
+    <data type="boolean">
+        <title>Chodník</title>
+        <id>105015</id>
+        <action trigger="set">
+            field: f.this,
+            coeff: f.205010;
+            change coeff about {
+            if (field.value)
+            return 1.0 as Double;
+            return 0 as Double;
+            }
+        </action>
+    </data>
+    <data type="number">
+        <title>Chodník, parkovacia plocha</title>
+        <id>105016</id>
+        <placeholder>Poistná suma</placeholder>
+        <action trigger="set">
+            field: f.this,
+            coeff: f.205010,
+            excess: f.208001,
+            sum: f.305007;
+            change sum about {
+            return field.value*coeff.value*excess.value/1000 as Double;
+            }
+        </action>
+    </data>
+    <data type="number">
+        <title>Chodník, parkovacia plocha</title>
+        <id>305007</id>
+        <placeholder>Poistné</placeholder>
+    </data>
+    <data type="boolean">
+        <title>Sauna</title>
+        <id>105017</id>
+        <action trigger="set">
+            field: f.this,
+            coeff: f.205011;
+            change coeff about {
+            if (field.value)
+            return 1.0 as Double;
+            return 0 as Double;
+            }
+        </action>
+    </data>
+    <data type="number">
+        <title>Sauna</title>
+        <id>105018</id>
+        <placeholder>Poistná suma</placeholder>
+        <action trigger="set">
+            field: f.this,
+            coeff: f.205011,
+            excess: f.208001,
+            sum: f.305008;
+            change sum about {
+            return field.value*coeff.value*excess.value/1000 as Double;
+            }
+        </action>
+    </data>
+    <data type="number">
+        <title>Sauna</title>
+        <id>305008</id>
+        <placeholder>Poistné</placeholder>
+    </data>
+    <data type="boolean">
+        <title>Elektrická brána</title>
+        <id>105019</id>
+        <action trigger="set">
+            field: f.this,
+            coeff: f.205012;
+            change coeff about {
+            if (field.value)
+            return 1.0 as Double;
+            return 0 as Double;
+            }
+        </action>
+    </data>
+    <data type="number">
+        <title>Elektrická brána, oplotenie</title>
+        <id>105020</id>
+        <placeholder>Poistná suma</placeholder>
+        <action trigger="set">
+            field: f.this,
+            coeff: f.205012,
+            excess: f.208001,
+            sum: f.305009;
+            change sum about {
+            return field.value*coeff.value*excess.value/1000 as Double;
+            }
+        </action>
+    </data>
+    <data type="number">
+        <title>Elektrická brána, oplotenie</title>
+        <id>305009</id>
+        <placeholder>Poistné</placeholder>
+    </data>
+    <data type="boolean">
+        <title>Tenisový kurt</title>
+        <id>105021</id>
+        <action trigger="set">
+            field: f.this,
+            coeff: f.205013;
+            change coeff about {
+            if (field.value)
+            return 1.0 as Double;
+            return 0 as Double;
+            }
+        </action>
+    </data>
+    <data type="number">
+        <title>Tenisový kurt</title>
+        <id>105022</id>
+        <placeholder>Poistná suma</placeholder>
+        <action trigger="set">
+            field: f.this,
+            coeff: f.205013,
+            excess: f.208001,
+            sum: f.305010;
+            change sum about {
+            return field.value*coeff.value*excess.value/1000 as Double;
+            }
+        </action>
+    </data>
+    <data type="number">
+        <title>Tenisový kurt</title>
+        <id>305010</id>
+        <placeholder>Poistné</placeholder>
+    </data>
+    <data type="boolean">
+        <title>Vonkajší bazén</title>
+        <id>105023</id>
+        <action trigger="set">
+            field: f.this,
+            coeff: f.205014;
+            change coeff about {
+            if (field.value)
+            return 1.0 as Double;
+            return 0 as Double;
+            }
+        </action>
+    </data>
+    <data type="number">
+        <title>Vonkajší bazén</title>
+        <id>105024</id>
+        <placeholder>Poistná suma</placeholder>
+        <action trigger="set">
+            field: f.this,
+            coeff: f.205014,
+            excess: f.208001,
+            sum: f.305011;
+            change sum about {
+            return field.value*coeff.value*excess.value/1000 as Double;
+            }
+        </action>
+    </data>
+    <data type="number">
+        <title>Vonkajší bazén</title>
+        <id>305011</id>
+        <placeholder>Poistné</placeholder>
+    </data>
+    <data type="boolean">
+        <title>Studňa</title>
+        <id>105025</id>
+        <action trigger="set">
+            field: f.this,
+            coeff: f.205015;
+            change coeff about {
+            if (field.value)
+            return 1.0 as Double;
+            return 0 as Double;
+            }
+        </action>
+    </data>
+    <data type="number">
+        <title>Studňa</title>
+        <id>105026</id>
+        <placeholder>Poistná suma</placeholder>
+        <action trigger="set">
+            field: f.this,
+            coeff: f.205015,
+            excess: f.208001,
+            sum: f.305012;
+            change sum about {
+            return field.value*coeff.value*excess.value/1000 as Double;
+            }
+        </action>
+    </data>
+    <data type="number">
+        <title>Studňa</title>
+        <id>305012</id>
+        <placeholder>Poistné</placeholder>
+    </data>
+    <data type="boolean">
+        <title>Žumpa, septik</title>
+        <id>105027</id>
+        <action trigger="set">
+            field: f.this,
+            coeff: f.205016;
+            change coeff about {
+            if (field.value)
+            return 1.0 as Double;
+            return 0 as Double;
+            }
+        </action>
+    </data>
+    <data type="number">
+        <title>Žumpa, septik</title>
+        <id>105028</id>
+        <placeholder>Poistná suma</placeholder>
+        <action trigger="set">
+            field: f.this,
+            coeff: f.205016,
+            excess: f.208001,
+            sum: f.305013;
+            change sum about {
+            return field.value*coeff.value*excess.value/1000 as Double;
+            }
+        </action>
+    </data>
+    <data type="number">
+        <title>Žumpa, septik</title>
+        <id>305013</id>
+        <placeholder>Poistné</placeholder>
+    </data>
+    <data type="boolean">
+        <title>Iné</title>
+        <id>105029</id>
+        <action trigger="set">
+            field: f.this,
+            coeff: f.205017;
+            change coeff about {
+            if (field.value)
+            return 1.0 as Double;
+            return 0 as Double;
+            }
+        </action>
+    </data>
+    <data type="number">
+        <title>Iné</title>
+        <id>105030</id>
+        <placeholder>Poistná suma</placeholder>
+        <action trigger="set">
+            field: f.this,
+            coeff: f.205017,
+            excess: f.208001,
+            sum: f.305014;
+            change sum about {
+            return field.value*coeff.value*excess.value/1000 as Double;
+            }
+        </action>
+    </data>
+    <data type="number">
+        <title>Iné</title>
+        <id>305014</id>
+        <placeholder>Poistné</placeholder>
+    </data>
+    <data type="boolean">
+        <title>Stavebné materialy</title>
+        <id>105031</id>
+        <action trigger="set">
+            field: f.this,
+            coeff: f.205018;
+            change coeff about {
+            if (field.value)
+            return 3.5 as Double;
+            return 0 as Double;
+            }
+        </action>
+    </data>
+    <data type="number">
+        <title>Stavebné materiály</title>
+        <id>105032</id>
+        <placeholder>Poistná suma</placeholder>
+        <action trigger="set">
+            field: f.this,
+            coeff: f.205018,
+            excess: f.208001,
+            sum: f.305015;
+            change sum about {
+            return field.value*coeff.value*excess.value/1000 as Double;
+            }
+        </action>
+    </data>
+    <data type="number">
+        <title>Stavebné materiály</title>
+        <id>305015</id>
+        <placeholder>Poistné</placeholder>
+    </data>
+    <data type="boolean">
         <title>Stavebné a záhradné mechanizmy</title>
+        <id>105033</id>
+        <action trigger="set">
+            field: f.this,
+            coeff: f.205019;
+            change coeff about {
+            if (field.value)
+            return 3.5 as Double;
+            return 0 as Double;
+            }
+        </action>
     </data>
     <data type="number">
-        <id></id>
-        <title>Stavebné materiály - poistná suma</title>
+        <title>Stavebné a záhradné mechanizmy</title>
+        <id>105034</id>
+        <placeholder>Poistná suma</placeholder>
+        <action trigger="set">
+            field: f.this,
+            coeff: f.205019,
+            excess: f.208001,
+            sum: f.305016;
+            change sum about {
+            return field.value*coeff.value*excess.value/1000 as Double;
+            }
+        </action>
+    </data>
+    <data type="number">
+        <title>Stavebné a záhradné mechanizmy</title>
+        <id>305016</id>
+        <placeholder>Poistné</placeholder>
     </data>
     <!-- ===== Poistenie domácnosti ===== -->
     <data type="enumeration">
-        <id></id>
         <title>Poistenie domácnosti - spoluúčasť</title>
+        <id>106001</id>
         <values>0.00 €</values>
         <values>50.00 €</values>
         <values>150.00 €</values>
     </data>
     <data type="number">
-        <id></id>
         <title>Poistenie domácnosti - poistná suma</title>
+        <id>106002</id>
     </data>
     <data type="number">
-        <id></id>
         <title>Poistenie domácnosti - poistné</title>
+        <id>306001</id>
     </data>
     <!-- ===== Doplnkové poistenie domácnosti ===== -->
     <data type="number">
-        <id></id>
+        <title>Celková podlahová plocha</title>
+        <id>106003</id>
+    </data>
+    <data type="boolean">
+        <title>Cennosti</title>
+        <id>106004</id>
+    </data>
+    <data type="number">
         <title>Cennosti - poistná suma</title>
+        <id>106005</id>
     </data>
     <data type="number">
-        <id></id>
-        <title>Cmelecké diela - poistná suma</title>
-    </data>
-    <data type="number">
-        <id></id>
-        <title>Elektronické a optické zariadenia - poistná suma</title>
-    </data>
-    <data type="number">
-        <id></id>
-        <title>Špeciálne sklá a presklenie - poistná suma</title>
-    </data>
-    <data type="number">
-        <id></id>
-        <title>Záhradé vybavenie a nábytok - poistná suma</title>
-    </data>
-    <data type="number">
-        <id></id>
-        <title>Elektromotory v domácich spotrebičoch - poistná suma</title>
-    </data>
-    <data type="number">
-        <id></id>
-        <title>Stavebné súčasti domácností - poistná suma</title>
-    </data>
-    <data type="number">
-        <id></id>
-        <title>Športové náradie - poistná suma</title>
-    </data>
-    <data type="number">
-        <id></id>
-        <title>Iné - poistná suma</title>
-    </data>
-    <data type="number">
-        <id></id>
         <title>Cennosti - poistné</title>
+        <id>306002</id>
+    </data>
+    <data type="boolean">
+        <title>Umelecké diela</title>
+        <id>106006</id>
     </data>
     <data type="number">
-        <id></id>
+        <title>Umelecké diela - poistná suma</title>
+        <id>106007</id>
+    </data>
+    <data type="number">
         <title>Umelecké diela - poistné</title>
+        <id>306003</id>
+    </data>
+    <data type="boolean">
+        <title>Elektronické a optické zariadenia</title>
+        <id>106008</id>
     </data>
     <data type="number">
-        <id></id>
+        <title>Elektronické a optické zariadenia - poistná suma</title>
+        <id>106009</id>
+    </data>
+    <data type="number">
         <title>Elektronické a optické zariadenia - poistné</title>
+        <id>306004</id>
+    </data>
+    <data type="boolean">
+        <title>Špecialne sklá a presklenie</title>
+        <id>106010</id>
     </data>
     <data type="number">
-        <id></id>
+        <title>Špeciálne sklá a presklenie - poistná suma</title>
+        <id>106011</id>
+    </data>
+    <data type="number">
         <title>Špeciálne sklá a presklenie - poistné</title>
+        <id>306005</id>
+    </data>
+    <data type="boolean">
+        <title>Záhradné vybavenie a nábytok</title>
+        <id>106012</id>
     </data>
     <data type="number">
-        <id></id>
+        <title>Záhradé vybavenie a nábytok - poistná suma</title>
+        <id>106013</id>
+    </data>
+    <data type="number">
         <title>Záhradé vybavenie a nábytok - poistné</title>
+        <id>306006</id>
+    </data>
+    <data type="boolean">
+        <title>Elektromotory v domácich spotrebičoch</title>
+        <id>106014</id>
     </data>
     <data type="number">
-        <id></id>
+        <title>Elektromotory v domácich spotrebičoch - poistná suma</title>
+        <id>106015</id>
+    </data>
+    <data type="number">
         <title>Elektromotory v domácich spotrebičoch - poistné</title>
+        <id>306007</id>
+    </data>
+    <data type="boolean">
+        <title>Stavebné súčasti domácnosti</title>
+        <id>106016</id>
     </data>
     <data type="number">
-        <id></id>
+        <title>Stavebné súčasti domácností - poistná suma</title>
+        <id>106017</id>
+    </data>
+    <data type="number">
         <title>Stavebné súčasti domácností - poistné</title>
+        <id>306008</id>
+    </data>
+    <data type="boolean">
+        <title>Športové náradie</title>
+        <id>106018</id>
     </data>
     <data type="number">
-        <id></id>
+        <title>Športové náradie - poistná suma</title>
+        <id>106019</id>
+    </data>
+    <data type="number">
         <title>športové náradie - poistné</title>
+        <id>306009</id>
+    </data>
+    <data type="boolean">
+        <title>Iné</title>
+        <id>106020</id>
     </data>
     <data type="number">
-        <id></id>
+        <title>Iné - poistná suma</title>
+        <id>106021</id>
+    </data>
+    <data type="number">
         <title>iné - poistné</title>
+        <id>306010</id>
     </data>
     <!-- ===== Poistenie zodpovednosti za škodu ===== -->
     <data type="enumeration">
-        <id></id>
-        <title>Poistenie zodpovednosti z vlastníctva nehnuteľnosti - poistná suma</title>
+        <title>Poistenie zodpovednosti z vlastníctva nehnuteľnosti</title>
+        <id>107001</id>
+        <placeholder>Poistná suma</placeholder>
         <values>15,000.00 €</values>
         <values>30,000.00 €</values>
         <values>60,000.00 €</values>
         <values>120,000.00 €</values>
     </data>
     <data type="enumeration">
-        <id></id>
-        <title>Poistenie zodpovednosti z vlastníctva nehnuteľnosti - spoluúčasť</title>
+        <title>Poistenie zodpovednosti z vlastníctva nehnuteľnosti</title>
+        <id>107002</id>
+        <placeholder>Spoluúčasť</placeholder>
         <values>0.00 €</values>
         <values>50.00 €</values>
         <values>150.00 €</values>
     </data>
     <data type="enumeration">
-        <id></id>
         <title>Zodpovednosť za škodu členov domácnosti</title>
+        <id>107003</id>
+        <placeholder>Eur</placeholder>
         <values>15,000.00 €</values>
         <values>30,000.00 €</values>
         <values>60,000.00 €</values>
@@ -492,39 +1497,63 @@
     </data>
     <!-- ===== Sumár ===== -->
     <data type="number">
-        <id></id>
         <title>Poistenie nehnuteľnosti</title>
+        <id>308001</id>
+        <placeholder>Poistné</placeholder>
     </data>
     <data type="number">
-        <id></id>
         <title>Poistenie domácnosti</title>
+        <id>308002</id>
+        <placeholder>Poistné</placeholder>
     </data>
     <data type="number">
-        <id></id>
         <title>Poistenie zodpovednosti za škodu</title>
+        <id>308003</id>
+        <placeholder>Poistné</placeholder>
     </data>
     <data type="number">
-        <id></id>
         <title>ROČNÉ POISTNÉ CELKOM</title>
+        <id>308004</id>
     </data>
     <data type="enumeration">
-        <id></id>
         <title>PERIODICITA PLATBY POISTNÉHO</title>
+        <id>108001</id>
         <values>ročná</values>
         <values>polročná</values>
         <values>štvrťročná</values>
+        <action trigger="set">
+            field: f.this,
+            coeff: f.208004;
+            change coeff about {
+            if (field.value == "ročná")
+            return 0.95 as Double;
+            if (field.value == "polročná")
+            return 0.99 as Double;
+            if (field.value == "štvrťročná")
+            return 1.0 as Double;
+            }
+        </action>
     </data>
     <data type="boolean">
-        <id></id>
         <title>KOMPLETNÉ POISTENIE</title>
+        <id>308005</id>
+        <!--<action trigger="set">-->
+            <!--field: f.103001,-->
+            <!--coeff: f.208004;-->
+            <!--change coeff about {-->
+            <!--if (field.value == "bungalow")-->
+            <!--return true ;-->
+            <!--return false ;-->
+            <!--}-->
+        <!--</action>-->
     </data>
     <data type="boolean">
-        <id></id>
         <title>ZĽAVA ZA INÉ POISTENIE V PREMIUM</title>
+        <id>108002</id>
     </data>
     <data type="enumeration">
-        <id></id>
         <title>OBCHODNÁ ZĽAVA</title>
+        <id>108003</id>
         <values>0%</values>
         <values>5%</values>
         <values>10%</values>
@@ -533,236 +1562,1125 @@
         <values>25%</values>
     </data>
     <data type="boolean">
-        <id></id>
         <title>AKCIOVÁ ZĽAVA</title>
+        <id>108004</id>
     </data>
     <data type="number">
-        <id></id>
         <title>BEŽNÉ POISTNÉ</title>
+        <id>308006</id>
     </data>
-
     <!-- ===== Základné informácie koeficienty ===== -->
     <data type="number">
-        <id></id>
+        <title>Koeficient - Lokalita</title>
+        <id>201001</id>
+        <init>1</init>
+        <action trigger="set">
+            c1: f.201001,
+            c2: f.201002,
+            c3: f.201003,
+            c4: f.201004,
+            c5: f.201005,
+            c6: f.201006,
+            c7: f.201007,
+            c8: f.201008,
+            c9: f.201009,
+            c10: f.201010,
+            c11: f.201011,
+            c12: f.201012,
+            c13: f.201013,
+            c14: f.201014,
+            c15: f.201015,
+            c16: f.201016,
+            sum: f.201017;
+            change sum about {
+            return c1.value*c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c9.value*c10.value*c11.value*c12.value*c13.value*c14.value*c15.value*c16.value;
+            }
+        </action>
+    </data>
+    <data type="number">
         <title>Koeficient - Nachádza sa mimo obce (extravilán)?</title>
+        <id>201002</id>
+        <init>1</init>
+        <action trigger="set">
+            c1: f.201001,
+            c2: f.201002,
+            c3: f.201003,
+            c4: f.201004,
+            c5: f.201005,
+            c6: f.201006,
+            c7: f.201007,
+            c8: f.201008,
+            c9: f.201009,
+            c10: f.201010,
+            c11: f.201011,
+            c12: f.201012,
+            c13: f.201013,
+            c14: f.201014,
+            c15: f.201015,
+            c16: f.201016,
+            sum: f.201017;
+            change sum about {
+            return c1.value*c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c9.value*c10.value*c11.value*c12.value*c13.value*c14.value*c15.value*c16.value;
+            }
+        </action>
     </data>
     <data type="number">
-        <id></id>
         <title>Koeficient - Bolo miesto poistenia postihnuté povodňou za posledných 10 rokov?</title>
+        <id>201003</id>
+        <init>1</init>
+        <action trigger="set">
+            c1: f.201001,
+            c2: f.201002,
+            c3: f.201003,
+            c4: f.201004,
+            c5: f.201005,
+            c6: f.201006,
+            c7: f.201007,
+            c8: f.201008,
+            c9: f.201009,
+            c10: f.201010,
+            c11: f.201011,
+            c12: f.201012,
+            c13: f.201013,
+            c14: f.201014,
+            c15: f.201015,
+            c16: f.201016,
+            sum: f.201017;
+            change sum about {
+            return c1.value*c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c9.value*c10.value*c11.value*c12.value*c13.value*c14.value*c15.value*c16.value;
+            }
+        </action>
     </data>
     <data type="number">
-        <id></id>
         <title>Koeficient - Nachádza nehnuteľnosť sa vo vzdialenosti kratšej ako 300 m od vodného toku?</title>
+        <id>201004</id>
+        <init>1</init>
+        <action trigger="set">
+            c1: f.201001,
+            c2: f.201002,
+            c3: f.201003,
+            c4: f.201004,
+            c5: f.201005,
+            c6: f.201006,
+            c7: f.201007,
+            c8: f.201008,
+            c9: f.201009,
+            c10: f.201010,
+            c11: f.201011,
+            c12: f.201012,
+            c13: f.201013,
+            c14: f.201014,
+            c15: f.201015,
+            c16: f.201016,
+            sum: f.201017;
+            change sum about {
+            return c1.value*c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c9.value*c10.value*c11.value*c12.value*c13.value*c14.value*c15.value*c16.value;
+            }
+        </action>
     </data>
     <data type="number">
-        <id></id>
         <title>Koeficient - Koľko rokov žijete v poisťovanej nehnuteľnosti?</title>
+        <id>201005</id>
+        <init>1</init>
+        <action trigger="set">
+            c1: f.201001,
+            c2: f.201002,
+            c3: f.201003,
+            c4: f.201004,
+            c5: f.201005,
+            c6: f.201006,
+            c7: f.201007,
+            c8: f.201008,
+            c9: f.201009,
+            c10: f.201010,
+            c11: f.201011,
+            c12: f.201012,
+            c13: f.201013,
+            c14: f.201014,
+            c15: f.201015,
+            c16: f.201016,
+            sum: f.201017;
+            change sum about {
+            return c1.value*c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c9.value*c10.value*c11.value*c12.value*c13.value*c14.value*c15.value*c16.value;
+            }
+        </action>
     </data>
     <data type="number">
-        <id></id>
         <title>Koeficient - Aký je vzťah poisteného k poisťovanej nehnuteľnosti?</title>
+        <id>201006</id>
+        <init>1</init>
+        <action trigger="set">
+            c1: f.201001,
+            c2: f.201002,
+            c3: f.201003,
+            c4: f.201004,
+            c5: f.201005,
+            c6: f.201006,
+            c7: f.201007,
+            c8: f.201008,
+            c9: f.201009,
+            c10: f.201010,
+            c11: f.201011,
+            c12: f.201012,
+            c13: f.201013,
+            c14: f.201014,
+            c15: f.201015,
+            c16: f.201016,
+            sum: f.201017;
+            change sum about {
+            return c1.value*c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c9.value*c10.value*c11.value*c12.value*c13.value*c14.value*c15.value*c16.value;
+            }
+        </action>
     </data>
     <data type="number">
-        <id></id>
         <title>Koeficient - Koľko dospelých žije v domácnosti?</title>
+        <id>201007</id>
+        <init>0.95</init>
+        <action trigger="set">
+            c1: f.201001,
+            c2: f.201002,
+            c3: f.201003,
+            c4: f.201004,
+            c5: f.201005,
+            c6: f.201006,
+            c7: f.201007,
+            c8: f.201008,
+            c9: f.201009,
+            c10: f.201010,
+            c11: f.201011,
+            c12: f.201012,
+            c13: f.201013,
+            c14: f.201014,
+            c15: f.201015,
+            c16: f.201016,
+            sum: f.201017;
+            change sum about {
+            return c1.value*c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c9.value*c10.value*c11.value*c12.value*c13.value*c14.value*c15.value*c16.value;
+            }
+        </action>
     </data>
     <data type="number">
-        <id></id>
         <title>Koeficient - Koľko detí žije v domácnosti?</title>
+        <id>201008</id>
+        <init>1</init>
+        <action trigger="set">
+            c1: f.201001,
+            c2: f.201002,
+            c3: f.201003,
+            c4: f.201004,
+            c5: f.201005,
+            c6: f.201006,
+            c7: f.201007,
+            c8: f.201008,
+            c9: f.201009,
+            c10: f.201010,
+            c11: f.201011,
+            c12: f.201012,
+            c13: f.201013,
+            c14: f.201014,
+            c15: f.201015,
+            c16: f.201016,
+            sum: f.201017;
+            change sum about {
+            return c1.value*c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c9.value*c10.value*c11.value*c12.value*c13.value*c14.value*c15.value*c16.value;
+            }
+        </action>
     </data>
     <data type="number">
-        <id></id>
-        <title>Koeficient - Bolo poistenému alebo spolupoistenej osobe niekedy v minulosti zamiestnuté poistné plnenie alebo vypovedaná poistná zmluva?</title>
+        <title>Koeficient - Bolo poistenému alebo spolupoistenej osobe niekedy v minulosti zamietnuté poistné plnenie alebo vypovedaná poistná zmluva?</title>
+        <id>201009</id>
+        <init>1</init>
+        <action trigger="set">
+            c1: f.201001,
+            c2: f.201002,
+            c3: f.201003,
+            c4: f.201004,
+            c5: f.201005,
+            c6: f.201006,
+            c7: f.201007,
+            c8: f.201008,
+            c9: f.201009,
+            c10: f.201010,
+            c11: f.201011,
+            c12: f.201012,
+            c13: f.201013,
+            c14: f.201014,
+            c15: f.201015,
+            c16: f.201016,
+            sum: f.201017;
+            change sum about {
+            return c1.value*c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c9.value*c10.value*c11.value*c12.value*c13.value*c14.value*c15.value*c16.value;
+            }
+        </action>
     </data>
     <data type="number">
-        <id></id>
         <title>Koeficient - Bol poistený alebo spolupoistená osoba niekedy trestné stihaný / vyhlásil osobný bankrot / stíhaný za dlhy alebo odsúdený za podvodné alebo obdobné konanie.</title>
+        <id>201010</id>
+        <init>1</init>
+        <action trigger="set">
+            c1: f.201001,
+            c2: f.201002,
+            c3: f.201003,
+            c4: f.201004,
+            c5: f.201005,
+            c6: f.201006,
+            c7: f.201007,
+            c8: f.201008,
+            c9: f.201009,
+            c10: f.201010,
+            c11: f.201011,
+            c12: f.201012,
+            c13: f.201013,
+            c14: f.201014,
+            c15: f.201015,
+            c16: f.201016,
+            sum: f.201017;
+            change sum about {
+            return c1.value*c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c9.value*c10.value*c11.value*c12.value*c13.value*c14.value*c15.value*c16.value;
+            }
+        </action>
     </data>
     <data type="number">
-        <id></id>
         <title>Koeficient - Je plánovaná rekonštrukcia alebo prestavba poisťovanej nehnuteľnosti v priebehu najbližších 3 mesiacov?</title>
+        <id>201011</id>
+        <init>1</init>
+        <action trigger="set">
+            c1: f.201001,
+            c2: f.201002,
+            c3: f.201003,
+            c4: f.201004,
+            c5: f.201005,
+            c6: f.201006,
+            c7: f.201007,
+            c8: f.201008,
+            c9: f.201009,
+            c10: f.201010,
+            c11: f.201011,
+            c12: f.201012,
+            c13: f.201013,
+            c14: f.201014,
+            c15: f.201015,
+            c16: f.201016,
+            sum: f.201017;
+            change sum about {
+            return c1.value*c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c9.value*c10.value*c11.value*c12.value*c13.value*c14.value*c15.value*c16.value;
+            }
+        </action>
     </data>
     <data type="number">
-        <id></id>
         <title>Koeficient - Žije v poisťovanej domácnosti pes alebo mačka?</title>
+        <id>201012</id>
+        <init>1</init>
+        <action trigger="set">
+            c1: f.201001,
+            c2: f.201002,
+            c3: f.201003,
+            c4: f.201004,
+            c5: f.201005,
+            c6: f.201006,
+            c7: f.201007,
+            c8: f.201008,
+            c9: f.201009,
+            c10: f.201010,
+            c11: f.201011,
+            c12: f.201012,
+            c13: f.201013,
+            c14: f.201014,
+            c15: f.201015,
+            c16: f.201016,
+            sum: f.201017;
+            change sum about {
+            return c1.value*c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c9.value*c10.value*c11.value*c12.value*c13.value*c14.value*c15.value*c16.value;
+            }
+        </action>
     </data>
     <data type="number">
-        <id></id>
         <title>Koeficient - Kedy je nehnuteľnosť najviac obývaná?</title>
+        <id>201013</id>
+        <init>1</init>
+        <action trigger="set">
+            c1: f.201001,
+            c2: f.201002,
+            c3: f.201003,
+            c4: f.201004,
+            c5: f.201005,
+            c6: f.201006,
+            c7: f.201007,
+            c8: f.201008,
+            c9: f.201009,
+            c10: f.201010,
+            c11: f.201011,
+            c12: f.201012,
+            c13: f.201013,
+            c14: f.201014,
+            c15: f.201015,
+            c16: f.201016,
+            sum: f.201017;
+            change sum about {
+            return c1.value*c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c9.value*c10.value*c11.value*c12.value*c13.value*c14.value*c15.value*c16.value;
+            }
+        </action>
     </data>
     <data type="number">
-        <id></id>
         <title>Koeficient - Je nehnuteľnosť využívaná aj na podnikanie?</title>
+        <id>201014</id>
+        <init>1</init>
+        <action trigger="set">
+            c1: f.201001,
+            c2: f.201002,
+            c3: f.201003,
+            c4: f.201004,
+            c5: f.201005,
+            c6: f.201006,
+            c7: f.201007,
+            c8: f.201008,
+            c9: f.201009,
+            c10: f.201010,
+            c11: f.201011,
+            c12: f.201012,
+            c13: f.201013,
+            c14: f.201014,
+            c15: f.201015,
+            c16: f.201016,
+            sum: f.201017;
+            change sum about {
+            return c1.value*c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c9.value*c10.value*c11.value*c12.value*c13.value*c14.value*c15.value*c16.value;
+            }
+        </action>
     </data>
     <data type="number">
-        <id></id>
         <title>Koeficient - Právna subjektivita poisteného?</title>
+        <id>201015</id>
+        <init>1</init>
+        <action trigger="set">
+            c1: f.201001,
+            c2: f.201002,
+            c3: f.201003,
+            c4: f.201004,
+            c5: f.201005,
+            c6: f.201006,
+            c7: f.201007,
+            c8: f.201008,
+            c9: f.201009,
+            c10: f.201010,
+            c11: f.201011,
+            c12: f.201012,
+            c13: f.201013,
+            c14: f.201014,
+            c15: f.201015,
+            c16: f.201016,
+            sum: f.201017;
+            change sum about {
+            return c1.value*c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c9.value*c10.value*c11.value*c12.value*c13.value*c14.value*c15.value*c16.value;
+            }
+        </action>
     </data>
     <data type="number">
-        <id></id>
         <title>Koeficient - Počet poistných udalostí za posledné 3 roky?</title>
+        <id>201016</id>
+        <init>1</init>
+        <action trigger="set">
+            c1: f.201001,
+            c2: f.201002,
+            c3: f.201003,
+            c4: f.201004,
+            c5: f.201005,
+            c6: f.201006,
+            c7: f.201007,
+            c8: f.201008,
+            c9: f.201009,
+            c10: f.201010,
+            c11: f.201011,
+            c12: f.201012,
+            c13: f.201013,
+            c14: f.201014,
+            c15: f.201015,
+            c16: f.201016,
+            sum: f.201017;
+            change sum about {
+            return c1.value*c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c9.value*c10.value*c11.value*c12.value*c13.value*c14.value*c15.value*c16.value;
+            }
+        </action>
     </data>
     <data type="number">
-        <id></id>
         <title>ZÁKLADNÉ INFORMÁCIE koeficient</title>
+        <id>201017</id>
+        <int>0.95</int>
     </data>
     <!-- ===== Nehnuteľnosť koeficienty ===== -->
     <data type="number">
-        <id></id>
         <title>Koeficient - Predmet poistenia</title>
+        <id>202001</id>
+        <init>1</init>
+        <action trigger="set">
+            c1: f.202001,
+            c2: f.202002,
+            c3: f.202003,
+            c4: f.202004,
+            c5: f.202005,
+            c6: f.202006,
+            c7: f.202007,
+            c8: f.202008,
+            sum: f.201009;
+            change sum about {
+            return c1.value*c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value;
+            }
+        </action>
     </data>
     <data type="number">
-        <id></id>
         <title>Koeficient - Konštrukcia múrov</title>
+        <id>202002</id>
+        <init>1</init>
+        <action trigger="set">
+            c1: f.202001,
+            c2: f.202002,
+            c3: f.202003,
+            c4: f.202004,
+            c5: f.202005,
+            c6: f.202006,
+            c7: f.202007,
+            c8: f.202008,
+            sum: f.201009;
+            change sum about {
+            return c1.value*c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value;
+            }
+        </action>
     </data>
     <data type="number">
-        <id></id>
         <title>Koeficient - Konštrukcia strechy</title>
+        <id>202003</id>
+        <init>1</init>
+        <action trigger="set">
+            c1: f.202001,
+            c2: f.202002,
+            c3: f.202003,
+            c4: f.202004,
+            c5: f.202005,
+            c6: f.202006,
+            c7: f.202007,
+            c8: f.202008,
+            sum: f.201009;
+            change sum about {
+            return c1.value*c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value;
+            }
+        </action>
     </data>
     <data type="number">
-        <id></id>
         <title>Koeficient - Koľko rokov má nehnuteľnosť?</title>
+        <id>202004</id>
+        <init>1.05</init>
+        <action trigger="set">
+            c1: f.202001,
+            c2: f.202002,
+            c3: f.202003,
+            c4: f.202004,
+            c5: f.202005,
+            c6: f.202006,
+            c7: f.202007,
+            c8: f.202008,
+            sum: f.201009;
+            change sum about {
+            return c1.value*c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value;
+            }
+        </action>
     </data>
     <data type="number">
-        <id></id>
         <title>Koeficient - Má nehnuteľnosť praskliny na vonkajšej fasáde?</title>
+        <id>202005</id>
+        <init>1</init>
+        <action trigger="set">
+            c1: f.202001,
+            c2: f.202002,
+            c3: f.202003,
+            c4: f.202004,
+            c5: f.202005,
+            c6: f.202006,
+            c7: f.202007,
+            c8: f.202008,
+            sum: f.201009;
+            change sum about {
+            return c1.value*c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value;
+            }
+        </action>
     </data>
     <data type="number">
-        <id></id>
         <title>Koeficient - Koľko izieb má nehnuteľnosť?</title>
+        <id>202006</id>
+        <init>1</init>
+        <action trigger="set">
+            c1: f.202001,
+            c2: f.202002,
+            c3: f.202003,
+            c4: f.202004,
+            c5: f.202005,
+            c6: f.202006,
+            c7: f.202007,
+            c8: f.202008,
+            sum: f.201009;
+            change sum about {
+            return c1.value*c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value;
+            }
+        </action>
     </data>
     <data type="number">
-        <id></id>
         <title>Koeficient - Koľko kúpeľní má nehnuteľnosť?</title>
+        <id>202007</id>
+        <init>1</init>
+        <action trigger="set">
+            c1: f.202001,
+            c2: f.202002,
+            c3: f.202003,
+            c4: f.202004,
+            c5: f.202005,
+            c6: f.202006,
+            c7: f.202007,
+            c8: f.202008,
+            sum: f.201009;
+            change sum about {
+            return c1.value*c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value;
+            }
+        </action>
     </data>
     <data type="number">
-        <id></id>
         <title>Koeficient - Uveďte celkovú hodnotu rekonštrukcií, ak boli vykonané</title>
+        <id>202008</id>
+        <init>1</init>
+        <action trigger="set">
+            c1: f.202001,
+            c2: f.202002,
+            c3: f.202003,
+            c4: f.202004,
+            c5: f.202005,
+            c6: f.202006,
+            c7: f.202007,
+            c8: f.202008,
+            sum: f.201009;
+            change sum about {
+            return c1.value*c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value;
+            }
+        </action>
     </data>
     <data type="number">
-        <id></id>
         <title>NEHNUTEĽNOSŤ koeficient</title>
+        <id>202009</id>
+        <init>0.945</init>
     </data>
     <!-- ===== Domácnosť koeficienty ===== -->
     <data type="number">
-        <id></id>
         <title>Koeficient - Umiestnenie domácnosti</title>
+        <id>203001</id>
     </data>
     <data type="number">
-        <id></id>
         <title>Koeficient - Obývanosť domácnosti</title>
+        <id>203002</id>
     </data>
     <data type="number">
-        <id></id>
         <title>Koeficient - Je nehnuteľnosť, v ktorej sa nachádza poisťovaná domácnosť v blízkom susedstve s inou obývanou nehnuteľnosťou?</title>
+        <id>203003</id>
     </data>
     <data type="number">
-        <id></id>
         <title>Koeficient - Je domácnosť zabezpečená funkčným alarmom?</title>
+        <id>203004</id>
     </data>
     <data type="number">
-        <id></id>
         <title>Koeficient - Má domácnosť na oknách vo výške do 3 metrov od okolitého terénu mreže / vonkajšie žalúzie alebo rolety?</title>
+        <id>203005</id>
     </data>
     <data type="number">
-        <id></id>
         <title>DOMÁCNOSŤ koeficient</title>
+        <id>203006</id>
     </data>
     <!-- ===== Zodpovednosť koeficienty ===== -->
     <data type="number">
-        <id></id>
         <title>Koeficient - Poistenie zodpovednosti z vlastníctva nehnuteľnosti</title>
+        <id>204001</id>
     </data>
     <data type="number">
-        <id></id>
         <title>Koeficient - Zodpovednosť za škodu členov domácnosti</title>
+        <id>204002</id>
     </data>
     <data type="number">
-        <id></id>
         <title>Koeficient - Územná platnosť poistenia</title>
+        <id>204003</id>
     </data>
     <data type="number">
-        <id></id>
         <title>Koeficient - Zodpovednosť celkovo</title>
+        <id>204004</id>
     </data>
     <!-- ===== Sumár koeficienty ===== -->
     <data type="number">
-        <id></id>
         <title>Koeficient - Poistenie nehnuteľnosti - spoluúčasť</title>
+        <id>208001</id>
+        <init>1</init>
     </data>
     <data type="number">
-        <id></id>
         <title>Koeficient - Poistenie domácnosti - spoluúčasť</title>
+        <id>208002</id>
     </data>
     <data type="number">
-        <id></id>
-        <title>Koeficient - Garáž</title>
+        <title>Koeficient - Garáž umiestnenie</title>
+        <id>208003</id>
     </data>
     <data type="number">
-        <id></id>
         <title>Koeficient - PERIODICITA PLATBY POISTNÉHO</title>
+        <id>208004</id>
     </data>
     <data type="number">
-        <id></id>
-        <title>Koeficient - KOMPLETNÉ POISTENIE</title>
-    </data>
-    <data type="number">
-        <id></id>
         <title>Koeficient - ZĽAVA ZA INÉ POISTENIE V PREMIUM</title>
+        <id>208005</id>
     </data>
     <data type="number">
-        <id></id>
         <title>Koeficient - OBCHODNÁ ZĽAVA</title>
+        <id>208006</id>
     </data>
     <data type="number">
-        <id></id>
         <title>Koeficient - AKCIOVÁ ZĽAVA</title>
+        <id>208007</id>
     </data>
-    <!-- ===== Údaje k zmluve ===== -->
+    <data type="number">
+        <title>Koeficient - KOMPLETNÉ POISTENIE</title>
+        <id>208008</id>
+    </data>
+    <!-- ===== Poistenie nehnuteľností koeficienty ===== -->
+    <data type="number">
+        <title>Koeficient - Lokalita - byt</title>
+        <id>205001</id>
+    </data>
+    <data type="number">
+        <title>Koeficient - Lokalita - pivnica</title>
+        <id>205002</id>
+        <init>0</init>
+    </data>
+    <data type="number">
+        <title>Koeficient - Lokalita - prízemie</title>
+        <id>205003</id>
+        <init>0</init>
+    </data>
+    <data type="number">
+        <title>Koeficient - Lokalita - obytné poschodie</title>
+        <id>205004</id>
+        <init>0</init>
+    </data>
+    <data type="number">
+        <title>Koeficient - Lokalita - garáž</title>
+        <id>205005</id>
+    </data>
+    <data type="number">
+        <title>Koeficient - Garáž</title>
+        <id>205006</id>
+    </data>
+    <data type="number">
+        <title>Koeficient - Hospodárska budova</title>
+        <id>205007</id>
+        <action trigger="set">
+            c1: f.305002,
+            c2: f.205006,
+            c3: f.205007,
+            c4: f.205008,
+            c5: f.205009,
+            c6: f.205010,
+            c7: f.205011,
+            c8: f.205012,
+            c9: f.205013,
+            c10: f.205014,
+            c11: f.205015,
+            c12: f.205016,
+            c13: f.205017,
+            c14: f.205018,
+            c15: f.205019,
+            sum: f.308001;
+            change sum about {
+            return c1.value+c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
+            }
+        </action>
+    </data>
+    <data type="number">
+        <title>Koeficient - Altánok</title>
+        <id>205008</id>
+        <action trigger="set">
+            c1: f.305002,
+            c2: f.205006,
+            c3: f.205007,
+            c4: f.205008,
+            c5: f.205009,
+            c6: f.205010,
+            c7: f.205011,
+            c8: f.205012,
+            c9: f.205013,
+            c10: f.205014,
+            c11: f.205015,
+            c12: f.205016,
+            c13: f.205017,
+            c14: f.205018,
+            c15: f.205019,
+            sum: f.308001;
+            change sum about {
+            return c1.value+c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
+            }
+        </action>
+    </data>
+    <data type="number">
+        <title>Koeficient - Prístrešok</title>
+        <id>205009</id>
+        <action trigger="set">
+            c1: f.305002,
+            c2: f.205006,
+            c3: f.205007,
+            c4: f.205008,
+            c5: f.205009,
+            c6: f.205010,
+            c7: f.205011,
+            c8: f.205012,
+            c9: f.205013,
+            c10: f.205014,
+            c11: f.205015,
+            c12: f.205016,
+            c13: f.205017,
+            c14: f.205018,
+            c15: f.205019,
+            sum: f.308001;
+            change sum about {
+            return c1.value+c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
+            }
+        </action>
+    </data>
+    <data type="number">
+        <title>Koeficient - Chodník, parkovacia plocha</title>
+        <id>205010</id>
+        <action trigger="set">
+            c1: f.305002,
+            c2: f.205006,
+            c3: f.205007,
+            c4: f.205008,
+            c5: f.205009,
+            c6: f.205010,
+            c7: f.205011,
+            c8: f.205012,
+            c9: f.205013,
+            c10: f.205014,
+            c11: f.205015,
+            c12: f.205016,
+            c13: f.205017,
+            c14: f.205018,
+            c15: f.205019,
+            sum: f.308001;
+            change sum about {
+            return c1.value+c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
+            }
+        </action>
+    </data>
+    <data type="number">
+        <title>Koeficient - Sauna</title>
+        <id>205011</id>
+        <action trigger="set">
+            c1: f.305002,
+            c2: f.205006,
+            c3: f.205007,
+            c4: f.205008,
+            c5: f.205009,
+            c6: f.205010,
+            c7: f.205011,
+            c8: f.205012,
+            c9: f.205013,
+            c10: f.205014,
+            c11: f.205015,
+            c12: f.205016,
+            c13: f.205017,
+            c14: f.205018,
+            c15: f.205019,
+            sum: f.308001;
+            change sum about {
+            return c1.value+c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
+            }
+        </action>
+    </data>
+    <data type="number">
+        <title>Koeficient - Elektrická brána, oplotenie</title>
+        <id>205012</id>
+        <action trigger="set">
+            c1: f.305002,
+            c2: f.205006,
+            c3: f.205007,
+            c4: f.205008,
+            c5: f.205009,
+            c6: f.205010,
+            c7: f.205011,
+            c8: f.205012,
+            c9: f.205013,
+            c10: f.205014,
+            c11: f.205015,
+            c12: f.205016,
+            c13: f.205017,
+            c14: f.205018,
+            c15: f.205019,
+            sum: f.308001;
+            change sum about {
+            return c1.value+c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
+            }
+        </action>
+    </data>
+    <data type="number">
+        <title>Koeficient - Tenisový kurt</title>
+        <id>205013</id>
+        <action trigger="set">
+            c1: f.305002,
+            c2: f.205006,
+            c3: f.205007,
+            c4: f.205008,
+            c5: f.205009,
+            c6: f.205010,
+            c7: f.205011,
+            c8: f.205012,
+            c9: f.205013,
+            c10: f.205014,
+            c11: f.205015,
+            c12: f.205016,
+            c13: f.205017,
+            c14: f.205018,
+            c15: f.205019,
+            sum: f.308001;
+            change sum about {
+            return c1.value+c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
+            }
+        </action>
+    </data>
+    <data type="number">
+        <title>Koeficient - Vonkajší bazén</title>
+        <id>205014</id>
+        <action trigger="set">
+            c1: f.305002,
+            c2: f.205006,
+            c3: f.205007,
+            c4: f.205008,
+            c5: f.205009,
+            c6: f.205010,
+            c7: f.205011,
+            c8: f.205012,
+            c9: f.205013,
+            c10: f.205014,
+            c11: f.205015,
+            c12: f.205016,
+            c13: f.205017,
+            c14: f.205018,
+            c15: f.205019,
+            sum: f.308001;
+            change sum about {
+            return c1.value+c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
+            }
+        </action>
+    </data>
+    <data type="number">
+        <title>Koeficient - Studňa</title>
+        <id>205015</id>
+        <action trigger="set">
+            c1: f.305002,
+            c2: f.205006,
+            c3: f.205007,
+            c4: f.205008,
+            c5: f.205009,
+            c6: f.205010,
+            c7: f.205011,
+            c8: f.205012,
+            c9: f.205013,
+            c10: f.205014,
+            c11: f.205015,
+            c12: f.205016,
+            c13: f.205017,
+            c14: f.205018,
+            c15: f.205019,
+            sum: f.308001;
+            change sum about {
+            return c1.value+c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
+            }
+        </action>
+    </data>
+    <data type="number">
+        <title>Koeficient - Žumpa, septik</title>
+        <id>205016</id>
+        <action trigger="set">
+            c1: f.305002,
+            c2: f.205006,
+            c3: f.205007,
+            c4: f.205008,
+            c5: f.205009,
+            c6: f.205010,
+            c7: f.205011,
+            c8: f.205012,
+            c9: f.205013,
+            c10: f.205014,
+            c11: f.205015,
+            c12: f.205016,
+            c13: f.205017,
+            c14: f.205018,
+            c15: f.205019,
+            sum: f.308001;
+            change sum about {
+            return c1.value+c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
+            }
+        </action>
+    </data>
+    <data type="number">
+        <title>Koeficient - Iné</title>
+        <id>205017</id>
+        <action trigger="set">
+            c1: f.305002,
+            c2: f.205006,
+            c3: f.205007,
+            c4: f.205008,
+            c5: f.205009,
+            c6: f.205010,
+            c7: f.205011,
+            c8: f.205012,
+            c9: f.205013,
+            c10: f.205014,
+            c11: f.205015,
+            c12: f.205016,
+            c13: f.205017,
+            c14: f.205018,
+            c15: f.205019,
+            sum: f.308001;
+            change sum about {
+            return c1.value+c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
+            }
+        </action>
+    </data>
+    <data type="number">
+        <title>Koeficient - Stavebné materiály</title>
+        <id>205018</id>
+        <action trigger="set">
+            c1: f.305002,
+            c2: f.205006,
+            c3: f.205007,
+            c4: f.205008,
+            c5: f.205009,
+            c6: f.205010,
+            c7: f.205011,
+            c8: f.205012,
+            c9: f.205013,
+            c10: f.205014,
+            c11: f.205015,
+            c12: f.205016,
+            c13: f.205017,
+            c14: f.205018,
+            c15: f.205019,
+            sum: f.308001;
+            change sum about {
+            return c1.value+c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
+            }
+        </action>
+    </data>
+    <data type="number">
+        <title>Koeficient - Stavebné a záhradné mechanizmy</title>
+        <id>205019</id>
+        <action trigger="set">
+            c1: f.305002,
+            c2: f.205006,
+            c3: f.205007,
+            c4: f.205008,
+            c5: f.205009,
+            c6: f.205010,
+            c7: f.205011,
+            c8: f.205012,
+            c9: f.205013,
+            c10: f.205014,
+            c11: f.205015,
+            c12: f.205016,
+            c13: f.205017,
+            c14: f.205018,
+            c15: f.205019,
+            sum: f.308001;
+            change sum about {
+            return c1.value+c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
+            }
+        </action>
+    </data>
+    <!-- ===== Poistenie domácností koeficienty ===== -->
+    <data type="number">
+        <title>Koeficient - Cennosti</title>
+        <id>206001</id>
+    </data>
+    <data type="number">
+        <title>Koeficient - Umelecké diela</title>
+        <id>206002</id>
+    </data>
+    <data type="number">
+        <title>Koeficient - Elektronické a optické zariadneia</title>
+        <id>206003</id>
+    </data>
+    <data type="number">
+        <title>Koeficient - Špecialne sklá a presklenie</title>
+        <id>206004</id>
+    </data>
+    <data type="number">
+        <title>Koeficient - Záhradné vybavenie a nábytok</title>
+        <id>206005</id>
+    </data>
+    <data type="number">
+        <title>Koeficient - Elektromotory v domácich spotrebičoch</title>
+        <id>206006</id>
+    </data>
+    <data type="number">
+        <title>Koeficient - Stavebné súčasti domácností</title>
+        <id>206007</id>
+    </data>
+    <data type="number">
+        <title>Koeficient - Športové náradie</title>
+        <id>206008</id>
+    </data>
+    <data type="number">
+        <title>Koeficient - Iné</title>
+        <id>206009</id>
+    </data>
+    <!-- ===== Poistenie zodpovednosti za škodu koeficienty ===== -->
+    <data type="number">
+        <title>Koeficient - Poistenie zodpovednosti z vlastníctva nehnuteľnosti</title>
+        <id>207001</id>
+    </data>
+    <!-- ===== Údaje o zmluve ===== -->
     <data type="text">
-        <id></id>
         <title>Číslo ponuky</title>
+        <id>309001</id>
     </data>
     <data type="date">
-        <id></id>
         <title>Začiatok poistenia</title>
+        <id>109001</id>
     </data>
     <data type="boolean">
-        <id></id>
         <title>Poistenie na dobu určitú</title>
+        <id>109002</id>
     </data>
     <data type="date">
-        <id></id>
         <title>Koniec poistenia</title>
+        <id>109003</id>
     </data>
     <data type="text">
-        <id></id>
         <title>V prospech</title>
+        <id>109004</id>
         <desc>Údaje o vinkulácii</desc>
     </data>
     <data type="number">
-        <id></id>
         <title>Číslo úverovej zmluvy</title>
+        <id>109005</id>
         <desc>Údaje o vinkulácii</desc>
     </data>
     <data type="enumeration">
-        <id></id>
         <title>Spôsob platenia</title>
+        <id>109006</id>
         <values>z účtu</values>
         <values>poštovou poukážkou</values>
     </data>
     <!-- ===== Údaje o poistníkovi ===== -->
     <!-- Poistník -->
     <data type="enumeration">
-        <id></id>
         <title>Typ subjektu</title>
+        <id>109007</id>
         <desc>Poistník</desc>
         <values>právnická osoba</values>
         <values>fyzická osoba podnikateľ (SZČO)</values>
     </data>
     <data type="enumeration">
-        <id></id>
         <title>Titul pred menom</title>
+        <id>109008</id>
         <desc>Poistník</desc>
         <values>Bc.</values>
         <values>Mgr.</values>
@@ -781,67 +2699,80 @@
         <values>prof.</values>
     </data>
     <data type="enumeration">
-        <id></id>
         <title>Titul za menom</title>
+        <id>109009</id>
         <desc>Poistník</desc>
         <values>Ph.D.</values>
         <values>CSc.</values>
     </data>
     <data type="text">
-        <id></id>
         <title>Meno</title>
+        <id>109010</id>
         <desc>Poistník</desc>
     </data>
     <data type="text">
-        <id></id>
         <title>Priezvisko</title>
+        <id>109011</id>
         <desc>Poistník</desc>
     </data>
     <data type="text">
-        <id></id>
+        <title>Obchodné meno</title>
+        <id>109012</id>
+    </data>
+    <data type="text">
         <title>Štátna príslušnosť</title>
+        <id>109013</id>
         <desc>Poistník</desc>
     </data>
     <data type="date">
-        <id></id>
         <title>Dátum narodenia</title>
+        <id>109014</id>
         <desc>Poistník</desc>
     </data>
     <data type="text">
-        <id></id>
         <title>Rodné číslo</title>
+        <id>109015</id>
         <desc>Poistník</desc>
         <valid>length 10</valid>
     </data>
     <data type="enumeration">
-        <id></id>
         <title>Typ preukazu</title>
+        <id>109016</id>
         <desc>Poistník</desc>
         <values>pas</values>
         <values>OP</values>
         <values>iné</values>
     </data>
     <data type="text">
-        <id></id>
         <title>Číslo preukazu</title>
+        <id>109017</id>
         <desc>Poistník</desc>
     </data>
+    <data type="text">
+        <title>Telefónne číslo</title>
+        <id>109018</id>
+    </data>
+    <data type="text">
+        <title>Email</title>
+        <id>109019</id>
+    </data>
     <data type="boolean">
-        <id></id>
         <title>Poistený je iná osoba</title>
+        <id>109020</id>
+        <init>false</init>
         <desc>Poistený a poistenec sú rôzne osoby</desc>
     </data>
     <!-- Poistený -->
     <data type="enumeration">
-        <id></id>
         <title>Typ subjektu</title>
+        <id>109021</id>
         <desc>Poistený</desc>
         <values>právnická osoba</values>
         <values>fyzická osoba podnikateľ (SZČO)</values>
     </data>
     <data type="enumeration">
-        <id></id>
         <title>Titul pred menom</title>
+        <id>109022</id>
         <desc>Poistený</desc>
         <values>Bc.</values>
         <values>Mgr.</values>
@@ -860,212 +2791,218 @@
         <values>prof.</values>
     </data>
     <data type="enumeration">
-        <id></id>
         <title>Titul za menom</title>
+        <id>109023</id>
         <desc>Poistený</desc>
         <values>Ph.D.</values>
         <values>CSc.</values>
     </data>
     <data type="text">
-        <id></id>
         <title>Meno</title>
+        <id>109024</id>
         <desc>Poistený</desc>
     </data>
     <data type="text">
-        <id></id>
         <title>Priezvisko</title>
+        <id>109025</id>
         <desc>Poistený</desc>
     </data>
     <data type="text">
-        <id></id>
+        <title>Obchodné meno</title>
+        <id>109026</id>
+    </data>
+    <data type="text">
         <title>Štátna príslušnosť</title>
+        <id>109027</id>
         <desc>Poistený</desc>
     </data>
     <data type="date">
-        <id></id>
         <title>Dátum narodenia</title>
+        <id>109028</id>
         <desc>Poistený</desc>
     </data>
     <data type="text">
-        <id></id>
         <title>Rodné číslo</title>
+        <id>109029</id>
         <desc>Poistený</desc>
         <valid>length 10</valid>
     </data>
     <data type="enumeration">
-        <id></id>
         <title>Typ preukazu</title>
+        <id>109030</id>
         <desc>Poistený</desc>
         <values>pas</values>
         <values>OP</values>
         <values>iné</values>
     </data>
     <data type="text">
-        <id></id>
         <title>Číslo preukazu</title>
+        <id>109031</id>
         <desc>Poistený</desc>
+    </data>
+    <data type="text">
+        <title>Telefónne číslo</title>
+        <id>109032</id>
+    </data>
+    <data type="text">
+        <title>Email</title>
+        <id>109033</id>
     </data>
     <!-- ===== Údaje o mieste poistenia ===== -->
     <data type="enumeration">
-        <id></id>
         <title>Adresa</title>
+        <id>109034</id>
         <values>rovnaká ako poistníkova</values>
         <values>rovnaká ako poisteného</values>
         <values>iná</values>
     </data>
     <!-- Adresa poistníka -->
     <data type="enumeration">
-        <id></id>
         <title>Typ adresy</title>
+        <id>109035</id>
         <desc>Poistník</desc>
         <values>trvalé bydlisko</values>
         <values>korešpondenčná adresa</values>
     </data>
     <data type="text">
-        <id></id>
         <title>Ulica</title>
+        <id>109036</id>
         <desc>Poistník</desc>
     </data>
     <data type="text">
-        <id></id>
         <title>Súpisné a orientačné číslo</title>
+        <id>109037</id>
         <desc>Poistník</desc>
     </data>
     <data type="text">
-        <id></id>
         <title>PSČ</title>
+        <id>109038</id>
         <desc>Poistník</desc>
     </data>
     <data type="text">
-        <id></id>
         <title>Obec</title>
-        <desc>Poistník</desc>
-    </data>
-    <!-- Účet poistníka -->
-    <data type="text">
-        <id></id>
-        <title>číslo účtu/IBAN</title>
+        <id>109039</id>
         <desc>Poistník</desc>
     </data>
     <!-- Adresa poisteného -->
     <data type="enumeration">
-        <id></id>
         <title>Typ adresy</title>
+        <id>109040</id>
         <desc>Poistený</desc>
         <values>trvalé bydlisko</values>
         <values>korešpondenčná adresa</values>
     </data>
     <data type="text">
-        <id></id>
         <title>Ulica</title>
+        <id>109041</id>
         <desc>Poistený</desc>
     </data>
     <data type="text">
-        <id></id>
         <title>Súpisné a orientačné číslo</title>
+        <id>109042</id>
         <desc>Poistený</desc>
     </data>
     <data type="text">
-        <id></id>
         <title>PSČ</title>
+        <id>109043</id>
         <desc>Poistený</desc>
     </data>
     <data type="text">
-        <id></id>
         <title>Obec</title>
-        <desc>Poistený</desc>
-    </data>
-    <!-- Účet poisteného -->
-    <data type="text">
-        <id></id>
-        <title>číslo účtu/IBAN</title>
+        <id>109044</id>
         <desc>Poistený</desc>
     </data>
     <!-- Iná adresa -->
     <data type="text">
-        <id></id>
         <title>Ulica</title>
+        <id>109045</id>
         <desc>Iná</desc>
     </data>
     <data type="text">
-        <id></id>
         <title>Súpisné a orientačné číslo</title>
+        <id>109046</id>
         <desc>Iná</desc>
     </data>
     <data type="text">
-        <id></id>
         <title>PSČ</title>
+        <id>109047</id>
         <desc>Iná</desc>
     </data>
     <data type="text">
-        <id></id>
         <title>Obec</title>
+        <id>109048</id>
         <desc>Iná</desc>
     </data>
     <!-- Adresa dodatočné info -->
     <data type="boolean">
-        <id></id>
         <title>Byt</title>
+        <id>109049</id>
     </data>
     <data type="number">
-        <id></id>
         <title>Poschodie</title>
+        <id>109050</id>
     </data>
     <data type="number">
-        <id></id>
         <title>Číslo bytu</title>
+        <id>109051</id>
     </data>
     <data type="boolean">
-        <id></id>
         <title>Rozostavaná stavba</title>
+        <id>109052</id>
     </data>
     <data type="text">
-        <id></id>
         <title>Číslo parcely</title>
+        <id>109053</id>
     </data>
     <!-- Adresa garáže -->
     <data type="text">
-        <id></id>
         <title>Ulica</title>
+        <id>109054</id>
         <desc>Garáž</desc>
     </data>
     <data type="text">
-        <id></id>
         <title>Súpisné a orientačné číslo</title>
+        <id>109055</id>
         <desc>Garáž</desc>
     </data>
     <data type="text">
-        <id></id>
         <title>PSČ</title>
+        <id>109056</id>
         <desc>Garáž</desc>
     </data>
     <data type="text">
-        <id></id>
         <title>Obec</title>
+        <id>109057</id>
         <desc>Garáž</desc>
     </data>
     <!-- ===== Napárovanie platby ===== -->
     <data type="text">
-        <id></id>
         <title>Variabilný symbol</title>
+        <id>308007</id>
     </data>
     <!-- ===== TODO ===== -->
     <data type="date">
-        <id></id>
         <title>Dátum dojednania návrhu na uzavretie poistnej zmluvy</title>
+        <id>309002</id>
     </data>
     <!-- ===== PDF ===== -->
     <data type="file">
-        <id></id>
         <title>Ponuka PDF</title>
+        <id>309003</id>
         <init>Automaticky generované</init>
-        <logic>generate Insurance.offerPDF always</logic>
+        <action trigger="get">
+            self: f.this;
+            generate "Insurance.offerPDF",always into self
+        </action>
     </data>
     <data type="file">
-        <id></id>
         <title>Zmluva PDF</title>
+        <id>309004</id>
         <init>Automaticky generované</init>
-        <logic>generate Insurance.offerPDF always</logic>
+        <action trigger="get">
+            self: f.this;
+            generate "Insurance.offerPDF",always into self
+        </action>
     </data>
     <!-- ========== PLACES ========== -->
     <place>
@@ -1288,7 +3225,7 @@
         <id>1368</id>
         <x>741</x>
         <y>301</y>
-        <label></label>
+        <label>30</label>
         <tokens>0</tokens>
         <isStatic>false</isStatic>
     </place>
@@ -1296,7 +3233,7 @@
         <id>1369</id>
         <x>742</x>
         <y>378</y>
-        <label></label>
+        <label>31</label>
         <tokens>0</tokens>
         <isStatic>false</isStatic>
     </place>
@@ -1304,7 +3241,7 @@
         <id>1370</id>
         <x>751</x>
         <y>577</y>
-        <label></label>
+        <label>32</label>
         <tokens>0</tokens>
         <isStatic>false</isStatic>
     </place>
@@ -1312,7 +3249,7 @@
         <id>1372</id>
         <x>736</x>
         <y>911</y>
-        <label></label>
+        <label>33</label>
         <tokens>0</tokens>
         <isStatic>false</isStatic>
     </place>
@@ -1320,11 +3257,12 @@
         <id>1393</id>
         <x>748</x>
         <y>661</y>
-        <label></label>
+        <label>34</label>
         <tokens>0</tokens>
         <isStatic>false</isStatic>
     </place>
     <!-- ========== TRANSITIONS ========== -->
+    <!-- ========== Základné informácie ========== -->
     <transition>
         <id>154</id>
         <x>620</x>
@@ -1339,7 +3277,140 @@
                 <perform>true</perform>
             </logic>
         </roleRef>
+        <dataRef>
+            <id>301001</id>
+            <logic>
+                <behavior>visible</behavior>
+                <!--todo: psc and lokalita lookup -->
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>101001</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>301002</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>101002</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>101003</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>101004</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>101005</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>101006</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>101007</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>101008</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>101008</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>101009</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>101010</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>101011</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>101012</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>101013</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>101014</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>101015</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>101016</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+            </logic>
+        </dataRef>
     </transition>
+    <!-- ========== Poistenie nehnuteľnosti ========== -->
     <transition>
         <id>2</id>
         <x>260</x>
@@ -1355,13 +3426,14 @@
             </logic>
         </roleRef>
     </transition>
+    <!-- ========== Poistenie domácnosti ========== -->
     <transition>
         <id>4</id>
         <x>260</x>
         <y>900</y>
         <label>Poistenie domácnosti</label>
         <transactionRef>
-            <id>2</id>
+            <id>1</id>
         </transactionRef>
         <roleRef>
             <id>1</id>
@@ -1370,6 +3442,7 @@
             </logic>
         </roleRef>
     </transition>
+    <!-- ========== Poistenie nehnuteľnosti a domácnosti ========== -->
     <transition>
         <id>3</id>
         <x>260</x>
@@ -1385,6 +3458,7 @@
             </logic>
         </roleRef>
     </transition>
+    <!-- ========== Výpočet poistného nehnuteľnoosti ========== -->
     <transition>
         <id>30</id>
         <x>900</x>
@@ -1400,6 +3474,7 @@
             </logic>
         </roleRef>
     </transition>
+    <!-- ========== Nehnuteľnosť ========== -->
     <transition>
         <id>155</id>
         <x>620</x>
@@ -1414,7 +3489,88 @@
                 <perform>true</perform>
             </logic>
         </roleRef>
+        <dataRef>
+            <id>102001</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>105001</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>105002</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>105003</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>105004</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>305001</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>102002</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>102003</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>102004</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>102005</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>102006</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>102007</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>102008</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
     </transition>
+    <!-- ========== Poistenie zodpovednosti za škodu ========== -->
     <transition>
         <id>178</id>
         <x>620</x>
@@ -1429,7 +3585,29 @@
                 <perform>true</perform>
             </logic>
         </roleRef>
+        <dataRef>
+            <id>104001</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>104002</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>104003</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+            </logic>
+        </dataRef>
     </transition>
+    <!-- ========== Ponuka ========== -->
     <transition>
         <id>259</id>
         <x>1100</x>
@@ -1444,7 +3622,14 @@
                 <perform>true</perform>
             </logic>
         </roleRef>
+        <dataRef>
+            <id>309003</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
     </transition>
+    <!-- ========== Výpočet poistného nehnuteľnosti a domácnosti ========== -->
     <transition>
         <id>332</id>
         <x>900</x>
@@ -1460,6 +3645,7 @@
             </logic>
         </roleRef>
     </transition>
+    <!-- ========== Výpočet poistného domácnosti ========== -->
     <transition>
         <id>333</id>
         <x>900</x>
@@ -1475,6 +3661,7 @@
             </logic>
         </roleRef>
     </transition>
+    <!-- ========== Klient nepotvrdil ========== -->
     <transition>
         <id>341</id>
         <x>1260</x>
@@ -1490,6 +3677,7 @@
             </logic>
         </roleRef>
     </transition>
+    <!-- ========== Klient potvrdil ========== -->
     <transition>
         <id>342</id>
         <x>1260</x>
@@ -1505,6 +3693,7 @@
             </logic>
         </roleRef>
     </transition>
+    <!-- ========== Domácnosť ========== -->
     <transition>
         <id>363</id>
         <x>620</x>
@@ -1519,7 +3708,50 @@
                 <perform>true</perform>
             </logic>
         </roleRef>
+        <dataRef>
+            <id>103001</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>106003</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>103002</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>103003</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>103004</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>103005</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+            </logic>
+        </dataRef>
     </transition>
+    <!-- ========== Sumár ========== -->
     <transition>
         <id>364</id>
         <x>620</x>
@@ -1534,7 +3766,88 @@
                 <perform>true</perform>
             </logic>
         </roleRef>
+        <dataRef>
+            <!--spoluucast nehjnutelnost-->
+            <id>105005</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <!--nehnutelnost poistna suma-->
+            <id>105006</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <!--nehnutelnost poistne-->
+            <id>305002</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>308001</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>308002</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>308003</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>308004</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>108001</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>308005</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>108002</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>108003</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>308006</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
     </transition>
+    <!-- ========== Vedľajšie stavby ========== -->
     <transition>
         <id>413</id>
         <x>620</x>
@@ -1549,7 +3862,230 @@
                 <perform>true</perform>
             </logic>
         </roleRef>
+        <dataRef>
+            <id>105035</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>105007</id>
+            <logic>
+                <behavior>hidden</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>105008</id>
+            <logic>
+                <behavior>hidden</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>305003</id>
+            <logic>
+                <behavior>hidden</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>105009</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>105010</id>
+            <logic>
+                <behavior>hidden</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>305004</id>
+            <logic>
+                <behavior>hidden</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>105011</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>105012</id>
+            <logic>
+                <behavior>hidden</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>305005</id>
+            <logic>
+                <behavior>hidden</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>105013</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>105014</id>
+            <logic>
+                <behavior>hidden</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>305006</id>
+            <logic>
+                <behavior>hidden</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>105015</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>105016</id>
+            <logic>
+                <behavior>hidden</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>305007</id>
+            <logic>
+                <behavior>hidden</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>105017</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>105018</id>
+            <logic>
+                <behavior>hidden</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>305008</id>
+            <logic>
+                <behavior>hidden</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>105019</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>105020</id>
+            <logic>
+                <behavior>hidden</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>305009</id>
+            <logic>
+                <behavior>hidden</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>105021</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>105022</id>
+            <logic>
+                <behavior>hidden</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>305010</id>
+            <logic>
+                <behavior>hidden</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>105023</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>105024</id>
+            <logic>
+                <behavior>hidden</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>305011</id>
+            <logic>
+                <behavior>hidden</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>105025</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>105026</id>
+            <logic>
+                <behavior>hidden</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>305012</id>
+            <logic>
+                <behavior>hidden</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>105027</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>105028</id>
+            <logic>
+                <behavior>hidden</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>305013</id>
+            <logic>
+                <behavior>hidden</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>105029</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>105030</id>
+            <logic>
+                <behavior>hidden</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>305014</id>
+            <logic>
+                <behavior>hidden</behavior>
+            </logic>
+        </dataRef>
     </transition>
+    <!-- ========== Doplnkové poistenie nehnuteľnosti ========== -->
     <transition>
         <id>414</id>
         <x>620</x>
@@ -1564,7 +4100,44 @@
                 <perform>true</perform>
             </logic>
         </roleRef>
+        <dataRef>
+            <id>105031</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>105032</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>305015</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>105033</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>105034</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>305016</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
     </transition>
+    <!-- ========== Doplnkové poistenie domácnosti ========== -->
     <transition>
         <id>421</id>
         <x>620</x>
@@ -1579,7 +4152,170 @@
                 <perform>true</perform>
             </logic>
         </roleRef>
+        <dataRef>
+            <id>106004</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>106005</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>306002</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>106006</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>106007</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>306003</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>106008</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>106009</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>306004</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>106010</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>106011</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>306005</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>106012</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>106013</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>306006</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>106014</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>106015</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>306007</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>106016</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>106017</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>306008</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>106018</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>106019</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>306009</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>106020</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>106021</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>306010</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
     </transition>
+    <!-- ========== Údaje o zmluve ========== -->
     <transition>
         <id>580</id>
         <x>1500</x>
@@ -1594,7 +4330,55 @@
                 <perform>true</perform>
             </logic>
         </roleRef>
+        <!-- ===== Údaje o zmluve ===== -->
+        <dataRef>
+            <id>309001</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109001</id>
+            <logic>
+                <behavior>required</behavior>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109002</id>
+            <logic>
+                <behavior>required</behavior>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109003</id>
+            <logic>
+                <behavior>required</behavior>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109004</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109005</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109006</id>
+            <logic>
+                <behavior>required</behavior>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
     </transition>
+    <!-- ========== Údaje o poistníkovi a mieste poistenia ========== -->
     <transition>
         <id>588</id>
         <x>1500</x>
@@ -1609,7 +4393,803 @@
                 <perform>true</perform>
             </logic>
         </roleRef>
+        <!-- ===== Údaje o poistníkovi ===== -->
+        <!-- Poistník -->
+        <dataRef>
+            <id>109007</id>
+            <logic>
+                <behavior>required</behavior>
+                <behavior>editable</behavior>
+                <!--<action trigger="set">-->
+                    <!--check: f.109020,-->
+                    <!--field: f.109007,-->
+                    <!--other: f.109021;-->
+                    <!--change other about {-->
+                    <!--if (check.value == false) {-->
+                    <!--return field.value as String;-->
+                    <!--}-->
+                    <!--return other.value as String;-->
+                    <!--}-->
+                <!--</action>-->
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109008</id>
+            <logic>
+                <behavior>editable</behavior>
+                <!--<action trigger="set">-->
+                    <!--check: f.109020,-->
+                    <!--field: f.109008,-->
+                    <!--other: f.109022;-->
+                    <!--change other about {-->
+                    <!--if (check.value == false) {-->
+                    <!--return field.value as String;-->
+                    <!--}-->
+                    <!--return other.value as String;-->
+                    <!--}-->
+                <!--</action>-->
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109009</id>
+            <logic>
+                <behavior>editable</behavior>
+                <!--<action trigger="set">-->
+                    <!--check: f.109020,-->
+                    <!--field: f.109009,-->
+                    <!--other: f.109023;-->
+                    <!--change other about {-->
+                    <!--if (check.value == false) {-->
+                    <!--return field.value as String;-->
+                    <!--}-->
+                    <!--return other.value as String;-->
+                    <!--}-->
+                <!--</action>-->
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109010</id>
+            <logic>
+                <behavior>required</behavior>
+                <behavior>editable</behavior>
+                <!--<action trigger="set">-->
+                    <!--check: f.109020,-->
+                    <!--field: f.109010,-->
+                    <!--other: f.109024;-->
+                    <!--change other about {-->
+                    <!--if (check.value == false) {-->
+                    <!--return field.value as String;-->
+                    <!--}-->
+                    <!--return other.value as String;-->
+                    <!--}-->
+                <!--</action>-->
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109011</id>
+            <logic>
+                <behavior>required</behavior>
+                <behavior>editable</behavior>
+                <!--<action trigger="set">-->
+                    <!--check: f.109020,-->
+                    <!--field: f.109011,-->
+                    <!--other: f.109025;-->
+                    <!--change other about {-->
+                    <!--if (check.value == false) {-->
+                    <!--return field.value as String;-->
+                    <!--}-->
+                    <!--return other.value as String;-->
+                    <!--}-->
+                <!--</action>-->
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109012</id>
+            <logic>
+                <behavior>required</behavior>
+                <behavior>editable</behavior>
+                <!--<action trigger="set">-->
+                    <!--check: f.109020,-->
+                    <!--field: f.109012,-->
+                    <!--other: f.109026;-->
+                    <!--change other about {-->
+                    <!--if (check.value == false) {-->
+                    <!--return field.value as String;-->
+                    <!--}-->
+                    <!--return other.value as String;-->
+                    <!--}-->
+                <!--</action>-->
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109013</id>
+            <logic>
+                <behavior>required</behavior>
+                <behavior>editable</behavior>
+                <!--<action trigger="set">-->
+                    <!--check: f.109020,-->
+                    <!--field: f.109013,-->
+                    <!--other: f.109027;-->
+                    <!--change other about {-->
+                    <!--if (check.value == false) {-->
+                    <!--return field.value as String;-->
+                    <!--}-->
+                    <!--return other.value as String;-->
+                    <!--}-->
+                <!--</action>-->
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109014</id>
+            <logic>
+                <behavior>required</behavior>
+                <behavior>editable</behavior>
+                <!--<action trigger="set">-->
+                    <!--check: f.109020,-->
+                    <!--field: f.109014,-->
+                    <!--other: f.109028;-->
+                    <!--change other about {-->
+                    <!--if (check.value == false) {-->
+                    <!--return field.value as LocalDate;-->
+                    <!--}-->
+                    <!--return other.value as LocalDate;-->
+                    <!--}-->
+                <!--</action>-->
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109015</id>
+            <logic>
+                <behavior>required</behavior>
+                <behavior>editable</behavior>
+                <!--<action trigger="set">-->
+                    <!--check: f.109020,-->
+                    <!--field: f.109015,-->
+                    <!--other: f.109029;-->
+                    <!--change other about {-->
+                    <!--if (check.value == false) {-->
+                    <!--return field.value as String;-->
+                    <!--}-->
+                    <!--return other.value as String;-->
+                    <!--}-->
+                <!--</action>-->
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109016</id>
+            <logic>
+                <behavior>required</behavior>
+                <behavior>editable</behavior>
+                <!--<action trigger="set">-->
+                    <!--check: f.109020,-->
+                    <!--field: f.109016,-->
+                    <!--other: f.109030;-->
+                    <!--change other about {-->
+                    <!--if (check.value == false) {-->
+                    <!--return field.value as String;-->
+                    <!--}-->
+                    <!--return other.value as String;-->
+                    <!--}-->
+                <!--</action>-->
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109017</id>
+            <logic>
+                <behavior>required</behavior>
+                <behavior>editable</behavior>
+                <!--<action trigger="set">-->
+                    <!--check: f.109020,-->
+                    <!--field: f.109017,-->
+                    <!--other: f.109031;-->
+                    <!--change other about {-->
+                    <!--if (check.value == false) {-->
+                    <!--return field.value as String;-->
+                    <!--}-->
+                    <!--return other.value as String;-->
+                    <!--}-->
+                <!--</action>-->
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109018</id>
+            <logic>
+                <behavior>required</behavior>
+                <behavior>editable</behavior>
+                <!--<action trigger="set">-->
+                    <!--check: f.109020,-->
+                    <!--field: f.109018,-->
+                    <!--other: f.109032;-->
+                    <!--change other about {-->
+                    <!--if (check.value == false) {-->
+                    <!--return field.value as String;-->
+                    <!--}-->
+                    <!--return other.value as String;-->
+                    <!--}-->
+                <!--</action>-->
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109019</id>
+            <logic>
+                <behavior>required</behavior>
+                <behavior>editable</behavior>
+                <!--<action trigger="set">-->
+                    <!--check: f.109020,-->
+                    <!--field: f.109019,-->
+                    <!--other: f.109033;-->
+                    <!--change other about {-->
+                    <!--if (check.value == false) {-->
+                    <!--return field.value as String;-->
+                    <!--}-->
+                    <!--return other.value as String;-->
+                    <!--}-->
+                <!--</action>-->
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109020</id>
+            <logic>
+                <behavior>editable</behavior>
+                <!-- Show poisteny when true -->
+                <!--<action trigger="set">-->
+                    <!--field: f.this,-->
+                    <!--other: f.109021,-->
+                    <!--trans: t.588;-->
+                    <!--make other,visible on trans when { field.value }-->
+                <!--</action>-->
+                <!--<action trigger="set">-->
+                    <!--field: f.this,-->
+                    <!--other: f.109022,-->
+                    <!--trans: t.588;-->
+                    <!--make other,visible on trans when { field.value }-->
+                <!--</action>-->
+                <!--<action trigger="set">-->
+                    <!--field: f.this,-->
+                    <!--other: f.109023,-->
+                    <!--trans: t.588;-->
+                    <!--make other,visible on trans when { field.value }-->
+                <!--</action>-->
+                <!--<action trigger="set">-->
+                    <!--field: f.this,-->
+                    <!--other: f.109024,-->
+                    <!--trans: t.588;-->
+                    <!--make other,visible on trans when { field.value }-->
+                <!--</action>-->
+                <!--<action trigger="set">-->
+                    <!--field: f.this,-->
+                    <!--other: f.109025,-->
+                    <!--trans: t.588;-->
+                    <!--make other,visible on trans when { field.value }-->
+                <!--</action>-->
+                <!--<action trigger="set">-->
+                    <!--field: f.this,-->
+                    <!--other: f.109026,-->
+                    <!--trans: t.588;-->
+                    <!--make other,visible on trans when { field.value }-->
+                <!--</action>-->
+                <!--<action trigger="set">-->
+                    <!--field: f.this,-->
+                    <!--other: f.109027,-->
+                    <!--trans: t.588;-->
+                    <!--make other,visible on trans when { field.value }-->
+                <!--</action>-->
+                <!--<action trigger="set">-->
+                    <!--field: f.this,-->
+                    <!--other: f.109028,-->
+                    <!--trans: t.588;-->
+                    <!--make other,visible on trans when { field.value }-->
+                <!--</action>-->
+                <!--<action trigger="set">-->
+                    <!--field: f.this,-->
+                    <!--other: f.109029,-->
+                    <!--trans: t.588;-->
+                    <!--make other,visible on trans when { field.value }-->
+                <!--</action>-->
+                <!--<action trigger="set">-->
+                    <!--field: f.this,-->
+                    <!--other: f.109030,-->
+                    <!--trans: t.588;-->
+                    <!--make other,visible on trans when { field.value }-->
+                <!--</action>-->
+                <!--<action trigger="set">-->
+                    <!--field: f.this,-->
+                    <!--other: f.109031,-->
+                    <!--trans: t.588;-->
+                    <!--make other,visible on trans when { field.value }-->
+                <!--</action>-->
+                <!--<action trigger="set">-->
+                    <!--field: f.this,-->
+                    <!--other: f.109032,-->
+                    <!--trans: t.588;-->
+                    <!--make other,visible on trans when { field.value }-->
+                <!--</action>-->
+                <!--<action trigger="set">-->
+                    <!--field: f.this,-->
+                    <!--other: f.109033,-->
+                    <!--trans: t.588;-->
+                    <!--make other,visible on trans when { field.value }-->
+                <!--</action>-->
+                <!--&lt;!&ndash; Hide poisteny when false &ndash;&gt;-->
+                <!--<action trigger="set">-->
+                    <!--field: f.this,-->
+                    <!--other: f.109021,-->
+                    <!--trans: t.588;-->
+                    <!--make other,hidden on trans when { return !field.value }-->
+                <!--</action>-->
+                <!--<action trigger="set">-->
+                    <!--field: f.this,-->
+                    <!--other: f.109022,-->
+                    <!--trans: t.588;-->
+                    <!--make other,hidden on trans when { return !field.value }-->
+                <!--</action>-->
+                <!--<action trigger="set">-->
+                    <!--field: f.this,-->
+                    <!--other: f.109023,-->
+                    <!--trans: t.588;-->
+                    <!--make other,hidden on trans when { return !field.value }-->
+                <!--</action>-->
+                <!--<action trigger="set">-->
+                    <!--field: f.this,-->
+                    <!--other: f.109024,-->
+                    <!--trans: t.588;-->
+                    <!--make other,hidden on trans when { return !field.value }-->
+                <!--</action>-->
+                <!--<action trigger="set">-->
+                    <!--field: f.this,-->
+                    <!--other: f.109025,-->
+                    <!--trans: t.588;-->
+                    <!--make other,hidden on trans when { return !field.value }-->
+                <!--</action>-->
+                <!--<action trigger="set">-->
+                    <!--field: f.this,-->
+                    <!--other: f.109026,-->
+                    <!--trans: t.588;-->
+                    <!--make other,hidden on trans when { return !field.value }-->
+                <!--</action>-->
+                <!--<action trigger="set">-->
+                    <!--field: f.this,-->
+                    <!--other: f.109027,-->
+                    <!--trans: t.588;-->
+                    <!--make other,hidden on trans when { return !field.value }-->
+                <!--</action>-->
+                <!--<action trigger="set">-->
+                    <!--field: f.this,-->
+                    <!--other: f.109028,-->
+                    <!--trans: t.588;-->
+                    <!--make other,hidden on trans when { return !field.value }-->
+                <!--</action>-->
+                <!--<action trigger="set">-->
+                    <!--field: f.this,-->
+                    <!--other: f.109029,-->
+                    <!--trans: t.588;-->
+                    <!--make other,hidden on trans when { return !field.value }-->
+                <!--</action>-->
+                <!--<action trigger="set">-->
+                    <!--field: f.this,-->
+                    <!--other: f.109030,-->
+                    <!--trans: t.588;-->
+                    <!--make other,hidden on trans when { return !field.value }-->
+                <!--</action>-->
+                <!--<action trigger="set">-->
+                    <!--field: f.this,-->
+                    <!--other: f.109031,-->
+                    <!--trans: t.588;-->
+                    <!--make other,hidden on trans when { return !field.value }-->
+                <!--</action>-->
+                <!--<action trigger="set">-->
+                    <!--field: f.this,-->
+                    <!--other: f.109032,-->
+                    <!--trans: t.588;-->
+                    <!--make other,hidden on trans when { return !field.value }-->
+                <!--</action>-->
+                <!--<action trigger="set">-->
+                    <!--field: f.this,-->
+                    <!--other: f.109033,-->
+                    <!--trans: t.588;-->
+                    <!--make other,hidden on trans when { return !field.value }-->
+                <!--</action>-->
+                <!--&lt;!&ndash; Fill poisteny when false &ndash;&gt;-->
+                <!--<action trigger="set">-->
+                    <!--field: f.this,-->
+                    <!--f_1: f.109007,-->
+                    <!--f_2: f.109021;-->
+                    <!--change f_2 about {-->
+                    <!--if (field.value == false) {-->
+                    <!--return f_1.value as String;-->
+                    <!--}-->
+                    <!--return f_2.value as String;-->
+                    <!--}-->
+                <!--</action>-->
+                <!--<action trigger="set">-->
+                    <!--field: f.this,-->
+                    <!--f_1: f.109008,-->
+                    <!--f_2: f.109022;-->
+                    <!--change f_2 about {-->
+                    <!--if (field.value == false) {-->
+                    <!--return f_1.value as String;-->
+                    <!--}-->
+                    <!--return f_2.value as String;-->
+                    <!--}-->
+                <!--</action>-->
+                <!--<action trigger="set">-->
+                    <!--field: f.this,-->
+                    <!--f_1: f.109009,-->
+                    <!--f_2: f.109023;-->
+                    <!--change f_2 about {-->
+                    <!--if (field.value == false) {-->
+                    <!--return f_1.value as String;-->
+                    <!--}-->
+                    <!--return f_2.value as String;-->
+                    <!--}-->
+                <!--</action>-->
+                <!--<action trigger="set">-->
+                    <!--field: f.this,-->
+                    <!--f_1: f.109010,-->
+                    <!--f_2: f.109024;-->
+                    <!--change f_2 about {-->
+                    <!--if (field.value == false) {-->
+                    <!--return f_1.value as String;-->
+                    <!--}-->
+                    <!--return f_2.value as String;-->
+                    <!--}-->
+                <!--</action>-->
+                <!--<action trigger="set">-->
+                    <!--field: f.this,-->
+                    <!--f_1: f.109011,-->
+                    <!--f_2: f.109025;-->
+                    <!--change f_2 about {-->
+                    <!--if (field.value == false) {-->
+                    <!--return f_1.value as String;-->
+                    <!--}-->
+                    <!--return f_2.value as String;-->
+                    <!--}-->
+                <!--</action>-->
+                <!--<action trigger="set">-->
+                    <!--field: f.this,-->
+                    <!--f_1: f.109012,-->
+                    <!--f_2: f.109026;-->
+                    <!--change f_2 about {-->
+                    <!--if (field.value == false) {-->
+                    <!--return f_1.value as String;-->
+                    <!--}-->
+                    <!--return f_2.value as String;-->
+                    <!--}-->
+                <!--</action>-->
+                <!--<action trigger="set">-->
+                    <!--field: f.this,-->
+                    <!--f_1: f.109013,-->
+                    <!--f_2: f.109027;-->
+                    <!--change f_2 about {-->
+                    <!--if (field.value == false) {-->
+                    <!--return f_1.value as String;-->
+                    <!--}-->
+                    <!--return f_2.value as String;-->
+                    <!--}-->
+                <!--</action>-->
+                <!--<action trigger="set">-->
+                    <!--field: f.this,-->
+                    <!--f_1: f.109014,-->
+                    <!--f_2: f.109028;-->
+                    <!--change f_2 about {-->
+                    <!--if (field.value == false) {-->
+                    <!--return f_1.value as LocalDate;-->
+                    <!--}-->
+                    <!--return f_2.value as LocalDate;-->
+                    <!--}-->
+                <!--</action>-->
+                <!--<action trigger="set">-->
+                    <!--field: f.this,-->
+                    <!--f_1: f.109015,-->
+                    <!--f_2: f.109029;-->
+                    <!--change f_2 about {-->
+                    <!--if (field.value == false) {-->
+                    <!--return f_1.value as String;-->
+                    <!--}-->
+                    <!--return f_2.value as String;-->
+                    <!--}-->
+                <!--</action>-->
+                <!--<action trigger="set">-->
+                    <!--field: f.this,-->
+                    <!--f_1: f.109016,-->
+                    <!--f_2: f.109030;-->
+                    <!--change f_2 about {-->
+                    <!--if (field.value == false) {-->
+                    <!--return f_1.value as String;-->
+                    <!--}-->
+                    <!--return f_2.value as String;-->
+                    <!--}-->
+                <!--</action>-->
+                <!--<action trigger="set">-->
+                    <!--field: f.this,-->
+                    <!--f_1: f.109017,-->
+                    <!--f_2: f.109031;-->
+                    <!--change f_2 about {-->
+                    <!--if (field.value == false) {-->
+                    <!--return f_1.value as String;-->
+                    <!--}-->
+                    <!--return f_2.value as String;-->
+                    <!--}-->
+                <!--</action>-->
+                <!--<action trigger="set">-->
+                    <!--field: f.this,-->
+                    <!--f_1: f.109018,-->
+                    <!--f_2: f.109032;-->
+                    <!--change f_2 about {-->
+                    <!--if (field.value == false) {-->
+                    <!--return f_1.value as String;-->
+                    <!--}-->
+                    <!--return f_2.value as String;-->
+                    <!--}-->
+                <!--</action>-->
+                <!--<action trigger="set">-->
+                    <!--field: f.this,-->
+                    <!--f_1: f.109019,-->
+                    <!--f_2: f.109033;-->
+                    <!--change f_2 about {-->
+                    <!--if (field.value == false) {-->
+                    <!--return f_1.value as String;-->
+                    <!--}-->
+                    <!--return f_2.value as String;-->
+                    <!--}-->
+                <!--</action>-->
+            </logic>
+        </dataRef>
+        <!-- Poistený -->
+        <dataRef>
+            <id>109021</id>
+            <logic>
+                <behavior>hidden</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109022</id>
+            <logic>
+                <behavior>hidden</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109023</id>
+            <logic>
+                <behavior>hidden</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109024</id>
+            <logic>
+                <behavior>hidden</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109025</id>
+            <logic>
+                <behavior>hidden</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109026</id>
+            <logic>
+                <behavior>hidden</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109027</id>
+            <logic>
+                <behavior>hidden</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109028</id>
+            <logic>
+                <behavior>hidden</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109029</id>
+            <logic>
+                <behavior>hidden</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109030</id>
+            <logic>
+                <behavior>hidden</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109031</id>
+            <logic>
+                <behavior>hidden</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109032</id>
+            <logic>
+                <behavior>hidden</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109033</id>
+            <logic>
+                <behavior>hidden</behavior>
+            </logic>
+        </dataRef>
+        <!-- Údaje o mieste poistenia -->
+        <dataRef>
+            <id>109034</id>
+            <logic>
+                <behavior>editable</behavior>
+                <!--todo: action-->
+            </logic>
+        </dataRef>
+        <!-- Adresa poistníka -->
+        <dataRef>
+            <id>109035</id>
+            <logic>
+                <behavior>required</behavior>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109036</id>
+            <logic>
+                <behavior>required</behavior>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109037</id>
+            <logic>
+                <behavior>required</behavior>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109038</id>
+            <logic>
+                <behavior>required</behavior>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109039</id>
+            <logic>
+                <behavior>required</behavior>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <!-- Adresa poisteného -->
+        <dataRef>
+            <id>109040</id>
+            <logic>
+                <behavior>required</behavior>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109041</id>
+            <logic>
+                <behavior>required</behavior>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109042</id>
+            <logic>
+                <behavior>required</behavior>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109043</id>
+            <logic>
+                <behavior>required</behavior>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109044</id>
+            <logic>
+                <behavior>required</behavior>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <!-- Iná adresa -->
+        <dataRef>
+            <id>109045</id>
+            <logic>
+                <behavior>required</behavior>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109046</id>
+            <logic>
+                <behavior>required</behavior>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109047</id>
+            <logic>
+                <behavior>required</behavior>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109048</id>
+            <logic>
+                <behavior>required</behavior>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <!-- Adresa dodatočné info -->
+        <dataRef>
+            <id>109049</id>
+            <logic>
+                <behavior>required</behavior>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109050</id>
+            <logic>
+                <behavior>required</behavior>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109051</id>
+            <logic>
+                <behavior>required</behavior>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109052</id>
+            <logic>
+                <behavior>required</behavior>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109053</id>
+            <logic>
+                <behavior>required</behavior>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <!-- Adresa garáže -->
+        <dataRef>
+            <id>109054</id>
+            <logic>
+                <behavior>required</behavior>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109055</id>
+            <logic>
+                <behavior>required</behavior>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109056</id>
+            <logic>
+                <behavior>required</behavior>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109057</id>
+            <logic>
+                <behavior>required</behavior>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
     </transition>
+    <!-- ========== Zmluva ========== -->
     <transition>
         <id>596</id>
         <x>1740</x>
@@ -1625,6 +5205,7 @@
             </logic>
         </roleRef>
     </transition>
+    <!-- ========== Späť na poistenie nehnuteľnosti ========== -->
     <transition>
         <id>616</id>
         <x>1180</x>
@@ -1637,6 +5218,7 @@
             </logic>
         </roleRef>
     </transition>
+    <!-- ========== Späť na poistenie nehnuteľnosti a domácnosti ========== -->
     <transition>
         <id>617</id>
         <x>980</x>
@@ -1649,6 +5231,7 @@
             </logic>
         </roleRef>
     </transition>
+    <!-- ========== Späť na poistenie domácnosti ========== -->
     <transition>
         <id>648</id>
         <x>1180</x>
@@ -1661,6 +5244,7 @@
             </logic>
         </roleRef>
     </transition>
+    <!-- ========== Zamietnuta ponuka ========== -->
     <transition>
         <id>667</id>
         <x>1660</x>
@@ -1676,6 +5260,7 @@
             </logic>
         </roleRef>
     </transition>
+    <!-- ========== Zrušenie návrhu poistky (po vypršaní lehoty) ========== -->
     <transition>
         <id>674</id>
         <x>2020</x>
@@ -1688,6 +5273,7 @@
             </logic>
         </roleRef>
     </transition>
+    <!-- ========== Napárovanie platby ========== -->
     <transition>
         <id>680</id>
         <x>2020</x>
@@ -1703,6 +5289,7 @@
             </logic>
         </roleRef>
     </transition>
+    <!-- ========== Aktívna zmluva ========== -->
     <transition>
         <id>686</id>
         <x>2100</x>
@@ -1718,6 +5305,7 @@
             </logic>
         </roleRef>
     </transition>
+    <!-- ========== Expirovaný návrh poistky ========== -->
     <transition>
         <id>687</id>
         <x>2180</x>
@@ -1733,6 +5321,7 @@
             </logic>
         </roleRef>
     </transition>
+    <!-- ========== Expirácia zmluvy ========== -->
     <transition>
         <id>692</id>
         <x>2180</x>
@@ -1748,6 +5337,7 @@
             </logic>
         </roleRef>
     </transition>
+    <!-- ========== Expirovaná zmluva ========== -->
     <transition>
         <id>694</id>
         <x>2260</x>
@@ -1763,6 +5353,7 @@
             </logic>
         </roleRef>
     </transition>
+    <!-- ========== Zmluva pred zaplatením ========== -->
     <transition>
         <id>1360</id>
         <x>1940</x>
@@ -1778,6 +5369,7 @@
             </logic>
         </roleRef>
     </transition>
+    <!-- ========== Zaslaná zmluvy ========== -->
     <transition>
         <id>1365</id>
         <x>1740</x>
@@ -3162,6 +6754,48 @@
         <type>regular</type>
         <sourceId>332</sourceId>
         <destinationId>1372</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>1593</id>
+        <type>regular</type>
+        <sourceId>1393</sourceId>
+        <destinationId>332</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>1594</id>
+        <type>regular</type>
+        <sourceId>332</sourceId>
+        <destinationId>1393</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>1595</id>
+        <type>regular</type>
+        <sourceId>1393</sourceId>
+        <destinationId>30</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>1596</id>
+        <type>regular</type>
+        <sourceId>30</sourceId>
+        <destinationId>1393</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>1597</id>
+        <type>regular</type>
+        <sourceId>1393</sourceId>
+        <destinationId>333</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>1598</id>
+        <type>regular</type>
+        <sourceId>333</sourceId>
+        <destinationId>1393</destinationId>
         <multiplicity>1</multiplicity>
     </arc>
 </document>
