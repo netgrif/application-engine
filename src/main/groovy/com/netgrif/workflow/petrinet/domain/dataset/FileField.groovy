@@ -1,28 +1,28 @@
 package com.netgrif.workflow.petrinet.domain.dataset
 
 import com.fasterxml.jackson.annotation.JsonIgnore
+import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action
 import org.springframework.data.mongodb.core.mapping.Document
 
 @Document
 public class FileField extends FieldWithDefault<String> {
 
     private boolean generated = false
-    @JsonIgnore
-    private Set<String> logic
 
     public FileField() {
         super();
     }
 
-    public void addLogic(String logic){
-        if(this.logic == null)
-            this.logic = new LinkedHashSet<>()
+    @Override
+    void clearValue() {
+        super.clearValue()
+        setValue(getDefaultValue())
+    }
 
-        String[] parts = logic.split(" ",2)
-        if(parts[0] == "generate")
-            generated = true
-
-        this.logic.add(parts[1])
+    @Override
+    void addAction(String action, String trigger) {
+        super.addAction(action, trigger)
+        this.generated = (Action.ActionTrigger.fromString(trigger) == Action.ActionTrigger.GET && action.contains("generate")) || this.generated
     }
 
     String getFilePath(String fileName){
@@ -31,9 +31,5 @@ public class FileField extends FieldWithDefault<String> {
 
     boolean isGenerated() {
         return generated
-    }
-
-    Set<String> getLogic() {
-        return logic
     }
 }
