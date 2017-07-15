@@ -27,6 +27,10 @@
         <valid>length 20</valid>
         <init>Bratislava</init>
         <placeholder>Mesto</placeholder>
+        <action trigger="set">
+            self: f.30;
+            change self about { 5 as Double }
+        </action>
     </data>
     <data type="enumeration">
         <id>5</id>
@@ -79,6 +83,11 @@
     <data type="boolean">
         <id>25</id>
         <title>Is a burglar alarm fitted and used?</title>
+        <action trigger="set">
+            self: f.this,
+            other: f.24;
+            change other about { "5 lever mortice deadlock" }
+        </action>
     </data>
     <data type="user">
         <id>27</id>
@@ -105,7 +114,10 @@
         <id>39</id>
         <title>PDF document</title>
         <init>Automatically generated</init>
-        <logic>generate Insurance.offerPDF always</logic>
+        <action trigger="get">
+            self: f.this;
+            generate "Insurance.offerPDF",always into self
+        </action>
     </data>
     <!-- ========== ROLES ========== -->
     <role>
@@ -267,7 +279,7 @@
             <logic>
                 <behavior>editable</behavior>
                 <behavior>required</behavior>
-                <action>
+                <action trigger="set">
                     other: f.14;
                     change other about { "Brick" }
                 </action>
@@ -283,7 +295,7 @@
             <id>14</id>
             <logic>
                 <behavior>editable</behavior>
-                <action>
+                <action trigger="set">
                     other: f.18;
                     change other about { 100000 as Double }
                 </action>

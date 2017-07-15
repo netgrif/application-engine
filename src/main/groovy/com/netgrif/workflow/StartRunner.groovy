@@ -42,6 +42,9 @@ class StartRunner  implements CommandLineRunner{
     void run(String... strings) throws Exception {
         mongoTemplate.getDb().dropDatabase()
 
+        File storage = new File("storage/generated/start.txt")
+        storage.getParentFile().mkdirs()
+
         insuranceImporter.run(strings)
 
         //xlsImporter.run(strings)

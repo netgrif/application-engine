@@ -24,6 +24,12 @@ public class TextField extends ValidableField<String> {
         this.subType = values != null ? values[0] : SIMPLE_SUBTYPE;
     }
 
+    @Override
+    void clearValue() {
+        super.clearValue()
+        setValue(getDefaultValue())
+    }
+
     String getSubType() {
         return subType
     }

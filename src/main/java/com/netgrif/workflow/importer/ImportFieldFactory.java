@@ -28,8 +28,6 @@ public final class ImportFieldFactory {
                 break;
             case FILE:
                 field = new FileField();
-                if(data.getLogic() != null && data.getLogic().length != 0)
-                    Arrays.stream(data.getLogic()).forEach(((FileField) field)::addLogic);
                 break;
             case ENUMERATION:
                 field = new EnumerationField(data.getValues());
@@ -61,6 +59,9 @@ public final class ImportFieldFactory {
             ((ValidableField)field).setValidationRules(data.getValid());
         if(data.getInit() != null && field instanceof FieldWithDefault)
             ((FieldWithDefault)field).setDefaultValue(data.getInit());
+        if(data.getAction() != null && data.getAction().length != 0){
+            Arrays.stream(data.getAction()).forEach(action -> field.addAction(action.getDefinition(),action.getTrigger()));
+        }
         return field;
     }
 
