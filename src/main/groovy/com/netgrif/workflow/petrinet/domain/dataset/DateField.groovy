@@ -24,6 +24,12 @@ public class DateField extends ValidableField<LocalDate> {
         super.superSetDefaultValue(LocalDate.parse(value))
     }
 
+    @Override
+    void clearValue() {
+        super.clearValue()
+        setValue(getDefaultValue())
+    }
+
     public void setValue(Date value) {
         this.value = ((Date)value).toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
     }

@@ -32,5 +32,5 @@ public class ImportData {
 
     private String init;
 
-    private String[] logic;
+    private ImportAction[] action;
 }

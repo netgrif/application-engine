@@ -9,6 +9,10 @@ class ChangedField {
     Map<String, Set<FieldBehavior>> behavior
     Object value
 
+    ChangedField(){
+        behavior = new HashMap<>()
+    }
+
     ChangedField(String id) {
         this.id = id
         behavior = new HashMap<>()
