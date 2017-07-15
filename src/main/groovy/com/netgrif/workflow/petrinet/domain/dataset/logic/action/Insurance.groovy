@@ -1,6 +1,6 @@
 package com.netgrif.workflow.petrinet.domain.dataset.logic.action
 
-import com.netgrif.workflow.pdf.service.PdfFormFiller
+import com.netgrif.workflow.pdf.service.PdfUtils
 import com.netgrif.workflow.petrinet.domain.dataset.FileField
 import com.netgrif.workflow.workflow.domain.Case
 import groovy.xml.MarkupBuilder
@@ -23,7 +23,7 @@ class Insurance {
         File xml  = new File("src/main/resources/pdf/zmluva_editovatelna.xml")
         //String xml = datasetToXml()
 
-        File pdf = PdfFormFiller.fillPdfForm(pdfPath, new FileInputStream(input), new FileInputStream(xml))
+        File pdf = PdfUtils.fillPdfForm(pdfPath, new FileInputStream(input), new FileInputStream(xml))
         useCase.dataSet.get(field.objectId).setValue(name)
 
         return pdf
