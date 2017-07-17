@@ -2,6 +2,9 @@ package com.netgrif.workflow.importer;
 
 import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository;
+import com.netgrif.workflow.workflow.domain.Case;
+import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
+import groovy.util.GroovyTestCase;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -23,6 +26,9 @@ public class ImporterTest {
     @Autowired
     private PetriNetRepository repository;
 
+    @Autowired
+    private IWorkflowService workflowService;
+
     private static final String NET_TITLE = "jaxb_test";
     private static final String NET_INITIALS = "TST";
     private static final Integer NET_PLACES = 17;
@@ -41,6 +47,17 @@ public class ImporterTest {
         importer.importPetriNet(new File("src/test/resources/prikladFM_test.xml"), NET_TITLE, NET_INITIALS);
 
         assertNetProperlyImported();
+    }
+
+    @Test
+    public void priorityTest() {
+        PetriNet net = importer.importPetriNet(new File("src/test/resources/priority_test.xml"), "Priority test", "PT");
+
+        assert  net != null;
+
+        Case useCase = workflowService.createCase(net.getStringId(), net.getTitle(), "color", 1L);
+
+        assert useCase != null;
     }
 
     private void assertNetProperlyImported() {
