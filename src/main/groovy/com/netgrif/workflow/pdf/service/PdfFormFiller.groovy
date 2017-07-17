@@ -19,8 +19,11 @@ class PdfFormFiller {
             PDDocumentCatalog docCatalog = document.getDocumentCatalog()
             PDAcroForm acroForm = docCatalog.getAcroForm()
 
-            addFont(document, acroForm, "src/main/resources/fonts/Klavika Regular.ttf")
-            addFieldValues(acroForm, xmlFile.getText())
+            Map<String, String> fonts = new HashMap<>()
+            fonts.put("/KlavikaBasic-Regular", addFont(document, acroForm, "src/main/resources/fonts/Klavika Regular.ttf"))
+            fonts.put("/KlavikaBasic-Bold", addFont(document, acroForm, "src/main/resources/fonts/Klavika Bold.ttf"))
+            fonts.put("/KlavikaBasic-Medium", addFont(document, acroForm, "src/main/resources/fonts/Klavika Medium.ttf"))
+            addFieldValues(acroForm, xmlFile.getText(), fonts)
             return saveToFile(document, outPdfName)
         } catch (IOException e) {
             e.printStackTrace()
@@ -28,7 +31,7 @@ class PdfFormFiller {
         }
     }
 
-    private static void addFont(PDDocument document, PDAcroForm acroForm, String fontPath) {
+    private static String addFont(PDDocument document, PDAcroForm acroForm, String fontPath) {
         PDResources res = acroForm.getDefaultResources()
         if (res == null)
             res = new PDResources()
@@ -36,19 +39,24 @@ class PdfFormFiller {
         InputStream fontStream = new FileInputStream(fontPath)
         PDTrueTypeFont font = PDTrueTypeFont.loadTTF(document, fontStream)
 
-        String fontName = res.add(font)
+        String fontName = res.add(font).name
         if (fontName == null)
             log.error("Could not add font to pdf resource")
 
         acroForm.setDefaultResources(res)
+
+        return fontName
     }
 
-    private static void addFieldValues(PDAcroForm acroForm, String xmlText) {
+    private static void addFieldValues(PDAcroForm acroForm, String xmlText, Map<String, String> fonts) {
         def fieldValues = new XmlSlurper().parseText(xmlText)
 
         fieldValues.children().each {
             String DA = acroForm.getField(it["@xfdf:original"] as String).getCOSObject().getString(COSName.DA)
-            acroForm.getField(it["@xfdf:original"] as String).getCOSObject().setString(COSName.DA, DA.replaceAll("/KlavikaBasic-[a-zA-Z]*","/Helv"))
+            fonts.each { font ->
+                if (DA.contains(font.key))
+                    acroForm.getField(it["@xfdf:original"] as String).getCOSObject().setString(COSName.DA, DA.replaceAll(font.key, "/${font.value}"))
+            }
             acroForm.getField(it["@xfdf:original"] as String).setValue(it as String)
         }
 
