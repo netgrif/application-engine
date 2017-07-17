@@ -1,52 +1,65 @@
 package com.netgrif.workflow.pdf.service
 
+import org.apache.pdfbox.cos.COSName
 import org.apache.pdfbox.pdmodel.PDDocument
 import org.apache.pdfbox.pdmodel.PDDocumentCatalog
+import org.apache.pdfbox.pdmodel.PDResources
+import org.apache.pdfbox.pdmodel.font.PDFont
+import org.apache.pdfbox.pdmodel.font.PDFontFactory
+import org.apache.pdfbox.pdmodel.font.PDTrueTypeFont
+import org.apache.pdfbox.pdmodel.font.encoding.Encoding
 import org.apache.pdfbox.pdmodel.interactive.form.PDAcroForm
-import org.springframework.stereotype.Component
-
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 class PdfFormFiller {
+
+    private static final Logger log = LoggerFactory.getLogger(PdfFormFiller.class)
 
     static File fillPdfForm(String outPdfName, InputStream pdfFile, InputStream xmlFile) throws IllegalArgumentException {
         try {
             PDDocument document = PDDocument.load(pdfFile)
-            File file = new File(outPdfName)
             PDDocumentCatalog docCatalog = document.getDocumentCatalog()
             PDAcroForm acroForm = docCatalog.getAcroForm()
-            def fieldValues = new XmlSlurper().parseText(xmlFile.getText())
 
-            fieldValues.children().each {
-                acroForm.getField(it["@xfdf:original"] as String).setValue(it as String)
-            }
-
-            acroForm.flatten()
-            document.save(file)
-            return file
+            addFont(document, acroForm, "src/main/resources/fonts/Klavika Regular.ttf")
+            addFieldValues(acroForm, xmlFile.getText())
+            return saveToFile(document, outPdfName)
         } catch (IOException e) {
             e.printStackTrace()
             throw new IllegalArgumentException(e)
         }
     }
 
-    static File fillPdfForm(String outPdfName, File pdfFile, String xml) throws IllegalArgumentException {
-        try {
-            PDDocument document = PDDocument.load(pdfFile)
-            File file = new File(outPdfName)
-            PDDocumentCatalog docCatalog = document.getDocumentCatalog()
-            PDAcroForm acroForm = docCatalog.getAcroForm()
-            def fieldValues = new XmlSlurper().parseText(xml)
+    private static void addFont(PDDocument document, PDAcroForm acroForm, String fontPath) {
+        PDResources res = acroForm.getDefaultResources()
+        if (res == null)
+            res = new PDResources()
 
-            fieldValues.children().each {
-                acroForm.getField(it["@xfdf:original"] as String).setValue(it as String)
-            }
+        InputStream fontStream = new FileInputStream(fontPath)
+        PDTrueTypeFont font = PDTrueTypeFont.loadTTF(document, fontStream)
 
-            acroForm.flatten()
-            document.save(file)
-            return file
-        } catch (IOException e) {
-            e.printStackTrace()
-            throw new IllegalArgumentException(e)
+        String fontName = res.add(font)
+        if (fontName == null)
+            log.error("Could not add font to pdf resource")
+
+        acroForm.setDefaultResources(res)
+    }
+
+    private static void addFieldValues(PDAcroForm acroForm, String xmlText) {
+        def fieldValues = new XmlSlurper().parseText(xmlText)
+
+        fieldValues.children().each {
+            acroForm.getField(it["@xfdf:original"] as String).setValue(it as String)
         }
+
+        acroForm.flatten()
+    }
+
+    private static File saveToFile(PDDocument document, String outPdfName) {
+        File file = new File(outPdfName)
+        document.save(file)
+        document.close()
+        return file
     }
 }
