@@ -87,21 +87,21 @@ public class Importer {
         Arrays.stream(document.getImportArc()).forEach(this::createArc);
 
         //Resolve actions after everything has object id
-        Arrays.stream(document.getImportTransitions()).forEach( trans -> {
-            if(trans.getDataRef() != null){
-                Arrays.stream(trans.getDataRef()).forEach( ref -> {
-                    if(ref.getLogic().getAction() != null){
+        Arrays.stream(document.getImportTransitions()).forEach(trans -> {
+            if (trans.getDataRef() != null) {
+                Arrays.stream(trans.getDataRef()).forEach(ref -> {
+                    if (ref.getLogic().getAction() != null) {
                         String fieldId = fields.get(ref.getId()).getObjectId();
-                        transitions.get(trans.getId()).addActions(fieldId,buildActions(ref.getLogic().getAction(),
+                        transitions.get(trans.getId()).addActions(fieldId, buildActions(ref.getLogic().getAction(),
                                 fieldId,
                                 transitions.get(trans.getId()).getStringId()));
                     }
                 });
             }
         });
-        Arrays.stream(document.getImportData()).forEach( data -> {
-            if(data.getAction() != null){
-                fields.get(data.getId()).setActions(buildActions(data.getAction(),fields.get(data.getId()).getObjectId(),null));
+        Arrays.stream(document.getImportData()).forEach(data -> {
+            if (data.getAction() != null) {
+                fields.get(data.getId()).setActions(buildActions(data.getAction(), fields.get(data.getId()).getObjectId(), null));
             }
         });
         return repository.save(net);
@@ -130,6 +130,7 @@ public class Importer {
         Transition transition = new Transition();
         transition.setTitle(importTransition.getLabel());
         transition.setPosition(importTransition.getX(), importTransition.getY());
+        transition.setPriority(importTransition.getPriority());
 
         if (importTransition.getRoleRef() != null) {
             Arrays.stream(importTransition.getRoleRef()).forEach(roleRef ->
@@ -168,7 +169,7 @@ public class Importer {
         if (logic == null || roleId == null)
             return;
 
-        transition.addRole(roleId,ImportRoleFactory.getPermissions(logic));
+        transition.addRole(roleId, ImportRoleFactory.getPermissions(logic));
 //        if (logic.getPerform())
 //            transition.addRole(roleId, new AssignFunction(roleId));
 //        if (logic.getDelegate())
@@ -184,47 +185,47 @@ public class Importer {
             return;
 
         Set<FieldBehavior> behavior = new HashSet<>();
-        if(logic.getBehavior() != null)
+        if (logic.getBehavior() != null)
             Arrays.stream(logic.getBehavior()).forEach(b -> behavior.add(FieldBehavior.fromString(b)));
 
-        transition.addDataSet(fieldId,behavior,null);
+        transition.addDataSet(fieldId, behavior, null);
     }
 
     @Transactional
-    private LinkedHashSet<Action> buildActions(ImportAction[] imported, String fieldId, String transitionId){
+    protected LinkedHashSet<Action> buildActions(ImportAction[] imported, String fieldId, String transitionId) {
         final LinkedHashSet<Action> actions = new LinkedHashSet<>();
         Arrays.stream(imported).forEach(action -> {
             String definition = action.getDefinition();
             definition = parseObjectIds(definition, fieldId, FIELD_KEYWORD);
-            definition = parseObjectIds(definition, transitionId,TRANSITION_KEYWORD);
-            actions.add(new Action(definition,action.getTrigger()));
+            definition = parseObjectIds(definition, transitionId, TRANSITION_KEYWORD);
+            actions.add(new Action(definition, action.getTrigger()));
         });
         return actions;
     }
 
     @Transactional
-    private String parseObjectIds(String action, String currentId, String processedObject){
-        action = action.replace("\n","").replace("  ","");
+    protected String parseObjectIds(String action, String currentId, String processedObject) {
+        action = action.replace("\n", "").replace("  ", "");
         int last = 0;
-        while(true){
-            int start = action.indexOf(processedObject+".",last);
-            if(start == -1) break;
-            int coma = action.indexOf(',',start);
-            int semicolon = action.indexOf(';',start);
+        while (true) {
+            int start = action.indexOf(processedObject + ".", last);
+            if (start == -1) break;
+            int coma = action.indexOf(',', start);
+            int semicolon = action.indexOf(';', start);
             int delimeter = coma < semicolon && coma != -1 ? coma : semicolon;
 
-            String id = action.substring(start+2,delimeter);
-            String objectId = id.equalsIgnoreCase("this") ? currentId : getObjectId(processedObject,Long.parseLong(id));
+            String id = action.substring(start + 2, delimeter);
+            String objectId = id.equalsIgnoreCase("this") ? currentId : getObjectId(processedObject, Long.parseLong(id));
 
-            action = action.replace(processedObject+"."+id, processedObject+"."+objectId);
+            action = action.replace(processedObject + "." + id, processedObject + "." + objectId);
 
-            if(delimeter == semicolon) break;
+            if (delimeter == semicolon) break;
             else last = coma + (objectId.length() - id.length());
         }
         return action;
     }
 
-    private String getObjectId(String processedObject, Long xmlId){
+    private String getObjectId(String processedObject, Long xmlId) {
         try {
             if (processedObject.equalsIgnoreCase(FIELD_KEYWORD)) return fields.get(xmlId).getObjectId();
             if (processedObject.equalsIgnoreCase(TRANSITION_KEYWORD)) return transitions.get(xmlId).getStringId();

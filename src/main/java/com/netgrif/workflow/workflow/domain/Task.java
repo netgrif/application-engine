@@ -34,8 +34,8 @@ public class Task {
     @Getter @Setter
     private String caseTitle;
 
-    @Getter
-    private int priority;
+    @Getter @Setter
+    private Integer priority;
 
     @Setter
     private Long userId;
@@ -85,10 +85,6 @@ public class Task {
         return _id.toString();
     }
 
-    public void setPriority(int priority) {
-        this.priority = priority == Priorities.UNDEFINED ? Priorities.LOW : priority;
-    }
-
     public String getTransitionId() {
         return transitionId;
     }
@@ -114,14 +110,6 @@ public class Task {
     @JsonIgnore
     public Long getUserId() {
         return userId;
-    }
-
-    public static class Priorities {
-        public static final int HIGH = 3;
-        public static final int MEDIUM = 2;
-        public static final int LOW = 1;
-        public static final int UNDEFINED = 0;
-
     }
 
     public enum Type {
