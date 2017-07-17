@@ -4,10 +4,7 @@ import org.apache.pdfbox.cos.COSName
 import org.apache.pdfbox.pdmodel.PDDocument
 import org.apache.pdfbox.pdmodel.PDDocumentCatalog
 import org.apache.pdfbox.pdmodel.PDResources
-import org.apache.pdfbox.pdmodel.font.PDFont
-import org.apache.pdfbox.pdmodel.font.PDFontFactory
 import org.apache.pdfbox.pdmodel.font.PDTrueTypeFont
-import org.apache.pdfbox.pdmodel.font.encoding.Encoding
 import org.apache.pdfbox.pdmodel.interactive.form.PDAcroForm
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -50,6 +47,8 @@ class PdfFormFiller {
         def fieldValues = new XmlSlurper().parseText(xmlText)
 
         fieldValues.children().each {
+            String DA = acroForm.getField(it["@xfdf:original"] as String).getCOSObject().getString(COSName.DA)
+            acroForm.getField(it["@xfdf:original"] as String).getCOSObject().setString(COSName.DA, DA.replaceAll("/KlavikaBasic-[a-zA-Z]*","/Helv"))
             acroForm.getField(it["@xfdf:original"] as String).setValue(it as String)
         }
 
