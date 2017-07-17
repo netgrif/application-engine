@@ -22,4 +22,8 @@ public class ImportTransition {
     private TransactionRef transactionRef;
 
     private Integer priority;
+
+    public Integer getPriority() {
+        return priority == null ? 0 : priority;
+    }
 }
