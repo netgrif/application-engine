@@ -20,4 +20,6 @@ public class ImportTransition {
     private ImportTrigger[] trigger;
 
     private TransactionRef transactionRef;
+
+    private Integer priority;
 }
