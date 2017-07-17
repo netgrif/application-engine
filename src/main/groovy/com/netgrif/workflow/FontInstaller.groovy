@@ -1,5 +1,6 @@
 package com.netgrif.workflow
 
+import org.apache.commons.lang.NotImplementedException
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.boot.CommandLineRunner
@@ -51,19 +52,19 @@ class FontInstaller implements CommandLineRunner {
     }
 
     private void installOnWindows() throws FontInstallException {
-        try {
-            GraphicsEnvironment gr = GraphicsEnvironment.getLocalGraphicsEnvironment()
-            new File(FONT_PATH).eachFile { file ->
-                Font fontFile = Font.createFont(Font.TRUETYPE_FONT, file)
-                gr.registerFont(fontFile)
-            }
-        } catch (Exception ignored) {
-            throw new FontInstallException(ignored.message)
-        }
+//        try {
+//            GraphicsEnvironment gr = GraphicsEnvironment.getLocalGraphicsEnvironment()
+//            new File(FONT_PATH).eachFile { file ->
+//                Font fontFile = Font.createFont(Font.TRUETYPE_FONT, file)
+//                gr.registerFont(fontFile)
+//            }
+//        } catch (Exception ignored) {
+//            throw new FontInstallException(ignored.message)
+//        }
     }
 
     private void installOnUnix() throws FontInstallException {
-        def result = "cp -r ${FONT_PATH} /usr/share/fonts/truetype/".execute()
+        def result = "sudo cp -r ${FONT_PATH} /usr/share/fonts/truetype/".execute()
         if (!result.exitValue()) {
             throw new FontInstallException("Command exited with value ${result.exitValue()}: ${result.text}")
         }
