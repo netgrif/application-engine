@@ -1,5 +1,8 @@
 package com.netgrif.workflow.pdf.service;
 
+import org.apache.commons.lang.math.IntRange;
+import org.apache.commons.lang.math.LongRange;
+import org.apache.commons.lang.math.Range;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -12,14 +15,25 @@ import java.io.FileInputStream;
 @SpringBootTest
 @ActiveProfiles({"test"})
 @RunWith(SpringRunner.class)
-public class PdfFormFillerTest {
+public class PdfUtilsTest {
 
     @Test
     public void fillPdfForm() throws Exception {
         File input = new File("src/test/resources/pdf/test.pdf");
         File xml = new File("src/test/resources/pdf/test.xml");
 
-        File out = PdfFormFiller.fillPdfForm("test_out.pdf", new FileInputStream(input), new FileInputStream(xml));
+        File out = PdfUtils.fillPdfForm("test_out.pdf", new FileInputStream(input), new FileInputStream(xml));
+
+        assert out != null;
+    }
+
+    @Test
+    public void mergePdf() {
+        File f1 = new File("src/test/resources/pdf/test.pdf");
+        File f2 = new File("src/test/resources/pdf/test.pdf");
+        File f3 = new File("src/test/resources/pdf/test.pdf");
+
+        File out = PdfUtils.mergePdfFiles("test_out_2.pdf", f1, f2, f3);
 
         assert out != null;
     }
