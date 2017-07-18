@@ -27,7 +27,7 @@ public class Transition extends Node {
     private List<Trigger> triggers;
 
     @Getter @Setter
-    private int priority;
+    private Integer priority;
 
     public Transition() {
         super();
