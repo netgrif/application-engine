@@ -12,4 +12,6 @@ public class ImportTrigger {
 
     @XmlAttribute
     private String type;
+
+    private String content;
 }
