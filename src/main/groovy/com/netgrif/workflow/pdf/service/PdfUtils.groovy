@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory
 
 class PdfUtils {
 
-    private static final Logger log = LoggerFactory.getLogger(PdfFormFiller.class)
+    private static final Logger log = LoggerFactory.getLogger(PdfUtils.class)
 
     static File fillPdfForm(String outPdfName, InputStream pdfFile, InputStream xmlFile) throws IllegalArgumentException {
         try {
