@@ -11,7 +11,7 @@ import org.apache.pdfbox.pdmodel.interactive.form.PDAcroForm
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
-class PdfFormFiller {
+class PdfUtils {
 
     private static final Logger log = LoggerFactory.getLogger(PdfFormFiller.class)
 
