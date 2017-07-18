@@ -1,5 +1,7 @@
 package com.netgrif.workflow.pdf.service
 
+import org.apache.pdfbox.io.MemoryUsageSetting
+import org.apache.pdfbox.multipdf.PDFMergerUtility
 import org.apache.pdfbox.cos.COSName
 import org.apache.pdfbox.pdmodel.PDDocument
 import org.apache.pdfbox.pdmodel.PDDocumentCatalog
@@ -9,7 +11,7 @@ import org.apache.pdfbox.pdmodel.interactive.form.PDAcroForm
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
-class PdfFormFiller {
+class PdfUtils {
 
     private static final Logger log = LoggerFactory.getLogger(PdfFormFiller.class)
 
@@ -68,5 +70,18 @@ class PdfFormFiller {
         document.save(file)
         document.close()
         return file
+    }
+
+    static File mergePdfFiles(String outPdfName, File... files) {
+        PDFMergerUtility pdfMerger = new PDFMergerUtility()
+        pdfMerger.setDestinationFileName(outPdfName)
+
+        files.each {
+            pdfMerger.addSource(it)
+        }
+
+        pdfMerger.mergeDocuments(MemoryUsageSetting.setupMixed(100_000_000L, 500_000_000L))
+
+        return new File(pdfMerger.getDestinationFileName())
     }
 }
