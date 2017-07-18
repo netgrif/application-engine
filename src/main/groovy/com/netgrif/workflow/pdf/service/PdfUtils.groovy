@@ -2,52 +2,74 @@ package com.netgrif.workflow.pdf.service
 
 import org.apache.pdfbox.io.MemoryUsageSetting
 import org.apache.pdfbox.multipdf.PDFMergerUtility
+import org.apache.pdfbox.cos.COSName
 import org.apache.pdfbox.pdmodel.PDDocument
 import org.apache.pdfbox.pdmodel.PDDocumentCatalog
+import org.apache.pdfbox.pdmodel.PDResources
+import org.apache.pdfbox.pdmodel.font.PDTrueTypeFont
 import org.apache.pdfbox.pdmodel.interactive.form.PDAcroForm
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
-class PdfUtils {
+class PdfFormFiller {
+
+    private static final Logger log = LoggerFactory.getLogger(PdfFormFiller.class)
 
     static File fillPdfForm(String outPdfName, InputStream pdfFile, InputStream xmlFile) throws IllegalArgumentException {
         try {
             PDDocument document = PDDocument.load(pdfFile)
-            File file = new File(outPdfName)
             PDDocumentCatalog docCatalog = document.getDocumentCatalog()
             PDAcroForm acroForm = docCatalog.getAcroForm()
-            def fieldValues = new XmlSlurper().parseText(xmlFile.getText())
 
-            fieldValues.children().each {
-                acroForm.getField(it["@xfdf:original"] as String).setValue(it as String)
-            }
-
-            acroForm.flatten()
-            document.save(file)
-            return file
+            Map<String, String> fonts = new HashMap<>()
+            fonts.put("/KlavikaBasic-Regular", addFont(document, acroForm, "src/main/resources/fonts/Klavika Regular.ttf"))
+            fonts.put("/KlavikaBasic-Bold", addFont(document, acroForm, "src/main/resources/fonts/Klavika Bold.ttf"))
+            fonts.put("/KlavikaBasic-Medium", addFont(document, acroForm, "src/main/resources/fonts/Klavika Medium.ttf"))
+            addFieldValues(acroForm, xmlFile.getText(), fonts)
+            return saveToFile(document, outPdfName)
         } catch (IOException e) {
             e.printStackTrace()
             throw new IllegalArgumentException(e)
         }
     }
 
-    static File fillPdfForm(String outPdfName, File pdfFile, String xml) throws IllegalArgumentException {
-        try {
-            PDDocument document = PDDocument.load(pdfFile)
-            File file = new File(outPdfName)
-            PDDocumentCatalog docCatalog = document.getDocumentCatalog()
-            PDAcroForm acroForm = docCatalog.getAcroForm()
-            def fieldValues = new XmlSlurper().parseText(xml)
+    private static String addFont(PDDocument document, PDAcroForm acroForm, String fontPath) {
+        PDResources res = acroForm.getDefaultResources()
+        if (res == null)
+            res = new PDResources()
 
-            fieldValues.children().each {
-                acroForm.getField(it["@xfdf:original"] as String).setValue(it as String)
+        InputStream fontStream = new FileInputStream(fontPath)
+        PDTrueTypeFont font = PDTrueTypeFont.loadTTF(document, fontStream)
+
+        String fontName = res.add(font).name
+        if (fontName == null)
+            log.error("Could not add font to pdf resource")
+
+        acroForm.setDefaultResources(res)
+
+        return fontName
+    }
+
+    private static void addFieldValues(PDAcroForm acroForm, String xmlText, Map<String, String> fonts) {
+        def fieldValues = new XmlSlurper().parseText(xmlText)
+
+        fieldValues.children().each {
+            String DA = acroForm.getField(it["@xfdf:original"] as String).getCOSObject().getString(COSName.DA)
+            fonts.each { font ->
+                if (DA.contains(font.key))
+                    acroForm.getField(it["@xfdf:original"] as String).getCOSObject().setString(COSName.DA, DA.replaceAll(font.key, "/${font.value}"))
             }
-
-            acroForm.flatten()
-            document.save(file)
-            return file
-        } catch (IOException e) {
-            e.printStackTrace()
-            throw new IllegalArgumentException(e)
+            acroForm.getField(it["@xfdf:original"] as String).setValue(it as String)
         }
+
+        acroForm.flatten()
+    }
+
+    private static File saveToFile(PDDocument document, String outPdfName) {
+        File file = new File(outPdfName)
+        document.save(file)
+        document.close()
+        return file
     }
 
     static File mergePdfFiles(String outPdfName, File... files) {
