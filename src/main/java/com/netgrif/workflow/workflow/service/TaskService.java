@@ -160,6 +160,7 @@ public class TaskService implements ITaskService {
 
         finishExecution(transition, useCase);
         task.setFinishDate(LocalDateTime.now());
+        task.setUserId(null);
 
         caseRepository.save(useCase);
         taskRepository.save(task);
@@ -443,7 +444,7 @@ public class TaskService implements ITaskService {
     }
 
     /**
-     * Reloads all tasks of given case:
+     * Reloads all unassigned tasks of given case:
      * <table border="1">
      *     <tr>
      *         <td></td><td>Task is present</td><td>Task is not present</td>
@@ -460,17 +461,23 @@ public class TaskService implements ITaskService {
     void reloadTasks(Case useCase) {
         PetriNet net = useCase.getPetriNet();
         List<Task> tasks = taskRepository.findAllByCaseId(useCase.getStringId());
+
         net.getTransitions().values().forEach(transition -> {
             if (isExecutable(transition, net)) {
                 if (taskIsNotPresent(tasks, transition)) {
                     createFromTransition(transition, useCase);
                 }
             } else {
-                tasks.stream()
-                        .filter(task -> task.getTransitionId().equals(transition.getStringId()))
-                        .forEach(task -> taskRepository.delete(task));
+                deleteUnassignedNotExecutableTasks(tasks, transition);
             }
         });
+    }
+
+    @Transactional
+    void deleteUnassignedNotExecutableTasks(List<Task> tasks, Transition transition) {
+        tasks.stream()
+                .filter(task -> task.getTransitionId().equals(transition.getStringId()) && task.getUserId() == null)
+                .forEach(task -> taskRepository.delete(task));
     }
 
     @Transactional
