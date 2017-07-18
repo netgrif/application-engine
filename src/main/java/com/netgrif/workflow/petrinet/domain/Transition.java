@@ -3,10 +3,9 @@ package com.netgrif.workflow.petrinet.domain;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.FieldBehavior;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.workflow.petrinet.domain.roles.RolePermission;
-import com.netgrif.workflow.workflow.domain.Trigger;
+import com.netgrif.workflow.workflow.domain.triggers.Trigger;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
@@ -23,7 +22,7 @@ public class Transition extends Node {
     @Getter @Setter
     private Map<String, Set<RolePermission>> roles;
 
-    @DBRef
+    @Field("triggers")
     @Getter @Setter
     private List<Trigger> triggers;
 
@@ -36,20 +35,6 @@ public class Transition extends Node {
         roles = new HashMap<>();
         triggers = new LinkedList<>();
     }
-
-//    public ObjectNode applyDataLogic(String id, ObjectNode json) {
-//        for (IDataFunction function : dataSet.get(id)) {
-//            json = function.apply(json);
-//        }
-//        return json;
-//    }
-
-//    public ObjectNode applyRoleLogic(String id, ObjectNode json) {
-//        for (IRoleFunction function : roles.get(id)) {
-//            json = function.apply(json);
-//        }
-//        return json;
-//    }
 
     public void addDataSet(String fieldId, DataFieldLogic logic) {
         if (dataSet.containsKey(fieldId) && dataSet.get(fieldId) != null) {

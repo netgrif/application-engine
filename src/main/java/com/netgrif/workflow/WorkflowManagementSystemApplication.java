@@ -10,8 +10,8 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 @EnableCaching
 @EnableHypermediaSupport(type = EnableHypermediaSupport.HypermediaType.HAL)
 @EnableGlobalMethodSecurity(prePostEnabled = true)
-@SpringBootApplication
 @EnableAspectJAutoProxy
+@SpringBootApplication
 public class WorkflowManagementSystemApplication {
     public static void main(String[] args) {
         SpringApplication.run(WorkflowManagementSystemApplication.class, args);
