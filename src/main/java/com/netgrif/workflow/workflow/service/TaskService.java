@@ -12,7 +12,6 @@ import com.netgrif.workflow.petrinet.domain.dataset.*;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedField;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.FieldActionsRunner;
-import com.netgrif.workflow.petrinet.domain.dataset.logic.action.FileGenerateReflection;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.validation.FieldValidationRunner;
 import com.netgrif.workflow.petrinet.domain.roles.RolePermission;
 import com.netgrif.workflow.petrinet.domain.throwable.TransitionNotExecutableException;
@@ -161,6 +160,7 @@ public class TaskService implements ITaskService {
 
         finishExecution(transition, useCase);
         task.setFinishDate(LocalDateTime.now());
+        task.setUserId(null);
 
         caseRepository.save(useCase);
         taskRepository.save(task);
@@ -444,25 +444,51 @@ public class TaskService implements ITaskService {
     }
 
     /**
-     * Reloads all tasks of given case.
-     * 1. delete unassigned tasks
-     * 2. delete finished tasks
-     * 3. generate new tasks
+     * Reloads all unassigned tasks of given case:
+     * <table border="1">
+     *     <tr>
+     *         <td></td><td>Task is present</td><td>Task is not present</td>
+     *     </tr>
+     *     <tr>
+     *         <td>Transition executable</td><td>no action</td><td>create task</td>
+     *     </tr>
+     *     <tr>
+     *         <td>Transition not executable</td><td>destroy task</td><td>no action</td>
+     *     </tr>
+     * </table>
      */
     @Transactional
     void reloadTasks(Case useCase) {
-        taskRepository.deleteAllByCaseIdAndUserIdIsNull(useCase.getStringId());
-        taskRepository.deleteAllByCaseIdAndFinishDateIsNotNull(useCase.getStringId());
-        createTasks(useCase);
+        PetriNet net = useCase.getPetriNet();
+        List<Task> tasks = taskRepository.findAllByCaseId(useCase.getStringId());
+
+        net.getTransitions().values().forEach(transition -> {
+            if (isExecutable(transition, net)) {
+                if (taskIsNotPresent(tasks, transition)) {
+                    createFromTransition(transition, useCase);
+                }
+            } else {
+                deleteUnassignedNotExecutableTasks(tasks, transition);
+            }
+        });
     }
 
-//    private void figureOutProcessRoles(Task task, Transition transition) {
-//        transition.getRoles().keySet().forEach((id) -> {
-//            ObjectNode node = transition.applyRoleLogic(id, JsonNodeFactory.instance.objectNode().put("roleIds", id));
-//            if (node.get("assign") != null && node.get("assign").asBoolean()) task.setAssignRole(id);
-//            if (node.get("delegate") != null && node.get("delegate").asBoolean()) task.setDelegateRole(id);
-//        });
-//    }
+    @Transactional
+    void deleteUnassignedNotExecutableTasks(List<Task> tasks, Transition transition) {
+        tasks.stream()
+                .filter(task -> task.getTransitionId().equals(transition.getStringId()) && task.getUserId() == null)
+                .forEach(task -> taskRepository.delete(task));
+    }
+
+    @Transactional
+    boolean taskIsNotPresent(List<Task> tasks, Transition transition) {
+        return tasks.stream().noneMatch(task -> task.getTransitionId().equals(transition.getStringId()));
+    }
+
+    @Transactional
+    boolean isNotExecutable(Transition transition, PetriNet net) {
+        return !isExecutable(transition, net);
+    }
 
     @Transactional
     boolean isExecutable(Transition transition, PetriNet net) {
