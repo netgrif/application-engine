@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.auth.domain.repositories.UserRepository;
+import com.netgrif.workflow.event.events.*;
 import com.netgrif.workflow.petrinet.domain.*;
 import com.netgrif.workflow.petrinet.domain.dataset.*;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedField;
@@ -15,18 +16,25 @@ import com.netgrif.workflow.petrinet.domain.dataset.logic.action.FieldActionsRun
 import com.netgrif.workflow.petrinet.domain.dataset.logic.validation.FieldValidationRunner;
 import com.netgrif.workflow.petrinet.domain.roles.RolePermission;
 import com.netgrif.workflow.petrinet.domain.throwable.TransitionNotExecutableException;
+import com.netgrif.workflow.utils.DateUtils;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.Task;
 import com.netgrif.workflow.workflow.domain.repositories.CaseRepository;
 import com.netgrif.workflow.workflow.domain.repositories.TaskRepository;
+import com.netgrif.workflow.workflow.domain.triggers.AutoTrigger;
+import com.netgrif.workflow.workflow.domain.triggers.TimeTrigger;
+import com.netgrif.workflow.workflow.domain.triggers.Trigger;
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.BasicQuery;
+import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -46,14 +54,25 @@ import java.util.stream.Stream;
 @Service
 public class TaskService implements ITaskService {
 
+    private static final Logger log = Logger.getLogger(TaskService.class);
+
+    @Autowired
+    private ApplicationEventPublisher publisher;
+
     @Autowired
     private TaskRepository taskRepository;
+
     @Autowired
     private CaseRepository caseRepository;
+
     @Autowired
     private UserRepository userRepository;
+
     @Autowired
     private MongoTemplate mongoTemplate;
+
+    @Autowired
+    private TaskScheduler scheduler;
 
     //    @Override
 //    public Page<Task> getAll(LoggedUser loggedUser, Pageable pageable) {
@@ -66,7 +85,7 @@ public class TaskService implements ITaskService {
         List<Task> tasks;
         if (loggedUser.getProcessRoles().isEmpty()) {
             tasks = new ArrayList<>();
-            return new PageImpl<Task>(tasks, pageable, 0L);
+            return new PageImpl<>(tasks, pageable, 0L);
         } else {
             StringBuilder queryBuilder = new StringBuilder();
             queryBuilder.append("{$or:[");
@@ -80,7 +99,7 @@ public class TaskService implements ITaskService {
             BasicQuery query = new BasicQuery(queryBuilder.toString());
             query = (BasicQuery) query.with(pageable);
             tasks = mongoTemplate.find(query, Task.class);
-            return loadUsers(new PageImpl<Task>(tasks, pageable,
+            return loadUsers(new PageImpl<>(tasks, pageable,
                     mongoTemplate.count(new BasicQuery(queryBuilder.toString(), "{_id:1}"), Task.class)));
         }
     }
@@ -110,6 +129,8 @@ public class TaskService implements ITaskService {
                 // TODO: 16. 3. 2017 there should be some fancy logic
 //                task.setAssignRole(net.getRoles().get(transition.getRoles().keySet().stream().findFirst().orElseGet(null)).getStringId());
                 //figureOutProcessRoles(task, transition);
+                if (task == null)
+                    break;
                 taskRepository.save(task);
             }
         }
@@ -150,6 +171,7 @@ public class TaskService implements ITaskService {
     @Transactional
     public void finishTask(Long userId, String taskId) throws Exception {
         Task task = taskRepository.findOne(taskId);
+        User user = userRepository.findOne(userId);
         // TODO: 14. 4. 2017 replace with @PreAuthorize
         if (!task.getUserId().equals(userId)) {
             throw new Exception("User that is not assigned tried to finish task");
@@ -165,6 +187,8 @@ public class TaskService implements ITaskService {
         caseRepository.save(useCase);
         taskRepository.save(task);
         reloadTasks(useCase);
+
+        publisher.publishEvent(new UserFinishTaskEvent(user, task, useCase));
     }
 
     @Override
@@ -172,16 +196,10 @@ public class TaskService implements ITaskService {
     public void assignTask(User user, String taskId) throws TransitionNotExecutableException {
         Task task = taskRepository.findOne(taskId);
         Case useCase = caseRepository.findOne(task.getCaseId());
-        useCase.getPetriNet().initializeArcs();
-        Transition transition = useCase.getPetriNet().getTransition(task.getTransitionId());
 
-        startExecution(transition, useCase);
-        task.setUserId(user.getId());
-        task.setStartDate(LocalDateTime.now());
+        assignTaskToUser(user, task, useCase);
 
-        caseRepository.save(useCase);
-        taskRepository.save(task);
-        reloadTasks(useCase);
+        publisher.publishEvent(new UserAssignTaskEvent(user, task, useCase));
 
 //        moveAttributes(task);
     }
@@ -346,8 +364,9 @@ public class TaskService implements ITaskService {
 
     @Override
     @Transactional
-    public void cancelTask(Long id, String taskId) {
+    public void cancelTask(Long userId, String taskId) {
         Task task = taskRepository.findOne(taskId);
+        User user = userRepository.findOne(userId);
         Case useCase = caseRepository.findOne(task.getCaseId());
         PetriNet net = useCase.getPetriNet();
 
@@ -366,7 +385,7 @@ public class TaskService implements ITaskService {
         caseRepository.save(useCase);
         reloadTasks(useCase);
 
-//        moveAttributes(task);
+        publisher.publishEvent(new UserCancelTaskEvent(user, task, useCase));
     }
 
     @Transactional
@@ -403,10 +422,13 @@ public class TaskService implements ITaskService {
     public void delegateTask(Long userId, String delegatedEmail, String taskId) throws TransitionNotExecutableException {
         User delegated = userRepository.findByEmail(delegatedEmail);
         User delegate = userRepository.findOne(userId);
-
         Task task = taskRepository.findOne(taskId);
+        Case useCase = caseRepository.findOne(task.getCaseId());
+
         task.setUserId(delegated.getId());
         taskRepository.save(task);
+
+        publisher.publishEvent(new UserDelegateTaskEvent(delegate, task, useCase, delegated));
     }
 
     @Override
@@ -504,6 +526,7 @@ public class TaskService implements ITaskService {
 
     @Transactional
     void finishExecution(Transition transition, Case useCase) throws TransitionNotExecutableException {
+        log.info("Finish execution of " + transition.getTitle() + " in case " + useCase.getTitle());
         execute(transition, useCase, arc -> arc.getSource() == transition);
         useCase.getPetriNet().getArcsOfTransition(transition.getStringId()).stream()
                 .filter(arc -> arc instanceof ResetArc)
@@ -512,10 +535,12 @@ public class TaskService implements ITaskService {
 
     @Transactional
     public void startExecution(Transition transition, Case useCase) throws TransitionNotExecutableException {
+        log.info("Start execution of " + transition.getTitle() + " in case " + useCase.getTitle());
         execute(transition, useCase, arc -> arc.getDestination() == transition);
     }
 
-    private void execute(Transition transition, Case useCase, Predicate<Arc> predicate) throws TransitionNotExecutableException {
+    @Transactional
+    protected void execute(Transition transition, Case useCase, Predicate<Arc> predicate) throws TransitionNotExecutableException {
         Supplier<Stream<Arc>> filteredSupplier = () -> useCase.getPetriNet().getArcsOfTransition(transition.getStringId()).stream().filter(predicate);
 
         if (!filteredSupplier.get().allMatch(Arc::isExecutable))
@@ -532,7 +557,7 @@ public class TaskService implements ITaskService {
     }
 
     private Task createFromTransition(Transition transition, Case useCase) {
-        Task task = new Task();
+        final Task task = new Task();
 
         task.setTitle(transition.getTitle());
         task.setCaseId(useCase.get_id().toString());
@@ -540,17 +565,29 @@ public class TaskService implements ITaskService {
         task.setCaseColor(useCase.getColor());
         task.setCaseTitle(useCase.getTitle());
         task.setPriority(transition.getPriority());
+        for (Trigger trigger : transition.getTriggers()) {
+            Trigger taskTrigger = trigger.clone();
+            task.addTrigger(taskTrigger);
+
+            if (taskTrigger instanceof TimeTrigger) {
+                TimeTrigger timeTrigger = (TimeTrigger) taskTrigger;
+                scheduleTaskExecution(task, timeTrigger.getStartDate(), useCase);
+            } else if (taskTrigger instanceof AutoTrigger) {
+                executeTransition(task, useCase);
+                log.info("Auto trigger triggered");
+                return null;
+            }
+        }
         for (Map.Entry<String, Set<RolePermission>> entry : transition.getRoles().entrySet()) {
             task.addRole(entry.getKey(), entry.getValue());
         }
-        task = taskRepository.save(task);
 
         Transaction transaction = useCase.getPetriNet().getTransactionByTransition(transition);
         if (transaction != null) {
             task.setTransactionId(transaction.getStringId());
         }
 
-        return task;
+        return taskRepository.save(task);
     }
 
     private Page<Task> loadUsers(Page<Task> tasks) {
@@ -569,7 +606,42 @@ public class TaskService implements ITaskService {
         return tasks;
     }
 
+    @Override
     public void deleteTasksByCase(String caseId) {
         taskRepository.deleteAllByCaseId(caseId);
+    }
+
+    @Transactional
+    protected void assignTaskToUser(User user, Task task, Case useCase) throws TransitionNotExecutableException {
+        useCase.getPetriNet().initializeArcs();// TODO: 19/06/2017 remove?
+        Transition transition = useCase.getPetriNet().getTransition(task.getTransitionId());
+
+        startExecution(transition, useCase);
+        task.setUserId(user.getId());
+        task.setStartDate(LocalDateTime.now());
+
+        caseRepository.save(useCase);
+        taskRepository.save(task);
+        reloadTasks(useCase);
+    }
+
+    @Transactional
+    protected void executeTransition(Task task, Case useCase) {
+        log.info("executeTransition");
+        Transition transition = useCase.getPetriNet().getTransition(task.getTransitionId());
+        try {
+            startExecution(transition, useCase);
+            finishExecution(transition, useCase);
+            caseRepository.save(useCase);
+            reloadTasks(useCase);
+        } catch (TransitionNotExecutableException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Transactional
+    protected void scheduleTaskExecution(Task task, LocalDateTime time, Case useCase) {
+        scheduler.schedule(() -> executeTransition(task, useCase), DateUtils.localDateTimeToDate(time));
+        publisher.publishEvent(new TimeFinishTaskEvent(time, task, useCase));
     }
 }

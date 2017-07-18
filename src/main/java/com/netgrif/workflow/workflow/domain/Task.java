@@ -3,6 +3,7 @@ package com.netgrif.workflow.workflow.domain;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.petrinet.domain.roles.RolePermission;
+import com.netgrif.workflow.workflow.domain.triggers.Trigger;
 import lombok.Getter;
 import lombok.Setter;
 import org.bson.types.ObjectId;
@@ -105,6 +106,10 @@ public class Task {
     @JsonIgnore
     public List<Trigger> getTriggers() {
         return triggers;
+    }
+
+    public void addTrigger(Trigger trigger) {
+        triggers.add(trigger);
     }
 
     @JsonIgnore

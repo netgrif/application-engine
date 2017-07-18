@@ -10,7 +10,7 @@ import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository;
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRole;
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRoleRepository;
 import com.netgrif.workflow.petrinet.service.ArcFactory;
-import com.netgrif.workflow.workflow.domain.Trigger;
+import com.netgrif.workflow.workflow.domain.triggers.Trigger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -142,11 +142,11 @@ public class Importer {
                     addDataLogic(transition, dataRef)
             );
         }
-//        if (importTransition.getTrigger() != null) {
-//            Arrays.stream(importTransition.getTrigger()).forEach(trigger ->
-//                    addTrigger(transition, trigger)
-//            );
-//        }
+        if (importTransition.getTrigger() != null) {
+            Arrays.stream(importTransition.getTrigger()).forEach(trigger ->
+                    addTrigger(transition, trigger)
+            );
+        }
         if (importTransition.getTransactionRef() != null) {
             addToTransaction(transition, importTransition.getTransactionRef());
         }
@@ -170,10 +170,6 @@ public class Importer {
             return;
 
         transition.addRole(roleId, ImportRoleFactory.getPermissions(logic));
-//        if (logic.getPerform())
-//            transition.addRole(roleId, new AssignFunction(roleId));
-//        if (logic.getDelegate())
-//            transition.addRole(roleId, new DelegateFunction(roleId));
     }
 
     @Transactional
