@@ -9,6 +9,7 @@ import java.util.Collection;
 import java.util.List;
 
 public interface TaskRepository extends MongoRepository<Task, String> {
+
     List<Task> findAllByCaseId(String id);
 
     Page<Task> findByCaseIdIn(Pageable pageable, Collection<String> ids);
