@@ -1,8 +1,5 @@
 package com.netgrif.workflow.pdf.service;
 
-import org.apache.commons.lang.math.IntRange;
-import org.apache.commons.lang.math.LongRange;
-import org.apache.commons.lang.math.Range;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
