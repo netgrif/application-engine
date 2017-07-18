@@ -1,16 +1,19 @@
-package com.netgrif.workflow.workflow.domain;
+package com.netgrif.workflow.workflow.domain.triggers;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import javax.persistence.Entity;
-
 @Document
 public abstract class Trigger {
+
     @Id
     protected ObjectId _id;
+
+    protected Trigger() {
+        this._id = new ObjectId();
+    }
 
     public String getObjectId() {
         return _id.toString();
@@ -23,6 +26,8 @@ public abstract class Trigger {
     public void set_id(ObjectId _id) {
         this._id = _id;
     }
+
+    public abstract Trigger clone();
 
     public enum Type {
         AUTO ("auto"),
