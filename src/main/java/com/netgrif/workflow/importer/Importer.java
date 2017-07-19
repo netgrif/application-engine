@@ -11,6 +11,7 @@ import com.netgrif.workflow.petrinet.domain.roles.ProcessRole;
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRoleRepository;
 import com.netgrif.workflow.petrinet.service.ArcFactory;
 import com.netgrif.workflow.workflow.domain.triggers.Trigger;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +24,8 @@ import java.util.*;
 
 @Component
 public class Importer {
+
+    private static final Logger log = Logger.getLogger(Importer.class.getName());
 
     public static final String FIELD_KEYWORD = "f";
     public static final String TRANSITION_KEYWORD = "t";
@@ -202,7 +205,7 @@ public class Importer {
                 definition = parseObjectIds(definition, transitionId, TRANSITION_KEYWORD);
             } catch (NumberFormatException e) {
 //                todo: message
-                throw new IllegalArgumentException("Error parsing ids of action ["+action.getDefinition()+"]", e);
+                throw new IllegalArgumentException("Error parsing ids of action [" + action.getDefinition() + "]", e);
             }
             actions.add(new Action(definition, action.getTrigger()));
         });
@@ -213,20 +216,25 @@ public class Importer {
     protected String parseObjectIds(String action, String currentId, String processedObject) {
         action = action.replace("\n", "").replace("  ", "");
         int last = 0;
-        while (true) {
-            int start = action.indexOf(processedObject + ".", last);
-            if (start == -1) break;
-            int coma = action.indexOf(',', start);
-            int semicolon = action.indexOf(';', start);
-            int delimeter = coma < semicolon && coma != -1 ? coma : semicolon;
+        try {
+            while (true) {
+                int start = action.indexOf(processedObject + ".", last);
+                if (start == -1) break;
+                int coma = action.indexOf(',', start);
+                int semicolon = action.indexOf(';', start);
+                int delimeter = coma < semicolon && coma != -1 ? coma : semicolon;
 
-            String id = action.substring(start + 2, delimeter);
-            String objectId = id.equalsIgnoreCase("this") ? currentId : getObjectId(processedObject, Long.parseLong(id));
+                String id = action.substring(start + 2, delimeter);
+                String objectId = id.equalsIgnoreCase("this") ? currentId : getObjectId(processedObject, Long.parseLong(id));
 
-            action = action.replace(processedObject + "." + id, processedObject + "." + objectId);
+                action = action.replace(processedObject + "." + id, processedObject + "." + objectId);
 
-            if (delimeter == semicolon) break;
-            else last = coma + (objectId.length() - id.length());
+                if (delimeter == semicolon) break;
+                else last = coma + (objectId.length() - id.length());
+            }
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+            log.error("Failed to parse action: "+action,e);
         }
         return action;
     }
