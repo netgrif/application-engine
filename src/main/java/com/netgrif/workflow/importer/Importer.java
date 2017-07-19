@@ -197,8 +197,13 @@ public class Importer {
                 throw new IllegalArgumentException("Action [" + action.getDefinition() + "] doesn't have trigger");
 
             String definition = action.getDefinition();
-            definition = parseObjectIds(definition, fieldId, FIELD_KEYWORD);
-            definition = parseObjectIds(definition, transitionId, TRANSITION_KEYWORD);
+            try {
+                definition = parseObjectIds(definition, fieldId, FIELD_KEYWORD);
+                definition = parseObjectIds(definition, transitionId, TRANSITION_KEYWORD);
+            } catch (NumberFormatException e) {
+//                todo: message
+                throw new IllegalArgumentException("Error parsing ids of action ["+action.getDefinition()+"]", e);
+            }
             actions.add(new Action(definition, action.getTrigger()));
         });
         return actions;
