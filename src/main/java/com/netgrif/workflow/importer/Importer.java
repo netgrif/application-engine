@@ -193,6 +193,9 @@ public class Importer {
     protected LinkedHashSet<Action> buildActions(ImportAction[] imported, String fieldId, String transitionId) {
         final LinkedHashSet<Action> actions = new LinkedHashSet<>();
         Arrays.stream(imported).forEach(action -> {
+            if (action.getTrigger() == null)
+                throw new IllegalArgumentException("Action [" + action.getDefinition() + "] doesn't have trigger");
+
             String definition = action.getDefinition();
             definition = parseObjectIds(definition, fieldId, FIELD_KEYWORD);
             definition = parseObjectIds(definition, transitionId, TRANSITION_KEYWORD);
@@ -228,9 +231,7 @@ public class Importer {
             if (processedObject.equalsIgnoreCase(FIELD_KEYWORD)) return fields.get(xmlId).getObjectId();
             if (processedObject.equalsIgnoreCase(TRANSITION_KEYWORD)) return transitions.get(xmlId).getStringId();
         } catch (Exception e) {
-            // TODO: 9.7.2017 remove
-            System.out.println("Processed object: " + processedObject + ", xml id: " + xmlId);
-            throw e;
+            throw new IllegalArgumentException("Object " + processedObject + "." + xmlId + " does not exists");
         }
         return "";
     }
