@@ -1095,7 +1095,7 @@
             generate "Insurance.offerPDF",always into self
         </action>
     </data>
-    <!--================PLACES========================-->
+    <!--=================================PLACES========================-->
     <place>
         <id>1</id>
         <x>20</x>
@@ -1424,7 +1424,7 @@
         <tokens>0</tokens>
         <isStatic>false</isStatic>
     </place>
-    <!--============================TRANSITIONS================-->
+    <!--=================================TRANSITIONS================-->
     <transition>
         <id>154</id>
         <x>620</x>
@@ -1569,7 +1569,7 @@
             </logic>
         </dataRef>
     </transition>
-    <!--================================poistenie nehnuteľnosti====================-->
+    <!--=================================poistenie nehnuteľnosti====================-->
     <transition>
         <id>2</id>
         <x>260</x>
@@ -1582,7 +1582,7 @@
             </logic>
         </roleRef>
     </transition>
-    <!--===========================================postenie domacnosti=============-->
+    <!--=================================postenie domacnosti=============-->
     <transition>
         <id>4</id>
         <x>180</x>
@@ -1769,7 +1769,7 @@
             </logic>
         </dataRef>
     </transition>
-    <!--============================Domácnosť=====================-->
+    <!--=================================Domácnosť=====================-->
     <transition>
         <id>363</id>
         <x>620</x>
@@ -1827,6 +1827,7 @@
             </logic>
         </dataRef>
     </transition>
+    <!--=================================Sumár=====================-->
     <transition>
         <id>364</id>
         <x>620</x>
@@ -1919,6 +1920,7 @@
             </logic>
         </dataRef>
     </transition>
+    <!--=================================Vedlajsie stavby=====================-->
     <transition>
         <id>413</id>
         <x>620</x>
@@ -2153,6 +2155,7 @@
             </logic>
         </dataRef>
     </transition>
+    <!--=================================Doplnkové poistenie nehnuteľnosti=====================-->
     <transition>
         <id>414</id>
         <x>620</x>
@@ -2201,6 +2204,7 @@
             </logic>
         </dataRef>
     </transition>
+    <!--=================================Doplnkové poistenie domácnosti=====================-->
     <transition>
         <id>421</id>
         <x>620</x>
@@ -2375,6 +2379,7 @@
             </logic>
         </dataRef>
     </transition>
+    <!--=================================Údaje o poistníkovi a mieste poistenia=====================-->
     <transition>
         <id>588</id>
         <x>620</x>
@@ -3182,108 +3187,1149 @@
             </logic>
         </dataRef>
     </transition>
+    <!--=================================Zrušenia návrhu poistky=====================-->
     <transition>
         <id>674</id>
         <x>1433</x>
         <y>965</y>
         <label>Zrušenie návrhu poistky (po vypršaní lehoty) </label>
     </transition>
+    <!--=================================Napárovanie platby=====================-->
     <transition>
         <id>680</id>
         <x>1681</x>
         <y>967</y>
         <label>Napárovanie platby</label>
     </transition>
+    <!--=================================Aktívna zmluva==================================-->
     <transition>
         <id>686</id>
         <x>1870</x>
         <y>1071</y>
         <label>Aktívna zmluva</label>
     </transition>
+    <!--=================================Expirovaný návrh poistky=====================-->
     <transition>
         <id>687</id>
         <x>1431</x>
         <y>1243</y>
         <label>Expirovaný návrh poistky</label>
     </transition>
+    <!--=================================Expirácia zmluvy=====================-->
     <transition>
         <id>692</id>
         <x>1682</x>
         <y>1250</y>
         <label>Expirácia zmluvy</label>
     </transition>
+    <!--=================================Expirovaná zmluva=====================-->
     <transition>
         <id>694</id>
         <x>2077</x>
         <y>1245</y>
         <label>Expirovaná zmluva</label>
     </transition>
+    <!--=================================Údaje o zmluve=====================-->
     <transition>
         <id>1618</id>
         <x>1180</x>
         <y>260</y>
         <label>Údaje o zmluve</label>
     </transition>
+    <!--=================================Údaje o zmluve=====================-->
     <transition>
         <id>1661</id>
         <x>1185</x>
         <y>898</y>
         <label>Údaje o zmluve</label>
     </transition>
+    <!--=================================Údaje o zmluve=====================-->
     <transition>
         <id>2014</id>
         <x>2237</x>
         <y>743</y>
         <label>Údaje o zmluve</label>
     </transition>
+    <!--================================= ZÁKLADNÉ INFORMÁCIE (visible) - DONE=====================-->
     <transition>
         <id>2015</id>
         <x>2229</x>
         <y>38</y>
         <label>Základné informácie</label>
+        <roleRef>
+            <id>1</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <dataRef>
+            <id>301001</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>101001</id>
+            <logic>
+                <behavior>visible</behavior>
+                
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>301002</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>101002</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>101003</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>101004</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>101005</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>101006</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>101007</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>101008</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>101008</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>101009</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>101010</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>101011</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>101012</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>101013</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>101014</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>101015</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>101016</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
     </transition>
+    <!--================================= ÚDAJE O POISTNÍKOVI A MIESTE POISTENIA (visible) - TODO hidden =====================-->
     <transition>
         <id>2016</id>
         <x>2235</x>
         <y>646</y>
         <label>Údaje o poistníkovi a mieste poistenia</label>
+        <!-- Poistník -->
+        <dataRef>
+            <id>109007</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109008</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109009</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109010</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109011</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109012</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109013</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109014</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109015</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109016</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109017</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109018</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109019</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109020</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <!-- Poistený -->
+        <dataRef>
+            <id>109021</id>
+            <logic>
+                <behavior>hidden</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109022</id>
+            <logic>
+                <behavior>hidden</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109023</id>
+            <logic>
+                <behavior>hidden</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109024</id>
+            <logic>
+                <behavior>hidden</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109025</id>
+            <logic>
+                <behavior>hidden</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109026</id>
+            <logic>
+                <behavior>hidden</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109027</id>
+            <logic>
+                <behavior>hidden</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109028</id>
+            <logic>
+                <behavior>hidden</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109029</id>
+            <logic>
+                <behavior>hidden</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109030</id>
+            <logic>
+                <behavior>hidden</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109031</id>
+            <logic>
+                <behavior>hidden</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109032</id>
+            <logic>
+                <behavior>hidden</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109033</id>
+            <logic>
+                <behavior>hidden</behavior>
+            </logic>
+        </dataRef>
+        <!-- Údaje o mieste poistenia -->
+        <dataRef>
+            <id>109034</id>
+            <logic>
+                <behavior>visible</behavior>
+                <!--todo: action-->
+            </logic>
+        </dataRef>
+        <!-- Adresa poistníka -->
+        <dataRef>
+            <id>109035</id>
+            <logic>
+                
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109036</id>
+            <logic>
+                
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109037</id>
+            <logic>
+                
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109038</id>
+            <logic>
+                
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109039</id>
+            <logic>
+                
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <!-- Adresa poisteného -->
+        <dataRef>
+            <id>109040</id>
+            <logic>
+                
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109041</id>
+            <logic>
+                
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109042</id>
+            <logic>
+                
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109043</id>
+            <logic>
+                
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109044</id>
+            <logic>
+                
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <!-- Iná adresa -->
+        <dataRef>
+            <id>109045</id>
+            <logic>
+                
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109046</id>
+            <logic>
+                
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109047</id>
+            <logic>
+                
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109048</id>
+            <logic>
+                
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <!-- Adresa dodatočné info -->
+        <dataRef>
+            <id>109049</id>
+            <logic>
+                
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109050</id>
+            <logic>
+                
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109051</id>
+            <logic>
+                
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109052</id>
+            <logic>
+                
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109053</id>
+            <logic>
+                
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <!-- Adresa garáže -->
+        <dataRef>
+            <id>109054</id>
+            <logic>
+                
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109055</id>
+            <logic>
+                
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109056</id>
+            <logic>
+                
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109057</id>
+            <logic>
+                
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
     </transition>
+    <!--================================= DOPLNKOVÉ POISTENIE DOMÁCNOSTI (visible) - DONE =====================-->
     <transition>
         <id>2017</id>
         <x>2233</x>
         <y>549</y>
         <label>Doplnkové poistenie domácnosti</label>
+        <roleRef>
+            <id>1</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <dataRef>
+            <id>106004</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>106005</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>306002</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>106006</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>106007</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>306003</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>106008</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>106009</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>306004</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>106010</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>106011</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>306005</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>106012</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>106013</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>306006</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>106014</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>106015</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>306007</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>106016</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>106017</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>306008</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>106018</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>106019</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>306009</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>106020</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>106021</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>306010</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
     </transition>
+    <!--================================= DOMÁCNOSŤ (visible) - DONE =====================-->
     <transition>
         <id>2018</id>
         <x>2231</x>
         <y>451</y>
         <label>Domácnosť</label>
+        <roleRef>
+            <id>1</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <dataRef>
+            <id>103001</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>106003</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>103002</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>103003</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>103004</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>103005</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
     </transition>
+    <!--================================= NEHNUTEĽNOSŤ (visible) - DONE =====================-->
     <transition>
         <id>2019</id>
         <x>2231</x>
         <y>143</y>
         <label>Nehnuteľnosť</label>
+        <roleRef>
+            <id>1</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <dataRef>
+            <id>102001</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>105001</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>105002</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>105003</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>105004</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>305001</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>102002</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>102003</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>102004</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>102005</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>102006</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>102007</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>102008</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
     </transition>
+    <!--================================= DOPLNKOVÉ POISTENIE NEHNUTEĽNOSTI (visible) - DONE =====================-->
     <transition>
         <id>2020</id>
         <x>2233</x>
         <y>247</y>
         <label>Doplnkové poistenie nehnuteľnosti</label>
+        <roleRef>
+            <id>1</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <dataRef>
+            <id>105031</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>105032</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>305015</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>105033</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>105034</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>305016</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
     </transition>
+    <!--================================= VEDĽAJŠIE STAVBY (visible) - DONE =====================-->
     <transition>
         <id>2021</id>
         <x>2233</x>
         <y>351</y>
         <label>Vedľajšie stavby</label>
+        <roleRef>
+            <id>1</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <dataRef>
+            <id>105035</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>105007</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>105008</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>305003</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>105009</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>105010</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>305004</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>105011</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>105012</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>305005</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>105013</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>105014</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>305006</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>105015</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>105016</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>305007</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>105017</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>105018</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>305008</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>105019</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>105020</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>305009</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>105021</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>105022</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>305010</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>105023</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>105024</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>305011</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>105025</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>105026</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>305012</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>105027</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>105028</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>305013</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>105029</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>105030</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>305014</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
     </transition>
+    <!--=================================Údaje o zaplatení=====================-->
     <transition>
         <id>2045</id>
         <x>2237</x>
         <y>841</y>
         <label>Údaje o zaplatení</label>
     </transition>
+    <!--=================================Informácie o províziách=====================-->
     <transition>
         <id>2046</id>
         <x>2237</x>
