@@ -4492,20 +4492,57 @@
             <id>106004</id>
             <logic>
                 <behavior>editable</behavior>
+                <!--set editable-->
+                <action trigger="set">
+                    idTrue: f.106004,
+                    trans: t.421,
+                    other: f.106005;
+                    make other,editable on trans when { idTrue.value }
+                </action>
+                <action trigger="set">
+                    idTrue: f.106004,
+                    trans: t.421,
+                    other: f.306002;
+                    make other,visible on trans when { idTrue.value }
+                </action>
+                <!--set hidden-->
+                <action trigger="set">
+                    idTrue: f.106004,
+                    trans: t.421,
+                    other: f.106005;
+                    make other,hidden on trans when { !idTrue.value }
+                </action>
+                <action trigger="set">
+                    idTrue: f.106004,
+                    trans: t.421,
+                    other: f.306002;
+                    make other,hidden on trans when { !idTrue.value }
+                </action>
             </logic>
         </dataRef>
         <!--Cennosti ps-->
 <dataRef>
             <id>106005</id>
             <logic>
-                <behavior>editable</behavior>
+                <behavior>hidden</behavior>
+                <action trigger="set">
+                    field: f.this,
+                    check: f.106004,
+                    exces: f.208002,
+                    other: f.306002;
+                    change other about {
+                    if (check.value)
+                    return field.value*exces.value/1000.0 as Double;
+                    return other.value as Double;
+                    }
+                </action>
             </logic>
         </dataRef>
         <!--Cennosti p-->
 <dataRef>
             <id>306002</id>
             <logic>
-                <behavior>visible</behavior>
+                <behavior>hidden</behavior>
             </logic>
         </dataRef>
         <!--Umelecké diela-->
@@ -4513,20 +4550,57 @@
             <id>106006</id>
             <logic>
                 <behavior>editable</behavior>
+                <!--set editable-->
+                <action trigger="set">
+                    idTrue: f.106006,
+                    trans: t.421,
+                    other: f.106007;
+                    make other,editable on trans when { idTrue.value }
+                </action>
+                <action trigger="set">
+                    idTrue: f.106006,
+                    trans: t.421,
+                    other: f.306003;
+                    make other,visible on trans when { idTrue.value }
+                </action>
+                <!--set hidden-->
+                <action trigger="set">
+                    idTrue: f.106006,
+                    trans: t.421,
+                    other: f.106007;
+                    make other,hidden on trans when { !idTrue.value }
+                </action>
+                <action trigger="set">
+                    idTrue: f.106006,
+                    trans: t.421,
+                    other: f.306003;
+                    make other,hidden on trans when { !idTrue.value }
+                </action>
             </logic>
         </dataRef>
         <!--Umelecké diela ps-->
 <dataRef>
             <id>106007</id>
             <logic>
-                <behavior>editable</behavior>
+                <behavior>hidden</behavior>
+                <action trigger="set">
+                    field: f.this,
+                    check: f.106006,
+                    exces: f.208002,
+                    other: f.306003;
+                    change other about {
+                    if (check.value)
+                    return field.value*exces.value/1000.0 as Double;
+                    return other.value as Double;
+                    }
+                </action>
             </logic>
         </dataRef>
         <!--Umelecké diela p-->
 <dataRef>
             <id>306003</id>
             <logic>
-                <behavior>visible</behavior>
+                <behavior>hidden</behavior>
             </logic>
         </dataRef>
         <!--Elektronické a optické zariadenia-->
@@ -4534,20 +4608,57 @@
             <id>106008</id>
             <logic>
                 <behavior>editable</behavior>
+                <!--set editable-->
+                <action trigger="set">
+                    idTrue: f.106008,
+                    trans: t.421,
+                    other: f.106009;
+                    make other,editable on trans when { idTrue.value }
+                </action>
+                <action trigger="set">
+                    idTrue: f.106008,
+                    trans: t.421,
+                    other: f.306004;
+                    make other,visible on trans when { idTrue.value }
+                </action>
+                <!--set hidden-->
+                <action trigger="set">
+                    idTrue: f.106008,
+                    trans: t.421,
+                    other: f.106009;
+                    make other,hidden on trans when { !idTrue.value }
+                </action>
+                <action trigger="set">
+                    idTrue: f.106008,
+                    trans: t.421,
+                    other: f.306004;
+                    make other,hidden on trans when { !idTrue.value }
+                </action>
             </logic>
         </dataRef>
         <!--Elektronické a optické zariadenia ps-->
 <dataRef>
             <id>106009</id>
             <logic>
-                <behavior>editable</behavior>
+                <behavior>hidden</behavior>
+                <action trigger="set">
+                    field: f.this,
+                    check: f.106008,
+                    exces: f.208002,
+                    other: f.306004;
+                    change other about {
+                    if (check.value)
+                    return field.value*exces.value/1000.0 as Double;
+                    return other.value as Double;
+                    }
+                </action>
             </logic>
         </dataRef>
         <!--Elektronické a optické zariadenia p-->
 <dataRef>
             <id>306004</id>
             <logic>
-                <behavior>visible</behavior>
+                <behavior>hidden</behavior>
             </logic>
         </dataRef>
         <!--Špecialne sklá a presklenie-->
@@ -4555,20 +4666,57 @@
             <id>106010</id>
             <logic>
                 <behavior>editable</behavior>
+                <!--set editable-->
+                <action trigger="set">
+                    idTrue: f.106010,
+                    trans: t.421,
+                    other: f.106011;
+                    make other,editable on trans when { idTrue.value }
+                </action>
+                <action trigger="set">
+                    idTrue: f.106010,
+                    trans: t.421,
+                    other: f.306005;
+                    make other,visible on trans when { idTrue.value }
+                </action>
+                <!--set hidden-->
+                <action trigger="set">
+                    idTrue: f.106010,
+                    trans: t.421,
+                    other: f.106011;
+                    make other,hidden on trans when { !idTrue.value }
+                </action>
+                <action trigger="set">
+                    idTrue: f.106010,
+                    trans: t.421,
+                    other: f.306005;
+                    make other,hidden on trans when { !idTrue.value }
+                </action>
             </logic>
         </dataRef>
         <!--Špecialne sklá a presklenie ps-->
 <dataRef>
             <id>106011</id>
             <logic>
-                <behavior>editable</behavior>
+                <behavior>hidden</behavior>
+                <action trigger="set">
+                    field: f.this,
+                    check: f.106010,
+                    exces: f.208002,
+                    other: f.306005;
+                    change other about {
+                    if (check.value)
+                    return field.value*exces.value/1000.0 as Double;
+                    return other.value as Double;
+                    }
+                </action>
             </logic>
         </dataRef>
         <!--Špecialne sklá a presklenie p-->
 <dataRef>
             <id>306005</id>
             <logic>
-                <behavior>visible</behavior>
+                <behavior>hidden</behavior>
             </logic>
         </dataRef>
         <!--Záhradné vybavenie a nábytok-->
@@ -4576,20 +4724,57 @@
             <id>106012</id>
             <logic>
                 <behavior>editable</behavior>
+                <!--set editable-->
+                <action trigger="set">
+                    idTrue: f.106012,
+                    trans: t.421,
+                    other: f.106013;
+                    make other,editable on trans when { idTrue.value }
+                </action>
+                <action trigger="set">
+                    idTrue: f.106012,
+                    trans: t.421,
+                    other: f.306006;
+                    make other,visible on trans when { idTrue.value }
+                </action>
+                <!--set hidden-->
+                <action trigger="set">
+                    idTrue: f.106012,
+                    trans: t.421,
+                    other: f.106013;
+                    make other,hidden on trans when { !idTrue.value }
+                </action>
+                <action trigger="set">
+                    idTrue: f.106012,
+                    trans: t.421,
+                    other: f.306006;
+                    make other,hidden on trans when { !idTrue.value }
+                </action>
             </logic>
         </dataRef>
         <!--Záhradné vybavenie a nábytok ps-->
 <dataRef>
             <id>106013</id>
             <logic>
-                <behavior>editable</behavior>
+                <behavior>hidden</behavior>
+                <action trigger="set">
+                    field: f.this,
+                    check: f.106012,
+                    exces: f.208002,
+                    other: f.306006;
+                    change other about {
+                    if (check.value)
+                    return field.value*exces.value/1000.0 as Double;
+                    return other.value as Double;
+                    }
+                </action>
             </logic>
         </dataRef>
         <!--Záhradné vybavenie a nábytok p-->
 <dataRef>
             <id>306006</id>
             <logic>
-                <behavior>visible</behavior>
+                <behavior>hidden</behavior>
             </logic>
         </dataRef>
         <!--Elektromotory v domácich spotrebičoch-->
@@ -4597,20 +4782,57 @@
             <id>106014</id>
             <logic>
                 <behavior>editable</behavior>
+                <!--set editable-->
+                <action trigger="set">
+                    idTrue: f.106014,
+                    trans: t.421,
+                    other: f.106015;
+                    make other,editable on trans when { idTrue.value }
+                </action>
+                <action trigger="set">
+                    idTrue: f.106014,
+                    trans: t.421,
+                    other: f.306007;
+                    make other,visible on trans when { idTrue.value }
+                </action>
+                <!--set hidden-->
+                <action trigger="set">
+                    idTrue: f.106014,
+                    trans: t.421,
+                    other: f.106015;
+                    make other,hidden on trans when { !idTrue.value }
+                </action>
+                <action trigger="set">
+                    idTrue: f.106014,
+                    trans: t.421,
+                    other: f.306007;
+                    make other,hidden on trans when { !idTrue.value }
+                </action>
             </logic>
         </dataRef>
         <!--Elektromotory v domácich spotrebičoch ps-->
 <dataRef>
             <id>106015</id>
             <logic>
-                <behavior>editable</behavior>
+                <behavior>hidden</behavior>
+                <action trigger="set">
+                    field: f.this,
+                    check: f.106014,
+                    exces: f.208002,
+                    other: f.306007;
+                    change other about {
+                    if (check.value)
+                    return field.value*exces.value/1000.0 as Double;
+                    return other.value as Double;
+                    }
+                </action>
             </logic>
         </dataRef>
         <!--Elektromotory v domácich spotrebičoch p-->
 <dataRef>
             <id>306007</id>
             <logic>
-                <behavior>visible</behavior>
+                <behavior>hidden</behavior>
             </logic>
         </dataRef>
         <!--Stavebné súčasti domácnosti-->
@@ -4618,20 +4840,57 @@
             <id>106016</id>
             <logic>
                 <behavior>editable</behavior>
+                <!--set editable-->
+                <action trigger="set">
+                    idTrue: f.106016,
+                    trans: t.421,
+                    other: f.106017;
+                    make other,editable on trans when { idTrue.value }
+                </action>
+                <action trigger="set">
+                    idTrue: f.106016,
+                    trans: t.421,
+                    other: f.306008;
+                    make other,visible on trans when { idTrue.value }
+                </action>
+                <!--set hidden-->
+                <action trigger="set">
+                    idTrue: f.106016,
+                    trans: t.421,
+                    other: f.106017;
+                    make other,hidden on trans when { !idTrue.value }
+                </action>
+                <action trigger="set">
+                    idTrue: f.106016,
+                    trans: t.421,
+                    other: f.306008;
+                    make other,hidden on trans when { !idTrue.value }
+                </action>
             </logic>
         </dataRef>
         <!--Stavebné súčasti domácnosti ps-->
 <dataRef>
             <id>106017</id>
             <logic>
-                <behavior>editable</behavior>
+                <behavior>hidden</behavior>
+                <action trigger="set">
+                    field: f.this,
+                    check: f.106016,
+                    exces: f.208002,
+                    other: f.306008;
+                    change other about {
+                    if (check.value)
+                    return field.value*exces.value/1000.0 as Double;
+                    return other.value as Double;
+                    }
+                </action>
             </logic>
         </dataRef>
         <!--Stavebné súčasti domácnosti p-->
 <dataRef>
             <id>306008</id>
             <logic>
-                <behavior>visible</behavior>
+                <behavior>hidden</behavior>
             </logic>
         </dataRef>
         <!--Športové náradie-->
@@ -4639,20 +4898,57 @@
             <id>106018</id>
             <logic>
                 <behavior>editable</behavior>
+                <!--set editable-->
+                <action trigger="set">
+                    idTrue: f.106018,
+                    trans: t.421,
+                    other: f.106019;
+                    make other,editable on trans when { idTrue.value }
+                </action>
+                <action trigger="set">
+                    idTrue: f.106018,
+                    trans: t.421,
+                    other: f.306009;
+                    make other,visible on trans when { idTrue.value }
+                </action>
+                <!--set hidden-->
+                <action trigger="set">
+                    idTrue: f.106018,
+                    trans: t.421,
+                    other: f.106019;
+                    make other,hidden on trans when { !idTrue.value }
+                </action>
+                <action trigger="set">
+                    idTrue: f.106018,
+                    trans: t.421,
+                    other: f.306009;
+                    make other,hidden on trans when { !idTrue.value }
+                </action>
             </logic>
         </dataRef>
         <!--Športové náradie ps-->
 <dataRef>
             <id>106019</id>
             <logic>
-                <behavior>editable</behavior>
+                <behavior>hidden</behavior>
+                <action trigger="set">
+                    field: f.this,
+                    check: f.106018,
+                    exces: f.208002,
+                    other: f.306009;
+                    change other about {
+                    if (check.value)
+                    return field.value*exces.value/1000.0 as Double;
+                    return other.value as Double;
+                    }
+                </action>
             </logic>
         </dataRef>
         <!--Športové náradie p-->
 <dataRef>
             <id>306009</id>
             <logic>
-                <behavior>visible</behavior>
+                <behavior>hidden</behavior>
             </logic>
         </dataRef>
         <!--Iné-->
@@ -4660,20 +4956,57 @@
             <id>106020</id>
             <logic>
                 <behavior>editable</behavior>
+                <!--set editable-->
+                <action trigger="set">
+                    idTrue: f.106020,
+                    trans: t.421,
+                    other: f.106021;
+                    make other,editable on trans when { idTrue.value }
+                </action>
+                <action trigger="set">
+                    idTrue: f.106020,
+                    trans: t.421,
+                    other: f.306010;
+                    make other,visible on trans when { idTrue.value }
+                </action>
+                <!--set hidden-->
+                <action trigger="set">
+                    idTrue: f.106020,
+                    trans: t.421,
+                    other: f.106021;
+                    make other,hidden on trans when { !idTrue.value }
+                </action>
+                <action trigger="set">
+                    idTrue: f.106020,
+                    trans: t.421,
+                    other: f.306010;
+                    make other,hidden on trans when { !idTrue.value }
+                </action>
             </logic>
         </dataRef>
         <!--Iné ps-->
 <dataRef>
             <id>106021</id>
             <logic>
-                <behavior>editable</behavior>
+                <behavior>hidden</behavior>
+                <action trigger="set">
+                    field: f.this,
+                    check: f.106020,
+                    exces: f.208002,
+                    other: f.306010;
+                    change other about {
+                    if (check.value)
+                    return field.value*exces.value/1000.0 as Double;
+                    return other.value as Double;
+                    }
+                </action>
             </logic>
         </dataRef>
         <!--Iné p-->
 <dataRef>
             <id>306010</id>
             <logic>
-                <behavior>visible</behavior>
+                <behavior>hidden</behavior>
             </logic>
         </dataRef>
     </transition>
