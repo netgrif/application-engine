@@ -3595,7 +3595,7 @@
                     isGarage: f.105035,
                     trans: t.413,
                     other: f.305003;
-                    make other,editable on trans when { isGarage.value }
+                    make other,visible on trans when { isGarage.value }
                 </action>
                 <action trigger="set">
                     isGarage: f.105035,
@@ -3649,7 +3649,7 @@
                     idTrue: f.105009,
                     trans: t.413,
                     other: f.305004;
-                    make other,editable on trans when { idTrue.value }
+                    make other,visible on trans when { idTrue.value }
                 </action>
                 <!--set hidden-->
                 <action trigger="set">
@@ -3707,7 +3707,7 @@
                     idTrue: f.105011,
                     trans: t.413,
                     other: f.305005;
-                    make other,editable on trans when { idTrue.value }
+                    make other,visible on trans when { idTrue.value }
                 </action>
                 <!--set hidden-->
                 <action trigger="set">
@@ -3736,9 +3736,8 @@
                     exces: f.208001,
                     other: f.305005;
                     change other about {
-                        if (check.value) {
+                        if (check.value)
                             return field.value*exces.value/1000.0 as Double;
-                        }
                         return other.value as Double;
                     }
                     <!--@formatter:on-->
@@ -3768,7 +3767,7 @@
                     idTrue: f.105013,
                     trans: t.413,
                     other: f.305006;
-                    make other,editable on trans when { idTrue.value }
+                    make other,visible on trans when { idTrue.value }
                 </action>
                 <!--set hidden-->
                 <action trigger="set">
@@ -3797,9 +3796,8 @@
                     exces: f.208001,
                     other: f.305006;
                     change other about {
-                        if (check.value) {
+                        if (check.value)
                             return field.value*exces.value/1000.0 as Double;
-                        }
                         return other.value as Double;
                     }
                     <!--@formatter:on-->
@@ -3829,7 +3827,7 @@
                     idTrue: f.105015,
                     trans: t.413,
                     other: f.305007;
-                    make other,editable on trans when { idTrue.value }
+                    make other,visible on trans when { idTrue.value }
                 </action>
                 <!--set hidden-->
                 <action trigger="set">
@@ -3858,9 +3856,8 @@
                     exces: f.208001,
                     other: f.305007;
                     change other about {
-                        if (check.value) {
+                        if (check.value)
                             return field.value*exces.value/1000.0 as Double;
-                        }
                         return other.value as Double;
                     }
                     <!--@formatter:on-->
@@ -3890,7 +3887,7 @@
                     idTrue: f.105017,
                     trans: t.413,
                     other: f.305008;
-                    make other,editable on trans when { idTrue.value }
+                    make other,visible on trans when { idTrue.value }
                 </action>
                 <!--set hidden-->
                 <action trigger="set">
@@ -3919,9 +3916,8 @@
                     exces: f.208001,
                     other: f.305008;
                     change other about {
-                        if (check.value) {
+                        if (check.value)
                             return field.value*exces.value/1000.0 as Double;
-                        }
                         return other.value as Double;
                     }
                     <!--@formatter:on-->
@@ -3951,7 +3947,7 @@
                     idTrue: f.105019,
                     trans: t.413,
                     other: f.305009;
-                    make other,editable on trans when { idTrue.value }
+                    make other,visible on trans when { idTrue.value }
                 </action>
                 <!--set hidden-->
                 <action trigger="set">
@@ -3980,9 +3976,8 @@
                     exces: f.208001,
                     other: f.305009;
                     change other about {
-                        if (check.value) {
+                        if (check.value)
                             return field.value*exces.value/1000.0 as Double;
-                        }
                         return other.value as Double;
                     }
                     <!--@formatter:on-->
@@ -4012,7 +4007,7 @@
                     idTrue: f.105021,
                     trans: t.413,
                     other: f.305010;
-                    make other,editable on trans when { idTrue.value }
+                    make other,visible on trans when { idTrue.value }
                 </action>
                 <!--set hidden-->
                 <action trigger="set">
@@ -4041,9 +4036,8 @@
                     exces: f.208001,
                     other: f.305010;
                     change other about {
-                        if (check.value) {
+                        if (check.value)
                             return field.value*exces.value/1000.0 as Double;
-                        }
                         return other.value as Double;
                     }
                     <!--@formatter:on-->
@@ -4073,7 +4067,7 @@
                     idTrue: f.105023,
                     trans: t.413,
                     other: f.305011;
-                    make other,editable on trans when { idTrue.value }
+                    make other,visible on trans when { idTrue.value }
                 </action>
                 <!--set hidden-->
                 <action trigger="set">
@@ -4102,9 +4096,8 @@
                     exces: f.208001,
                     other: f.305011;
                     change other about {
-                        if (check.value) {
+                        if (check.value)
                             return field.value*exces.value/1000.0 as Double;
-                        }
                         return other.value as Double;
                     }
                     <!--@formatter:on-->
@@ -4134,7 +4127,7 @@
                     idTrue: f.105025,
                     trans: t.413,
                     other: f.305012;
-                    make other,editable on trans when { idTrue.value }
+                    make other,visible on trans when { idTrue.value }
                 </action>
                 <!--set hidden-->
                 <action trigger="set">
@@ -4163,9 +4156,8 @@
                     exces: f.208001,
                     other: f.305012;
                     change other about {
-                        if (check.value) {
+                        if (check.value)
                             return field.value*exces.value/1000.0 as Double;
-                        }
                         return other.value as Double;
                     }
                     <!--@formatter:on-->
@@ -4195,7 +4187,7 @@
                     idTrue: f.105027,
                     trans: t.413,
                     other: f.305013;
-                    make other,editable on trans when { idTrue.value }
+                    make other,visible on trans when { idTrue.value }
                 </action>
                 <!--set hidden-->
                 <action trigger="set">
@@ -4223,9 +4215,8 @@
                     exces: f.208001,
                     other: f.305013;
                     change other about {
-                        if (check.value) {
+                        if (check.value)
                             return field.value*exces.value/1000.0 as Double;
-                        }
                         return other.value as Double;
                     }
                 </action>
@@ -4254,7 +4245,7 @@
                     idTrue: f.105029,
                     trans: t.413,
                     other: f.305014;
-                    make other,editable on trans when { idTrue.value }
+                    make other,visible on trans when { idTrue.value }
                 </action>
                 <!--set hidden-->
                 <action trigger="set">
@@ -4282,9 +4273,8 @@
                     exces: f.208001,
                     other: f.305014;
                     change other about {
-                        if (check.value) {
+                        if (check.value)
                             return field.value*exces.value/1000.0 as Double;
-                        }
                         return other.value as Double;
                     }
                 </action>
