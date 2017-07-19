@@ -3610,6 +3610,7 @@
             <id>105004</id>
             <logic>
                 <behavior>hidden</behavior>
+                <!--TODO: some action-->
             </logic>
         </dataRef>
         <!--Rovnaké miesto poistenia garáže?-->
@@ -3617,6 +3618,21 @@
             <id>105008</id>
             <logic>
                 <behavior>hidden</behavior>
+                <action trigger="set">
+                    <!--@formatter:off-->
+                    field: f.105007,
+                    check: f.105035,
+                    exces: f.208001,
+                    same: f.105008,
+                    other: f.305003;
+                    change other about {
+                        def coeff = same.value ? 1.0 : 1.1;
+                        if (check.value)
+                            return field.value*coeff*exces.value/1000.0 as Double;
+                        return other.value as Double;
+                    }
+                    <!--@formatter:on-->
+                </action>
             </logic>
         </dataRef>
         <!--Garáž - poistná suma-->
@@ -3624,6 +3640,21 @@
             <id>105007</id>
             <logic>
                 <behavior>hidden</behavior>
+                <action trigger="set">
+                    <!--@formatter:off-->
+                    field: f.105007,
+                    check: f.105035,
+                    exces: f.208001,
+                    same: f.105008,
+                    other: f.305003;
+                    change other about {
+                        def coeff = same.value ? 1.0 : 1.1;
+                        if (check.value)
+                            return field.value*coeff*exces.value/1000.0 as Double;
+                        return other.value as Double;
+                    }
+                    <!--@formatter:on-->
+                </action>
             </logic>
         </dataRef>
         <!--Garáž - poistné-->
