@@ -3049,38 +3049,47 @@
     <data type="number">
         <title>Koeficient - Cennosti</title>
         <id>206001</id>
+        <init>4.2</init>
     </data>
     <data type="number">
         <title>Koeficient - Umelecké diela</title>
         <id>206002</id>
+        <init>4.2</init>
     </data>
     <data type="number">
         <title>Koeficient - Elektronické a optické zariadneia</title>
         <id>206003</id>
+        <init>4.2</init>
     </data>
     <data type="number">
         <title>Koeficient - Špecialne sklá a presklenie</title>
         <id>206004</id>
+        <init>25</init>
     </data>
     <data type="number">
         <title>Koeficient - Záhradné vybavenie a nábytok</title>
         <id>206005</id>
+        <init>12</init>
     </data>
     <data type="number">
         <title>Koeficient - Elektromotory v domácich spotrebičoch</title>
         <id>206006</id>
+        <init>50</init>
     </data>
     <data type="number">
         <title>Koeficient - Stavebné súčasti domácností</title>
         <id>206007</id>
+        <init>3.45</init>
     </data>
     <data type="number">
         <title>Koeficient - Športové náradie</title>
         <id>206008</id>
+        <init>7</init>
     </data>
     <data type="number">
         <title>Koeficient - Iné</title>
         <id>206009</id>
+        <init>10</init>
     </data>
     <data type="number">
         <title>Koeficient - Domácnosť - lokalita</title>
@@ -4910,11 +4919,12 @@
                 <action trigger="set">
                     field: f.this,
                     check: f.106004,
+                    coeff: f.206001,
                     exces: f.208002,
                     other: f.306002;
                     change other about {
                     if (check.value)
-                    return field.value*exces.value/1000.0 as Double;
+                    return coeff.value*field.value*exces.value/1000.0 as Double;
                     return other.value as Double;
                     }
                 </action>
@@ -4968,11 +4978,12 @@
                 <action trigger="set">
                     field: f.this,
                     check: f.106006,
+                    coeff: f.206002,
                     exces: f.208002,
                     other: f.306003;
                     change other about {
                     if (check.value)
-                    return field.value*exces.value/1000.0 as Double;
+                    return coeff.value*field.value*exces.value/1000.0 as Double;
                     return other.value as Double;
                     }
                 </action>
@@ -5027,10 +5038,11 @@
                     field: f.this,
                     check: f.106008,
                     exces: f.208002,
+                    coeff: f.206003,
                     other: f.306004;
                     change other about {
                     if (check.value)
-                    return field.value*exces.value/1000.0 as Double;
+                    return coeff.value*field.value*exces.value/1000.0 as Double;
                     return other.value as Double;
                     }
                 </action>
@@ -5085,10 +5097,11 @@
                     field: f.this,
                     check: f.106010,
                     exces: f.208002,
+                    coeff: f.206004,
                     other: f.306005;
                     change other about {
                     if (check.value)
-                    return field.value*exces.value/1000.0 as Double;
+                    return coeff.value*field.value*exces.value/1000.0 as Double;
                     return other.value as Double;
                     }
                 </action>
@@ -5142,11 +5155,12 @@
                 <action trigger="set">
                     field: f.this,
                     check: f.106012,
+                    coeff: f.206005,
                     exces: f.208002,
                     other: f.306006;
                     change other about {
                     if (check.value)
-                    return field.value*exces.value/1000.0 as Double;
+                    return coeff.value*field.value*exces.value/1000.0 as Double;
                     return other.value as Double;
                     }
                 </action>
@@ -5201,10 +5215,11 @@
                     field: f.this,
                     check: f.106014,
                     exces: f.208002,
+                    coeff: f.206006,
                     other: f.306007;
                     change other about {
                     if (check.value)
-                    return field.value*exces.value/1000.0 as Double;
+                    return coeff.value*field.value*exces.value/1000.0 as Double;
                     return other.value as Double;
                     }
                 </action>
@@ -5259,10 +5274,11 @@
                     field: f.this,
                     check: f.106016,
                     exces: f.208002,
+                    coeff: f.206007,
                     other: f.306008;
                     change other about {
                     if (check.value)
-                    return field.value*exces.value/1000.0 as Double;
+                    return coeff.value*field.value*exces.value/1000.0 as Double;
                     return other.value as Double;
                     }
                 </action>
@@ -5317,10 +5333,11 @@
                     field: f.this,
                     check: f.106018,
                     exces: f.208002,
+                    coeff: f.206008,
                     other: f.306009;
                     change other about {
                     if (check.value)
-                    return field.value*exces.value/1000.0 as Double;
+                    return coeff.value*field.value*exces.value/1000.0 as Double;
                     return other.value as Double;
                     }
                 </action>
@@ -5375,10 +5392,11 @@
                     field: f.this,
                     check: f.106020,
                     exces: f.208002,
+                    coeff: f.206009,
                     other: f.306010;
                     change other about {
                     if (check.value)
-                    return field.value*exces.value/1000.0 as Double;
+                    return coeff.value*field.value*exces.value/1000.0 as Double;
                     return other.value as Double;
                     }
                 </action>
