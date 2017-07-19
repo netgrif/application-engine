@@ -4731,58 +4731,67 @@
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Poistenie nehnuteľnosti-->
+<dataRef>
             <id>308001</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Poistenie domácnosti-->
+<dataRef>
             <id>308002</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Poistenie zodpovednosti za škodu-->
+<dataRef>
             <id>308003</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--ROČNÉ POISTNÉ CELKOM-->
+<dataRef>
             <id>308004</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--PERIODICITA PLATBY POISTNÉHO-->
+<dataRef>
             <id>108001</id>
             <logic>
                 <behavior>editable</behavior>
                 <behavior>required</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--KOMPLETNÉ POISTENIE-->
+<dataRef>
             <id>308005</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--ZĽAVA ZA INÉ POISTENIE V PREMIUM-->
+<dataRef>
             <id>108002</id>
             <logic>
                 <behavior>editable</behavior>
                 <behavior>required</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--OBCHODNÁ ZĽAVA-->
+<dataRef>
             <id>108003</id>
             <logic>
                 <behavior>editable</behavior>
                 <behavior>required</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--BEŽNÉ POISTNÉ-->
+<dataRef>
             <id>308006</id>
             <logic>
                 <behavior>visible</behavior>
@@ -4807,7 +4816,8 @@
         </roleRef>
         <!-- ===== Údaje o poistníkovi ===== -->
         <!-- Poistník -->
-        <dataRef>
+        <!--Typ subjektu-->
+<dataRef>
             <id>109007</id>
             <logic>
                 <behavior>required</behavior>
@@ -4825,7 +4835,8 @@
                 <!--</action>-->
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Titul pred menom-->
+<dataRef>
             <id>109008</id>
             <logic>
                 <behavior>editable</behavior>
@@ -4842,7 +4853,8 @@
                 <!--</action>-->
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Titul za menom-->
+<dataRef>
             <id>109009</id>
             <logic>
                 <behavior>editable</behavior>
@@ -4859,7 +4871,8 @@
                 <!--</action>-->
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Meno-->
+<dataRef>
             <id>109010</id>
             <logic>
                 <behavior>required</behavior>
@@ -4877,7 +4890,8 @@
                 <!--</action>-->
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Priezvisko-->
+<dataRef>
             <id>109011</id>
             <logic>
                 <behavior>required</behavior>
@@ -4895,7 +4909,8 @@
                 <!--</action>-->
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Obchodné meno-->
+<dataRef>
             <id>109012</id>
             <logic>
                 <behavior>required</behavior>
@@ -4913,7 +4928,8 @@
                 <!--</action>-->
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Štátna príslušnosť-->
+<dataRef>
             <id>109013</id>
             <logic>
                 <behavior>required</behavior>
@@ -4931,7 +4947,8 @@
                 <!--</action>-->
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Dátum narodenia-->
+<dataRef>
             <id>109014</id>
             <logic>
                 <behavior>required</behavior>
@@ -4949,7 +4966,8 @@
                 <!--</action>-->
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Rodné číslo-->
+<dataRef>
             <id>109015</id>
             <logic>
                 <behavior>required</behavior>
@@ -4967,7 +4985,8 @@
                 <!--</action>-->
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Typ preukazu-->
+<dataRef>
             <id>109016</id>
             <logic>
                 <behavior>required</behavior>
@@ -4985,7 +5004,8 @@
                 <!--</action>-->
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Číslo preukazu-->
+<dataRef>
             <id>109017</id>
             <logic>
                 <behavior>required</behavior>
@@ -5003,7 +5023,8 @@
                 <!--</action>-->
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Telefónne číslo-->
+<dataRef>
             <id>109018</id>
             <logic>
                 <behavior>required</behavior>
@@ -5021,7 +5042,8 @@
                 <!--</action>-->
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Email-->
+<dataRef>
             <id>109019</id>
             <logic>
                 <behavior>required</behavior>
@@ -5039,7 +5061,8 @@
                 <!--</action>-->
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Poistený je iná osoba-->
+<dataRef>
             <id>109020</id>
             <logic>
                 <behavior>editable</behavior>
@@ -5348,86 +5371,100 @@
             </logic>
         </dataRef>
         <!-- Poistený -->
-        <dataRef>
+        <!--Typ subjektu-->
+<dataRef>
             <id>109021</id>
             <logic>
                 <behavior>hidden</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Titul pred menom-->
+<dataRef>
             <id>109022</id>
             <logic>
                 <behavior>hidden</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Titul za menom-->
+<dataRef>
             <id>109023</id>
             <logic>
                 <behavior>hidden</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Meno poistený-->
+<dataRef>
             <id>109024</id>
             <logic>
                 <behavior>hidden</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Priezvisko poistený-->
+<dataRef>
             <id>109025</id>
             <logic>
                 <behavior>hidden</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Obchodné meno poistený-->
+<dataRef>
             <id>109026</id>
             <logic>
                 <behavior>hidden</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Štátna príslušnosť poistený-->
+<dataRef>
             <id>109027</id>
             <logic>
                 <behavior>hidden</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Dátum narodenia poistený-->
+<dataRef>
             <id>109028</id>
             <logic>
                 <behavior>hidden</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Rodné číslo-->
+<dataRef>
             <id>109029</id>
             <logic>
                 <behavior>hidden</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Typ preukazu poisteny-->
+<dataRef>
             <id>109030</id>
             <logic>
                 <behavior>hidden</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Číslo preukazu-->
+<dataRef>
             <id>109031</id>
             <logic>
                 <behavior>hidden</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Telefónne číslo poisteny-->
+<dataRef>
             <id>109032</id>
             <logic>
                 <behavior>hidden</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Email poisteny-->
+<dataRef>
             <id>109033</id>
             <logic>
                 <behavior>hidden</behavior>
             </logic>
         </dataRef>
         <!-- Údaje o mieste poistenia -->
-        <dataRef>
+        <!--Adresa miesta poistenia-->
+<dataRef>
             <id>109034</id>
             <logic>
                 <behavior>editable</behavior>
@@ -5435,7 +5472,8 @@
             </logic>
         </dataRef>
         <!-- Adresa poistníka -->
-        <dataRef>
+        <!--Typ adresy poistnika-->
+<dataRef>
             <id>109035</id>
             <logic>
                 <behavior>required</behavior>
@@ -5620,27 +5658,31 @@
                 <perform>true</perform>
             </logic>
         </roleRef>
-        <dataRef>
+        <!--Číslo ponuky-->
+<dataRef>
             <id>309001</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Začiatok poistenia-->
+<dataRef>
             <id>109001</id>
             <logic>
                 <behavior>required</behavior>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--oistenie na dobu určitú-->
+<dataRef>
             <id>109002</id>
             <logic>
                 <behavior>required</behavior>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Koniec poistenia-->
+<dataRef>
             <id>109003</id>
             <logic>
                 <behavior>required</behavior>
@@ -5653,20 +5695,23 @@
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Číslo úverovej zmluvy-->
+<dataRef>
             <id>109005</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Spôsob platenia-->
+<dataRef>
             <id>109006</id>
             <logic>
                 <behavior>required</behavior>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Ponuka PDF-->
+<dataRef>
             <id>309003</id>
             <logic>
                 <behavior>visible</behavior>
@@ -5689,27 +5734,31 @@
                 <perform>true</perform>
             </logic>
         </roleRef>
-        <dataRef>
+        <!--Číslo ponuky-->
+<dataRef>
             <id>309001</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Začiatok poistenia-->
+<dataRef>
             <id>109001</id>
             <logic>
                 <behavior>required</behavior>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--oistenie na dobu určitú-->
+<dataRef>
             <id>109002</id>
             <logic>
                 <behavior>required</behavior>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Koniec poistenia-->
+<dataRef>
             <id>109003</id>
             <logic>
                 <behavior>required</behavior>
@@ -5722,20 +5771,23 @@
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Číslo úverovej zmluvy-->
+<dataRef>
             <id>109005</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Spôsob platenia-->
+<dataRef>
             <id>109006</id>
             <logic>
                 <behavior>required</behavior>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Ponuka PDF-->
+<dataRef>
             <id>309003</id>
             <logic>
                 <behavior>visible</behavior>
@@ -5758,27 +5810,31 @@
                 <perform>true</perform>
             </logic>
         </roleRef>
-        <dataRef>
+        <!--Číslo ponuky-->
+<dataRef>
             <id>309001</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Začiatok poistenia-->
+<dataRef>
             <id>109001</id>
             <logic>
                 <behavior>required</behavior>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--oistenie na dobu určitú-->
+<dataRef>
             <id>109002</id>
             <logic>
                 <behavior>required</behavior>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Koniec poistenia-->
+<dataRef>
             <id>109003</id>
             <logic>
                 <behavior>required</behavior>
@@ -5791,20 +5847,23 @@
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Číslo úverovej zmluvy-->
+<dataRef>
             <id>109005</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Spôsob platenia-->
+<dataRef>
             <id>109006</id>
             <logic>
                 <behavior>required</behavior>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Ponuka PDF-->
+<dataRef>
             <id>309003</id>
             <logic>
                 <behavior>visible</behavior>
@@ -5855,7 +5914,8 @@
                 <perform>true</perform>
             </logic>
         </roleRef>
-        <dataRef>
+        <!--Variabilný symbol-->
+<dataRef>
             <id>308007</id>
             <logic>
                 <behavior>required</behavior>
@@ -6768,171 +6828,199 @@
             <id>3</id>
         </transactionRef>
         <!-- Poistník -->
-        <dataRef>
+        <!--Typ subjektu-->
+<dataRef>
             <id>109007</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Titul pred menom-->
+<dataRef>
             <id>109008</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Titul za menom-->
+<dataRef>
             <id>109009</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Meno-->
+<dataRef>
             <id>109010</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Priezvisko-->
+<dataRef>
             <id>109011</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Obchodné meno-->
+<dataRef>
             <id>109012</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Štátna príslušnosť-->
+<dataRef>
             <id>109013</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Dátum narodenia-->
+<dataRef>
             <id>109014</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Rodné číslo-->
+<dataRef>
             <id>109015</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Typ preukazu-->
+<dataRef>
             <id>109016</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Číslo preukazu-->
+<dataRef>
             <id>109017</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Telefónne číslo-->
+<dataRef>
             <id>109018</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Email-->
+<dataRef>
             <id>109019</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Poistený je iná osoba-->
+<dataRef>
             <id>109020</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
         <!-- Poistený -->
-        <dataRef>
+        <!--Typ subjektu-->
+<dataRef>
             <id>109021</id>
             <logic>
                 <behavior>hidden</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Titul pred menom-->
+<dataRef>
             <id>109022</id>
             <logic>
                 <behavior>hidden</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Titul za menom-->
+<dataRef>
             <id>109023</id>
             <logic>
                 <behavior>hidden</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Meno poistený-->
+<dataRef>
             <id>109024</id>
             <logic>
                 <behavior>hidden</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Priezvisko poistený-->
+<dataRef>
             <id>109025</id>
             <logic>
                 <behavior>hidden</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Obchodné meno poistený-->
+<dataRef>
             <id>109026</id>
             <logic>
                 <behavior>hidden</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Štátna príslušnosť poistený-->
+<dataRef>
             <id>109027</id>
             <logic>
                 <behavior>hidden</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Dátum narodenia poistený-->
+<dataRef>
             <id>109028</id>
             <logic>
                 <behavior>hidden</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Rodné číslo-->
+<dataRef>
             <id>109029</id>
             <logic>
                 <behavior>hidden</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Typ preukazu poisteny-->
+<dataRef>
             <id>109030</id>
             <logic>
                 <behavior>hidden</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Číslo preukazu-->
+<dataRef>
             <id>109031</id>
             <logic>
                 <behavior>hidden</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Telefónne číslo poisteny-->
+<dataRef>
             <id>109032</id>
             <logic>
                 <behavior>hidden</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Email poisteny-->
+<dataRef>
             <id>109033</id>
             <logic>
                 <behavior>hidden</behavior>
             </logic>
         </dataRef>
         <!-- Údaje o mieste poistenia -->
-        <dataRef>
+        <!--Adresa miesta poistenia-->
+<dataRef>
             <id>109034</id>
             <logic>
                 <behavior>visible</behavior>
@@ -6940,7 +7028,8 @@
             </logic>
         </dataRef>
         <!-- Adresa poistníka -->
-        <dataRef>
+        <!--Typ adresy poistnika-->
+<dataRef>
             <id>109035</id>
             <logic>
 
@@ -7122,26 +7211,30 @@
                 <perform>true</perform>
             </logic>
         </roleRef>
-        <dataRef>
+        <!--Číslo ponuky-->
+<dataRef>
             <id>309001</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Začiatok poistenia-->
+<dataRef>
             <id>109001</id>
             <logic>
 
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--oistenie na dobu určitú-->
+<dataRef>
             <id>109002</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Koniec poistenia-->
+<dataRef>
             <id>109003</id>
             <logic>
                 <behavior>visible</behavior>
@@ -7153,19 +7246,22 @@
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Číslo úverovej zmluvy-->
+<dataRef>
             <id>109005</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Spôsob platenia-->
+<dataRef>
             <id>109006</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Ponuka PDF-->
+<dataRef>
             <id>309003</id>
             <logic>
                 <behavior>visible</behavior>
@@ -7188,7 +7284,8 @@
                 <perform>true</perform>
             </logic>
         </roleRef>
-        <dataRef>
+        <!--Variabilný symbol-->
+<dataRef>
             <id>308007</id>
             <logic>
                 <behavior>visible</behavior>
