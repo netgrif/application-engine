@@ -5040,6 +5040,58 @@
         <x>1180</x>
         <y>260</y>
         <label>Údaje o zmluve</label>
+        <roleRef>
+            <id>1</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <dataRef>
+            <id>309001</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109001</id>
+            <logic>
+                <behavior>required</behavior>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109002</id>
+            <logic>
+                <behavior>required</behavior>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109003</id>
+            <logic>
+                <behavior>required</behavior>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109004</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109005</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109006</id>
+            <logic>
+                <behavior>required</behavior>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
     </transition>
     <!--todo============================= Údaje o zmluve=====================-->
     <transition>
@@ -5047,6 +5099,58 @@
         <x>1185</x>
         <y>898</y>
         <label>Údaje o zmluve</label>
+        <roleRef>
+            <id>1</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <dataRef>
+            <id>309001</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109001</id>
+            <logic>
+                <behavior>required</behavior>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109002</id>
+            <logic>
+                <behavior>required</behavior>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109003</id>
+            <logic>
+                <behavior>required</behavior>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109004</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109005</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109006</id>
+            <logic>
+                <behavior>required</behavior>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
     </transition>
     <!--todo============================= Údaje o zmluve=====================-->
     <transition>
