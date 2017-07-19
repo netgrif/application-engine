@@ -46,7 +46,9 @@ public class MailService implements IMailService {
         model.put("token", token);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
         model.put("date", LocalDate.now().plusDays(3).format(formatter));
-        model.put("serverName", "http://" + subdomain + "." + InetAddress.getLocalHost().getHostName() + "." + topLevelDomain + (port != null && !port.isEmpty() ?  (":" + port) : ""));
+
+        topLevelDomain = topLevelDomain == null ? "com" : (topLevelDomain.isEmpty() ? "com" : topLevelDomain);
+        model.put("serverName", "http://" + (subdomain != null && !subdomain.isEmpty() ? (subdomain + ".") : "") + InetAddress.getLocalHost().getHostName().toLowerCase() + "." + topLevelDomain + (port != null && !port.isEmpty() ?  (":" + port) : ""));
         MimeMessage email = buildEmail(EmailType.REGISTRATION, recipients, model);
         mailSender.send(email);
     }
