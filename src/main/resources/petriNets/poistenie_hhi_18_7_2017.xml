@@ -3534,7 +3534,7 @@
             </logic>
         </dataRef>
     </transition>
-    <!--todo============================= Vedlajsie stavby - skryvanie na boolean, vzorce =====================-->
+    <!--todo============================= Vedlajsie stavby - action podlahova plocha, zmena na spoluucast =====================-->
     <transition>
         <id>413</id>
         <x>620</x>
