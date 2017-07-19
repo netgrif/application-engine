@@ -3639,20 +3639,46 @@
             <id>105009</id>
             <logic>
                 <behavior>editable</behavior>
+                <!--set editable-->
+                <action trigger="set">
+                    idTrue: f.105009,
+                    trans: t.413,
+                    other: f.105010;
+                    make other,editable on trans when { idTrue.value }
+                </action>
+                <action trigger="set">
+                    idTrue: f.105009,
+                    trans: t.413,
+                    other: f.305004;
+                    make other,editable on trans when { idTrue.value }
+                </action>
+                <!--set hidden-->
+                <action trigger="set">
+                    idTrue: f.105009,
+                    trans: t.413,
+                    other: f.105010;
+                    make other,hidden on trans when { !idTrue.value }
+                </action>
+                <action trigger="set">
+                    idTrue: f.105009,
+                    trans: t.413,
+                    other: f.305004;
+                    make other,hidden on trans when { !idTrue.value }
+                </action>
             </logic>
         </dataRef>
         <!--Hospodárska budova - poistná suma-->
         <dataRef>
             <id>105010</id>
             <logic>
-                <behavior>editable</behavior>
+                <behavior>hidden</behavior>
             </logic>
         </dataRef>
         <!--Hospodárska budova - poistné-->
         <dataRef>
             <id>305004</id>
             <logic>
-                <behavior>editable</behavior>
+                <behavior>hidden</behavior>
             </logic>
         </dataRef>
         <!--Altánok?-->
@@ -3660,20 +3686,46 @@
             <id>105011</id>
             <logic>
                 <behavior>editable</behavior>
+                <!--set editable-->
+                <action trigger="set">
+                    idTrue: f.105011,
+                    trans: t.413,
+                    other: f.105012;
+                    make other,editable on trans when { idTrue.value }
+                </action>
+                <action trigger="set">
+                    idTrue: f.105011,
+                    trans: t.413,
+                    other: f.305005;
+                    make other,editable on trans when { idTrue.value }
+                </action>
+                <!--set hidden-->
+                <action trigger="set">
+                    idTrue: f.105011,
+                    trans: t.413,
+                    other: f.105012;
+                    make other,hidden on trans when { !idTrue.value }
+                </action>
+                <action trigger="set">
+                    idTrue: f.105011,
+                    trans: t.413,
+                    other: f.305005;
+                    make other,hidden on trans when { !idTrue.value }
+                </action>
             </logic>
         </dataRef>
         <!--Altánok - poistná suma-->
         <dataRef>
             <id>105012</id>
             <logic>
-                <behavior>editable</behavior>
+                <behavior>hidden</behavior>
             </logic>
         </dataRef>
         <!--Altánok - poistné-->
         <dataRef>
             <id>305005</id>
             <logic>
-                <behavior>editable</behavior>
+                <behavior>hidden</behavior>
             </logic>
         </dataRef>
         <!--Prístrešok?-->
@@ -3681,20 +3733,46 @@
             <id>105013</id>
             <logic>
                 <behavior>editable</behavior>
+                <!--set editable-->
+                <action trigger="set">
+                    idTrue: f.105013,
+                    trans: t.413,
+                    other: f.105014;
+                    make other,editable on trans when { idTrue.value }
+                </action>
+                <action trigger="set">
+                    idTrue: f.105013,
+                    trans: t.413,
+                    other: f.305006;
+                    make other,editable on trans when { idTrue.value }
+                </action>
+                <!--set hidden-->
+                <action trigger="set">
+                    idTrue: f.105013,
+                    trans: t.413,
+                    other: f.105014;
+                    make other,hidden on trans when { !idTrue.value }
+                </action>
+                <action trigger="set">
+                    idTrue: f.105013,
+                    trans: t.413,
+                    other: f.305006;
+                    make other,hidden on trans when { !idTrue.value }
+                </action>
             </logic>
         </dataRef>
         <!--Prístrešok - poistná suma-->
         <dataRef>
             <id>105014</id>
             <logic>
-                <behavior>editable</behavior>
+                <behavior>hidden</behavior>
             </logic>
         </dataRef>
         <!--Prístrešok - poistné-->
         <dataRef>
             <id>305006</id>
             <logic>
-                <behavior>editable</behavior>
+                <behavior>hidden</behavior>
             </logic>
         </dataRef>
         <!--Chodník, parkovacia plocha?-->
@@ -3702,20 +3780,46 @@
             <id>105015</id>
             <logic>
                 <behavior>editable</behavior>
+                <!--set editable-->
+                <action trigger="set">
+                    idTrue: f.105015,
+                    trans: t.413,
+                    other: f.105016;
+                    make other,editable on trans when { idTrue.value }
+                </action>
+                <action trigger="set">
+                    idTrue: f.105015,
+                    trans: t.413,
+                    other: f.305007;
+                    make other,editable on trans when { idTrue.value }
+                </action>
+                <!--set hidden-->
+                <action trigger="set">
+                    idTrue: f.105015,
+                    trans: t.413,
+                    other: f.105016;
+                    make other,hidden on trans when { !idTrue.value }
+                </action>
+                <action trigger="set">
+                    idTrue: f.105015,
+                    trans: t.413,
+                    other: f.305007;
+                    make other,hidden on trans when { !idTrue.value }
+                </action>
             </logic>
         </dataRef>
         <!--Chodník, parkovacia plocha - poistná suma -->
         <dataRef>
             <id>105016</id>
             <logic>
-                <behavior>editable</behavior>
+                <behavior>hidden</behavior>
             </logic>
         </dataRef>
         <!--Chodník, parkovacia plocha - poistné-->
         <dataRef>
             <id>305007</id>
             <logic>
-                <behavior>editable</behavior>
+                <behavior>hidden</behavior>
             </logic>
         </dataRef>
         <!--Sauna?-->
@@ -3723,20 +3827,46 @@
             <id>105017</id>
             <logic>
                 <behavior>editable</behavior>
+                <!--set editable-->
+                <action trigger="set">
+                    idTrue: f.105017,
+                    trans: t.413,
+                    other: f.105018;
+                    make other,editable on trans when { idTrue.value }
+                </action>
+                <action trigger="set">
+                    idTrue: f.105017,
+                    trans: t.413,
+                    other: f.305008;
+                    make other,editable on trans when { idTrue.value }
+                </action>
+                <!--set hidden-->
+                <action trigger="set">
+                    idTrue: f.105017,
+                    trans: t.413,
+                    other: f.105018;
+                    make other,hidden on trans when { !idTrue.value }
+                </action>
+                <action trigger="set">
+                    idTrue: f.105017,
+                    trans: t.413,
+                    other: f.305008;
+                    make other,hidden on trans when { !idTrue.value }
+                </action>
             </logic>
         </dataRef>
         <!--Sauna - poistná suma-->
         <dataRef>
             <id>105018</id>
             <logic>
-                <behavior>editable</behavior>
+                <behavior>hidden</behavior>
             </logic>
         </dataRef>
         <!--Sauna - poistné-->
         <dataRef>
             <id>305008</id>
             <logic>
-                <behavior>editable</behavior>
+                <behavior>hidden</behavior>
             </logic>
         </dataRef>
         <!--Elektrická brána?-->
@@ -3744,20 +3874,46 @@
             <id>105019</id>
             <logic>
                 <behavior>editable</behavior>
+                <!--set editable-->
+                <action trigger="set">
+                    idTrue: f.105019,
+                    trans: t.413,
+                    other: f.105020;
+                    make other,editable on trans when { idTrue.value }
+                </action>
+                <action trigger="set">
+                    idTrue: f.105019,
+                    trans: t.413,
+                    other: f.305009;
+                    make other,editable on trans when { idTrue.value }
+                </action>
+                <!--set hidden-->
+                <action trigger="set">
+                    idTrue: f.105019,
+                    trans: t.413,
+                    other: f.105020;
+                    make other,hidden on trans when { !idTrue.value }
+                </action>
+                <action trigger="set">
+                    idTrue: f.105019,
+                    trans: t.413,
+                    other: f.305009;
+                    make other,hidden on trans when { !idTrue.value }
+                </action>
             </logic>
         </dataRef>
         <!--Elektrická brána - poistná suma-->
         <dataRef>
             <id>105020</id>
             <logic>
-                <behavior>editable</behavior>
+                <behavior>hidden</behavior>
             </logic>
         </dataRef>
         <!--Elektrická brána - poistné-->
         <dataRef>
             <id>305009</id>
             <logic>
-                <behavior>editable</behavior>
+                <behavior>hidden</behavior>
             </logic>
         </dataRef>
         <!--Tenisový kurt?-->
@@ -3765,20 +3921,46 @@
             <id>105021</id>
             <logic>
                 <behavior>editable</behavior>
+                <!--set editable-->
+                <action trigger="set">
+                    idTrue: f.105021,
+                    trans: t.413,
+                    other: f.105022;
+                    make other,editable on trans when { idTrue.value }
+                </action>
+                <action trigger="set">
+                    idTrue: f.105021,
+                    trans: t.413,
+                    other: f.305010;
+                    make other,editable on trans when { idTrue.value }
+                </action>
+                <!--set hidden-->
+                <action trigger="set">
+                    idTrue: f.105021,
+                    trans: t.413,
+                    other: f.105022;
+                    make other,hidden on trans when { !idTrue.value }
+                </action>
+                <action trigger="set">
+                    idTrue: f.105021,
+                    trans: t.413,
+                    other: f.305010;
+                    make other,hidden on trans when { !idTrue.value }
+                </action>
             </logic>
         </dataRef>
         <!--Tenisový kurt - poistná suma-->
         <dataRef>
             <id>105022</id>
             <logic>
-                <behavior>editable</behavior>
+                <behavior>hidden</behavior>
             </logic>
         </dataRef>
         <!--Tenisový kurt - poistné-->
         <dataRef>
             <id>305010</id>
             <logic>
-                <behavior>editable</behavior>
+                <behavior>hidden</behavior>
             </logic>
         </dataRef>
         <!--Vonkajší bazén?-->
@@ -3786,20 +3968,46 @@
             <id>105023</id>
             <logic>
                 <behavior>editable</behavior>
+                <!--set editable-->
+                <action trigger="set">
+                    idTrue: f.105023,
+                    trans: t.413,
+                    other: f.105024;
+                    make other,editable on trans when { idTrue.value }
+                </action>
+                <action trigger="set">
+                    idTrue: f.105023,
+                    trans: t.413,
+                    other: f.305011;
+                    make other,editable on trans when { idTrue.value }
+                </action>
+                <!--set hidden-->
+                <action trigger="set">
+                    idTrue: f.105023,
+                    trans: t.413,
+                    other: f.105024;
+                    make other,hidden on trans when { !idTrue.value }
+                </action>
+                <action trigger="set">
+                    idTrue: f.105023,
+                    trans: t.413,
+                    other: f.305011;
+                    make other,hidden on trans when { !idTrue.value }
+                </action>
             </logic>
         </dataRef>
         <!--Vonkajší bazén - poistná suma-->
         <dataRef>
             <id>105024</id>
             <logic>
-                <behavior>editable</behavior>
+                <behavior>hidden</behavior>
             </logic>
         </dataRef>
         <!--Vonkajší bazén - poistné-->
         <dataRef>
             <id>305011</id>
             <logic>
-                <behavior>editable</behavior>
+                <behavior>hidden</behavior>
             </logic>
         </dataRef>
         <!--Studňa-->
@@ -3807,20 +4015,46 @@
             <id>105025</id>
             <logic>
                 <behavior>editable</behavior>
+                <!--set editable-->
+                <action trigger="set">
+                    idTrue: f.105025,
+                    trans: t.413,
+                    other: f.105026;
+                    make other,editable on trans when { idTrue.value }
+                </action>
+                <action trigger="set">
+                    idTrue: f.105025,
+                    trans: t.413,
+                    other: f.305012;
+                    make other,editable on trans when { idTrue.value }
+                </action>
+                <!--set hidden-->
+                <action trigger="set">
+                    idTrue: f.105025,
+                    trans: t.413,
+                    other: f.105026;
+                    make other,hidden on trans when { !idTrue.value }
+                </action>
+                <action trigger="set">
+                    idTrue: f.105025,
+                    trans: t.413,
+                    other: f.305012;
+                    make other,hidden on trans when { !idTrue.value }
+                </action>
             </logic>
         </dataRef>
         <!--Studňa - poistná suma-->
         <dataRef>
             <id>105026</id>
             <logic>
-                <behavior>editable</behavior>
+                <behavior>hidden</behavior>
             </logic>
         </dataRef>
         <!--Studňa - poistné-->
         <dataRef>
             <id>305012</id>
             <logic>
-                <behavior>editable</behavior>
+                <behavior>hidden</behavior>
             </logic>
         </dataRef>
         <!--Žumpa, septik?-->
@@ -3828,20 +4062,46 @@
             <id>105027</id>
             <logic>
                 <behavior>editable</behavior>
+                <!--set editable-->
+                <action trigger="set">
+                    idTrue: f.105027,
+                    trans: t.413,
+                    other: f.105028;
+                    make other,editable on trans when { idTrue.value }
+                </action>
+                <action trigger="set">
+                    idTrue: f.105027,
+                    trans: t.413,
+                    other: f.305013;
+                    make other,editable on trans when { idTrue.value }
+                </action>
+                <!--set hidden-->
+                <action trigger="set">
+                    idTrue: f.105027,
+                    trans: t.413,
+                    other: f.105028;
+                    make other,hidden on trans when { !idTrue.value }
+                </action>
+                <action trigger="set">
+                    idTrue: f.105027,
+                    trans: t.413,
+                    other: f.305013;
+                    make other,hidden on trans when { !idTrue.value }
+                </action>
             </logic>
         </dataRef>
         <!--Žumpa, septik - poistná suma-->
         <dataRef>
             <id>105028</id>
             <logic>
-                <behavior>editable</behavior>
+                <behavior>hidden</behavior>
             </logic>
         </dataRef>
         <!--Žumpa, septik - poistné-->
         <dataRef>
             <id>305013</id>
             <logic>
-                <behavior>editable</behavior>
+                <behavior>hidden</behavior>
             </logic>
         </dataRef>
         <!--Iné?-->
@@ -3849,20 +4109,46 @@
             <id>105029</id>
             <logic>
                 <behavior>editable</behavior>
+                <!--set editable-->
+                <action trigger="set">
+                    idTrue: f.105029,
+                    trans: t.413,
+                    other: f.105030;
+                    make other,editable on trans when { idTrue.value }
+                </action>
+                <action trigger="set">
+                    idTrue: f.105029,
+                    trans: t.413,
+                    other: f.305014;
+                    make other,editable on trans when { idTrue.value }
+                </action>
+                <!--set hidden-->
+                <action trigger="set">
+                    idTrue: f.105029,
+                    trans: t.413,
+                    other: f.105030;
+                    make other,hidden on trans when { !idTrue.value }
+                </action>
+                <action trigger="set">
+                    idTrue: f.105029,
+                    trans: t.413,
+                    other: f.305014;
+                    make other,hidden on trans when { !idTrue.value }
+                </action>
             </logic>
         </dataRef>
         <!--Iné - poistná suma-->
         <dataRef>
             <id>105030</id>
             <logic>
-                <behavior>editable</behavior>
+                <behavior>hidden</behavior>
             </logic>
         </dataRef>
         <!--Iné - poistné-->
         <dataRef>
             <id>305014</id>
             <logic>
-                <behavior>editable</behavior>
+                <behavior>hidden</behavior>
             </logic>
         </dataRef>
     </transition>
