@@ -361,7 +361,6 @@
         <values>bytový dom</values>
         <values>bungalow</values>
         <values>rozostavaná stavba</values>
-        <init>rodinný dom</init>
         <action trigger="set">
             field: f.this,
             coeff: f.202001;
@@ -3328,6 +3327,52 @@
         <isStatic>false</isStatic>
     </place>
     <!--=================================TRANSITIONS================-->
+    <!--================================= poistenie nehnuteľnosti DONE====================-->
+    <transition>
+        <id>2</id>
+        <x>260</x>
+        <y>300</y>
+        <label>Poistenie nehnuteľnosti</label>
+        <roleRef>
+            <id>1</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+    </transition>
+    <!--================================= postenie domacnosti DONE=============-->
+    <transition>
+        <id>4</id>
+        <x>180</x>
+        <y>900</y>
+        <label>Poistenie domácnosti</label>
+        <transactionRef>
+            <id>1</id>
+        </transactionRef>
+        <roleRef>
+            <id>1</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+    </transition>
+    <!--================================= Poistenie nehnuteľnosti a domácnosti DONE=====================-->
+    <transition>
+        <id>3</id>
+        <x>180</x>
+        <y>580</y>
+        <label>Poistenie nehnuteľnosti a domácnosti</label>
+        <transactionRef>
+            <id>1</id>
+        </transactionRef>
+        <roleRef>
+            <id>1</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+    </transition>
+    <!--todo============================== ZÁKLADNÉ INFO - psc ====================-->
     <transition>
         <id>154</id>
         <x>620</x>
@@ -3472,52 +3517,7 @@
             </logic>
         </dataRef>
     </transition>
-    <!--=================================poistenie nehnuteľnosti====================-->
-    <transition>
-        <id>2</id>
-        <x>260</x>
-        <y>300</y>
-        <label>Poistenie nehnuteľnosti</label>
-        <roleRef>
-            <id>1</id>
-            <logic>
-                <perform>true</perform>
-            </logic>
-        </roleRef>
-    </transition>
-    <!--=================================postenie domacnosti=============-->
-    <transition>
-        <id>4</id>
-        <x>180</x>
-        <y>900</y>
-        <label>Poistenie domácnosti</label>
-        <transactionRef>
-            <id>1</id>
-        </transactionRef>
-        <roleRef>
-            <id>1</id>
-            <logic>
-                <perform>true</perform>
-            </logic>
-        </roleRef>
-    </transition>
-    <!--=================================Poistenie nehnuteľnosti a domácnosti=====================-->
-    <transition>
-        <id>3</id>
-        <x>180</x>
-        <y>580</y>
-        <label>Poistenie nehnuteľnosti a domácnosti</label>
-        <transactionRef>
-            <id>1</id>
-        </transactionRef>
-        <roleRef>
-            <id>1</id>
-            <logic>
-                <perform>true</perform>
-            </logic>
-        </roleRef>
-    </transition>
-    <!--=================================Nehnuteľnosť=====================-->
+    <!--todo============================= Nehnuteľnosť - vzorce, pridate spoluucast =====================-->
     <transition>
         <id>155</id>
         <x>620</x>
@@ -3552,12 +3552,6 @@
         </dataRef>
         <dataRef>
             <id>105003</id>
-            <logic>
-                <behavior>editable</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>105004</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
@@ -3613,74 +3607,12 @@
             </logic>
         </dataRef>
     </transition>
-    <!--=================================Údaje o zmluve=====================-->
+    <!--todo============================= Doplnkové poistenie nehnuteľnosti - skryvanie na boolean =====================-->
     <transition>
-        <id>332</id>
-        <x>1180</x>
-        <y>580</y>
-        <label>Údaje o zmluve</label>
-        <roleRef>
-            <id>1</id>
-            <logic>
-                <perform>true</perform>
-            </logic>
-        </roleRef>
-        <dataRef>
-            <id>309001</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>109001</id>
-            <logic>
-                <behavior>required</behavior>
-                <behavior>editable</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>109002</id>
-            <logic>
-                <behavior>required</behavior>
-                <behavior>editable</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>109003</id>
-            <logic>
-                <behavior>required</behavior>
-                <behavior>editable</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>109004</id>
-            <logic>
-                <behavior>editable</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>109005</id>
-            <logic>
-                <behavior>editable</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>109006</id>
-            <logic>
-                <behavior>required</behavior>
-                <behavior>editable</behavior>
-            </logic>
-        </dataRef>
-    </transition>
-    <!--=================================Domácnosť=====================-->
-    <transition>
-        <id>363</id>
+        <id>414</id>
         <x>620</x>
-        <y>700</y>
-        <label>Domácnosť</label>
-        <transactionRef>
-            <id>2</id>
-        </transactionRef>
+        <y>380</y>
+        <label>Doplnkové poistenie nehnuteľnosti</label>
         <roleRef>
             <id>1</id>
             <logic>
@@ -3688,142 +3620,43 @@
             </logic>
         </roleRef>
         <dataRef>
-            <id>103001</id>
+            <id>105031</id>
             <logic>
                 <behavior>editable</behavior>
-                <behavior>required</behavior>
             </logic>
         </dataRef>
         <dataRef>
-            <id>106003</id>
+            <id>105032</id>
             <logic>
                 <behavior>editable</behavior>
-                <behavior>required</behavior>
             </logic>
         </dataRef>
         <dataRef>
-            <id>103002</id>
-            <logic>
-                <behavior>editable</behavior>
-                <behavior>required</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>103003</id>
-            <logic>
-                <behavior>editable</behavior>
-                <behavior>required</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>103004</id>
-            <logic>
-                <behavior>editable</behavior>
-                <behavior>required</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>103005</id>
-            <logic>
-                <behavior>editable</behavior>
-                <behavior>required</behavior>
-            </logic>
-        </dataRef>
-    </transition>
-    <!--=================================Sumár=====================-->
-    <transition>
-        <id>364</id>
-        <x>620</x>
-        <y>1020</y>
-        <label>Sumár</label>
-        <roleRef>
-            <id>1</id>
-            <logic>
-                <perform>true</perform>
-            </logic>
-        </roleRef>
-        <dataRef>
-            <!--spoluucast nehjnutelnost-->
-            <id>105005</id>
-            <logic>
-                <behavior>editable</behavior>
-                <behavior>required</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <!--nehnutelnost poistna suma-->
-            <id>105006</id>
-            <logic>
-                <behavior>editable</behavior>
-                <behavior>required</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <!--nehnutelnost poistne-->
-            <id>305002</id>
+            <id>305015</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
         <dataRef>
-            <id>308001</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>308002</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>308003</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>308004</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>108001</id>
+            <id>105033</id>
             <logic>
                 <behavior>editable</behavior>
-                <behavior>required</behavior>
             </logic>
         </dataRef>
         <dataRef>
-            <id>308005</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>108002</id>
+            <id>105034</id>
             <logic>
                 <behavior>editable</behavior>
-                <behavior>required</behavior>
             </logic>
         </dataRef>
         <dataRef>
-            <id>108003</id>
-            <logic>
-                <behavior>editable</behavior>
-                <behavior>required</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>308006</id>
+            <id>305016</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
     </transition>
-    <!--=================================Vedlajsie stavby=====================-->
+    <!--todo============================= Vedlajsie stavby - skryvanie na boolean, vzorce =====================-->
     <transition>
         <id>413</id>
         <x>620</x>
@@ -3835,6 +3668,12 @@
                 <perform>true</perform>
             </logic>
         </roleRef>
+        <dataRef>
+            <id>105004</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
         <dataRef>
             <id>105035</id>
             <logic>
@@ -4058,12 +3897,15 @@
             </logic>
         </dataRef>
     </transition>
-    <!--=================================Doplnkové poistenie nehnuteľnosti=====================-->
+    <!--todo============================= Domácnosť - vzorce, pridate spoluucast =====================-->
     <transition>
-        <id>414</id>
+        <id>363</id>
         <x>620</x>
-        <y>380</y>
-        <label>Doplnkové poistenie nehnuteľnosti</label>
+        <y>700</y>
+        <label>Domácnosť</label>
+        <transactionRef>
+            <id>2</id>
+        </transactionRef>
         <roleRef>
             <id>1</id>
             <logic>
@@ -4071,43 +3913,49 @@
             </logic>
         </roleRef>
         <dataRef>
-            <id>105031</id>
+            <id>103001</id>
             <logic>
                 <behavior>editable</behavior>
+                <behavior>required</behavior>
             </logic>
         </dataRef>
         <dataRef>
-            <id>105032</id>
+            <id>106003</id>
             <logic>
                 <behavior>editable</behavior>
+                <behavior>required</behavior>
             </logic>
         </dataRef>
         <dataRef>
-            <id>305015</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>105033</id>
+            <id>103002</id>
             <logic>
                 <behavior>editable</behavior>
+                <behavior>required</behavior>
             </logic>
         </dataRef>
         <dataRef>
-            <id>105034</id>
+            <id>103003</id>
             <logic>
                 <behavior>editable</behavior>
+                <behavior>required</behavior>
             </logic>
         </dataRef>
         <dataRef>
-            <id>305016</id>
+            <id>103004</id>
             <logic>
-                <behavior>visible</behavior>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>103005</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
             </logic>
         </dataRef>
     </transition>
-    <!--=================================Doplnkové poistenie domácnosti=====================-->
+    <!--todo============================= Doplnkové poistenie domácnosti=====================-->
     <transition>
         <id>421</id>
         <x>620</x>
@@ -4282,7 +4130,100 @@
             </logic>
         </dataRef>
     </transition>
-    <!--=================================Údaje o poistníkovi a mieste poistenia=====================-->
+    <!--todo============================= Sumár - vzorce, zmazat spoluucast nehnutelnost a domacnost =====================-->
+    <transition>
+        <id>364</id>
+        <x>620</x>
+        <y>1020</y>
+        <label>Sumár</label>
+        <roleRef>
+            <id>1</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <dataRef>
+            <!--spoluucast nehjnutelnost-->
+            <id>105005</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <!--nehnutelnost poistna suma-->
+            <id>105006</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <!--nehnutelnost poistne-->
+            <id>305002</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>308001</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>308002</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>308003</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>308004</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>108001</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>308005</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>108002</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>108003</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>308006</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+    </transition>
+    <!--todo============================= Údaje o poistníkovi a mieste poistenia=====================-->
     <transition>
         <id>588</id>
         <x>620</x>
@@ -5090,69 +5031,133 @@
             </logic>
         </dataRef>
     </transition>
-    <!--todo=============================Zrušenia návrhu poistky=====================-->
-    <transition>
-        <id>674</id>
-        <x>1433</x>
-        <y>965</y>
-        <label>Zrušenie návrhu poistky (po vypršaní lehoty) </label>
-    </transition>
-    <!--todo=============================Napárovanie platby=====================-->
-    <transition>
-        <id>680</id>
-        <x>1681</x>
-        <y>967</y>
-        <label>Napárovanie platby</label>
-    </transition>
-    <!--todo=============================Aktívna zmluva==================================-->
-    <transition>
-        <id>686</id>
-        <x>1870</x>
-        <y>1071</y>
-        <label>Aktívna zmluva</label>
-    </transition>
-    <!--todo=============================Expirovaný návrh poistky=====================-->
-    <transition>
-        <id>687</id>
-        <x>1431</x>
-        <y>1243</y>
-        <label>Expirovaný návrh poistky</label>
-    </transition>
-    <!--todo=============================Expirácia zmluvy=====================-->
-    <transition>
-        <id>692</id>
-        <x>1682</x>
-        <y>1250</y>
-        <label>Expirácia zmluvy</label>
-    </transition>
-    <!--todo=============================Expirovaná zmluva=====================-->
-    <transition>
-        <id>694</id>
-        <x>2077</x>
-        <y>1245</y>
-        <label>Expirovaná zmluva</label>
-    </transition>
-    <!--todo=============================Údaje o zmluve=====================-->
+
+    <!--================================= VYTVORENIE ZMLLUVY =====================-->
+
+    <!--todo============================= Údaje o zmluve=====================-->
     <transition>
         <id>1618</id>
         <x>1180</x>
         <y>260</y>
         <label>Údaje o zmluve</label>
     </transition>
-    <!--todo=============================Údaje o zmluve=====================-->
+    <!--todo============================= Údaje o zmluve=====================-->
     <transition>
         <id>1661</id>
         <x>1185</x>
         <y>898</y>
         <label>Údaje o zmluve</label>
     </transition>
-    <!--todo=============================Údaje o zmluve=====================-->
+    <!--todo============================= Údaje o zmluve=====================-->
     <transition>
-        <id>2014</id>
-        <x>2237</x>
-        <y>743</y>
+        <id>332</id>
+        <x>1180</x>
+        <y>580</y>
         <label>Údaje o zmluve</label>
+        <roleRef>
+            <id>1</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <dataRef>
+            <id>309001</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109001</id>
+            <logic>
+                <behavior>required</behavior>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109002</id>
+            <logic>
+                <behavior>required</behavior>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109003</id>
+            <logic>
+                <behavior>required</behavior>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109004</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109005</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109006</id>
+            <logic>
+                <behavior>required</behavior>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
     </transition>
+
+    <!--================================= ZRUŠENIE NÁVRHU =====================-->
+
+    <!--todo============================= Zrušenia návrhu poistky=====================-->
+    <transition>
+        <id>674</id>
+        <x>1433</x>
+        <y>965</y>
+        <label>Zrušenie návrhu poistky (po vypršaní lehoty) </label>
+    </transition>
+    <!--todo============================= Expirovaný návrh poistky=====================-->
+    <transition>
+        <id>687</id>
+        <x>1431</x>
+        <y>1243</y>
+        <label>Expirovaný návrh poistky</label>
+    </transition>
+
+    <!--================================= ZAPLATENIE =====================-->
+
+    <!--todo============================= Napárovanie platby=====================-->
+    <transition>
+        <id>680</id>
+        <x>1681</x>
+        <y>967</y>
+        <label>Napárovanie platby</label>
+    </transition>
+    <!--todo============================= Aktívna zmluva==================================-->
+    <transition>
+        <id>686</id>
+        <x>1870</x>
+        <y>1071</y>
+        <label>Aktívna zmluva</label>
+    </transition>
+    <!--todo============================= Expirácia zmluvy=====================-->
+    <transition>
+        <id>692</id>
+        <x>1682</x>
+        <y>1250</y>
+        <label>Expirácia zmluvy</label>
+    </transition>
+    <!--todo============================= Expirovaná zmluva=====================-->
+    <transition>
+        <id>694</id>
+        <x>2077</x>
+        <y>1245</y>
+        <label>Expirovaná zmluva</label>
+    </transition>
+
+    <!--================================= KONTROLA ZADANÝCH ÚDAJOV =====================-->
+
     <!--================================= ZÁKLADNÉ INFORMÁCIE (visible) - DONE =====================-->
     <transition>
         <id>2015</id>
@@ -6224,6 +6229,13 @@
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
+    </transition>
+    <!--todo============================= Údaje o zmluve=====================-->
+    <transition>
+        <id>2014</id>
+        <x>2237</x>
+        <y>743</y>
+        <label>Údaje o zmluve</label>
     </transition>
     <!--todo=============================Údaje o zaplatení=====================-->
     <transition>
