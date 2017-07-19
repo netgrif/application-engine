@@ -5105,6 +5105,12 @@
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
+        <dataRef>
+            <id>309003</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
     </transition>
     <!--todo============================= Údaje o zmluve=====================-->
     <transition>
@@ -5164,6 +5170,12 @@
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
+        <dataRef>
+            <id>309003</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
     </transition>
     <!--todo============================= Údaje o zmluve=====================-->
     <transition>
@@ -5221,6 +5233,12 @@
             <logic>
                 <behavior>required</behavior>
                 <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>309003</id>
+            <logic>
+                <behavior>visible</behavior>
             </logic>
         </dataRef>
     </transition>
