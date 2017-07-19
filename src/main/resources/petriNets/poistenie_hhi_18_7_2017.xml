@@ -3251,6 +3251,7 @@
                 <perform>true</perform>
             </logic>
         </roleRef>
+        <!--Obec-->
         <dataRef>
             <id>301001</id>
             <logic>
@@ -3258,14 +3259,16 @@
                 <!--todo: psc and lokalita lookup -->
             </logic>
         </dataRef>
-        <dataRef>
+        <!--PSČ-->
+<dataRef>
             <id>101001</id>
             <logic>
                 <behavior>editable</behavior>
                 <behavior>required</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Lokalita-->
+<dataRef>
             <id>301002</id>
             <logic>
                 <behavior>visible</behavior>
@@ -3278,105 +3281,120 @@
                 <behavior>required</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Bolo miesto poistenia postihnuté povodňou za posledných 10 rokov?-->
+<dataRef>
             <id>101003</id>
             <logic>
                 <behavior>editable</behavior>
                 <behavior>required</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Nachádza nehnuteľnosť sa vo vzdialenosti kratšej ako 300 m od vodného toku?-->
+<dataRef>
             <id>101004</id>
             <logic>
                 <behavior>editable</behavior>
                 <behavior>required</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Koľko rokov žijete v poisťovanej nehnuteľnosti?-->
+<dataRef>
             <id>101005</id>
             <logic>
                 <behavior>editable</behavior>
                 <behavior>required</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Aký je vzťah poisteného k poisťovanej nehnuteľnosti?-->
+<dataRef>
             <id>101006</id>
             <logic>
                 <behavior>editable</behavior>
                 <behavior>required</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Koľko dospelých žije v domácnosti?-->
+<dataRef>
             <id>101007</id>
             <logic>
                 <behavior>editable</behavior>
                 <behavior>required</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Koľko detí žije v domácnosti?-->
+<dataRef>
             <id>101008</id>
             <logic>
                 <behavior>editable</behavior>
                 <behavior>required</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Koľko detí žije v domácnosti?-->
+<dataRef>
             <id>101008</id>
             <logic>
                 <behavior>editable</behavior>
                 <behavior>required</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Bolo poistenému alebo spolupoistenej osobe niekedy v minulosti zamiestnuté poistné plnenie alebo vypovedaná poistná zmluva?-->
+<dataRef>
             <id>101009</id>
             <logic>
                 <behavior>editable</behavior>
                 <behavior>required</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Bol poistený alebo spolupoistená osoba niekedy trestné stihaný / vyhlásil osobný bankrot / stíhaný za dlhy alebo odsúdený za podvodné alebo obdobné konanie.-->
+<dataRef>
             <id>101010</id>
             <logic>
                 <behavior>editable</behavior>
                 <behavior>required</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Je plánovaná rekonštrukcia alebo prestavba poisťovanej nehnuteľnosti v priebehu najbližších 3 mesiacov?-->
+<dataRef>
             <id>101011</id>
             <logic>
                 <behavior>editable</behavior>
                 <behavior>required</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Žije v poisťovanej domácnosti pes alebo mačka?-->
+<dataRef>
             <id>101012</id>
             <logic>
                 <behavior>editable</behavior>
                 <behavior>required</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Kedy je nehnuteľnosť najviac obývaná?-->
+<dataRef>
             <id>101013</id>
             <logic>
                 <behavior>editable</behavior>
                 <behavior>required</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Je nehnuteľnosť využívaná aj na podnikanie?-->
+<dataRef>
             <id>101014</id>
             <logic>
                 <behavior>editable</behavior>
                 <behavior>required</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Právna subjektivita poisteného?-->
+<dataRef>
             <id>101015</id>
             <logic>
                 <behavior>editable</behavior>
                 <behavior>required</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Počet poistných udalostí za posledné 3 roky?-->
+<dataRef>
             <id>101016</id>
             <logic>
                 <behavior>editable</behavior>
@@ -3400,81 +3418,94 @@
                 <perform>true</perform>
             </logic>
         </roleRef>
-        <dataRef>
+        <!--Predmet poistenia-->
+<dataRef>
             <id>102001</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Poistenie nehnuteľnosti-Spoluúčasť-->
+<dataRef>
             <id>105005</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Podlahová plocha pivnice-->
+<dataRef>
             <id>105001</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Podlahová plocha prízemia-->
+<dataRef>
             <id>105002</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Podlahová plocha všetkých obytných poschodí-->
+<dataRef>
             <id>105003</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Celková podlahová plocha-->
+<dataRef>
             <id>305001</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Konštrukcia múrov-->
+<dataRef>
             <id>102002</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Konštrukcia strechy-->
+<dataRef>
             <id>102003</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Koľko rokov má nehnuteľnosť?-->
+<dataRef>
             <id>102004</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Má nehnuteľnosť praskliny na vonkajšej fasáde?-->
+<dataRef>
             <id>102005</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Koľko izieb má nehnuteľnosť?-->
+<dataRef>
             <id>102006</id>
             <logic>
                 <behavior>editable</behavior>
                 <behavior>required</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Koľko kúpeľní má nehnuteľnosť?-->
+<dataRef>
             <id>102007</id>
             <logic>
                 <behavior>editable</behavior>
                 <behavior>required</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Uveďte celkovú hodnotu rekonštrukcií, ak boli vykonané-->
+<dataRef>
             <id>102008</id>
             <logic>
                 <behavior>editable</behavior>
@@ -3497,37 +3528,43 @@
                 <perform>true</perform>
             </logic>
         </roleRef>
-        <dataRef>
+        <!--Stavebné materialy-->
+<dataRef>
             <id>105031</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Stavebné materialy ps-->
+<dataRef>
             <id>105032</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Stavebné materialy p-->
+<dataRef>
             <id>305015</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Stavebné a záhradné mechanizmy-->
+<dataRef>
             <id>105033</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Stavebné a záhradné mechanizmy ps-->
+<dataRef>
             <id>105034</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Stavebné a záhradné mechanizmy p-->
+<dataRef>
             <id>305016</id>
             <logic>
                 <behavior>visible</behavior>
@@ -3550,8 +3587,8 @@
                 <perform>true</perform>
             </logic>
         </roleRef>
-        <!--Garáž?-->
-        <dataRef>
+        <!--Garáž-->
+<dataRef>
             <id>105035</id>
             <logic>
                 <behavior>editable</behavior>
@@ -3606,7 +3643,7 @@
             </logic>
         </dataRef>
         <!--Podlahová plocha garáže-->
-        <dataRef>
+<dataRef>
             <id>105004</id>
             <logic>
                 <behavior>hidden</behavior>
@@ -3614,7 +3651,7 @@
             </logic>
         </dataRef>
         <!--Rovnaké miesto poistenia garáže?-->
-        <dataRef>
+<dataRef>
             <id>105008</id>
             <logic>
                 <behavior>hidden</behavior>
@@ -3635,8 +3672,8 @@
                 </action>
             </logic>
         </dataRef>
-        <!--Garáž - poistná suma-->
-        <dataRef>
+        <!--Garáž ps-->
+<dataRef>
             <id>105007</id>
             <logic>
                 <behavior>hidden</behavior>
@@ -3658,14 +3695,16 @@
             </logic>
         </dataRef>
         <!--Garáž - poistné-->
-        <dataRef>
+        <!--Garáž p-->
+<dataRef>
             <id>305003</id>
             <logic>
                 <behavior>hidden</behavior>
             </logic>
         </dataRef>
         <!--Hospodárska budova?-->
-        <dataRef>
+        <!--Hospodárska budova-->
+<dataRef>
             <id>105009</id>
             <logic>
                 <behavior>editable</behavior>
@@ -3698,7 +3737,8 @@
             </logic>
         </dataRef>
         <!--Hospodárska budova - poistná suma-->
-        <dataRef>
+        <!--Hospodárska budova ps-->
+<dataRef>
             <id>105010</id>
             <logic>
                 <behavior>hidden</behavior>
@@ -3716,14 +3756,16 @@
             </logic>
         </dataRef>
         <!--Hospodárska budova - poistné-->
-        <dataRef>
+        <!--Hospodárska budova p-->
+<dataRef>
             <id>305004</id>
             <logic>
                 <behavior>hidden</behavior>
             </logic>
         </dataRef>
         <!--Altánok?-->
-        <dataRef>
+        <!--Altánok-->
+<dataRef>
             <id>105011</id>
             <logic>
                 <behavior>editable</behavior>
@@ -3756,7 +3798,8 @@
             </logic>
         </dataRef>
         <!--Altánok - poistná suma-->
-        <dataRef>
+        <!--Altánok ps-->
+<dataRef>
             <id>105012</id>
             <logic>
                 <behavior>hidden</behavior>
@@ -3776,14 +3819,16 @@
             </logic>
         </dataRef>
         <!--Altánok - poistné-->
-        <dataRef>
+        <!--Altánok p-->
+<dataRef>
             <id>305005</id>
             <logic>
                 <behavior>hidden</behavior>
             </logic>
         </dataRef>
         <!--Prístrešok?-->
-        <dataRef>
+        <!--Prístrešok-->
+<dataRef>
             <id>105013</id>
             <logic>
                 <behavior>editable</behavior>
@@ -3816,7 +3861,8 @@
             </logic>
         </dataRef>
         <!--Prístrešok - poistná suma-->
-        <dataRef>
+        <!--Prístrešok ps-->
+<dataRef>
             <id>105014</id>
             <logic>
                 <behavior>hidden</behavior>
@@ -3836,14 +3882,16 @@
             </logic>
         </dataRef>
         <!--Prístrešok - poistné-->
-        <dataRef>
+        <!--Prístrešok p-->
+<dataRef>
             <id>305006</id>
             <logic>
                 <behavior>hidden</behavior>
             </logic>
         </dataRef>
         <!--Chodník, parkovacia plocha?-->
-        <dataRef>
+        <!--Chodník-->
+<dataRef>
             <id>105015</id>
             <logic>
                 <behavior>editable</behavior>
@@ -3876,7 +3924,8 @@
             </logic>
         </dataRef>
         <!--Chodník, parkovacia plocha - poistná suma -->
-        <dataRef>
+        <!--Chodník ps-->
+<dataRef>
             <id>105016</id>
             <logic>
                 <behavior>hidden</behavior>
@@ -3896,14 +3945,16 @@
             </logic>
         </dataRef>
         <!--Chodník, parkovacia plocha - poistné-->
-        <dataRef>
+        <!--Chodník p-->
+<dataRef>
             <id>305007</id>
             <logic>
                 <behavior>hidden</behavior>
             </logic>
         </dataRef>
         <!--Sauna?-->
-        <dataRef>
+        <!--Sauna-->
+<dataRef>
             <id>105017</id>
             <logic>
                 <behavior>editable</behavior>
@@ -3936,7 +3987,8 @@
             </logic>
         </dataRef>
         <!--Sauna - poistná suma-->
-        <dataRef>
+        <!--Sauna ps-->
+<dataRef>
             <id>105018</id>
             <logic>
                 <behavior>hidden</behavior>
@@ -3956,14 +4008,16 @@
             </logic>
         </dataRef>
         <!--Sauna - poistné-->
-        <dataRef>
+        <!--Sauna p-->
+<dataRef>
             <id>305008</id>
             <logic>
                 <behavior>hidden</behavior>
             </logic>
         </dataRef>
         <!--Elektrická brána?-->
-        <dataRef>
+        <!--Elektrická brána-->
+<dataRef>
             <id>105019</id>
             <logic>
                 <behavior>editable</behavior>
@@ -3996,7 +4050,8 @@
             </logic>
         </dataRef>
         <!--Elektrická brána - poistná suma-->
-        <dataRef>
+        <!--Elektrická brána ps-->
+<dataRef>
             <id>105020</id>
             <logic>
                 <behavior>hidden</behavior>
@@ -4016,14 +4071,16 @@
             </logic>
         </dataRef>
         <!--Elektrická brána - poistné-->
-        <dataRef>
+        <!--Elektrická brána p-->
+<dataRef>
             <id>305009</id>
             <logic>
                 <behavior>hidden</behavior>
             </logic>
         </dataRef>
         <!--Tenisový kurt?-->
-        <dataRef>
+        <!--Tenisový kurt-->
+<dataRef>
             <id>105021</id>
             <logic>
                 <behavior>editable</behavior>
@@ -4056,7 +4113,8 @@
             </logic>
         </dataRef>
         <!--Tenisový kurt - poistná suma-->
-        <dataRef>
+        <!--Tenisový kurt ps-->
+<dataRef>
             <id>105022</id>
             <logic>
                 <behavior>hidden</behavior>
@@ -4076,14 +4134,16 @@
             </logic>
         </dataRef>
         <!--Tenisový kurt - poistné-->
-        <dataRef>
+        <!--Tenisový kurt p-->
+<dataRef>
             <id>305010</id>
             <logic>
                 <behavior>hidden</behavior>
             </logic>
         </dataRef>
         <!--Vonkajší bazén?-->
-        <dataRef>
+        <!--Vonkajší bazén-->
+<dataRef>
             <id>105023</id>
             <logic>
                 <behavior>editable</behavior>
@@ -4116,7 +4176,8 @@
             </logic>
         </dataRef>
         <!--Vonkajší bazén - poistná suma-->
-        <dataRef>
+        <!--Vonkajší bazén ps-->
+<dataRef>
             <id>105024</id>
             <logic>
                 <behavior>hidden</behavior>
@@ -4136,14 +4197,16 @@
             </logic>
         </dataRef>
         <!--Vonkajší bazén - poistné-->
-        <dataRef>
+        <!--Vonkajší bazén p-->
+<dataRef>
             <id>305011</id>
             <logic>
                 <behavior>hidden</behavior>
             </logic>
         </dataRef>
         <!--Studňa-->
-        <dataRef>
+        <!--Studňa-->
+<dataRef>
             <id>105025</id>
             <logic>
                 <behavior>editable</behavior>
@@ -4176,7 +4239,8 @@
             </logic>
         </dataRef>
         <!--Studňa - poistná suma-->
-        <dataRef>
+        <!--Studňa ps-->
+<dataRef>
             <id>105026</id>
             <logic>
                 <behavior>hidden</behavior>
@@ -4196,14 +4260,16 @@
             </logic>
         </dataRef>
         <!--Studňa - poistné-->
-        <dataRef>
+        <!--Studňa p-->
+<dataRef>
             <id>305012</id>
             <logic>
                 <behavior>hidden</behavior>
             </logic>
         </dataRef>
         <!--Žumpa, septik?-->
-        <dataRef>
+        <!--Žumpa, septik-->
+<dataRef>
             <id>105027</id>
             <logic>
                 <behavior>editable</behavior>
@@ -4236,7 +4302,8 @@
             </logic>
         </dataRef>
         <!--Žumpa, septik - poistná suma-->
-        <dataRef>
+        <!--Žumpa, septik ps-->
+<dataRef>
             <id>105028</id>
             <logic>
                 <behavior>hidden</behavior>
@@ -4254,14 +4321,16 @@
             </logic>
         </dataRef>
         <!--Žumpa, septik - poistné-->
-        <dataRef>
+        <!--Žumpa, septik p-->
+<dataRef>
             <id>305013</id>
             <logic>
                 <behavior>hidden</behavior>
             </logic>
         </dataRef>
         <!--Iné?-->
-        <dataRef>
+        <!--Iné-->
+<dataRef>
             <id>105029</id>
             <logic>
                 <behavior>editable</behavior>
@@ -4294,7 +4363,8 @@
             </logic>
         </dataRef>
         <!--Iné - poistná suma-->
-        <dataRef>
+        <!--Iné ps-->
+<dataRef>
             <id>105030</id>
             <logic>
                 <behavior>hidden</behavior>
@@ -4312,7 +4382,8 @@
             </logic>
         </dataRef>
         <!--Iné - poistné-->
-        <dataRef>
+        <!--Iné p-->
+<dataRef>
             <id>305014</id>
             <logic>
                 <behavior>hidden</behavior>
@@ -4335,56 +4406,64 @@
                 <perform>true</perform>
             </logic>
         </roleRef>
-        <dataRef>
+        <!--Umiestnenie domácnosti-->
+<dataRef>
             <id>103001</id>
             <logic>
                 <behavior>editable</behavior>
                 <behavior>required</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Poistenie domácnosti - spoluúčasť-->
+<dataRef>
             <id>106001</id>
             <logic>
                 <behavior>editable</behavior>
                 <behavior>required</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Celková podlahová plocha-->
+<dataRef>
             <id>106003</id>
             <logic>
                 <behavior>editable</behavior>
                 <behavior>required</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Obývanosť domácnosti-->
+<dataRef>
             <id>103002</id>
             <logic>
                 <behavior>editable</behavior>
                 <behavior>required</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Je nehnuteľnosť, v ktorej sa nachádza poisťovaná domácnosť v blízkom susedstve s inou obývanou nehnuteľnosťou?-->
+<dataRef>
             <id>103003</id>
             <logic>
                 <behavior>editable</behavior>
                 <behavior>required</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Je domácnosť zabezpečená funkčným alarmom?-->
+<dataRef>
             <id>103004</id>
             <logic>
                 <behavior>editable</behavior>
                 <behavior>required</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Má domácnosť na oknách vo výške do 3 metrov od okolitého terénu mreže / vonkajšie žalúzie alebo rolety?-->
+<dataRef>
             <id>103005</id>
             <logic>
                 <behavior>editable</behavior>
                 <behavior>required</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Celková podlahová plocha-->
+<dataRef>
             <id>106003</id>
             <logic>
                 <behavior>editable</behavior>
@@ -4408,163 +4487,190 @@
                 <perform>true</perform>
             </logic>
         </roleRef>
-        <dataRef>
+        <!--Cennosti-->
+<dataRef>
             <id>106004</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Cennosti ps-->
+<dataRef>
             <id>106005</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Cennosti p-->
+<dataRef>
             <id>306002</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Umelecké diela-->
+<dataRef>
             <id>106006</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Umelecké diela ps-->
+<dataRef>
             <id>106007</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Umelecké diela p-->
+<dataRef>
             <id>306003</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Elektronické a optické zariadenia-->
+<dataRef>
             <id>106008</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Elektronické a optické zariadenia ps-->
+<dataRef>
             <id>106009</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Elektronické a optické zariadenia p-->
+<dataRef>
             <id>306004</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Špecialne sklá a presklenie-->
+<dataRef>
             <id>106010</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Špecialne sklá a presklenie ps-->
+<dataRef>
             <id>106011</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Špecialne sklá a presklenie p-->
+<dataRef>
             <id>306005</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Záhradné vybavenie a nábytok-->
+<dataRef>
             <id>106012</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Záhradné vybavenie a nábytok ps-->
+<dataRef>
             <id>106013</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Záhradné vybavenie a nábytok p-->
+<dataRef>
             <id>306006</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Elektromotory v domácich spotrebičoch-->
+<dataRef>
             <id>106014</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Elektromotory v domácich spotrebičoch ps-->
+<dataRef>
             <id>106015</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Elektromotory v domácich spotrebičoch p-->
+<dataRef>
             <id>306007</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Stavebné súčasti domácnosti-->
+<dataRef>
             <id>106016</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Stavebné súčasti domácnosti ps-->
+<dataRef>
             <id>106017</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Stavebné súčasti domácnosti p-->
+<dataRef>
             <id>306008</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Športové náradie-->
+<dataRef>
             <id>106018</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Športové náradie ps-->
+<dataRef>
             <id>106019</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Športové náradie p-->
+<dataRef>
             <id>306009</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Iné-->
+<dataRef>
             <id>106020</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Iné ps-->
+<dataRef>
             <id>106021</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Iné p-->
+<dataRef>
             <id>306010</id>
             <logic>
                 <behavior>visible</behavior>
@@ -4610,14 +4716,16 @@
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Poistenie domácnosti - poistná suma-->
+<dataRef>
             <id>106002</id>
             <logic>
                 <behavior>editable</behavior>
                 <behavior>required</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Poistenie domácnosti - poistné-->
+<dataRef>
             <id>306001</id>
             <logic>
                 <behavior>visible</behavior>
@@ -5807,20 +5915,23 @@
                 <perform>true</perform>
             </logic>
         </roleRef>
-        <dataRef>
+        <!--Obec-->
+<dataRef>
             <id>301001</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--PSČ-->
+<dataRef>
             <id>101001</id>
             <logic>
                 <behavior>visible</behavior>
 
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Lokalita-->
+<dataRef>
             <id>301002</id>
             <logic>
                 <behavior>visible</behavior>
@@ -5832,91 +5943,106 @@
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Bolo miesto poistenia postihnuté povodňou za posledných 10 rokov?-->
+<dataRef>
             <id>101003</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Nachádza nehnuteľnosť sa vo vzdialenosti kratšej ako 300 m od vodného toku?-->
+<dataRef>
             <id>101004</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Koľko rokov žijete v poisťovanej nehnuteľnosti?-->
+<dataRef>
             <id>101005</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Aký je vzťah poisteného k poisťovanej nehnuteľnosti?-->
+<dataRef>
             <id>101006</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Koľko dospelých žije v domácnosti?-->
+<dataRef>
             <id>101007</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Koľko detí žije v domácnosti?-->
+<dataRef>
             <id>101008</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Koľko detí žije v domácnosti?-->
+<dataRef>
             <id>101008</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Bolo poistenému alebo spolupoistenej osobe niekedy v minulosti zamiestnuté poistné plnenie alebo vypovedaná poistná zmluva?-->
+<dataRef>
             <id>101009</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Bol poistený alebo spolupoistená osoba niekedy trestné stihaný / vyhlásil osobný bankrot / stíhaný za dlhy alebo odsúdený za podvodné alebo obdobné konanie.-->
+<dataRef>
             <id>101010</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Je plánovaná rekonštrukcia alebo prestavba poisťovanej nehnuteľnosti v priebehu najbližších 3 mesiacov?-->
+<dataRef>
             <id>101011</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Žije v poisťovanej domácnosti pes alebo mačka?-->
+<dataRef>
             <id>101012</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Kedy je nehnuteľnosť najviac obývaná?-->
+<dataRef>
             <id>101013</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Je nehnuteľnosť využívaná aj na podnikanie?-->
+<dataRef>
             <id>101014</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Právna subjektivita poisteného?-->
+<dataRef>
             <id>101015</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Počet poistných udalostí za posledné 3 roky?-->
+<dataRef>
             <id>101016</id>
             <logic>
                 <behavior>visible</behavior>
@@ -5939,79 +6065,92 @@
                 <perform>true</perform>
             </logic>
         </roleRef>
-        <dataRef>
+        <!--Predmet poistenia-->
+<dataRef>
             <id>102001</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Podlahová plocha pivnice-->
+<dataRef>
             <id>105001</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Podlahová plocha prízemia-->
+<dataRef>
             <id>105002</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Podlahová plocha všetkých obytných poschodí-->
+<dataRef>
             <id>105003</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Podlahová plocha garáže-->
+<dataRef>
             <id>105004</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Celková podlahová plocha-->
+<dataRef>
             <id>305001</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Konštrukcia múrov-->
+<dataRef>
             <id>102002</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Konštrukcia strechy-->
+<dataRef>
             <id>102003</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Koľko rokov má nehnuteľnosť?-->
+<dataRef>
             <id>102004</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Má nehnuteľnosť praskliny na vonkajšej fasáde?-->
+<dataRef>
             <id>102005</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Koľko izieb má nehnuteľnosť?-->
+<dataRef>
             <id>102006</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Koľko kúpeľní má nehnuteľnosť?-->
+<dataRef>
             <id>102007</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Uveďte celkovú hodnotu rekonštrukcií, ak boli vykonané-->
+<dataRef>
             <id>102008</id>
             <logic>
                 <behavior>visible</behavior>
@@ -6034,37 +6173,43 @@
                 <perform>true</perform>
             </logic>
         </roleRef>
-        <dataRef>
+        <!--Stavebné materialy-->
+<dataRef>
             <id>105031</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Stavebné materialy ps-->
+<dataRef>
             <id>105032</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Stavebné materialy p-->
+<dataRef>
             <id>305015</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Stavebné a záhradné mechanizmy-->
+<dataRef>
             <id>105033</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Stavebné a záhradné mechanizmy ps-->
+<dataRef>
             <id>105034</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Stavebné a záhradné mechanizmy p-->
+<dataRef>
             <id>305016</id>
             <logic>
                 <behavior>visible</behavior>
@@ -6087,223 +6232,260 @@
                 <perform>true</perform>
             </logic>
         </roleRef>
-        <dataRef>
+        <!--Garáž-->
+<dataRef>
             <id>105035</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Garáž ps-->
+<dataRef>
             <id>105007</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Rovnaké miesto poistenia garáže?-->
+<dataRef>
             <id>105008</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Garáž p-->
+<dataRef>
             <id>305003</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Hospodárska budova-->
+<dataRef>
             <id>105009</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Hospodárska budova ps-->
+<dataRef>
             <id>105010</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Hospodárska budova p-->
+<dataRef>
             <id>305004</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Altánok-->
+<dataRef>
             <id>105011</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Altánok ps-->
+<dataRef>
             <id>105012</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Altánok p-->
+<dataRef>
             <id>305005</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Prístrešok-->
+<dataRef>
             <id>105013</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Prístrešok ps-->
+<dataRef>
             <id>105014</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Prístrešok p-->
+<dataRef>
             <id>305006</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Chodník-->
+<dataRef>
             <id>105015</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Chodník ps-->
+<dataRef>
             <id>105016</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Chodník p-->
+<dataRef>
             <id>305007</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Sauna-->
+<dataRef>
             <id>105017</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Sauna ps-->
+<dataRef>
             <id>105018</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Sauna p-->
+<dataRef>
             <id>305008</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Elektrická brána-->
+<dataRef>
             <id>105019</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Elektrická brána ps-->
+<dataRef>
             <id>105020</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Elektrická brána p-->
+<dataRef>
             <id>305009</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Tenisový kurt-->
+<dataRef>
             <id>105021</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Tenisový kurt ps-->
+<dataRef>
             <id>105022</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Tenisový kurt p-->
+<dataRef>
             <id>305010</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Vonkajší bazén-->
+<dataRef>
             <id>105023</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Vonkajší bazén ps-->
+<dataRef>
             <id>105024</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Vonkajší bazén p-->
+<dataRef>
             <id>305011</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Studňa-->
+<dataRef>
             <id>105025</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Studňa ps-->
+<dataRef>
             <id>105026</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Studňa p-->
+<dataRef>
             <id>305012</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Žumpa, septik-->
+<dataRef>
             <id>105027</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Žumpa, septik ps-->
+<dataRef>
             <id>105028</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Žumpa, septik p-->
+<dataRef>
             <id>305013</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Iné-->
+<dataRef>
             <id>105029</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Iné ps-->
+<dataRef>
             <id>105030</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Iné p-->
+<dataRef>
             <id>305014</id>
             <logic>
                 <behavior>visible</behavior>
@@ -6326,37 +6508,43 @@
                 <perform>true</perform>
             </logic>
         </roleRef>
-        <dataRef>
+        <!--Umiestnenie domácnosti-->
+<dataRef>
             <id>103001</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Celková podlahová plocha-->
+<dataRef>
             <id>106003</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Obývanosť domácnosti-->
+<dataRef>
             <id>103002</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Je nehnuteľnosť, v ktorej sa nachádza poisťovaná domácnosť v blízkom susedstve s inou obývanou nehnuteľnosťou?-->
+<dataRef>
             <id>103003</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Je domácnosť zabezpečená funkčným alarmom?-->
+<dataRef>
             <id>103004</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Má domácnosť na oknách vo výške do 3 metrov od okolitého terénu mreže / vonkajšie žalúzie alebo rolety?-->
+<dataRef>
             <id>103005</id>
             <logic>
                 <behavior>visible</behavior>
@@ -6379,163 +6567,190 @@
                 <perform>true</perform>
             </logic>
         </roleRef>
-        <dataRef>
+        <!--Cennosti-->
+<dataRef>
             <id>106004</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Cennosti ps-->
+<dataRef>
             <id>106005</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Cennosti p-->
+<dataRef>
             <id>306002</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Umelecké diela-->
+<dataRef>
             <id>106006</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Umelecké diela ps-->
+<dataRef>
             <id>106007</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Umelecké diela p-->
+<dataRef>
             <id>306003</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Elektronické a optické zariadenia-->
+<dataRef>
             <id>106008</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Elektronické a optické zariadenia ps-->
+<dataRef>
             <id>106009</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Elektronické a optické zariadenia p-->
+<dataRef>
             <id>306004</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Špecialne sklá a presklenie-->
+<dataRef>
             <id>106010</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Špecialne sklá a presklenie ps-->
+<dataRef>
             <id>106011</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Špecialne sklá a presklenie p-->
+<dataRef>
             <id>306005</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Záhradné vybavenie a nábytok-->
+<dataRef>
             <id>106012</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Záhradné vybavenie a nábytok ps-->
+<dataRef>
             <id>106013</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Záhradné vybavenie a nábytok p-->
+<dataRef>
             <id>306006</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Elektromotory v domácich spotrebičoch-->
+<dataRef>
             <id>106014</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Elektromotory v domácich spotrebičoch ps-->
+<dataRef>
             <id>106015</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Elektromotory v domácich spotrebičoch p-->
+<dataRef>
             <id>306007</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Stavebné súčasti domácnosti-->
+<dataRef>
             <id>106016</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Stavebné súčasti domácnosti ps-->
+<dataRef>
             <id>106017</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Stavebné súčasti domácnosti p-->
+<dataRef>
             <id>306008</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Športové náradie-->
+<dataRef>
             <id>106018</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Športové náradie ps-->
+<dataRef>
             <id>106019</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Športové náradie p-->
+<dataRef>
             <id>306009</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Iné-->
+<dataRef>
             <id>106020</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Iné ps-->
+<dataRef>
             <id>106021</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <dataRef>
+        <!--Iné p-->
+<dataRef>
             <id>306010</id>
             <logic>
                 <behavior>visible</behavior>
