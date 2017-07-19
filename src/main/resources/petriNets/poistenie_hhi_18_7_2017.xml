@@ -3529,228 +3529,306 @@
                 <perform>true</perform>
             </logic>
         </roleRef>
-        <dataRef>
-            <id>105004</id>
-            <logic>
-                <behavior>editable</behavior>
-            </logic>
-        </dataRef>
+        <!--Garáž?-->
         <dataRef>
             <id>105035</id>
             <logic>
                 <behavior>editable</behavior>
+                <action trigger="set">
+                    isGarage: f.105035,
+                    other: f.105004;
+                    make other,editable on trans when { isGarage.value }
+                </action>
+                <action trigger="set">
+                    isGarage: f.105035,
+                    other: f.105004;
+                    make other,hidden on trans when { !isGarage.value }
+                </action>
+                <action trigger="set">
+                    isGarage: f.105035,
+                    other: f.105008;
+                    make other,editable on trans when { isGarage.value }
+                </action>
+                <action trigger="set">
+                    isGarage: f.105035,
+                    other: f.105008;
+                    make other,hidden on trans when { !isGarage.value }
+                </action>
+                <action trigger="set">
+                    isGarage: f.105035,
+                    other: f.105007;
+                    make other,editable on trans when { isGarage.value }
+                </action>
+                <action trigger="set">
+                    isGarage: f.105035,
+                    other: f.105007;
+                    make other,hidden on trans when { !isGarage.value }
+                </action>
+                <action trigger="set">
+                    isGarage: f.105035,
+                    other: f.305003;
+                    make other,editable on trans when { isGarage.value }
+                </action>
+                <action trigger="set">
+                    isGarage: f.105035,
+                    other: f.305003;
+                    make other,hidden on trans when { !isGarage.value }
+                </action>
             </logic>
         </dataRef>
+        <!--Podlahová plocha garáže-->
         <dataRef>
-            <id>105007</id>
+            <id>105004</id>
             <logic>
-                <behavior>editable</behavior>
+                <behavior>hidden</behavior>
             </logic>
         </dataRef>
+        <!--Rovnaké miesto poistenia garáže?-->
         <dataRef>
             <id>105008</id>
             <logic>
-                <behavior>editable</behavior>
+                <behavior>hidden</behavior>
             </logic>
         </dataRef>
+        <!--Garáž - poistná suma-->
+        <dataRef>
+            <id>105007</id>
+            <logic>
+                <behavior>hidden</behavior>
+            </logic>
+        </dataRef>
+        <!--Garáž - poistné-->
         <dataRef>
             <id>305003</id>
             <logic>
-                <behavior>editable</behavior>
+                <behavior>hidden</behavior>
             </logic>
         </dataRef>
+        <!--Hospodárska budova?-->
         <dataRef>
             <id>105009</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
+        <!--Hospodárska budova - poistná suma-->
         <dataRef>
             <id>105010</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
+        <!--Hospodárska budova - poistné-->
         <dataRef>
             <id>305004</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
+        <!--Altánok?-->
         <dataRef>
             <id>105011</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
+        <!--Altánok - poistná suma-->
         <dataRef>
             <id>105012</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
+        <!--Altánok - poistné-->
         <dataRef>
             <id>305005</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
+        <!--Prístrešok?-->
         <dataRef>
             <id>105013</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
+        <!--Prístrešok - poistná suma-->
         <dataRef>
             <id>105014</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
+        <!--Prístrešok - poistné-->
         <dataRef>
             <id>305006</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
+        <!--Chodník, parkovacia plocha?-->
         <dataRef>
             <id>105015</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
+        <!--Chodník, parkovacia plocha - poistná suma -->
         <dataRef>
             <id>105016</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
+        <!--Chodník, parkovacia plocha - poistné-->
         <dataRef>
             <id>305007</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
+        <!--Sauna?-->
         <dataRef>
             <id>105017</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
+        <!--Sauna - poistná suma-->
         <dataRef>
             <id>105018</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
+        <!--Sauna - poistné-->
         <dataRef>
             <id>305008</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
+        <!--Elektrická brána?-->
         <dataRef>
             <id>105019</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
+        <!--Elektrická brána - poistná suma-->
         <dataRef>
             <id>105020</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
+        <!--Elektrická brána - poistné-->
         <dataRef>
             <id>305009</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
+        <!--Tenisový kurt?-->
         <dataRef>
             <id>105021</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
+        <!--Tenisový kurt - poistná suma-->
         <dataRef>
             <id>105022</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
+        <!--Tenisový kurt - poistné-->
         <dataRef>
             <id>305010</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
+        <!--Vonkajší bazén?-->
         <dataRef>
             <id>105023</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
+        <!--Vonkajší bazén - poistná suma-->
         <dataRef>
             <id>105024</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
+        <!--Vonkajší bazén - poistné-->
         <dataRef>
             <id>305011</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
+        <!--Studňa-->
         <dataRef>
             <id>105025</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
+        <!--Studňa - poistná suma-->
         <dataRef>
             <id>105026</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
+        <!--Studňa - poistné-->
         <dataRef>
             <id>305012</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
+        <!--Žumpa, septik?-->
         <dataRef>
             <id>105027</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
+        <!--Žumpa, septik - poistná suma-->
         <dataRef>
             <id>105028</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
+        <!--Žumpa, septik - poistné-->
         <dataRef>
             <id>305013</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
+        <!--Iné?-->
         <dataRef>
             <id>105029</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
+        <!--Iné - poistná suma-->
         <dataRef>
             <id>105030</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
+        <!--Iné - poistné-->
         <dataRef>
             <id>305014</id>
             <logic>
