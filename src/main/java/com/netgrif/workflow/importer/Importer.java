@@ -158,6 +158,8 @@ public class Importer {
     @Transactional
     protected void addToTransaction(Transition transition, TransactionRef transactionRef) {
         Transaction transaction = transactions.get(transactionRef.getId());
+        if (transaction == null)
+            throw new IllegalArgumentException("Referenced transaction [" + transactionRef.getId() + "] in transition [" + transition.getTitle() + "] doesn't exist.");
         transaction.addTransition(transition);
     }
 
