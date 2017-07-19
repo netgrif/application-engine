@@ -3536,41 +3536,49 @@
                 <behavior>editable</behavior>
                 <action trigger="set">
                     isGarage: f.105035,
+                    trans: t.413,
                     other: f.105004;
                     make other,editable on trans when { isGarage.value }
                 </action>
                 <action trigger="set">
                     isGarage: f.105035,
+                    trans: t.413,
                     other: f.105004;
                     make other,hidden on trans when { !isGarage.value }
                 </action>
                 <action trigger="set">
                     isGarage: f.105035,
+                    trans: t.413,
                     other: f.105008;
                     make other,editable on trans when { isGarage.value }
                 </action>
                 <action trigger="set">
                     isGarage: f.105035,
+                    trans: t.413,
                     other: f.105008;
                     make other,hidden on trans when { !isGarage.value }
                 </action>
                 <action trigger="set">
                     isGarage: f.105035,
+                    trans: t.413,
                     other: f.105007;
                     make other,editable on trans when { isGarage.value }
                 </action>
                 <action trigger="set">
                     isGarage: f.105035,
+                    trans: t.413,
                     other: f.105007;
                     make other,hidden on trans when { !isGarage.value }
                 </action>
                 <action trigger="set">
                     isGarage: f.105035,
+                    trans: t.413,
                     other: f.305003;
                     make other,editable on trans when { isGarage.value }
                 </action>
                 <action trigger="set">
                     isGarage: f.105035,
+                    trans: t.413,
                     other: f.305003;
                     make other,hidden on trans when { !isGarage.value }
                 </action>
