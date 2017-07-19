@@ -557,24 +557,80 @@
         <values>rodinný dom</values>
         <values>chata</values>
         <values>bungalow</values>
+        <init>byt</init>
+        <action trigger="set">
+            field: f.this,
+            coeff: f.203001;
+            change coeff about {
+            if (field.value=="byt")
+            return 1.0 as Double;
+            if (field.value=="rodinný dom")
+            return 1.0 as Double;
+            if (field.value=="chata")
+            return 1.25 as Double;
+            if (field.value=="bungalow")
+            return 1.25 as Double;
+            }
+        </action>
     </data>
     <data type="enumeration">
         <title>Obývanosť domácnosti</title>
         <id>103002</id>
         <values>trvalá</values>
         <values>dočasná</values>
+        <init>trvalá</init>
+        <action trigger="set">
+            field: f.this,
+            coeff: f.203002;
+            change coeff about {
+            if (field.value=="trvalá")
+            return 1.0 as Double;
+            if (field.value=="dočasná")
+            return 2.5 as Double;
+            }
+        </action>
     </data>
     <data type="boolean">
         <title>Je nehnuteľnosť, v ktorej sa nachádza poisťovaná domácnosť v blízkom susedstve s inou obývanou nehnuteľnosťou?</title>
         <id>103003</id>
+        <init>true</init>
+        <action trigger="set">
+            field: f.this,
+            coeff: f.203003;
+            change coeff about {
+            if (field.value)
+            return 0.95 as Double;
+            return 1.0 as Double;
+            }
+        </action>
     </data>
     <data type="boolean">
         <title>Je domácnosť zabezpečená funkčným alarmom?</title>
         <id>103004</id>
+        <init>false</init>
+        <action trigger="set">
+            field: f.this,
+            coeff: f.203004;
+            change coeff about {
+            if (field.value)
+            return 0.97 as Double;
+            return 1.0 as Double;
+            }
+        </action>
     </data>
     <data type="boolean">
         <title>Má domácnosť na oknách vo výške do 3 metrov od okolitého terénu mreže / vonkajšie žalúzie alebo rolety?</title>
         <id>103005</id>
+        <init>false</init>
+        <action trigger="set">
+            field: f.this,
+            coeff: f.203005;
+            change coeff about {
+            if (field.value)
+            return 0.97 as Double;
+            return 1.0 as Double;
+            }
+        </action>
     </data>
     <!-- ===== Zodpovednosť ===== -->
     <data type="boolean">
@@ -2161,26 +2217,86 @@
     <data type="number">
         <title>Koeficient - Umiestnenie domácnosti</title>
         <id>203001</id>
+        <init>1.0</init>
+        <action trigger="set">
+            c1: f.203001,
+            c2: f.203002,
+            c3: f.203003,
+            c4: f.203004,
+            c5: f.203005,
+            sum: f.203006;
+            change sum about {
+            return c1.value*c1.value*c2.value*c3.value*c4.value*c5.value;
+            }
+        </action>
     </data>
     <data type="number">
         <title>Koeficient - Obývanosť domácnosti</title>
         <id>203002</id>
+        <init>1.0</init>
+        <action trigger="set">
+            c1: f.203001,
+            c2: f.203002,
+            c3: f.203003,
+            c4: f.203004,
+            c5: f.203005,
+            sum: f.203006;
+            change sum about {
+            return c1.value*c1.value*c2.value*c3.value*c4.value*c5.value;
+            }
+        </action>
     </data>
     <data type="number">
         <title>Koeficient - Je nehnuteľnosť, v ktorej sa nachádza poisťovaná domácnosť v blízkom susedstve s inou obývanou nehnuteľnosťou?</title>
         <id>203003</id>
+        <init>0.95</init>
+        <action trigger="set">
+            c1: f.203001,
+            c2: f.203002,
+            c3: f.203003,
+            c4: f.203004,
+            c5: f.203005,
+            sum: f.203006;
+            change sum about {
+            return c1.value*c1.value*c2.value*c3.value*c4.value*c5.value;
+            }
+        </action>
     </data>
     <data type="number">
         <title>Koeficient - Je domácnosť zabezpečená funkčným alarmom?</title>
         <id>203004</id>
+        <init>1.0</init>
+        <action trigger="set">
+            c1: f.203001,
+            c2: f.203002,
+            c3: f.203003,
+            c4: f.203004,
+            c5: f.203005,
+            sum: f.203006;
+            change sum about {
+            return c1.value*c1.value*c2.value*c3.value*c4.value*c5.value;
+            }
+        </action>
     </data>
     <data type="number">
         <title>Koeficient - Má domácnosť na oknách vo výške do 3 metrov od okolitého terénu mreže / vonkajšie žalúzie alebo rolety?</title>
-        <id>203005</id>
+        <init>1.0</init>
+        <action trigger="set">
+            c1: f.203001,
+            c2: f.203002,
+            c3: f.203003,
+            c4: f.203004,
+            c5: f.203005,
+            sum: f.203006;
+            change sum about {
+            return c1.value*c1.value*c2.value*c3.value*c4.value*c5.value;
+            }
+        </action>
     </data>
     <data type="number">
         <title>DOMÁCNOSŤ koeficient</title>
         <id>203006</id>
+        <init>0.95</init>
     </data>
     <!-- ===== Zodpovednosť koeficienty ===== -->
     <data type="number">
