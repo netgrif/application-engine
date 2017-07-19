@@ -24,7 +24,7 @@
     </role>
     <!-- ========== DATA ========== -->
     <!-- ========== DATA ========== -->
-    <!-- ===== Základné informácie  ===== -->
+    <!-- ===== Základné informácie - DONE ===== -->
     <data type="text">
         <title>Obec</title>
         <id>301001</id>
@@ -182,7 +182,7 @@
         <values>2</values>
         <values>3</values>
         <values>viac ako 3</values>
-        <init>1</init>
+        <init>2</init>
         <action trigger="set">
             field: f.this,
             coeff: f.201007;
@@ -206,7 +206,7 @@
         <values>1</values>
         <values>2</values>
         <values>viac</values>
-        <init>0</init>
+        <init>1</init>
         <action trigger="set">
             field: f.this,
             coeff: f.201008;
@@ -281,6 +281,7 @@
         <values>cez deň</values>
         <values>večer a v noci</values>
         <values>počas celého dňa</values>
+        <init>počas celého dňa</init>
         <action trigger="set">
             field: f.this,
             coeff: f.201013;
