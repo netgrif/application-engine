@@ -1471,14 +1471,14 @@
         <values>60,000.00 €</values>
         <values>120,000.00 €</values>
     </data>
-    <data type="enumeration">
-        <title>Poistenie zodpovednosti z vlastníctva nehnuteľnosti</title>
-        <id>107002</id>
-        <placeholder>Spoluúčasť</placeholder>
-        <values>0.00 €</values>
-        <values>50.00 €</values>
-        <values>150.00 €</values>
-    </data>
+    <!--<data type="enumeration">-->
+        <!--<title>Poistenie zodpovednosti z vlastníctva nehnuteľnosti</title>-->
+        <!--<id>107002</id>-->
+        <!--<placeholder>Spoluúčasť</placeholder>-->
+        <!--<values>0.00 €</values>-->
+        <!--<values>50.00 €</values>-->
+        <!--<values>150.00 €</values>-->
+    <!--</data>-->
     <data type="enumeration">
         <title>Zodpovednosť za škodu členov domácnosti</title>
         <id>107003</id>
@@ -2629,6 +2629,11 @@
         <title>Koeficient - Poistenie zodpovednosti z vlastníctva nehnuteľnosti</title>
         <id>207001</id>
     </data>
+    <data type="number">
+        <title>Koeficient - Zodpovednosť za škodu členov domácnosti</title>
+        <id>207002</id>
+    </data>
+
     <!-- ===== Údaje o zmluve ===== -->
     <data type="text">
         <title>Číslo ponuky</title>
