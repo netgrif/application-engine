@@ -94,6 +94,16 @@ class InsuranceImporter {
                 organizations: [orgs.get("insurance")] as Set<Organization>)
         premium.addProcessRole(premiumRole)
         userService.saveNew(premium)
+
+        User zatko = new User(
+                name: "Ondrej",
+                surname: "Zaťko",
+                email: "ondrej.zatko@premium-ic.sk",
+                password: "premiumIC2017",
+                authorities: [auths.get(Authority.user)] as Set<Authority>,
+                organizations: [orgs.get("insurance")] as Set<Organization>)
+        zatko.addProcessRole(agentRole)
+        userService.saveNew(zatko)
     }
 
     private void createCases(PetriNet net){
