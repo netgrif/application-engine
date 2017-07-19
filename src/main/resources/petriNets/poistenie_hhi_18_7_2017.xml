@@ -857,15 +857,15 @@
         <id>105006</id>
         <placeholder>Poistná suma</placeholder>
         <action trigger="set">
-            field: f.this,
-            excess: f.208001,
-            hhc: f.202009,
-            bic: f.201017,
-            sum: f.305002;
-            change sum about {
-            return (field.value*excess.value*hhc.value*bic.value)/1000 as Double;
-            }
-        </action>
+        field: f.this,
+        excess: f.208001,
+        hhc: f.202009,
+        bic: f.201017,
+        sum: f.305002;
+        change sum about {
+        return (field.value*excess.value*hhc.value*bic.value)/1000 as Double;
+        }
+    </action>
     </data>
     <data type="number">
         <title>Poistenie nehnuteľnosti - Poistné</title>
@@ -1408,10 +1408,32 @@
         <values>0.00 €</values>
         <values>50.00 €</values>
         <values>150.00 €</values>
+        <action trigger="set">
+        field: f.this,
+        coeff: f.208002;
+        change coeff about {
+        if (field.value=="0.00 €")
+        return 1.1 as Double;
+        if (field.value=="50.00 €")
+        return 1.0 as Double;
+        if (field.value=="150.00 €")
+        return 0.9 as Double;
+        }
+        </action>
     </data>
     <data type="number">
         <title>Poistenie domácnosti - poistná suma</title>
         <id>106002</id>
+        <action trigger="set">
+            field: f.this,
+            excess: f.208002,
+            ppc: f.203006,
+            bic: f.201017,
+            sum: f.306001;
+            change sum about {
+            return (field.value*excess.value*ppc.value*bic.value)/1000 as Double;
+            }
+        </action>
     </data>
     <data type="number">
         <title>Poistenie domácnosti - poistné</title>
@@ -4131,6 +4153,19 @@
         <dataRef>
             <!--nehnutelnost poistne-->
             <id>305002</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>106002</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>306001</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
