@@ -5052,7 +5052,7 @@
 
     <!--================================= VYTVORENIE ZMLLUVY =====================-->
 
-    <!--todo============================= Údaje o zmluve=====================-->
+    <!--================================= Údaje o zmluve=====================-->
     <transition>
         <id>1618</id>
         <x>1180</x>
@@ -5117,7 +5117,7 @@
             </logic>
         </dataRef>
     </transition>
-    <!--todo============================= Údaje o zmluve=====================-->
+    <!--================================= Údaje o zmluve=====================-->
     <transition>
         <id>1661</id>
         <x>1185</x>
@@ -5182,7 +5182,7 @@
             </logic>
         </dataRef>
     </transition>
-    <!--todo============================= Údaje o zmluve=====================-->
+    <!--================================= Údaje o zmluve=====================-->
     <transition>
         <id>332</id>
         <x>1180</x>
@@ -5273,6 +5273,19 @@
         <x>1681</x>
         <y>967</y>
         <label>Napárovanie platby</label>
+        <roleRef>
+            <id>1</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <dataRef>
+            <id>308007</id>
+            <logic>
+                <behavior>required</behavior>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
     </transition>
     <!--todo============================= Aktívna zmluva==================================-->
     <transition>
@@ -6370,12 +6383,67 @@
             </logic>
         </dataRef>
     </transition>
-    <!--todo============================= Údaje o zmluve=====================-->
+    <!--================================= Údaje o zmluve - DONE =====================-->
     <transition>
         <id>2014</id>
         <x>2237</x>
         <y>743</y>
         <label>Údaje o zmluve</label>
+        <roleRef>
+            <id>1</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <dataRef>
+            <id>309001</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109001</id>
+            <logic>
+                
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109002</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109003</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109004</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109005</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>109006</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>309003</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
     </transition>
     <!--todo=============================Údaje o zaplatení=====================-->
     <transition>
@@ -6383,6 +6451,18 @@
         <x>2237</x>
         <y>841</y>
         <label>Údaje o zaplatení</label>
+        <roleRef>
+            <id>1</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <dataRef>
+            <id>308007</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
     </transition>
     <!--================================= INFORMÁCIE O PROVÍZIÁCH - DONE =====================-->
     <transition>
