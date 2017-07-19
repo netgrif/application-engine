@@ -85,6 +85,20 @@
             return 3.1 as Double;
             }
         </action>
+        <action trigger="set">
+            field: f.this,
+            coeff: f.201018;
+            change coeff about {
+            if (field.value=="BA")
+            return 4.2 as Double;
+            if (field.value=="(Krajské mesto")
+            return 3.5 as Double;
+            if (field.value=="Mesto")
+            return 3.2 as Double;
+            if (field.value=="Dedina")
+            return 2.8 as Double;
+            }
+        </action>
     </data>
     <data type="boolean">
         <title>Nachádza sa mimo obce (extravilán)?</title>
@@ -1407,6 +1421,22 @@
     <data type="number">
         <title>Celková podlahová plocha</title>
         <id>106003</id>
+        <init>0</init>
+        <action trigger="set">
+            field: f.this,
+            location: f.301002,
+            coeff: f.206010;
+            change coeff about {
+            if (location.value=="BA")
+            return 1900*field.value as Double;
+            if (location.value=="Dedina")
+            return 700*field.value as Double;
+            if (location.value=="Mesto")
+            return 950*field.value as Double;
+            if (location.value=="Krajské mesto")
+            return 1300*field.value as Double;
+            }
+        </action>
     </data>
     <data type="boolean">
         <title>Cennosti</title>
@@ -1619,7 +1649,7 @@
     </data>
     <!-- ===== Základné informácie koeficienty ===== -->
     <data type="number">
-        <title>Koeficient - Lokalita</title>
+        <title>Koeficient - Lokalita nehnutelnosť</title>
         <id>201001</id>
         <init>1</init>
         <action trigger="set">
@@ -1644,6 +1674,11 @@
             return c1.value*c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c9.value*c10.value*c11.value*c12.value*c13.value*c14.value*c15.value*c16.value;
             }
         </action>
+    </data>
+    <data type="number">
+        <title>Koeficient - Lokalita domácnosť</title>
+        <id>201018</id>
+        <init>1</init>
     </data>
     <data type="number">
         <title>Koeficient - Nachádza sa mimo obce (extravilán)?</title>
@@ -2224,9 +2259,10 @@
             c3: f.203003,
             c4: f.203004,
             c5: f.203005,
+            c6: f.201018,
             sum: f.203006;
             change sum about {
-            return c1.value*c1.value*c2.value*c3.value*c4.value*c5.value;
+            return c1.value*c1.value*c2.value*c3.value*c4.value*c5.value*c6.value;
             }
         </action>
     </data>
@@ -2240,9 +2276,10 @@
             c3: f.203003,
             c4: f.203004,
             c5: f.203005,
+            c6: f.201018,
             sum: f.203006;
             change sum about {
-            return c1.value*c1.value*c2.value*c3.value*c4.value*c5.value;
+            return c1.value*c1.value*c2.value*c3.value*c4.value*c5.value*c6.value;
             }
         </action>
     </data>
@@ -2256,9 +2293,10 @@
             c3: f.203003,
             c4: f.203004,
             c5: f.203005,
+            c6: f.201018,
             sum: f.203006;
             change sum about {
-            return c1.value*c1.value*c2.value*c3.value*c4.value*c5.value;
+            return c1.value*c1.value*c2.value*c3.value*c4.value*c5.value*c6.value;
             }
         </action>
     </data>
@@ -2272,14 +2310,16 @@
             c3: f.203003,
             c4: f.203004,
             c5: f.203005,
+            c6: f.201018,
             sum: f.203006;
             change sum about {
-            return c1.value*c1.value*c2.value*c3.value*c4.value*c5.value;
+            return c1.value*c1.value*c2.value*c3.value*c4.value*c5.value*c6.value;
             }
         </action>
     </data>
     <data type="number">
         <title>Koeficient - Má domácnosť na oknách vo výške do 3 metrov od okolitého terénu mreže / vonkajšie žalúzie alebo rolety?</title>
+        <id>203005</id>
         <init>1.0</init>
         <action trigger="set">
             c1: f.203001,
@@ -2287,9 +2327,10 @@
             c3: f.203003,
             c4: f.203004,
             c5: f.203005,
+            c6: f.201018,
             sum: f.203006;
             change sum about {
-            return c1.value*c1.value*c2.value*c3.value*c4.value*c5.value;
+            return c1.value*c1.value*c2.value*c3.value*c4.value*c5.value*c6.value;
             }
         </action>
     </data>
@@ -2738,6 +2779,10 @@
     <data type="number">
         <title>Koeficient - Iné</title>
         <id>206009</id>
+    </data>
+    <data type="number">
+        <title>Koeficient - Domácnosť - lokalita</title>
+        <id>206010</id>
     </data>
     <!-- ===== Poistenie zodpovednosti za škodu koeficienty ===== -->
     <data type="number">
@@ -3773,6 +3818,13 @@
         </dataRef>
         <dataRef>
             <id>103005</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>106003</id>
             <logic>
                 <behavior>editable</behavior>
                 <behavior>required</behavior>
