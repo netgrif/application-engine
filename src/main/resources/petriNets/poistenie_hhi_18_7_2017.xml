@@ -3187,70 +3187,70 @@
             </logic>
         </dataRef>
     </transition>
-    <!--=================================Zrušenia návrhu poistky=====================-->
+    <!--todo=============================Zrušenia návrhu poistky=====================-->
     <transition>
         <id>674</id>
         <x>1433</x>
         <y>965</y>
         <label>Zrušenie návrhu poistky (po vypršaní lehoty) </label>
     </transition>
-    <!--=================================Napárovanie platby=====================-->
+    <!--todo=============================Napárovanie platby=====================-->
     <transition>
         <id>680</id>
         <x>1681</x>
         <y>967</y>
         <label>Napárovanie platby</label>
     </transition>
-    <!--=================================Aktívna zmluva==================================-->
+    <!--todo=============================Aktívna zmluva==================================-->
     <transition>
         <id>686</id>
         <x>1870</x>
         <y>1071</y>
         <label>Aktívna zmluva</label>
     </transition>
-    <!--=================================Expirovaný návrh poistky=====================-->
+    <!--todo=============================Expirovaný návrh poistky=====================-->
     <transition>
         <id>687</id>
         <x>1431</x>
         <y>1243</y>
         <label>Expirovaný návrh poistky</label>
     </transition>
-    <!--=================================Expirácia zmluvy=====================-->
+    <!--todo=============================Expirácia zmluvy=====================-->
     <transition>
         <id>692</id>
         <x>1682</x>
         <y>1250</y>
         <label>Expirácia zmluvy</label>
     </transition>
-    <!--=================================Expirovaná zmluva=====================-->
+    <!--todo=============================Expirovaná zmluva=====================-->
     <transition>
         <id>694</id>
         <x>2077</x>
         <y>1245</y>
         <label>Expirovaná zmluva</label>
     </transition>
-    <!--=================================Údaje o zmluve=====================-->
+    <!--todo=============================Údaje o zmluve=====================-->
     <transition>
         <id>1618</id>
         <x>1180</x>
         <y>260</y>
         <label>Údaje o zmluve</label>
     </transition>
-    <!--=================================Údaje o zmluve=====================-->
+    <!--todo=============================Údaje o zmluve=====================-->
     <transition>
         <id>1661</id>
         <x>1185</x>
         <y>898</y>
         <label>Údaje o zmluve</label>
     </transition>
-    <!--=================================Údaje o zmluve=====================-->
+    <!--todo=============================Údaje o zmluve=====================-->
     <transition>
         <id>2014</id>
         <x>2237</x>
         <y>743</y>
         <label>Údaje o zmluve</label>
     </transition>
-    <!--================================= ZÁKLADNÉ INFORMÁCIE (visible) - DONE=====================-->
+    <!--todo============================= ZÁKLADNÉ INFORMÁCIE (visible) - DONE=====================-->
     <transition>
         <id>2015</id>
         <x>2229</x>
@@ -3378,7 +3378,7 @@
             </logic>
         </dataRef>
     </transition>
-    <!--================================= ÚDAJE O POISTNÍKOVI A MIESTE POISTENIA (visible) - TODO hidden =====================-->
+    <!--todo============================= ÚDAJE O POISTNÍKOVI A MIESTE POISTENIA (visible) - hidden =====================-->
     <transition>
         <id>2016</id>
         <x>2235</x>
@@ -4322,14 +4322,14 @@
             </logic>
         </dataRef>
     </transition>
-    <!--=================================Údaje o zaplatení=====================-->
+    <!--todo=============================Údaje o zaplatení=====================-->
     <transition>
         <id>2045</id>
         <x>2237</x>
         <y>841</y>
         <label>Údaje o zaplatení</label>
     </transition>
-    <!--=================================Informácie o províziách=====================-->
+    <!--================================= INFORMÁCIE O PROVÍZIÁCH - DONE =====================-->
     <transition>
         <id>2046</id>
         <x>2237</x>
