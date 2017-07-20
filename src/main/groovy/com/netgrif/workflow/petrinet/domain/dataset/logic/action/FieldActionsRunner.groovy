@@ -7,7 +7,6 @@ import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedField
 import com.netgrif.workflow.petrinet.domain.dataset.logic.IllegalVariableTypeException
 import com.netgrif.workflow.psc.IPostalCodeService
 import com.netgrif.workflow.workflow.domain.Case
-import lombok.Getter
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 
@@ -24,6 +23,7 @@ class FieldActionsRunner {
         bindVariables(script, binding, useCase)
         def shell = new GroovyShell(binding)
 
+        println script
         def code = (Closure) shell.evaluate("{->${getExpression(script)}}")
         code.delegate = new ActionDelegate(useCase,this)
         code()
