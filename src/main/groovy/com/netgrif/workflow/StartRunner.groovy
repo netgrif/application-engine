@@ -28,6 +28,8 @@ class StartRunner  implements CommandLineRunner{
     @Autowired
     private InsuranceImporter insuranceImporter
     @Autowired
+    private InsurancePostalCodeImporter postalCodeImporter
+    @Autowired
     private XlsImporter xlsImporter
     @Autowired
     private SuperCreator superCreator
@@ -46,6 +48,7 @@ class StartRunner  implements CommandLineRunner{
         storage.getParentFile().mkdirs()
 
         insuranceImporter.run(strings)
+        postalCodeImporter.run(strings)
 
         //xlsImporter.run(strings)
 
