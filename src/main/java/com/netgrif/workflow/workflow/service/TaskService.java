@@ -237,6 +237,15 @@ public class TaskService implements ITaskService {
         return dataSetFields;
     }
 
+    @Override
+    public List<DataGroup> getDataGroups(String taskId) {
+        Task task = taskRepository.findOne(taskId);
+        Case useCase = caseRepository.findOne(task.getCaseId());
+        Transition transition = useCase.getPetriNet().getTransition(task.getTransitionId());
+
+        return new ArrayList<>(transition.getDataGroups().values());
+    }
+
     public static Field buildField(Case useCase, String fieldId, boolean withValidation) {
         Field field = useCase.getPetriNet().getDataSet().get(fieldId);
         field.setValue(useCase.getDataSet().get(fieldId).getValue());
