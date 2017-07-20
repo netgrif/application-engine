@@ -13,7 +13,7 @@ class InsurancePostalCodeImporter {
     void run(String... strings) {
         def importFile = new File("src/main/resources/postal_codes.csv")
         importFile.splitEachLine(',') { items ->
-            service.createPostalCode(items[0],items[1],items[3])
+            service.createPostalCode(items[0],items[1],items[2],items[3])
         }
     }
 }

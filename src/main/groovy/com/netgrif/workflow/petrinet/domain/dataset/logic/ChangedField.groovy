@@ -1,51 +1,59 @@
 package com.netgrif.workflow.petrinet.domain.dataset.logic
 
-import com.fasterxml.jackson.databind.node.JsonNodeFactory
-import com.fasterxml.jackson.databind.node.ObjectNode
-
 class ChangedField {
 
     String id
-    Map<String, Set<FieldBehavior>> behavior
-    Object value
+    Map<String, Object> attributes
 
-    ChangedField(){
-        behavior = new HashMap<>()
+    ChangedField() {
+        attributes = new HashMap<>()
     }
 
     ChangedField(String id) {
+        this()
         this.id = id
-        behavior = new HashMap<>()
+    }
+
+    void addAttribute(String name, Object value) {
+        attributes.put(name, value)
+    }
+
+    void addBehavior(Map<String, Set<FieldBehavior>> behavior) {
+        Map<String, Map<String, Boolean>> behs = new HashMap<>()
+        behavior.each { trans, fieldBehaviors ->
+            Map<String,Boolean> b = new HashMap<>()
+            fieldBehaviors.each {b.put(it.toString(),true)}
+            behs.put(trans,b)
+        }
+        attributes.put("behavior",behs)
     }
 
     void merge(ChangedField changedField) {
-        if (changedField.value != null)
-            this.value = changedField.value
-        if (changedField.behavior != null && !changedField.behavior.isEmpty()) {
-            changedField.behavior.each { trans, behav ->
-                behavior.put(trans, new HashSet<FieldBehavior>(behav))
-            }
-        }
+        this.attributes.putAll(changedField.attributes)
     }
 
-    ObjectNode toJson() {
-        ObjectNode node = JsonNodeFactory.instance.objectNode()
-        if (!behavior.isEmpty()) {
-            ObjectNode b = JsonNodeFactory.instance.objectNode()
-            behavior.each { trans, behav -> b.set(trans, behaviorToJson(trans)) }
-            node.set("behavior", b)
-        }
-        if (this.value != null)
-            node.put("value", value as String)
-
-        return node
+    Map<String, Object> getAttributes() {
+        return attributes
     }
 
-    private ObjectNode behaviorToJson(String trans) {
-        ObjectNode node = JsonNodeFactory.instance.objectNode()
-        behavior.get(trans).each { behav -> node.put(behav.toString(), true) }
-        return node
-    }
+//    ObjectNode toJson() {
+//        ObjectNode node = JsonNodeFactory.instance.objectNode()
+//        if (!behavior.isEmpty()) {
+//            ObjectNode b = JsonNodeFactory.instance.objectNode()
+//            behavior.each { trans, behav -> b.set(trans, behaviorToJson(trans)) }
+//            node.set("behavior", b)
+//        }
+//        if (this.value != null)
+//            node.put("value", value)
+//
+//        return node
+//    }
+//
+//    private ObjectNode behaviorToJson(String trans) {
+//        ObjectNode node = JsonNodeFactory.instance.objectNode()
+//        behavior.get(trans).each { behav -> node.put(behav.toString(), true) }
+//        return node
+//    }
 
     boolean equals(o) {
         if (this.is(o)) return true

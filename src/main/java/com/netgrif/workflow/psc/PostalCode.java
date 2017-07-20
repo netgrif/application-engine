@@ -23,6 +23,9 @@ public class PostalCode {
     private String locality;
 
     @Getter @Setter
+    private String region;
+
+    @Getter @Setter
     private String regionCode;
 
     public PostalCode(){}
@@ -31,9 +34,10 @@ public class PostalCode {
         this.code = code;
     }
 
-    public PostalCode(String code, String locality, String regionCode) {
+    public PostalCode(String code, String locality, String region, String regionCode) {
         this.code = code;
         this.locality = locality;
+        this.region = region;
         this.regionCode = regionCode;
     }
 }
