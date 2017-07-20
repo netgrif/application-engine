@@ -36,7 +36,7 @@ class ChangedField {
             node.set("behavior", b)
         }
         if (this.value != null)
-            node.put("value", value)
+            node.put("value", value as String)
 
         return node
     }
