@@ -154,8 +154,8 @@ public class Importer {
         if (importTransition.getTransactionRef() != null) {
             addToTransaction(transition, importTransition.getTransactionRef());
         }
-        if (importTransition.getDataRef() != null) {
-            addDataGroups(transition, importTransition.getDataGroups());
+        if (importTransition.getDataGroup() != null) {
+            addDataGroups(transition, importTransition.getDataGroup());
         }
 
         net.addTransition(transition);
@@ -166,10 +166,8 @@ public class Importer {
     protected void addDataGroups(Transition transition, ImportDataGroup[] dataGroups) {
         Stream.of(dataGroups).forEach(importDataGroup -> {
             DataGroup dataGroup = new DataGroup(importDataGroup.getTitle(), importDataGroup.getAlignment());
-            Stream.of(importDataGroup.getDataRefs()).forEach(dataRef -> {
-                dataGroup.addData();
-            });
-            transition
+            Stream.of(importDataGroup.getDataRef()).forEach(dataRef -> dataGroup.addData(fields.get(dataRef.getId()).getObjectId()));
+            transition.addDataGroup(dataGroup);
         });
     }
 
