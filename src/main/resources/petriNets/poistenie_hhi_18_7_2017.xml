@@ -49,22 +49,16 @@
         <title>PSČ</title>
         <id>101001</id>
         <placeholder>PSČ</placeholder>
-        <action trigger="set">
-            <!--@formatter:off-->
-            field: f.this,
-            obec: f.301001;
-            change obec about {
-            if (field.value=="83106")
-            return "Bratislava";
-            if (field.value=="93401")
-            return "Levice";
-            if (field.value=="91921")
-            return "Zelenec";
-            if (field.value=="(94901")
-            return "Nitra";
-            }
-            <!--@formatter:on-->
-        </action>
+        <!--<action trigger="set">-->
+            <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
+            <!--field: f.this,-->
+            <!--obec: f.301001;-->
+            <!--change obec about {-->
+            <!--def postal = psc byCode,field.value;-->
+            <!--return postal?.locality-->
+            <!--}-->
+            <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
+        <!--</action>-->
     </data>
     <data type="enumeration">
         <title>Lokalita</title>
