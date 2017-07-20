@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document>
+    <data type="text">
+        <id>1</id>
+        <title>Field 1</title>
+    </data>
+    <data type="text">
+        <id>2</id>
+        <title>Field 2</title>
+    </data>
+    <data type="text">
+        <id>3</id>
+        <title>Field 3</title>
+    </data>
+
+    <role>
+        <id>1</id>
+        <name>Agent</name>
+    </role>
+
+    <place>
+        <id>2</id>
+        <x>274</x>
+        <y>187</y>
+        <label></label>
+        <tokens>1</tokens>
+        <isStatic>false</isStatic>
+    </place>
+    <place>
+        <id>3</id>
+        <x>506</x>
+        <y>186</y>
+        <label></label>
+        <tokens>0</tokens>
+        <isStatic>false</isStatic>
+    </place>
+
+    <transition>
+        <id>1</id>
+        <x>362</x>
+        <y>183</y>
+        <label>Test data groups</label>
+        <roleRef>
+            <id>1</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+
+        <dataGroup>
+            <id>1</id>
+            <title>Left</title>
+            <alignment>left</alignment>
+            <dataRef>
+                <id>1</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>2</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>3</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>2</id>
+            <title>Right</title>
+            <alignment>Right</alignment>
+            <dataRef>
+                <id>1</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>2</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>3</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>3</id>
+            <title>Default</title>
+            <dataRef>
+                <id>1</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>2</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>3</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+    </transition>
+
+    <arc>
+        <id>4</id>
+        <type>regular</type>
+        <sourceId>2</sourceId>
+        <destinationId>1</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>5</id>
+        <type>regular</type>
+        <sourceId>1</sourceId>
+        <destinationId>3</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+</document>
