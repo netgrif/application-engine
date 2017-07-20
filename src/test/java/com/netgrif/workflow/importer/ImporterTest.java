@@ -4,7 +4,6 @@ import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
-import groovy.util.GroovyTestCase;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -58,6 +57,13 @@ public class ImporterTest {
         Case useCase = workflowService.createCase(net.getStringId(), net.getTitle(), "color", 1L);
 
         assert useCase != null;
+    }
+
+    @Test
+    public void dataGroupTest() {
+        PetriNet net = importer.importPetriNet(new File("src/test/resources/datagroup_test.xml"), "DataGroup test", "DGT");
+
+        assert net != null;
     }
 
     private void assertNetProperlyImported() {
