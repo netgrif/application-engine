@@ -13,7 +13,7 @@ public class ImportTransition {
 
     private RoleRef[] roleRef;
 
-    private ImportDataGroup[] dataGroups;
+    private ImportDataGroup[] dataGroup;
 
     private Integer y;
 
@@ -30,10 +30,11 @@ public class ImportTransition {
     }
 
     public DataRef[] getDataRef() {
-        if (dataGroups == null)
+        if (dataGroup == null)
             return null;
-        return Arrays.stream(dataGroups)
-                .map(ImportDataGroup::getDataRefs)
+        return Arrays.stream(dataGroup)
+                .map(ImportDataGroup::getDataRef)
+                .flatMap(Arrays::stream)
                 .toArray(DataRef[]::new);
     }
 }

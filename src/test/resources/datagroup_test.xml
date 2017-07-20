@@ -12,10 +12,26 @@
         <id>3</id>
         <title>Field 3</title>
     </data>
+    <data type="text">
+        <id>4</id>
+        <title>Field 4</title>
+    </data>
+    <data type="text">
+        <id>5</id>
+        <title>Field 5</title>
+    </data>
+    <data type="text">
+        <id>6</id>
+        <title>Field 6</title>
+    </data>
 
     <role>
         <id>1</id>
         <name>Agent</name>
+    </role>
+    <role>
+        <id>2</id>
+        <name>Premium</name>
     </role>
 
     <place>
@@ -50,7 +66,7 @@
         <dataGroup>
             <id>1</id>
             <title>Left</title>
-            <alignment>left</alignment>
+            <alignment>start</alignment>
             <dataRef>
                 <id>1</id>
                 <logic>
@@ -73,43 +89,21 @@
         <dataGroup>
             <id>2</id>
             <title>Right</title>
-            <alignment>Right</alignment>
+            <alignment>end</alignment>
             <dataRef>
-                <id>1</id>
+                <id>4</id>
                 <logic>
                     <behavior>visible</behavior>
                 </logic>
             </dataRef>
             <dataRef>
-                <id>2</id>
+                <id>5</id>
                 <logic>
                     <behavior>visible</behavior>
                 </logic>
             </dataRef>
             <dataRef>
-                <id>3</id>
-                <logic>
-                    <behavior>visible</behavior>
-                </logic>
-            </dataRef>
-        </dataGroup>
-        <dataGroup>
-            <id>3</id>
-            <title>Default</title>
-            <dataRef>
-                <id>1</id>
-                <logic>
-                    <behavior>visible</behavior>
-                </logic>
-            </dataRef>
-            <dataRef>
-                <id>2</id>
-                <logic>
-                    <behavior>visible</behavior>
-                </logic>
-            </dataRef>
-            <dataRef>
-                <id>3</id>
+                <id>6</id>
                 <logic>
                     <behavior>visible</behavior>
                 </logic>
