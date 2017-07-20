@@ -3193,8 +3193,235 @@
         <title>Typ subjektu</title>
         <id>109007</id>
         <desc>Poistník</desc>
+        <values>fyzická osoba</values>
         <values>právnická osoba</values>
         <values>fyzická osoba podnikateľ (SZČO)</values>
+        <init>fyzická osoba</init>
+        <!--Titul pred-->
+        <!--<action trigger="set">-->
+            <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
+            <!--check: f.109007,-->
+            <!--field: f.109008,-->
+            <!--trans: t.588;-->
+            <!--make field,hidden on trans when { check.value == "právnická osoba" }-->
+            <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
+        <!--</action>-->
+        <!--<action trigger="set">-->
+            <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
+            <!--check: f.109007,-->
+            <!--field: f.109008,-->
+            <!--trans: t.588;-->
+            <!--make field,editable on trans when { check.value == "fyzická osoba" }-->
+            <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
+        <!--</action>-->
+        <!--<action trigger="set">-->
+            <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
+            <!--check: f.109007,-->
+            <!--field: f.109008,-->
+            <!--trans: t.588;-->
+            <!--make field,editable on trans when { check.value == "fyzická osoba podnikateľ (SZČO)" }-->
+            <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
+        <!--</action>-->
+        <!--&lt;!&ndash;Titul za&ndash;&gt;-->
+        <!--<action trigger="set">-->
+            <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
+            <!--check: f.109007,-->
+            <!--field: f.109009,-->
+            <!--trans: t.588;-->
+            <!--make field,hidden on trans when { check.value == "právnická osoba" }-->
+            <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
+        <!--</action>-->
+        <!--<action trigger="set">-->
+            <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
+            <!--check: f.109007,-->
+            <!--field: f.109009,-->
+            <!--trans: t.588;-->
+            <!--make field,editable on trans when { check.value == "fyzická osoba" }-->
+            <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
+        <!--</action>-->
+        <!--<action trigger="set">-->
+            <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
+            <!--check: f.109007,-->
+            <!--field: f.109009,-->
+            <!--trans: t.588;-->
+            <!--make field,editable on trans when { check.value == "fyzická osoba podnikateľ (SZČO)" }-->
+            <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
+        <!--</action>-->
+        <!--&lt;!&ndash;Meno&ndash;&gt;-->
+        <!--<action trigger="set">-->
+            <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
+            <!--check: f.109007,-->
+            <!--field: f.109010,-->
+            <!--trans: t.588;-->
+            <!--make field,hidden on trans when { check.value == "právnická osoba" }-->
+            <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
+        <!--</action>-->
+        <!--<action trigger="set">-->
+            <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
+            <!--check: f.109007,-->
+            <!--field: f.109010,-->
+            <!--trans: t.588;-->
+            <!--make field,required on trans when { check.value == "fyzická osoba" }-->
+            <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
+        <!--</action>-->
+        <!--<action trigger="set">-->
+            <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
+            <!--check: f.109007,-->
+            <!--field: f.109010,-->
+            <!--trans: t.588;-->
+            <!--make field,required on trans when { check.value == "fyzická osoba podnikateľ (SZČO)" }-->
+            <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
+        <!--</action>-->
+        <!--&lt;!&ndash;Priezvisko&ndash;&gt;-->
+        <!--<action trigger="set">-->
+            <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
+            <!--check: f.109007,-->
+            <!--field: f.109011,-->
+            <!--trans: t.588;-->
+            <!--make field,hidden on trans when { check.value == "právnická osoba" }-->
+            <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
+        <!--</action>-->
+        <!--<action trigger="set">-->
+            <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
+            <!--check: f.109007,-->
+            <!--field: f.109011,-->
+            <!--trans: t.588;-->
+            <!--make field,required on trans when { check.value == "fyzická osoba" }-->
+            <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
+        <!--</action>-->
+        <!--<action trigger="set">-->
+            <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
+            <!--check: f.109007,-->
+            <!--field: f.109011,-->
+            <!--trans: t.588;-->
+            <!--make field,required on trans when { check.value == "fyzická osoba podnikateľ (SZČO)" }-->
+            <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
+        <!--</action>-->
+        <!--&lt;!&ndash;Obchodné meno&ndash;&gt;-->
+        <!--<action trigger="set">-->
+            <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
+            <!--check: f.109007,-->
+            <!--field: f.109012,-->
+            <!--trans: t.588;-->
+            <!--make field,required on trans when { check.value == "právnická osoba" }-->
+            <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
+        <!--</action>-->
+        <!--<action trigger="set">-->
+            <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
+            <!--check: f.109007,-->
+            <!--field: f.109012,-->
+            <!--trans: t.588;-->
+            <!--make field,hidden on trans when { check.value == "fyzická osoba" }-->
+            <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
+        <!--</action>-->
+        <!--<action trigger="set">-->
+            <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
+            <!--check: f.109007,-->
+            <!--field: f.109012,-->
+            <!--trans: t.588;-->
+            <!--make field,hidden on trans when { check.value == "fyzická osoba podnikateľ (SZČO)" }-->
+            <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
+        <!--</action>-->
+        <!--&lt;!&ndash;Typ ID&ndash;&gt;-->
+        <!--<action trigger="set">-->
+            <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
+            <!--check: f.109007,-->
+            <!--field: f.109016,-->
+            <!--trans: t.588;-->
+            <!--make field,hidden on trans when { check.value == "právnická osoba" }-->
+            <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
+        <!--</action>-->
+        <!--<action trigger="set">-->
+            <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
+            <!--check: f.109007,-->
+            <!--field: f.109016,-->
+            <!--trans: t.588;-->
+            <!--make field,required on trans when { check.value == "fyzická osoba" }-->
+            <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
+        <!--</action>-->
+        <!--<action trigger="set">-->
+            <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
+            <!--check: f.109007,-->
+            <!--field: f.109016,-->
+            <!--trans: t.588;-->
+            <!--make field,required on trans when { check.value == "fyzická osoba podnikateľ (SZČO)" }-->
+            <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
+        <!--</action>-->
+        <!--&lt;!&ndash;Číslo ID&ndash;&gt;-->
+        <!--<action trigger="set">-->
+            <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
+            <!--check: f.109007,-->
+            <!--field: f.109017,-->
+            <!--trans: t.588;-->
+            <!--make field,hidden on trans when { check.value == "právnická osoba" }-->
+            <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
+        <!--</action>-->
+        <!--<action trigger="set">-->
+            <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
+            <!--check: f.109007,-->
+            <!--field: f.109017,-->
+            <!--trans: t.588;-->
+            <!--make field,required on trans when { check.value == "fyzická osoba" }-->
+            <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
+        <!--</action>-->
+        <!--<action trigger="set">-->
+            <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
+            <!--check: f.109007,-->
+            <!--field: f.109017,-->
+            <!--trans: t.588;-->
+            <!--make field,required on trans when { check.value == "fyzická osoba podnikateľ (SZČO)" }-->
+            <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
+        <!--</action>-->
+        <!--&lt;!&ndash;Dátum narodenia&ndash;&gt;-->
+        <!--<action trigger="set">-->
+            <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
+            <!--check: f.109007,-->
+            <!--field: f.109014,-->
+            <!--trans: t.588;-->
+            <!--make field,hidden on trans when { check.value == "právnická osoba" }-->
+            <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
+        <!--</action>-->
+        <!--<action trigger="set">-->
+            <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
+            <!--check: f.109007,-->
+            <!--field: f.109014,-->
+            <!--trans: t.588;-->
+            <!--make field,required on trans when { check.value == "fyzická osoba" }-->
+            <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
+        <!--</action>-->
+        <!--<action trigger="set">-->
+            <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
+            <!--check: f.109007,-->
+            <!--field: f.109014,-->
+            <!--trans: t.588;-->
+            <!--make field,required on trans when { check.value == "fyzická osoba podnikateľ (SZČO)" }-->
+            <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
+        <!--</action>-->
+        <!--&lt;!&ndash;Rodné číslo&ndash;&gt;-->
+        <!--<action trigger="set">-->
+            <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
+            <!--check: f.109007,-->
+            <!--field: f.109015,-->
+            <!--trans: t.588;-->
+            <!--make field,hidden on trans when { check.value == "právnická osoba" }-->
+            <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
+        <!--</action>-->
+        <!--<action trigger="set">-->
+            <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
+            <!--check: f.109007,-->
+            <!--field: f.109015,-->
+            <!--trans: t.588;-->
+            <!--make field,required on trans when { check.value == "fyzická osoba" }-->
+            <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
+        <!--</action>-->
+        <!--<action trigger="set">-->
+            <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
+            <!--check: f.109007,-->
+            <!--field: f.109015,-->
+            <!--trans: t.588;-->
+            <!--make field,required on trans when { check.value == "fyzická osoba podnikateľ (SZČO)" }-->
+            <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
+        <!--</action>-->
     </data>
     <data type="enumeration">
         <title>Titul pred menom</title>
@@ -3236,6 +3463,7 @@
     <data type="text">
         <title>Obchodné meno</title>
         <id>109012</id>
+        <desc>Poistník</desc>
     </data>
     <data type="text">
         <title>Štátna príslušnosť</title>
@@ -3269,10 +3497,12 @@
     <data type="text">
         <title>Telefónne číslo</title>
         <id>109018</id>
+        <desc>Poistník</desc>
     </data>
     <data type="text">
         <title>Email</title>
         <id>109019</id>
+        <desc>Poistník</desc>
     </data>
     <data type="boolean">
         <title>Poistený je iná osoba</title>
@@ -3600,8 +3830,235 @@
         <title>Typ subjektu</title>
         <id>109021</id>
         <desc>Poistený</desc>
+        <values>fyzická osoba</values>
         <values>právnická osoba</values>
         <values>fyzická osoba podnikateľ (SZČO)</values>
+        <init>fyzická osoba</init>
+        <!--Titul pred-->
+        <!--<action trigger="set">-->
+            <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
+            <!--check: f.109021,-->
+            <!--field: f.109022,-->
+            <!--trans: t.588;-->
+            <!--make field,hidden on trans when { check.value == "právnická osoba" }-->
+            <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
+        <!--</action>-->
+        <!--<action trigger="set">-->
+            <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
+            <!--check: f.109021,-->
+            <!--field: f.109022,-->
+            <!--trans: t.588;-->
+            <!--make field,editable on trans when { check.value == "fyzická osoba" }-->
+            <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
+        <!--</action>-->
+        <!--<action trigger="set">-->
+            <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
+            <!--check: f.109021,-->
+            <!--field: f.109022,-->
+            <!--trans: t.588;-->
+            <!--make field,editable on trans when { check.value == "fyzická osoba podnikateľ (SZČO)" }-->
+            <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
+        <!--</action>-->
+        <!--&lt;!&ndash;Titul za&ndash;&gt;-->
+        <!--<action trigger="set">-->
+            <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
+            <!--check: f.109021,-->
+            <!--field: f.109023,-->
+            <!--trans: t.588;-->
+            <!--make field,hidden on trans when { check.value == "právnická osoba" }-->
+            <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
+        <!--</action>-->
+        <!--<action trigger="set">-->
+            <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
+            <!--check: f.109021,-->
+            <!--field: f.109023,-->
+            <!--trans: t.588;-->
+            <!--make field,editable on trans when { check.value == "fyzická osoba" }-->
+            <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
+        <!--</action>-->
+        <!--<action trigger="set">-->
+            <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
+            <!--check: f.109021,-->
+            <!--field: f.109023,-->
+            <!--trans: t.588;-->
+            <!--make field,editable on trans when { check.value == "fyzická osoba podnikateľ (SZČO)" }-->
+            <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
+        <!--</action>-->
+        <!--&lt;!&ndash;Meno&ndash;&gt;-->
+        <!--<action trigger="set">-->
+            <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
+            <!--check: f.109021,-->
+            <!--field: f.109024,-->
+            <!--trans: t.588;-->
+            <!--make field,hidden on trans when { check.value == "právnická osoba" }-->
+            <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
+        <!--</action>-->
+        <!--<action trigger="set">-->
+            <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
+            <!--check: f.109021,-->
+            <!--field: f.109024,-->
+            <!--trans: t.588;-->
+            <!--make field,required on trans when { check.value == "fyzická osoba" }-->
+            <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
+        <!--</action>-->
+        <!--<action trigger="set">-->
+            <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
+            <!--check: f.109021,-->
+            <!--field: f.109024,-->
+            <!--trans: t.588;-->
+            <!--make field,required on trans when { check.value == "fyzická osoba podnikateľ (SZČO)" }-->
+            <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
+        <!--</action>-->
+        <!--&lt;!&ndash;Priezvisko&ndash;&gt;-->
+        <!--<action trigger="set">-->
+            <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
+            <!--check: f.109021,-->
+            <!--field: f.109025,-->
+            <!--trans: t.588;-->
+            <!--make field,hidden on trans when { check.value == "právnická osoba" }-->
+            <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
+        <!--</action>-->
+        <!--<action trigger="set">-->
+            <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
+            <!--check: f.109021,-->
+            <!--field: f.109025,-->
+            <!--trans: t.588;-->
+            <!--make field,required on trans when { check.value == "fyzická osoba" }-->
+            <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
+        <!--</action>-->
+        <!--<action trigger="set">-->
+            <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
+            <!--check: f.109021,-->
+            <!--field: f.109025,-->
+            <!--trans: t.588;-->
+            <!--make field,required on trans when { check.value == "fyzická osoba podnikateľ (SZČO)" }-->
+            <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
+        <!--</action>-->
+        <!--&lt;!&ndash;Obchodné meno&ndash;&gt;-->
+        <!--<action trigger="set">-->
+            <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
+            <!--check: f.109021,-->
+            <!--field: f.109026,-->
+            <!--trans: t.588;-->
+            <!--make field,required on trans when { check.value == "právnická osoba" }-->
+            <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
+        <!--</action>-->
+        <!--<action trigger="set">-->
+            <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
+            <!--check: f.109021,-->
+            <!--field: f.109026,-->
+            <!--trans: t.588;-->
+            <!--make field,hidden on trans when { check.value == "fyzická osoba" }-->
+            <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
+        <!--</action>-->
+        <!--<action trigger="set">-->
+            <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
+            <!--check: f.109021,-->
+            <!--field: f.109026,-->
+            <!--trans: t.588;-->
+            <!--make field,hidden on trans when { check.value == "fyzická osoba podnikateľ (SZČO)" }-->
+            <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
+        <!--</action>-->
+        <!--&lt;!&ndash;Typ ID&ndash;&gt;-->
+        <!--<action trigger="set">-->
+            <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
+            <!--check: f.109021,-->
+            <!--field: f.109030,-->
+            <!--trans: t.588;-->
+            <!--make field,hidden on trans when { check.value == "právnická osoba" }-->
+            <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
+        <!--</action>-->
+        <!--<action trigger="set">-->
+            <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
+            <!--check: f.109021,-->
+            <!--field: f.109030,-->
+            <!--trans: t.588;-->
+            <!--make field,required on trans when { check.value == "fyzická osoba" }-->
+            <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
+        <!--</action>-->
+        <!--<action trigger="set">-->
+            <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
+            <!--check: f.109021,-->
+            <!--field: f.109030,-->
+            <!--trans: t.588;-->
+            <!--make field,required on trans when { check.value == "fyzická osoba podnikateľ (SZČO)" }-->
+            <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
+        <!--</action>-->
+        <!--&lt;!&ndash;Číslo ID&ndash;&gt;-->
+        <!--<action trigger="set">-->
+            <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
+            <!--check: f.109021,-->
+            <!--field: f.109031,-->
+            <!--trans: t.588;-->
+            <!--make field,hidden on trans when { check.value == "právnická osoba" }-->
+            <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
+        <!--</action>-->
+        <!--<action trigger="set">-->
+            <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
+            <!--check: f.109021,-->
+            <!--field: f.109031,-->
+            <!--trans: t.588;-->
+            <!--make field,required on trans when { check.value == "fyzická osoba" }-->
+            <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
+        <!--</action>-->
+        <!--<action trigger="set">-->
+            <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
+            <!--check: f.109021,-->
+            <!--field: f.109031,-->
+            <!--trans: t.588;-->
+            <!--make field,required on trans when { check.value == "fyzická osoba podnikateľ (SZČO)" }-->
+            <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
+        <!--</action>-->
+        <!--&lt;!&ndash;Dátum narodenia&ndash;&gt;-->
+        <!--<action trigger="set">-->
+            <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
+            <!--check: f.109021,-->
+            <!--field: f.109028,-->
+            <!--trans: t.588;-->
+            <!--make field,hidden on trans when { check.value == "právnická osoba" }-->
+            <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
+        <!--</action>-->
+        <!--<action trigger="set">-->
+            <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
+            <!--check: f.109021,-->
+            <!--field: f.109028,-->
+            <!--trans: t.588;-->
+            <!--make field,required on trans when { check.value == "fyzická osoba" }-->
+            <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
+        <!--</action>-->
+        <!--<action trigger="set">-->
+            <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
+            <!--check: f.109021,-->
+            <!--field: f.109028,-->
+            <!--trans: t.588;-->
+            <!--make field,required on trans when { check.value == "fyzická osoba podnikateľ (SZČO)" }-->
+            <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
+        <!--</action>-->
+        <!--&lt;!&ndash;Rodné číslo&ndash;&gt;-->
+        <!--<action trigger="set">-->
+            <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
+            <!--check: f.109021,-->
+            <!--field: f.109029,-->
+            <!--trans: t.588;-->
+            <!--make field,hidden on trans when { check.value == "právnická osoba" }-->
+            <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
+        <!--</action>-->
+        <!--<action trigger="set">-->
+            <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
+            <!--check: f.109021,-->
+            <!--field: f.109029,-->
+            <!--trans: t.588;-->
+            <!--make field,required on trans when { check.value == "fyzická osoba" }-->
+            <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
+        <!--</action>-->
+        <!--<action trigger="set">-->
+            <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
+            <!--check: f.109021,-->
+            <!--field: f.109029,-->
+            <!--trans: t.588;-->
+            <!--make field,required on trans when { check.value == "fyzická osoba podnikateľ (SZČO)" }-->
+            <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
+        <!--</action>-->
     </data>
     <data type="enumeration">
         <title>Titul pred menom</title>
@@ -3643,6 +4100,7 @@
     <data type="text">
         <title>Obchodné meno</title>
         <id>109026</id>
+        <desc>Poistený</desc>
     </data>
     <data type="text">
         <title>Štátna príslušnosť</title>
@@ -3676,10 +4134,12 @@
     <data type="text">
         <title>Telefónne číslo</title>
         <id>109032</id>
+        <desc>Poistený</desc>
     </data>
     <data type="text">
         <title>Email</title>
         <id>109033</id>
+        <desc>Poistený</desc>
     </data>
     <!-- ===== Údaje o mieste poistenia ===== -->
     <!-- Adresa trvalého pobytu -->
@@ -4545,6 +5005,21 @@
             <id>105008</id>
             <logic>
                 <behavior>hidden</behavior>
+                <action trigger="set">
+                    <!--@formatter:off-->
+                    field: f.105007,
+                    check: f.105035,
+                    exces: f.208001,
+                    same: f.105008,
+                    other: f.305003;
+                    change other about {
+                        def coeff = same.value ? 1.0 : 1.1;
+                        if (check.value)
+                            return field.value*coeff*exces.value/1000.0 as Double;
+                        return other.value as Double;
+                    }
+                    <!--@formatter:on-->
+                </action>
                 <action trigger="set">
                     <!--@formatter:off-->
                     field: f.105007,
@@ -6124,19 +6599,7 @@
         <dataRef>
             <id>109007</id>
             <logic>
-                <behavior>required</behavior>
                 <behavior>editable</behavior>
-                <!--<action trigger="set">-->
-                <!--check: f.109020,-->
-                <!--field: f.109007,-->
-                <!--other: f.109021;-->
-                <!--change other about {-->
-                <!--if (check.value == false) {-->
-                <!--return field.value as String;-->
-                <!--}-->
-                <!--return other.value as String;-->
-                <!--}-->
-                <!--</action>-->
             </logic>
         </dataRef>
         <!--Titul pred menom-->
@@ -6144,17 +6607,6 @@
             <id>109008</id>
             <logic>
                 <behavior>editable</behavior>
-                <!--<action trigger="set">-->
-                <!--check: f.109020,-->
-                <!--field: f.109008,-->
-                <!--other: f.109022;-->
-                <!--change other about {-->
-                <!--if (check.value == false) {-->
-                <!--return field.value as String;-->
-                <!--}-->
-                <!--return other.value as String;-->
-                <!--}-->
-                <!--</action>-->
             </logic>
         </dataRef>
         <!--Titul za menom-->
@@ -6162,207 +6614,76 @@
             <id>109009</id>
             <logic>
                 <behavior>editable</behavior>
-                <!--<action trigger="set">-->
-                <!--check: f.109020,-->
-                <!--field: f.109009,-->
-                <!--other: f.109023;-->
-                <!--change other about {-->
-                <!--if (check.value == false) {-->
-                <!--return field.value as String;-->
-                <!--}-->
-                <!--return other.value as String;-->
-                <!--}-->
-                <!--</action>-->
             </logic>
         </dataRef>
         <!--Meno-->
         <dataRef>
             <id>109010</id>
             <logic>
-                <behavior>required</behavior>
                 <behavior>editable</behavior>
-                <!--<action trigger="set">-->
-                <!--check: f.109020,-->
-                <!--field: f.109010,-->
-                <!--other: f.109024;-->
-                <!--change other about {-->
-                <!--if (check.value == false) {-->
-                <!--return field.value as String;-->
-                <!--}-->
-                <!--return other.value as String;-->
-                <!--}-->
-                <!--</action>-->
             </logic>
         </dataRef>
         <!--Priezvisko-->
         <dataRef>
             <id>109011</id>
             <logic>
-                <behavior>required</behavior>
                 <behavior>editable</behavior>
-                <!--<action trigger="set">-->
-                <!--check: f.109020,-->
-                <!--field: f.109011,-->
-                <!--other: f.109025;-->
-                <!--change other about {-->
-                <!--if (check.value == false) {-->
-                <!--return field.value as String;-->
-                <!--}-->
-                <!--return other.value as String;-->
-                <!--}-->
-                <!--</action>-->
             </logic>
         </dataRef>
         <!--Obchodné meno-->
         <dataRef>
             <id>109012</id>
             <logic>
-                <behavior>required</behavior>
                 <behavior>editable</behavior>
-                <!--<action trigger="set">-->
-                <!--check: f.109020,-->
-                <!--field: f.109012,-->
-                <!--other: f.109026;-->
-                <!--change other about {-->
-                <!--if (check.value == false) {-->
-                <!--return field.value as String;-->
-                <!--}-->
-                <!--return other.value as String;-->
-                <!--}-->
-                <!--</action>-->
             </logic>
         </dataRef>
         <!--Štátna príslušnosť-->
         <dataRef>
             <id>109013</id>
             <logic>
-                <behavior>required</behavior>
                 <behavior>editable</behavior>
-                <!--<action trigger="set">-->
-                <!--check: f.109020,-->
-                <!--field: f.109013,-->
-                <!--other: f.109027;-->
-                <!--change other about {-->
-                <!--if (check.value == false) {-->
-                <!--return field.value as String;-->
-                <!--}-->
-                <!--return other.value as String;-->
-                <!--}-->
-                <!--</action>-->
             </logic>
         </dataRef>
         <!--Dátum narodenia-->
         <dataRef>
             <id>109014</id>
             <logic>
-                <behavior>required</behavior>
                 <behavior>editable</behavior>
-                <!--<action trigger="set">-->
-                <!--check: f.109020,-->
-                <!--field: f.109014,-->
-                <!--other: f.109028;-->
-                <!--change other about {-->
-                <!--if (check.value == false) {-->
-                <!--return field.value as LocalDate;-->
-                <!--}-->
-                <!--return other.value as LocalDate;-->
-                <!--}-->
-                <!--</action>-->
             </logic>
         </dataRef>
         <!--Rodné číslo-->
         <dataRef>
             <id>109015</id>
             <logic>
-                <behavior>required</behavior>
                 <behavior>editable</behavior>
-                <!--<action trigger="set">-->
-                <!--check: f.109020,-->
-                <!--field: f.109015,-->
-                <!--other: f.109029;-->
-                <!--change other about {-->
-                <!--if (check.value == false) {-->
-                <!--return field.value as String;-->
-                <!--}-->
-                <!--return other.value as String;-->
-                <!--}-->
-                <!--</action>-->
             </logic>
         </dataRef>
         <!--Typ preukazu-->
         <dataRef>
             <id>109016</id>
             <logic>
-                <behavior>required</behavior>
                 <behavior>editable</behavior>
-                <!--<action trigger="set">-->
-                <!--check: f.109020,-->
-                <!--field: f.109016,-->
-                <!--other: f.109030;-->
-                <!--change other about {-->
-                <!--if (check.value == false) {-->
-                <!--return field.value as String;-->
-                <!--}-->
-                <!--return other.value as String;-->
-                <!--}-->
-                <!--</action>-->
             </logic>
         </dataRef>
         <!--Číslo preukazu-->
         <dataRef>
             <id>109017</id>
             <logic>
-                <behavior>required</behavior>
                 <behavior>editable</behavior>
-                <!--<action trigger="set">-->
-                <!--check: f.109020,-->
-                <!--field: f.109017,-->
-                <!--other: f.109031;-->
-                <!--change other about {-->
-                <!--if (check.value == false) {-->
-                <!--return field.value as String;-->
-                <!--}-->
-                <!--return other.value as String;-->
-                <!--}-->
-                <!--</action>-->
             </logic>
         </dataRef>
         <!--Telefónne číslo-->
         <dataRef>
             <id>109018</id>
             <logic>
-                <behavior>required</behavior>
                 <behavior>editable</behavior>
-                <!--<action trigger="set">-->
-                <!--check: f.109020,-->
-                <!--field: f.109018,-->
-                <!--other: f.109032;-->
-                <!--change other about {-->
-                <!--if (check.value == false) {-->
-                <!--return field.value as String;-->
-                <!--}-->
-                <!--return other.value as String;-->
-                <!--}-->
-                <!--</action>-->
             </logic>
         </dataRef>
         <!--Email-->
         <dataRef>
             <id>109019</id>
             <logic>
-                <behavior>required</behavior>
                 <behavior>editable</behavior>
-                <!--<action trigger="set">-->
-                <!--check: f.109020,-->
-                <!--field: f.109019,-->
-                <!--other: f.109033;-->
-                <!--change other about {-->
-                <!--if (check.value == false) {-->
-                <!--return field.value as String;-->
-                <!--}-->
-                <!--return other.value as String;-->
-                <!--}-->
-                <!--</action>-->
             </logic>
         </dataRef>
         <!--Poistený je iná osoba-->
@@ -6370,308 +6691,6 @@
             <id>109020</id>
             <logic>
                 <behavior>editable</behavior>
-                <!-- Show poisteny when true -->
-                <!--<action trigger="set">-->
-                <!--field: f.this,-->
-                <!--other: f.109021,-->
-                <!--trans: t.588;-->
-                <!--make other,visible on trans when { field.value }-->
-                <!--</action>-->
-                <!--<action trigger="set">-->
-                <!--field: f.this,-->
-                <!--other: f.109022,-->
-                <!--trans: t.588;-->
-                <!--make other,visible on trans when { field.value }-->
-                <!--</action>-->
-                <!--<action trigger="set">-->
-                <!--field: f.this,-->
-                <!--other: f.109023,-->
-                <!--trans: t.588;-->
-                <!--make other,visible on trans when { field.value }-->
-                <!--</action>-->
-                <!--<action trigger="set">-->
-                <!--field: f.this,-->
-                <!--other: f.109024,-->
-                <!--trans: t.588;-->
-                <!--make other,visible on trans when { field.value }-->
-                <!--</action>-->
-                <!--<action trigger="set">-->
-                <!--field: f.this,-->
-                <!--other: f.109025,-->
-                <!--trans: t.588;-->
-                <!--make other,visible on trans when { field.value }-->
-                <!--</action>-->
-                <!--<action trigger="set">-->
-                <!--field: f.this,-->
-                <!--other: f.109026,-->
-                <!--trans: t.588;-->
-                <!--make other,visible on trans when { field.value }-->
-                <!--</action>-->
-                <!--<action trigger="set">-->
-                <!--field: f.this,-->
-                <!--other: f.109027,-->
-                <!--trans: t.588;-->
-                <!--make other,visible on trans when { field.value }-->
-                <!--</action>-->
-                <!--<action trigger="set">-->
-                <!--field: f.this,-->
-                <!--other: f.109028,-->
-                <!--trans: t.588;-->
-                <!--make other,visible on trans when { field.value }-->
-                <!--</action>-->
-                <!--<action trigger="set">-->
-                <!--field: f.this,-->
-                <!--other: f.109029,-->
-                <!--trans: t.588;-->
-                <!--make other,visible on trans when { field.value }-->
-                <!--</action>-->
-                <!--<action trigger="set">-->
-                <!--field: f.this,-->
-                <!--other: f.109030,-->
-                <!--trans: t.588;-->
-                <!--make other,visible on trans when { field.value }-->
-                <!--</action>-->
-                <!--<action trigger="set">-->
-                <!--field: f.this,-->
-                <!--other: f.109031,-->
-                <!--trans: t.588;-->
-                <!--make other,visible on trans when { field.value }-->
-                <!--</action>-->
-                <!--<action trigger="set">-->
-                <!--field: f.this,-->
-                <!--other: f.109032,-->
-                <!--trans: t.588;-->
-                <!--make other,visible on trans when { field.value }-->
-                <!--</action>-->
-                <!--<action trigger="set">-->
-                <!--field: f.this,-->
-                <!--other: f.109033,-->
-                <!--trans: t.588;-->
-                <!--make other,visible on trans when { field.value }-->
-                <!--</action>-->
-                <!--&lt;!&ndash; Hide poisteny when false &ndash;&gt;-->
-                <!--<action trigger="set">-->
-                <!--field: f.this,-->
-                <!--other: f.109021,-->
-                <!--trans: t.588;-->
-                <!--make other,hidden on trans when { return !field.value }-->
-                <!--</action>-->
-                <!--<action trigger="set">-->
-                <!--field: f.this,-->
-                <!--other: f.109022,-->
-                <!--trans: t.588;-->
-                <!--make other,hidden on trans when { return !field.value }-->
-                <!--</action>-->
-                <!--<action trigger="set">-->
-                <!--field: f.this,-->
-                <!--other: f.109023,-->
-                <!--trans: t.588;-->
-                <!--make other,hidden on trans when { return !field.value }-->
-                <!--</action>-->
-                <!--<action trigger="set">-->
-                <!--field: f.this,-->
-                <!--other: f.109024,-->
-                <!--trans: t.588;-->
-                <!--make other,hidden on trans when { return !field.value }-->
-                <!--</action>-->
-                <!--<action trigger="set">-->
-                <!--field: f.this,-->
-                <!--other: f.109025,-->
-                <!--trans: t.588;-->
-                <!--make other,hidden on trans when { return !field.value }-->
-                <!--</action>-->
-                <!--<action trigger="set">-->
-                <!--field: f.this,-->
-                <!--other: f.109026,-->
-                <!--trans: t.588;-->
-                <!--make other,hidden on trans when { return !field.value }-->
-                <!--</action>-->
-                <!--<action trigger="set">-->
-                <!--field: f.this,-->
-                <!--other: f.109027,-->
-                <!--trans: t.588;-->
-                <!--make other,hidden on trans when { return !field.value }-->
-                <!--</action>-->
-                <!--<action trigger="set">-->
-                <!--field: f.this,-->
-                <!--other: f.109028,-->
-                <!--trans: t.588;-->
-                <!--make other,hidden on trans when { return !field.value }-->
-                <!--</action>-->
-                <!--<action trigger="set">-->
-                <!--field: f.this,-->
-                <!--other: f.109029,-->
-                <!--trans: t.588;-->
-                <!--make other,hidden on trans when { return !field.value }-->
-                <!--</action>-->
-                <!--<action trigger="set">-->
-                <!--field: f.this,-->
-                <!--other: f.109030,-->
-                <!--trans: t.588;-->
-                <!--make other,hidden on trans when { return !field.value }-->
-                <!--</action>-->
-                <!--<action trigger="set">-->
-                <!--field: f.this,-->
-                <!--other: f.109031,-->
-                <!--trans: t.588;-->
-                <!--make other,hidden on trans when { return !field.value }-->
-                <!--</action>-->
-                <!--<action trigger="set">-->
-                <!--field: f.this,-->
-                <!--other: f.109032,-->
-                <!--trans: t.588;-->
-                <!--make other,hidden on trans when { return !field.value }-->
-                <!--</action>-->
-                <!--<action trigger="set">-->
-                <!--field: f.this,-->
-                <!--other: f.109033,-->
-                <!--trans: t.588;-->
-                <!--make other,hidden on trans when { return !field.value }-->
-                <!--</action>-->
-                <!--&lt;!&ndash; Fill poisteny when false &ndash;&gt;-->
-                <!--<action trigger="set">-->
-                <!--field: f.this,-->
-                <!--f_1: f.109007,-->
-                <!--f_2: f.109021;-->
-                <!--change f_2 about {-->
-                <!--if (field.value == false) {-->
-                <!--return f_1.value as String;-->
-                <!--}-->
-                <!--return f_2.value as String;-->
-                <!--}-->
-                <!--</action>-->
-                <!--<action trigger="set">-->
-                <!--field: f.this,-->
-                <!--f_1: f.109008,-->
-                <!--f_2: f.109022;-->
-                <!--change f_2 about {-->
-                <!--if (field.value == false) {-->
-                <!--return f_1.value as String;-->
-                <!--}-->
-                <!--return f_2.value as String;-->
-                <!--}-->
-                <!--</action>-->
-                <!--<action trigger="set">-->
-                <!--field: f.this,-->
-                <!--f_1: f.109009,-->
-                <!--f_2: f.109023;-->
-                <!--change f_2 about {-->
-                <!--if (field.value == false) {-->
-                <!--return f_1.value as String;-->
-                <!--}-->
-                <!--return f_2.value as String;-->
-                <!--}-->
-                <!--</action>-->
-                <!--<action trigger="set">-->
-                <!--field: f.this,-->
-                <!--f_1: f.109010,-->
-                <!--f_2: f.109024;-->
-                <!--change f_2 about {-->
-                <!--if (field.value == false) {-->
-                <!--return f_1.value as String;-->
-                <!--}-->
-                <!--return f_2.value as String;-->
-                <!--}-->
-                <!--</action>-->
-                <!--<action trigger="set">-->
-                <!--field: f.this,-->
-                <!--f_1: f.109011,-->
-                <!--f_2: f.109025;-->
-                <!--change f_2 about {-->
-                <!--if (field.value == false) {-->
-                <!--return f_1.value as String;-->
-                <!--}-->
-                <!--return f_2.value as String;-->
-                <!--}-->
-                <!--</action>-->
-                <!--<action trigger="set">-->
-                <!--field: f.this,-->
-                <!--f_1: f.109012,-->
-                <!--f_2: f.109026;-->
-                <!--change f_2 about {-->
-                <!--if (field.value == false) {-->
-                <!--return f_1.value as String;-->
-                <!--}-->
-                <!--return f_2.value as String;-->
-                <!--}-->
-                <!--</action>-->
-                <!--<action trigger="set">-->
-                <!--field: f.this,-->
-                <!--f_1: f.109013,-->
-                <!--f_2: f.109027;-->
-                <!--change f_2 about {-->
-                <!--if (field.value == false) {-->
-                <!--return f_1.value as String;-->
-                <!--}-->
-                <!--return f_2.value as String;-->
-                <!--}-->
-                <!--</action>-->
-                <!--<action trigger="set">-->
-                <!--field: f.this,-->
-                <!--f_1: f.109014,-->
-                <!--f_2: f.109028;-->
-                <!--change f_2 about {-->
-                <!--if (field.value == false) {-->
-                <!--return f_1.value as LocalDate;-->
-                <!--}-->
-                <!--return f_2.value as LocalDate;-->
-                <!--}-->
-                <!--</action>-->
-                <!--<action trigger="set">-->
-                <!--field: f.this,-->
-                <!--f_1: f.109015,-->
-                <!--f_2: f.109029;-->
-                <!--change f_2 about {-->
-                <!--if (field.value == false) {-->
-                <!--return f_1.value as String;-->
-                <!--}-->
-                <!--return f_2.value as String;-->
-                <!--}-->
-                <!--</action>-->
-                <!--<action trigger="set">-->
-                <!--field: f.this,-->
-                <!--f_1: f.109016,-->
-                <!--f_2: f.109030;-->
-                <!--change f_2 about {-->
-                <!--if (field.value == false) {-->
-                <!--return f_1.value as String;-->
-                <!--}-->
-                <!--return f_2.value as String;-->
-                <!--}-->
-                <!--</action>-->
-                <!--<action trigger="set">-->
-                <!--field: f.this,-->
-                <!--f_1: f.109017,-->
-                <!--f_2: f.109031;-->
-                <!--change f_2 about {-->
-                <!--if (field.value == false) {-->
-                <!--return f_1.value as String;-->
-                <!--}-->
-                <!--return f_2.value as String;-->
-                <!--}-->
-                <!--</action>-->
-                <!--<action trigger="set">-->
-                <!--field: f.this,-->
-                <!--f_1: f.109018,-->
-                <!--f_2: f.109032;-->
-                <!--change f_2 about {-->
-                <!--if (field.value == false) {-->
-                <!--return f_1.value as String;-->
-                <!--}-->
-                <!--return f_2.value as String;-->
-                <!--}-->
-                <!--</action>-->
-                <!--<action trigger="set">-->
-                <!--field: f.this,-->
-                <!--f_1: f.109019,-->
-                <!--f_2: f.109033;-->
-                <!--change f_2 about {-->
-                <!--if (field.value == false) {-->
-                <!--return f_1.value as String;-->
-                <!--}-->
-                <!--return f_2.value as String;-->
-                <!--}-->
-                <!--</action>-->
             </logic>
         </dataRef>
         <!-- Poistený -->
