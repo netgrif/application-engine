@@ -11,5 +11,5 @@ public class ImportDataGroup {
 
     private String alignment;
 
-    private DataRef[] dataRefs;
+    private DataRef[] dataRef;
 }
