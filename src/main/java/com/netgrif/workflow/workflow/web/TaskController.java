@@ -2,6 +2,7 @@ package com.netgrif.workflow.workflow.web;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.netgrif.workflow.auth.domain.LoggedUser;
+import com.netgrif.workflow.petrinet.domain.DataGroup;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.workflow.workflow.domain.Task;
@@ -164,6 +165,7 @@ public class TaskController {
     @RequestMapping(value = "/{id}/data", method = RequestMethod.GET)
     public DataFieldsResource getData(@PathVariable("id") String taskId) {
         List<Field> dataFields = taskService.getData(taskId);
+        List<DataGroup> dataGroups = taskService.getDataGroups(taskId);
         return new DataFieldsResource(dataFields, taskId);
     }
 
