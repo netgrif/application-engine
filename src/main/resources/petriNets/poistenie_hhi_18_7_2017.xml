@@ -5091,6 +5091,10 @@
             </logic>
         </roleRef>
         <!--Obec-->
+
+        <dataGroup>
+                <id>1</id>
+        <alignment>start</alignment>
         <dataRef>
             <id>301001</id>
             <logic>
@@ -5233,6 +5237,7 @@
                 <behavior>required</behavior>
             </logic>
         </dataRef>
+        </dataGroup>
     </transition>
     <!--============================= Nehnuteľnosť - DONE =====================-->
     <transition>
