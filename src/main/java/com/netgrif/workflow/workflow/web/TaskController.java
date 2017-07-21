@@ -163,10 +163,14 @@ public class TaskController {
     }
 
     @RequestMapping(value = "/{id}/data", method = RequestMethod.GET)
-    public DataFieldsResource getData(@PathVariable("id") String taskId) {
+    public DataGroupsResource getData(@PathVariable("id") String taskId) {
         List<Field> dataFields = taskService.getData(taskId);
         List<DataGroup> dataGroups = taskService.getDataGroups(taskId);
-        return new DataFieldsResource(dataFields, taskId);
+
+        dataGroups.forEach(group -> group.setFields(new DataFieldsResource(dataFields.stream().filter(field ->
+                group.getData().contains(field.getObjectId())).collect(Collectors.toList()), taskId)));
+
+        return new DataGroupsResource(dataGroups);
     }
 
     @RequestMapping(value = "/{id}/data", method = RequestMethod.POST)
