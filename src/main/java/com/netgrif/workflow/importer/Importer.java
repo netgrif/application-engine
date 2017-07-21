@@ -21,6 +21,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import java.io.File;
 import java.util.*;
+import java.util.stream.Stream;
 
 @Component
 public class Importer {
@@ -153,9 +154,21 @@ public class Importer {
         if (importTransition.getTransactionRef() != null) {
             addToTransaction(transition, importTransition.getTransactionRef());
         }
+        if (importTransition.getDataGroup() != null) {
+            addDataGroups(transition, importTransition.getDataGroup());
+        }
 
         net.addTransition(transition);
         transitions.put(importTransition.getId(), transition);
+    }
+
+    @Transactional
+    protected void addDataGroups(Transition transition, ImportDataGroup[] dataGroups) {
+        Stream.of(dataGroups).forEach(importDataGroup -> {
+            DataGroup dataGroup = new DataGroup(importDataGroup.getTitle(), importDataGroup.getAlignment());
+            Stream.of(importDataGroup.getDataRef()).forEach(dataRef -> dataGroup.addData(fields.get(dataRef.getId()).getObjectId()));
+            transition.addDataGroup(dataGroup);
+        });
     }
 
     @Transactional

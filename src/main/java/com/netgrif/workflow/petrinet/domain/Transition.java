@@ -14,6 +14,10 @@ import java.util.*;
 @Document
 public class Transition extends Node {
 
+    @Field("dataGroups")
+    @Getter @Setter
+    private Map<String, DataGroup> dataGroups;
+
     @Field("dataSet")
     @Getter @Setter
     private LinkedHashMap<String, DataFieldLogic> dataSet;
@@ -34,6 +38,7 @@ public class Transition extends Node {
         dataSet = new LinkedHashMap<>();
         roles = new HashMap<>();
         triggers = new LinkedList<>();
+        dataGroups = new LinkedHashMap<>();
     }
 
     public void addDataSet(String fieldId, DataFieldLogic logic) {
@@ -65,6 +70,10 @@ public class Transition extends Node {
         } else {
             roles.put(roleId, permissions);
         }
+    }
+
+    public void addDataGroup(DataGroup dataGroup) {
+        dataGroups.put(dataGroup.getStringId(), dataGroup);
     }
 
     public void addTrigger(Trigger trigger) {
