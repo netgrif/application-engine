@@ -1857,64 +1857,6 @@
     <data type="boolean">
         <title>Stavebné materialy</title>
         <id>105031</id>
-        <action trigger="set">
-            <!--@formatter:off-->
-            field: f.this,
-            coeff: f.205018;
-            change coeff about {
-                if (field.value)
-                    return 3.5 as Double;
-                return 0 as Double;
-            }
-            <!--@formatter:on-->
-        </action>
-        <action trigger="set">
-            <!--@formatter:off-->
-            check: f.105031,
-            other: f.105032,
-            trans: t.414;
-            make other,editable on trans when { check.value }
-            <!--@formatter:on-->
-        </action>
-        <action trigger="set">
-            <!--@formatter:off-->
-            check: f.105031,
-            other: f.105032,
-            trans: t.414;
-            make other,hidden on trans when { !check.value }
-            <!--@formatter:on-->
-        </action>
-        <action trigger="set">
-            <!--@formatter:off-->
-            check: f.105031,
-            other: f.305015,
-            trans: t.414;
-            make other,visible on trans when { check.value }
-            <!--@formatter:on-->
-        </action>
-        <action trigger="set">
-            <!--@formatter:off-->
-            check: f.105031,
-            other: f.305015,
-            trans: t.414;
-            make other,hidden on trans when { !check.value }
-            <!--@formatter:on-->
-        </action>
-        <!--Remove value-->
-        <action trigger="set">
-            <!--@formatter:off-->
-            check: f.105031,
-            other: f.105032;
-            change other about { null; }
-            <!--@formatter:on-->
-        </action>
-        <action trigger="set">
-            <!--@formatter:off-->
-            check: f.105031,
-            other: f.105032;
-            change other about { null; }
-            <!--@formatter:on-->
-        </action>
     </data>
     <data type="number">
         <title>Stavebné materiály</title>
@@ -1963,64 +1905,6 @@
     <data type="boolean">
         <title>Stavebné a záhradné mechanizmy</title>
         <id>105033</id>
-        <action trigger="set">
-            <!--@formatter:off-->
-            field: f.this,
-            coeff: f.205019;
-            change coeff about {
-                if (field.value)
-                    return 3.5 as Double;
-                return 0 as Double;
-            }
-            <!--@formatter:on-->
-        </action>
-        <action trigger="set">
-            <!--@formatter:off-->
-            check: f.105033,
-            other: f.105034,
-            trans: t.414;
-            make other,editable on trans when { check.value }
-            <!--@formatter:on-->
-        </action>
-        <action trigger="set">
-            <!--@formatter:off-->
-            check: f.105033,
-            other: f.105034,
-            trans: t.414;
-            make other,hidden on trans when { !check.value }
-            <!--@formatter:on-->
-        </action>
-        <action trigger="set">
-            <!--@formatter:off-->
-            check: f.105033,
-            other: f.305016,
-            trans: t.414;
-            make other,visible on trans when { check.value }
-            <!--@formatter:on-->
-        </action>
-        <action trigger="set">
-            <!--@formatter:off-->
-            check: f.105033,
-            other: f.305016,
-            trans: t.414;
-            make other,hidden on trans when { !check.value }
-            <!--@formatter:on-->
-        </action>
-        <!--Remove value-->
-        <action trigger="set">
-            <!--@formatter:off-->
-            check: f.105033,
-            other: f.105034;
-            change other about { null; }
-            <!--@formatter:on-->
-        </action>
-        <action trigger="set">
-            <!--@formatter:off-->
-            check: f.105033,
-            other: f.105034;
-            change other about { null; }
-            <!--@formatter:on-->
-        </action>
     </data>
     <data type="number">
         <title>Stavebné a záhradné mechanizmy</title>
@@ -5476,6 +5360,64 @@
                 <id>105031</id>
                 <logic>
                     <behavior>editable</behavior>
+                    <action trigger="set">
+                        <!--@formatter:off-->
+            field: f.this,
+            coeff: f.205018;
+            change coeff about {
+                if (field.value)
+                    return 3.5 as Double;
+                return 0 as Double;
+            }
+            <!--@formatter:on-->
+                    </action>
+                    <action trigger="set">
+                        <!--@formatter:off-->
+            check: f.105031,
+            other: f.105032,
+            trans: t.414;
+            make other,editable on trans when { check.value }
+            <!--@formatter:on-->
+                    </action>
+                    <action trigger="set">
+                        <!--@formatter:off-->
+            check: f.105031,
+            other: f.105032,
+            trans: t.414;
+            make other,hidden on trans when { !check.value }
+            <!--@formatter:on-->
+                    </action>
+                    <action trigger="set">
+                        <!--@formatter:off-->
+            check: f.105031,
+            other: f.305015,
+            trans: t.414;
+            make other,visible on trans when { check.value }
+            <!--@formatter:on-->
+                    </action>
+                    <action trigger="set">
+                        <!--@formatter:off-->
+            check: f.105031,
+            other: f.305015,
+            trans: t.414;
+            make other,hidden on trans when { !check.value }
+            <!--@formatter:on-->
+                    </action>
+                    <!--Remove value-->
+                    <action trigger="set">
+                        <!--@formatter:off-->
+            check: f.105031,
+            other: f.105032;
+            change other about { null; }
+            <!--@formatter:on-->
+                    </action>
+                    <action trigger="set">
+                        <!--@formatter:off-->
+            check: f.105031,
+            other: f.105032;
+            change other about { null; }
+            <!--@formatter:on-->
+                    </action>
                 </logic>
             </dataRef>
         </dataGroup>
@@ -5507,6 +5449,64 @@
                 <id>105033</id>
                 <logic>
                     <behavior>editable</behavior>
+                    <action trigger="set">
+                        <!--@formatter:off-->
+                        field: f.this,
+                        coeff: f.205019;
+                        change coeff about {
+                            if (field.value)
+                                return 3.5 as Double;
+                            return 0 as Double;
+                        }
+                        <!--@formatter:on-->
+                    </action>
+                    <action trigger="set">
+                        <!--@formatter:off-->
+                        check: f.105033,
+                        other: f.105034,
+                        trans: t.414;
+                        make other,editable on trans when { check.value }
+                        <!--@formatter:on-->
+                    </action>
+                    <action trigger="set">
+                        <!--@formatter:off-->
+                        check: f.105033,
+                        other: f.105034,
+                        trans: t.414;
+                        make other,hidden on trans when { !check.value }
+                        <!--@formatter:on-->
+                    </action>
+                    <action trigger="set">
+                        <!--@formatter:off-->
+                        check: f.105033,
+                        other: f.305016,
+                        trans: t.414;
+                        make other,visible on trans when { check.value }
+                        <!--@formatter:on-->
+                    </action>
+                    <action trigger="set">
+                        <!--@formatter:off-->
+                        check: f.105033,
+                        other: f.305016,
+                        trans: t.414;
+                        make other,hidden on trans when { !check.value }
+                        <!--@formatter:on-->
+                    </action>
+                    <!--Remove value-->
+                    <action trigger="set">
+                        <!--@formatter:off-->
+            check: f.105033,
+            other: f.105034;
+            change other about { null; }
+            <!--@formatter:on-->
+                    </action>
+                    <action trigger="set">
+                        <!--@formatter:off-->
+            check: f.105033,
+            other: f.105034;
+            change other about { null; }
+            <!--@formatter:on-->
+                    </action>
                 </logic>
             </dataRef>
         </dataGroup>
