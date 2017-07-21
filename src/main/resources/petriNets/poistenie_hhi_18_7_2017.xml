@@ -402,6 +402,29 @@
     </data>
     <!-- ===== Nehnuteľnosť ===== -->
     <data type="enumeration">
+        <title>Poistenie nehnuteľnosti-Spoluúčasť</title>
+        <id>105005</id>
+        <placeholder>Spoluúčasť</placeholder>
+        <values>0.00 €</values>
+        <values>50.00 €</values>
+        <values>150.00 €</values>
+        <init>50.00 €</init>
+        <action trigger="set">
+            <!--@formatter:off-->
+            field: f.this,
+            coeff: f.208001;
+            change coeff about {
+            if (field.value=="0.00 €")
+            return 1.1 as Double;
+            if (field.value=="50.00 €")
+            return 1.0 as Double;
+            if (field.value=="150.00 €")
+            return 0.9 as Double;
+            }
+        <!--@formatter:on-->
+        </action>
+    </data>
+    <data type="enumeration">
         <title>Predmet poistenia</title>
         <id>102001</id>
         <placeholder>Typ</placeholder>
@@ -716,16 +739,51 @@
     <data type="boolean">
         <title>Poistenie zodpovednosti z vlastníctva nehnuteľnosti</title>
         <id>104001</id>
+        <action trigger="set">
+            <!--@formatter:off-->
+            field: f.this,
+            coeff: f.204001;
+            change coeff about {
+            if (field.value)
+            return 0.1 as Double;
+            return 0 as Double;
+            }
+        <!--@formatter:on-->
+        </action>
     </data>
     <data type="boolean">
         <title>Zodpovednosť za škodu členov domácnosti</title>
         <id>104002</id>
+        <action trigger="set">
+        <!--@formatter:off-->
+            field: f.this,
+            coeff: f.204002;
+            change coeff about {
+            if (field.value)
+            return 0.3 as Double;
+            return 0 as Double;
+            }
+        <!--@formatter:on-->
+        </action>
     </data>
     <data type="enumeration">
         <title>Územná platnosť poistenia</title>
         <id>104003</id>
         <values>Slovenská republika</values>
         <values>Európa</values>
+        <action trigger="set">
+            <!--@formatter:off-->
+            field: f.this,
+            coeff1: f.204002,
+            coeff: f.204003;
+            change coeff about {
+            if (field.value=="Slovenská republika")
+            return 1.0*204002 as Double;
+             if (field.value=="Európa")
+            return 1.2*204002 as Double;
+            }
+        <!--@formatter:on-->
+        </action>
     </data>
     <!-- ===== Poistenie nehnuteľnosti ===== -->
     <data type="number">
@@ -873,7 +931,7 @@
             <!--@formatter:off-->
             field: f.this,
             location: f.301002,
-            coeff: f.205005;
+            coeff: f.105007;
             change coeff about {
             if (location.value=="BA")
             return 850*field.value as Double;
@@ -918,51 +976,7 @@
         <!--}-->
         <!--</action>-->
     </data>
-    <data type="enumeration">
-        <title>Poistenie nehnuteľnosti-Spoluúčasť</title>
-        <id>105005</id>
-        <placeholder>Spoluúčasť</placeholder>
-        <values>0.00 €</values>
-        <values>50.00 €</values>
-        <values>150.00 €</values>
-        <init>50.00 €</init>
-        <action trigger="set">
-            <!--@formatter:off-->
-            field: f.this,
-            coeff: f.208001;
-            change coeff about {
-            if (field.value=="0.00 €")
-            return 1.1 as Double;
-            if (field.value=="50.00 €")
-            return 1.0 as Double;
-            if (field.value=="150.00 €")
-            return 0.9 as Double;
-            }
-        <!--@formatter:on-->
-        </action>
-    </data>
-    <data type="number">
-        <title>Poistenie nehnuteľnosti - Poistná suma</title>
-        <id>105006</id>
-        <placeholder>Poistná suma</placeholder>
-        <action trigger="set">
-            <!--@formatter:off-->
-        field: f.this,
-        excess: f.208001,
-        hhc: f.202009,
-        bic: f.201017,
-        sum: f.305002;
-        change sum about {
-            return (field.value*excess.value*hhc.value*bic.value)/1000 as Double;
-        }
-    <!--@formatter:on-->
-        </action>
-    </data>
-    <data type="number">
-        <title>Poistenie nehnuteľnosti - Poistné</title>
-        <id>305002</id>
-        <placeholder>Poistné</placeholder>
-    </data>
+
     <!-- ===== Doplnkové poistenie nehnuteľnosti ===== -->
     <data type="boolean">
         <title>Garáž</title>
@@ -1020,11 +1034,45 @@
         <title>Garáž</title>
         <id>105007</id>
         <placeholder>Poistná suma</placeholder>
+        <action trigger="set">
+            <!--@formatter:off-->
+            field: f.this,
+            coeff: f.208003,
+            excess: f.208001,
+            sum: f.305003;
+            change sum about {
+            return field.value*coeff.value*excess.value/1000 as Double;
+            }
+        <!--@formatter:on-->
+        </action>
     </data>
     <data type="number">
         <title>Garáž</title>
         <id>305003</id>
         <placeholder>Poistné</placeholder>
+        <action trigger="set">
+            <!--@formatter:off-->
+            c1: f.305002,
+            c2: f.305003,
+            c3: f.305004,
+            c4: f.305005,
+            c5: f.305006,
+            c6: f.305007,
+            c7: f.305008,
+            c8: f.305009,
+            c9: f.305010,
+            c10: f.305011,
+            c11: f.305012,
+            c12: f.305013,
+            c13: f.305014,
+            c14: f.305015,
+            c15: f.305016,
+            sum: f.308001;
+            change sum about {
+            return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
+            }
+        <!--@formatter:on-->
+        </action>
     </data>
     <data type="boolean">
         <title>Rovnaké miesto poistenia garáže?</title>
@@ -1108,6 +1156,29 @@
         <title>Hospodárska budova</title>
         <id>305004</id>
         <placeholder>Poistné</placeholder>
+        <action trigger="set">
+            <!--@formatter:off-->
+            c1: f.305002,
+            c2: f.305003,
+            c3: f.305004,
+            c4: f.305005,
+            c5: f.305006,
+            c6: f.305007,
+            c7: f.305008,
+            c8: f.305009,
+            c9: f.305010,
+            c10: f.305011,
+            c11: f.305012,
+            c12: f.305013,
+            c13: f.305014,
+            c14: f.305015,
+            c15: f.305016,
+            sum: f.308001;
+            change sum about {
+            return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
+            }
+        <!--@formatter:on-->
+        </action>
     </data>
     <data type="boolean">
         <title>Altánok</title>
@@ -1176,6 +1247,29 @@
         <title>Altánok</title>
         <id>305005</id>
         <placeholder>Poistné</placeholder>
+        <action trigger="set">
+            <!--@formatter:off-->
+            c1: f.305002,
+            c2: f.305003,
+            c3: f.305004,
+            c4: f.305005,
+            c5: f.305006,
+            c6: f.305007,
+            c7: f.305008,
+            c8: f.305009,
+            c9: f.305010,
+            c10: f.305011,
+            c11: f.305012,
+            c12: f.305013,
+            c13: f.305014,
+            c14: f.305015,
+            c15: f.305016,
+            sum: f.308001;
+            change sum about {
+            return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
+            }
+        <!--@formatter:on-->
+        </action>
     </data>
     <data type="boolean">
         <title>Prístrešok</title>
@@ -1212,6 +1306,29 @@
         <title>Prístrešok</title>
         <id>305006</id>
         <placeholder>Poistné</placeholder>
+        <action trigger="set">
+            <!--@formatter:off-->
+            c1: f.305002,
+            c2: f.305003,
+            c3: f.305004,
+            c4: f.305005,
+            c5: f.305006,
+            c6: f.305007,
+            c7: f.305008,
+            c8: f.305009,
+            c9: f.305010,
+            c10: f.305011,
+            c11: f.305012,
+            c12: f.305013,
+            c13: f.305014,
+            c14: f.305015,
+            c15: f.305016,
+            sum: f.308001;
+            change sum about {
+            return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
+            }
+        <!--@formatter:on-->
+        </action>
     </data>
     <data type="boolean">
         <title>Chodník</title>
@@ -1248,6 +1365,29 @@
         <title>Chodník, parkovacia plocha</title>
         <id>305007</id>
         <placeholder>Poistné</placeholder>
+        <action trigger="set">
+            <!--@formatter:off-->
+            c1: f.305002,
+            c2: f.305003,
+            c3: f.305004,
+            c4: f.305005,
+            c5: f.305006,
+            c6: f.305007,
+            c7: f.305008,
+            c8: f.305009,
+            c9: f.305010,
+            c10: f.305011,
+            c11: f.305012,
+            c12: f.305013,
+            c13: f.305014,
+            c14: f.305015,
+            c15: f.305016,
+            sum: f.308001;
+            change sum about {
+            return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
+            }
+        <!--@formatter:on-->
+        </action>
     </data>
     <data type="boolean">
         <title>Sauna</title>
@@ -1284,6 +1424,29 @@
         <title>Sauna</title>
         <id>305008</id>
         <placeholder>Poistné</placeholder>
+        <action trigger="set">
+            <!--@formatter:off-->
+            c1: f.305002,
+            c2: f.305003,
+            c3: f.305004,
+            c4: f.305005,
+            c5: f.305006,
+            c6: f.305007,
+            c7: f.305008,
+            c8: f.305009,
+            c9: f.305010,
+            c10: f.305011,
+            c11: f.305012,
+            c12: f.305013,
+            c13: f.305014,
+            c14: f.305015,
+            c15: f.305016,
+            sum: f.308001;
+            change sum about {
+            return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
+            }
+        <!--@formatter:on-->
+        </action>
     </data>
     <data type="boolean">
         <title>Elektrická brána</title>
@@ -1320,6 +1483,29 @@
         <title>Elektrická brána, oplotenie</title>
         <id>305009</id>
         <placeholder>Poistné</placeholder>
+        <action trigger="set">
+            <!--@formatter:off-->
+            c1: f.305002,
+            c2: f.305003,
+            c3: f.305004,
+            c4: f.305005,
+            c5: f.305006,
+            c6: f.305007,
+            c7: f.305008,
+            c8: f.305009,
+            c9: f.305010,
+            c10: f.305011,
+            c11: f.305012,
+            c12: f.305013,
+            c13: f.305014,
+            c14: f.305015,
+            c15: f.305016,
+            sum: f.308001;
+            change sum about {
+            return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
+            }
+        <!--@formatter:on-->
+        </action>
     </data>
     <data type="boolean">
         <title>Tenisový kurt</title>
@@ -1356,6 +1542,29 @@
         <title>Tenisový kurt</title>
         <id>305010</id>
         <placeholder>Poistné</placeholder>
+        <action trigger="set">
+            <!--@formatter:off-->
+            c1: f.305002,
+            c2: f.305003,
+            c3: f.305004,
+            c4: f.305005,
+            c5: f.305006,
+            c6: f.305007,
+            c7: f.305008,
+            c8: f.305009,
+            c9: f.305010,
+            c10: f.305011,
+            c11: f.305012,
+            c12: f.305013,
+            c13: f.305014,
+            c14: f.305015,
+            c15: f.305016,
+            sum: f.308001;
+            change sum about {
+            return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
+            }
+        <!--@formatter:on-->
+        </action>
     </data>
     <data type="boolean">
         <title>Vonkajší bazén</title>
@@ -1392,6 +1601,29 @@
         <title>Vonkajší bazén</title>
         <id>305011</id>
         <placeholder>Poistné</placeholder>
+        <action trigger="set">
+            <!--@formatter:off-->
+            c1: f.305002,
+            c2: f.305003,
+            c3: f.305004,
+            c4: f.305005,
+            c5: f.305006,
+            c6: f.305007,
+            c7: f.305008,
+            c8: f.305009,
+            c9: f.305010,
+            c10: f.305011,
+            c11: f.305012,
+            c12: f.305013,
+            c13: f.305014,
+            c14: f.305015,
+            c15: f.305016,
+            sum: f.308001;
+            change sum about {
+            return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
+            }
+        <!--@formatter:on-->
+        </action>
     </data>
     <data type="boolean">
         <title>Studňa</title>
@@ -1428,6 +1660,29 @@
         <title>Studňa</title>
         <id>305012</id>
         <placeholder>Poistné</placeholder>
+        <action trigger="set">
+            <!--@formatter:off-->
+            c1: f.305002,
+            c2: f.305003,
+            c3: f.305004,
+            c4: f.305005,
+            c5: f.305006,
+            c6: f.305007,
+            c7: f.305008,
+            c8: f.305009,
+            c9: f.305010,
+            c10: f.305011,
+            c11: f.305012,
+            c12: f.305013,
+            c13: f.305014,
+            c14: f.305015,
+            c15: f.305016,
+            sum: f.308001;
+            change sum about {
+            return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
+            }
+        <!--@formatter:on-->
+        </action>
     </data>
     <data type="boolean">
         <title>Žumpa, septik</title>
@@ -1464,6 +1719,29 @@
         <title>Žumpa, septik</title>
         <id>305013</id>
         <placeholder>Poistné</placeholder>
+        <action trigger="set">
+            <!--@formatter:off-->
+            c1: f.305002,
+            c2: f.305003,
+            c3: f.305004,
+            c4: f.305005,
+            c5: f.305006,
+            c6: f.305007,
+            c7: f.305008,
+            c8: f.305009,
+            c9: f.305010,
+            c10: f.305011,
+            c11: f.305012,
+            c12: f.305013,
+            c13: f.305014,
+            c14: f.305015,
+            c15: f.305016,
+            sum: f.308001;
+            change sum about {
+            return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
+            }
+        <!--@formatter:on-->
+        </action>
     </data>
     <data type="boolean">
         <title>Iné</title>
@@ -1500,6 +1778,29 @@
         <title>Iné</title>
         <id>305014</id>
         <placeholder>Poistné</placeholder>
+        <action trigger="set">
+            <!--@formatter:off-->
+            c1: f.305002,
+            c2: f.305003,
+            c3: f.305004,
+            c4: f.305005,
+            c5: f.305006,
+            c6: f.305007,
+            c7: f.305008,
+            c8: f.305009,
+            c9: f.305010,
+            c10: f.305011,
+            c11: f.305012,
+            c12: f.305013,
+            c13: f.305014,
+            c14: f.305015,
+            c15: f.305016,
+            sum: f.308001;
+            change sum about {
+            return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
+            }
+        <!--@formatter:on-->
+        </action>
     </data>
     <data type="boolean">
         <title>Stavebné materialy</title>
@@ -1568,6 +1869,29 @@
         <title>Stavebné materiály</title>
         <id>305015</id>
         <placeholder>Poistné</placeholder>
+        <action trigger="set">
+            <!--@formatter:off-->
+            c1: f.305002,
+            c2: f.305003,
+            c3: f.305004,
+            c4: f.305005,
+            c5: f.305006,
+            c6: f.305007,
+            c7: f.305008,
+            c8: f.305009,
+            c9: f.305010,
+            c10: f.305011,
+            c11: f.305012,
+            c12: f.305013,
+            c13: f.305014,
+            c14: f.305015,
+            c15: f.305016,
+            sum: f.308001;
+            change sum about {
+            return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
+            }
+        <!--@formatter:on-->
+        </action>
     </data>
     <data type="boolean">
         <title>Stavebné a záhradné mechanizmy</title>
@@ -1636,6 +1960,29 @@
         <title>Stavebné a záhradné mechanizmy</title>
         <id>305016</id>
         <placeholder>Poistné</placeholder>
+        <action trigger="set">
+            <!--@formatter:off-->
+            c1: f.305002,
+            c2: f.305003,
+            c3: f.305004,
+            c4: f.305005,
+            c5: f.305006,
+            c6: f.305007,
+            c7: f.305008,
+            c8: f.305009,
+            c9: f.305010,
+            c10: f.305011,
+            c11: f.305012,
+            c12: f.305013,
+            c13: f.305014,
+            c14: f.305015,
+            c15: f.305016,
+            sum: f.308001;
+            change sum about {
+            return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
+            }
+        <!--@formatter:on-->
+        </action>
     </data>
     <!-- ===== Poistenie domácnosti ===== -->
     <data type="enumeration">
@@ -1678,6 +2025,24 @@
     <data type="number">
         <title>Poistenie domácnosti - poistné</title>
         <id>306001</id>
+        <action trigger="set">
+            <!--@formatter:off-->
+            c1: f.306001,
+            c2: f.306002,
+            c3: f.306003,
+            c4: f.306004,
+            c5: f.306005,
+            c6: f.306006,
+            c7: f.306007,
+            c8: f.306008,
+            c9: f.306009,
+            c10: f.306010,
+            sum: f.308002;
+            change sum about {
+            return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value;
+            }
+        <!--@formatter:on-->
+        </action>
     </data>
     <!-- ===== Doplnkové poistenie domácnosti ===== -->
     <data type="number">
@@ -1688,7 +2053,7 @@
             <!--@formatter:off-->
             field: f.this,
             location: f.301002,
-            coeff: f.206010;
+            coeff: f.106002;
             change coeff about {
             if (location.value=="BA")
             return 1900*field.value as Double;
@@ -1713,6 +2078,24 @@
     <data type="number">
         <title>Cennosti - poistné</title>
         <id>306002</id>
+        <action trigger="set">
+            <!--@formatter:off-->
+            c1: f.306001,
+            c2: f.306002,
+            c3: f.306003,
+            c4: f.306004,
+            c5: f.306005,
+            c6: f.306006,
+            c7: f.306007,
+            c8: f.306008,
+            c9: f.306009,
+            c10: f.306010,
+            sum: f.308002;
+            change sum about {
+            return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value;
+            }
+        <!--@formatter:on-->
+        </action>
     </data>
     <data type="boolean">
         <title>Umelecké diela</title>
@@ -1725,6 +2108,24 @@
     <data type="number">
         <title>Umelecké diela - poistné</title>
         <id>306003</id>
+        <action trigger="set">
+            <!--@formatter:off-->
+            c1: f.306001,
+            c2: f.306002,
+            c3: f.306003,
+            c4: f.306004,
+            c5: f.306005,
+            c6: f.306006,
+            c7: f.306007,
+            c8: f.306008,
+            c9: f.306009,
+            c10: f.306010,
+            sum: f.308002;
+            change sum about {
+           return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value;
+            }
+        <!--@formatter:on-->
+        </action>
     </data>
     <data type="boolean">
         <title>Elektronické a optické zariadenia</title>
@@ -1737,6 +2138,24 @@
     <data type="number">
         <title>Elektronické a optické zariadenia - poistné</title>
         <id>306004</id>
+        <action trigger="set">
+            <!--@formatter:off-->
+            c1: f.306001,
+            c2: f.306002,
+            c3: f.306003,
+            c4: f.306004,
+            c5: f.306005,
+            c6: f.306006,
+            c7: f.306007,
+            c8: f.306008,
+            c9: f.306009,
+            c10: f.306010,
+            sum: f.308002;
+            change sum about {
+           return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value;
+            }
+        <!--@formatter:on-->
+        </action>
     </data>
     <data type="boolean">
         <title>Špecialne sklá a presklenie</title>
@@ -1749,6 +2168,24 @@
     <data type="number">
         <title>Špeciálne sklá a presklenie - poistné</title>
         <id>306005</id>
+        <action trigger="set">
+            <!--@formatter:off-->
+            c1: f.306001,
+            c2: f.306002,
+            c3: f.306003,
+            c4: f.306004,
+            c5: f.306005,
+            c6: f.306006,
+            c7: f.306007,
+            c8: f.306008,
+            c9: f.306009,
+            c10: f.306010,
+            sum: f.308002;
+            change sum about {
+            return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value;
+            }
+        <!--@formatter:on-->
+        </action>
     </data>
     <data type="boolean">
         <title>Záhradné vybavenie a nábytok</title>
@@ -1761,6 +2198,24 @@
     <data type="number">
         <title>Záhradé vybavenie a nábytok - poistné</title>
         <id>306006</id>
+        <action trigger="set">
+            <!--@formatter:off-->
+            c1: f.306001,
+            c2: f.306002,
+            c3: f.306003,
+            c4: f.306004,
+            c5: f.306005,
+            c6: f.306006,
+            c7: f.306007,
+            c8: f.306008,
+            c9: f.306009,
+            c10: f.306010,
+            sum: f.308002;
+            change sum about {
+           return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value;
+            }
+        <!--@formatter:on-->
+        </action>
     </data>
     <data type="boolean">
         <title>Elektromotory v domácich spotrebičoch</title>
@@ -1773,6 +2228,24 @@
     <data type="number">
         <title>Elektromotory v domácich spotrebičoch - poistné</title>
         <id>306007</id>
+        <action trigger="set">
+            <!--@formatter:off-->
+            c1: f.306001,
+            c2: f.306002,
+            c3: f.306003,
+            c4: f.306004,
+            c5: f.306005,
+            c6: f.306006,
+            c7: f.306007,
+            c8: f.306008,
+            c9: f.306009,
+            c10: f.306010,
+            sum: f.308002;
+            change sum about {
+           return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value;
+            }
+        <!--@formatter:on-->
+        </action>
     </data>
     <data type="boolean">
         <title>Stavebné súčasti domácnosti</title>
@@ -1785,6 +2258,24 @@
     <data type="number">
         <title>Stavebné súčasti domácností - poistné</title>
         <id>306008</id>
+        <action trigger="set">
+            <!--@formatter:off-->
+            c1: f.306001,
+            c2: f.306002,
+            c3: f.306003,
+            c4: f.306004,
+            c5: f.306005,
+            c6: f.306006,
+            c7: f.306007,
+            c8: f.306008,
+            c9: f.306009,
+            c10: f.306010,
+            sum: f.308002;
+            change sum about {
+           return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value;
+            }
+        <!--@formatter:on-->
+        </action>
     </data>
     <data type="boolean">
         <title>Športové náradie</title>
@@ -1797,6 +2288,24 @@
     <data type="number">
         <title>športové náradie - poistné</title>
         <id>306009</id>
+        <action trigger="set">
+            <!--@formatter:off-->
+            c1: f.306001,
+            c2: f.306002,
+            c3: f.306003,
+            c4: f.306004,
+            c5: f.306005,
+            c6: f.306006,
+            c7: f.306007,
+            c8: f.306008,
+            c9: f.306009,
+            c10: f.306010,
+            sum: f.308002;
+            change sum about {
+          return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value;
+            }
+        <!--@formatter:on-->
+        </action>
     </data>
     <data type="boolean">
         <title>Iné</title>
@@ -1809,6 +2318,24 @@
     <data type="number">
         <title>iné - poistné</title>
         <id>306010</id>
+        <action trigger="set">
+            <!--@formatter:off-->
+            c1: f.306001,
+            c2: f.306002,
+            c3: f.306003,
+            c4: f.306004,
+            c5: f.306005,
+            c6: f.306006,
+            c7: f.306007,
+            c8: f.306008,
+            c9: f.306009,
+            c10: f.306010,
+            sum: f.308002;
+            change sum about {
+           return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value;
+            }
+        <!--@formatter:on-->
+        </action>
     </data>
     <!-- ===== Poistenie zodpovednosti za škodu ===== -->
     <data type="enumeration">
@@ -1819,6 +2346,18 @@
         <values>30,000.00 €</values>
         <values>60,000.00 €</values>
         <values>120,000.00 €</values>
+        <action trigger="set">
+            <!--@formatter:off-->
+            field: f.this,
+            coeff: f.204001,
+            excess: f.208001,
+            sum: f.308008;
+            change sum about {
+                def n = field.value.replaceAll("[,€ ]","") as Double;
+                return n*coeff.value*excess.value/1000 as Double;
+            }
+        <!--@formatter:on-->
+        </action>
     </data>
     <!--<data type="enumeration">-->
     <!--<title>Poistenie zodpovednosti z vlastníctva nehnuteľnosti</title>-->
@@ -1836,26 +2375,161 @@
         <values>30,000.00 €</values>
         <values>60,000.00 €</values>
         <values>120,000.00 €</values>
+        <action trigger="set">
+            <!--@formatter:off-->
+            field: f.this,
+            coeff: f.204001,
+            excess: f.208002,
+            sum: f.308009;
+            change sum about {
+                def n = field.value.replaceAll("[,€ ]","") as Double;
+                return n*coeff.value*excess.value/1000 as Double;
+            }
+        <!--@formatter:on-->
+        </action>
     </data>
     <!-- ===== Sumár ===== -->
     <data type="number">
-        <title>Poistenie nehnuteľnosti</title>
+        <title>Celkové poistenie nehnuteľnosti</title>
         <id>308001</id>
         <placeholder>Poistné</placeholder>
+        <action trigger="set">
+            <!--@formatter:off-->
+        s1: f.308001,
+        s2: f.308002,
+        s3: f.308003,
+        sum: f.308004;
+        change sum about {
+            return s1.value+s2.value+s3.value as Double;
+        }
+    <!--@formatter:on-->
+        </action>
     </data>
     <data type="number">
-        <title>Poistenie domácnosti</title>
+        <title>Poistenie nehnuteľnosti - Poistné</title>
+        <id>305002</id>
+        <placeholder>Poistné</placeholder>
+        <init>0</init>
+    </data>
+    <data type="number">
+        <title>Poistenie nehnuteľnosti - Poistná suma</title>
+        <id>105006</id>
+        <placeholder>Poistná suma</placeholder>
+        <action trigger="set">
+            <!--@formatter:off-->
+        field: f.this,
+        excess: f.208001,
+        hhc: f.202009,
+        bic: f.201017,
+        sum: f.305002;
+        change sum about {
+            return (field.value*excess.value*hhc.value*bic.value)/1000 as Double;
+        }
+    <!--@formatter:on-->
+        </action>
+        <action trigger="set">
+            <!--@formatter:off-->
+            c1: f.305002,
+            c2: f.305003,
+            c3: f.305004,
+            c4: f.305005,
+            c5: f.305006,
+            c6: f.305007,
+            c7: f.305008,
+            c8: f.305009,
+            c9: f.305010,
+            c10: f.305011,
+            c11: f.305012,
+            c12: f.305013,
+            c13: f.305014,
+            c14: f.305015,
+            c15: f.305016,
+            sum: f.308001;
+            change sum about {
+            return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
+            }
+        <!--@formatter:on-->
+        </action>
+    </data>
+    <data type="number">
+        <title>Celkové poistenie domácnosti</title>
         <id>308002</id>
         <placeholder>Poistné</placeholder>
+        <action trigger="set">
+            <!--@formatter:off-->
+        s1: f.308001,
+        s2: f.308002,
+        s3: f.308003,
+        sum: f.308004;
+        change sum about {
+            return s1.value+s2.value+s3.value as Double;
+        }
+    <!--@formatter:on-->
+        </action>
     </data>
     <data type="number">
-        <title>Poistenie zodpovednosti za škodu</title>
+        <title>Poistenie zodpovednosti z vlastníctva nehnuteľnosti</title>
+        <id>308008</id>
+        <placeholder>Poistné</placeholder>
+        <action trigger="set">
+            <!--@formatter:off-->
+            c1: f.308008,
+            c2: f.308009,
+            sum: f.308003;
+            change sum about {
+                return c1.value+c2.value as Double;
+            }
+        <!--@formatter:on-->
+        </action>
+    </data>
+    <data type="number">
+        <title>Zodpovednosť za škodu členov domácnosti</title>
+        <id>308009</id>
+        <placeholder>Poistné</placeholder>
+        <action trigger="set">
+            <!--@formatter:off-->
+            c1: f.308008,
+            c2: f.308009,
+            sum: f.308003;
+            change sum about {
+                return c1.value+c2.value as Double;
+            }
+        <!--@formatter:on-->
+        </action>
+    </data>
+    <data type="number">
+        <title>Celkové poistenie zodpovednosti za škodu</title>
         <id>308003</id>
         <placeholder>Poistné</placeholder>
+        <action trigger="set">
+            <!--@formatter:off-->
+        s1: f.308001,
+        s2: f.308002,
+        s3: f.308003,
+        sum: f.308004;
+        change sum about {
+            return s1.value+s2.value+s3.value as Double;
+        }
+    <!--@formatter:on-->
+        </action>
     </data>
     <data type="number">
         <title>ROČNÉ POISTNÉ CELKOM</title>
         <id>308004</id>
+        <action trigger="set">
+            <!--@formatter:off-->
+            c1: f.308004,
+            c2: f.208004,
+            c3: f.208008,
+            c4: f.208005,
+            c5: f.208006,
+            c6: f.208007,
+            sum: f.308006;
+            change sum about {
+            return c1.value*c2.value*c3.value*c4.value*c5.value*c6.value as Double;
+            }
+        <!--@formatter:on-->
+        </action>
     </data>
     <data type="enumeration">
         <title>PERIODICITA PLATBY POISTNÉHO</title>
@@ -1877,23 +2551,78 @@
             }
         <!--@formatter:on-->
         </action>
+        <action trigger="set">
+            <!--@formatter:off-->
+            c1: f.308004,
+            c2: f.208004,
+            c3: f.208008,
+            c4: f.208005,
+            c5: f.208006,
+            c6: f.208007,
+            sum: f.308006;
+            change sum about {
+            return c1.value*c2.value*c3.value*c4.value*c5.value*c6.value as Double;
+            }
+        <!--@formatter:on-->
+        </action>
     </data>
     <data type="boolean">
         <title>KOMPLETNÉ POISTENIE</title>
         <id>308005</id>
-        <!--<action trigger="set">-->
-        <!--field: f.103001,-->
-        <!--coeff: f.208004;-->
-        <!--change coeff about {-->
-        <!--if (field.value == "bungalow")-->
-        <!--return true ;-->
-        <!--return false ;-->
-        <!--}-->
-        <!--</action>-->
+        <action trigger="set">
+            <!--@formatter:off-->
+            field: f.this,
+            coeff: f.208008;
+            change coeff about {
+            if (field.value)
+            return 0.95 as Double;
+            return 1.0 as Double;
+            }
+        <!--@formatter:on-->
+        </action>
+        <action trigger="set">
+            <!--@formatter:off-->
+            c1: f.308004,
+            c2: f.208004,
+            c3: f.208008,
+            c4: f.208005,
+            c5: f.208006,
+            c6: f.208007,
+            sum: f.308006;
+            change sum about {
+            return c1.value*c2.value*c3.value*c4.value*c5.value*c6.value as Double;
+            }
+        <!--@formatter:on-->
+        </action>
     </data>
     <data type="boolean">
         <title>ZĽAVA ZA INÉ POISTENIE V PREMIUM</title>
         <id>108002</id>
+        <action trigger="set">
+            <!--@formatter:off-->
+            field: f.this,
+            coeff: f.208005;
+            change coeff about {
+            if (field.value)
+            return 0.95 as Double;
+            return 1.0 as Double;
+            }
+        <!--@formatter:on-->
+        </action>
+        <action trigger="set">
+            <!--@formatter:off-->
+            c1: f.308004,
+            c2: f.208004,
+            c3: f.208008,
+            c4: f.208005,
+            c5: f.208006,
+            c6: f.208007,
+            sum: f.308006;
+            change sum about {
+            return c1.value*c2.value*c3.value*c4.value*c5.value*c6.value as Double;
+            }
+        <!--@formatter:on-->
+        </action>
     </data>
     <data type="enumeration">
         <title>OBCHODNÁ ZĽAVA</title>
@@ -1904,10 +2633,69 @@
         <values>15%</values>
         <values>20%</values>
         <values>25%</values>
+        <action trigger="set">
+            <!--@formatter:off-->
+            field: f.this,
+            coeff: f.208006;
+            change coeff about {
+            if (field.value=="0%")
+            return 1.0 as Double;
+            if (field.value=="5%")
+            return 0.95 as Double;
+            if (field.value=="10%")
+            return 0.9 as Double;
+            if (field.value=="15%")
+            return 0.85 as Double;
+            if (field.value=="20%")
+            return 0.8 as Double;
+            if (field.value=="25%")
+            return 0.75 as Double;
+            }
+        <!--@formatter:on-->
+        </action>
+        <action trigger="set">
+            <!--@formatter:off-->
+            c1: f.308004,
+            c2: f.208004,
+            c3: f.208008,
+            c4: f.208005,
+            c5: f.208006,
+            c6: f.208007,
+            sum: f.308006;
+            change sum about {
+            return c1.value*c2.value*c3.value*c4.value*c5.value*c6.value as Double;
+            }
+        <!--@formatter:on-->
+        </action>
     </data>
     <data type="boolean">
         <title>AKCIOVÁ ZĽAVA</title>
         <id>108004</id>
+        <action trigger="set">
+            <!--@formatter:off-->
+            field: f.this,
+            coeff: f.208007;
+            change coeff about {
+            if (field.value)
+            return 0.85 as Double;
+            return 1.0 as Double;
+            }
+        <!--@formatter:on-->
+        </action>
+        <action trigger="set">
+            <!--@formatter:off-->
+            c1: f.308004,
+            c2: f.208004,
+            c3: f.208008,
+            c4: f.208005,
+            c5: f.208006,
+            c6: f.208007,
+            sum: f.308006;
+            change sum about {
+            return c1.value*c2.value*c3.value*c4.value*c5.value*c6.value as Double;
+            }
+        <!--@formatter:on-->
+        </action>
     </data>
     <data type="number">
         <title>BEŽNÉ POISTNÉ</title>
@@ -2396,6 +3184,11 @@
     </data>
     <!-- ===== Nehnuteľnosť koeficienty ===== -->
     <data type="number">
+        <title>Koeficient - Poistenie nehnuteľnosti - spoluúčasť</title>
+        <id>208001</id>
+        <init>1</init>
+    </data>
+    <data type="number">
         <title>Koeficient - Predmet poistenia</title>
         <id>202001</id>
         <init>1</init>
@@ -2570,6 +3363,10 @@
     </data>
     <!-- ===== Domácnosť koeficienty ===== -->
     <data type="number">
+        <title>Koeficient - Poistenie domácnosti - spoluúčasť</title>
+        <id>208002</id>
+    </data>
+    <data type="number">
         <title>Koeficient - Umiestnenie domácnosti</title>
         <id>203001</id>
         <init>1.0</init>
@@ -2692,19 +3489,6 @@
     </data>
     <!-- ===== Sumár koeficienty ===== -->
     <data type="number">
-        <title>Koeficient - Poistenie nehnuteľnosti - spoluúčasť</title>
-        <id>208001</id>
-        <init>1</init>
-    </data>
-    <data type="number">
-        <title>Koeficient - Poistenie domácnosti - spoluúčasť</title>
-        <id>208002</id>
-    </data>
-    <data type="number">
-        <title>Koeficient - Garáž umiestnenie</title>
-        <id>208003</id>
-    </data>
-    <data type="number">
         <title>Koeficient - PERIODICITA PLATBY POISTNÉHO</title>
         <id>208004</id>
     </data>
@@ -2728,6 +3512,7 @@
     <data type="number">
         <title>Koeficient - Lokalita - byt</title>
         <id>205001</id>
+        <init>0</init>
     </data>
     <data type="number">
         <title>Koeficient - Lokalita - pivnica</title>
@@ -2753,355 +3538,61 @@
         <id>205006</id>
     </data>
     <data type="number">
+        <title>Koeficient - Garáž umiestnenie</title>
+        <id>208003</id>
+    </data>
+    <data type="number">
         <title>Koeficient - Hospodárska budova</title>
         <id>205007</id>
-        <action trigger="set">
-            <!--@formatter:off-->
-            c1: f.305002,
-            c2: f.205006,
-            c3: f.205007,
-            c4: f.205008,
-            c5: f.205009,
-            c6: f.205010,
-            c7: f.205011,
-            c8: f.205012,
-            c9: f.205013,
-            c10: f.205014,
-            c11: f.205015,
-            c12: f.205016,
-            c13: f.205017,
-            c14: f.205018,
-            c15: f.205019,
-            sum: f.308001;
-            change sum about {
-            return c1.value+c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
-            }
-        <!--@formatter:on-->
-        </action>
     </data>
     <data type="number">
         <title>Koeficient - Altánok</title>
         <id>205008</id>
-        <action trigger="set">
-            <!--@formatter:off-->
-            c1: f.305002,
-            c2: f.205006,
-            c3: f.205007,
-            c4: f.205008,
-            c5: f.205009,
-            c6: f.205010,
-            c7: f.205011,
-            c8: f.205012,
-            c9: f.205013,
-            c10: f.205014,
-            c11: f.205015,
-            c12: f.205016,
-            c13: f.205017,
-            c14: f.205018,
-            c15: f.205019,
-            sum: f.308001;
-            change sum about {
-            return c1.value+c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
-            }
-        <!--@formatter:on-->
-        </action>
     </data>
     <data type="number">
         <title>Koeficient - Prístrešok</title>
         <id>205009</id>
-        <action trigger="set">
-            <!--@formatter:off-->
-            c1: f.305002,
-            c2: f.205006,
-            c3: f.205007,
-            c4: f.205008,
-            c5: f.205009,
-            c6: f.205010,
-            c7: f.205011,
-            c8: f.205012,
-            c9: f.205013,
-            c10: f.205014,
-            c11: f.205015,
-            c12: f.205016,
-            c13: f.205017,
-            c14: f.205018,
-            c15: f.205019,
-            sum: f.308001;
-            change sum about {
-            return c1.value+c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
-            }
-        <!--@formatter:on-->
-        </action>
     </data>
     <data type="number">
         <title>Koeficient - Chodník, parkovacia plocha</title>
         <id>205010</id>
-        <action trigger="set">
-            <!--@formatter:off-->
-            c1: f.305002,
-            c2: f.205006,
-            c3: f.205007,
-            c4: f.205008,
-            c5: f.205009,
-            c6: f.205010,
-            c7: f.205011,
-            c8: f.205012,
-            c9: f.205013,
-            c10: f.205014,
-            c11: f.205015,
-            c12: f.205016,
-            c13: f.205017,
-            c14: f.205018,
-            c15: f.205019,
-            sum: f.308001;
-            change sum about {
-            return c1.value+c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
-            }
-        <!--@formatter:on-->
-        </action>
+
     </data>
     <data type="number">
         <title>Koeficient - Sauna</title>
         <id>205011</id>
-        <action trigger="set">
-            <!--@formatter:off-->
-            c1: f.305002,
-            c2: f.205006,
-            c3: f.205007,
-            c4: f.205008,
-            c5: f.205009,
-            c6: f.205010,
-            c7: f.205011,
-            c8: f.205012,
-            c9: f.205013,
-            c10: f.205014,
-            c11: f.205015,
-            c12: f.205016,
-            c13: f.205017,
-            c14: f.205018,
-            c15: f.205019,
-            sum: f.308001;
-            change sum about {
-            return c1.value+c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
-            }
-        <!--@formatter:on-->
-        </action>
     </data>
     <data type="number">
         <title>Koeficient - Elektrická brána, oplotenie</title>
         <id>205012</id>
-        <action trigger="set">
-            <!--@formatter:off-->
-            c1: f.305002,
-            c2: f.205006,
-            c3: f.205007,
-            c4: f.205008,
-            c5: f.205009,
-            c6: f.205010,
-            c7: f.205011,
-            c8: f.205012,
-            c9: f.205013,
-            c10: f.205014,
-            c11: f.205015,
-            c12: f.205016,
-            c13: f.205017,
-            c14: f.205018,
-            c15: f.205019,
-            sum: f.308001;
-            change sum about {
-            return c1.value+c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
-            }
-        <!--@formatter:on-->
-        </action>
     </data>
     <data type="number">
         <title>Koeficient - Tenisový kurt</title>
         <id>205013</id>
-        <action trigger="set">
-            <!--@formatter:off-->
-            c1: f.305002,
-            c2: f.205006,
-            c3: f.205007,
-            c4: f.205008,
-            c5: f.205009,
-            c6: f.205010,
-            c7: f.205011,
-            c8: f.205012,
-            c9: f.205013,
-            c10: f.205014,
-            c11: f.205015,
-            c12: f.205016,
-            c13: f.205017,
-            c14: f.205018,
-            c15: f.205019,
-            sum: f.308001;
-            change sum about {
-            return c1.value+c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
-            }
-        <!--@formatter:on-->
-        </action>
     </data>
     <data type="number">
         <title>Koeficient - Vonkajší bazén</title>
         <id>205014</id>
-        <action trigger="set">
-            <!--@formatter:off-->
-            c1: f.305002,
-            c2: f.205006,
-            c3: f.205007,
-            c4: f.205008,
-            c5: f.205009,
-            c6: f.205010,
-            c7: f.205011,
-            c8: f.205012,
-            c9: f.205013,
-            c10: f.205014,
-            c11: f.205015,
-            c12: f.205016,
-            c13: f.205017,
-            c14: f.205018,
-            c15: f.205019,
-            sum: f.308001;
-            change sum about {
-            return c1.value+c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
-            }
-        <!--@formatter:on-->
-        </action>
     </data>
     <data type="number">
         <title>Koeficient - Studňa</title>
         <id>205015</id>
-        <action trigger="set">
-            <!--@formatter:off-->
-            c1: f.305002,
-            c2: f.205006,
-            c3: f.205007,
-            c4: f.205008,
-            c5: f.205009,
-            c6: f.205010,
-            c7: f.205011,
-            c8: f.205012,
-            c9: f.205013,
-            c10: f.205014,
-            c11: f.205015,
-            c12: f.205016,
-            c13: f.205017,
-            c14: f.205018,
-            c15: f.205019,
-            sum: f.308001;
-            change sum about {
-            return c1.value+c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
-            }
-        <!--@formatter:on-->
-        </action>
     </data>
     <data type="number">
         <title>Koeficient - Žumpa, septik</title>
         <id>205016</id>
-        <action trigger="set">
-            <!--@formatter:off-->
-            c1: f.305002,
-            c2: f.205006,
-            c3: f.205007,
-            c4: f.205008,
-            c5: f.205009,
-            c6: f.205010,
-            c7: f.205011,
-            c8: f.205012,
-            c9: f.205013,
-            c10: f.205014,
-            c11: f.205015,
-            c12: f.205016,
-            c13: f.205017,
-            c14: f.205018,
-            c15: f.205019,
-            sum: f.308001;
-            change sum about {
-            return c1.value+c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
-            }
-        <!--@formatter:on-->
-        </action>
     </data>
     <data type="number">
         <title>Koeficient - Iné</title>
         <id>205017</id>
-        <action trigger="set">
-            <!--@formatter:off-->
-            c1: f.305002,
-            c2: f.205006,
-            c3: f.205007,
-            c4: f.205008,
-            c5: f.205009,
-            c6: f.205010,
-            c7: f.205011,
-            c8: f.205012,
-            c9: f.205013,
-            c10: f.205014,
-            c11: f.205015,
-            c12: f.205016,
-            c13: f.205017,
-            c14: f.205018,
-            c15: f.205019,
-            sum: f.308001;
-            change sum about {
-            return c1.value+c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
-            }
-        <!--@formatter:on-->
-        </action>
     </data>
     <data type="number">
         <title>Koeficient - Stavebné materiály</title>
         <id>205018</id>
-        <action trigger="set">
-            <!--@formatter:off-->
-            c1: f.305002,
-            c2: f.205006,
-            c3: f.205007,
-            c4: f.205008,
-            c5: f.205009,
-            c6: f.205010,
-            c7: f.205011,
-            c8: f.205012,
-            c9: f.205013,
-            c10: f.205014,
-            c11: f.205015,
-            c12: f.205016,
-            c13: f.205017,
-            c14: f.205018,
-            c15: f.205019,
-            sum: f.308001;
-            change sum about {
-            return c1.value+c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
-            }
-        <!--@formatter:on-->
-        </action>
     </data>
     <data type="number">
         <title>Koeficient - Stavebné a záhradné mechanizmy</title>
         <id>205019</id>
-        <action trigger="set">
-            <!--@formatter:off-->
-            c1: f.305002,
-            c2: f.205006,
-            c3: f.205007,
-            c4: f.205008,
-            c5: f.205009,
-            c6: f.205010,
-            c7: f.205011,
-            c8: f.205012,
-            c9: f.205013,
-            c10: f.205014,
-            c11: f.205015,
-            c12: f.205016,
-            c13: f.205017,
-            c14: f.205018,
-            c15: f.205019,
-            sum: f.308001;
-            change sum about {
-            return c1.value+c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
-            }
-        <!--@formatter:on-->
-        </action>
     </data>
     <!-- ===== Poistenie domácností koeficienty ===== -->
     <data type="number">
@@ -3154,6 +3645,10 @@
         <id>207002</id>
     </data>
 
+
+<!--=======================================================ZMLUVY==========================-->
+
+
     <!-- ===== Údaje o zmluve ===== -->
     <data type="text">
         <title>Číslo ponuky</title>
@@ -3193,8 +3688,235 @@
         <title>Typ subjektu</title>
         <id>109007</id>
         <desc>Poistník</desc>
+        <values>fyzická osoba</values>
         <values>právnická osoba</values>
         <values>fyzická osoba podnikateľ (SZČO)</values>
+        <init>fyzická osoba</init>
+        <!--Titul pred-->
+        <!--<action trigger="set">-->
+            <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
+            <!--check: f.109007,-->
+            <!--field: f.109008,-->
+            <!--trans: t.588;-->
+            <!--make field,hidden on trans when { check.value == "právnická osoba" }-->
+            <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
+        <!--</action>-->
+        <!--<action trigger="set">-->
+            <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
+            <!--check: f.109007,-->
+            <!--field: f.109008,-->
+            <!--trans: t.588;-->
+            <!--make field,editable on trans when { check.value == "fyzická osoba" }-->
+            <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
+        <!--</action>-->
+        <!--<action trigger="set">-->
+            <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
+            <!--check: f.109007,-->
+            <!--field: f.109008,-->
+            <!--trans: t.588;-->
+            <!--make field,editable on trans when { check.value == "fyzická osoba podnikateľ (SZČO)" }-->
+            <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
+        <!--</action>-->
+        <!--&lt;!&ndash;Titul za&ndash;&gt;-->
+        <!--<action trigger="set">-->
+            <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
+            <!--check: f.109007,-->
+            <!--field: f.109009,-->
+            <!--trans: t.588;-->
+            <!--make field,hidden on trans when { check.value == "právnická osoba" }-->
+            <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
+        <!--</action>-->
+        <!--<action trigger="set">-->
+            <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
+            <!--check: f.109007,-->
+            <!--field: f.109009,-->
+            <!--trans: t.588;-->
+            <!--make field,editable on trans when { check.value == "fyzická osoba" }-->
+            <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
+        <!--</action>-->
+        <!--<action trigger="set">-->
+            <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
+            <!--check: f.109007,-->
+            <!--field: f.109009,-->
+            <!--trans: t.588;-->
+            <!--make field,editable on trans when { check.value == "fyzická osoba podnikateľ (SZČO)" }-->
+            <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
+        <!--</action>-->
+        <!--&lt;!&ndash;Meno&ndash;&gt;-->
+        <!--<action trigger="set">-->
+            <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
+            <!--check: f.109007,-->
+            <!--field: f.109010,-->
+            <!--trans: t.588;-->
+            <!--make field,hidden on trans when { check.value == "právnická osoba" }-->
+            <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
+        <!--</action>-->
+        <!--<action trigger="set">-->
+            <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
+            <!--check: f.109007,-->
+            <!--field: f.109010,-->
+            <!--trans: t.588;-->
+            <!--make field,required on trans when { check.value == "fyzická osoba" }-->
+            <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
+        <!--</action>-->
+        <!--<action trigger="set">-->
+            <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
+            <!--check: f.109007,-->
+            <!--field: f.109010,-->
+            <!--trans: t.588;-->
+            <!--make field,required on trans when { check.value == "fyzická osoba podnikateľ (SZČO)" }-->
+            <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
+        <!--</action>-->
+        <!--&lt;!&ndash;Priezvisko&ndash;&gt;-->
+        <!--<action trigger="set">-->
+            <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
+            <!--check: f.109007,-->
+            <!--field: f.109011,-->
+            <!--trans: t.588;-->
+            <!--make field,hidden on trans when { check.value == "právnická osoba" }-->
+            <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
+        <!--</action>-->
+        <!--<action trigger="set">-->
+            <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
+            <!--check: f.109007,-->
+            <!--field: f.109011,-->
+            <!--trans: t.588;-->
+            <!--make field,required on trans when { check.value == "fyzická osoba" }-->
+            <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
+        <!--</action>-->
+        <!--<action trigger="set">-->
+            <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
+            <!--check: f.109007,-->
+            <!--field: f.109011,-->
+            <!--trans: t.588;-->
+            <!--make field,required on trans when { check.value == "fyzická osoba podnikateľ (SZČO)" }-->
+            <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
+        <!--</action>-->
+        <!--&lt;!&ndash;Obchodné meno&ndash;&gt;-->
+        <!--<action trigger="set">-->
+            <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
+            <!--check: f.109007,-->
+            <!--field: f.109012,-->
+            <!--trans: t.588;-->
+            <!--make field,required on trans when { check.value == "právnická osoba" }-->
+            <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
+        <!--</action>-->
+        <!--<action trigger="set">-->
+            <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
+            <!--check: f.109007,-->
+            <!--field: f.109012,-->
+            <!--trans: t.588;-->
+            <!--make field,hidden on trans when { check.value == "fyzická osoba" }-->
+            <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
+        <!--</action>-->
+        <!--<action trigger="set">-->
+            <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
+            <!--check: f.109007,-->
+            <!--field: f.109012,-->
+            <!--trans: t.588;-->
+            <!--make field,hidden on trans when { check.value == "fyzická osoba podnikateľ (SZČO)" }-->
+            <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
+        <!--</action>-->
+        <!--&lt;!&ndash;Typ ID&ndash;&gt;-->
+        <!--<action trigger="set">-->
+            <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
+            <!--check: f.109007,-->
+            <!--field: f.109016,-->
+            <!--trans: t.588;-->
+            <!--make field,hidden on trans when { check.value == "právnická osoba" }-->
+            <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
+        <!--</action>-->
+        <!--<action trigger="set">-->
+            <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
+            <!--check: f.109007,-->
+            <!--field: f.109016,-->
+            <!--trans: t.588;-->
+            <!--make field,required on trans when { check.value == "fyzická osoba" }-->
+            <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
+        <!--</action>-->
+        <!--<action trigger="set">-->
+            <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
+            <!--check: f.109007,-->
+            <!--field: f.109016,-->
+            <!--trans: t.588;-->
+            <!--make field,required on trans when { check.value == "fyzická osoba podnikateľ (SZČO)" }-->
+            <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
+        <!--</action>-->
+        <!--&lt;!&ndash;Číslo ID&ndash;&gt;-->
+        <!--<action trigger="set">-->
+            <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
+            <!--check: f.109007,-->
+            <!--field: f.109017,-->
+            <!--trans: t.588;-->
+            <!--make field,hidden on trans when { check.value == "právnická osoba" }-->
+            <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
+        <!--</action>-->
+        <!--<action trigger="set">-->
+            <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
+            <!--check: f.109007,-->
+            <!--field: f.109017,-->
+            <!--trans: t.588;-->
+            <!--make field,required on trans when { check.value == "fyzická osoba" }-->
+            <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
+        <!--</action>-->
+        <!--<action trigger="set">-->
+            <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
+            <!--check: f.109007,-->
+            <!--field: f.109017,-->
+            <!--trans: t.588;-->
+            <!--make field,required on trans when { check.value == "fyzická osoba podnikateľ (SZČO)" }-->
+            <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
+        <!--</action>-->
+        <!--&lt;!&ndash;Dátum narodenia&ndash;&gt;-->
+        <!--<action trigger="set">-->
+            <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
+            <!--check: f.109007,-->
+            <!--field: f.109014,-->
+            <!--trans: t.588;-->
+            <!--make field,hidden on trans when { check.value == "právnická osoba" }-->
+            <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
+        <!--</action>-->
+        <!--<action trigger="set">-->
+            <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
+            <!--check: f.109007,-->
+            <!--field: f.109014,-->
+            <!--trans: t.588;-->
+            <!--make field,required on trans when { check.value == "fyzická osoba" }-->
+            <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
+        <!--</action>-->
+        <!--<action trigger="set">-->
+            <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
+            <!--check: f.109007,-->
+            <!--field: f.109014,-->
+            <!--trans: t.588;-->
+            <!--make field,required on trans when { check.value == "fyzická osoba podnikateľ (SZČO)" }-->
+            <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
+        <!--</action>-->
+        <!--&lt;!&ndash;Rodné číslo&ndash;&gt;-->
+        <!--<action trigger="set">-->
+            <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
+            <!--check: f.109007,-->
+            <!--field: f.109015,-->
+            <!--trans: t.588;-->
+            <!--make field,hidden on trans when { check.value == "právnická osoba" }-->
+            <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
+        <!--</action>-->
+        <!--<action trigger="set">-->
+            <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
+            <!--check: f.109007,-->
+            <!--field: f.109015,-->
+            <!--trans: t.588;-->
+            <!--make field,required on trans when { check.value == "fyzická osoba" }-->
+            <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
+        <!--</action>-->
+        <!--<action trigger="set">-->
+            <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
+            <!--check: f.109007,-->
+            <!--field: f.109015,-->
+            <!--trans: t.588;-->
+            <!--make field,required on trans when { check.value == "fyzická osoba podnikateľ (SZČO)" }-->
+            <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
+        <!--</action>-->
     </data>
     <data type="enumeration">
         <title>Titul pred menom</title>
@@ -3236,6 +3958,7 @@
     <data type="text">
         <title>Obchodné meno</title>
         <id>109012</id>
+        <desc>Poistník</desc>
     </data>
     <data type="text">
         <title>Štátna príslušnosť</title>
@@ -3269,10 +3992,12 @@
     <data type="text">
         <title>Telefónne číslo</title>
         <id>109018</id>
+        <desc>Poistník</desc>
     </data>
     <data type="text">
         <title>Email</title>
         <id>109019</id>
+        <desc>Poistník</desc>
     </data>
     <data type="boolean">
         <title>Poistený je iná osoba</title>
@@ -3600,8 +4325,235 @@
         <title>Typ subjektu</title>
         <id>109021</id>
         <desc>Poistený</desc>
+        <values>fyzická osoba</values>
         <values>právnická osoba</values>
         <values>fyzická osoba podnikateľ (SZČO)</values>
+        <init>fyzická osoba</init>
+        <!--Titul pred-->
+        <!--<action trigger="set">-->
+            <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
+            <!--check: f.109021,-->
+            <!--field: f.109022,-->
+            <!--trans: t.588;-->
+            <!--make field,hidden on trans when { check.value == "právnická osoba" }-->
+            <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
+        <!--</action>-->
+        <!--<action trigger="set">-->
+            <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
+            <!--check: f.109021,-->
+            <!--field: f.109022,-->
+            <!--trans: t.588;-->
+            <!--make field,editable on trans when { check.value == "fyzická osoba" }-->
+            <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
+        <!--</action>-->
+        <!--<action trigger="set">-->
+            <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
+            <!--check: f.109021,-->
+            <!--field: f.109022,-->
+            <!--trans: t.588;-->
+            <!--make field,editable on trans when { check.value == "fyzická osoba podnikateľ (SZČO)" }-->
+            <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
+        <!--</action>-->
+        <!--&lt;!&ndash;Titul za&ndash;&gt;-->
+        <!--<action trigger="set">-->
+            <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
+            <!--check: f.109021,-->
+            <!--field: f.109023,-->
+            <!--trans: t.588;-->
+            <!--make field,hidden on trans when { check.value == "právnická osoba" }-->
+            <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
+        <!--</action>-->
+        <!--<action trigger="set">-->
+            <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
+            <!--check: f.109021,-->
+            <!--field: f.109023,-->
+            <!--trans: t.588;-->
+            <!--make field,editable on trans when { check.value == "fyzická osoba" }-->
+            <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
+        <!--</action>-->
+        <!--<action trigger="set">-->
+            <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
+            <!--check: f.109021,-->
+            <!--field: f.109023,-->
+            <!--trans: t.588;-->
+            <!--make field,editable on trans when { check.value == "fyzická osoba podnikateľ (SZČO)" }-->
+            <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
+        <!--</action>-->
+        <!--&lt;!&ndash;Meno&ndash;&gt;-->
+        <!--<action trigger="set">-->
+            <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
+            <!--check: f.109021,-->
+            <!--field: f.109024,-->
+            <!--trans: t.588;-->
+            <!--make field,hidden on trans when { check.value == "právnická osoba" }-->
+            <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
+        <!--</action>-->
+        <!--<action trigger="set">-->
+            <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
+            <!--check: f.109021,-->
+            <!--field: f.109024,-->
+            <!--trans: t.588;-->
+            <!--make field,required on trans when { check.value == "fyzická osoba" }-->
+            <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
+        <!--</action>-->
+        <!--<action trigger="set">-->
+            <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
+            <!--check: f.109021,-->
+            <!--field: f.109024,-->
+            <!--trans: t.588;-->
+            <!--make field,required on trans when { check.value == "fyzická osoba podnikateľ (SZČO)" }-->
+            <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
+        <!--</action>-->
+        <!--&lt;!&ndash;Priezvisko&ndash;&gt;-->
+        <!--<action trigger="set">-->
+            <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
+            <!--check: f.109021,-->
+            <!--field: f.109025,-->
+            <!--trans: t.588;-->
+            <!--make field,hidden on trans when { check.value == "právnická osoba" }-->
+            <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
+        <!--</action>-->
+        <!--<action trigger="set">-->
+            <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
+            <!--check: f.109021,-->
+            <!--field: f.109025,-->
+            <!--trans: t.588;-->
+            <!--make field,required on trans when { check.value == "fyzická osoba" }-->
+            <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
+        <!--</action>-->
+        <!--<action trigger="set">-->
+            <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
+            <!--check: f.109021,-->
+            <!--field: f.109025,-->
+            <!--trans: t.588;-->
+            <!--make field,required on trans when { check.value == "fyzická osoba podnikateľ (SZČO)" }-->
+            <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
+        <!--</action>-->
+        <!--&lt;!&ndash;Obchodné meno&ndash;&gt;-->
+        <!--<action trigger="set">-->
+            <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
+            <!--check: f.109021,-->
+            <!--field: f.109026,-->
+            <!--trans: t.588;-->
+            <!--make field,required on trans when { check.value == "právnická osoba" }-->
+            <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
+        <!--</action>-->
+        <!--<action trigger="set">-->
+            <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
+            <!--check: f.109021,-->
+            <!--field: f.109026,-->
+            <!--trans: t.588;-->
+            <!--make field,hidden on trans when { check.value == "fyzická osoba" }-->
+            <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
+        <!--</action>-->
+        <!--<action trigger="set">-->
+            <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
+            <!--check: f.109021,-->
+            <!--field: f.109026,-->
+            <!--trans: t.588;-->
+            <!--make field,hidden on trans when { check.value == "fyzická osoba podnikateľ (SZČO)" }-->
+            <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
+        <!--</action>-->
+        <!--&lt;!&ndash;Typ ID&ndash;&gt;-->
+        <!--<action trigger="set">-->
+            <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
+            <!--check: f.109021,-->
+            <!--field: f.109030,-->
+            <!--trans: t.588;-->
+            <!--make field,hidden on trans when { check.value == "právnická osoba" }-->
+            <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
+        <!--</action>-->
+        <!--<action trigger="set">-->
+            <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
+            <!--check: f.109021,-->
+            <!--field: f.109030,-->
+            <!--trans: t.588;-->
+            <!--make field,required on trans when { check.value == "fyzická osoba" }-->
+            <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
+        <!--</action>-->
+        <!--<action trigger="set">-->
+            <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
+            <!--check: f.109021,-->
+            <!--field: f.109030,-->
+            <!--trans: t.588;-->
+            <!--make field,required on trans when { check.value == "fyzická osoba podnikateľ (SZČO)" }-->
+            <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
+        <!--</action>-->
+        <!--&lt;!&ndash;Číslo ID&ndash;&gt;-->
+        <!--<action trigger="set">-->
+            <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
+            <!--check: f.109021,-->
+            <!--field: f.109031,-->
+            <!--trans: t.588;-->
+            <!--make field,hidden on trans when { check.value == "právnická osoba" }-->
+            <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
+        <!--</action>-->
+        <!--<action trigger="set">-->
+            <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
+            <!--check: f.109021,-->
+            <!--field: f.109031,-->
+            <!--trans: t.588;-->
+            <!--make field,required on trans when { check.value == "fyzická osoba" }-->
+            <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
+        <!--</action>-->
+        <!--<action trigger="set">-->
+            <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
+            <!--check: f.109021,-->
+            <!--field: f.109031,-->
+            <!--trans: t.588;-->
+            <!--make field,required on trans when { check.value == "fyzická osoba podnikateľ (SZČO)" }-->
+            <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
+        <!--</action>-->
+        <!--&lt;!&ndash;Dátum narodenia&ndash;&gt;-->
+        <!--<action trigger="set">-->
+            <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
+            <!--check: f.109021,-->
+            <!--field: f.109028,-->
+            <!--trans: t.588;-->
+            <!--make field,hidden on trans when { check.value == "právnická osoba" }-->
+            <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
+        <!--</action>-->
+        <!--<action trigger="set">-->
+            <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
+            <!--check: f.109021,-->
+            <!--field: f.109028,-->
+            <!--trans: t.588;-->
+            <!--make field,required on trans when { check.value == "fyzická osoba" }-->
+            <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
+        <!--</action>-->
+        <!--<action trigger="set">-->
+            <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
+            <!--check: f.109021,-->
+            <!--field: f.109028,-->
+            <!--trans: t.588;-->
+            <!--make field,required on trans when { check.value == "fyzická osoba podnikateľ (SZČO)" }-->
+            <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
+        <!--</action>-->
+        <!--&lt;!&ndash;Rodné číslo&ndash;&gt;-->
+        <!--<action trigger="set">-->
+            <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
+            <!--check: f.109021,-->
+            <!--field: f.109029,-->
+            <!--trans: t.588;-->
+            <!--make field,hidden on trans when { check.value == "právnická osoba" }-->
+            <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
+        <!--</action>-->
+        <!--<action trigger="set">-->
+            <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
+            <!--check: f.109021,-->
+            <!--field: f.109029,-->
+            <!--trans: t.588;-->
+            <!--make field,required on trans when { check.value == "fyzická osoba" }-->
+            <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
+        <!--</action>-->
+        <!--<action trigger="set">-->
+            <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
+            <!--check: f.109021,-->
+            <!--field: f.109029,-->
+            <!--trans: t.588;-->
+            <!--make field,required on trans when { check.value == "fyzická osoba podnikateľ (SZČO)" }-->
+            <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
+        <!--</action>-->
     </data>
     <data type="enumeration">
         <title>Titul pred menom</title>
@@ -3643,6 +4595,7 @@
     <data type="text">
         <title>Obchodné meno</title>
         <id>109026</id>
+        <desc>Poistený</desc>
     </data>
     <data type="text">
         <title>Štátna príslušnosť</title>
@@ -3676,10 +4629,12 @@
     <data type="text">
         <title>Telefónne číslo</title>
         <id>109032</id>
+        <desc>Poistený</desc>
     </data>
     <data type="text">
         <title>Email</title>
         <id>109033</id>
+        <desc>Poistený</desc>
     </data>
     <!-- ===== Údaje o mieste poistenia ===== -->
     <!-- Adresa trvalého pobytu -->
@@ -4057,7 +5012,17 @@
             <!--@formatter:on-->
         </action>
     </data>
+
+
+
+
+
     <!--=================================TRANSITIONS================-->
+
+
+
+
+
     <!--================================= poistenie nehnuteľnosti DONE====================-->
     <transition>
         <id>2</id>
@@ -4139,13 +5104,6 @@
             <logic>
                 <behavior>editable</behavior>
                 <behavior>required</behavior>
-            </logic>
-        </dataRef>
-        <!--Lokalita-->
-        <dataRef>
-            <id>301002</id>
-            <logic>
-                <behavior>visible</behavior>
             </logic>
         </dataRef>
         <dataRef>
@@ -4385,6 +5343,20 @@
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
+        <!--Zodpovednost nehnutelnost-->
+        <dataRef>
+            <id>107001</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <!--Zodpovednost nehnutelnost boolean-->
+        <dataRef>
+            <id>104001</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
     </transition>
     <!--================================= Doplnkové poistenie nehnuteľnosti - =====================-->
     <transition>
@@ -4545,6 +5517,21 @@
             <id>105008</id>
             <logic>
                 <behavior>hidden</behavior>
+                <action trigger="set">
+                    <!--@formatter:off-->
+                    field: f.105007,
+                    check: f.105035,
+                    exces: f.208001,
+                    same: f.105008,
+                    other: f.305003;
+                    change other about {
+                        def coeff = same.value ? 1.0 : 1.1;
+                        if (check.value)
+                            return field.value*coeff*exces.value/1000.0 as Double;
+                        return other.value as Double;
+                    }
+                    <!--@formatter:on-->
+                </action>
                 <action trigger="set">
                     <!--@formatter:off-->
                     field: f.105007,
@@ -5441,6 +6428,29 @@
                 <behavior>required</behavior>
             </logic>
         </dataRef>
+        <!--Zodpovednost domacnost ps-->
+        <dataRef>
+            <id>107003</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <!--Zodpovednost domacnost-->
+        <dataRef>
+            <id>104002</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <!--Zodpovednost domacnost uzemna platnost-->
+        <dataRef>
+            <id>104003</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+
+
     </transition>
     <!--================================= Doplnkové poistenie domácnosti=====================-->
     <transition>
@@ -5997,24 +7007,16 @@
                 <perform>true</perform>
             </logic>
         </roleRef>
+        <!--nehnutelnost poistna suma-->
         <dataRef>
-            <!--spoluucast nehjnutelnost-->
-            <id>105005</id>
-            <logic>
-                <behavior>editable</behavior>
-                <behavior>required</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <!--nehnutelnost poistna suma-->
             <id>105006</id>
             <logic>
                 <behavior>editable</behavior>
                 <behavior>required</behavior>
             </logic>
         </dataRef>
+        <!--nehnutelnost poistne-->
         <dataRef>
-            <!--nehnutelnost poistne-->
             <id>305002</id>
             <logic>
                 <behavior>visible</behavior>
@@ -6035,16 +7037,30 @@
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <!--Poistenie nehnuteľnosti-->
+        <!--Celkové poistenie nehnuteľnosti-->
         <dataRef>
             <id>308001</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <!--Poistenie domácnosti-->
+        <!--Celkové poistenie domácnosti-->
         <dataRef>
             <id>308002</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <!--Poistenie zodpovednosti nehnutelnost-->
+        <dataRef>
+            <id>308008</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <!--Poistenie zodpovednosti domacnost-->
+        <dataRef>
+            <id>308009</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
@@ -6124,19 +7140,7 @@
         <dataRef>
             <id>109007</id>
             <logic>
-                <behavior>required</behavior>
                 <behavior>editable</behavior>
-                <!--<action trigger="set">-->
-                <!--check: f.109020,-->
-                <!--field: f.109007,-->
-                <!--other: f.109021;-->
-                <!--change other about {-->
-                <!--if (check.value == false) {-->
-                <!--return field.value as String;-->
-                <!--}-->
-                <!--return other.value as String;-->
-                <!--}-->
-                <!--</action>-->
             </logic>
         </dataRef>
         <!--Titul pred menom-->
@@ -6144,17 +7148,6 @@
             <id>109008</id>
             <logic>
                 <behavior>editable</behavior>
-                <!--<action trigger="set">-->
-                <!--check: f.109020,-->
-                <!--field: f.109008,-->
-                <!--other: f.109022;-->
-                <!--change other about {-->
-                <!--if (check.value == false) {-->
-                <!--return field.value as String;-->
-                <!--}-->
-                <!--return other.value as String;-->
-                <!--}-->
-                <!--</action>-->
             </logic>
         </dataRef>
         <!--Titul za menom-->
@@ -6162,207 +7155,76 @@
             <id>109009</id>
             <logic>
                 <behavior>editable</behavior>
-                <!--<action trigger="set">-->
-                <!--check: f.109020,-->
-                <!--field: f.109009,-->
-                <!--other: f.109023;-->
-                <!--change other about {-->
-                <!--if (check.value == false) {-->
-                <!--return field.value as String;-->
-                <!--}-->
-                <!--return other.value as String;-->
-                <!--}-->
-                <!--</action>-->
             </logic>
         </dataRef>
         <!--Meno-->
         <dataRef>
             <id>109010</id>
             <logic>
-                <behavior>required</behavior>
                 <behavior>editable</behavior>
-                <!--<action trigger="set">-->
-                <!--check: f.109020,-->
-                <!--field: f.109010,-->
-                <!--other: f.109024;-->
-                <!--change other about {-->
-                <!--if (check.value == false) {-->
-                <!--return field.value as String;-->
-                <!--}-->
-                <!--return other.value as String;-->
-                <!--}-->
-                <!--</action>-->
             </logic>
         </dataRef>
         <!--Priezvisko-->
         <dataRef>
             <id>109011</id>
             <logic>
-                <behavior>required</behavior>
                 <behavior>editable</behavior>
-                <!--<action trigger="set">-->
-                <!--check: f.109020,-->
-                <!--field: f.109011,-->
-                <!--other: f.109025;-->
-                <!--change other about {-->
-                <!--if (check.value == false) {-->
-                <!--return field.value as String;-->
-                <!--}-->
-                <!--return other.value as String;-->
-                <!--}-->
-                <!--</action>-->
             </logic>
         </dataRef>
         <!--Obchodné meno-->
         <dataRef>
             <id>109012</id>
             <logic>
-                <behavior>required</behavior>
                 <behavior>editable</behavior>
-                <!--<action trigger="set">-->
-                <!--check: f.109020,-->
-                <!--field: f.109012,-->
-                <!--other: f.109026;-->
-                <!--change other about {-->
-                <!--if (check.value == false) {-->
-                <!--return field.value as String;-->
-                <!--}-->
-                <!--return other.value as String;-->
-                <!--}-->
-                <!--</action>-->
             </logic>
         </dataRef>
         <!--Štátna príslušnosť-->
         <dataRef>
             <id>109013</id>
             <logic>
-                <behavior>required</behavior>
                 <behavior>editable</behavior>
-                <!--<action trigger="set">-->
-                <!--check: f.109020,-->
-                <!--field: f.109013,-->
-                <!--other: f.109027;-->
-                <!--change other about {-->
-                <!--if (check.value == false) {-->
-                <!--return field.value as String;-->
-                <!--}-->
-                <!--return other.value as String;-->
-                <!--}-->
-                <!--</action>-->
             </logic>
         </dataRef>
         <!--Dátum narodenia-->
         <dataRef>
             <id>109014</id>
             <logic>
-                <behavior>required</behavior>
                 <behavior>editable</behavior>
-                <!--<action trigger="set">-->
-                <!--check: f.109020,-->
-                <!--field: f.109014,-->
-                <!--other: f.109028;-->
-                <!--change other about {-->
-                <!--if (check.value == false) {-->
-                <!--return field.value as LocalDate;-->
-                <!--}-->
-                <!--return other.value as LocalDate;-->
-                <!--}-->
-                <!--</action>-->
             </logic>
         </dataRef>
         <!--Rodné číslo-->
         <dataRef>
             <id>109015</id>
             <logic>
-                <behavior>required</behavior>
                 <behavior>editable</behavior>
-                <!--<action trigger="set">-->
-                <!--check: f.109020,-->
-                <!--field: f.109015,-->
-                <!--other: f.109029;-->
-                <!--change other about {-->
-                <!--if (check.value == false) {-->
-                <!--return field.value as String;-->
-                <!--}-->
-                <!--return other.value as String;-->
-                <!--}-->
-                <!--</action>-->
             </logic>
         </dataRef>
         <!--Typ preukazu-->
         <dataRef>
             <id>109016</id>
             <logic>
-                <behavior>required</behavior>
                 <behavior>editable</behavior>
-                <!--<action trigger="set">-->
-                <!--check: f.109020,-->
-                <!--field: f.109016,-->
-                <!--other: f.109030;-->
-                <!--change other about {-->
-                <!--if (check.value == false) {-->
-                <!--return field.value as String;-->
-                <!--}-->
-                <!--return other.value as String;-->
-                <!--}-->
-                <!--</action>-->
             </logic>
         </dataRef>
         <!--Číslo preukazu-->
         <dataRef>
             <id>109017</id>
             <logic>
-                <behavior>required</behavior>
                 <behavior>editable</behavior>
-                <!--<action trigger="set">-->
-                <!--check: f.109020,-->
-                <!--field: f.109017,-->
-                <!--other: f.109031;-->
-                <!--change other about {-->
-                <!--if (check.value == false) {-->
-                <!--return field.value as String;-->
-                <!--}-->
-                <!--return other.value as String;-->
-                <!--}-->
-                <!--</action>-->
             </logic>
         </dataRef>
         <!--Telefónne číslo-->
         <dataRef>
             <id>109018</id>
             <logic>
-                <behavior>required</behavior>
                 <behavior>editable</behavior>
-                <!--<action trigger="set">-->
-                <!--check: f.109020,-->
-                <!--field: f.109018,-->
-                <!--other: f.109032;-->
-                <!--change other about {-->
-                <!--if (check.value == false) {-->
-                <!--return field.value as String;-->
-                <!--}-->
-                <!--return other.value as String;-->
-                <!--}-->
-                <!--</action>-->
             </logic>
         </dataRef>
         <!--Email-->
         <dataRef>
             <id>109019</id>
             <logic>
-                <behavior>required</behavior>
                 <behavior>editable</behavior>
-                <!--<action trigger="set">-->
-                <!--check: f.109020,-->
-                <!--field: f.109019,-->
-                <!--other: f.109033;-->
-                <!--change other about {-->
-                <!--if (check.value == false) {-->
-                <!--return field.value as String;-->
-                <!--}-->
-                <!--return other.value as String;-->
-                <!--}-->
-                <!--</action>-->
             </logic>
         </dataRef>
         <!--Poistený je iná osoba-->
@@ -6370,308 +7232,6 @@
             <id>109020</id>
             <logic>
                 <behavior>editable</behavior>
-                <!-- Show poisteny when true -->
-                <!--<action trigger="set">-->
-                <!--field: f.this,-->
-                <!--other: f.109021,-->
-                <!--trans: t.588;-->
-                <!--make other,visible on trans when { field.value }-->
-                <!--</action>-->
-                <!--<action trigger="set">-->
-                <!--field: f.this,-->
-                <!--other: f.109022,-->
-                <!--trans: t.588;-->
-                <!--make other,visible on trans when { field.value }-->
-                <!--</action>-->
-                <!--<action trigger="set">-->
-                <!--field: f.this,-->
-                <!--other: f.109023,-->
-                <!--trans: t.588;-->
-                <!--make other,visible on trans when { field.value }-->
-                <!--</action>-->
-                <!--<action trigger="set">-->
-                <!--field: f.this,-->
-                <!--other: f.109024,-->
-                <!--trans: t.588;-->
-                <!--make other,visible on trans when { field.value }-->
-                <!--</action>-->
-                <!--<action trigger="set">-->
-                <!--field: f.this,-->
-                <!--other: f.109025,-->
-                <!--trans: t.588;-->
-                <!--make other,visible on trans when { field.value }-->
-                <!--</action>-->
-                <!--<action trigger="set">-->
-                <!--field: f.this,-->
-                <!--other: f.109026,-->
-                <!--trans: t.588;-->
-                <!--make other,visible on trans when { field.value }-->
-                <!--</action>-->
-                <!--<action trigger="set">-->
-                <!--field: f.this,-->
-                <!--other: f.109027,-->
-                <!--trans: t.588;-->
-                <!--make other,visible on trans when { field.value }-->
-                <!--</action>-->
-                <!--<action trigger="set">-->
-                <!--field: f.this,-->
-                <!--other: f.109028,-->
-                <!--trans: t.588;-->
-                <!--make other,visible on trans when { field.value }-->
-                <!--</action>-->
-                <!--<action trigger="set">-->
-                <!--field: f.this,-->
-                <!--other: f.109029,-->
-                <!--trans: t.588;-->
-                <!--make other,visible on trans when { field.value }-->
-                <!--</action>-->
-                <!--<action trigger="set">-->
-                <!--field: f.this,-->
-                <!--other: f.109030,-->
-                <!--trans: t.588;-->
-                <!--make other,visible on trans when { field.value }-->
-                <!--</action>-->
-                <!--<action trigger="set">-->
-                <!--field: f.this,-->
-                <!--other: f.109031,-->
-                <!--trans: t.588;-->
-                <!--make other,visible on trans when { field.value }-->
-                <!--</action>-->
-                <!--<action trigger="set">-->
-                <!--field: f.this,-->
-                <!--other: f.109032,-->
-                <!--trans: t.588;-->
-                <!--make other,visible on trans when { field.value }-->
-                <!--</action>-->
-                <!--<action trigger="set">-->
-                <!--field: f.this,-->
-                <!--other: f.109033,-->
-                <!--trans: t.588;-->
-                <!--make other,visible on trans when { field.value }-->
-                <!--</action>-->
-                <!--&lt;!&ndash; Hide poisteny when false &ndash;&gt;-->
-                <!--<action trigger="set">-->
-                <!--field: f.this,-->
-                <!--other: f.109021,-->
-                <!--trans: t.588;-->
-                <!--make other,hidden on trans when { return !field.value }-->
-                <!--</action>-->
-                <!--<action trigger="set">-->
-                <!--field: f.this,-->
-                <!--other: f.109022,-->
-                <!--trans: t.588;-->
-                <!--make other,hidden on trans when { return !field.value }-->
-                <!--</action>-->
-                <!--<action trigger="set">-->
-                <!--field: f.this,-->
-                <!--other: f.109023,-->
-                <!--trans: t.588;-->
-                <!--make other,hidden on trans when { return !field.value }-->
-                <!--</action>-->
-                <!--<action trigger="set">-->
-                <!--field: f.this,-->
-                <!--other: f.109024,-->
-                <!--trans: t.588;-->
-                <!--make other,hidden on trans when { return !field.value }-->
-                <!--</action>-->
-                <!--<action trigger="set">-->
-                <!--field: f.this,-->
-                <!--other: f.109025,-->
-                <!--trans: t.588;-->
-                <!--make other,hidden on trans when { return !field.value }-->
-                <!--</action>-->
-                <!--<action trigger="set">-->
-                <!--field: f.this,-->
-                <!--other: f.109026,-->
-                <!--trans: t.588;-->
-                <!--make other,hidden on trans when { return !field.value }-->
-                <!--</action>-->
-                <!--<action trigger="set">-->
-                <!--field: f.this,-->
-                <!--other: f.109027,-->
-                <!--trans: t.588;-->
-                <!--make other,hidden on trans when { return !field.value }-->
-                <!--</action>-->
-                <!--<action trigger="set">-->
-                <!--field: f.this,-->
-                <!--other: f.109028,-->
-                <!--trans: t.588;-->
-                <!--make other,hidden on trans when { return !field.value }-->
-                <!--</action>-->
-                <!--<action trigger="set">-->
-                <!--field: f.this,-->
-                <!--other: f.109029,-->
-                <!--trans: t.588;-->
-                <!--make other,hidden on trans when { return !field.value }-->
-                <!--</action>-->
-                <!--<action trigger="set">-->
-                <!--field: f.this,-->
-                <!--other: f.109030,-->
-                <!--trans: t.588;-->
-                <!--make other,hidden on trans when { return !field.value }-->
-                <!--</action>-->
-                <!--<action trigger="set">-->
-                <!--field: f.this,-->
-                <!--other: f.109031,-->
-                <!--trans: t.588;-->
-                <!--make other,hidden on trans when { return !field.value }-->
-                <!--</action>-->
-                <!--<action trigger="set">-->
-                <!--field: f.this,-->
-                <!--other: f.109032,-->
-                <!--trans: t.588;-->
-                <!--make other,hidden on trans when { return !field.value }-->
-                <!--</action>-->
-                <!--<action trigger="set">-->
-                <!--field: f.this,-->
-                <!--other: f.109033,-->
-                <!--trans: t.588;-->
-                <!--make other,hidden on trans when { return !field.value }-->
-                <!--</action>-->
-                <!--&lt;!&ndash; Fill poisteny when false &ndash;&gt;-->
-                <!--<action trigger="set">-->
-                <!--field: f.this,-->
-                <!--f_1: f.109007,-->
-                <!--f_2: f.109021;-->
-                <!--change f_2 about {-->
-                <!--if (field.value == false) {-->
-                <!--return f_1.value as String;-->
-                <!--}-->
-                <!--return f_2.value as String;-->
-                <!--}-->
-                <!--</action>-->
-                <!--<action trigger="set">-->
-                <!--field: f.this,-->
-                <!--f_1: f.109008,-->
-                <!--f_2: f.109022;-->
-                <!--change f_2 about {-->
-                <!--if (field.value == false) {-->
-                <!--return f_1.value as String;-->
-                <!--}-->
-                <!--return f_2.value as String;-->
-                <!--}-->
-                <!--</action>-->
-                <!--<action trigger="set">-->
-                <!--field: f.this,-->
-                <!--f_1: f.109009,-->
-                <!--f_2: f.109023;-->
-                <!--change f_2 about {-->
-                <!--if (field.value == false) {-->
-                <!--return f_1.value as String;-->
-                <!--}-->
-                <!--return f_2.value as String;-->
-                <!--}-->
-                <!--</action>-->
-                <!--<action trigger="set">-->
-                <!--field: f.this,-->
-                <!--f_1: f.109010,-->
-                <!--f_2: f.109024;-->
-                <!--change f_2 about {-->
-                <!--if (field.value == false) {-->
-                <!--return f_1.value as String;-->
-                <!--}-->
-                <!--return f_2.value as String;-->
-                <!--}-->
-                <!--</action>-->
-                <!--<action trigger="set">-->
-                <!--field: f.this,-->
-                <!--f_1: f.109011,-->
-                <!--f_2: f.109025;-->
-                <!--change f_2 about {-->
-                <!--if (field.value == false) {-->
-                <!--return f_1.value as String;-->
-                <!--}-->
-                <!--return f_2.value as String;-->
-                <!--}-->
-                <!--</action>-->
-                <!--<action trigger="set">-->
-                <!--field: f.this,-->
-                <!--f_1: f.109012,-->
-                <!--f_2: f.109026;-->
-                <!--change f_2 about {-->
-                <!--if (field.value == false) {-->
-                <!--return f_1.value as String;-->
-                <!--}-->
-                <!--return f_2.value as String;-->
-                <!--}-->
-                <!--</action>-->
-                <!--<action trigger="set">-->
-                <!--field: f.this,-->
-                <!--f_1: f.109013,-->
-                <!--f_2: f.109027;-->
-                <!--change f_2 about {-->
-                <!--if (field.value == false) {-->
-                <!--return f_1.value as String;-->
-                <!--}-->
-                <!--return f_2.value as String;-->
-                <!--}-->
-                <!--</action>-->
-                <!--<action trigger="set">-->
-                <!--field: f.this,-->
-                <!--f_1: f.109014,-->
-                <!--f_2: f.109028;-->
-                <!--change f_2 about {-->
-                <!--if (field.value == false) {-->
-                <!--return f_1.value as LocalDate;-->
-                <!--}-->
-                <!--return f_2.value as LocalDate;-->
-                <!--}-->
-                <!--</action>-->
-                <!--<action trigger="set">-->
-                <!--field: f.this,-->
-                <!--f_1: f.109015,-->
-                <!--f_2: f.109029;-->
-                <!--change f_2 about {-->
-                <!--if (field.value == false) {-->
-                <!--return f_1.value as String;-->
-                <!--}-->
-                <!--return f_2.value as String;-->
-                <!--}-->
-                <!--</action>-->
-                <!--<action trigger="set">-->
-                <!--field: f.this,-->
-                <!--f_1: f.109016,-->
-                <!--f_2: f.109030;-->
-                <!--change f_2 about {-->
-                <!--if (field.value == false) {-->
-                <!--return f_1.value as String;-->
-                <!--}-->
-                <!--return f_2.value as String;-->
-                <!--}-->
-                <!--</action>-->
-                <!--<action trigger="set">-->
-                <!--field: f.this,-->
-                <!--f_1: f.109017,-->
-                <!--f_2: f.109031;-->
-                <!--change f_2 about {-->
-                <!--if (field.value == false) {-->
-                <!--return f_1.value as String;-->
-                <!--}-->
-                <!--return f_2.value as String;-->
-                <!--}-->
-                <!--</action>-->
-                <!--<action trigger="set">-->
-                <!--field: f.this,-->
-                <!--f_1: f.109018,-->
-                <!--f_2: f.109032;-->
-                <!--change f_2 about {-->
-                <!--if (field.value == false) {-->
-                <!--return f_1.value as String;-->
-                <!--}-->
-                <!--return f_2.value as String;-->
-                <!--}-->
-                <!--</action>-->
-                <!--<action trigger="set">-->
-                <!--field: f.this,-->
-                <!--f_1: f.109019,-->
-                <!--f_2: f.109033;-->
-                <!--change f_2 about {-->
-                <!--if (field.value == false) {-->
-                <!--return f_1.value as String;-->
-                <!--}-->
-                <!--return f_2.value as String;-->
-                <!--}-->
-                <!--</action>-->
             </logic>
         </dataRef>
         <!-- Poistený -->
