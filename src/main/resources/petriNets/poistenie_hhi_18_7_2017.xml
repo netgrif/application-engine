@@ -1029,6 +1029,28 @@
             make other,hidden on trans when { field.value == false }
         <!--@formatter:on-->
         </action>
+        <!--Remove value-->
+        <action trigger="set">
+            <!--@formatter:off-->
+            field: f.this,
+            other: f.105007;
+            change other about { null; }
+        <!--@formatter:on-->
+        </action>
+        <action trigger="set">
+            <!--@formatter:off-->
+            field: f.this,
+            other: f.305003;
+            change other about { null; }
+        <!--@formatter:on-->
+        </action>
+        <action trigger="set">
+            <!--@formatter:off-->
+            field: f.this,
+            other: f.105008;
+            change other about { null; }
+        <!--@formatter:on-->
+        </action>
     </data>
     <data type="number">
         <title>Garáž</title>
@@ -1135,6 +1157,21 @@
             make other,hidden on trans when { !field.value }
         <!--@formatter:on-->
         </action>
+        <!--Remove value-->
+        <action trigger="set">
+            <!--@formatter:off-->
+            field: f.this,
+            other: f.105010;
+            change other about { null; }
+        <!--@formatter:on-->
+        </action>
+        <action trigger="set">
+            <!--@formatter:off-->
+            field: f.this,
+            other: f.305004;
+            change other about { null; }
+        <!--@formatter:on-->
+        </action>
     </data>
     <data type="number">
         <title>Hospodárska budova</title>
@@ -1224,6 +1261,21 @@
             other: f.305005,
             trans: t.413;
             make other,hidden on trans when { return !field.value }
+        <!--@formatter:on-->
+        </action>
+        <!--Remove value-->
+        <action trigger="set">
+            <!--@formatter:off-->
+            field: f.this,
+            other: f.105012;
+            change other about { null; }
+        <!--@formatter:on-->
+        </action>
+        <action trigger="set">
+            <!--@formatter:off-->
+            field: f.this,
+            other: f.305005;
+            change other about { null; }
         <!--@formatter:on-->
         </action>
     </data>
@@ -1848,6 +1900,21 @@
             make other,hidden on trans when { !check.value }
             <!--@formatter:on-->
         </action>
+        <!--Remove value-->
+        <action trigger="set">
+            <!--@formatter:off-->
+            check: f.105031,
+            other: f.105032;
+            change other about { null; }
+            <!--@formatter:on-->
+        </action>
+        <action trigger="set">
+            <!--@formatter:off-->
+            check: f.105031,
+            other: f.105032;
+            change other about { null; }
+            <!--@formatter:on-->
+        </action>
     </data>
     <data type="number">
         <title>Stavebné materiály</title>
@@ -1937,6 +2004,21 @@
             other: f.305016,
             trans: t.414;
             make other,hidden on trans when { !check.value }
+            <!--@formatter:on-->
+        </action>
+        <!--Remove value-->
+        <action trigger="set">
+            <!--@formatter:off-->
+            check: f.105033,
+            other: f.105034;
+            change other about { null; }
+            <!--@formatter:on-->
+        </action>
+        <action trigger="set">
+            <!--@formatter:off-->
+            check: f.105033,
+            other: f.105034;
+            change other about { null; }
             <!--@formatter:on-->
         </action>
     </data>
@@ -4171,7 +4253,7 @@
             change f_2 about {
                 if (field.value == false)
                     return f_1.value as String;
-                return f_2.value as String;
+                return null;
             }
             <!--@formatter:on-->
         </action>
@@ -4183,7 +4265,7 @@
             change f_2 about {
                 if (field.value == false)
                     return f_1.value as String;
-                return f_2.value as String;
+                return null;
             }
             <!--@formatter:on-->
         </action>
@@ -4195,7 +4277,7 @@
             change f_2 about {
                 if (field.value == false)
                     return f_1.value as String;
-                return f_2.value as String;
+                return null;
             }
             <!--@formatter:on-->
         </action>
@@ -4207,7 +4289,7 @@
             change f_2 about {
                 if (field.value == false)
                     return f_1.value as String;
-                return f_2.value as String;
+                return null;
             }
             <!--@formatter:on-->
         </action>
@@ -4219,7 +4301,7 @@
             change f_2 about {
                 if (field.value == false)
                     return f_1.value as String;
-                return f_2.value as String;
+                return null;
             }
             <!--@formatter:on-->
         </action>
@@ -4231,7 +4313,7 @@
             change f_2 about {
                 if (field.value == false)
                     return f_1.value as String;
-                return f_2.value as String;
+                return null;
             }
             <!--@formatter:on-->
         </action>
@@ -4243,7 +4325,7 @@
             change f_2 about {
                 if (field.value == false)
                     return f_1.value as String;
-                return f_2.value as String;
+                return null;
             }
             <!--@formatter:on-->
         </action>
@@ -4267,7 +4349,7 @@
             change f_2 about {
                 if (field.value == false)
                     return f_1.value as String;
-                return f_2.value as String;
+                return null;
             }
             <!--@formatter:on-->
         </action>
@@ -4279,7 +4361,7 @@
             change f_2 about {
                 if (field.value == false)
                     return f_1.value as String;
-                return f_2.value as String;
+                return null;
             }
             <!--@formatter:on-->
         </action>
@@ -4291,7 +4373,7 @@
             change f_2 about {
                 if (field.value == false)
                     return f_1.value as String;
-                return f_2.value as String;
+                return null;
             }
             <!--@formatter:on-->
         </action>
@@ -4303,7 +4385,7 @@
             change f_2 about {
                 if (field.value == false)
                     return f_1.value as String;
-                return f_2.value as String;
+                return null;
             }
             <!--@formatter:on-->
         </action>
@@ -4315,7 +4397,7 @@
             change f_2 about {
                 if (field.value == false)
                     return f_1.value as String;
-                return f_2.value as String;
+                return null;
             }
             <!--@formatter:on-->
         </action>
@@ -5093,151 +5175,151 @@
         <!--Obec-->
 
         <dataGroup>
-                <id>1</id>
+            <id>1</id>
             <title>info</title>
-        <alignment>start</alignment>
-        <dataRef>
-            <id>301001</id>
-            <logic>
-                <behavior>visible</behavior>
-                <!--todo: psc and lokalita lookup -->
-            </logic>
-        </dataRef>
-        <!--PSČ-->
-        <dataRef>
-            <id>101001</id>
-            <logic>
-                <behavior>editable</behavior>
-                <behavior>required</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>101002</id>
-            <logic>
-                <behavior>editable</behavior>
-                <behavior>required</behavior>
-            </logic>
-        </dataRef>
-        <!--Bolo miesto poistenia postihnuté povodňou za posledných 10 rokov?-->
-        <dataRef>
-            <id>101003</id>
-            <logic>
-                <behavior>editable</behavior>
-                <behavior>required</behavior>
-            </logic>
-        </dataRef>
-        <!--Nachádza nehnuteľnosť sa vo vzdialenosti kratšej ako 300 m od vodného toku?-->
-        <dataRef>
-            <id>101004</id>
-            <logic>
-                <behavior>editable</behavior>
-                <behavior>required</behavior>
-            </logic>
-        </dataRef>
-        <!--Koľko rokov žijete v poisťovanej nehnuteľnosti?-->
-        <dataRef>
-            <id>101005</id>
-            <logic>
-                <behavior>editable</behavior>
-                <behavior>required</behavior>
-            </logic>
-        </dataRef>
-        <!--Aký je vzťah poisteného k poisťovanej nehnuteľnosti?-->
-        <dataRef>
-            <id>101006</id>
-            <logic>
-                <behavior>editable</behavior>
-                <behavior>required</behavior>
-            </logic>
-        </dataRef>
-        <!--Koľko dospelých žije v domácnosti?-->
-        <dataRef>
-            <id>101007</id>
-            <logic>
-                <behavior>editable</behavior>
-                <behavior>required</behavior>
-            </logic>
-        </dataRef>
-        <!--Koľko detí žije v domácnosti?-->
-        <dataRef>
-            <id>101008</id>
-            <logic>
-                <behavior>editable</behavior>
-                <behavior>required</behavior>
-            </logic>
-        </dataRef>
-        <!--Koľko detí žije v domácnosti?-->
-        <dataRef>
-            <id>101008</id>
-            <logic>
-                <behavior>editable</behavior>
-                <behavior>required</behavior>
-            </logic>
-        </dataRef>
-        <!--Bolo poistenému alebo spolupoistenej osobe niekedy v minulosti zamiestnuté poistné plnenie alebo vypovedaná poistná zmluva?-->
-        <dataRef>
-            <id>101009</id>
-            <logic>
-                <behavior>editable</behavior>
-                <behavior>required</behavior>
-            </logic>
-        </dataRef>
-        <!--Bol poistený alebo spolupoistená osoba niekedy trestné stihaný / vyhlásil osobný bankrot / stíhaný za dlhy alebo odsúdený za podvodné alebo obdobné konanie.-->
-        <dataRef>
-            <id>101010</id>
-            <logic>
-                <behavior>editable</behavior>
-                <behavior>required</behavior>
-            </logic>
-        </dataRef>
-        <!--Je plánovaná rekonštrukcia alebo prestavba poisťovanej nehnuteľnosti v priebehu najbližších 3 mesiacov?-->
-        <dataRef>
-            <id>101011</id>
-            <logic>
-                <behavior>editable</behavior>
-                <behavior>required</behavior>
-            </logic>
-        </dataRef>
-        <!--Žije v poisťovanej domácnosti pes alebo mačka?-->
-        <dataRef>
-            <id>101012</id>
-            <logic>
-                <behavior>editable</behavior>
-                <behavior>required</behavior>
-            </logic>
-        </dataRef>
-        <!--Kedy je nehnuteľnosť najviac obývaná?-->
-        <dataRef>
-            <id>101013</id>
-            <logic>
-                <behavior>editable</behavior>
-                <behavior>required</behavior>
-            </logic>
-        </dataRef>
-        <!--Je nehnuteľnosť využívaná aj na podnikanie?-->
-        <dataRef>
-            <id>101014</id>
-            <logic>
-                <behavior>editable</behavior>
-                <behavior>required</behavior>
-            </logic>
-        </dataRef>
-        <!--Právna subjektivita poisteného?-->
-        <dataRef>
-            <id>101015</id>
-            <logic>
-                <behavior>editable</behavior>
-                <behavior>required</behavior>
-            </logic>
-        </dataRef>
-        <!--Počet poistných udalostí za posledné 3 roky?-->
-        <dataRef>
-            <id>101016</id>
-            <logic>
-                <behavior>editable</behavior>
-                <behavior>required</behavior>
-            </logic>
-        </dataRef>
+            <alignment>start</alignment>
+            <dataRef>
+                <id>301001</id>
+                <logic>
+                    <behavior>visible</behavior>
+                    <!--todo: psc and lokalita lookup -->
+                </logic>
+            </dataRef>
+            <!--PSČ-->
+            <dataRef>
+                <id>101001</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>101002</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                </logic>
+            </dataRef>
+            <!--Bolo miesto poistenia postihnuté povodňou za posledných 10 rokov?-->
+            <dataRef>
+                <id>101003</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                </logic>
+            </dataRef>
+            <!--Nachádza nehnuteľnosť sa vo vzdialenosti kratšej ako 300 m od vodného toku?-->
+            <dataRef>
+                <id>101004</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                </logic>
+            </dataRef>
+            <!--Koľko rokov žijete v poisťovanej nehnuteľnosti?-->
+            <dataRef>
+                <id>101005</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                </logic>
+            </dataRef>
+            <!--Aký je vzťah poisteného k poisťovanej nehnuteľnosti?-->
+            <dataRef>
+                <id>101006</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                </logic>
+            </dataRef>
+            <!--Koľko dospelých žije v domácnosti?-->
+            <dataRef>
+                <id>101007</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                </logic>
+            </dataRef>
+            <!--Koľko detí žije v domácnosti?-->
+            <dataRef>
+                <id>101008</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                </logic>
+            </dataRef>
+            <!--Koľko detí žije v domácnosti?-->
+            <dataRef>
+                <id>101008</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                </logic>
+            </dataRef>
+            <!--Bolo poistenému alebo spolupoistenej osobe niekedy v minulosti zamiestnuté poistné plnenie alebo vypovedaná poistná zmluva?-->
+            <dataRef>
+                <id>101009</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                </logic>
+            </dataRef>
+            <!--Bol poistený alebo spolupoistená osoba niekedy trestné stihaný / vyhlásil osobný bankrot / stíhaný za dlhy alebo odsúdený za podvodné alebo obdobné konanie.-->
+            <dataRef>
+                <id>101010</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                </logic>
+            </dataRef>
+            <!--Je plánovaná rekonštrukcia alebo prestavba poisťovanej nehnuteľnosti v priebehu najbližších 3 mesiacov?-->
+            <dataRef>
+                <id>101011</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                </logic>
+            </dataRef>
+            <!--Žije v poisťovanej domácnosti pes alebo mačka?-->
+            <dataRef>
+                <id>101012</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                </logic>
+            </dataRef>
+            <!--Kedy je nehnuteľnosť najviac obývaná?-->
+            <dataRef>
+                <id>101013</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                </logic>
+            </dataRef>
+            <!--Je nehnuteľnosť využívaná aj na podnikanie?-->
+            <dataRef>
+                <id>101014</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                </logic>
+            </dataRef>
+            <!--Právna subjektivita poisteného?-->
+            <dataRef>
+                <id>101015</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                </logic>
+            </dataRef>
+            <!--Počet poistných udalostí za posledné 3 roky?-->
+            <dataRef>
+                <id>101016</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                </logic>
+            </dataRef>
         </dataGroup>
     </transition>
     <!--============================= Nehnuteľnosť - DONE =====================-->
@@ -5258,115 +5340,115 @@
         </roleRef>
         <!--Predmet poistenia-->
         <dataGroup>
-        <id>2</id>
-        <title>info</title>
-        <alignment>start</alignment>
-        <dataRef>
-            <id>102001</id>
-            <logic>
-                <behavior>editable</behavior>
-            </logic>
-        </dataRef>
-        <!--Poistenie nehnuteľnosti-Spoluúčasť-->
-        <dataRef>
-            <id>105005</id>
-            <logic>
-                <behavior>editable</behavior>
-            </logic>
-        </dataRef>
-        <!--Podlahová plocha pivnice-->
-        <dataRef>
-            <id>105001</id>
-            <logic>
-                <behavior>editable</behavior>
-            </logic>
-        </dataRef>
-        <!--Podlahová plocha prízemia-->
-        <dataRef>
-            <id>105002</id>
-            <logic>
-                <behavior>editable</behavior>
-            </logic>
-        </dataRef>
-        <!--Podlahová plocha všetkých obytných poschodí-->
-        <dataRef>
-            <id>105003</id>
-            <logic>
-                <behavior>editable</behavior>
-            </logic>
-        </dataRef>
-        <!--Celková podlahová plocha-->
-        <dataRef>
-            <id>305001</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--Konštrukcia múrov-->
-        <dataRef>
-            <id>102002</id>
-            <logic>
-                <behavior>editable</behavior>
-            </logic>
-        </dataRef>
-        <!--Konštrukcia strechy-->
-        <dataRef>
-            <id>102003</id>
-            <logic>
-                <behavior>editable</behavior>
-            </logic>
-        </dataRef>
-        <!--Koľko rokov má nehnuteľnosť?-->
-        <dataRef>
-            <id>102004</id>
-            <logic>
-                <behavior>editable</behavior>
-            </logic>
-        </dataRef>
-        <!--Má nehnuteľnosť praskliny na vonkajšej fasáde?-->
-        <dataRef>
-            <id>102005</id>
-            <logic>
-                <behavior>editable</behavior>
-            </logic>
-        </dataRef>
-        <!--Koľko izieb má nehnuteľnosť?-->
-        <dataRef>
-            <id>102006</id>
-            <logic>
-                <behavior>editable</behavior>
-                <behavior>required</behavior>
-            </logic>
-        </dataRef>
-        <!--Koľko kúpeľní má nehnuteľnosť?-->
-        <dataRef>
-            <id>102007</id>
-            <logic>
-                <behavior>editable</behavior>
-                <behavior>required</behavior>
-            </logic>
-        </dataRef>
-        <!--Uveďte celkovú hodnotu rekonštrukcií, ak boli vykonané-->
-        <dataRef>
-            <id>102008</id>
-            <logic>
-                <behavior>editable</behavior>
-            </logic>
-        </dataRef>
-        <!--Zodpovednost nehnutelnost-->
-        <dataRef>
-            <id>107001</id>
-            <logic>
-                <behavior>editable</behavior>
-            </logic>
-        </dataRef>
-        <!--Zodpovednost nehnutelnost boolean-->
-        <dataRef>
-            <id>104001</id>
-            <logic>
-                <behavior>editable</behavior>
-            </logic>
-        </dataRef>
+            <id>2</id>
+            <title>info</title>
+            <alignment>start</alignment>
+            <dataRef>
+                <id>102001</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <!--Poistenie nehnuteľnosti-Spoluúčasť-->
+            <dataRef>
+                <id>105005</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <!--Podlahová plocha pivnice-->
+            <dataRef>
+                <id>105001</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <!--Podlahová plocha prízemia-->
+            <dataRef>
+                <id>105002</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <!--Podlahová plocha všetkých obytných poschodí-->
+            <dataRef>
+                <id>105003</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <!--Celková podlahová plocha-->
+            <dataRef>
+                <id>305001</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!--Konštrukcia múrov-->
+            <dataRef>
+                <id>102002</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <!--Konštrukcia strechy-->
+            <dataRef>
+                <id>102003</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <!--Koľko rokov má nehnuteľnosť?-->
+            <dataRef>
+                <id>102004</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <!--Má nehnuteľnosť praskliny na vonkajšej fasáde?-->
+            <dataRef>
+                <id>102005</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <!--Koľko izieb má nehnuteľnosť?-->
+            <dataRef>
+                <id>102006</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                </logic>
+            </dataRef>
+            <!--Koľko kúpeľní má nehnuteľnosť?-->
+            <dataRef>
+                <id>102007</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                </logic>
+            </dataRef>
+            <!--Uveďte celkovú hodnotu rekonštrukcií, ak boli vykonané-->
+            <dataRef>
+                <id>102008</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <!--Zodpovednost nehnutelnost-->
+            <dataRef>
+                <id>107001</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <!--Zodpovednost nehnutelnost boolean-->
+            <dataRef>
+                <id>104001</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
         </dataGroup>
     </transition>
     <!--================================= Doplnkové poistenie nehnuteľnosti - =====================-->
@@ -5386,51 +5468,66 @@
             </logic>
         </roleRef>
         <dataGroup>
-        <id>3</id>
-        <title>info</title>
-        <alignment>start</alignment>
-        <!--Stavebné materialy-->
-        <dataRef>
-            <id>105031</id>
-            <logic>
-                <behavior>editable</behavior>
-            </logic>
-        </dataRef>
-        <!--Stavebné materialy ps-->
-        <dataRef>
-            <id>105032</id>
-            <logic>
-                <behavior>hidden</behavior>
-            </logic>
-        </dataRef>
-        <!--Stavebné materialy p-->
-        <dataRef>
-            <id>305015</id>
-            <logic>
-                <behavior>hidden</behavior>
-            </logic>
-        </dataRef>
-        <!--Stavebné a záhradné mechanizmy-->
-        <dataRef>
-            <id>105033</id>
-            <logic>
-                <behavior>editable</behavior>
-            </logic>
-        </dataRef>
-        <!--Stavebné a záhradné mechanizmy ps-->
-        <dataRef>
-            <id>105034</id>
-            <logic>
-                <behavior>hidden</behavior>
-            </logic>
-        </dataRef>
-        <!--Stavebné a záhradné mechanizmy p-->
-        <dataRef>
-            <id>305016</id>
-            <logic>
-                <behavior>hidden</behavior>
-            </logic>
-        </dataRef>
+            <id>1</id>
+            <title></title>
+            <alignment>start</alignment>
+            <!--Stavebné materialy-->
+            <dataRef>
+                <id>105031</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>2</id>
+            <title></title>
+            <alignment>start</alignment>
+            <!--Stavebné materialy ps-->
+            <dataRef>
+                <id>105032</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+            </dataRef>
+            <!--Stavebné materialy p-->
+            <dataRef>
+                <id>305015</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>3</id>
+            <title></title>
+            <alignment>start</alignment>
+            <!--Stavebné a záhradné mechanizmy-->
+            <dataRef>
+                <id>105033</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>4</id>
+            <title></title>
+            <alignment>start</alignment>
+            <!--Stavebné a záhradné mechanizmy ps-->
+            <dataRef>
+                <id>105034</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+            </dataRef>
+            <!--Stavebné a záhradné mechanizmy p-->
+            <dataRef>
+                <id>305016</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+            </dataRef>
         </dataGroup>
     </transition>
     <!--todo============================= Vedlajsie stavby - action podlahova plocha, zmena na spoluucast =====================-->
@@ -5450,95 +5547,100 @@
             </logic>
         </roleRef>
         <dataGroup>
-        <id>4</id>
-        <title>info</title>
-        <alignment>start</alignment>
-        <!--Garáž-->
-        <dataRef>
-            <id>105035</id>
-            <logic>
-                <behavior>editable</behavior>
-                <action trigger="set">
-                    <!--@formatter:off-->
+            <id>1</id>
+            <title></title>
+            <alignment>start</alignment>
+            <!--Garáž-->
+            <dataRef>
+                <id>105035</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <action trigger="set">
+                        <!--@formatter:off-->
                     isGarage: f.105035,
                     trans: t.413,
                     other: f.105004;
                     make other,editable on trans when { isGarage.value }
                 <!--@formatter:on-->
-                </action>
-                <action trigger="set">
-                    <!--@formatter:off-->
+                    </action>
+                    <action trigger="set">
+                        <!--@formatter:off-->
                     isGarage: f.105035,
                     trans: t.413,
                     other: f.105004;
                     make other,hidden on trans when { !isGarage.value }
                 <!--@formatter:on-->
-                </action>
-                <action trigger="set">
-                    <!--@formatter:off-->
+                    </action>
+                    <action trigger="set">
+                        <!--@formatter:off-->
                     isGarage: f.105035,
                     trans: t.413,
                     other: f.105008;
                     make other,editable on trans when { isGarage.value }
                 <!--@formatter:on-->
-                </action>
-                <action trigger="set">
-                    <!--@formatter:off-->
+                    </action>
+                    <action trigger="set">
+                        <!--@formatter:off-->
                     isGarage: f.105035,
                     trans: t.413,
                     other: f.105008;
                     make other,hidden on trans when { !isGarage.value }
                 <!--@formatter:on-->
-                </action>
-                <action trigger="set">
-                    <!--@formatter:off-->
+                    </action>
+                    <action trigger="set">
+                        <!--@formatter:off-->
                     isGarage: f.105035,
                     trans: t.413,
                     other: f.105007;
                     make other,editable on trans when { isGarage.value }
                 <!--@formatter:on-->
-                </action>
-                <action trigger="set">
-                    <!--@formatter:off-->
+                    </action>
+                    <action trigger="set">
+                        <!--@formatter:off-->
                     isGarage: f.105035,
                     trans: t.413,
                     other: f.105007;
                     make other,hidden on trans when { !isGarage.value }
                 <!--@formatter:on-->
-                </action>
-                <action trigger="set">
-                    <!--@formatter:off-->
+                    </action>
+                    <action trigger="set">
+                        <!--@formatter:off-->
                     isGarage: f.105035,
                     trans: t.413,
                     other: f.305003;
                     make other,visible on trans when { isGarage.value }
                 <!--@formatter:on-->
-                </action>
-                <action trigger="set">
-                    <!--@formatter:off-->
+                    </action>
+                    <action trigger="set">
+                        <!--@formatter:off-->
                     isGarage: f.105035,
                     trans: t.413,
                     other: f.305003;
                     make other,hidden on trans when { !isGarage.value }
                 <!--@formatter:on-->
-                </action>
-            </logic>
-        </dataRef>
-        <!--Podlahová plocha garáže-->
-        <dataRef>
-            <id>105004</id>
-            <logic>
-                <behavior>hidden</behavior>
-                <!--TODO: some action-->
-            </logic>
-        </dataRef>
-        <!--Rovnaké miesto poistenia garáže?-->
-        <dataRef>
-            <id>105008</id>
-            <logic>
-                <behavior>hidden</behavior>
-                <action trigger="set">
-                    <!--@formatter:off-->
+                    </action>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>101</id>
+            <title></title>
+            <alignment>start</alignment>
+            <!--Podlahová plocha garáže-->
+            <dataRef>
+                <id>105004</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                    <!--TODO: some action-->
+                </logic>
+            </dataRef>
+            <!--Rovnaké miesto poistenia garáže?-->
+            <dataRef>
+                <id>105008</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                    <action trigger="set">
+                        <!--@formatter:off-->
                     field: f.105007,
                     check: f.105035,
                     exces: f.208001,
@@ -5551,9 +5653,9 @@
                         return other.value as Double;
                     }
                     <!--@formatter:on-->
-                </action>
-                <action trigger="set">
-                    <!--@formatter:off-->
+                    </action>
+                    <action trigger="set">
+                        <!--@formatter:off-->
                     field: f.105007,
                     check: f.105035,
                     exces: f.208001,
@@ -5566,16 +5668,16 @@
                         return other.value as Double;
                     }
                     <!--@formatter:on-->
-                </action>
-            </logic>
-        </dataRef>
-        <!--Garáž ps-->
-        <dataRef>
-            <id>105007</id>
-            <logic>
-                <behavior>hidden</behavior>
-                <action trigger="set">
-                    <!--@formatter:off-->
+                    </action>
+                </logic>
+            </dataRef>
+            <!--Garáž ps-->
+            <dataRef>
+                <id>105007</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                    <action trigger="set">
+                        <!--@formatter:off-->
                     field: f.105007,
                     check: f.105035,
                     exces: f.208001,
@@ -5588,66 +5690,74 @@
                         return other.value as Double;
                     }
                     <!--@formatter:on-->
-                </action>
-            </logic>
-        </dataRef>
-        <!--Garáž - poistné-->
-        <!--Garáž p-->
-        <dataRef>
-            <id>305003</id>
-            <logic>
-                <behavior>hidden</behavior>
-            </logic>
-        </dataRef>
-        <!--Hospodárska budova?-->
-        <!--Hospodárska budova-->
-        <dataRef>
-            <id>105009</id>
-            <logic>
-                <behavior>editable</behavior>
-                <!--set editable-->
-                <action trigger="set">
-                    <!--@formatter:off-->
+                    </action>
+                </logic>
+            </dataRef>
+            <!--Garáž - poistné-->
+            <!--Garáž p-->
+            <dataRef>
+                <id>305003</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>2</id>
+            <title></title>
+            <alignment>start</alignment>
+            <!--Hospodárska budova?-->
+            <dataRef>
+                <id>105009</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <!--set editable-->
+                    <action trigger="set">
+                        <!--@formatter:off-->
                     idTrue: f.105009,
                     trans: t.413,
                     other: f.105010;
                     make other,editable on trans when { idTrue.value }
                 <!--@formatter:on-->
-                </action>
-                <action trigger="set">
-                    <!--@formatter:off-->
+                    </action>
+                    <action trigger="set">
+                        <!--@formatter:off-->
                     idTrue: f.105009,
                     trans: t.413,
                     other: f.305004;
                     make other,visible on trans when { idTrue.value }
                 <!--@formatter:on-->
-                </action>                <!--set hidden-->
-                <action trigger="set">
-                    <!--@formatter:off-->
+                    </action>                <!--set hidden-->
+                    <action trigger="set">
+                        <!--@formatter:off-->
                     idTrue: f.105009,
                     trans: t.413,
                     other: f.105010;
                     make other,hidden on trans when { !idTrue.value }
                 <!--@formatter:on-->
-                </action>
-                <action trigger="set">
-                    <!--@formatter:off-->
+                    </action>
+                    <action trigger="set">
+                        <!--@formatter:off-->
                     idTrue: f.105009,
                     trans: t.413,
                     other: f.305004;
                     make other,hidden on trans when { !idTrue.value }
                 <!--@formatter:on-->
-                </action>
-            </logic>
-        </dataRef>
-        <!--Hospodárska budova - poistná suma-->
-        <!--Hospodárska budova ps-->
-        <dataRef>
-            <id>105010</id>
-            <logic>
-                <behavior>hidden</behavior>
-                <action trigger="set">
-                    <!--@formatter:off-->
+                    </action>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>102</id>
+            <title></title>
+            <alignment>start</alignment>
+            <!--Hospodárska budova - poistná suma-->
+            <dataRef>
+                <id>105010</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                    <action trigger="set">
+                        <!--@formatter:off-->
                     field: f.this,
                     check: f.105009,
                     exces: f.208001,
@@ -5658,66 +5768,73 @@
                         return other.value as Double;
                     }
                 <!--@formatter:on-->
-                </action>
-            </logic>
-        </dataRef>
-        <!--Hospodárska budova - poistné-->
-        <!--Hospodárska budova p-->
-        <dataRef>
-            <id>305004</id>
-            <logic>
-                <behavior>hidden</behavior>
-            </logic>
-        </dataRef>
-        <!--Altánok?-->
-        <!--Altánok-->
-        <dataRef>
-            <id>105011</id>
-            <logic>
-                <behavior>editable</behavior>
-                <!--set editable-->
-                <action trigger="set">
-                    <!--@formatter:off-->
+                    </action>
+                </logic>
+            </dataRef>
+            <!--Hospodárska budova - poistné-->
+            <dataRef>
+                <id>305004</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>3</id>
+            <title></title>
+            <alignment>start</alignment>
+            <!--Altánok?-->
+            <dataRef>
+                <id>105011</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <!--set editable-->
+                    <action trigger="set">
+                        <!--@formatter:off-->
                     idTrue: f.105011,
                     trans: t.413,
                     other: f.105012;
                     make other,editable on trans when { idTrue.value }
                 <!--@formatter:on-->
-                </action>
-                <action trigger="set">
-                    <!--@formatter:off-->
+                    </action>
+                    <action trigger="set">
+                        <!--@formatter:off-->
                     idTrue: f.105011,
                     trans: t.413,
                     other: f.305005;
                     make other,visible on trans when { idTrue.value }
                 <!--@formatter:on-->
-                </action>                <!--set hidden-->
-                <action trigger="set">
-                    <!--@formatter:off-->
+                    </action>                <!--set hidden-->
+                    <action trigger="set">
+                        <!--@formatter:off-->
                     idTrue: f.105011,
                     trans: t.413,
                     other: f.105012;
                     make other,hidden on trans when { !idTrue.value }
                 <!--@formatter:on-->
-                </action>
-                <action trigger="set">
-                    <!--@formatter:off-->
+                    </action>
+                    <action trigger="set">
+                        <!--@formatter:off-->
                     idTrue: f.105011,
                     trans: t.413,
                     other: f.305005;
                     make other,hidden on trans when { !idTrue.value }
                 <!--@formatter:on-->
-                </action>
-            </logic>
-        </dataRef>
-        <!--Altánok - poistná suma-->
-        <!--Altánok ps-->
-        <dataRef>
-            <id>105012</id>
-            <logic>
-                <behavior>hidden</behavior>
-                <action trigger="set">
-                    <!--@formatter:off-->
+                    </action>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>103</id>
+            <title></title>
+            <alignment>start</alignment>
+            <!--Altánok - poistná suma-->
+            <dataRef>
+                <id>105012</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                    <action trigger="set">
+                        <!--@formatter:off-->
                     field: f.this,
                     check: f.105011,
                     exces: f.208001,
@@ -5728,66 +5845,73 @@
                         return other.value as Double;
                     }
                     <!--@formatter:on-->
-                </action>
-            </logic>
-        </dataRef>
-        <!--Altánok - poistné-->
-        <!--Altánok p-->
-        <dataRef>
-            <id>305005</id>
-            <logic>
-                <behavior>hidden</behavior>
-            </logic>
-        </dataRef>
-        <!--Prístrešok?-->
-        <!--Prístrešok-->
-        <dataRef>
-            <id>105013</id>
-            <logic>
-                <behavior>editable</behavior>
-                <!--set editable-->
-                <action trigger="set">
-                    <!--@formatter:off-->
+                    </action>
+                </logic>
+            </dataRef>
+            <!--Altánok - poistné-->
+            <dataRef>
+                <id>305005</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>4</id>
+            <title></title>
+            <alignment>start</alignment>
+            <!--Prístrešok?-->
+            <dataRef>
+                <id>105013</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <!--set editable-->
+                    <action trigger="set">
+                        <!--@formatter:off-->
                     idTrue: f.105013,
                     trans: t.413,
                     other: f.105014;
                     make other,editable on trans when { idTrue.value }
                 <!--@formatter:on-->
-                </action>
-                <action trigger="set">
-                    <!--@formatter:off-->
+                    </action>
+                    <action trigger="set">
+                        <!--@formatter:off-->
                     idTrue: f.105013,
                     trans: t.413,
                     other: f.305006;
                     make other,visible on trans when { idTrue.value }
                 <!--@formatter:on-->
-                </action>                <!--set hidden-->
-                <action trigger="set">
-                    <!--@formatter:off-->
+                    </action>                <!--set hidden-->
+                    <action trigger="set">
+                        <!--@formatter:off-->
                     idTrue: f.105013,
                     trans: t.413,
                     other: f.105014;
                     make other,hidden on trans when { !idTrue.value }
                 <!--@formatter:on-->
-                </action>
-                <action trigger="set">
-                    <!--@formatter:off-->
+                    </action>
+                    <action trigger="set">
+                        <!--@formatter:off-->
                     idTrue: f.105013,
                     trans: t.413,
                     other: f.305006;
                     make other,hidden on trans when { !idTrue.value }
                 <!--@formatter:on-->
-                </action>
-            </logic>
-        </dataRef>
-        <!--Prístrešok - poistná suma-->
-        <!--Prístrešok ps-->
-        <dataRef>
-            <id>105014</id>
-            <logic>
-                <behavior>hidden</behavior>
-                <action trigger="set">
-                    <!--@formatter:off-->
+                    </action>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>104</id>
+            <title></title>
+            <alignment>start</alignment>
+            <!--Prístrešok - poistná suma-->
+            <dataRef>
+                <id>105014</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                    <action trigger="set">
+                        <!--@formatter:off-->
                     field: f.this,
                     check: f.105013,
                     exces: f.208001,
@@ -5798,66 +5922,89 @@
                         return other.value as Double;
                     }
                     <!--@formatter:on-->
-                </action>
-            </logic>
-        </dataRef>
-        <!--Prístrešok - poistné-->
-        <!--Prístrešok p-->
-        <dataRef>
-            <id>305006</id>
-            <logic>
-                <behavior>hidden</behavior>
-            </logic>
-        </dataRef>
-        <!--Chodník, parkovacia plocha?-->
-        <!--Chodník-->
-        <dataRef>
-            <id>105015</id>
-            <logic>
-                <behavior>editable</behavior>
-                <!--set editable-->
-                <action trigger="set">
-                    <!--@formatter:off-->
+                    </action>
+                </logic>
+            </dataRef>
+            <!--Prístrešok - poistné-->
+            <dataRef>
+                <id>305006</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>5</id>
+            <title></title>
+            <alignment>start</alignment>
+            <!--Chodník, parkovacia plocha?-->
+            <dataRef>
+                <id>105015</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <!--set editable-->
+                    <action trigger="set">
+                        <!--@formatter:off-->
                     idTrue: f.105015,
                     trans: t.413,
                     other: f.105016;
                     make other,editable on trans when { idTrue.value }
                 <!--@formatter:on-->
-                </action>
-                <action trigger="set">
-                    <!--@formatter:off-->
+                    </action>
+                    <action trigger="set">
+                        <!--@formatter:off-->
                     idTrue: f.105015,
                     trans: t.413,
                     other: f.305007;
                     make other,visible on trans when { idTrue.value }
                 <!--@formatter:on-->
-                </action>                <!--set hidden-->
-                <action trigger="set">
-                    <!--@formatter:off-->
+                    </action>
+                    <!--set hidden-->
+                    <action trigger="set">
+                        <!--@formatter:off-->
                     idTrue: f.105015,
                     trans: t.413,
                     other: f.105016;
                     make other,hidden on trans when { !idTrue.value }
                 <!--@formatter:on-->
-                </action>
-                <action trigger="set">
-                    <!--@formatter:off-->
+                    </action>
+                    <action trigger="set">
+                        <!--@formatter:off-->
                     idTrue: f.105015,
                     trans: t.413,
                     other: f.305007;
                     make other,hidden on trans when { !idTrue.value }
                 <!--@formatter:on-->
-                </action>
-            </logic>
-        </dataRef>
-        <!--Chodník, parkovacia plocha - poistná suma -->
-        <!--Chodník ps-->
-        <dataRef>
-            <id>105016</id>
-            <logic>
-                <behavior>hidden</behavior>
-                <action trigger="set">
-                    <!--@formatter:off-->
+                    </action>
+                    <!--Remove value-->
+                    <action trigger="set">
+                        <!--@formatter:off-->
+                    idTrue: f.105015,
+                    other: f.105016;
+                    change other about { null; }
+                <!--@formatter:on-->
+                    </action>
+                    <action trigger="set">
+                        <!--@formatter:off-->
+                    idTrue: f.105015,
+                    other: f.305007;
+                    change other about { null; }
+                <!--@formatter:on-->
+                    </action>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>105</id>
+            <title></title>
+            <alignment>start</alignment>
+            <!--Chodník, parkovacia plocha - poistná suma -->
+            <dataRef>
+                <id>105016</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                    <action trigger="set">
+                        <!--@formatter:off-->
                     field: f.this,
                     check: f.105015,
                     exces: f.208001,
@@ -5868,66 +6015,90 @@
                         return other.value as Double;
                     }
                     <!--@formatter:on-->
-                </action>
-            </logic>
-        </dataRef>
-        <!--Chodník, parkovacia plocha - poistné-->
-        <!--Chodník p-->
-        <dataRef>
-            <id>305007</id>
-            <logic>
-                <behavior>hidden</behavior>
-            </logic>
-        </dataRef>
-        <!--Sauna?-->
-        <!--Sauna-->
-        <dataRef>
-            <id>105017</id>
-            <logic>
-                <behavior>editable</behavior>
-                <!--set editable-->
-                <action trigger="set">
-                    <!--@formatter:off-->
+                    </action>
+                </logic>
+            </dataRef>
+            <!--Chodník, parkovacia plocha - poistné-->
+            <dataRef>
+                <id>305007</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>6</id>
+            <title></title>
+            <alignment>start</alignment>
+            <!--Sauna?-->
+            <!--Sauna-->
+            <dataRef>
+                <id>105017</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <!--set editable-->
+                    <action trigger="set">
+                        <!--@formatter:off-->
                     idTrue: f.105017,
                     trans: t.413,
                     other: f.105018;
                     make other,editable on trans when { idTrue.value }
                 <!--@formatter:on-->
-                </action>
-                <action trigger="set">
-                    <!--@formatter:off-->
+                    </action>
+                    <action trigger="set">
+                        <!--@formatter:off-->
                     idTrue: f.105017,
                     trans: t.413,
                     other: f.305008;
                     make other,visible on trans when { idTrue.value }
                 <!--@formatter:on-->
-                </action>                <!--set hidden-->
-                <action trigger="set">
-                    <!--@formatter:off-->
+                    </action>
+                    <!--set hidden-->
+                    <action trigger="set">
+                        <!--@formatter:off-->
                     idTrue: f.105017,
                     trans: t.413,
                     other: f.105018;
                     make other,hidden on trans when { !idTrue.value }
                 <!--@formatter:on-->
-                </action>
-                <action trigger="set">
-                    <!--@formatter:off-->
+                    </action>
+                    <action trigger="set">
+                        <!--@formatter:off-->
                     idTrue: f.105017,
                     trans: t.413,
                     other: f.305008;
                     make other,hidden on trans when { !idTrue.value }
                 <!--@formatter:on-->
-                </action>
-            </logic>
-        </dataRef>
-        <!--Sauna - poistná suma-->
-        <!--Sauna ps-->
-        <dataRef>
-            <id>105018</id>
-            <logic>
-                <behavior>hidden</behavior>
-                <action trigger="set">
-                    <!--@formatter:off-->
+                    </action>
+                    <!--Remove value-->
+                    <action trigger="set">
+                        <!--@formatter:off-->
+                    idTrue: f.105017,
+                    other: f.105018;
+                    change other about { null; }
+                <!--@formatter:on-->
+                    </action>
+                    <action trigger="set">
+                        <!--@formatter:off-->
+                    idTrue: f.105017,
+                    other: f.305008;
+                    change other about { null; }
+                <!--@formatter:on-->
+                    </action>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>106</id>
+            <title></title>
+            <alignment>start</alignment>
+            <!--Sauna - poistná suma-->
+            <dataRef>
+                <id>105018</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                    <action trigger="set">
+                        <!--@formatter:off-->
                     field: f.this,
                     check: f.105017,
                     exces: f.208001,
@@ -5938,66 +6109,89 @@
                         return other.value as Double;
                     }
                     <!--@formatter:on-->
-                </action>
-            </logic>
-        </dataRef>
-        <!--Sauna - poistné-->
-        <!--Sauna p-->
-        <dataRef>
-            <id>305008</id>
-            <logic>
-                <behavior>hidden</behavior>
-            </logic>
-        </dataRef>
-        <!--Elektrická brána?-->
-        <!--Elektrická brána-->
-        <dataRef>
-            <id>105019</id>
-            <logic>
-                <behavior>editable</behavior>
-                <!--set editable-->
-                <action trigger="set">
-                    <!--@formatter:off-->
+                    </action>
+                </logic>
+            </dataRef>
+            <!--Sauna - poistné-->
+            <dataRef>
+                <id>305008</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>7</id>
+            <title></title>
+            <alignment>start</alignment>
+            <!--Elektrická brána?-->
+            <dataRef>
+                <id>105019</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <!--set editable-->
+                    <action trigger="set">
+                        <!--@formatter:off-->
                     idTrue: f.105019,
                     trans: t.413,
                     other: f.105020;
                     make other,editable on trans when { idTrue.value }
                 <!--@formatter:on-->
-                </action>
-                <action trigger="set">
-                    <!--@formatter:off-->
+                    </action>
+                    <action trigger="set">
+                        <!--@formatter:off-->
                     idTrue: f.105019,
                     trans: t.413,
                     other: f.305009;
                     make other,visible on trans when { idTrue.value }
                 <!--@formatter:on-->
-                </action>                <!--set hidden-->
-                <action trigger="set">
-                    <!--@formatter:off-->
+                    </action>
+                    <!--set hidden-->
+                    <action trigger="set">
+                        <!--@formatter:off-->
                     idTrue: f.105019,
                     trans: t.413,
                     other: f.105020;
                     make other,hidden on trans when { !idTrue.value }
                 <!--@formatter:on-->
-                </action>
-                <action trigger="set">
-                    <!--@formatter:off-->
+                    </action>
+                    <action trigger="set">
+                        <!--@formatter:off-->
                     idTrue: f.105019,
                     trans: t.413,
                     other: f.305009;
                     make other,hidden on trans when { !idTrue.value }
                 <!--@formatter:on-->
-                </action>
-            </logic>
-        </dataRef>
-        <!--Elektrická brána - poistná suma-->
-        <!--Elektrická brána ps-->
-        <dataRef>
-            <id>105020</id>
-            <logic>
-                <behavior>hidden</behavior>
-                <action trigger="set">
-                    <!--@formatter:off-->
+                    </action>
+                    <!--Remove value-->
+                    <action trigger="set">
+                        <!--@formatter:off-->
+                    idTrue: f.105019,
+                    other: f.105020;
+                    change other about { null; }
+                <!--@formatter:on-->
+                    </action>
+                    <action trigger="set">
+                        <!--@formatter:off-->
+                    idTrue: f.105019,
+                    other: f.305009;
+                    change other about { null; }
+                <!--@formatter:on-->
+                    </action>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>107</id>
+            <title></title>
+            <alignment>start</alignment>
+            <!--Elektrická brána - poistná suma-->
+            <dataRef>
+                <id>105020</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                    <action trigger="set">
+                        <!--@formatter:off-->
                     field: f.this,
                     check: f.105019,
                     exces: f.208001,
@@ -6008,66 +6202,89 @@
                         return other.value as Double;
                     }
                     <!--@formatter:on-->
-                </action>
-            </logic>
-        </dataRef>
-        <!--Elektrická brána - poistné-->
-        <!--Elektrická brána p-->
-        <dataRef>
-            <id>305009</id>
-            <logic>
-                <behavior>hidden</behavior>
-            </logic>
-        </dataRef>
-        <!--Tenisový kurt?-->
-        <!--Tenisový kurt-->
-        <dataRef>
-            <id>105021</id>
-            <logic>
-                <behavior>editable</behavior>
-                <!--set editable-->
-                <action trigger="set">
-                    <!--@formatter:off-->
+                    </action>
+                </logic>
+            </dataRef>
+            <!--Elektrická brána - poistné-->
+            <dataRef>
+                <id>305009</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>8</id>
+            <title></title>
+            <alignment>start</alignment>
+            <!--Tenisový kurt?-->
+            <dataRef>
+                <id>105021</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <!--set editable-->
+                    <action trigger="set">
+                        <!--@formatter:off-->
                     idTrue: f.105021,
                     trans: t.413,
                     other: f.105022;
                     make other,editable on trans when { idTrue.value }
                 <!--@formatter:on-->
-                </action>
-                <action trigger="set">
-                    <!--@formatter:off-->
+                    </action>
+                    <action trigger="set">
+                        <!--@formatter:off-->
                     idTrue: f.105021,
                     trans: t.413,
                     other: f.305010;
                     make other,visible on trans when { idTrue.value }
                 <!--@formatter:on-->
-                </action>                <!--set hidden-->
-                <action trigger="set">
-                    <!--@formatter:off-->
+                    </action>
+                    <!--set hidden-->
+                    <action trigger="set">
+                        <!--@formatter:off-->
                     idTrue: f.105021,
                     trans: t.413,
                     other: f.105022;
                     make other,hidden on trans when { !idTrue.value }
                 <!--@formatter:on-->
-                </action>
-                <action trigger="set">
-                    <!--@formatter:off-->
+                    </action>
+                    <action trigger="set">
+                        <!--@formatter:off-->
                     idTrue: f.105021,
                     trans: t.413,
                     other: f.305010;
                     make other,hidden on trans when { !idTrue.value }
                 <!--@formatter:on-->
-                </action>
-            </logic>
-        </dataRef>
-        <!--Tenisový kurt - poistná suma-->
-        <!--Tenisový kurt ps-->
-        <dataRef>
-            <id>105022</id>
-            <logic>
-                <behavior>hidden</behavior>
-                <action trigger="set">
-                    <!--@formatter:off-->
+                    </action>
+                    <!--Remove value-->
+                    <action trigger="set">
+                        <!--@formatter:off-->
+                    idTrue: f.105021,
+                    other: f.105022;
+                    change other about { null; }
+                <!--@formatter:on-->
+                    </action>
+                    <action trigger="set">
+                        <!--@formatter:off-->
+                    idTrue: f.105021,
+                    other: f.305010;
+                    change other about { null; }
+                <!--@formatter:on-->
+                    </action>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>108</id>
+            <title></title>
+            <alignment>start</alignment>
+            <!--Tenisový kurt - poistná suma-->
+            <dataRef>
+                <id>105022</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                    <action trigger="set">
+                        <!--@formatter:off-->
                     field: f.this,
                     check: f.105021,
                     exces: f.208001,
@@ -6078,66 +6295,89 @@
                         return other.value as Double;
                     }
                     <!--@formatter:on-->
-                </action>
-            </logic>
-        </dataRef>
-        <!--Tenisový kurt - poistné-->
-        <!--Tenisový kurt p-->
-        <dataRef>
-            <id>305010</id>
-            <logic>
-                <behavior>hidden</behavior>
-            </logic>
-        </dataRef>
-        <!--Vonkajší bazén?-->
-        <!--Vonkajší bazén-->
-        <dataRef>
-            <id>105023</id>
-            <logic>
-                <behavior>editable</behavior>
-                <!--set editable-->
-                <action trigger="set">
-                    <!--@formatter:off-->
+                    </action>
+                </logic>
+            </dataRef>
+            <!--Tenisový kurt - poistné-->
+            <dataRef>
+                <id>305010</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>9</id>
+            <title></title>
+            <alignment>start</alignment>
+            <!--Vonkajší bazén?-->
+            <dataRef>
+                <id>105023</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <!--set editable-->
+                    <action trigger="set">
+                        <!--@formatter:off-->
                     idTrue: f.105023,
                     trans: t.413,
                     other: f.105024;
                     make other,editable on trans when { idTrue.value }
                 <!--@formatter:on-->
-                </action>
-                <action trigger="set">
-                    <!--@formatter:off-->
+                    </action>
+                    <action trigger="set">
+                        <!--@formatter:off-->
                     idTrue: f.105023,
                     trans: t.413,
                     other: f.305011;
                     make other,visible on trans when { idTrue.value }
                 <!--@formatter:on-->
-                </action>                <!--set hidden-->
-                <action trigger="set">
-                    <!--@formatter:off-->
+                    </action>
+                    <!--set hidden-->
+                    <action trigger="set">
+                        <!--@formatter:off-->
                     idTrue: f.105023,
                     trans: t.413,
                     other: f.105024;
                     make other,hidden on trans when { !idTrue.value }
                 <!--@formatter:on-->
-                </action>
-                <action trigger="set">
-                    <!--@formatter:off-->
+                    </action>
+                    <action trigger="set">
+                        <!--@formatter:off-->
                     idTrue: f.105023,
                     trans: t.413,
                     other: f.305011;
                     make other,hidden on trans when { !idTrue.value }
                 <!--@formatter:on-->
-                </action>
-            </logic>
-        </dataRef>
-        <!--Vonkajší bazén - poistná suma-->
-        <!--Vonkajší bazén ps-->
-        <dataRef>
-            <id>105024</id>
-            <logic>
-                <behavior>hidden</behavior>
-                <action trigger="set">
-                    <!--@formatter:off-->
+                    </action>
+                    <!--Remove value-->
+                    <action trigger="set">
+                        <!--@formatter:off-->
+                    idTrue: f.105023,
+                    other: f.105024;
+                    change other about { null; }
+                <!--@formatter:on-->
+                    </action>
+                    <action trigger="set">
+                        <!--@formatter:off-->
+                    idTrue: f.105023,
+                    other: f.305011;
+                    change other about { null; }
+                <!--@formatter:on-->
+                    </action>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>109</id>
+            <title></title>
+            <alignment>start</alignment>
+            <!--Vonkajší bazén - poistná suma-->
+            <dataRef>
+                <id>105024</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                    <action trigger="set">
+                        <!--@formatter:off-->
                     field: f.this,
                     check: f.105023,
                     exces: f.208001,
@@ -6148,66 +6388,89 @@
                         return other.value as Double;
                     }
                     <!--@formatter:on-->
-                </action>
-            </logic>
-        </dataRef>
-        <!--Vonkajší bazén - poistné-->
-        <!--Vonkajší bazén p-->
-        <dataRef>
-            <id>305011</id>
-            <logic>
-                <behavior>hidden</behavior>
-            </logic>
-        </dataRef>
-        <!--Studňa-->
-        <!--Studňa-->
-        <dataRef>
-            <id>105025</id>
-            <logic>
-                <behavior>editable</behavior>
-                <!--set editable-->
-                <action trigger="set">
-                    <!--@formatter:off-->
+                    </action>
+                </logic>
+            </dataRef>
+            <!--Vonkajší bazén - poistné-->
+            <dataRef>
+                <id>305011</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>10</id>
+            <title></title>
+            <alignment>start</alignment>
+            <!--Studňa-->
+            <dataRef>
+                <id>105025</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <!--set editable-->
+                    <action trigger="set">
+                        <!--@formatter:off-->
                     idTrue: f.105025,
                     trans: t.413,
                     other: f.105026;
                     make other,editable on trans when { idTrue.value }
                 <!--@formatter:on-->
-                </action>
-                <action trigger="set">
-                    <!--@formatter:off-->
+                    </action>
+                    <action trigger="set">
+                        <!--@formatter:off-->
                     idTrue: f.105025,
                     trans: t.413,
                     other: f.305012;
                     make other,visible on trans when { idTrue.value }
                 <!--@formatter:on-->
-                </action>                <!--set hidden-->
-                <action trigger="set">
-                    <!--@formatter:off-->
+                    </action>
+                    <!--set hidden-->
+                    <action trigger="set">
+                        <!--@formatter:off-->
                     idTrue: f.105025,
                     trans: t.413,
                     other: f.105026;
                     make other,hidden on trans when { !idTrue.value }
                 <!--@formatter:on-->
-                </action>
-                <action trigger="set">
-                    <!--@formatter:off-->
+                    </action>
+                    <action trigger="set">
+                        <!--@formatter:off-->
                     idTrue: f.105025,
                     trans: t.413,
                     other: f.305012;
                     make other,hidden on trans when { !idTrue.value }
                 <!--@formatter:on-->
-                </action>
-            </logic>
-        </dataRef>
-        <!--Studňa - poistná suma-->
-        <!--Studňa ps-->
-        <dataRef>
-            <id>105026</id>
-            <logic>
-                <behavior>hidden</behavior>
-                <action trigger="set">
-                    <!--@formatter:off-->
+                    </action>
+                    <!--Remove value-->
+                    <action trigger="set">
+                        <!--@formatter:off-->
+                    idTrue: f.105025,
+                    other: f.105026;
+                    change other about { null; }
+                <!--@formatter:on-->
+                    </action>
+                    <action trigger="set">
+                        <!--@formatter:off-->
+                    idTrue: f.105025,
+                    other: f.305012;
+                    change other about { null; }
+                <!--@formatter:on-->
+                    </action>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>110</id>
+            <title></title>
+            <alignment>start</alignment>
+            <!--Studňa - poistná suma-->
+            <dataRef>
+                <id>105026</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                    <action trigger="set">
+                        <!--@formatter:off-->
                     field: f.this,
                     check: f.105025,
                     exces: f.208001,
@@ -6218,155 +6481,200 @@
                         return other.value as Double;
                     }
                     <!--@formatter:on-->
-                </action>
-            </logic>
-        </dataRef>
-        <!--Studňa - poistné-->
-        <!--Studňa p-->
-        <dataRef>
-            <id>305012</id>
-            <logic>
-                <behavior>hidden</behavior>
-            </logic>
-        </dataRef>
-        <!--Žumpa, septik?-->
-        <!--Žumpa, septik-->
-        <dataRef>
-            <id>105027</id>
-            <logic>
-                <behavior>editable</behavior>
-                <!--set editable-->
-                <action trigger="set">
-                    <!--@formatter:off-->
+                    </action>
+                </logic>
+            </dataRef>
+            <!--Studňa - poistné-->
+            <dataRef>
+                <id>305012</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>11</id>
+            <title></title>
+            <alignment>start</alignment>
+            <!--Žumpa, septik?-->
+            <dataRef>
+                <id>105027</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <!--set editable-->
+                    <action trigger="set">
+                        <!--@formatter:off-->
                     idTrue: f.105027,
                     trans: t.413,
                     other: f.105028;
                     make other,editable on trans when { idTrue.value }
                 <!--@formatter:on-->
-                </action>
-                <action trigger="set">
-                    <!--@formatter:off-->
+                    </action>
+                    <action trigger="set">
+                        <!--@formatter:off-->
                     idTrue: f.105027,
                     trans: t.413,
                     other: f.305013;
                     make other,visible on trans when { idTrue.value }
                 <!--@formatter:on-->
-                </action>                <!--set hidden-->
-                <action trigger="set">
-                    <!--@formatter:off-->
+                    </action>
+                    <!--set hidden-->
+                    <action trigger="set">
+                        <!--@formatter:off-->
                     idTrue: f.105027,
                     trans: t.413,
                     other: f.105028;
                     make other,hidden on trans when { !idTrue.value }
                 <!--@formatter:on-->
-                </action>
-                <action trigger="set">
-                    <!--@formatter:off-->
+                    </action>
+                    <action trigger="set">
+                        <!--@formatter:off-->
                     idTrue: f.105027,
                     trans: t.413,
                     other: f.305013;
                     make other,hidden on trans when { !idTrue.value }
                 <!--@formatter:on-->
-                </action>
-            </logic>
-        </dataRef>
-        <!--Žumpa, septik - poistná suma-->
-        <!--Žumpa, septik ps-->
-        <dataRef>
-            <id>105028</id>
-            <logic>
-                <behavior>hidden</behavior>
-                <action trigger="set">
-                    field: f.this,
-                    check: f.105027,
-                    exces: f.208001,
+                    </action>
+                    <!--Remove value-->
+                    <action trigger="set">
+                        <!--@formatter:off-->
+                    idTrue: f.105027,
+                    other: f.105028;
+                    change other about { null; }
+                <!--@formatter:on-->
+                    </action>
+                    <action trigger="set">
+                        <!--@formatter:off-->
+                    idTrue: f.105027,
                     other: f.305013;
-                    change other about {
-                    if (check.value)
-                    return field.value*exces.value/1000.0 as Double;
-                    return other.value as Double;
-                    }
-                    <!--@formatter:on-->
-                </action>
-            </logic>
-        </dataRef>
-        <!--Žumpa, septik - poistné-->
-        <!--Žumpa, septik p-->
-        <dataRef>
-            <id>305013</id>
-            <logic>
-                <behavior>hidden</behavior>
-            </logic>
-        </dataRef>
-        <!--Iné?-->
-        <!--Iné-->
-        <dataRef>
-            <id>105029</id>
-            <logic>
-                <behavior>editable</behavior>
-                <!--set editable-->
-                <action trigger="set">
-                    <!--@formatter:off-->
+                    change other about { null; }
+                <!--@formatter:on-->
+                    </action>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>111</id>
+            <title></title>
+            <alignment>start</alignment>
+            <!--Žumpa, septik - poistná suma-->
+            <dataRef>
+                <id>105028</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                    <action trigger="set">
+                        field: f.this,
+                        check: f.105027,
+                        exces: f.208001,
+                        other: f.305013;
+                        change other about {
+                        if (check.value)
+                        return field.value*exces.value/1000.0 as Double;
+                        return other.value as Double;
+                        }
+                        <!--@formatter:on-->
+                    </action>
+                </logic>
+            </dataRef>
+            <!--Žumpa, septik - poistné-->
+            <dataRef>
+                <id>305013</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>12</id>
+            <title></title>
+            <alignment>start</alignment>
+            <!--Iné?-->
+            <dataRef>
+                <id>105029</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <!--set editable-->
+                    <action trigger="set">
+                        <!--@formatter:off-->
                     idTrue: f.105029,
                     trans: t.413,
                     other: f.105030;
                     make other,editable on trans when { idTrue.value }
                 <!--@formatter:on-->
-                </action>
-                <action trigger="set">
-                    <!--@formatter:off-->
+                    </action>
+                    <action trigger="set">
+                        <!--@formatter:off-->
                     idTrue: f.105029,
                     trans: t.413,
                     other: f.305014;
                     make other,visible on trans when { idTrue.value }
                 <!--@formatter:on-->
-                </action>                <!--set hidden-->
-                <action trigger="set">
-                    <!--@formatter:off-->
+                    </action>
+                    <!--set hidden-->
+                    <action trigger="set">
+                        <!--@formatter:off-->
                     idTrue: f.105029,
                     trans: t.413,
                     other: f.105030;
                     make other,hidden on trans when { !idTrue.value }
                 <!--@formatter:on-->
-                </action>
-                <action trigger="set">
-                    <!--@formatter:off-->
+                    </action>
+                    <action trigger="set">
+                        <!--@formatter:off-->
                     idTrue: f.105029,
                     trans: t.413,
                     other: f.305014;
                     make other,hidden on trans when { !idTrue.value }
                 <!--@formatter:on-->
-                </action>
-            </logic>
-        </dataRef>
-        <!--Iné - poistná suma-->
-        <!--Iné ps-->
-        <dataRef>
-            <id>105030</id>
-            <logic>
-                <behavior>hidden</behavior>
-                <action trigger="set">
-                    field: f.this,
-                    check: f.105029,
-                    exces: f.208001,
+                    </action>
+                    <!--Remove value-->
+                    <action trigger="set">
+                        <!--@formatter:off-->
+                    idTrue: f.105029,
+                    other: f.105030;
+                    change other about { null; }
+                <!--@formatter:on-->
+                    </action>
+                    <action trigger="set">
+                        <!--@formatter:off-->
+                    idTrue: f.105029,
                     other: f.305014;
-                    change other about {
-                    if (check.value)
-                    return field.value*exces.value/1000.0 as Double;
-                    return other.value as Double;
-                    }
-                    <!--@formatter:on-->
-                </action>
-            </logic>
-        </dataRef>
-        <!--Iné - poistné-->
-        <!--Iné p-->
-        <dataRef>
-            <id>305014</id>
-            <logic>
-                <behavior>hidden</behavior>
-            </logic>
-        </dataRef>
+                    change other about { null; }
+                <!--@formatter:on-->
+                    </action>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>112</id>
+            <title></title>
+            <alignment>start</alignment>
+            <!--Iné - poistná suma-->
+            <dataRef>
+                <id>105030</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                    <action trigger="set">
+                        field: f.this,
+                        check: f.105029,
+                        exces: f.208001,
+                        other: f.305014;
+                        change other about {
+                        if (check.value)
+                        return field.value*exces.value/1000.0 as Double;
+                        return other.value as Double;
+                        }
+                        <!--@formatter:on-->
+                    </action>
+                </logic>
+            </dataRef>
+            <!--Iné - poistné-->
+            <dataRef>
+                <id>305014</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+            </dataRef>
         </dataGroup>
     </transition>
     <!--================================= Domácnosť =====================-->
@@ -6494,531 +6802,715 @@
             </logic>
         </roleRef>
         <dataGroup>
-        <id>6</id>
-        <title>info</title>
-        <alignment>start</alignment>
-        <!--Cennosti-->
-        <dataRef>
-            <id>106004</id>
-            <logic>
-                <behavior>editable</behavior>
-                <!--set editable-->
-                <action trigger="set">
-                    idTrue: f.106004,
-                    trans: t.421,
-                    other: f.106005;
-                    make other,editable on trans when { idTrue.value }
-                </action>
-                <action trigger="set">
-                    idTrue: f.106004,
-                    trans: t.421,
-                    other: f.306002;
-                    make other,visible on trans when { idTrue.value }
-                </action>
-                <!--set hidden-->
-                <action trigger="set">
-                    idTrue: f.106004,
-                    trans: t.421,
-                    other: f.106005;
-                    make other,hidden on trans when { !idTrue.value }
-                </action>
-                <action trigger="set">
-                    idTrue: f.106004,
-                    trans: t.421,
-                    other: f.306002;
-                    make other,hidden on trans when { !idTrue.value }
-                </action>
-            </logic>
-        </dataRef>
-        <!--Cennosti ps-->
-        <dataRef>
-            <id>106005</id>
-            <logic>
-                <behavior>hidden</behavior>
-                <action trigger="set">
-                    field: f.this,
-                    check: f.106004,
-                    exces: f.208002,
-                    other: f.306002;
-                    change other about {
-                    if (check.value)
-                    return field.value*exces.value/1000.0 as Double;
-                    return other.value as Double;
-                    }
-                </action>
-            </logic>
-        </dataRef>
-        <!--Cennosti p-->
-        <dataRef>
-            <id>306002</id>
-            <logic>
-                <behavior>hidden</behavior>
-            </logic>
-        </dataRef>
-        <!--Umelecké diela-->
-        <dataRef>
-            <id>106006</id>
-            <logic>
-                <behavior>editable</behavior>
-                <!--set editable-->
-                <action trigger="set">
-                    idTrue: f.106006,
-                    trans: t.421,
-                    other: f.106007;
-                    make other,editable on trans when { idTrue.value }
-                </action>
-                <action trigger="set">
-                    idTrue: f.106006,
-                    trans: t.421,
-                    other: f.306003;
-                    make other,visible on trans when { idTrue.value }
-                </action>
-                <!--set hidden-->
-                <action trigger="set">
-                    idTrue: f.106006,
-                    trans: t.421,
-                    other: f.106007;
-                    make other,hidden on trans when { !idTrue.value }
-                </action>
-                <action trigger="set">
-                    idTrue: f.106006,
-                    trans: t.421,
-                    other: f.306003;
-                    make other,hidden on trans when { !idTrue.value }
-                </action>
-            </logic>
-        </dataRef>
-        <!--Umelecké diela ps-->
-        <dataRef>
-            <id>106007</id>
-            <logic>
-                <behavior>hidden</behavior>
-                <action trigger="set">
-                    field: f.this,
-                    check: f.106006,
-                    exces: f.208002,
-                    other: f.306003;
-                    change other about {
-                    if (check.value)
-                    return field.value*exces.value/1000.0 as Double;
-                    return other.value as Double;
-                    }
-                </action>
-            </logic>
-        </dataRef>
-        <!--Umelecké diela p-->
-        <dataRef>
-            <id>306003</id>
-            <logic>
-                <behavior>hidden</behavior>
-            </logic>
-        </dataRef>
-        <!--Elektronické a optické zariadenia-->
-        <dataRef>
-            <id>106008</id>
-            <logic>
-                <behavior>editable</behavior>
-                <!--set editable-->
-                <action trigger="set">
-                    idTrue: f.106008,
-                    trans: t.421,
-                    other: f.106009;
-                    make other,editable on trans when { idTrue.value }
-                </action>
-                <action trigger="set">
-                    idTrue: f.106008,
-                    trans: t.421,
-                    other: f.306004;
-                    make other,visible on trans when { idTrue.value }
-                </action>
-                <!--set hidden-->
-                <action trigger="set">
-                    idTrue: f.106008,
-                    trans: t.421,
-                    other: f.106009;
-                    make other,hidden on trans when { !idTrue.value }
-                </action>
-                <action trigger="set">
-                    idTrue: f.106008,
-                    trans: t.421,
-                    other: f.306004;
-                    make other,hidden on trans when { !idTrue.value }
-                </action>
-            </logic>
-        </dataRef>
-        <!--Elektronické a optické zariadenia ps-->
-        <dataRef>
-            <id>106009</id>
-            <logic>
-                <behavior>hidden</behavior>
-                <action trigger="set">
-                    field: f.this,
-                    check: f.106008,
-                    exces: f.208002,
-                    other: f.306004;
-                    change other about {
-                    if (check.value)
-                    return field.value*exces.value/1000.0 as Double;
-                    return other.value as Double;
-                    }
-                </action>
-            </logic>
-        </dataRef>
-        <!--Elektronické a optické zariadenia p-->
-        <dataRef>
-            <id>306004</id>
-            <logic>
-                <behavior>hidden</behavior>
-            </logic>
-        </dataRef>
-        <!--Špecialne sklá a presklenie-->
-        <dataRef>
-            <id>106010</id>
-            <logic>
-                <behavior>editable</behavior>
-                <!--set editable-->
-                <action trigger="set">
-                    idTrue: f.106010,
-                    trans: t.421,
-                    other: f.106011;
-                    make other,editable on trans when { idTrue.value }
-                </action>
-                <action trigger="set">
-                    idTrue: f.106010,
-                    trans: t.421,
-                    other: f.306005;
-                    make other,visible on trans when { idTrue.value }
-                </action>
-                <!--set hidden-->
-                <action trigger="set">
-                    idTrue: f.106010,
-                    trans: t.421,
-                    other: f.106011;
-                    make other,hidden on trans when { !idTrue.value }
-                </action>
-                <action trigger="set">
-                    idTrue: f.106010,
-                    trans: t.421,
-                    other: f.306005;
-                    make other,hidden on trans when { !idTrue.value }
-                </action>
-            </logic>
-        </dataRef>
-        <!--Špecialne sklá a presklenie ps-->
-        <dataRef>
-            <id>106011</id>
-            <logic>
-                <behavior>hidden</behavior>
-                <action trigger="set">
-                    field: f.this,
-                    check: f.106010,
-                    exces: f.208002,
-                    other: f.306005;
-                    change other about {
-                    if (check.value)
-                    return field.value*exces.value/1000.0 as Double;
-                    return other.value as Double;
-                    }
-                </action>
-            </logic>
-        </dataRef>
-        <!--Špecialne sklá a presklenie p-->
-        <dataRef>
-            <id>306005</id>
-            <logic>
-                <behavior>hidden</behavior>
-            </logic>
-        </dataRef>
-        <!--Záhradné vybavenie a nábytok-->
-        <dataRef>
-            <id>106012</id>
-            <logic>
-                <behavior>editable</behavior>
-                <!--set editable-->
-                <action trigger="set">
-                    idTrue: f.106012,
-                    trans: t.421,
-                    other: f.106013;
-                    make other,editable on trans when { idTrue.value }
-                </action>
-                <action trigger="set">
-                    idTrue: f.106012,
-                    trans: t.421,
-                    other: f.306006;
-                    make other,visible on trans when { idTrue.value }
-                </action>
-                <!--set hidden-->
-                <action trigger="set">
-                    idTrue: f.106012,
-                    trans: t.421,
-                    other: f.106013;
-                    make other,hidden on trans when { !idTrue.value }
-                </action>
-                <action trigger="set">
-                    idTrue: f.106012,
-                    trans: t.421,
-                    other: f.306006;
-                    make other,hidden on trans when { !idTrue.value }
-                </action>
-            </logic>
-        </dataRef>
-        <!--Záhradné vybavenie a nábytok ps-->
-        <dataRef>
-            <id>106013</id>
-            <logic>
-                <behavior>hidden</behavior>
-                <action trigger="set">
-                    field: f.this,
-                    check: f.106012,
-                    exces: f.208002,
-                    other: f.306006;
-                    change other about {
-                    if (check.value)
-                    return field.value*exces.value/1000.0 as Double;
-                    return other.value as Double;
-                    }
-                </action>
-            </logic>
-        </dataRef>
-        <!--Záhradné vybavenie a nábytok p-->
-        <dataRef>
-            <id>306006</id>
-            <logic>
-                <behavior>hidden</behavior>
-            </logic>
-        </dataRef>
-        <!--Elektromotory v domácich spotrebičoch-->
-        <dataRef>
-            <id>106014</id>
-            <logic>
-                <behavior>editable</behavior>
-                <!--set editable-->
-                <action trigger="set">
-                    idTrue: f.106014,
-                    trans: t.421,
-                    other: f.106015;
-                    make other,editable on trans when { idTrue.value }
-                </action>
-                <action trigger="set">
-                    idTrue: f.106014,
-                    trans: t.421,
-                    other: f.306007;
-                    make other,visible on trans when { idTrue.value }
-                </action>
-                <!--set hidden-->
-                <action trigger="set">
-                    idTrue: f.106014,
-                    trans: t.421,
-                    other: f.106015;
-                    make other,hidden on trans when { !idTrue.value }
-                </action>
-                <action trigger="set">
-                    idTrue: f.106014,
-                    trans: t.421,
-                    other: f.306007;
-                    make other,hidden on trans when { !idTrue.value }
-                </action>
-            </logic>
-        </dataRef>
-        <!--Elektromotory v domácich spotrebičoch ps-->
-        <dataRef>
-            <id>106015</id>
-            <logic>
-                <behavior>hidden</behavior>
-                <action trigger="set">
-                    field: f.this,
-                    check: f.106014,
-                    exces: f.208002,
-                    other: f.306007;
-                    change other about {
-                    if (check.value)
-                    return field.value*exces.value/1000.0 as Double;
-                    return other.value as Double;
-                    }
-                </action>
-            </logic>
-        </dataRef>
-        <!--Elektromotory v domácich spotrebičoch p-->
-        <dataRef>
-            <id>306007</id>
-            <logic>
-                <behavior>hidden</behavior>
-            </logic>
-        </dataRef>
-        <!--Stavebné súčasti domácnosti-->
-        <dataRef>
-            <id>106016</id>
-            <logic>
-                <behavior>editable</behavior>
-                <!--set editable-->
-                <action trigger="set">
-                    idTrue: f.106016,
-                    trans: t.421,
-                    other: f.106017;
-                    make other,editable on trans when { idTrue.value }
-                </action>
-                <action trigger="set">
-                    idTrue: f.106016,
-                    trans: t.421,
-                    other: f.306008;
-                    make other,visible on trans when { idTrue.value }
-                </action>
-                <!--set hidden-->
-                <action trigger="set">
-                    idTrue: f.106016,
-                    trans: t.421,
-                    other: f.106017;
-                    make other,hidden on trans when { !idTrue.value }
-                </action>
-                <action trigger="set">
-                    idTrue: f.106016,
-                    trans: t.421,
-                    other: f.306008;
-                    make other,hidden on trans when { !idTrue.value }
-                </action>
-            </logic>
-        </dataRef>
-        <!--Stavebné súčasti domácnosti ps-->
-        <dataRef>
-            <id>106017</id>
-            <logic>
-                <behavior>hidden</behavior>
-                <action trigger="set">
-                    field: f.this,
-                    check: f.106016,
-                    exces: f.208002,
-                    other: f.306008;
-                    change other about {
-                    if (check.value)
-                    return field.value*exces.value/1000.0 as Double;
-                    return other.value as Double;
-                    }
-                </action>
-            </logic>
-        </dataRef>
-        <!--Stavebné súčasti domácnosti p-->
-        <dataRef>
-            <id>306008</id>
-            <logic>
-                <behavior>hidden</behavior>
-            </logic>
-        </dataRef>
-        <!--Športové náradie-->
-        <dataRef>
-            <id>106018</id>
-            <logic>
-                <behavior>editable</behavior>
-                <!--set editable-->
-                <action trigger="set">
-                    idTrue: f.106018,
-                    trans: t.421,
-                    other: f.106019;
-                    make other,editable on trans when { idTrue.value }
-                </action>
-                <action trigger="set">
-                    idTrue: f.106018,
-                    trans: t.421,
-                    other: f.306009;
-                    make other,visible on trans when { idTrue.value }
-                </action>
-                <!--set hidden-->
-                <action trigger="set">
-                    idTrue: f.106018,
-                    trans: t.421,
-                    other: f.106019;
-                    make other,hidden on trans when { !idTrue.value }
-                </action>
-                <action trigger="set">
-                    idTrue: f.106018,
-                    trans: t.421,
-                    other: f.306009;
-                    make other,hidden on trans when { !idTrue.value }
-                </action>
-            </logic>
-        </dataRef>
-        <!--Športové náradie ps-->
-        <dataRef>
-            <id>106019</id>
-            <logic>
-                <behavior>hidden</behavior>
-                <action trigger="set">
-                    field: f.this,
-                    check: f.106018,
-                    exces: f.208002,
-                    other: f.306009;
-                    change other about {
-                    if (check.value)
-                    return field.value*exces.value/1000.0 as Double;
-                    return other.value as Double;
-                    }
-                </action>
-            </logic>
-        </dataRef>
-        <!--Športové náradie p-->
-        <dataRef>
-            <id>306009</id>
-            <logic>
-                <behavior>hidden</behavior>
-            </logic>
-        </dataRef>
-        <!--Iné-->
-        <dataRef>
-            <id>106020</id>
-            <logic>
-                <behavior>editable</behavior>
-                <!--set editable-->
-                <action trigger="set">
-                    idTrue: f.106020,
-                    trans: t.421,
-                    other: f.106021;
-                    make other,editable on trans when { idTrue.value }
-                </action>
-                <action trigger="set">
-                    idTrue: f.106020,
-                    trans: t.421,
-                    other: f.306010;
-                    make other,visible on trans when { idTrue.value }
-                </action>
-                <!--set hidden-->
-                <action trigger="set">
-                    idTrue: f.106020,
-                    trans: t.421,
-                    other: f.106021;
-                    make other,hidden on trans when { !idTrue.value }
-                </action>
-                <action trigger="set">
-                    idTrue: f.106020,
-                    trans: t.421,
-                    other: f.306010;
-                    make other,hidden on trans when { !idTrue.value }
-                </action>
-            </logic>
-        </dataRef>
-        <!--Iné ps-->
-        <dataRef>
-            <id>106021</id>
-            <logic>
-                <behavior>hidden</behavior>
-                <action trigger="set">
-                    field: f.this,
-                    check: f.106020,
-                    exces: f.208002,
-                    other: f.306010;
-                    change other about {
-                    if (check.value)
-                    return field.value*exces.value/1000.0 as Double;
-                    return other.value as Double;
-                    }
-                </action>
-            </logic>
-        </dataRef>
-        <!--Iné p-->
-        <dataRef>
-            <id>306010</id>
-            <logic>
-                <behavior>hidden</behavior>
-            </logic>
-        </dataRef>
+            <id>1</id>
+            <title></title>
+            <alignment>start</alignment>
+            <!--Cennosti-->
+            <dataRef>
+                <id>106004</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <!--set editable-->
+                    <action trigger="set">
+                        idTrue: f.106004,
+                        trans: t.421,
+                        other: f.106005;
+                        make other,editable on trans when { idTrue.value }
+                    </action>
+                    <action trigger="set">
+                        idTrue: f.106004,
+                        trans: t.421,
+                        other: f.306002;
+                        make other,visible on trans when { idTrue.value }
+                    </action>
+                    <!--set hidden-->
+                    <action trigger="set">
+                        idTrue: f.106004,
+                        trans: t.421,
+                        other: f.106005;
+                        make other,hidden on trans when { !idTrue.value }
+                    </action>
+                    <action trigger="set">
+                        idTrue: f.106004,
+                        trans: t.421,
+                        other: f.306002;
+                        make other,hidden on trans when { !idTrue.value }
+                    </action>
+                    <!--set editable-->
+                    <action trigger="set">
+                        idTrue: f.106004,
+                        other: f.106005;
+                        change other about { null; }
+                    </action>
+                    <action trigger="set">
+                        idTrue: f.106004,
+                        other: f.306002;
+                        change other about { null; }
+                    </action>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>2</id>
+            <title></title>
+            <alignment>start</alignment>
+            <!--Cennosti ps-->
+            <dataRef>
+                <id>106005</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                    <action trigger="set">
+                        field: f.this,
+                        check: f.106004,
+                        exces: f.208002,
+                        other: f.306002;
+                        change other about {
+                        if (check.value)
+                        return field.value*exces.value/1000.0 as Double;
+                        return other.value as Double;
+                        }
+                    </action>
+                </logic>
+            </dataRef>
+            <!--Cennosti p-->
+            <dataRef>
+                <id>306002</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>3</id>
+            <title></title>
+            <alignment>start</alignment>
+            <!--Umelecké diela-->
+            <dataRef>
+                <id>106006</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <!--set editable-->
+                    <action trigger="set">
+                        idTrue: f.106006,
+                        trans: t.421,
+                        other: f.106007;
+                        make other,editable on trans when { idTrue.value }
+                    </action>
+                    <action trigger="set">
+                        idTrue: f.106006,
+                        trans: t.421,
+                        other: f.306003;
+                        make other,visible on trans when { idTrue.value }
+                    </action>
+                    <!--set hidden-->
+                    <action trigger="set">
+                        idTrue: f.106006,
+                        trans: t.421,
+                        other: f.106007;
+                        make other,hidden on trans when { !idTrue.value }
+                    </action>
+                    <action trigger="set">
+                        idTrue: f.106006,
+                        trans: t.421,
+                        other: f.306003;
+                        make other,hidden on trans when { !idTrue.value }
+                    </action>
+                    <!--set editable-->
+                    <action trigger="set">
+                        idTrue: f.106006,
+                        other: f.106007;
+                        change other about { null; }
+                    </action>
+                    <action trigger="set">
+                        idTrue: f.106006,
+                        other: f.306003;
+                        change other about { null; }
+                    </action>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>4</id>
+            <title></title>
+            <alignment>start</alignment>
+            <!--Umelecké diela ps-->
+            <dataRef>
+                <id>106007</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                    <action trigger="set">
+                        field: f.this,
+                        check: f.106006,
+                        exces: f.208002,
+                        other: f.306003;
+                        change other about {
+                        if (check.value)
+                        return field.value*exces.value/1000.0 as Double;
+                        return other.value as Double;
+                        }
+                    </action>
+                </logic>
+            </dataRef>
+            <!--Umelecké diela p-->
+            <dataRef>
+                <id>306003</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>5</id>
+            <title></title>
+            <alignment>start</alignment>
+            <!--Elektronické a optické zariadenia-->
+            <dataRef>
+                <id>106008</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <!--set editable-->
+                    <action trigger="set">
+                        idTrue: f.106008,
+                        trans: t.421,
+                        other: f.106009;
+                        make other,editable on trans when { idTrue.value }
+                    </action>
+                    <action trigger="set">
+                        idTrue: f.106008,
+                        trans: t.421,
+                        other: f.306004;
+                        make other,visible on trans when { idTrue.value }
+                    </action>
+                    <!--set hidden-->
+                    <action trigger="set">
+                        idTrue: f.106008,
+                        trans: t.421,
+                        other: f.106009;
+                        make other,hidden on trans when { !idTrue.value }
+                    </action>
+                    <action trigger="set">
+                        idTrue: f.106008,
+                        trans: t.421,
+                        other: f.306004;
+                        make other,hidden on trans when { !idTrue.value }
+                    </action>
+                    <!--Remove value-->
+                    <action trigger="set">
+                        idTrue: f.106008,
+                        other: f.106009;
+                        change other about { null; }
+                    </action>
+                    <action trigger="set">
+                        idTrue: f.106008,
+                        other: f.306004;
+                        change other about { null; }
+                    </action>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>6</id>
+            <title></title>
+            <alignment>start</alignment>
+            <!--Elektronické a optické zariadenia ps-->
+            <dataRef>
+                <id>106009</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                    <action trigger="set">
+                        field: f.this,
+                        check: f.106008,
+                        exces: f.208002,
+                        other: f.306004;
+                        change other about {
+                        if (check.value)
+                        return field.value*exces.value/1000.0 as Double;
+                        return other.value as Double;
+                        }
+                    </action>
+                </logic>
+            </dataRef>
+            <!--Elektronické a optické zariadenia p-->
+            <dataRef>
+                <id>306004</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>7</id>
+            <title></title>
+            <alignment>start</alignment>
+            <!--Špecialne sklá a presklenie-->
+            <dataRef>
+                <id>106010</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <!--set editable-->
+                    <action trigger="set">
+                        idTrue: f.106010,
+                        trans: t.421,
+                        other: f.106011;
+                        make other,editable on trans when { idTrue.value }
+                    </action>
+                    <action trigger="set">
+                        idTrue: f.106010,
+                        trans: t.421,
+                        other: f.306005;
+                        make other,visible on trans when { idTrue.value }
+                    </action>
+                    <!--set hidden-->
+                    <action trigger="set">
+                        idTrue: f.106010,
+                        trans: t.421,
+                        other: f.106011;
+                        make other,hidden on trans when { !idTrue.value }
+                    </action>
+                    <action trigger="set">
+                        idTrue: f.106010,
+                        trans: t.421,
+                        other: f.306005;
+                        make other,hidden on trans when { !idTrue.value }
+                    </action>
+                    <!--Remove value-->
+                    <action trigger="set">
+                        idTrue: f.106010,
+                        other: f.106011;
+                        change other about { null; }
+                    </action>
+                    <action trigger="set">
+                        idTrue: f.106010,
+                        other: f.306005;
+                        change other about { null; }
+                    </action>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>8</id>
+            <title></title>
+            <alignment>start</alignment>
+            <!--Špecialne sklá a presklenie ps-->
+            <dataRef>
+                <id>106011</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                    <action trigger="set">
+                        field: f.this,
+                        check: f.106010,
+                        exces: f.208002,
+                        other: f.306005;
+                        change other about {
+                        if (check.value)
+                        return field.value*exces.value/1000.0 as Double;
+                        return other.value as Double;
+                        }
+                    </action>
+                </logic>
+            </dataRef>
+            <!--Špecialne sklá a presklenie p-->
+            <dataRef>
+                <id>306005</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>9</id>
+            <title></title>
+            <alignment>start</alignment>
+            <!--Záhradné vybavenie a nábytok-->
+            <dataRef>
+                <id>106012</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <!--set editable-->
+                    <action trigger="set">
+                        idTrue: f.106012,
+                        trans: t.421,
+                        other: f.106013;
+                        make other,editable on trans when { idTrue.value }
+                    </action>
+                    <action trigger="set">
+                        idTrue: f.106012,
+                        trans: t.421,
+                        other: f.306006;
+                        make other,visible on trans when { idTrue.value }
+                    </action>
+                    <!--set hidden-->
+                    <action trigger="set">
+                        idTrue: f.106012,
+                        trans: t.421,
+                        other: f.106013;
+                        make other,hidden on trans when { !idTrue.value }
+                    </action>
+                    <action trigger="set">
+                        idTrue: f.106012,
+                        trans: t.421,
+                        other: f.306006;
+                        make other,hidden on trans when { !idTrue.value }
+                    </action>
+                    <!--Remove value-->
+                    <action trigger="set">
+                        idTrue: f.106012,
+                        other: f.106013;
+                        change other about { null; }
+                    </action>
+                    <action trigger="set">
+                        idTrue: f.106012,
+                        other: f.306006;
+                        change other about { null; }
+                    </action>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>10</id>
+            <title></title>
+            <alignment>start</alignment>
+            <!--Záhradné vybavenie a nábytok ps-->
+            <dataRef>
+                <id>106013</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                    <action trigger="set">
+                        field: f.this,
+                        check: f.106012,
+                        exces: f.208002,
+                        other: f.306006;
+                        change other about {
+                        if (check.value)
+                        return field.value*exces.value/1000.0 as Double;
+                        return other.value as Double;
+                        }
+                    </action>
+                </logic>
+            </dataRef>
+            <!--Záhradné vybavenie a nábytok p-->
+            <dataRef>
+                <id>306006</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>11</id>
+            <title></title>
+            <alignment>start</alignment>
+            <!--Elektromotory v domácich spotrebičoch-->
+            <dataRef>
+                <id>106014</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <!--set editable-->
+                    <action trigger="set">
+                        idTrue: f.106014,
+                        trans: t.421,
+                        other: f.106015;
+                        make other,editable on trans when { idTrue.value }
+                    </action>
+                    <action trigger="set">
+                        idTrue: f.106014,
+                        trans: t.421,
+                        other: f.306007;
+                        make other,visible on trans when { idTrue.value }
+                    </action>
+                    <!--set hidden-->
+                    <action trigger="set">
+                        idTrue: f.106014,
+                        trans: t.421,
+                        other: f.106015;
+                        make other,hidden on trans when { !idTrue.value }
+                    </action>
+                    <action trigger="set">
+                        idTrue: f.106014,
+                        trans: t.421,
+                        other: f.306007;
+                        make other,hidden on trans when { !idTrue.value }
+                    </action>
+                    <!--set editable-->
+                    <action trigger="set">
+                        idTrue: f.106014,
+                        other: f.106015;
+                        change other about { null; }
+                    </action>
+                    <action trigger="set">
+                        idTrue: f.106014,
+                        other: f.306007;
+                        change other about { null; }
+                    </action>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>12</id>
+            <title></title>
+            <alignment>start</alignment>
+            <!--Elektromotory v domácich spotrebičoch ps-->
+            <dataRef>
+                <id>106015</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                    <action trigger="set">
+                        field: f.this,
+                        check: f.106014,
+                        exces: f.208002,
+                        other: f.306007;
+                        change other about {
+                        if (check.value)
+                        return field.value*exces.value/1000.0 as Double;
+                        return other.value as Double;
+                        }
+                    </action>
+                </logic>
+            </dataRef>
+            <!--Elektromotory v domácich spotrebičoch p-->
+            <dataRef>
+                <id>306007</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>13</id>
+            <title></title>
+            <alignment>start</alignment>
+            <!--Stavebné súčasti domácnosti-->
+            <dataRef>
+                <id>106016</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <!--set editable-->
+                    <action trigger="set">
+                        idTrue: f.106016,
+                        trans: t.421,
+                        other: f.106017;
+                        make other,editable on trans when { idTrue.value }
+                    </action>
+                    <action trigger="set">
+                        idTrue: f.106016,
+                        trans: t.421,
+                        other: f.306008;
+                        make other,visible on trans when { idTrue.value }
+                    </action>
+                    <!--set hidden-->
+                    <action trigger="set">
+                        idTrue: f.106016,
+                        trans: t.421,
+                        other: f.106017;
+                        make other,hidden on trans when { !idTrue.value }
+                    </action>
+                    <action trigger="set">
+                        idTrue: f.106016,
+                        trans: t.421,
+                        other: f.306008;
+                        make other,hidden on trans when { !idTrue.value }
+                    </action>
+                    <!--Remove value-->
+                    <action trigger="set">
+                        idTrue: f.106016,
+                        other: f.106017;
+                        change other about { null; }
+                    </action>
+                    <action trigger="set">
+                        idTrue: f.106016,
+                        other: f.306008;
+                        change other about { null; }
+                    </action>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>14</id>
+            <title></title>
+            <alignment>start</alignment>
+            <!--Stavebné súčasti domácnosti ps-->
+            <dataRef>
+                <id>106017</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                    <action trigger="set">
+                        field: f.this,
+                        check: f.106016,
+                        exces: f.208002,
+                        other: f.306008;
+                        change other about {
+                        if (check.value)
+                        return field.value*exces.value/1000.0 as Double;
+                        return other.value as Double;
+                        }
+                    </action>
+                </logic>
+            </dataRef>
+            <!--Stavebné súčasti domácnosti p-->
+            <dataRef>
+                <id>306008</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>15</id>
+            <title></title>
+            <alignment>start</alignment>
+            <!--Športové náradie-->
+            <dataRef>
+                <id>106018</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <!--set editable-->
+                    <action trigger="set">
+                        idTrue: f.106018,
+                        trans: t.421,
+                        other: f.106019;
+                        make other,editable on trans when { idTrue.value }
+                    </action>
+                    <action trigger="set">
+                        idTrue: f.106018,
+                        trans: t.421,
+                        other: f.306009;
+                        make other,visible on trans when { idTrue.value }
+                    </action>
+                    <!--set hidden-->
+                    <action trigger="set">
+                        idTrue: f.106018,
+                        trans: t.421,
+                        other: f.106019;
+                        make other,hidden on trans when { !idTrue.value }
+                    </action>
+                    <action trigger="set">
+                        idTrue: f.106018,
+                        trans: t.421,
+                        other: f.306009;
+                        make other,hidden on trans when { !idTrue.value }
+                    </action>
+                    <!--Remove value-->
+                    <action trigger="set">
+                        idTrue: f.106018,
+                        other: f.106019;
+                        change other about { null; }
+                    </action>
+                    <action trigger="set">
+                        idTrue: f.106018,
+                        other: f.306009;
+                        change other about { null; }
+                    </action>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>16</id>
+            <title></title>
+            <alignment>start</alignment>
+            <!--Športové náradie ps-->
+            <dataRef>
+                <id>106019</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                    <action trigger="set">
+                        field: f.this,
+                        check: f.106018,
+                        exces: f.208002,
+                        other: f.306009;
+                        change other about {
+                        if (check.value)
+                        return field.value*exces.value/1000.0 as Double;
+                        return other.value as Double;
+                        }
+                    </action>
+                </logic>
+            </dataRef>
+            <!--Športové náradie p-->
+            <dataRef>
+                <id>306009</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>17</id>
+            <title></title>
+            <alignment>start</alignment>
+            <!--Iné-->
+            <dataRef>
+                <id>106020</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <!--set editable-->
+                    <action trigger="set">
+                        idTrue: f.106020,
+                        trans: t.421,
+                        other: f.106021;
+                        make other,editable on trans when { idTrue.value }
+                    </action>
+                    <action trigger="set">
+                        idTrue: f.106020,
+                        trans: t.421,
+                        other: f.306010;
+                        make other,visible on trans when { idTrue.value }
+                    </action>
+                    <!--set hidden-->
+                    <action trigger="set">
+                        idTrue: f.106020,
+                        trans: t.421,
+                        other: f.106021;
+                        make other,hidden on trans when { !idTrue.value }
+                    </action>
+                    <action trigger="set">
+                        idTrue: f.106020,
+                        trans: t.421,
+                        other: f.306010;
+                        make other,hidden on trans when { !idTrue.value }
+                    </action>
+                    <!--Remove value-->
+                    <action trigger="set">
+                        idTrue: f.106020,
+                        other: f.106021;
+                        change other about { null; }
+                    </action>
+                    <action trigger="set">
+                        idTrue: f.106020,
+                        other: f.306010;
+                        change other about { null; }
+                    </action>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>18</id>
+            <title></title>
+            <alignment>start</alignment>
+            <!--Iné ps-->
+            <dataRef>
+                <id>106021</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                    <action trigger="set">
+                        field: f.this,
+                        check: f.106020,
+                        exces: f.208002,
+                        other: f.306010;
+                        change other about {
+                        if (check.value)
+                        return field.value*exces.value/1000.0 as Double;
+                        return other.value as Double;
+                        }
+                    </action>
+                </logic>
+            </dataRef>
+            <!--Iné p-->
+            <dataRef>
+                <id>306010</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+            </dataRef>
         </dataGroup>
     </transition>
     <!--todo============================= Sumár - vzorce, zmazat spoluucast nehnutelnost a domacnost =====================-->
