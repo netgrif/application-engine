@@ -2,6 +2,7 @@ package com.netgrif.workflow
 
 import com.netgrif.workflow.auth.domain.User
 import com.netgrif.workflow.auth.domain.repositories.UserRepository
+import org.apache.log4j.Logger
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory
 import org.springframework.session.FindByIndexNameSessionRepository
@@ -11,6 +12,8 @@ import org.springframework.stereotype.Component
 @Component
 class FlushSessionsRunner {
 
+    private static final Logger log = Logger.getLogger(FlushSessionsRunner.class.name)
+
     @Autowired
     private JedisConnectionFactory connectionFactory
     @Autowired
@@ -18,6 +21,7 @@ class FlushSessionsRunner {
 
 
     public void run(String... args){
+        log.info("Flushing all users session")
         RedisOperationsSessionRepository sessionRepository = new RedisOperationsSessionRepository(connectionFactory)
         List<User> users = userRepository.findAll()
         users.each {user ->
