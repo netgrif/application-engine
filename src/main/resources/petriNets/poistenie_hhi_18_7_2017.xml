@@ -54,14 +54,8 @@
             field: f.this,
             obec: f.301001;
             change obec about {
-            if (field.value=="83106")
-            return "Bratislava";
-            if (field.value=="93401")
-            return "Levice";
-            if (field.value=="91921")
-            return "Zelenec";
-            if (field.value=="(94901")
-            return "Nitra";
+            def postal = psc byCode,field.value;
+            return postal?.first()?.locality;
             }
             <!--@formatter:on-->
         </action>
