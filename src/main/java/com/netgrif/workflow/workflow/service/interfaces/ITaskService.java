@@ -3,6 +3,7 @@ package com.netgrif.workflow.workflow.service.interfaces;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.auth.domain.User;
+import com.netgrif.workflow.petrinet.domain.DataGroup;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldContainer;
 import com.netgrif.workflow.petrinet.domain.throwable.TransitionNotExecutableException;
@@ -11,7 +12,6 @@ import com.netgrif.workflow.workflow.domain.Task;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -38,6 +38,8 @@ public interface ITaskService {
     void assignTask(User user, String taskId) throws TransitionNotExecutableException;
 
     List<Field> getData(String taskId);
+
+    List<DataGroup> getDataGroups(String taskId);
 
     ChangedFieldContainer setData(String taskId, ObjectNode values);
 
