@@ -165,7 +165,7 @@ public class Importer {
     @Transactional
     protected void addDataGroups(Transition transition, ImportDataGroup[] dataGroups) {
         Stream.of(dataGroups).forEach(importDataGroup -> {
-            DataGroup dataGroup = new DataGroup(importDataGroup.getTitle(), importDataGroup.getAlignment());
+            DataGroup dataGroup = new DataGroup(importDataGroup.getTitle(), importDataGroup.getAlignment(), importDataGroup.getStretch());
             Stream.of(importDataGroup.getDataRef()).forEach(dataRef -> dataGroup.addData(fields.get(dataRef.getId()).getObjectId()));
             transition.addDataGroup(dataGroup);
         });
