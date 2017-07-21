@@ -5,6 +5,7 @@ import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.petrinet.domain.DataGroup;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
+import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldContainer;
 import com.netgrif.workflow.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.Task;
@@ -40,7 +41,7 @@ public interface ITaskService {
 
     List<DataGroup> getDataGroups(String taskId);
 
-    ObjectNode setData(String taskId, ObjectNode values);
+    ChangedFieldContainer setData(String taskId, ObjectNode values);
 
     void cancelTask(Long id, String taskId);
 

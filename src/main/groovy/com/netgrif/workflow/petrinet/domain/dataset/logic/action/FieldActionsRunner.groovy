@@ -5,20 +5,27 @@ import com.netgrif.workflow.petrinet.domain.Transition
 import com.netgrif.workflow.petrinet.domain.dataset.Field
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedField
 import com.netgrif.workflow.petrinet.domain.dataset.logic.IllegalVariableTypeException
+import com.netgrif.workflow.psc.IPostalCodeService
 import com.netgrif.workflow.workflow.domain.Case
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.stereotype.Component
 
+@Component
 class FieldActionsRunner {
 
-    FieldActionsRunner() {
-    }
+    @Autowired
+    private IPostalCodeService postalCodeService
 
-    static ChangedField run(String script, Case useCase) {
+    private Map<String,Object> actionsCache;
+
+    ChangedField run(String script, Case useCase) {
         Binding binding = new Binding()
         bindVariables(script, binding, useCase)
         def shell = new GroovyShell(binding)
 
+        println script
         def code = (Closure) shell.evaluate("{->${getExpression(script)}}")
-        code.delegate = new ActionDelegate(useCase)
+        code.delegate = new ActionDelegate(useCase,this)
         code()
         return ((ActionDelegate)code.delegate).changedField
     }
@@ -68,5 +75,19 @@ class FieldActionsRunner {
         return useCase.petriNet.transitions.get(objectId)
     }
 
+    void addToCache(String key, Object value){
+        this.actionsCache.put(key,value)
+    }
 
+    void removeFromCache(String key){
+        this.actionsCache.remove(key)
+    }
+
+    void getFromCache(String key){
+        this.actionsCache.get(key)
+    }
+
+    IPostalCodeService getPostalCodeService() {
+        return postalCodeService
+    }
 }

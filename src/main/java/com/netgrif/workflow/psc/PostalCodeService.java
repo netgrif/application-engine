@@ -12,8 +12,8 @@ public class PostalCodeService implements IPostalCodeService {
     private PostalCodeRepository repository;
 
     @Override
-    public void createPostalCode(String code, String locality, String regionCode) {
-        repository.save(new PostalCode(code.replaceAll("\\s","").trim(),locality.trim(),regionCode.trim()));
+    public void createPostalCode(String code, String locality, String region, String regionCode) {
+        repository.save(new PostalCode(code.replaceAll("\\s","").trim(),locality.trim(),region.trim(),regionCode.trim()));
     }
 
     @Override
@@ -22,7 +22,7 @@ public class PostalCodeService implements IPostalCodeService {
     }
 
     @Override
-    public PostalCode findByCode(String code) {
+    public List<PostalCode> findByCode(String code) {
         return repository.findByCode(code.replaceAll("\\s","").trim());
     }
 
