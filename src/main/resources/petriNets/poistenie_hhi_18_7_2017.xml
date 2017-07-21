@@ -2537,6 +2537,7 @@
         <values>ročná</values>
         <values>polročná</values>
         <values>štvrťročná</values>
+        <init>ročná</init>
         <action trigger="set">
             <!--@formatter:off-->
             field: f.this,
@@ -3507,6 +3508,7 @@
     <data type="number">
         <title>Koeficient - KOMPLETNÉ POISTENIE</title>
         <id>208008</id>
+        <init>1.0</init>
     </data>
     <!-- ===== Poistenie nehnuteľností koeficienty ===== -->
     <data type="number">
@@ -5094,7 +5096,6 @@
 
         <dataGroup>
                 <id>1</id>
-            <title>info</title>
         <alignment>start</alignment>
         <dataRef>
             <id>301001</id>
@@ -5258,8 +5259,7 @@
         </roleRef>
         <!--Predmet poistenia-->
         <dataGroup>
-        <id>2</id>
-        <title>info</title>
+        <id>1</id>
         <alignment>start</alignment>
         <dataRef>
             <id>102001</id>
@@ -5353,6 +5353,11 @@
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
+        </dataGroup>
+        <dataGroup>
+        <id>2</id>
+        <title>Poistenie zodpovednosti</title>
+        <alignment>start</alignment>
         <!--Zodpovednost nehnutelnost-->
         <dataRef>
             <id>107001</id>
@@ -6386,8 +6391,7 @@
             </logic>
         </roleRef>
         <dataGroup>
-        <id>5</id>
-        <title>info</title>
+        <id>1</id>
         <alignment>start</alignment>
         <!--Umiestnenie domácnosti-->
         <dataRef>
@@ -6453,6 +6457,11 @@
                 <behavior>required</behavior>
             </logic>
         </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>2</id>
+            <title>Poistenie zodpovednosti</title>
+            <alignment>start</alignment>
         <!--Zodpovednost domacnost ps-->
         <dataRef>
             <id>107003</id>
@@ -7038,8 +7047,8 @@
             </logic>
         </roleRef>
         <dataGroup>
-        <id>7</id>
-        <title>info</title>
+        <id>1</id>
+        <title>Poistenie nehnutelnosti</title>
         <alignment>start</alignment>
         <!--nehnutelnost poistna suma-->
         <dataRef>
@@ -7056,6 +7065,18 @@
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
+        <!--Celkové poistenie nehnuteľnosti-->
+        <dataRef>
+                <id>308001</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            </dataGroup>
+        <dataGroup>
+            <id>2</id>
+            <title>Poistenie domacnosti</title>
+            <alignment>start</alignment>
         <!--Poistenie domácnosti - poistná suma-->
         <dataRef>
             <id>106002</id>
@@ -7071,13 +7092,6 @@
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-        <!--Celkové poistenie nehnuteľnosti-->
-        <dataRef>
-            <id>308001</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
         <!--Celkové poistenie domácnosti-->
         <dataRef>
             <id>308002</id>
@@ -7085,6 +7099,11 @@
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
+            </dataGroup>
+        <dataGroup>
+            <id>3</id>
+            <title>Poistenie zodpovednosti</title>
+            <alignment>start</alignment>
         <!--Poistenie zodpovednosti nehnutelnost-->
         <dataRef>
             <id>308008</id>
@@ -7106,11 +7125,16 @@
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
+            </dataGroup>
+        <dataGroup>
+            <id>1</id>
+            <title>Vysledne poistenie</title>
+            <alignment>start</alignment>
         <!--ROČNÉ POISTNÉ CELKOM-->
         <dataRef>
             <id>308004</id>
             <logic>
-                <behavior>visible</behavior>
+                <behavior>editable</behavior>
             </logic>
         </dataRef>
         <!--PERIODICITA PLATBY POISTNÉHO-->
@@ -7125,7 +7149,7 @@
         <dataRef>
             <id>308005</id>
             <logic>
-                <behavior>visible</behavior>
+                <behavior>editable</behavior>
             </logic>
         </dataRef>
         <!--ZĽAVA ZA INÉ POISTENIE V PREMIUM-->
