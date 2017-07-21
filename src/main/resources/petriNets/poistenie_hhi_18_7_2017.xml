@@ -5056,12 +5056,11 @@
                 <perform>true</perform>
             </logic>
         </roleRef>
-        <!--Obec-->
-
         <dataGroup>
             <id>1</id>
-            <title>info</title>
+            <title></title>
             <alignment>start</alignment>
+            <!--Obec-->
             <dataRef>
                 <id>301001</id>
                 <logic>
@@ -5084,6 +5083,12 @@
                     <behavior>required</behavior>
                 </logic>
             </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>2</id>
+            <title></title>
+            <alignment>start</alignment>
+            <stretch>true</stretch>
             <!--Bolo miesto poistenia postihnuté povodňou za posledných 10 rokov?-->
             <dataRef>
                 <id>101003</id>
@@ -5092,6 +5097,11 @@
                     <behavior>required</behavior>
                 </logic>
             </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>3</id>
+            <title></title>
+            <stretch>true</stretch>
             <!--Nachádza nehnuteľnosť sa vo vzdialenosti kratšej ako 300 m od vodného toku?-->
             <dataRef>
                 <id>101004</id>
@@ -5100,6 +5110,11 @@
                     <behavior>required</behavior>
                 </logic>
             </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>4</id>
+            <title></title>
+            <stretch>true</stretch>
             <!--Koľko rokov žijete v poisťovanej nehnuteľnosti?-->
             <dataRef>
                 <id>101005</id>
@@ -5140,6 +5155,11 @@
                     <behavior>required</behavior>
                 </logic>
             </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>5</id>
+            <title></title>
+            <stretch>true</stretch>
             <!--Bolo poistenému alebo spolupoistenej osobe niekedy v minulosti zamiestnuté poistné plnenie alebo vypovedaná poistná zmluva?-->
             <dataRef>
                 <id>101009</id>
@@ -5148,6 +5168,11 @@
                     <behavior>required</behavior>
                 </logic>
             </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>6</id>
+            <title></title>
+            <stretch>true</stretch>
             <!--Bol poistený alebo spolupoistená osoba niekedy trestné stihaný / vyhlásil osobný bankrot / stíhaný za dlhy alebo odsúdený za podvodné alebo obdobné konanie.-->
             <dataRef>
                 <id>101010</id>
@@ -5156,6 +5181,11 @@
                     <behavior>required</behavior>
                 </logic>
             </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>7</id>
+            <title></title>
+            <stretch>true</stretch>
             <!--Je plánovaná rekonštrukcia alebo prestavba poisťovanej nehnuteľnosti v priebehu najbližších 3 mesiacov?-->
             <dataRef>
                 <id>101011</id>
@@ -5164,6 +5194,11 @@
                     <behavior>required</behavior>
                 </logic>
             </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>8</id>
+            <title></title>
+            <stretch>true</stretch>
             <!--Žije v poisťovanej domácnosti pes alebo mačka?-->
             <dataRef>
                 <id>101012</id>
