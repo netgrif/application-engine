@@ -5257,6 +5257,10 @@
             </logic>
         </roleRef>
         <!--Predmet poistenia-->
+        <dataGroup>
+        <id>2</id>
+        <title>info</title>
+        <alignment>start</alignment>
         <dataRef>
             <id>102001</id>
             <logic>
@@ -5363,6 +5367,7 @@
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
+        </dataGroup>
     </transition>
     <!--================================= Doplnkové poistenie nehnuteľnosti - =====================-->
     <transition>
@@ -5380,6 +5385,10 @@
                 <perform>true</perform>
             </logic>
         </roleRef>
+        <dataGroup>
+        <id>3</id>
+        <title>info</title>
+        <alignment>start</alignment>
         <!--Stavebné materialy-->
         <dataRef>
             <id>105031</id>
@@ -5422,6 +5431,7 @@
                 <behavior>hidden</behavior>
             </logic>
         </dataRef>
+        </dataGroup>
     </transition>
     <!--todo============================= Vedlajsie stavby - action podlahova plocha, zmena na spoluucast =====================-->
     <transition>
@@ -5439,6 +5449,10 @@
                 <perform>true</perform>
             </logic>
         </roleRef>
+        <dataGroup>
+        <id>4</id>
+        <title>info</title>
+        <alignment>start</alignment>
         <!--Garáž-->
         <dataRef>
             <id>105035</id>
@@ -6353,6 +6367,7 @@
                 <behavior>hidden</behavior>
             </logic>
         </dataRef>
+        </dataGroup>
     </transition>
     <!--================================= Domácnosť =====================-->
     <transition>
@@ -6370,6 +6385,10 @@
                 <perform>true</perform>
             </logic>
         </roleRef>
+        <dataGroup>
+        <id>5</id>
+        <title>info</title>
+        <alignment>start</alignment>
         <!--Umiestnenie domácnosti-->
         <dataRef>
             <id>103001</id>
@@ -6455,7 +6474,7 @@
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-
+</dataGroup>
 
     </transition>
     <!--================================= Doplnkové poistenie domácnosti=====================-->
@@ -6474,6 +6493,10 @@
                 <perform>true</perform>
             </logic>
         </roleRef>
+        <dataGroup>
+        <id>6</id>
+        <title>info</title>
+        <alignment>start</alignment>
         <!--Cennosti-->
         <dataRef>
             <id>106004</id>
@@ -6996,6 +7019,7 @@
                 <behavior>hidden</behavior>
             </logic>
         </dataRef>
+        </dataGroup>
     </transition>
     <!--todo============================= Sumár - vzorce, zmazat spoluucast nehnutelnost a domacnost =====================-->
     <transition>
@@ -7013,6 +7037,10 @@
                 <perform>true</perform>
             </logic>
         </roleRef>
+        <dataGroup>
+        <id>7</id>
+        <title>info</title>
+        <alignment>start</alignment>
         <!--nehnutelnost poistna suma-->
         <dataRef>
             <id>105006</id>
@@ -7123,6 +7151,7 @@
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
+        </dataGroup>
     </transition>
     <!--todo============================= Údaje o poistníkovi a mieste poistenia=====================-->
     <transition>
@@ -7141,6 +7170,10 @@
             </logic>
         </roleRef>
         <!-- ===== Údaje o poistníkovi ===== -->
+        <dataGroup>
+        <id>8</id>
+        <title>info</title>
+        <alignment>start</alignment>
         <!-- Poistník -->
         <!--Typ subjektu-->
         <dataRef>
@@ -7454,6 +7487,7 @@
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
+        </dataGroup>
     </transition>
 
     <!--================================= VYTVORENIE ZMLLUVY =====================-->
