@@ -1,10 +1,14 @@
 package com.netgrif.workflow.petrinet.domain.dataset.logic.action
 
 import com.netgrif.workflow.petrinet.domain.Transition
+import com.netgrif.workflow.petrinet.domain.dataset.ChoiceField
+import com.netgrif.workflow.petrinet.domain.dataset.EnumerationField
 import com.netgrif.workflow.petrinet.domain.dataset.Field
 import com.netgrif.workflow.petrinet.domain.dataset.FieldWithDefault
 import com.netgrif.workflow.petrinet.domain.dataset.FileField
+import com.netgrif.workflow.petrinet.domain.dataset.MultichoiceField
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedField
+import com.netgrif.workflow.psc.PostalCode
 import com.netgrif.workflow.workflow.domain.Case
 
 class ActionDelegate {
@@ -14,10 +18,12 @@ class ActionDelegate {
     private static final String ONCE_GENERATE = "once"
 
     private Case useCase
+    private FieldActionsRunner actionsRunner
     ChangedField changedField
 
-    ActionDelegate(Case useCase) {
+    ActionDelegate(Case useCase, FieldActionsRunner actionsRunner) {
         this.useCase = useCase
+        this.actionsRunner = actionsRunner
         this.changedField = new ChangedField()
     }
 
@@ -60,7 +66,7 @@ class ActionDelegate {
                 if (condition()) {
                     behavior(field, trans)
                     changedField.id = field.objectId
-                    changedField.behavior = useCase.dataSet.get(field.objectId).behavior
+                    changedField.addBehavior(useCase.dataSet.get(field.objectId).behavior)
                 }
             }]
         }]
@@ -69,7 +75,7 @@ class ActionDelegate {
     def saveChangedValue(Field field){
         useCase.dataSet.get(field.objectId).value = field.value
         changedField.id = field.objectId
-        changedField.value = field.value
+        changedField.addAttribute("value",field.value)
     }
 
     def change(Field field) {
@@ -92,6 +98,17 @@ class ActionDelegate {
                 field.value = value
                 saveChangedValue(field)
             }
+        },
+        choices: { cl ->
+            if(!(field instanceof MultichoiceField || field instanceof EnumerationField)) return
+
+            def values = cl()
+            if(values == null || (values instanceof Closure && values() == UNCHANGED_VALUE)) return
+            if(!(values instanceof Collection)) values = [values]
+            field = (ChoiceField)field
+            field.choices = values as Set<String>
+            changedField.id = field.objectId
+            changedField.addAttribute("choices",field.choices)
         }]
     }
 
@@ -106,5 +123,33 @@ class ActionDelegate {
                 field.value = f.name
             }*/
         }]
+    }
+
+    //Cache manipulation
+    def cache(String name, Object value){
+        actionsRunner.addToCache("${useCase.stringId}-${name}",value)
+    }
+
+    def cache(String name){
+        return actionsRunner.getFromCache("${useCase.stringId}-${name}")
+    }
+
+    def cacheFree(String name){
+        actionsRunner.removeFromCache("${useCase.stringId}-${name}")
+    }
+
+    //Get PSC - DSL only for Insurance
+    def byCode = { String code ->
+        return actionsRunner.postalCodeService.findByCode(code)
+    }
+
+    def byLocality = { String locality ->
+        return actionsRunner.postalCodeService.findByLocality(locality)
+    }
+
+    def psc(Closure find, String input){
+        if(find)
+            return find(input)
+        return null
     }
 }

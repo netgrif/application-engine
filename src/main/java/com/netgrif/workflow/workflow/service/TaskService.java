@@ -11,6 +11,7 @@ import com.netgrif.workflow.event.events.*;
 import com.netgrif.workflow.petrinet.domain.*;
 import com.netgrif.workflow.petrinet.domain.dataset.*;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedField;
+import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldContainer;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.FieldActionsRunner;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.validation.FieldValidationRunner;
@@ -73,6 +74,9 @@ public class TaskService implements ITaskService {
 
     @Autowired
     private TaskScheduler scheduler;
+
+    @Autowired
+    private FieldActionsRunner actionsRunner;
 
     //    @Override
 //    public Page<Task> getAll(LoggedUser loggedUser, Pageable pageable) {
@@ -267,7 +271,7 @@ public class TaskService implements ITaskService {
     }
 
     @Override
-    public ObjectNode setData(String taskId, ObjectNode values) {
+    public ChangedFieldContainer setData(String taskId, ObjectNode values) {
         Task task = taskRepository.findOne(taskId);
         Case useCase = caseRepository.findOne(task.getCaseId());
 
@@ -282,9 +286,10 @@ public class TaskService implements ITaskService {
 
         caseRepository.save(useCase);
 
-        ObjectNode node = JsonNodeFactory.instance.objectNode();
-        changedFields.forEach((id, field) -> node.set(id, field.toJson()));
-        return node;
+
+        ChangedFieldContainer container = new ChangedFieldContainer();
+        container.putAll(changedFields);
+        return container;
     }
 
     private Map<String, ChangedField> resolveActions(Field field, Action.ActionTrigger actionTrigger, Case useCase, Transition transition) {
@@ -308,7 +313,7 @@ public class TaskService implements ITaskService {
 
     private void runActions(List<String> actions, Action.ActionTrigger trigger, Case useCase, Transition transition, Map<String, ChangedField> changedFields, boolean recursive) {
         actions.forEach(action -> {
-            ChangedField changedField = FieldActionsRunner.run(action, useCase);
+            ChangedField changedField = actionsRunner.run(action, useCase);
 
             if (changedField.getId() == null) return;
 
@@ -317,7 +322,7 @@ public class TaskService implements ITaskService {
             else
                 changedFields.put(changedField.getId(), changedField);
 
-            if (changedField.getValue() != null && recursive)
+            if ((changedField.getAttributes().containsKey("value") && changedField.getAttributes().get("value") != null) && recursive)
                 processActions(useCase.getPetriNet().getDataSet().get(changedField.getId()), trigger,
                         useCase, transition, changedFields);
 
@@ -413,7 +418,7 @@ public class TaskService implements ITaskService {
 
         if (field.isGenerated()) {
             field.getActions().forEach(action ->
-                    FieldActionsRunner.run(action.getDefinition(), useCase)
+                    actionsRunner.run(action.getDefinition(), useCase)
             );
             if (useCase.getDataSet().get(fieldId).getValue() == null) return null;
 
