@@ -5336,7 +5336,6 @@
         </dataGroup>
     </transition>
     <!--============================= Nehnuteľnosť - DONE =====================-->
-    <!--todo: schovat Poistenie zodpovednosti ak FALSE-->
     <transition>
         <id>155</id>
         <x>620</x>
@@ -5355,7 +5354,7 @@
         <!--Predmet poistenia-->
         <dataGroup>
             <id>2</id>
-            <title>info</title>
+            <title></title>
             <alignment>start</alignment>
             <dataRef>
                 <id>102001</id>
@@ -5449,18 +5448,43 @@
                     <behavior>editable</behavior>
                 </logic>
             </dataRef>
-            <!--Zodpovednost nehnutelnost-->
-            <dataRef>
-                <id>107001</id>
-                <logic>
-                    <behavior>editable</behavior>
-                </logic>
-            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>3</id>
+            <title></title>
+            <alignment>left</alignment>
             <!--Zodpovednost nehnutelnost boolean-->
             <dataRef>
                 <id>104001</id>
                 <logic>
                     <behavior>editable</behavior>
+                    <!--Show-->
+                    <action trigger="set">
+                        field: f.this,
+                        other: f.107001,
+                        trans: t.this;
+                        make other,editable on trans when { field.value; }
+                    </action>
+                    <!--Hide-->
+                    <action trigger="set">
+                        field: f.this,
+                        other: f.107001,
+                        trans: t.this;
+                        make other,hidden on trans when { !field.value; }
+                    </action>
+                    <!--Remove value-->
+                    <action trigger="set">
+                        field: f.this,
+                        other: f.107001;
+                        change other about { null; }
+                    </action>
+                </logic>
+            </dataRef>
+            <!--Zodpovednost nehnutelnost-->
+            <dataRef>
+                <id>107001</id>
+                <logic>
+                    <behavior>hidden</behavior>
                 </logic>
             </dataRef>
         </dataGroup>
@@ -6825,7 +6849,7 @@
         </roleRef>
         <dataGroup>
         <id>5</id>
-        <title>info</title>
+        <title></title>
         <alignment>start</alignment>
         <!--Umiestnenie domácnosti-->
         <dataRef>
@@ -7660,117 +7684,117 @@
             </logic>
         </roleRef>
         <dataGroup>
-        <id>7</id>
-        <title>info</title>
-        <alignment>start</alignment>
-        <!--nehnutelnost poistna suma-->
-        <dataRef>
-            <id>105006</id>
-            <logic>
-                <behavior>hidden</behavior>
-            </logic>
-        </dataRef>
-        <!--nehnutelnost poistne-->
-        <dataRef>
-            <id>305002</id>
-            <logic>
-                <behavior>hidden</behavior>
-            </logic>
-        </dataRef>
-        <!--Poistenie domácnosti - poistná suma-->
-        <dataRef>
-            <id>106002</id>
-            <logic>
-                <behavior>hidden</behavior>
-            </logic>
-        </dataRef>
-        <!--Poistenie domácnosti - poistné-->
-        <dataRef>
-            <id>306001</id>
-            <logic>
-                <behavior>hidden</behavior>
-            </logic>
-        </dataRef>
-        <!--Celkové poistenie nehnuteľnosti-->
-        <dataRef>
-            <id>308001</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--Celkové poistenie domácnosti-->
-        <dataRef>
-            <id>308002</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--Poistenie zodpovednosti nehnutelnost-->
-        <dataRef>
-            <id>308008</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--Poistenie zodpovednosti domacnost-->
-        <dataRef>
-            <id>308009</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--Poistenie zodpovednosti za škodu-->
-        <dataRef>
-            <id>308003</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--ROČNÉ POISTNÉ CELKOM-->
-        <dataRef>
-            <id>308004</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--PERIODICITA PLATBY POISTNÉHO-->
-        <dataRef>
-            <id>108001</id>
-            <logic>
-                <behavior>editable</behavior>
-                <behavior>required</behavior>
-            </logic>
-        </dataRef>
-        <!--KOMPLETNÉ POISTENIE-->
-        <dataRef>
-            <id>308005</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--ZĽAVA ZA INÉ POISTENIE V PREMIUM-->
-        <dataRef>
-            <id>108002</id>
-            <logic>
-                <behavior>editable</behavior>
-                <behavior>required</behavior>
-            </logic>
-        </dataRef>
-        <!--OBCHODNÁ ZĽAVA-->
-        <dataRef>
-            <id>108003</id>
-            <logic>
-                <behavior>editable</behavior>
-                <behavior>required</behavior>
-            </logic>
-        </dataRef>
-        <!--BEŽNÉ POISTNÉ-->
-        <dataRef>
-            <id>308006</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
+            <id>7</id>
+            <title></title>
+            <alignment>start</alignment>
+            <!--nehnutelnost poistna suma-->
+            <dataRef>
+                <id>105006</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+            </dataRef>
+            <!--nehnutelnost poistne-->
+            <dataRef>
+                <id>305002</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+            </dataRef>
+            <!--Poistenie domácnosti - poistná suma-->
+            <dataRef>
+                <id>106002</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+            </dataRef>
+            <!--Poistenie domácnosti - poistné-->
+            <dataRef>
+                <id>306001</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+            </dataRef>
+            <!--Celkové poistenie nehnuteľnosti-->
+            <dataRef>
+                <id>308001</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!--Celkové poistenie domácnosti-->
+            <dataRef>
+                <id>308002</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!--Poistenie zodpovednosti nehnutelnost-->
+            <dataRef>
+                <id>308008</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!--Poistenie zodpovednosti domacnost-->
+            <dataRef>
+                <id>308009</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!--Poistenie zodpovednosti za škodu-->
+            <dataRef>
+                <id>308003</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!--ROČNÉ POISTNÉ CELKOM-->
+            <dataRef>
+                <id>308004</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!--PERIODICITA PLATBY POISTNÉHO-->
+            <dataRef>
+                <id>108001</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                </logic>
+            </dataRef>
+            <!--KOMPLETNÉ POISTENIE-->
+            <dataRef>
+                <id>308005</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!--ZĽAVA ZA INÉ POISTENIE V PREMIUM-->
+            <dataRef>
+                <id>108002</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                </logic>
+            </dataRef>
+            <!--OBCHODNÁ ZĽAVA-->
+            <dataRef>
+                <id>108003</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                </logic>
+            </dataRef>
+            <!--BEŽNÉ POISTNÉ-->
+            <dataRef>
+                <id>308006</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
         </dataGroup>
     </transition>
     <!--todo============================= Údaje o poistníkovi a mieste poistenia=====================-->
@@ -7791,8 +7815,8 @@
         </roleRef>
         <!-- ===== Údaje o poistníkovi ===== -->
         <dataGroup>
-            <id>8</id>
-            <title>info</title>
+            <id>1</id>
+            <title>Poistník</title>
             <alignment>start</alignment>
             <!-- Poistník -->
             <!--Typ subjektu-->
@@ -7886,6 +7910,10 @@
                     <behavior>editable</behavior>
                 </logic>
             </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>2</id>
+            <title>Poistený</title>
             <!--Poistený je iná osoba-->
             <dataRef>
                 <id>109020</id>
@@ -7985,6 +8013,10 @@
                     <behavior>hidden</behavior>
                 </logic>
             </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>3</id>
+            <title>Adresa trvalého pobytu</title>
             <!-- Údaje o mieste poistenia -->
             <!-- Adresa trvalého pobytu -->
             <dataRef>
@@ -8015,6 +8047,10 @@
                     <behavior>editable</behavior>
                 </logic>
             </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>3</id>
+            <title>Korešpondenčná adresa</title>
             <!-- Korešpondenčná adresa -->
             <!--Rovnaká ako trvalý pobyt-->
             <dataRef>
@@ -8047,6 +8083,10 @@
                     <behavior>hidden</behavior>
                 </logic>
             </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>4</id>
+            <title>Miesto poistenia</title>
             <!-- Miesto poistenia -->
             <dataRef>
                 <id>109035</id>
@@ -8078,6 +8118,10 @@
                     <behavior>hidden</behavior>
                 </logic>
             </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>3</id>
+            <title>Adresa garáže</title>
             <!-- Adresa garáže -->
             <dataRef>
                 <id>109054</id>
