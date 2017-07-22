@@ -41,10 +41,7 @@ public class UserService implements IUserService {
             authorities.add(authorityRepository.findByName(Authority.user));
             user.setAuthorities(authorities);
         }
-        //TODO: 10.7.2017 - implemetuje normálne!!!!!!!!!!!!!
-        Set<Organization> orgs = new HashSet<>();
-        orgs.add(organizationRepository.findByName("Insurance Company"));
-        user.setOrganizations(orgs);
+
         return userRepository.save(user);
     }
 
@@ -89,6 +86,11 @@ public class UserService implements IUserService {
         authority.addUser(user);
 
         userRepository.save(user);
+    }
+
+    @Override
+    public List<Organization> getAllOrganizations(){
+        return organizationRepository.findAll();
     }
 
     private User loadProcessRoles(User user){

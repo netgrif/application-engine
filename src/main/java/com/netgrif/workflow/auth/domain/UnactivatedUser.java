@@ -28,6 +28,7 @@ public class UnactivatedUser {
     @NotNull
     @NotBlank
     @Email
+    @Column(unique = true)
     @Getter
     @Setter
     private String email;
@@ -54,6 +55,7 @@ public class UnactivatedUser {
     }
 
     public UnactivatedUser(String email, String token) {
+        this();
         this.email = email;
         this.token = token;
     }
@@ -82,14 +84,14 @@ public class UnactivatedUser {
         return separate(this.processRoles, String::new);
     }
 
-    private static <T> String join(Set<T> objs) {
+    public static <T> String join(Set<T> objs) {
         StringBuilder builder = new StringBuilder();
         objs.forEach(o -> builder.append(o).append(VALUE_SEPARATOR));
         builder.deleteCharAt(builder.length() - 1);
         return builder.toString();
     }
 
-    private static <T> Set<T> separate(String str, Function<String, T> parser) {
+    public static <T> Set<T> separate(String str, Function<String, T> parser) {
         Set<T> s = new LinkedHashSet<>();
         Set<String> items = Arrays.stream(str.split(VALUE_SEPARATOR)).collect(Collectors.toSet());
         items.forEach(item -> s.add(parser.apply(item)));
