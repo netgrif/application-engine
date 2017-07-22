@@ -83,7 +83,7 @@ public class UserController {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @RequestMapping(value = "/organization", method = RequestMethod.GET)
+    @RequestMapping(value = "/organizations", method = RequestMethod.GET)
     public OrganizationsResource getAllOrganizations(){
         return new OrganizationsResource(userService.getAllOrganizations());
     }
