@@ -400,7 +400,7 @@ public class TaskService implements ITaskService {
                 });
         useCase.updateActivePlaces();
 
-        taskRepository.delete(taskId);
+        task.setUserId(null);
         caseRepository.save(useCase);
         reloadTasks(useCase);
 
