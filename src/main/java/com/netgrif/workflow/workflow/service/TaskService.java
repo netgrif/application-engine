@@ -401,6 +401,7 @@ public class TaskService implements ITaskService {
         useCase.updateActivePlaces();
 
         task.setUserId(null);
+        task = taskRepository.save(task);
         caseRepository.save(useCase);
         reloadTasks(useCase);
 
