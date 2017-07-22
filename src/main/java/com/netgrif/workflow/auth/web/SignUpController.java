@@ -1,9 +1,9 @@
 package com.netgrif.workflow.auth.web;
 
-import com.netgrif.workflow.auth.domain.Token;
-import com.netgrif.workflow.auth.domain.User;
-import com.netgrif.workflow.auth.service.interfaces.ITokenService;
+import com.netgrif.workflow.auth.domain.UnactivatedUser;
+import com.netgrif.workflow.auth.service.interfaces.IUnactivatedUserService;
 import com.netgrif.workflow.auth.service.interfaces.IUserService;
+import com.netgrif.workflow.auth.web.requestbodies.NewUserRequest;
 import com.netgrif.workflow.auth.web.requestbodies.RegistrationRequest;
 import com.netgrif.workflow.mail.IMailService;
 import com.netgrif.workflow.workflow.web.responsebodies.MessageResource;
@@ -35,7 +35,7 @@ public class SignUpController {
     private IUserService userService;
 
     @Autowired
-    private ITokenService tokenService;
+    private IUnactivatedUserService unactivatedUserService;
 
     @Autowired
     private IMailService mailService;
@@ -48,40 +48,34 @@ public class SignUpController {
 
     @RequestMapping(method = RequestMethod.POST)
     public MessageResource registration(@RequestBody RegistrationRequest regRequest) {
-        if (tokenService.authorizeToken(regRequest.email, regRequest.token)) {
-            regRequest.password = new String(Base64.getDecoder().decode(regRequest.password));
-            User user = new User(regRequest.email, regRequest.password, regRequest.name, regRequest.surname);
-            userService.saveNew(user);
+        if(!unactivatedUserService.authorizeToken(regRequest.email, regRequest.token))
+            return MessageResource.errorMessage("Registration of " + regRequest.email + " has failed! Invalid token!");
 
-            return MessageResource.successMessage("Registration complete");
-        } else {
-            return MessageResource.errorMessage("Registration of "+regRequest.email+" failed!");
-        }
+        regRequest.password = new String(Base64.getDecoder().decode(regRequest.password));
+        userService.saveNew(unactivatedUserService.createUser(regRequest));
+
+        return MessageResource.successMessage("Registration complete");
     }
 
     @PreAuthorize("hasRole('ADMIN')")
     @RequestMapping(value = "/invite", method = RequestMethod.POST)
-    public MessageResource invite(@RequestBody String email) {
+    public MessageResource invite(@RequestBody NewUserRequest newUserRequest) {
         try {
-            String mail = URLDecoder.decode(email.split("=")[1], StandardCharsets.UTF_8.name());
-            Token token = tokenService.createToken(mail);
-            mailService.sendRegistrationEmail(mail, token.getHashedToken());
+            newUserRequest.email = URLDecoder.decode(newUserRequest.email, StandardCharsets.UTF_8.name());
+            UnactivatedUser user = unactivatedUserService.createUnactivatedUser(newUserRequest);
+            mailService.sendRegistrationEmail(user.getEmail(), user.getToken());
 
-            return MessageResource.successMessage("Mail was sent to "+mail);
+            return MessageResource.successMessage("Mail was sent to " + user.getEmail());
         } catch (MessagingException | UnsupportedEncodingException | UnknownHostException e) {
             log.error(e.toString());
-            return MessageResource.errorMessage("Sending mail to "+email+" failed!");
+            return MessageResource.errorMessage("Sending mail to " + newUserRequest.email + " failed!");
         }
     }
 
     @RequestMapping(value = "/token", method = RequestMethod.POST)
     public MessageResource getEmail(@RequestBody String token) {
-        String email = tokenService.getEmail(token);
-        if (email != null) {
-            return MessageResource.successMessage(email);
-        } else {
-            return MessageResource.errorMessage("Bad token!");
-        }
+        String email =  unactivatedUserService.getEmail(token);
+        return email != null ? MessageResource.successMessage(email) : MessageResource.errorMessage("Bad token!");
     }
 
 
