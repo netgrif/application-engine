@@ -45,4 +45,8 @@ public class Organization {
     public void addUser(User user){
         this.users.add(user);
     }
+
+    public Long getEntityId(){
+        return id;
+    }
 }
