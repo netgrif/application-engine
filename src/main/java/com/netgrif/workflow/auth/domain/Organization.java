@@ -24,7 +24,7 @@ public class Organization {
     private String name;
 
     @JsonIgnore
-    @ManyToMany(mappedBy = "organizations")
+    @ManyToMany(mappedBy = "organizations", fetch = FetchType.LAZY)
     @Getter @Setter
     private Set<User> users;
 
