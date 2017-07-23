@@ -20,6 +20,8 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 @RestController()
@@ -94,6 +96,18 @@ public class WorkflowController {
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
             return new DataFieldsResource(new ArrayList<>(), null);
+        }
+    }
+
+    @RequestMapping(value = "/case/{caseId}/field/{fieldId}", method = RequestMethod.GET)
+    public List<Case> getCaseFieldChoices(@PathVariable("caseId") String caseId, @PathVariable("fieldId") String fieldId, Pageable pageable) {
+        try {
+            caseId = URLDecoder.decode(caseId, StandardCharsets.UTF_8.name());
+            fieldId = URLDecoder.decode(fieldId, StandardCharsets.UTF_8.name());
+            return workflowService.getCaseFieldChoices(pageable, caseId, fieldId);
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+            return new LinkedList<>();
         }
     }
 }
