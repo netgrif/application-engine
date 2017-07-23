@@ -170,6 +170,10 @@ public class MongoSearchService<T> {
         return builder.toString();
     }
 
+    public static String exists(boolean val){
+        return "{$exists:"+val+"}";
+    }
+
     public static Object resolveDataValue(Object val, String type) {
         switch (type) {
             case "string":
