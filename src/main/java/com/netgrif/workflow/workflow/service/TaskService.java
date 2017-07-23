@@ -2,7 +2,6 @@ package com.netgrif.workflow.workflow.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.auth.domain.User;
@@ -279,8 +278,14 @@ public class TaskService implements ITaskService {
         values.fields().forEachRemaining(entry -> {
             useCase.getDataSet().get(entry.getKey()).setValue(parseFieldsValues(entry.getValue()));
             //changedFields.put(entry.getKey(), new ChangedField(entry.getKey()));
-            changedFields.putAll(resolveActions(useCase.getPetriNet().getDataSet().get(entry.getKey()),
-                    Action.ActionTrigger.SET, useCase, useCase.getPetriNet().getTransition(task.getTransitionId())));
+            resolveActions(useCase.getPetriNet().getDataSet().get(entry.getKey()),
+                    Action.ActionTrigger.SET, useCase, useCase.getPetriNet().getTransition(task.getTransitionId()))
+                    .forEach((key, changedField) -> {
+                        if (changedFields.containsKey(changedField.getId()))
+                            changedFields.get(changedField.getId()).merge(changedField);
+                        else
+                            changedFields.put(changedField.getId(), changedField);
+                    });
             //changedFields.remove(entry.getKey());
         });
 
@@ -395,7 +400,8 @@ public class TaskService implements ITaskService {
                 });
         useCase.updateActivePlaces();
 
-        taskRepository.delete(taskId);
+        task.setUserId(null);
+        task = taskRepository.save(task);
         caseRepository.save(useCase);
         reloadTasks(useCase);
 
@@ -482,15 +488,15 @@ public class TaskService implements ITaskService {
     /**
      * Reloads all unassigned tasks of given case:
      * <table border="1">
-     *     <tr>
-     *         <td></td><td>Task is present</td><td>Task is not present</td>
-     *     </tr>
-     *     <tr>
-     *         <td>Transition executable</td><td>no action</td><td>create task</td>
-     *     </tr>
-     *     <tr>
-     *         <td>Transition not executable</td><td>destroy task</td><td>no action</td>
-     *     </tr>
+     * <tr>
+     * <td></td><td>Task is present</td><td>Task is not present</td>
+     * </tr>
+     * <tr>
+     * <td>Transition executable</td><td>no action</td><td>create task</td>
+     * </tr>
+     * <tr>
+     * <td>Transition not executable</td><td>destroy task</td><td>no action</td>
+     * </tr>
      * </table>
      */
     @Transactional

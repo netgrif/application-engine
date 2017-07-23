@@ -11,6 +11,8 @@ import com.netgrif.workflow.petrinet.web.responsebodies.TransitionReference;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.Transition;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.BasicQuery;
 import org.springframework.stereotype.Service;
 import org.xml.sax.SAXException;
 
@@ -29,6 +31,9 @@ public class PetriNetService implements IPetriNetService {
 
     @Autowired
     private PetriNetRepository repository;
+
+    @Autowired
+    private MongoTemplate mongoTemplate;
 
     @Override
     public void importPetriNet(File xmlFile, String name, String initials) throws IOException, SAXException, ParserConfigurationException {
@@ -98,5 +103,20 @@ public class PetriNetService implements IPetriNetService {
         }));
 
         return dataRefs;
+    }
+
+    public List<PetriNetReference> getAllAccessibleReferences(LoggedUser user){
+        StringBuilder builder = new StringBuilder(8+(user.getProcessRoles().size()*50));
+        builder.append("{$or:[");
+        user.getProcessRoles().forEach(role -> {
+            builder.append("{\"roles.");
+            builder.append(role);
+            builder.append("\":{$exists:true}},");
+        });
+        builder.deleteCharAt(builder.length() - 1);
+        builder.append("]}");
+        BasicQuery query = new BasicQuery(builder.toString(),"{_id:1,title:1}");
+        List<PetriNet> nets = mongoTemplate.find(query, PetriNet.class);
+        return nets.stream().map(PetriNetReference::new).collect(Collectors.toList());
     }
 }
