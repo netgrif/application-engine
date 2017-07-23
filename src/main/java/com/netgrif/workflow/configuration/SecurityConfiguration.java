@@ -1,5 +1,6 @@
 package com.netgrif.workflow.configuration;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,6 +8,7 @@ import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.core.env.Environment;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -19,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.security.Principal;
+import java.util.stream.Stream;
 
 @Configuration
 @Controller
@@ -27,6 +30,16 @@ import java.security.Principal;
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     private static final Logger log = LoggerFactory.getLogger(SecurityConfiguration.class);
+
+    private final String[] PERMIT_ALL_STATIC_PATTERNS = {
+            "/bower_components/**","/scripts/**","/assets/**","/styles/**","/views/**","/**/favicon.ico"
+    };
+    private final String[] PERMIT_ALL_SERVER_PATTERNS = {
+            "/index.html", "/", "/login", "/signup/{token}", "/signup", "/signup/token"
+    };
+
+    @Autowired
+    private Environment env;
 
     @Autowired
     private UserDetailsService userDetailsService;
@@ -58,8 +71,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         http
             .httpBasic().and()
             .authorizeRequests()
-                .antMatchers("/bower_components/**","/scripts/**","/assets/**","/styles/**","/views/**","/**/favicon.ico").permitAll()
-                .antMatchers("/index.html", "/", "/login", "/signup/{token}", "/signup", "/signup/token").permitAll()
+                .antMatchers(getPatterns()).permitAll()
                 .anyRequest().authenticated()
             .and()
             .formLogin()
@@ -67,5 +79,12 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             .and()
             .csrf()//.disable();
                 .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse());
+    }
+
+    private String[] getPatterns() {
+        String[] patterns = (String[]) ArrayUtils.addAll(PERMIT_ALL_STATIC_PATTERNS, PERMIT_ALL_SERVER_PATTERNS);
+        if (Stream.of(env.getActiveProfiles()).anyMatch(it -> it.equals("dev")))
+            patterns = (String[]) ArrayUtils.add(patterns, "/dev/**");
+        return patterns;
     }
 }
