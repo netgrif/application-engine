@@ -1,5 +1,6 @@
 package com.netgrif.workflow.petrinet.service;
 
+import com.netgrif.workflow.auth.domain.Authority;
 import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.importer.Importer;
 import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository;
@@ -10,6 +11,8 @@ import com.netgrif.workflow.petrinet.web.responsebodies.TransitionReference;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.Transition;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.BasicQuery;
 import org.springframework.stereotype.Service;
 import org.xml.sax.SAXException;
 
@@ -28,6 +31,9 @@ public class PetriNetService implements IPetriNetService {
 
     @Autowired
     private PetriNetRepository repository;
+
+    @Autowired
+    private MongoTemplate mongoTemplate;
 
     @Override
     public void importPetriNet(File xmlFile, String name, String initials) throws IOException, SAXException, ParserConfigurationException {
@@ -57,8 +63,18 @@ public class PetriNetService implements IPetriNetService {
     @Override
     public List<PetriNetReference> getAllReferences(LoggedUser user) {
         List<PetriNet> nets = loadAll();
+        if(user.getAuthorities().contains(new Authority(Authority.admin)))
+            return nets.stream().map(net -> new PetriNetReference(net.get_id().toString(),net.getTitle())).collect(Collectors.toList());
         return nets.stream().filter(net -> net.getRoles().keySet().stream().anyMatch(user.getProcessRoles()::contains))
                 .map(net -> new PetriNetReference(net.get_id().toString(), net.getTitle())).collect(Collectors.toList());
+    }
+
+    @Override
+    public PetriNetReference getReferenceByTitle(LoggedUser user, String title){
+        List<PetriNet> nets = repository.findByTitle(title);
+        return nets.stream().filter(net -> net.getRoles().keySet().stream().anyMatch(user.getProcessRoles()::contains))
+                .map(net -> new PetriNetReference(net.get_id().toString(), net.getTitle())).findFirst().orElse(new PetriNetReference("",""));
+
     }
 
     @Override
@@ -87,5 +103,20 @@ public class PetriNetService implements IPetriNetService {
         }));
 
         return dataRefs;
+    }
+
+    public List<PetriNetReference> getAllAccessibleReferences(LoggedUser user){
+        StringBuilder builder = new StringBuilder(8+(user.getProcessRoles().size()*50));
+        builder.append("{$or:[");
+        user.getProcessRoles().forEach(role -> {
+            builder.append("{\"roles.");
+            builder.append(role);
+            builder.append("\":{$exists:true}},");
+        });
+        builder.deleteCharAt(builder.length() - 1);
+        builder.append("]}");
+        BasicQuery query = new BasicQuery(builder.toString(),"{_id:1,title:1}");
+        List<PetriNet> nets = mongoTemplate.find(query, PetriNet.class);
+        return nets.stream().map(PetriNetReference::new).collect(Collectors.toList());
     }
 }

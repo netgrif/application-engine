@@ -3,6 +3,7 @@ package com.netgrif.workflow.workflow.domain;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.petrinet.domain.roles.RolePermission;
+import com.netgrif.workflow.workflow.domain.triggers.Trigger;
 import lombok.Getter;
 import lombok.Setter;
 import org.bson.types.ObjectId;
@@ -34,11 +35,8 @@ public class Task {
     @Getter @Setter
     private String caseTitle;
 
-    @Getter
-    private String visualId;
-
-    @Getter
-    private int priority;
+    @Getter @Setter
+    private Integer priority;
 
     @Setter
     private Long userId;
@@ -63,6 +61,12 @@ public class Task {
     @Getter @Setter
     private String transactionId;
 
+    @Getter @Setter
+    private Boolean requiredFilled;
+
+//    @Getter @Setter
+//    private String icon;
+
     public Task() {
         this._id = new ObjectId();
         roles = new HashMap<>();
@@ -80,15 +84,6 @@ public class Task {
 
     public String getStringId() {
         return _id.toString();
-    }
-
-    public void setVisualId(String petriNetInitials) {
-        // TODO: 9.5.2017 bullshit remove now!
-        this.visualId = petriNetInitials+"-"+this._id;
-    }
-
-    public void setPriority(int priority) {
-        this.priority = priority == Priorities.UNDEFINED ? Priorities.LOW : priority;
     }
 
     public String getTransitionId() {
@@ -113,17 +108,13 @@ public class Task {
         return triggers;
     }
 
+    public void addTrigger(Trigger trigger) {
+        triggers.add(trigger);
+    }
+
     @JsonIgnore
     public Long getUserId() {
         return userId;
-    }
-
-    public static class Priorities {
-        public static final int HIGH = 3;
-        public static final int MEDIUM = 2;
-        public static final int LOW = 1;
-        public static final int UNDEFINED = 0;
-
     }
 
     public enum Type {

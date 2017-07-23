@@ -3,28 +3,31 @@ package com.netgrif.workflow.petrinet.domain.dataset
 import org.springframework.data.mongodb.core.mapping.Document
 
 @Document
-public class MultichoiceField extends Field<Set<String>> {
+class MultichoiceField extends ChoiceField<Set<String>> {
 
-    private Set<String> choices;
-
-    public MultichoiceField() {
-        super();
-        value = new HashSet<>();
-        choices = new HashSet<>();
+    MultichoiceField() {
+        super()
+        value = new HashSet<>()
     }
 
-    public MultichoiceField(String[] values) {
-        this();
-        if (values != null) {
-            choices.addAll(Arrays.asList(values));
-        }
+    MultichoiceField(String[] values) {
+        super(values)
     }
 
-    public void setValue(List<String> value) {
-        this.value = new HashSet<>(value);
+    @Override
+    void setDefaultValue(String value) {
+        String[] vls = value.split(",")
+        vls.each { s -> s.trim() }
+        this.defaultValue = new HashSet<String>(vls as Set)
     }
 
-    Set<String> getChoices() {
-        return choices
+    @Override
+    void clearValue() {
+        super.clearValue()
+        setValue(getDefaultValue())
+    }
+
+    void setValue(List<String> value) {
+        this.value = new HashSet<>(value)
     }
 }

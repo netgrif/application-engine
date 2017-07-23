@@ -3,18 +3,19 @@ package com.netgrif.workflow.workflow.domain;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.Place;
+import com.netgrif.workflow.petrinet.domain.dataset.Field;
+import com.netgrif.workflow.petrinet.domain.dataset.FieldWithDefault;
 import lombok.Getter;
 import lombok.Setter;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.mapping.Field;
 
 import javax.validation.constraints.NotNull;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.ThreadLocalRandom;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Document
 public class Case {
@@ -28,29 +29,47 @@ public class Case {
     @Setter
     private PetriNet petriNet;
 
-    @Field("activePlaces")
-    @Getter @Setter
+    @org.springframework.data.mongodb.core.mapping.Field("activePlaces")
+    @Getter
+    @Setter
     @JsonIgnore
     private Map<String, Integer> activePlaces;
 
     @NotNull
-    @Getter @Setter
+    @Getter
+    @Setter
     private String title;
 
     @Getter
     private String color;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     @JsonIgnore
-    private Map<String, DataField> dataSet;
+    private LinkedHashMap<String, DataField> dataSet;
+
+    @Getter
+    @Setter
+    @JsonIgnore
+    private Set<String> immediateDataFields;
+
+    @Getter
+    @Setter
+    @Transient
+    private List<Field> immediateData;
 
     @Getter @Setter
     private Long author;
 
+    @Getter @Setter
+    private Map<String, Integer> resetArcTokens;
+
     public Case() {
         _id = new ObjectId();
         activePlaces = new HashMap<>();
-        dataSet = new HashMap<>();
+        dataSet = new LinkedHashMap<>();
+        immediateDataFields = new LinkedHashSet<>();
+        resetArcTokens = new HashMap<>();
     }
 
     public Case(String title) {
@@ -62,6 +81,8 @@ public class Case {
         this(title);
         this.petriNet = petriNet;
         this.activePlaces = activePlaces;
+        populateDataSet();
+        this.immediateDataFields = this.petriNet.getImmediateFields().stream().map(Field::getObjectId).collect(Collectors.toSet());
     }
 
     public ObjectId get_id() {
@@ -94,23 +115,27 @@ public class Case {
         activePlaces.put(id, newTokens);
     }
 
-    public boolean hasFieldBehavior(String field, String transition){
+    public boolean hasFieldBehavior(String field, String transition) {
         return this.dataSet.get(field).hasDefinedBehavior(transition);
     }
 
-    public String getVisualId(){
-        int n = _id.getTimestamp()+title.length();
-        if(this.petriNet != null) return petriNet.getInitials()+"-"+n;
-        return n+"";
+    public String getVisualId() {
+        int n = _id.getTimestamp() + title.length();
+        if (this.petriNet != null) return petriNet.getInitials() + "-" + n;
+        return n + "";
     }
 
-    public String getPetriNetId(){
-        if(this.petriNet != null) return petriNet.getStringId();
+    public String getPetriNetId() {
+        if (this.petriNet != null) return petriNet.getStringId();
         return null;
     }
 
     public void updateActivePlaces() {
         activePlaces = petriNet.getActivePlaces();
+    }
+
+    public void addImmediateDataField(String fieldId) {
+        this.immediateDataFields.add(fieldId);
     }
 
     private void removeTokensFromActivePlace(Place place, Integer tokens) {
@@ -124,5 +149,14 @@ public class Case {
 
     private boolean isActivePlace(Place place) {
         return activePlaces.containsKey(place.getStringId());
+    }
+
+    private void populateDataSet(){
+        petriNet.getDataSet().forEach((key, field) -> {
+            if (field instanceof FieldWithDefault)
+                this.dataSet.put(key, new DataField(((FieldWithDefault) field).getDefaultValue()));
+            else
+                this.dataSet.put(key, new DataField());
+        });
     }
 }

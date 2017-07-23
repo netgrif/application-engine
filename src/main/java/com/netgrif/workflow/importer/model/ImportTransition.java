@@ -2,6 +2,8 @@ package com.netgrif.workflow.importer.model;
 
 import lombok.Data;
 
+import java.util.Arrays;
+
 @Data
 public class ImportTransition {
 
@@ -11,7 +13,7 @@ public class ImportTransition {
 
     private RoleRef[] roleRef;
 
-    private DataRef[] dataRef;
+    private ImportDataGroup[] dataGroup;
 
     private Integer y;
 
@@ -20,4 +22,19 @@ public class ImportTransition {
     private ImportTrigger[] trigger;
 
     private TransactionRef transactionRef;
+
+    private Integer priority;
+
+    public Integer getPriority() {
+        return priority == null ? 0 : priority;
+    }
+
+    public DataRef[] getDataRef() {
+        if (dataGroup == null)
+            return null;
+        return Arrays.stream(dataGroup)
+                .map(ImportDataGroup::getDataRef)
+                .flatMap(Arrays::stream)
+                .toArray(DataRef[]::new);
+    }
 }
