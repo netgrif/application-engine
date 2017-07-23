@@ -82,7 +82,7 @@ public class WorkflowService implements IWorkflowService {
         } else
             request.put(key, nets.stream().map(PetriNetReference::getEntityId).collect(Collectors.toList()));
 
-        return setImmediateDataFields(searchService.search(request, pageable));
+        return setImmediateDataFields(searchService.search(request, pageable,Case.class));
     }
 
     @Override
