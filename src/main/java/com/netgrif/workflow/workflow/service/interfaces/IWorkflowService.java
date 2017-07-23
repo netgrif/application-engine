@@ -25,4 +25,6 @@ public interface IWorkflowService {
     List<Field> getData(String caseId);
 
     Page<Case> search(Map<String, Object> request, Pageable pageable, LoggedUser user);
+
+    List<Case> getCaseFieldChoices(Pageable pageable, String caseId, String fieldId);
 }

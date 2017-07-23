@@ -3,7 +3,7 @@ package com.netgrif.workflow.importer;
 import com.netgrif.workflow.importer.model.ImportData;
 import com.netgrif.workflow.petrinet.domain.dataset.*;
 
-import java.util.Arrays;
+import java.util.*;
 
 public final class ImportFieldFactory {
 
@@ -44,6 +44,9 @@ public final class ImportFieldFactory {
             case TABULAR:
                 field = buildTabularField(data);
                 break;
+            case CASEREF:
+                field = buildCaseField(data);
+                break;
             default:
                 throw new IllegalArgumentException(data.getType() + " is not a valid Field type");
         }
@@ -65,11 +68,16 @@ public final class ImportFieldFactory {
         return field;
     }
 
+    private CaseField buildCaseField(ImportData data) {
+        Map<Long, LinkedHashSet<Long>> netIds = new HashMap<>();
+        Arrays.stream(data.getDocumentRefs())
+                .forEach(documentRef -> netIds.put(documentRef.getId(), new LinkedHashSet<>(Arrays.asList(documentRef.getFields()))));
+        return new CaseField(netIds);
+    }
+
     private TabularField buildTabularField(ImportData data) {
         TabularField field = new TabularField();
-        Arrays.stream(data.getColumns().getData()).forEach(dataField -> {
-            field.addField(getField(dataField));
-        });
+        Arrays.stream(data.getColumns().getData()).forEach(dataField -> field.addField(getField(dataField)));
         return field;
     }
 
