@@ -1,6 +1,6 @@
 package com.netgrif.workflow.petrinet.domain.dataset
 
-abstract class ChoiceField<T> extends FieldWithDefault<T>{
+abstract class ChoiceField<T> extends FieldWithDefault<T> {
 
     private Set<String> choices
 
@@ -11,7 +11,7 @@ abstract class ChoiceField<T> extends FieldWithDefault<T>{
 
     ChoiceField(String[] values) {
         this()
-        if(values != null)
+        if (values != null)
             this.choices.addAll(values)
     }
 
