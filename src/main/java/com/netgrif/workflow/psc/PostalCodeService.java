@@ -10,6 +10,8 @@ public class PostalCodeService implements IPostalCodeService {
 
     @Autowired
     private PostalCodeRepository repository;
+    @Autowired
+    private PostalCodePostRequestService postRequestService;
 
     @Override
     public void createPostalCode(String code, String locality, String region, String regionCode) {
@@ -23,7 +25,12 @@ public class PostalCodeService implements IPostalCodeService {
 
     @Override
     public List<PostalCode> findByCode(String code) {
-        return repository.findByCode(code.replaceAll("\\s","").trim());
+        List<PostalCode> results = repository.findByCode(code.replaceAll("\\s","").trim());
+        if(results.isEmpty()){
+            //TODO: ošetriť requesty na poštu
+//            results = postRequestService.getByCode(code);
+        }
+        return results;
     }
 
     @Override

@@ -68,4 +68,9 @@ class ChangedField {
     int hashCode() {
         return id.hashCode()
     }
+
+    @Override
+    String toString() {
+        return attributes as String
+    }
 }
