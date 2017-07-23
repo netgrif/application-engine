@@ -50,7 +50,7 @@ public class TokenServiceTest {
         expired2.setEmail("test2@test.com");
         expired2.setToken("token2");
         //expired2.setExpirationDate(LocalDateTime.now().minusDays(10));
-        repository.save(expired);
+        repository.save(expired2);
 
         service.removeExpired();
 

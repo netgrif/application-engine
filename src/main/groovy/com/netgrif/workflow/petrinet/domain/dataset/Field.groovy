@@ -137,19 +137,19 @@ abstract class Field<T> {
         this.actions = actions
     }
 
-    void addAction(Action action){
-        if(this.actions == null)
+    void addAction(Action action) {
+        if (this.actions == null)
             this.actions = new LinkedHashSet<>()
-        if(action == null) return
+        if (action == null) return
 
         this.actions.add(action)
     }
 
-    void addAction(String action, String trigger){
-        this.addAction(new Action(action,trigger))
+    void addAction(String action, String trigger) {
+        this.addAction(new Action(action, trigger))
     }
 
-    void clearValue(){}
+    void clearValue() {}
 //operators overloading
     T plus(final Field field) {
         return this.value + field.value

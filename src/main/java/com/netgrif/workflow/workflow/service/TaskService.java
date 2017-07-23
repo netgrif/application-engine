@@ -34,6 +34,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.BasicQuery;
+import org.springframework.data.util.Pair;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -72,6 +73,9 @@ public class TaskService implements ITaskService {
     private MongoTemplate mongoTemplate;
 
     @Autowired
+    private TaskSearchService searchService;
+
+    @Autowired
     private TaskScheduler scheduler;
 
     @Autowired
@@ -105,6 +109,31 @@ public class TaskService implements ITaskService {
             return loadUsers(new PageImpl<>(tasks, pageable,
                     mongoTemplate.count(new BasicQuery(queryBuilder.toString(), "{_id:1}"), Task.class)));
         }
+    }
+
+    @Override
+    public Page<Task> search(Map<String, Object> request, Pageable pageable, LoggedUser user) {
+        if (request.containsKey("or")) {
+            if (((Map<String, Object>) request.get("or")).containsKey("role")) {
+                Object roles = ((Map<String, Object>) request.get("or")).get("role");
+                Set<String> union = new HashSet<>(user.getProcessRoles());
+                if (roles instanceof String)
+                    union.add((String)roles);
+                else if (roles instanceof List)
+                    union.addAll((List)roles);
+
+                ((Map<String, Object>) request.get("or")).put("role", new ArrayList<>(union));
+
+            } else
+                ((Map<String, Object>) request.get("or")).put("role", new ArrayList<>(user.getProcessRoles()));
+
+        } else {
+            Map<String, Object> orMap = new LinkedHashMap<>();
+            orMap.put("role", new ArrayList<>(user.getProcessRoles()));
+            request.put("or", orMap);
+        }
+
+        return loadUsers(searchService.search(request,pageable,Task.class));
     }
 
     @Override
@@ -249,7 +278,8 @@ public class TaskService implements ITaskService {
         return new ArrayList<>(transition.getDataGroups().values());
     }
 
-    public static Field buildField(Case useCase, String fieldId, boolean withValidation) {
+    @Override
+    public Field buildField(Case useCase, String fieldId, boolean withValidation) {
         Field field = useCase.getPetriNet().getDataSet().get(fieldId);
         field.setValue(useCase.getDataSet().get(fieldId).getValue());
         if (withValidation && field instanceof ValidableField && ((ValidableField) field).getValidationRules() != null)
@@ -259,13 +289,31 @@ public class TaskService implements ITaskService {
         return field;
     }
 
-    public static void resolveDataValues(Field field) {
+    public void resolveDataValues(Field field) {
         if (field instanceof DateField) {
             ((DateField) field).convertValue();
         } else if (field instanceof NumberField && field.getValue() instanceof Integer) {
             field.setValue(((Integer) field.getValue()).doubleValue());
         } else if (field instanceof MultichoiceField && field.getValue() instanceof List) {
             field.setValue(new HashSet<String>(((MultichoiceField) field).getValue()));
+        } else if (field instanceof CaseField && field.getValue() != null) {
+            CaseField caseField = (CaseField) field;
+            Case useCase = caseRepository.findOne(caseField.getValue());
+            PetriNet net = useCase.getPetriNet();
+
+            if (caseField.getConstraintNetIds() == null || !caseField.getConstraintNetIds().containsKey(net.getNetId()))
+                return;
+
+            Map<String, Object> values = caseField.getConstraintNetIds().get(net.getNetId()).stream().map(fieldId -> {
+                Optional<Field> optional = net.getDataSet().values().stream().filter(netField -> Objects.equals(netField.getImportId(), fieldId)).findFirst();
+                if (!optional.isPresent()) {
+                    throw new IllegalArgumentException("Field ["+fieldId+"] not present in net ["+net.getStringId()+"]");
+                }
+                String fieldStringId = optional.get().getObjectId();
+                return Pair.of(fieldStringId, useCase.getDataSet().get(fieldStringId).getValue());
+            }).collect(Collectors.toMap(Pair::getFirst, Pair::getSecond));
+
+            ((CaseField) field).setImmediateFieldValues(values);
         }
     }
 
