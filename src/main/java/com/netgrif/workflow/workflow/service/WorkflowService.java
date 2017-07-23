@@ -1,9 +1,11 @@
 package com.netgrif.workflow.workflow.service;
 
+import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.petrinet.domain.dataset.FieldWithDefault;
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
+import com.netgrif.workflow.petrinet.web.responsebodies.PetriNetReference;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.DataField;
 import com.netgrif.workflow.workflow.domain.repositories.CaseRepository;
@@ -18,9 +20,9 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.BasicQuery;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 import java.util.stream.LongStream;
 
 @Service
@@ -37,6 +39,9 @@ public class WorkflowService implements IWorkflowService {
 
     @Autowired
     private ITaskService taskService;
+
+    @Autowired
+    private CaseSearchService searchService;
 
     @Override
     public Case saveCase(Case useCase) {
@@ -65,6 +70,22 @@ public class WorkflowService implements IWorkflowService {
         return setImmediateDataFields(new PageImpl<Case>(useCases, pageable, mongoTemplate.count(new BasicQuery(queryString, "{_id:1}"), Case.class)));
     }
 
+    public Page<Case> search(Map<String, Object> request, Pageable pageable, LoggedUser user) {
+        String key = "petriNet";
+
+        List<PetriNetReference> nets = petriNetService.getAllAccessibleReferences(user);
+        if (request.containsKey(key)) {
+            Set<String> netIds = nets.stream().map(PetriNetReference::getEntityId).collect(Collectors.toSet());
+            if (request.get(key) instanceof String) netIds.add((String) request.get(key));
+            else if (request.get(key) instanceof List) netIds.addAll((List) request.get(key));
+            request.put(key, new ArrayList<>(netIds));
+
+        } else
+            request.put(key, nets.stream().map(PetriNetReference::getEntityId).collect(Collectors.toList()));
+
+        return setImmediateDataFields(searchService.search(request, pageable));
+    }
+
     @Override
     public Case createCase(String netId, String title, String color, Long authorId) {
         PetriNet petriNet = petriNetService.loadPetriNet(netId);
@@ -78,40 +99,40 @@ public class WorkflowService implements IWorkflowService {
 
     @Override
     public Page<Case> findAllByAuthor(Long authorId, String petriNet, Pageable pageable) {
-        String queryString = "{author:"+authorId+", petriNet:{$ref:\"petriNet\",$id:{$oid:\""+petriNet+"\"}}}";
+        String queryString = "{author:" + authorId + ", petriNet:{$ref:\"petriNet\",$id:{$oid:\"" + petriNet + "\"}}}";
         BasicQuery query = new BasicQuery(queryString);
-        query = (BasicQuery)query.with(pageable);
-        List<Case> cases = mongoTemplate.find(query,Case.class);
-        return setImmediateDataFields(new PageImpl<Case>(cases,pageable,mongoTemplate.count(new BasicQuery(queryString,"{_id:1}"),Case.class)));
+        query = (BasicQuery) query.with(pageable);
+        List<Case> cases = mongoTemplate.find(query, Case.class);
+        return setImmediateDataFields(new PageImpl<Case>(cases, pageable, mongoTemplate.count(new BasicQuery(queryString, "{_id:1}"), Case.class)));
     }
 
     @Override
-    public void deleteCase(String caseId){
+    public void deleteCase(String caseId) {
         repository.delete(caseId);
         taskService.deleteTasksByCase(caseId);
     }
 
-    public List<Field> getData(String caseId){
+    public List<Field> getData(String caseId) {
         Case useCase = repository.findOne(caseId);
         List<Field> fields = new ArrayList<>();
         useCase.getDataSet().forEach((id, dataField) -> {
-            if(dataField.isDisplayable() || useCase.getPetriNet().isDisplayableInAnyTransition(id)){
-                Field field = TaskService.buildField(useCase,id,false);
+            if (dataField.isDisplayable() || useCase.getPetriNet().isDisplayableInAnyTransition(id)) {
+                Field field = TaskService.buildField(useCase, id, false);
                 field.setBehavior(dataField.applyOnlyVisibleBehavior());
                 fields.add(field);
             }
         });
 
-        LongStream.range(0L,fields.size()).forEach(l -> fields.get((int)l).setOrder(l));
+        LongStream.range(0L, fields.size()).forEach(l -> fields.get((int) l).setOrder(l));
         return fields;
     }
 
-    private Page<Case> setImmediateDataFields(Page<Case> cases){
+    private Page<Case> setImmediateDataFields(Page<Case> cases) {
         cases.getContent().forEach(this::setImmediateDataFields);
         return cases;
     }
 
-    private Case setImmediateDataFields(Case useCase){
+    private Case setImmediateDataFields(Case useCase) {
         useCase.populateImmediateData();
         return useCase;
     }
