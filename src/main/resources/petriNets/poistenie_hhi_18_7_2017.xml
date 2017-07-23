@@ -856,9 +856,9 @@
             coeff: f.204003;
             change coeff about {
             if (field.value=="Slovenská republika")
-                return 1.0*coeff1 as Double;
+                return 1.0*coeff1.value as Double;
              if (field.value=="Európa")
-                return 1.2*coeff1 as Double;
+                return 1.2*coeff1.value as Double;
             }
         <!--@formatter:on-->
         </action>
@@ -5781,7 +5781,7 @@
             </dataRef>
         </dataGroup>
     </transition>
-    <!--todo============================= Vedlajsie stavby - action podlahova plocha, zmena na spoluucast =====================-->
+    <!--============================= Vedlajsie stavby =====================-->
     <transition>
         <id>413</id>
         <x>620</x>
@@ -7124,7 +7124,7 @@
             </dataRef>
         </dataGroup>
     </transition>
-    <!--================================= Domácnosť =====================-->
+    <!--todo============================= Domácnosť - check zodpovednost, uzemna platnost =====================-->
     <transition>
         <id>363</id>
         <x>620</x>
@@ -8028,7 +8028,7 @@
             </dataRef>
         </dataGroup>
     </transition>
-    <!--todo============================= Sumár - vzorce, zmazat spoluucast nehnutelnost a domacnost =====================-->
+    <!--================================= Sumár =====================-->
     <transition>
         <id>364</id>
         <x>620</x>
@@ -8116,6 +8116,12 @@
                     <behavior>visible</behavior>
                 </logic>
             </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>2</id>
+            <title></title>
+            <alignment>start</alignment>
+            <stretch>true</stretch>
             <!--ROČNÉ POISTNÉ CELKOM-->
             <dataRef>
                 <id>308004</id>
@@ -8123,6 +8129,12 @@
                     <behavior>visible</behavior>
                 </logic>
             </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>2</id>
+            <title></title>
+            <alignment>start</alignment>
+            <stretch>true</stretch>
             <!--PERIODICITA PLATBY POISTNÉHO-->
             <dataRef>
                 <id>108001</id>
@@ -8131,6 +8143,12 @@
                     <behavior>required</behavior>
                 </logic>
             </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>2</id>
+            <title></title>
+            <alignment>start</alignment>
+            <stretch>true</stretch>
             <!--KOMPLETNÉ POISTENIE-->
             <dataRef>
                 <id>308005</id>
@@ -8138,6 +8156,12 @@
                     <behavior>visible</behavior>
                 </logic>
             </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>2</id>
+            <title></title>
+            <alignment>start</alignment>
+            <stretch>true</stretch>
             <!--ZĽAVA ZA INÉ POISTENIE V PREMIUM-->
             <dataRef>
                 <id>108002</id>
@@ -8146,6 +8170,12 @@
                     <behavior>required</behavior>
                 </logic>
             </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>2</id>
+            <title></title>
+            <alignment>start</alignment>
+            <stretch>true</stretch>
             <!--OBCHODNÁ ZĽAVA-->
             <dataRef>
                 <id>108003</id>
@@ -8154,6 +8184,12 @@
                     <behavior>required</behavior>
                 </logic>
             </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>2</id>
+            <title></title>
+            <alignment>start</alignment>
+            <stretch>true</stretch>
             <!--BEŽNÉ POISTNÉ-->
             <dataRef>
                 <id>308006</id>
@@ -8546,65 +8582,69 @@
                 <perform>true</perform>
             </logic>
         </roleRef>
-        <!--Číslo ponuky-->
-        <dataRef>
-            <id>309001</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--Začiatok poistenia-->
-        <dataRef>
-            <id>109001</id>
-            <logic>
-                <behavior>required</behavior>
-                <behavior>editable</behavior>
-            </logic>
-        </dataRef>
-        <!--oistenie na dobu určitú-->
-        <dataRef>
-            <id>109002</id>
-            <logic>
-                <behavior>required</behavior>
-                <behavior>editable</behavior>
-            </logic>
-        </dataRef>
-        <!--Koniec poistenia-->
-        <dataRef>
-            <id>109003</id>
-            <logic>
-                <behavior>required</behavior>
-                <behavior>editable</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>109004</id>
-            <logic>
-                <behavior>editable</behavior>
-            </logic>
-        </dataRef>
-        <!--Číslo úverovej zmluvy-->
-        <dataRef>
-            <id>109005</id>
-            <logic>
-                <behavior>editable</behavior>
-            </logic>
-        </dataRef>
-        <!--Spôsob platenia-->
-        <dataRef>
-            <id>109006</id>
-            <logic>
-                <behavior>required</behavior>
-                <behavior>editable</behavior>
-            </logic>
-        </dataRef>
-        <!--Ponuka PDF-->
-        <dataRef>
-            <id>309003</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
+        <dataGroup>
+            <id>1</id>
+            <alignment>start</alignment>
+            <!--Číslo ponuky-->
+            <dataRef>
+                <id>309001</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!--Začiatok poistenia-->
+            <dataRef>
+                <id>109001</id>
+                <logic>
+                    <behavior>required</behavior>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <!--oistenie na dobu určitú-->
+            <dataRef>
+                <id>109002</id>
+                <logic>
+                    <behavior>required</behavior>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <!--Koniec poistenia-->
+            <dataRef>
+                <id>109003</id>
+                <logic>
+                    <behavior>required</behavior>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>109004</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <!--Číslo úverovej zmluvy-->
+            <dataRef>
+                <id>109005</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <!--Spôsob platenia-->
+            <dataRef>
+                <id>109006</id>
+                <logic>
+                    <behavior>required</behavior>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <!--Ponuka PDF-->
+            <dataRef>
+                <id>309003</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
     </transition>
     <!--================================= Údaje o zmluve=====================-->
     <transition>
@@ -8622,65 +8662,69 @@
                 <perform>true</perform>
             </logic>
         </roleRef>
-        <!--Číslo ponuky-->
-        <dataRef>
-            <id>309001</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--Začiatok poistenia-->
-        <dataRef>
-            <id>109001</id>
-            <logic>
-                <behavior>required</behavior>
-                <behavior>editable</behavior>
-            </logic>
-        </dataRef>
-        <!--oistenie na dobu určitú-->
-        <dataRef>
-            <id>109002</id>
-            <logic>
-                <behavior>required</behavior>
-                <behavior>editable</behavior>
-            </logic>
-        </dataRef>
-        <!--Koniec poistenia-->
-        <dataRef>
-            <id>109003</id>
-            <logic>
-                <behavior>required</behavior>
-                <behavior>editable</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>109004</id>
-            <logic>
-                <behavior>editable</behavior>
-            </logic>
-        </dataRef>
-        <!--Číslo úverovej zmluvy-->
-        <dataRef>
-            <id>109005</id>
-            <logic>
-                <behavior>editable</behavior>
-            </logic>
-        </dataRef>
-        <!--Spôsob platenia-->
-        <dataRef>
-            <id>109006</id>
-            <logic>
-                <behavior>required</behavior>
-                <behavior>editable</behavior>
-            </logic>
-        </dataRef>
-        <!--Ponuka PDF-->
-        <dataRef>
-            <id>309003</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
+        <dataGroup>
+            <id>1</id>
+            <alignment>start</alignment>
+            <!--Číslo ponuky-->
+            <dataRef>
+                <id>309001</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!--Začiatok poistenia-->
+            <dataRef>
+                <id>109001</id>
+                <logic>
+                    <behavior>required</behavior>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <!--oistenie na dobu určitú-->
+            <dataRef>
+                <id>109002</id>
+                <logic>
+                    <behavior>required</behavior>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <!--Koniec poistenia-->
+            <dataRef>
+                <id>109003</id>
+                <logic>
+                    <behavior>required</behavior>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>109004</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <!--Číslo úverovej zmluvy-->
+            <dataRef>
+                <id>109005</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <!--Spôsob platenia-->
+            <dataRef>
+                <id>109006</id>
+                <logic>
+                    <behavior>required</behavior>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <!--Ponuka PDF-->
+            <dataRef>
+                <id>309003</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
     </transition>
     <!--================================= Údaje o zmluve=====================-->
     <transition>
@@ -8698,65 +8742,69 @@
                 <perform>true</perform>
             </logic>
         </roleRef>
-        <!--Číslo ponuky-->
-        <dataRef>
-            <id>309001</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--Začiatok poistenia-->
-        <dataRef>
-            <id>109001</id>
-            <logic>
-                <behavior>required</behavior>
-                <behavior>editable</behavior>
-            </logic>
-        </dataRef>
-        <!--oistenie na dobu určitú-->
-        <dataRef>
-            <id>109002</id>
-            <logic>
-                <behavior>required</behavior>
-                <behavior>editable</behavior>
-            </logic>
-        </dataRef>
-        <!--Koniec poistenia-->
-        <dataRef>
-            <id>109003</id>
-            <logic>
-                <behavior>required</behavior>
-                <behavior>editable</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>109004</id>
-            <logic>
-                <behavior>editable</behavior>
-            </logic>
-        </dataRef>
-        <!--Číslo úverovej zmluvy-->
-        <dataRef>
-            <id>109005</id>
-            <logic>
-                <behavior>editable</behavior>
-            </logic>
-        </dataRef>
-        <!--Spôsob platenia-->
-        <dataRef>
-            <id>109006</id>
-            <logic>
-                <behavior>required</behavior>
-                <behavior>editable</behavior>
-            </logic>
-        </dataRef>
-        <!--Ponuka PDF-->
-        <dataRef>
-            <id>309003</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
+        <dataGroup>
+            <id>1</id>
+            <alignment>start</alignment>
+            <!--Číslo ponuky-->
+            <dataRef>
+                <id>309001</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!--Začiatok poistenia-->
+            <dataRef>
+                <id>109001</id>
+                <logic>
+                    <behavior>required</behavior>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <!--oistenie na dobu určitú-->
+            <dataRef>
+                <id>109002</id>
+                <logic>
+                    <behavior>required</behavior>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <!--Koniec poistenia-->
+            <dataRef>
+                <id>109003</id>
+                <logic>
+                    <behavior>required</behavior>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>109004</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <!--Číslo úverovej zmluvy-->
+            <dataRef>
+                <id>109005</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <!--Spôsob platenia-->
+            <dataRef>
+                <id>109006</id>
+                <logic>
+                    <behavior>required</behavior>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <!--Ponuka PDF-->
+            <dataRef>
+                <id>309003</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
     </transition>
 
     <!--================================= ZRUŠENIE NÁVRHU =====================-->
