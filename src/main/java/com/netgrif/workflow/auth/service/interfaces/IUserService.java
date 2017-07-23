@@ -1,5 +1,6 @@
 package com.netgrif.workflow.auth.service.interfaces;
 
+import com.netgrif.workflow.auth.domain.Organization;
 import com.netgrif.workflow.auth.domain.User;
 import org.springframework.stereotype.Service;
 
@@ -22,4 +23,6 @@ public interface IUserService {
     Set<User> findByProcessRoles(Set<String> roleIds);
 
     void assignAuthority(Long userId, Long authorityId);
+
+    List<Organization> getAllOrganizations();
 }

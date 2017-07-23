@@ -12,35 +12,45 @@ import com.netgrif.workflow.importer.Importer
 import com.netgrif.workflow.petrinet.domain.PetriNet
 import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository
 import com.netgrif.workflow.workflow.domain.Case
-import com.netgrif.workflow.workflow.domain.DataField
 import com.netgrif.workflow.workflow.domain.repositories.CaseRepository
 import com.netgrif.workflow.workflow.service.TaskService
+import org.apache.log4j.Logger
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 
 @Component
 class InsuranceImporter {
 
+    private static final Logger log = Logger.getLogger(InsuranceImporter.class.name)
+
     @Autowired
     private PetriNetRepository petriNetRepository
+
     @Autowired
     private IUserService userService
+
     @Autowired
     private OrganizationRepository organizationRepository
+
     @Autowired
     private CaseRepository caseRepository
+
     @Autowired
     private UserProcessRoleRepository userProcessRoleRepository
+
     @Autowired
     private AuthorityRepository authorityRepository
+
     @Autowired
     private TaskService taskService
+
     @Autowired
     private Importer importer
 
 
     void run(String... strings) throws Exception {
-        def net = importer.importPetriNet(new File("src/main/resources/petriNets/poistenie_rozsirene.xml"), "Poistenie", "INS")
+        log.info("Importing of Petri net Insurance")
+        def net = importer.importPetriNet(new File("src/main/resources/petriNets/poistenie_hhi_18_7_2017.xml"), "Insurance", "INS")
         def documentLifeCycleNet = importer.importPetriNet(new File("src/main/resources/petriNets/document-lifecycle.xml"), "Dokument", "DOC")
 
         def orgs = createOrganizations()
@@ -50,23 +60,26 @@ class InsuranceImporter {
     }
 
     private Map<String, Organization> createOrganizations() {
+        log.info("Creating organizations")
         Map<String, Organization> orgs = new HashMap<>()
-        orgs.put("premium", organizationRepository.save(new Organization("PREMIUM Insurance Company Limited")))
+        orgs.put("insurance", organizationRepository.save(new Organization("Insurance Company")))
         return orgs
     }
 
     private Map<String, Authority> createAuthorities() {
+        log.info("Creating authorities")
         Map<String, Authority> auths = new HashMap<>()
         auths.put(Authority.user, authorityRepository.save(new Authority(Authority.user)))
         return auths
     }
 
     private void createUsers(Map<String, Organization> orgs, Map<String, Authority> auths, PetriNet net, PetriNet documentNet) {
+        log.info("Creating users")
         def agentRole = userProcessRoleRepository.save(new UserProcessRole(
                 roleId: net.roles.values().find { it -> it.name == "Agent" }.objectId
         ))
-        def systemRole = userProcessRoleRepository.save(new UserProcessRole(
-                roleId: net.roles.values().find { it -> it.name == "System" }.objectId
+        def premiumRole = userProcessRoleRepository.save(new UserProcessRole(
+                roleId: net.roles.values().find { it -> it.name == "Premium" }.objectId
         ))
         def documentAdminRole = userProcessRoleRepository.save(new UserProcessRole(
                 roleId: documentNet.roles.values().find { it -> it.name == "Admin" }.objectId
@@ -74,73 +87,66 @@ class InsuranceImporter {
         def documentAgentRole = userProcessRoleRepository.save(new UserProcessRole(
                 roleId: documentNet.roles.values().find { it -> it.name == "Agent" }.objectId
         ))
+
         User agent = new User(
-                name: "Fero",
-                surname: "Poisťovák",
-                email: "agent@premium.com",
+                name: "Agent",
+                surname: "Smith",
+                email: "agent@company.com",
                 password: "password",
                 authorities: [auths.get(Authority.user)] as Set<Authority>,
-                organizations: [orgs.get("premium")] as Set<Organization>)
+                organizations: [orgs.get("insurance")] as Set<Organization>)
         agent.addProcessRole(agentRole)
         agent.addProcessRole(documentAgentRole)
-        User user = new User(
-                name: "Ján",
-                surname: "Kováč",
-                email: "admin@premium.com",
+        userService.saveNew(agent)
+        log.info("User $agent.name $agent.surname created")
+
+        User premium = new User(
+                name: "Premium",
+                surname: "Worker",
+                email: "user@premium-ic.com",
                 password: "password",
                 authorities: [auths.get(Authority.user)] as Set<Authority>,
-                organizations: [orgs.get("premium")] as Set<Organization>)
-        user.addProcessRole(agentRole)
-        user.addProcessRole(documentAdminRole)
-        User system = new User(
-                name: "System",
-                surname: "System",
-                email: "system@premium.com",
-                password: "password",
-                authorities: [auths.get(Authority.user)] as Set<Authority>)
-        system.addProcessRole(systemRole)
-        userService.saveNew(agent)
-        userService.saveNew(user)
-        userService.saveNew(system)
+                organizations: [orgs.get("insurance")] as Set<Organization>)
+        premium.addProcessRole(premiumRole)
+        premium.addProcessRole(documentAgentRole)
+        userService.saveNew(premium)
+        log.info("User $premium.name $premium.surname created")
+
+        User zatko = new User(
+                name: "Ondrej",
+                surname: "Zaťko",
+                email: "ondrej.zatko@premium-ic.sk",
+                password: "premiumIC2017",
+                authorities: [auths.get(Authority.user)] as Set<Authority>,
+                organizations: [orgs.get("insurance")] as Set<Organization>)
+        zatko.addProcessRole(agentRole)
+        zatko.addProcessRole(documentAdminRole)
+        userService.saveNew(zatko)
+        log.info("User $zatko.name $zatko.surname created")
     }
 
-    private void createCases(PetriNet net) {
-        Case useCase = new Case(
-                title: "Poistenie nehnuteľnosti",
-                petriNet: net,
-                color: StartRunner.randomColor())
-        useCase.dataSet = new HashMap<>(net.dataSet.collectEntries { [(it.key): new DataField()] })
-        useCase.activePlaces.put(net.places.find { it -> it.value.title == "E" }.key, 1)
-        useCase.activePlaces.put(net.places.find { it -> it.value.title == "F" }.key, 1)
-        useCase.activePlaces.put(net.places.find { it -> it.value.title == "G" }.key, 1)
-        useCase.activePlaces.put(net.places.find { it -> it.value.title == "K" }.key, 1)
-        useCase.activePlaces.put(net.places.find { it -> it.value.title == "I" }.key, 1)
-        useCase.activePlaces.put(net.places.find { it -> it.value.title == "J" }.key, 1)
-        useCase.setAuthor(1L)
-        caseRepository.save(useCase)
-        net.initializeTokens(useCase.activePlaces)
-        taskService.createTasks(useCase)
+    private void createCases(PetriNet net){
+        createCase("Prvé poistenie", net,1L)
+        Case useCase= createCase("Druhé poistenie",net,1L)
 
-        useCase = new Case(
-                title: "Poistenie domu",
-                petriNet: net,
-                color: StartRunner.randomColor())
-        useCase.dataSet = new HashMap<>(net.dataSet.collectEntries { [(it.key): new DataField()] })
-        useCase.activePlaces.put(net.places.find { it -> it.value.title == "B" }.key, 1)
-        useCase.setAuthor(1L)
-        caseRepository.save(useCase)
-        net.initializeTokens(useCase.activePlaces)
-        taskService.createTasks(useCase)
+        //        def field = net.dataSet .find {  it.value.name == "How many adults 18 or over live in the property"}.value
+        //        field.value = 5
+        //        def js = FieldValidationRunner.toJavascript(field,field.validationRules)
+        //        def valid = FieldValidationRunner.validate(field,field.validationRules)
+        //        field.validationJS(js)
 
-        useCase = new Case(
-                title: "Poistenie domácnosti",
-                petriNet: net,
-                color: StartRunner.randomColor())
-        useCase.dataSet = new HashMap<>(net.dataSet.collectEntries { [(it.key): new DataField()] })
-        useCase.activePlaces.put(net.places.find { it -> it.value.title == "C" }.key, 1)
-        useCase.setAuthor(1L)
+        //def field =useCase.petriNet.dataSet.values().find { v -> v.name == "Ponuka PDF"}
+        //def file = new Insurance(useCase,(FileField)field).offerPDF()
+                //println file
+    }
+
+    private Case createCase(String title, PetriNet net, Long author){
+        Case useCase = new Case(title,net,net.getActivePlaces())
+        useCase.setColor(StartRunner.randomColor())
+        useCase.setAuthor(author)
         useCase = caseRepository.save(useCase)
-        net.initializeTokens(useCase.activePlaces)
         taskService.createTasks(useCase)
+        log.info("Case $title created")
+        return useCase
     }
 }
