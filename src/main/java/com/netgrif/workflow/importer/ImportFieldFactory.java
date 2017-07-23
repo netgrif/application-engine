@@ -44,6 +44,9 @@ public final class ImportFieldFactory {
             case TABULAR:
                 field = buildTabularField(data);
                 break;
+            case CASEREF:
+                field = buildCaseField(data);
+                break;
             default:
                 throw new IllegalArgumentException(data.getType() + " is not a valid Field type");
         }
@@ -65,11 +68,14 @@ public final class ImportFieldFactory {
         return field;
     }
 
+    private CaseField buildCaseField(ImportData data) {
+        Long[] ids = Arrays.stream(data.getValues()).map(Long::parseLong).toArray(Long[]::new);
+        return new CaseField(ids);
+    }
+
     private TabularField buildTabularField(ImportData data) {
         TabularField field = new TabularField();
-        Arrays.stream(data.getColumns().getData()).forEach(dataField -> {
-            field.addField(getField(dataField));
-        });
+        Arrays.stream(data.getColumns().getData()).forEach(dataField -> field.addField(getField(dataField)));
         return field;
     }
 

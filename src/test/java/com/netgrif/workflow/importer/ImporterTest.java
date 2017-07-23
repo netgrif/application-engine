@@ -66,6 +66,13 @@ public class ImporterTest {
         assert net != null;
     }
 
+    @Test
+    public void caseRefTest() {
+        PetriNet net = importer.importPetriNet(new File("src/test/resources/caseref_test.xml"), "Caseref test", "CRT");
+
+        assert net != null;
+    }
+
     private void assertNetProperlyImported() {
         assert repository.count() == 1;
         PetriNet net = repository.findAll().get(0);
