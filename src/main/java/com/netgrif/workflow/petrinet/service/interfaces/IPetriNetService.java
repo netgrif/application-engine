@@ -24,6 +24,8 @@ public interface IPetriNetService {
 
     List<PetriNetReference> getAllReferences(LoggedUser user);
 
+    List<PetriNetReference> getAllAccessibleReferences(LoggedUser user);
+
     PetriNetReference getReferenceByTitle(LoggedUser user, String title);
 
     List<TransitionReference> getTransitionReferences(List<String> netsIds, LoggedUser user);
