@@ -4,20 +4,21 @@ import org.springframework.data.annotation.Transient
 import org.springframework.data.mongodb.core.mapping.Document
 
 @Document
-public class NumberField extends ValidableField<Double> {
+class NumberField extends ValidableField<Double> {
 
     @Transient
     private Double minValue
+
     @Transient
     private Double maxValue
 
-    public NumberField() {
-        super();
+    NumberField() {
+        super()
         super.superSetDefaultValue(0)
     }
 
     @Override
-    public void setDefaultValue(String value){
+    void setDefaultValue(String value) {
         super.superSetDefaultValue(Double.parseDouble(value))
     }
 
