@@ -72,6 +72,9 @@ public class TaskService implements ITaskService {
     private MongoTemplate mongoTemplate;
 
     @Autowired
+    private TaskSearchService searchService;
+
+    @Autowired
     private TaskScheduler scheduler;
 
     @Autowired
@@ -105,6 +108,31 @@ public class TaskService implements ITaskService {
             return loadUsers(new PageImpl<>(tasks, pageable,
                     mongoTemplate.count(new BasicQuery(queryBuilder.toString(), "{_id:1}"), Task.class)));
         }
+    }
+
+    @Override
+    public Page<Task> search(Map<String, Object> request, Pageable pageable, LoggedUser user) {
+        if (request.containsKey("or")) {
+            if (((Map<String, Object>) request.get("or")).containsKey("role")) {
+                Object roles = ((Map<String, Object>) request.get("or")).get("role");
+                Set<String> union = new HashSet<>(user.getProcessRoles());
+                if (roles instanceof String)
+                    union.add((String)roles);
+                else if (roles instanceof List)
+                    union.addAll((List)roles);
+
+                ((Map<String, Object>) request.get("or")).put("role", new ArrayList<>(union));
+
+            } else
+                ((Map<String, Object>) request.get("or")).put("role", new ArrayList<>(user.getProcessRoles()));
+
+        } else {
+            Map<String, Object> orMap = new LinkedHashMap<>();
+            orMap.put("role", new ArrayList<>(user.getProcessRoles()));
+            request.put("or", orMap);
+        }
+
+        return loadUsers(searchService.search(request,pageable,Task.class));
     }
 
     @Override
