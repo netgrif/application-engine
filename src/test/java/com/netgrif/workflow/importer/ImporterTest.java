@@ -1,6 +1,7 @@
 package com.netgrif.workflow.importer;
 
 import com.netgrif.workflow.petrinet.domain.PetriNet;
+import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
@@ -13,6 +14,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.File;
+import java.util.List;
 
 @SpringBootTest
 @ActiveProfiles({"test"})
@@ -52,7 +54,7 @@ public class ImporterTest {
     public void priorityTest() {
         PetriNet net = importer.importPetriNet(new File("src/test/resources/priority_test.xml"), "Priority test", "PT");
 
-        assert  net != null;
+        assert net != null;
 
         Case useCase = workflowService.createCase(net.getStringId(), net.getTitle(), "color", 1L);
 
@@ -69,8 +71,18 @@ public class ImporterTest {
     @Test
     public void caseRefTest() {
         PetriNet net = importer.importPetriNet(new File("src/test/resources/caseref_test.xml"), "Caseref test", "CRT");
-
         assert net != null;
+
+        Case useCase = workflowService.createCase(net.getStringId(), net.getTitle(), "color", 1L);
+        assert useCase != null;
+
+        List<Field> data = workflowService.getData(useCase.getStringId());
+        assert data != null && data.size() > 0;
+
+        useCase.getDataSet().get(data.get(0).getObjectId()).setValue(useCase.getStringId());
+        workflowService.saveCase(useCase);
+        data = workflowService.getData(useCase.getStringId());
+        assert data != null && data.size() > 0;
     }
 
     private void assertNetProperlyImported() {
