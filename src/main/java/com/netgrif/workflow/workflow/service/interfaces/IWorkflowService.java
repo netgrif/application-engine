@@ -1,11 +1,13 @@
 package com.netgrif.workflow.workflow.service.interfaces;
 
+import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.workflow.domain.Case;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
+import java.util.Map;
 
 public interface IWorkflowService {
     Case saveCase(Case useCase);
@@ -21,4 +23,6 @@ public interface IWorkflowService {
     void deleteCase(String caseId);
 
     List<Field> getData(String caseId);
+
+    Page<Case> search(Map<String, Object> request, Pageable pageable, LoggedUser user);
 }
