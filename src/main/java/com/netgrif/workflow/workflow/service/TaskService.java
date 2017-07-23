@@ -266,6 +266,8 @@ public class TaskService implements ITaskService {
             field.setValue(((Integer) field.getValue()).doubleValue());
         } else if (field instanceof MultichoiceField && field.getValue() instanceof List) {
             field.setValue(new HashSet<String>(((MultichoiceField) field).getValue()));
+        } else if (field instanceof CaseField) {
+
         }
     }
 

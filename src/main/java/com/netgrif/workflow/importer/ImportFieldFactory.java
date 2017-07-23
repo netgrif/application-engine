@@ -3,7 +3,7 @@ package com.netgrif.workflow.importer;
 import com.netgrif.workflow.importer.model.ImportData;
 import com.netgrif.workflow.petrinet.domain.dataset.*;
 
-import java.util.Arrays;
+import java.util.*;
 
 public final class ImportFieldFactory {
 
@@ -69,8 +69,10 @@ public final class ImportFieldFactory {
     }
 
     private CaseField buildCaseField(ImportData data) {
-        Long[] ids = Arrays.stream(data.getValues()).map(Long::parseLong).toArray(Long[]::new);
-        return new CaseField(ids);
+        Map<Long, Set<Long>> netIds = new HashMap<>();
+        Arrays.stream(data.getDocumentRefs())
+                .forEach(documentRef -> netIds.put(documentRef.getId(), new HashSet<>(Arrays.asList(documentRef.getFields()))));
+        return new CaseField(netIds);
     }
 
     private TabularField buildTabularField(ImportData data) {

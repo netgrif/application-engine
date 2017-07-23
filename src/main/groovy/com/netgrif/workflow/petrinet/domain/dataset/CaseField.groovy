@@ -5,28 +5,35 @@ import org.springframework.data.mongodb.core.mapping.Document
 @Document
 class CaseField extends Field<String> {
 
-    private Long[] constraintNetIds
+    /**
+     * Stores PetriNet import id and immediate fields ids of given net
+     */
+    private Map<Long, Set<Long>> constraintNetIds
 
-    CaseField(Long[] netId) {
+    CaseField() {
         super()
+    }
+
+    CaseField(Map<Long, Set<Long>> netId) {
+        this()
         constraintNetIds = netId
     }
 
     @Override
     void setValue(String value) {
-        super.setValue(value)
+        this.value = value
     }
 
     @Override
     void clearValue() {
-        super.clearValue()
+        this.value = null
     }
 
-    Long[] getConstraintNetId() {
+    Map<Long, Set<Long>> getConstraintNetId() {
         return constraintNetIds
     }
 
-    void setConstraintNetId(Long[] constraintNetId) {
+    void setConstraintNetId(Map<Long, Set<Long>> constraintNetId) {
         this.constraintNetIds = constraintNetId
     }
 }

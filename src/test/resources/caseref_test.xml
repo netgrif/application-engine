@@ -5,8 +5,17 @@
     <data type="caseref">
         <id>1</id>
         <title>Case ref</title>
-        <values>1</values>
+        <documentRef>
+            <id>1</id>
+            <fields>2</fields>
+        </documentRef>
     </data>
+    <data type="text">
+        <id>2</id>
+        <title>Text</title>
+        <init>Initial value</init>
+    </data>
+
     <place>
         <id>1</id>
         <x>180</x>
@@ -29,6 +38,16 @@
         <y>140</y>
         <label>3</label>
         <priority>3</priority>
+        <dataGroup>
+            <id>1</id>
+            <title></title>
+            <dataRef>
+                <id>1</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
     </transition>
     <transition>
         <id>3</id>
@@ -36,6 +55,16 @@
         <y>220</y>
         <label>1</label>
         <priority>1</priority>
+        <dataGroup>
+            <id>1</id>
+            <title></title>
+            <dataRef>
+                <id>1</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
     </transition>
     <transition>
         <id>4</id>
@@ -43,6 +72,16 @@
         <y>300</y>
         <label>2</label>
         <priority>2</priority>
+        <dataGroup>
+            <id>1</id>
+            <title></title>
+            <dataRef>
+                <id>1</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
     </transition>
     <arc>
         <id>5</id>
