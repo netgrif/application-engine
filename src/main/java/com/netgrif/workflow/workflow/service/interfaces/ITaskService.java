@@ -52,4 +52,6 @@ public interface ITaskService {
     FileSystemResource getFile(String taskId, String fieldId);
 
     void deleteTasksByCase(String caseId);
+
+    Field buildField(Case useCase, String fieldId, boolean withValidation);
 }
