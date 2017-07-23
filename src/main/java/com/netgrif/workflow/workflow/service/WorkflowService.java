@@ -2,7 +2,9 @@ package com.netgrif.workflow.workflow.service;
 
 import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
+import com.netgrif.workflow.petrinet.domain.dataset.CaseField;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
+import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository;
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.workflow.petrinet.web.responsebodies.PetriNetReference;
 import com.netgrif.workflow.workflow.domain.Case;
@@ -17,10 +19,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.BasicQuery;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.LongStream;
 
@@ -29,6 +28,9 @@ public class WorkflowService implements IWorkflowService {
 
     @Autowired
     private CaseRepository repository;
+
+    @Autowired
+    private PetriNetRepository petriNetRepository;
 
     @Autowired
     private MongoTemplate mongoTemplate;
@@ -83,6 +85,20 @@ public class WorkflowService implements IWorkflowService {
             request.put(key, nets.stream().map(PetriNetReference::getEntityId).collect(Collectors.toList()));
 
         return setImmediateDataFields(searchService.search(request, pageable,Case.class));
+    }
+
+    @Override
+    public List<Case> getCaseFieldChoices(Pageable pageable, String caseId, String fieldId) {
+        Case useCase = repository.findOne(caseId);
+        CaseField field = (CaseField) useCase.getPetriNet().getDataSet().get(fieldId);
+
+        List<Case> list = new LinkedList<>();
+        field.getConstraintNetIds().forEach((netImportId, fieldImportIds) -> {
+            PetriNet net = petriNetRepository.findByNetId(netImportId);
+            list.addAll(repository.findAllByPetriNetId(net.getStringId()));
+        });
+
+        return list;
     }
 
     @Override
