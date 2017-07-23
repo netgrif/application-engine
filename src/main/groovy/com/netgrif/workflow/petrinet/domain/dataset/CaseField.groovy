@@ -16,6 +16,7 @@ class CaseField extends Field<String> {
 
     CaseField() {
         super()
+        immediateFieldValues = new HashMap<>()
     }
 
     CaseField(Map<Long, LinkedHashSet<Long>> netId) {
