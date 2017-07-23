@@ -7,17 +7,16 @@ import com.netgrif.workflow.petrinet.domain.dataset.logic.FieldBehavior;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class DataField {
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private Map<String, Set<FieldBehavior>> behavior;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private Object value;
 
     public DataField() {
@@ -29,43 +28,66 @@ public class DataField {
         this.value = value;
     }
 
-    public ObjectNode applyBehavior(String transition, ObjectNode json){
-        behavior.get(transition).forEach(behav -> json.put(behav.toString(),true));
+    public ObjectNode applyBehavior(String transition, ObjectNode json) {
+        behavior.get(transition).forEach(behav -> json.put(behav.toString(), true));
         return json;
     }
 
-    public ObjectNode applyBehavior(String transition){
+    public ObjectNode applyBehavior(String transition) {
         return applyBehavior(transition, JsonNodeFactory.instance.objectNode());
     }
 
-    public void addBehavior(String transition, Set<FieldBehavior> behavior){
-        if(hasDefinedBehavior(transition) && this.behavior.get(transition) != null)
+    public void addBehavior(String transition, Set<FieldBehavior> behavior) {
+        if (hasDefinedBehavior(transition) && this.behavior.get(transition) != null)
             this.behavior.get(transition).addAll(behavior);
         else
             this.behavior.put(transition, new HashSet<>(behavior));
     }
 
-    public boolean hasDefinedBehavior(String transition){
+    public ObjectNode applyOnlyVisibleBehavior(){
+        ObjectNode node = JsonNodeFactory.instance.objectNode();
+        node.put(FieldBehavior.VISIBLE.toString(),true);
+        return node;
+    }
+
+    public boolean hasDefinedBehavior(String transition) {
         return this.behavior.containsKey(transition);
     }
 
-    public void makeVisible(String transition){
-        this.behavior.get(transition).remove(FieldBehavior.EDITABLE);
-        this.behavior.get(transition).add(FieldBehavior.VISIBLE);
+    public boolean isDisplayable(String transition) {
+        return behavior.containsKey(transition) && (behavior.get(transition).contains(FieldBehavior.VISIBLE) ||
+                behavior.get(transition).contains(FieldBehavior.EDITABLE) ||
+                behavior.get(transition).contains(FieldBehavior.HIDDEN));
     }
 
-    public void makeEditable(String transition){
-        this.behavior.get(transition).remove(FieldBehavior.VISIBLE);
-        this.behavior.get(transition).add(FieldBehavior.EDITABLE);
+    public boolean isDisplayable(){
+        return behavior.values().stream().parallel()
+                .anyMatch(bs -> bs.contains(FieldBehavior.VISIBLE) || bs.contains(FieldBehavior.EDITABLE));
     }
 
-    public void makeRequired(String transition){
-        this.behavior.get(transition).remove(FieldBehavior.OPTIONAL);
-        this.behavior.get(transition).add(FieldBehavior.REQUIRED);
+    public void makeVisible(String transition) {
+        changeBehavior(FieldBehavior.VISIBLE, transition);
     }
 
-    public void makeOptional(String transition){
-        this.behavior.get(transition).remove(FieldBehavior.REQUIRED);
-        this.behavior.get(transition).add(FieldBehavior.OPTIONAL);
+    public void makeEditable(String transition) {
+        changeBehavior(FieldBehavior.EDITABLE, transition);
+    }
+
+    public void makeRequired(String transition) {
+        changeBehavior(FieldBehavior.REQUIRED, transition);
+    }
+
+    public void makeOptional(String transition) {
+        changeBehavior(FieldBehavior.OPTIONAL, transition);
+    }
+
+    public void makeHidden(String transition) {
+        changeBehavior(FieldBehavior.HIDDEN, transition);
+    }
+
+    private void changeBehavior(FieldBehavior behavior, String transition) {
+        List<FieldBehavior> tmp = Arrays.asList(behavior.getAntonyms());
+        tmp.forEach(beh -> this.behavior.get(transition).remove(beh));
+        this.behavior.get(transition).add(behavior);
     }
 }

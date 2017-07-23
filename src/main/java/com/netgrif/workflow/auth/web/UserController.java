@@ -4,6 +4,7 @@ import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.auth.service.interfaces.IAuthorityService;
 import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.auth.web.responsebodies.AuthoritiesResources;
+import com.netgrif.workflow.auth.web.responsebodies.OrganizationsResource;
 import com.netgrif.workflow.auth.web.responsebodies.UserResource;
 import com.netgrif.workflow.auth.web.responsebodies.UsersResource;
 import com.netgrif.workflow.petrinet.service.interfaces.IProcessRoleService;
@@ -81,5 +82,10 @@ public class UserController {
         return MessageResource.successMessage("Authority " + authorityId + " assigned to user " + userId);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
+    @RequestMapping(value = "/organizations", method = RequestMethod.GET)
+    public OrganizationsResource getAllOrganizations(){
+        return new OrganizationsResource(userService.getAllOrganizations());
+    }
 
 }

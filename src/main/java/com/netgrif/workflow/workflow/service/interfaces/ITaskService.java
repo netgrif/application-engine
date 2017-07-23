@@ -3,7 +3,9 @@ package com.netgrif.workflow.workflow.service.interfaces;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.auth.domain.User;
+import com.netgrif.workflow.petrinet.domain.DataGroup;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
+import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldContainer;
 import com.netgrif.workflow.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.Task;
@@ -13,9 +15,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Map;
 
 public interface ITaskService {
     Page<Task> getAll(LoggedUser loggedUser, Pageable pageable);
+
+    Page<Task> search(Map<String, Object> request, Pageable pageable, LoggedUser user);
 
     Page<Task> findByCases(Pageable pageable, List<String> cases);
 
@@ -37,13 +42,19 @@ public interface ITaskService {
 
     List<Field> getData(String taskId);
 
-    ObjectNode setDataFieldsValues(String taskId, ObjectNode values);
+    List<DataGroup> getDataGroups(String taskId);
+
+    ChangedFieldContainer setData(String taskId, ObjectNode values);
 
     void cancelTask(Long id, String taskId);
+
+    void delegateTask(Long userId, String delegatedEmail, String taskId) throws TransitionNotExecutableException;
 
     boolean saveFile(String taskId, String fieldId, MultipartFile multipartFile);
 
     FileSystemResource getFile(String taskId, String fieldId);
 
-    void delegateTask(String delegatedEmail, String taskId) throws TransitionNotExecutableException;
+    void deleteTasksByCase(String caseId);
+
+    Field buildField(Case useCase, String fieldId, boolean withValidation);
 }

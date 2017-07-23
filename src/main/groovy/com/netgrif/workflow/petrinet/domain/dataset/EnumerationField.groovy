@@ -3,23 +3,19 @@ package com.netgrif.workflow.petrinet.domain.dataset
 import org.springframework.data.mongodb.core.mapping.Document
 
 @Document
-public class EnumerationField extends Field<String> {
+class EnumerationField extends ChoiceField<String> {
 
-    private Set<String> choices;
-
-    public EnumerationField() {
-        super();
-        choices = new HashSet<>();
+    EnumerationField() {
+        super()
     }
 
-    public EnumerationField(String[] values) {
-        this();
-        if (values != null) {
-            choices.addAll(Arrays.asList(values));
-        }
+    EnumerationField(String[] values) {
+        super(values)
     }
 
-    Set<String> getChoices() {
-        return choices
+    @Override
+    void clearValue() {
+        super.clearValue()
+        setValue(getDefaultValue())
     }
 }

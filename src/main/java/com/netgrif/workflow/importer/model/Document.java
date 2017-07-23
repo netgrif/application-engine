@@ -1,10 +1,16 @@
 package com.netgrif.workflow.importer.model;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
 public class Document {
+
+    @Getter @Setter
+    private Long id;
 
     @XmlElement(name = "arc")
     private ImportArc[] arcs;
