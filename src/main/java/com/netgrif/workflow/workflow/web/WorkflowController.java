@@ -5,6 +5,7 @@ import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
 import com.netgrif.workflow.workflow.web.requestbodies.CreateCaseBody;
 import com.netgrif.workflow.workflow.web.responsebodies.*;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -20,10 +21,13 @@ import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @RestController()
 @RequestMapping("/res/workflow")
 public class WorkflowController {
+
+    private static final Logger log = Logger.getLogger(WorkflowController.class.getName());
 
     @Autowired
     private IWorkflowService workflowService;
@@ -91,5 +95,16 @@ public class WorkflowController {
             e.printStackTrace();
             return new DataFieldsResource(new ArrayList<>(),null);
         }
+    }
+
+    @RequestMapping(value = "/case/newsearch", method = RequestMethod.POST)
+    public PagedResources<CaseResource> search(@RequestBody Map<String, Object> searchBody, Pageable pageable, PagedResourcesAssembler<Case> assembler, Authentication auth){
+        log.info("Starting search");
+        Page<Case> cases = workflowService.search(searchBody,pageable,(LoggedUser)auth.getPrincipal());
+        Link selfLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(WorkflowController.class)
+                .search(searchBody, pageable, assembler,auth)).withRel("search");
+        PagedResources<CaseResource> resources = assembler.toResource(cases, new CaseResourceAssembler(), selfLink);
+        ResourceLinkAssembler.addLinks(resources, Case.class, selfLink.getRel());
+        return resources;
     }
 }
