@@ -56,7 +56,7 @@ class InsuranceImporter {
         def orgs = createOrganizations()
         def auths = createAuthorities()
         createUsers(orgs, auths, net, documentLifeCycleNet)
-        createCases(net)
+        createCases(net, documentLifeCycleNet)
     }
 
     private Map<String, Organization> createOrganizations() {
@@ -125,9 +125,11 @@ class InsuranceImporter {
         log.info("User $zatko.name $zatko.surname created")
     }
 
-    private void createCases(PetriNet net){
-        createCase("Prvé poistenie", net,1L)
-        Case useCase= createCase("Druhé poistenie",net,1L)
+    private void createCases(PetriNet insurance, PetriNet document){
+        createCase("Zmluvné podmienky", document, 4L)
+
+        createCase("Prvé poistenie", insurance,1L)
+        Case useCase= createCase("Druhé poistenie",insurance,1L)
 
         //        def field = net.dataSet .find {  it.value.name == "How many adults 18 or over live in the property"}.value
         //        field.value = 5
