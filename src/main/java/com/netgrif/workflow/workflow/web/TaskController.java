@@ -10,7 +10,6 @@ import com.netgrif.workflow.workflow.domain.Task;
 import com.netgrif.workflow.workflow.service.interfaces.IFilterService;
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
 import com.netgrif.workflow.workflow.web.requestbodies.CreateFilterBody;
-import com.netgrif.workflow.workflow.web.requestbodies.TaskSearchBody;
 import com.netgrif.workflow.workflow.web.responsebodies.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
@@ -28,8 +27,8 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletResponse;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
@@ -142,23 +141,24 @@ public class TaskController {
     }
 
     @RequestMapping(value = "/search", method = RequestMethod.POST)
-    public PagedResources<TaskResource> search(Authentication auth, Pageable pageable, @RequestBody TaskSearchBody searchBody, PagedResourcesAssembler<Task> assembler) {
-        Page<Task> page = null;
-        if (searchBody.searchTier == TaskSearchBody.SEARCH_TIER_1) {
-            page = taskService.findByPetriNets(pageable, searchBody.petriNets
-                    .stream()
-                    .map(net -> net.petriNet)
-                    .collect(Collectors.toList()));
-        } else if (searchBody.searchTier == TaskSearchBody.SEARCH_TIER_2) {
-            List<String> transitions = new ArrayList<>();
-            searchBody.petriNets.forEach(net -> transitions.addAll(net.transitions));
-            page = taskService.findByTransitions(pageable, transitions);
-        } else if (searchBody.searchTier == TaskSearchBody.SEARCH_TIER_3) {
-            //TODO: 4.6.2017 vyhľadanie na základe dát
-        }
+    public PagedResources<TaskResource> search(Authentication auth, Pageable pageable, @RequestBody Map<String, Object> searchBody, PagedResourcesAssembler<Task> assembler) {
+//        Page<Task> page = null;
+//        if (searchBody.searchTier == TaskSearchBody.SEARCH_TIER_1) {
+//            page = taskService.findByPetriNets(pageable, searchBody.petriNets
+//                    .stream()
+//                    .map(net -> net.petriNet)
+//                    .collect(Collectors.toList()));
+//        } else if (searchBody.searchTier == TaskSearchBody.SEARCH_TIER_2) {
+//            List<String> transitions = new ArrayList<>();
+//            searchBody.petriNets.forEach(net -> transitions.addAll(net.transitions));
+//            page = taskService.findByTransitions(pageable, transitions);
+//        } else if (searchBody.searchTier == TaskSearchBody.SEARCH_TIER_3) {
+//            //TODO: 4.6.2017 vyhľadanie na základe dát
+//        }
+        Page<Task> tasks = taskService.search(searchBody,pageable,(LoggedUser) auth.getPrincipal());
         Link selfLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
                 .search(auth, pageable, searchBody, assembler)).withRel("search");
-        PagedResources<TaskResource> resources = assembler.toResource(page,new TaskResourceAssembler(),selfLink);
+        PagedResources<TaskResource> resources = assembler.toResource(tasks,new TaskResourceAssembler(),selfLink);
         ResourceLinkAssembler.addLinks(resources,Task.class,selfLink.getRel());
         return resources;
     }
