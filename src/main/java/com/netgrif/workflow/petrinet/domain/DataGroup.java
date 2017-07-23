@@ -29,15 +29,19 @@ public class DataGroup extends PetriNetObject {
     @Getter @Setter
     private String alignment;
 
+    @Getter @Setter
+    private Boolean stretch;
+
     public DataGroup() {
         this._id = new ObjectId();
         this.data = new LinkedHashSet<>();
     }
 
-    public DataGroup(String title, String alignment) {
+    public DataGroup(String title, String alignment, Boolean stretch) {
         this();
         this.title = title;
         this.alignment = alignment;
+        this.stretch = stretch;
     }
 
     public void addData(String dataId) {
