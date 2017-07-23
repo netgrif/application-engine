@@ -31,19 +31,18 @@
         <action trigger="set">
             <!--@formatter:off-->
             field: f.this,
-            lokal: f.301002;
-            change lokal about {
-            if (field.value=="Bratislava")
-            return "BA";
-            if (field.value=="Levice")
-            return "Mesto";
-            if (field.value=="Zelenec")
-            return "Dedina";
-            if (field.value=="(Nitra")
-            return "Krajské mesto";
+            other: f.301006;
+            change other choices {
+                def postal = psc byLocality,field.value;
+                return postal?.first()?.locality;
             }
             <!--@formatter:on-->
         </action>
+    </data>
+    <data type="enumeration">
+        <id>301005</id>
+        <title>Obec</title>
+        <values></values>
     </data>
     <data type="text">
         <title>PSČ</title>
@@ -54,11 +53,16 @@
             field: f.this,
             obec: f.301001;
             change obec about {
-            def postal = psc byCode,field.value;
-            return postal?.first()?.locality;
+                def postal = psc byCode,field.value;
+                return postal?.first()?.locality;
             }
             <!--@formatter:on-->
         </action>
+    </data>
+    <data type="enumeration">
+        <id>301006</id>
+        <title>PSČ</title>
+        <values></values>
     </data>
     <data type="enumeration">
         <title>Lokalita</title>
@@ -75,13 +79,13 @@
             coeff: f.201001;
             change coeff about {
             if (field.value=="BA")
-            return 3.5 as Double;
+                return 3.5 as Double;
             if (field.value=="Mesto")
-            return 3.7 as Double;
+                return 3.7 as Double;
             if (field.value=="Dedina")
-            return 2.5 as Double;
+                return 2.5 as Double;
             if (field.value=="(Krajské mesto")
-            return 3.1 as Double;
+                return 3.1 as Double;
             }
             <!--@formatter:on-->
         </action>
@@ -401,14 +405,12 @@
         </action>
     </data>
     <data type="text">
-        <!--todo: normalize-->
-        <id>9998</id>
+        <id>301003</id>
         <title>Trestne stíhaný - kontrola</title>
         <init>nemaz ma</init>
     </data>
     <data type="text">
-        <!--todo: normalize-->
-        <id>9999</id>
+        <id>301004</id>
         <title>Upozorenie</title>
         <init>Nemožno dokončiť kalkuláciu v prípade trestne stíhaných osôb</init>
     </data>
@@ -565,9 +567,9 @@
             field: f.this,
             coeff: f.202005;
             change coeff about {
-            if (field.value)
-            return 1.5 as Double;
-            return 1.2 as Double;
+                if (field.value)
+                    return 1.5 as Double;
+                return 1.0 as Double;
             }
         <!--@formatter:on-->
         </action>
@@ -620,6 +622,14 @@
             check: f.this,
             trans: t.364,
             other: f.305002;
+            make other,visible on trans when { check.value != null }
+            <!--@formatter:on-->
+        </action>
+        <action trigger="set">
+            <!--@formatter:off-->
+            check: f.this,
+            trans: t.364,
+            other: f.308001;
             make other,visible on trans when { check.value != null }
             <!--@formatter:on-->
         </action>
@@ -721,6 +731,14 @@
             check: f.this,
             trans: t.364,
             other: f.306001;
+            make other,visible on trans when { check.value != null }
+            <!--@formatter:on-->
+        </action>
+        <action trigger="set">
+            <!--@formatter:off-->
+            check: f.this,
+            trans: t.364,
+            other: f.308002;
             make other,visible on trans when { check.value != null }
             <!--@formatter:on-->
         </action>
@@ -838,9 +856,9 @@
             coeff: f.204003;
             change coeff about {
             if (field.value=="Slovenská republika")
-            return 1.0*204002 as Double;
+                return 1.0*coeff1 as Double;
              if (field.value=="Európa")
-            return 1.2*204002 as Double;
+                return 1.2*coeff1 as Double;
             }
         <!--@formatter:on-->
         </action>
@@ -903,13 +921,13 @@
             coeff: f.205003;
             change coeff about {
             if (location.value=="BA")
-            return 1400*field.value as Double;
+                return 1400*field.value as Double;
             if (location.value=="Dedina")
-            return 550*field.value as Double;
+                return 550*field.value as Double;
             if (location.value=="Mesto")
-            return 800*field.value as Double;
+                return 800*field.value as Double;
             if (location.value=="Krajské mesto")
-            return 900*field.value as Double;
+                return 900*field.value as Double;
             }
         <!--@formatter:on-->
         </action>
@@ -1036,7 +1054,6 @@
         <!--}-->
         <!--</action>-->
     </data>
-
     <!-- ===== Doplnkové poistenie nehnuteľnosti ===== -->
     <data type="boolean">
         <title>Garáž</title>
@@ -1159,6 +1176,7 @@
     <data type="boolean">
         <title>Rovnaké miesto poistenia garáže?</title>
         <id>105008</id>
+        <init>true</init>
         <action trigger="set">
             <!--@formatter:off-->
             field: f.this,
@@ -1185,6 +1203,7 @@
             }
         <!--@formatter:on-->
         </action>
+        <!--show-->
         <action trigger="set">
             <!--@formatter:off-->
             field: f.this,
@@ -1196,11 +1215,20 @@
         <action trigger="set">
             <!--@formatter:off-->
             field: f.this,
+            other: f.105010,
+            trans: t.413;
+            make other,required on trans when { field.value }
+        <!--@formatter:on-->
+        </action>
+        <action trigger="set">
+            <!--@formatter:off-->
+            field: f.this,
             other: f.305004,
             trans: t.413;
             make other,visible on trans when { field.value }
         <!--@formatter:on-->
         </action>
+        <!--hide-->
         <action trigger="set">
             <!--@formatter:off-->
             field: f.this,
@@ -1291,6 +1319,7 @@
             }
         <!--@formatter:on-->
         </action>
+        <!--show-->
         <action trigger="set">
             <!--@formatter:off-->
             field: f.this,
@@ -1307,6 +1336,7 @@
             make other,visible on trans when { field.value }
         <!--@formatter:on-->
         </action>
+        <!--hide-->
         <action trigger="set">
             <!--@formatter:off-->
             field: f.this,
@@ -1509,9 +1539,9 @@
             field: f.this,
             coeff: f.205011;
             change coeff about {
-            if (field.value)
-            return 1.0 as Double;
-            return 0 as Double;
+                if (field.value)
+                    return 1.0 as Double;
+                return 0 as Double;
             }
         <!--@formatter:on-->
         </action>
@@ -2031,6 +2061,40 @@
         }
         <!--@formatter:on-->
         </action>
+        <action trigger="set">
+            <!--@formatter:off-->
+            check: f.this,
+            trans: t.364,
+            other: f.106002;
+            make other,required on trans when { check.value != null }
+            <!--@formatter:on-->
+        </action>
+        <action trigger="set">
+            <!--@formatter:off-->
+            check: f.this,
+            trans: t.364,
+            other: f.106002;
+            make other,editable on trans when { check.value != null }
+            <!--@formatter:on-->
+        </action>
+        <action trigger="set">
+            <!--@formatter:off-->
+            check: f.this,
+            trans: t.364,
+            other: f.306001;
+            make other,visible on trans when { check.value != null }
+            <!--@formatter:on-->
+        </action>
+        <action trigger="set">
+            <!--@formatter:off-->
+            f1: f.102001,
+            f2: f.106001,
+            other: f.308005;
+            change other about {
+                return Boolean.logicalAnd(f1.value != null, f2.value != null);
+            }
+            <!--@formatter:on-->
+        </action>
     </data>
     <data type="number">
         <title>Poistenie domácnosti - poistná suma</title>
@@ -2043,9 +2107,9 @@
             bic: f.201017,
             sum: f.306001;
             change sum about {
-            return (field.value*excess.value*ppc.value*bic.value)/1000 as Double;
+                return (field.value*excess.value*ppc.value*bic.value)/1000 as Double;
             }
-        <!--@formatter:on-->
+            <!--@formatter:on-->
         </action>
     </data>
     <data type="number">
@@ -2065,7 +2129,7 @@
             c10: f.306010,
             sum: f.308002;
             change sum about {
-            return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value;
+                return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value;
             }
         <!--@formatter:on-->
         </action>
@@ -2552,7 +2616,7 @@
             c6: f.208007,
             sum: f.308006;
             change sum about {
-            return c1.value*c2.value*c3.value*c4.value*c5.value*c6.value as Double;
+                return (Math.round(100.0*c1.value*c2.value*c3.value*c4.value*c5.value*c6.value/4.0)/100.0)*4.0 as Double;
             }
         <!--@formatter:on-->
         </action>
@@ -2587,7 +2651,7 @@
             c6: f.208007,
             sum: f.308006;
             change sum about {
-            return c1.value*c2.value*c3.value*c4.value*c5.value*c6.value as Double;
+                return (Math.round(100.0*c1.value*c2.value*c3.value*c4.value*c5.value*c6.value/4.0)/100.0)*4.0 as Double;
             }
         <!--@formatter:on-->
         </action>
@@ -2616,7 +2680,7 @@
             c6: f.208007,
             sum: f.308006;
             change sum about {
-            return c1.value*c2.value*c3.value*c4.value*c5.value*c6.value as Double;
+                return (Math.round(100.0*c1.value*c2.value*c3.value*c4.value*c5.value*c6.value/4.0)/100.0)*4.0 as Double;
             }
         <!--@formatter:on-->
         </action>
@@ -2645,7 +2709,7 @@
             c6: f.208007,
             sum: f.308006;
             change sum about {
-            return c1.value*c2.value*c3.value*c4.value*c5.value*c6.value as Double;
+                return (Math.round(100.0*c1.value*c2.value*c3.value*c4.value*c5.value*c6.value/4.0)/100.0)*4.0 as Double;
             }
         <!--@formatter:on-->
         </action>
@@ -2689,7 +2753,7 @@
             c6: f.208007,
             sum: f.308006;
             change sum about {
-            return c1.value*c2.value*c3.value*c4.value*c5.value*c6.value as Double;
+                return (Math.round(100.0*c1.value*c2.value*c3.value*c4.value*c5.value*c6.value/4.0)/100.0)*4.0 as Double;
             }
         <!--@formatter:on-->
         </action>
@@ -2718,7 +2782,7 @@
             c6: f.208007,
             sum: f.308006;
             change sum about {
-            return c1.value*c2.value*c3.value*c4.value*c5.value*c6.value as Double;
+                return (Math.round(100.0*c1.value*c2.value*c3.value*c4.value*c5.value*c6.value/4.0)/100.0)*4.0 as Double;
             }
         <!--@formatter:on-->
         </action>
@@ -2910,7 +2974,7 @@
     <data type="number">
         <title>Koeficient - Koľko dospelých žije v domácnosti?</title>
         <id>201007</id>
-        <init>0.95</init>
+        <init>1</init>
         <action trigger="set">
             <!--@formatter:off-->
             c1: f.201001,
@@ -3206,7 +3270,7 @@
     <data type="number">
         <title>ZÁKLADNÉ INFORMÁCIE koeficient</title>
         <id>201017</id>
-        <int>0.95</int>
+        <init>1</init>
     </data>
     <!-- ===== Nehnuteľnosť koeficienty ===== -->
     <data type="number">
@@ -3228,9 +3292,9 @@
             c6: f.202006,
             c7: f.202007,
             c8: f.202008,
-            sum: f.201009;
+            sum: f.202009;
             change sum about {
-            return c1.value*c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value;
+                return c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value;
             }
         <!--@formatter:on-->
         </action>
@@ -3249,9 +3313,9 @@
             c6: f.202006,
             c7: f.202007,
             c8: f.202008,
-            sum: f.201009;
+            sum: f.202009;
             change sum about {
-            return c1.value*c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value;
+                return c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value;
             }
         <!--@formatter:on-->
         </action>
@@ -3270,9 +3334,9 @@
             c6: f.202006,
             c7: f.202007,
             c8: f.202008,
-            sum: f.201009;
+            sum: f.202009;
             change sum about {
-            return c1.value*c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value;
+                return c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value;
             }
         <!--@formatter:on-->
         </action>
@@ -3291,9 +3355,9 @@
             c6: f.202006,
             c7: f.202007,
             c8: f.202008,
-            sum: f.201009;
+            sum: f.202009;
             change sum about {
-            return c1.value*c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value;
+                return c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value;
             }
         <!--@formatter:on-->
         </action>
@@ -3312,9 +3376,9 @@
             c6: f.202006,
             c7: f.202007,
             c8: f.202008,
-            sum: f.201009;
+            sum: f.202009;
             change sum about {
-            return c1.value*c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value;
+                return c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value;
             }
         <!--@formatter:on-->
         </action>
@@ -3333,9 +3397,9 @@
             c6: f.202006,
             c7: f.202007,
             c8: f.202008,
-            sum: f.201009;
+            sum: f.202009;
             change sum about {
-            return c1.value*c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value;
+                return c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value;
             }
         <!--@formatter:on-->
         </action>
@@ -3354,9 +3418,9 @@
             c6: f.202006,
             c7: f.202007,
             c8: f.202008,
-            sum: f.201009;
+            sum: f.202009;
             change sum about {
-            return c1.value*c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value;
+                return c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value;
             }
         <!--@formatter:on-->
         </action>
@@ -3375,9 +3439,9 @@
             c6: f.202006,
             c7: f.202007,
             c8: f.202008,
-            sum: f.201009;
+            sum: f.202009;
             change sum about {
-            return c1.value*c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value;
+                return c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value;
             }
         <!--@formatter:on-->
         </action>
@@ -3391,6 +3455,7 @@
     <data type="number">
         <title>Koeficient - Poistenie domácnosti - spoluúčasť</title>
         <id>208002</id>
+        <init>1</init>
     </data>
     <data type="number">
         <title>Koeficient - Umiestnenie domácnosti</title>
@@ -3500,39 +3565,48 @@
     <data type="number">
         <title>Koeficient - Poistenie zodpovednosti z vlastníctva nehnuteľnosti</title>
         <id>204001</id>
+        <init>0</init>
     </data>
     <data type="number">
         <title>Koeficient - Zodpovednosť za škodu členov domácnosti</title>
         <id>204002</id>
+        <init>0</init>
     </data>
     <data type="number">
         <title>Koeficient - Územná platnosť poistenia</title>
         <id>204003</id>
+        <init>1</init>
     </data>
     <data type="number">
         <title>Koeficient - Zodpovednosť celkovo</title>
         <id>204004</id>
+        <init>0</init>
     </data>
     <!-- ===== Sumár koeficienty ===== -->
     <data type="number">
         <title>Koeficient - PERIODICITA PLATBY POISTNÉHO</title>
         <id>208004</id>
+        <init>1</init>
     </data>
     <data type="number">
         <title>Koeficient - ZĽAVA ZA INÉ POISTENIE V PREMIUM</title>
         <id>208005</id>
+        <init>1</init>
     </data>
     <data type="number">
         <title>Koeficient - OBCHODNÁ ZĽAVA</title>
         <id>208006</id>
+        <init>1</init>
     </data>
     <data type="number">
         <title>Koeficient - AKCIOVÁ ZĽAVA</title>
         <id>208007</id>
+        <init>1</init>
     </data>
     <data type="number">
         <title>Koeficient - KOMPLETNÉ POISTENIE</title>
         <id>208008</id>
+        <init>1</init>
     </data>
     <!-- ===== Poistenie nehnuteľností koeficienty ===== -->
     <data type="number">
@@ -4836,7 +4910,7 @@
     </data>
     <!-- Miesto poistenia -->
     <data type="boolean">
-        <title>Rovnaká ako trvalý pobyt</title>
+        <title>Rovnaké ako trvalý pobyt</title>
         <id>109035</id>
         <desc>Miesto poistenia</desc>
         <init>true</init>
@@ -5038,17 +5112,7 @@
             <!--@formatter:on-->
         </action>
     </data>
-
-
-
-
-
     <!--=================================TRANSITIONS================-->
-
-
-
-
-
     <!--================================= poistenie nehnuteľnosti DONE====================-->
     <transition>
         <id>2</id>
@@ -5241,7 +5305,7 @@
                     <behavior>required</behavior>
                     <action trigger="set">
                         field: f.101010,
-                        f_req: f.9998;
+                        f_req: f.301003;
                         change f_req about {
                             if (field.value)
                                 return null;
@@ -5251,26 +5315,26 @@
                     <action trigger="set">
                         field: f.this,
                         trans: t.this,
-                        f_err: f.9999;
+                        f_err: f.301004;
                         make f_err,visible on trans when { field.value; }
                     </action>
                     <action trigger="set">
                         field: f.this,
                         trans: t.this,
-                        f_err: f.9999;
+                        f_err: f.301004;
                         make f_err,hidden on trans when { !field.value; }
                     </action>
                 </logic>
             </dataRef>
             <dataRef>
-                <id>9998</id>
+                <id>301003</id>
                 <logic>
                     <behavior>required</behavior>
                     <behavior>hidden</behavior>
                 </logic>
             </dataRef>
             <dataRef>
-                <id>9999</id>
+                <id>301004</id>
                 <logic>
                     <behavior>hidden</behavior>
                 </logic>
@@ -5351,15 +5415,26 @@
                 <perform>true</perform>
             </logic>
         </roleRef>
-        <!--Predmet poistenia-->
         <dataGroup>
             <id>2</id>
             <title></title>
             <alignment>start</alignment>
+            <!--Predmet poistenia-->
             <dataRef>
                 <id>102001</id>
                 <logic>
+                    <behavior>required</behavior>
                     <behavior>editable</behavior>
+                    <action trigger="set">
+                        <!--@formatter:off-->
+                        f1: f.102001,
+                        f2: f.106001,
+                        other: f.308005;
+                        change other about {
+                            return Boolean.logicalAnd(f1.value != null, f2.value != null);
+                        }
+                        <!--@formatter:on-->
+                    </action>
                 </logic>
             </dataRef>
             <!--Poistenie nehnuteľnosti-Spoluúčasť-->
@@ -5465,6 +5540,12 @@
                         trans: t.this;
                         make other,editable on trans when { field.value; }
                     </action>
+                    <action trigger="set">
+                        field: f.this,
+                        other: f.107001,
+                        trans: t.this;
+                        make other,required on trans when { field.value; }
+                    </action>
                     <!--Hide-->
                     <action trigger="set">
                         field: f.this,
@@ -5516,61 +5597,69 @@
                     <behavior>editable</behavior>
                     <action trigger="set">
                         <!--@formatter:off-->
-            field: f.this,
-            coeff: f.205018;
-            change coeff about {
-                if (field.value)
-                    return 3.5 as Double;
-                return 0 as Double;
-            }
-            <!--@formatter:on-->
+                        field: f.this,
+                        coeff: f.205018;
+                        change coeff about {
+                            if (field.value)
+                                return 3.5 as Double;
+                            return 0 as Double;
+                        }
+                        <!--@formatter:on-->
                     </action>
                     <action trigger="set">
                         <!--@formatter:off-->
-            check: f.105031,
-            other: f.105032,
-            trans: t.414;
-            make other,editable on trans when { check.value }
-            <!--@formatter:on-->
+                        check: f.105031,
+                        other: f.105032,
+                        trans: t.414;
+                        make other,editable on trans when { check.value }
+                        <!--@formatter:on-->
                     </action>
                     <action trigger="set">
                         <!--@formatter:off-->
-            check: f.105031,
-            other: f.105032,
-            trans: t.414;
-            make other,hidden on trans when { !check.value }
-            <!--@formatter:on-->
+                        check: f.105031,
+                        other: f.105032,
+                        trans: t.414;
+                        make other,required on trans when { check.value }
+                        <!--@formatter:on-->
                     </action>
                     <action trigger="set">
                         <!--@formatter:off-->
-            check: f.105031,
-            other: f.305015,
-            trans: t.414;
-            make other,visible on trans when { check.value }
-            <!--@formatter:on-->
+                        check: f.105031,
+                        other: f.105032,
+                        trans: t.414;
+                        make other,hidden on trans when { !check.value }
+                        <!--@formatter:on-->
                     </action>
                     <action trigger="set">
                         <!--@formatter:off-->
-            check: f.105031,
-            other: f.305015,
-            trans: t.414;
-            make other,hidden on trans when { !check.value }
-            <!--@formatter:on-->
+                        check: f.105031,
+                        other: f.305015,
+                        trans: t.414;
+                        make other,visible on trans when { check.value }
+                        <!--@formatter:on-->
+                    </action>
+                    <action trigger="set">
+                        <!--@formatter:off-->
+                        check: f.105031,
+                        other: f.305015,
+                        trans: t.414;
+                        make other,hidden on trans when { !check.value }
+                        <!--@formatter:on-->
                     </action>
                     <!--Remove value-->
                     <action trigger="set">
                         <!--@formatter:off-->
-            check: f.105031,
-            other: f.105032;
-            change other about { null; }
-            <!--@formatter:on-->
+                        check: f.105031,
+                        other: f.105032;
+                        change other about { null; }
+                        <!--@formatter:on-->
                     </action>
                     <action trigger="set">
                         <!--@formatter:off-->
-            check: f.105031,
-            other: f.105032;
-            change other about { null; }
-            <!--@formatter:on-->
+                        check: f.105031,
+                        other: f.105032;
+                        change other about { null; }
+                        <!--@formatter:on-->
                     </action>
                 </logic>
             </dataRef>
@@ -5620,6 +5709,14 @@
                         other: f.105034,
                         trans: t.414;
                         make other,editable on trans when { check.value }
+                        <!--@formatter:on-->
+                    </action>
+                    <action trigger="set">
+                        <!--@formatter:off-->
+                        check: f.105033,
+                        other: f.105034,
+                        trans: t.414;
+                        make other,required on trans when { check.value }
                         <!--@formatter:on-->
                     </action>
                     <action trigger="set">
@@ -5711,11 +5808,19 @@
                     <behavior>editable</behavior>
                     <action trigger="set">
                         <!--@formatter:off-->
-                    isGarage: f.105035,
-                    trans: t.413,
-                    other: f.105004;
-                    make other,editable on trans when { isGarage.value }
-                <!--@formatter:on-->
+                            isGarage: f.105035,
+                            trans: t.413,
+                            other: f.105004;
+                            make other,editable on trans when { isGarage.value }
+                        <!--@formatter:on-->
+                    </action>
+                    <action trigger="set">
+                        <!--@formatter:off-->
+                            isGarage: f.105035,
+                            trans: t.413,
+                            other: f.105004;
+                            make other,required on trans when { isGarage.value }
+                        <!--@formatter:on-->
                     </action>
                     <action trigger="set">
                         <!--@formatter:off-->
@@ -5743,11 +5848,19 @@
                     </action>
                     <action trigger="set">
                         <!--@formatter:off-->
-                    isGarage: f.105035,
-                    trans: t.413,
-                    other: f.105007;
-                    make other,editable on trans when { isGarage.value }
-                <!--@formatter:on-->
+                            isGarage: f.105035,
+                            trans: t.413,
+                            other: f.105007;
+                            make other,editable on trans when { isGarage.value }
+                        <!--@formatter:on-->
+                    </action>
+                    <action trigger="set">
+                        <!--@formatter:off-->
+                            isGarage: f.105035,
+                            trans: t.413,
+                            other: f.105007;
+                            make other,required on trans when { isGarage.value }
+                        <!--@formatter:on-->
                     </action>
                     <action trigger="set">
                         <!--@formatter:off-->
@@ -5767,11 +5880,11 @@
                     </action>
                     <action trigger="set">
                         <!--@formatter:off-->
-                    isGarage: f.105035,
-                    trans: t.413,
-                    other: f.305003;
-                    make other,hidden on trans when { !isGarage.value }
-                <!--@formatter:on-->
+                            isGarage: f.105035,
+                            trans: t.413,
+                            other: f.305003;
+                            make other,hidden on trans when { !isGarage.value }
+                        <!--@formatter:on-->
                     </action>
                 </logic>
             </dataRef>
@@ -5822,6 +5935,104 @@
                         return other.value as Double;
                     }
                     <!--@formatter:on-->
+                    </action>
+                    <!--show-->
+                    <action trigger="set">
+                        <!--@formatter:off-->
+                            isGarage: f.105008,
+                            trans: t.588,
+                            other: f.109054;
+                            make other,editable on trans when { !isGarage.value }
+                        <!--@formatter:on-->
+                    </action>
+                    <action trigger="set">
+                        <!--@formatter:off-->
+                            isGarage: f.105008,
+                            trans: t.588,
+                            other: f.109055;
+                            make other,editable on trans when { !isGarage.value }
+                        <!--@formatter:on-->
+                    </action>
+                    <action trigger="set">
+                        <!--@formatter:off-->
+                            isGarage: f.105008,
+                            trans: t.588,
+                            other: f.109056;
+                            make other,editable on trans when { !isGarage.value }
+                        <!--@formatter:on-->
+                    </action>
+                    <action trigger="set">
+                        <!--@formatter:off-->
+                            isGarage: f.105008,
+                            trans: t.588,
+                            other: f.109057;
+                            make other,editable on trans when { !isGarage.value }
+                        <!--@formatter:on-->
+                    </action>
+                    <action trigger="set">
+                        <!--@formatter:off-->
+                            isGarage: f.105008,
+                            trans: t.588,
+                            other: f.109054;
+                            make other,required on trans when { !isGarage.value }
+                        <!--@formatter:on-->
+                    </action>
+                    <action trigger="set">
+                        <!--@formatter:off-->
+                            isGarage: f.105008,
+                            trans: t.588,
+                            other: f.109055;
+                            make other,required on trans when { !isGarage.value }
+                        <!--@formatter:on-->
+                    </action>
+                    <action trigger="set">
+                        <!--@formatter:off-->
+                            isGarage: f.105008,
+                            trans: t.588,
+                            other: f.109056;
+                            make other,required on trans when { !isGarage.value }
+                        <!--@formatter:on-->
+                    </action>
+                    <action trigger="set">
+                        <!--@formatter:off-->
+                            isGarage: f.105008,
+                            trans: t.588,
+                            other: f.109057;
+                            make other,required on trans when { !isGarage.value }
+                        <!--@formatter:on-->
+                    </action>
+                    <!--hide-->
+                    <action trigger="set">
+                        <!--@formatter:off-->
+                            isGarage: f.105008,
+                            trans: t.588,
+                            other: f.109054;
+                            make other,hidden on trans when { isGarage.value }
+                        <!--@formatter:on-->
+                    </action>
+                    <action trigger="set">
+                        <!--@formatter:off-->
+                            isGarage: f.105008,
+                            trans: t.588,
+                            other: f.109055;
+                            make other,hidden on trans when { isGarage.value }
+                        <!--@formatter:on-->
+                    </action>
+                    <action trigger="set">
+                        <!--@formatter:off-->
+                            isGarage: f.105008,
+                            trans: t.588,
+                            other: f.109056;
+                            make other,hidden on trans when { isGarage.value }
+                        <!--@formatter:on-->
+                    </action>
+                    <action trigger="set">
+                        <!--@formatter:off-->
+                            isGarage: f.105008,
+                            trans: t.588,
+                            other: f.109057;
+                            make other,hidden on trans when { isGarage.value }
+                        <!--@formatter:on-->
                     </action>
                 </logic>
             </dataRef>
@@ -5955,10 +6166,19 @@
                         <!--@formatter:off-->
                     idTrue: f.105011,
                     trans: t.413,
+                    other: f.105012;
+                    make other,required on trans when { idTrue.value }
+                <!--@formatter:on-->
+                    </action>
+                    <action trigger="set">
+                        <!--@formatter:off-->
+                    idTrue: f.105011,
+                    trans: t.413,
                     other: f.305005;
                     make other,visible on trans when { idTrue.value }
                 <!--@formatter:on-->
-                    </action>                <!--set hidden-->
+                    </action>
+                    <!--set hidden-->
                     <action trigger="set">
                         <!--@formatter:off-->
                     idTrue: f.105011,
@@ -6035,7 +6255,16 @@
                     other: f.305006;
                     make other,visible on trans when { idTrue.value }
                 <!--@formatter:on-->
-                    </action>                <!--set hidden-->
+                    </action>
+                    <action trigger="set">
+                        <!--@formatter:off-->
+                    idTrue: f.105013,
+                    trans: t.413,
+                    other: f.105014;
+                    make other,required on trans when { idTrue.value }
+                <!--@formatter:on-->
+                    </action>
+                    <!--set hidden-->
                     <action trigger="set">
                         <!--@formatter:off-->
                     idTrue: f.105013,
@@ -6103,6 +6332,14 @@
                     trans: t.413,
                     other: f.105016;
                     make other,editable on trans when { idTrue.value }
+                <!--@formatter:on-->
+                    </action>
+                    <action trigger="set">
+                        <!--@formatter:off-->
+                    idTrue: f.105015,
+                    trans: t.413,
+                    other: f.105016;
+                    make other,required on trans when { idTrue.value }
                 <!--@formatter:on-->
                     </action>
                     <action trigger="set">
@@ -6203,6 +6440,14 @@
                         <!--@formatter:off-->
                     idTrue: f.105017,
                     trans: t.413,
+                    other: f.105018;
+                    make other,required on trans when { idTrue.value }
+                <!--@formatter:on-->
+                    </action>
+                    <action trigger="set">
+                        <!--@formatter:off-->
+                    idTrue: f.105017,
+                    trans: t.413,
                     other: f.305008;
                     make other,visible on trans when { idTrue.value }
                 <!--@formatter:on-->
@@ -6290,6 +6535,14 @@
                     trans: t.413,
                     other: f.105020;
                     make other,editable on trans when { idTrue.value }
+                <!--@formatter:on-->
+                    </action>
+                    <action trigger="set">
+                        <!--@formatter:off-->
+                    idTrue: f.105019,
+                    trans: t.413,
+                    other: f.105020;
+                    make other,required on trans when { idTrue.value }
                 <!--@formatter:on-->
                     </action>
                     <action trigger="set">
@@ -6389,6 +6642,14 @@
                         <!--@formatter:off-->
                     idTrue: f.105021,
                     trans: t.413,
+                    other: f.105022;
+                    make other,required on trans when { idTrue.value }
+                <!--@formatter:on-->
+                    </action>
+                    <action trigger="set">
+                        <!--@formatter:off-->
+                    idTrue: f.105021,
+                    trans: t.413,
                     other: f.305010;
                     make other,visible on trans when { idTrue.value }
                 <!--@formatter:on-->
@@ -6476,6 +6737,14 @@
                     trans: t.413,
                     other: f.105024;
                     make other,editable on trans when { idTrue.value }
+                <!--@formatter:on-->
+                    </action>
+                    <action trigger="set">
+                        <!--@formatter:off-->
+                    idTrue: f.105023,
+                    trans: t.413,
+                    other: f.105024;
+                    make other,required on trans when { idTrue.value }
                 <!--@formatter:on-->
                     </action>
                     <action trigger="set">
@@ -6575,6 +6844,14 @@
                         <!--@formatter:off-->
                     idTrue: f.105025,
                     trans: t.413,
+                    other: f.105026;
+                    make other,required on trans when { idTrue.value }
+                <!--@formatter:on-->
+                    </action>
+                    <action trigger="set">
+                        <!--@formatter:off-->
+                    idTrue: f.105025,
+                    trans: t.413,
                     other: f.305012;
                     make other,visible on trans when { idTrue.value }
                 <!--@formatter:on-->
@@ -6662,6 +6939,14 @@
                     trans: t.413,
                     other: f.105028;
                     make other,editable on trans when { idTrue.value }
+                <!--@formatter:on-->
+                    </action>
+                    <action trigger="set">
+                        <!--@formatter:off-->
+                    idTrue: f.105027,
+                    trans: t.413,
+                    other: f.105028;
+                    make other,required on trans when { idTrue.value }
                 <!--@formatter:on-->
                     </action>
                     <action trigger="set">
@@ -6760,6 +7045,14 @@
                         <!--@formatter:off-->
                     idTrue: f.105029,
                     trans: t.413,
+                    other: f.105030;
+                    make other,required on trans when { idTrue.value }
+                <!--@formatter:on-->
+                    </action>
+                    <action trigger="set">
+                        <!--@formatter:off-->
+                    idTrue: f.105029,
+                    trans: t.413,
                     other: f.305014;
                     make other,visible on trans when { idTrue.value }
                 <!--@formatter:on-->
@@ -6848,96 +7141,110 @@
             </logic>
         </roleRef>
         <dataGroup>
-        <id>5</id>
-        <title></title>
-        <alignment>start</alignment>
-        <!--Umiestnenie domácnosti-->
-        <dataRef>
-            <id>103001</id>
-            <logic>
-                <behavior>editable</behavior>
-                <behavior>required</behavior>
-            </logic>
-        </dataRef>
-        <!--Poistenie domácnosti - spoluúčasť-->
-        <dataRef>
-            <id>106001</id>
-            <logic>
-                <behavior>editable</behavior>
-                <behavior>required</behavior>
-            </logic>
-        </dataRef>
-        <!--Celková podlahová plocha-->
-        <dataRef>
-            <id>106003</id>
-            <logic>
-                <behavior>editable</behavior>
-                <behavior>required</behavior>
-            </logic>
-        </dataRef>
-        <!--Obývanosť domácnosti-->
-        <dataRef>
-            <id>103002</id>
-            <logic>
-                <behavior>editable</behavior>
-                <behavior>required</behavior>
-            </logic>
-        </dataRef>
-        <!--Je nehnuteľnosť, v ktorej sa nachádza poisťovaná domácnosť v blízkom susedstve s inou obývanou nehnuteľnosťou?-->
-        <dataRef>
-            <id>103003</id>
-            <logic>
-                <behavior>editable</behavior>
-                <behavior>required</behavior>
-            </logic>
-        </dataRef>
-        <!--Je domácnosť zabezpečená funkčným alarmom?-->
-        <dataRef>
-            <id>103004</id>
-            <logic>
-                <behavior>editable</behavior>
-                <behavior>required</behavior>
-            </logic>
-        </dataRef>
-        <!--Má domácnosť na oknách vo výške do 3 metrov od okolitého terénu mreže / vonkajšie žalúzie alebo rolety?-->
-        <dataRef>
-            <id>103005</id>
-            <logic>
-                <behavior>editable</behavior>
-                <behavior>required</behavior>
-            </logic>
-        </dataRef>
-        <!--Celková podlahová plocha-->
-        <dataRef>
-            <id>106003</id>
-            <logic>
-                <behavior>editable</behavior>
-                <behavior>required</behavior>
-            </logic>
-        </dataRef>
-        <!--Zodpovednost domacnost ps-->
-        <dataRef>
-            <id>107003</id>
-            <logic>
-                <behavior>editable</behavior>
-            </logic>
-        </dataRef>
-        <!--Zodpovednost domacnost-->
-        <dataRef>
-            <id>104002</id>
-            <logic>
-                <behavior>editable</behavior>
-            </logic>
-        </dataRef>
-        <!--Zodpovednost domacnost uzemna platnost-->
-        <dataRef>
-            <id>104003</id>
-            <logic>
-                <behavior>editable</behavior>
-            </logic>
-        </dataRef>
-</dataGroup>
-
+            <id>5</id>
+            <title></title>
+            <alignment>start</alignment>
+            <!--Umiestnenie domácnosti-->
+            <dataRef>
+                <id>103001</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                </logic>
+            </dataRef>
+            <!--Poistenie domácnosti - spoluúčasť-->
+            <dataRef>
+                <id>106001</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                </logic>
+            </dataRef>
+            <!--Celková podlahová plocha-->
+            <dataRef>
+                <id>106003</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                </logic>
+            </dataRef>
+            <!--Obývanosť domácnosti-->
+            <dataRef>
+                <id>103002</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>5</id>
+            <title></title>
+            <alignment>start</alignment>
+            <stretch>true</stretch>
+            <!--Je nehnuteľnosť, v ktorej sa nachádza poisťovaná domácnosť v blízkom susedstve s inou obývanou nehnuteľnosťou?-->
+            <dataRef>
+                <id>103003</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>5</id>
+            <title></title>
+            <alignment>start</alignment>
+            <stretch>true</stretch>
+            <!--Je domácnosť zabezpečená funkčným alarmom?-->
+            <dataRef>
+                <id>103004</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>5</id>
+            <title></title>
+            <alignment>start</alignment>
+            <stretch>true</stretch>
+            <!--Má domácnosť na oknách vo výške do 3 metrov od okolitého terénu mreže / vonkajšie žalúzie alebo rolety?-->
+            <dataRef>
+                <id>103005</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>5</id>
+            <title></title>
+            <alignment>start</alignment>
+            <!--Zodpovednost domacnost ps-->
+            <dataRef>
+                <id>107003</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <!--Zodpovednost domacnost-->
+            <dataRef>
+                <id>104002</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <!--Zodpovednost domacnost uzemna platnost-->
+            <dataRef>
+                <id>104003</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
     </transition>
     <!--================================= Doplnkové poistenie domácnosti=====================-->
     <transition>
@@ -6970,6 +7277,12 @@
                         trans: t.421,
                         other: f.106005;
                         make other,editable on trans when { idTrue.value }
+                    </action>
+                    <action trigger="set">
+                        idTrue: f.106004,
+                        trans: t.421,
+                        other: f.106005;
+                        make other,required on trans when { idTrue.value }
                     </action>
                     <action trigger="set">
                         idTrue: f.106004,
@@ -7019,9 +7332,9 @@
                         exces: f.208002,
                         other: f.306002;
                         change other about {
-                        if (check.value)
-                        return field.value*exces.value/1000.0 as Double;
-                        return other.value as Double;
+                            if (check.value)
+                                return field.value*exces.value*4.2/1000.0 as Double;
+                            return other.value as Double;
                         }
                     </action>
                 </logic>
@@ -7049,6 +7362,12 @@
                         trans: t.421,
                         other: f.106007;
                         make other,editable on trans when { idTrue.value }
+                    </action>
+                    <action trigger="set">
+                        idTrue: f.106006,
+                        trans: t.421,
+                        other: f.106007;
+                        make other,required on trans when { idTrue.value }
                     </action>
                     <action trigger="set">
                         idTrue: f.106006,
@@ -7098,9 +7417,9 @@
                         exces: f.208002,
                         other: f.306003;
                         change other about {
-                        if (check.value)
-                        return field.value*exces.value/1000.0 as Double;
-                        return other.value as Double;
+                            if (check.value)
+                                return field.value*exces.value*4.2/1000.0 as Double;
+                            return other.value as Double;
                         }
                     </action>
                 </logic>
@@ -7128,6 +7447,12 @@
                         trans: t.421,
                         other: f.106009;
                         make other,editable on trans when { idTrue.value }
+                    </action>
+                    <action trigger="set">
+                        idTrue: f.106008,
+                        trans: t.421,
+                        other: f.106009;
+                        make other,required on trans when { idTrue.value }
                     </action>
                     <action trigger="set">
                         idTrue: f.106008,
@@ -7177,9 +7502,9 @@
                         exces: f.208002,
                         other: f.306004;
                         change other about {
-                        if (check.value)
-                        return field.value*exces.value/1000.0 as Double;
-                        return other.value as Double;
+                            if (check.value)
+                                return field.value*exces.value*4.2/1000.0 as Double;
+                            return other.value as Double;
                         }
                     </action>
                 </logic>
@@ -7207,6 +7532,12 @@
                         trans: t.421,
                         other: f.106011;
                         make other,editable on trans when { idTrue.value }
+                    </action>
+                    <action trigger="set">
+                        idTrue: f.106010,
+                        trans: t.421,
+                        other: f.106011;
+                        make other,required on trans when { idTrue.value }
                     </action>
                     <action trigger="set">
                         idTrue: f.106010,
@@ -7256,9 +7587,9 @@
                         exces: f.208002,
                         other: f.306005;
                         change other about {
-                        if (check.value)
-                        return field.value*exces.value/1000.0 as Double;
-                        return other.value as Double;
+                            if (check.value)
+                                return field.value*exces.value*25.0/1000.0 as Double;
+                            return other.value as Double;
                         }
                     </action>
                 </logic>
@@ -7286,6 +7617,12 @@
                         trans: t.421,
                         other: f.106013;
                         make other,editable on trans when { idTrue.value }
+                    </action>
+                    <action trigger="set">
+                        idTrue: f.106012,
+                        trans: t.421,
+                        other: f.106013;
+                        make other,required on trans when { idTrue.value }
                     </action>
                     <action trigger="set">
                         idTrue: f.106012,
@@ -7335,9 +7672,9 @@
                         exces: f.208002,
                         other: f.306006;
                         change other about {
-                        if (check.value)
-                        return field.value*exces.value/1000.0 as Double;
-                        return other.value as Double;
+                            if (check.value)
+                                return field.value*exces.value*12.0/1000.0 as Double;
+                            return other.value as Double;
                         }
                     </action>
                 </logic>
@@ -7365,6 +7702,12 @@
                         trans: t.421,
                         other: f.106015;
                         make other,editable on trans when { idTrue.value }
+                    </action>
+                    <action trigger="set">
+                        idTrue: f.106014,
+                        trans: t.421,
+                        other: f.106015;
+                        make other,required on trans when { idTrue.value }
                     </action>
                     <action trigger="set">
                         idTrue: f.106014,
@@ -7414,9 +7757,9 @@
                         exces: f.208002,
                         other: f.306007;
                         change other about {
-                        if (check.value)
-                        return field.value*exces.value/1000.0 as Double;
-                        return other.value as Double;
+                            if (check.value)
+                                return field.value*exces.value*50.0/1000.0 as Double;
+                            return other.value as Double;
                         }
                     </action>
                 </logic>
@@ -7444,6 +7787,12 @@
                         trans: t.421,
                         other: f.106017;
                         make other,editable on trans when { idTrue.value }
+                    </action>
+                    <action trigger="set">
+                        idTrue: f.106016,
+                        trans: t.421,
+                        other: f.106017;
+                        make other,required on trans when { idTrue.value }
                     </action>
                     <action trigger="set">
                         idTrue: f.106016,
@@ -7493,9 +7842,9 @@
                         exces: f.208002,
                         other: f.306008;
                         change other about {
-                        if (check.value)
-                        return field.value*exces.value/1000.0 as Double;
-                        return other.value as Double;
+                            if (check.value)
+                                return field.value*exces.value*3.45/1000.0 as Double;
+                            return other.value as Double;
                         }
                     </action>
                 </logic>
@@ -7523,6 +7872,12 @@
                         trans: t.421,
                         other: f.106019;
                         make other,editable on trans when { idTrue.value }
+                    </action>
+                    <action trigger="set">
+                        idTrue: f.106018,
+                        trans: t.421,
+                        other: f.106019;
+                        make other,required on trans when { idTrue.value }
                     </action>
                     <action trigger="set">
                         idTrue: f.106018,
@@ -7572,9 +7927,9 @@
                         exces: f.208002,
                         other: f.306009;
                         change other about {
-                        if (check.value)
-                        return field.value*exces.value/1000.0 as Double;
-                        return other.value as Double;
+                            if (check.value)
+                                return field.value*exces.value*7.0/1000.0 as Double;
+                            return other.value as Double;
                         }
                     </action>
                 </logic>
@@ -7602,6 +7957,12 @@
                         trans: t.421,
                         other: f.106021;
                         make other,editable on trans when { idTrue.value }
+                    </action>
+                    <action trigger="set">
+                        idTrue: f.106020,
+                        trans: t.421,
+                        other: f.106021;
+                        make other,required on trans when { idTrue.value }
                     </action>
                     <action trigger="set">
                         idTrue: f.106020,
@@ -7651,9 +8012,9 @@
                         exces: f.208002,
                         other: f.306010;
                         change other about {
-                        if (check.value)
-                        return field.value*exces.value/1000.0 as Double;
-                        return other.value as Double;
+                            if (check.value)
+                                return field.value*exces.value*10.0/1000.0 as Double;
+                            return other.value as Double;
                         }
                     </action>
                 </logic>
@@ -7684,7 +8045,7 @@
             </logic>
         </roleRef>
         <dataGroup>
-            <id>7</id>
+            <id>1</id>
             <title></title>
             <alignment>start</alignment>
             <!--nehnutelnost poistna suma-->
@@ -7719,16 +8080,21 @@
             <dataRef>
                 <id>308001</id>
                 <logic>
-                    <behavior>visible</behavior>
+                    <behavior>hidden</behavior>
                 </logic>
             </dataRef>
             <!--Celkové poistenie domácnosti-->
             <dataRef>
                 <id>308002</id>
                 <logic>
-                    <behavior>visible</behavior>
+                    <behavior>hidden</behavior>
                 </logic>
             </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>2</id>
+            <title></title>
+            <alignment>start</alignment>
             <!--Poistenie zodpovednosti nehnutelnost-->
             <dataRef>
                 <id>308008</id>
@@ -8049,8 +8415,9 @@
             </dataRef>
         </dataGroup>
         <dataGroup>
-            <id>3</id>
+            <id>4</id>
             <title>Korešpondenčná adresa</title>
+            <alignment>start</alignment>
             <!-- Korešpondenčná adresa -->
             <!--Rovnaká ako trvalý pobyt-->
             <dataRef>
@@ -8059,6 +8426,11 @@
                     <behavior>editable</behavior>
                 </logic>
             </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>7</id>
+            <title></title>
+            <alignment>start</alignment>
             <dataRef>
                 <id>109041</id>
                 <logic>
@@ -8085,8 +8457,9 @@
             </dataRef>
         </dataGroup>
         <dataGroup>
-            <id>4</id>
+            <id>5</id>
             <title>Miesto poistenia</title>
+            <alignment>start</alignment>
             <!-- Miesto poistenia -->
             <dataRef>
                 <id>109035</id>
@@ -8094,6 +8467,11 @@
                     <behavior>editable</behavior>
                 </logic>
             </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>8</id>
+            <title></title>
+            <alignment>start</alignment>
             <dataRef>
                 <id>109045</id>
                 <logic>
@@ -8120,35 +8498,31 @@
             </dataRef>
         </dataGroup>
         <dataGroup>
-            <id>3</id>
+            <id>6</id>
             <title>Adresa garáže</title>
             <!-- Adresa garáže -->
             <dataRef>
                 <id>109054</id>
                 <logic>
-                    <behavior>required</behavior>
-                    <behavior>editable</behavior>
+                    <behavior>hidden</behavior>
                 </logic>
             </dataRef>
             <dataRef>
                 <id>109055</id>
                 <logic>
-                    <behavior>required</behavior>
-                    <behavior>editable</behavior>
+                    <behavior>hidden</behavior>
                 </logic>
             </dataRef>
             <dataRef>
                 <id>109056</id>
                 <logic>
-                    <behavior>required</behavior>
-                    <behavior>editable</behavior>
+                    <behavior>hidden</behavior>
                 </logic>
             </dataRef>
             <dataRef>
                 <id>109057</id>
                 <logic>
-                    <behavior>required</behavior>
-                    <behavior>editable</behavior>
+                    <behavior>hidden</behavior>
                 </logic>
             </dataRef>
         </dataGroup>
@@ -8489,139 +8863,180 @@
                 <perform>true</perform>
             </logic>
         </roleRef>
-        <!--Obec-->
-        <dataRef>
-            <id>301001</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--PSČ-->
-        <dataRef>
-            <id>101001</id>
-            <logic>
-                <behavior>visible</behavior>
+        <dataGroup>
+            <id>1</id>
+            <title></title>
+            <alignment>start</alignment>
+            <!--Obec-->
+            <dataRef>
+                <id>301001</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!--PSČ-->
+            <dataRef>
+                <id>101001</id>
+                <logic>
+                    <behavior>visible</behavior>
 
-            </logic>
-        </dataRef>
-        <!--Lokalita-->
-        <dataRef>
-            <id>301002</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>101002</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--Bolo miesto poistenia postihnuté povodňou za posledných 10 rokov?-->
-        <dataRef>
-            <id>101003</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--Nachádza nehnuteľnosť sa vo vzdialenosti kratšej ako 300 m od vodného toku?-->
-        <dataRef>
-            <id>101004</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--Koľko rokov žijete v poisťovanej nehnuteľnosti?-->
-        <dataRef>
-            <id>101005</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--Aký je vzťah poisteného k poisťovanej nehnuteľnosti?-->
-        <dataRef>
-            <id>101006</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--Koľko dospelých žije v domácnosti?-->
-        <dataRef>
-            <id>101007</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--Koľko detí žije v domácnosti?-->
-        <dataRef>
-            <id>101008</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--Koľko detí žije v domácnosti?-->
-        <dataRef>
-            <id>101008</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--Bolo poistenému alebo spolupoistenej osobe niekedy v minulosti zamiestnuté poistné plnenie alebo vypovedaná poistná zmluva?-->
-        <dataRef>
-            <id>101009</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--Bol poistený alebo spolupoistená osoba niekedy trestné stihaný / vyhlásil osobný bankrot / stíhaný za dlhy alebo odsúdený za podvodné alebo obdobné konanie.-->
-        <dataRef>
-            <id>101010</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--Je plánovaná rekonštrukcia alebo prestavba poisťovanej nehnuteľnosti v priebehu najbližších 3 mesiacov?-->
-        <dataRef>
-            <id>101011</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--Žije v poisťovanej domácnosti pes alebo mačka?-->
-        <dataRef>
-            <id>101012</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--Kedy je nehnuteľnosť najviac obývaná?-->
-        <dataRef>
-            <id>101013</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--Je nehnuteľnosť využívaná aj na podnikanie?-->
-        <dataRef>
-            <id>101014</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--Právna subjektivita poisteného?-->
-        <dataRef>
-            <id>101015</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--Počet poistných udalostí za posledné 3 roky?-->
-        <dataRef>
-            <id>101016</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
+                </logic>
+            </dataRef>
+            <!--Lokalita-->
+            <dataRef>
+                <id>301002</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>101002</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>2</id>
+            <title></title>
+            <alignment>start</alignment>
+            <stretch>true</stretch>
+            <!--Bolo miesto poistenia postihnuté povodňou za posledných 10 rokov?-->
+            <dataRef>
+                <id>101003</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>3</id>
+            <title></title>
+            <stretch>true</stretch>
+            <!--Nachádza nehnuteľnosť sa vo vzdialenosti kratšej ako 300 m od vodného toku?-->
+            <dataRef>
+                <id>101004</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>4</id>
+            <title></title>
+            <stretch>true</stretch>
+            <!--Koľko rokov žijete v poisťovanej nehnuteľnosti?-->
+            <dataRef>
+                <id>101005</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!--Aký je vzťah poisteného k poisťovanej nehnuteľnosti?-->
+            <dataRef>
+                <id>101006</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!--Koľko dospelých žije v domácnosti?-->
+            <dataRef>
+                <id>101007</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!--Koľko detí žije v domácnosti?-->
+            <dataRef>
+                <id>101008</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!--Koľko detí žije v domácnosti?-->
+            <dataRef>
+                <id>101008</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>5</id>
+            <title></title>
+            <stretch>true</stretch>
+            <!--Bolo poistenému alebo spolupoistenej osobe niekedy v minulosti zamiestnuté poistné plnenie alebo vypovedaná poistná zmluva?-->
+            <dataRef>
+                <id>101009</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>6</id>
+            <title></title>
+            <stretch>true</stretch>
+            <!--Bol poistený alebo spolupoistená osoba niekedy trestné stihaný / vyhlásil osobný bankrot / stíhaný za dlhy alebo odsúdený za podvodné alebo obdobné konanie.-->
+            <dataRef>
+                <id>101010</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>7</id>
+            <title></title>
+            <stretch>true</stretch>
+            <!--Je plánovaná rekonštrukcia alebo prestavba poisťovanej nehnuteľnosti v priebehu najbližších 3 mesiacov?-->
+            <dataRef>
+                <id>101011</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>8</id>
+            <title></title>
+            <stretch>true</stretch>
+            <!--Žije v poisťovanej domácnosti pes alebo mačka?-->
+            <dataRef>
+                <id>101012</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!--Kedy je nehnuteľnosť najviac obývaná?-->
+            <dataRef>
+                <id>101013</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!--Je nehnuteľnosť využívaná aj na podnikanie?-->
+            <dataRef>
+                <id>101014</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!--Právna subjektivita poisteného?-->
+            <dataRef>
+                <id>101015</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!--Počet poistných udalostí za posledné 3 roky?-->
+            <dataRef>
+                <id>101016</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
     </transition>
     <!--================================= NEHNUTEĽNOSŤ (visible) - DONE =====================-->
     <transition>
@@ -8639,97 +9054,121 @@
                 <perform>true</perform>
             </logic>
         </roleRef>
-        <!--Predmet poistenia-->
-        <dataRef>
-            <id>102001</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--Podlahová plocha pivnice-->
-        <dataRef>
-            <id>105001</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--Podlahová plocha prízemia-->
-        <dataRef>
-            <id>105002</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--Podlahová plocha všetkých obytných poschodí-->
-        <dataRef>
-            <id>105003</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--Podlahová plocha garáže-->
-        <dataRef>
-            <id>105004</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--Celková podlahová plocha-->
-        <dataRef>
-            <id>305001</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--Konštrukcia múrov-->
-        <dataRef>
-            <id>102002</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--Konštrukcia strechy-->
-        <dataRef>
-            <id>102003</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--Koľko rokov má nehnuteľnosť?-->
-        <dataRef>
-            <id>102004</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--Má nehnuteľnosť praskliny na vonkajšej fasáde?-->
-        <dataRef>
-            <id>102005</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--Koľko izieb má nehnuteľnosť?-->
-        <dataRef>
-            <id>102006</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--Koľko kúpeľní má nehnuteľnosť?-->
-        <dataRef>
-            <id>102007</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--Uveďte celkovú hodnotu rekonštrukcií, ak boli vykonané-->
-        <dataRef>
-            <id>102008</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
+        <dataGroup>
+            <id>2</id>
+            <title></title>
+            <alignment>start</alignment>
+            <!--Predmet poistenia-->
+            <dataRef>
+                <id>102001</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!--Podlahová plocha pivnice-->
+            <dataRef>
+                <id>105001</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!--Podlahová plocha prízemia-->
+            <dataRef>
+                <id>105002</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!--Podlahová plocha všetkých obytných poschodí-->
+            <dataRef>
+                <id>105003</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!--Podlahová plocha garáže-->
+            <dataRef>
+                <id>105004</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!--Celková podlahová plocha-->
+            <dataRef>
+                <id>305001</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!--Konštrukcia múrov-->
+            <dataRef>
+                <id>102002</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!--Konštrukcia strechy-->
+            <dataRef>
+                <id>102003</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!--Koľko rokov má nehnuteľnosť?-->
+            <dataRef>
+                <id>102004</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!--Má nehnuteľnosť praskliny na vonkajšej fasáde?-->
+            <dataRef>
+                <id>102005</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!--Koľko izieb má nehnuteľnosť?-->
+            <dataRef>
+                <id>102006</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!--Koľko kúpeľní má nehnuteľnosť?-->
+            <dataRef>
+                <id>102007</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!--Uveďte celkovú hodnotu rekonštrukcií, ak boli vykonané-->
+            <dataRef>
+                <id>102008</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>3</id>
+            <title></title>
+            <alignment>left</alignment>
+            <!--Zodpovednost nehnutelnost boolean-->
+            <dataRef>
+                <id>104001</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!--Zodpovednost nehnutelnost-->
+            <dataRef>
+                <id>107001</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
     </transition>
     <!--================================= DOPLNKOVÉ POISTENIE NEHNUTEĽNOSTI (visible) - DONE =====================-->
     <transition>
@@ -8747,48 +9186,52 @@
                 <perform>true</perform>
             </logic>
         </roleRef>
-        <!--Stavebné materialy-->
-        <dataRef>
-            <id>105031</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--Stavebné materialy ps-->
-        <dataRef>
-            <id>105032</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--Stavebné materialy p-->
-        <dataRef>
-            <id>305015</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--Stavebné a záhradné mechanizmy-->
-        <dataRef>
-            <id>105033</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--Stavebné a záhradné mechanizmy ps-->
-        <dataRef>
-            <id>105034</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--Stavebné a záhradné mechanizmy p-->
-        <dataRef>
-            <id>305016</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
+        <dataGroup>
+            <id>1</id>
+            <title></title>
+            <!--Stavebné materialy-->
+            <dataRef>
+                <id>105031</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!--Stavebné materialy ps-->
+            <dataRef>
+                <id>105032</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!--Stavebné materialy p-->
+            <dataRef>
+                <id>305015</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!--Stavebné a záhradné mechanizmy-->
+            <dataRef>
+                <id>105033</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!--Stavebné a záhradné mechanizmy ps-->
+            <dataRef>
+                <id>105034</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!--Stavebné a záhradné mechanizmy p-->
+            <dataRef>
+                <id>305016</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
     </transition>
     <!--================================= VEDĽAJŠIE STAVBY (visible) - DONE =====================-->
     <transition>
@@ -8806,265 +9249,269 @@
                 <perform>true</perform>
             </logic>
         </roleRef>
-        <!--Garáž-->
-        <dataRef>
-            <id>105035</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--Garáž ps-->
-        <dataRef>
-            <id>105007</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--Rovnaké miesto poistenia garáže?-->
-        <dataRef>
-            <id>105008</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--Garáž p-->
-        <dataRef>
-            <id>305003</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--Hospodárska budova-->
-        <dataRef>
-            <id>105009</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--Hospodárska budova ps-->
-        <dataRef>
-            <id>105010</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--Hospodárska budova p-->
-        <dataRef>
-            <id>305004</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--Altánok-->
-        <dataRef>
-            <id>105011</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--Altánok ps-->
-        <dataRef>
-            <id>105012</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--Altánok p-->
-        <dataRef>
-            <id>305005</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--Prístrešok-->
-        <dataRef>
-            <id>105013</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--Prístrešok ps-->
-        <dataRef>
-            <id>105014</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--Prístrešok p-->
-        <dataRef>
-            <id>305006</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--Chodník-->
-        <dataRef>
-            <id>105015</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--Chodník ps-->
-        <dataRef>
-            <id>105016</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--Chodník p-->
-        <dataRef>
-            <id>305007</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--Sauna-->
-        <dataRef>
-            <id>105017</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--Sauna ps-->
-        <dataRef>
-            <id>105018</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--Sauna p-->
-        <dataRef>
-            <id>305008</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--Elektrická brána-->
-        <dataRef>
-            <id>105019</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--Elektrická brána ps-->
-        <dataRef>
-            <id>105020</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--Elektrická brána p-->
-        <dataRef>
-            <id>305009</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--Tenisový kurt-->
-        <dataRef>
-            <id>105021</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--Tenisový kurt ps-->
-        <dataRef>
-            <id>105022</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--Tenisový kurt p-->
-        <dataRef>
-            <id>305010</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--Vonkajší bazén-->
-        <dataRef>
-            <id>105023</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--Vonkajší bazén ps-->
-        <dataRef>
-            <id>105024</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--Vonkajší bazén p-->
-        <dataRef>
-            <id>305011</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--Studňa-->
-        <dataRef>
-            <id>105025</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--Studňa ps-->
-        <dataRef>
-            <id>105026</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--Studňa p-->
-        <dataRef>
-            <id>305012</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--Žumpa, septik-->
-        <dataRef>
-            <id>105027</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--Žumpa, septik ps-->
-        <dataRef>
-            <id>105028</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--Žumpa, septik p-->
-        <dataRef>
-            <id>305013</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--Iné-->
-        <dataRef>
-            <id>105029</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--Iné ps-->
-        <dataRef>
-            <id>105030</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--Iné p-->
-        <dataRef>
-            <id>305014</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
+        <dataGroup>
+            <id>1</id>
+            <title></title>
+            <!--Garáž-->
+            <dataRef>
+                <id>105035</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!--Garáž ps-->
+            <dataRef>
+                <id>105007</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!--Rovnaké miesto poistenia garáže?-->
+            <dataRef>
+                <id>105008</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!--Garáž p-->
+            <dataRef>
+                <id>305003</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!--Hospodárska budova-->
+            <dataRef>
+                <id>105009</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!--Hospodárska budova ps-->
+            <dataRef>
+                <id>105010</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!--Hospodárska budova p-->
+            <dataRef>
+                <id>305004</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!--Altánok-->
+            <dataRef>
+                <id>105011</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!--Altánok ps-->
+            <dataRef>
+                <id>105012</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!--Altánok p-->
+            <dataRef>
+                <id>305005</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!--Prístrešok-->
+            <dataRef>
+                <id>105013</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!--Prístrešok ps-->
+            <dataRef>
+                <id>105014</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!--Prístrešok p-->
+            <dataRef>
+                <id>305006</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!--Chodník-->
+            <dataRef>
+                <id>105015</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!--Chodník ps-->
+            <dataRef>
+                <id>105016</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!--Chodník p-->
+            <dataRef>
+                <id>305007</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!--Sauna-->
+            <dataRef>
+                <id>105017</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!--Sauna ps-->
+            <dataRef>
+                <id>105018</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!--Sauna p-->
+            <dataRef>
+                <id>305008</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!--Elektrická brána-->
+            <dataRef>
+                <id>105019</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!--Elektrická brána ps-->
+            <dataRef>
+                <id>105020</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!--Elektrická brána p-->
+            <dataRef>
+                <id>305009</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!--Tenisový kurt-->
+            <dataRef>
+                <id>105021</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!--Tenisový kurt ps-->
+            <dataRef>
+                <id>105022</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!--Tenisový kurt p-->
+            <dataRef>
+                <id>305010</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!--Vonkajší bazén-->
+            <dataRef>
+                <id>105023</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!--Vonkajší bazén ps-->
+            <dataRef>
+                <id>105024</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!--Vonkajší bazén p-->
+            <dataRef>
+                <id>305011</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!--Studňa-->
+            <dataRef>
+                <id>105025</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!--Studňa ps-->
+            <dataRef>
+                <id>105026</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!--Studňa p-->
+            <dataRef>
+                <id>305012</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!--Žumpa, septik-->
+            <dataRef>
+                <id>105027</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!--Žumpa, septik ps-->
+            <dataRef>
+                <id>105028</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!--Žumpa, septik p-->
+            <dataRef>
+                <id>305013</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!--Iné-->
+            <dataRef>
+                <id>105029</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!--Iné ps-->
+            <dataRef>
+                <id>105030</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!--Iné p-->
+            <dataRef>
+                <id>305014</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
     </transition>
     <!--================================= DOMÁCNOSŤ (visible) - DONE =====================-->
     <transition>
@@ -9082,48 +9529,52 @@
                 <perform>true</perform>
             </logic>
         </roleRef>
-        <!--Umiestnenie domácnosti-->
-        <dataRef>
-            <id>103001</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--Celková podlahová plocha-->
-        <dataRef>
-            <id>106003</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--Obývanosť domácnosti-->
-        <dataRef>
-            <id>103002</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--Je nehnuteľnosť, v ktorej sa nachádza poisťovaná domácnosť v blízkom susedstve s inou obývanou nehnuteľnosťou?-->
-        <dataRef>
-            <id>103003</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--Je domácnosť zabezpečená funkčným alarmom?-->
-        <dataRef>
-            <id>103004</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--Má domácnosť na oknách vo výške do 3 metrov od okolitého terénu mreže / vonkajšie žalúzie alebo rolety?-->
-        <dataRef>
-            <id>103005</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
+        <dataGroup>
+            <id>1</id>
+            <title></title>
+            <!--Umiestnenie domácnosti-->
+            <dataRef>
+                <id>103001</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!--Celková podlahová plocha-->
+            <dataRef>
+                <id>106003</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!--Obývanosť domácnosti-->
+            <dataRef>
+                <id>103002</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!--Je nehnuteľnosť, v ktorej sa nachádza poisťovaná domácnosť v blízkom susedstve s inou obývanou nehnuteľnosťou?-->
+            <dataRef>
+                <id>103003</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!--Je domácnosť zabezpečená funkčným alarmom?-->
+            <dataRef>
+                <id>103004</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!--Má domácnosť na oknách vo výške do 3 metrov od okolitého terénu mreže / vonkajšie žalúzie alebo rolety?-->
+            <dataRef>
+                <id>103005</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
     </transition>
     <!--================================= DOPLNKOVÉ POISTENIE DOMÁCNOSTI (visible) - DONE =====================-->
     <transition>
@@ -9141,195 +9592,199 @@
                 <perform>true</perform>
             </logic>
         </roleRef>
-        <!--Cennosti-->
-        <dataRef>
-            <id>106004</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--Cennosti ps-->
-        <dataRef>
-            <id>106005</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--Cennosti p-->
-        <dataRef>
-            <id>306002</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--Umelecké diela-->
-        <dataRef>
-            <id>106006</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--Umelecké diela ps-->
-        <dataRef>
-            <id>106007</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--Umelecké diela p-->
-        <dataRef>
-            <id>306003</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--Elektronické a optické zariadenia-->
-        <dataRef>
-            <id>106008</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--Elektronické a optické zariadenia ps-->
-        <dataRef>
-            <id>106009</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--Elektronické a optické zariadenia p-->
-        <dataRef>
-            <id>306004</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--Špecialne sklá a presklenie-->
-        <dataRef>
-            <id>106010</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--Špecialne sklá a presklenie ps-->
-        <dataRef>
-            <id>106011</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--Špecialne sklá a presklenie p-->
-        <dataRef>
-            <id>306005</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--Záhradné vybavenie a nábytok-->
-        <dataRef>
-            <id>106012</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--Záhradné vybavenie a nábytok ps-->
-        <dataRef>
-            <id>106013</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--Záhradné vybavenie a nábytok p-->
-        <dataRef>
-            <id>306006</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--Elektromotory v domácich spotrebičoch-->
-        <dataRef>
-            <id>106014</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--Elektromotory v domácich spotrebičoch ps-->
-        <dataRef>
-            <id>106015</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--Elektromotory v domácich spotrebičoch p-->
-        <dataRef>
-            <id>306007</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--Stavebné súčasti domácnosti-->
-        <dataRef>
-            <id>106016</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--Stavebné súčasti domácnosti ps-->
-        <dataRef>
-            <id>106017</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--Stavebné súčasti domácnosti p-->
-        <dataRef>
-            <id>306008</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--Športové náradie-->
-        <dataRef>
-            <id>106018</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--Športové náradie ps-->
-        <dataRef>
-            <id>106019</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--Športové náradie p-->
-        <dataRef>
-            <id>306009</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--Iné-->
-        <dataRef>
-            <id>106020</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--Iné ps-->
-        <dataRef>
-            <id>106021</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--Iné p-->
-        <dataRef>
-            <id>306010</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
+        <dataGroup>
+            <id>1</id>
+            <title></title>
+            <!--Cennosti-->
+            <dataRef>
+                <id>106004</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!--Cennosti ps-->
+            <dataRef>
+                <id>106005</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!--Cennosti p-->
+            <dataRef>
+                <id>306002</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!--Umelecké diela-->
+            <dataRef>
+                <id>106006</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!--Umelecké diela ps-->
+            <dataRef>
+                <id>106007</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!--Umelecké diela p-->
+            <dataRef>
+                <id>306003</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!--Elektronické a optické zariadenia-->
+            <dataRef>
+                <id>106008</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!--Elektronické a optické zariadenia ps-->
+            <dataRef>
+                <id>106009</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!--Elektronické a optické zariadenia p-->
+            <dataRef>
+                <id>306004</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!--Špecialne sklá a presklenie-->
+            <dataRef>
+                <id>106010</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!--Špecialne sklá a presklenie ps-->
+            <dataRef>
+                <id>106011</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!--Špecialne sklá a presklenie p-->
+            <dataRef>
+                <id>306005</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!--Záhradné vybavenie a nábytok-->
+            <dataRef>
+                <id>106012</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!--Záhradné vybavenie a nábytok ps-->
+            <dataRef>
+                <id>106013</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!--Záhradné vybavenie a nábytok p-->
+            <dataRef>
+                <id>306006</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!--Elektromotory v domácich spotrebičoch-->
+            <dataRef>
+                <id>106014</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!--Elektromotory v domácich spotrebičoch ps-->
+            <dataRef>
+                <id>106015</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!--Elektromotory v domácich spotrebičoch p-->
+            <dataRef>
+                <id>306007</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!--Stavebné súčasti domácnosti-->
+            <dataRef>
+                <id>106016</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!--Stavebné súčasti domácnosti ps-->
+            <dataRef>
+                <id>106017</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!--Stavebné súčasti domácnosti p-->
+            <dataRef>
+                <id>306008</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!--Športové náradie-->
+            <dataRef>
+                <id>106018</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!--Športové náradie ps-->
+            <dataRef>
+                <id>106019</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!--Športové náradie p-->
+            <dataRef>
+                <id>306009</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!--Iné-->
+            <dataRef>
+                <id>106020</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!--Iné ps-->
+            <dataRef>
+                <id>106021</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!--Iné p-->
+            <dataRef>
+                <id>306010</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
     </transition>
     <!--todo============================= ÚDAJE O POISTNÍKOVI A MIESTE POISTENIA (visible) - hidden =====================-->
     <transition>
@@ -9341,310 +9796,320 @@
         <transactionRef>
             <id>3</id>
         </transactionRef>
-        <!-- Poistník -->
-        <!--Typ subjektu-->
-        <dataRef>
-            <id>109007</id>
+        <roleRef>
+            <id>1</id>
             <logic>
-                <behavior>visible</behavior>
+                <perform>true</perform>
             </logic>
-        </dataRef>
-        <!--Titul pred menom-->
-        <dataRef>
-            <id>109008</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--Titul za menom-->
-        <dataRef>
-            <id>109009</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--Meno-->
-        <dataRef>
-            <id>109010</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--Priezvisko-->
-        <dataRef>
-            <id>109011</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--Obchodné meno-->
-        <dataRef>
-            <id>109012</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--Štátna príslušnosť-->
-        <dataRef>
-            <id>109013</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--Dátum narodenia-->
-        <dataRef>
-            <id>109014</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--Rodné číslo-->
-        <dataRef>
-            <id>109015</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--Typ preukazu-->
-        <dataRef>
-            <id>109016</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--Číslo preukazu-->
-        <dataRef>
-            <id>109017</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--Telefónne číslo-->
-        <dataRef>
-            <id>109018</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--Email-->
-        <dataRef>
-            <id>109019</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--Poistený je iná osoba-->
-        <dataRef>
-            <id>109020</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!-- Poistený -->
-        <!--Typ subjektu Poistený-->
-        <dataRef>
-            <id>109021</id>
-            <logic>
-                <behavior>hidden</behavior>
-            </logic>
-        </dataRef>
-        <!--Titul pred menom Poistený-->
-        <dataRef>
-            <id>109022</id>
-            <logic>
-                <behavior>hidden</behavior>
-            </logic>
-        </dataRef>
-        <!--Titul za menom Poistený-->
-        <dataRef>
-            <id>109023</id>
-            <logic>
-                <behavior>hidden</behavior>
-            </logic>
-        </dataRef>
-        <!--Meno poistený-->
-        <dataRef>
-            <id>109024</id>
-            <logic>
-                <behavior>hidden</behavior>
-            </logic>
-        </dataRef>
-        <!--Priezvisko poistený-->
-        <dataRef>
-            <id>109025</id>
-            <logic>
-                <behavior>hidden</behavior>
-            </logic>
-        </dataRef>
-        <!--Obchodné meno poistený-->
-        <dataRef>
-            <id>109026</id>
-            <logic>
-                <behavior>hidden</behavior>
-            </logic>
-        </dataRef>
-        <!--Štátna príslušnosť poistený-->
-        <dataRef>
-            <id>109027</id>
-            <logic>
-                <behavior>hidden</behavior>
-            </logic>
-        </dataRef>
-        <!--Dátum narodenia poistený-->
-        <dataRef>
-            <id>109028</id>
-            <logic>
-                <behavior>hidden</behavior>
-            </logic>
-        </dataRef>
-        <!--Rodné číslo Poistený-->
-        <dataRef>
-            <id>109029</id>
-            <logic>
-                <behavior>hidden</behavior>
-            </logic>
-        </dataRef>
-        <!--Typ preukazu poisteny-->
-        <dataRef>
-            <id>109030</id>
-            <logic>
-                <behavior>hidden</behavior>
-            </logic>
-        </dataRef>
-        <!--Číslo preukazu Poistený-->
-        <dataRef>
-            <id>109031</id>
-            <logic>
-                <behavior>hidden</behavior>
-            </logic>
-        </dataRef>
-        <!--Telefónne číslo poisteny-->
-        <dataRef>
-            <id>109032</id>
-            <logic>
-                <behavior>hidden</behavior>
-            </logic>
-        </dataRef>
-        <!--Email poisteny-->
-        <dataRef>
-            <id>109033</id>
-            <logic>
-                <behavior>hidden</behavior>
-            </logic>
-        </dataRef>
-        <!-- Údaje o mieste poistenia -->
-        <!-- Adresa trvalého pobytu -->
-        <dataRef>
-            <id>109036</id>
-            <logic>
+        </roleRef>
+        <dataGroup>
+            <id>1</id>
+            <title></title>
+            <!-- Poistník -->
+            <!--Typ subjektu-->
+            <dataRef>
+                <id>109007</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!--Titul pred menom-->
+            <dataRef>
+                <id>109008</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!--Titul za menom-->
+            <dataRef>
+                <id>109009</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!--Meno-->
+            <dataRef>
+                <id>109010</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!--Priezvisko-->
+            <dataRef>
+                <id>109011</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!--Obchodné meno-->
+            <dataRef>
+                <id>109012</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!--Štátna príslušnosť-->
+            <dataRef>
+                <id>109013</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!--Dátum narodenia-->
+            <dataRef>
+                <id>109014</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!--Rodné číslo-->
+            <dataRef>
+                <id>109015</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!--Typ preukazu-->
+            <dataRef>
+                <id>109016</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!--Číslo preukazu-->
+            <dataRef>
+                <id>109017</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!--Telefónne číslo-->
+            <dataRef>
+                <id>109018</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!--Email-->
+            <dataRef>
+                <id>109019</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!--Poistený je iná osoba-->
+            <dataRef>
+                <id>109020</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!-- Poistený -->
+            <!--Typ subjektu Poistený-->
+            <dataRef>
+                <id>109021</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+            </dataRef>
+            <!--Titul pred menom Poistený-->
+            <dataRef>
+                <id>109022</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+            </dataRef>
+            <!--Titul za menom Poistený-->
+            <dataRef>
+                <id>109023</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+            </dataRef>
+            <!--Meno poistený-->
+            <dataRef>
+                <id>109024</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+            </dataRef>
+            <!--Priezvisko poistený-->
+            <dataRef>
+                <id>109025</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+            </dataRef>
+            <!--Obchodné meno poistený-->
+            <dataRef>
+                <id>109026</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+            </dataRef>
+            <!--Štátna príslušnosť poistený-->
+            <dataRef>
+                <id>109027</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+            </dataRef>
+            <!--Dátum narodenia poistený-->
+            <dataRef>
+                <id>109028</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+            </dataRef>
+            <!--Rodné číslo Poistený-->
+            <dataRef>
+                <id>109029</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+            </dataRef>
+            <!--Typ preukazu poisteny-->
+            <dataRef>
+                <id>109030</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+            </dataRef>
+            <!--Číslo preukazu Poistený-->
+            <dataRef>
+                <id>109031</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+            </dataRef>
+            <!--Telefónne číslo poisteny-->
+            <dataRef>
+                <id>109032</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+            </dataRef>
+            <!--Email poisteny-->
+            <dataRef>
+                <id>109033</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+            </dataRef>
+            <!-- Údaje o mieste poistenia -->
+            <!-- Adresa trvalého pobytu -->
+            <dataRef>
+                <id>109036</id>
+                <logic>
 
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>109037</id>
-            <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>109037</id>
+                <logic>
 
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>109038</id>
-            <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>109038</id>
+                <logic>
 
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>109039</id>
-            <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>109039</id>
+                <logic>
 
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!-- Korešpondenčná adresa -->
-        <dataRef>
-            <id>109041</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>109042</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>109043</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>109044</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!-- Miesto poistenia -->
-        <dataRef>
-            <id>109045</id>
-            <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!-- Korešpondenčná adresa -->
+            <dataRef>
+                <id>109041</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>109042</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>109043</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>109044</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!-- Miesto poistenia -->
+            <dataRef>
+                <id>109045</id>
+                <logic>
 
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>109046</id>
-            <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>109046</id>
+                <logic>
 
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>109047</id>
-            <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>109047</id>
+                <logic>
 
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>109048</id>
-            <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>109048</id>
+                <logic>
 
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!-- Adresa garáže -->
-        <dataRef>
-            <id>109054</id>
-            <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!-- Adresa garáže -->
+            <dataRef>
+                <id>109054</id>
+                <logic>
 
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>109055</id>
-            <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>109055</id>
+                <logic>
 
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>109056</id>
-            <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>109056</id>
+                <logic>
 
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>109057</id>
-            <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>109057</id>
+                <logic>
 
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
     </transition>
     <!--================================= Údaje o zmluve - DONE =====================-->
     <transition>
@@ -9662,62 +10127,66 @@
                 <perform>true</perform>
             </logic>
         </roleRef>
-        <!--Číslo ponuky-->
-        <dataRef>
-            <id>309001</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--Začiatok poistenia-->
-        <dataRef>
-            <id>109001</id>
-            <logic>
+        <dataGroup>
+            <id>1</id>
+            <title></title>
+            <!--Číslo ponuky-->
+            <dataRef>
+                <id>309001</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!--Začiatok poistenia-->
+            <dataRef>
+                <id>109001</id>
+                <logic>
 
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--oistenie na dobu určitú-->
-        <dataRef>
-            <id>109002</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--Koniec poistenia-->
-        <dataRef>
-            <id>109003</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>109004</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--Číslo úverovej zmluvy-->
-        <dataRef>
-            <id>109005</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--Spôsob platenia-->
-        <dataRef>
-            <id>109006</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <!--Ponuka PDF-->
-        <dataRef>
-            <id>309003</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!--oistenie na dobu určitú-->
+            <dataRef>
+                <id>109002</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!--Koniec poistenia-->
+            <dataRef>
+                <id>109003</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>109004</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!--Číslo úverovej zmluvy-->
+            <dataRef>
+                <id>109005</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!--Spôsob platenia-->
+            <dataRef>
+                <id>109006</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <!--Ponuka PDF-->
+            <dataRef>
+                <id>309003</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
     </transition>
     <!--todo=============================Údaje o zaplatení=====================-->
     <transition>
@@ -9735,13 +10204,17 @@
                 <perform>true</perform>
             </logic>
         </roleRef>
-        <!--Variabilný symbol-->
-        <dataRef>
-            <id>308007</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
+        <dataGroup>
+            <id>1</id>
+            <title></title>
+            <!--Variabilný symbol-->
+            <dataRef>
+                <id>308007</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
     </transition>
     <!--================================= INFORMÁCIE O PROVÍZIÁCH - DONE =====================-->
     <transition>
@@ -9753,6 +10226,12 @@
         <transactionRef>
             <id>3</id>
         </transactionRef>
+        <roleRef>
+            <id>1</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
     </transition>
     <!--=================================PLACES========================-->
     <place>
@@ -10079,6 +10558,22 @@
         <id>2056</id>
         <x>2070</x>
         <y>927</y>
+        <label></label>
+        <tokens>0</tokens>
+        <isStatic>false</isStatic>
+    </place>
+    <place>
+        <id>2280</id>
+        <x>715</x>
+        <y>615</y>
+        <label></label>
+        <tokens>0</tokens>
+        <isStatic>false</isStatic>
+    </place>
+    <place>
+        <id>2284</id>
+        <x>782</x>
+        <y>931</y>
         <label></label>
         <tokens>0</tokens>
         <isStatic>false</isStatic>
@@ -10673,20 +11168,6 @@
         <multiplicity>1</multiplicity>
     </arc>
     <arc>
-        <id>1628</id>
-        <type>regular</type>
-        <sourceId>1626</sourceId>
-        <destinationId>364</destinationId>
-        <multiplicity>1</multiplicity>
-    </arc>
-    <arc>
-        <id>1629</id>
-        <type>regular</type>
-        <sourceId>364</sourceId>
-        <destinationId>1626</destinationId>
-        <multiplicity>1</multiplicity>
-    </arc>
-    <arc>
         <id>1630</id>
         <type>reset</type>
         <sourceId>444</sourceId>
@@ -10936,20 +11417,6 @@
         <type>regular</type>
         <sourceId>589</sourceId>
         <destinationId>332</destinationId>
-        <multiplicity>1</multiplicity>
-    </arc>
-    <arc>
-        <id>1700</id>
-        <type>regular</type>
-        <sourceId>1612</sourceId>
-        <destinationId>363</destinationId>
-        <multiplicity>1</multiplicity>
-    </arc>
-    <arc>
-        <id>1701</id>
-        <type>regular</type>
-        <sourceId>363</sourceId>
-        <destinationId>1612</destinationId>
         <multiplicity>1</multiplicity>
     </arc>
     <arc>
@@ -11426,6 +11893,55 @@
         <type>regular</type>
         <sourceId>332</sourceId>
         <destinationId>2056</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>2281</id>
+        <type>regular</type>
+        <sourceId>154</sourceId>
+        <destinationId>2280</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>2282</id>
+        <type>regular</type>
+        <sourceId>2280</sourceId>
+        <destinationId>363</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>2283</id>
+        <type>regular</type>
+        <sourceId>363</sourceId>
+        <destinationId>2280</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>2285</id>
+        <type>regular</type>
+        <sourceId>413</sourceId>
+        <destinationId>2284</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>2286</id>
+        <type>regular</type>
+        <sourceId>2284</sourceId>
+        <destinationId>364</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>2287</id>
+        <type>regular</type>
+        <sourceId>364</sourceId>
+        <destinationId>2284</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>2479</id>
+        <type>regular</type>
+        <sourceId>363</sourceId>
+        <destinationId>2284</destinationId>
         <multiplicity>1</multiplicity>
     </arc>
 </document>
