@@ -80,6 +80,7 @@ public class Importer {
     @Transactional
     protected PetriNet createPetriNet(String title, String initials) {
         net = new PetriNet();
+        net.setNetId(document.getId());
         net.setTitle(title);
         net.setInitials(initials);
 

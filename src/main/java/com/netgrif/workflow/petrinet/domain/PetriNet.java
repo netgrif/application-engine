@@ -5,7 +5,6 @@ import com.netgrif.workflow.petrinet.domain.roles.ProcessRole;
 import lombok.Getter;
 import lombok.Setter;
 import org.bson.types.ObjectId;
-import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -15,10 +14,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Document
-public class PetriNet {
-
-    @Id
-    private ObjectId _id;
+public class PetriNet extends PetriNetObject {
 
     @Getter @Setter
     private String title;
