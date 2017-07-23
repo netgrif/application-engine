@@ -20,7 +20,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 @RestController()
@@ -55,10 +54,11 @@ public class WorkflowController {
     }
 
     @RequestMapping(value = "/case/search", method = RequestMethod.POST)
-    public PagedResources<CaseResource> searchCases(@RequestBody List<String> petriNets, Pageable pageable, PagedResourcesAssembler<Case> assembler) {
-        Page<Case> cases = workflowService.searchCase(petriNets, pageable);
+    public PagedResources<CaseResource> search(@RequestBody Map<String, Object> searchBody, Pageable pageable, PagedResourcesAssembler<Case> assembler, Authentication auth) {
+        log.info("Starting search");
+        Page<Case> cases = workflowService.search(searchBody, pageable, (LoggedUser) auth.getPrincipal());
         Link selfLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(WorkflowController.class)
-                .searchCases(petriNets, pageable, assembler)).withRel("search");
+                .search(searchBody, pageable, assembler, auth)).withRel("search");
         PagedResources<CaseResource> resources = assembler.toResource(cases, new CaseResourceAssembler(), selfLink);
         ResourceLinkAssembler.addLinks(resources, Case.class, selfLink.getRel());
         return resources;
@@ -75,36 +75,25 @@ public class WorkflowController {
     }
 
     @RequestMapping(value = "/case/{id}", method = RequestMethod.DELETE)
-    public MessageResource deleteCase(@PathVariable("id") String caseId){
+    public MessageResource deleteCase(@PathVariable("id") String caseId) {
         try {
             caseId = URLDecoder.decode(caseId, StandardCharsets.UTF_8.name());
             workflowService.deleteCase(caseId);
-            return MessageResource.successMessage("Case "+caseId+" was deleted");
+            return MessageResource.successMessage("Case " + caseId + " was deleted");
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
-            return MessageResource.errorMessage("Deleting case "+caseId+" has failed!");
+            return MessageResource.errorMessage("Deleting case " + caseId + " has failed!");
         }
     }
 
-    @RequestMapping(value= "/case/{id}/data", method = RequestMethod.GET)
-    public DataFieldsResource getAllCaseData(@PathVariable("id") String caseId){
+    @RequestMapping(value = "/case/{id}/data", method = RequestMethod.GET)
+    public DataFieldsResource getAllCaseData(@PathVariable("id") String caseId) {
         try {
             caseId = URLDecoder.decode(caseId, StandardCharsets.UTF_8.name());
-            return new DataFieldsResource(workflowService.getData(caseId),null);
+            return new DataFieldsResource(workflowService.getData(caseId), null);
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
-            return new DataFieldsResource(new ArrayList<>(),null);
+            return new DataFieldsResource(new ArrayList<>(), null);
         }
-    }
-
-    @RequestMapping(value = "/case/newsearch", method = RequestMethod.POST)
-    public PagedResources<CaseResource> search(@RequestBody Map<String, Object> searchBody, Pageable pageable, PagedResourcesAssembler<Case> assembler, Authentication auth){
-        log.info("Starting search");
-        Page<Case> cases = workflowService.search(searchBody,pageable,(LoggedUser)auth.getPrincipal());
-        Link selfLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(WorkflowController.class)
-                .search(searchBody, pageable, assembler,auth)).withRel("search");
-        PagedResources<CaseResource> resources = assembler.toResource(cases, new CaseResourceAssembler(), selfLink);
-        ResourceLinkAssembler.addLinks(resources, Case.class, selfLink.getRel());
-        return resources;
     }
 }
