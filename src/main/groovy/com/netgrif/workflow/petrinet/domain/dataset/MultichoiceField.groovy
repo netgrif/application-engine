@@ -3,11 +3,11 @@ package com.netgrif.workflow.petrinet.domain.dataset
 import org.springframework.data.mongodb.core.mapping.Document
 
 @Document
-public class MultichoiceField extends ChoiceField<Set<String>> {
+class MultichoiceField extends ChoiceField<Set<String>> {
 
-    public MultichoiceField() {
-        super();
-        value = new HashSet<>();
+    MultichoiceField() {
+        super()
+        value = new HashSet<>()
     }
 
     MultichoiceField(String[] values) {
@@ -15,9 +15,9 @@ public class MultichoiceField extends ChoiceField<Set<String>> {
     }
 
     @Override
-    public void setDefaultValue(String value){
+    void setDefaultValue(String value) {
         String[] vls = value.split(",")
-        vls.each {s -> s.trim()}
+        vls.each { s -> s.trim() }
         this.defaultValue = new HashSet<String>(vls as Set)
     }
 
@@ -27,7 +27,7 @@ public class MultichoiceField extends ChoiceField<Set<String>> {
         setValue(getDefaultValue())
     }
 
-    public void setValue(List<String> value) {
-        this.value = new HashSet<>(value);
+    void setValue(List<String> value) {
+        this.value = new HashSet<>(value)
     }
 }
