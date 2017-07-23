@@ -56,10 +56,11 @@ public class WorkflowController {
     }
 
     @RequestMapping(value = "/case/search", method = RequestMethod.POST)
-    public PagedResources<CaseResource> searchCases(@RequestBody List<String> petriNets, Pageable pageable, PagedResourcesAssembler<Case> assembler) {
-        Page<Case> cases = workflowService.searchCase(petriNets, pageable);
+    public PagedResources<CaseResource> search(@RequestBody Map<String, Object> searchBody, Pageable pageable, PagedResourcesAssembler<Case> assembler, Authentication auth) {
+        log.info("Starting search");
+        Page<Case> cases = workflowService.search(searchBody, pageable, (LoggedUser) auth.getPrincipal());
         Link selfLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(WorkflowController.class)
-                .searchCases(petriNets, pageable, assembler)).withRel("search");
+                .search(searchBody, pageable, assembler, auth)).withRel("search");
         PagedResources<CaseResource> resources = assembler.toResource(cases, new CaseResourceAssembler(), selfLink);
         ResourceLinkAssembler.addLinks(resources, Case.class, selfLink.getRel());
         return resources;
