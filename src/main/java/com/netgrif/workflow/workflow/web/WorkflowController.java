@@ -99,17 +99,6 @@ public class WorkflowController {
         }
     }
 
-    @RequestMapping(value = "/case/newsearch", method = RequestMethod.POST)
-    public PagedResources<CaseResource> search(@RequestBody Map<String, Object> searchBody, Pageable pageable, PagedResourcesAssembler<Case> assembler, Authentication auth) {
-        log.info("Starting search");
-        Page<Case> cases = workflowService.search(searchBody, pageable, (LoggedUser) auth.getPrincipal());
-        Link selfLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(WorkflowController.class)
-                .search(searchBody, pageable, assembler, auth)).withRel("search");
-        PagedResources<CaseResource> resources = assembler.toResource(cases, new CaseResourceAssembler(), selfLink);
-        ResourceLinkAssembler.addLinks(resources, Case.class, selfLink.getRel());
-        return resources;
-    }
-
     @RequestMapping(value = "/case/{caseId}/field/{fieldId}", method = RequestMethod.GET)
     public List<Case> getCaseFieldChoices(@PathVariable("caseId") String caseId, @PathVariable("fieldId") String fieldId, Pageable pageable) {
         try {
