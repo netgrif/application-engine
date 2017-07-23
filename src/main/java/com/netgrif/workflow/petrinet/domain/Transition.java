@@ -81,7 +81,8 @@ public class Transition extends Node {
     }
 
     public boolean isDisplayable(String fieldId){
-        return dataSet.get(fieldId).isDisplayable();
+        DataFieldLogic logic = dataSet.get(fieldId);
+        return logic != null && logic.isDisplayable();
     }
 
     @Override

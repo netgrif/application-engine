@@ -69,9 +69,9 @@ public final class ImportFieldFactory {
     }
 
     private CaseField buildCaseField(ImportData data) {
-        Map<Long, Set<Long>> netIds = new HashMap<>();
+        Map<Long, LinkedHashSet<Long>> netIds = new HashMap<>();
         Arrays.stream(data.getDocumentRefs())
-                .forEach(documentRef -> netIds.put(documentRef.getId(), new HashSet<>(Arrays.asList(documentRef.getFields()))));
+                .forEach(documentRef -> netIds.put(documentRef.getId(), new LinkedHashSet<>(Arrays.asList(documentRef.getFields()))));
         return new CaseField(netIds);
     }
 
