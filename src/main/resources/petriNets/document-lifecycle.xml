@@ -2,17 +2,47 @@
 <document>
     <!-- ========== TRANSACTIONS ========== -->
     <!-- ========== DATA ========== -->
-    <data type="text">
+    <data type="text" immediate="true">
         <id>1</id>
         <title>Názov dokumentu</title>
     </data>
     <data type="file">
         <id>2</id>
         <title>Dokument</title>
+        <!--Set create date-->
+        <action trigger="set">
+            <!--@formatter:off-->
+            field: f.2,
+            date: f.4;
+            change date about {
+                if (date.value != null)
+                    return date.value;
+                return new LocalDate();
+            }
+            <!--@formatter:on-->
+        </action>
+        <!--Set last edit date-->
+        <action trigger="set">
+            <!--@formatter:off-->
+            field: f.2,
+            date: f.5;
+            change date about {
+                return new LocalDate();
+            }
+            <!--@formatter:on-->
+        </action>
     </data>
-    <data type="text">
+    <data type="text" immediate="true">
         <id>3</id>
         <title>Popis</title>
+    </data>
+    <data type="date">
+        <id>4</id>
+        <title>Dátum vytvorenia</title>
+    </data>
+    <data type="date" immediate="true">
+        <id>5</id>
+        <title>Dátum poslednej úpravy</title>
     </data>
     <!-- ========== ROLES ========== -->
     <role>
@@ -60,27 +90,29 @@
                 <perform>true</perform>
             </logic>
         </roleRef>
-        <dataRef>
-            <id>1</id>
-            <logic>
-                <behavior>required</behavior>
-                <behavior>editable</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>2</id>
-            <logic>
-                <behavior>required</behavior>
-                <behavior>editable</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>3</id>
-            <logic>
-                <behavior>optional</behavior>
-                <behavior>editable</behavior>
-            </logic>
-        </dataRef>
+        <dataGroup>
+            <dataRef>
+                <id>1</id>
+                <logic>
+                    <behavior>required</behavior>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>2</id>
+                <logic>
+                    <behavior>required</behavior>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>3</id>
+                <logic>
+                    <behavior>optional</behavior>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
     </transition>
     <transition>
         <id>6</id>
@@ -99,24 +131,49 @@
                 <delegate>true</delegate>
             </logic>
         </roleRef>
-        <dataRef>
+        <dataGroup>
             <id>1</id>
-            <logic>
-                <visible>true</visible>
-            </logic>
-        </dataRef>
-        <dataRef>
+            <title></title>
+            <dataRef>
+                <id>1</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>2</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
             <id>2</id>
-            <logic>
-                <visible>true</visible>
-            </logic>
-        </dataRef>
-        <dataRef>
+            <title></title>
+            <stretch>true</stretch>
+            <dataRef>
+                <id>3</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
             <id>3</id>
-            <logic>
-                <visible>true</visible>
-            </logic>
-        </dataRef>
+            <title></title>
+            <dataRef>
+                <id>4</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>5</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
     </transition>
     <transition>
         <id>7</id>
