@@ -193,16 +193,19 @@ public class Importer {
     @Transactional
     protected void addDataLogic(Transition transition, DataRef dataRef) {
         DataLogic logic = dataRef.getLogic();
-        String fieldId = fields.get(dataRef.getId()).getObjectId();
+        try {
+            String fieldId = fields.get(dataRef.getId()).getObjectId();
+            if (logic == null || fieldId == null)
+                return;
 
-        if (logic == null || fieldId == null)
-            return;
+            Set<FieldBehavior> behavior = new HashSet<>();
+            if (logic.getBehavior() != null)
+                Arrays.stream(logic.getBehavior()).forEach(b -> behavior.add(FieldBehavior.fromString(b)));
 
-        Set<FieldBehavior> behavior = new HashSet<>();
-        if (logic.getBehavior() != null)
-            Arrays.stream(logic.getBehavior()).forEach(b -> behavior.add(FieldBehavior.fromString(b)));
-
-        transition.addDataSet(fieldId, behavior, null);
+            transition.addDataSet(fieldId, behavior, null);
+        } catch (NullPointerException e) {
+            throw new IllegalArgumentException("Wrong dataRef id [" + dataRef.getId() + "] on transition [" + transition.getTitle() + "]", e);
+        }
     }
 
     @Transactional
@@ -247,7 +250,7 @@ public class Importer {
             }
         } catch (NullPointerException e) {
             e.printStackTrace();
-            log.error("Failed to parse action: "+action,e);
+            log.error("Failed to parse action: " + action, e);
         }
         return action;
     }
@@ -272,7 +275,7 @@ public class Importer {
     @Transactional
     protected void createPlace(ImportPlace importPlace) {
         Place place = new Place();
-        place.setStatic(importPlace.getIsStatic());
+        place.setIsStatic(importPlace.getIsStatic());
         place.setTokens(importPlace.getTokens());
         place.setPosition(importPlace.getX(), importPlace.getY());
         place.setTitle(importPlace.getLabel());

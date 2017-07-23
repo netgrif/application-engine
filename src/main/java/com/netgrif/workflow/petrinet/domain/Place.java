@@ -8,10 +8,10 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class Place extends Node {
 
     @Getter @Setter
-    private int tokens;
+    private Integer tokens;
 
     @Getter @Setter
-    private boolean isStatic;
+    private Boolean isStatic;
 
     public Place() {
         super();
@@ -21,7 +21,7 @@ public class Place extends Node {
         this.tokens += tokens;
     }
 
-    public void removeTokens(int tokens) throws IllegalArgumentException {
+    public void removeTokens(Integer tokens) throws IllegalArgumentException {
         if (this.tokens - tokens < 0)
             throw new IllegalArgumentException("Place can not have negative number of tokens.");
         this.tokens -= tokens;
