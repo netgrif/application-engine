@@ -5,7 +5,6 @@ import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.Place;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.petrinet.domain.dataset.FieldWithDefault;
-import com.netgrif.workflow.workflow.service.TaskService;
 import lombok.Getter;
 import lombok.Setter;
 import org.bson.types.ObjectId;
@@ -16,9 +15,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.NotNull;
 import java.util.*;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
-import java.util.stream.LongStream;
 
 @Document
 public class Case {
@@ -49,7 +46,7 @@ public class Case {
     @Getter
     @Setter
     @JsonIgnore
-    private Map<String, DataField> dataSet;
+    private LinkedHashMap<String, DataField> dataSet;
 
     @Getter
     @Setter
@@ -57,6 +54,7 @@ public class Case {
     private Set<String> immediateDataFields;
 
     @Getter
+    @Setter
     @Transient
     private List<Field> immediateData;
 
@@ -138,14 +136,6 @@ public class Case {
 
     public void addImmediateDataField(String fieldId) {
         this.immediateDataFields.add(fieldId);
-    }
-
-    public void populateImmediateData() {
-        this.immediateData = new ArrayList<>();
-        this.immediateDataFields.forEach(fieldId ->
-                immediateData.add(TaskService.buildField(this, fieldId, false))
-        );
-        LongStream.range(0L, this.immediateData.size()).forEach(index -> immediateData.get((int) index).setOrder(index));
     }
 
     private void removeTokensFromActivePlace(Place place, Integer tokens) {

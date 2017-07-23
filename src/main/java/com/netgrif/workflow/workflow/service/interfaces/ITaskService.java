@@ -15,9 +15,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Map;
 
 public interface ITaskService {
     Page<Task> getAll(LoggedUser loggedUser, Pageable pageable);
+
+    Page<Task> search(Map<String, Object> request, Pageable pageable, LoggedUser user);
 
     Page<Task> findByCases(Pageable pageable, List<String> cases);
 
@@ -52,4 +55,6 @@ public interface ITaskService {
     FileSystemResource getFile(String taskId, String fieldId);
 
     void deleteTasksByCase(String caseId);
+
+    Field buildField(Case useCase, String fieldId, boolean withValidation);
 }

@@ -26,9 +26,9 @@ public class CaseSearchService extends MongoSearchService<Case> {
     public String authorQuery(Object obj) {
         Map<Class, Function<Object, String>> builder = new HashMap<>();
 
-        builder.put(Long.class, o -> (String) o);
-        builder.put(Integer.class, o -> (String) o);
-        builder.put(ArrayList.class, o -> in((List<Object>) obj, oo -> (String) oo, ob -> ob instanceof Long || ob instanceof Integer));
+        builder.put(Long.class, o -> ((Long) o).toString());
+        builder.put(Integer.class, o -> ((Integer) o).toString());
+        builder.put(ArrayList.class, o -> in((List<Object>) obj, oo -> oo.toString(), ob -> ob instanceof Long || ob instanceof Integer));
         builder.put(String.class, o -> {
             Long id = resolveAuthorByEmail((String) obj);
             return id != null ? id.toString() : "";
