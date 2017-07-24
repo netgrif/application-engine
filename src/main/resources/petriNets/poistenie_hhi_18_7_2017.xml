@@ -826,6 +826,52 @@
             return 0 as Double;
             }
         <!--@formatter:on-->
+        </action><action trigger="set">
+        <!--@formatter:off-->
+            check: f.this,
+            trans: t.364,
+            other: f.308008;
+            make other,visible on trans when { check.value == true }
+            <!--@formatter:on-->
+    </action>
+        <action trigger="set">
+            <!--@formatter:off-->
+            check: f.this,
+            trans: t.364,
+            other: f.308003;
+            make other,visible on trans when { check.value == true }
+            <!--@formatter:on-->
+        </action>
+        <action trigger="set">
+            <!--@formatter:off-->
+            check: f.this,
+            trans: t.364,
+            other: f.308008;
+            make other,hidden on trans when { check.value == false }
+            <!--@formatter:on-->
+        </action>
+        <action trigger="set">
+            <!--@formatter:off-->
+            check: f.this,
+            trans: t.364,
+            other: f.308003;
+            make other,hidden on trans when { check.value == false }
+            <!--@formatter:on-->
+        </action>
+        <!--Remove value-->
+        <action trigger="set">
+            <!--@formatter:off-->
+            field: f.this,
+            other: f.107001;
+            change other about { null; }
+        <!--@formatter:on-->
+        </action>
+        <action trigger="set">
+            <!--@formatter:off-->
+            field: f.this,
+            other: f.308008;
+            change other about { null; }
+        <!--@formatter:on-->
         </action>
     </data>
     <data type="boolean">
@@ -890,11 +936,50 @@
             make other,hidden on trans when { check.value == false }
             <!--@formatter:on-->
         </action>
+        <action trigger="set">
+            <!--@formatter:off-->
+            check: f.this,
+            trans: t.364,
+            other: f.308009;
+            make other,visible on trans when { check.value == true }
+            <!--@formatter:on-->
+        </action>
+        <action trigger="set">
+            <!--@formatter:off-->
+            check: f.this,
+            trans: t.364,
+            other: f.308003;
+            make other,visible on trans when { check.value == true }
+            <!--@formatter:on-->
+        </action>
+        <action trigger="set">
+            <!--@formatter:off-->
+            check: f.this,
+            trans: t.364,
+            other: f.308009;
+            make other,hidden on trans when { check.value == false }
+            <!--@formatter:on-->
+        </action>
+        <action trigger="set">
+            <!--@formatter:off-->
+            check: f.this,
+            trans: t.364,
+            other: f.308003;
+            make other,hidden on trans when { check.value == false }
+            <!--@formatter:on-->
+        </action>
         <!--Remove value-->
         <action trigger="set">
             <!--@formatter:off-->
             field: f.this,
             other: f.107003;
+            change other about { null; }
+        <!--@formatter:on-->
+        </action>
+        <action trigger="set">
+            <!--@formatter:off-->
+            field: f.this,
+            other: f.308009;
             change other about { null; }
         <!--@formatter:on-->
         </action>
@@ -2525,7 +2610,7 @@
         <action trigger="set">
             <!--@formatter:off-->
             field: f.this,
-            coeff: f.204001,
+            coeff: f.204002,
             excess: f.208002,
             sum: f.308009;
             change sum about {
@@ -3622,7 +3707,6 @@
     <data type="number">
         <title>Koeficient - Poistenie zodpovednosti z vlastníctva nehnuteľnosti</title>
         <id>204001</id>
-        <init>0</init>
     </data>
     <data type="number">
         <title>Koeficient - Zodpovednosť za škodu členov domácnosti</title>
@@ -5265,6 +5349,10 @@
                 </logic>
             </dataRef>
         </dataGroup>
+        <dataGroup>
+        <id>2</id>
+        <title></title>
+        <alignment>start</alignment>
                     <!--Bolo miesto poistenia postihnuté povodňou za posledných 10 rokov?-->
             <dataRef>
                 <id>101003</id>
@@ -5419,6 +5507,7 @@
                     <behavior>required</behavior>
                 </logic>
             </dataRef>
+        </dataGroup>
     </transition>
     <!--============================= Nehnuteľnosť - DONE =====================-->
     <transition>
@@ -7186,7 +7275,6 @@
                 <id>106003</id>
                 <logic>
                     <behavior>editable</behavior>
-                    <behavior>required</behavior>
                 </logic>
             </dataRef>
             <!--Obývanosť domácnosti-->
@@ -8067,7 +8155,7 @@
         </roleRef>
         <dataGroup>
             <id>1</id>
-            <title></title>
+            <title>Nehnuteľnosť</title>
             <alignment>start</alignment>
             <!--nehnutelnost poistna suma-->
             <dataRef>
@@ -8083,6 +8171,18 @@
                     <behavior>hidden</behavior>
                 </logic>
             </dataRef>
+            <!--Celkové poistenie nehnuteľnosti-->
+            <dataRef>
+                <id>308001</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>2</id>
+            <title>Domácnosť</title>
+            <alignment>start</alignment>
             <!--Poistenie domácnosti - poistná suma-->
             <dataRef>
                 <id>106002</id>
@@ -8097,13 +8197,6 @@
                     <behavior>hidden</behavior>
                 </logic>
             </dataRef>
-            <!--Celkové poistenie nehnuteľnosti-->
-            <dataRef>
-                <id>308001</id>
-                <logic>
-                    <behavior>hidden</behavior>
-                </logic>
-            </dataRef>
             <!--Celkové poistenie domácnosti-->
             <dataRef>
                 <id>308002</id>
@@ -8113,33 +8206,33 @@
             </dataRef>
         </dataGroup>
         <dataGroup>
-            <id>2</id>
-            <title></title>
+            <id>3</id>
+            <title>Poistenie zodpovednosti</title>
             <alignment>start</alignment>
             <!--Poistenie zodpovednosti nehnutelnost-->
             <dataRef>
                 <id>308008</id>
                 <logic>
-                    <behavior>visible</behavior>
+                    <behavior>hidden</behavior>
                 </logic>
             </dataRef>
             <!--Poistenie zodpovednosti domacnost-->
             <dataRef>
                 <id>308009</id>
                 <logic>
-                    <behavior>visible</behavior>
+                    <behavior>hidden</behavior>
                 </logic>
             </dataRef>
             <!--Poistenie zodpovednosti za škodu-->
             <dataRef>
                 <id>308003</id>
                 <logic>
-                    <behavior>visible</behavior>
+                    <behavior>hidden</behavior>
                 </logic>
             </dataRef>
         </dataGroup>
         <dataGroup>
-            <id>2</id>
+            <id>4</id>
             <title></title>
             <alignment>start</alignment>
             <stretch>true</stretch>
@@ -8152,7 +8245,7 @@
             </dataRef>
         </dataGroup>
         <dataGroup>
-            <id>2</id>
+            <id>5</id>
             <title></title>
             <alignment>start</alignment>
             <stretch>true</stretch>
@@ -8202,7 +8295,6 @@
                 <id>108003</id>
                 <logic>
                     <behavior>editable</behavior>
-                    <behavior>required</behavior>
                 </logic>
             </dataRef>
         </dataGroup>
