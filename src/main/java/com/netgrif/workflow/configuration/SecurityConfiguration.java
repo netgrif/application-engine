@@ -20,6 +20,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.servlet.http.HttpServletRequest;
 import java.security.Principal;
 import java.util.stream.Stream;
 
@@ -32,7 +33,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     private static final Logger log = LoggerFactory.getLogger(SecurityConfiguration.class);
 
     private final String[] PERMIT_ALL_STATIC_PATTERNS = {
-            "/bower_components/**","/scripts/**","/assets/**","/styles/**","/views/**","/**/favicon.ico"
+            "/bower_components/**", "/scripts/**", "/assets/**", "/styles/**", "/views/**", "/**/favicon.ico"
     };
     private final String[] PERMIT_ALL_SERVER_PATTERNS = {
             "/index.html", "/", "/login", "/signup/{token}", "/signup", "/signup/token"
@@ -45,8 +46,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     private UserDetailsService userDetailsService;
 
     @RequestMapping(value = "{path:[^res][^\\.]*$}")
-    public String redirect() {
-        log.info("Forwarding to root");
+    public String redirect(HttpServletRequest request) {
+        log.info("Forwarding to root for request URI [" + request.getRequestURI() + "]");
         return "forward:/";
     }
 
@@ -69,15 +70,15 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
-            .httpBasic().and()
-            .authorizeRequests()
+                .httpBasic().and()
+                .authorizeRequests()
                 .antMatchers(getPatterns()).permitAll()
                 .anyRequest().authenticated()
-            .and()
-            .formLogin()
+                .and()
+                .formLogin()
                 .loginPage("/login")
-            .and()
-            .csrf()//.disable();
+                .and()
+                .csrf()//.disable();
                 .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse());
     }
 
