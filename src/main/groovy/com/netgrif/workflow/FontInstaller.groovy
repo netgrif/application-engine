@@ -64,10 +64,10 @@ class FontInstaller implements CommandLineRunner {
     }
 
     private void installOnUnix() throws FontInstallException {
-        def result = "sudo cp -r ${FONT_PATH} /usr/share/fonts/truetype/".execute()
-        if (!result.exitValue()) {
-            throw new FontInstallException("Command exited with value ${result.exitValue()}: ${result.text}")
-        }
+//        def result = "sudo cp -r ${FONT_PATH} /usr/share/fonts/truetype/".execute()
+//        if (!result.exitValue()) {
+//            throw new FontInstallException("Command exited with value ${result.exitValue()}: ${result.text}")
+//        }
     }
 
     class FontInstallException extends Exception {
