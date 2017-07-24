@@ -70,6 +70,7 @@ public class ImporterTest {
 
     @Test
     public void caseRefTest() {
+        importer.importPetriNet(new File("src/test/resources/datagroup_test.xml"), "DataGroup test", "DGT");
         PetriNet net = importer.importPetriNet(new File("src/test/resources/caseref_test.xml"), "Caseref test", "CRT");
         assert net != null;
 
