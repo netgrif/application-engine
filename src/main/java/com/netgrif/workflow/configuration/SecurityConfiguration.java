@@ -69,17 +69,19 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
+//        @formatter:off
         http
-                .httpBasic().and()
-                .authorizeRequests()
+            .httpBasic().and()
+            .authorizeRequests()
                 .antMatchers(getPatterns()).permitAll()
                 .anyRequest().authenticated()
-                .and()
-                .formLogin()
+            .and()
+            .formLogin()
                 .loginPage("/login")
-                .and()
-                .csrf()//.disable();
+            .and()
+            .csrf()//.disable();
                 .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse());
+//        @formatter:on
     }
 
     private String[] getPatterns() {
