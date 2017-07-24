@@ -46,10 +46,11 @@
         <action trigger="set">
             <!--@formatter:off-->
             field: f.301002,
+            zipcode: f.101001,
             obec: f.this;
-            change field about{
-                def postal = cache "post";
-                return postal.find {item -> item.locality.equals(obec.value as String)}.regionCode;
+            change field about {
+                def postal = psc byCode,zipcode.value;
+                return postal.locality;
             }
             <!--@formatter:on-->
         </action>
