@@ -4,7 +4,6 @@ import org.apache.log4j.Logger;
 import org.apache.velocity.app.VelocityEngine;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
 import org.springframework.ui.velocity.VelocityEngineUtils;
@@ -55,13 +54,13 @@ public class MailService implements IMailService {
 
     @Override
     public void testConnection() {
-        try {
-            ((JavaMailSenderImpl) mailSender).testConnection();
-            log.info("MAIL: Connection to mail server is stable");
-        } catch (MessagingException e) {
-            e.printStackTrace();
-            log.error("MAIL: Connection failed!");
-        }
+//        try {
+//            ((JavaMailSenderImpl) mailSender).testConnection();
+//            log.info("MAIL: Connection to mail server is stable");
+//        } catch (MessagingException e) {
+//            e.printStackTrace();
+//            log.error("MAIL: Connection failed!");
+//        }
     }
 
     private MimeMessage buildEmail(EmailType type, List<String> recipients, Map<String, Object> model) throws MessagingException {
