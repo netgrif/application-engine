@@ -7,9 +7,9 @@ import org.springframework.data.mongodb.core.mapping.Document
 class CaseField extends Field<String> {
 
     /**
-     * Stores PetriNet import id and immediate fields ids of given net
+     * Stores PetriNet object id and immediate fields ids of given net
      */
-    private Map<Long, LinkedHashSet<Long>> constraintNetIds
+    private Map<String, LinkedHashSet<String>> constraintNetIds
 
     @Transient
     private Map<String, Object> immediateFieldValues
@@ -19,7 +19,7 @@ class CaseField extends Field<String> {
         immediateFieldValues = new HashMap<>()
     }
 
-    CaseField(Map<Long, LinkedHashSet<Long>> netId) {
+    CaseField(Map<String, LinkedHashSet<String>> netId) {
         this()
         constraintNetIds = netId
     }
@@ -34,11 +34,11 @@ class CaseField extends Field<String> {
         this.setValue(null)
     }
 
-    Map<Long, Set<Long>> getConstraintNetIds() {
+    Map<String, LinkedHashSet<String>> getConstraintNetIds() {
         return constraintNetIds
     }
 
-    void setConstraintNetIds(Map<Long, LinkedHashSet<Long>> constraintNetId) {
+    void setConstraintNetIds(Map<String, LinkedHashSet<String>> constraintNetId) {
         this.constraintNetIds = constraintNetId
     }
 
