@@ -12,7 +12,7 @@ public abstract class PetriNetObject {
     @JsonIgnore
     protected ObjectId _id;
 
-    protected Long id;
+    protected Long importId;
 
     public String getStringId() {
         return _id.toString();
@@ -26,11 +26,11 @@ public abstract class PetriNetObject {
         this._id = _id;
     }
 
-    public Long getNetId() {
-        return id;
+    public Long getImportId() {
+        return importId;
     }
 
-    public void setNetId(Long id) {
-        this.id = id;
+    public void setImportId(Long importId) {
+        this.importId = importId;
     }
 }
