@@ -53,32 +53,7 @@
         <id>2</id>
         <name>Admin</name>
     </role>
-    <!-- ========== PLACES ========== -->
-    <place>
-        <id>1</id>
-        <x>100</x>
-        <y>180</y>
-        <label>in</label>
-        <tokens>1</tokens>
-        <isStatic>false</isStatic>
-    </place>
-    <place>
-        <id>4</id>
-        <x>340</x>
-        <y>180</y>
-        <label></label>
-        <tokens>0</tokens>
-        <isStatic>false</isStatic>
-    </place>
-    <place>
-        <id>14</id>
-        <x>660</x>
-        <y>180</y>
-        <label>out</label>
-        <tokens>0</tokens>
-        <isStatic>false</isStatic>
-    </place>
-    <!-- ========== TRANSITIONS ========== -->
+    <!-- ========== TRANISITONS ========== -->
     <transition>
         <id>2</id>
         <x>220</x>
@@ -116,8 +91,8 @@
     </transition>
     <transition>
         <id>6</id>
-        <x>420</x>
-        <y>100</y>
+        <x>500</x>
+        <y>60</y>
         <label>Zobraziť</label>
         <roleRef>
             <id>1</id>
@@ -177,8 +152,8 @@
     </transition>
     <transition>
         <id>7</id>
-        <x>420</x>
-        <y>260</y>
+        <x>500</x>
+        <y>300</y>
         <label>Nahrať revíziu</label>
         <roleRef>
             <id>2</id>
@@ -205,25 +180,85 @@
                 <perform>true</perform>
             </logic>
         </roleRef>
-        <dataRef>
+        <dataGroup>
             <id>1</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>2</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>3</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
+            <title></title>
+            <dataRef>
+                <id>1</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>2</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>3</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
     </transition>
+    <transition>
+        <id>48</id>
+        <x>700</x>
+        <y>180</y>
+        <label></label>
+        <trigger type="auto"></trigger>
+    </transition>
+    <!-- ========== PLACES ========== -->
+    <place>
+        <id>1</id>
+        <x>100</x>
+        <y>180</y>
+        <label>in</label>
+        <tokens>1</tokens>
+        <isStatic>false</isStatic>
+    </place>
+    <place>
+        <id>4</id>
+        <x>340</x>
+        <y>180</y>
+        <label></label>
+        <tokens>0</tokens>
+        <isStatic>false</isStatic>
+    </place>
+    <place>
+        <id>14</id>
+        <x>820</x>
+        <y>180</y>
+        <label>out</label>
+        <tokens>0</tokens>
+        <isStatic>false</isStatic>
+    </place>
+    <place>
+        <id>23</id>
+        <x>340</x>
+        <y>60</y>
+        <label></label>
+        <tokens>0</tokens>
+        <isStatic>false</isStatic>
+    </place>
+    <place>
+        <id>24</id>
+        <x>340</x>
+        <y>300</y>
+        <label></label>
+        <tokens>0</tokens>
+        <isStatic>false</isStatic>
+    </place>
+    <place>
+        <id>47</id>
+        <x>580</x>
+        <y>180</y>
+        <label></label>
+        <tokens>0</tokens>
+        <isStatic>false</isStatic>
+    </place>
     <!-- ========== ARCS ========== -->
     <arc>
         <id>3</id>
@@ -240,34 +275,6 @@
         <multiplicity>1</multiplicity>
     </arc>
     <arc>
-        <id>8</id>
-        <type>regular</type>
-        <sourceId>4</sourceId>
-        <destinationId>6</destinationId>
-        <multiplicity>1</multiplicity>
-    </arc>
-    <arc>
-        <id>9</id>
-        <type>regular</type>
-        <sourceId>4</sourceId>
-        <destinationId>7</destinationId>
-        <multiplicity>1</multiplicity>
-    </arc>
-    <arc>
-        <id>11</id>
-        <type>regular</type>
-        <sourceId>6</sourceId>
-        <destinationId>4</destinationId>
-        <multiplicity>1</multiplicity>
-    </arc>
-    <arc>
-        <id>12</id>
-        <type>regular</type>
-        <sourceId>7</sourceId>
-        <destinationId>4</destinationId>
-        <multiplicity>1</multiplicity>
-    </arc>
-    <arc>
         <id>13</id>
         <type>regular</type>
         <sourceId>4</sourceId>
@@ -275,10 +282,80 @@
         <multiplicity>1</multiplicity>
     </arc>
     <arc>
-        <id>15</id>
+        <id>25</id>
+        <type>regular</type>
+        <sourceId>2</sourceId>
+        <destinationId>23</destinationId>
+        <multiplicity>2147483640</multiplicity>
+    </arc>
+    <arc>
+        <id>26</id>
+        <type>regular</type>
+        <sourceId>2</sourceId>
+        <destinationId>24</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>43</id>
+        <type>regular</type>
+        <sourceId>23</sourceId>
+        <destinationId>6</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>44</id>
+        <type>regular</type>
+        <sourceId>24</sourceId>
+        <destinationId>7</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>45</id>
+        <type>regular</type>
+        <sourceId>6</sourceId>
+        <destinationId>23</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>46</id>
+        <type>regular</type>
+        <sourceId>7</sourceId>
+        <destinationId>24</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>49</id>
         <type>regular</type>
         <sourceId>10</sourceId>
+        <destinationId>47</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>50</id>
+        <type>regular</type>
+        <sourceId>47</sourceId>
+        <destinationId>48</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>51</id>
+        <type>regular</type>
+        <sourceId>48</sourceId>
         <destinationId>14</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>52</id>
+        <type>reset</type>
+        <sourceId>23</sourceId>
+        <destinationId>48</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>53</id>
+        <type>reset</type>
+        <sourceId>24</sourceId>
+        <destinationId>48</destinationId>
         <multiplicity>1</multiplicity>
     </arc>
 </document>
