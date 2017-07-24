@@ -16,7 +16,7 @@ class FieldActionsRunner {
     @Autowired
     private IPostalCodeService postalCodeService
 
-    private Map<String,Object> actionsCache;
+    private Map<String,Object> actionsCache = new HashMap<>()
 
     ChangedField run(String script, Case useCase) {
         Binding binding = new Binding()
