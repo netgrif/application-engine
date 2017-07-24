@@ -218,7 +218,7 @@ public class TaskService implements ITaskService {
 
         caseRepository.save(useCase);
         taskRepository.save(task);
-        reloadTasks(useCase);
+        reloadTasks(useCase, userId);
 
         publisher.publishEvent(new UserFinishTaskEvent(user, task, useCase));
     }
@@ -451,7 +451,7 @@ public class TaskService implements ITaskService {
         task.setUserId(null);
         task = taskRepository.save(task);
         caseRepository.save(useCase);
-        reloadTasks(useCase);
+        reloadTasks(useCase, userId);
 
         publisher.publishEvent(new UserCancelTaskEvent(user, task, useCase));
     }
@@ -548,13 +548,13 @@ public class TaskService implements ITaskService {
      * </table>
      */
     @Transactional
-    void reloadTasks(Case useCase) {
+    void reloadTasks(Case useCase, Long userId) {
         PetriNet net = useCase.getPetriNet();
         List<Task> tasks = taskRepository.findAllByCaseId(useCase.getStringId());
 
         net.getTransitions().values().forEach(transition -> {
             if (isExecutable(transition, net)) {
-                if (taskIsNotPresent(tasks, transition)) {
+                if (taskIsNotPresent(tasks, transition, userId)) {
                     createFromTransition(transition, useCase);
                 }
             } else {
@@ -571,8 +571,8 @@ public class TaskService implements ITaskService {
     }
 
     @Transactional
-    boolean taskIsNotPresent(List<Task> tasks, Transition transition) {
-        return tasks.stream().noneMatch(task -> task.getTransitionId().equals(transition.getStringId()));
+    boolean taskIsNotPresent(List<Task> tasks, Transition transition, Long userId) {
+        return tasks.stream().noneMatch(task -> task.getTransitionId().equals(transition.getStringId()) || userId.equals(task.getUserId()));
     }
 
     @Transactional
@@ -690,7 +690,7 @@ public class TaskService implements ITaskService {
 
         caseRepository.save(useCase);
         taskRepository.save(task);
-        reloadTasks(useCase);
+        reloadTasks(useCase, user.getId());
     }
 
     @Transactional
@@ -701,7 +701,7 @@ public class TaskService implements ITaskService {
             startExecution(transition, useCase);
             finishExecution(transition, useCase);
             caseRepository.save(useCase);
-            reloadTasks(useCase);
+            reloadTasks(useCase, -1L);
         } catch (TransitionNotExecutableException e) {
             e.printStackTrace();
         }

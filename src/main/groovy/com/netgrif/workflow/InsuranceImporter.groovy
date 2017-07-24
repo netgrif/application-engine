@@ -50,36 +50,42 @@ class InsuranceImporter {
 
     void run(String... strings) throws Exception {
         log.info("Importing of Petri net Insurance")
-  //      def net = importer.importPetriNet(new File("src/test/resources/datagroup_test.xml"), "Insurance", "INS")
-       def net = importer.importPetriNet(new File("src/main/resources/petriNets/poistenie_hhi_18_7_2017.xml"), "Insurance", "INS")
+        def net = importer.importPetriNet(new File("src/main/resources/petriNets/poistenie_hhi_18_7_2017.xml"), "Insurance", "INS")
+        def documentLifeCycleNet = importer.importPetriNet(new File("src/main/resources/petriNets/document-lifecycle.xml"), "Dokument", "DOC")
 
         def orgs = createOrganizations()
         def auths = createAuthorities()
-        createUsers(orgs,auths,net)
-        createCases(net)
+        createUsers(orgs, auths, net, documentLifeCycleNet)
+        createCases(net, documentLifeCycleNet)
     }
 
-    private Map<String, Organization> createOrganizations(){
+    private Map<String, Organization> createOrganizations() {
         log.info("Creating organizations")
         Map<String, Organization> orgs = new HashMap<>()
-        orgs.put("insurance",organizationRepository.save(new Organization("Insurance Company")))
+        orgs.put("insurance", organizationRepository.save(new Organization("Insurance Company")))
         return orgs
     }
 
-    private Map<String, Authority> createAuthorities(){
+    private Map<String, Authority> createAuthorities() {
         log.info("Creating authorities")
         Map<String, Authority> auths = new HashMap<>()
-        auths.put(Authority.user,authorityRepository.save(new Authority(Authority.user)))
+        auths.put(Authority.user, authorityRepository.save(new Authority(Authority.user)))
         return auths
     }
 
-    private void createUsers(Map<String, Organization> orgs, Map<String, Authority> auths, PetriNet net){
+    private void createUsers(Map<String, Organization> orgs, Map<String, Authority> auths, PetriNet net, PetriNet documentNet) {
         log.info("Creating users")
         def agentRole = userProcessRoleRepository.save(new UserProcessRole(
                 roleId: net.roles.values().find { it -> it.name == "Agent" }.objectId
         ))
         def premiumRole = userProcessRoleRepository.save(new UserProcessRole(
                 roleId: net.roles.values().find { it -> it.name == "Premium" }.objectId
+        ))
+        def documentAdminRole = userProcessRoleRepository.save(new UserProcessRole(
+                roleId: documentNet.roles.values().find { it -> it.name == "Admin" }.objectId
+        ))
+        def documentAgentRole = userProcessRoleRepository.save(new UserProcessRole(
+                roleId: documentNet.roles.values().find { it -> it.name == "Agent" }.objectId
         ))
 
         User agent = new User(
@@ -90,6 +96,7 @@ class InsuranceImporter {
                 authorities: [auths.get(Authority.user)] as Set<Authority>,
                 organizations: [orgs.get("insurance")] as Set<Organization>)
         agent.addProcessRole(agentRole)
+        agent.addProcessRole(documentAgentRole)
         userService.saveNew(agent)
         log.info("User $agent.name $agent.surname created")
 
@@ -101,6 +108,7 @@ class InsuranceImporter {
                 authorities: [auths.get(Authority.user)] as Set<Authority>,
                 organizations: [orgs.get("insurance")] as Set<Organization>)
         premium.addProcessRole(premiumRole)
+        premium.addProcessRole(documentAgentRole)
         userService.saveNew(premium)
         log.info("User $premium.name $premium.surname created")
 
@@ -112,23 +120,26 @@ class InsuranceImporter {
                 authorities: [auths.get(Authority.user)] as Set<Authority>,
                 organizations: [orgs.get("insurance")] as Set<Organization>)
         zatko.addProcessRole(agentRole)
+        zatko.addProcessRole(documentAdminRole)
         userService.saveNew(zatko)
         log.info("User $zatko.name $zatko.surname created")
     }
 
-    private void createCases(PetriNet net){
-        createCase("Prvé poistenie",net,1L)
-        Case useCase = createCase("Druhé poistenie",net,1L)
+    private void createCases(PetriNet insurance, PetriNet document){
+        createCase("Zmluvné podmienky", document, 4L)
 
-//        def field = net.dataSet.find {it.value.name == "How many adults 18 or over live in the property"}.value
-//        field.value = 5
-//        def js = FieldValidationRunner.toJavascript(field,field.validationRules)
-//        def valid = FieldValidationRunner.validate(field,field.validationRules)
-//        field.validationJS(js)
+        createCase("Prvé poistenie", insurance,1L)
+        Case useCase= createCase("Druhé poistenie",insurance,1L)
 
-        //def field = useCase.petriNet.dataSet.values().find { v -> v.name == "Ponuka PDF"}
+        //        def field = net.dataSet .find {  it.value.name == "How many adults 18 or over live in the property"}.value
+        //        field.value = 5
+        //        def js = FieldValidationRunner.toJavascript(field,field.validationRules)
+        //        def valid = FieldValidationRunner.validate(field,field.validationRules)
+        //        field.validationJS(js)
+
+        //def field =useCase.petriNet.dataSet.values().find { v -> v.name == "Ponuka PDF"}
         //def file = new Insurance(useCase,(FileField)field).offerPDF()
-        //println file
+                //println file
     }
 
     private Case createCase(String title, PetriNet net, Long author){
