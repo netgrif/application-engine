@@ -693,7 +693,6 @@
         <values>rodinný dom</values>
         <values>chata</values>
         <values>bungalow</values>
-        <init>byt</init>
         <action trigger="set">
             <!--@formatter:off-->
             field: f.this,
@@ -843,6 +842,63 @@
             }
         <!--@formatter:on-->
         </action>
+        <action trigger="set">
+            <!--@formatter:off-->
+            check: f.this,
+            trans: t.363,
+            other: f.107003;
+            make other,editable on trans when { check.value == true }
+            <!--@formatter:on-->
+        </action>
+        <action trigger="set">
+            <!--@formatter:off-->
+            check: f.this,
+            trans: t.363,
+            other: f.107003;
+            make other,required on trans when { check.value == true }
+            <!--@formatter:on-->
+        </action>
+        <action trigger="set">
+            <!--@formatter:off-->
+            check: f.this,
+            trans: t.363,
+            other: f.107003;
+            make other,hidden on trans when { check.value == false }
+            <!--@formatter:on-->
+        </action>
+        <action trigger="set">
+            <!--@formatter:off-->
+            check: f.this,
+            trans: t.363,
+            other: f.104003;
+            make other,editable on trans when { check.value == true }
+            <!--@formatter:on-->
+        </action>
+        <action trigger="set">
+            <!--@formatter:off-->
+            check: f.this,
+            trans: t.363,
+            other: f.104003;
+            make other,required on trans when { check.value == true }
+            <!--@formatter:on-->
+        </action>
+        <action trigger="set">
+            <!--@formatter:off-->
+            check: f.this,
+            trans: t.363,
+            other: f.104003;
+            make other,hidden on trans when { check.value == false }
+            <!--@formatter:on-->
+        </action>
+        <!--Remove value-->
+        <action trigger="set">
+            <!--@formatter:off-->
+            field: f.this,
+            other: f.107003;
+            change other about { null; }
+        <!--@formatter:on-->
+        </action>
+
     </data>
     <data type="enumeration">
         <title>Územná platnosť poistenia</title>
@@ -2047,6 +2103,7 @@
         <values>0.00 €</values>
         <values>50.00 €</values>
         <values>150.00 €</values>
+        <init>50.00 €</init>
         <action trigger="set">
             <!--@formatter:off-->
         field: f.this,
@@ -5208,12 +5265,7 @@
                 </logic>
             </dataRef>
         </dataGroup>
-        <dataGroup>
-            <id>2</id>
-            <title></title>
-            <alignment>start</alignment>
-            <stretch>true</stretch>
-            <!--Bolo miesto poistenia postihnuté povodňou za posledných 10 rokov?-->
+                    <!--Bolo miesto poistenia postihnuté povodňou za posledných 10 rokov?-->
             <dataRef>
                 <id>101003</id>
                 <logic>
@@ -5221,11 +5273,6 @@
                     <behavior>required</behavior>
                 </logic>
             </dataRef>
-        </dataGroup>
-        <dataGroup>
-            <id>3</id>
-            <title></title>
-            <stretch>true</stretch>
             <!--Nachádza nehnuteľnosť sa vo vzdialenosti kratšej ako 300 m od vodného toku?-->
             <dataRef>
                 <id>101004</id>
@@ -5234,11 +5281,6 @@
                     <behavior>required</behavior>
                 </logic>
             </dataRef>
-        </dataGroup>
-        <dataGroup>
-            <id>4</id>
-            <title></title>
-            <stretch>true</stretch>
             <!--Koľko rokov žijete v poisťovanej nehnuteľnosti?-->
             <dataRef>
                 <id>101005</id>
@@ -5279,11 +5321,6 @@
                     <behavior>required</behavior>
                 </logic>
             </dataRef>
-        </dataGroup>
-        <dataGroup>
-            <id>5</id>
-            <title></title>
-            <stretch>true</stretch>
             <!--Bolo poistenému alebo spolupoistenej osobe niekedy v minulosti zamiestnuté poistné plnenie alebo vypovedaná poistná zmluva?-->
             <dataRef>
                 <id>101009</id>
@@ -5292,11 +5329,6 @@
                     <behavior>required</behavior>
                 </logic>
             </dataRef>
-        </dataGroup>
-        <dataGroup>
-            <id>6</id>
-            <title></title>
-            <stretch>true</stretch>
             <!--Bol poistený alebo spolupoistená osoba niekedy trestné stihaný / vyhlásil osobný bankrot / stíhaný za dlhy alebo odsúdený za podvodné alebo obdobné konanie.-->
             <dataRef>
                 <id>101010</id>
@@ -5339,11 +5371,6 @@
                     <behavior>hidden</behavior>
                 </logic>
             </dataRef>
-        </dataGroup>
-        <dataGroup>
-            <id>7</id>
-            <title></title>
-            <stretch>true</stretch>
             <!--Je plánovaná rekonštrukcia alebo prestavba poisťovanej nehnuteľnosti v priebehu najbližších 3 mesiacov?-->
             <dataRef>
                 <id>101011</id>
@@ -5352,11 +5379,6 @@
                     <behavior>required</behavior>
                 </logic>
             </dataRef>
-        </dataGroup>
-        <dataGroup>
-            <id>8</id>
-            <title></title>
-            <stretch>true</stretch>
             <!--Žije v poisťovanej domácnosti pes alebo mačka?-->
             <dataRef>
                 <id>101012</id>
@@ -5397,7 +5419,6 @@
                     <behavior>required</behavior>
                 </logic>
             </dataRef>
-        </dataGroup>
     </transition>
     <!--============================= Nehnuteľnosť - DONE =====================-->
     <transition>
@@ -7223,13 +7244,6 @@
             <id>5</id>
             <title></title>
             <alignment>start</alignment>
-            <!--Zodpovednost domacnost ps-->
-            <dataRef>
-                <id>107003</id>
-                <logic>
-                    <behavior>editable</behavior>
-                </logic>
-            </dataRef>
             <!--Zodpovednost domacnost-->
             <dataRef>
                 <id>104002</id>
@@ -7237,11 +7251,18 @@
                     <behavior>editable</behavior>
                 </logic>
             </dataRef>
+            <!--Zodpovednost domacnost ps-->
+            <dataRef>
+                <id>107003</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+            </dataRef>
             <!--Zodpovednost domacnost uzemna platnost-->
             <dataRef>
                 <id>104003</id>
                 <logic>
-                    <behavior>editable</behavior>
+                    <behavior>hidden</behavior>
                 </logic>
             </dataRef>
         </dataGroup>
