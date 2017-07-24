@@ -49,6 +49,22 @@ public class Importer {
     private ProcessRoleRepository roleRepository;
 
     public Importer() {
+        initialize();
+    }
+
+    @Transactional
+    public PetriNet importPetriNet(File xml, String title, String initials) {
+        try {
+            initialize();
+            unmarshallXml(xml);
+            return createPetriNet(title, initials);
+        } catch (JAXBException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    private void initialize() {
         this.roles = new HashMap<>();
         this.transitions = new HashMap<>();
         this.places = new HashMap<>();
@@ -56,17 +72,6 @@ public class Importer {
         this.fieldFactory = new ImportFieldFactory(this);
         this.triggerFactory = new ImportTriggerFactory(this);
         this.transactions = new HashMap<>();
-    }
-
-    @Transactional
-    public PetriNet importPetriNet(File xml, String title, String initials) {
-        try {
-            unmarshallXml(xml);
-            return createPetriNet(title, initials);
-        } catch (JAXBException e) {
-            e.printStackTrace();
-        }
-        return null;
     }
 
     @Transactional
