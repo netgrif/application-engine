@@ -273,10 +273,10 @@ public class TaskService implements ITaskService {
             Case useCase = caseRepository.findOne(caseField.getValue());
             PetriNet net = useCase.getPetriNet();
 
-            if (caseField.getConstraintNetIds() == null || !caseField.getConstraintNetIds().containsKey(net.getNetId()))
+            if (caseField.getConstraintNetIds() == null || !caseField.getConstraintNetIds().containsKey(net.getImportId()))
                 return;
 
-            Map<String, Object> values = caseField.getConstraintNetIds().get(net.getNetId()).stream().map(fieldId -> {
+            Map<String, Object> values = caseField.getConstraintNetIds().get(net.getImportId()).stream().map(fieldId -> {
                 Optional<Field> optional = net.getDataSet().values().stream().filter(netField -> Objects.equals(netField.getImportId(), fieldId)).findFirst();
                 if (!optional.isPresent()) {
                     throw new IllegalArgumentException("Field ["+fieldId+"] not present in net ["+net.getStringId()+"]");

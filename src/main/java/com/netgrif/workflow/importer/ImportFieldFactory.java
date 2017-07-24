@@ -1,6 +1,7 @@
 package com.netgrif.workflow.importer;
 
 import com.netgrif.workflow.importer.model.ImportData;
+import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.dataset.*;
 
 import java.util.*;
@@ -69,9 +70,21 @@ public final class ImportFieldFactory {
     }
 
     private CaseField buildCaseField(ImportData data) {
-        Map<Long, LinkedHashSet<Long>> netIds = new HashMap<>();
+        Map<String, LinkedHashSet<String>> netIds = new HashMap<>();
         Arrays.stream(data.getDocumentRefs())
-                .forEach(documentRef -> netIds.put(documentRef.getId(), new LinkedHashSet<>(Arrays.asList(documentRef.getFields()))));
+                .forEach(documentRef -> {
+                    PetriNet net = importer.getNetByImportId(documentRef.getId());
+                    LinkedHashSet<String> fieldIds = new LinkedHashSet<>();
+                    List<Long> fieldImportIds = Arrays.asList(documentRef.getFields());
+
+                    net.getDataSet().values().forEach(field -> {
+                        if (fieldImportIds.contains(field.getImportId())) {
+                            fieldIds.add(field.getObjectId());
+                        }
+                    });
+
+                    netIds.put(net.getStringId(), fieldIds);
+                });
         return new CaseField(netIds);
     }
 
