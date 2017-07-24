@@ -90,67 +90,6 @@
         </dataGroup>
     </transition>
     <transition>
-        <id>6</id>
-        <x>500</x>
-        <y>60</y>
-        <label>Zobraziť</label>
-        <roleRef>
-            <id>1</id>
-            <logic>
-                <delegate>true</delegate>
-            </logic>
-        </roleRef>
-        <roleRef>
-            <id>1</id>
-            <logic>
-                <delegate>true</delegate>
-            </logic>
-        </roleRef>
-        <dataGroup>
-            <id>1</id>
-            <title></title>
-            <dataRef>
-                <id>1</id>
-                <logic>
-                    <behavior>visible</behavior>
-                </logic>
-            </dataRef>
-            <dataRef>
-                <id>2</id>
-                <logic>
-                    <behavior>visible</behavior>
-                </logic>
-            </dataRef>
-        </dataGroup>
-        <dataGroup>
-            <id>2</id>
-            <title></title>
-            <stretch>true</stretch>
-            <dataRef>
-                <id>3</id>
-                <logic>
-                    <behavior>visible</behavior>
-                </logic>
-            </dataRef>
-        </dataGroup>
-        <dataGroup>
-            <id>3</id>
-            <title></title>
-            <dataRef>
-                <id>4</id>
-                <logic>
-                    <behavior>visible</behavior>
-                </logic>
-            </dataRef>
-            <dataRef>
-                <id>5</id>
-                <logic>
-                    <behavior>visible</behavior>
-                </logic>
-            </dataRef>
-        </dataGroup>
-    </transition>
-    <transition>
         <id>7</id>
         <x>500</x>
         <y>300</y>
@@ -236,14 +175,6 @@
         <isStatic>false</isStatic>
     </place>
     <place>
-        <id>23</id>
-        <x>340</x>
-        <y>60</y>
-        <label></label>
-        <tokens>0</tokens>
-        <isStatic>false</isStatic>
-    </place>
-    <place>
         <id>24</id>
         <x>340</x>
         <y>300</y>
@@ -282,13 +213,6 @@
         <multiplicity>1</multiplicity>
     </arc>
     <arc>
-        <id>25</id>
-        <type>regular</type>
-        <sourceId>2</sourceId>
-        <destinationId>23</destinationId>
-        <multiplicity>2147483640</multiplicity>
-    </arc>
-    <arc>
         <id>26</id>
         <type>regular</type>
         <sourceId>2</sourceId>
@@ -296,24 +220,10 @@
         <multiplicity>1</multiplicity>
     </arc>
     <arc>
-        <id>43</id>
-        <type>regular</type>
-        <sourceId>23</sourceId>
-        <destinationId>6</destinationId>
-        <multiplicity>1</multiplicity>
-    </arc>
-    <arc>
         <id>44</id>
         <type>regular</type>
         <sourceId>24</sourceId>
         <destinationId>7</destinationId>
-        <multiplicity>1</multiplicity>
-    </arc>
-    <arc>
-        <id>45</id>
-        <type>regular</type>
-        <sourceId>6</sourceId>
-        <destinationId>23</destinationId>
         <multiplicity>1</multiplicity>
     </arc>
     <arc>
@@ -342,13 +252,6 @@
         <type>regular</type>
         <sourceId>48</sourceId>
         <destinationId>14</destinationId>
-        <multiplicity>1</multiplicity>
-    </arc>
-    <arc>
-        <id>52</id>
-        <type>reset</type>
-        <sourceId>23</sourceId>
-        <destinationId>48</destinationId>
         <multiplicity>1</multiplicity>
     </arc>
     <arc>
