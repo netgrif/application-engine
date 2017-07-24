@@ -1,5 +1,6 @@
 package com.netgrif.workflow.importer.model;
 
+import com.netgrif.workflow.importer.InvalidXmlException;
 import lombok.Data;
 
 import java.util.Arrays;
@@ -30,11 +31,15 @@ public class ImportTransition {
     }
 
     public DataRef[] getDataRef() {
-        if (dataGroup == null)
-            return null;
-        return Arrays.stream(dataGroup)
-                .map(ImportDataGroup::getDataRef)
-                .flatMap(Arrays::stream)
-                .toArray(DataRef[]::new);
+        try {
+            if (dataGroup == null)
+                return null;
+            return Arrays.stream(dataGroup)
+                    .map(ImportDataGroup::getDataRef)
+                    .flatMap(Arrays::stream)
+                    .toArray(DataRef[]::new);
+        } catch (NullPointerException e) {
+            throw new InvalidXmlException("DataGroup of Transition[id:" + id + "] element has no dataRefs", e);
+        }
     }
 }
