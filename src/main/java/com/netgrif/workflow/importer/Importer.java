@@ -80,7 +80,7 @@ public class Importer {
     @Transactional
     protected PetriNet createPetriNet(String title, String initials) {
         net = new PetriNet();
-        net.setNetId(document.getId());
+        net.setImportId(document.getId());
         net.setTitle(title);
         net.setInitials(initials);
 
@@ -311,6 +311,10 @@ public class Importer {
             return places.get(id);
         else
             return transitions.get(id);
+    }
+
+    PetriNet getNetByImportId(Long id) {
+        return repository.findByImportId(id);
     }
 
     public Document getDocument() {
