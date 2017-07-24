@@ -50,7 +50,7 @@
             obec: f.this;
             change field about {
                 def postal = psc byCode,zipcode.value;
-                return postal.locality;
+                return postal.find {item -> item.locality==obec.value}.regionCode;
             }
             <!--@formatter:on-->
         </action>
