@@ -18,7 +18,14 @@ class FieldActionsRunner {
 
     private Map<String,Object> actionsCache = new HashMap<>()
 
+    FieldActionsRunner() {
+        actionsCache = new HashMap<>()
+    }
+
     ChangedField run(String script, Case useCase) {
+        if (!actionsCache)
+            actionsCache = new HashMap<>()
+
         Binding binding = new Binding()
         bindVariables(script, binding, useCase)
         def shell = new GroovyShell(binding)
