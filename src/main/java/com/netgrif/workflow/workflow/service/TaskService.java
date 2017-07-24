@@ -572,7 +572,7 @@ public class TaskService implements ITaskService {
 
     @Transactional
     boolean taskIsNotPresent(List<Task> tasks, Transition transition, Long userId) {
-        return tasks.stream().noneMatch(task -> task.getTransitionId().equals(transition.getStringId()) && userId.equals(task.getUserId()));
+        return tasks.stream().noneMatch(task -> task.getTransitionId().equals(transition.getStringId()) || userId.equals(task.getUserId()));
     }
 
     @Transactional
