@@ -43,12 +43,12 @@
         <values>Ph.D.</values>
         <values>CSc.</values>
     </data>
-    <data type="text">
+    <data type="text" immediate="true">
         <title>Meno</title>
         <id>109024</id>
         <desc>Poistený</desc>
     </data>
-    <data type="text">
+    <data type="text" immediate="true">
         <title>Priezvisko</title>
         <id>109025</id>
         <desc>Poistený</desc>
@@ -87,12 +87,12 @@
         <id>109031</id>
         <desc>Poistený</desc>
     </data>
-    <data type="text">
+    <data type="text" immediate="true">
         <title>Telefónne číslo</title>
         <id>109032</id>
         <desc>Poistený</desc>
     </data>
-    <data type="text">
+    <data type="text" immediate="true">
         <title>Email</title>
         <id>109033</id>
         <desc>Poistený</desc>
