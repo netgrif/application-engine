@@ -64,6 +64,11 @@ public class TaskController {
         return resources;
     }
 
+    @RequestMapping(value ="/case/{id}", method = RequestMethod.GET)
+    public List<TaskReference> getTasksOfCase(@PathVariable("id") String caseId) {
+        return taskService.findAllByCase(caseId);
+    }
+
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     public TaskResource getOne(@PathVariable("id") String taskId) {
         return new TaskResource(taskService.findById(taskId));

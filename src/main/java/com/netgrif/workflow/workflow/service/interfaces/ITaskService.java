@@ -9,6 +9,7 @@ import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldContainer;
 import com.netgrif.workflow.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.Task;
+import com.netgrif.workflow.workflow.web.responsebodies.TaskReference;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -57,4 +58,6 @@ public interface ITaskService {
     void deleteTasksByCase(String caseId);
 
     Field buildField(Case useCase, String fieldId, boolean withValidation);
+
+    List<TaskReference> findAllByCase(String caseId);
 }
