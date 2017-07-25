@@ -295,17 +295,6 @@
             dlhy alebo odsúdený za podvodné alebo obdobné konanie.
         </title>
         <id>101010</id>
-        <action trigger="set">
-            <!--@formatter:off-->
-            field: f.this,
-            coeff: f.201010;
-            change coeff about {
-                if (field.value)
-                    return 1000000000000000000000.0 as Double;
-                return 1.0 as Double;
-            }
-            <!--@formatter:on-->
-        </action>
     </data>
     <data type="boolean">
         <title>Je plánovaná rekonštrukcia alebo prestavba poisťovanej nehnuteľnosti v priebehu najbližších 3 mesiacov?
@@ -426,6 +415,7 @@
         <id>301003</id>
         <title>Trestne stíhaný - kontrola</title>
         <init>nemaz ma</init>
+        <values>area</values>
     </data>
     <data type="text">
         <id>301004</id>
@@ -2971,7 +2961,6 @@
             c7: f.201007,
             c8: f.201008,
             c9: f.201009,
-            c10: f.201010,
             c11: f.201011,
             c12: f.201012,
             c13: f.201013,
@@ -2980,7 +2969,7 @@
             c16: f.201016,
             sum: f.201017;
             change sum about {
-            return c1.value*c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c9.value*c10.value*c11.value*c12.value*c13.value*c14.value*c15.value*c16.value;
+            return c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c9.value*c11.value*c12.value*c13.value*c14.value*c15.value*c16.value;
             }
         <!--@formatter:on-->
         </action>
@@ -3005,7 +2994,6 @@
             c7: f.201007,
             c8: f.201008,
             c9: f.201009,
-            c10: f.201010,
             c11: f.201011,
             c12: f.201012,
             c13: f.201013,
@@ -3014,7 +3002,7 @@
             c16: f.201016,
             sum: f.201017;
             change sum about {
-            return c1.value*c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c9.value*c10.value*c11.value*c12.value*c13.value*c14.value*c15.value*c16.value;
+            return c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c9.value*c11.value*c12.value*c13.value*c14.value*c15.value*c16.value;
             }
         <!--@formatter:on-->
         </action>
@@ -3034,7 +3022,6 @@
             c7: f.201007,
             c8: f.201008,
             c9: f.201009,
-            c10: f.201010,
             c11: f.201011,
             c12: f.201012,
             c13: f.201013,
@@ -3043,7 +3030,7 @@
             c16: f.201016,
             sum: f.201017;
             change sum about {
-            return c1.value*c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c9.value*c10.value*c11.value*c12.value*c13.value*c14.value*c15.value*c16.value;
+            return c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c9.value*c11.value*c12.value*c13.value*c14.value*c15.value*c16.value;
             }
         <!--@formatter:on-->
         </action>
@@ -3063,7 +3050,6 @@
             c7: f.201007,
             c8: f.201008,
             c9: f.201009,
-            c10: f.201010,
             c11: f.201011,
             c12: f.201012,
             c13: f.201013,
@@ -3072,7 +3058,7 @@
             c16: f.201016,
             sum: f.201017;
             change sum about {
-            return c1.value*c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c9.value*c10.value*c11.value*c12.value*c13.value*c14.value*c15.value*c16.value;
+            return c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c9.value*c11.value*c12.value*c13.value*c14.value*c15.value*c16.value;
             }
         <!--@formatter:on-->
         </action>
@@ -3092,7 +3078,6 @@
             c7: f.201007,
             c8: f.201008,
             c9: f.201009,
-            c10: f.201010,
             c11: f.201011,
             c12: f.201012,
             c13: f.201013,
@@ -3101,7 +3086,7 @@
             c16: f.201016,
             sum: f.201017;
             change sum about {
-            return c1.value*c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c9.value*c10.value*c11.value*c12.value*c13.value*c14.value*c15.value*c16.value;
+            return c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c9.value*c11.value*c12.value*c13.value*c14.value*c15.value*c16.value;
             }
         <!--@formatter:on-->
         </action>
@@ -3121,7 +3106,6 @@
             c7: f.201007,
             c8: f.201008,
             c9: f.201009,
-            c10: f.201010,
             c11: f.201011,
             c12: f.201012,
             c13: f.201013,
@@ -3130,7 +3114,7 @@
             c16: f.201016,
             sum: f.201017;
             change sum about {
-            return c1.value*c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c9.value*c10.value*c11.value*c12.value*c13.value*c14.value*c15.value*c16.value;
+            return c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c9.value*c11.value*c12.value*c13.value*c14.value*c15.value*c16.value;
             }
         <!--@formatter:on-->
         </action>
@@ -3150,7 +3134,6 @@
             c7: f.201007,
             c8: f.201008,
             c9: f.201009,
-            c10: f.201010,
             c11: f.201011,
             c12: f.201012,
             c13: f.201013,
@@ -3159,7 +3142,7 @@
             c16: f.201016,
             sum: f.201017;
             change sum about {
-            return c1.value*c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c9.value*c10.value*c11.value*c12.value*c13.value*c14.value*c15.value*c16.value;
+            return c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c9.value*c11.value*c12.value*c13.value*c14.value*c15.value*c16.value;
             }
         <!--@formatter:on-->
         </action>
@@ -3179,7 +3162,6 @@
             c7: f.201007,
             c8: f.201008,
             c9: f.201009,
-            c10: f.201010,
             c11: f.201011,
             c12: f.201012,
             c13: f.201013,
@@ -3188,7 +3170,7 @@
             c16: f.201016,
             sum: f.201017;
             change sum about {
-            return c1.value*c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c9.value*c10.value*c11.value*c12.value*c13.value*c14.value*c15.value*c16.value;
+            return c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c9.value*c11.value*c12.value*c13.value*c14.value*c15.value*c16.value;
             }
         <!--@formatter:on-->
         </action>
@@ -3210,7 +3192,6 @@
             c7: f.201007,
             c8: f.201008,
             c9: f.201009,
-            c10: f.201010,
             c11: f.201011,
             c12: f.201012,
             c13: f.201013,
@@ -3219,38 +3200,7 @@
             c16: f.201016,
             sum: f.201017;
             change sum about {
-            return c1.value*c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c9.value*c10.value*c11.value*c12.value*c13.value*c14.value*c15.value*c16.value;
-            }
-        <!--@formatter:on-->
-        </action>
-    </data>
-    <data type="number">
-        <title>Koeficient - Bol poistený alebo spolupoistená osoba niekedy trestné stihaný / vyhlásil osobný bankrot /
-            stíhaný za dlhy alebo odsúdený za podvodné alebo obdobné konanie.
-        </title>
-        <id>201010</id>
-        <init>1</init>
-        <action trigger="set">
-            <!--@formatter:off-->
-            c1: f.201001,
-            c2: f.201002,
-            c3: f.201003,
-            c4: f.201004,
-            c5: f.201005,
-            c6: f.201006,
-            c7: f.201007,
-            c8: f.201008,
-            c9: f.201009,
-            c10: f.201010,
-            c11: f.201011,
-            c12: f.201012,
-            c13: f.201013,
-            c14: f.201014,
-            c15: f.201015,
-            c16: f.201016,
-            sum: f.201017;
-            change sum about {
-            return c1.value*c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c9.value*c10.value*c11.value*c12.value*c13.value*c14.value*c15.value*c16.value;
+            return c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c9.value*c11.value*c12.value*c13.value*c14.value*c15.value*c16.value;
             }
         <!--@formatter:on-->
         </action>
@@ -3272,7 +3222,6 @@
             c7: f.201007,
             c8: f.201008,
             c9: f.201009,
-            c10: f.201010,
             c11: f.201011,
             c12: f.201012,
             c13: f.201013,
@@ -3281,7 +3230,7 @@
             c16: f.201016,
             sum: f.201017;
             change sum about {
-            return c1.value*c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c9.value*c10.value*c11.value*c12.value*c13.value*c14.value*c15.value*c16.value;
+            return c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c9.value*c11.value*c12.value*c13.value*c14.value*c15.value*c16.value;
             }
         <!--@formatter:on-->
         </action>
@@ -3301,7 +3250,6 @@
             c7: f.201007,
             c8: f.201008,
             c9: f.201009,
-            c10: f.201010,
             c11: f.201011,
             c12: f.201012,
             c13: f.201013,
@@ -3310,7 +3258,7 @@
             c16: f.201016,
             sum: f.201017;
             change sum about {
-            return c1.value*c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c9.value*c10.value*c11.value*c12.value*c13.value*c14.value*c15.value*c16.value;
+            return c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c9.value*c11.value*c12.value*c13.value*c14.value*c15.value*c16.value;
             }
         <!--@formatter:on-->
         </action>
@@ -3330,7 +3278,6 @@
             c7: f.201007,
             c8: f.201008,
             c9: f.201009,
-            c10: f.201010,
             c11: f.201011,
             c12: f.201012,
             c13: f.201013,
@@ -3339,7 +3286,7 @@
             c16: f.201016,
             sum: f.201017;
             change sum about {
-            return c1.value*c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c9.value*c10.value*c11.value*c12.value*c13.value*c14.value*c15.value*c16.value;
+            return c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c9.value*c11.value*c12.value*c13.value*c14.value*c15.value*c16.value;
             }
         <!--@formatter:on-->
         </action>
@@ -3359,7 +3306,6 @@
             c7: f.201007,
             c8: f.201008,
             c9: f.201009,
-            c10: f.201010,
             c11: f.201011,
             c12: f.201012,
             c13: f.201013,
@@ -3368,7 +3314,7 @@
             c16: f.201016,
             sum: f.201017;
             change sum about {
-            return c1.value*c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c9.value*c10.value*c11.value*c12.value*c13.value*c14.value*c15.value*c16.value;
+            return c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c9.value*c11.value*c12.value*c13.value*c14.value*c15.value*c16.value;
             }
         <!--@formatter:on-->
         </action>
@@ -3388,7 +3334,6 @@
             c7: f.201007,
             c8: f.201008,
             c9: f.201009,
-            c10: f.201010,
             c11: f.201011,
             c12: f.201012,
             c13: f.201013,
@@ -3397,7 +3342,7 @@
             c16: f.201016,
             sum: f.201017;
             change sum about {
-            return c1.value*c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c9.value*c10.value*c11.value*c12.value*c13.value*c14.value*c15.value*c16.value;
+            return c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c9.value*c11.value*c12.value*c13.value*c14.value*c15.value*c16.value;
             }
         <!--@formatter:on-->
         </action>
@@ -3417,7 +3362,6 @@
             c7: f.201007,
             c8: f.201008,
             c9: f.201009,
-            c10: f.201010,
             c11: f.201011,
             c12: f.201012,
             c13: f.201013,
@@ -3426,7 +3370,7 @@
             c16: f.201016,
             sum: f.201017;
             change sum about {
-            return c1.value*c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c9.value*c10.value*c11.value*c12.value*c13.value*c14.value*c15.value*c16.value;
+            return c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c9.value*c11.value*c12.value*c13.value*c14.value*c15.value*c16.value;
             }
         <!--@formatter:on-->
         </action>
@@ -3635,7 +3579,7 @@
             c6: f.201018,
             sum: f.203006;
             change sum about {
-            return c1.value*c1.value*c2.value*c3.value*c4.value*c5.value*c6.value;
+            return c1.value*c2.value*c3.value*c4.value*c5.value*c6.value;
             }
         <!--@formatter:on-->
         </action>
@@ -3654,7 +3598,7 @@
             c6: f.201018,
             sum: f.203006;
             change sum about {
-            return c1.value*c1.value*c2.value*c3.value*c4.value*c5.value*c6.value;
+            return c1.value*c2.value*c3.value*c4.value*c5.value*c6.value;
             }
         <!--@formatter:on-->
         </action>
@@ -3675,7 +3619,7 @@
             c6: f.201018,
             sum: f.203006;
             change sum about {
-            return c1.value*c1.value*c2.value*c3.value*c4.value*c5.value*c6.value;
+            return c1.value*c2.value*c3.value*c4.value*c5.value*c6.value;
             }
         <!--@formatter:on-->
         </action>
@@ -3694,7 +3638,7 @@
             c6: f.201018,
             sum: f.203006;
             change sum about {
-            return c1.value*c1.value*c2.value*c3.value*c4.value*c5.value*c6.value;
+            return c1.value*c2.value*c3.value*c4.value*c5.value*c6.value;
             }
         <!--@formatter:on-->
         </action>
@@ -3715,7 +3659,7 @@
             c6: f.201018,
             sum: f.203006;
             change sum about {
-            return c1.value*c1.value*c2.value*c3.value*c4.value*c5.value*c6.value;
+            return c1.value*c2.value*c3.value*c4.value*c5.value*c6.value;
             }
         <!--@formatter:on-->
         </action>
@@ -5458,7 +5402,7 @@
                         f_req: f.301003;
                         change f_req about {
                             if (field.value)
-                                return null;
+                                return "";
                             return "nemaz ma";
                         }
                     </action>
