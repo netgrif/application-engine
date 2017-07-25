@@ -51,7 +51,7 @@ public class Case {
     @Getter
     @Setter
     @JsonIgnore
-    private Set<String> immediateDataFields;
+    private LinkedHashSet<String> immediateDataFields;
 
     @Getter
     @Setter
@@ -82,7 +82,7 @@ public class Case {
         this.petriNet = petriNet;
         this.activePlaces = activePlaces;
         populateDataSet();
-        this.immediateDataFields = this.petriNet.getImmediateFields().stream().map(Field::getObjectId).collect(Collectors.toSet());
+        this.immediateDataFields = new LinkedHashSet<>(this.petriNet.getImmediateFields().stream().map(Field::getObjectId).collect(Collectors.toList()));
     }
 
     public ObjectId get_id() {
