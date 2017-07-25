@@ -25,6 +25,7 @@ import com.netgrif.workflow.workflow.domain.triggers.AutoTrigger;
 import com.netgrif.workflow.workflow.domain.triggers.TimeTrigger;
 import com.netgrif.workflow.workflow.domain.triggers.Trigger;
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
+import com.netgrif.workflow.workflow.web.responsebodies.TaskReference;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
@@ -48,6 +49,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.LongStream;
 import java.util.stream.Stream;
@@ -118,9 +120,9 @@ public class TaskService implements ITaskService {
                 Object roles = ((Map<String, Object>) request.get("or")).get("role");
                 Set<String> union = new HashSet<>(user.getProcessRoles());
                 if (roles instanceof String)
-                    union.add((String)roles);
+                    union.add((String) roles);
                 else if (roles instanceof List)
-                    union.addAll((List)roles);
+                    union.addAll((List) roles);
 
                 ((Map<String, Object>) request.get("or")).put("role", new ArrayList<>(union));
 
@@ -133,7 +135,7 @@ public class TaskService implements ITaskService {
             request.put("or", orMap);
         }
 
-        return loadUsers(searchService.search(request,pageable,Task.class));
+        return loadUsers(searchService.search(request, pageable, Task.class));
     }
 
     @Override
@@ -289,6 +291,13 @@ public class TaskService implements ITaskService {
         return field;
     }
 
+    @Override
+    public List<TaskReference> findAllByCase(String caseId) {
+        return taskRepository.findAllByCaseId(caseId).stream()
+                .map(task -> new TaskReference(task.getStringId(), task.getTitle(), task.getTransitionId()))
+                .collect(Collectors.toList());
+    }
+
     public void resolveDataValues(Field field) {
         if (field instanceof DateField) {
             ((DateField) field).convertValue();
@@ -307,7 +316,7 @@ public class TaskService implements ITaskService {
             Map<String, Object> values = caseField.getConstraintNetIds().get(net.getImportId()).stream().map(fieldId -> {
                 Optional<Field> optional = net.getDataSet().values().stream().filter(netField -> Objects.equals(netField.getImportId(), fieldId)).findFirst();
                 if (!optional.isPresent()) {
-                    throw new IllegalArgumentException("Field ["+fieldId+"] not present in net ["+net.getStringId()+"]");
+                    throw new IllegalArgumentException("Field [" + fieldId + "] not present in net [" + net.getStringId() + "]");
                 }
                 String fieldStringId = optional.get().getObjectId();
                 return Pair.of(fieldStringId, useCase.getDataSet().get(fieldStringId).getValue());
