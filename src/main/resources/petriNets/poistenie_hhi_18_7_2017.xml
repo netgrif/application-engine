@@ -63,6 +63,13 @@
             <!--@formatter:off-->
             field: f.this,
             obec: f.301005;
+            change obec about { null; }
+            <!--@formatter:on-->
+        </action>
+        <action trigger="set">
+            <!--@formatter:off-->
+            field: f.this,
+            obec: f.301005;
             change obec choices {
                 def postal = psc byCode,field.value;
                 cache "post",postal;
@@ -1074,7 +1081,6 @@
             location: f.301002,
             coeff: f.205003;
             change coeff about {
-           change coeff about {
             if (location.value=="L5")
             return 1400*field.value as Double;
             if (location.value=="L4")
@@ -1122,7 +1128,6 @@
             field: f.this,
             location: f.301002,
             coeff: f.205004;
-            change coeff about {
             change coeff about {
             if (location.value=="L5")
             return 1200*field.value as Double;
@@ -3936,7 +3941,7 @@
         <id>109004</id>
         <desc>Údaje o vinkulácii</desc>
     </data>
-    <data type="number">
+    <data type="text">
         <title>Číslo úverovej zmluvy</title>
         <id>109005</id>
         <desc>Údaje o vinkulácii</desc>
