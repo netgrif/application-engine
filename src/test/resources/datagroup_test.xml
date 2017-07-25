@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document>
+    <id>5</id>
+
     <data type="text">
         <id>1</id>
         <title>Field 1</title>
+        <init>10</init>
     </data>
     <data type="text">
         <id>2</id>
