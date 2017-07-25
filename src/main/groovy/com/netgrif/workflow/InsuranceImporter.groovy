@@ -144,19 +144,23 @@ class InsuranceImporter {
     private void createCases(){
         createCase("Zmluvné podmienky", documentNet, 4L)
 
-        createContactCase("Adam Krt", "+421950 123 456", "adam.krt@gmail.com")
-        createContactCase("Ežo Vlkolínsky", "+421902 256 512", "vlkolinsky@gmail.com")
-        createContactCase("Jožko Mrkvička", "+421948 987 654", "mrkvicka@yahoo.com")
+        createContactCase("Adam","Krt", "+421950 123 456", "adam.krt@gmail.com")
+        createContactCase("Ežo","Vlkolínsky", "+421902 256 512", "vlkolinsky@gmail.com")
+        createContactCase("Jožko", "Mrkvička", "+421948 987 654", "mrkvicka@yahoo.com")
 
         createCase("Prvé poistenie",insuranceNet,1L)
         Case useCase = createCase("Druhé poistenie",insuranceNet,1L)
     }
 
-    private void createContactCase(String name, String telNumber, String email) {
-        def contactCase = createCase(name, contactNet, 1L)
+    private void createContactCase(String name, String surname, String telNumber, String email) {
+        def contactCase = createCase(name+" "+surname, contactNet, 1L)
+        def nameField = contactCase.petriNet.dataSet.values().find { v -> v.name == "Meno"}
+        def surnameField = contactCase.petriNet.dataSet.values().find { v -> v.name == "Priezvisko"}
         def telField = contactCase.petriNet.dataSet.values().find { v -> v.name == "Telefónne číslo"}
         def emailField = contactCase.petriNet.dataSet.values().find { v -> v.name == "Email"}
 
+        contactCase.dataSet.put(nameField.getObjectId(), new DataField(name))
+        contactCase.dataSet.put(surnameField.getObjectId(), new DataField(surname))
         contactCase.dataSet.put(telField.getObjectId(), new DataField(telNumber))
         contactCase.dataSet.put(emailField.getObjectId(), new DataField(email))
 
