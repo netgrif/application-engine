@@ -43,12 +43,12 @@
         <values>Ph.D.</values>
         <values>CSc.</values>
     </data>
-    <data type="text" immediate="true">
+    <data type="text">
         <title>Meno</title>
         <id>109024</id>
         <desc>Poistený</desc>
     </data>
-    <data type="text" immediate="true">
+    <data type="text">
         <title>Priezvisko</title>
         <id>109025</id>
         <desc>Poistený</desc>
