@@ -66,7 +66,7 @@ class InsuranceImporter {
     }
 
     private importNets() {
-        contactNet = importer.importPetriNet(new File("src/main/resources/petriNets/document-lifecycle.xml"), "Dokument", "DOC")
+        documentNet = importer.importPetriNet(new File("src/main/resources/petriNets/document-lifecycle.xml"), "Dokument", "DOC")
         contactNet = importer.importPetriNet(new File("src/main/resources/petriNets/contact.xml"), "Contact", "CON")
         insuranceNet = importer.importPetriNet(new File("src/main/resources/petriNets/poistenie_hhi_18_7_2017.xml"), "Insurance", "INS")
     }
@@ -141,12 +141,12 @@ class InsuranceImporter {
     }
 
     private void createCases(){
-        createCase("Zmluvné podmienky", document, 4L)
+        createCase("Zmluvné podmienky", documentNet, 4L)
 
         createCase("Jožko Mrkvička", contactNet, 1L)
 
-        createCase("Prvé poistenie",insurance,1L)
-        Case useCase = createCase("Druhé poistenie",insurance,1L)
+        createCase("Prvé poistenie",insuranceNet,1L)
+        Case useCase = createCase("Druhé poistenie",insuranceNet,1L)
 
         //        def field = net.dataSet .find {  it.value.name == "How many adults 18 or over live in the property"}.value
         //        field.value = 5
