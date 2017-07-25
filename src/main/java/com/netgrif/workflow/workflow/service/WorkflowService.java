@@ -77,9 +77,11 @@ public class WorkflowService implements IWorkflowService {
         List<PetriNetReference> nets = petriNetService.getAllAccessibleReferences(user);
         if (request.containsKey(key)) {
             Set<String> netIds = nets.stream().map(PetriNetReference::getEntityId).collect(Collectors.toSet());
-            if (request.get(key) instanceof String) netIds.add((String) request.get(key));
-            else if (request.get(key) instanceof List) netIds.addAll((List) request.get(key));
-            request.put(key, new ArrayList<>(netIds));
+            if (request.get(key) instanceof String && !netIds.contains(request.get(key)))
+                return new PageImpl<Case>(new ArrayList<>(),pageable,0);
+            else if (request.get(key) instanceof List) {
+                request.put(key,((List<String>)request.get(key)).stream().filter(netIds::contains).collect(Collectors.toList()));
+            }
 
         } else
             request.put(key, nets.stream().map(PetriNetReference::getEntityId).collect(Collectors.toList()));
