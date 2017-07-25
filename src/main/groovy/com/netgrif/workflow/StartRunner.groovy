@@ -15,7 +15,7 @@ import java.util.concurrent.ThreadLocalRandom
 @Profile("!test")
 class StartRunner  implements CommandLineRunner{
 
-    static Logger log = Logger.getLogger(StartRunner.class.getName())
+    private static Logger log = Logger.getLogger(StartRunner.class.getName())
 
     @Autowired
     private Environment environment
@@ -44,6 +44,7 @@ class StartRunner  implements CommandLineRunner{
     void run(String... strings) throws Exception {
         mongoTemplate.getDb().dropDatabase()
 
+        log.info("Creating storage folder")
         File storage = new File("storage/generated/start.txt")
         storage.getParentFile().mkdirs()
 
@@ -57,6 +58,7 @@ class StartRunner  implements CommandLineRunner{
         sessionsRunner.run(strings)
 //        export.run(strings)
 
+        log.info("Starting test for mail connection")
         mailService.testConnection()
         host()
     }
