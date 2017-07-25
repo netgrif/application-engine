@@ -248,8 +248,8 @@ public class TaskService implements ITaskService {
         List<Field> dataSetFields = new ArrayList<>();
 
         fieldsIds.forEach(fieldId -> {
-            //resolveActions(useCase.getPetriNet().getDataSet().get(fieldId),
-            //        Action.ActionTrigger.GET, useCase, transition);
+            resolveActions(useCase.getPetriNet().getDataSet().get(fieldId),
+                    Action.ActionTrigger.GET, useCase, transition);
 
             if (useCase.hasFieldBehavior(fieldId, transition.getStringId())) {
                 if (useCase.getDataSet().get(fieldId).isDisplayable(transition.getStringId())) {
@@ -268,6 +268,7 @@ public class TaskService implements ITaskService {
         LongStream.range(0L, dataSetFields.size())
                 .forEach(index -> dataSetFields.get((int) index).setOrder(index));
 
+        caseRepository.save(useCase);
         return dataSetFields;
     }
 

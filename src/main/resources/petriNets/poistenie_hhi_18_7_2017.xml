@@ -3911,6 +3911,13 @@
     <data type="text">
         <title>Číslo ponuky</title>
         <id>309001</id>
+        <init>0000000000</init>
+        <action trigger="get">
+            <!--formatter:off-->
+            self: f.this;
+            generate "Insurance.offerId",once into self
+            <!--@formatter:on-->
+        </action>
     </data>
     <data type="date">
         <title>Začiatok poistenia</title>
@@ -5342,18 +5349,18 @@
             <id>1</id>
             <title></title>
             <alignment>start</alignment>
+            <!--PSČ-->
+            <dataRef>
+                <id>101001</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                </logic>
+            </dataRef>
             <!--Obec-->
             <dataRef>
                 <!--<id>301001</id>-->
                 <id>301005</id>
-                <logic>
-                    <behavior>editable</behavior>
-                    <!--todo: psc and lokalita lookup -->
-                </logic>
-            </dataRef>
-            <!--PSČ-->
-            <dataRef>
-                <id>101001</id>
                 <logic>
                     <behavior>editable</behavior>
                     <behavior>required</behavior>
