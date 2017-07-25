@@ -12,6 +12,7 @@ import com.netgrif.workflow.importer.Importer
 import com.netgrif.workflow.petrinet.domain.PetriNet
 import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository
 import com.netgrif.workflow.workflow.domain.Case
+import com.netgrif.workflow.workflow.domain.DataField
 import com.netgrif.workflow.workflow.domain.repositories.CaseRepository
 import com.netgrif.workflow.workflow.service.TaskService
 import org.apache.log4j.Logger
@@ -143,20 +144,23 @@ class InsuranceImporter {
     private void createCases(){
         createCase("Zmluvné podmienky", documentNet, 4L)
 
-        createCase("Jožko Mrkvička", contactNet, 1L)
+        createContactCase("Adam Krt", "+421950 123 456", "adam.krt@gmail.com")
+        createContactCase("Ežo Vlkolínsky", "+421902 256 512", "vlkolinsky@gmail.com")
+        createContactCase("Jožko Mrkvička", "+421948 987 654", "mrkvicka@yahoo.com")
 
         createCase("Prvé poistenie",insuranceNet,1L)
         Case useCase = createCase("Druhé poistenie",insuranceNet,1L)
+    }
 
-        //        def field = net.dataSet .find {  it.value.name == "How many adults 18 or over live in the property"}.value
-        //        field.value = 5
-        //        def js = FieldValidationRunner.toJavascript(field,field.validationRules)
-        //        def valid = FieldValidationRunner.validate(field,field.validationRules)
-        //        field.validationJS(js)
+    private void createContactCase(String name, String telNumber, String email) {
+        def contactCase = createCase(name, contactNet, 1L)
+        def telField = contactCase.petriNet.dataSet.values().find { v -> v.name == "Telefónne číslo"}
+        def emailField = contactCase.petriNet.dataSet.values().find { v -> v.name == "Email"}
 
-        //def field =useCase.petriNet.dataSet.values().find { v -> v.name == "Ponuka PDF"}
-        //def file = new Insurance(useCase,(FileField)field).offerPDF()
-                //println file
+        contactCase.dataSet.put(telField.getObjectId(), new DataField(telNumber))
+        contactCase.dataSet.put(emailField.getObjectId(), new DataField(email))
+
+        caseRepository.save(contactCase)
     }
 
     private Case createCase(String title, PetriNet net, Long author) {
