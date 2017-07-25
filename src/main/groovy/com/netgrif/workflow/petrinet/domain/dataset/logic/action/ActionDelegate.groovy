@@ -1,14 +1,8 @@
 package com.netgrif.workflow.petrinet.domain.dataset.logic.action
 
 import com.netgrif.workflow.petrinet.domain.Transition
-import com.netgrif.workflow.petrinet.domain.dataset.ChoiceField
-import com.netgrif.workflow.petrinet.domain.dataset.EnumerationField
-import com.netgrif.workflow.petrinet.domain.dataset.Field
-import com.netgrif.workflow.petrinet.domain.dataset.FieldWithDefault
-import com.netgrif.workflow.petrinet.domain.dataset.FileField
-import com.netgrif.workflow.petrinet.domain.dataset.MultichoiceField
+import com.netgrif.workflow.petrinet.domain.dataset.*
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedField
-import com.netgrif.workflow.psc.PostalCode
 import com.netgrif.workflow.workflow.domain.Case
 
 class ActionDelegate {
@@ -131,7 +125,7 @@ class ActionDelegate {
     }
 
     def cache(String name){
-        return actionsRunner.getFromCache("${useCase.stringId}-${name}")
+        return actionsRunner.getFromCache("${useCase.stringId}-${name}" as String)
     }
 
     def cacheFree(String name){

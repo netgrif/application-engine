@@ -43,6 +43,17 @@
         <id>301005</id>
         <title>Obec</title>
         <values></values>
+        <action trigger="set">
+            <!--@formatter:off-->
+            field: f.301002,
+            zipcode: f.101001,
+            obec: f.this;
+            change field about {
+                def postal = psc byCode,zipcode.value;
+                return postal.find {item -> item.locality==obec.value}.regionCode;
+            }
+            <!--@formatter:on-->
+        </action>
     </data>
     <data type="text">
         <title>PSČ</title>
@@ -51,10 +62,11 @@
         <action trigger="set">
             <!--@formatter:off-->
             field: f.this,
-            obec: f.301001;
-            change obec about {
+            obec: f.301005;
+            change obec choices {
                 def postal = psc byCode,field.value;
-                return postal?.first()?.locality;
+                cache "post",postal;
+                return postal.locality;
             }
             <!--@formatter:on-->
         </action>
@@ -64,27 +76,24 @@
         <title>PSČ</title>
         <values></values>
     </data>
-    <data type="enumeration">
+    <data type="text">
         <title>Lokalita</title>
         <id>301002</id>
         <placeholder>Typ</placeholder>
-        <values>BA</values>
-        <values>Dedina</values>
-        <values>Mesto</values>
-        <values>Krajské mesto</values>
-        <init>Krajské mesto</init>
         <action trigger="set">
             <!--@formatter:off-->
             field: f.this,
             coeff: f.201001;
             change coeff about {
-            if (field.value=="BA")
+            if (field.value=="L5")
                 return 3.5 as Double;
-            if (field.value=="Mesto")
+            if (field.value=="L4")
+                return 3.5 as Double;
+            if (field.value=="L2")
                 return 3.7 as Double;
-            if (field.value=="Dedina")
+            if (field.value=="L1")
                 return 2.5 as Double;
-            if (field.value=="(Krajské mesto")
+            if (field.value=="L3")
                 return 3.1 as Double;
             }
             <!--@formatter:on-->
@@ -94,13 +103,15 @@
             field: f.this,
             coeff: f.201018;
             change coeff about {
-                if (field.value=="BA")
+                if (field.value=="L5")
                     return 4.2 as Double;
-                if (field.value=="(Krajské mesto")
+                if (field.value=="L4")
+                    return 4.2 as Double;
+                if (field.value=="L3")
                     return 3.5 as Double;
-                if (field.value=="Mesto")
+                if (field.value=="L2")
                     return 3.2 as Double;
-                if (field.value=="Dedina")
+                if (field.value=="L1")
                     return 2.8 as Double;
             }
             <!--@formatter:on-->
@@ -1016,14 +1027,16 @@
             location: f.301002,
             coeff: f.205002;
             change coeff about {
-            if (location.value=="BA")
+            if (location.value=="L5")
             return 850*field.value as Double;
-            if (location.value=="Dedina")
-            return 400*field.value as Double;
-            if (location.value=="Mesto")
-            return 650*field.value as Double;
-            if (location.value=="Krajské mesto")
+            if (location.value=="L4")
             return 700*field.value as Double;
+            if (location.value=="L1")
+            return 400*field.value as Double;
+            if (location.value=="L2")
+            return 500*field.value as Double;
+            if (location.value=="L3")
+            return 650*field.value as Double;
             }
         <!--@formatter:on-->
         </action>
@@ -1061,14 +1074,17 @@
             location: f.301002,
             coeff: f.205003;
             change coeff about {
-            if (location.value=="BA")
-                return 1400*field.value as Double;
-            if (location.value=="Dedina")
-                return 550*field.value as Double;
-            if (location.value=="Mesto")
-                return 800*field.value as Double;
-            if (location.value=="Krajské mesto")
-                return 900*field.value as Double;
+           change coeff about {
+            if (location.value=="L5")
+            return 1400*field.value as Double;
+            if (location.value=="L4")
+            return 900*field.value as Double;
+            if (location.value=="L1")
+            return 550*field.value as Double;
+            if (location.value=="L2")
+            return 650*field.value as Double;
+            if (location.value=="L3")
+            return 800*field.value as Double;
             }
         <!--@formatter:on-->
         </action>
@@ -1107,14 +1123,17 @@
             location: f.301002,
             coeff: f.205004;
             change coeff about {
-            if (location.value=="BA")
+            change coeff about {
+            if (location.value=="L5")
             return 1200*field.value as Double;
-            if (location.value=="Dedina")
-            return 450*field.value as Double;
-            if (location.value=="Mesto")
-            return 700*field.value as Double;
-            if (location.value=="Krajské mesto")
+            if (location.value=="L4")
             return 800*field.value as Double;
+            if (location.value=="L1")
+            return 500*field.value as Double;
+            if (location.value=="L2")
+            return 550*field.value as Double;
+            if (location.value=="L3")
+            return 700*field.value as Double;
             }
         <!--@formatter:on-->
         </action>
@@ -1152,14 +1171,16 @@
             location: f.301002,
             coeff: f.105007;
             change coeff about {
-            if (location.value=="BA")
+             if (location.value=="L5")
             return 850*field.value as Double;
-            if (location.value=="Dedina")
-            return 400*field.value as Double;
-            if (location.value=="Mesto")
-            return 650*field.value as Double;
-            if (location.value=="Krajské mesto")
+            if (location.value=="L4")
             return 700*field.value as Double;
+            if (location.value=="L1")
+            return 400*field.value as Double;
+            if (location.value=="L2")
+            return 500*field.value as Double;
+            if (location.value=="L3")
+            return 650*field.value as Double;
             }
         <!--@formatter:on-->
         </action>
@@ -1175,14 +1196,16 @@
             location: f.301002,
             coeff: f.205001;
             change coeff about {
-            if (location.value=="BA")
+            if (location.value=="L5")
             return 1900*field.value as Double;
-            if (location.value=="Dedina")
-            return 700*field.value as Double;
-            if (location.value=="Mesto")
-            return 950*field.value as Double;
-            if (location.value=="Krajské mesto")
+            if (location.value=="L4")
             return 1300*field.value as Double;
+            if (location.value=="L1")
+            return 650*field.value as Double;
+            if (location.value=="L2")
+            return 700*field.value as Double;
+            if (location.value=="L3")
+            return 950*field.value as Double;
             }
         <!--@formatter:on-->
         </action>        <!--<action trigger="set">-->
@@ -2287,14 +2310,16 @@
             location: f.301002,
             coeff: f.106002;
             change coeff about {
-            if (location.value=="BA")
+             if (location.value=="L5")
             return 1900*field.value as Double;
-            if (location.value=="Dedina")
-            return 700*field.value as Double;
-            if (location.value=="Mesto")
-            return 950*field.value as Double;
-            if (location.value=="Krajské mesto")
+            if (location.value=="L4")
             return 1300*field.value as Double;
+            if (location.value=="L1")
+            return 650*field.value as Double;
+            if (location.value=="L2")
+            return 700*field.value as Double;
+            if (location.value=="L3")
+            return 950*field.value as Double;
             }
         <!--@formatter:on-->
         </action>
@@ -2591,14 +2616,6 @@
         <!--@formatter:on-->
         </action>
     </data>
-    <!--<data type="enumeration">-->
-    <!--<title>Poistenie zodpovednosti z vlastníctva nehnuteľnosti</title>-->
-    <!--<id>107002</id>-->
-    <!--<placeholder>Spoluúčasť</placeholder>-->
-    <!--<values>0.00 €</values>-->
-    <!--<values>50.00 €</values>-->
-    <!--<values>150.00 €</values>-->
-    <!--</data>-->
     <data type="enumeration">
         <title>Zodpovednosť za škodu členov domácnosti</title>
         <id>107003</id>
@@ -5327,9 +5344,10 @@
             <alignment>start</alignment>
             <!--Obec-->
             <dataRef>
-                <id>301001</id>
+                <!--<id>301001</id>-->
+                <id>301005</id>
                 <logic>
-                    <behavior>visible</behavior>
+                    <behavior>editable</behavior>
                     <!--todo: psc and lokalita lookup -->
                 </logic>
             </dataRef>
@@ -8233,7 +8251,7 @@
         </dataGroup>
         <dataGroup>
             <id>4</id>
-            <title></title>
+            <title>Sumarizácia poistnej sumy</title>
             <alignment>start</alignment>
             <stretch>true</stretch>
             <!--ROČNÉ POISTNÉ CELKOM-->
@@ -8958,7 +8976,7 @@
             <id>3</id>
         </transactionRef>
         <roleRef>
-            <id>1</id>
+            <id>2</id>
             <logic>
                 <perform>true</perform>
             </logic>
