@@ -82,7 +82,7 @@ public class Case {
         this.petriNet = petriNet;
         this.activePlaces = activePlaces;
         populateDataSet();
-        this.immediateDataFields = new LinkedHashSet<>(this.petriNet.getImmediateFields().stream().map(Field::getObjectId).collect(Collectors.toList()));
+        this.immediateDataFields = new LinkedHashSet<>(this.petriNet.getImmediateFields().stream().map(Field::getStringId).collect(Collectors.toList()));
     }
 
     public ObjectId get_id() {

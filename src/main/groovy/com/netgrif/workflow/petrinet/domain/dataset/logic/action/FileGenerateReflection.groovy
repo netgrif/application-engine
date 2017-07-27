@@ -32,15 +32,15 @@ class FileGenerateReflection {
                 results.add(callMethod(member))
         }
         if (results.isEmpty())
-            results.add(new File(field.getFilePath((String) useCase.dataSet.get(field.objectId).value)))
+            results.add(new File(field.getFilePath((String) useCase.dataSet.get(field.stringId).value)))
 
         return results
     }
 
     Object callMethod(String calledMethod) {
         try {
-            if (!alwaysGenerate && useCase.dataSet.get(field.objectId).value != field.getDefaultValue())
-                return new File(field.getFilePath(useCase.dataSet.get(field.objectId).value as String))
+            if (!alwaysGenerate && useCase.dataSet.get(field.stringId).value != field.getDefaultValue())
+                return new File(field.getFilePath(useCase.dataSet.get(field.stringId).value as String))
 
             String[] parts = calledMethod.split("\\.")
             Class clazz = Class.forName(GENERATION_METHODS_PACKAGE + parts[0])
