@@ -2972,7 +2972,6 @@
         <init>1</init>
         <action trigger="set">
             <!--@formatter:off-->
-            c1: f.201001,
             c2: f.201002,
             c3: f.201003,
             c4: f.201004,
@@ -2989,7 +2988,7 @@
             c16: f.201016,
             sum: f.201017;
             change sum about {
-            return c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c9.value*c11.value*c12.value*c13.value*c14.value*c15.value*c16.value;
+            return c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c9.value*c11.value*c12.value*c13.value*c14.value*c15.value*c16.value;
             }
         <!--@formatter:on-->
         </action>
@@ -3005,7 +3004,6 @@
         <init>1</init>
         <action trigger="set">
             <!--@formatter:off-->
-            c1: f.201001,
             c2: f.201002,
             c3: f.201003,
             c4: f.201004,
@@ -3022,7 +3020,7 @@
             c16: f.201016,
             sum: f.201017;
             change sum about {
-            return c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c9.value*c11.value*c12.value*c13.value*c14.value*c15.value*c16.value;
+            return c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c9.value*c11.value*c12.value*c13.value*c14.value*c15.value*c16.value;
             }
         <!--@formatter:on-->
         </action>
@@ -3033,7 +3031,6 @@
         <init>1</init>
         <action trigger="set">
             <!--@formatter:off-->
-            c1: f.201001,
             c2: f.201002,
             c3: f.201003,
             c4: f.201004,
@@ -3050,7 +3047,7 @@
             c16: f.201016,
             sum: f.201017;
             change sum about {
-            return c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c9.value*c11.value*c12.value*c13.value*c14.value*c15.value*c16.value;
+            return c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c9.value*c11.value*c12.value*c13.value*c14.value*c15.value*c16.value;
             }
         <!--@formatter:on-->
         </action>
@@ -3061,7 +3058,6 @@
         <init>1</init>
         <action trigger="set">
             <!--@formatter:off-->
-            c1: f.201001,
             c2: f.201002,
             c3: f.201003,
             c4: f.201004,
@@ -3078,7 +3074,7 @@
             c16: f.201016,
             sum: f.201017;
             change sum about {
-            return c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c9.value*c11.value*c12.value*c13.value*c14.value*c15.value*c16.value;
+            return c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c9.value*c11.value*c12.value*c13.value*c14.value*c15.value*c16.value;
             }
         <!--@formatter:on-->
         </action>
@@ -3089,7 +3085,6 @@
         <init>1</init>
         <action trigger="set">
             <!--@formatter:off-->
-            c1: f.201001,
             c2: f.201002,
             c3: f.201003,
             c4: f.201004,
@@ -3106,7 +3101,7 @@
             c16: f.201016,
             sum: f.201017;
             change sum about {
-            return c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c9.value*c11.value*c12.value*c13.value*c14.value*c15.value*c16.value;
+            return c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c9.value*c11.value*c12.value*c13.value*c14.value*c15.value*c16.value;
             }
         <!--@formatter:on-->
         </action>
@@ -3117,7 +3112,6 @@
         <init>1</init>
         <action trigger="set">
             <!--@formatter:off-->
-            c1: f.201001,
             c2: f.201002,
             c3: f.201003,
             c4: f.201004,
@@ -3134,7 +3128,7 @@
             c16: f.201016,
             sum: f.201017;
             change sum about {
-            return c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c9.value*c11.value*c12.value*c13.value*c14.value*c15.value*c16.value;
+            return c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c9.value*c11.value*c12.value*c13.value*c14.value*c15.value*c16.value;
             }
         <!--@formatter:on-->
         </action>
@@ -3145,7 +3139,6 @@
         <init>1</init>
         <action trigger="set">
             <!--@formatter:off-->
-            c1: f.201001,
             c2: f.201002,
             c3: f.201003,
             c4: f.201004,
@@ -3162,7 +3155,7 @@
             c16: f.201016,
             sum: f.201017;
             change sum about {
-            return c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c9.value*c11.value*c12.value*c13.value*c14.value*c15.value*c16.value;
+            return c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c9.value*c11.value*c12.value*c13.value*c14.value*c15.value*c16.value;
             }
         <!--@formatter:on-->
         </action>
@@ -3173,7 +3166,6 @@
         <init>1</init>
         <action trigger="set">
             <!--@formatter:off-->
-            c1: f.201001,
             c2: f.201002,
             c3: f.201003,
             c4: f.201004,
@@ -3190,7 +3182,7 @@
             c16: f.201016,
             sum: f.201017;
             change sum about {
-            return c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c9.value*c11.value*c12.value*c13.value*c14.value*c15.value*c16.value;
+            return c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c9.value*c11.value*c12.value*c13.value*c14.value*c15.value*c16.value;
             }
         <!--@formatter:on-->
         </action>
@@ -3203,7 +3195,6 @@
         <init>1</init>
         <action trigger="set">
             <!--@formatter:off-->
-            c1: f.201001,
             c2: f.201002,
             c3: f.201003,
             c4: f.201004,
@@ -3220,7 +3211,7 @@
             c16: f.201016,
             sum: f.201017;
             change sum about {
-            return c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c9.value*c11.value*c12.value*c13.value*c14.value*c15.value*c16.value;
+            return c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c9.value*c11.value*c12.value*c13.value*c14.value*c15.value*c16.value;
             }
         <!--@formatter:on-->
         </action>
@@ -3233,7 +3224,6 @@
         <init>1</init>
         <action trigger="set">
             <!--@formatter:off-->
-            c1: f.201001,
             c2: f.201002,
             c3: f.201003,
             c4: f.201004,
@@ -3250,7 +3240,7 @@
             c16: f.201016,
             sum: f.201017;
             change sum about {
-            return c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c9.value*c11.value*c12.value*c13.value*c14.value*c15.value*c16.value;
+            return c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c9.value*c11.value*c12.value*c13.value*c14.value*c15.value*c16.value;
             }
         <!--@formatter:on-->
         </action>
@@ -3261,7 +3251,6 @@
         <init>1</init>
         <action trigger="set">
             <!--@formatter:off-->
-            c1: f.201001,
             c2: f.201002,
             c3: f.201003,
             c4: f.201004,
@@ -3278,7 +3267,7 @@
             c16: f.201016,
             sum: f.201017;
             change sum about {
-            return c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c9.value*c11.value*c12.value*c13.value*c14.value*c15.value*c16.value;
+            return c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c9.value*c11.value*c12.value*c13.value*c14.value*c15.value*c16.value;
             }
         <!--@formatter:on-->
         </action>
@@ -3289,7 +3278,6 @@
         <init>1</init>
         <action trigger="set">
             <!--@formatter:off-->
-            c1: f.201001,
             c2: f.201002,
             c3: f.201003,
             c4: f.201004,
@@ -3306,7 +3294,7 @@
             c16: f.201016,
             sum: f.201017;
             change sum about {
-            return c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c9.value*c11.value*c12.value*c13.value*c14.value*c15.value*c16.value;
+            return c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c9.value*c11.value*c12.value*c13.value*c14.value*c15.value*c16.value;
             }
         <!--@formatter:on-->
         </action>
@@ -3317,7 +3305,6 @@
         <init>1</init>
         <action trigger="set">
             <!--@formatter:off-->
-            c1: f.201001,
             c2: f.201002,
             c3: f.201003,
             c4: f.201004,
@@ -3334,7 +3321,7 @@
             c16: f.201016,
             sum: f.201017;
             change sum about {
-            return c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c9.value*c11.value*c12.value*c13.value*c14.value*c15.value*c16.value;
+            return c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c9.value*c11.value*c12.value*c13.value*c14.value*c15.value*c16.value;
             }
         <!--@formatter:on-->
         </action>
@@ -3345,7 +3332,6 @@
         <init>1</init>
         <action trigger="set">
             <!--@formatter:off-->
-            c1: f.201001,
             c2: f.201002,
             c3: f.201003,
             c4: f.201004,
@@ -3362,7 +3348,7 @@
             c16: f.201016,
             sum: f.201017;
             change sum about {
-            return c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c9.value*c11.value*c12.value*c13.value*c14.value*c15.value*c16.value;
+            return c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c9.value*c11.value*c12.value*c13.value*c14.value*c15.value*c16.value;
             }
         <!--@formatter:on-->
         </action>
@@ -3373,7 +3359,6 @@
         <init>1</init>
         <action trigger="set">
             <!--@formatter:off-->
-            c1: f.201001,
             c2: f.201002,
             c3: f.201003,
             c4: f.201004,
@@ -3390,7 +3375,7 @@
             c16: f.201016,
             sum: f.201017;
             change sum about {
-            return c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c9.value*c11.value*c12.value*c13.value*c14.value*c15.value*c16.value;
+            return c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c9.value*c11.value*c12.value*c13.value*c14.value*c15.value*c16.value;
             }
         <!--@formatter:on-->
         </action>
@@ -5332,7 +5317,7 @@
                 <id>301005</id>
                 <logic>
                     <behavior>editable</behavior>
-                    <behavior>required</behavior>
+                    <!--todo: psc and lokalita lookup -->
                 </logic>
             </dataRef>
             <dataRef>
