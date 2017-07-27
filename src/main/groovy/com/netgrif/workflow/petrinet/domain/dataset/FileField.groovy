@@ -25,7 +25,7 @@ class FileField extends FieldWithDefault<String> {
     }
 
     String getFilePath(String fileName) {
-        return "storage/" + (this.generated ? "generated/" : "") + getObjectId() + "-" + fileName
+        return "storage/" + (this.generated ? "generated/" : "") + getStringId() + "-" + fileName
     }
 
     boolean isGenerated() {
