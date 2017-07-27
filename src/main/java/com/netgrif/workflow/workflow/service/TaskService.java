@@ -318,7 +318,7 @@ public class TaskService implements ITaskService {
                 if (!optional.isPresent()) {
                     throw new IllegalArgumentException("Field [" + fieldId + "] not present in net [" + net.getStringId() + "]");
                 }
-                String fieldStringId = optional.get().getObjectId();
+                String fieldStringId = optional.get().getStringId();
                 return Pair.of(fieldStringId, useCase.getDataSet().get(fieldStringId).getValue());
             }).collect(Collectors.toMap(Pair::getFirst, Pair::getSecond));
 
@@ -364,8 +364,8 @@ public class TaskService implements ITaskService {
         LinkedHashSet<Action> fieldActions = new LinkedHashSet<>();
         if (field.getActions() != null)
             fieldActions.addAll(DataFieldLogic.getActionByTrigger(field.getActions(), actionTrigger));
-        if (transition.getDataSet().containsKey(field.getObjectId()) && !transition.getDataSet().get(field.getObjectId()).getActions().isEmpty())
-            fieldActions.addAll(DataFieldLogic.getActionByTrigger(transition.getDataSet().get(field.getObjectId()).getActions(), actionTrigger));
+        if (transition.getDataSet().containsKey(field.getStringId()) && !transition.getDataSet().get(field.getStringId()).getActions().isEmpty())
+            fieldActions.addAll(DataFieldLogic.getActionByTrigger(transition.getDataSet().get(field.getStringId()).getActions(), actionTrigger));
 
         if (fieldActions.isEmpty()) return;
 

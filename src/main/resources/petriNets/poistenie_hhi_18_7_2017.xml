@@ -2276,8 +2276,9 @@
         </action>
     </data>
     <data type="number">
-        <title>Poistenie domácnosti - poistná suma</title>
+        <title>Poistenie domácnosti</title>
         <id>106002</id>
+        <placeholder>Poistná suma</placeholder>
         <valid>positive</valid>
         <action trigger="set">
             <!--@formatter:off-->
@@ -2293,8 +2294,9 @@
         </action>
     </data>
     <data type="number">
-        <title>Poistenie domácnosti - poistné</title>
+        <title>Poistenie domácnosti</title>
         <id>306001</id>
+        <placeholder>Poistné</placeholder>
         <action trigger="set">
             <!--@formatter:off-->
             c1: f.306001,
@@ -2345,13 +2347,15 @@
         <id>106004</id>
     </data>
     <data type="number">
-        <title>Cennosti - poistná suma</title>
+        <title>Cennosti</title>
         <id>106005</id>
         <valid>positive</valid>
+        <placeholder>Poistná suma</placeholder>
     </data>
     <data type="number">
-        <title>Cennosti - poistné</title>
+        <title>Cennosti</title>
         <id>306002</id>
+        <placeholder>Poistné</placeholder>
         <action trigger="set">
             <!--@formatter:off-->
             c1: f.306001,
@@ -2376,13 +2380,15 @@
         <id>106006</id>
     </data>
     <data type="number">
-        <title>Umelecké diela - poistná suma</title>
+        <title>Umelecké diela</title>
         <id>106007</id>
+        <placeholder>Poistná suma</placeholder>
         <valid>positive</valid>
     </data>
     <data type="number">
-        <title>Umelecké diela - poistné</title>
+        <title>Umelecké diela</title>
         <id>306003</id>
+        <placeholder>Poistné</placeholder>
         <action trigger="set">
             <!--@formatter:off-->
             c1: f.306001,
@@ -2407,13 +2413,15 @@
         <id>106008</id>
     </data>
     <data type="number">
-        <title>Elektronické a optické zariadenia - poistná suma</title>
+        <title>Elektronické a optické zariadenia</title>
         <id>106009</id>
+        <placeholder>Poistná suma</placeholder>
         <valid>positive</valid>
     </data>
     <data type="number">
-        <title>Elektronické a optické zariadenia - poistné</title>
+        <title>Elektronické a optické zariadenia</title>
         <id>306004</id>
+        <placeholder>Poistné</placeholder>
         <action trigger="set">
             <!--@formatter:off-->
             c1: f.306001,
@@ -2438,13 +2446,15 @@
         <id>106010</id>
     </data>
     <data type="number">
-        <title>Špeciálne sklá a presklenie - poistná suma</title>
+        <title>Špeciálne sklá a presklenie</title>
         <id>106011</id>
         <valid>positive</valid>
+        <placeholder>Poistná suma</placeholder>
     </data>
     <data type="number">
-        <title>Špeciálne sklá a presklenie - poistné</title>
+        <title>Špeciálne sklá a presklenie</title>
         <id>306005</id>
+        <placeholder>Poistné</placeholder>
         <action trigger="set">
             <!--@formatter:off-->
             c1: f.306001,
@@ -2469,13 +2479,15 @@
         <id>106012</id>
     </data>
     <data type="number">
-        <title>Záhradé vybavenie a nábytok - poistná suma</title>
+        <title>Záhradé vybavenie a nábytok</title>
         <id>106013</id>
         <valid>positive</valid>
+        <placeholder>Poistná suma</placeholder>
     </data>
     <data type="number">
-        <title>Záhradé vybavenie a nábytok - poistné</title>
+        <title>Záhradé vybavenie a nábytok</title>
         <id>306006</id>
+        <placeholder>Poistné</placeholder>
         <action trigger="set">
             <!--@formatter:off-->
             c1: f.306001,
@@ -2500,13 +2512,15 @@
         <id>106014</id>
     </data>
     <data type="number">
-        <title>Elektromotory v domácich spotrebičoch - poistná suma</title>
+        <title>Elektromotory v domácich spotrebičoch</title>
         <id>106015</id>
         <valid>positive</valid>
+        <placeholder>Poistná suma</placeholder>
     </data>
     <data type="number">
-        <title>Elektromotory v domácich spotrebičoch - poistné</title>
+        <title>Elektromotory v domácich spotrebičoch</title>
         <id>306007</id>
+        <placeholder>Poistné</placeholder>
         <action trigger="set">
             <!--@formatter:off-->
             c1: f.306001,
@@ -2531,13 +2545,15 @@
         <id>106016</id>
     </data>
     <data type="number">
-        <title>Stavebné súčasti domácností - poistná suma</title>
+        <title>Stavebné súčasti domácností</title>
         <id>106017</id>
         <valid>positive</valid>
+        <placeholder>Poistná suma</placeholder>
     </data>
     <data type="number">
-        <title>Stavebné súčasti domácností - poistné</title>
+        <title>Stavebné súčasti domácností</title>
         <id>306008</id>
+        <placeholder>Poistné</placeholder>
         <action trigger="set">
             <!--@formatter:off-->
             c1: f.306001,
@@ -2562,13 +2578,15 @@
         <id>106018</id>
     </data>
     <data type="number">
-        <title>Športové náradie - poistná suma</title>
+        <title>Športové náradie</title>
         <id>106019</id>
         <valid>positive</valid>
+        <placeholder>Poistná suma</placeholder>
     </data>
     <data type="number">
-        <title>športové náradie - poistné</title>
+        <title>športové náradie</title>
         <id>306009</id>
+        <placeholder>Poistné</placeholder>
         <action trigger="set">
             <!--@formatter:off-->
             c1: f.306001,
@@ -2593,13 +2611,15 @@
         <id>106020</id>
     </data>
     <data type="number">
-        <title>Iné - poistná suma</title>
+        <title>Iné</title>
         <id>106021</id>
+        <placeholder>Poistná suma</placeholder>
         <valid>positive</valid>
     </data>
     <data type="number">
-        <title>iné - poistné</title>
+        <title>Iné</title>
         <id>306010</id>
+        <placeholder>Poistné</placeholder>
         <action trigger="set">
             <!--@formatter:off-->
             c1: f.306001,
@@ -2680,13 +2700,13 @@
         </action>
     </data>
     <data type="number">
-        <title>Poistenie nehnuteľnosti - Poistné</title>
+        <title>Poistenie nehnuteľnosti</title>
         <id>305002</id>
         <placeholder>Poistné</placeholder>
         <init>0</init>
     </data>
     <data type="number">
-        <title>Poistenie nehnuteľnosti - Poistná suma</title>
+        <title>Poistenie nehnuteľnosti</title>
         <id>105006</id>
         <placeholder>Poistná suma</placeholder>
         <valid>positive</valid>
@@ -2983,7 +3003,6 @@
         <init>1</init>
         <action trigger="set">
             <!--@formatter:off-->
-            c1: f.201001,
             c2: f.201002,
             c3: f.201003,
             c4: f.201004,
@@ -3000,7 +3019,7 @@
             c16: f.201016,
             sum: f.201017;
             change sum about {
-            return c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c9.value*c11.value*c12.value*c13.value*c14.value*c15.value*c16.value;
+            return c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c9.value*c11.value*c12.value*c13.value*c14.value*c15.value*c16.value;
             }
         <!--@formatter:on-->
         </action>
@@ -3016,7 +3035,6 @@
         <init>1</init>
         <action trigger="set">
             <!--@formatter:off-->
-            c1: f.201001,
             c2: f.201002,
             c3: f.201003,
             c4: f.201004,
@@ -3033,7 +3051,7 @@
             c16: f.201016,
             sum: f.201017;
             change sum about {
-            return c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c9.value*c11.value*c12.value*c13.value*c14.value*c15.value*c16.value;
+            return c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c9.value*c11.value*c12.value*c13.value*c14.value*c15.value*c16.value;
             }
         <!--@formatter:on-->
         </action>
@@ -3044,7 +3062,6 @@
         <init>1</init>
         <action trigger="set">
             <!--@formatter:off-->
-            c1: f.201001,
             c2: f.201002,
             c3: f.201003,
             c4: f.201004,
@@ -3061,7 +3078,7 @@
             c16: f.201016,
             sum: f.201017;
             change sum about {
-            return c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c9.value*c11.value*c12.value*c13.value*c14.value*c15.value*c16.value;
+            return c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c9.value*c11.value*c12.value*c13.value*c14.value*c15.value*c16.value;
             }
         <!--@formatter:on-->
         </action>
@@ -3072,7 +3089,6 @@
         <init>1</init>
         <action trigger="set">
             <!--@formatter:off-->
-            c1: f.201001,
             c2: f.201002,
             c3: f.201003,
             c4: f.201004,
@@ -3089,7 +3105,7 @@
             c16: f.201016,
             sum: f.201017;
             change sum about {
-            return c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c9.value*c11.value*c12.value*c13.value*c14.value*c15.value*c16.value;
+            return c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c9.value*c11.value*c12.value*c13.value*c14.value*c15.value*c16.value;
             }
         <!--@formatter:on-->
         </action>
@@ -3100,7 +3116,6 @@
         <init>1</init>
         <action trigger="set">
             <!--@formatter:off-->
-            c1: f.201001,
             c2: f.201002,
             c3: f.201003,
             c4: f.201004,
@@ -3117,7 +3132,7 @@
             c16: f.201016,
             sum: f.201017;
             change sum about {
-            return c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c9.value*c11.value*c12.value*c13.value*c14.value*c15.value*c16.value;
+            return c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c9.value*c11.value*c12.value*c13.value*c14.value*c15.value*c16.value;
             }
         <!--@formatter:on-->
         </action>
@@ -3128,7 +3143,6 @@
         <init>1</init>
         <action trigger="set">
             <!--@formatter:off-->
-            c1: f.201001,
             c2: f.201002,
             c3: f.201003,
             c4: f.201004,
@@ -3145,7 +3159,7 @@
             c16: f.201016,
             sum: f.201017;
             change sum about {
-            return c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c9.value*c11.value*c12.value*c13.value*c14.value*c15.value*c16.value;
+            return c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c9.value*c11.value*c12.value*c13.value*c14.value*c15.value*c16.value;
             }
         <!--@formatter:on-->
         </action>
@@ -3156,7 +3170,6 @@
         <init>1</init>
         <action trigger="set">
             <!--@formatter:off-->
-            c1: f.201001,
             c2: f.201002,
             c3: f.201003,
             c4: f.201004,
@@ -3173,7 +3186,7 @@
             c16: f.201016,
             sum: f.201017;
             change sum about {
-            return c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c9.value*c11.value*c12.value*c13.value*c14.value*c15.value*c16.value;
+            return c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c9.value*c11.value*c12.value*c13.value*c14.value*c15.value*c16.value;
             }
         <!--@formatter:on-->
         </action>
@@ -3184,7 +3197,6 @@
         <init>1</init>
         <action trigger="set">
             <!--@formatter:off-->
-            c1: f.201001,
             c2: f.201002,
             c3: f.201003,
             c4: f.201004,
@@ -3201,7 +3213,7 @@
             c16: f.201016,
             sum: f.201017;
             change sum about {
-            return c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c9.value*c11.value*c12.value*c13.value*c14.value*c15.value*c16.value;
+            return c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c9.value*c11.value*c12.value*c13.value*c14.value*c15.value*c16.value;
             }
         <!--@formatter:on-->
         </action>
@@ -3214,7 +3226,6 @@
         <init>1</init>
         <action trigger="set">
             <!--@formatter:off-->
-            c1: f.201001,
             c2: f.201002,
             c3: f.201003,
             c4: f.201004,
@@ -3231,7 +3242,7 @@
             c16: f.201016,
             sum: f.201017;
             change sum about {
-            return c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c9.value*c11.value*c12.value*c13.value*c14.value*c15.value*c16.value;
+            return c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c9.value*c11.value*c12.value*c13.value*c14.value*c15.value*c16.value;
             }
         <!--@formatter:on-->
         </action>
@@ -3244,7 +3255,6 @@
         <init>1</init>
         <action trigger="set">
             <!--@formatter:off-->
-            c1: f.201001,
             c2: f.201002,
             c3: f.201003,
             c4: f.201004,
@@ -3261,7 +3271,7 @@
             c16: f.201016,
             sum: f.201017;
             change sum about {
-            return c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c9.value*c11.value*c12.value*c13.value*c14.value*c15.value*c16.value;
+            return c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c9.value*c11.value*c12.value*c13.value*c14.value*c15.value*c16.value;
             }
         <!--@formatter:on-->
         </action>
@@ -3272,7 +3282,6 @@
         <init>1</init>
         <action trigger="set">
             <!--@formatter:off-->
-            c1: f.201001,
             c2: f.201002,
             c3: f.201003,
             c4: f.201004,
@@ -3289,7 +3298,7 @@
             c16: f.201016,
             sum: f.201017;
             change sum about {
-            return c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c9.value*c11.value*c12.value*c13.value*c14.value*c15.value*c16.value;
+            return c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c9.value*c11.value*c12.value*c13.value*c14.value*c15.value*c16.value;
             }
         <!--@formatter:on-->
         </action>
@@ -3300,7 +3309,6 @@
         <init>1</init>
         <action trigger="set">
             <!--@formatter:off-->
-            c1: f.201001,
             c2: f.201002,
             c3: f.201003,
             c4: f.201004,
@@ -3317,7 +3325,7 @@
             c16: f.201016,
             sum: f.201017;
             change sum about {
-            return c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c9.value*c11.value*c12.value*c13.value*c14.value*c15.value*c16.value;
+            return c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c9.value*c11.value*c12.value*c13.value*c14.value*c15.value*c16.value;
             }
         <!--@formatter:on-->
         </action>
@@ -3328,7 +3336,6 @@
         <init>1</init>
         <action trigger="set">
             <!--@formatter:off-->
-            c1: f.201001,
             c2: f.201002,
             c3: f.201003,
             c4: f.201004,
@@ -3345,7 +3352,7 @@
             c16: f.201016,
             sum: f.201017;
             change sum about {
-            return c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c9.value*c11.value*c12.value*c13.value*c14.value*c15.value*c16.value;
+            return c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c9.value*c11.value*c12.value*c13.value*c14.value*c15.value*c16.value;
             }
         <!--@formatter:on-->
         </action>
@@ -3356,7 +3363,6 @@
         <init>1</init>
         <action trigger="set">
             <!--@formatter:off-->
-            c1: f.201001,
             c2: f.201002,
             c3: f.201003,
             c4: f.201004,
@@ -3373,7 +3379,7 @@
             c16: f.201016,
             sum: f.201017;
             change sum about {
-            return c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c9.value*c11.value*c12.value*c13.value*c14.value*c15.value*c16.value;
+            return c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c9.value*c11.value*c12.value*c13.value*c14.value*c15.value*c16.value;
             }
         <!--@formatter:on-->
         </action>
@@ -3384,7 +3390,6 @@
         <init>1</init>
         <action trigger="set">
             <!--@formatter:off-->
-            c1: f.201001,
             c2: f.201002,
             c3: f.201003,
             c4: f.201004,
@@ -3401,7 +3406,7 @@
             c16: f.201016,
             sum: f.201017;
             change sum about {
-            return c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c9.value*c11.value*c12.value*c13.value*c14.value*c15.value*c16.value;
+            return c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c9.value*c11.value*c12.value*c13.value*c14.value*c15.value*c16.value;
             }
         <!--@formatter:on-->
         </action>
@@ -3882,7 +3887,7 @@
         <title>Koeficient - Zodpovednosť za škodu členov domácnosti</title>
         <id>207002</id>
     </data>
-    
+
 <!--=======================================================ZMLUVY==========================-->
 
     <!-- ===== Údaje o zmluve ===== -->
@@ -5255,7 +5260,7 @@
             <!--@formatter:on-->
         </action>
     </data>
-    
+
     <!--=================================TRANSITIONS================-->
     <!--================================= poistenie nehnuteľnosti DONE====================-->
     <transition>
@@ -5342,7 +5347,7 @@
                 <id>301005</id>
                 <logic>
                     <behavior>editable</behavior>
-                    <behavior>required</behavior>
+                    <!--todo: psc and lokalita lookup -->
                 </logic>
             </dataRef>
             <dataRef>
