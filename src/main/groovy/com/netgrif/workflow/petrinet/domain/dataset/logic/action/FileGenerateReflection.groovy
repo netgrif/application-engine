@@ -5,9 +5,10 @@ import com.netgrif.workflow.workflow.domain.Case
 
 import java.lang.reflect.Method
 
-class FileGenerateReflection{
+class FileGenerateReflection {
 
-    private static final String GENERATION_METHODS_PACKAGE = "com.netgrif.workflow.petrinet.domain.dataset.logic.action."
+    private static
+    final String GENERATION_METHODS_PACKAGE = "com.netgrif.workflow.petrinet.domain.dataset.logic.action."
 
     private Case useCase
     private FileField field
@@ -20,25 +21,25 @@ class FileGenerateReflection{
     }
 
     @Deprecated
-    public List<Object> executeLogic(){
-        if(field.logic == null) return null
-        if(field.logic.isEmpty()) return null
+    List<Object> executeLogic() {
+        if (field.logic == null) return null
+        if (field.logic.isEmpty()) return null
 
         List<Object> results = new ArrayList<>()
-        field.logic.each {member ->
-            if(!shouldExecute(member)) return
-            if(member.contains("."))
+        field.logic.each { member ->
+            if (!shouldExecute(member)) return
+            if (member.contains("."))
                 results.add(callMethod(member))
         }
-        if(results.isEmpty())
-            results.add(new File(field.getFilePath((String)useCase.dataSet.get(field.objectId).value)))
+        if (results.isEmpty())
+            results.add(new File(field.getFilePath((String) useCase.dataSet.get(field.objectId).value)))
 
         return results
     }
 
-    public Object callMethod(String calledMethod){
+    Object callMethod(String calledMethod) {
         try {
-            if(!alwaysGenerate && useCase.dataSet.get(field.objectId).value != field.getDefaultValue())
+            if (!alwaysGenerate && useCase.dataSet.get(field.objectId).value != field.getDefaultValue())
                 return new File(field.getFilePath(useCase.dataSet.get(field.objectId).value as String))
 
             String[] parts = calledMethod.split("\\.")
@@ -48,7 +49,7 @@ class FileGenerateReflection{
             Method m = clazz.getMethod(parts[1])
             return m.invoke(t)
 
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace()
             return null
         }
