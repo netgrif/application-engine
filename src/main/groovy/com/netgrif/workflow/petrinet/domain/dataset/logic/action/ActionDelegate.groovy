@@ -22,34 +22,34 @@ class ActionDelegate {
     }
 
     def copyBehavior(Field field, Transition transition) {
-        if (!useCase.hasFieldBehavior(field.objectId, transition.stringId)) {
-            useCase.dataSet.get(field.objectId).addBehavior(transition.stringId, transition.dataSet.get(field.objectId).behavior)
+        if (!useCase.hasFieldBehavior(field.stringId, transition.stringId)) {
+            useCase.dataSet.get(field.stringId).addBehavior(transition.stringId, transition.dataSet.get(field.stringId).behavior)
         }
     }
 
     def visible = { Field field, Transition trans ->
         copyBehavior(field, trans)
-        useCase.dataSet.get(field.objectId).makeVisible(trans.stringId)
+        useCase.dataSet.get(field.stringId).makeVisible(trans.stringId)
     }
 
     def editable = { Field field, Transition trans ->
         copyBehavior(field, trans)
-        useCase.dataSet.get(field.objectId).makeEditable(trans.stringId)
+        useCase.dataSet.get(field.stringId).makeEditable(trans.stringId)
     }
 
     def required = { Field field, Transition trans ->
         copyBehavior(field, trans)
-        useCase.dataSet.get(field.objectId).makeRequired(trans.stringId)
+        useCase.dataSet.get(field.stringId).makeRequired(trans.stringId)
     }
 
     def optional = { Field field, Transition trans ->
         copyBehavior(field, trans)
-        useCase.dataSet.get(field.objectId).makeOptional(trans.stringId)
+        useCase.dataSet.get(field.stringId).makeOptional(trans.stringId)
     }
 
     def hidden = { Field field, Transition trans ->
         copyBehavior(field, trans)
-        useCase.dataSet.get(field.objectId).makeHidden(trans.stringId)
+        useCase.dataSet.get(field.stringId).makeHidden(trans.stringId)
     }
 
     def unchanged = { return UNCHANGED_VALUE }
@@ -59,16 +59,16 @@ class ActionDelegate {
             [when: { Closure condition ->
                 if (condition()) {
                     behavior(field, trans)
-                    changedField.id = field.objectId
-                    changedField.addBehavior(useCase.dataSet.get(field.objectId).behavior)
+                    changedField.id = field.stringId
+                    changedField.addBehavior(useCase.dataSet.get(field.stringId).behavior)
                 }
             }]
         }]
     }
 
     def saveChangedValue(Field field){
-        useCase.dataSet.get(field.objectId).value = field.value
-        changedField.id = field.objectId
+        useCase.dataSet.get(field.stringId).value = field.value
+        changedField.id = field.stringId
         changedField.addAttribute("value",field.value)
     }
 
@@ -79,10 +79,10 @@ class ActionDelegate {
                 return
             }
             if(value == null){
-                if(field instanceof FieldWithDefault && field.defaultValue != useCase.dataSet.get(field.objectId).value){
+                if(field instanceof FieldWithDefault && field.defaultValue != useCase.dataSet.get(field.stringId).value){
                     field.clearValue()
                     saveChangedValue(field)
-                } else if(!(field instanceof FieldWithDefault) && useCase.dataSet.get(field.objectId).value != null){
+                } else if(!(field instanceof FieldWithDefault) && useCase.dataSet.get(field.stringId).value != null){
                     field.clearValue()
                     saveChangedValue(field)
                 }
@@ -101,7 +101,7 @@ class ActionDelegate {
             if(!(values instanceof Collection)) values = [values]
             field = (ChoiceField)field
             field.choices = values as Set<String>
-            changedField.id = field.objectId
+            changedField.id = field.stringId
             changedField.addAttribute("choices",field.choices)
         }]
     }

@@ -56,7 +56,7 @@ class JMeterExport {
         net = petriNetRepository.findAll().first()
         org = organizationRepository.findAll().first()
         authority = authorityRepository.findByName(Authority.user)
-        processRole = processRoleRepository.findByRoleIdIn([net.roles.values().find { it -> it.name == "Agent" }.objectId]).first()
+        processRole = processRoleRepository.findByRoleIdIn([net.roles.values().find { it -> it.name == "Agent" }.stringId]).first()
 
         List<User> users = createUsers(100)
         List<Case> cases = createCases(users)
@@ -89,7 +89,7 @@ class JMeterExport {
             file << tasks.get(i).stringId
             file << ","
             tasksFields.get(tasks.get(i).stringId).eachWithIndex { Field f, int j ->
-                file << f.objectId
+                file << f.stringId
                 if(j < 3) file << ","
             }
             file << "\n"

@@ -105,7 +105,7 @@ class XlsImporter {
                 authorities: [userRole] as Set<Authority>,
                 organizations: [ClientOrg] as Set<Organization>)
         client_manager.addProcessRole(userProcessRoleRepository.save(new UserProcessRole(
-                roleId: net.roles.values().find { it -> it.name == "client manager" }.objectId)))
+                roleId: net.roles.values().find { it -> it.name == "client manager" }.stringId)))
         def client_worker = new User(
                 email: "worker@company.com",
                 name: "Mária",
@@ -114,7 +114,7 @@ class XlsImporter {
                 authorities: [userRole] as Set<Authority>,
                 organizations: [ClientOrg] as Set<Organization>)
         client_worker.addProcessRole(userProcessRoleRepository.save(new UserProcessRole(
-                roleId: net.roles.values().find { it -> it.name == "client" }.objectId)))
+                roleId: net.roles.values().find { it -> it.name == "client" }.stringId)))
         def fm_manager = new User(
                 email: "manager@fmservis.sk",
                 name: "Peter",
@@ -123,7 +123,7 @@ class XlsImporter {
                 authorities: [roleAdmin] as Set<Authority>,
                 organizations: [FMOrg] as Set<Organization>)
         fm_manager.addProcessRole(userProcessRoleRepository.save(new UserProcessRole(
-                roleId: net.roles.values().find { it -> it.name == "fm manager" }.objectId)))
+                roleId: net.roles.values().find { it -> it.name == "fm manager" }.stringId)))
         def fm_worker = new User(
                 email: "worker@fmservis.sk",
                 name: "Štefan",
@@ -132,7 +132,7 @@ class XlsImporter {
                 authorities: [userRole] as Set<Authority>,
                 organizations: [FMOrg] as Set<Organization>)
         fm_worker.addProcessRole(userProcessRoleRepository.save(new UserProcessRole(
-                roleId: net.roles.values().find { it -> it.name == "fm servis" }.objectId)))
+                roleId: net.roles.values().find { it -> it.name == "fm servis" }.stringId)))
         userService.saveNew(client_manager)
         userService.saveNew(client_worker)
         userService.saveNew(fm_manager)

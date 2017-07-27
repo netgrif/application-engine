@@ -23,7 +23,7 @@ class Insurance {
         String xml = datasetToXml()
 
         File pdf = PdfUtils.fillPdfForm(pdfPath, new FileInputStream(input), xml)
-        useCase.dataSet.get(field.objectId).setValue(name)
+        useCase.dataSet.get(field.stringId).setValue(name)
 
         return pdf
     }
@@ -43,7 +43,7 @@ class Insurance {
         postfix %= 10
 
         new File("src/test/resources/counter.txt").setText(((id as Long) + 1) as String)
-        useCase.dataSet.get(field.objectId).setValue("${prefix}${base}${postfix}" as String)
+        useCase.dataSet.get(field.stringId).setValue("${prefix}${base}${postfix}" as String)
 
         return "${prefix}${base}${postfix}"
     }
