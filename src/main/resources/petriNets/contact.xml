@@ -843,7 +843,7 @@
         <id>2</id>
         <x>180</x>
         <y>140</y>
-        <label>Vytvoriť nový</label>
+        <label>Vyplniť údaje</label>
         <roleRef>
             <id>1</id>
             <logic>

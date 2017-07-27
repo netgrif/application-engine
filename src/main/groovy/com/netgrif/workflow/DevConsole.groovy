@@ -21,7 +21,7 @@ class DevConsole {
     @RequestMapping(value = "/dataset/{title}", method = GET, produces = APPLICATION_JSON_VALUE)
     String dataset(@PathVariable String title) {
         def useCase = caseRepository.findAll().find {it.title == title}
-        return "{ ${useCase?.dataSet?.collect {"\"${useCase?.petriNet?.dataSet?.get(it?.key)?.name?.take(20)}\":\"${it?.value?.value as String}\""}?.join(", ")} }"
+        return "{ ${useCase?.dataSet?.collect {"\"${useCase?.petriNet?.dataSet?.get(it?.key)?.importId}:${useCase?.petriNet?.dataSet?.get(it?.key)?.name?.replaceAll("\n[ ]{2}", "")}\":\"${it?.value?.value as String}\""}?.join(", ")} }"
     }
 
 //    @RequestMapping(value = "/login", method = GET)

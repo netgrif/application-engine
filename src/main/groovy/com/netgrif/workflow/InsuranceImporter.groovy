@@ -87,20 +87,20 @@ class InsuranceImporter {
     private void createUsers() {
         log.info("Creating users")
         def agentRole = userProcessRoleRepository.save(new UserProcessRole(
-                roleId: insuranceNet.roles.values().find { it -> it.name == "Agent" }.objectId
+                roleId: insuranceNet.roles.values().find { it -> it.name == "Agent" }.stringId
         ))
         def premiumRole = userProcessRoleRepository.save(new UserProcessRole(
-                roleId: insuranceNet.roles.values().find { it -> it.name == "Premium" }.objectId
+                roleId: insuranceNet.roles.values().find { it -> it.name == "Premium" }.stringId
         ))
 
         def contactRole = userProcessRoleRepository.save(new UserProcessRole(
-                roleId: contactNet.roles.values().find { it -> it.name == "Agent" }.objectId
+                roleId: contactNet.roles.values().find { it -> it.name == "Agent" }.stringId
         ))
         def documentAdminRole = userProcessRoleRepository.save(new UserProcessRole(
-                roleId: documentNet.roles.values().find { it -> it.name == "Admin" }.objectId
+                roleId: documentNet.roles.values().find { it -> it.name == "Admin" }.stringId
         ))
         def documentAgentRole = userProcessRoleRepository.save(new UserProcessRole(
-                roleId: documentNet.roles.values().find { it -> it.name == "Agent" }.objectId
+                roleId: documentNet.roles.values().find { it -> it.name == "Agent" }.stringId
         ))
 
         User agent = new User(
@@ -171,10 +171,10 @@ class InsuranceImporter {
         def telField = contactCase.petriNet.dataSet.values().find { v -> v.name == "Telefónne číslo"}
         def emailField = contactCase.petriNet.dataSet.values().find { v -> v.name == "Email"}
 
-        contactCase.dataSet.put(nameField.getObjectId(), new DataField(name))
-        contactCase.dataSet.put(surnameField.getObjectId(), new DataField(surname))
-        contactCase.dataSet.put(telField.getObjectId(), new DataField(telNumber))
-        contactCase.dataSet.put(emailField.getObjectId(), new DataField(email))
+        contactCase.dataSet.put(nameField.getStringId(), new DataField(name))
+        contactCase.dataSet.put(surnameField.getStringId(), new DataField(surname))
+        contactCase.dataSet.put(telField.getStringId(), new DataField(telNumber))
+        contactCase.dataSet.put(emailField.getStringId(), new DataField(email))
 
         caseRepository.save(contactCase)
     }
