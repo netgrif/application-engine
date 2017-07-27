@@ -139,6 +139,18 @@ class InsuranceImporter {
         zatko.addProcessRole(documentAdminRole)
         userService.saveNew(zatko)
         log.info("User $zatko.name $zatko.surname created")
+
+        User gratex = new User(
+                name: "Gratex",
+                surname: "International",
+                email: "gratex@gratex.com",
+                password: "gratex2017",
+                authorities: [auths.get(Authority.user)] as Set<Authority>,
+                organizations: [orgs.get("insurance")] as Set<Organization>)
+        gratex.addProcessRole(agentRole)
+        gratex.addProcessRole(documentAdminRole)
+        userService.saveNew(gratex)
+        log.info("User $gratex.name $gratex.surname created")
     }
 
     private void createCases(){
