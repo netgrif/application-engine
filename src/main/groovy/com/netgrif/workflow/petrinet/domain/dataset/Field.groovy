@@ -45,7 +45,7 @@ abstract class Field<T> {
         this.importId = importId
     }
 
-    String getObjectId() {
+    String getStringId() {
         return _id.toString()
     }
 

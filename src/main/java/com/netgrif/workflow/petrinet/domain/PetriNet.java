@@ -88,7 +88,7 @@ public class PetriNet extends PetriNetObject {
     }
 
     public void addRole(ProcessRole role) {
-        this.roles.put(role.getObjectId(), role);
+        this.roles.put(role.getStringId(), role);
     }
 
     public List<Arc> getArcsOfTransition(Transition transition) {
@@ -100,7 +100,7 @@ public class PetriNet extends PetriNetObject {
     }
 
     public void addDataSetField(Field field) {
-        this.dataSet.put(field.getObjectId(), field);
+        this.dataSet.put(field.getStringId(), field);
     }
 
     public boolean isNotInitialized() {
