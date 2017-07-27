@@ -1018,6 +1018,7 @@
         <id>105001</id>
         <placeholder>m2</placeholder>
         <init>0</init>
+        <valid>positive</valid>
         <action trigger="set">
             <!--@formatter:off-->
             field: f.this,
@@ -1065,6 +1066,7 @@
         <id>105002</id>
         <placeholder>m2</placeholder>
         <init>0</init>
+        <valid>positive</valid>
         <action trigger="set">
             <!--@formatter:off-->
             field: f.this,
@@ -1113,6 +1115,7 @@
         <placeholder>m2</placeholder>
         <desc>Okrem prízemia</desc>
         <init>0</init>
+        <valid>positive</valid>
         <action trigger="set">
             <!--@formatter:off-->
             field: f.this,
@@ -1160,6 +1163,7 @@
         <id>105004</id>
         <placeholder>m2</placeholder>
         <init>0</init>
+        <valid>positive</valid>
         <action trigger="set">
             <!--@formatter:off-->
             field: f.this,
@@ -1185,6 +1189,7 @@
         <id>305001</id>
         <placeholder>m2</placeholder>
         <init>0</init>
+        <valid>positive</valid>
         <action trigger="set">
             <!--@formatter:off-->
             field: f.this,
@@ -1292,6 +1297,7 @@
         <title>Garáž</title>
         <id>105007</id>
         <placeholder>Poistná suma</placeholder>
+        <valid>positive</valid>
         <action trigger="set">
             <!--@formatter:off-->
             field: f.this,
@@ -1424,6 +1430,7 @@
         <title>Hospodárska budova</title>
         <id>105010</id>
         <placeholder>Poistná suma</placeholder>
+        <valid>positive</valid>
         <action trigger="set">
             <!--@formatter:off-->
             field: f.this,
@@ -1532,6 +1539,7 @@
         <title>Altánok</title>
         <id>105012</id>
         <placeholder>Poistná suma</placeholder>
+        <valid>positive</valid>
         <action trigger="set">
             <!--@formatter:off-->
             field: f.this,
@@ -1591,6 +1599,7 @@
         <title>Prístrešok</title>
         <id>105014</id>
         <placeholder>Poistná suma</placeholder>
+        <valid>positive</valid>
         <action trigger="set">
             <!--@formatter:off-->
             field: f.this,
@@ -1650,6 +1659,7 @@
         <title>Chodník, parkovacia plocha</title>
         <id>105016</id>
         <placeholder>Poistná suma</placeholder>
+        <valid>positive</valid>
         <action trigger="set">
             <!--@formatter:off-->
             field: f.this,
@@ -1709,6 +1719,7 @@
         <title>Sauna</title>
         <id>105018</id>
         <placeholder>Poistná suma</placeholder>
+        <valid>positive</valid>
         <action trigger="set">
             <!--@formatter:off-->
             field: f.this,
@@ -1768,6 +1779,7 @@
         <title>Elektrická brána, oplotenie</title>
         <id>105020</id>
         <placeholder>Poistná suma</placeholder>
+        <valid>positive</valid>
         <action trigger="set">
             <!--@formatter:off-->
             field: f.this,
@@ -1827,6 +1839,7 @@
         <title>Tenisový kurt</title>
         <id>105022</id>
         <placeholder>Poistná suma</placeholder>
+        <valid>positive</valid>
         <action trigger="set">
             <!--@formatter:off-->
             field: f.this,
@@ -1886,6 +1899,7 @@
         <title>Vonkajší bazén</title>
         <id>105024</id>
         <placeholder>Poistná suma</placeholder>
+        <valid>positive</valid>
         <action trigger="set">
             <!--@formatter:off-->
             field: f.this,
@@ -1945,6 +1959,7 @@
         <title>Studňa</title>
         <id>105026</id>
         <placeholder>Poistná suma</placeholder>
+        <valid>positive</valid>
         <action trigger="set">
             <!--@formatter:off-->
             field: f.this,
@@ -2004,6 +2019,7 @@
         <title>Žumpa, septik</title>
         <id>105028</id>
         <placeholder>Poistná suma</placeholder>
+        <valid>positive</valid>
         <action trigger="set">
             <!--@formatter:off-->
             field: f.this,
@@ -2063,6 +2079,7 @@
         <title>Iné</title>
         <id>105030</id>
         <placeholder>Poistná suma</placeholder>
+        <valid>positive</valid>
         <action trigger="set">
             <!--@formatter:off-->
             field: f.this,
@@ -2111,6 +2128,7 @@
         <title>Stavebné materiály</title>
         <id>105032</id>
         <placeholder>Poistná suma</placeholder>
+        <valid>positive</valid>
         <action trigger="set">
             <!--@formatter:off-->
             field: f.this,
@@ -2159,6 +2177,7 @@
         <title>Stavebné a záhradné mechanizmy</title>
         <id>105034</id>
         <placeholder>Poistná suma</placeholder>
+        <valid>positive</valid>
         <action trigger="set">
             <!--@formatter:off-->
             field: f.this,
@@ -2260,6 +2279,7 @@
         <title>Poistenie domácnosti</title>
         <id>106002</id>
         <placeholder>Poistná suma</placeholder>
+        <valid>positive</valid>
         <action trigger="set">
             <!--@formatter:off-->
             field: f.this,
@@ -2301,6 +2321,7 @@
         <title>Celková podlahová plocha</title>
         <id>106003</id>
         <init>0</init>
+        <valid>positive</valid>
         <action trigger="set">
             <!--@formatter:off-->
             field: f.this,
@@ -2328,6 +2349,7 @@
     <data type="number">
         <title>Cennosti</title>
         <id>106005</id>
+        <valid>positive</valid>
         <placeholder>Poistná suma</placeholder>
     </data>
     <data type="number">
@@ -2361,6 +2383,7 @@
         <title>Umelecké diela</title>
         <id>106007</id>
         <placeholder>Poistná suma</placeholder>
+        <valid>positive</valid>
     </data>
     <data type="number">
         <title>Umelecké diela</title>
@@ -2393,6 +2416,7 @@
         <title>Elektronické a optické zariadenia</title>
         <id>106009</id>
         <placeholder>Poistná suma</placeholder>
+        <valid>positive</valid>
     </data>
     <data type="number">
         <title>Elektronické a optické zariadenia</title>
@@ -2424,6 +2448,7 @@
     <data type="number">
         <title>Špeciálne sklá a presklenie</title>
         <id>106011</id>
+        <valid>positive</valid>
         <placeholder>Poistná suma</placeholder>
     </data>
     <data type="number">
@@ -2456,6 +2481,7 @@
     <data type="number">
         <title>Záhradé vybavenie a nábytok</title>
         <id>106013</id>
+        <valid>positive</valid>
         <placeholder>Poistná suma</placeholder>
     </data>
     <data type="number">
@@ -2488,6 +2514,7 @@
     <data type="number">
         <title>Elektromotory v domácich spotrebičoch</title>
         <id>106015</id>
+        <valid>positive</valid>
         <placeholder>Poistná suma</placeholder>
     </data>
     <data type="number">
@@ -2520,6 +2547,7 @@
     <data type="number">
         <title>Stavebné súčasti domácností</title>
         <id>106017</id>
+        <valid>positive</valid>
         <placeholder>Poistná suma</placeholder>
     </data>
     <data type="number">
@@ -2552,6 +2580,7 @@
     <data type="number">
         <title>Športové náradie</title>
         <id>106019</id>
+        <valid>positive</valid>
         <placeholder>Poistná suma</placeholder>
     </data>
     <data type="number">
@@ -2585,6 +2614,7 @@
         <title>Iné</title>
         <id>106021</id>
         <placeholder>Poistná suma</placeholder>
+        <valid>positive</valid>
     </data>
     <data type="number">
         <title>Iné</title>
@@ -2679,6 +2709,7 @@
         <title>Poistenie nehnuteľnosti</title>
         <id>105006</id>
         <placeholder>Poistná suma</placeholder>
+        <valid>positive</valid>
         <action trigger="set">
             <!--@formatter:off-->
         field: f.this,
@@ -3857,9 +3888,7 @@
         <id>207002</id>
     </data>
 
-
 <!--=======================================================ZMLUVY==========================-->
-
 
     <!-- ===== Údaje o zmluve ===== -->
     <data type="text">
@@ -5231,6 +5260,7 @@
             <!--@formatter:on-->
         </action>
     </data>
+
     <!--=================================TRANSITIONS================-->
     <!--================================= poistenie nehnuteľnosti DONE====================-->
     <transition>
