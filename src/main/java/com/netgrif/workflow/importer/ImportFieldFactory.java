@@ -79,7 +79,7 @@ public final class ImportFieldFactory {
 
                     net.getDataSet().values().forEach(field -> {
                         if (fieldImportIds.contains(field.getImportId())) {
-                            fieldIds.add(field.getObjectId());
+                            fieldIds.add(field.getStringId());
                         }
                     });
 
@@ -96,7 +96,7 @@ public final class ImportFieldFactory {
 
     private UserField buildUserField(ImportData data) {
         String[] roles = Arrays.stream(data.getValues())
-                .map(value -> importer.getRoles().get(Long.parseLong(value)).getObjectId())
+                .map(value -> importer.getRoles().get(Long.parseLong(value)).getStringId())
                 .toArray(String[]::new);
         return new UserField(roles);
     }

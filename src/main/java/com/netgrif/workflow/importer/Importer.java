@@ -101,7 +101,7 @@ public class Importer {
             if (trans.getDataRef() != null) {
                 Arrays.stream(trans.getDataRef()).forEach(ref -> {
                     if (ref.getLogic().getAction() != null) {
-                        String fieldId = fields.get(ref.getId()).getObjectId();
+                        String fieldId = fields.get(ref.getId()).getStringId();
                         transitions.get(trans.getId()).addActions(fieldId, buildActions(ref.getLogic().getAction(),
                                 fieldId,
                                 transitions.get(trans.getId()).getStringId()));
@@ -111,7 +111,7 @@ public class Importer {
         });
         Arrays.stream(document.getImportData()).forEach(data -> {
             if (data.getAction() != null) {
-                fields.get(data.getId()).setActions(buildActions(data.getAction(), fields.get(data.getId()).getObjectId(), null));
+                fields.get(data.getId()).setActions(buildActions(data.getAction(), fields.get(data.getId()).getStringId(), null));
             }
         });
         return repository.save(net);
@@ -172,7 +172,7 @@ public class Importer {
     protected void addDataGroups(Transition transition, ImportDataGroup[] dataGroups) {
         Stream.of(dataGroups).forEach(importDataGroup -> {
             DataGroup dataGroup = new DataGroup(importDataGroup.getTitle(), importDataGroup.getAlignment(), importDataGroup.getStretch());
-            Stream.of(importDataGroup.getDataRef()).forEach(dataRef -> dataGroup.addData(fields.get(dataRef.getId()).getObjectId()));
+            Stream.of(importDataGroup.getDataRef()).forEach(dataRef -> dataGroup.addData(fields.get(dataRef.getId()).getStringId()));
             transition.addDataGroup(dataGroup);
         });
     }
@@ -188,7 +188,7 @@ public class Importer {
     @Transactional
     protected void addRoleLogic(Transition transition, RoleRef roleRef) {
         RoleLogic logic = roleRef.getLogic();
-        String roleId = roles.get(roleRef.getId()).getObjectId();
+        String roleId = roles.get(roleRef.getId()).getStringId();
 
         if (logic == null || roleId == null)
             return;
@@ -200,7 +200,7 @@ public class Importer {
     protected void addDataLogic(Transition transition, DataRef dataRef) {
         DataLogic logic = dataRef.getLogic();
         try {
-            String fieldId = fields.get(dataRef.getId()).getObjectId();
+            String fieldId = fields.get(dataRef.getId()).getStringId();
             if (logic == null || fieldId == null)
                 return;
 
@@ -263,7 +263,7 @@ public class Importer {
 
     private String getObjectId(String processedObject, Long xmlId) {
         try {
-            if (processedObject.equalsIgnoreCase(FIELD_KEYWORD)) return fields.get(xmlId).getObjectId();
+            if (processedObject.equalsIgnoreCase(FIELD_KEYWORD)) return fields.get(xmlId).getStringId();
             if (processedObject.equalsIgnoreCase(TRANSITION_KEYWORD)) return transitions.get(xmlId).getStringId();
         } catch (Exception e) {
             throw new IllegalArgumentException("Object " + processedObject + "." + xmlId + " does not exists");

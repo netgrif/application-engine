@@ -174,7 +174,7 @@ public class TaskController {
         List<DataGroup> dataGroups = taskService.getDataGroups(taskId);
 
         dataGroups.forEach(group -> group.setFields(new DataFieldsResource(dataFields.stream().filter(field ->
-                group.getData().contains(field.getObjectId())).collect(Collectors.toList()), taskId)));
+                group.getData().contains(field.getStringId())).collect(Collectors.toList()), taskId)));
 
         return new DataGroupsResource(dataGroups);
     }
