@@ -361,7 +361,7 @@ public class TaskService implements ITaskService {
     }
 
     private void processActions(Field field, Action.ActionTrigger actionTrigger, Case useCase, Transition transition, Map<String, ChangedField> changedFields) {
-        LinkedHashSet<Action> fieldActions = new LinkedHashSet<>();
+        LinkedList<Action> fieldActions = new LinkedList<>();
         if (field.getActions() != null)
             fieldActions.addAll(DataFieldLogic.getActionByTrigger(field.getActions(), actionTrigger));
         if (transition.getDataSet().containsKey(field.getStringId()) && !transition.getDataSet().get(field.getStringId()).getActions().isEmpty())

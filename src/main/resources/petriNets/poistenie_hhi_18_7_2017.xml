@@ -2288,7 +2288,7 @@
             bic: f.201017,
             sum: f.306001;
             change sum about {
-                return ((field.value*excess.value*ppc.value*bic.value))/1000.0) as Double;
+                return ((field.value*excess.value*ppc.value*bic.value)/1000.0) as Double;
             }
             <!--@formatter:on-->
         </action>
@@ -2704,6 +2704,29 @@
         <id>305002</id>
         <placeholder>Poistné</placeholder>
         <init>0</init>
+        <action trigger="set">
+            <!--@formatter:off-->
+            c1: f.305002,
+            c2: f.305003,
+            c3: f.305004,
+            c4: f.305005,
+            c5: f.305006,
+            c6: f.305007,
+            c7: f.305008,
+            c8: f.305009,
+            c9: f.305010,
+            c10: f.305011,
+            c11: f.305012,
+            c12: f.305013,
+            c13: f.305014,
+            c14: f.305015,
+            c15: f.305016,
+            sum: f.308001;
+            change sum about {
+                return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
+            }
+            <!--@formatter:on-->
+        </action>
     </data>
     <data type="number">
         <title>Poistenie nehnuteľnosti</title>
@@ -2712,7 +2735,7 @@
         <valid>positive</valid>
         <action trigger="set">
             <!--@formatter:off-->
-        field: f.this,
+        field: f.105006,
         excess: f.208001,
         hhc: f.202009,
         bic: f.201017,
@@ -3415,6 +3438,18 @@
         <title>ZÁKLADNÉ INFORMÁCIE koeficient</title>
         <id>201017</id>
         <init>1</init>
+        <action trigger="set">
+            <!--@formatter:off-->
+            field: f.105006,
+            excess: f.208001,
+            hhc: f.202009,
+            bic: f.201017,
+            sum: f.305002;
+            change sum about {
+                return ((field.value*excess.value*hhc.value*bic.value)/1000.0) as Double;
+            }
+            <!--@formatter:on-->
+        </action>
     </data>
     <!-- ===== Nehnuteľnosť koeficienty ===== -->
     <data type="number">
@@ -3594,6 +3629,18 @@
         <title>NEHNUTEĽNOSŤ koeficient</title>
         <id>202009</id>
         <init>0.945</init>
+        <action trigger="set">
+            <!--@formatter:off-->
+            field: f.105006,
+            excess: f.208001,
+            hhc: f.202009,
+            bic: f.201017,
+            sum: f.305002;
+            change sum about {
+                return ((field.value*excess.value*hhc.value*bic.value)/1000.0) as Double;
+            }
+            <!--@formatter:on-->
+        </action>
     </data>
     <!-- ===== Domácnosť koeficienty ===== -->
     <data type="number">
@@ -3751,6 +3798,41 @@
         <title>Koeficient - Lokalita - byt</title>
         <id>205001</id>
         <init>0</init>
+        <action trigger="set">
+            <!--@formatter:off-->
+            field: f.105006,
+            excess: f.208001,
+            hhc: f.202009,
+            bic: f.201017,
+            sum: f.305002;
+            change sum about {
+                return ((field.value*excess.value*hhc.value*bic.value)/1000.0) as Double;
+            }
+            <!--@formatter:on-->
+        </action>
+        <action trigger="set">
+            <!--@formatter:off-->
+            c1: f.305002,
+            c2: f.305003,
+            c3: f.305004,
+            c4: f.305005,
+            c5: f.305006,
+            c6: f.305007,
+            c7: f.305008,
+            c8: f.305009,
+            c9: f.305010,
+            c10: f.305011,
+            c11: f.305012,
+            c12: f.305013,
+            c13: f.305014,
+            c14: f.305015,
+            c15: f.305016,
+            sum: f.308001;
+            change sum about {
+                return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
+            }
+            <!--@formatter:on-->
+        </action>
     </data>
     <data type="number">
         <title>Koeficient - Lokalita - pivnica</title>
