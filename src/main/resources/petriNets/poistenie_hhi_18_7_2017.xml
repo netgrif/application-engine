@@ -97,7 +97,7 @@
             if (field.value=="L4")
                 return 3.5 as Double;
             if (field.value=="L2")
-                return 3.7 as Double;
+                return 2.7 as Double;
             if (field.value=="L1")
                 return 2.5 as Double;
             if (field.value=="L3")
@@ -2284,11 +2284,12 @@
             <!--@formatter:off-->
             field: f.this,
             excess: f.208002,
+            loc: f.201001,
             ppc: f.203006,
             bic: f.201017,
             sum: f.306001;
             change sum about {
-                return ((field.value*excess.value*ppc.value*bic.value)/1000.0) as Double;
+                return ((field.value*excess.value*ppc.value*bic.value*loc.value)/1000.0) as Double;
             }
             <!--@formatter:on-->
         </action>
@@ -3051,6 +3052,7 @@
         <title>Koeficient - Lokalita domácnosť</title>
         <id>201018</id>
         <init>1</init>
+
     </data>
     <data type="number">
         <title>Koeficient - Nachádza sa mimo obce (extravilán)?</title>
