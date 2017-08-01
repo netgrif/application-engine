@@ -2856,6 +2856,7 @@
         <values>ročná</values>
         <values>polročná</values>
         <values>štvrťročná</values>
+        <init>štvrťročná</init>
         <action trigger="set">
             <!--@formatter:off-->
             field: f.this,
