@@ -39,7 +39,7 @@ public interface ITaskService {
 
     void finishTask(Long userId, String taskId) throws Exception;
 
-    void assignTask(User user, String taskId) throws TransitionNotExecutableException;
+    void assignTask(Long userId, String taskId) throws TransitionNotExecutableException;
 
     List<Field> getData(String taskId);
 
