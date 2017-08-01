@@ -226,9 +226,10 @@ public class TaskService implements ITaskService {
 
     @Override
     @Transactional
-    public void assignTask(User user, String taskId) throws TransitionNotExecutableException {
+    public void assignTask(Long userId, String taskId) throws TransitionNotExecutableException {
         Task task = taskRepository.findOne(taskId);
         Case useCase = caseRepository.findOne(task.getCaseId());
+        User user = userRepository.findOne(userId);
 
         assignTaskToUser(user, task, useCase);
 
