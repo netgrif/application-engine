@@ -6,7 +6,7 @@ import org.apache.pdfbox.multipdf.PDFMergerUtility
 import org.apache.pdfbox.pdmodel.PDDocument
 import org.apache.pdfbox.pdmodel.PDDocumentCatalog
 import org.apache.pdfbox.pdmodel.PDResources
-import org.apache.pdfbox.pdmodel.font.PDTrueTypeFont
+import org.apache.pdfbox.pdmodel.font.PDType0Font
 import org.apache.pdfbox.pdmodel.interactive.form.PDAcroForm
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -43,7 +43,7 @@ class PdfUtils {
             res = new PDResources()
 
         InputStream fontStream = new FileInputStream(fontPath)
-        PDTrueTypeFont font = PDTrueTypeFont.loadTTF(document, fontStream)
+        PDType0Font font = PDType0Font.load(document, fontStream, true)
 
         String fontName = res.add(font).name
         if (fontName == null)
@@ -63,7 +63,7 @@ class PdfUtils {
                 if (DA.contains(font.key))
                     acroForm.getField(it["@xfdf:original"] as String).getCOSObject().setString(COSName.DA, DA.replaceAll(font.key, "/${font.value}"))
             }
-            acroForm.getField(it["@xfdf:original"] as String).setValue((it as String).replaceAll("[áäčďéíĺľňóôŕšťúýž]", "?"))
+            acroForm.getField(it["@xfdf:original"] as String).setValue(it as String)
         }
 
         acroForm.flatten()
