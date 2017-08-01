@@ -78,7 +78,7 @@ public class TaskController {
     public MessageResource assign(Authentication auth, @PathVariable("id") String taskId) {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
         try {
-            taskService.assignTask(loggedUser.transformToUser(), taskId);
+            taskService.assignTask(loggedUser.getId(), taskId);
             return MessageResource.successMessage("Task " + taskId + " assigned to " + loggedUser.getFullName());
         } catch (TransitionNotExecutableException e) {
             e.printStackTrace();
