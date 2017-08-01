@@ -1,4 +1,4 @@
-package com.netgrif.workflow.psc;
+package com.netgrif.workflow.premiuminsurance;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
