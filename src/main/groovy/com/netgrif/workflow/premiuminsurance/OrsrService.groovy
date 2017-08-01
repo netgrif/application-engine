@@ -20,10 +20,14 @@ class OrsrService implements IOrsrService {
     }
 
     private String parseCompanyUrl(String companyIco) {
-        Document doc = Jsoup.connect("${ORSR_URL_BASE}${ORSR_URL_SEARCH(companyIco)}" as String).get()
-        Element table = doc.select("table[cellpadding=2]").get(0)
+        try {
+            Document doc = Jsoup.connect("${ORSR_URL_BASE}${ORSR_URL_SEARCH(companyIco)}" as String).get()
+            Element table = doc.select("table[cellpadding=2]").get(0)
 
-        return table.child(0).child(1).child(2).child(0).child(1).attr("href")
+            return table.child(0).child(1).child(2).child(0).child(1).attr("href")
+        } catch (Exception ignored) {
+            return null
+        }
     }
 
     private OrsrReference parseCompanyInfo(String companyUrl) {
