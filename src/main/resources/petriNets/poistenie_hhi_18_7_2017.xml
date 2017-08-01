@@ -5489,14 +5489,6 @@
                     <behavior>required</behavior>
                 </logic>
             </dataRef>
-            <!--Koľko detí žije v domácnosti?-->
-            <dataRef>
-                <id>101008</id>
-                <logic>
-                    <behavior>editable</behavior>
-                    <behavior>required</behavior>
-                </logic>
-            </dataRef>
             <!--Bolo poistenému alebo spolupoistenej osobe niekedy v minulosti zamiestnuté poistné plnenie alebo vypovedaná poistná zmluva?-->
             <dataRef>
                 <id>101009</id>
@@ -9118,7 +9110,7 @@
             <alignment>start</alignment>
             <!--Obec-->
             <dataRef>
-                <id>301001</id>
+                <id>301005</id>
                 <logic>
                     <behavior>visible</behavior>
                 </logic>
