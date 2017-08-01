@@ -5,6 +5,7 @@ import com.netgrif.workflow.petrinet.domain.dataset.*
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedField
 import com.netgrif.workflow.workflow.domain.Case
 
+@SuppressWarnings(["GrMethodMayBeStatic", "GroovyUnusedDeclaration"])
 class ActionDelegate {
 
     private static final String UNCHANGED_VALUE = "unchangedooo"
@@ -148,5 +149,13 @@ class ActionDelegate {
         if(find)
             return find(input)
         return null
+    }
+
+    def byIco = { String ico ->
+        return actionsRunner.orsrService.findByIco(ico)
+    }
+
+    def orsr(Closure find, String ico) {
+        return find?.call(ico)
     }
 }
