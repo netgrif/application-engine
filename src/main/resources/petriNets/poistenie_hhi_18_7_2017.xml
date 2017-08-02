@@ -4657,6 +4657,7 @@
             name: f.109012;
             change name about {
                 def orsr = psc byIco,ico.value;
+                cache "orsr",orsr;
                 return orsr?.name;
             }
             <!--@formatter:on-->
@@ -4666,7 +4667,7 @@
             ico: f.this,
             name: f.109036;
             change name about {
-                def orsr = psc byIco,ico.value;
+                def orsr = cache "orsr";
                 return orsr?.street;
             }
             <!--@formatter:on-->
@@ -4676,7 +4677,7 @@
             ico: f.this,
             name: f.109037;
             change name about {
-                def orsr = psc byIco,ico.value;
+                def orsr = cache "orsr";
                 return orsr?.streetNumber;
             }
             <!--@formatter:on-->
@@ -4686,7 +4687,7 @@
             ico: f.this,
             name: f.109038;
             change name about {
-                def orsr = psc byIco,ico.value;
+                def orsr = cache "orsr";
                 return orsr?.zipCode;
             }
             <!--@formatter:on-->
@@ -4696,7 +4697,7 @@
             ico: f.this,
             name: f.109039;
             change name about {
-                def orsr = psc byIco,ico.value;
+                def orsr = cache "orsr";
                 return orsr?.city;
             }
             <!--@formatter:on-->
