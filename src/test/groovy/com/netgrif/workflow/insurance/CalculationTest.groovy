@@ -325,50 +325,62 @@ class CalculationTest {
 
         taskService.assignTask(1L, taskID)
         ObjectNode dataset = populateDataset([
+//                Garáž
                 105035: [
                         value: true,
                         type: "boolean"
                 ],
+//                Hospodárska budova
                 105009: [
                         value: true,
                         type: "boolean"
                 ],
+//                Altánok
                 105011: [
                         value: true,
                         type: "boolean"
                 ],
+//                Prístrešok
                 105013: [
                         value: true,
                         type: "boolean"
                 ],
+//                Chodník
                 105015: [
                         value: true,
                         type: "boolean"
                 ],
+//                Sauna
                 105017: [
                         value: true,
                         type: "boolean"
                 ],
+//                Elektrická brána
                 105019: [
                         value: true,
                         type: "boolean"
                 ],
+//                Tenisový kurt
                 105021: [
                         value: true,
                         type: "boolean"
                 ],
+//                Vonkajší bazén
                 105023: [
                         value: true,
                         type: "boolean"
                 ],
+//                Studňa
                 105025: [
                         value: true,
                         type: "boolean"
                 ],
+//                Žumpa, septik
                 105027: [
                         value: true,
                         type: "boolean"
                 ],
+//                Iné
                 105029: [
                         value: true,
                         type: "boolean"
@@ -376,55 +388,68 @@ class CalculationTest {
         ])
         taskService.setData(taskID, dataset)
         dataset = populateDataset([
+//                Garáž plocha
                 105004: [
                         value: 100,
                         type: "number"
                 ],
+//                Garáž poistná sumá
                 105007: [
                         value: 90_000,
                         type: "number"
                 ],
+//                Hospodárska budova
                 105010: [
                         value: 1000,
                         type: "number"
                 ],
+//                Altánok
+                105012: [
+                        value: 1000,
+                        type: "number"
+                ],
+//                Prístrešok
                 105014: [
                         value: 1000,
                         type: "number"
                 ],
+//                Chodník
                 105016: [
                         value: 1000,
                         type: "number"
                 ],
+//                Sauna
                 105018: [
                         value: 1000,
                         type: "number"
                 ],
+//               Elektrická brána
                 105020: [
                         value: 1000,
                         type: "number"
                 ],
+//                Tenisový kurt
                 105022: [
                         value: 1000,
                         type: "number"
                 ],
+//                Vonkajší bazén
                 105024: [
                         value: 1000,
                         type: "number"
                 ],
+//                Studňa
                 105026: [
                         value: 1000,
                         type: "number"
                 ],
+//                Žumpa, septik
                 105028: [
                         value: 1000,
                         type: "number"
                 ],
+//                Iné
                 105030: [
-                        value: 1000,
-                        type: "number"
-                ],
-                105032: [
                         value: 1000,
                         type: "number"
                 ],
@@ -439,34 +464,42 @@ class CalculationTest {
 
         taskService.assignTask(1L, taskID)
         ObjectNode dataset = populateDataset([
+//                Umiestnenie domácnosti
                 103001: [
                         value: "byt",
                         type: "enumeration"
                 ],
+//                Poistenie domácnosti
                 106001: [
                         value: "150.00 €",
                         type: "enumeration"
                 ],
+//                Celková podlahová plocha
                 106003: [
                         value: 100,
                         type: "number"
                 ],
+//                Obývanosť domácnosti
                 103002: [
                         value: "trvalá",
                         type: "enumeration"
                 ],
+//                Je nehnuteľnosť, v ktorej sa nachádza poisťovaná domácnosť v blízkom susedstve s inou obývanou nehnuteľnosťou?
                 103003: [
                         value: true,
                         type: "boolean"
                 ],
+//                Je domácnosť zabezpečená funkčným alarmom?
                 103004: [
                         value: true,
                         type: "boolean"
                 ],
+//                Má domácnosť na oknách vo výške do 3 metrov od okolitého terénu mreže / vonkajšie žalúzie alebo rolety?
                 103005: [
                         value: true,
                         type: "boolean"
                 ],
+//                Zodpovednost domacnost
                 104002: [
                         value: true,
                         type: "boolean"
@@ -474,10 +507,12 @@ class CalculationTest {
         ])
         taskService.setData(taskID, dataset)
         dataset = populateDataset([
+//                Zodpovednost domacnost poistná suma
                 107003: [
                         value: "15,000.00 €",
                         type: "enumeration"
                 ],
+//                Zodpovednost domacnost - územná platnosť
                 104003: [
                         value: "Slovenská republika",
                         type: "enumeration"
@@ -493,38 +528,47 @@ class CalculationTest {
 
         taskService.assignTask(1L, taskID)
         ObjectNode dataset = populateDataset([
+//                Cennosti
                 106004: [
                         value: true,
                         type: boolean
                 ],
+//                Umelecké diela
                 106006: [
                         value: true,
                         type: boolean
                 ],
+//                Elektronické a optické zariadenia
                 106008: [
                         value: true,
                         type: boolean
                 ],
+//                Špecialne sklá a presklenie
                 106010: [
                         value: true,
                         type: boolean
                 ],
+//                Záhradné vybavenie a nábytok
                 106012: [
                         value: true,
                         type: boolean
                 ],
+//                Elektromotory v domácich spotrebičoch
                 106014: [
                         value: true,
                         type: boolean
                 ],
+//                Stavebné súčasti domácnosti
                 106016: [
                         value: true,
                         type: boolean
                 ],
+//                Športové náradie
                 106018: [
                         value: true,
                         type: boolean
                 ],
+//                Iné
                 106020: [
                         value: true,
                         type: boolean
@@ -532,38 +576,47 @@ class CalculationTest {
         ])
         taskService.setData(taskID, dataset)
         dataset = populateDataset([
+//                Cennosti
                 106005: [
                         value: 1000,
                         type: boolean
                 ],
+//                Umelecké diela
                 106007: [
                         value: 1000,
                         type: boolean
                 ],
+//                Elektronické a optické zariadenia
                 106009: [
                         value: 1000,
                         type: boolean
                 ],
+//                Špecialne sklá a presklenie
                 106011: [
                         value: 1000,
                         type: boolean
                 ],
+//                Záhradné vybavenie a nábytok
                 106013: [
                         value: 1000,
                         type: boolean
                 ],
+//                Elektromotory v domácich spotrebičoch
                 106015: [
                         value: 1000,
                         type: boolean
                 ],
+//                Stavebné súčasti domácnosti
                 106017: [
                         value: 1000,
                         type: boolean
                 ],
+//                Športové náradie
                 106019: [
                         value: 1000,
                         type: boolean
                 ],
+//                Iné
                 106021: [
                         value: 1000,
                         type: boolean
@@ -579,14 +632,17 @@ class CalculationTest {
 
         taskService.assignTask(1L, taskID)
         ObjectNode dataset = populateDataset([
+//                PERIODICITA PLATBY POISTNÉHO
                 108001: [
                         value: "polročná",
                         type: "enumeration"
                 ],
+//                ZĽAVA ZA INÉ POISTENIE V PREMIUM
                 108002: [
                         value: true,
                         type: "bool"
                 ],
+//                OBCHODNÁ ZĽAVA
                 108003: [
                         value: "20%",
                         type: "enumeration"
