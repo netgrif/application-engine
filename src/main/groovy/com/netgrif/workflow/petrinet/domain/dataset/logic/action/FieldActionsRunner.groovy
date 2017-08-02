@@ -90,8 +90,8 @@ class FieldActionsRunner {
         this.actionsCache.remove(key)
     }
 
-    void getFromCache(String key){
-        this.actionsCache.get(key)
+    def getFromCache(String key){
+        return this.actionsCache.get(key)
     }
 
     IPostalCodeService getPostalCodeService() {
