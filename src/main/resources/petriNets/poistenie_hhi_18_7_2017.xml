@@ -476,6 +476,22 @@
             }
         <!--@formatter:on-->
         </action>
+        <action trigger="set">
+            <!--@formatter:off-->
+            field: f.this,
+            coeff: f.103001;
+            change coeff about {
+            if (field.value=="byt")
+            return "byt";
+            if (field.value=="rodinný dom")
+            return "rodinný dom";
+            if (field.value=="chata")
+            return "chata";
+            if (field.value=="bungalow")
+            return "bungalow";
+            }
+        <!--@formatter:on-->
+        </action>
     </data>
     <data type="enumeration">
         <title>Konštrukcia múrov</title>
@@ -1008,6 +1024,18 @@
                 return 1.0*coeff1.value as Double;
              if (field.value=="Európa")
                 return 1.2*coeff1.value as Double;
+            }
+        <!--@formatter:on-->
+        </action>
+        <action trigger="set">
+            <!--@formatter:off-->
+            field: f.107003,
+            coeff: f.204003,
+            excess: f.208002,
+            sum: f.308009;
+            change sum about {
+                def n = field.value.replaceAll("[,€ ]","") as Double;
+                return ((n*coeff.value*excess.value)/1000.0) as Double;
             }
         <!--@formatter:on-->
         </action>
@@ -2242,6 +2270,19 @@
         </action>
         <action trigger="set">
             <!--@formatter:off-->
+            field: f.106002,
+            excess: f.208002,
+            loc: f.201001,
+            ppc: f.203006,
+            bic: f.201017,
+            sum: f.306001;
+            change sum about {
+                return ((field.value*excess.value*ppc.value*bic.value*loc.value)/1000.0) as Double;
+            }
+            <!--@formatter:on-->
+        </action>
+        <action trigger="set">
+            <!--@formatter:off-->
             check: f.this,
             trans: t.364,
             other: f.106002;
@@ -2282,7 +2323,7 @@
         <valid>positive</valid>
         <action trigger="set">
             <!--@formatter:off-->
-            field: f.this,
+            field: f.106002,
             excess: f.208002,
             loc: f.201001,
             ppc: f.203006,
@@ -2672,8 +2713,8 @@
         <values>120,000.00 €</values>
         <action trigger="set">
             <!--@formatter:off-->
-            field: f.this,
-            coeff: f.204002,
+            field: f.107003,
+            coeff: f.204003,
             excess: f.208002,
             sum: f.308009;
             change sum about {
@@ -2856,6 +2897,7 @@
         <values>ročná</values>
         <values>polročná</values>
         <values>štvrťročná</values>
+        <init>štvrťročná</init>
         <action trigger="set">
             <!--@formatter:off-->
             field: f.this,
@@ -3440,7 +3482,7 @@
         <title>ZÁKLADNÉ INFORMÁCIE koeficient</title>
         <id>201017</id>
         <init>1</init>
-        <action trigger="set">
+        <action trigger="set"><!--nehnutelnost-->
             <!--@formatter:off-->
             field: f.105006,
             excess: f.208001,
@@ -3449,6 +3491,19 @@
             sum: f.305002;
             change sum about {
                 return ((field.value*excess.value*hhc.value*bic.value)/1000.0) as Double;
+            }
+            <!--@formatter:on-->
+        </action>
+        <action trigger="set">
+            <!--@formatter:off-->
+            field: f.106002,
+            excess: f.208002,
+            loc: f.201001,
+            ppc: f.203006,
+            bic: f.201017,
+            sum: f.306001;
+            change sum about {
+                return ((field.value*excess.value*ppc.value*bic.value*loc.value)/1000.0) as Double;
             }
             <!--@formatter:on-->
         </action>
@@ -3649,6 +3704,19 @@
         <title>Koeficient - Poistenie domácnosti - spoluúčasť</title>
         <id>208002</id>
         <init>1</init>
+        <action trigger="set">
+            <!--@formatter:off-->
+            field: f.106002,
+            excess: f.208002,
+            loc: f.201001,
+            ppc: f.203006,
+            bic: f.201017,
+            sum: f.306001;
+            change sum about {
+                return ((field.value*excess.value*ppc.value*bic.value*loc.value)/1000.0) as Double;
+            }
+            <!--@formatter:on-->
+        </action>
     </data>
     <data type="number">
         <title>Koeficient - Umiestnenie domácnosti</title>
@@ -3748,6 +3816,19 @@
         <title>DOMÁCNOSŤ koeficient</title>
         <id>203006</id>
         <init>0.95</init>
+        <action trigger="set">
+            <!--@formatter:off-->
+            field: f.106002,
+            excess: f.208002,
+            loc: f.201001,
+            ppc: f.203006,
+            bic: f.201017,
+            sum: f.306001;
+            change sum about {
+                return ((field.value*excess.value*ppc.value*bic.value*loc.value)/1000.0) as Double;
+            }
+            <!--@formatter:on-->
+        </action>
     </data>
     <!-- ===== Zodpovednosť koeficienty ===== -->
     <data type="number">
@@ -5487,6 +5568,7 @@
                 <id>301005</id>
                 <logic>
                     <behavior>editable</behavior>
+                    <behavior>required</behavior>
                     <!--todo: psc and lokalita lookup -->
                 </logic>
             </dataRef>
