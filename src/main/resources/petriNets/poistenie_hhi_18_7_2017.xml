@@ -4728,6 +4728,11 @@
             <!--@formatter:on-->
         </action>
     </data>
+    <data type="text">
+        <title>IČO</title>
+        <id>109058</id>
+        <desc>Poistník</desc>
+    </data>
     <!-- Poistený -->
     <data type="enumeration">
         <title>Typ subjektu</title>
@@ -5042,6 +5047,11 @@
     <data type="text">
         <title>Email</title>
         <id>109033</id>
+        <desc>Poistený</desc>
+    </data>
+    <data type="text">
+        <title>IČO</title>
+        <id>109059</id>
         <desc>Poistený</desc>
     </data>
     <!-- ===== Údaje o mieste poistenia ===== -->
@@ -6188,7 +6198,7 @@
                     change other about {
                         def coeff = same.value ? 1.0 : 1.1;
                         if (check.value)
-                            return ((field.value*coeff*exces.value/)1000.0) as Double;
+                            return ((field.value*coeff*exces.value)/1000.0) as Double;
                         return other.value as Double;
                     }
                     <!--@formatter:on-->
@@ -8531,6 +8541,13 @@
                     <behavior>editable</behavior>
                 </logic>
             </dataRef>
+            <!--ICO-->
+            <dataRef>
+                <id>109058</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
             <!--Obchodné meno-->
             <dataRef>
                 <id>109012</id>
@@ -8632,6 +8649,13 @@
                 <id>109025</id>
                 <logic>
                     <behavior>hidden</behavior>
+                </logic>
+            </dataRef>
+            <!--ICO-->
+            <dataRef>
+                <id>109059</id>
+                <logic>
+                    <behavior>editable</behavior>
                 </logic>
             </dataRef>
             <!--Obchodné meno poistený-->
