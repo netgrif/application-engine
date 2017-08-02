@@ -1357,33 +1357,6 @@
             </dataRef>
         </dataGroup>
     </transition>
-    <transition>
-        <id>8</id>
-        <x>420</x>
-        <y>140</y>
-        <label>Vymazať</label>
-        <roleRef>
-            <id>1</id>
-            <logic>
-                <perform>true</perform>
-            </logic>
-        </roleRef>
-        <dataGroup>
-            <id>1</id>
-            <dataRef>
-                <id>109024</id>
-                <logic>
-                    <behavior>visible</behavior>
-                </logic>
-            </dataRef>
-            <dataRef>
-                <id>109025</id>
-                <logic>
-                    <behavior>visible</behavior>
-                </logic>
-            </dataRef>
-        </dataGroup>
-    </transition>
     <!-- ========== PLACES ========== -->
     <place>
         <id>1</id>
@@ -1429,20 +1402,6 @@
         <type>regular</type>
         <sourceId>3</sourceId>
         <destinationId>6</destinationId>
-        <multiplicity>1</multiplicity>
-    </arc>
-    <arc>
-        <id>9</id>
-        <type>regular</type>
-        <sourceId>3</sourceId>
-        <destinationId>8</destinationId>
-        <multiplicity>1</multiplicity>
-    </arc>
-    <arc>
-        <id>11</id>
-        <type>regular</type>
-        <sourceId>8</sourceId>
-        <destinationId>10</destinationId>
         <multiplicity>1</multiplicity>
     </arc>
     <arc>
