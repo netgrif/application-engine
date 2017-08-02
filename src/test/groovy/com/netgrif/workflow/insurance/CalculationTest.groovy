@@ -64,7 +64,11 @@ class CalculationTest {
         "Poistenie nehnuteľnosti a domácnosti"()
         "Základné informácie"()
         "Nehnuteľnosť"()
-
+        "Doplnkové poistenie nehnuteľnosti"()
+        "Vedľajšie stavby"()
+        "Domácnosť"()
+        "Doplnkové poistenie domácnosti"()
+        "Sumár"()
     }
 
     private void init() {
@@ -108,67 +112,67 @@ class CalculationTest {
         dataset = populateDataset([
                 301005: [
                         value: "Bratislava",
-                        type: "enumeration"
+                        type : "enumeration"
                 ],
                 101002: [
                         value: false,
-                        type: "boolean"
+                        type : "boolean"
                 ],
                 101003: [
                         value: false,
-                        type: "boolean"
+                        type : "boolean"
                 ],
                 101004: [
                         value: false,
-                        type: "boolean"
+                        type : "boolean"
                 ],
                 101005: [
                         value: "6 až 10",
-                        type: "enumeration"
+                        type : "enumeration"
                 ],
                 101006: [
                         value: "vlastník nehnuteľnosti",
-                        type: "enumeration"
+                        type : "enumeration"
                 ],
                 101007: [
                         value: "2",
-                        type: "enumeration"
+                        type : "enumeration"
                 ],
                 101008: [
                         value: "1",
-                        type: "enumeration"
+                        type : "enumeration"
                 ],
                 101009: [
                         value: false,
-                        type: "boolean"
+                        type : "boolean"
                 ],
                 101010: [
                         value: false,
-                        type: "boolean"
+                        type : "boolean"
                 ],
                 101011: [
                         value: false,
-                        type: "boolean"
+                        type : "boolean"
                 ],
                 101012: [
                         value: false,
-                        type: "boolean"
+                        type : "boolean"
                 ],
                 101013: [
                         value: "počas celého dňa",
-                        type: "boolean"
+                        type : "boolean"
                 ],
                 101014: [
                         value: false,
-                        type: "boolean"
+                        type : "boolean"
                 ],
                 101015: [
                         value: "fyzická osoba",
-                        type: "enumeration"
+                        type : "enumeration"
                 ],
                 101016: [
                         value: "0",
-                        type: "enumeration"
+                        type : "enumeration"
                 ],
         ])
         taskService.setData(taskID, dataset)
@@ -246,10 +250,230 @@ class CalculationTest {
         taskService.finishTask(1L, taskID)
     }
 
+    private "Doplnkové poistenie nehnuteľnosti"() {
+        List<TaskReference> references = taskService.findAllByCase(_case.getStringId())
+        String taskID = references.find { it.getTitle() == "Nehnuteľnosť" }.getStringId()
+
+        taskService.assignTask(1L, taskID)
+        ObjectNode dataset = populateDataset([
+                105031: [
+                        value: true,
+                        type: "boolean"
+                ],
+                105033: [
+                        value: true,
+                        type: "boolean"
+                ]
+        ])
+        taskService.setData(taskID, dataset)
+        dataset = populateDataset([
+                105032: [
+                        value: 1000,
+                        type: "number"
+                ],
+                105034: [
+                        value: 1000,
+                        type: "number"
+                ]
+        ])
+        taskService.setData(taskID, dataset)
+        taskService.finishTask(1L, taskID)
+    }
+
+    private "Vedľajšie stavby"() {
+        List<TaskReference> references = taskService.findAllByCase(_case.getStringId())
+        String taskID = references.find { it.getTitle() == "Nehnuteľnosť" }.getStringId()
+
+        taskService.assignTask(1L, taskID)
+        ObjectNode dataset = populateDataset([
+                105035: [
+                        value: true,
+                        type: "boolean"
+                ],
+                105009: [
+                        value: true,
+                        type: "boolean"
+                ],
+                105011: [
+                        value: true,
+                        type: "boolean"
+                ],
+                105013: [
+                        value: true,
+                        type: "boolean"
+                ],
+                105015: [
+                        value: true,
+                        type: "boolean"
+                ],
+                105017: [
+                        value: true,
+                        type: "boolean"
+                ],
+                105019: [
+                        value: true,
+                        type: "boolean"
+                ],
+                105021: [
+                        value: true,
+                        type: "boolean"
+                ],
+                105023: [
+                        value: true,
+                        type: "boolean"
+                ],
+                105025: [
+                        value: true,
+                        type: "boolean"
+                ],
+                105027: [
+                        value: true,
+                        type: "boolean"
+                ],
+                105029: [
+                        value: true,
+                        type: "boolean"
+                ]
+        ])
+        taskService.setData(taskID, dataset)
+        dataset = populateDataset([
+                105004: [
+                        value: 100,
+                        type: "number"
+                ],
+                105007: [
+                        value: 90_000,
+                        type: "number"
+                ],
+                105010: [
+                        value: 1000,
+                        type: "number"
+                ],
+                105014: [
+                        value: 1000,
+                        type: "number"
+                ],
+                105016: [
+                        value: 1000,
+                        type: "number"
+                ],
+                105018: [
+                        value: 1000,
+                        type: "number"
+                ],
+                105020: [
+                        value: 1000,
+                        type: "number"
+                ],
+                105022: [
+                        value: 1000,
+                        type: "number"
+                ],
+                105024: [
+                        value: 1000,
+                        type: "number"
+                ],
+                105026: [
+                        value: 1000,
+                        type: "number"
+                ],
+                105028: [
+                        value: 1000,
+                        type: "number"
+                ],
+                105030: [
+                        value: 1000,
+                        type: "number"
+                ],
+                105032: [
+                        value: 1000,
+                        type: "number"
+                ],
+        ])
+        taskService.setData(taskID, dataset)
+        taskService.finishTask(1L, taskID)
+    }
+
+    private "Domácnosť"() {
+        List<TaskReference> references = taskService.findAllByCase(_case.getStringId())
+        String taskID = references.find { it.getTitle() == "Nehnuteľnosť" }.getStringId()
+
+        taskService.assignTask(1L, taskID)
+        ObjectNode dataset = populateDataset([
+                103001: [
+                        value: "byt",
+                        type: "enumeration"
+                ],
+                106001: [
+                        value: "150.00 €",
+                        type: "enumeration"
+                ],
+                106003: [
+                        value: 100,
+                        type: "number"
+                ],
+                103002: [
+                        value: "trvalá",
+                        type: "enumeration"
+                ],
+                103003: [
+                        value: true,
+                        type: "boolean"
+                ],
+                103004: [
+                        value: true,
+                        type: "boolean"
+                ],
+                103005: [
+                        value: true,
+                        type: "boolean"
+                ],
+                104002: [
+                        value: true,
+                        type: "boolean"
+                ]
+        ])
+        taskService.setData(taskID, dataset)
+        dataset = populateDataset([
+                107003: [
+                        value: "15,000.00 €",
+                        type: "enumeration"
+                ],
+                104003: [
+                        value: "Slovenská republika",
+                        type: "enumeration"
+                ]
+        ])
+        taskService.setData(taskID, dataset)
+        taskService.finishTask(1L, taskID)
+    }
+
+    private "Doplnkové poistenie domácnosti"() {
+        List<TaskReference> references = taskService.findAllByCase(_case.getStringId())
+        String taskID = references.find { it.getTitle() == "Nehnuteľnosť" }.getStringId()
+
+        taskService.assignTask(1L, taskID)
+        ObjectNode dataset = populateDataset([
+        ])
+        taskService.setData(taskID, dataset)
+        taskService.finishTask(1L, taskID)
+    }
+
+    private "Sumár"() {
+        List<TaskReference> references = taskService.findAllByCase(_case.getStringId())
+        String taskID = references.find { it.getTitle() == "Nehnuteľnosť" }.getStringId()
+
+        taskService.assignTask(1L, taskID)
+        ObjectNode dataset = populateDataset([
+        ])
+        taskService.setData(taskID, dataset)
+        taskService.finishTask(1L, taskID)
+    }
+
     @SuppressWarnings("GrMethodMayBeStatic")
     private ObjectNode populateDataset(Map<Long, Map<String, String>> data) {
         ObjectMapper mapper = new ObjectMapper()
-        String json = JsonOutput.toJson(data.collectEntries {[(idConverter.get(it.key as Long)): it.value]})
+        String json = JsonOutput.toJson(data.collectEntries { [(idConverter.get(it.key as Long)): it.value] })
         return mapper.readTree(json) as ObjectNode
     }
 }
