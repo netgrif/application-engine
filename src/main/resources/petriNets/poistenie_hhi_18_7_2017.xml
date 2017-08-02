@@ -2248,12 +2248,13 @@
     </data>
     <!-- ===== Poistenie domácnosti ===== -->
     <data type="enumeration">
-        <title>Poistenie domácnosti - spoluúčasť</title>
+        <title>Poistenie domácnosti</title>
         <id>106001</id>
         <values>0.00 €</values>
         <values>50.00 €</values>
         <values>150.00 €</values>
         <init>50.00 €</init>
+        <placeholder>Spoluúčasť</placeholder>
         <action trigger="set">
             <!--@formatter:off-->
         field: f.this,
