@@ -424,7 +424,7 @@
     </data>
     <!-- ===== Nehnuteľnosť ===== -->
     <data type="enumeration">
-        <title>Poistenie nehnuteľnosti-Spoluúčasť</title>
+        <title>Poistenie nehnuteľnosti</title>
         <id>105005</id>
         <placeholder>Spoluúčasť</placeholder>
         <values>0.00 €</values>
