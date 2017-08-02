@@ -12,6 +12,7 @@ import com.netgrif.workflow.importer.Importer
 import com.netgrif.workflow.petrinet.domain.PetriNet
 import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository
 import com.netgrif.workflow.workflow.domain.Case
+import com.netgrif.workflow.workflow.domain.repositories.CaseRepository
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService
 import com.netgrif.workflow.workflow.web.responsebodies.TaskReference
@@ -42,6 +43,9 @@ class CalculationTest {
     private AuthorityRepository authorityRepository
 
     @Autowired
+    private CaseRepository caseRepository
+
+    @Autowired
     private IUserService userService
 
     @Autowired
@@ -69,6 +73,7 @@ class CalculationTest {
         "Domácnosť"()
         "Doplnkové poistenie domácnosti"()
         "Sumár"()
+        assertCalculation()
     }
 
     private void init() {
@@ -103,6 +108,7 @@ class CalculationTest {
 
         taskService.assignTask(1L, taskID)
         ObjectNode dataset = populateDataset([
+//                PSC
                 101001: [
                         value: "81101",
                         type : "text",
@@ -110,66 +116,82 @@ class CalculationTest {
         ])
         taskService.setData(taskID, dataset)
         dataset = populateDataset([
+//                Mesto
                 301005: [
                         value: "Bratislava",
                         type : "enumeration"
                 ],
+//                Nachádza sa mimo obce (extravilán)?
                 101002: [
                         value: false,
                         type : "boolean"
                 ],
+//                Bolo miesto poistenia postihnuté povodňou za posledných 10 rokov?
                 101003: [
                         value: false,
                         type : "boolean"
                 ],
+//                Nachádza nehnuteľnosť sa vo vzdialenosti kratšej ako 300 m od vodného toku?
                 101004: [
                         value: false,
                         type : "boolean"
                 ],
+//                Koľko rokov žijete v poisťovanej nehnuteľnosti?
                 101005: [
                         value: "6 až 10",
                         type : "enumeration"
                 ],
+//                Aký je vzťah poisteného k poisťovanej nehnuteľnosti?
                 101006: [
                         value: "vlastník nehnuteľnosti",
                         type : "enumeration"
                 ],
+//                Koľko dospelých žije v domácnosti?
                 101007: [
                         value: "2",
                         type : "enumeration"
                 ],
+//                Koľko detí žije v domácnosti?
                 101008: [
                         value: "1",
                         type : "enumeration"
                 ],
+//                Bolo poistenému alebo spolupoistenej osobe niekedy v minulosti zamiestnuté poistné plnenie alebo vypovedaná poistná zmluva?
                 101009: [
                         value: false,
                         type : "boolean"
                 ],
+//                Bol poistený alebo spolupoistená osoba niekedy trestné stihaný / vyhlásil osobný bankrot / stíhaný za
                 101010: [
                         value: false,
                         type : "boolean"
                 ],
+//                Je plánovaná rekonštrukcia alebo prestavba poisťovanej nehnuteľnosti v priebehu najbližších 3 mesiacov?
                 101011: [
                         value: false,
                         type : "boolean"
                 ],
+//                Žije v poisťovanej domácnosti pes alebo mačka?
                 101012: [
                         value: false,
                         type : "boolean"
                 ],
+//                Kedy je nehnuteľnosť najviac obývaná?
                 101013: [
                         value: "počas celého dňa",
                         type : "boolean"
                 ],
+//                Je nehnuteľnosť využívaná aj na podnikanie?
                 101014: [
                         value: false,
                         type : "boolean"
                 ],
+//                Právna subjektivita poisteného?
                 101015: [
                         value: "fyzická osoba",
                         type : "enumeration"
                 ],
+//                Počet poistných udalostí za posledné 3 roky?
                 101016: [
                         value: "0",
                         type : "enumeration"
@@ -185,55 +207,67 @@ class CalculationTest {
 
         taskService.assignTask(1L, taskID)
         ObjectNode dataset = populateDataset([
+//                Predmet poistenia
                 102001: [
                         value: "byt",
                         type : "enumeration",
                 ],
+//                Poistenie nehnuteľnosti-Spoluúčasť
                 105005: [
                         value: "50.00 €",
                         type : "enumeration",
                 ],
+//                Podlahová plocha pivnice
                 105001: [
                         value: 10,
                         type : "number",
                 ],
+//                Podlahová plocha prízemia
                 105002: [
                         value: 20,
                         type : "number",
                 ],
+//                Podlahová plocha všetkých obytných poschodí
                 105003: [
                         value: "30",
                         type : "number",
                 ],
+//                Konštrukcia múrov
                 102002: [
                         value: "tehla a/alebo betón",
                         type : "enumeration",
                 ],
+//                Konštrukcia strechy
                 102003: [
                         value: "škridla",
                         type : "enumeration",
                 ],
+//                Koľko rokov má nehnuteľnosť?
                 102004: [
                         value: "6 až 10",
                         type : "enumeration",
                 ],
+//                Má nehnuteľnosť praskliny na vonkajšej fasáde?
                 102005: [
                         value: false,
                         type : "boolean",
                 ],
+//                Koľko izieb má nehnuteľnosť?
                 102006: [
                         value: "1",
                         type : "enumeration",
                 ],
+//                Koľko kúpeľní má nehnuteľnosť?
                 102007: [
                         value: "1",
                         type : "enumeration",
                 ],
+//                Uveďte celkovú hodnotu rekonštrukcií, ak boli vykonané
                 102008: [
                         value: "bez rekonštrukcie",
                         type : "enumeration",
                 ],
-
+//                Poistenie zodpovednosti z vlastníctva nehnuteľnosti
                 104001: [
                         value: true,
                         type : "boolean",
@@ -241,6 +275,7 @@ class CalculationTest {
         ])
         taskService.setData(taskID, dataset)
         dataset = populateDataset([
+//                Poistenie zodpovednosti z vlastníctva nehnuteľnosti
                 107001: [
                         value: "15,000.00 €",
                         type : "enumeration",
@@ -256,10 +291,12 @@ class CalculationTest {
 
         taskService.assignTask(1L, taskID)
         ObjectNode dataset = populateDataset([
+//                Stavebné materialy
                 105031: [
                         value: true,
                         type: "boolean"
                 ],
+//                Stavebné a záhradné mechanizmy
                 105033: [
                         value: true,
                         type: "boolean"
@@ -267,10 +304,12 @@ class CalculationTest {
         ])
         taskService.setData(taskID, dataset)
         dataset = populateDataset([
+//                Stavebné materiály
                 105032: [
                         value: 1000,
                         type: "number"
                 ],
+//                Stavebné a záhradné mechanizmy
                 105034: [
                         value: 1000,
                         type: "number"
@@ -454,6 +493,81 @@ class CalculationTest {
 
         taskService.assignTask(1L, taskID)
         ObjectNode dataset = populateDataset([
+                106004: [
+                        value: true,
+                        type: boolean
+                ],
+                106006: [
+                        value: true,
+                        type: boolean
+                ],
+                106008: [
+                        value: true,
+                        type: boolean
+                ],
+                106010: [
+                        value: true,
+                        type: boolean
+                ],
+                106012: [
+                        value: true,
+                        type: boolean
+                ],
+                106014: [
+                        value: true,
+                        type: boolean
+                ],
+                106016: [
+                        value: true,
+                        type: boolean
+                ],
+                106018: [
+                        value: true,
+                        type: boolean
+                ],
+                106020: [
+                        value: true,
+                        type: boolean
+                ]
+        ])
+        taskService.setData(taskID, dataset)
+        dataset = populateDataset([
+                106005: [
+                        value: 1000,
+                        type: boolean
+                ],
+                106007: [
+                        value: 1000,
+                        type: boolean
+                ],
+                106009: [
+                        value: 1000,
+                        type: boolean
+                ],
+                106011: [
+                        value: 1000,
+                        type: boolean
+                ],
+                106013: [
+                        value: 1000,
+                        type: boolean
+                ],
+                106015: [
+                        value: 1000,
+                        type: boolean
+                ],
+                106017: [
+                        value: 1000,
+                        type: boolean
+                ],
+                106019: [
+                        value: 1000,
+                        type: boolean
+                ],
+                106021: [
+                        value: 1000,
+                        type: boolean
+                ]
         ])
         taskService.setData(taskID, dataset)
         taskService.finishTask(1L, taskID)
@@ -465,6 +579,18 @@ class CalculationTest {
 
         taskService.assignTask(1L, taskID)
         ObjectNode dataset = populateDataset([
+                108001: [
+                        value: "polročná",
+                        type: "enumeration"
+                ],
+                108002: [
+                        value: true,
+                        type: "bool"
+                ],
+                108003: [
+                        value: "20%",
+                        type: "enumeration"
+                ]
         ])
         taskService.setData(taskID, dataset)
         taskService.finishTask(1L, taskID)
@@ -475,5 +601,15 @@ class CalculationTest {
         ObjectMapper mapper = new ObjectMapper()
         String json = JsonOutput.toJson(data.collectEntries { [(idConverter.get(it.key as Long)): it.value] })
         return mapper.readTree(json) as ObjectNode
+    }
+
+    private void assertCalculation() {
+        _case = caseRepository.findOne(_case.getStringId())
+
+//        assert valueOf(308006) ==
+    }
+
+    private def valueOf(Long id) {
+        return _case.dataSet[idConverter[id] as String].value
     }
 }
