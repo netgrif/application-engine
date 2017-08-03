@@ -63,17 +63,22 @@
             <!--@formatter:off-->
             field: f.this,
             obec: f.301005;
-            change obec about { null; }
+            change obec choices {
+                def postal = psc byCode,field.value;
+                cache "post",postal;
+                return postal.locality;
+            }
             <!--@formatter:on-->
         </action>
         <action trigger="set">
             <!--@formatter:off-->
             field: f.this,
             obec: f.301005;
-            change obec choices {
-                def postal = psc byCode,field.value;
-                cache "post",postal;
-                return postal.locality;
+            change obec about {
+                def postal = cache "post";
+                if (postal.size() == 1)
+                    return postal.first().locality;
+                return null;
             }
             <!--@formatter:on-->
         </action>
@@ -254,7 +259,7 @@
         <values>0</values>
         <values>1</values>
         <values>2</values>
-        <values>viac</values>
+        <values>viac ako 2</values>
         <init>1</init>
         <action trigger="set">
             <!--@formatter:off-->
@@ -837,178 +842,6 @@
         </action>
     </data>
     <!-- ===== Zodpovednosť ===== -->
-    <data type="boolean">
-        <title>Poistenie zodpovednosti z vlastníctva nehnuteľnosti</title>
-        <id>104001</id>
-        <action trigger="set">
-            <!--@formatter:off-->
-            field: f.this,
-            coeff: f.204001;
-            change coeff about {
-            if (field.value)
-            return 0.1 as Double;
-            return 0 as Double;
-            }
-        <!--@formatter:on-->
-        </action><action trigger="set">
-        <!--@formatter:off-->
-            check: f.this,
-            trans: t.364,
-            other: f.308008;
-            make other,visible on trans when { check.value == true }
-            <!--@formatter:on-->
-    </action>
-        <action trigger="set">
-            <!--@formatter:off-->
-            check: f.this,
-            trans: t.364,
-            other: f.308003;
-            make other,visible on trans when { check.value == true }
-            <!--@formatter:on-->
-        </action>
-        <action trigger="set">
-            <!--@formatter:off-->
-            check: f.this,
-            trans: t.364,
-            other: f.308008;
-            make other,hidden on trans when { check.value == false }
-            <!--@formatter:on-->
-        </action>
-        <action trigger="set">
-            <!--@formatter:off-->
-            check: f.this,
-            trans: t.364,
-            other: f.308003;
-            make other,hidden on trans when { check.value == false }
-            <!--@formatter:on-->
-        </action>
-        <!--Remove value-->
-        <action trigger="set">
-            <!--@formatter:off-->
-            field: f.this,
-            other: f.107001;
-            change other about { null; }
-        <!--@formatter:on-->
-        </action>
-        <action trigger="set">
-            <!--@formatter:off-->
-            field: f.this,
-            other: f.308008;
-            change other about { null; }
-        <!--@formatter:on-->
-        </action>
-    </data>
-    <data type="boolean">
-        <title>Zodpovednosť za škodu členov domácnosti</title>
-        <id>104002</id>
-        <action trigger="set">
-        <!--@formatter:off-->
-            field: f.this,
-            coeff: f.204002;
-            change coeff about {
-            if (field.value)
-            return 0.3 as Double;
-            return 0 as Double;
-            }
-        <!--@formatter:on-->
-        </action>
-        <action trigger="set">
-            <!--@formatter:off-->
-            check: f.this,
-            trans: t.363,
-            other: f.107003;
-            make other,editable on trans when { check.value == true }
-            <!--@formatter:on-->
-        </action>
-        <action trigger="set">
-            <!--@formatter:off-->
-            check: f.this,
-            trans: t.363,
-            other: f.107003;
-            make other,required on trans when { check.value == true }
-            <!--@formatter:on-->
-        </action>
-        <action trigger="set">
-            <!--@formatter:off-->
-            check: f.this,
-            trans: t.363,
-            other: f.107003;
-            make other,hidden on trans when { check.value == false }
-            <!--@formatter:on-->
-        </action>
-        <action trigger="set">
-            <!--@formatter:off-->
-            check: f.this,
-            trans: t.363,
-            other: f.104003;
-            make other,editable on trans when { check.value == true }
-            <!--@formatter:on-->
-        </action>
-        <action trigger="set">
-            <!--@formatter:off-->
-            check: f.this,
-            trans: t.363,
-            other: f.104003;
-            make other,required on trans when { check.value == true }
-            <!--@formatter:on-->
-        </action>
-        <action trigger="set">
-            <!--@formatter:off-->
-            check: f.this,
-            trans: t.363,
-            other: f.104003;
-            make other,hidden on trans when { check.value == false }
-            <!--@formatter:on-->
-        </action>
-        <action trigger="set">
-            <!--@formatter:off-->
-            check: f.this,
-            trans: t.364,
-            other: f.308009;
-            make other,visible on trans when { check.value == true }
-            <!--@formatter:on-->
-        </action>
-        <action trigger="set">
-            <!--@formatter:off-->
-            check: f.this,
-            trans: t.364,
-            other: f.308003;
-            make other,visible on trans when { check.value == true }
-            <!--@formatter:on-->
-        </action>
-        <action trigger="set">
-            <!--@formatter:off-->
-            check: f.this,
-            trans: t.364,
-            other: f.308009;
-            make other,hidden on trans when { check.value == false }
-            <!--@formatter:on-->
-        </action>
-        <action trigger="set">
-            <!--@formatter:off-->
-            check: f.this,
-            trans: t.364,
-            other: f.308003;
-            make other,hidden on trans when { check.value == false }
-            <!--@formatter:on-->
-        </action>
-        <!--Remove value-->
-        <action trigger="set">
-            <!--@formatter:off-->
-            field: f.this,
-            other: f.107003;
-            change other about { null; }
-        <!--@formatter:on-->
-        </action>
-        <action trigger="set">
-            <!--@formatter:off-->
-            field: f.this,
-            other: f.308009;
-            change other about { null; }
-        <!--@formatter:on-->
-        </action>
-
-    </data>
     <data type="enumeration">
         <title>Územná platnosť poistenia</title>
         <id>104003</id>
@@ -2684,13 +2517,25 @@
     </data>
     <!-- ===== Poistenie zodpovednosti za škodu ===== -->
     <data type="enumeration">
-        <title>Poistenie zodpovednosti z vlastníctva nehnuteľnosti</title>
+        <title>Poistenie zodpovednosti z vlastníctva nehnuteľnosti do výšky</title>
         <id>107001</id>
         <placeholder>Poistná suma</placeholder>
+        <values>0.00 €</values>
         <values>15,000.00 €</values>
         <values>30,000.00 €</values>
         <values>60,000.00 €</values>
         <values>120,000.00 €</values>
+        <action trigger="set">
+            <!--@formatter:off-->
+            field: f.this,
+            coeff: f.204001;
+            change coeff about {
+                if (field.value == "0.00 €")
+                    return 0.0 as Double;
+                return 0.1 as Double;
+            }
+        <!--@formatter:on-->
+        </action>
         <action trigger="set">
             <!--@formatter:off-->
             field: f.this,
@@ -2708,10 +2553,22 @@
         <title>Zodpovednosť za škodu členov domácnosti</title>
         <id>107003</id>
         <placeholder>Eur</placeholder>
+        <values>0.00 €</values>
         <values>15,000.00 €</values>
         <values>30,000.00 €</values>
         <values>60,000.00 €</values>
         <values>120,000.00 €</values>
+        <action trigger="set">
+            <!--@formatter:off-->
+            field: f.this,
+            coeff: f.204002;
+            change coeff about {
+                if (field.value == "0.00 €")
+                    return 0.0 as Double;
+                return 0.3 as Double;
+            }
+            <!--@formatter:on-->
+        </action>
         <action trigger="set">
             <!--@formatter:off-->
             field: f.107003,
@@ -2722,6 +2579,46 @@
                 def n = field.value.replaceAll("[,€ ]","") as Double;
                 return ((n*coeff.value*excess.value)/1000.0) as Double;
             }
+        <!--@formatter:on-->
+        </action>
+        <action trigger="set">
+            <!--@formatter:off-->
+            check: f.this,
+            trans: t.364,
+            other: f.308009;
+            make other,visible on trans when { check.value != "0.00 €" }
+            <!--@formatter:on-->
+        </action>
+        <action trigger="set">
+            <!--@formatter:off-->
+            check: f.this,
+            trans: t.364,
+            other: f.308003;
+            make other,visible on trans when { check.value != "0.00 €" }
+            <!--@formatter:on-->
+        </action>
+        <action trigger="set">
+            <!--@formatter:off-->
+            check: f.this,
+            trans: t.364,
+            other: f.308009;
+            make other,hidden on trans when { check.value == "0.00 €" }
+            <!--@formatter:on-->
+        </action>
+        <action trigger="set">
+            <!--@formatter:off-->
+            check: f.this,
+            trans: t.364,
+            other: f.308003;
+            make other,hidden on trans when { check.value == "0.00 €" }
+            <!--@formatter:on-->
+        </action>
+        <!--Remove value-->
+        <action trigger="set">
+            <!--@formatter:off-->
+            field: f.this,
+            other: f.308009;
+            change other about { null; }
         <!--@formatter:on-->
         </action>
     </data>
@@ -2864,14 +2761,14 @@
         <placeholder>Poistné</placeholder>
         <action trigger="set">
             <!--@formatter:off-->
-        s1: f.308001,
-        s2: f.308002,
-        s3: f.308003,
-        sum: f.308004;
-        change sum about {
-            return s1.value+s2.value+s3.value as Double;
-        }
-    <!--@formatter:on-->
+            s1: f.308001,
+            s2: f.308002,
+            s3: f.308003,
+            sum: f.308004;
+            change sum about {
+                return s1.value+s2.value+s3.value as Double;
+            }
+            <!--@formatter:on-->
         </action>
     </data>
     <data type="number">
@@ -5545,7 +5442,7 @@
         <id>2</id>
         <x>260</x>
         <y>300</y>
-        <label>Poistenie nehnuteľnosti</label>
+        <label>Iba nehnuteľnosť</label>
         <priority>1</priority>
         <transactionRef>
             <id>1</id>
@@ -5562,7 +5459,7 @@
         <id>4</id>
         <x>180</x>
         <y>900</y>
-        <label>Poistenie domácnosti</label>
+        <label>Iba domácnosť</label>
         <priority>2</priority>
         <transactionRef>
             <id>1</id>
@@ -5579,7 +5476,7 @@
         <id>3</id>
         <x>180</x>
         <y>580</y>
-        <label>Poistenie nehnuteľnosti a domácnosti</label>
+        <label>Nehnuteľnosť a domácnosť</label>
         <priority>3</priority>
         <transactionRef>
             <id>1</id>
@@ -5834,6 +5731,35 @@
                     <behavior>editable</behavior>
                 </logic>
             </dataRef>
+            <!--Koľko izieb má nehnuteľnosť?-->
+            <dataRef>
+                <id>102006</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                </logic>
+            </dataRef>
+            <!--Koľko kúpeľní má nehnuteľnosť?-->
+            <dataRef>
+                <id>102007</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                </logic>
+            </dataRef>
+            <!--Zodpovednost nehnutelnost-->
+            <dataRef>
+                <id>107001</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>3</id>
+            <title></title>
+            <alignment>left</alignment>
             <!--Podlahová plocha pivnice-->
             <dataRef>
                 <id>105001</id>
@@ -5890,72 +5816,11 @@
                     <behavior>editable</behavior>
                 </logic>
             </dataRef>
-            <!--Koľko izieb má nehnuteľnosť?-->
-            <dataRef>
-                <id>102006</id>
-                <logic>
-                    <behavior>editable</behavior>
-                    <behavior>required</behavior>
-                </logic>
-            </dataRef>
-            <!--Koľko kúpeľní má nehnuteľnosť?-->
-            <dataRef>
-                <id>102007</id>
-                <logic>
-                    <behavior>editable</behavior>
-                    <behavior>required</behavior>
-                </logic>
-            </dataRef>
             <!--Uveďte celkovú hodnotu rekonštrukcií, ak boli vykonané-->
             <dataRef>
                 <id>102008</id>
                 <logic>
                     <behavior>editable</behavior>
-                </logic>
-            </dataRef>
-        </dataGroup>
-        <dataGroup>
-            <id>3</id>
-            <title></title>
-            <alignment>left</alignment>
-            <!--Zodpovednost nehnutelnost boolean-->
-            <dataRef>
-                <id>104001</id>
-                <logic>
-                    <behavior>editable</behavior>
-                    <!--Show-->
-                    <action trigger="set">
-                        field: f.this,
-                        other: f.107001,
-                        trans: t.this;
-                        make other,editable on trans when { field.value; }
-                    </action>
-                    <action trigger="set">
-                        field: f.this,
-                        other: f.107001,
-                        trans: t.this;
-                        make other,required on trans when { field.value; }
-                    </action>
-                    <!--Hide-->
-                    <action trigger="set">
-                        field: f.this,
-                        other: f.107001,
-                        trans: t.this;
-                        make other,hidden on trans when { !field.value; }
-                    </action>
-                    <!--Remove value-->
-                    <action trigger="set">
-                        field: f.this,
-                        other: f.107001;
-                        change other about { null; }
-                    </action>
-                </logic>
-            </dataRef>
-            <!--Zodpovednost nehnutelnost-->
-            <dataRef>
-                <id>107001</id>
-                <logic>
-                    <behavior>hidden</behavior>
                 </logic>
             </dataRef>
         </dataGroup>
@@ -7612,18 +7477,12 @@
             <id>5</id>
             <title></title>
             <alignment>start</alignment>
-            <!--Zodpovednost domacnost-->
-            <dataRef>
-                <id>104002</id>
-                <logic>
-                    <behavior>editable</behavior>
-                </logic>
-            </dataRef>
             <!--Zodpovednost domacnost ps-->
             <dataRef>
                 <id>107003</id>
                 <logic>
-                    <behavior>hidden</behavior>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
                 </logic>
             </dataRef>
             <!--Zodpovednost domacnost uzemna platnost-->
@@ -9609,13 +9468,6 @@
             <id>3</id>
             <title></title>
             <alignment>left</alignment>
-            <!--Zodpovednost nehnutelnost boolean-->
-            <dataRef>
-                <id>104001</id>
-                <logic>
-                    <behavior>visible</behavior>
-                </logic>
-            </dataRef>
             <!--Zodpovednost nehnutelnost-->
             <dataRef>
                 <id>107001</id>
