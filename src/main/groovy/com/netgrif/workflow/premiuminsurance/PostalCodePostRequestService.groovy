@@ -1,6 +1,5 @@
-package com.netgrif.workflow.psc
+package com.netgrif.workflow.premiuminsurance
 
-import groovy.json.JsonSlurper
 import groovyx.net.http.ContentType
 import groovyx.net.http.HTTPBuilder
 import groovyx.net.http.HttpResponseDecorator
