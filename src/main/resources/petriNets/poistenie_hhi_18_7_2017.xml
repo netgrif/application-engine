@@ -733,7 +733,7 @@
             }
         <!--@formatter:on-->
         </action>
-        <action trigger="set">
+        <action trigger="get">
             <!--@formatter:off-->
             check: f.this,
             trans: t.364,
@@ -741,7 +741,7 @@
             make other,editable on trans when { check.value != null }
             <!--@formatter:on-->
         </action>
-        <action trigger="set">
+        <action trigger="get">
             <!--@formatter:off-->
             check: f.this,
             trans: t.364,
@@ -749,7 +749,7 @@
             make other,required on trans when { check.value != null }
             <!--@formatter:on-->
         </action>
-        <action trigger="set">
+        <action trigger="get">
             <!--@formatter:off-->
             check: f.this,
             trans: t.364,
@@ -757,7 +757,7 @@
             make other,visible on trans when { check.value != null }
             <!--@formatter:on-->
         </action>
-        <action trigger="set">
+        <action trigger="get">
             <!--@formatter:off-->
             check: f.this,
             trans: t.364,
@@ -5104,6 +5104,57 @@
         <title>IČO</title>
         <id>109059</id>
         <desc>Poistený</desc>
+        <action trigger="set">
+            <!--@formatter:off-->
+            ico: f.this,
+            name: f.109026;
+            change name about {
+                def orsr = psc byIco,ico.value;
+                cache "orsr2",orsr;
+                return orsr?.name;
+            }
+            <!--@formatter:on-->
+        </action>
+        <action trigger="set">
+            <!--@formatter:off-->
+            ico: f.this,
+            name: f.109036;
+            change name about {
+                def orsr = cache "orsr2";
+                return orsr?.street;
+            }
+            <!--@formatter:on-->
+        </action>
+        <action trigger="set">
+            <!--@formatter:off-->
+            ico: f.this,
+            name: f.109037;
+            change name about {
+                def orsr = cache "orsr2";
+                return orsr?.streetNumber;
+            }
+            <!--@formatter:on-->
+        </action>
+        <action trigger="set">
+            <!--@formatter:off-->
+            ico: f.this,
+            name: f.109038;
+            change name about {
+                def orsr = cache "orsr2";
+                return orsr?.zipCode;
+            }
+            <!--@formatter:on-->
+        </action>
+        <action trigger="set">
+            <!--@formatter:off-->
+            ico: f.this,
+            name: f.109039;
+            change name about {
+                def orsr = cache "orsr2";
+                return orsr?.city;
+            }
+            <!--@formatter:on-->
+        </action>
     </data>
     <!-- ===== Údaje o mieste poistenia ===== -->
     <!-- Adresa trvalého pobytu -->
