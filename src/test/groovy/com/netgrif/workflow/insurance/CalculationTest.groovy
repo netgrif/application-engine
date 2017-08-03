@@ -229,7 +229,7 @@ class CalculationTest {
                 ],
 //                Podlahová plocha všetkých obytných poschodí
                 105003: [
-                        value: "30",
+                        value: 30,
                         type : "number",
                 ],
 //                Konštrukcia múrov
@@ -264,7 +264,7 @@ class CalculationTest {
                 ],
 //                Uveďte celkovú hodnotu rekonštrukcií, ak boli vykonané
                 102008: [
-                        value: "bez rekonštrukcie",
+                        value: "bez rekonštrukcií",
                         type : "enumeration",
                 ],
 //                Poistenie zodpovednosti z vlastníctva nehnuteľnosti
@@ -287,7 +287,7 @@ class CalculationTest {
 
     private "Doplnkové poistenie nehnuteľnosti"() {
         List<TaskReference> references = taskService.findAllByCase(_case.getStringId())
-        String taskID = references.find { it.getTitle() == "Nehnuteľnosť" }.getStringId()
+        String taskID = references.find { it.getTitle() == "Doplnkové poistenie nehnuteľnosti" }.getStringId()
 
         taskService.assignTask(1L, taskID)
         ObjectNode dataset = populateDataset([
@@ -321,7 +321,7 @@ class CalculationTest {
 
     private "Vedľajšie stavby"() {
         List<TaskReference> references = taskService.findAllByCase(_case.getStringId())
-        String taskID = references.find { it.getTitle() == "Nehnuteľnosť" }.getStringId()
+        String taskID = references.find { it.getTitle() == "Vedľajšie stavby" }.getStringId()
 
         taskService.assignTask(1L, taskID)
         ObjectNode dataset = populateDataset([
@@ -393,6 +393,11 @@ class CalculationTest {
                         value: 100,
                         type: "number"
                 ],
+//                Rovnaké miesto ...
+                105008: [
+                        value: false,
+                        type: "boolean"
+                ],
 //                Garáž poistná sumá
                 105007: [
                         value: 90_000,
@@ -460,7 +465,7 @@ class CalculationTest {
 
     private "Domácnosť"() {
         List<TaskReference> references = taskService.findAllByCase(_case.getStringId())
-        String taskID = references.find { it.getTitle() == "Nehnuteľnosť" }.getStringId()
+        String taskID = references.find { it.getTitle() == "Domácnosť" }.getStringId()
 
         taskService.assignTask(1L, taskID)
         ObjectNode dataset = populateDataset([
@@ -524,54 +529,54 @@ class CalculationTest {
 
     private "Doplnkové poistenie domácnosti"() {
         List<TaskReference> references = taskService.findAllByCase(_case.getStringId())
-        String taskID = references.find { it.getTitle() == "Nehnuteľnosť" }.getStringId()
+        String taskID = references.find { it.getTitle() == "Doplnkové poistenie domácnosti" }.getStringId()
 
         taskService.assignTask(1L, taskID)
         ObjectNode dataset = populateDataset([
 //                Cennosti
                 106004: [
                         value: true,
-                        type: boolean
+                        type: "boolean"
                 ],
 //                Umelecké diela
                 106006: [
                         value: true,
-                        type: boolean
+                        type: "boolean"
                 ],
 //                Elektronické a optické zariadenia
                 106008: [
                         value: true,
-                        type: boolean
+                        type: "boolean"
                 ],
 //                Špecialne sklá a presklenie
                 106010: [
                         value: true,
-                        type: boolean
+                        type: "boolean"
                 ],
 //                Záhradné vybavenie a nábytok
                 106012: [
                         value: true,
-                        type: boolean
+                        type: "boolean"
                 ],
 //                Elektromotory v domácich spotrebičoch
                 106014: [
                         value: true,
-                        type: boolean
+                        type: "boolean"
                 ],
 //                Stavebné súčasti domácnosti
                 106016: [
                         value: true,
-                        type: boolean
+                        type: "boolean"
                 ],
 //                Športové náradie
                 106018: [
                         value: true,
-                        type: boolean
+                        type: "boolean"
                 ],
 //                Iné
                 106020: [
                         value: true,
-                        type: boolean
+                        type: "boolean"
                 ]
         ])
         taskService.setData(taskID, dataset)
@@ -579,47 +584,47 @@ class CalculationTest {
 //                Cennosti
                 106005: [
                         value: 1000,
-                        type: boolean
+                        type: "number"
                 ],
 //                Umelecké diela
                 106007: [
                         value: 1000,
-                        type: boolean
+                        type: "number"
                 ],
 //                Elektronické a optické zariadenia
                 106009: [
                         value: 1000,
-                        type: boolean
+                        type: "number"
                 ],
 //                Špecialne sklá a presklenie
                 106011: [
                         value: 1000,
-                        type: boolean
+                        type: "number"
                 ],
 //                Záhradné vybavenie a nábytok
                 106013: [
                         value: 1000,
-                        type: boolean
+                        type: "number"
                 ],
 //                Elektromotory v domácich spotrebičoch
                 106015: [
                         value: 1000,
-                        type: boolean
+                        type: "number"
                 ],
 //                Stavebné súčasti domácnosti
                 106017: [
                         value: 1000,
-                        type: boolean
+                        type: "number"
                 ],
 //                Športové náradie
                 106019: [
                         value: 1000,
-                        type: boolean
+                        type: "number"
                 ],
 //                Iné
                 106021: [
                         value: 1000,
-                        type: boolean
+                        type: "number"
                 ]
         ])
         taskService.setData(taskID, dataset)
@@ -628,7 +633,7 @@ class CalculationTest {
 
     private "Sumár"() {
         List<TaskReference> references = taskService.findAllByCase(_case.getStringId())
-        String taskID = references.find { it.getTitle() == "Nehnuteľnosť" }.getStringId()
+        String taskID = references.find { it.getTitle() == "Sumár" }.getStringId()
 
         taskService.assignTask(1L, taskID)
         ObjectNode dataset = populateDataset([
@@ -640,7 +645,7 @@ class CalculationTest {
 //                ZĽAVA ZA INÉ POISTENIE V PREMIUM
                 108002: [
                         value: true,
-                        type: "bool"
+                        type: "boolean"
                 ],
 //                OBCHODNÁ ZĽAVA
                 108003: [
@@ -662,7 +667,16 @@ class CalculationTest {
     private void assertCalculation() {
         _case = caseRepository.findOne(_case.getStringId())
 
-//        assert valueOf(308006) ==
+//        Poistenie nehnuteľnosti
+        assert Math.round(valueOf(308001)*100)/100.0 == 178.66
+//        Poistenie domácnosti
+        assert Math.round(valueOf(308002)*100)/100.0 == 643.02
+//        Poistenie zodpovednosti za škodu
+        assert Math.round(valueOf(308003)*100)/100.0 == 5.55
+//        ROČNÉ POISTNÉ CELKOM
+        assert Math.round(valueOf(308004)*100)/100.0 == 827.23
+//        Bežné poistné
+        assert valueOf(308006) == 591.28
     }
 
     private def valueOf(Long id) {
