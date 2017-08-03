@@ -6188,7 +6188,7 @@
                     change other about {
                         def coeff = same.value ? 1.0 : 1.1;
                         if (check.value)
-                            return ((field.value*coeff*exces.value/)1000.0) as Double;
+                            return ((field.value*coeff*exces.value)/1000.0) as Double;
                         return other.value as Double;
                     }
                     <!--@formatter:on-->
