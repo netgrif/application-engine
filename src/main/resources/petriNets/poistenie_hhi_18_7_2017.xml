@@ -424,7 +424,7 @@
     </data>
     <!-- ===== Nehnuteľnosť ===== -->
     <data type="enumeration">
-        <title>Poistenie nehnuteľnosti-Spoluúčasť</title>
+        <title>Poistenie nehnuteľnosti</title>
         <id>105005</id>
         <placeholder>Spoluúčasť</placeholder>
         <values>0.00 €</values>
@@ -2248,12 +2248,13 @@
     </data>
     <!-- ===== Poistenie domácnosti ===== -->
     <data type="enumeration">
-        <title>Poistenie domácnosti - spoluúčasť</title>
+        <title>Poistenie domácnosti</title>
         <id>106001</id>
         <values>0.00 €</values>
         <values>50.00 €</values>
         <values>150.00 €</values>
         <init>50.00 €</init>
+        <placeholder>Spoluúčasť</placeholder>
         <action trigger="set">
             <!--@formatter:off-->
         field: f.this,
@@ -4784,6 +4785,11 @@
             <!--@formatter:on-->
         </action>
     </data>
+    <data type="text">
+        <title>IČO</title>
+        <id>109058</id>
+        <desc>Poistník</desc>
+    </data>
     <!-- Poistený -->
     <data type="enumeration">
         <title>Typ subjektu</title>
@@ -6300,7 +6306,7 @@
                     change other about {
                         def coeff = same.value ? 1.0 : 1.1;
                         if (check.value)
-                            return ((field.value*coeff*exces.value/)1000.0) as Double;
+                            return ((field.value*coeff*exces.value)/1000.0) as Double;
                         return other.value as Double;
                     }
                     <!--@formatter:on-->
