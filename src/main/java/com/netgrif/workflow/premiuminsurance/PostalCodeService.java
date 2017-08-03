@@ -1,4 +1,4 @@
-package com.netgrif.workflow.psc;
+package com.netgrif.workflow.premiuminsurance;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
