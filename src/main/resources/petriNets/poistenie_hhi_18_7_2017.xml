@@ -4379,10 +4379,15 @@
         <id>109012</id>
         <desc>Poistník</desc>
     </data>
-    <data type="text">
+    <data type="enumeration">
         <title>Štátna príslušnosť</title>
         <id>109013</id>
         <desc>Poistník</desc>
+        <values>SK</values>
+        <values>CZ</values>
+        <values>HU</values>
+        <values>PL</values>
+        <values>Iná</values>
     </data>
     <data type="date">
         <title>Dátum narodenia</title>
@@ -5077,10 +5082,15 @@
         <id>109026</id>
         <desc>Poistený</desc>
     </data>
-    <data type="text">
+    <data type="enumeration">
         <title>Štátna príslušnosť</title>
         <id>109027</id>
         <desc>Poistený</desc>
+        <values>SK</values>
+        <values>CZ</values>
+        <values>HU</values>
+        <values>PL</values>
+        <values>Iná</values>
     </data>
     <data type="date">
         <title>Dátum narodenia</title>
