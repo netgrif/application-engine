@@ -8650,6 +8650,20 @@
                     <behavior>editable</behavior>
                 </logic>
             </dataRef>
+            <!--Typ preukazu-->
+            <dataRef>
+                <id>109016</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <!--Číslo preukazu-->
+            <dataRef>
+                <id>109017</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
             <!--Štátna príslušnosť-->
             <dataRef>
                 <id>109013</id>
@@ -8667,20 +8681,6 @@
             <!--Rodné číslo-->
             <dataRef>
                 <id>109015</id>
-                <logic>
-                    <behavior>editable</behavior>
-                </logic>
-            </dataRef>
-            <!--Typ preukazu-->
-            <dataRef>
-                <id>109016</id>
-                <logic>
-                    <behavior>editable</behavior>
-                </logic>
-            </dataRef>
-            <!--Číslo preukazu-->
-            <dataRef>
-                <id>109017</id>
                 <logic>
                     <behavior>editable</behavior>
                 </logic>
@@ -8760,6 +8760,20 @@
                     <behavior>hidden</behavior>
                 </logic>
             </dataRef>
+            <!--Typ preukazu poisteny-->
+            <dataRef>
+                <id>109030</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+            </dataRef>
+            <!--Číslo preukazu-->
+            <dataRef>
+                <id>109031</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+            </dataRef>
             <!--Štátna príslušnosť poistený-->
             <dataRef>
                 <id>109027</id>
@@ -8777,20 +8791,6 @@
             <!--Rodné číslo-->
             <dataRef>
                 <id>109029</id>
-                <logic>
-                    <behavior>hidden</behavior>
-                </logic>
-            </dataRef>
-            <!--Typ preukazu poisteny-->
-            <dataRef>
-                <id>109030</id>
-                <logic>
-                    <behavior>hidden</behavior>
-                </logic>
-            </dataRef>
-            <!--Číslo preukazu-->
-            <dataRef>
-                <id>109031</id>
                 <logic>
                     <behavior>hidden</behavior>
                 </logic>
