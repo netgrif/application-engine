@@ -2520,11 +2520,11 @@
         <title>Poistenie zodpovednosti z vlastníctva nehnuteľnosti do výšky</title>
         <id>107001</id>
         <placeholder>Poistná suma</placeholder>
-        <values>0.00 €</values>
-        <values>15,000.00 €</values>
-        <values>30,000.00 €</values>
-        <values>60,000.00 €</values>
         <values>120,000.00 €</values>
+        <values>60,000.00 €</values>
+        <values>30,000.00 €</values>
+        <values>15,000.00 €</values>
+        <values>0.00 €</values>
         <action trigger="set">
             <!--@formatter:off-->
             field: f.this,
@@ -2578,11 +2578,11 @@
         <title>Zodpovednosť za škodu členov domácnosti</title>
         <id>107003</id>
         <placeholder>Eur</placeholder>
-        <values>0.00 €</values>
-        <values>15,000.00 €</values>
-        <values>30,000.00 €</values>
-        <values>60,000.00 €</values>
         <values>120,000.00 €</values>
+        <values>60,000.00 €</values>
+        <values>30,000.00 €</values>
+        <values>15,000.00 €</values>
+        <values>0.00 €</values>
         <action trigger="set">
             <!--@formatter:off-->
             field: f.this,
