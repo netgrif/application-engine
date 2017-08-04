@@ -4028,6 +4028,54 @@
     <data type="boolean">
         <title>Poistenie na dobu určitú</title>
         <id>109002</id>
+        <action trigger="set">
+            <!--@formatter:off-->
+            field: f.this,
+            other: f.109003,
+            trans: t.1661;332, 1618
+            make other,editable on trans when { field.value }
+            <!--@formatter:off-->
+        </action>
+        <action trigger="set">
+            <!--@formatter:off-->
+            field: f.this,
+            other: f.109003,
+            trans: t.332;
+            make other,editable on trans when { field.value }
+            <!--@formatter:off-->
+        </action>
+        <action trigger="set">
+            <!--@formatter:off-->
+            field: f.this,
+            other: f.109003,
+            trans: t.1618;
+            make other,editable on trans when { field.value }
+            <!--@formatter:off-->
+        </action>
+        <action trigger="set">
+            <!--@formatter:off-->
+            field: f.this,
+            other: f.109003,
+            trans: t.1661;332, 1618
+            make other,hidden on trans when { !field.value }
+            <!--@formatter:off-->
+        </action>
+        <action trigger="set">
+            <!--@formatter:off-->
+            field: f.this,
+            other: f.109003,
+            trans: t.332;
+            make other,hidden on trans when { !field.value }
+            <!--@formatter:off-->
+        </action>
+        <action trigger="set">
+            <!--@formatter:off-->
+            field: f.this,
+            other: f.109003,
+            trans: t.1618;
+            make other,hidden on trans when { !field.value }
+            <!--@formatter:off-->
+        </action>
     </data>
     <data type="date">
         <title>Koniec poistenia</title>
@@ -4048,6 +4096,10 @@
         <id>109006</id>
         <values>z účtu</values>
         <values>poštovou poukážkou</values>
+    </data>
+    <data type="boolean">
+        <id>109060</id>
+        <title>Zriaďuje sa indexácia poistnej sumy?</title>
     </data>
     <!-- ===== Údaje o poistníkovi ===== -->
     <!-- Poistník -->
@@ -8936,16 +8988,14 @@
             <dataRef>
                 <id>109002</id>
                 <logic>
-                    <behavior>required</behavior>
-                    <behavior>editable</behavior>
+                    <behavior>hidden</behavior>
                 </logic>
             </dataRef>
             <!--Koniec poistenia-->
             <dataRef>
                 <id>109003</id>
                 <logic>
-                    <behavior>required</behavior>
-                    <behavior>editable</behavior>
+                    <behavior>hidden</behavior>
                 </logic>
             </dataRef>
             <dataRef>
@@ -8957,6 +9007,13 @@
             <!--Číslo úverovej zmluvy-->
             <dataRef>
                 <id>109005</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <!--Indexácia-->
+            <dataRef>
+                <id>109060</id>
                 <logic>
                     <behavior>editable</behavior>
                 </logic>
@@ -9016,16 +9073,14 @@
             <dataRef>
                 <id>109002</id>
                 <logic>
-                    <behavior>required</behavior>
-                    <behavior>editable</behavior>
+                    <behavior>hidden</behavior>
                 </logic>
             </dataRef>
             <!--Koniec poistenia-->
             <dataRef>
                 <id>109003</id>
                 <logic>
-                    <behavior>required</behavior>
-                    <behavior>editable</behavior>
+                    <behavior>hidden</behavior>
                 </logic>
             </dataRef>
             <dataRef>
@@ -9037,6 +9092,13 @@
             <!--Číslo úverovej zmluvy-->
             <dataRef>
                 <id>109005</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <!--Indexácia-->
+            <dataRef>
+                <id>109060</id>
                 <logic>
                     <behavior>editable</behavior>
                 </logic>
@@ -9096,16 +9158,14 @@
             <dataRef>
                 <id>109002</id>
                 <logic>
-                    <behavior>required</behavior>
-                    <behavior>editable</behavior>
+                    <behavior>hidden</behavior>
                 </logic>
             </dataRef>
             <!--Koniec poistenia-->
             <dataRef>
                 <id>109003</id>
                 <logic>
-                    <behavior>required</behavior>
-                    <behavior>editable</behavior>
+                    <behavior>hidden</behavior>
                 </logic>
             </dataRef>
             <dataRef>
@@ -9117,6 +9177,13 @@
             <!--Číslo úverovej zmluvy-->
             <dataRef>
                 <id>109005</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <!--Indexácia-->
+            <dataRef>
+                <id>109060</id>
                 <logic>
                     <behavior>editable</behavior>
                 </logic>
