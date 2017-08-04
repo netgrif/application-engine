@@ -2548,6 +2548,31 @@
             }
         <!--@formatter:on-->
         </action>
+        <action trigger="set">
+            <!--@formatter:off-->
+            check: f.this,
+            trans: t.364,
+            other: f.308008;
+            make other,hidden on trans when { check.value == "0.00 €" }
+            <!--@formatter:on-->
+        </action>
+        <action trigger="set">
+            <!--@formatter:off-->
+            check: f.this,
+            trans: t.364,
+            other: f.308008;
+            make other,visible on trans when { check.value != "0.00 €" }
+            <!--@formatter:on-->
+        </action>
+        <action trigger="set">
+            <!--@formatter:off-->
+            check: f.107003,
+            check2: f.107001,
+            trans: t.364,
+            other: f.308003;
+            make other,hidden on trans when { Boolean.logicalAnd(check.value == "0.00 €", check2.value == "0.00 €") }
+            <!--@formatter:on-->
+        </action>
     </data>
     <data type="enumeration">
         <title>Zodpovednosť za škodu členov domácnosti</title>
@@ -2584,6 +2609,41 @@
         <action trigger="set">
             <!--@formatter:off-->
             check: f.this,
+            trans: t.363,
+            other: f.104003;
+            make other,editable on trans when { check.value != "0.00 €" }
+            <!--@formatter:on-->
+        </action>
+        <action trigger="set">
+            <!--@formatter:off-->
+            check: f.this,
+            trans: t.363,
+            other: f.104003;
+            make other,required on trans when { check.value != "0.00 €" }
+            <!--@formatter:on-->
+        </action>
+        <action trigger="set">
+            <!--@formatter:off-->
+            check: f.this,
+            trans: t.363,
+            other: f.104003;
+            make other,hidden on trans when { check.value == "0.00 €" }
+            <!--@formatter:on-->
+        </action>
+        <action trigger="set">
+            <!--@formatter:off-->
+            check: f.this,
+            other: f.104003;
+            change other about {
+                if (check.value == "0.00 €")
+                    return null;
+                return other.value;
+            }
+            <!--@formatter:on-->
+        </action>
+        <action trigger="set">
+            <!--@formatter:off-->
+            check: f.this,
             trans: t.364,
             other: f.308009;
             make other,visible on trans when { check.value != "0.00 €" }
@@ -2607,10 +2667,11 @@
         </action>
         <action trigger="set">
             <!--@formatter:off-->
-            check: f.this,
+            check: f.107003,
+            check2: f.107001,
             trans: t.364,
             other: f.308003;
-            make other,hidden on trans when { check.value == "0.00 €" }
+            make other,hidden on trans when { Boolean.logicalAnd(check.value == "0.00 €", check2.value == "0.00 €") }
             <!--@formatter:on-->
         </action>
         <!--Remove value-->
@@ -5437,7 +5498,7 @@
     </data>
 
     <!--=================================TRANSITIONS================-->
-    <!--================================= poistenie nehnuteľnosti DONE====================-->
+    <!--================================= poistenie nehnuteľnosti ====================-->
     <transition>
         <id>2</id>
         <x>260</x>
@@ -5454,7 +5515,7 @@
             </logic>
         </roleRef>
     </transition>
-    <!--================================= postenie domacnosti DONE=============-->
+    <!--================================= postenie domacnosti =============-->
     <transition>
         <id>4</id>
         <x>180</x>
@@ -5471,7 +5532,7 @@
             </logic>
         </roleRef>
     </transition>
-    <!--================================= Poistenie nehnuteľnosti a domácnosti DONE=====================-->
+    <!--================================= Poistenie nehnuteľnosti a domácnosti =====================-->
     <transition>
         <id>3</id>
         <x>180</x>
@@ -5686,7 +5747,7 @@
             </dataRef>
         </dataGroup>
     </transition>
-    <!--============================= Nehnuteľnosť - DONE =====================-->
+    <!--============================= Nehnuteľnosť =====================-->
     <transition>
         <id>155</id>
         <x>620</x>
@@ -7379,7 +7440,7 @@
             </dataRef>
         </dataGroup>
     </transition>
-    <!--todo============================= Domácnosť - check zodpovednost, uzemna platnost =====================-->
+    <!--================================= Domácnosť =====================-->
     <transition>
         <id>363</id>
         <x>620</x>
@@ -7415,19 +7476,44 @@
                     <behavior>required</behavior>
                 </logic>
             </dataRef>
-            <!--Celková podlahová plocha-->
+        </dataGroup>
+        <dataGroup>
+            <id>5</id>
+            <title></title>
+            <alignment>start</alignment>
+            <!--Zodpovednost domacnost ps-->
             <dataRef>
-                <id>106003</id>
+                <id>107003</id>
                 <logic>
                     <behavior>editable</behavior>
+                    <behavior>required</behavior>
                 </logic>
             </dataRef>
+            <!--Zodpovednost domacnost uzemna platnost-->
+            <dataRef>
+                <id>104003</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>6</id>
+            <title></title>
+            <alignment>start</alignment>
             <!--Obývanosť domácnosti-->
             <dataRef>
                 <id>103002</id>
                 <logic>
                     <behavior>editable</behavior>
                     <behavior>required</behavior>
+                </logic>
+            </dataRef>
+            <!--Celková podlahová plocha-->
+            <dataRef>
+                <id>106003</id>
+                <logic>
+                    <behavior>editable</behavior>
                 </logic>
             </dataRef>
         </dataGroup>
@@ -7470,26 +7556,6 @@
                 <logic>
                     <behavior>editable</behavior>
                     <behavior>required</behavior>
-                </logic>
-            </dataRef>
-        </dataGroup>
-        <dataGroup>
-            <id>5</id>
-            <title></title>
-            <alignment>start</alignment>
-            <!--Zodpovednost domacnost ps-->
-            <dataRef>
-                <id>107003</id>
-                <logic>
-                    <behavior>editable</behavior>
-                    <behavior>required</behavior>
-                </logic>
-            </dataRef>
-            <!--Zodpovednost domacnost uzemna platnost-->
-            <dataRef>
-                <id>104003</id>
-                <logic>
-                    <behavior>hidden</behavior>
                 </logic>
             </dataRef>
         </dataGroup>
@@ -8451,7 +8517,7 @@
             </dataRef>
         </dataGroup>
     </transition>
-    <!--todo============================= Údaje o poistníkovi a mieste poistenia=====================-->
+    <!--================================= Údaje o poistníkovi a mieste poistenia =====================-->
     <transition>
         <id>588</id>
         <x>620</x>
