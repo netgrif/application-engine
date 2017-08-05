@@ -18,6 +18,7 @@ public abstract class PetriNetObject {
         return _id.toString();
     }
 
+    @JsonIgnore
     public ObjectId getObjectId() {
         return _id;
     }
