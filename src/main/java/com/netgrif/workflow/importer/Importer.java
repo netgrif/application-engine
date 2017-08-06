@@ -93,6 +93,7 @@ public class Importer {
         net = new PetriNet();
         net.setImportXmlPath(importedXmlPath.toString());
         net.setImportId(document.getId());
+        net.setIcon(document.getIcon());
         net.setTitle(title);
         net.setInitials(initials);
 
@@ -148,6 +149,7 @@ public class Importer {
         transition.setTitle(importTransition.getLabel());
         transition.setPosition(importTransition.getX(), importTransition.getY());
         transition.setPriority(importTransition.getPriority());
+        transition.setIcon(importTransition.getIcon());
 
         if (importTransition.getRoleRef() != null) {
             Arrays.stream(importTransition.getRoleRef()).forEach(roleRef ->
