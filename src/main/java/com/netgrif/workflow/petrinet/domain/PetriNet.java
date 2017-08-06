@@ -57,6 +57,9 @@ public class PetriNet extends PetriNetObject {
     @Transient
     private boolean initialized;
 
+    @Getter @Setter
+    private String importXmlPath;
+
     public PetriNet() {
         initialized = false;
         creationDate = LocalDateTime.now();
@@ -72,14 +75,6 @@ public class PetriNet extends PetriNetObject {
         this();
         this.title = title;
         this.initials = initials;
-    }
-
-    public ObjectId get_id() {
-        return _id;
-    }
-
-    public String getStringId() {
-        return _id.toString();
     }
 
     public void addPlace(Place place) {
