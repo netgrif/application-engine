@@ -5615,6 +5615,12 @@
         </action>
     </data>
 
+    <!--===== DUMMY FIELD =====-->
+    <data type="text">
+        <title>Dummy</title>
+        <id>410001</id>
+    </data>
+
     <!--=================================TRANSITIONS================-->
     <!--================================= poistenie nehnuteľnosti DONE====================-->
     <transition>
@@ -5633,6 +5639,21 @@
                 <perform>true</perform>
             </logic>
         </roleRef>
+        <dataGroup>
+            <id>1</id>
+            <title></title>
+            <alignment>start</alignment>
+            <dataRef>
+                <id>410001</id>
+                <logic>
+                    <behavior>forbidden</behavior>
+                    <action trigger="get">
+                        trans: t.this;
+                        changeCaseProperty "icon" about { trans.icon }
+                    </action>
+                </logic>
+            </dataRef>
+        </dataGroup>
     </transition>
     <!--================================= postenie domacnosti DONE=============-->
     <transition>
@@ -5651,6 +5672,21 @@
                 <perform>true</perform>
             </logic>
         </roleRef>
+        <dataGroup>
+            <id>1</id>
+            <title></title>
+            <alignment>start</alignment>
+            <dataRef>
+                <id>410001</id>
+                <logic>
+                    <behavior>forbidden</behavior>
+                    <action trigger="get">
+                        trans: t.this;
+                        changeCaseProperty "icon" about { trans.icon }
+                    </action>
+                </logic>
+            </dataRef>
+        </dataGroup>
     </transition>
     <!--================================= Poistenie nehnuteľnosti a domácnosti DONE=====================-->
     <transition>
@@ -5669,6 +5705,21 @@
                 <perform>true</perform>
             </logic>
         </roleRef>
+        <dataGroup>
+            <id>1</id>
+            <title></title>
+            <alignment>start</alignment>
+            <dataRef>
+                <id>410001</id>
+                <logic>
+                    <behavior>forbidden</behavior>
+                    <action trigger="get">
+                        trans: t.this;
+                        changeCaseProperty "icon" about { trans.icon }
+                    </action>
+                </logic>
+            </dataRef>
+        </dataGroup>
     </transition>
     <!--================================= ZÁKLADNÉ INFO - psc ====================-->
     <transition>
@@ -9386,7 +9437,7 @@
         <id>2015</id>
         <x>2229</x>
         <y>38</y>
-        <label>Základné informácie</label>
+        <label>Základné  informácie</label><!-- dve medzery sú tu naschvál. NEPREPISOVAŤ! -->
         <priority>1</priority>
         <transactionRef>
             <id>3</id>
@@ -10650,7 +10701,7 @@
         <id>2014</id>
         <x>2237</x>
         <y>743</y>
-        <label>Údaje o zmluve</label>
+        <label>Údaje o  zmluve</label> <!-- dve medzery sú tu naschvál. NEPREPISOVAŤ! -->
         <priority>8</priority>
         <transactionRef>
             <id>3</id>

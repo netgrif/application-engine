@@ -123,6 +123,14 @@ class ActionDelegate {
         }]
     }
 
+    def changeCaseProperty(String property){
+        [about: {cl ->
+            def value = cl()
+            if(value instanceof Closure && value() == UNCHANGED_VALUE) return
+            useCase."$property" = value
+        }]
+    }
+
     //Cache manipulation
     def cache(String name, Object value){
         actionsRunner.addToCache("${useCase.stringId}-${name}",value)

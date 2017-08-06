@@ -87,7 +87,7 @@ public class CaseSearchService extends MongoSearchService<Case> {
         });
         builder.put(ArrayList.class, o -> {
             List<Task> tasks = taskRepository.findAllByTransitionIdIn((List<String>) o);
-            return in(tasks.stream().map(Task::getCaseId).collect(Collectors.toList()), ob -> oid((String) ob), null);
+            return in(new ArrayList<>(tasks.stream().map(Task::getCaseId).collect(Collectors.toSet())), ob -> oid((String) ob), null);
         });
 
         return buildQueryPart("_id", obj, builder);
