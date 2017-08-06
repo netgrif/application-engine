@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document>
     <!-- ========== GLOBAL ================ -->
-    <icon>home</icon>
+    <!--<icon>location_city</icon>-->
     <!-- ========== TRANSACTIONS ========== -->
     <transaction>
         <id>1</id>
@@ -5622,6 +5622,7 @@
         <x>260</x>
         <y>300</y>
         <label>Poistenie nehnuteľnosti</label>
+        <icon>home</icon>
         <priority>1</priority>
         <transactionRef>
             <id>1</id>
@@ -5639,6 +5640,7 @@
         <x>180</x>
         <y>900</y>
         <label>Poistenie domácnosti</label>
+        <icon>weekend</icon>
         <priority>2</priority>
         <transactionRef>
             <id>1</id>
@@ -5656,6 +5658,7 @@
         <x>180</x>
         <y>580</y>
         <label>Poistenie nehnuteľnosti a domácnosti</label>
+        <icon>home weekend</icon>
         <priority>3</priority>
         <transactionRef>
             <id>1</id>
