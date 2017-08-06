@@ -59,6 +59,9 @@ public class Task {
     private LocalDateTime finishDate;
 
     @Getter @Setter
+    private Long finishedBy;
+
+    @Getter @Setter
     private String transactionId;
 
     @Getter @Setter
