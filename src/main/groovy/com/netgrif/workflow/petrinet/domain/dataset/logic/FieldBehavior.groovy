@@ -6,6 +6,7 @@ enum FieldBehavior {
     VISIBLE("visible"),
     EDITABLE("editable"),
     HIDDEN("hidden"),
+    FORBIDDEN("forbidden"),
     ANTONYM_SETUP("",true);
 
 
@@ -30,15 +31,17 @@ enum FieldBehavior {
     private FieldBehavior[] addAntonyms() {
         switch (name) {
             case "required":
-                return (FieldBehavior[]) [VISIBLE, HIDDEN, OPTIONAL].toArray()
+                return (FieldBehavior[]) [VISIBLE, HIDDEN, OPTIONAL, FORBIDDEN].toArray()
             case "optional":
-                return (FieldBehavior[]) [REQUIRED].toArray()
+                return (FieldBehavior[]) [REQUIRED, FORBIDDEN].toArray()
             case "visible":
-                return (FieldBehavior[]) [REQUIRED, EDITABLE, HIDDEN].toArray()
+                return (FieldBehavior[]) [REQUIRED, EDITABLE, HIDDEN, FORBIDDEN].toArray()
             case "editable":
-                return (FieldBehavior[]) [VISIBLE, HIDDEN].toArray()
+                return (FieldBehavior[]) [VISIBLE, HIDDEN, FORBIDDEN].toArray()
             case "hidden":
-                return (FieldBehavior[]) [EDITABLE, VISIBLE, REQUIRED].toArray()
+                return (FieldBehavior[]) [EDITABLE, VISIBLE, REQUIRED, FORBIDDEN].toArray()
+            case "forbidden":
+                return (FieldBehavior[]) [VISIBLE, EDITABLE, HIDDEN, REQUIRED, OPTIONAL].toArray()
             default:
                 return null
         }
