@@ -122,7 +122,7 @@ class Insurance {
 //            Vinkulácia poistného plnenia
             field('xfdf:original': "129", "${value(109004) ?: ''}")
             field('xfdf:original': "130", "${value(109005) ?: ''}")
-//            field('xfdf:original': "131", "${value()}") // todo: Zriaďuje sa indexácia poistnej sumy?
+            field('xfdf:original': "131", "${value(109060) ? 'Áno' : 'Nie'}")
             field('xfdf:original': "Text Field 153", "${value(309001) ?: ''}")
         }
 
