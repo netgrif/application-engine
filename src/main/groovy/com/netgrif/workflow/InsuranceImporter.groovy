@@ -183,6 +183,7 @@ class InsuranceImporter {
         Case useCase = new Case(title, net, net.getActivePlaces())
         useCase.setColor(StartRunner.randomColor())
         useCase.setAuthor(author)
+        useCase.setIcon(net.icon)
         useCase = caseRepository.save(useCase)
         taskService.createTasks(useCase)
         log.info("Case $title created")

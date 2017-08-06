@@ -109,6 +109,7 @@ public class WorkflowService implements IWorkflowService {
         Case useCase = new Case(title, petriNet, petriNet.getActivePlaces());
         useCase.setColor(color);
         useCase.setAuthor(authorId);
+        useCase.setIcon(petriNet.getIcon());
         useCase = saveCase(useCase);
         taskService.createTasks(useCase);
         return setImmediateDataFields(useCase);
