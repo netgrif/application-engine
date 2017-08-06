@@ -64,16 +64,16 @@ public class PetriNetService implements IPetriNetService {
     public List<PetriNetReference> getAllReferences(LoggedUser user) {
         List<PetriNet> nets = loadAll();
         if(user.getAuthorities().contains(new Authority(Authority.admin)))
-            return nets.stream().map(net -> new PetriNetReference(net.get_id().toString(),net.getTitle())).collect(Collectors.toList());
+            return nets.stream().map(net -> new PetriNetReference(net.getObjectId().toString(),net.getTitle())).collect(Collectors.toList());
         return nets.stream().filter(net -> net.getRoles().keySet().stream().anyMatch(user.getProcessRoles()::contains))
-                .map(net -> new PetriNetReference(net.get_id().toString(), net.getTitle())).collect(Collectors.toList());
+                .map(net -> new PetriNetReference(net.getObjectId().toString(), net.getTitle())).collect(Collectors.toList());
     }
 
     @Override
     public PetriNetReference getReferenceByTitle(LoggedUser user, String title){
         List<PetriNet> nets = repository.findByTitle(title);
         return nets.stream().filter(net -> net.getRoles().keySet().stream().anyMatch(user.getProcessRoles()::contains))
-                .map(net -> new PetriNetReference(net.get_id().toString(), net.getTitle())).findFirst().orElse(new PetriNetReference("",""));
+                .map(net -> new PetriNetReference(net.getObjectId().toString(), net.getTitle())).findFirst().orElse(new PetriNetReference("",""));
 
     }
 
