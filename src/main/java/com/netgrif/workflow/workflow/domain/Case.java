@@ -43,6 +43,9 @@ public class Case {
     @Getter
     private String color;
 
+    @Setter
+    private String icon;
+
     @Getter
     @Setter
     @JsonIgnore
@@ -91,6 +94,10 @@ public class Case {
 
     public String getStringId() {
         return _id.toString();
+    }
+
+    public String getIcon() {
+        return icon;
     }
 
     public PetriNet getPetriNet() {
