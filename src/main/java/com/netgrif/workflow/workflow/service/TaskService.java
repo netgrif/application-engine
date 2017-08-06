@@ -215,6 +215,7 @@ public class TaskService implements ITaskService {
 
         finishExecution(transition, useCase);
         task.setFinishDate(LocalDateTime.now());
+        task.setFinishedBy(task.getUserId());
         task.setUserId(null);
 
         caseRepository.save(useCase);
@@ -226,9 +227,10 @@ public class TaskService implements ITaskService {
 
     @Override
     @Transactional
-    public void assignTask(User user, String taskId) throws TransitionNotExecutableException {
+    public void assignTask(Long userId, String taskId) throws TransitionNotExecutableException {
         Task task = taskRepository.findOne(taskId);
         Case useCase = caseRepository.findOne(task.getCaseId());
+        User user = userRepository.findOne(userId);
 
         assignTaskToUser(user, task, useCase);
 
@@ -581,7 +583,7 @@ public class TaskService implements ITaskService {
 
     @Transactional
     boolean taskIsNotPresent(List<Task> tasks, Transition transition, Long userId) {
-        return tasks.stream().noneMatch(task -> task.getTransitionId().equals(transition.getStringId()) || userId.equals(task.getUserId()));
+        return tasks.stream().noneMatch(task -> task.getTransitionId().equals(transition.getStringId()));
     }
 
     @Transactional
