@@ -22,6 +22,9 @@ public class PetriNet extends PetriNetObject {
     @Getter @Setter
     private String initials;
 
+    @Getter @Setter
+    private String icon;
+
     // TODO: 18. 3. 2017 replace with Spring auditing
     @Getter @Setter
     private LocalDateTime creationDate;
