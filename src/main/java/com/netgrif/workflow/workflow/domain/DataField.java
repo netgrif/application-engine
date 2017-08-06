@@ -62,7 +62,7 @@ public class DataField {
 
     public boolean isDisplayable(){
         return behavior.values().stream().parallel()
-                .anyMatch(bs -> bs.contains(FieldBehavior.VISIBLE) || bs.contains(FieldBehavior.EDITABLE));
+                .anyMatch(bs -> bs.contains(FieldBehavior.VISIBLE) || bs.contains(FieldBehavior.EDITABLE) || bs.contains(FieldBehavior.HIDDEN));
     }
 
     public void makeVisible(String transition) {
