@@ -1090,6 +1090,17 @@
             }
         <!--@formatter:on-->
         </action>
+        <action trigger="set">
+            <!--@formatter:off-->
+            p1: f.105001,
+            p2: f.105002,
+            p3: f.105003,
+            field: f.106003;
+            change field about {
+            return p1.value+p2.value+p3.value as Double;
+            }
+        <!--@formatter:on-->
+        </action>
     </data>
     <data type="number">
         <title>Podlahová plocha prízemia</title>
@@ -1133,6 +1144,17 @@
             p2: f.105002,
             p3: f.105003,
             field: f.305001;
+            change field about {
+            return p1.value+p2.value+p3.value as Double;
+            }
+        <!--@formatter:on-->
+        </action>
+        <action trigger="set">
+            <!--@formatter:off-->
+            p1: f.105001,
+            p2: f.105002,
+            p3: f.105003,
+            field: f.106003;
             change field about {
             return p1.value+p2.value+p3.value as Double;
             }
@@ -1182,6 +1204,17 @@
             p2: f.105002,
             p3: f.105003,
             field: f.305001;
+            change field about {
+            return p1.value+p2.value+p3.value as Double;
+            }
+        <!--@formatter:on-->
+        </action>
+        <action trigger="set">
+            <!--@formatter:off-->
+            p1: f.105001,
+            p2: f.105002,
+            p3: f.105003,
+            field: f.106003;
             change field about {
             return p1.value+p2.value+p3.value as Double;
             }
@@ -1238,7 +1271,32 @@
             return 950*field.value as Double;
             }
         <!--@formatter:on-->
-        </action>        <!--<action trigger="set">-->
+        </action>
+        <action trigger="set">
+            field: f.305001,
+            trans: t.363,
+            other: f.106003;
+            make other,visible on trans when { field.value > 0 }
+        </action>
+        <action trigger="set">
+            field: f.305001,
+            trans: t.363,
+            other: f.106003;
+            make other,editable on trans when { field.value == null  }
+        </action>
+        <action trigger="set">
+            field: f.305001,
+            trans: t.363,
+            other: f.106003;
+            make other,editable on trans when { field.value == 0 as Double  }
+        </action>
+        <!--<action trigger="set">-->
+            <!--field: f.305001,-->
+            <!--trans: t.363,-->
+            <!--other: f.106003;-->
+            <!--make other,editable on trans when { (field.value == "0" as Boolean).or(field.value == null as Boolean) }-->
+        <!--</action>-->
+        <!--<action trigger="set">-->
         <!--p1: f.105001,-->
         <!--p2: f.105002,-->
         <!--p3: f.105003,-->
@@ -4410,6 +4468,22 @@
         <id>109019</id>
         <desc>Poistník</desc>
     </data>
+    <data type="text">
+        <title>Štát</title>
+        <id>109060</id>
+        <desc>Poistník</desc>
+    </data>
+    <data type="text">
+        <title>V zastúpení</title>
+        <id>109061</id>
+        <desc>Poistník</desc>
+    </data>
+    <data type="text">
+        <title>Funkcia</title>
+        <id>109062</id>
+        <desc>Poistník</desc>
+    </data>
+
     <data type="boolean">
         <title>Poistený je iná osoba</title>
         <id>109020</id>
