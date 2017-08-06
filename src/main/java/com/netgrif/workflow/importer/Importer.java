@@ -1,7 +1,6 @@
 package com.netgrif.workflow.importer;
 
 import com.netgrif.workflow.importer.model.*;
-import com.netgrif.workflow.importer.model.DataLogic;
 import com.netgrif.workflow.petrinet.domain.*;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.FieldBehavior;
@@ -20,6 +19,10 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.*;
 import java.util.stream.Stream;
 
@@ -31,6 +34,7 @@ public class Importer {
     public static final String FIELD_KEYWORD = "f";
     public static final String TRANSITION_KEYWORD = "t";
 
+    private Path importedXmlPath;
     private Document document;
     private PetriNet net;
     private Map<Long, ProcessRole> roles;
@@ -58,13 +62,14 @@ public class Importer {
             initialize();
             unmarshallXml(xml);
             return createPetriNet(title, initials);
-        } catch (JAXBException e) {
+        } catch (JAXBException | IOException e) {
             e.printStackTrace();
         }
         return null;
     }
 
     private void initialize() {
+        this.importedXmlPath = null;
         this.roles = new HashMap<>();
         this.transitions = new HashMap<>();
         this.places = new HashMap<>();
@@ -75,16 +80,18 @@ public class Importer {
     }
 
     @Transactional
-    protected void unmarshallXml(File xml) throws JAXBException {
+    protected void unmarshallXml(File xml) throws JAXBException, IOException {
         JAXBContext jaxbContext = JAXBContext.newInstance(Document.class);
 
         Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
         document = (Document) jaxbUnmarshaller.unmarshal(xml);
+        importedXmlPath = Files.copy(xml.toPath(), (new File("storage/"+xml.getName())).toPath(), StandardCopyOption.REPLACE_EXISTING);
     }
 
     @Transactional
     protected PetriNet createPetriNet(String title, String initials) {
         net = new PetriNet();
+        net.setImportXmlPath(importedXmlPath.toString());
         net.setImportId(document.getId());
         net.setTitle(title);
         net.setInitials(initials);
@@ -281,6 +288,7 @@ public class Importer {
     @Transactional
     protected void createPlace(ImportPlace importPlace) {
         Place place = new Place();
+        place.setImportId(importPlace.getId());
         place.setIsStatic(importPlace.getIsStatic());
         place.setTokens(importPlace.getTokens());
         place.setPosition(importPlace.getX(), importPlace.getY());

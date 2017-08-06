@@ -215,6 +215,7 @@ public class TaskService implements ITaskService {
 
         finishExecution(transition, useCase);
         task.setFinishDate(LocalDateTime.now());
+        task.setFinishedBy(task.getUserId());
         task.setUserId(null);
 
         caseRepository.save(useCase);
@@ -581,7 +582,7 @@ public class TaskService implements ITaskService {
 
     @Transactional
     boolean taskIsNotPresent(List<Task> tasks, Transition transition, Long userId) {
-        return tasks.stream().noneMatch(task -> task.getTransitionId().equals(transition.getStringId()) || userId.equals(task.getUserId()));
+        return tasks.stream().noneMatch(task -> task.getTransitionId().equals(transition.getStringId()));
     }
 
     @Transactional

@@ -2213,6 +2213,7 @@
         <title>Poistná suma</title>
         <id>106022</id>
         <placeholder>Poistná suma</placeholder>
+        <valid>inrange 1,inf</valid>
         <action trigger="set">
             <!--@formatter:off-->
             field: f.106022,
@@ -2806,6 +2807,7 @@
         <title>Poistná suma</title>
         <id>105036</id>
         <placeholder>Poistná suma</placeholder>
+        <valid>inrange 1,inf</valid>
         <action trigger="set">
             <!--@formatter:off-->
             field: f.105036,
@@ -4183,6 +4185,18 @@
         <values>právnická osoba</values>
         <values>fyzická osoba podnikateľ (SZČO)</values>
         <init>fyzická osoba</init>
+        <action trigger="set">
+            <!--@formatter:off-->
+            field: f.109020,
+            f_1: f.109007,
+            f_2: f.109021;
+            change f_2 about {
+                if (field.value == false)
+                    return f_1.value as String;
+                return null;
+            }
+            <!--@formatter:on-->
+        </action>
         <!--IČO-->
         <action trigger="set">
             <!--@formatter:off-->
@@ -4284,50 +4298,6 @@
                 if (check.value == "fyzická osoba")
                     return null;
                 return field.value;
-            }
-            <!--@formatter:on-->
-        </action>
-        <!--Rodné číslo-->
-        <action trigger="set">
-            <!--@formatter:off-->
-            check: f.109007,
-            field: f.109015,
-            trans: t.588;
-            make field,hidden on trans when { check.value == "právnická osoba" }
-            <!--@formatter:on-->
-        </action>
-        <action trigger="set">
-            <!--@formatter:off-->
-            check: f.109007,
-            field: f.109015,
-            trans: t.588;
-            make field,required on trans when { check.value == "fyzická osoba" }
-            <!--@formatter:on-->
-        </action>
-        <action trigger="set">
-            <!--@formatter:off-->
-            check: f.109007,
-            field: f.109015,
-            trans: t.588;
-            make field,editable on trans when { check.value == "fyzická osoba" }
-            <!--@formatter:on-->
-        </action>
-        <action trigger="set">
-            <!--@formatter:off-->
-            check: f.109007,
-            field: f.109015,
-            trans: t.588;
-            make field,hidden on trans when { check.value == "fyzická osoba podnikateľ (SZČO)" }
-            <!--@formatter:on-->
-        </action>
-        <action trigger="set">
-            <!--@formatter:off-->
-            check: f.109007,
-            field: f.109015;
-            change field about {
-                if (check.value == "fyzická osoba")
-                    return field.value;
-                return null;
             }
             <!--@formatter:on-->
         </action>
@@ -4439,6 +4409,18 @@
         <values>MVDr.</values>
         <values>doc.</values>
         <values>prof.</values>
+        <action trigger="set">
+            <!--@formatter:off-->
+            field: f.109020,
+            f_1: f.109008,
+            f_2: f.109022;
+            change f_2 about {
+                if (field.value == false)
+                    return f_1.value as String;
+                return null;
+            }
+            <!--@formatter:on-->
+        </action>
     </data>
     <data type="enumeration">
         <title>Titul za menom</title>
@@ -4446,21 +4428,69 @@
         <desc>Poistník</desc>
         <values>Ph.D.</values>
         <values>CSc.</values>
+        <action trigger="set">
+            <!--@formatter:off-->
+            field: f.109020,
+            f_1: f.109009,
+            f_2: f.109023;
+            change f_2 about {
+                if (field.value == false)
+                    return f_1.value as String;
+                return null;
+            }
+            <!--@formatter:on-->
+        </action>
     </data>
     <data type="text">
         <title>Meno</title>
         <id>109010</id>
         <desc>Poistník</desc>
+        <action trigger="set">
+            <!--@formatter:off-->
+            field: f.109020,
+            f_1: f.109010,
+            f_2: f.109024;
+            change f_2 about {
+                if (field.value == false)
+                    return f_1.value as String;
+                return null;
+            }
+            <!--@formatter:on-->
+        </action>
     </data>
     <data type="text">
         <title>Priezvisko</title>
         <id>109011</id>
         <desc>Poistník</desc>
+        <action trigger="set">
+            <!--@formatter:off-->
+            field: f.109020,
+            f_1: f.109011,
+            f_2: f.109025;
+            change f_2 about {
+                if (field.value == false)
+                    return f_1.value as String;
+                return null;
+            }
+            <!--@formatter:on-->
+        </action>
     </data>
     <data type="text">
         <title>Obchodné meno</title>
         <id>109012</id>
         <desc>Poistník</desc>
+        <action trigger="set">
+            <!--@formatter:off-->
+            field: f.109020,
+            f_1: f.109012,
+            f_2: f.109026;
+            change f_2 about {
+                if (field.value == false)
+                    return f_1.value as String;
+                return null;
+            }
+            <!--@formatter:on-->
+        </action>
     </data>
     <data type="enumeration">
         <title>Štátna príslušnosť</title>
@@ -4471,17 +4501,52 @@
         <values>HU</values>
         <values>PL</values>
         <values>Iná</values>
+        <action trigger="set">
+            <!--@formatter:off-->
+            field: f.109020,
+            f_1: f.109013,
+            f_2: f.109027;
+            change f_2 about {
+                if (field.value == false)
+                    return f_1.value as String;
+                return null;
+            }
+            <!--@formatter:on-->
+        </action>
     </data>
     <data type="date">
         <title>Dátum narodenia</title>
         <id>109014</id>
         <desc>Poistník</desc>
+        <action trigger="set">
+            <!--@formatter:off-->
+            field: f.109020,
+            f_1: f.109014,
+            f_2: f.109028;
+            change f_2 about {
+                if (field.value == false)
+                    return f_1.value;
+                return f_2.value;
+            }
+            <!--@formatter:on-->
+        </action>
     </data>
     <data type="text">
         <title>Rodné číslo</title>
         <id>109015</id>
         <desc>Poistník</desc>
-        <valid>length 10</valid>
+        <action trigger="set">
+            <!--@formatter:off-->
+            field: f.109020,
+            f_1: f.109015,
+            f_2: f.109029;
+            change f_2 about {
+                if (field.value == false)
+                    return f_1.value as String;
+                return null;
+            }
+            <!--@formatter:on-->
+        </action>
     </data>
     <data type="enumeration">
         <title>Typ preukazu</title>
@@ -4490,21 +4555,93 @@
         <values>pas</values>
         <values>OP</values>
         <values>iné</values>
+        <action trigger="set">
+            <!--@formatter:off-->
+            check: f.this,
+            other: f.109015,
+            trans: t.588;
+            make other,hidden on trans when { check.value != "OP" }
+            <!--@formatter:on-->
+        </action>
+        <action trigger="set">
+            <!--@formatter:off-->
+            check: f.this,
+            other: f.109015,
+            trans: t.588;
+            make other,editable on trans when { check.value == "OP" }
+            <!--@formatter:on-->
+        </action>
+        <action trigger="set">
+            <!--@formatter:off-->
+            check: f.this,
+            other: f.109015,
+            trans: t.588;
+            make other,required on trans when { check.value == "OP" }
+            <!--@formatter:on-->
+        </action>
+        <action trigger="set">
+            <!--@formatter:off-->
+            field: f.109020,
+            f_1: f.109016,
+            f_2: f.109030;
+            change f_2 about {
+                if (field.value == false)
+                    return f_1.value as String;
+                return null;
+            }
+            <!--@formatter:on-->
+        </action>
     </data>
     <data type="text">
         <title>Číslo preukazu</title>
         <id>109017</id>
         <desc>Poistník</desc>
+        <action trigger="set">
+            <!--@formatter:off-->
+            field: f.109020,
+            f_1: f.109017,
+            f_2: f.109031;
+            change f_2 about {
+                if (field.value == false)
+                    return f_1.value as String;
+                return null;
+            }
+            <!--@formatter:on-->
+        </action>
     </data>
     <data type="text">
         <title>Telefónne číslo</title>
         <id>109018</id>
         <desc>Poistník</desc>
+        <action trigger="set">
+            <!--@formatter:off-->
+            field: f.109020,
+            f_1: f.109018,
+            f_2: f.109032;
+            change f_2 about {
+                if (field.value == false)
+                    return f_1.value as String;
+                return null;
+            }
+            <!--@formatter:on-->
+        </action>
     </data>
     <data type="text">
         <title>Email</title>
         <id>109019</id>
         <desc>Poistník</desc>
+        <action trigger="set">
+            <!--@formatter:off-->
+            field: f.109020,
+            f_1: f.109019,
+            f_2: f.109033;
+            change f_2 about {
+                if (field.value == false)
+                    return f_1.value as String;
+                return null;
+            }
+            <!--@formatter:on-->
+        </action>
     </data>
     <data type="boolean">
         <title>Poistený je iná osoba</title>
@@ -4629,7 +4766,7 @@
         <!-- Fill poisteny when false -->
         <action trigger="set">
             <!--@formatter:off-->
-            field: f.this,
+            field: f.109020,
             f_1: f.109007,
             f_2: f.109021;
             change f_2 about {
@@ -4641,7 +4778,7 @@
         </action>
         <action trigger="set">
             <!--@formatter:off-->
-            field: f.this,
+            field: f.109020,
             f_1: f.109008,
             f_2: f.109022;
             change f_2 about {
@@ -4653,7 +4790,7 @@
         </action>
         <action trigger="set">
             <!--@formatter:off-->
-            field: f.this,
+            field: f.109020,
             f_1: f.109009,
             f_2: f.109023;
             change f_2 about {
@@ -4665,7 +4802,7 @@
         </action>
         <action trigger="set">
             <!--@formatter:off-->
-            field: f.this,
+            field: f.109020,
             f_1: f.109010,
             f_2: f.109024;
             change f_2 about {
@@ -4677,7 +4814,7 @@
         </action>
         <action trigger="set">
             <!--@formatter:off-->
-            field: f.this,
+            field: f.109020,
             f_1: f.109011,
             f_2: f.109025;
             change f_2 about {
@@ -4689,7 +4826,7 @@
         </action>
         <action trigger="set">
             <!--@formatter:off-->
-            field: f.this,
+            field: f.109020,
             f_1: f.109012,
             f_2: f.109026;
             change f_2 about {
@@ -4701,7 +4838,7 @@
         </action>
         <action trigger="set">
             <!--@formatter:off-->
-            field: f.this,
+            field: f.109020,
             f_1: f.109013,
             f_2: f.109027;
             change f_2 about {
@@ -4713,7 +4850,7 @@
         </action>
         <action trigger="set">
             <!--@formatter:off-->
-            field: f.this,
+            field: f.109020,
             f_1: f.109014,
             f_2: f.109028;
             change f_2 about {
@@ -4725,7 +4862,7 @@
         </action>
         <action trigger="set">
             <!--@formatter:off-->
-            field: f.this,
+            field: f.109020,
             f_1: f.109015,
             f_2: f.109029;
             change f_2 about {
@@ -4737,7 +4874,7 @@
         </action>
         <action trigger="set">
             <!--@formatter:off-->
-            field: f.this,
+            field: f.109020,
             f_1: f.109016,
             f_2: f.109030;
             change f_2 about {
@@ -4749,7 +4886,7 @@
         </action>
         <action trigger="set">
             <!--@formatter:off-->
-            field: f.this,
+            field: f.109020,
             f_1: f.109017,
             f_2: f.109031;
             change f_2 about {
@@ -4761,7 +4898,7 @@
         </action>
         <action trigger="set">
             <!--@formatter:off-->
-            field: f.this,
+            field: f.109020,
             f_1: f.109018,
             f_2: f.109032;
             change f_2 about {
@@ -4773,7 +4910,7 @@
         </action>
         <action trigger="set">
             <!--@formatter:off-->
-            field: f.this,
+            field: f.109020,
             f_1: f.109019,
             f_2: f.109033;
             change f_2 about {
@@ -4785,7 +4922,7 @@
         </action>
         <action trigger="set">
             <!--@formatter:off-->
-            field: f.this,
+            field: f.109020,
             f_1: f.109058,
             f_2: f.109059;
             change f_2 about {
@@ -4797,7 +4934,7 @@
         </action>
         <action trigger="set">
             <!--@formatter:off-->
-            field: f.this,
+            field: f.109020,
             f_1: f.109061,
             f_2: f.109063;
             change f_2 about {
@@ -4809,7 +4946,7 @@
         </action>
         <action trigger="set">
             <!--@formatter:off-->
-            field: f.this,
+            field: f.109020,
             f_1: f.109062,
             f_2: f.109064;
             change f_2 about {
@@ -4972,16 +5109,52 @@
             }
             <!--@formatter:on-->
         </action>
+        <action trigger="set">
+            <!--@formatter:off-->
+            field: f.109020,
+            f_1: f.109058,
+            f_2: f.109059;
+            change f_2 about {
+                if (field.value == false)
+                    return f_1.value as String;
+                return null;
+            }
+            <!--@formatter:on-->
+        </action>
     </data>
     <data type="text">
         <id>109061</id>
         <title>V zastúpení</title>
         <desc>Poistník</desc>
+        <action trigger="set">
+            <!--@formatter:off-->
+            field: f.109020,
+            f_1: f.109061,
+            f_2: f.109063;
+            change f_2 about {
+                if (field.value == false)
+                    return f_1.value as String;
+                return null;
+            }
+            <!--@formatter:on-->
+        </action>
     </data>
     <data type="text">
         <id>109062</id>
         <title>Funkcia konateľa</title>
         <desc>Poistník</desc>
+        <action trigger="set">
+            <!--@formatter:off-->
+            field: f.109020,
+            f_1: f.109062,
+            f_2: f.109064;
+            change f_2 about {
+                if (field.value == false)
+                    return f_1.value as String;
+                return null;
+            }
+            <!--@formatter:on-->
+        </action>
     </data>
     <!-- Poistený -->
     <data type="enumeration">
@@ -5290,7 +5463,6 @@
         <title>Rodné číslo</title>
         <id>109029</id>
         <desc>Poistený</desc>
-        <valid>length 10</valid>
     </data>
     <data type="enumeration">
         <title>Typ preukazu</title>
@@ -5299,6 +5471,30 @@
         <values>pas</values>
         <values>OP</values>
         <values>iné</values>
+        <action trigger="set">
+            <!--@formatter:off-->
+            check: f.this,
+            other: f.109029,
+            trans: t.588;
+            make other,hidden on trans when { check.value != "OP" }
+            <!--@formatter:on-->
+        </action>
+        <action trigger="set">
+            <!--@formatter:off-->
+            check: f.this,
+            other: f.109029,
+            trans: t.588;
+            make other,editable on trans when { check.value == "OP" }
+            <!--@formatter:on-->
+        </action>
+        <action trigger="set">
+            <!--@formatter:off-->
+            check: f.this,
+            other: f.109029,
+            trans: t.588;
+            make other,required on trans when { check.value == "OP" }
+            <!--@formatter:on-->
+        </action>
     </data>
     <data type="text">
         <title>Číslo preukazu</title>
@@ -10934,7 +11130,6 @@
             <dataRef>
                 <id>109001</id>
                 <logic>
-
                     <behavior>visible</behavior>
                 </logic>
             </dataRef>
