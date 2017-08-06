@@ -64,8 +64,8 @@ public class Task {
     @Getter @Setter
     private Boolean requiredFilled;
 
-//    @Getter @Setter
-//    private String icon;
+    @Setter
+    private String icon;
 
     public Task() {
         this._id = new ObjectId();
@@ -88,6 +88,10 @@ public class Task {
 
     public String getTransitionId() {
         return transitionId;
+    }
+
+    public String getIcon() {
+        return icon;
     }
 
     public void addRole(String roleId, Set<RolePermission> permissions){

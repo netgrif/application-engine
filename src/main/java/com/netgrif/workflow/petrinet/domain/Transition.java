@@ -33,6 +33,9 @@ public class Transition extends Node {
     @Getter @Setter
     private Integer priority;
 
+    @Getter @Setter
+    private String icon;
+
     public Transition() {
         super();
         dataSet = new LinkedHashMap<>();

@@ -12,6 +12,8 @@ public class ImportTransition {
 
     private String label;
 
+    private String icon;
+
     private RoleRef[] roleRef;
 
     private ImportDataGroup[] dataGroup;
