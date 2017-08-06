@@ -12,6 +12,9 @@ public class Document {
     @Getter @Setter
     private Long id;
 
+    @Getter @Setter
+    private String icon;
+
     @XmlElement(name = "arc")
     private ImportArc[] arcs;
 
