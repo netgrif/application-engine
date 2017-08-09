@@ -517,6 +517,12 @@
         </action>
         <action trigger="set">
             field: f.102001,
+            hide: f.103001,
+            trans: t.363;
+            make hide,visible on trans when { field.value != null }
+        </action>
+        <action trigger="set">
+            field: f.102001,
             hide: f.105001,
             trans: t.155;
             make hide,hidden on trans when { field.value=="byt"; }
