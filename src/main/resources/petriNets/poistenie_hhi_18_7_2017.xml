@@ -6282,7 +6282,7 @@
         <id>2</id>
         <title></title>
         <alignment>start</alignment>
-                    <!--Bolo miesto poistenia postihnuté povodňou za posledných 10 rokov?-->
+            <!--Bolo miesto poistenia postihnuté povodňou za posledných 10 rokov?-->
             <dataRef>
                 <id>101003</id>
                 <logic>
