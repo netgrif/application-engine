@@ -480,9 +480,7 @@
         <values>byt</values>
         <values>rodinný dom</values>
         <values>chata</values>
-        <values>bytový dom</values>
         <values>bungalow</values>
-        <values>rozostavaná stavba</values>
         <action trigger="set">
             <!--@formatter:off-->
             field: f.this,
@@ -494,8 +492,6 @@
             return 0.9 as Double;
             if (field.value=="chata")
             return 1.2 as Double;
-            if (field.value=="bytový dom")
-            return 0.75 as Double;
             if (field.value=="bungalow")
             return 0.9 as Double;
             if (field.value=="rozostavaná stavba")
@@ -516,6 +512,90 @@
             return "chata";
             if (field.value=="bungalow")
             return "bungalow";
+            }
+        <!--@formatter:on-->
+        </action>
+        <action trigger="set">
+            field: f.102001,
+            hide: f.105001,
+            trans: t.155;
+            make hide,hidden on trans when { field.value=="byt"; }
+        </action>
+        <action trigger="set">
+            field: f.102001,
+            hide: f.105002,
+            trans: t.155;
+            make hide,hidden on trans when { field.value=="byt"; }
+        </action>
+        <action trigger="set">
+            field: f.102001,
+            hide: f.105003,
+            trans: t.155;
+            make hide,hidden on trans when { field.value=="byt"; }
+        </action>
+        <action trigger="set">
+            field: f.102001,
+            hide: f.305001,
+            trans: t.155;
+            make hide,editable on trans when { field.value=="byt"; }
+        </action>
+        <action trigger="set">
+            field: f.102001,
+            hide: f.305001,
+            trans: t.155;
+            make hide,required on trans when { field.value=="byt"; }
+        </action>
+
+        <action trigger="set">
+            field: f.102001,
+            hide: f.105001,
+            trans: t.155;
+            make hide,editable on trans when { field.value!="byt"; }
+        </action>
+        <action trigger="set">
+            field: f.102001,
+            hide: f.105001,
+            trans: t.155;
+            make hide,required on trans when { field.value!="byt"; }
+        </action>
+        <action trigger="set">
+            field: f.102001,
+            hide: f.105002,
+            trans: t.155;
+            make hide,editable on trans when { field.value!="byt"; }
+        </action>
+        <action trigger="set">
+            field: f.102001,
+            hide: f.105002,
+            trans: t.155;
+            make hide,required on trans when { field.value!="byt"; }
+        </action>
+        <action trigger="set">
+            field: f.102001,
+            hide: f.105003,
+            trans: t.155;
+            make hide,editable on trans when { field.value!="byt"; }
+        </action>
+        <action trigger="set">
+            field: f.102001,
+            hide: f.105003,
+            trans: t.155;
+            make hide,required on trans when { field.value!="byt"; }
+        </action>
+        <action trigger="set">
+            field: f.102001,
+            hide: f.305001,
+            trans: t.155;
+            make hide,visible on trans when { field.value!="byt"; }
+        </action>
+        <action trigger="set">
+            <!--@formatter:off-->
+            p1: f.105001,
+            p2: f.105002,
+            p3: f.105003,
+            field: f.305001;
+            change field about {
+            return p1.value+p2.value+p3.value as Double;
             }
         <!--@formatter:on-->
         </action>
@@ -6162,6 +6242,10 @@
                         trans: t.this;
                         changeCaseProperty "icon" about { trans.icon }
                     </action>
+                    <action trigger="get">
+                        trans: f.this;
+                        change trans about { "Nehnutelnost" }
+                    </action>
                 </logic>
             </dataRef>
         </dataGroup>
@@ -6466,6 +6550,17 @@
                         }
                         <!--@formatter:on-->
                     </action>
+                    <action trigger="get">
+                        <!--@formatter:off-->
+                        other: f.410001,
+                        field: f.this;
+                        change field choices {
+                            if (other.value == "Nehnutelnost")
+                                return field.choices + ["rozostavaná stavba"];
+                            return field.choices;
+                        }
+                        <!--@formatter:on-->
+                    </action>
                 </logic>
             </dataRef>
             <!--Poistenie nehnuteľnosti-Spoluúčasť-->
@@ -6509,6 +6604,7 @@
                 <id>105001</id>
                 <logic>
                     <behavior>editable</behavior>
+                    <behavior>required</behavior>
                 </logic>
             </dataRef>
             <!--Podlahová plocha prízemia-->
@@ -6516,6 +6612,7 @@
                 <id>105002</id>
                 <logic>
                     <behavior>editable</behavior>
+                    <behavior>required</behavior>
                 </logic>
             </dataRef>
             <!--Podlahová plocha všetkých obytných poschodí-->
@@ -6523,6 +6620,7 @@
                 <id>105003</id>
                 <logic>
                     <behavior>editable</behavior>
+                    <behavior>required</behavior>
                 </logic>
             </dataRef>
             <!--Celková podlahová plocha-->
@@ -8197,6 +8295,7 @@
                 <id>106003</id>
                 <logic>
                     <behavior>editable</behavior>
+                    <behavior>required</behavior>
                 </logic>
             </dataRef>
         </dataGroup>
