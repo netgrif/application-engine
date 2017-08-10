@@ -1,9 +1,13 @@
 package com.netgrif.workflow.insurance
 
+import com.netgrif.workflow.petrinet.domain.dataset.Field
+import com.netgrif.workflow.petrinet.domain.dataset.TextField
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Insurance
 import com.netgrif.workflow.premiuminsurance.IdGenerator
 import com.netgrif.workflow.premiuminsurance.OfferId
 import com.netgrif.workflow.premiuminsurance.OfferIdRepository
+import com.netgrif.workflow.workflow.domain.Case
+import com.netgrif.workflow.workflow.domain.DataField
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -23,30 +27,37 @@ class InsuranceTest {
     private IdGenerator generator
 
     @Test
-    void testOfferIdGeneration() {
-        repository.save(new OfferId(offerId: 0))
+    void offerIdGenerationTest() {
+        Case mockCase = new Case()
+        Field mockField = new TextField()
+        mockCase.dataSet.put(mockField.getStringId(), new DataField())
+        repository.save(new OfferId())
+        def insurance = new Insurance(mockCase, mockField)
 
-        def insurance = new Insurance(null, null)
         def offerId = insurance.offerId()
 
-        assert offerId == "3110000016"
+        assertValidOfferId(offerId)
     }
 
     @Test
-    void testConcurrentOfferIdGeneration() {
-        repository.save(new OfferId(offerId: 0))
+    void concurrentOfferIdGenerationTest() {
+        repository.save(new OfferId())
         def threads = []
+        def ids = []
         (0..100).each {
             threads << new Thread({
-                try {
-                    println generator.getId()
-                } catch (Exception ignored) {
-
-                }
+                ids.add(generator.getId())
             })
         }
 
         threads.each { it.start() }
         threads.each { it.join() }
+
+        assert ids.size() == ids.toSet().size()
+    }
+
+    private static def assertValidOfferId(String offerId) {
+        assert offerId ==~ /311[0-9]{7}/
+        assert offerId[9] as int == offerId.substring(0, 9).collect { it as int }.sum() % 10
     }
 }

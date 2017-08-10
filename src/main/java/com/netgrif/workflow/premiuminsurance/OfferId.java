@@ -14,6 +14,4 @@ public class OfferId {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-
-    private Long offerId;
 }
