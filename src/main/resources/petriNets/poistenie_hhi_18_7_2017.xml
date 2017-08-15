@@ -6258,8 +6258,8 @@
                         changeCaseProperty "icon" about { trans.icon }
                     </action>
                     <action trigger="get">
-                        trans: f.this;
-                        change trans about { "Nehnutelnost" }
+                        self: f.this;
+                        change self about { "Nehnutelnost" }
                     </action>
                 </logic>
             </dataRef>
@@ -6295,8 +6295,8 @@
                         changeCaseProperty "icon" about { trans.icon }
                     </action>
                     <action trigger="get">
-                        trans: f.this;
-                        change trans about { "Domacnost" }
+                        self: f.this;
+                        change self about { "Domacnost" }
                     </action>
                 </logic>
             </dataRef>
@@ -6332,8 +6332,8 @@
                         changeCaseProperty "icon" about { trans.icon }
                     </action>
                     <action trigger="get">
-                        trans: f.this;
-                        change trans about { "Nehnutelnost a domacnost" }
+                        self: f.this;
+                        change self about { "Nehnutelnost a domacnost" }
                     </action>
                 </logic>
             </dataRef>
