@@ -198,6 +198,6 @@ class InsuranceImporter {
     }
 
     private def createOfferId() {
-        offerIdRepository.save(new OfferId(offerId: 0))
+        offerIdRepository.save(new OfferId(id: 0))
     }
 }
