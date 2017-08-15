@@ -16,4 +16,8 @@ class ApplicationContextProvider implements ApplicationContextAware {
     static ApplicationContext getAppContext() {
         return context
     }
+
+    static def getBean(String name) {
+        return context.getBean(name)
+    }
 }
