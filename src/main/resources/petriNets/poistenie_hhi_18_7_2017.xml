@@ -1050,9 +1050,12 @@
             p1: f.105001,
             p2: f.105002,
             p3: f.105003,
+            other: f.410001,
             field: f.106003;
             change field about {
-            return p1.value+p2.value+p3.value as Double;
+                if (other.value == "Nehnutelnost a domacnost" )
+                    return p1.value+p2.value+p3.value as Double;
+                return field.value;
             }
         <!--@formatter:on-->
         </action>
@@ -1109,9 +1112,12 @@
             p1: f.105001,
             p2: f.105002,
             p3: f.105003,
+            other: f.410001,
             field: f.106003;
             change field about {
-            return p1.value+p2.value+p3.value as Double;
+                if (other.value == "Nehnutelnost a domacnost" )
+                    return p1.value+p2.value+p3.value as Double;
+                return field.value;
             }
         <!--@formatter:on-->
         </action>
@@ -1169,9 +1175,12 @@
             p1: f.105001,
             p2: f.105002,
             p3: f.105003,
+            other: f.410001,
             field: f.106003;
             change field about {
-            return p1.value+p2.value+p3.value as Double;
+                if (other.value == "Nehnutelnost a domacnost" )
+                    return p1.value+p2.value+p3.value as Double;
+                return field.value;
             }
         <!--@formatter:on-->
         </action>
@@ -6285,6 +6294,10 @@
                         trans: t.this;
                         changeCaseProperty "icon" about { trans.icon }
                     </action>
+                    <action trigger="get">
+                        trans: f.this;
+                        change trans about { "Domacnost" }
+                    </action>
                 </logic>
             </dataRef>
         </dataGroup>
@@ -6317,6 +6330,10 @@
                     <action trigger="get">
                         trans: t.this;
                         changeCaseProperty "icon" about { trans.icon }
+                    </action>
+                    <action trigger="get">
+                        trans: f.this;
+                        change trans about { "Nehnutelnost a domacnost" }
                     </action>
                 </logic>
             </dataRef>
