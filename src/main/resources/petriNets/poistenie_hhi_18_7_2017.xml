@@ -1025,37 +1025,12 @@
         </action>
         <action trigger="set">
             <!--@formatter:off-->
-            p1: f.205002,
-            p2: f.205003,
-            p3: f.205004,
-            field: f.105006;
-            change field about {
-            return p1.value+p2.value+p3.value as Double;
-            }
-        <!--@formatter:on-->
-        </action>
-        <action trigger="set">
-            <!--@formatter:off-->
             p1: f.105001,
             p2: f.105002,
             p3: f.105003,
             field: f.305001;
             change field about {
             return p1.value+p2.value+p3.value as Double;
-            }
-        <!--@formatter:on-->
-        </action>
-        <action trigger="set">
-            <!--@formatter:off-->
-            p1: f.105001,
-            p2: f.105002,
-            p3: f.105003,
-            other: f.410001,
-            field: f.106003;
-            change field about {
-                if (other.value == "Nehnutelnost a domacnost" )
-                    return p1.value+p2.value+p3.value as Double;
-                return field.value;
             }
         <!--@formatter:on-->
         </action>
@@ -1087,37 +1062,12 @@
         </action>
         <action trigger="set">
             <!--@formatter:off-->
-            p1: f.205002,
-            p2: f.205003,
-            p3: f.205004,
-            field: f.105006;
-            change field about {
-            return p1.value+p2.value+p3.value as Double;
-            }
-        <!--@formatter:on-->
-        </action>
-        <action trigger="set">
-            <!--@formatter:off-->
             p1: f.105001,
             p2: f.105002,
             p3: f.105003,
             field: f.305001;
             change field about {
             return p1.value+p2.value+p3.value as Double;
-            }
-        <!--@formatter:on-->
-        </action>
-        <action trigger="set">
-            <!--@formatter:off-->
-            p1: f.105001,
-            p2: f.105002,
-            p3: f.105003,
-            other: f.410001,
-            field: f.106003;
-            change field about {
-                if (other.value == "Nehnutelnost a domacnost" )
-                    return p1.value+p2.value+p3.value as Double;
-                return field.value;
             }
         <!--@formatter:on-->
         </action>
@@ -1150,37 +1100,12 @@
         </action>
         <action trigger="set">
             <!--@formatter:off-->
-            p1: f.205002,
-            p2: f.205003,
-            p3: f.205004,
-            field: f.105006;
-            change field about {
-            return p1.value+p2.value+p3.value as Double;
-            }
-        <!--@formatter:on-->
-        </action>
-        <action trigger="set">
-            <!--@formatter:off-->
             p1: f.105001,
             p2: f.105002,
             p3: f.105003,
             field: f.305001;
             change field about {
             return p1.value+p2.value+p3.value as Double;
-            }
-        <!--@formatter:on-->
-        </action>
-        <action trigger="set">
-            <!--@formatter:off-->
-            p1: f.105001,
-            p2: f.105002,
-            p3: f.105003,
-            other: f.410001,
-            field: f.106003;
-            change field about {
-                if (other.value == "Nehnutelnost a domacnost" )
-                    return p1.value+p2.value+p3.value as Double;
-                return field.value;
             }
         <!--@formatter:on-->
         </action>
@@ -1219,6 +1144,31 @@
         <valid>positive</valid>
         <action trigger="set">
             <!--@formatter:off-->
+            sum: f.this,
+            check: f.102001,
+            location: f.301002,
+            p1: f.205002,
+            p2: f.205003,
+            p3: f.205004,
+            field: f.105006;
+            change field about {
+                if (check.value != "byt")
+                    return p1.value+p2.value+p3.value as Double;
+                if (location.value=="L5")
+                    return 1900*sum.value as Double;
+                if (location.value=="L4")
+                    return 1300*sum.value as Double;
+                if (location.value=="L3")
+                    return 950*sum.value as Double;
+                if (location.value=="L2")
+                    return 700*sum.value as Double;
+                if (location.value=="L1")
+                    return 650*sum.value as Double;
+            }
+        <!--@formatter:on-->
+        </action>
+        <action trigger="set">
+            <!--@formatter:off-->
             field: f.this,
             location: f.301002,
             coeff: f.205001;
@@ -1253,6 +1203,18 @@
             trans: t.363,
             other: f.106003;
             make other,editable on trans when { field.value == 0 as Double  }
+        </action>
+        <action trigger="set">
+            <!--@formatter:off-->
+            field: f.this,
+            check: f.410001,
+            other: f.106003;
+            change other about {
+                if (check.value == "Nehnutelnost a domacnost" )
+                    return field.value as Double;
+                return other.value as Double;
+            }
+        <!--@formatter:on-->
         </action>
         <!--<action trigger="set">-->
             <!--field: f.305001,-->
