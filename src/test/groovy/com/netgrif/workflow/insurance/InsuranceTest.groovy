@@ -44,7 +44,7 @@ class InsuranceTest {
         repository.save(new OfferId())
         def threads = []
         def ids = []
-        (0..100).each {
+        (0..1000).each {
             threads << new Thread({
                 ids.add(generator.getId())
             })

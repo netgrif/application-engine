@@ -10,7 +10,7 @@ public class IdGenerator {
     private OfferIdRepository repository;
 
     public Long getId() {
-        OfferId id = repository.save(new OfferId());
+        OfferId id = repository.saveAndFlush(new OfferId());
         return id.getId();
     }
 }

@@ -663,15 +663,15 @@ class CalculationTest1 {
         _case = caseRepository.findOne(_case.getStringId())
 
 //        Poistenie nehnuteľnosti
-        assert Math.round(valueOf(308001)*100)/100.0 == 178.66
+        assert Math.round(valueOf(308001)*100)/100.0 == 213.96
 //        Poistenie domácnosti
         assert Math.round(valueOf(308002)*100)/100.0 == 643.02
 //        Poistenie zodpovednosti za škodu
         assert Math.round(valueOf(308003)*100)/100.0 == 5.55
 //        ROČNÉ POISTNÉ CELKOM
-        assert Math.round(valueOf(308004)*100)/100.0 == 827.23
+        assert Math.round(valueOf(308004)*100)/100.0 == 862.52
 //        Bežné poistné
-        assert valueOf(308006) == 591.28
+        assert valueOf(308006) == 616.52
     }
 
     private def valueOf(Long id) {
