@@ -11,6 +11,8 @@ import com.netgrif.workflow.auth.service.interfaces.IUserService
 import com.netgrif.workflow.importer.Importer
 import com.netgrif.workflow.petrinet.domain.PetriNet
 import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository
+import com.netgrif.workflow.premiuminsurance.OfferId
+import com.netgrif.workflow.premiuminsurance.OfferIdRepository
 import com.netgrif.workflow.workflow.domain.Case
 import com.netgrif.workflow.workflow.domain.DataField
 import com.netgrif.workflow.workflow.domain.repositories.CaseRepository
@@ -48,6 +50,9 @@ class InsuranceImporter {
     @Autowired
     private Importer importer
 
+    @Autowired
+    private OfferIdRepository offerIdRepository
+
     private Map<String, Organization> orgs
     private Map<String, Authority> auths
     private PetriNet insuranceNet
@@ -64,6 +69,8 @@ class InsuranceImporter {
 
         createUsers()
         createCases()
+
+        createOfferId()
     }
 
     private importNets() {
@@ -188,5 +195,9 @@ class InsuranceImporter {
         taskService.createTasks(useCase)
         log.info("Case $title created")
         return useCase
+    }
+
+    private def createOfferId() {
+        offerIdRepository.save(new OfferId(offerId: 0))
     }
 }
