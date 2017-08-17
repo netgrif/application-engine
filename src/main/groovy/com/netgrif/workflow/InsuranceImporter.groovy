@@ -89,6 +89,7 @@ class InsuranceImporter {
         log.info("Creating authorities")
         auths = new HashMap<>()
         auths.put(Authority.user, authorityRepository.save(new Authority(Authority.user)))
+        auths.put(Authority.admin, authorityRepository.save(new Authority(Authority.admin)))
     }
 
     private void createUsers() {
