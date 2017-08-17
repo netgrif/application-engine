@@ -143,9 +143,24 @@ class InsuranceImporter {
                 authorities: [auths.get(Authority.user)] as Set<Authority>,
                 organizations: [orgs.get("insurance")] as Set<Organization>)
         zatko.addProcessRole(agentRole)
+        zatko.addProcessRole(contactRole)
         zatko.addProcessRole(documentAdminRole)
         userService.saveNew(zatko)
         log.info("User $zatko.name $zatko.surname created")
+
+        User dzugas = new User(
+                name: "Ľubomír",
+                surname: "Dzugas",
+                email: "lubomir.dzugas@premium-ic.sk",
+                password: "premiumIC2017",
+                authorities: [auths.get(Authority.admin)] as Set<Authority>,
+                organizations: [orgs.get("insurance")] as Set<Organization>)
+        dzugas.addProcessRole(agentRole)
+        dzugas.addProcessRole(premiumRole)
+        dzugas.addProcessRole(contactRole)
+        dzugas.addProcessRole(documentAdminRole)
+        userService.saveNew(dzugas)
+        log.info("User $dzugas.name $dzugas.surname created")
 
         User gratex = new User(
                 name: "Gratex",
