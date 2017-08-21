@@ -4617,6 +4617,7 @@
         <values>CZ</values>
         <values>HU</values>
         <values>PL</values>
+        <values>AT</values>
         <values>Iná</values>
         <action trigger="set">
             <!--@formatter:off-->
