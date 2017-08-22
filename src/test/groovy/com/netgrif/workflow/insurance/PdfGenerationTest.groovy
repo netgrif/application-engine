@@ -79,6 +79,7 @@ class PdfGenerationTest {
         "Doplnkové poistenie domácnosti"()
         "Sumár"()
         "Údaje o poistníkovi a mieste poistenia"()
+        "Údaje o zmluve"()
         assertPdfGeneration()
     }
 
@@ -700,6 +701,22 @@ class PdfGenerationTest {
                         value: "jozko.mrkvicka@gmail.com",
                         type: "text"
                 ]
+        ])
+        taskService.setData(taskID, dataset)
+        taskService.finishTask(1L, taskID)
+    }
+
+    private "Údaje o zmluve"() {
+        List<TaskReference> references = taskService.findAllByCase(_case.getStringId())
+        String taskID = references.find { it.getTitle() == "Údaje o zmluve" }.getStringId()
+
+        taskService.assignTask(1L, taskID)
+        taskService.getData(taskID)
+        ObjectNode dataset = populateDataset([
+                109001: [
+                        value: "2017-08-30",
+                        type: "date"
+                ],
         ])
         taskService.setData(taskID, dataset)
         taskService.finishTask(1L, taskID)
