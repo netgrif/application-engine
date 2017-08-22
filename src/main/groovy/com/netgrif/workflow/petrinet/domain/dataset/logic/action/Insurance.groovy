@@ -207,22 +207,25 @@ class Insurance {
 
     Closure<MarkupBuilder> rekapitulaciaPoistneho = { MarkupBuilder builder ->
         builder.field("xfdf:original": "110", "${valueRound(305002) ?: ''}")
-//        builder.field("xfdf:original": "112", "${valueRound() ?: ''}") //todo
+        builder.field("xfdf:original": "112", "${valueSum(305003, 305004, 305005, 305006, 305007, 305008, 305009, 305010, 305011, 305012, 305013, 305014) ?: ''}")
         builder.field("xfdf:original": "114", "${valueRound(306001) ?: ''}")
         builder.field("xfdf:original": "116", "${valueRound(308003) ?: ''}")
-//        builder.field("xfdf:original": "118", "${valueRound() ?: ''}") //todo
+        builder.field("xfdf:original": "118", "${valueSum(305015, 305016, 306002, 306003, 306004, 306005, 306006, 306007, 306008, 306009, 306010) ?: ''}")
         builder.field("xfdf:original": "120", "${valueRound(308004) ?: ''}")
         builder.field("xfdf:original": "89323", "${valueRound(308006) ?: ''}")
-        builder.field("xfdf:original": "111", "${value(108003) ?: ''}")
+        builder.field("xfdf:original": "111", "${value(108003)?.replace('%', '.0') ?: ''}")
         builder.field("xfdf:original": "113", "${valuePercentageDiscount(208004) ?: ''}")
         builder.field("xfdf:original": "115", "${valuePercentageDiscount(203004) ?: ''}")
         builder.field("xfdf:original": "117", "${valuePercentageDiscount(208008) ?: ''}")
         builder.field("xfdf:original": "119", "${valuePercentageDiscount(208005) ?: ''}")
         builder.field("xfdf:original": "121", "${valuePercentageDiscount(208007) ?: ''}")
-//        builder.field("xfdf:original": "mjjttzeželljsd", "${value() ?: ''}") // todo
+
+        def periodicity = ((value(108001) == "štvrťročná") ? 4 : ((value(108001) == "polročná") ? 2 : 1)) as double
+//        builder.field("xfdf:original": "mjjttzeželljsd", "${((value(308006)/periodicity ?: ''}") todo
 
         return builder
     }
+
     Closure<MarkupBuilder> uhradaPoistneho = { MarkupBuilder builder ->
         builder.field("xfdf:original": "126", "${value(309001) ?: ''}")
 
@@ -402,22 +405,31 @@ class Insurance {
     }
 
     Closure<MarkupBuilder> sposobUhradenia = { MarkupBuilder builder ->
-//            x("${value() ?: ''}") //todo
-//            X2("${value() ?: ''}") //todo
+        builder.x(value(109006) == "prevodom" ? 'X' : '')
+        builder.X2(value(109006) == "prevodom" ? '' : 'X')
+        builder.mn("${value(109065) ?: ''}")
 
         return builder
     }
 
     Closure<MarkupBuilder> osobitneVyjadrenia = { MarkupBuilder builder ->
-//            mn("${value() ?: ''}") //todo
-//            field("xfdf:original": ",ketuýg", "${value() ?: ''}") //todo
+        def MAX_LENGTH = 125
+        def multiLine = value(109066)
+
+        if (multiLine?.length() > MAX_LENGTH) {
+            int index = multiLine?.take(MAX_LENGTH)?.toString()?.lastIndexOf(' ')
+            builder.osobitne("${multiLine?.take(index) ?: ''}")
+            builder.field("xfdf:original": ",ketuýg", "${value(109066)?.substring(index) ?: ''}")
+        } else {
+            builder.osobitne("${multiLine ?: ''}")
+        }
 
         return builder
     }
 
     Closure<MarkupBuilder> suhlasOsobneUdaje = { MarkupBuilder builder ->
-//            X3("${value() ?: ''}") //todo
-//            X4("${value() ?: ''}") //todo
+        builder.X3(value(109067) as Boolean ? 'X' : '')
+        builder.X4(value(109067) as Boolean ? '' : 'X')
 
         return builder
     }
@@ -481,5 +493,16 @@ class Insurance {
             return null
 
         return (value as Double).round(precision) as String
+    }
+
+    private String valueSum(Long... ids) {
+        Double sum = 0.0
+        ids.each {
+            def value = value(it)
+            if (value != null)
+                sum += value as Double
+        }
+
+        return sum.round(2)
     }
 }
