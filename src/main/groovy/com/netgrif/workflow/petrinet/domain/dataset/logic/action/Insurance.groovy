@@ -1,8 +1,10 @@
 package com.netgrif.workflow.petrinet.domain.dataset.logic.action
 
+import com.netgrif.workflow.context.ApplicationContextProvider
 import com.netgrif.workflow.pdf.service.PdfUtils
 import com.netgrif.workflow.petrinet.domain.dataset.Field
 import com.netgrif.workflow.petrinet.domain.dataset.FileField
+import com.netgrif.workflow.premiuminsurance.IdGenerator
 import com.netgrif.workflow.workflow.domain.Case
 import groovy.xml.MarkupBuilder
 
@@ -38,20 +40,13 @@ class Insurance {
     }
 
     String offerId() {
-        def id = new File("src/test/resources/counter.txt").getText()
+        def generator = ApplicationContextProvider.getBean("idGenerator") as IdGenerator
+        def id = generator.getId() as String
 
         def prefix = "311"
         def base = id.padLeft(6, "0")
-        def postfix = 0
-        prefix.each {
-            postfix += it as Long
-        }
-        base.each {
-            postfix += it as Long
-        }
-        postfix %= 10
+        def postfix = "$prefix$base".collect { it as int }.sum() % 10
 
-        new File("src/test/resources/counter.txt").setText(((id as Long) + 1) as String)
         useCase.dataSet.get(field.stringId).setValue("${prefix}${base}${postfix}" as String)
 
         return "${prefix}${base}${postfix}"

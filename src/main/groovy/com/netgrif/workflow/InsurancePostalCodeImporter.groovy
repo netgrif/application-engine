@@ -18,10 +18,10 @@ class InsurancePostalCodeImporter {
     private PostalCodeService service
 
     void run(String... strings) {
-        log.info("Importing postal codes")
+        log.info("Importing postal codes from file " + postalCodesPath)
         def importFile = new File(postalCodesPath)
         importFile.splitEachLine(',') { items ->
-            service.createPostalCode(items[0],items[1],items[2],items[3])
+            service.createPostalCode(items[0], items[1], items[2], items[3])
         }
     }
 }
