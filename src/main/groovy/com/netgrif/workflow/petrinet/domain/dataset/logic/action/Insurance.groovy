@@ -34,7 +34,7 @@ class Insurance {
         File offerPdfFile = PdfUtils.fillPdfForm(offerPath, new FileInputStream("$PDF_PATH/$OFFER_FILENAME"), offerXml)
         File mergedPdf = PdfUtils.mergePdfFiles(finalPath, draftPdfFile, offerPdfFile)
 
-        useCase.dataSet.get(field.stringId).setValue(finalPath)
+        useCase.dataSet.get(field.stringId).setValue(FINAL_FILENAME)
 
         return mergedPdf
     }
