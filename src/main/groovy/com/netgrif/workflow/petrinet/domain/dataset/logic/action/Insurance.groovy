@@ -185,9 +185,9 @@ class Insurance {
     }
 
     Closure<MarkupBuilder> udajeOPoisteni = { MarkupBuilder builder ->
-        builder.field("xfdf:original": "106", "${value(309002) ?: ''}")
+        builder.field("xfdf:original": "106", "${valueDate(309002) ?: ''}")
         builder.field("xfdf:original": "107", "${valueDate(109001) ?: ''}")
-        builder.field("xfdf:original": "108", "${(value(109002) as Boolean) ? valueDate(109003) : ''}") //todo date format
+        builder.field("xfdf:original": "108", "${(value(109002) as Boolean) ? (valueDate(109003) ?: '') : ''}")
 
         return builder
     }
@@ -460,8 +460,13 @@ class Insurance {
         def value = value(id)
         if (value == null)
             return null
-//        todo
-        return value
+
+        try {
+            return Date.parse("EEE MMM d HH:mm:ss z YYYY", value).format("dd.MM.YYYY")
+        } catch (Exception e) {
+            e.printStackTrace()
+            return null
+        }
     }
 
     /**

@@ -700,6 +700,10 @@ class PdfGenerationTest {
                 109019: [
                         value: "jozko.mrkvicka@gmail.com",
                         type: "text"
+                ],
+                109014: [
+                        value: "1993-02-28",
+                        type: "date"
                 ]
         ])
         taskService.setData(taskID, dataset)
