@@ -4223,7 +4223,7 @@
             <!--@formatter:off-->
             field: f.this,
             other: f.109003,
-            trans: t.1661;332, 1618
+            trans: t.1661;
             make other,editable on trans when { field.value }
             <!--@formatter:off-->
         </action>
@@ -4247,7 +4247,7 @@
             <!--@formatter:off-->
             field: f.this,
             other: f.109003,
-            trans: t.1661;332, 1618
+            trans: t.1661;
             make other,hidden on trans when { !field.value }
             <!--@formatter:off-->
         </action>
@@ -4282,15 +4282,110 @@
         <id>109005</id>
         <desc>Údaje o vinkulácii</desc>
     </data>
-    <data type="enumeration">
-        <title>Spôsob platenia</title>
-        <id>109006</id>
-        <values>z účtu</values>
-        <values>poštovou poukážkou</values>
-    </data>
     <data type="boolean">
         <id>109060</id>
         <title>Zriaďuje sa indexácia poistnej sumy?</title>
+    </data>
+    <data type="enumeration">
+        <title>Spôsob platenia</title>
+        <id>109006</id>
+        <values>prevodom</values>
+        <values>vkladom alebo poštovou poukážkou</values>
+        <action trigger="set">
+            <!--@formatter:off-->
+            field: f.this,
+            other: f.109065,
+            trans: t.1661;
+            make other,editable on trans when { field.value == "vkladom alebo poštovou poukážkou" }
+            <!--@formatter:off-->
+        </action>
+        <action trigger="set">
+            <!--@formatter:off-->
+            field: f.this,
+            other: f.109065,
+            trans: t.332;
+            make other,editable on trans when { field.value == "vkladom alebo poštovou poukážkou" }
+            <!--@formatter:off-->
+        </action>
+        <action trigger="set">
+            <!--@formatter:off-->
+            field: f.this,
+            other: f.109065,
+            trans: t.1618;
+            make other,editable on trans when { field.value == "vkladom alebo poštovou poukážkou" }
+            <!--@formatter:off-->
+        </action>
+        <!-- require -->
+        <action trigger="set">
+            <!--@formatter:off-->
+            field: f.this,
+            other: f.109065,
+            trans: t.1661;
+            make other,required on trans when { field.value == "vkladom alebo poštovou poukážkou" }
+            <!--@formatter:off-->
+        </action>
+        <action trigger="set">
+            <!--@formatter:off-->
+            field: f.this,
+            other: f.109065,
+            trans: t.332;
+            make other,required on trans when { field.value == "vkladom alebo poštovou poukážkou" }
+            <!--@formatter:off-->
+        </action>
+        <action trigger="set">
+            <!--@formatter:off-->
+            field: f.this,
+            other: f.109065,
+            trans: t.1618;
+            make other,required on trans when { field.value == "vkladom alebo poštovou poukážkou" }
+            <!--@formatter:off-->
+        </action>
+        <!-- hide -->
+        <action trigger="set">
+            <!--@formatter:off-->
+            field: f.this,
+            other: f.109065,
+            trans: t.1661;
+            make other,hidden on trans when { field.value == "prevodom" }
+            <!--@formatter:off-->
+        </action>
+        <action trigger="set">
+            <!--@formatter:off-->
+            field: f.this,
+            other: f.109065,
+            trans: t.332;
+            make other,hidden on trans when { field.value == "prevodom" }
+            <!--@formatter:off-->
+        </action>
+        <action trigger="set">
+            <!--@formatter:off-->
+            field: f.this,
+            other: f.109065,
+            trans: t.1618;
+            make other,hidden on trans when { field.value == "prevodom" }
+            <!--@formatter:off-->
+        </action>
+        <!--clean-->
+        <action trigger="set">
+            <!--@formatter:off-->
+            field: f.this,
+            other: f.109065;
+            change other about { return null; }
+            <!--@formatter:off-->
+        </action>
+    </data>
+    <data type="text">
+        <id>109065</id>
+        <title>Pôvod finančných prostriedkov</title>
+    </data>
+    <data type="text">
+        <id>109066</id>
+        <title>Osobitné vyjadrenia týkajúce sa poisteného alebo poistníka</title>
+        <values>area</values>
+    </data>
+    <data type="boolean">
+        <id>109067</id>
+        <title>Poistník udeľuje poisťovateľovi súhlas so spracovaním osobných údajov na marketingové účely</title>
     </data>
     <!-- ===== Údaje o poistníkovi ===== -->
     <!-- Poistník -->
@@ -9790,6 +9885,27 @@
                     <behavior>editable</behavior>
                 </logic>
             </dataRef>
+            <!--Povod financii-->
+            <dataRef>
+                <id>109065</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+            </dataRef>
+            <!--Osobitné vyjadrenia-->
+            <dataRef>
+                <id>109066</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <!--súhlas so spracovaním osobných údajov-->
+            <dataRef>
+                <id>109067</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
             <!--Ponuka PDF-->
             <dataRef>
                 <id>309003</id>
@@ -9875,6 +9991,27 @@
                     <behavior>editable</behavior>
                 </logic>
             </dataRef>
+            <!--Povod financii-->
+            <dataRef>
+                <id>109065</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+            </dataRef>
+            <!--Osobitné vyjadrenia-->
+            <dataRef>
+                <id>109066</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <!--súhlas so spracovaním osobných údajov-->
+            <dataRef>
+                <id>109067</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
             <!--Ponuka PDF-->
             <dataRef>
                 <id>309003</id>
@@ -9957,6 +10094,27 @@
                 <id>109006</id>
                 <logic>
                     <behavior>required</behavior>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <!--Povod financii-->
+            <dataRef>
+                <id>109065</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+            </dataRef>
+            <!--Osobitné vyjadrenia-->
+            <dataRef>
+                <id>109066</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <!--súhlas so spracovaním osobných údajov-->
+            <dataRef>
+                <id>109067</id>
+                <logic>
                     <behavior>editable</behavior>
                 </logic>
             </dataRef>
