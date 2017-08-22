@@ -1,4 +1,4 @@
-package com.netgrif.workflow.insurance
+package com.netgrif.workflow.insurance.calculation
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.node.JsonNodeFactory
@@ -22,16 +22,20 @@ import org.junit.runner.RunWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.data.mongodb.core.MongoTemplate
+import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit4.SpringRunner
 
 @RunWith(SpringRunner.class)
 @ActiveProfiles(["test"])
 @SpringBootTest
-class CalculationTest {
+class CalculationTest2 {
 
     @Autowired
     private MongoTemplate mongoTemplate
+
+    @Autowired
+    private JdbcTemplate jdbcTemplate
 
     @Autowired
     private Importer importer
@@ -65,7 +69,7 @@ class CalculationTest {
     @Test
     void testCalculation() {
         init()
-        "Poistenie nehnuteľnosti a domácnosti"()
+        "Nehnuteľnosť a domácnosť"()
         "Základné informácie"()
         "Nehnuteľnosť"()
         "Doplnkové poistenie nehnuteľnosti"()
@@ -78,25 +82,26 @@ class CalculationTest {
 
     private void init() {
         mongoTemplate.getDb().dropDatabase()
+        jdbcTemplate.update("TRUNCATE TABLE postal_code")
         userService.saveNew(new User(
-                email: "name.surname@company.com",
-                password: "password",
-                name: "name",
-                surname: "surname",
+                email: "name2.surname@company.com",
+                password: "password2",
+                name: "name2",
+                surname: "surname2",
                 authorities: [
-                        authorityRepository.save(new Authority("user"))
+                        authorityRepository.findByName("user")?:authorityRepository.save(new Authority("user"))
                 ]
         ))
         jsonNodeFactory = JsonNodeFactory.newInstance()
         net = importer.importPetriNet(new File("src/main/resources/petriNets/poistenie_hhi_18_7_2017.xml"), "Household insurance", "HHI")
-        _case = workflowService.createCase(net.getStringId(), "Household insurance", "color", 1L)
+        _case = workflowService.createCase(net.getStringId(), "Household insurance2", "color", 1L)
         idConverter = net.dataSet.collectEntries { [(it.value.importId): (it.key)] }
         postalCodeImporter.run()
     }
 
-    private void "Poistenie nehnuteľnosti a domácnosti"() {
+    private void "Nehnuteľnosť a domácnosť"() {
         List<TaskReference> references = taskService.findAllByCase(_case.getStringId())
-        String taskID = references.find { it.getTitle() == "Poistenie nehnuteľnosti a domácnosti" }.getStringId()
+        String taskID = references.find { it.getTitle() == "Nehnuteľnosť a domácnosť" }.getStringId()
 
         taskService.assignTask(1L, taskID)
         taskService.finishTask(1L, taskID)
@@ -110,7 +115,7 @@ class CalculationTest {
         ObjectNode dataset = populateDataset([
 //                PSC
                 101001: [
-                        value: "81101",
+                        value: "04001",
                         type : "text",
                 ],
         ])
@@ -118,47 +123,47 @@ class CalculationTest {
         dataset = populateDataset([
 //                Mesto
                 301005: [
-                        value: "Bratislava",
+                        value: "Košice",
                         type : "enumeration"
                 ],
 //                Nachádza sa mimo obce (extravilán)?
                 101002: [
-                        value: false,
+                        value: true,
                         type : "boolean"
                 ],
 //                Bolo miesto poistenia postihnuté povodňou za posledných 10 rokov?
                 101003: [
-                        value: false,
+                        value: true,
                         type : "boolean"
                 ],
 //                Nachádza nehnuteľnosť sa vo vzdialenosti kratšej ako 300 m od vodného toku?
                 101004: [
-                        value: false,
+                        value: true,
                         type : "boolean"
                 ],
 //                Koľko rokov žijete v poisťovanej nehnuteľnosti?
                 101005: [
-                        value: "6 až 10",
+                        value: "menej ako 1",
                         type : "enumeration"
                 ],
 //                Aký je vzťah poisteného k poisťovanej nehnuteľnosti?
                 101006: [
-                        value: "vlastník nehnuteľnosti",
+                        value: "vlastník ma hypotéku na nehnuteľnosť",
                         type : "enumeration"
                 ],
 //                Koľko dospelých žije v domácnosti?
                 101007: [
-                        value: "2",
+                        value: "3",
                         type : "enumeration"
                 ],
 //                Koľko detí žije v domácnosti?
                 101008: [
-                        value: "1",
+                        value: "2",
                         type : "enumeration"
                 ],
 //                Bolo poistenému alebo spolupoistenej osobe niekedy v minulosti zamiestnuté poistné plnenie alebo vypovedaná poistná zmluva?
                 101009: [
-                        value: false,
+                        value: true,
                         type : "boolean"
                 ],
 //                Bol poistený alebo spolupoistená osoba niekedy trestné stihaný / vyhlásil osobný bankrot / stíhaný za
@@ -168,7 +173,7 @@ class CalculationTest {
                 ],
 //                Je plánovaná rekonštrukcia alebo prestavba poisťovanej nehnuteľnosti v priebehu najbližších 3 mesiacov?
                 101011: [
-                        value: false,
+                        value: true,
                         type : "boolean"
                 ],
 //                Žije v poisťovanej domácnosti pes alebo mačka?
@@ -178,22 +183,22 @@ class CalculationTest {
                 ],
 //                Kedy je nehnuteľnosť najviac obývaná?
                 101013: [
-                        value: "počas celého dňa",
-                        type : "boolean"
+                        value: "cez deň",
+                        type : "enumeration"
                 ],
 //                Je nehnuteľnosť využívaná aj na podnikanie?
                 101014: [
-                        value: false,
+                        value: true,
                         type : "boolean"
                 ],
 //                Právna subjektivita poisteného?
                 101015: [
-                        value: "fyzická osoba",
+                        value: "právnická osoba",
                         type : "enumeration"
                 ],
 //                Počet poistných udalostí za posledné 3 roky?
                 101016: [
-                        value: "0",
+                        value: "1",
                         type : "enumeration"
                 ],
         ])
@@ -234,27 +239,27 @@ class CalculationTest {
                 ],
 //                Konštrukcia múrov
                 102002: [
-                        value: "tehla a/alebo betón",
+                        value: "porobetón (ytong)",
                         type : "enumeration",
                 ],
 //                Konštrukcia strechy
                 102003: [
-                        value: "škridla",
+                        value: "hydroizolačné fólie",
                         type : "enumeration",
                 ],
 //                Koľko rokov má nehnuteľnosť?
                 102004: [
-                        value: "6 až 10",
+                        value: "viac ako 20",
                         type : "enumeration",
                 ],
 //                Má nehnuteľnosť praskliny na vonkajšej fasáde?
                 102005: [
-                        value: false,
+                        value: true,
                         type : "boolean",
                 ],
 //                Koľko izieb má nehnuteľnosť?
                 102006: [
-                        value: "1",
+                        value: "4",
                         type : "enumeration",
                 ],
 //                Koľko kúpeľní má nehnuteľnosť?
@@ -264,20 +269,15 @@ class CalculationTest {
                 ],
 //                Uveďte celkovú hodnotu rekonštrukcií, ak boli vykonané
                 102008: [
-                        value: "bez rekonštrukcií",
+                        value: "do 50 000 EUR",
                         type : "enumeration",
-                ],
-//                Poistenie zodpovednosti z vlastníctva nehnuteľnosti
-                104001: [
-                        value: true,
-                        type : "boolean",
                 ],
         ])
         taskService.setData(taskID, dataset)
         dataset = populateDataset([
 //                Poistenie zodpovednosti z vlastníctva nehnuteľnosti
                 107001: [
-                        value: "15,000.00 €",
+                        value: "0.00 €",
                         type : "enumeration",
                 ],
         ])
@@ -290,32 +290,6 @@ class CalculationTest {
         String taskID = references.find { it.getTitle() == "Doplnkové poistenie nehnuteľnosti" }.getStringId()
 
         taskService.assignTask(1L, taskID)
-        ObjectNode dataset = populateDataset([
-//                Stavebné materialy
-                105031: [
-                        value: true,
-                        type: "boolean"
-                ],
-//                Stavebné a záhradné mechanizmy
-                105033: [
-                        value: true,
-                        type: "boolean"
-                ]
-        ])
-        taskService.setData(taskID, dataset)
-        dataset = populateDataset([
-//                Stavebné materiály
-                105032: [
-                        value: 1000,
-                        type: "number"
-                ],
-//                Stavebné a záhradné mechanizmy
-                105034: [
-                        value: 1000,
-                        type: "number"
-                ]
-        ])
-        taskService.setData(taskID, dataset)
         taskService.finishTask(1L, taskID)
     }
 
@@ -330,56 +304,6 @@ class CalculationTest {
                         value: true,
                         type: "boolean"
                 ],
-//                Hospodárska budova
-                105009: [
-                        value: true,
-                        type: "boolean"
-                ],
-//                Altánok
-                105011: [
-                        value: true,
-                        type: "boolean"
-                ],
-//                Prístrešok
-                105013: [
-                        value: true,
-                        type: "boolean"
-                ],
-//                Chodník
-                105015: [
-                        value: true,
-                        type: "boolean"
-                ],
-//                Sauna
-                105017: [
-                        value: true,
-                        type: "boolean"
-                ],
-//                Elektrická brána
-                105019: [
-                        value: true,
-                        type: "boolean"
-                ],
-//                Tenisový kurt
-                105021: [
-                        value: true,
-                        type: "boolean"
-                ],
-//                Vonkajší bazén
-                105023: [
-                        value: true,
-                        type: "boolean"
-                ],
-//                Studňa
-                105025: [
-                        value: true,
-                        type: "boolean"
-                ],
-//                Žumpa, septik
-                105027: [
-                        value: true,
-                        type: "boolean"
-                ],
 //                Iné
                 105029: [
                         value: true,
@@ -390,72 +314,22 @@ class CalculationTest {
         dataset = populateDataset([
 //                Garáž plocha
                 105004: [
-                        value: 100,
+                        value: 165,
                         type: "number"
                 ],
 //                Rovnaké miesto ...
                 105008: [
-                        value: false,
+                        value: true,
                         type: "boolean"
                 ],
 //                Garáž poistná sumá
                 105007: [
-                        value: 90_000,
-                        type: "number"
-                ],
-//                Hospodárska budova
-                105010: [
-                        value: 1000,
-                        type: "number"
-                ],
-//                Altánok
-                105012: [
-                        value: 1000,
-                        type: "number"
-                ],
-//                Prístrešok
-                105014: [
-                        value: 1000,
-                        type: "number"
-                ],
-//                Chodník
-                105016: [
-                        value: 1000,
-                        type: "number"
-                ],
-//                Sauna
-                105018: [
-                        value: 1000,
-                        type: "number"
-                ],
-//               Elektrická brána
-                105020: [
-                        value: 1000,
-                        type: "number"
-                ],
-//                Tenisový kurt
-                105022: [
-                        value: 1000,
-                        type: "number"
-                ],
-//                Vonkajší bazén
-                105024: [
-                        value: 1000,
-                        type: "number"
-                ],
-//                Studňa
-                105026: [
-                        value: 1000,
-                        type: "number"
-                ],
-//                Žumpa, septik
-                105028: [
-                        value: 1000,
+                        value: 49_000,
                         type: "number"
                 ],
 //                Iné
                 105030: [
-                        value: 1000,
+                        value: 10_000,
                         type: "number"
                 ],
         ])
@@ -476,7 +350,7 @@ class CalculationTest {
                 ],
 //                Poistenie domácnosti
                 106001: [
-                        value: "150.00 €",
+                        value: "50.00 €",
                         type: "enumeration"
                 ],
 //                Celková podlahová plocha
@@ -486,12 +360,12 @@ class CalculationTest {
                 ],
 //                Obývanosť domácnosti
                 103002: [
-                        value: "trvalá",
+                        value: "dočasná",
                         type: "enumeration"
                 ],
 //                Je nehnuteľnosť, v ktorej sa nachádza poisťovaná domácnosť v blízkom susedstve s inou obývanou nehnuteľnosťou?
                 103003: [
-                        value: true,
+                        value: false,
                         type: "boolean"
                 ],
 //                Je domácnosť zabezpečená funkčným alarmom?
@@ -503,18 +377,13 @@ class CalculationTest {
                 103005: [
                         value: true,
                         type: "boolean"
-                ],
-//                Zodpovednost domacnost
-                104002: [
-                        value: true,
-                        type: "boolean"
                 ]
         ])
         taskService.setData(taskID, dataset)
         dataset = populateDataset([
 //                Zodpovednost domacnost poistná suma
                 107003: [
-                        value: "15,000.00 €",
+                        value: "30,000.00 €",
                         type: "enumeration"
                 ],
 //                Zodpovednost domacnost - územná platnosť
@@ -548,16 +417,6 @@ class CalculationTest {
                         value: true,
                         type: "boolean"
                 ],
-//                Špecialne sklá a presklenie
-                106010: [
-                        value: true,
-                        type: "boolean"
-                ],
-//                Záhradné vybavenie a nábytok
-                106012: [
-                        value: true,
-                        type: "boolean"
-                ],
 //                Elektromotory v domácich spotrebičoch
                 106014: [
                         value: true,
@@ -568,64 +427,34 @@ class CalculationTest {
                         value: true,
                         type: "boolean"
                 ],
-//                Športové náradie
-                106018: [
-                        value: true,
-                        type: "boolean"
-                ],
-//                Iné
-                106020: [
-                        value: true,
-                        type: "boolean"
-                ]
         ])
         taskService.setData(taskID, dataset)
         dataset = populateDataset([
 //                Cennosti
                 106005: [
-                        value: 1000,
+                        value: 5_000,
                         type: "number"
                 ],
 //                Umelecké diela
                 106007: [
-                        value: 1000,
+                        value: 10_000,
                         type: "number"
                 ],
 //                Elektronické a optické zariadenia
                 106009: [
-                        value: 1000,
-                        type: "number"
-                ],
-//                Špecialne sklá a presklenie
-                106011: [
-                        value: 1000,
-                        type: "number"
-                ],
-//                Záhradné vybavenie a nábytok
-                106013: [
-                        value: 1000,
+                        value: 3_000,
                         type: "number"
                 ],
 //                Elektromotory v domácich spotrebičoch
                 106015: [
-                        value: 1000,
+                        value: 300,
                         type: "number"
                 ],
 //                Stavebné súčasti domácnosti
                 106017: [
-                        value: 1000,
+                        value: 15_000,
                         type: "number"
                 ],
-//                Športové náradie
-                106019: [
-                        value: 1000,
-                        type: "number"
-                ],
-//                Iné
-                106021: [
-                        value: 1000,
-                        type: "number"
-                ]
         ])
         taskService.setData(taskID, dataset)
         taskService.finishTask(1L, taskID)
@@ -637,6 +466,18 @@ class CalculationTest {
 
         taskService.assignTask(1L, taskID)
         ObjectNode dataset = populateDataset([
+//                POISTNA SUMA Nehnutelnost
+                105036: [
+                        value: 357_500,
+                        type: "number"
+                ],
+                106022: [
+                        value: 357_500,
+                        type: "number"
+                ]
+        ])
+        taskService.setData(taskID, dataset)
+        dataset = populateDataset([
 //                PERIODICITA PLATBY POISTNÉHO
                 108001: [
                         value: "polročná",
@@ -644,14 +485,19 @@ class CalculationTest {
                 ],
 //                ZĽAVA ZA INÉ POISTENIE V PREMIUM
                 108002: [
-                        value: true,
+                        value: false,
                         type: "boolean"
                 ],
 //                OBCHODNÁ ZĽAVA
                 108003: [
                         value: "20%",
                         type: "enumeration"
-                ]
+                ],
+//                AKCIOVÁ ZĽAVA
+                108004: [
+                        value: true,
+                        type: "boolean"
+                ],
         ])
         taskService.setData(taskID, dataset)
         taskService.finishTask(1L, taskID)
@@ -664,19 +510,24 @@ class CalculationTest {
         return mapper.readTree(json) as ObjectNode
     }
 
+    @SuppressWarnings("GroovyAssignabilityCheck")
     private void assertCalculation() {
         _case = caseRepository.findOne(_case.getStringId())
 
+//        Základné poistenie
+        assert Math.round(valueOf(201017)*100)/100.0 == 7.49
+//        Nehnutelnost
+        assert Math.round(valueOf(202009)*1000)/1000.0 == 1.937
 //        Poistenie nehnuteľnosti
-        assert Math.round(valueOf(308001)*100)/100.0 == 178.66
+        assert Math.round(valueOf(308001)*100)/100.0 == 5_243.37
 //        Poistenie domácnosti
-        assert Math.round(valueOf(308002)*100)/100.0 == 643.02
+        assert Math.round(valueOf(308002)*100)/100.0 == 22_182.26
 //        Poistenie zodpovednosti za škodu
-        assert Math.round(valueOf(308003)*100)/100.0 == 5.55
+        assert Math.round(valueOf(308003)*100)/100.0 == 9.00
 //        ROČNÉ POISTNÉ CELKOM
-        assert Math.round(valueOf(308004)*100)/100.0 == 827.23
+        assert Math.round(valueOf(308004)*100)/100.0 == 27_434.62
 //        Bežné poistné
-        assert valueOf(308006) == 591.28
+        assert valueOf(308006) == 17_545.52
     }
 
     private def valueOf(Long id) {
