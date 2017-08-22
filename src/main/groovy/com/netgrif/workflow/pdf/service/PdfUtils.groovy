@@ -66,7 +66,7 @@ class PdfUtils {
 
     private static setFieldValueAndFont(PDAcroForm acroForm, def xmlNode, Map<String, String> fonts) {
         def id = ((xmlNode["@xfdf:original"] as String) ?: xmlNode.name()) as String
-        def field = acroForm.fieldIterator.find { it.fullyQualifiedName.contains(id) }
+        def field = acroForm.fieldIterator.find { it.partialName.equalsIgnoreCase(id) }
 
         String DA = field.getCOSObject().getString(COSName.DA)
 
