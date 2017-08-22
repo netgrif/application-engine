@@ -11,6 +11,8 @@ import com.netgrif.workflow.auth.service.interfaces.IUserService
 import com.netgrif.workflow.importer.Importer
 import com.netgrif.workflow.petrinet.domain.PetriNet
 import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository
+import com.netgrif.workflow.premiuminsurance.OfferId
+import com.netgrif.workflow.premiuminsurance.OfferIdRepository
 import com.netgrif.workflow.workflow.domain.Case
 import com.netgrif.workflow.workflow.domain.DataField
 import com.netgrif.workflow.workflow.domain.repositories.CaseRepository
@@ -48,6 +50,9 @@ class InsuranceImporter {
     @Autowired
     private Importer importer
 
+    @Autowired
+    private OfferIdRepository offerIdRepository
+
     private Map<String, Organization> orgs
     private Map<String, Authority> auths
     private PetriNet insuranceNet
@@ -64,6 +69,8 @@ class InsuranceImporter {
 
         createUsers()
         createCases()
+
+        createOfferId()
     }
 
     private importNets() {
@@ -82,6 +89,7 @@ class InsuranceImporter {
         log.info("Creating authorities")
         auths = new HashMap<>()
         auths.put(Authority.user, authorityRepository.save(new Authority(Authority.user)))
+        auths.put(Authority.admin, authorityRepository.save(new Authority(Authority.admin)))
     }
 
     private void createUsers() {
@@ -136,9 +144,24 @@ class InsuranceImporter {
                 authorities: [auths.get(Authority.user)] as Set<Authority>,
                 organizations: [orgs.get("insurance")] as Set<Organization>)
         zatko.addProcessRole(agentRole)
+        zatko.addProcessRole(contactRole)
         zatko.addProcessRole(documentAdminRole)
         userService.saveNew(zatko)
         log.info("User $zatko.name $zatko.surname created")
+
+        User dzugas = new User(
+                name: "Ľubomír",
+                surname: "Dzugas",
+                email: "lubomir.dzugas@premium-ic.sk",
+                password: "premiumIC2017",
+                authorities: [auths.get(Authority.admin)] as Set<Authority>,
+                organizations: [orgs.get("insurance")] as Set<Organization>)
+        dzugas.addProcessRole(agentRole)
+        dzugas.addProcessRole(premiumRole)
+        dzugas.addProcessRole(contactRole)
+        dzugas.addProcessRole(documentAdminRole)
+        userService.saveNew(dzugas)
+        log.info("User $dzugas.name $dzugas.surname created")
 
         User gratex = new User(
                 name: "Gratex",
@@ -188,5 +211,9 @@ class InsuranceImporter {
         taskService.createTasks(useCase)
         log.info("Case $title created")
         return useCase
+    }
+
+    private def createOfferId() {
+        offerIdRepository.save(new OfferId(id: 0))
     }
 }

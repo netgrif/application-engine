@@ -413,6 +413,10 @@ public class TaskService implements ITaskService {
                 value = set;
                 break;
             case "user":
+                if(node.get("value") == null) {
+                    value = null;
+                    break;
+                }
                 User user = userRepository.findByEmail(node.get("value").asText());
                 user.setPassword(null);
                 user.setOrganizations(null);
@@ -421,9 +425,17 @@ public class TaskService implements ITaskService {
                 value = user;
                 break;
             case "number":
+                if(node.get("value") == null) {
+                    value = 0.0;
+                    break;
+                }
                 value = node.get("value").asDouble();
                 break;
             default:
+                if(node.get("value") == null) {
+                    value = "null";
+                    break;
+                }
                 value = node.get("value").asText();
                 break;
         }
