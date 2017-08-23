@@ -187,7 +187,7 @@ class Insurance {
     Closure<MarkupBuilder> udajeOPoisteni = { MarkupBuilder builder ->
         builder.field("xfdf:original": "106", "${valueDate(309002) ?: ''}")
         builder.field("xfdf:original": "107", "${valueDate(109001) ?: ''}")
-        builder.field("xfdf:original": "108", "${(value(109002) as Boolean) ? (valueDate(109003) ?: '') : ''}")
+        builder.field("xfdf:original": "108", "${(Boolean.parseBoolean(value(109002))) ? (valueDate(109003) ?: '') : ''}")
 
         return builder
     }
@@ -221,7 +221,8 @@ class Insurance {
         builder.field("xfdf:original": "121", "${valuePercentageDiscount(208007) ?: ''}")
 
         def periodicity = ((value(108001) == "štvrťročná") ? 4 : ((value(108001) == "polročná") ? 2 : 1)) as double
-//        builder.field("xfdf:original": "mjjttzeželljsd", "${((value(308006)/periodicity ?: ''}") todo
+        def payment = Math.floor((((value(308006) as Double) / periodicity) * 100) as Double) / 100
+        builder.field("xfdf:original": "mjjttzeželljsd", "$payment")
 
         return builder
     }
@@ -428,8 +429,8 @@ class Insurance {
     }
 
     Closure<MarkupBuilder> suhlasOsobneUdaje = { MarkupBuilder builder ->
-        builder.X3(value(109067) as Boolean ? 'X' : '')
-        builder.X4(value(109067) as Boolean ? '' : 'X')
+        builder.X3(Boolean.parseBoolean(value(109067)) ? 'X' : '')
+        builder.X4(Boolean.parseBoolean(value(109067)) ? '' : 'X')
 
         return builder
     }
@@ -487,11 +488,13 @@ class Insurance {
      * @param precision
      * @return
      */
-    private String valueRound(Long id, int precision = 2) {
+    private String valueRound(Long id, int precision = 2, boolean returnZero = false) {
         def value = value(id)
         if (value == null)
             return null
 
+        if (value == 0 && !returnZero)
+            return null
         return (value as Double).round(precision) as String
     }
 
