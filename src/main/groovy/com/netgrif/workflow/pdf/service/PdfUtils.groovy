@@ -6,6 +6,8 @@ import org.apache.pdfbox.multipdf.PDFMergerUtility
 import org.apache.pdfbox.pdmodel.PDDocument
 import org.apache.pdfbox.pdmodel.PDDocumentCatalog
 import org.apache.pdfbox.pdmodel.PDResources
+import org.apache.pdfbox.pdmodel.encryption.AccessPermission
+import org.apache.pdfbox.pdmodel.encryption.StandardProtectionPolicy
 import org.apache.pdfbox.pdmodel.font.PDType0Font
 import org.apache.pdfbox.pdmodel.interactive.form.PDAcroForm
 import org.slf4j.Logger
@@ -14,6 +16,35 @@ import org.slf4j.LoggerFactory
 class PdfUtils {
 
     private static final Logger log = LoggerFactory.getLogger(PdfUtils.class)
+
+    private static final int KEY_LENGTH = 128
+
+    static File encryptPdfFile(String outPdfPath, File input, String ownerPassword, String userPassword = "") {
+        PDDocument doc = PDDocument.load(input)
+        AccessPermission ap = new AccessPermission(canFillInForm: false, canModify: false)
+        StandardProtectionPolicy spp = new StandardProtectionPolicy(ownerPassword, userPassword, ap)
+        File encrypted = new File(outPdfPath)
+
+        spp.setEncryptionKeyLength(KEY_LENGTH)
+        doc.protect(spp)
+        doc.save(encrypted)
+        doc.close()
+
+        return encrypted
+    }
+
+    static File mergePdfFiles(String outPdfName, File... files) {
+        PDFMergerUtility pdfMerger = new PDFMergerUtility()
+        pdfMerger.setDestinationFileName(outPdfName)
+
+        files.each {
+            pdfMerger.addSource(it)
+        }
+
+        pdfMerger.mergeDocuments(MemoryUsageSetting.setupMixed(100_000_000L, 500_000_000L))
+
+        return new File(pdfMerger.getDestinationFileName())
+    }
 
     static File fillPdfForm(String outPdfName, InputStream pdfFile, InputStream xmlFile) throws IllegalArgumentException {
         fillPdfForm(outPdfName, pdfFile, xmlFile.getText())
@@ -82,18 +113,5 @@ class PdfUtils {
         document.save(file)
         document.close()
         return file
-    }
-
-    static File mergePdfFiles(String outPdfName, File... files) {
-        PDFMergerUtility pdfMerger = new PDFMergerUtility()
-        pdfMerger.setDestinationFileName(outPdfName)
-
-        files.each {
-            pdfMerger.addSource(it)
-        }
-
-        pdfMerger.mergeDocuments(MemoryUsageSetting.setupMixed(100_000_000L, 500_000_000L))
-
-        return new File(pdfMerger.getDestinationFileName())
     }
 }
