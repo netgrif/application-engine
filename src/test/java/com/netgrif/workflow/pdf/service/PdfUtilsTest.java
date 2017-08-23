@@ -44,4 +44,13 @@ public class PdfUtilsTest {
 
         assert out != null;
     }
+
+    @Test
+    public void encryptPdf() {
+        File input = new File("src/test/resources/pdf/test.pdf");
+
+        File output = PdfUtils.encryptPdfFile("target/test_encrypt.pdf", input, "owner", "user");
+
+        assert output != null;
+    }
 }
