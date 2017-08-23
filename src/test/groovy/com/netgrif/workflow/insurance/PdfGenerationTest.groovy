@@ -87,17 +87,17 @@ class PdfGenerationTest {
         mongoTemplate.getDb().dropDatabase()
         jdbcTemplate.update("TRUNCATE TABLE postal_code")
         userService.saveNew(new User(
-                email: "name.surname@company.com",
+                email: "namepdf.surname@company.com",
                 password: "password",
-                name: "name",
-                surname: "surname",
+                name: "namepdf",
+                surname: "surnamepdf",
                 authorities: [
-                        authorityRepository.save(new Authority("user"))
+                        authorityRepository.findByName("user")?:authorityRepository.save(new Authority("user"))
                 ]
         ))
         jsonNodeFactory = JsonNodeFactory.newInstance()
-        net = importer.importPetriNet(new File("src/main/resources/petriNets/poistenie_hhi_18_7_2017.xml"), "Household insurance", "HHI")
-        _case = workflowService.createCase(net.getStringId(), "Household insurance", "color", 1L)
+        net = importer.importPetriNet(new File("src/main/resources/petriNets/poistenie_hhi_18_7_2017.xml"), "Household insurance pdf", "HHI")
+        _case = workflowService.createCase(net.getStringId(), "Household insurance pdf", "color", 1L)
         idConverter = net.dataSet.collectEntries { [(it.value.importId): (it.key)] }
         postalCodeImporter.run()
     }
