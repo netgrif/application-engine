@@ -5711,17 +5711,19 @@
         <action trigger="set">
             <!--@formatter:off-->
             check: f.this,
+            check2: f.109020,
             other: f.109029,
             trans: t.588;
-            make other,editable on trans when { check.value == "OP" }
+            make other,editable on trans when { Boolean.logicalAnd(check.value == "OP", check2.value as Boolean) }
             <!--@formatter:on-->
         </action>
         <action trigger="set">
             <!--@formatter:off-->
             check: f.this,
+            check2: f.109020,
             other: f.109029,
             trans: t.588;
-            make other,required on trans when { check.value == "OP" }
+            make other,required on trans when { Boolean.logicalAnd(check.value == "OP", check2.value as Boolean) }
             <!--@formatter:on-->
         </action>
     </data>
