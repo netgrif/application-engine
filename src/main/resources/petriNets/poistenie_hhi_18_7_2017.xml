@@ -10157,7 +10157,6 @@
             <dataRef>
                 <id>110004</id>
                 <logic>
-                    <behavior>required</behavior>
                     <behavior>editable</behavior>
                 </logic>
             </dataRef>
@@ -10205,7 +10204,6 @@
             <dataRef>
                 <id>110010</id>
                 <logic>
-                    <behavior>required</behavior>
                     <behavior>editable</behavior>
                 </logic>
             </dataRef>
@@ -10253,7 +10251,6 @@
             <dataRef>
                 <id>110016</id>
                 <logic>
-                    <behavior>required</behavior>
                     <behavior>editable</behavior>
                 </logic>
             </dataRef>
@@ -10261,7 +10258,6 @@
             <dataRef>
                 <id>110017</id>
                 <logic>
-                    <behavior>required</behavior>
                     <behavior>editable</behavior>
                 </logic>
             </dataRef>
@@ -10269,7 +10265,6 @@
             <dataRef>
                 <id>110018</id>
                 <logic>
-                    <behavior>required</behavior>
                     <behavior>editable</behavior>
                 </logic>
             </dataRef>
@@ -10277,7 +10272,6 @@
             <dataRef>
                 <id>110019</id>
                 <logic>
-                    <behavior>required</behavior>
                     <behavior>editable</behavior>
                 </logic>
             </dataRef>
@@ -10285,7 +10279,6 @@
             <dataRef>
                 <id>110020</id>
                 <logic>
-                    <behavior>required</behavior>
                     <behavior>editable</behavior>
                 </logic>
             </dataRef>
@@ -10293,7 +10286,6 @@
             <dataRef>
                 <id>110021</id>
                 <logic>
-                    <behavior>required</behavior>
                     <behavior>editable</behavior>
                 </logic>
             </dataRef>
@@ -10301,7 +10293,6 @@
             <dataRef>
                 <id>110022</id>
                 <logic>
-                    <behavior>required</behavior>
                     <behavior>editable</behavior>
                 </logic>
             </dataRef>
@@ -10309,7 +10300,6 @@
             <dataRef>
                 <id>110023</id>
                 <logic>
-                    <behavior>required</behavior>
                     <behavior>editable</behavior>
                 </logic>
             </dataRef>
@@ -10317,7 +10307,6 @@
             <dataRef>
                 <id>110024</id>
                 <logic>
-                    <behavior>required</behavior>
                     <behavior>editable</behavior>
                 </logic>
             </dataRef>
@@ -10325,7 +10314,6 @@
             <dataRef>
                 <id>110025</id>
                 <logic>
-                    <behavior>required</behavior>
                     <behavior>editable</behavior>
                 </logic>
             </dataRef>
@@ -10333,7 +10321,6 @@
             <dataRef>
                 <id>110026</id>
                 <logic>
-                    <behavior>required</behavior>
                     <behavior>editable</behavior>
                 </logic>
             </dataRef>
