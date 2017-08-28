@@ -4207,8 +4207,17 @@
         <init>0000000000</init>
         <action trigger="get">
             <!--formatter:off-->
-            self: f.this;
-            generate "Insurance.offerId",once into self
+            field: f.this;
+            generate "Insurance.offerId",once into field
+            <!--@formatter:on-->
+        </action>
+        <action trigger="set">
+            <!--@formatter:off-->
+            field: f.this,
+            other: f.310001;
+            change other about {
+                return field.value;
+            }
             <!--@formatter:on-->
         </action>
     </data>
@@ -6153,7 +6162,111 @@
     <!-- ===== Napárovanie platby ===== -->
     <data type="text">
         <title>Variabilný symbol</title>
-        <id>308007</id>
+        <id>310001</id>
+    </data>
+    <data type="date">
+        <title>Dátum valuty</title>
+        <id>110001</id>
+    </data>
+    <data type="text">
+        <title>Predčíslo účtu</title>
+        <id>110002</id>
+    </data>
+    <data type="text">
+        <title>Číslo účtu</title>
+        <id>110003</id>
+    </data>
+    <data type="text">
+        <title>Predčíslo protiúčtu</title>
+        <id>110004</id>
+    </data>
+    <data type="text">
+        <title>Číslo protiúčtu</title>
+        <id>110005</id>
+    </data>
+    <data type="text">
+        <title>Kód banky protiúčtu</title>
+        <id>110006</id>
+    </data>
+    <data type="text">
+        <title>Názov protiúčtu</title>
+        <id>110007</id>
+    </data>
+    <data type="number">
+        <title>Suma</title>
+        <id>110008</id>
+    </data>
+    <data type="text"><!--todo enumeration-->
+        <title>Mena</title>
+        <id>110009</id>
+    </data>
+    <data type="text">
+        <title>Kurz</title>
+        <id>110010</id>
+    </data>
+    <data type="number">
+        <title>Zostatok</title>
+        <id>110011</id>
+    </data>
+    <data type="text"><!--todo enumeration-->
+        <title>Popis obratu</title>
+        <id>110012</id>
+    </data>
+    <data type="text">
+        <title>E2E reference</title>
+        <id>110013</id>
+    </data>
+    <data type="text">
+        <title>Variabilný symbol</title>
+        <id>110014</id>
+    </data>
+    <data type="text">
+        <title>Konštantný symbol</title>
+        <id>110015</id>
+    </data>
+    <data type="text">
+        <title>Špecifický symbol</title>
+        <id>110016</id>
+    </data>
+    <data type="text">
+        <title>Poznámka</title>
+        <id>110017</id>
+    </data>
+    <data type="text">
+        <title>Číslo výpisu</title>
+        <id>110018</id>
+    </data>
+    <data type="text">
+        <title>Identifikácia protiúčtu 1</title>
+        <id>110019</id>
+    </data>
+    <data type="text">
+        <title>Identifikácia protiúčtu 2</title>
+        <id>110020</id>
+    </data>
+    <data type="text">
+        <title>Identifikácia protiúčtu 3</title>
+        <id>110021</id>
+    </data>
+    <data type="text">
+        <title>Identifikácia protiúčtu 4</title>
+        <id>110022</id>
+    </data>
+    <data type="text">
+        <title>Správa pre prijímateľa 1</title>
+        <id>110023</id>
+    </data>
+    <data type="text">
+        <title>Správa pre prijímateľa 2</title>
+        <id>110024</id>
+    </data>
+    <data type="text">
+        <title>Správa pre prijímateľa 3</title>
+        <id>110025</id>
+    </data>
+    <data type="text">
+        <title>Správa pre prijímateľa 4</title>
+        <id>110026</id>
     </data>
     <!-- ===== TODO ===== -->
     <data type="date">
@@ -9997,7 +10110,7 @@
 
     <!--================================= ZAPLATENIE =====================-->
 
-    <!--todo============================= Napárovanie platby=====================-->
+    <!--================================= Napárovanie platby=====================-->
     <transition>
         <id>680</id>
         <x>1681</x>
@@ -10013,14 +10126,218 @@
                 <perform>true</perform>
             </logic>
         </roleRef>
-        <!--Variabilný symbol-->
-        <dataRef>
-            <id>308007</id>
-            <logic>
-                <behavior>required</behavior>
-                <behavior>editable</behavior>
-            </logic>
-        </dataRef>
+        <dataGroup>
+            <id>1</id>
+            <alignment>start</alignment>
+            <!-- Dátum valuty -->
+            <dataRef>
+                <id>110001</id>
+                <logic>
+                    <behavior>required</behavior>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <!-- Predčíslo účtu -->
+            <dataRef>
+                <id>110002</id>
+                <logic>
+                    <behavior>required</behavior>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <!-- Číslo účtu -->
+            <dataRef>
+                <id>110003</id>
+                <logic>
+                    <behavior>required</behavior>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <!-- Predčíslo protiúčtu -->
+            <dataRef>
+                <id>110004</id>
+                <logic>
+                    <behavior>required</behavior>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <!-- Číslo protiúčtu -->
+            <dataRef>
+                <id>110005</id>
+                <logic>
+                    <behavior>required</behavior>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <!-- Kód banky protiúčtu -->
+            <dataRef>
+                <id>110006</id>
+                <logic>
+                    <behavior>required</behavior>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <!-- Názov protiúčtu -->
+            <dataRef>
+                <id>110007</id>
+                <logic>
+                    <behavior>required</behavior>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <!-- Suma -->
+            <dataRef>
+                <id>110008</id>
+                <logic>
+                    <behavior>required</behavior>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <!-- Mena -->
+            <dataRef>
+                <id>110009</id>
+                <logic>
+                    <behavior>required</behavior>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <!-- Kurz -->
+            <dataRef>
+                <id>110010</id>
+                <logic>
+                    <behavior>required</behavior>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <!-- Zostatok -->
+            <dataRef>
+                <id>110011</id>
+                <logic>
+                    <behavior>required</behavior>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <!-- Popis obratu -->
+            <dataRef>
+                <id>110012</id>
+                <logic>
+                    <behavior>required</behavior>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <!-- E2E reference -->
+            <dataRef>
+                <id>110013</id>
+                <logic>
+                    <behavior>required</behavior>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <!-- Variabilný symbol -->
+            <dataRef>
+                <id>110014</id>
+                <logic>
+                    <behavior>required</behavior>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <!-- Konštantný symbol -->
+            <dataRef>
+                <id>110015</id>
+                <logic>
+                    <behavior>required</behavior>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <!-- Špecifický symbol -->
+            <dataRef>
+                <id>110016</id>
+                <logic>
+                    <behavior>required</behavior>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <!-- Poznámka -->
+            <dataRef>
+                <id>110017</id>
+                <logic>
+                    <behavior>required</behavior>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <!-- Číslo výpisu -->
+            <dataRef>
+                <id>110018</id>
+                <logic>
+                    <behavior>required</behavior>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <!-- Identifikácia protiúčtu 1 -->
+            <dataRef>
+                <id>110019</id>
+                <logic>
+                    <behavior>required</behavior>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <!-- Identifikácia protiúčtu 2 -->
+            <dataRef>
+                <id>110020</id>
+                <logic>
+                    <behavior>required</behavior>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <!-- Identifikácia protiúčtu 3 -->
+            <dataRef>
+                <id>110021</id>
+                <logic>
+                    <behavior>required</behavior>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <!-- Identifikácia protiúčtu 4 -->
+            <dataRef>
+                <id>110022</id>
+                <logic>
+                    <behavior>required</behavior>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <!-- Správa pre prijímateľa 1 -->
+            <dataRef>
+                <id>110023</id>
+                <logic>
+                    <behavior>required</behavior>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <!-- Správa pre prijímateľa 2 -->
+            <dataRef>
+                <id>110024</id>
+                <logic>
+                    <behavior>required</behavior>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <!-- Správa pre prijímateľa 3 -->
+            <dataRef>
+                <id>110025</id>
+                <logic>
+                    <behavior>required</behavior>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <!-- Správa pre prijímateľa 4 -->
+            <dataRef>
+                <id>110026</id>
+                <logic>
+                    <behavior>required</behavior>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
     </transition>
     <!--todo============================= Aktívna zmluva==================================-->
     <transition>
@@ -11412,7 +11729,7 @@
             <title></title>
             <!--Variabilný symbol-->
             <dataRef>
-                <id>308007</id>
+                <id>310001</id>
                 <logic>
                     <behavior>visible</behavior>
                 </logic>
