@@ -1,12 +1,14 @@
 package com.netgrif.workflow.workflow.service;
 
+import com.netgrif.workflow.auth.domain.User;
+import com.netgrif.workflow.auth.domain.repositories.UserRepository;
 import com.netgrif.workflow.importer.Importer;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
-import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository;
+import com.netgrif.workflow.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.workflow.workflow.domain.Case;
-import com.netgrif.workflow.workflow.domain.repositories.CaseRepository;
 import com.netgrif.workflow.workflow.domain.Task;
+import com.netgrif.workflow.workflow.domain.repositories.CaseRepository;
 import com.netgrif.workflow.workflow.domain.repositories.TaskRepository;
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
@@ -20,7 +22,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.File;
-import java.util.List;
 
 @SpringBootTest
 @ActiveProfiles({"test"})
@@ -51,6 +52,9 @@ public class TaskServiceTest {
     @Autowired
     private MongoTemplate mongoTemplate;
 
+    @Autowired
+    private UserRepository userRepository;
+
     @Before
     public void setUp() {
         mongoTemplate.getDb().dropDatabase();
@@ -61,18 +65,6 @@ public class TaskServiceTest {
         workflowService.createCase(net.getStringId(), "Storage Unit", "color", 1L);
     }
 
-//    @Test
-//    public void getAll() throws Exception {
-//    }
-//
-//    @Test
-//    public void findByCaseId() throws Exception {
-//    }
-//
-//    @Test
-//    public void findById() throws Exception {
-//    }
-
     @Test
     public void createTasks() throws Exception {
         Case useCase = caseRepository.findAll().get(0);
@@ -82,48 +74,35 @@ public class TaskServiceTest {
         assert repository.findAll().size() > 0;
     }
 
-//    @Test
-//    public void findByUser() throws Exception {
-//    }
-//
-//    @Test
-//    public void findUserFinishedTasks() throws Exception {
-//    }
-//
-//    @Test
-//    public void finishTask() throws Exception {
-//    }
-//
-//    @Test
-//    public void assignTask() throws Exception {
-//    }
-
     @Test
-    public void getData() throws Exception {
-        Task task = repository.findAll().stream().filter(t -> t.getTitle().equals("Data UJ")).findFirst().get();
+    public void resetArcTest() throws TransitionNotExecutableException {
+        PetriNet net = importer.importPetriNet(new File("src/test/resources/reset_inhibitor_test.xml"), "reset", "rst");
+        Case useCase = workflowService.createCase(net.getStringId(), "Reset test", "color", 1L);
+        User user = new User();
+        user.setName("name");
+        user.setPassword("password");
+        user.setSurname("surname");
+        user.setEmail("email@email.com");
+        user = userRepository.save(user);
 
-        List<Field> fields = service.getData(task.getStringId());
+        assert useCase.getResetArcTokens().size() == 0;
+        assert useCase.getActivePlaces().size() == 1;
+        assert useCase.getActivePlaces().values().contains(5);
 
-        assert fields != null && !fields.isEmpty();
+        Task task = taskRepository.findAll().stream().filter(t -> t.getTitle().equalsIgnoreCase("reset")).findFirst().orElse(null);
+
+        service.assignTask(user.getId(), task.getStringId());
+        useCase = caseRepository.findOne(useCase.getStringId());
+
+        assert useCase.getResetArcTokens().size() == 1;
+        assert useCase.getResetArcTokens().values().contains(5);
+        assert useCase.getActivePlaces().size() == 0;
+
+        service.cancelTask(user.getId(), task.getStringId());
+        useCase = caseRepository.findOne(useCase.getStringId());
+
+        assert useCase.getResetArcTokens().size() == 0;
+        assert useCase.getActivePlaces().size() == 1;
+        assert useCase.getActivePlaces().values().contains(5);
     }
-
-//    @Test
-//    public void setDataFieldsValues() throws Exception {
-//    }
-//
-//    @Test
-//    public void cancelTask() throws Exception {
-//    }
-//
-//    @Test
-//    public void saveFile() throws Exception {
-//    }
-//
-//    @Test
-//    public void getFile() throws Exception {
-//    }
-//
-//    @Test
-//    public void delegateTask() throws Exception {
-//    }
 }

@@ -7,4 +7,7 @@ public class InhibitorArc extends Arc {
             return true;
         return ((Place) source).getTokens() < multiplicity;
     }
+
+    @Override
+    public void execute(){ }
 }
