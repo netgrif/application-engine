@@ -16,6 +16,7 @@ import com.netgrif.workflow.workflow.domain.DataField
 import com.netgrif.workflow.workflow.domain.repositories.CaseRepository
 import com.netgrif.workflow.workflow.service.TaskService
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Component
 
 @Component
@@ -51,23 +52,23 @@ class InsuranceImporter {
 
         def orgs = createOrganizations()
         def auths = createAuthorities()
-        createUsers(orgs,auths,net)
+        createUsers(orgs, auths, net)
         createCases(net)
     }
 
-    private Map<String, Organization> createOrganizations(){
+    private Map<String, Organization> createOrganizations() {
         Map<String, Organization> orgs = new HashMap<>()
-        orgs.put("insurance",organizationRepository.save(new Organization("Insurance Company")))
+        orgs.put("insurance", organizationRepository.save(new Organization("Insurance Company")))
         return orgs
     }
 
-    private Map<String, Authority> createAuthorities(){
+    private Map<String, Authority> createAuthorities() {
         Map<String, Authority> auths = new HashMap<>()
-        auths.put(Authority.user,authorityRepository.save(new Authority(Authority.user)))
+        auths.put(Authority.user, authorityRepository.save(new Authority(Authority.user)))
         return auths
     }
 
-    private void createUsers(Map<String, Organization> orgs, Map<String, Authority> auths, PetriNet net){
+    private void createUsers(Map<String, Organization> orgs, Map<String, Authority> auths, PetriNet net) {
         def agentRole = userProcessRoleRepository.save(new UserProcessRole(
                 roleId: net.roles.values().find { it -> it.name == "Agent" }.objectId
         ))
@@ -91,14 +92,60 @@ class InsuranceImporter {
         system.addProcessRole(systemRole)
         userService.saveNew(agent)
         userService.saveNew(system)
+
+        User gabo = new User(
+                name: "Gabo",
+                surname: "Juhás",
+                email: "gabo@netgrif.com",
+                password: "password",
+                authorities: [auths.get(Authority.user)] as Set<Authority>,
+                organizations: [orgs.get("insurance")] as Set<Organization>)
+        gabo.addProcessRole(agentRole)
+        userService.saveNew(gabo)
+        User milan = new User(
+                name: "Milan",
+                surname: "Mladoniczky",
+                email: "mladoniczky@netgrif.com",
+                password: "password",
+                authorities: [auths.get(Authority.user)] as Set<Authority>,
+                organizations: [orgs.get("insurance")] as Set<Organization>)
+        milan.addProcessRole(agentRole)
+        userService.saveNew(milan)
+        User juraj = new User(
+                name: "Juraj",
+                surname: "Mažári",
+                email: "mazari@netgrif.com",
+                password: "password",
+                authorities: [auths.get(Authority.user)] as Set<Authority>,
+                organizations: [orgs.get("insurance")] as Set<Organization>)
+        juraj.addProcessRole(agentRole)
+        userService.saveNew(juraj)
+        User tomas = new User(
+                name: "Tomáš",
+                surname: "Gažo",
+                email: "gazo@netgrif.com",
+                password: "password",
+                authorities: [auths.get(Authority.user)] as Set<Authority>,
+                organizations: [orgs.get("insurance")] as Set<Organization>)
+        tomas.addProcessRole(agentRole)
+        userService.saveNew(tomas)
+        User martin = new User(
+                name: "Martin",
+                surname: "Makáň",
+                email: "makan@netgrif.com",
+                password: "password",
+                authorities: [auths.get(Authority.user)] as Set<Authority>,
+                organizations: [orgs.get("insurance")] as Set<Organization>)
+        martin.addProcessRole(agentRole)
+        userService.saveNew(martin)
     }
 
-    private void createCases(PetriNet net){
+    private void createCases(PetriNet net) {
         Case useCase = new Case(
                 title: "Buildings cover",
                 petriNet: net,
                 color: StartRunner.randomColor())
-        useCase.dataSet = new HashMap<>(net.dataSet.collectEntries {[(it.key): new DataField()]})
+        useCase.dataSet = new HashMap<>(net.dataSet.collectEntries { [(it.key): new DataField()] })
         useCase.activePlaces.put(net.places.find { it -> it.value.title == "B" }.key, 1)
         useCase.activePlaces.put(net.places.find { it -> it.value.title == "L" }.key, 1)
         useCase.setAuthor(1L)
@@ -110,7 +157,7 @@ class InsuranceImporter {
                 title: "Contents cover",
                 petriNet: net,
                 color: StartRunner.randomColor())
-        useCase.dataSet = new HashMap<>(net.dataSet.collectEntries {[(it.key): new DataField()]})
+        useCase.dataSet = new HashMap<>(net.dataSet.collectEntries { [(it.key): new DataField()] })
         useCase.activePlaces.put(net.places.find { it -> it.value.title == "C" }.key, 1)
         useCase.activePlaces.put(net.places.find { it -> it.value.title == "L" }.key, 1)
         useCase.setAuthor(1L)
@@ -122,7 +169,7 @@ class InsuranceImporter {
                 title: "Buildings & contents cover",
                 petriNet: net,
                 color: StartRunner.randomColor())
-        useCase.dataSet = new HashMap<>(net.dataSet.collectEntries {[(it.key): new DataField()]})
+        useCase.dataSet = new HashMap<>(net.dataSet.collectEntries { [(it.key): new DataField()] })
         useCase.activePlaces.put(net.places.find { it -> it.value.title == "B" }.key, 1)
         useCase.activePlaces.put(net.places.find { it -> it.value.title == "L" }.key, 1)
         useCase.activePlaces.put(net.places.find { it -> it.value.title == "C" }.key, 1)
