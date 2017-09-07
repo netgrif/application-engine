@@ -4507,25 +4507,10 @@
             <!--@formatter:on-->
         </action>
     </data>
-    <data type="enumeration">
+    <data type="text">
         <title>Titul pred menom</title>
         <id>109008</id>
         <desc>Poistník</desc>
-        <values>Bc.</values>
-        <values>Mgr.</values>
-        <values>Ing.</values>
-        <values>Ing. arch.</values>
-        <values>RNDr.</values>
-        <values>PharnDr.</values>
-        <values>PhDr.</values>
-        <values>JUDr.</values>
-        <values>PeaDr.</values>
-        <values>ThDr.</values>
-        <values>MUDr.</values>
-        <values>MDDr.</values>
-        <values>MVDr.</values>
-        <values>doc.</values>
-        <values>prof.</values>
         <action trigger="set">
             <!--@formatter:off-->
             field: f.109020,
@@ -4539,12 +4524,10 @@
             <!--@formatter:on-->
         </action>
     </data>
-    <data type="enumeration">
+    <data type="text">
         <title>Titul za menom</title>
         <id>109009</id>
         <desc>Poistník</desc>
-        <values>Ph.D.</values>
-        <values>CSc.</values>
         <action trigger="set">
             <!--@formatter:off-->
             field: f.109020,
@@ -5536,32 +5519,15 @@
             <!--@formatter:on-->
         </action>
     </data>
-    <data type="enumeration">
+    <data type="text">
         <title>Titul pred menom</title>
         <id>109022</id>
         <desc>Poistený</desc>
-        <values>Bc.</values>
-        <values>Mgr.</values>
-        <values>Ing.</values>
-        <values>Ing. arch.</values>
-        <values>RNDr.</values>
-        <values>PharnDr.</values>
-        <values>PhDr.</values>
-        <values>JUDr.</values>
-        <values>PeaDr.</values>
-        <values>ThDr.</values>
-        <values>MUDr.</values>
-        <values>MDDr.</values>
-        <values>MVDr.</values>
-        <values>doc.</values>
-        <values>prof.</values>
     </data>
-    <data type="enumeration">
+    <data type="text">
         <title>Titul za menom</title>
         <id>109023</id>
         <desc>Poistený</desc>
-        <values>Ph.D.</values>
-        <values>CSc.</values>
     </data>
     <data type="text">
         <title>Meno</title>
@@ -5587,6 +5553,7 @@
         <values>HU</values>
         <values>PL</values>
         <values>Iná</values>
+        <init>SK</init>
     </data>
     <data type="date">
         <title>Dátum narodenia</title>
