@@ -18,4 +18,5 @@ target/
 ### Work folder ###
 _issues/
 
+storage
 wms.log*

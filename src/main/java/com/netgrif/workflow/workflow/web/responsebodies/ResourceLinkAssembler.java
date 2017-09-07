@@ -41,10 +41,10 @@ public class ResourceLinkAssembler {
                     .getAll(null,null)).withRel("all"));
         if(!selfRel.equalsIgnoreCase("search"))
             pagedResources.add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(WorkflowController.class)
-                    .searchCases(null,null,null)).withRel("search"));
+                    .search(null,null,null,null)).withRel("search"));
         if(!selfRel.equalsIgnoreCase("author"))
             pagedResources.add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(WorkflowController.class)
-                    .findAllByAuthor(0L,null,null)).withRel("author"));
+                    .findAllByAuthor(0L,"",null,null)).withRel("author"));
     }
 
 

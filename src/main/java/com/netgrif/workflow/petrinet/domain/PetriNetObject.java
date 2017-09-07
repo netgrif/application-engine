@@ -1,5 +1,6 @@
 package com.netgrif.workflow.petrinet.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -8,14 +9,16 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public abstract class PetriNetObject {
 
     @Id
+    @JsonIgnore
     protected ObjectId _id;
 
-    protected Integer id;
+    protected Long importId;
 
     public String getStringId() {
         return _id.toString();
     }
 
+    @JsonIgnore
     public ObjectId getObjectId() {
         return _id;
     }
@@ -24,11 +27,11 @@ public abstract class PetriNetObject {
         this._id = _id;
     }
 
-    public Integer getNetId() {
-        return id;
+    public Long getImportId() {
+        return importId;
     }
 
-    public void setNetId(Integer id) {
-        this.id = id;
+    public void setImportId(Long importId) {
+        this.importId = importId;
     }
 }

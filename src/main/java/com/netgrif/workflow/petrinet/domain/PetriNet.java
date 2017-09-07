@@ -5,28 +5,25 @@ import com.netgrif.workflow.petrinet.domain.roles.ProcessRole;
 import lombok.Getter;
 import lombok.Setter;
 import org.bson.types.ObjectId;
-import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Document
-public class PetriNet {
-
-    @Id
-    private ObjectId _id;
+public class PetriNet extends PetriNetObject {
 
     @Getter @Setter
     private String title;
 
     @Getter @Setter
     private String initials;
+
+    @Getter @Setter
+    private String icon;
 
     // TODO: 18. 3. 2017 replace with Spring auditing
     @Getter @Setter
@@ -60,13 +57,16 @@ public class PetriNet {
     @Transient
     private boolean initialized;
 
+    @Getter @Setter
+    private String importXmlPath;
+
     public PetriNet() {
         initialized = false;
         creationDate = LocalDateTime.now();
         places = new HashMap<>();
         transitions = new HashMap<>();
         arcs = new HashMap<>();
-        dataSet = new HashMap<>();
+        dataSet = new LinkedHashMap<>();
         roles = new HashMap<>();
         transactions = new HashMap<>();
     }
@@ -75,14 +75,6 @@ public class PetriNet {
         this();
         this.title = title;
         this.initials = initials;
-    }
-
-    public ObjectId get_id() {
-        return _id;
-    }
-
-    public String getStringId() {
-        return _id.toString();
     }
 
     public void addPlace(Place place) {
@@ -94,7 +86,7 @@ public class PetriNet {
     }
 
     public void addRole(ProcessRole role) {
-        this.roles.put(role.getObjectId(), role);
+        this.roles.put(role.getStringId(), role);
     }
 
     public List<Arc> getArcsOfTransition(Transition transition) {
@@ -106,7 +98,7 @@ public class PetriNet {
     }
 
     public void addDataSetField(Field field) {
-        this.dataSet.put(field.getObjectId(), field);
+        this.dataSet.put(field.getStringId(), field);
     }
 
     public boolean isNotInitialized() {
@@ -172,6 +164,14 @@ public class PetriNet {
                 .filter(transaction ->
                         transaction.getTransitions().contains(transition.getObjectId())
                 ).findAny().orElse(null);
+    }
+
+    public List<Field> getImmediateFields(){
+        return this.dataSet.values().stream().filter(Field::isImmediate).collect(Collectors.toList());
+    }
+
+    public boolean isDisplayableInAnyTransition(String fieldId){
+        return transitions.values().stream().parallel().anyMatch(trans -> trans.isDisplayable(fieldId));
     }
 
     @Override

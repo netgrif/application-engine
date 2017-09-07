@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface PetriNetRepository extends MongoRepository<PetriNet, String> {
     List<PetriNet> findByTitle(String title);
+
+    PetriNet findByImportId(Long id);
 }

@@ -2,13 +2,14 @@ package com.netgrif.workflow.workflow.web;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.netgrif.workflow.auth.domain.LoggedUser;
+import com.netgrif.workflow.petrinet.domain.DataGroup;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
+import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldContainer;
 import com.netgrif.workflow.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.workflow.workflow.domain.Task;
 import com.netgrif.workflow.workflow.service.interfaces.IFilterService;
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
 import com.netgrif.workflow.workflow.web.requestbodies.CreateFilterBody;
-import com.netgrif.workflow.workflow.web.requestbodies.TaskSearchBody;
 import com.netgrif.workflow.workflow.web.responsebodies.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
@@ -26,8 +27,8 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletResponse;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
@@ -63,6 +64,11 @@ public class TaskController {
         return resources;
     }
 
+    @RequestMapping(value ="/case/{id}", method = RequestMethod.GET)
+    public List<TaskReference> getTasksOfCase(@PathVariable("id") String caseId) {
+        return taskService.findAllByCase(caseId);
+    }
+
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     public TaskResource getOne(@PathVariable("id") String taskId) {
         return new TaskResource(taskService.findById(taskId));
@@ -72,9 +78,10 @@ public class TaskController {
     public MessageResource assign(Authentication auth, @PathVariable("id") String taskId) {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
         try {
-            taskService.assignTask(loggedUser.transformToUser(), taskId);
+            taskService.assignTask(loggedUser.getId(), taskId);
             return MessageResource.successMessage("Task " + taskId + " assigned to " + loggedUser.getFullName());
         } catch (TransitionNotExecutableException e) {
+            e.printStackTrace();
             return MessageResource.errorMessage("Task " + taskId + " cannot be assigned");
         }
     }
@@ -139,36 +146,42 @@ public class TaskController {
     }
 
     @RequestMapping(value = "/search", method = RequestMethod.POST)
-    public PagedResources<TaskResource> search(Authentication auth, Pageable pageable, @RequestBody TaskSearchBody searchBody, PagedResourcesAssembler<Task> assembler) {
-        Page<Task> page = null;
-        if (searchBody.searchTier == TaskSearchBody.SEARCH_TIER_1) {
-            page = taskService.findByPetriNets(pageable, searchBody.petriNets
-                    .stream()
-                    .map(net -> net.petriNet)
-                    .collect(Collectors.toList()));
-        } else if (searchBody.searchTier == TaskSearchBody.SEARCH_TIER_2) {
-            List<String> transitions = new ArrayList<>();
-            searchBody.petriNets.forEach(net -> transitions.addAll(net.transitions));
-            page = taskService.findByTransitions(pageable, transitions);
-        } else if (searchBody.searchTier == TaskSearchBody.SEARCH_TIER_3) {
-            //TODO: 4.6.2017 vyhľadanie na základe dát
-        }
+    public PagedResources<TaskResource> search(Authentication auth, Pageable pageable, @RequestBody Map<String, Object> searchBody, PagedResourcesAssembler<Task> assembler) {
+//        Page<Task> page = null;
+//        if (searchBody.searchTier == TaskSearchBody.SEARCH_TIER_1) {
+//            page = taskService.findByPetriNets(pageable, searchBody.petriNets
+//                    .stream()
+//                    .map(net -> net.petriNet)
+//                    .collect(Collectors.toList()));
+//        } else if (searchBody.searchTier == TaskSearchBody.SEARCH_TIER_2) {
+//            List<String> transitions = new ArrayList<>();
+//            searchBody.petriNets.forEach(net -> transitions.addAll(net.transitions));
+//            page = taskService.findByTransitions(pageable, transitions);
+//        } else if (searchBody.searchTier == TaskSearchBody.SEARCH_TIER_3) {
+//            //TODO: 4.6.2017 vyhľadanie na základe dát
+//        }
+        Page<Task> tasks = taskService.search(searchBody,pageable,(LoggedUser) auth.getPrincipal());
         Link selfLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
                 .search(auth, pageable, searchBody, assembler)).withRel("search");
-        PagedResources<TaskResource> resources = assembler.toResource(page,new TaskResourceAssembler(),selfLink);
+        PagedResources<TaskResource> resources = assembler.toResource(tasks,new TaskResourceAssembler(),selfLink);
         ResourceLinkAssembler.addLinks(resources,Task.class,selfLink.getRel());
         return resources;
     }
 
     @RequestMapping(value = "/{id}/data", method = RequestMethod.GET)
-    public DataFieldsResource getData(@PathVariable("id") String taskId) {
+    public DataGroupsResource getData(@PathVariable("id") String taskId) {
         List<Field> dataFields = taskService.getData(taskId);
-        return new DataFieldsResource(dataFields, taskId);
+        List<DataGroup> dataGroups = taskService.getDataGroups(taskId);
+
+        dataGroups.forEach(group -> group.setFields(new DataFieldsResource(dataFields.stream().filter(field ->
+                group.getData().contains(field.getStringId())).collect(Collectors.toList()), taskId)));
+
+        return new DataGroupsResource(dataGroups);
     }
 
     @RequestMapping(value = "/{id}/data", method = RequestMethod.POST)
-    public ObjectNode saveData(@PathVariable("id") String taskId, @RequestBody ObjectNode dataBody) {
-        return taskService.setDataFieldsValues(taskId, dataBody);
+    public ChangedFieldContainer saveData(@PathVariable("id") String taskId, @RequestBody ObjectNode dataBody) {
+        return taskService.setData(taskId, dataBody);
     }
 
     @RequestMapping(value = "/{id}/file/{field}", method = RequestMethod.POST)

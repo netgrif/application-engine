@@ -1,6 +1,11 @@
 package com.netgrif.workflow.petrinet.domain;
 
+import lombok.Getter;
+import lombok.Setter;
+
 public class ResetArc extends Arc {
+
+    @Getter @Setter
     private Integer removedTokens;
 
     @Override
