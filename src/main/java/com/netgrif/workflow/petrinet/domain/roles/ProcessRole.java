@@ -15,7 +15,7 @@ public class ProcessRole {
         _id = new ObjectId();
     }
 
-    public String getObjectId() {
+    public String getStringId() {
         return _id.toString();
     }
 

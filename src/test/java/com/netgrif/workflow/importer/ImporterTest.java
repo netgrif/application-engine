@@ -1,7 +1,10 @@
 package com.netgrif.workflow.importer;
 
 import com.netgrif.workflow.petrinet.domain.PetriNet;
+import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository;
+import com.netgrif.workflow.workflow.domain.Case;
+import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -11,6 +14,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.File;
+import java.util.List;
 
 @SpringBootTest
 @ActiveProfiles({"test"})
@@ -22,6 +26,9 @@ public class ImporterTest {
 
     @Autowired
     private PetriNetRepository repository;
+
+    @Autowired
+    private IWorkflowService workflowService;
 
     private static final String NET_TITLE = "jaxb_test";
     private static final String NET_INITIALS = "TST";
@@ -41,6 +48,42 @@ public class ImporterTest {
         importer.importPetriNet(new File("src/test/resources/prikladFM_test.xml"), NET_TITLE, NET_INITIALS);
 
         assertNetProperlyImported();
+    }
+
+    @Test
+    public void priorityTest() {
+        PetriNet net = importer.importPetriNet(new File("src/test/resources/priority_test.xml"), "Priority test", "PT");
+
+        assert net != null;
+
+        Case useCase = workflowService.createCase(net.getStringId(), net.getTitle(), "color", 1L);
+
+        assert useCase != null;
+    }
+
+    @Test
+    public void dataGroupTest() {
+        PetriNet net = importer.importPetriNet(new File("src/test/resources/datagroup_test.xml"), "DataGroup test", "DGT");
+
+        assert net != null;
+    }
+
+    @Test
+    public void caseRefTest() {
+        importer.importPetriNet(new File("src/test/resources/datagroup_test.xml"), "DataGroup test", "DGT");
+        PetriNet net = importer.importPetriNet(new File("src/test/resources/caseref_test.xml"), "Caseref test", "CRT");
+        assert net != null;
+
+        Case useCase = workflowService.createCase(net.getStringId(), net.getTitle(), "color", 1L);
+        assert useCase != null;
+
+        List<Field> data = workflowService.getData(useCase.getStringId());
+        assert data != null && data.size() > 0;
+
+        useCase.getDataSet().get(data.get(0).getStringId()).setValue(useCase.getStringId());
+        workflowService.saveCase(useCase);
+        data = workflowService.getData(useCase.getStringId());
+        assert data != null && data.size() > 0;
     }
 
     private void assertNetProperlyImported() {

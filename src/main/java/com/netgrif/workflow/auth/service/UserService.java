@@ -1,13 +1,13 @@
 package com.netgrif.workflow.auth.service;
 
-import com.netgrif.workflow.auth.domain.Organization;
 import com.netgrif.workflow.auth.domain.Authority;
+import com.netgrif.workflow.auth.domain.Organization;
 import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.auth.domain.UserProcessRole;
 import com.netgrif.workflow.auth.domain.repositories.AuthorityRepository;
+import com.netgrif.workflow.auth.domain.repositories.OrganizationRepository;
 import com.netgrif.workflow.auth.domain.repositories.UserRepository;
 import com.netgrif.workflow.auth.service.interfaces.IUserService;
-import com.netgrif.workflow.petrinet.domain.roles.ProcessRole;
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRoleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -21,12 +21,19 @@ import java.util.stream.Collectors;
 
 @Service
 public class UserService implements IUserService {
+
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private OrganizationRepository organizationRepository;
+
     @Autowired
     private AuthorityRepository authorityRepository;
+
     @Autowired
     private ProcessRoleRepository processRoleRepository;
+
     @Autowired
     private BCryptPasswordEncoder bCryptPasswordEncoder;
 
@@ -38,6 +45,7 @@ public class UserService implements IUserService {
             authorities.add(authorityRepository.findByName(Authority.user));
             user.setAuthorities(authorities);
         }
+
         return userRepository.save(user);
     }
 
@@ -82,6 +90,11 @@ public class UserService implements IUserService {
         authority.addUser(user);
 
         userRepository.save(user);
+    }
+
+    @Override
+    public List<Organization> getAllOrganizations(){
+        return organizationRepository.findAll();
     }
 
     private User loadProcessRoles(User user){

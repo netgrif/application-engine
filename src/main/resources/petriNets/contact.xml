@@ -1,0 +1,1414 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document>
+    <!-- ========== TRANSACTIONS ========== -->
+    <role>
+        <id>1</id>
+        <name>Agent</name>
+    </role>
+    <!-- ========== DATA ========== -->
+    <!-- Poistený -->
+    <data type="enumeration">
+        <title>Typ subjektu</title>
+        <id>109021</id>
+        <desc>Poistený</desc>
+        <values>fyzická osoba</values>
+        <values>právnická osoba</values>
+        <values>fyzická osoba podnikateľ (SZČO)</values>
+        <init>fyzická osoba</init>
+    </data>
+    <data type="enumeration">
+        <title>Titul pred menom</title>
+        <id>109022</id>
+        <desc>Poistený</desc>
+        <values>Bc.</values>
+        <values>Mgr.</values>
+        <values>Ing.</values>
+        <values>Ing. arch.</values>
+        <values>RNDr.</values>
+        <values>PharnDr.</values>
+        <values>PhDr.</values>
+        <values>JUDr.</values>
+        <values>PeaDr.</values>
+        <values>ThDr.</values>
+        <values>MUDr.</values>
+        <values>MDDr.</values>
+        <values>MVDr.</values>
+        <values>doc.</values>
+        <values>prof.</values>
+    </data>
+    <data type="enumeration">
+        <title>Titul za menom</title>
+        <id>109023</id>
+        <desc>Poistený</desc>
+        <values>Ph.D.</values>
+        <values>CSc.</values>
+    </data>
+    <data type="text" immediate="true">
+        <title>Meno</title>
+        <id>109024</id>
+        <desc>Poistený</desc>
+    </data>
+    <data type="text" immediate="true">
+        <title>Priezvisko</title>
+        <id>109025</id>
+        <desc>Poistený</desc>
+    </data>
+    <data type="text">
+        <title>Obchodné meno</title>
+        <id>109026</id>
+        <desc>Poistený</desc>
+    </data>
+    <data type="text">
+        <title>Štátna príslušnosť</title>
+        <id>109027</id>
+        <desc>Poistený</desc>
+    </data>
+    <data type="date">
+        <title>Dátum narodenia</title>
+        <id>109028</id>
+        <desc>Poistený</desc>
+    </data>
+    <data type="text">
+        <title>Rodné číslo</title>
+        <id>109029</id>
+        <desc>Poistený</desc>
+        <valid>length 10</valid>
+    </data>
+    <data type="enumeration">
+        <title>Typ preukazu</title>
+        <id>109030</id>
+        <desc>Poistený</desc>
+        <values>pas</values>
+        <values>OP</values>
+        <values>iné</values>
+    </data>
+    <data type="text">
+        <title>Číslo preukazu</title>
+        <id>109031</id>
+        <desc>Poistený</desc>
+    </data>
+    <data type="text" immediate="true">
+        <title>Telefónne číslo</title>
+        <id>109032</id>
+        <desc>Poistený</desc>
+    </data>
+    <data type="text" immediate="true">
+        <title>Email</title>
+        <id>109033</id>
+        <desc>Poistený</desc>
+    </data>
+    <!-- Adresa trvalého pobytu -->
+    <data type="text">
+        <title>Ulica</title>
+        <id>109036</id>
+        <desc>Trvalý pobyt/Sídlo</desc>
+    </data>
+    <data type="text">
+        <title>Súpisné a orientačné číslo</title>
+        <id>109037</id>
+        <desc>Trvalý pobyt/Sídlo</desc>
+    </data>
+    <data type="text">
+        <title>PSČ</title>
+        <id>109038</id>
+        <desc>Trvalý pobyt/Sídlo</desc>
+    </data>
+    <data type="text">
+        <title>Obec</title>
+        <id>109039</id>
+        <desc>Trvalý pobyt/Sídlo</desc>
+    </data>
+    <!-- Korešpondenčná adresa -->
+    <data type="boolean">
+        <title>Rovnaká ako trvalý pobyt</title>
+        <id>109034</id>
+        <desc>Korešpondenčná adresa</desc>
+        <init>true</init>
+        <!-- Show -->
+        <action trigger="set">
+            field: f.this,
+            other: f.109041,
+            trans: t.2;
+            make other,editable on trans when { !field.value }
+        </action>
+        <action trigger="set">
+            field: f.this,
+            other: f.109042,
+            trans: t.2;
+            make other,editable on trans when { !field.value }
+        </action>
+        <action trigger="set">
+            field: f.this,
+            other: f.109043,
+            trans: t.2;
+            make other,editable on trans when { !field.value }
+        </action>
+        <action trigger="set">
+            field: f.this,
+            other: f.109044,
+            trans: t.2;
+            make other,editable on trans when { !field.value }
+        </action>
+        <action trigger="set">
+            field: f.this,
+            other: f.109041,
+            trans: t.2;
+            make other,required on trans when { !field.value }
+        </action>
+        <action trigger="set">
+            field: f.this,
+            other: f.109042,
+            trans: t.2;
+            make other,required on trans when { !field.value }
+        </action>
+        <action trigger="set">
+            field: f.this,
+            other: f.109043,
+            trans: t.2;
+            make other,required on trans when { !field.value }
+        </action>
+        <action trigger="set">
+            field: f.this,
+            other: f.109044,
+            trans: t.2;
+            make other,required on trans when { !field.value }
+        </action>
+        <!-- Hide -->
+        <action trigger="set">
+            field: f.this,
+            other: f.109041,
+            trans: t.2;
+            make other,hidden on trans when { field.value }
+        </action>
+        <action trigger="set">
+            field: f.this,
+            other: f.109042,
+            trans: t.2;
+            make other,hidden on trans when { field.value }
+        </action>
+        <action trigger="set">
+            field: f.this,
+            other: f.109043,
+            trans: t.2;
+            make other,hidden on trans when { field.value }
+        </action>
+        <action trigger="set">
+            field: f.this,
+            other: f.109044,
+            trans: t.2;
+            make other,hidden on trans when { field.value }
+        </action>
+        <!-- Set value -->
+        <action trigger="set">
+            <!--@formatter:off-->
+            field: f.this,
+            f_1: f.109036,
+            f_2: f.109041;
+            change f_2 about {
+                if (field.value)
+                    return f_1.value as String;
+                return f_2.value as String;
+            }
+            <!--@formatter:on-->
+        </action>
+        <action trigger="set">
+            <!--@formatter:off-->
+            field: f.this,
+            f_1: f.109037,
+            f_2: f.109042;
+            change f_2 about {
+                if (field.value)
+                    return f_1.value as String;
+                return f_2.value as String;
+            }
+            <!--@formatter:on-->
+        </action>
+        <action trigger="set">
+            <!--@formatter:off-->
+            field: f.this,
+            f_1: f.109038,
+            f_2: f.109043;
+            change f_2 about {
+                if (field.value)
+                    return f_1.value as String;
+                return f_2.value as String;
+            }
+            <!--@formatter:on-->
+        </action>
+        <action trigger="set">
+            <!--@formatter:off-->
+            field: f.this,
+            f_1: f.109039,
+            f_2: f.109044;
+            change f_2 about {
+                if (field.value)
+                    return f_1.value as String;
+                return f_2.value as String;
+            }
+            <!--@formatter:on-->
+        </action>
+        <!-- Show -->
+        <action trigger="set">
+            field: f.this,
+            other: f.109041,
+            trans: t.6;
+            make other,editable on trans when { !field.value }
+        </action>
+        <action trigger="set">
+            field: f.this,
+            other: f.109042,
+            trans: t.6;
+            make other,editable on trans when { !field.value }
+        </action>
+        <action trigger="set">
+            field: f.this,
+            other: f.109043,
+            trans: t.6;
+            make other,editable on trans when { !field.value }
+        </action>
+        <action trigger="set">
+            field: f.this,
+            other: f.109044,
+            trans: t.6;
+            make other,editable on trans when { !field.value }
+        </action>
+        <action trigger="set">
+            field: f.this,
+            other: f.109041,
+            trans: t.6;
+            make other,required on trans when { !field.value }
+        </action>
+        <action trigger="set">
+            field: f.this,
+            other: f.109042,
+            trans: t.6;
+            make other,required on trans when { !field.value }
+        </action>
+        <action trigger="set">
+            field: f.this,
+            other: f.109043,
+            trans: t.6;
+            make other,required on trans when { !field.value }
+        </action>
+        <action trigger="set">
+            field: f.this,
+            other: f.109044,
+            trans: t.6;
+            make other,required on trans when { !field.value }
+        </action>
+        <!-- Hide -->
+        <action trigger="set">
+            field: f.this,
+            other: f.109041,
+            trans: t.6;
+            make other,hidden on trans when { field.value }
+        </action>
+        <action trigger="set">
+            field: f.this,
+            other: f.109042,
+            trans: t.6;
+            make other,hidden on trans when { field.value }
+        </action>
+        <action trigger="set">
+            field: f.this,
+            other: f.109043,
+            trans: t.6;
+            make other,hidden on trans when { field.value }
+        </action>
+        <action trigger="set">
+            field: f.this,
+            other: f.109044,
+            trans: t.6;
+            make other,hidden on trans when { field.value }
+        </action>
+    </data>
+    <data type="text">
+        <title>Ulica</title>
+        <id>109041</id>
+        <desc>Korešpondenčná adresa</desc>
+    </data>
+    <data type="text">
+        <title>Súpisné a orientačné číslo</title>
+        <id>109042</id>
+        <desc>Korešpondenčná adresa</desc>
+    </data>
+    <data type="text">
+        <title>PSČ</title>
+        <id>109043</id>
+        <desc>Korešpondenčná adresa</desc>
+    </data>
+    <data type="text">
+        <title>Obec</title>
+        <id>109044</id>
+        <desc>Korešpondenčná adresa</desc>
+    </data>
+    <!-- Miesto poistenia -->
+    <data type="boolean">
+        <title>Rovnaké ako trvalý pobyt</title>
+        <id>109035</id>
+        <desc>Miesto poistenia</desc>
+        <init>true</init>
+        <!-- Show -->
+        <action trigger="set">
+            field: f.this,
+            other: f.109045,
+            trans: t.2;
+            make other,editable on trans when { !field.value }
+        </action>
+        <action trigger="set">
+            field: f.this,
+            other: f.109046,
+            trans: t.2;
+            make other,editable on trans when { !field.value }
+        </action>
+        <action trigger="set">
+            field: f.this,
+            other: f.109047,
+            trans: t.2;
+            make other,editable on trans when { !field.value }
+        </action>
+        <action trigger="set">
+            field: f.this,
+            other: f.109048,
+            trans: t.2;
+            make other,editable on trans when { !field.value }
+        </action>
+        <action trigger="set">
+            field: f.this,
+            other: f.109045,
+            trans: t.2;
+            make other,required on trans when { !field.value }
+        </action>
+        <action trigger="set">
+            field: f.this,
+            other: f.109046,
+            trans: t.2;
+            make other,required on trans when { !field.value }
+        </action>
+        <action trigger="set">
+            field: f.this,
+            other: f.109047,
+            trans: t.2;
+            make other,required on trans when { !field.value }
+        </action>
+        <action trigger="set">
+            field: f.this,
+            other: f.109048,
+            trans: t.2;
+            make other,required on trans when { !field.value }
+        </action>
+        <!-- Hide -->
+        <action trigger="set">
+            field: f.this,
+            other: f.109045,
+            trans: t.2;
+            make other,hidden on trans when { field.value }
+        </action>
+        <action trigger="set">
+            field: f.this,
+            other: f.109046,
+            trans: t.2;
+            make other,hidden on trans when { field.value }
+        </action>
+        <action trigger="set">
+            field: f.this,
+            other: f.109047,
+            trans: t.2;
+            make other,hidden on trans when { field.value }
+        </action>
+        <action trigger="set">
+            field: f.this,
+            other: f.109048,
+            trans: t.2;
+            make other,hidden on trans when { field.value }
+        </action>
+        <!-- Set value -->
+        <action trigger="set">
+            <!--@formatter:off-->
+            field: f.this,
+            f_1: f.109036,
+            f_2: f.109045;
+            change f_2 about {
+                if (field.value)
+                    return f_1.value as String;
+                return f_2.value as String;
+            }
+            <!--@formatter:on-->
+        </action>
+        <action trigger="set">
+            <!--@formatter:off-->
+            field: f.this,
+            f_1: f.109037,
+            f_2: f.109046;
+            change f_2 about {
+                if (field.value)
+                    return f_1.value as String;
+                return f_2.value as String;
+            }
+            <!--@formatter:on-->
+        </action>
+        <action trigger="set">
+            <!--@formatter:off-->
+            field: f.this,
+            f_1: f.109038,
+            f_2: f.109047;
+            change f_2 about {
+                if (field.value)
+                    return f_1.value as String;
+                return f_2.value as String;
+            }
+            <!--@formatter:on-->
+        </action>
+        <action trigger="set">
+            <!--@formatter:off-->
+            field: f.this,
+            f_1: f.109039,
+            f_2: f.109048;
+            change f_2 about {
+                if (field.value)
+                    return f_1.value as String;
+                return f_2.value as String;
+            }
+            <!--@formatter:on-->
+        </action>
+
+        <!-- Show -->
+        <action trigger="set">
+            field: f.this,
+            other: f.109045,
+            trans: t.6;
+            make other,editable on trans when { !field.value }
+        </action>
+        <action trigger="set">
+            field: f.this,
+            other: f.109046,
+            trans: t.6;
+            make other,editable on trans when { !field.value }
+        </action>
+        <action trigger="set">
+            field: f.this,
+            other: f.109047,
+            trans: t.6;
+            make other,editable on trans when { !field.value }
+        </action>
+        <action trigger="set">
+            field: f.this,
+            other: f.109048,
+            trans: t.6;
+            make other,editable on trans when { !field.value }
+        </action>
+        <action trigger="set">
+            field: f.this,
+            other: f.109045,
+            trans: t.6;
+            make other,required on trans when { !field.value }
+        </action>
+        <action trigger="set">
+            field: f.this,
+            other: f.109046,
+            trans: t.6;
+            make other,required on trans when { !field.value }
+        </action>
+        <action trigger="set">
+            field: f.this,
+            other: f.109047,
+            trans: t.6;
+            make other,required on trans when { !field.value }
+        </action>
+        <action trigger="set">
+            field: f.this,
+            other: f.109048,
+            trans: t.6;
+            make other,required on trans when { !field.value }
+        </action>
+        <!-- Hide -->
+        <action trigger="set">
+            field: f.this,
+            other: f.109045,
+            trans: t.6;
+            make other,hidden on trans when { field.value }
+        </action>
+        <action trigger="set">
+            field: f.this,
+            other: f.109046,
+            trans: t.6;
+            make other,hidden on trans when { field.value }
+        </action>
+        <action trigger="set">
+            field: f.this,
+            other: f.109047,
+            trans: t.6;
+            make other,hidden on trans when { field.value }
+        </action>
+        <action trigger="set">
+            field: f.this,
+            other: f.109048,
+            trans: t.6;
+            make other,hidden on trans when { field.value }
+        </action>
+        <!-- Set value -->
+        <action trigger="set">
+            <!--@formatter:off-->
+            field: f.this,
+            f_1: f.109036,
+            f_2: f.109045;
+            change f_2 about {
+                if (field.value)
+                    return f_1.value as String;
+                return f_2.value as String;
+            }
+            <!--@formatter:on-->
+        </action>
+        <action trigger="set">
+            <!--@formatter:off-->
+            field: f.this,
+            f_1: f.109037,
+            f_2: f.109046;
+            change f_2 about {
+                if (field.value)
+                    return f_1.value as String;
+                return f_2.value as String;
+            }
+            <!--@formatter:on-->
+        </action>
+        <action trigger="set">
+            <!--@formatter:off-->
+            field: f.this,
+            f_1: f.109038,
+            f_2: f.109047;
+            change f_2 about {
+                if (field.value)
+                    return f_1.value as String;
+                return f_2.value as String;
+            }
+            <!--@formatter:on-->
+        </action>
+        <action trigger="set">
+            <!--@formatter:off-->
+            field: f.this,
+            f_1: f.109039,
+            f_2: f.109048;
+            change f_2 about {
+                if (field.value)
+                    return f_1.value as String;
+                return f_2.value as String;
+            }
+            <!--@formatter:on-->
+        </action>
+    </data>
+    <data type="text">
+        <title>Ulica</title>
+        <id>109045</id>
+        <desc>Miesto poistenia</desc>
+    </data>
+    <data type="text">
+        <title>Súpisné a orientačné číslo</title>
+        <id>109046</id>
+        <desc>Miesto poistenia</desc>
+    </data>
+    <data type="text">
+        <title>PSČ</title>
+        <id>109047</id>
+        <desc>Miesto poistenia</desc>
+    </data>
+    <data type="text">
+        <title>Obec</title>
+        <id>109048</id>
+        <desc>Miesto poistenia</desc>
+    </data>
+    <!-- Adresagaráže -->
+    <data type="boolean">
+        <title>Rovnaké miesto poistenia garáže?</title>
+        <id>105008</id>
+        <init>true</init>
+        <!--show-->
+        <action trigger="set">
+            <!--@formatter:off-->
+                isGarage: f.105008,
+                trans: t.2,
+                other: f.109054;
+                make other,editable on trans when { !isGarage.value }
+            <!--@formatter:on-->
+        </action>
+        <action trigger="set">
+            <!--@formatter:off-->
+                isGarage: f.105008,
+                trans: t.2,
+                other: f.109055;
+                make other,editable on trans when { !isGarage.value }
+            <!--@formatter:on-->
+        </action>
+        <action trigger="set">
+            <!--@formatter:off-->
+                isGarage: f.105008,
+                trans: t.2,
+                other: f.109056;
+                make other,editable on trans when { !isGarage.value }
+            <!--@formatter:on-->
+        </action>
+        <action trigger="set">
+            <!--@formatter:off-->
+                isGarage: f.105008,
+                trans: t.2,
+                other: f.109057;
+                make other,editable on trans when { !isGarage.value }
+            <!--@formatter:on-->
+        </action>
+        <action trigger="set">
+            <!--@formatter:off-->
+                isGarage: f.105008,
+                trans: t.2,
+                other: f.109054;
+                make other,required on trans when { !isGarage.value }
+            <!--@formatter:on-->
+        </action>
+        <action trigger="set">
+            <!--@formatter:off-->
+                isGarage: f.105008,
+                trans: t.2,
+                other: f.109055;
+                make other,required on trans when { !isGarage.value }
+            <!--@formatter:on-->
+        </action>
+        <action trigger="set">
+            <!--@formatter:off-->
+                isGarage: f.105008,
+                trans: t.2,
+                other: f.109056;
+                make other,required on trans when { !isGarage.value }
+            <!--@formatter:on-->
+        </action>
+        <action trigger="set">
+            <!--@formatter:off-->
+                isGarage: f.105008,
+                trans: t.2,
+                other: f.109057;
+                make other,required on trans when { !isGarage.value }
+            <!--@formatter:on-->
+        </action>
+        <!--hide-->
+        <action trigger="set">
+            <!--@formatter:off-->
+                isGarage: f.105008,
+                trans: t.2,
+                other: f.109054;
+                make other,hidden on trans when { isGarage.value }
+            <!--@formatter:on-->
+        </action>
+        <action trigger="set">
+            <!--@formatter:off-->
+                isGarage: f.105008,
+                trans: t.2,
+                other: f.109055;
+                make other,hidden on trans when { isGarage.value }
+            <!--@formatter:on-->
+        </action>
+        <action trigger="set">
+            <!--@formatter:off-->
+                isGarage: f.105008,
+                trans: t.2,
+                other: f.109056;
+                make other,hidden on trans when { isGarage.value }
+            <!--@formatter:on-->
+        </action>
+        <action trigger="set">
+            <!--@formatter:off-->
+                isGarage: f.105008,
+                trans: t.2,
+                other: f.109057;
+                make other,hidden on trans when { isGarage.value }
+            <!--@formatter:on-->
+        </action>
+
+        <action trigger="set">
+            <!--@formatter:off-->
+                isGarage: f.105008,
+                trans: t.6,
+                other: f.109054;
+                make other,editable on trans when { !isGarage.value }
+            <!--@formatter:on-->
+        </action>
+        <action trigger="set">
+            <!--@formatter:off-->
+                isGarage: f.105008,
+                trans: t.6,
+                other: f.109055;
+                make other,editable on trans when { !isGarage.value }
+            <!--@formatter:on-->
+        </action>
+        <action trigger="set">
+            <!--@formatter:off-->
+                isGarage: f.105008,
+                trans: t.6,
+                other: f.109056;
+                make other,editable on trans when { !isGarage.value }
+            <!--@formatter:on-->
+        </action>
+        <action trigger="set">
+            <!--@formatter:off-->
+                isGarage: f.105008,
+                trans: t.6,
+                other: f.109057;
+                make other,editable on trans when { !isGarage.value }
+            <!--@formatter:on-->
+        </action>
+        <action trigger="set">
+            <!--@formatter:off-->
+                isGarage: f.105008,
+                trans: t.6,
+                other: f.109054;
+                make other,required on trans when { !isGarage.value }
+            <!--@formatter:on-->
+        </action>
+        <action trigger="set">
+            <!--@formatter:off-->
+                isGarage: f.105008,
+                trans: t.6,
+                other: f.109055;
+                make other,required on trans when { !isGarage.value }
+            <!--@formatter:on-->
+        </action>
+        <action trigger="set">
+            <!--@formatter:off-->
+                isGarage: f.105008,
+                trans: t.6,
+                other: f.109056;
+                make other,required on trans when { !isGarage.value }
+            <!--@formatter:on-->
+        </action>
+        <action trigger="set">
+            <!--@formatter:off-->
+                isGarage: f.105008,
+                trans: t.6,
+                other: f.109057;
+                make other,required on trans when { !isGarage.value }
+            <!--@formatter:on-->
+        </action>
+        <!--hide-->
+        <action trigger="set">
+            <!--@formatter:off-->
+                isGarage: f.105008,
+                trans: t.6,
+                other: f.109054;
+                make other,hidden on trans when { isGarage.value }
+            <!--@formatter:on-->
+        </action>
+        <action trigger="set">
+            <!--@formatter:off-->
+                isGarage: f.105008,
+                trans: t.6,
+                other: f.109055;
+                make other,hidden on trans when { isGarage.value }
+            <!--@formatter:on-->
+        </action>
+        <action trigger="set">
+            <!--@formatter:off-->
+                isGarage: f.105008,
+                trans: t.6,
+                other: f.109056;
+                make other,hidden on trans when { isGarage.value }
+            <!--@formatter:on-->
+        </action>
+        <action trigger="set">
+            <!--@formatter:off-->
+                isGarage: f.105008,
+                trans: t.6,
+                other: f.109057;
+                make other,hidden on trans when { isGarage.value }
+            <!--@formatter:on-->
+        </action>
+    </data>
+    <data type="text">
+        <title>Ulica</title>
+        <id>109054</id>
+        <desc>Garáž</desc>
+    </data>
+    <data type="text">
+        <title>Súpisné a orientačné číslo</title>
+        <id>109055</id>
+        <desc>Garáž</desc>
+    </data>
+    <data type="text">
+        <title>PSČ</title>
+        <id>109056</id>
+        <desc>Garáž</desc>
+    </data>
+    <data type="text">
+        <title>Obec</title>
+        <id>109057</id>
+        <desc>Garáž</desc>
+    </data>
+    <!-- ========== TRANSITIONS ========== -->
+    <transition>
+        <id>2</id>
+        <x>180</x>
+        <y>140</y>
+        <label>Vyplniť údaje</label>
+        <roleRef>
+            <id>1</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <dataGroup>
+            <id>2</id>
+            <title>Poistený</title>
+            <!-- Poistený -->
+            <!--Typ subjektu-->
+            <dataRef>
+                <id>109021</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <!--Titul pred menom-->
+            <dataRef>
+                <id>109022</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <!--Titul za menom-->
+            <dataRef>
+                <id>109023</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <!--Meno poistený-->
+            <dataRef>
+                <id>109024</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <!--Priezvisko poistený-->
+            <dataRef>
+                <id>109025</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <!--Obchodné meno poistený-->
+            <dataRef>
+                <id>109026</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <!--Štátna príslušnosť poistený-->
+            <dataRef>
+                <id>109027</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <!--Dátum narodenia poistený-->
+            <dataRef>
+                <id>109028</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <!--Rodné číslo-->
+            <dataRef>
+                <id>109029</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <!--Typ preukazu poisteny-->
+            <dataRef>
+                <id>109030</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <!--Číslo preukazu-->
+            <dataRef>
+                <id>109031</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <!--Telefónne číslo poisteny-->
+            <dataRef>
+                <id>109032</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <!--Email poisteny-->
+            <dataRef>
+                <id>109033</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>3</id>
+            <title>Adresa trvalého pobytu</title>
+            <!-- Údaje o mieste poistenia -->
+            <!-- Adresa trvalého pobytu -->
+            <dataRef>
+                <id>109036</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>109037</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>109038</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>109039</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>4</id>
+            <title>Korešpondenčná adresa</title>
+            <alignment>start</alignment>
+            <!-- Korešpondenčná adresa -->
+            <!--Rovnaká ako trvalý pobyt-->
+            <dataRef>
+                <id>109034</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>7</id>
+            <title></title>
+            <alignment>start</alignment>
+            <dataRef>
+                <id>109041</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>109042</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>109043</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>109044</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>5</id>
+            <title>Miesto poistenia</title>
+            <alignment>start</alignment>
+            <!-- Miesto poistenia -->
+            <dataRef>
+                <id>109035</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>8</id>
+            <title></title>
+            <alignment>start</alignment>
+            <dataRef>
+                <id>109045</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>109046</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>109047</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>109048</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>6</id>
+            <title>Adresa garáže</title>
+            <!--Rovnaké miesto poistenia garáže?-->
+            <dataRef>
+                <id>105008</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>7</id>
+            <dataRef>
+                <id>109054</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>109055</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>109056</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>109057</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+    </transition>
+    <transition>
+        <id>6</id>
+        <x>300</x>
+        <y>260</y>
+        <label>Upraviť</label>
+        <roleRef>
+            <id>1</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <dataGroup>
+            <id>2</id>
+            <title>Poistený</title>
+            <!-- Poistený -->
+            <!--Typ subjektu-->
+            <dataRef>
+                <id>109021</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <!--Titul pred menom-->
+            <dataRef>
+                <id>109022</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <!--Titul za menom-->
+            <dataRef>
+                <id>109023</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <!--Meno poistený-->
+            <dataRef>
+                <id>109024</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <!--Priezvisko poistený-->
+            <dataRef>
+                <id>109025</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <!--Obchodné meno poistený-->
+            <dataRef>
+                <id>109026</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <!--Štátna príslušnosť poistený-->
+            <dataRef>
+                <id>109027</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <!--Dátum narodenia poistený-->
+            <dataRef>
+                <id>109028</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <!--Rodné číslo-->
+            <dataRef>
+                <id>109029</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <!--Typ preukazu poisteny-->
+            <dataRef>
+                <id>109030</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <!--Číslo preukazu-->
+            <dataRef>
+                <id>109031</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <!--Telefónne číslo poisteny-->
+            <dataRef>
+                <id>109032</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <!--Email poisteny-->
+            <dataRef>
+                <id>109033</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>3</id>
+            <title>Adresa trvalého pobytu</title>
+            <!-- Údaje o mieste poistenia -->
+            <!-- Adresa trvalého pobytu -->
+            <dataRef>
+                <id>109036</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>109037</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>109038</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>109039</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>4</id>
+            <title>Korešpondenčná adresa</title>
+            <alignment>start</alignment>
+            <!-- Korešpondenčná adresa -->
+            <!--Rovnaká ako trvalý pobyt-->
+            <dataRef>
+                <id>109034</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>7</id>
+            <title></title>
+            <alignment>start</alignment>
+            <dataRef>
+                <id>109041</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>109042</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>109043</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>109044</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>5</id>
+            <title>Miesto poistenia</title>
+            <alignment>start</alignment>
+            <!-- Miesto poistenia -->
+            <dataRef>
+                <id>109035</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>8</id>
+            <title></title>
+            <alignment>start</alignment>
+            <dataRef>
+                <id>109045</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>109046</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>109047</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>109048</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>6</id>
+            <title>Adresa garáže</title>
+            <!--Rovnaké miesto poistenia garáže?-->
+            <dataRef>
+                <id>105008</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>7</id>
+            <dataRef>
+                <id>109054</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>109055</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>109056</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>109057</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+    </transition>
+    <!-- ========== PLACES ========== -->
+    <place>
+        <id>1</id>
+        <x>60</x>
+        <y>140</y>
+        <label>in</label>
+        <tokens>1</tokens>
+        <static>false</static>
+    </place>
+    <place>
+        <id>3</id>
+        <x>300</x>
+        <y>140</y>
+        <label></label>
+        <tokens>0</tokens>
+        <static>false</static>
+    </place>
+    <place>
+        <id>10</id>
+        <x>540</x>
+        <y>140</y>
+        <label></label>
+        <tokens>0</tokens>
+        <static>false</static>
+    </place>
+    <!-- ========== ARCS ========== -->
+    <arc>
+        <id>4</id>
+        <type>regular</type>
+        <sourceId>1</sourceId>
+        <destinationId>2</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>5</id>
+        <type>regular</type>
+        <sourceId>2</sourceId>
+        <destinationId>3</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>7</id>
+        <type>regular</type>
+        <sourceId>3</sourceId>
+        <destinationId>6</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>12</id>
+        <type>regular</type>
+        <sourceId>6</sourceId>
+        <destinationId>3</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+</document>

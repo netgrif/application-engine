@@ -1,13 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document>
+    <!-- ========== TRANSACTIONS ========== -->
+    <transaction>
+        <id>1</id>
+        <title>Insurance selection</title>
+    </transaction>
+    <transaction>
+        <id>2</id>
+        <title>Insurance calculation</title>
+    </transaction>
+    <transaction>
+        <id>3</id>
+        <title>Contract proposal</title>
+    </transaction>
     <!-- ========== DATA ========== -->
-    <data type="date">
+    <data type="date" immediate="true">
         <id>1</id>
         <title>On which date would you like your cover to start?</title>
+        <valid>between "2017-07-01","2017-07-30"</valid>
+        <valid>workday</valid>
+        <init>2017-07-01</init>
     </data>
     <data type="text">
         <id>2</id>
         <title>City</title>
+        <valid>length 20</valid>
+        <init>Bratislava</init>
+        <placeholder>Mesto</placeholder>
+        <action trigger="set">
+            self: f.30;
+            change self about { 5 as Double }
+        </action>
     </data>
     <data type="enumeration">
         <id>5</id>
@@ -34,10 +57,12 @@
     <data type="number">
         <id>18</id>
         <title>Size of living area</title>
+        <init>200</init>
     </data>
     <data type="number">
         <id>20</id>
         <title>How much would it cost to replace the entire contents of your home as new?</title>
+        <placeholder>Age</placeholder>
     </data>
     <data type="multichoice">
         <id>22</id>
@@ -45,6 +70,7 @@
         <values>Television</values>
         <values>Computer</values>
         <values>Home cinema</values>
+        <init>Television,Computer</init>
     </data>
     <data type="enumeration">
         <id>24</id>
@@ -57,6 +83,11 @@
     <data type="boolean">
         <id>25</id>
         <title>Is a burglar alarm fitted and used?</title>
+        <action trigger="set">
+            self: f.this,
+            other: f.24;
+            change other about { "5 lever mortice deadlock" }
+        </action>
     </data>
     <data type="user">
         <id>27</id>
@@ -66,14 +97,27 @@
     <data type="number">
         <id>29</id>
         <title>How many adults 18 or over live in the property</title>
+        <valid>positive</valid>
+        <valid>decimal</valid>
+        <valid>inrange 1,50</valid>
+        <placeholder>Age</placeholder>
     </data>
     <data type="number">
         <id>30</id>
         <title>How many children under 18 live in the property</title>
     </data>
-    <data type="number">
+    <data type="number" immediate="true">
         <id>38</id>
         <title>Quote</title>
+    </data>
+    <data type="file">
+        <id>39</id>
+        <title>PDF document</title>
+        <init>Automatically generated</init>
+        <action trigger="get">
+            self: f.this;
+            generate "Insurance.offerPDF",always into self
+        </action>
     </data>
     <!-- ========== ROLES ========== -->
     <role>
@@ -82,7 +126,7 @@
     </role>
     <role>
         <id>2</id>
-        <name>System</name>
+        <name>Premium</name>
     </role>
     <!-- ========== PLACES ========== -->
     <place>
@@ -185,6 +229,9 @@
                 <perform>true</perform>
             </logic>
         </roleRef>
+        <transactionRef>
+            <id>1</id>
+        </transactionRef>
     </transition>
     <transition>
         <id>3</id>
@@ -197,6 +244,9 @@
                 <perform>true</perform>
             </logic>
         </roleRef>
+        <transactionRef>
+            <id>1</id>
+        </transactionRef>
     </transition>
     <transition>
         <id>4</id>
@@ -209,6 +259,9 @@
                 <perform>true</perform>
             </logic>
         </roleRef>
+        <transactionRef>
+            <id>1</id>
+        </transactionRef>
     </transition>
     <transition>
         <id>14</id>
@@ -226,6 +279,10 @@
             <logic>
                 <behavior>editable</behavior>
                 <behavior>required</behavior>
+                <action trigger="set">
+                    other: f.14;
+                    change other about { "Brick" }
+                </action>
             </logic>
         </dataRef>
         <dataRef>
@@ -238,6 +295,10 @@
             <id>14</id>
             <logic>
                 <behavior>editable</behavior>
+                <action trigger="set">
+                    other: f.18;
+                    change other about { 100000 as Double }
+                </action>
             </logic>
         </dataRef>
         <dataRef>
@@ -246,6 +307,9 @@
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
+        <transactionRef>
+            <id>1</id>
+        </transactionRef>
     </transition>
     <transition>
         <id>15</id>
@@ -283,6 +347,9 @@
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
+        <transactionRef>
+            <id>1</id>
+        </transactionRef>
     </transition>
     <transition>
         <id>27</id>
@@ -290,7 +357,7 @@
         <y>260</y>
         <label>Buildings and contents cover calculation</label>
         <roleRef>
-            <id>2</id>
+            <id>1</id>
             <logic>
                 <perform>true</perform>
             </logic>
@@ -380,6 +447,9 @@
                 <behavior>required</behavior>
             </logic>
         </dataRef>
+        <transactionRef>
+            <id>2</id>
+        </transactionRef>
     </transition>
     <transition>
         <id>30</id>
@@ -387,7 +457,7 @@
         <y>140</y>
         <label>Buildings cover calculation</label>
         <roleRef>
-            <id>2</id>
+            <id>1</id>
             <logic>
                 <perform>true</perform>
             </logic>
@@ -453,6 +523,9 @@
                 <behavior>required</behavior>
             </logic>
         </dataRef>
+        <transactionRef>
+            <id>2</id>
+        </transactionRef>
     </transition>
     <transition>
         <id>33</id>
@@ -460,7 +533,7 @@
         <y>380</y>
         <label>Contents cover calculation</label>
         <roleRef>
-            <id>2</id>
+            <id>1</id>
             <logic>
                 <perform>true</perform>
             </logic>
@@ -526,6 +599,9 @@
                 <behavior>required</behavior>
             </logic>
         </dataRef>
+        <transactionRef>
+            <id>2</id>
+        </transactionRef>
     </transition>
     <transition>
         <id>36</id>
@@ -538,6 +614,9 @@
                 <perform>true</perform>
             </logic>
         </roleRef>
+        <transactionRef>
+            <id>3</id>
+        </transactionRef>
     </transition>
     <transition>
         <id>49</id>
@@ -545,11 +624,14 @@
         <y>340</y>
         <label>Expiration</label>
         <roleRef>
-            <id>2</id>
+            <id>1</id>
             <logic>
                 <perform>true</perform>
             </logic>
         </roleRef>
+        <transactionRef>
+            <id>3</id>
+        </transactionRef>
     </transition>
     <transition>
         <id>96</id>
@@ -593,6 +675,15 @@
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
+        <dataRef>
+            <id>39</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <transactionRef>
+            <id>1</id>
+        </transactionRef>
     </transition>
     <!-- ========== ARCS ========== -->
     <arc>

@@ -17,6 +17,8 @@ public class DataFieldsResource extends Resources<Field> {
     }
 
     private void buildLinks(String taskId){
+        if(taskId == null) return;
+
         add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
             .getData(taskId)).withSelfRel());
         add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
