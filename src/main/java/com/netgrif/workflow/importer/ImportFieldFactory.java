@@ -1,11 +1,13 @@
 package com.netgrif.workflow.importer;
 
 import com.netgrif.workflow.importer.model.ImportData;
+import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.dataset.*;
 
-import java.util.Arrays;
+import java.util.*;
 
 public final class ImportFieldFactory {
+
     private Importer importer;
 
     public ImportFieldFactory(Importer importer) {
@@ -43,26 +45,58 @@ public final class ImportFieldFactory {
             case TABULAR:
                 field = buildTabularField(data);
                 break;
+            case CASEREF:
+                field = buildCaseField(data);
+                break;
             default:
                 throw new IllegalArgumentException(data.getType() + " is not a valid Field type");
         }
         field.setName(data.getTitle());
+        field.setImportId(data.getId());
         field.setType(type);
-
+        field.setImmediate(data.isImmediate());
+        if(data.getDesc() != null)
+            field.setDescription(data.getDesc());
+        if(data.getPlaceholder() != null)
+            field.setPlaceholder(data.getPlaceholder());
+        if(data.getValid() != null && field instanceof ValidableField)
+            ((ValidableField)field).setValidationRules(data.getValid());
+        if(data.getInit() != null && field instanceof FieldWithDefault)
+            ((FieldWithDefault)field).setDefaultValue(data.getInit());
+        if(data.getAction() != null && data.getAction().length != 0){
+            Arrays.stream(data.getAction()).forEach(action -> field.addAction(action.getDefinition(),action.getTrigger()));
+        }
         return field;
+    }
+
+    private CaseField buildCaseField(ImportData data) {
+        Map<String, LinkedHashSet<String>> netIds = new HashMap<>();
+        Arrays.stream(data.getDocumentRefs())
+                .forEach(documentRef -> {
+                    PetriNet net = importer.getNetByImportId(documentRef.getId());
+                    LinkedHashSet<String> fieldIds = new LinkedHashSet<>();
+                    List<Long> fieldImportIds = Arrays.asList(documentRef.getFields());
+
+                    net.getDataSet().values().forEach(field -> {
+                        if (fieldImportIds.contains(field.getImportId())) {
+                            fieldIds.add(field.getStringId());
+                        }
+                    });
+
+                    netIds.put(net.getStringId(), fieldIds);
+                });
+        return new CaseField(netIds);
     }
 
     private TabularField buildTabularField(ImportData data) {
         TabularField field = new TabularField();
-        Arrays.stream(data.getColumns().getData()).forEach(dataField -> {
-            field.addField(getField(dataField));
-        });
+        Arrays.stream(data.getColumns().getData()).forEach(dataField -> field.addField(getField(dataField)));
         return field;
     }
 
     private UserField buildUserField(ImportData data) {
         String[] roles = Arrays.stream(data.getValues())
-                .map(value -> importer.getRoles().get(Long.parseLong(value)).getObjectId())
+                .map(value -> importer.getRoles().get(Long.parseLong(value)).getStringId())
                 .toArray(String[]::new);
         return new UserField(roles);
     }
