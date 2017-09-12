@@ -58,15 +58,23 @@ class PdfUtils {
         def fieldValues = new XmlSlurper().parseText(xmlText)
 
         fieldValues.children().each {
-            String DA = acroForm.getField(it["@xfdf:original"] as String).getCOSObject().getString(COSName.DA)
-            fonts.each { font ->
-                if (DA.contains(font.key))
-                    acroForm.getField(it["@xfdf:original"] as String).getCOSObject().setString(COSName.DA, DA.replaceAll(font.key, "/${font.value}"))
-            }
-            acroForm.getField(it["@xfdf:original"] as String).setValue(it as String)
+            setFieldValueAndFont(acroForm, it, fonts)
         }
 
         acroForm.flatten()
+    }
+
+    private static setFieldValueAndFont(PDAcroForm acroForm, def xmlNode, Map<String, String> fonts) {
+        def id = ((xmlNode["@xfdf:original"] as String) ?: xmlNode.name()) as String
+        def field = acroForm.fieldIterator.find { it.partialName.equalsIgnoreCase(id) }
+
+        String DA = field.getCOSObject().getString(COSName.DA)
+
+        fonts.each { font ->
+            if (DA.contains(font.key))
+                field.getCOSObject().setString(COSName.DA, DA.replaceAll(font.key, "/${font.value}"))
+        }
+        field.setValue(xmlNode as String)
     }
 
     private static File saveToFile(PDDocument document, String outPdfName) {
