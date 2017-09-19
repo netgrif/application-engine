@@ -2134,7 +2134,7 @@
         </action>
     </data>
     <data type="boolean">
-        <title>Stavebné materialy</title>
+        <title>Stavebné materiály</title>
         <id>105031</id>
     </data>
     <data type="number">
@@ -6737,7 +6737,7 @@
             <id>1</id>
             <title></title>
             <alignment>start</alignment>
-            <!--Stavebné materialy-->
+            <!--Stavebné materiály-->
             <dataRef>
                 <id>105031</id>
                 <logic>
@@ -6815,14 +6815,14 @@
             <id>2</id>
             <title></title>
             <alignment>start</alignment>
-            <!--Stavebné materialy ps-->
+            <!--Stavebné materiály ps-->
             <dataRef>
                 <id>105032</id>
                 <logic>
                     <behavior>hidden</behavior>
                 </logic>
             </dataRef>
-            <!--Stavebné materialy p-->
+            <!--Stavebné materiály p-->
             <dataRef>
                 <id>305015</id>
                 <logic>
@@ -10520,21 +10520,21 @@
         <dataGroup>
             <id>1</id>
             <title></title>
-            <!--Stavebné materialy-->
+            <!--Stavebné materiály-->
             <dataRef>
                 <id>105031</id>
                 <logic>
                     <behavior>visible</behavior>
                 </logic>
             </dataRef>
-            <!--Stavebné materialy ps-->
+            <!--Stavebné materiály ps-->
             <dataRef>
                 <id>105032</id>
                 <logic>
                     <behavior>visible</behavior>
                 </logic>
             </dataRef>
-            <!--Stavebné materialy p-->
+            <!--Stavebné materiály p-->
             <dataRef>
                 <id>305015</id>
                 <logic>
