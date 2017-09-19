@@ -301,8 +301,7 @@
         </action>
     </data>
     <data type="boolean">
-        <title>Bolo poistenému alebo spolupoistenej osobe niekedy v minulosti zamiestnuté poistné plnenie alebo
-            vypovedaná poistná zmluva?
+        <title>Bolo poistenému alebo spolupoistenej osobe niekedy v minulosti zamietnuté poistné plnenie alebo vypovedaná poistná zmluva?
         </title>
         <id>101009</id>
         <action trigger="set">
@@ -3436,8 +3435,7 @@
         </action>
     </data>
     <data type="number">
-        <title>Koeficient - Bolo poistenému alebo spolupoistenej osobe niekedy v minulosti zamietnuté poistné plnenie
-            alebo vypovedaná poistná zmluva?
+        <title>Koeficient - Bolo poistenému alebo spolupoistenej osobe niekedy v minulosti zamietnuté poistné plnenie alebo vypovedaná poistná zmluva?
         </title>
         <id>201009</id>
         <init>1</init>
@@ -6466,7 +6464,7 @@
                     <behavior>required</behavior>
                 </logic>
             </dataRef>
-            <!--Bolo poistenému alebo spolupoistenej osobe niekedy v minulosti zamiestnuté poistné plnenie alebo vypovedaná poistná zmluva?-->
+            <!--Bolo poistenému alebo spolupoistenej osobe niekedy v minulosti zamietnuté poistné plnenie alebo vypovedaná poistná zmluva?-->
             <dataRef>
                 <id>101009</id>
                 <logic>
@@ -10305,7 +10303,7 @@
             <id>5</id>
             <title></title>
             <stretch>true</stretch>
-            <!--Bolo poistenému alebo spolupoistenej osobe niekedy v minulosti zamiestnuté poistné plnenie alebo vypovedaná poistná zmluva?-->
+            <!--Bolo poistenému alebo spolupoistenej osobe niekedy v minulosti zamietnuté poistné plnenie alebo vypovedaná poistná zmluva?-->
             <dataRef>
                 <id>101009</id>
                 <logic>
