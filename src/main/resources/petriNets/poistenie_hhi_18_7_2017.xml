@@ -6219,14 +6219,14 @@
         <title>Variabilný symbol</title>
         <id>308007</id>
     </data>
-    <!-- ===== TODO ===== -->
+    <!-- ===== TODO PI-125 ===== -->
     <data type="date">
         <title>Dátum dojednania návrhu na uzavretie poistnej zmluvy</title>
         <id>309002</id>
     </data>
     <!-- ===== PDF ===== -->
     <data type="file">
-        <title>Ponuka PDF</title>
+        <title>Zmluva PDF</title>
         <id>309003</id>
         <init>Automaticky generované</init>
         <action trigger="get">
@@ -9875,7 +9875,7 @@
                     <behavior>editable</behavior>
                 </logic>
             </dataRef>
-            <!--Ponuka PDF-->
+            <!--Zmluva PDF-->
             <dataRef>
                 <id>309003</id>
                 <logic>
@@ -9981,7 +9981,7 @@
                     <behavior>editable</behavior>
                 </logic>
             </dataRef>
-            <!--Ponuka PDF-->
+            <!--Zmluva PDF-->
             <dataRef>
                 <id>309003</id>
                 <logic>
@@ -10087,7 +10087,7 @@
                     <behavior>editable</behavior>
                 </logic>
             </dataRef>
-            <!--Ponuka PDF-->
+            <!--Zmluva PDF-->
             <dataRef>
                 <id>309003</id>
                 <logic>
@@ -11509,7 +11509,7 @@
                     <behavior>visible</behavior>
                 </logic>
             </dataRef>
-            <!--Ponuka PDF-->
+            <!--Zmluva PDF-->
             <dataRef>
                 <id>309003</id>
                 <logic>
