@@ -1654,7 +1654,7 @@
         </action>
     </data>
     <data type="boolean">
-        <title>Chodník</title>
+        <title>Chodník, parkovacia plocha</title>
         <id>105015</id>
         <action trigger="set">
             <!--@formatter:off-->
@@ -10674,21 +10674,21 @@
                     <behavior>visible</behavior>
                 </logic>
             </dataRef>
-            <!--Chodník-->
+            <!--Chodník, parkovacia plocha-->
             <dataRef>
                 <id>105015</id>
                 <logic>
                     <behavior>visible</behavior>
                 </logic>
             </dataRef>
-            <!--Chodník ps-->
+            <!--Chodník, parkovacia plocha ps-->
             <dataRef>
                 <id>105016</id>
                 <logic>
                     <behavior>visible</behavior>
                 </logic>
             </dataRef>
-            <!--Chodník p-->
+            <!--Chodník, parkovacia plocha p-->
             <dataRef>
                 <id>305007</id>
                 <logic>
