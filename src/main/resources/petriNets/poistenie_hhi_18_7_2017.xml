@@ -182,7 +182,7 @@
         </action>
     </data>
     <data type="boolean">
-        <title>Nachádza nehnuteľnosť sa vo vzdialenosti kratšej ako 300 m od vodného toku?</title>
+        <title>Nachádza sa nehnuteľnosť vo vzdialenosti kratšej ako 300 m od vodného toku?</title>
         <id>101004</id>
         <action trigger="set">
             <!--@formatter:off-->
@@ -3301,7 +3301,7 @@
         </action>
     </data>
     <data type="number">
-        <title>Koeficient - Nachádza nehnuteľnosť sa vo vzdialenosti kratšej ako 300 m od vodného toku?</title>
+        <title>Koeficient - Nachádza sa nehnuteľnosť vo vzdialenosti kratšej ako 300 m od vodného toku?</title>
         <id>201004</id>
         <init>1</init>
         <action trigger="set">
@@ -6426,7 +6426,7 @@
                     <behavior>required</behavior>
                 </logic>
             </dataRef>
-            <!--Nachádza nehnuteľnosť sa vo vzdialenosti kratšej ako 300 m od vodného toku?-->
+            <!--Nachádza sa nehnuteľnosť vo vzdialenosti kratšej ako 300 m od vodného toku?-->
             <dataRef>
                 <id>101004</id>
                 <logic>
@@ -10253,7 +10253,7 @@
             <id>3</id>
             <title></title>
             <stretch>true</stretch>
-            <!--Nachádza nehnuteľnosť sa vo vzdialenosti kratšej ako 300 m od vodného toku?-->
+            <!--Nachádza sa nehnuteľnosť vo vzdialenosti kratšej ako 300 m od vodného toku?-->
             <dataRef>
                 <id>101004</id>
                 <logic>
