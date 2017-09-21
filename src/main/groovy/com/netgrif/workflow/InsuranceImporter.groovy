@@ -76,7 +76,7 @@ class InsuranceImporter {
     private importNets() {
         documentNet = importer.importPetriNet(new File("src/main/resources/petriNets/document-lifecycle.xml"), "Dokument", "DOC")
         contactNet = importer.importPetriNet(new File("src/main/resources/petriNets/contact.xml"), "Contact", "CON")
-        insuranceNet = importer.importPetriNet(new File("src/main/resources/petriNets/poistenie_hhi_18_7_2017.xml"), "Insurance", "INS")
+        insuranceNet = importer.importPetriNet(new File("src/main/resources/petriNets/insurance_hhi.xml"), "Insurance", "INS")
     }
 
     private void createOrganizations() {
