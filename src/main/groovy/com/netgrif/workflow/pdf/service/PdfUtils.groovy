@@ -19,7 +19,7 @@ class PdfUtils {
 
     private static final int KEY_LENGTH = 128
 
-    static File encryptPdfFile(String outPdfPath, File input, String ownerPassword, String userPassword = "") {
+    static File encryptPdfFile(String outPdfPath, File input, String ownerPassword = "", String userPassword = "") {
         PDDocument doc = PDDocument.load(input)
         AccessPermission ap = new AccessPermission(canFillInForm: false, canModify: false)
         StandardProtectionPolicy spp = new StandardProtectionPolicy(ownerPassword, userPassword, ap)
