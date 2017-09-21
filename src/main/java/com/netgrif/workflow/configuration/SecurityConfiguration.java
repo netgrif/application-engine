@@ -1,6 +1,8 @@
 package com.netgrif.workflow.configuration;
 
 import org.apache.commons.lang.ArrayUtils;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.jasypt.encryption.pbe.StandardPBEStringEncryptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +19,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -56,6 +57,17 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
         auth.userDetailsService(userDetailsService).passwordEncoder(bCryptPasswordEncoder());
+    }
+
+    @Bean
+    public StandardPBEStringEncryptor standardPBEStringEncryptor() {
+        StandardPBEStringEncryptor encryptor = new StandardPBEStringEncryptor();
+
+        encryptor.setAlgorithm("PBEWITHSHA256AND256BITAES-CBC-BC");
+        encryptor.setPassword("randompassword");
+        encryptor.setProvider(new BouncyCastleProvider());
+
+        return encryptor;
     }
 
     @Bean
