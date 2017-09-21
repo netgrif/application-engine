@@ -6,10 +6,7 @@ import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.DataField;
 import org.jasypt.encryption.pbe.StandardPBEStringEncryptor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.core.mapping.event.AbstractMongoEventListener;
-import org.springframework.data.mongodb.core.mapping.event.AfterConvertEvent;
-import org.springframework.data.mongodb.core.mapping.event.BeforeSaveEvent;
-import org.springframework.data.mongodb.core.mapping.event.MongoMappingEvent;
+import org.springframework.data.mongodb.core.mapping.event.*;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -32,12 +29,12 @@ public class CaseListener extends AbstractMongoEventListener<Case> {
     }
 
     @Override
-    public void onBeforeSave(BeforeSaveEvent<Case> event) {
+    public void onBeforeConvert(BeforeConvertEvent<Case> event) {
         List<DataField> dataFields = getDataFields(event);
 
         dataFields.forEach(field -> field.setValue(encryptor.encrypt((String) field.getValue())));
 
-        super.onBeforeSave(event);
+        super.onBeforeConvert(event);
     }
 
     private List<DataField> getDataFields(MongoMappingEvent<Case> event) {
