@@ -55,7 +55,9 @@ class Insurance {
         String userPassword
         switch (value(109007)) {
             case "právnická osoba":
-                return fileToEncrypt
+                File encrypted = new File(encryptedFilePath)
+                encrypted.bytes = fileToEncrypt.bytes
+                return encrypted
             case "fyzická osoba podnikateľ (SZČO)":
                 userPassword = value(109017)
                 break
