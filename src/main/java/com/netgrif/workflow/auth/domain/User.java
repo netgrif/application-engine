@@ -6,12 +6,9 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRole;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.Type;
-import org.hibernate.annotations.TypeDef;
 import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotBlank;
-import org.jasypt.hibernate4.type.EncryptedStringType;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -20,15 +17,6 @@ import java.util.Set;
 
 @Entity
 @Table(name = "user")
-@TypeDef(
-        name = "encryptedStr",
-        defaultForType = EncryptedStringType.class,
-        typeClass = EncryptedStringType.class,
-        parameters = {
-                @org.hibernate.annotations.Parameter(name = "algorithm", value = "PBEWITHSHA1ANDRC4_128"),
-                @org.hibernate.annotations.Parameter(name = "password", value = "s56k3N5xh782")
-        }
-)
 public class User {
 
     @Id
@@ -57,7 +45,6 @@ public class User {
     @NotNull
     @NotBlank
     @Getter @Setter
-    @Type(type = "encryptedStr")
     private String name;
 
     @NotNull
