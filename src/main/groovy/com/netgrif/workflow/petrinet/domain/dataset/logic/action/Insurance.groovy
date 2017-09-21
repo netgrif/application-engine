@@ -13,7 +13,9 @@ class Insurance {
     private final static String PDF_PATH = "src/main/resources/pdf"
     private final static String OFFER_FILENAME = "offer.pdf"
     private final static String DRAFT_FILENAME = "draft.pdf"
+    private final static String MERGE_FILENAME = "merged.pdf"
     private final static String FINAL_FILENAME = "final.pdf"
+    private final static String OWNER_PASSWORD = "PremiumInsurance2017"
 
     private Case useCase
     private Field field
@@ -26,17 +28,46 @@ class Insurance {
     File offerPDF() {
         String draftPath = (field as FileField).getFilePath(DRAFT_FILENAME)
         String offerPath = (field as FileField).getFilePath(OFFER_FILENAME)
+        String mergePath = (field as FileField).getFilePath(MERGE_FILENAME)
         String finalPath = (field as FileField).getFilePath(FINAL_FILENAME)
         String draftXml = datasetToDraftXml()
         String offerXml = datasetToOfferXml()
 
         File draftPdfFile = PdfUtils.fillPdfForm(draftPath, new FileInputStream("$PDF_PATH/$DRAFT_FILENAME"), draftXml)
         File offerPdfFile = PdfUtils.fillPdfForm(offerPath, new FileInputStream("$PDF_PATH/$OFFER_FILENAME"), offerXml)
-        File mergedPdf = PdfUtils.mergePdfFiles(finalPath, draftPdfFile, offerPdfFile)
+        File mergedPdf = PdfUtils.mergePdfFiles(mergePath, draftPdfFile, offerPdfFile)
+        File encryptedPdf = encryptPdf(finalPath, mergedPdf)
 
         useCase.dataSet.get(field.stringId).setValue(FINAL_FILENAME)
 
-        return mergedPdf
+        return encryptedPdf
+    }
+
+    /**
+     * Fyzicka osoba - rodne cislo (109015), zahranicna osoba - cislo pasu (109017), <br>
+     * SZCO - preukaz (109017),<br>
+     * Pravnicka osoba - neheslovat
+     * @param encryptedFilePath path to be used for encrypted file
+     * @param fileToEncrypt file to be encrypted
+     * @return encrypted file
+     */
+    File encryptPdf(String encryptedFilePath, File fileToEncrypt) {
+        String userPassword
+        switch (value(109007)) {
+            case "právnická osoba":
+                return fileToEncrypt
+            case "fyzická osoba podnikateľ (SZČO)":
+                userPassword = value(109017)
+                break
+            default:
+                if (value(109016) == "OP")
+                    userPassword = value(109015)
+                else
+                    userPassword = value(109017)
+                break
+        }
+
+        return PdfUtils.encryptPdfFile(encryptedFilePath, fileToEncrypt, OWNER_PASSWORD, userPassword)
     }
 
     String offerId() {

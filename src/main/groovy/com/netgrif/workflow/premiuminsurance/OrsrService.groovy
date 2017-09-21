@@ -1,5 +1,7 @@
 package com.netgrif.workflow.premiuminsurance
 
+import org.apache.log4j.Logger
+import org.jsoup.HttpStatusException
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
@@ -8,6 +10,8 @@ import org.springframework.stereotype.Service
 
 @Service
 class OrsrService implements IOrsrService {
+
+    private static final Logger log = Logger.getLogger(OrsrService.class.name)
 
     def ORSR_URL_BASE = "http://www.orsr.sk/"
 
@@ -32,15 +36,20 @@ class OrsrService implements IOrsrService {
 
     private OrsrReference parseCompanyInfo(String companyUrl) {
         OrsrReference info = new OrsrReference()
-        Document doc = Jsoup.connect("${ORSR_URL_BASE}${companyUrl}").get()
-        Elements tables = doc.select("table[cellspacing=3]")
 
-        info.name = tables?.get(0)?.select("span[class=ra]")?.get(0)?.text()
-        info.created = tables?.get(3)?.select("span[class=ra]")?.get(0)?.text()
-        info.street = tables?.get(1)?.select("span[class=ra]")?.get(0)?.text()
-        info.streetNumber = tables?.get(1)?.select("span[class=ra]")?.get(1)?.text()
-        info.city = tables?.get(1)?.select("span[class=ra]")?.get(2)?.text()
-        info.zipCode = tables?.get(1)?.select("span[class=ra]")?.get(3)?.text()
+        try {
+            Document doc = Jsoup.connect("${ORSR_URL_BASE}${companyUrl}").get()
+            Elements tables = doc.select("table[cellspacing=3]")
+
+            info.name = tables?.get(0)?.select("span[class=ra]")?.get(0)?.text()
+            info.created = tables?.get(3)?.select("span[class=ra]")?.get(0)?.text()
+            info.street = tables?.get(1)?.select("span[class=ra]")?.get(0)?.text()
+            info.streetNumber = tables?.get(1)?.select("span[class=ra]")?.get(1)?.text()
+            info.city = tables?.get(1)?.select("span[class=ra]")?.get(2)?.text()
+            info.zipCode = tables?.get(1)?.select("span[class=ra]")?.get(3)?.text()
+        } catch (HttpStatusException e) {
+            log.error("HTTP error fetching URL $ORSR_URL_BASE$companyUrl", e)
+        }
 
         return info
     }
