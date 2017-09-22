@@ -6,6 +6,7 @@ import org.jasypt.encryption.pbe.StandardPBEStringEncryptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -59,12 +60,15 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         auth.userDetailsService(userDetailsService).passwordEncoder(bCryptPasswordEncoder());
     }
 
+    @Value("${database.password}")
+    private String password;
+
     @Bean
     public StandardPBEStringEncryptor standardPBEStringEncryptor() {
         StandardPBEStringEncryptor encryptor = new StandardPBEStringEncryptor();
 
         encryptor.setAlgorithm("PBEWITHSHA256AND256BITAES-CBC-BC");
-        encryptor.setPassword("randompassword");
+        encryptor.setPassword(password);
         encryptor.setProvider(new BouncyCastleProvider());
 
         return encryptor;
