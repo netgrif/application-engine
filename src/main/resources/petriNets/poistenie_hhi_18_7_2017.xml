@@ -5308,7 +5308,7 @@
             name: f.109047;
             change name about {
                 def orsr = cache "orsr";
-                return orsr?.zipCode;
+                return orsr?.postalCode;
             }
             <!--@formatter:on-->
         </action>
@@ -5752,7 +5752,7 @@
             name: f.109047;
             change name about {
                 def orsr = cache "orsr2";
-                return orsr?.zipCode;
+                return orsr?.postalCode;
             }
             <!--@formatter:on-->
         </action>
