@@ -220,26 +220,26 @@ class Insurance {
     }
 
     Closure<MarkupBuilder> spoluucastPriPoistnomPlneni = { MarkupBuilder builder ->
-        builder.field("xfdf:original": "453", "${value(105005).replace('€', '') ?: ''}")
-        builder.field("xfdf:original": "775", "${value(106001).replace('€', '') ?: ''}")
+        builder.field("xfdf:original": "453", "${value(105005)?.replace('€', '') ?: ''}")
+        builder.field("xfdf:original": "775", "${value(106001)?.replace('€', '') ?: ''}")
 
         return builder
     }
 
     Closure<MarkupBuilder> rekapitulaciaPoistneho = { MarkupBuilder builder ->
-        builder.field("xfdf:original": "110", "${valueRound(305002) ?: ''}")
+        builder.field("xfdf:original": "110", "${valueRound(305002, 2, true) ?: ''}")
         builder.field("xfdf:original": "112", "${valueSum(305003, 305004, 305005, 305006, 305007, 305008, 305009, 305010, 305011, 305012, 305013, 305014) ?: ''}")
-        builder.field("xfdf:original": "114", "${valueRound(306001) ?: ''}")
-        builder.field("xfdf:original": "116", "${valueRound(308003) ?: ''}")
+        builder.field("xfdf:original": "114", "${valueRound(306001, 2, true) ?: ''}")
+        builder.field("xfdf:original": "116", "${valueRound(308003, 2, true) ?: ''}")
         builder.field("xfdf:original": "118", "${valueSum(305015, 305016, 306002, 306003, 306004, 306005, 306006, 306007, 306008, 306009, 306010) ?: ''}")
-        builder.field("xfdf:original": "120", "${valueRound(308004) ?: ''}")
-        builder.field("xfdf:original": "89323", "${valueRound(308006) ?: ''}")
-        builder.field("xfdf:original": "111", "${value(108003)?.replace('%', '.0') ?: ''}")
-        builder.field("xfdf:original": "113", "${valuePercentageDiscount(208004) ?: ''}")
-        builder.field("xfdf:original": "115", "${valuePercentageDiscount(203004) ?: ''}")
-        builder.field("xfdf:original": "117", "${valuePercentageDiscount(208008) ?: ''}")
-        builder.field("xfdf:original": "119", "${valuePercentageDiscount(208005) ?: ''}")
-        builder.field("xfdf:original": "121", "${valuePercentageDiscount(208007) ?: ''}")
+        builder.field("xfdf:original": "120", "${valueRound(308004, 2, true) ?: ''}")
+        builder.field("xfdf:original": "89323", "${valueRound(308006, 2, true) ?: ''}")
+        builder.field("xfdf:original": "111", "${value(108003)?.replace('%', '.0') ?: '0.0'}")
+        builder.field("xfdf:original": "113", "${valuePercentageDiscount(208004, true) ?: ''}")
+        builder.field("xfdf:original": "115", "${valuePercentageDiscount(203004, true) ?: ''}")
+        builder.field("xfdf:original": "117", "${valuePercentageDiscount(208008, true) ?: ''}")
+        builder.field("xfdf:original": "119", "${valuePercentageDiscount(208005, true) ?: ''}")
+        builder.field("xfdf:original": "121", "${valuePercentageDiscount(208007, true) ?: ''}")
 
         def periodicity = ((value(108001) == "štvrťročná") ? 4 : ((value(108001) == "polročná") ? 2 : 1)) as double
         def payment = Math.floor((((value(308006) as Double) / periodicity) * 100) as Double) / 100
@@ -370,7 +370,7 @@ class Insurance {
     }
 
     Closure<MarkupBuilder> poistenieZodpovednostiZaSkoduNehnutelnost = { MarkupBuilder builder ->
-        builder.field("xfdf:original": "531", "${value(107001).replace('€', '') ?: ''}")
+        builder.field("xfdf:original": "531", "${value(107001)?.replace('€', '') ?: ''}")
         builder.field("xfdf:original": "532", "${valueRound(308008) ?: ''}")
 
         return builder
@@ -419,7 +419,7 @@ class Insurance {
     }
 
     Closure<MarkupBuilder> zodpovednostZaSkoduDomacnost = { MarkupBuilder builder ->
-        builder.field("xfdf:original": "ôôlll", "${value(107003).replace('€', '') ?: ''}")
+        builder.field("xfdf:original": "ôôlll", "${value(107003)?.replace('€', '') ?: ''}")
         builder.ldkdd("${valueRound(308009) ?: ''}")
         builder.field("xfdf:original": "pooríííčáčôfúääňňsss", "${value(104003) ?: ''}")
 
