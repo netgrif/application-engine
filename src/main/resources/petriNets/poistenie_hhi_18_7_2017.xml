@@ -4691,7 +4691,7 @@
         <title>Štátna príslušnosť</title>
         <id>109013</id>
         <desc>Poistník</desc>
-        <values>SK</values>
+        <values>SK</values><!--TODO: SR-->
         <values>CZ</values>
         <values>HU</values>
         <values>PL</values>
@@ -4709,6 +4709,7 @@
             }
             <!--@formatter:on-->
         </action>
+        <!--TODO: initial?-->
     </data>
     <data type="date">
         <title>Dátum narodenia</title>
@@ -5644,12 +5645,12 @@
         <title>Štátna príslušnosť</title>
         <id>109027</id>
         <desc>Poistený</desc>
-        <values>SK</values>
+        <values>SK</values><!--TODO: SR-->
         <values>CZ</values>
         <values>HU</values>
         <values>PL</values>
         <values>Iná</values>
-        <init>SK</init>
+        <init>SK</init><!--TODO: SR-->
     </data>
     <data type="date">
         <title>Dátum narodenia</title>
