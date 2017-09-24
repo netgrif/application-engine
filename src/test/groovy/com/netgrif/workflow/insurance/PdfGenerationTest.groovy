@@ -426,11 +426,6 @@ class PdfGenerationTest {
         value: 1000,
         type: "number"
 ],
-//                Sauna
-105018: [
-        value: 1000,
-        type: "number"
-],
 //               Elektrická brána
 105020: [
         value: 1000,
@@ -448,11 +443,6 @@ class PdfGenerationTest {
 ],
 //                Studňa
 105026: [
-        value: 1000,
-        type: "number"
-],
-//                Žumpa, septik
-105028: [
         value: 1000,
         type: "number"
 ],
@@ -584,11 +574,6 @@ class PdfGenerationTest {
         value: 1000,
         type: "number"
 ],
-//                Umelecké diela
-106007: [
-        value: 1000,
-        type: "number"
-],
 //                Elektronické a optické zariadenia
 106009: [
         value: 1000,
@@ -606,11 +591,6 @@ class PdfGenerationTest {
 ],
 //                Elektromotory v domácich spotrebičoch
 106015: [
-        value: 1000,
-        type: "number"
-],
-//                Stavebné súčasti domácnosti
-106017: [
         value: 1000,
         type: "number"
 ],
@@ -694,7 +674,7 @@ class PdfGenerationTest {
                         type: "text"
                 ],
                 109018: [
-                        value: "+421948 123 456",
+                        value: "+421 948 123 456",
                         type: "text"
                 ],
                 109019: [
