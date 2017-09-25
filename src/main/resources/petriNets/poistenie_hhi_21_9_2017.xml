@@ -783,22 +783,6 @@
             <!--@formatter:off-->
             check: f.this,
             trans: t.364,
-            other: f.106023;
-            make other,editable on trans when { true }
-            <!--@formatter:on-->
-        </action>
-        <action trigger="get">
-            <!--@formatter:off-->
-            check: f.this,
-            trans: t.364,
-            other: f.106023;
-            make other,required on trans when { true }
-            <!--@formatter:on-->
-        </action>
-        <action trigger="get">
-            <!--@formatter:off-->
-            check: f.this,
-            trans: t.364,
             other: f.306001;
             make other,visible on trans when { true }
             <!--@formatter:on-->
@@ -899,6 +883,20 @@
                 if(check.value=="dočasná")
                     return field.value as Double;
                 return 1.0 as Double;
+            }
+            <!--@formatter:on-->
+        </action>
+        <action trigger="set">
+            <!--@formatter:off-->
+            field: f.106023,
+            field2: f.106022,
+            excess: f.208002,
+            loc: f.201001,
+            ppc: f.203006,
+            bic: f.201017,
+            sum: f.306001;
+            change sum about {
+                return ((field.value*field2.value*excess.value*ppc.value*bic.value*loc.value)/1000.0) as Double;
             }
             <!--@formatter:on-->
         </action>
@@ -2382,13 +2380,14 @@
         <action trigger="set">
             <!--@formatter:off-->
             field: f.106022,
+            field2: f.106023,
             excess: f.208002,
             loc: f.201001,
             ppc: f.203006,
             bic: f.201017,
             sum: f.306001;
             change sum about {
-                return ((field.value*excess.value*ppc.value*bic.value*loc.value)/1000.0) as Double;
+                return ((field.value*field2.value*excess.value*ppc.value*bic.value*loc.value)/1000.0) as Double;
             }
             <!--@formatter:on-->
         </action>
@@ -2402,13 +2401,14 @@
         <action trigger="set">
             <!--@formatter:off-->
             field: f.106023,
+            field2: f.106022,
             excess: f.208002,
             loc: f.201001,
             ppc: f.203006,
             bic: f.201017,
             sum: f.306001;
             change sum about {
-                return ((field.value*excess.value*ppc.value*bic.value*loc.value)/1000.0) as Double;
+                return ((field.value*field2.value*excess.value*ppc.value*bic.value*loc.value)/1000.0) as Double;
             }
             <!--@formatter:on-->
         </action>
