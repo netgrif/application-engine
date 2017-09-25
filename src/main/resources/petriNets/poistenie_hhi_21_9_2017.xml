@@ -1199,7 +1199,7 @@
             <!--@formatter:off-->
             field: f.this,
             other: f.105007,
-            trans: t.413;
+            trans: t.414;
             make other,visible on trans when { field.value }
         <!--@formatter:on-->
         </action>
@@ -1207,7 +1207,7 @@
             <!--@formatter:off-->
             field: f.this,
             other: f.305003,
-            trans: t.413;
+            trans: t.414;
             make other,visible on trans when { field.value }
         <!--@formatter:on-->
         </action>
@@ -1215,7 +1215,7 @@
             <!--@formatter:off-->
             field: f.this,
             other: f.105008,
-            trans: t.413;
+            trans: t.414;
             make other,visible on trans when { field.value }
         <!--@formatter:on-->
         </action>
@@ -1223,7 +1223,7 @@
             <!--@formatter:off-->
             field: f.this,
             other: f.305019,
-            trans: t.413;
+            trans: t.414;
             make other,visible on trans when { field.value }
         <!--@formatter:on-->
         </action>
@@ -1231,7 +1231,7 @@
             <!--@formatter:off-->
             field: f.this,
             other: f.105007,
-            trans: t.413;
+            trans: t.414;
             make other,hidden on trans when { field.value == false }
         <!--@formatter:on-->
         </action>
@@ -1239,7 +1239,7 @@
             <!--@formatter:off-->
             field: f.this,
             other: f.305003,
-            trans: t.413;
+            trans: t.414;
             make other,hidden on trans when { field.value == false }
         <!--@formatter:on-->
         </action>
@@ -1247,7 +1247,7 @@
             <!--@formatter:off-->
             field: f.this,
             other: f.105008,
-            trans: t.413;
+            trans: t.414;
             make other,hidden on trans when { field.value == false }
         <!--@formatter:on-->
         </action>
@@ -1255,7 +1255,7 @@
             <!--@formatter:off-->
             field: f.this,
             other: f.305019,
-            trans: t.413;
+            trans: t.414;
             make other,hidden on trans when { field.value == false }
         <!--@formatter:on-->
         </action>
@@ -6698,23 +6698,6 @@
                 </logic>
             </dataRef>
         </dataGroup>
-    </transition>
-    <!--============================= Vedlajsie stavby =====================-->
-    <transition>
-        <id>413</id>
-        <x>620</x>
-        <y>540</y>
-        <label>Vedľajšie stavby</label>
-        <priority>4</priority>
-        <transactionRef>
-            <id>2</id>
-        </transactionRef>
-        <roleRef>
-            <id>1</id>
-            <logic>
-                <perform>true</perform>
-            </logic>
-        </roleRef>
         <dataGroup>
             <id>1</id>
             <title></title>
@@ -6727,7 +6710,7 @@
                     <action trigger="set">
                         <!--@formatter:off-->
                             isGarage: f.105035,
-                            trans: t.413,
+                            trans: t.414,
                             other: f.105004;
                             make other,editable on trans when { isGarage.value }
                         <!--@formatter:on-->
@@ -6735,7 +6718,7 @@
                     <action trigger="set">
                         <!--@formatter:off-->
                             isGarage: f.105035,
-                            trans: t.413,
+                            trans: t.414,
                             other: f.105004;
                             make other,required on trans when { isGarage.value }
                         <!--@formatter:on-->
@@ -6743,7 +6726,7 @@
                     <action trigger="set">
                         <!--@formatter:off-->
                     isGarage: f.105035,
-                    trans: t.413,
+                    trans: t.414,
                     other: f.105004;
                     make other,hidden on trans when { !isGarage.value }
                 <!--@formatter:on-->
@@ -6751,7 +6734,7 @@
                     <action trigger="set">
                         <!--@formatter:off-->
                     isGarage: f.105035,
-                    trans: t.413,
+                    trans: t.414,
                     other: f.105008;
                     make other,editable on trans when { isGarage.value }
                 <!--@formatter:on-->
@@ -6759,7 +6742,7 @@
                     <action trigger="set">
                         <!--@formatter:off-->
                     isGarage: f.105035,
-                    trans: t.413,
+                    trans: t.414,
                     other: f.105008;
                     make other,hidden on trans when { !isGarage.value }
                 <!--@formatter:on-->
@@ -6767,7 +6750,7 @@
                     <action trigger="set">
                         <!--@formatter:off-->
                             isGarage: f.105035,
-                            trans: t.413,
+                            trans: t.414,
                             other: f.105007;
                             make other,required on trans when { isGarage.value }
                         <!--@formatter:on-->
@@ -6775,15 +6758,15 @@
                     <action trigger="set">
                         <!--@formatter:off-->
                     isGarage: f.105035,
-                    trans: t.413,
+                    trans: t.414,
                     other: f.105007;
                     make other,hidden on trans when { !isGarage.value }
                 <!--@formatter:on-->
                     </action>
                     <action trigger="set">
-                    <!--@formatter:off-->
+                        <!--@formatter:off-->
                             isGarage: f.105035,
-                            trans: t.413,
+                            trans: t.414,
                             other: f.305019;
                             make other,editable on trans when { isGarage.value }
                         <!--@formatter:on-->
@@ -6791,7 +6774,7 @@
                     <action trigger="set">
                         <!--@formatter:off-->
                             isGarage: f.105035,
-                            trans: t.413,
+                            trans: t.414,
                             other: f.305019;
                             make other,required on trans when { isGarage.value }
                         <!--@formatter:on-->
@@ -6799,7 +6782,7 @@
                     <action trigger="set">
                         <!--@formatter:off-->
                     isGarage: f.105035,
-                    trans: t.413,
+                    trans: t.414,
                     other: f.305019;
                     make other,hidden on trans when { !isGarage.value }
                 <!--@formatter:on-->
@@ -6807,7 +6790,7 @@
                     <action trigger="set">
                         <!--@formatter:off-->
                     isGarage: f.105035,
-                    trans: t.413,
+                    trans: t.414,
                     other: f.305003;
                     make other,visible on trans when { isGarage.value }
                 <!--@formatter:on-->
@@ -6815,7 +6798,7 @@
                     <action trigger="set">
                         <!--@formatter:off-->
                             isGarage: f.105035,
-                            trans: t.413,
+                            trans: t.414,
                             other: f.305003;
                             make other,hidden on trans when { !isGarage.value }
                         <!--@formatter:on-->
@@ -6962,6 +6945,23 @@
                 </logic>
             </dataRef>
         </dataGroup>
+    </transition>
+    <!--============================= Vedlajsie stavby =====================-->
+    <transition>
+        <id>413</id>
+        <x>620</x>
+        <y>540</y>
+        <label>Vedľajšie stavby</label>
+        <priority>4</priority>
+        <transactionRef>
+            <id>2</id>
+        </transactionRef>
+        <roleRef>
+            <id>1</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
         <dataGroup>
             <id>2</id>
             <title></title>
