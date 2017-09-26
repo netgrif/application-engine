@@ -30,8 +30,6 @@ class StartRunner  implements CommandLineRunner{
     @Autowired
     private InsurancePostalCodeImporter postalCodeImporter
     @Autowired
-    private XlsImporter xlsImporter
-    @Autowired
     private SuperCreator superCreator
     @Autowired
     private FlushSessionsRunner sessionsRunner

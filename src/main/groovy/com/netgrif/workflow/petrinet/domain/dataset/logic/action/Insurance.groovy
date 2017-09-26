@@ -5,12 +5,13 @@ import com.netgrif.workflow.pdf.service.PdfUtils
 import com.netgrif.workflow.petrinet.domain.dataset.Field
 import com.netgrif.workflow.petrinet.domain.dataset.FileField
 import com.netgrif.workflow.premiuminsurance.IdGenerator
+import com.netgrif.workflow.utils.ResourceFileLoader
 import com.netgrif.workflow.workflow.domain.Case
 import groovy.xml.MarkupBuilder
 
 class Insurance {
 
-    private final static String PDF_PATH = "src/main/resources/pdf"
+    private final static String PDF_PATH = "pdf"
     private final static String OFFER_FILENAME = "offer.pdf"
     private final static String DRAFT_FILENAME = "draft.pdf"
     private final static String MERGE_FILENAME = "merged.pdf"
@@ -84,8 +85,9 @@ class Insurance {
     }
 
     private File generateDraftPdf(String draftPath) {
+        File draftBlankPdfFile = ResourceFileLoader.loadResourceFile("$PDF_PATH/$DRAFT_FILENAME")
         String draftXml = datasetToDraftXml()
-        File pdf = PdfUtils.fillPdfForm(draftPath, new FileInputStream("$PDF_PATH/$DRAFT_FILENAME"), draftXml)
+        File pdf = PdfUtils.fillPdfForm(draftPath, new FileInputStream(draftBlankPdfFile), draftXml)
 
         switch (value(410001)) {
             case "Nehnutelnost":
@@ -100,8 +102,9 @@ class Insurance {
     }
 
     private File generateOfferPdf(String offerPath) {
+        File offerBlankPdfFile = ResourceFileLoader.loadResourceFile("$PDF_PATH/$OFFER_FILENAME")
         String offerXml = datasetToOfferXml()
-        File pdf = PdfUtils.fillPdfForm(offerPath, new FileInputStream("$PDF_PATH/$OFFER_FILENAME"), offerXml)
+        File pdf = PdfUtils.fillPdfForm(offerPath, new FileInputStream(offerBlankPdfFile), offerXml)
 
         switch (value(410001)) {
             case "Nehnutelnost":
