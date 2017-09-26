@@ -89,7 +89,7 @@ class CalculationTest1 {
                 name: "name",
                 surname: "surname",
                 authorities: [
-                        authorityRepository.save(new Authority("user"))
+                        authorityRepository.findByName("user")?:authorityRepository.save(new Authority("user"))
                 ]
         ))
         jsonNodeFactory = JsonNodeFactory.newInstance()
