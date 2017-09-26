@@ -83,7 +83,7 @@ class InsuranceImporter {
         documentNet = importer.importPetriNet(documentRes.getFile(), "Dokument", "DOC")
         Resource contactRes = resourceLoader.getResource("petriNets/contact.xml")
         contactNet = importer.importPetriNet(contactRes.getFile(), "Contact", "CON")
-        Resource insuranceRes = resourceLoader.getResource("petriNets/poistenie_hhi_18_7_2017.xml")
+        Resource insuranceRes = resourceLoader.getResource("petriNets/poistenie_hhi_21_9_2017.xml")
         insuranceNet = importer.importPetriNet(insuranceRes.getFile(), "Insurance", "INS")
     }
 
@@ -211,11 +211,13 @@ class InsuranceImporter {
         def surnameField = contactCase.petriNet.dataSet.values().find { v -> v.name == "Priezvisko" }
         def telField = contactCase.petriNet.dataSet.values().find { v -> v.name == "Telefónne číslo" }
         def emailField = contactCase.petriNet.dataSet.values().find { v -> v.name == "Email" }
+        def rcField = contactCase.petriNet.dataSet.values().find { v -> v.name == "Rodné číslo"}
 
         contactCase.dataSet.put(nameField.getStringId(), new DataField(name))
         contactCase.dataSet.put(surnameField.getStringId(), new DataField(surname))
         contactCase.dataSet.put(telField.getStringId(), new DataField(telNumber))
         contactCase.dataSet.put(emailField.getStringId(), new DataField(email))
+        contactCase.dataSet.put(rcField.getStringId(), new DataField("123456789"))
 
         caseRepository.save(contactCase)
     }
