@@ -25,6 +25,16 @@ public class PdfUtilsTest {
     }
 
     @Test
+    public void fillPdfFormPoisteniePremioveByvanie() throws Exception {
+        File input = new File("src/main/resources/pdf/draft.pdf");
+        File xml = new File("src/test/resources/pdf/draft.xml");
+
+        File out = PdfUtils.fillPdfForm("target/test_out_premiovebyvanie.pdf", new FileInputStream(input), new FileInputStream(xml));
+
+        assert out != null;
+    }
+
+    @Test
     public void mergePdf() {
         File f1 = new File("src/test/resources/pdf/test.pdf");
         File f2 = new File("src/test/resources/pdf/test.pdf");
