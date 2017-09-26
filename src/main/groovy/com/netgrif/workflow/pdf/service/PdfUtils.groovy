@@ -1,5 +1,6 @@
 package com.netgrif.workflow.pdf.service
 
+import com.netgrif.workflow.utils.ResourceFileLoader
 import org.apache.pdfbox.cos.COSName
 import org.apache.pdfbox.io.MemoryUsageSetting
 import org.apache.pdfbox.multipdf.PDFMergerUtility
@@ -68,9 +69,9 @@ class PdfUtils {
             PDAcroForm acroForm = docCatalog.getAcroForm()
 
             Map<String, String> fonts = new HashMap<>()
-            fonts.put("/KlavikaBasic-Regular", addFont(document, acroForm, "src/main/resources/fonts/Klavika Regular.ttf"))
-            fonts.put("/KlavikaBasic-Bold", addFont(document, acroForm, "src/main/resources/fonts/Klavika Bold.ttf"))
-            fonts.put("/KlavikaBasic-Medium", addFont(document, acroForm, "src/main/resources/fonts/Klavika Medium.ttf"))
+            fonts.put("/KlavikaBasic-Regular", addFont(document, acroForm, "classpath:fonts/Klavika Regular.ttf"))
+            fonts.put("/KlavikaBasic-Bold", addFont(document, acroForm, "classpath:fonts/Klavika Bold.ttf"))
+            fonts.put("/KlavikaBasic-Medium", addFont(document, acroForm, "classpath:fonts/Klavika Medium.ttf"))
             addFieldValues(acroForm, xml, fonts)
             return saveToFile(document, outPdfName)
         } catch (IOException e) {
@@ -84,8 +85,8 @@ class PdfUtils {
         if (res == null)
             res = new PDResources()
 
-        InputStream fontStream = new FileInputStream(fontPath)
-        PDType0Font font = PDType0Font.load(document, fontStream, true)
+        File fontFile = ResourceFileLoader.loadResourceFile(fontPath)
+        PDType0Font font = PDType0Font.load(document, new FileInputStream(fontFile), true)
 
         String fontName = res.add(font).name
         if (fontName == null)
@@ -114,13 +115,17 @@ class PdfUtils {
             return
         }
 
-        String DA = field.getCOSObject().getString(COSName.DA)
+        try {
+            String DA = field.getCOSObject().getString(COSName.DA)
 
-        fonts.each { font ->
-            if (DA.contains(font.key))
-                field.getCOSObject().setString(COSName.DA, DA.replaceAll(font.key, "/${font.value}"))
+            fonts.each { font ->
+                if (DA.contains(font.key))
+                    field.getCOSObject().setString(COSName.DA, DA.replaceAll(font.key, "/${font.value}"))
+            }
+            field.setValue(xmlNode as String)
+        } catch (NullPointerException e) {
+            log.error("Cannot find field $id", e)
         }
-        field.setValue(xmlNode as String)
     }
 
     private static File saveToFile(PDDocument document, String outPdfName) {
