@@ -2811,30 +2811,30 @@
         <id>106002</id>
         <placeholder>Poistná suma</placeholder>
         <valid>positive</valid>
-        <!--<action trigger="set">-->
-            <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
-            <!--field: f.106002,-->
-            <!--check: f.103002,-->
-            <!--other: f.106022;-->
-            <!--change other about {-->
-                <!--if (check.value=="trvalá")-->
-                    <!--return field.value as Double;-->
-                <!--return 1.0 as Double;-->
-            <!--}-->
-            <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
-        <!--</action>-->
-        <!--<action trigger="set">-->
-            <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
-            <!--field: f.106002,-->
-            <!--check: f.103002,-->
-            <!--other: f.106023;-->
-            <!--change other about {-->
-                <!--if(check.value=="dočasná")-->
-                    <!--return field.value as Double;-->
-                <!--return 1.0 as Double;-->
-            <!--}-->
-            <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
-        <!--</action>-->
+        <action trigger="set">
+            <!--@formatter:off-->
+            field: f.106002,
+            check: f.103002,
+            other: f.106022;
+            change other about {
+                if (check.value=="trvalá")
+                    return field.value as Double;
+                return 1.0 as Double;
+            }
+            <!--@formatter:on-->
+        </action>
+        <action trigger="set">
+            <!--@formatter:off-->
+            field: f.106002,
+            check: f.103002,
+            other: f.106023;
+            change other about {
+                if(check.value=="dočasná")
+                    return field.value as Double;
+                return 1.0 as Double;
+            }
+            <!--@formatter:on-->
+        </action>
     </data>
     <data type="number">
         <!--trvalo-->
