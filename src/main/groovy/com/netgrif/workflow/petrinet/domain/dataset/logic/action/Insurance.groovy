@@ -69,6 +69,16 @@ class Insurance {
     private File generateOfferPdf(String offerPath) {
         String offerXml = datasetToOfferXml()
         File pdf = PdfUtils.fillPdfForm(offerPath, new FileInputStream("$PDF_PATH/$OFFER_FILENAME"), offerXml)
+
+        switch (value(410001)) {
+            case "Nehnutelnost":
+                pdf = PdfUtils.removePages(pdf, 3)
+                break
+            case "Domacnost":
+                pdf = PdfUtils.removePages(pdf, 2)
+                break
+        }
+
         return pdf
     }
 
@@ -108,6 +118,15 @@ class Insurance {
 
             field("xfdf:original": "Text Field 143", "${value(309001) ?: ''}")
             field("xfdf:original": "Text Field 153", "${value(309001) ?: ''}")
+
+            field('xfdf:original': "702", "${value(410001) ==~ /(Domacnost|Nehnutelnost)/ ? '4.' : '5.'}")
+            field('xfdf:original': "703", "${value(410001) ==~ /(Domacnost|Nehnutelnost)/ ? '5.' : '6.'}")
+            field('xfdf:original': "704", "${value(410001) ==~ /(Domacnost|Nehnutelnost)/ ? '6.' : '7.'}")
+            field('xfdf:original': "705", "${value(410001) ==~ /(Domacnost|Nehnutelnost)/ ? '7.' : '8.'}")
+            field('xfdf:original': "706", "${value(410001) ==~ /(Domacnost|Nehnutelnost)/ ? '8.' : '9.'}")
+            field('xfdf:original': "707", "${value(410001) ==~ /(Domacnost|Nehnutelnost)/ ? '9.' : '10.'}")
+            field('xfdf:original': "708", "${value(410001) ==~ /(Domacnost|Nehnutelnost)/ ? '10.' : '11.'}")
+            field('xfdf:original': "709", "${value(410001) ==~ /(Domacnost|Nehnutelnost)/ ? '11.' : '12.'}")
         }
 
         return writer.toString()
@@ -140,6 +159,8 @@ class Insurance {
             field('xfdf:original': "Text Field 153", "${value(309001) ?: ''}")
             field('xfdf:original': "Text Field 143", "${value(309001) ?: ''}")
             field('xfdf:original': "Text Field 152", "${value(309001) ?: ''}")
+
+            field('xfdf:original': "702", "${value(410001) == 'Domacnost' ? '3' : '4'}")
         }
         return writer.toString()
     }
@@ -419,9 +440,9 @@ class Insurance {
     }
 
     Closure<MarkupBuilder> zodpovednostZaSkoduDomacnost = { MarkupBuilder builder ->
-        builder.field("xfdf:original": "ôôlll", "${value(107003)?.replace('€', '') ?: ''}")
-        builder.ldkdd("${valueRound(308009) ?: ''}")
-        builder.field("xfdf:original": "pooríííčáčôfúääňňsss", "${value(104003) ?: ''}")
+        builder.field("xfdf:original": "601","${value(107003)?.replace('€', '') ?: ''}")
+        builder.field("xfdf:original": "602","${valueRound(308009) ?: ''}")
+        builder.field("xfdf:original": "603","${value(104003) ?: ''}")
 
         return builder
     }
