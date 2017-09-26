@@ -18,6 +18,7 @@ import com.netgrif.workflow.workflow.service.interfaces.ITaskService
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService
 import com.netgrif.workflow.workflow.web.responsebodies.TaskReference
 import groovy.json.JsonOutput
+import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -84,7 +85,7 @@ class PdfGenerationTest {
     }
 
     @Test
-//    @Ignore
+    @Ignore
     void testDomacnostPdf() {
         init()
         "Iba domácnosť"()
@@ -97,6 +98,7 @@ class PdfGenerationTest {
     }
 
     @Test
+    @Ignore
     void testNehnutelnostPdf() {
         init()
         "Iba nehnuteľnosť"()
