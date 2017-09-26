@@ -3610,6 +3610,21 @@
         </action>
         <action trigger="set">
             <!--@formatter:off-->
+           check: f.108001,
+            field: f.308006,
+            sum: f.308010;
+            change sum about {
+            if (check.value=="ročná")
+                return field.value as Double;
+            if (check.value=="polročná")
+                return field.value/2 as Double;
+            if (check.value=="štvrťročná")
+                return field.value/4 as Double;
+            }
+        <!--@formatter:on-->
+        </action>
+        <action trigger="set">
+            <!--@formatter:off-->
            c1: f.308004,
             c2: f.208004,
             c3: f.208008,
@@ -3684,6 +3699,7 @@
         <!--@formatter:on-->
         </action>
     </data>
+
     <data type="boolean">
     <title>Je domácnosť zabezpečená funkčným alarmom?</title>
     <id>108005</id>
@@ -3767,6 +3783,25 @@
     <data type="number">
         <title>BEŽNÉ POISTNÉ</title>
         <id>308006</id>
+        <action trigger="set">
+            <!--@formatter:off-->
+           check: f.108001,
+            field: f.308006,
+            sum: f.308010;
+            change sum about {
+            if (check.value=="ročná")
+                return field.value as Double;
+            if (check.value=="polročná")
+                return field.value/2 as Double;
+            if (check.value=="štvrťročná")
+                return field.value/4 as Double;
+            }
+        <!--@formatter:on-->
+        </action>
+    </data>
+    <data type="number">
+        <title>Výška splátky poistného</title>
+        <id>308010</id>
     </data>
     <!-- ===== Základné informácie koeficienty ===== -->
     <data type="number">
@@ -9603,6 +9638,19 @@
             <!--BEŽNÉ POISTNÉ-->
             <dataRef>
                 <id>308006</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>2</id>
+            <title></title>
+            <alignment>start</alignment>
+            <stretch>true</stretch>
+            <!--VYSKA SPLATKY POISTNEHO-->
+            <dataRef>
+                <id>308010</id>
                 <logic>
                     <behavior>visible</behavior>
                 </logic>
