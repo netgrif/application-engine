@@ -11,7 +11,6 @@ import com.netgrif.workflow.auth.service.interfaces.IUserService
 import com.netgrif.workflow.importer.Importer
 import com.netgrif.workflow.petrinet.domain.PetriNet
 import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository
-import com.netgrif.workflow.petrinet.domain.roles.ProcessRole
 import com.netgrif.workflow.premiuminsurance.OfferId
 import com.netgrif.workflow.premiuminsurance.OfferIdRepository
 import com.netgrif.workflow.workflow.domain.Case
@@ -77,7 +76,7 @@ class InsuranceImporter {
     private importNets() {
         documentNet = importer.importPetriNet(new File("src/main/resources/petriNets/document-lifecycle.xml"), "Dokument", "DOC")
         contactNet = importer.importPetriNet(new File("src/main/resources/petriNets/contact.xml"), "Contact", "CON")
-        insuranceNet = importer.importPetriNet(new File("src/main/resources/petriNets/poistenie_hhi_18_7_2017.xml"), "Insurance", "INS")
+        insuranceNet = importer.importPetriNet(new File("src/main/resources/petriNets/poistenie_hhi_21_9_2017.xml"), "Insurance", "INS")
     }
 
     private void createOrganizations() {
