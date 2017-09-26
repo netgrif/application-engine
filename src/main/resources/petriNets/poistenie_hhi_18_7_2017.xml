@@ -182,7 +182,7 @@
         </action>
     </data>
     <data type="boolean">
-        <title>Nachádza nehnuteľnosť sa vo vzdialenosti kratšej ako 300 m od vodného toku?</title>
+        <title>Nachádza sa nehnuteľnosť vo vzdialenosti kratšej ako 300 m od vodného toku?</title>
         <id>101004</id>
         <action trigger="set">
             <!--@formatter:off-->
@@ -301,8 +301,7 @@
         </action>
     </data>
     <data type="boolean">
-        <title>Bolo poistenému alebo spolupoistenej osobe niekedy v minulosti zamiestnuté poistné plnenie alebo
-            vypovedaná poistná zmluva?
+        <title>Bolo poistenému alebo spolupoistenej osobe niekedy v minulosti zamietnuté poistné plnenie alebo vypovedaná poistná zmluva?
         </title>
         <id>101009</id>
         <action trigger="set">
@@ -1655,7 +1654,7 @@
         </action>
     </data>
     <data type="boolean">
-        <title>Chodník</title>
+        <title>Chodník, parkovacia plocha</title>
         <id>105015</id>
         <action trigger="set">
             <!--@formatter:off-->
@@ -2135,7 +2134,7 @@
         </action>
     </data>
     <data type="boolean">
-        <title>Stavebné materialy</title>
+        <title>Stavebné materiály</title>
         <id>105031</id>
     </data>
     <data type="number">
@@ -3301,7 +3300,7 @@
         </action>
     </data>
     <data type="number">
-        <title>Koeficient - Nachádza nehnuteľnosť sa vo vzdialenosti kratšej ako 300 m od vodného toku?</title>
+        <title>Koeficient - Nachádza sa nehnuteľnosť vo vzdialenosti kratšej ako 300 m od vodného toku?</title>
         <id>201004</id>
         <init>1</init>
         <action trigger="set">
@@ -3436,8 +3435,7 @@
         </action>
     </data>
     <data type="number">
-        <title>Koeficient - Bolo poistenému alebo spolupoistenej osobe niekedy v minulosti zamietnuté poistné plnenie
-            alebo vypovedaná poistná zmluva?
+        <title>Koeficient - Bolo poistenému alebo spolupoistenej osobe niekedy v minulosti zamietnuté poistné plnenie alebo vypovedaná poistná zmluva?
         </title>
         <id>201009</id>
         <init>1</init>
@@ -6335,14 +6333,14 @@
         <title>Správa pre prijímateľa 4</title>
         <id>110026</id>
     </data>
-    <!-- ===== TODO ===== -->
+    <!-- ===== TODO PI-125 ===== -->
     <data type="date">
         <title>Dátum dojednania návrhu na uzavretie poistnej zmluvy</title>
         <id>309002</id>
     </data>
     <!-- ===== PDF ===== -->
     <data type="file">
-        <title>Ponuka PDF</title>
+        <title>Zmluva PDF</title>
         <id>309003</id>
         <init>Automaticky generované</init>
         <action trigger="get">
@@ -6540,7 +6538,7 @@
                     <behavior>required</behavior>
                 </logic>
             </dataRef>
-            <!--Nachádza nehnuteľnosť sa vo vzdialenosti kratšej ako 300 m od vodného toku?-->
+            <!--Nachádza sa nehnuteľnosť vo vzdialenosti kratšej ako 300 m od vodného toku?-->
             <dataRef>
                 <id>101004</id>
                 <logic>
@@ -6580,7 +6578,7 @@
                     <behavior>required</behavior>
                 </logic>
             </dataRef>
-            <!--Bolo poistenému alebo spolupoistenej osobe niekedy v minulosti zamiestnuté poistné plnenie alebo vypovedaná poistná zmluva?-->
+            <!--Bolo poistenému alebo spolupoistenej osobe niekedy v minulosti zamietnuté poistné plnenie alebo vypovedaná poistná zmluva?-->
             <dataRef>
                 <id>101009</id>
                 <logic>
@@ -6853,7 +6851,7 @@
             <id>1</id>
             <title></title>
             <alignment>start</alignment>
-            <!--Stavebné materialy-->
+            <!--Stavebné materiály-->
             <dataRef>
                 <id>105031</id>
                 <logic>
@@ -6931,14 +6929,14 @@
             <id>2</id>
             <title></title>
             <alignment>start</alignment>
-            <!--Stavebné materialy ps-->
+            <!--Stavebné materiály ps-->
             <dataRef>
                 <id>105032</id>
                 <logic>
                     <behavior>hidden</behavior>
                 </logic>
             </dataRef>
-            <!--Stavebné materialy p-->
+            <!--Stavebné materiály p-->
             <dataRef>
                 <id>305015</id>
                 <logic>
@@ -9991,7 +9989,7 @@
                     <behavior>editable</behavior>
                 </logic>
             </dataRef>
-            <!--Ponuka PDF-->
+            <!--Zmluva PDF-->
             <dataRef>
                 <id>309003</id>
                 <logic>
@@ -10097,7 +10095,7 @@
                     <behavior>editable</behavior>
                 </logic>
             </dataRef>
-            <!--Ponuka PDF-->
+            <!--Zmluva PDF-->
             <dataRef>
                 <id>309003</id>
                 <logic>
@@ -10203,7 +10201,7 @@
                     <behavior>editable</behavior>
                 </logic>
             </dataRef>
-            <!--Ponuka PDF-->
+            <!--Zmluva PDF-->
             <dataRef>
                 <id>309003</id>
                 <logic>
@@ -10558,7 +10556,7 @@
             <id>3</id>
             <title></title>
             <stretch>true</stretch>
-            <!--Nachádza nehnuteľnosť sa vo vzdialenosti kratšej ako 300 m od vodného toku?-->
+            <!--Nachádza sa nehnuteľnosť vo vzdialenosti kratšej ako 300 m od vodného toku?-->
             <dataRef>
                 <id>101004</id>
                 <logic>
@@ -10610,7 +10608,7 @@
             <id>5</id>
             <title></title>
             <stretch>true</stretch>
-            <!--Bolo poistenému alebo spolupoistenej osobe niekedy v minulosti zamiestnuté poistné plnenie alebo vypovedaná poistná zmluva?-->
+            <!--Bolo poistenému alebo spolupoistenej osobe niekedy v minulosti zamietnuté poistné plnenie alebo vypovedaná poistná zmluva?-->
             <dataRef>
                 <id>101009</id>
                 <logic>
@@ -10827,21 +10825,21 @@
         <dataGroup>
             <id>1</id>
             <title></title>
-            <!--Stavebné materialy-->
+            <!--Stavebné materiály-->
             <dataRef>
                 <id>105031</id>
                 <logic>
                     <behavior>visible</behavior>
                 </logic>
             </dataRef>
-            <!--Stavebné materialy ps-->
+            <!--Stavebné materiály ps-->
             <dataRef>
                 <id>105032</id>
                 <logic>
                     <behavior>visible</behavior>
                 </logic>
             </dataRef>
-            <!--Stavebné materialy p-->
+            <!--Stavebné materiály p-->
             <dataRef>
                 <id>305015</id>
                 <logic>
@@ -10981,21 +10979,21 @@
                     <behavior>visible</behavior>
                 </logic>
             </dataRef>
-            <!--Chodník-->
+            <!--Chodník, parkovacia plocha-->
             <dataRef>
                 <id>105015</id>
                 <logic>
                     <behavior>visible</behavior>
                 </logic>
             </dataRef>
-            <!--Chodník ps-->
+            <!--Chodník, parkovacia plocha ps-->
             <dataRef>
                 <id>105016</id>
                 <logic>
                     <behavior>visible</behavior>
                 </logic>
             </dataRef>
-            <!--Chodník p-->
+            <!--Chodník, parkovacia plocha p-->
             <dataRef>
                 <id>305007</id>
                 <logic>
@@ -11816,7 +11814,7 @@
                     <behavior>visible</behavior>
                 </logic>
             </dataRef>
-            <!--Ponuka PDF-->
+            <!--Zmluva PDF-->
             <dataRef>
                 <id>309003</id>
                 <logic>
