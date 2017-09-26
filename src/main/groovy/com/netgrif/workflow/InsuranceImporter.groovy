@@ -76,13 +76,14 @@ class InsuranceImporter {
     private importNets() {
         documentNet = importer.importPetriNet(new File("src/main/resources/petriNets/document-lifecycle.xml"), "Dokument", "DOC")
         contactNet = importer.importPetriNet(new File("src/main/resources/petriNets/contact.xml"), "Contact", "CON")
-        insuranceNet = importer.importPetriNet(new File("src/main/resources/petriNets/insurance_hhi.xml"), "Insurance", "INS")
+        insuranceNet = importer.importPetriNet(new File("src/main/resources/petriNets/poistenie_hhi_21_9_2017.xml"), "Insurance", "INS")
     }
 
     private void createOrganizations() {
         log.info("Creating organizations")
         orgs = new HashMap<>()
         orgs.put("insurance", organizationRepository.save(new Organization("Insurance Company")))
+        orgs.put("gratex", organizationRepository.save(new Organization("Gratex International")))
     }
 
     private void createAuthorities() {
@@ -163,17 +164,26 @@ class InsuranceImporter {
         userService.saveNew(dzugas)
         log.info("User $dzugas.name $dzugas.surname created")
 
-        User gratex = new User(
-                name: "Gratex",
-                surname: "International",
-                email: "gratex@gratex.com",
-                password: "gratex2017",
-                authorities: [auths.get(Authority.user)] as Set<Authority>,
-                organizations: [orgs.get("insurance")] as Set<Organization>)
-        gratex.addProcessRole(agentRole)
-        gratex.addProcessRole(documentAdminRole)
-        userService.saveNew(gratex)
-        log.info("User $gratex.name $gratex.surname created")
+        createUser(new User(name: "Renáta", surname: "Petríková", email: "rpetrikova@gratex.com", password: "gratex2017"),
+                [auths.get(Authority.user)] as Authority[], [orgs.get("gratex")] as Organization[], [agentRole, contactRole, documentAgentRole] as UserProcessRole[])
+
+        createUser(new User(name: "Martin", surname: "Blichar", email: "blichar@gratex.com", password: "gratex2017"),
+                [auths.get(Authority.user)] as Authority[], [orgs.get("gratex")] as Organization[], [agentRole, contactRole, documentAgentRole] as UserProcessRole[])
+
+        createUser(new User(name: "Tomáš", surname: "Husár", email: "thusar@gratex.com", password: "gratex2017"),
+                [auths.get(Authority.user)] as Authority[], [orgs.get("gratex")] as Organization[], [agentRole, contactRole, documentAgentRole] as UserProcessRole[])
+
+        createUser(new User(name: "Martin", surname: "Marko", email: "marcus@gratex.com", password: "gratex2017"),
+                [auths.get(Authority.user)] as Authority[], [orgs.get("gratex")] as Organization[], [agentRole, contactRole, documentAgentRole] as UserProcessRole[])
+
+    }
+
+    private void createUser(User user, Authority[] authorities, Organization[] orgs, UserProcessRole[] roles){
+        authorities.each {user.addAuthority(it)}
+        orgs.each {user.addOrganization(it)}
+        roles.each {user.addProcessRole(it)}
+        userService.saveNew(user)
+        log.info("User $user.name $user.surname created")
     }
 
     private void createCases(){
@@ -193,11 +203,13 @@ class InsuranceImporter {
         def surnameField = contactCase.petriNet.dataSet.values().find { v -> v.name == "Priezvisko"}
         def telField = contactCase.petriNet.dataSet.values().find { v -> v.name == "Telefónne číslo"}
         def emailField = contactCase.petriNet.dataSet.values().find { v -> v.name == "Email"}
+        def rcField = contactCase.petriNet.dataSet.values().find { v -> v.name == "Rodné číslo"}
 
         contactCase.dataSet.put(nameField.getStringId(), new DataField(name))
         contactCase.dataSet.put(surnameField.getStringId(), new DataField(surname))
         contactCase.dataSet.put(telField.getStringId(), new DataField(telNumber))
         contactCase.dataSet.put(emailField.getStringId(), new DataField(email))
+        contactCase.dataSet.put(rcField.getStringId(), new DataField("123456789"))
 
         caseRepository.save(contactCase)
     }
