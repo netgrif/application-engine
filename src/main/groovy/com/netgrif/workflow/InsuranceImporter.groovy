@@ -79,12 +79,15 @@ class InsuranceImporter {
     }
 
     private importNets() {
-        Resource documentRes = resourceLoader.getResource("petriNets/document-lifecycle.xml")
-        documentNet = importer.importPetriNet(documentRes.getFile(), "Dokument", "DOC")
-        Resource contactRes = resourceLoader.getResource("petriNets/contact.xml")
-        contactNet = importer.importPetriNet(contactRes.getFile(), "Contact", "CON")
-        Resource insuranceRes = resourceLoader.getResource("petriNets/poistenie_hhi_21_9_2017.xml")
-        insuranceNet = importer.importPetriNet(insuranceRes.getFile(), "Insurance", "INS")
+        //TODO 27.9.2017 load resources from jar archive
+//        documentNet = importer.importPetriNet(new File(this.class.getResource("/petriNets/document-lifecycle.xml").getFile()), "Dokument", "DOC")
+//        Resource contactRes = resourceLoader.getResource("petriNets/contact.xml")
+//        contactNet = importer.importPetriNet(contactRes.getFile(), "Contact", "CON")
+//        Resource insuranceRes = resourceLoader.getResource("petriNets/poistenie_hhi_21_9_2017.xml")
+//        insuranceNet = importer.importPetriNet(insuranceRes.getFile(), "Insurance", "INS")
+        documentNet = importer.importPetriNet(new File("src/main/resources/petriNets/document-lifecycle.xml"), "Dokument", "DOC")
+        contactNet = importer.importPetriNet(new File("src/main/resources/petriNets/contact.xml"), "Contact", "CON")
+        insuranceNet = importer.importPetriNet(new File("src/main/resources/petriNets/poistenie_hhi_21_9_2017.xml"), "Insurance", "INS")
     }
 
     private void createOrganizations() {
