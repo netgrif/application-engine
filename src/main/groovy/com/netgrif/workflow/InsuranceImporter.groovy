@@ -19,6 +19,8 @@ import com.netgrif.workflow.workflow.domain.repositories.CaseRepository
 import com.netgrif.workflow.workflow.service.TaskService
 import org.apache.log4j.Logger
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.core.io.Resource
+import org.springframework.core.io.ResourceLoader
 import org.springframework.stereotype.Component
 
 @Component
@@ -53,6 +55,9 @@ class InsuranceImporter {
     @Autowired
     private OfferIdRepository offerIdRepository
 
+    @Autowired
+    private ResourceLoader resourceLoader
+
     private Map<String, Organization> orgs
     private Map<String, Authority> auths
     private PetriNet insuranceNet
@@ -74,9 +79,12 @@ class InsuranceImporter {
     }
 
     private importNets() {
-        documentNet = importer.importPetriNet(new File("src/main/resources/petriNets/document-lifecycle.xml"), "Dokument", "DOC")
-        contactNet = importer.importPetriNet(new File("src/main/resources/petriNets/contact.xml"), "Contact", "CON")
-        insuranceNet = importer.importPetriNet(new File("src/main/resources/petriNets/poistenie_hhi_21_9_2017.xml"), "Insurance", "INS")
+        Resource documentRes = resourceLoader.getResource("petriNets/document-lifecycle.xml")
+        documentNet = importer.importPetriNet(documentRes.getFile(), "Dokument", "DOC")
+        Resource contactRes = resourceLoader.getResource("petriNets/contact.xml")
+        contactNet = importer.importPetriNet(contactRes.getFile(), "Contact", "CON")
+        Resource insuranceRes = resourceLoader.getResource("petriNets/poistenie_hhi_21_9_2017.xml")
+        insuranceNet = importer.importPetriNet(insuranceRes.getFile(), "Insurance", "INS")
     }
 
     private void createOrganizations() {
@@ -178,31 +186,31 @@ class InsuranceImporter {
 
     }
 
-    private void createUser(User user, Authority[] authorities, Organization[] orgs, UserProcessRole[] roles){
-        authorities.each {user.addAuthority(it)}
-        orgs.each {user.addOrganization(it)}
-        roles.each {user.addProcessRole(it)}
+    private void createUser(User user, Authority[] authorities, Organization[] orgs, UserProcessRole[] roles) {
+        authorities.each { user.addAuthority(it) }
+        orgs.each { user.addOrganization(it) }
+        roles.each { user.addProcessRole(it) }
         userService.saveNew(user)
         log.info("User $user.name $user.surname created")
     }
 
-    private void createCases(){
+    private void createCases() {
         createCase("Zmluvné podmienky", documentNet, 4L)
 
-        createContactCase("Adam","Krt", "+421950 123 456", "adam.krt@gmail.com")
-        createContactCase("Ežo","Vlkolínsky", "+421902 256 512", "vlkolinsky@gmail.com")
+        createContactCase("Adam", "Krt", "+421950 123 456", "adam.krt@gmail.com")
+        createContactCase("Ežo", "Vlkolínsky", "+421902 256 512", "vlkolinsky@gmail.com")
         createContactCase("Jožko", "Mrkvička", "+421948 987 654", "mrkvicka@yahoo.com")
 
-        createCase("Prvé poistenie",insuranceNet,1L)
-        Case useCase = createCase("Druhé poistenie",insuranceNet,1L)
+        createCase("Prvé poistenie", insuranceNet, 1L)
+        Case useCase = createCase("Druhé poistenie", insuranceNet, 1L)
     }
 
     private void createContactCase(String name, String surname, String telNumber, String email) {
-        def contactCase = createCase(name+" "+surname, contactNet, 1L)
-        def nameField = contactCase.petriNet.dataSet.values().find { v -> v.name == "Meno"}
-        def surnameField = contactCase.petriNet.dataSet.values().find { v -> v.name == "Priezvisko"}
-        def telField = contactCase.petriNet.dataSet.values().find { v -> v.name == "Telefónne číslo"}
-        def emailField = contactCase.petriNet.dataSet.values().find { v -> v.name == "Email"}
+        def contactCase = createCase(name + " " + surname, contactNet, 1L)
+        def nameField = contactCase.petriNet.dataSet.values().find { v -> v.name == "Meno" }
+        def surnameField = contactCase.petriNet.dataSet.values().find { v -> v.name == "Priezvisko" }
+        def telField = contactCase.petriNet.dataSet.values().find { v -> v.name == "Telefónne číslo" }
+        def emailField = contactCase.petriNet.dataSet.values().find { v -> v.name == "Email" }
         def rcField = contactCase.petriNet.dataSet.values().find { v -> v.name == "Rodné číslo"}
 
         contactCase.dataSet.put(nameField.getStringId(), new DataField(name))
