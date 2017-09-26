@@ -27,11 +27,9 @@ class Insurance {
         String draftPath = (field as FileField).getFilePath(DRAFT_FILENAME)
         String offerPath = (field as FileField).getFilePath(OFFER_FILENAME)
         String finalPath = (field as FileField).getFilePath(FINAL_FILENAME)
-        String draftXml = datasetToDraftXml()
-        String offerXml = datasetToOfferXml()
 
-        File draftPdfFile = PdfUtils.fillPdfForm(draftPath, new FileInputStream("$PDF_PATH/$DRAFT_FILENAME"), draftXml)
-        File offerPdfFile = PdfUtils.fillPdfForm(offerPath, new FileInputStream("$PDF_PATH/$OFFER_FILENAME"), offerXml)
+        File draftPdfFile = generateDraftPdf(draftPath)
+        File offerPdfFile = generateOfferPdf(offerPath)
         File mergedPdf = PdfUtils.mergePdfFiles(finalPath, draftPdfFile, offerPdfFile)
 
         useCase.dataSet.get(field.stringId).setValue(FINAL_FILENAME)
@@ -50,6 +48,38 @@ class Insurance {
         useCase.dataSet.get(field.stringId).setValue("${prefix}${base}${postfix}" as String)
 
         return "${prefix}${base}${postfix}"
+    }
+
+    private File generateDraftPdf(String draftPath) {
+        String draftXml = datasetToDraftXml()
+        File pdf = PdfUtils.fillPdfForm(draftPath, new FileInputStream("$PDF_PATH/$DRAFT_FILENAME"), draftXml)
+
+        switch (value(410001)) {
+            case "Nehnutelnost":
+                pdf = PdfUtils.removePages(pdf, 4)
+                break
+            case "Domacnost":
+                pdf = PdfUtils.removePages(pdf, 3)
+                break
+        }
+
+        return pdf
+    }
+
+    private File generateOfferPdf(String offerPath) {
+        String offerXml = datasetToOfferXml()
+        File pdf = PdfUtils.fillPdfForm(offerPath, new FileInputStream("$PDF_PATH/$OFFER_FILENAME"), offerXml)
+
+        switch (value(410001)) {
+            case "Nehnutelnost":
+                pdf = PdfUtils.removePages(pdf, 3)
+                break
+            case "Domacnost":
+                pdf = PdfUtils.removePages(pdf, 2)
+                break
+        }
+
+        return pdf
     }
 
     private String datasetToDraftXml() {
@@ -84,9 +114,19 @@ class Insurance {
             sposobUhradenia(builder)
             osobitneVyjadrenia(builder)
             suhlasOsobneUdaje(builder)
+            zodpovednostZaSkoduDomacnost(builder)
 
             field("xfdf:original": "Text Field 143", "${value(309001) ?: ''}")
             field("xfdf:original": "Text Field 153", "${value(309001) ?: ''}")
+
+            field('xfdf:original': "702", "${value(410001) ==~ /(Domacnost|Nehnutelnost)/ ? '4.' : '5.'}")
+            field('xfdf:original': "703", "${value(410001) ==~ /(Domacnost|Nehnutelnost)/ ? '5.' : '6.'}")
+            field('xfdf:original': "704", "${value(410001) ==~ /(Domacnost|Nehnutelnost)/ ? '6.' : '7.'}")
+            field('xfdf:original': "705", "${value(410001) ==~ /(Domacnost|Nehnutelnost)/ ? '7.' : '8.'}")
+            field('xfdf:original': "706", "${value(410001) ==~ /(Domacnost|Nehnutelnost)/ ? '8.' : '9.'}")
+            field('xfdf:original': "707", "${value(410001) ==~ /(Domacnost|Nehnutelnost)/ ? '9.' : '10.'}")
+            field('xfdf:original': "708", "${value(410001) ==~ /(Domacnost|Nehnutelnost)/ ? '10.' : '11.'}")
+            field('xfdf:original': "709", "${value(410001) ==~ /(Domacnost|Nehnutelnost)/ ? '11.' : '12.'}")
         }
 
         return writer.toString()
@@ -119,6 +159,8 @@ class Insurance {
             field('xfdf:original': "Text Field 153", "${value(309001) ?: ''}")
             field('xfdf:original': "Text Field 143", "${value(309001) ?: ''}")
             field('xfdf:original': "Text Field 152", "${value(309001) ?: ''}")
+
+            field('xfdf:original': "702", "${value(410001) == 'Domacnost' ? '3' : '4'}")
         }
         return writer.toString()
     }
@@ -130,7 +172,7 @@ class Insurance {
         builder.field("xfdf:original": "2", "${value(109012) ?: ''}")
         builder.field("xfdf:original": "3", "${value(109009) ?: ''}")
         builder.field("xfdf:original": "4", "${valueDate(109014) ?: ''}")
-        builder.field("xfdf:original": "5", "${(value(109015) ?: value(109058)) ?: ''}")
+        builder.field("xfdf:original": "5", "${(valueRC(109015) ?: value(109058)) ?: ''}")
         builder.field("xfdf:original": "6", "${value(109013) ?: ''}")
         builder.field("xfdf:original": "7", "${value(109016) ?: ''}")
         builder.field("xfdf:original": "8", "${value(109017) ?: ''}")
@@ -147,7 +189,7 @@ class Insurance {
         builder.field("xfdf:original": "403", "${value(109026) ?: ''}")
         builder.field("xfdf:original": "404", "${value(109023) ?: ''}")
         builder.field("xfdf:original": "405", "${valueDate(109028) ?: ''}")
-        builder.field("xfdf:original": "406", "${(value(109029) ?: value(109059)) ?: ''}")
+        builder.field("xfdf:original": "406", "${(valueRC(109029) ?: value(109059)) ?: ''}")
         builder.field("xfdf:original": "407", "${value(109027) ?: ''}")
         builder.field("xfdf:original": "408", "${value(109030) ?: ''}")
         builder.field("xfdf:original": "409", "${value(109031) ?: ''}")
@@ -187,7 +229,7 @@ class Insurance {
     Closure<MarkupBuilder> udajeOPoisteni = { MarkupBuilder builder ->
         builder.field("xfdf:original": "106", "${valueDate(309002) ?: ''}")
         builder.field("xfdf:original": "107", "${valueDate(109001) ?: ''}")
-        builder.field("xfdf:original": "108", "${(Boolean.parseBoolean(value(109002))) ? (valueDate(109003) ?: '') : ''}")
+        builder.field("xfdf:original": "108", "${(Boolean.parseBoolean(value(109002))) ? (valueDate(109003) ?: '') : 'poistenie na dobu neurčitú'}")
 
         return builder
     }
@@ -199,26 +241,26 @@ class Insurance {
     }
 
     Closure<MarkupBuilder> spoluucastPriPoistnomPlneni = { MarkupBuilder builder ->
-        builder.field("xfdf:original": "453", "${value(105005) ?: ''}")
-        builder.field("xfdf:original": "775", "${value(106001) ?: ''}")
+        builder.field("xfdf:original": "453", "${value(105005)?.replace('€', '') ?: ''}")
+        builder.field("xfdf:original": "775", "${value(106001)?.replace('€', '') ?: ''}")
 
         return builder
     }
 
     Closure<MarkupBuilder> rekapitulaciaPoistneho = { MarkupBuilder builder ->
-        builder.field("xfdf:original": "110", "${valueRound(305002) ?: ''}")
+        builder.field("xfdf:original": "110", "${valueRound(305002, 2, true) ?: ''}")
         builder.field("xfdf:original": "112", "${valueSum(305003, 305004, 305005, 305006, 305007, 305008, 305009, 305010, 305011, 305012, 305013, 305014) ?: ''}")
-        builder.field("xfdf:original": "114", "${valueRound(306001) ?: ''}")
-        builder.field("xfdf:original": "116", "${valueRound(308003) ?: ''}")
+        builder.field("xfdf:original": "114", "${valueRound(306001, 2, true) ?: ''}")
+        builder.field("xfdf:original": "116", "${valueRound(308003, 2, true) ?: ''}")
         builder.field("xfdf:original": "118", "${valueSum(305015, 305016, 306002, 306003, 306004, 306005, 306006, 306007, 306008, 306009, 306010) ?: ''}")
-        builder.field("xfdf:original": "120", "${valueRound(308004) ?: ''}")
-        builder.field("xfdf:original": "89323", "${valueRound(308006) ?: ''}")
-        builder.field("xfdf:original": "111", "${value(108003)?.replace('%', '.0') ?: ''}")
-        builder.field("xfdf:original": "113", "${valuePercentageDiscount(208004) ?: ''}")
-        builder.field("xfdf:original": "115", "${valuePercentageDiscount(203004) ?: ''}")
-        builder.field("xfdf:original": "117", "${valuePercentageDiscount(208008) ?: ''}")
-        builder.field("xfdf:original": "119", "${valuePercentageDiscount(208005) ?: ''}")
-        builder.field("xfdf:original": "121", "${valuePercentageDiscount(208007) ?: ''}")
+        builder.field("xfdf:original": "120", "${valueRound(308004, 2, true) ?: ''}")
+        builder.field("xfdf:original": "89323", "${valueRound(308006, 2, true) ?: ''}")
+        builder.field("xfdf:original": "111", "${value(108003)?.replace('%', '.0') ?: '0.0'}")
+        builder.field("xfdf:original": "113", "${valuePercentageDiscount(208004, true) ?: ''}")
+        builder.field("xfdf:original": "115", "${valuePercentageDiscount(203004, true) ?: ''}")
+        builder.field("xfdf:original": "117", "${valuePercentageDiscount(208008, true) ?: ''}")
+        builder.field("xfdf:original": "119", "${valuePercentageDiscount(208005, true) ?: ''}")
+        builder.field("xfdf:original": "121", "${valuePercentageDiscount(208007, true) ?: ''}")
 
         def periodicity = ((value(108001) == "štvrťročná") ? 4 : ((value(108001) == "polročná") ? 2 : 1)) as double
         def payment = Math.floor((((value(308006) as Double) / periodicity) * 100) as Double) / 100
@@ -349,7 +391,7 @@ class Insurance {
     }
 
     Closure<MarkupBuilder> poistenieZodpovednostiZaSkoduNehnutelnost = { MarkupBuilder builder ->
-        builder.field("xfdf:original": "531", "${value(107001) ?: ''}")
+        builder.field("xfdf:original": "531", "${value(107001)?.replace('€', '') ?: ''}")
         builder.field("xfdf:original": "532", "${valueRound(308008) ?: ''}")
 
         return builder
@@ -378,7 +420,7 @@ class Insurance {
         builder.field("xfdf:original": "101", "${valueRound(106015) ?: ''}")
         builder.field("xfdf:original": "103", "${valueRound(106017) ?: ''}")
         builder.field("xfdf:original": "105", "${valueRound(106019) ?: ''}")
-        builder.fvbgggztzhjg("${value(106021) ?: ''}")
+        builder.fvbgggztzhjg("${valueRound(106021) ?: ''}")
 
         return builder
     }
@@ -398,9 +440,9 @@ class Insurance {
     }
 
     Closure<MarkupBuilder> zodpovednostZaSkoduDomacnost = { MarkupBuilder builder ->
-        builder.field("xfdf:original": "ôôlll", "${value(107003) ?: ''}")
-        builder.ldkdd("${valueRound(308009) ?: ''}")
-        builder.field("xfdf:original": "pooríííčáčôfúääňňsss", "${value(104003) ?: ''}")
+        builder.field("xfdf:original": "601","${value(107003)?.replace('€', '') ?: ''}")
+        builder.field("xfdf:original": "602","${valueRound(308009) ?: ''}")
+        builder.field("xfdf:original": "603","${value(104003) ?: ''}")
 
         return builder
     }
@@ -475,7 +517,7 @@ class Insurance {
             return null
 
         try {
-            return Date.parse("EEE MMM d HH:mm:ss z YYYY", value).format("dd.MM.YYYY")
+            return Date.parseToStringDate(value).format("dd.MM.YYYY")
         } catch (Exception e) {
             e.printStackTrace()
             return null
@@ -493,8 +535,10 @@ class Insurance {
         if (value == null)
             return null
 
-        if (value == 0 && !returnZero)
+        if (value as Double == 0.0 && !returnZero)
             return null
+
+//        TODO: format to separate thousands e.g. '1 000 000'
         return (value as Double).round(precision) as String
     }
 
@@ -507,5 +551,16 @@ class Insurance {
         }
 
         return sum.round(2)
+    }
+
+    private String valueRC(Long id) {
+        def rc = value(id)
+        if (rc == null)
+            return null
+
+        if (rc ==~ /^[0-9]{6}\/[0-9]{3,4}$/)
+            return rc
+
+        return "${rc.substring(0, 6)}/${rc.substring(6, rc.length())}"
     }
 }
