@@ -8,11 +8,15 @@ import com.netgrif.workflow.petrinet.domain.dataset.logic.IllegalVariableTypeExc
 import com.netgrif.workflow.premiuminsurance.IOrsrService
 import com.netgrif.workflow.premiuminsurance.IPostalCodeService
 import com.netgrif.workflow.workflow.domain.Case
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 
 @Component
 class FieldActionsRunner {
+
+    private static final Logger log = LoggerFactory.getLogger(FieldActionsRunner.class)
 
     @Autowired
     private IOrsrService orsrService
@@ -20,7 +24,7 @@ class FieldActionsRunner {
     @Autowired
     private IPostalCodeService postalCodeService
 
-    private Map<String,Object> actionsCache = new HashMap<>()
+    private Map<String, Object> actionsCache = new HashMap<>()
 
     FieldActionsRunner() {
         actionsCache = new HashMap<>()
@@ -34,16 +38,16 @@ class FieldActionsRunner {
         bindVariables(script, binding, useCase)
         def shell = new GroovyShell(binding)
 
-        println script
+        log.debug("Action: $script")
         def code = (Closure) shell.evaluate("{->${getExpression(script)}}")
-        code.delegate = new ActionDelegate(useCase,this)
+        code.delegate = new ActionDelegate(useCase, this)
         code()
-        return ((ActionDelegate)code.delegate).changedField
+        return ((ActionDelegate) code.delegate).changedField
     }
 
     static void bindVariables(String script, Binding binding, Case useCase) {
         String[] vars = getVariables(script)
-        if(vars.length == 1.intValue() && !vars[0].contains(":"))
+        if (vars.length == 1.intValue() && !vars[0].contains(":"))
             return
 
         vars.each { binding.setVariable(getVarName(it), getVarValue(it, useCase)) }
@@ -86,15 +90,15 @@ class FieldActionsRunner {
         return useCase.petriNet.transitions.get(objectId)
     }
 
-    void addToCache(String key, Object value){
-        this.actionsCache.put(key,value)
+    void addToCache(String key, Object value) {
+        this.actionsCache.put(key, value)
     }
 
-    void removeFromCache(String key){
+    void removeFromCache(String key) {
         this.actionsCache.remove(key)
     }
 
-    def getFromCache(String key){
+    def getFromCache(String key) {
         return this.actionsCache.get(key)
     }
 
