@@ -83,6 +83,19 @@ class PdfGenerationTest {
         assertPdfGeneration()
     }
 
+    @Test
+//    @Ignore
+    void testDomacnostPdf() {
+        init()
+        "Iba domácnosť"()
+        "Základné informácie"()
+        "Domácnosť"()
+        "Doplnkové poistenie domácnosti"()
+        "Sumár"()
+        "Údaje o poistníkovi a mieste poistenia"()
+        "Údaje o zmluve"()
+    }
+
     private void init() {
         mongoTemplate.getDb().dropDatabase()
         jdbcTemplate.update("TRUNCATE TABLE postal_code")
@@ -92,7 +105,7 @@ class PdfGenerationTest {
                 name: "namepdf",
                 surname: "surnamepdf",
                 authorities: [
-                        authorityRepository.findByName("user")?:authorityRepository.save(new Authority("user"))
+                        authorityRepository.findByName("user") ?: authorityRepository.save(new Authority("user"))
                 ]
         ))
         jsonNodeFactory = JsonNodeFactory.newInstance()
@@ -107,6 +120,23 @@ class PdfGenerationTest {
         String taskID = references.find { it.getTitle() == "Nehnuteľnosť a domácnosť" }.getStringId()
 
         taskService.assignTask(1L, taskID)
+        taskService.finishTask(1L, taskID)
+    }
+
+    private void "Iba domácnosť"() {
+        List<TaskReference> references = taskService.findAllByCase(_case.getStringId())
+        String taskID = references.find { it.getTitle() == "Iba domácnosť" }.getStringId()
+
+
+
+        taskService.assignTask(1L, taskID)
+        ObjectNode dataset = populateDataset([
+                410001: [
+                        value: "Domacnost",
+                        type : "text",
+                ],
+        ])
+        taskService.setData(taskID, dataset)
         taskService.finishTask(1L, taskID)
     }
 
@@ -297,12 +327,12 @@ class PdfGenerationTest {
 //                Stavebné materialy
 105031: [
         value: true,
-        type: "boolean"
+        type : "boolean"
 ],
 //                Stavebné a záhradné mechanizmy
 105033: [
         value: true,
-        type: "boolean"
+        type : "boolean"
 ]
         ])
         taskService.setData(taskID, dataset)
@@ -310,12 +340,12 @@ class PdfGenerationTest {
 //                Stavebné materiály
 105032: [
         value: 1000,
-        type: "number"
+        type : "number"
 ],
 //                Stavebné a záhradné mechanizmy
 105034: [
         value: 1000,
-        type: "number"
+        type : "number"
 ]
         ])
         taskService.setData(taskID, dataset)
@@ -331,62 +361,62 @@ class PdfGenerationTest {
 //                Garáž
 105035: [
         value: true,
-        type: "boolean"
+        type : "boolean"
 ],
 //                Hospodárska budova
 105009: [
         value: true,
-        type: "boolean"
+        type : "boolean"
 ],
 //                Altánok
 105011: [
         value: true,
-        type: "boolean"
+        type : "boolean"
 ],
 //                Prístrešok
 105013: [
         value: true,
-        type: "boolean"
+        type : "boolean"
 ],
 //                Chodník
 105015: [
         value: true,
-        type: "boolean"
+        type : "boolean"
 ],
 //                Sauna
 105017: [
         value: true,
-        type: "boolean"
+        type : "boolean"
 ],
 //                Elektrická brána
 105019: [
         value: true,
-        type: "boolean"
+        type : "boolean"
 ],
 //                Tenisový kurt
 105021: [
         value: true,
-        type: "boolean"
+        type : "boolean"
 ],
 //                Vonkajší bazén
 105023: [
         value: true,
-        type: "boolean"
+        type : "boolean"
 ],
 //                Studňa
 105025: [
         value: true,
-        type: "boolean"
+        type : "boolean"
 ],
 //                Žumpa, septik
 105027: [
         value: true,
-        type: "boolean"
+        type : "boolean"
 ],
 //                Iné
 105029: [
         value: true,
-        type: "boolean"
+        type : "boolean"
 ]
         ])
         taskService.setData(taskID, dataset)
@@ -394,62 +424,62 @@ class PdfGenerationTest {
 //                Garáž plocha
 105004: [
         value: 100,
-        type: "number"
+        type : "number"
 ],
 //                Rovnaké miesto ...
 105008: [
         value: false,
-        type: "boolean"
+        type : "boolean"
 ],
 //                Garáž poistná sumá
 105007: [
         value: 90_000,
-        type: "number"
+        type : "number"
 ],
 //                Hospodárska budova
 105010: [
         value: 1000,
-        type: "number"
+        type : "number"
 ],
 //                Altánok
 105012: [
         value: 1000,
-        type: "number"
+        type : "number"
 ],
 //                Prístrešok
 105014: [
         value: 1000,
-        type: "number"
+        type : "number"
 ],
 //                Chodník
 105016: [
         value: 1000,
-        type: "number"
+        type : "number"
 ],
 //               Elektrická brána
 105020: [
         value: 1000,
-        type: "number"
+        type : "number"
 ],
 //                Tenisový kurt
 105022: [
         value: 1000,
-        type: "number"
+        type : "number"
 ],
 //                Vonkajší bazén
 105024: [
         value: 1000,
-        type: "number"
+        type : "number"
 ],
 //                Studňa
 105026: [
         value: 1000,
-        type: "number"
+        type : "number"
 ],
 //                Iné
 105030: [
         value: 1000,
-        type: "number"
+        type : "number"
 ],
         ])
         taskService.setData(taskID, dataset)
@@ -465,37 +495,37 @@ class PdfGenerationTest {
 //                Umiestnenie domácnosti
 103001: [
         value: "byt",
-        type: "enumeration"
+        type : "enumeration"
 ],
 //                Poistenie domácnosti
 106001: [
         value: "150.00 €",
-        type: "enumeration"
+        type : "enumeration"
 ],
 //                Celková podlahová plocha
 106003: [
         value: 100,
-        type: "number"
+        type : "number"
 ],
 //                Obývanosť domácnosti
 103002: [
         value: "trvalá",
-        type: "enumeration"
+        type : "enumeration"
 ],
 //                Je nehnuteľnosť, v ktorej sa nachádza poisťovaná domácnosť v blízkom susedstve s inou obývanou nehnuteľnosťou?
 103003: [
         value: true,
-        type: "boolean"
+        type : "boolean"
 ],
 //                Je domácnosť zabezpečená funkčným alarmom?
 103004: [
         value: true,
-        type: "boolean"
+        type : "boolean"
 ],
 //                Má domácnosť na oknách vo výške do 3 metrov od okolitého terénu mreže / vonkajšie žalúzie alebo rolety?
 103005: [
         value: true,
-        type: "boolean"
+        type : "boolean"
 ]
         ])
         taskService.setData(taskID, dataset)
@@ -503,12 +533,12 @@ class PdfGenerationTest {
 //                Zodpovednost domacnost poistná suma
 107003: [
         value: "15,000.00 €",
-        type: "enumeration"
+        type : "enumeration"
 ],
 //                Zodpovednost domacnost - územná platnosť
 104003: [
         value: "Slovenská republika",
-        type: "enumeration"
+        type : "enumeration"
 ]
         ])
         taskService.setData(taskID, dataset)
@@ -524,47 +554,47 @@ class PdfGenerationTest {
 //                Cennosti
 106004: [
         value: true,
-        type: "boolean"
+        type : "boolean"
 ],
 //                Umelecké diela
 106006: [
         value: true,
-        type: "boolean"
+        type : "boolean"
 ],
 //                Elektronické a optické zariadenia
 106008: [
         value: true,
-        type: "boolean"
+        type : "boolean"
 ],
 //                Špecialne sklá a presklenie
 106010: [
         value: true,
-        type: "boolean"
+        type : "boolean"
 ],
 //                Záhradné vybavenie a nábytok
 106012: [
         value: true,
-        type: "boolean"
+        type : "boolean"
 ],
 //                Elektromotory v domácich spotrebičoch
 106014: [
         value: true,
-        type: "boolean"
+        type : "boolean"
 ],
 //                Stavebné súčasti domácnosti
 106016: [
         value: true,
-        type: "boolean"
+        type : "boolean"
 ],
 //                Športové náradie
 106018: [
         value: true,
-        type: "boolean"
+        type : "boolean"
 ],
 //                Iné
 106020: [
         value: true,
-        type: "boolean"
+        type : "boolean"
 ]
         ])
         taskService.setData(taskID, dataset)
@@ -572,37 +602,37 @@ class PdfGenerationTest {
 //                Cennosti
 106005: [
         value: 1000,
-        type: "number"
+        type : "number"
 ],
 //                Elektronické a optické zariadenia
 106009: [
         value: 1000,
-        type: "number"
+        type : "number"
 ],
 //                Špecialne sklá a presklenie
 106011: [
         value: 1000,
-        type: "number"
+        type : "number"
 ],
 //                Záhradné vybavenie a nábytok
 106013: [
         value: 1000,
-        type: "number"
+        type : "number"
 ],
 //                Elektromotory v domácich spotrebičoch
 106015: [
         value: 1000,
-        type: "number"
+        type : "number"
 ],
 //                Športové náradie
 106019: [
         value: 1000,
-        type: "number"
+        type : "number"
 ],
 //                Iné
 106021: [
         value: 1000,
-        type: "number"
+        type : "number"
 ]
         ])
         taskService.setData(taskID, dataset)
@@ -618,17 +648,17 @@ class PdfGenerationTest {
 //                PERIODICITA PLATBY POISTNÉHO
 108001: [
         value: "polročná",
-        type: "enumeration"
+        type : "enumeration"
 ],
 //                ZĽAVA ZA INÉ POISTENIE V PREMIUM
 108002: [
         value: true,
-        type: "boolean"
+        type : "boolean"
 ],
 //                OBCHODNÁ ZĽAVA
 108003: [
         value: "20%",
-        type: "enumeration"
+        type : "enumeration"
 ]
         ])
         taskService.setData(taskID, dataset)
@@ -643,47 +673,47 @@ class PdfGenerationTest {
         ObjectNode dataset = populateDataset([
                 109045: [
                         value: "Staré Grunty",
-                        type: "text"
+                        type : "text"
                 ],
                 109046: [
                         value: "53",
-                        type: "text"
+                        type : "text"
                 ],
                 109010: [
                         value: "Jožko",
-                        type: "text"
+                        type : "text"
                 ],
                 109011: [
                         value: "Mrkvička",
-                        type: "text"
+                        type : "text"
                 ],
                 109013: [
                         value: "SK",
-                        type: "enumeration"
+                        type : "enumeration"
                 ],
                 109015: [
                         value: "9302291234",
-                        type: "text"
+                        type : "text"
                 ],
                 109016: [
                         value: "OP",
-                        type: "enumeration"
+                        type : "enumeration"
                 ],
                 109017: [
                         value: "AB123456",
-                        type: "text"
+                        type : "text"
                 ],
                 109018: [
                         value: "+421 948 123 456",
-                        type: "text"
+                        type : "text"
                 ],
                 109019: [
                         value: "jozko.mrkvicka@gmail.com",
-                        type: "text"
+                        type : "text"
                 ],
                 109014: [
                         value: "1993-02-28",
-                        type: "date"
+                        type : "date"
                 ]
         ])
         taskService.setData(taskID, dataset)
@@ -699,7 +729,7 @@ class PdfGenerationTest {
         ObjectNode dataset = populateDataset([
                 109001: [
                         value: "2017-08-30",
-                        type: "date"
+                        type : "date"
                 ],
         ])
         taskService.setData(taskID, dataset)
