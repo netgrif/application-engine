@@ -3802,6 +3802,7 @@
     <data type="number">
         <title>Výška splátky poistného</title>
         <id>308010</id>
+        <valid>inrange 20,inf</valid>
     </data>
     <!-- ===== Základné informácie koeficienty ===== -->
     <data type="number">
@@ -9648,7 +9649,7 @@
             <title></title>
             <alignment>start</alignment>
             <stretch>true</stretch>
-            <!--VYSKA SPLATKY POISTNEHO-->
+            <!--VYSKA SPLATKY POISTNEHO -->
             <dataRef>
                 <id>308010</id>
                 <logic>
