@@ -11,6 +11,7 @@ import com.netgrif.workflow.auth.service.interfaces.IUserService
 import com.netgrif.workflow.importer.Importer
 import com.netgrif.workflow.petrinet.domain.PetriNet
 import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository
+import com.netgrif.workflow.petrinet.domain.roles.ProcessRole
 import com.netgrif.workflow.premiuminsurance.OfferId
 import com.netgrif.workflow.premiuminsurance.OfferIdRepository
 import com.netgrif.workflow.workflow.domain.Case
@@ -83,6 +84,7 @@ class InsuranceImporter {
         log.info("Creating organizations")
         orgs = new HashMap<>()
         orgs.put("insurance", organizationRepository.save(new Organization("Insurance Company")))
+        orgs.put("gratex", organizationRepository.save(new Organization("Gratex International")))
     }
 
     private void createAuthorities() {
@@ -163,17 +165,26 @@ class InsuranceImporter {
         userService.saveNew(dzugas)
         log.info("User $dzugas.name $dzugas.surname created")
 
-        User gratex = new User(
-                name: "Gratex",
-                surname: "International",
-                email: "gratex@gratex.com",
-                password: "gratex2017",
-                authorities: [auths.get(Authority.user)] as Set<Authority>,
-                organizations: [orgs.get("insurance")] as Set<Organization>)
-        gratex.addProcessRole(agentRole)
-        gratex.addProcessRole(documentAdminRole)
-        userService.saveNew(gratex)
-        log.info("User $gratex.name $gratex.surname created")
+        createUser(new User(name: "Renáta", surname: "Petríková", email: "rpetrikova@gratex.com", password: "gratex2017"),
+                [auths.get(Authority.user)] as Authority[], [orgs.get("gratex")] as Organization[], [agentRole, contactRole, documentAgentRole] as UserProcessRole[])
+
+        createUser(new User(name: "Martin", surname: "Blichar", email: "blichar@gratex.com", password: "gratex2017"),
+                [auths.get(Authority.user)] as Authority[], [orgs.get("gratex")] as Organization[], [agentRole, contactRole, documentAgentRole] as UserProcessRole[])
+
+        createUser(new User(name: "Tomáš", surname: "Husár", email: "thusar@gratex.com", password: "gratex2017"),
+                [auths.get(Authority.user)] as Authority[], [orgs.get("gratex")] as Organization[], [agentRole, contactRole, documentAgentRole] as UserProcessRole[])
+
+        createUser(new User(name: "Martin", surname: "Marko", email: "marcus@gratex.com", password: "gratex2017"),
+                [auths.get(Authority.user)] as Authority[], [orgs.get("gratex")] as Organization[], [agentRole, contactRole, documentAgentRole] as UserProcessRole[])
+
+    }
+
+    private void createUser(User user, Authority[] authorities, Organization[] orgs, UserProcessRole[] roles){
+        authorities.each {user.addAuthority(it)}
+        orgs.each {user.addOrganization(it)}
+        roles.each {user.addProcessRole(it)}
+        userService.saveNew(user)
+        log.info("User $user.name $user.surname created")
     }
 
     private void createCases(){
