@@ -1117,6 +1117,18 @@
             }
         <!--@formatter:on-->
         </action>
+        <!--<action trigger="set">-->
+            <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
+                    <!--field: f.305019,-->
+                    <!--check: f.105035,-->
+                    <!--exces: f.208001,-->
+                    <!--coeff: f.208003,-->
+                    <!--other: f.305003;-->
+                    <!--change other about {-->
+                    <!--return ((field.value*coeff.value*exces.value)/1000.0) as Double;-->
+                    <!--}-->
+                    <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
+        <!--</action>-->
     </data>
     <data type="number">
         <title>Celková podlahová plocha</title>
@@ -1297,6 +1309,13 @@
             change other about { null; }
         <!--@formatter:on-->
         </action>
+        <action trigger="set">
+            <!--@formatter:off-->
+            field: f.this,
+            other: f.105004;
+            change other about { null; }
+        <!--@formatter:on-->
+        </action>
     </data>
 
     <data type="number">
@@ -1324,13 +1343,10 @@
                     field: f.305019,
                     check: f.105035,
                     exces: f.208001,
-                    same: f.105008,
+                    coeff: f.208003,
                     other: f.305003;
                     change other about {
-                        def coeff = same.value ? 1.0 : 1.1;
-                        if (check.value)
-                            return ((field.value*coeff*exces.value)/1000.0) as Double;
-                        return other.value as Double;
+                    return ((field.value*coeff.value*exces.value)/1000.0) as Double;
                     }
                     <!--@formatter:on-->
         </action>
@@ -1377,6 +1393,18 @@
             return 1.1 as Double;
             }
         <!--@formatter:on-->
+        </action>
+        <action trigger="set">
+            <!--@formatter:off-->
+                    field: f.305019,
+                    check: f.105035,
+                    exces: f.208001,
+                    coeff: f.208003,
+                    other: f.305003;
+                    change other about {
+                    return ((field.value*coeff.value*exces.value)/1000.0) as Double;
+                    }
+                    <!--@formatter:on-->
         </action>
     </data>
     <data type="boolean">
@@ -4395,6 +4423,7 @@
     <data type="number">
         <title>Koeficient - Garáž umiestnenie</title>
         <id>208003</id>
+        <init>1</init>
     </data>
     <data type="number">
         <title>Koeficient - Hospodárska budova</title>
