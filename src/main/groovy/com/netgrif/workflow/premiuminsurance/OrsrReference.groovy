@@ -2,15 +2,22 @@ package com.netgrif.workflow.premiuminsurance
 
 class OrsrReference {
 
-    String name
+    String id
 
-    String created
+    String name = ""
 
-    String street
+    String created = ""
 
-    String streetNumber
+    String street = ""
 
-    String city
+    String streetNumber = ""
 
-    String zipCode
+    String city = ""
+
+    String postalCode = ""
+
+    @Override
+    String toString() {
+        return "$name {created: $created, address: [$street $streetNumber, $city, $postalCode]}"
+    }
 }
