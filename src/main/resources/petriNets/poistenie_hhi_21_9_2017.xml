@@ -2750,14 +2750,6 @@
             <!--@formatter:off-->
             check: f.this,
             trans: t.364,
-            other: f.108005;
-            make other,visible on trans when { check.value != null }
-            <!--@formatter:on-->
-        </action>
-        <action trigger="set">
-            <!--@formatter:off-->
-            check: f.this,
-            trans: t.364,
             other: f.106022;
             make other,editable on trans when { check.value != null }
             <!--@formatter:on-->
@@ -3401,6 +3393,14 @@
             other: f.308009;
             change other about { null; }
         <!--@formatter:on-->
+        </action>
+        <action trigger="set">
+            <!--@formatter:off-->
+            check: f.this,
+            trans: t.364,
+            other: f.108005;
+            make other,visible on trans when { check.value != null }
+            <!--@formatter:on-->
         </action>
     </data>
     <!-- ===== Sumár ===== -->
