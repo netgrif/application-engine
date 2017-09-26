@@ -420,7 +420,7 @@ class Insurance {
         builder.field("xfdf:original": "101", "${valueRound(106015) ?: ''}")
         builder.field("xfdf:original": "103", "${valueRound(106017) ?: ''}")
         builder.field("xfdf:original": "105", "${valueRound(106019) ?: ''}")
-        builder.fvbgggztzhjg("${value(106021) ?: ''}")
+        builder.fvbgggztzhjg("${valueRound(106021) ?: ''}")
 
         return builder
     }
