@@ -16,6 +16,17 @@ class PdfUtils {
 
     private static final Logger log = LoggerFactory.getLogger(PdfUtils.class)
 
+    static File removePages(File pdfFile, int... pages) {
+        PDDocument document = PDDocument.load(pdfFile)
+
+        pages.each {
+            document.removePage(it)
+        }
+        document.save(pdfFile)
+
+        return pdfFile
+    }
+
     static File fillPdfForm(String outPdfName, InputStream pdfFile, InputStream xmlFile) throws IllegalArgumentException {
         fillPdfForm(outPdfName, pdfFile, xmlFile.getText())
     }
@@ -68,6 +79,10 @@ class PdfUtils {
     private static setFieldValueAndFont(PDAcroForm acroForm, def xmlNode, Map<String, String> fonts) {
         def id = ((xmlNode["@xfdf:original"] as String) ?: xmlNode.name()) as String
         def field = acroForm.fieldIterator.find { it.partialName.equalsIgnoreCase(id) }
+        if (field == null) {
+            log.error("Cannot find field [$id]")
+            return
+        }
 
         try {
             String DA = field.getCOSObject().getString(COSName.DA)
