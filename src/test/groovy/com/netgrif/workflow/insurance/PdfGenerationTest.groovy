@@ -96,6 +96,19 @@ class PdfGenerationTest {
         "Údaje o zmluve"()
     }
 
+    @Test
+    void testNehnutelnostPdf() {
+        init()
+        "Iba nehnuteľnosť"()
+        "Základné informácie"()
+        "Nehnuteľnosť"()
+        "Doplnkové poistenie nehnuteľnosti"()
+        "Vedľajšie stavby"()
+        "Sumár"()
+        "Údaje o poistníkovi a mieste poistenia"()
+        "Údaje o zmluve"()
+    }
+
     private void init() {
         mongoTemplate.getDb().dropDatabase()
         jdbcTemplate.update("TRUNCATE TABLE postal_code")
@@ -123,11 +136,24 @@ class PdfGenerationTest {
         taskService.finishTask(1L, taskID)
     }
 
+    private void "Iba nehnuteľnosť"() {
+        List<TaskReference> references = taskService.findAllByCase(_case.getStringId())
+        String taskID = references.find { it.getTitle() == "Iba nehnuteľnosť" }.getStringId()
+
+        taskService.assignTask(1L, taskID)
+        ObjectNode dataset = populateDataset([
+                410001: [
+                        value: "Nehnutelnost",
+                        type : "text",
+                ],
+        ])
+        taskService.setData(taskID, dataset)
+        taskService.finishTask(1L, taskID)
+    }
+
     private void "Iba domácnosť"() {
         List<TaskReference> references = taskService.findAllByCase(_case.getStringId())
         String taskID = references.find { it.getTitle() == "Iba domácnosť" }.getStringId()
-
-
 
         taskService.assignTask(1L, taskID)
         ObjectNode dataset = populateDataset([
