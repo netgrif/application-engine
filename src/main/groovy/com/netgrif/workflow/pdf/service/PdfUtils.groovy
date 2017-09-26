@@ -17,6 +17,17 @@ class PdfUtils {
 
     private static final Logger log = LoggerFactory.getLogger(PdfUtils.class)
 
+    static File removePages(File pdfFile, int... pages) {
+        PDDocument document = PDDocument.load(pdfFile)
+
+        pages.each {
+            document.removePage(it)
+        }
+        document.save(pdfFile)
+
+        return pdfFile
+    }
+
     private static final int KEY_LENGTH = 128
 
     static File encryptPdfFile(String outPdfPath, File input, String ownerPassword = "", String userPassword = "") {
@@ -98,6 +109,10 @@ class PdfUtils {
     private static setFieldValueAndFont(PDAcroForm acroForm, def xmlNode, Map<String, String> fonts) {
         def id = ((xmlNode["@xfdf:original"] as String) ?: xmlNode.name()) as String
         def field = acroForm.fieldIterator.find { it.partialName.equalsIgnoreCase(id) }
+        if (field == null) {
+            log.error("Cannot find field [$id]")
+            return
+        }
 
         String DA = field.getCOSObject().getString(COSName.DA)
 

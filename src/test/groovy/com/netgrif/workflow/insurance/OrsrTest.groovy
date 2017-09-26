@@ -30,7 +30,7 @@ class OrsrTest {
     private assertCorrectValidOrsrInfo(OrsrReference info) {
         assert info.name == "NETGRIF, s.r.o."
         assert info.city == "Bratislava - mestská časť Staré Mesto"
-        assert info.zipCode == "811 07"
+        assert info.postalCode == "811 07"
         assert info.street == "Blumentálska"
         assert info.streetNumber == "12"
     }
