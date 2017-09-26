@@ -1,6 +1,7 @@
 package com.netgrif.workflow.premiuminsurance
 
 import org.apache.log4j.Logger
+import org.jsoup.HttpStatusException
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
@@ -41,15 +42,19 @@ class OrsrService implements IOrsrService {
 
     private OrsrReference parseCompanyInfo(String companyUrl, String companyId) {
         OrsrReference info = new OrsrReference(id: companyId)
-        Document doc = Jsoup.connect("${ORSR_URL_BASE}${companyUrl}").get()
-        Elements tables = doc.select("table[cellspacing=3]")
+
+        try {
+            Document doc = Jsoup.connect("${ORSR_URL_BASE}${companyUrl}").get()
+            Elements tables = doc.select("table[cellspacing=3]")
 
         info.name = tables?.get(0)?.select("span[class=ra]")?.get(0)?.text()
         info.created = tables?.get(3)?.select("span[class=ra]")?.get(0)?.text()
         parseStreet(info, tables)
         parseStreetNumber(info, tables)
         parseCity(info, tables)
-        parsePostalCode(info, tables)
+        parsePostalCode(info, tables)} catch (HttpStatusException e) {
+            log.error("HTTP error fetching URL $ORSR_URL_BASE$companyUrl", e)
+        }
 
         return info
     }

@@ -122,7 +122,7 @@ class PdfGenerationTest {
                 ]
         ))
         jsonNodeFactory = JsonNodeFactory.newInstance()
-        net = importer.importPetriNet(new File("src/main/resources/petriNets/poistenie_hhi_18_7_2017.xml"), "Household insurance pdf", "HHI")
+        net = importer.importPetriNet(new File("src/main/resources/petriNets/insurance_hhi.xml"), "Household insurance pdf", "HHI")
         _case = workflowService.createCase(net.getStringId(), "Household insurance pdf", "color", 1L)
         idConverter = net.dataSet.collectEntries { [(it.value.importId): (it.key)] }
         postalCodeImporter.run()
