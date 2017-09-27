@@ -25,6 +25,7 @@ class PdfUtils {
             document.removePage(it)
         }
         document.save(pdfFile)
+        document.close()
 
         return pdfFile
     }

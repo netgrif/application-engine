@@ -14,7 +14,6 @@ class Insurance {
     private final static String PDF_PATH = "pdf"
     private final static String OFFER_FILENAME = "offer.pdf"
     private final static String DRAFT_FILENAME = "draft.pdf"
-    private final static String MERGE_FILENAME = "merged.pdf"
     private final static String FINAL_FILENAME = "final.pdf"
     private final static String OWNER_PASSWORD = "PremiumInsurance2017"
 
@@ -27,15 +26,23 @@ class Insurance {
     }
 
     File offerPDF() {
-        String draftPath = (field as FileField).getFilePath(DRAFT_FILENAME)
         String offerPath = (field as FileField).getFilePath(OFFER_FILENAME)
-        String mergePath = (field as FileField).getFilePath(MERGE_FILENAME)
+        String finalPath = (field as FileField).getFilePath(FINAL_FILENAME)
+
+        File offerPdfFile = generateOfferPdf(offerPath)
+        File encryptedPdf = encryptPdf(finalPath, offerPdfFile)
+
+        useCase.dataSet.get(field.stringId).setValue(FINAL_FILENAME)
+
+        return encryptedPdf
+    }
+
+    File draftPDF() {
+        String draftPath = (field as FileField).getFilePath(DRAFT_FILENAME)
         String finalPath = (field as FileField).getFilePath(FINAL_FILENAME)
 
         File draftPdfFile = generateDraftPdf(draftPath)
-        File offerPdfFile = generateOfferPdf(offerPath)
-        File mergedPdf = PdfUtils.mergePdfFiles(mergePath, draftPdfFile, offerPdfFile)
-        File encryptedPdf = encryptPdf(finalPath, mergedPdf)
+        File encryptedPdf = encryptPdf(finalPath, draftPdfFile)
 
         useCase.dataSet.get(field.stringId).setValue(FINAL_FILENAME)
 
