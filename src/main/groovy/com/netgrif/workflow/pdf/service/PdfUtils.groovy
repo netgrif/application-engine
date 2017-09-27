@@ -69,9 +69,12 @@ class PdfUtils {
             PDAcroForm acroForm = docCatalog.getAcroForm()
 
             Map<String, String> fonts = new HashMap<>()
-            fonts.put("/KlavikaBasic-Regular", addFont(document, acroForm, "classpath:fonts/Klavika Regular.ttf"))
-            fonts.put("/KlavikaBasic-Bold", addFont(document, acroForm, "classpath:fonts/Klavika Bold.ttf"))
-            fonts.put("/KlavikaBasic-Medium", addFont(document, acroForm, "classpath:fonts/Klavika Medium.ttf"))
+//            fonts.put("/KlavikaBasic-Regular", addFont(document, acroForm, "classpath:fonts/Klavika Regular.ttf"))
+//            fonts.put("/KlavikaBasic-Bold", addFont(document, acroForm, "classpath:fonts/Klavika Bold.ttf"))
+//            fonts.put("/KlavikaBasic-Medium", addFont(document, acroForm, "classpath:fonts/Klavika Medium.ttf"))
+            fonts.put("/KlavikaBasic-Regular", addFont(document, acroForm, "src/main/resources/fonts/Klavika Regular.ttf"))
+            fonts.put("/KlavikaBasic-Bold", addFont(document, acroForm, "src/main/resources/fonts/Klavika Bold.ttf"))
+            fonts.put("/KlavikaBasic-Medium", addFont(document, acroForm, "src/main/resources/fonts/Klavika Medium.ttf"))
             addFieldValues(acroForm, xml, fonts)
             return saveToFile(document, outPdfName)
         } catch (IOException e) {
@@ -85,7 +88,8 @@ class PdfUtils {
         if (res == null)
             res = new PDResources()
 
-        File fontFile = ResourceFileLoader.loadResourceFile(fontPath)
+//        File fontFile = ResourceFileLoader.loadResourceFile(fontPath)
+        File fontFile = new File(fontPath)
         PDType0Font font = PDType0Font.load(document, new FileInputStream(fontFile), true)
 
         String fontName = res.add(font).name
