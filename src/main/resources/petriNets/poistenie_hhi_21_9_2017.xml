@@ -4888,12 +4888,6 @@
         <title>Číslo ponuky</title>
         <id>309001</id>
         <init>0000000000</init>
-        <action trigger="get">
-            <!--formatter:off-->
-            self: f.this;
-            generate "Insurance.offerId",once into self
-            <!--@formatter:on-->
-        </action>
     </data>
     <data type="date">
         <title>Začiatok poistenia</title>
@@ -6928,7 +6922,7 @@
         <action trigger="get">
             <!--formatter:off-->
             self: f.this;
-            generate "Insurance.offerPDF",always into self
+            generate "Insurance.draftPDF",always into self
             <!--@formatter:on-->
         </action>
     </data>
@@ -9992,6 +9986,29 @@
                 </logic>
             </dataRef>
         </dataGroup>
+        <dataGroup>
+            <id>3</id>
+            <alignment>start</alignment>
+            <stretch>false</stretch>
+            <dataRef>
+                <id>309001</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                    <action trigger="get">
+                        <!--formatter:off-->
+                        self: f.this;
+                        generate "Insurance.offerId",once into self
+                        <!--@formatter:on-->
+                    </action>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>309003</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
     </transition>
     <!--================================= Údaje o poistníkovi a mieste poistenia =====================-->
     <transition>
@@ -10507,7 +10524,7 @@
             </dataRef>
             <!--Ponuka PDF-->
             <dataRef>
-                <id>309003</id>
+                <id>309004</id>
                 <logic>
                     <behavior>visible</behavior>
                 </logic>
@@ -10613,7 +10630,7 @@
             </dataRef>
             <!--Ponuka PDF-->
             <dataRef>
-                <id>309003</id>
+                <id>309004</id>
                 <logic>
                     <behavior>visible</behavior>
                 </logic>
@@ -10719,7 +10736,7 @@
             </dataRef>
             <!--Ponuka PDF-->
             <dataRef>
-                <id>309003</id>
+                <id>309004</id>
                 <logic>
                     <behavior>visible</behavior>
                 </logic>
@@ -12095,7 +12112,7 @@
             </dataRef>
             <!--Ponuka PDF-->
             <dataRef>
-                <id>309003</id>
+                <id>309004</id>
                 <logic>
                     <behavior>visible</behavior>
                 </logic>
