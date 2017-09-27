@@ -85,7 +85,8 @@ class Insurance {
     }
 
     private File generateDraftPdf(String draftPath) {
-        File draftBlankPdfFile = ResourceFileLoader.loadResourceFile("$PDF_PATH/$DRAFT_FILENAME")
+//        File draftBlankPdfFile = ResourceFileLoader.loadResourceFile("$PDF_PATH/$DRAFT_FILENAME")
+        File draftBlankPdfFile = new File("src/main/resources/$PDF_PATH/$DRAFT_FILENAME")
         String draftXml = datasetToDraftXml()
         File pdf = PdfUtils.fillPdfForm(draftPath, new FileInputStream(draftBlankPdfFile), draftXml)
 
@@ -102,7 +103,8 @@ class Insurance {
     }
 
     private File generateOfferPdf(String offerPath) {
-        File offerBlankPdfFile = ResourceFileLoader.loadResourceFile("$PDF_PATH/$OFFER_FILENAME")
+//        File offerBlankPdfFile = ResourceFileLoader.loadResourceFile("$PDF_PATH/$OFFER_FILENAME")
+        File offerBlankPdfFile = new File("src/main/resources/$PDF_PATH/$OFFER_FILENAME")
         String offerXml = datasetToOfferXml()
         File pdf = PdfUtils.fillPdfForm(offerPath, new FileInputStream(offerBlankPdfFile), offerXml)
 
