@@ -441,7 +441,7 @@ class Insurance {
         builder.field("xfdf:original": "71", "${valueBool(103005) ?: ''}")
         builder.field("xfdf:original": "72", "${valueRound(106003) ?: ''}")
         builder.field("xfdf:original": "73", "${valueRound(106002) ?: ''}")
-        builder.field("xfdf:original": "74", "${valueRound(106022) ?: ''}")
+        builder.field("xfdf:original": "74", "${((value(106022) as Double) > (value(106023) as Double)) ? valueRound(106022) : valueRound(106023)}")
         builder.field("xfdf:original": "vvbcbcvcvcvnmjkl,,,", "${valueRound(306001) ?: ''}")
 
         return builder
