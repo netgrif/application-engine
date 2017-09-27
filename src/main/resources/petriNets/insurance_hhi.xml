@@ -2373,22 +2373,33 @@
         <id>106003</id>
         <init>0</init>
         <valid>positive</valid>
+        <!--<action trigger="set">-->
+            <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
+            <!--field: f.this,-->
+            <!--location: f.301002,-->
+            <!--coeff: f.106002;-->
+            <!--change coeff about {-->
+                <!--if (location.value=="L5")-->
+                    <!--return 1900*field.value as Double;-->
+                <!--if (location.value=="L4")-->
+                    <!--return 1300*field.value as Double;-->
+                <!--if (location.value=="L1")-->
+                    <!--return 650*field.value as Double;-->
+                <!--if (location.value=="L2")-->
+                    <!--return 700*field.value as Double;-->
+                <!--if (location.value=="L3")-->
+                    <!--return 950*field.value as Double;-->
+            <!--}-->
+        <!--@formatter:on-->
+        <!--</action>-->
         <action trigger="set">
-            <!--@formatter:off-->
+        <!--@formatter:off-->
             field: f.this,
-            location: f.301002,
             coeff: f.106002;
             change coeff about {
-                if (location.value=="L5")
-                    return 1900*field.value as Double;
-                if (location.value=="L4")
-                    return 1300*field.value as Double;
-                if (location.value=="L1")
-                    return 650*field.value as Double;
-                if (location.value=="L2")
-                    return 700*field.value as Double;
-                if (location.value=="L3")
-                    return 950*field.value as Double;
+                if (this.value>100)
+                    return 25000+(field.value-100)*100  as Double;
+                return field.value*250 as Double
             }
         <!--@formatter:on-->
         </action>
