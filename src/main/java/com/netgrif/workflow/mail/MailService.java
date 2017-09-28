@@ -11,7 +11,6 @@ import org.springframework.ui.velocity.VelocityEngineUtils;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import java.io.File;
-import java.io.InputStream;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.time.LocalDate;
@@ -55,7 +54,7 @@ public class MailService implements IMailService {
     }
 
     @Override
-    public void sendDraftEmail(String recipient, File pdf) throws MessagingException {
+    public void sendDraftEmail(String recipient, File pdf) throws MessagingException, UnknownHostException {
         List<String> recipients = new LinkedList<>();
         recipients.add(recipient);
         Map<String, Object> model = new HashMap<>();
@@ -66,6 +65,8 @@ public class MailService implements IMailService {
         attachments.put(pdf.getName(), pdf);
         MimeMessage email = buildEmail(EmailType.REGISTRATION, recipients, model, attachments);
         mailSender.send(email);
+
+        log.info("Mail with draft pdf sent to " + recipient);
     }
 
     @Override
