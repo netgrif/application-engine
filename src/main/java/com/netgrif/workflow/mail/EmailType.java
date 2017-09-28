@@ -2,7 +2,8 @@ package com.netgrif.workflow.mail;
 
 
 public enum EmailType {
-    REGISTRATION ("registration.html", "Registration to Netgrif WMS");
+    REGISTRATION ("registration.html", "Registration to Netgrif WMS"),
+    DRAFT("draft.html", "Návrh na uzavretie poistnej zmluvy");
 
     String template;
     String subject;
