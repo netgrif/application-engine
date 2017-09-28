@@ -8,6 +8,7 @@ import com.netgrif.workflow.petrinet.domain.dataset.FileField
 import com.netgrif.workflow.premiuminsurance.IdGenerator
 import com.netgrif.workflow.utils.ResourceFileLoader
 import com.netgrif.workflow.workflow.domain.Case
+import com.netgrif.workflow.workflow.domain.DataField
 import groovy.xml.MarkupBuilder
 
 class Insurance {
@@ -50,17 +51,6 @@ class Insurance {
         return encryptedPdf
     }
 
-    void sendMail() {
-        try {
-            MailService service = ApplicationContextProvider.getBean("mailService") as MailService
-            String finalPath = (field as FileField).getFilePath(FINAL_FILENAME)
-
-            service.sendDraftEmail(value(109019), new File(finalPath))
-        } catch (Exception e) {
-
-        }
-    }
-
     /**
      * Fyzicka osoba - rodne cislo (109015), zahranicna osoba - cislo pasu (109017), <br>
      * SZCO - preukaz (109017),<br>
@@ -90,6 +80,15 @@ class Insurance {
         return PdfUtils.encryptPdfFile(encryptedFilePath, fileToEncrypt, OWNER_PASSWORD, userPassword)
     }
 
+    String sendMail() {
+        try {
+            sendDraftEmail()
+        } catch (Exception e) {
+            e.printStackTrace()
+        }
+        return field.value as String
+    }
+
     String offerId() {
         def generator = ApplicationContextProvider.getBean("idGenerator") as IdGenerator
         def id = generator.getId() as String
@@ -101,6 +100,15 @@ class Insurance {
         useCase.dataSet.get(field.stringId).setValue("${prefix}${base}${postfix}" as String)
 
         return "${prefix}${base}${postfix}"
+    }
+
+    private void sendDraftEmail() {
+        MailService service = ApplicationContextProvider.getBean("mailService") as MailService
+        def field = useCase.petriNet.dataSet.find { it.value.importId == 309004 }
+        DataField fileField = useCase.dataSet.get(field.key)
+        String finalPath = (field.value as FileField).getFilePath((String) fileField.getValue())
+
+        service.sendDraftEmail(value(109019), new File(finalPath))
     }
 
     private File generateDraftPdf(String draftPath) {
@@ -495,9 +503,9 @@ class Insurance {
     }
 
     Closure<MarkupBuilder> zodpovednostZaSkoduDomacnost = { MarkupBuilder builder ->
-        builder.field("xfdf:original": "601","${value(107003)?.replace('€', '') ?: ''}")
-        builder.field("xfdf:original": "602","${valueRound(308009) ?: ''}")
-        builder.field("xfdf:original": "603","${value(104003) ?: ''}")
+        builder.field("xfdf:original": "601", "${value(107003)?.replace('€', '') ?: ''}")
+        builder.field("xfdf:original": "602", "${valueRound(308009) ?: ''}")
+        builder.field("xfdf:original": "603", "${value(104003) ?: ''}")
 
         return builder
     }

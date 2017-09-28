@@ -12171,18 +12171,22 @@
         <y>117</y>
         <label>Send mail</label>
         <trigger type="auto"></trigger>
-        <dataRef>
-            <id>410001</id>
-            <logic>
-                <behavior>hidden</behavior>
-                <action trigger="get">
-                    <!--formatter:off-->
-                    self: f.this;
-                    generate "Insurance.sendMail",once into self
-                    <!--@formatter:on-->
-                </action>
-            </logic>
-        </dataRef>
+        <dataGroup>
+            <id>1</id>
+            <title></title>
+            <dataRef>
+                <id>410001</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                    <action trigger="get">
+                        <!--formatter:off-->
+                        self: f.this;
+                        generate "Insurance.sendMail",always into self
+                        <!--@formatter:on-->
+                    </action>
+                </logic>
+            </dataRef>
+        </dataGroup>
     </transition>
     <!--=================================PLACES========================-->
     <place>

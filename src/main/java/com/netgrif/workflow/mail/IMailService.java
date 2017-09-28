@@ -7,7 +7,7 @@ import java.net.UnknownHostException;
 public interface IMailService {
     void sendRegistrationEmail(String recipient, String token) throws MessagingException, UnknownHostException;
 
-    void sendDraftEmail(String recipient, File pdf) throws MessagingException;
+    void sendDraftEmail(String recipient, File pdf) throws MessagingException, UnknownHostException;
 
     void testConnection();
 }
