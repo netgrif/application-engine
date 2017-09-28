@@ -107,8 +107,11 @@ class Insurance {
         def field = useCase.petriNet.dataSet.find { it.value.importId == 309004 }
         DataField fileField = useCase.dataSet.get(field.key)
         String finalPath = (field.value as FileField).getFilePath((String) fileField.getValue())
+        Map<String, Object> model = [:]
+        model["id"] = value(309001)
+        model["payment"] = value(308010)
 
-        service.sendDraftEmail(value(109019), new File(finalPath))
+        service.sendDraftEmail(value(109019), new File(finalPath), model)
     }
 
     private File generateDraftPdf(String draftPath) {

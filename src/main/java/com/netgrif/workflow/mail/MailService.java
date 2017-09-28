@@ -5,6 +5,7 @@ import org.apache.velocity.app.VelocityEngine;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.ui.velocity.VelocityEngineUtils;
 
@@ -54,16 +55,16 @@ public class MailService implements IMailService {
     }
 
     @Override
-    public void sendDraftEmail(String recipient, File pdf) throws MessagingException, UnknownHostException {
+    @Async
+    public void sendDraftEmail(String recipient, File pdf, Map<String, Object> model) throws MessagingException, UnknownHostException {
         List<String> recipients = new LinkedList<>();
         recipients.add(recipient);
-        Map<String, Object> model = new HashMap<>();
         Map<String, File> attachments = new HashMap<>();
 
         topLevelDomain = topLevelDomain == null ? "com" : (topLevelDomain.isEmpty() ? "com" : topLevelDomain);
         model.put("serverName", "http://" + (subdomain != null && !subdomain.isEmpty() ? (subdomain + ".") : "") + InetAddress.getLocalHost().getHostName().toLowerCase() + "." + topLevelDomain + (port != null && !port.isEmpty() ?  (":" + port) : ""));
         attachments.put(pdf.getName(), pdf);
-        MimeMessage email = buildEmail(EmailType.REGISTRATION, recipients, model, attachments);
+        MimeMessage email = buildEmail(EmailType.DRAFT, recipients, model, attachments);
         mailSender.send(email);
 
         log.info("Mail with draft pdf sent to " + recipient);
