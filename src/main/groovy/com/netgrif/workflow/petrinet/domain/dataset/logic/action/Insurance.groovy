@@ -1,12 +1,14 @@
 package com.netgrif.workflow.petrinet.domain.dataset.logic.action
 
 import com.netgrif.workflow.context.ApplicationContextProvider
+import com.netgrif.workflow.mail.MailService
 import com.netgrif.workflow.pdf.service.PdfUtils
 import com.netgrif.workflow.petrinet.domain.dataset.Field
 import com.netgrif.workflow.petrinet.domain.dataset.FileField
 import com.netgrif.workflow.premiuminsurance.IdGenerator
 import com.netgrif.workflow.utils.ResourceFileLoader
 import com.netgrif.workflow.workflow.domain.Case
+import com.netgrif.workflow.workflow.domain.DataField
 import groovy.xml.MarkupBuilder
 
 class Insurance {
@@ -78,6 +80,15 @@ class Insurance {
         return PdfUtils.encryptPdfFile(encryptedFilePath, fileToEncrypt, OWNER_PASSWORD, userPassword)
     }
 
+    String sendMail() {
+        try {
+            sendDraftEmail()
+        } catch (Exception e) {
+            e.printStackTrace()
+        }
+        return field.value as String
+    }
+
     String offerId() {
         def generator = ApplicationContextProvider.getBean("idGenerator") as IdGenerator
         def id = generator.getId() as String
@@ -89,6 +100,18 @@ class Insurance {
         useCase.dataSet.get(field.stringId).setValue("${prefix}${base}${postfix}" as String)
 
         return "${prefix}${base}${postfix}"
+    }
+
+    private void sendDraftEmail() {
+        MailService service = ApplicationContextProvider.getBean("mailService") as MailService
+        def field = useCase.petriNet.dataSet.find { it.value.importId == 309004 }
+        DataField fileField = useCase.dataSet.get(field.key)
+        String finalPath = (field.value as FileField).getFilePath((String) fileField.getValue())
+        Map<String, Object> model = [:]
+        model["id"] = value(309001)
+        model["payment"] = value(308010)
+
+        service.sendDraftEmail(value(109019), new File(finalPath), model)
     }
 
     private File generateDraftPdf(String draftPath) {
@@ -485,9 +508,9 @@ class Insurance {
     }
 
     Closure<MarkupBuilder> zodpovednostZaSkoduDomacnost = { MarkupBuilder builder ->
-        builder.field("xfdf:original": "601","${value(107003)?.replace('€', '') ?: ''}")
-        builder.field("xfdf:original": "602","${valueRound(308009) ?: ''}")
-        builder.field("xfdf:original": "603","${value(104003) ?: ''}")
+        builder.field("xfdf:original": "601", "${value(107003)?.replace('€', '') ?: ''}")
+        builder.field("xfdf:original": "602", "${valueRound(308009) ?: ''}")
+        builder.field("xfdf:original": "603", "${value(104003) ?: ''}")
 
         return builder
     }
@@ -606,6 +629,10 @@ class Insurance {
         if (rc ==~ /^[0-9]{6}\/[0-9]{3,4}$/)
             return rc
 
-        return "${rc.substring(0, 6)}/${rc.substring(6, rc.length())}"
+        try {
+            return "${rc.substring(0, 6)}/${rc.substring(6, rc.length())}"
+        } catch (Exception e) {
+            return null
+        }
     }
 }

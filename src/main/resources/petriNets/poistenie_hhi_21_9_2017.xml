@@ -12164,6 +12164,30 @@
             </logic>
         </roleRef>
     </transition>
+
+    <transition>
+        <id>2484</id>
+        <x>1457</x>
+        <y>117</y>
+        <label>Send mail</label>
+        <trigger type="auto"></trigger>
+        <dataGroup>
+            <id>1</id>
+            <title></title>
+            <dataRef>
+                <id>410001</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                    <action trigger="get">
+                        <!--formatter:off-->
+                        self: f.this;
+                        generate "Insurance.sendMail",always into self
+                        <!--@formatter:on-->
+                    </action>
+                </logic>
+            </dataRef>
+        </dataGroup>
+    </transition>
     <!--=================================PLACES========================-->
     <place>
         <id>1</id>
@@ -12508,6 +12532,14 @@
         <label></label>
         <tokens>0</tokens>
         <isStatic>false</isStatic>
+    </place>
+    <place>
+        <id>2480</id>
+        <x>1399</x>
+        <y>117</y>
+        <label></label>
+        <tokens>0</tokens>
+        <static>false</static>
     </place>
     <!--=================================ARCS========================-->
     <arc>
@@ -13873,6 +13905,34 @@
         <type>regular</type>
         <sourceId>363</sourceId>
         <destinationId>2284</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>2481</id>
+        <type>regular</type>
+        <sourceId>1618</sourceId>
+        <destinationId>2480</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>2482</id>
+        <type>regular</type>
+        <sourceId>332</sourceId>
+        <destinationId>2480</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>2483</id>
+        <type>regular</type>
+        <sourceId>1661</sourceId>
+        <destinationId>2480</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>2485</id>
+        <type>regular</type>
+        <sourceId>2480</sourceId>
+        <destinationId>2484</destinationId>
         <multiplicity>1</multiplicity>
     </arc>
 </document>

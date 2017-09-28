@@ -243,6 +243,12 @@ public class TaskService implements ITaskService {
     public List<Field> getData(String taskId) {
         Task task = taskRepository.findOne(taskId);
         Case useCase = caseRepository.findOne(task.getCaseId());
+
+        return getData(task, useCase);
+    }
+
+    @Override
+    public List<Field> getData(Task task, Case useCase) {
         Transition transition = useCase.getPetriNet().getTransition(task.getTransitionId());
 
         Set<String> fieldsIds = transition.getDataSet().keySet();
@@ -723,7 +729,9 @@ public class TaskService implements ITaskService {
         Transition transition = useCase.getPetriNet().getTransition(task.getTransitionId());
         try {
             startExecution(transition, useCase);
+            getData(task, useCase);
             finishExecution(transition, useCase);
+
             caseRepository.save(useCase);
             reloadTasks(useCase, -1L);
         } catch (TransitionNotExecutableException e) {
