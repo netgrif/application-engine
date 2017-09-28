@@ -10,6 +10,8 @@ import org.springframework.ui.velocity.VelocityEngineUtils;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
+import java.io.File;
+import java.io.InputStream;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.time.LocalDate;
@@ -48,7 +50,21 @@ public class MailService implements IMailService {
 
         topLevelDomain = topLevelDomain == null ? "com" : (topLevelDomain.isEmpty() ? "com" : topLevelDomain);
         model.put("serverName", "http://" + (subdomain != null && !subdomain.isEmpty() ? (subdomain + ".") : "") + InetAddress.getLocalHost().getHostName().toLowerCase() + "." + topLevelDomain + (port != null && !port.isEmpty() ?  (":" + port) : ""));
-        MimeMessage email = buildEmail(EmailType.REGISTRATION, recipients, model);
+        MimeMessage email = buildEmail(EmailType.REGISTRATION, recipients, model, new HashMap<>());
+        mailSender.send(email);
+    }
+
+    @Override
+    public void sendDraftEmail(String recipient, File pdf) throws MessagingException {
+        List<String> recipients = new LinkedList<>();
+        recipients.add(recipient);
+        Map<String, Object> model = new HashMap<>();
+        Map<String, File> attachments = new HashMap<>();
+
+        topLevelDomain = topLevelDomain == null ? "com" : (topLevelDomain.isEmpty() ? "com" : topLevelDomain);
+        model.put("serverName", "http://" + (subdomain != null && !subdomain.isEmpty() ? (subdomain + ".") : "") + InetAddress.getLocalHost().getHostName().toLowerCase() + "." + topLevelDomain + (port != null && !port.isEmpty() ?  (":" + port) : ""));
+        attachments.put(pdf.getName(), pdf);
+        MimeMessage email = buildEmail(EmailType.REGISTRATION, recipients, model, attachments);
         mailSender.send(email);
     }
 
@@ -63,13 +79,20 @@ public class MailService implements IMailService {
 //        }
     }
 
-    private MimeMessage buildEmail(EmailType type, List<String> recipients, Map<String, Object> model) throws MessagingException {
+    private MimeMessage buildEmail(EmailType type, List<String> recipients, Map<String, Object> model, Map<String, File> attachments) throws MessagingException {
         MimeMessage message = mailSender.createMimeMessage();
         message.setSubject(type.subject);
         MimeMessageHelper helper = new MimeMessageHelper(message, true);
         helper.setFrom(mailFrom);
         helper.setTo(recipients.toArray(new String[recipients.size()]));
         helper.setText(VelocityEngineUtils.mergeTemplateIntoString(velocityEngine, type.template, "UTF-8", model), true);
+        attachments.forEach((s, inputStream) -> {
+            try {
+                helper.addAttachment(s, inputStream);
+            } catch (MessagingException e) {
+                e.printStackTrace();
+            }
+        });
         return message;
     }
 
