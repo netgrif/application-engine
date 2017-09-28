@@ -1,6 +1,7 @@
 package com.netgrif.workflow.petrinet.domain.dataset.logic.action
 
 import com.netgrif.workflow.context.ApplicationContextProvider
+import com.netgrif.workflow.mail.MailService
 import com.netgrif.workflow.pdf.service.PdfUtils
 import com.netgrif.workflow.petrinet.domain.dataset.Field
 import com.netgrif.workflow.petrinet.domain.dataset.FileField
@@ -47,6 +48,17 @@ class Insurance {
         useCase.dataSet.get(field.stringId).setValue(FINAL_FILENAME)
 
         return encryptedPdf
+    }
+
+    void sendMail() {
+        try {
+            MailService service = ApplicationContextProvider.getBean("mailService") as MailService
+            String finalPath = (field as FileField).getFilePath(FINAL_FILENAME)
+
+            service.sendDraftEmail(value(109019), new File(finalPath))
+        } catch (Exception e) {
+
+        }
     }
 
     /**
@@ -604,6 +616,10 @@ class Insurance {
         if (rc ==~ /^[0-9]{6}\/[0-9]{3,4}$/)
             return rc
 
-        return "${rc.substring(0, 6)}/${rc.substring(6, rc.length())}"
+        try {
+            return "${rc.substring(0, 6)}/${rc.substring(6, rc.length())}"
+        } catch (Exception e) {
+            return null
+        }
     }
 }
