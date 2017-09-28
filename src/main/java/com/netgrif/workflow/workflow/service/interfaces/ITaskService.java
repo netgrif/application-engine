@@ -43,6 +43,8 @@ public interface ITaskService {
 
     List<Field> getData(String taskId);
 
+    List<Field> getData(Task task, Case useCase);
+
     List<DataGroup> getDataGroups(String taskId);
 
     ChangedFieldContainer setData(String taskId, ObjectNode values);
