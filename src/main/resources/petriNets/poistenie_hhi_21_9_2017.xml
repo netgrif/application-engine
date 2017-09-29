@@ -5407,7 +5407,6 @@
     <data type="text">
         <title>Rodné číslo</title>
         <id>109015</id>
-        <desc>Poistník</desc>
         <action trigger="set">
             <!--@formatter:off-->
             field: f.109020,
@@ -5503,6 +5502,7 @@
     <data type="text">
         <title>Email</title>
         <id>109019</id>
+        <valid>email</valid>
         <desc>Poistník</desc>
         <action trigger="set">
             <!--@formatter:off-->
@@ -6336,6 +6336,7 @@
     <data type="text">
         <title>Rodné číslo</title>
         <id>109029</id>
+        <!--<valid>regex [0-9]{6}\/[0-9]{3,4}</valid>-->
         <desc>Poistený</desc>
     </data>
     <data type="enumeration">
@@ -6386,6 +6387,7 @@
     <data type="text">
         <title>Email</title>
         <id>109033</id>
+        <valid>email</valid>
         <desc>Poistený</desc>
     </data>
     <data type="text">
