@@ -4897,7 +4897,7 @@
         <action trigger="set">
             <!--@formatter:off-->
             field: f.this,
-            other: f.310001;
+            other: f.308007;
             change other about {
                 return field.value;
             }
