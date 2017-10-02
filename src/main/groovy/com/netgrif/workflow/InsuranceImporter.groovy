@@ -101,6 +101,8 @@ class InsuranceImporter {
         auths = new HashMap<>()
         auths.put(Authority.user, authorityRepository.save(new Authority(Authority.user)))
         auths.put(Authority.admin, authorityRepository.save(new Authority(Authority.admin)))
+        //permission to see payments
+        auths.put("permPayments", authorityRepository.save(new Authority("PERM_PAIR_PAYMENTS")))
     }
 
     private void createUsers() {
@@ -140,7 +142,7 @@ class InsuranceImporter {
                 surname: "Worker",
                 email: "user@premium-ic.com",
                 password: "password",
-                authorities: [auths.get(Authority.user)] as Set<Authority>,
+                authorities: [auths.get(Authority.user), auths.get("permPayments")] as Set<Authority>,
                 organizations: [orgs.get("insurance")] as Set<Organization>)
         premium.addProcessRole(premiumRole)
         premium.addProcessRole(documentAgentRole)
@@ -152,7 +154,7 @@ class InsuranceImporter {
                 surname: "Zaťko",
                 email: "ondrej.zatko@premium-ic.sk",
                 password: "premiumIC2017",
-                authorities: [auths.get(Authority.user)] as Set<Authority>,
+                authorities: [auths.get(Authority.user), auths.get("permPayments")] as Set<Authority>,
                 organizations: [orgs.get("insurance")] as Set<Organization>)
         zatko.addProcessRole(agentRole)
         zatko.addProcessRole(contactRole)
@@ -165,7 +167,7 @@ class InsuranceImporter {
                 surname: "Dzugas",
                 email: "lubomir.dzugas@premium-ic.sk",
                 password: "premiumIC2017",
-                authorities: [auths.get(Authority.admin)] as Set<Authority>,
+                authorities: [auths.get(Authority.admin), auths.get("permPayments")] as Set<Authority>,
                 organizations: [orgs.get("insurance")] as Set<Organization>)
         dzugas.addProcessRole(agentRole)
         dzugas.addProcessRole(premiumRole)
