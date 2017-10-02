@@ -134,7 +134,7 @@ public class TaskService implements ITaskService {
             request.put("or", orMap);
         }
 
-        return loadUsers(searchService.search(request, pageable, Task.class));
+        return setImmediateFields(loadUsers(searchService.search(request, pageable, Task.class)));
     }
 
     @Override
@@ -297,6 +297,20 @@ public class TaskService implements ITaskService {
                     .toJavascript(field, ((ValidableField) field).getValidationRules()));
         resolveDataValues(field);
         return field;
+    }
+
+    public Page<Task> setImmediateFields(Page<Task> tasks){
+        tasks.getContent().forEach(task -> task.setImmediateData(getImmediateFields(task)));
+        return tasks;
+    }
+
+    public List<Field> getImmediateFields(Task task){
+        Case useCase = caseRepository.findOne(task.getCaseId());
+
+        List<Field> fields = task.getImmediateDataFields().stream().map(id -> buildField(useCase,id,false)).collect(Collectors.toList());
+        LongStream.range(0L, fields.size()).forEach(index -> fields.get((int) index).setOrder(index));
+
+        return fields;
     }
 
     @Override
@@ -662,7 +676,8 @@ public class TaskService implements ITaskService {
         task.setCaseColor(useCase.getColor());
         task.setCaseTitle(useCase.getTitle());
         task.setPriority(transition.getPriority());
-        task.setIcon(transition.getIcon());
+        task.setIcon(transition.getIcon() == null ? useCase.getIcon() : transition.getIcon());
+        task.setImmediateDataFields(new LinkedHashSet<>(transition.getImmediateData()));
         for (Trigger trigger : transition.getTriggers()) {
             Trigger taskTrigger = trigger.clone();
             task.addTrigger(taskTrigger);

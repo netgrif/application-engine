@@ -10912,6 +10912,40 @@
         <dataGroup>
             <id>1</id>
             <alignment>start</alignment>
+            <!-- Immediate data -->
+            <!-- Číslo ponuky -->
+            <dataRef>
+                <id>309001</id>
+                <logic>
+                    <behavior>forbidden</behavior>
+                    <behavior>immediate</behavior>
+                </logic>
+            </dataRef>
+            <!-- Meno poistníka -->
+            <dataRef>
+                <id>109010</id>
+                <logic>
+                    <behavior>forbidden</behavior>
+                    <behavior>immediate</behavior>
+                </logic>
+            </dataRef>
+            <!-- Priezvisko poistníka -->
+            <dataRef>
+                <id>109011</id>
+                <logic>
+                    <behavior>forbidden</behavior>
+                    <behavior>immediate</behavior>
+                </logic>
+            </dataRef>
+            <!-- Dátum začiatku poistky -->
+            <dataRef>
+                <id>109001</id>
+                <logic>
+                    <behavior>forbidden</behavior>
+                    <behavior>immediate</behavior>
+                </logic>
+            </dataRef>
+            <!-- end of immediate data -->
             <!-- Dátum valuty -->
             <dataRef>
                 <id>110001</id>
