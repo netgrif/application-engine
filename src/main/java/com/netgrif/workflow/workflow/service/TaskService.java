@@ -593,9 +593,9 @@ public class TaskService implements ITaskService {
     @Transactional
     void reloadTasks(Case useCase, Long userId) {
         PetriNet net = useCase.getPetriNet();
-        List<Task> tasks = taskRepository.findAllByCaseId(useCase.getStringId());
 
         net.getTransitions().values().forEach(transition -> {
+            List<Task> tasks = taskRepository.findAllByCaseId(useCase.getStringId());
             if (isExecutable(transition, net)) {
                 if (taskIsNotPresent(tasks, transition, userId)) {
                     createFromTransition(transition, useCase);
