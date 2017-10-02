@@ -2,12 +2,14 @@ package com.netgrif.workflow.workflow.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.netgrif.workflow.auth.domain.User;
+import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.petrinet.domain.roles.RolePermission;
 import com.netgrif.workflow.workflow.domain.triggers.Trigger;
 import lombok.Getter;
 import lombok.Setter;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -67,6 +69,14 @@ public class Task {
     @Getter @Setter
     private Boolean requiredFilled;
 
+    @Getter @Setter
+    @JsonIgnore
+    private LinkedHashSet<String> immediateDataFields;
+
+    @Getter @Setter
+    @Transient
+    private List<Field> immediateData;
+
     @Setter
     private String icon;
 
@@ -74,6 +84,8 @@ public class Task {
         this._id = new ObjectId();
         roles = new HashMap<>();
         this.triggers = new LinkedList<>();
+        this.immediateDataFields = new LinkedHashSet<>();
+        this.immediateData = new ArrayList<>();
     }
 
     @JsonIgnore
@@ -117,6 +129,10 @@ public class Task {
 
     public void addTrigger(Trigger trigger) {
         triggers.add(trigger);
+    }
+
+    public void addImmediateData(Field field){
+        this.immediateData.add(field);
     }
 
     @JsonIgnore
