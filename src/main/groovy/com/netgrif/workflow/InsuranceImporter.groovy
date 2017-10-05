@@ -59,6 +59,7 @@ class InsuranceImporter {
 
     private Map<String, Organization> orgs
     private Map<String, Authority> auths
+    private Map<String, UserProcessRole> processRoles
     private PetriNet insuranceNet
     private PetriNet contactNet
     private PetriNet documentNet
@@ -70,6 +71,7 @@ class InsuranceImporter {
 
         createOrganizations()
         createAuthorities()
+        createProcessRoles()
 
         createUsers()
         createCases()
@@ -101,92 +103,66 @@ class InsuranceImporter {
         auths = new HashMap<>()
         auths.put(Authority.user, authorityRepository.save(new Authority(Authority.user)))
         auths.put(Authority.admin, authorityRepository.save(new Authority(Authority.admin)))
-        //permission to see payments
+        //permissions
         auths.put("permPayments", authorityRepository.save(new Authority("PERM_PAIR_PAYMENTS")))
+        auths.put("permMyContracts", authorityRepository.save(new Authority("PERM_SHOW_MY_CONTRACTS")))
+        auths.put("permCreateOffers", authorityRepository.save(new Authority("PERM_CAN_CREATE_OFFERS")))
+        auths.put("permCreateContacts", authorityRepository.save(new Authority("PERM_CAN_CREATE_CONTACTS")))
+        auths.put("permActiveContracts", authorityRepository.save(new Authority("PERM_SHOW_ACTIVE_CONTRACTS")))
+        auths.put("permDashboard", authorityRepository.save(new Authority("PERM_SHOW_DASHBOARD")))
+    }
+
+    private void createProcessRoles() {
+        log.info("Creating Process roles")
+        processRoles = new HashMap<>()
+
+        processRoles.put("agent", userProcessRoleRepository.save(new UserProcessRole(
+                roleId: insuranceNet.roles.values().find { it -> it.name == "Agent" }.stringId)))
+        processRoles.put("premium", userProcessRoleRepository.save(new UserProcessRole(
+                roleId: insuranceNet.roles.values().find { it -> it.name == "Premium" }.stringId)))
+        processRoles.put("contact", userProcessRoleRepository.save(new UserProcessRole(
+                roleId: contactNet.roles.values().find { it -> it.name == "Agent" }.stringId)))
+        processRoles.put("docAgent", userProcessRoleRepository.save(new UserProcessRole(
+                roleId: documentNet.roles.values().find { it -> it.name == "Agent" }.stringId)))
+        processRoles.put("docAdmin", userProcessRoleRepository.save(new UserProcessRole(
+                roleId: documentNet.roles.values().find { it -> it.name == "Admin" }.stringId)))
     }
 
     private void createUsers() {
         log.info("Creating users")
-        def agentRole = userProcessRoleRepository.save(new UserProcessRole(
-                roleId: insuranceNet.roles.values().find { it -> it.name == "Agent" }.stringId
-        ))
-        def premiumRole = userProcessRoleRepository.save(new UserProcessRole(
-                roleId: insuranceNet.roles.values().find { it -> it.name == "Premium" }.stringId
-        ))
 
-        def contactRole = userProcessRoleRepository.save(new UserProcessRole(
-                roleId: contactNet.roles.values().find { it -> it.name == "Agent" }.stringId
-        ))
-        def documentAdminRole = userProcessRoleRepository.save(new UserProcessRole(
-                roleId: documentNet.roles.values().find { it -> it.name == "Admin" }.stringId
-        ))
-        def documentAgentRole = userProcessRoleRepository.save(new UserProcessRole(
-                roleId: documentNet.roles.values().find { it -> it.name == "Agent" }.stringId
-        ))
+        //Generic test users
+        createUser(new User(name: "Agent", surname: "Smith", email: "agent@company.com", password: "password"),
+                [auths.get(Authority.user), auths.get("permMyContracts"), auths.get("permCreateOffers"), auths.get("permCreateContacts"), auths.get("permDashboard")] as Authority[],
+                [orgs.get("insurance")] as Organization[], [processRoles.get("agent"), processRoles.get("contact"), processRoles.get("docAgent")] as UserProcessRole[])
 
-        User agent = new User(
-                name: "Agent",
-                surname: "Smith",
-                email: "agent@company.com",
-                password: "password",
-                authorities: [auths.get(Authority.user)] as Set<Authority>,
-                organizations: [orgs.get("insurance")] as Set<Organization>)
-        agent.addProcessRole(agentRole)
-        agent.addProcessRole(documentAgentRole)
-        agent.addProcessRole(contactRole)
-        userService.saveNew(agent)
-        log.info("User $agent.name $agent.surname created")
+        createUser(new User(name: "Premium", surname: "Employee", email: "user@premium-ic.sk", password: "password"),
+                [auths.get(Authority.user), auths.get("permPayments"), auths.get("permActiveContracts")] as Authority[],
+                [orgs.get("insurance")] as Organization[], [processRoles.get("premium"), processRoles.get("docAdmin")] as UserProcessRole[])
 
-        User premium = new User(
-                name: "Premium",
-                surname: "Worker",
-                email: "user@premium-ic.com",
-                password: "password",
-                authorities: [auths.get(Authority.user), auths.get("permPayments")] as Set<Authority>,
-                organizations: [orgs.get("insurance")] as Set<Organization>)
-        premium.addProcessRole(premiumRole)
-        premium.addProcessRole(documentAgentRole)
-        userService.saveNew(premium)
-        log.info("User $premium.name $premium.surname created")
+        //Premium users
+        createUser(new User(name: "Ondrej", surname: "Zaťko", email: "ondrej.zatko@premium-ic.sk", password: "premiumIC2017"),
+                [auths.get(Authority.user), auths.get("permPayments"), auths.get("permActiveContracts"), auths.get("permMyContracts"), auths.get("permCreateOffers"), auths.get("permCreateContacts"), auths.get("permDashboard")] as Authority[],
+                [orgs.get("insurance")] as Organization[], [processRoles.get("agent"), processRoles.get("docAdmin"), processRoles.get("contact")] as UserProcessRole[])
 
-        User zatko = new User(
-                name: "Ondrej",
-                surname: "Zaťko",
-                email: "ondrej.zatko@premium-ic.sk",
-                password: "premiumIC2017",
-                authorities: [auths.get(Authority.user), auths.get("permPayments")] as Set<Authority>,
-                organizations: [orgs.get("insurance")] as Set<Organization>)
-        zatko.addProcessRole(agentRole)
-        zatko.addProcessRole(contactRole)
-        zatko.addProcessRole(documentAdminRole)
-        userService.saveNew(zatko)
-        log.info("User $zatko.name $zatko.surname created")
+        createUser(new User(name: "Ľubomír", surname: "Dzugas", email: "lubomir.dzugas@premium-ic.sk", password: "premiumIC2017"),
+                [auths.get(Authority.admin), auths.get("permPayments"), auths.get("permActiveContracts"), auths.get("permMyContracts"), auths.get("permCreateOffers"), auths.get("permCreateContacts"), auths.get("permDashboard")] as Authority[],
+                [orgs.get("insurance")] as Organization[], [processRoles.get("agent"), processRoles.get("premium"), processRoles.get("docAdmin"), processRoles.get("contact")] as UserProcessRole[])
 
-        User dzugas = new User(
-                name: "Ľubomír",
-                surname: "Dzugas",
-                email: "lubomir.dzugas@premium-ic.sk",
-                password: "premiumIC2017",
-                authorities: [auths.get(Authority.admin), auths.get("permPayments")] as Set<Authority>,
-                organizations: [orgs.get("insurance")] as Set<Organization>)
-        dzugas.addProcessRole(agentRole)
-        dzugas.addProcessRole(premiumRole)
-        dzugas.addProcessRole(contactRole)
-        dzugas.addProcessRole(documentAdminRole)
-        userService.saveNew(dzugas)
-        log.info("User $dzugas.name $dzugas.surname created")
-
+        //Gratex users
+        def perms = [auths.get(Authority.user), auths.get("permMyContracts"), auths.get("permCreateOffers"), auths.get("permCreateContacts"), auths.get("permDashboard")] as Authority[]
+        def pr = [processRoles.get("agent"), processRoles.get("contact"), processRoles.get("docAgent")] as UserProcessRole[]
         createUser(new User(name: "Renáta", surname: "Petríková", email: "rpetrikova@gratex.com", password: "gratex2017"),
-                [auths.get(Authority.user)] as Authority[], [orgs.get("gratex")] as Organization[], [agentRole, contactRole, documentAgentRole] as UserProcessRole[])
+                perms, [orgs.get("gratex")] as Organization[], pr)
 
         createUser(new User(name: "Martin", surname: "Blichar", email: "blichar@gratex.com", password: "gratex2017"),
-                [auths.get(Authority.user)] as Authority[], [orgs.get("gratex")] as Organization[], [agentRole, contactRole, documentAgentRole] as UserProcessRole[])
+                perms, [orgs.get("gratex")] as Organization[], pr)
 
         createUser(new User(name: "Tomáš", surname: "Husár", email: "thusar@gratex.com", password: "gratex2017"),
-                [auths.get(Authority.user)] as Authority[], [orgs.get("gratex")] as Organization[], [agentRole, contactRole, documentAgentRole] as UserProcessRole[])
+                perms, [orgs.get("gratex")] as Organization[], pr)
 
         createUser(new User(name: "Martin", surname: "Marko", email: "marcus@gratex.com", password: "gratex2017"),
-                [auths.get(Authority.user)] as Authority[], [orgs.get("gratex")] as Organization[], [agentRole, contactRole, documentAgentRole] as UserProcessRole[])
+                perms, [orgs.get("gratex")] as Organization[], pr)
 
     }
 
