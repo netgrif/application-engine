@@ -4885,7 +4885,7 @@
 
     <!-- ===== Údaje o zmluve ===== -->
     <data type="text">
-        <title>Číslo ponuky</title>
+        <title>Číslo zmluvy</title>
         <id>309001</id>
         <init>0000000000</init>
         <action trigger="get">
@@ -10911,6 +10911,7 @@
         </roleRef>
         <dataGroup>
             <id>1</id>
+            <title>Informačné údaje</title>
             <alignment>start</alignment>
             <!-- Immediate data -->
             <!-- Číslo ponuky -->
@@ -10925,7 +10926,7 @@
             <dataRef>
                 <id>109010</id>
                 <logic>
-                    <behavior>forbidden</behavior>
+                    <behavior>visible</behavior>
                     <behavior>immediate</behavior>
                 </logic>
             </dataRef>
@@ -10933,7 +10934,7 @@
             <dataRef>
                 <id>109011</id>
                 <logic>
-                    <behavior>forbidden</behavior>
+                    <behavior>visible</behavior>
                     <behavior>immediate</behavior>
                 </logic>
             </dataRef>
@@ -10941,11 +10942,16 @@
             <dataRef>
                 <id>109001</id>
                 <logic>
-                    <behavior>forbidden</behavior>
+                    <behavior>visible</behavior>
                     <behavior>immediate</behavior>
                 </logic>
             </dataRef>
-            <!-- end of immediate data -->
+            <!-- ./ Immediate data -->
+        </dataGroup>
+        <dataGroup>
+            <id>2</id>
+            <title>Údaje o platbe</title>
+            <alignment>start</alignment>
             <!-- Dátum valuty -->
             <dataRef>
                 <id>110001</id>
