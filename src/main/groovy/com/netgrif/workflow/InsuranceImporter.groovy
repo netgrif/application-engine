@@ -145,12 +145,12 @@ class InsuranceImporter {
                 [auths.get(Authority.user), auths.get("permPayments"), auths.get("permActiveContracts"), auths.get("permMyContracts"), auths.get("permCreateOffers"), auths.get("permCreateContacts"), auths.get("permDashboard")] as Authority[],
                 [orgs.get("insurance")] as Organization[], [processRoles.get("agent"), processRoles.get("docAdmin"), processRoles.get("contact")] as UserProcessRole[])
 
-        createUser(new User(name: "Ľubomír", surname: "Dzugas", email: "lubomir.dzugas@premium-ic.sk", password: "premiumIC2017"),
+       /* createUser(new User(name: "Ľubomír", surname: "Dzugas", email: "lubomir.dzugas@premium-ic.sk", password: "premiumIC2017"),
                 [auths.get(Authority.admin), auths.get("permPayments"), auths.get("permActiveContracts"), auths.get("permMyContracts"), auths.get("permCreateOffers"), auths.get("permCreateContacts"), auths.get("permDashboard")] as Authority[],
                 [orgs.get("insurance")] as Organization[], [processRoles.get("agent"), processRoles.get("premium"), processRoles.get("docAdmin"), processRoles.get("contact")] as UserProcessRole[])
-
+*/
         //Gratex users
-        def perms = [auths.get(Authority.user), auths.get("permMyContracts"), auths.get("permCreateOffers"), auths.get("permCreateContacts"), auths.get("permDashboard")] as Authority[]
+       /* def perms = [auths.get(Authority.user), auths.get("permMyContracts"), auths.get("permCreateOffers"), auths.get("permCreateContacts"), auths.get("permDashboard")] as Authority[]
         def pr = [processRoles.get("agent"), processRoles.get("contact"), processRoles.get("docAgent")] as UserProcessRole[]
         createUser(new User(name: "Renáta", surname: "Petríková", email: "rpetrikova@gratex.com", password: "gratex2017"),
                 perms, [orgs.get("gratex")] as Organization[], pr)
@@ -162,7 +162,7 @@ class InsuranceImporter {
                 perms, [orgs.get("gratex")] as Organization[], pr)
 
         createUser(new User(name: "Martin", surname: "Marko", email: "marcus@gratex.com", password: "gratex2017"),
-                perms, [orgs.get("gratex")] as Organization[], pr)
+                perms, [orgs.get("gratex")] as Organization[], pr)*/
 
     }
 
