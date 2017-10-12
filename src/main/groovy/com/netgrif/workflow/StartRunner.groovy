@@ -13,7 +13,7 @@ import java.util.concurrent.ThreadLocalRandom
 
 @Component
 @Profile("!test")
-class StartRunner  implements CommandLineRunner{
+class StartRunner implements CommandLineRunner {
 
     private static Logger log = Logger.getLogger(StartRunner.class.getName())
 
@@ -22,22 +22,21 @@ class StartRunner  implements CommandLineRunner{
 
     @Autowired
     private MongoTemplate mongoTemplate
+
     @Autowired
     private IMailService mailService
 
     @Autowired
-    private InsuranceImporter insuranceImporter
-    @Autowired
-    private InsurancePostalCodeImporter postalCodeImporter
-    @Autowired
     private XlsImporter xlsImporter
+
     @Autowired
     private SuperCreator superCreator
+
     @Autowired
     private FlushSessionsRunner sessionsRunner
+
     @Autowired
     private JMeterExport export
-
 
 
     @Override
@@ -48,13 +47,7 @@ class StartRunner  implements CommandLineRunner{
         File storage = new File("storage/generated/start.txt")
         storage.getParentFile().mkdirs()
 
-        insuranceImporter.run(strings)
-        postalCodeImporter.run(strings)
-
-        //xlsImporter.run(strings)
-
         superCreator.run(strings)
-
         sessionsRunner.run(strings)
 //        export.run(strings)
 
@@ -63,9 +56,9 @@ class StartRunner  implements CommandLineRunner{
         host()
     }
 
-    private void host(){
-        log.info("HOST ADDRESS: "+InetAddress.localHost.hostAddress)
-        log.info("HOST NAME: "+InetAddress.localHost.hostName)
+    private void host() {
+        log.info("HOST ADDRESS: " + InetAddress.localHost.hostAddress)
+        log.info("HOST NAME: " + InetAddress.localHost.hostName)
     }
 
     static String randomColor() {
