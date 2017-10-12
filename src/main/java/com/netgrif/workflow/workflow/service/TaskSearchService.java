@@ -39,5 +39,14 @@ public class TaskSearchService extends MongoSearchService<Task> {
         return buildQueryPart("caseId", obj, builder);
     }
 
+    public String titleQuery(Object obj) {
+        Map<Class, Function<Object, String>> builder = new HashMap<>();
+
+        builder.put(String.class, o -> "\"" + o + "\"");
+        builder.put(ArrayList.class, o -> in(((List<Object>) obj), oo -> "\"" + oo + "\"", null));
+
+        return buildQueryPart("title", obj, builder);
+    }
+
 
 }
