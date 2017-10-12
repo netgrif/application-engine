@@ -6,10 +6,14 @@ import com.netgrif.workflow.petrinet.domain.dataset.Field
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedField
 import com.netgrif.workflow.petrinet.domain.dataset.logic.IllegalVariableTypeException
 import com.netgrif.workflow.workflow.domain.Case
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 
 @Component
 class FieldActionsRunner {
+
+    private static final Logger log = LoggerFactory.getLogger(FieldActionsRunner.class)
 
     private Map<String, Object> actionsCache = new HashMap<>()
 
@@ -25,7 +29,7 @@ class FieldActionsRunner {
         bindVariables(script, binding, useCase)
         def shell = new GroovyShell(binding)
 
-        println script
+        log.debug("Action: $script")
         def code = (Closure) shell.evaluate("{->${getExpression(script)}}")
         code.delegate = new ActionDelegate(useCase, this)
         code()

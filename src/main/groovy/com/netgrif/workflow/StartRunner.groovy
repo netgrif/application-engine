@@ -27,9 +27,6 @@ class StartRunner implements CommandLineRunner {
     private IMailService mailService
 
     @Autowired
-    private XlsImporter xlsImporter
-
-    @Autowired
     private SuperCreator superCreator
 
     @Autowired
@@ -62,6 +59,8 @@ class StartRunner implements CommandLineRunner {
     }
 
     static String randomColor() {
+        return "color-fg-accent-50"
+
         int randomNum = ThreadLocalRandom.current().nextInt(0, 4)
         switch (randomNum) {
             case 0:
