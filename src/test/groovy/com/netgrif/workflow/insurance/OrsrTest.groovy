@@ -1,7 +1,7 @@
 package com.netgrif.workflow.insurance
 
-import com.netgrif.workflow.premiuminsurance.IOrsrService
-import com.netgrif.workflow.premiuminsurance.OrsrReference
+import com.netgrif.workflow.parser.orsr.IOrsrService
+import com.netgrif.workflow.parser.orsr.OrsrReference
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.springframework.beans.factory.annotation.Autowired
