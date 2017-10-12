@@ -146,12 +146,8 @@
                         <goals>
                             <goal>addSources</goal>
                             <goal>addTestSources</goal>
-                            <goal>generateStubs</goal>
                             <goal>compile</goal>
-                            <goal>testGenerateStubs</goal>
                             <goal>testCompile</goal>
-                            <goal>removeStubs</goal>
-                            <goal>removeTestStubs</goal>
                         </goals>
                     </execution>
                 </executions>
@@ -167,5 +163,4 @@
             </properties>
         </profile>
     </profiles>
-
 </project>
