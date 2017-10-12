@@ -134,7 +134,7 @@ public class TaskService implements ITaskService {
             request.put("or", orMap);
         }
 
-        return loadUsers(searchService.search(request, pageable, Task.class));
+        return setImmediateFields(loadUsers(searchService.search(request, pageable, Task.class)));
     }
 
     @Override
@@ -243,6 +243,12 @@ public class TaskService implements ITaskService {
     public List<Field> getData(String taskId) {
         Task task = taskRepository.findOne(taskId);
         Case useCase = caseRepository.findOne(task.getCaseId());
+
+        return getData(task, useCase);
+    }
+
+    @Override
+    public List<Field> getData(Task task, Case useCase) {
         Transition transition = useCase.getPetriNet().getTransition(task.getTransitionId());
 
         Set<String> fieldsIds = transition.getDataSet().keySet();
@@ -291,6 +297,20 @@ public class TaskService implements ITaskService {
                     .toJavascript(field, ((ValidableField) field).getValidationRules()));
         resolveDataValues(field);
         return field;
+    }
+
+    public Page<Task> setImmediateFields(Page<Task> tasks){
+        tasks.getContent().forEach(task -> task.setImmediateData(getImmediateFields(task)));
+        return tasks;
+    }
+
+    public List<Field> getImmediateFields(Task task){
+        Case useCase = caseRepository.findOne(task.getCaseId());
+
+        List<Field> fields = task.getImmediateDataFields().stream().map(id -> buildField(useCase,id,false)).collect(Collectors.toList());
+        LongStream.range(0L, fields.size()).forEach(index -> fields.get((int) index).setOrder(index));
+
+        return fields;
     }
 
     @Override
@@ -573,9 +593,9 @@ public class TaskService implements ITaskService {
     @Transactional
     void reloadTasks(Case useCase, Long userId) {
         PetriNet net = useCase.getPetriNet();
-        List<Task> tasks = taskRepository.findAllByCaseId(useCase.getStringId());
 
         net.getTransitions().values().forEach(transition -> {
+            List<Task> tasks = taskRepository.findAllByCaseId(useCase.getStringId());
             if (isExecutable(transition, net)) {
                 if (taskIsNotPresent(tasks, transition, userId)) {
                     createFromTransition(transition, useCase);
@@ -656,7 +676,8 @@ public class TaskService implements ITaskService {
         task.setCaseColor(useCase.getColor());
         task.setCaseTitle(useCase.getTitle());
         task.setPriority(transition.getPriority());
-        task.setIcon(transition.getIcon());
+        task.setIcon(transition.getIcon() == null ? useCase.getIcon() : transition.getIcon());
+        task.setImmediateDataFields(new LinkedHashSet<>(transition.getImmediateData()));
         for (Trigger trigger : transition.getTriggers()) {
             Trigger taskTrigger = trigger.clone();
             task.addTrigger(taskTrigger);
@@ -723,7 +744,9 @@ public class TaskService implements ITaskService {
         Transition transition = useCase.getPetriNet().getTransition(task.getTransitionId());
         try {
             startExecution(transition, useCase);
+            getData(task, useCase);
             finishExecution(transition, useCase);
+
             caseRepository.save(useCase);
             reloadTasks(useCase, -1L);
         } catch (TransitionNotExecutableException e) {

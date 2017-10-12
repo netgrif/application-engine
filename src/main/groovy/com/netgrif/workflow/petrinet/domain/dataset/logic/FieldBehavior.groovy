@@ -7,6 +7,7 @@ enum FieldBehavior {
     EDITABLE("editable"),
     HIDDEN("hidden"),
     FORBIDDEN("forbidden"),
+    IMMEDIATE("immediate"),
     ANTONYM_SETUP("",true);
 
 
@@ -25,6 +26,8 @@ enum FieldBehavior {
             VISIBLE.setAntonyms()
             EDITABLE.setAntonyms()
             HIDDEN.setAntonyms()
+            FORBIDDEN.setAntonyms()
+            IMMEDIATE.setAntonyms()
         }
     }
 
@@ -42,6 +45,8 @@ enum FieldBehavior {
                 return (FieldBehavior[]) [EDITABLE, VISIBLE, REQUIRED, FORBIDDEN].toArray()
             case "forbidden":
                 return (FieldBehavior[]) [VISIBLE, EDITABLE, HIDDEN, REQUIRED, OPTIONAL].toArray()
+            case "immediate":
+                return [] as FieldBehavior[]
             default:
                 return null
         }

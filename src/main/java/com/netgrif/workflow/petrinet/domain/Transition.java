@@ -10,6 +10,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Document
 public class Transition extends Node {
@@ -86,6 +87,11 @@ public class Transition extends Node {
     public boolean isDisplayable(String fieldId){
         DataFieldLogic logic = dataSet.get(fieldId);
         return logic != null && logic.isDisplayable();
+    }
+
+    public List<String> getImmediateData(){
+        return dataSet.entrySet().stream().filter(entry -> entry.getValue().getBehavior().contains(FieldBehavior.IMMEDIATE))
+                .map(Map.Entry::getKey).collect(Collectors.toList());
     }
 
     @Override
