@@ -22,7 +22,7 @@
     </role>
     <role>
         <id>2</id>
-        <name>Premium</name>
+        <name>Company</name>
     </role>
     <!-- ========== DATA ========== -->
     <!-- ===== Základné informácie - DONE ===== -->
@@ -3986,7 +3986,7 @@
         </action>
     </data>
     <data type="boolean">
-        <title>ZĽAVA ZA INÉ POISTENIE V PREMIUM</title>
+        <title>ZĽAVA ZA INÉ POISTENIE V SPOLOČNOSTI</title>
         <id>108002</id>
         <action trigger="set">
             <!--@formatter:off-->
@@ -4688,7 +4688,7 @@
         <init>1</init>
     </data>
     <data type="number">
-        <title>Koeficient - ZĽAVA ZA INÉ POISTENIE V PREMIUM</title>
+        <title>Koeficient - ZĽAVA ZA INÉ POISTENIE V SPOLOČNOSTI</title>
         <id>208005</id>
         <init>1</init>
     </data>
@@ -10047,7 +10047,7 @@
             <title></title>
             <alignment>start</alignment>
             <stretch>true</stretch>
-            <!--ZĽAVA ZA INÉ POISTENIE V PREMIUM-->
+            <!--ZĽAVA ZA INÉ POISTENIE V SPOLOČNOSTI-->
             <dataRef>
                 <id>108002</id>
                 <logic>
