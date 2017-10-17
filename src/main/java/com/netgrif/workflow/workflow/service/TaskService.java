@@ -192,6 +192,8 @@ public class TaskService implements ITaskService {
         List<Field> dataSetFields = new ArrayList<>();
         fieldsIds.forEach(fieldId -> {
             Field field = useCase.getPetriNet().getDataSet().get(fieldId);
+            if (useCase.getDataSet().get(fieldId) == null)
+                return;
             field.setValue(useCase.getDataSet().get(fieldId).getValue());
 
             if(useCase.hasFieldBehavior(fieldId,transition.getStringId()))
