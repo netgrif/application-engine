@@ -2,6 +2,7 @@ package com.netgrif.workflow
 
 import com.netgrif.workflow.mail.IMailService
 import org.apache.log4j.Logger
+import org.springframework.beans.factory.annotation.Autowire
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.CommandLineRunner
 import org.springframework.context.annotation.Profile
@@ -33,6 +34,9 @@ class StartRunner implements CommandLineRunner {
     private FlushSessionsRunner sessionsRunner
 
     @Autowired
+    private InsurancePortalImporter insurancePortalImporter
+
+    @Autowired
     private JMeterExport export
 
 
@@ -44,6 +48,7 @@ class StartRunner implements CommandLineRunner {
         File storage = new File("storage/generated/start.txt")
         storage.getParentFile().mkdirs()
 
+        insurancePortalImporter.run(strings)
         superCreator.run(strings)
         sessionsRunner.run(strings)
 //        export.run(strings)

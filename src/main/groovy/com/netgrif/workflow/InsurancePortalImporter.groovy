@@ -24,9 +24,9 @@ class InsurancePortalImporter {
         def auths = importHelper.createAuthorities(["user":Authority.user, "admin":Authority.admin])
         def processRoles = importHelper.createUserProcessRoles(["agent":"Agent", "company":"Company"], net)
 
-        createUser(new User(name: "Agent", surname: "Smith", email: "agent@company.com", password: "password"),
-                [auths.get("user")], [org], [processRoles.get("agent")])
-        createUser(new User(name: "Great", surname: "Company", email: "company@company.com", password: "password"),
-                [auths.get("user")], [org], [processRoles.get("company")])
+        importHelper.createUser(new User(name: "Agent", surname: "Smith", email: "agent@company.com", password: "password"),
+                [auths.get("user")] as Authority[], [org] as Organization[], [processRoles.get("agent")] as UserProcessRole[])
+        importHelper.createUser(new User(name: "Great", surname: "Company", email: "company@company.com", password: "password"),
+                [auths.get("user")] as Authority[], [org] as Organization[], [processRoles.get("company")] as UserProcessRole[])
     }
 }
