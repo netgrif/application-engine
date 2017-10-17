@@ -1,37 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document>
-<!-- ========== ROLES ========== -->
-<role>
-	<id>1</id>
-	<name>FM worker</name>
-</role>
-<role>
-	<id>2</id>
-	<name>FM manager</name>
-</role>
-<role>
-	<id>3</id>
-	<name>Client</name>
-</role>
-<role>
-	<id>4</id>
-	<name>Client manager</name>
-</role>
-<role>
-	<id>5</id>
-	<name>FM courier</name>
-</role>
-<role>
-	<id>6</id>
-	<name>Supplier</name>
-</role>
+    <!-- ========== ROLES ========== -->
+    <role>
+        <id>1</id>
+        <name>FM worker</name>
+    </role>
+    <role>
+        <id>2</id>
+        <name>FM manager</name>
+    </role>
+    <role>
+        <id>3</id>
+        <name>Client</name>
+    </role>
+    <role>
+        <id>4</id>
+        <name>Client manager</name>
+    </role>
+    <role>
+        <id>5</id>
+        <name>FM courier</name>
+    </role>
+    <role>
+        <id>6</id>
+        <name>Supplier</name>
+    </role>
     <role>
         <id>7</id>
         <name>System</name>
     </role>
- <!--=================================DATA========================-->
- 
- <data type="text">
+    <!--=================================DATA========================-->
+
+    <data type="text">
         <id>1</id>
         <title>Box</title>
     </data>
@@ -212,27 +212,27 @@
         <id>41</id>
         <title>Scan</title>
     </data>
- <data type="boolean">
+    <data type="boolean">
         <id>42</id>
         <title>Akceptovanie termínu a miesta odovzdania</title>
     </data>
-	<data type="text">
+    <data type="text">
         <id>43</id>
         <title>Dôvod zrušenia</title>
     </data>
-	<data type="number">
+    <data type="number">
         <id>44</id>
         <title>Predpokladaný počet škatúľ</title>
     </data>
-	<data type="text">
+    <data type="text">
         <id>45</id>
         <title>Čas stretnutia</title>
     </data>
-	<data type="text">
+    <data type="text">
         <id>46</id>
         <title>Pin kód</title>
     </data>
-	 <data type="boolean">
+    <data type="boolean">
         <id>47</id>
         <title>Povoliť sprístupnenie klientovi?</title>
     </data>
@@ -240,122 +240,122 @@
         <id>48</id>
         <title>Dátum skartácie</title>
     </data>
-<!--=================================TRANSITIONS========================-->
+    <!--=================================TRANSITIONS========================-->
     <transition>
         <id>1</id>
         <x>56</x>
         <y>222</y>
         <label>2. Zaevidovanie UJ</label>
-		<roleRef>
-			<id>3</id>
-			<logic>
-				<perform>true</perform>
-			</logic>
-		</roleRef>
-		<roleRef>
-			<id>4</id>
-			<logic>
-				<perform>true</perform>
-				<delegate>true</delegate>
-			</logic>
-		</roleRef>
-		 <dataRef>
+        <roleRef>
+            <id>3</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>4</id>
+            <logic>
+                <perform>true</perform>
+                <delegate>true</delegate>
+            </logic>
+        </roleRef>
+        <dataRef>
             <id>1</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-		 <dataRef>
+        <dataRef>
             <id>2</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-		 <dataRef>
+        <dataRef>
             <id>3</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-		 <dataRef>
+        <dataRef>
             <id>4</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-		 <dataRef>
+        <dataRef>
             <id>5</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-		 <dataRef>
+        <dataRef>
             <id>6</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-		 <dataRef>
+        <dataRef>
             <id>7</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-		 <dataRef>
+        <dataRef>
             <id>8</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-		 <dataRef>
+        <dataRef>
             <id>9</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-		 <dataRef>
+        <dataRef>
             <id>10</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-		 <dataRef>
+        <dataRef>
             <id>11</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-		 <dataRef>
+        <dataRef>
             <id>12</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-		 <dataRef>
+        <dataRef>
             <id>13</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-		 <dataRef>
+        <dataRef>
             <id>14</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-		 <dataRef>
+        <dataRef>
             <id>15</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-		 <dataRef>
+        <dataRef>
             <id>16</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-		 <dataRef>
+        <dataRef>
             <id>17</id>
             <logic>
                 <behavior>editable</behavior>
@@ -367,44 +367,44 @@
         <x>216</x>
         <y>578</y>
         <label>7. Požiadavka na odovzdanie UJ do RS-FMS _FM</label>
-		<roleRef>
-			<id>1</id>
-			<logic>
-				<perform>true</perform>
-			</logic>
-		</roleRef>
-		<roleRef>
-			<id>2</id>
-			<logic>
-				<perform>true</perform>
-				<delegate>true</delegate>
-			</logic>
-		</roleRef>
-		 <dataRef><!--Klientské číslo-->
+        <roleRef>
+            <id>1</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>2</id>
+            <logic>
+                <perform>true</perform>
+                <delegate>true</delegate>
+            </logic>
+        </roleRef>
+        <dataRef><!--Klientské číslo-->
             <id>30</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-		<dataRef>
+        <dataRef>
             <id>44</id><!--Predpokladaný počet škatúľ-->
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-		<dataRef>
+        <dataRef>
             <id>39</id><!--Navrhované miesto odovzdania-->
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-		<dataRef>
+        <dataRef>
             <id>40</id><!--Navrhovaný dátum odovzdania-->
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-		<dataRef>
+        <dataRef>
             <id>45</id><!--Čas stretnutia-->
             <logic>
                 <behavior>editable</behavior>
@@ -416,44 +416,44 @@
         <x>223</x>
         <y>368</y>
         <label>6. Požiadavka na odovzdanie UJ do RS-FMS _Client</label>
-		<roleRef>
-			<id>3</id>
-			<logic>
-				<perform>true</perform>
-			</logic>
-		</roleRef>
-		<roleRef>
-			<id>4</id>
-			<logic>
-				<perform>true</perform>
-				<delegate>true</delegate>
-			</logic>
-		</roleRef>
-		 <dataRef>
+        <roleRef>
+            <id>3</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>4</id>
+            <logic>
+                <perform>true</perform>
+                <delegate>true</delegate>
+            </logic>
+        </roleRef>
+        <dataRef>
             <id>30</id><!--Klientské číslo-->
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-		 <dataRef>
+        <dataRef>
             <id>32</id><!--Počet škatúľ-->
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-		 <dataRef>
+        <dataRef>
             <id>39</id><!--Navrhované miesto odovzdania-->
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-		 <dataRef>
+        <dataRef>
             <id>40</id><!--Navrhovaný dátum odovzdania-->
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-		<dataRef>
+        <dataRef>
             <id>45</id><!--Čas stretnutia-->
             <logic>
                 <behavior>editable</behavior>
@@ -465,44 +465,44 @@
         <x>297</x>
         <y>136</y>
         <label>5. Vrátenie UJ</label>
-			<roleRef>
-			<id>3</id>
-			<logic>
-				<perform>true</perform>
-			</logic>
-		</roleRef>
-		<roleRef>
-			<id>4</id>
-			<logic>
-				<perform>true</perform>
-				<delegate>true</delegate>
-			</logic>
-		</roleRef>
-		 <dataRef>
+        <roleRef>
+            <id>3</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>4</id>
+            <logic>
+                <perform>true</perform>
+                <delegate>true</delegate>
+            </logic>
+        </roleRef>
+        <dataRef>
             <id>15</id><!--Lokalizácia-->
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-		<dataRef>
+        <dataRef>
             <id>19</id><!--Dátum vypožičania-->
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-		<dataRef>
+        <dataRef>
             <id>21</id><!--Vypožičal-->
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-		<dataRef>
+        <dataRef>
             <id>20</id><!--Dátum vrátenia-->
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-		<dataRef>
+        <dataRef>
             <id>22</id><!--Vrátil-->
             <logic>
                 <behavior>editable</behavior>
@@ -514,32 +514,32 @@
         <x>167</x>
         <y>136</y>
         <label>4. Vypožičanie UJ</label>
-		<roleRef>
-			<id>3</id>
-			<logic>
-				<perform>true</perform>
-			</logic>
-		</roleRef>
-		<roleRef>
-			<id>4</id>
-			<logic>
-				<perform>true</perform>
-				<delegate>true</delegate>
-			</logic>
-		</roleRef>
-		 <dataRef>
+        <roleRef>
+            <id>3</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>4</id>
+            <logic>
+                <perform>true</perform>
+                <delegate>true</delegate>
+            </logic>
+        </roleRef>
+        <dataRef>
             <id>15</id><!--Lokalizácia-->
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-		<dataRef>
+        <dataRef>
             <id>19</id><!--Dátum vypožičania-->
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-		<dataRef>
+        <dataRef>
             <id>21</id><!--Vypožičal-->
             <logic>
                 <behavior>editable</behavior>
@@ -551,56 +551,56 @@
         <x>660</x>
         <y>460</y>
         <label>14. Potvrdenie terminu _FM</label>
-		<roleRef>
-			<id>5</id>
-			<logic>
-				<perform>true</perform>
-			</logic>
-		</roleRef>
-		<roleRef>
-			<id>2</id>
-			<logic>
-				<perform>true</perform>
-				<delegate>true</delegate>
-			</logic>
-		</roleRef>
-		 <dataRef>
+        <roleRef>
+            <id>5</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>2</id>
+            <logic>
+                <perform>true</perform>
+                <delegate>true</delegate>
+            </logic>
+        </roleRef>
+        <dataRef>
             <id>42</id><!--Akceptovanie termínu a miesta odovzdania-->
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-		 <dataRef><!--Klientské číslo-->
+        <dataRef><!--Klientské číslo-->
             <id>30</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-		<dataRef>
+        <dataRef>
             <id>44</id><!--Predpokladaný počet škatúľ-->
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-		<dataRef>
+        <dataRef>
             <id>32</id><!--Počet škatúľ-->
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-		<dataRef>
+        <dataRef>
             <id>39</id><!--Navrhované miesto odovzdania-->
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-		<dataRef>
+        <dataRef>
             <id>40</id><!--Navrhovaný dátum odovzdania-->
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-		<dataRef>
+        <dataRef>
             <id>45</id><!--Čas stretnutia-->
             <logic>
                 <behavior>visible</behavior>
@@ -612,50 +612,50 @@
         <x>535</x>
         <y>506</y>
         <label>8. Upresnenie miesta a termínu odovzdania _FM</label>
-		<roleRef>
-			<id>5</id>
-			<logic>
-				<perform>true</perform>
-			</logic>
-		</roleRef>
-		<roleRef>
-			<id>2</id>
-			<logic>
-				<perform>true</perform>
-				<delegate>true</delegate>
-			</logic>
-		</roleRef>
-		 <dataRef><!--Klientské číslo-->
+        <roleRef>
+            <id>5</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>2</id>
+            <logic>
+                <perform>true</perform>
+                <delegate>true</delegate>
+            </logic>
+        </roleRef>
+        <dataRef><!--Klientské číslo-->
             <id>30</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-		<dataRef>
+        <dataRef>
             <id>44</id><!--Predpokladaný počet škatúľ-->
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-		<dataRef>
+        <dataRef>
             <id>32</id><!--Počet škatúľ-->
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-		<dataRef>
+        <dataRef>
             <id>39</id><!--Navrhované miesto odovzdania-->
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-		<dataRef>
+        <dataRef>
             <id>40</id><!--Navrhovaný dátum odovzdania-->
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-		<dataRef>
+        <dataRef>
             <id>45</id><!--Čas stretnutia-->
             <logic>
                 <behavior>editable</behavior>
@@ -667,50 +667,50 @@
         <x>534</x>
         <y>626</y>
         <label>9. Upresnenie miesta a termínu odovzdania _Client</label>
-		<roleRef>
-			<id>3</id>
-			<logic>
-				<perform>true</perform>
-			</logic>
-		</roleRef>
-		<roleRef>
-			<id>4</id>
-			<logic>
-				<perform>true</perform>
-				<delegate>true</delegate>
-			</logic>
-		</roleRef>
-		 <dataRef><!--Klientské číslo-->
+        <roleRef>
+            <id>3</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>4</id>
+            <logic>
+                <perform>true</perform>
+                <delegate>true</delegate>
+            </logic>
+        </roleRef>
+        <dataRef><!--Klientské číslo-->
             <id>30</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-		<dataRef>
+        <dataRef>
             <id>44</id><!--Predpokladaný počet škatúľ-->
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-		<dataRef>
+        <dataRef>
             <id>32</id><!--Počet škatúľ-->
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-		<dataRef>
+        <dataRef>
             <id>39</id><!--Navrhované miesto odovzdania-->
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-		<dataRef>
+        <dataRef>
             <id>40</id><!--Navrhovaný dátum odovzdania-->
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-		<dataRef>
+        <dataRef>
             <id>45</id><!--Čas stretnutia-->
             <logic>
                 <behavior>editable</behavior>
@@ -722,172 +722,172 @@
         <x>1012</x>
         <y>580</y>
         <label>23. Odovzdanie</label>
-		<roleRef>
-			<id>3</id>
-			<logic>
-				<perform>true</perform>
-			</logic>
-		</roleRef>
-		<roleRef>
-			<id>4</id>
-			<logic>
-				<perform>true</perform>
-				<delegate>true</delegate>
-			</logic>
-		</roleRef>
-		 <dataRef><!--Klientské číslo-->
+        <roleRef>
+            <id>3</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>4</id>
+            <logic>
+                <perform>true</perform>
+                <delegate>true</delegate>
+            </logic>
+        </roleRef>
+        <dataRef><!--Klientské číslo-->
             <id>30</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-		<dataRef>
+        <dataRef>
             <id>32</id><!--Počet škatúľ-->
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-		<dataRef>
+        <dataRef>
             <id>31</id><!--Odovzdal-->
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-		<dataRef>
+        <dataRef>
             <id>39</id><!--Navrhované miesto odovzdania-->
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-		<dataRef>
+        <dataRef>
             <id>31</id><!--Navrhovaný dátum odovzdania-->
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-		<dataRef>
+        <dataRef>
             <id>45</id><!--Čas stretnutia-->
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-		
+
     </transition>
     <transition>
         <id>39</id>
         <x>1190</x>
         <y>418</y>
         <label>29. Zaevidovanie UJ _FM</label>
-		<roleRef>
-			<id>1</id>
-			<logic>
-				<perform>true</perform>
-			</logic>
-		</roleRef>
-		<roleRef>
-			<id>2</id>
-			<logic>
-				<perform>true</perform>
-				<delegate>true</delegate>
-			</logic>
-		</roleRef>
-		 <dataRef>
+        <roleRef>
+            <id>1</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>2</id>
+            <logic>
+                <perform>true</perform>
+                <delegate>true</delegate>
+            </logic>
+        </roleRef>
+        <dataRef>
             <id>1</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-		 <dataRef>
+        <dataRef>
             <id>2</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-		 <dataRef>
+        <dataRef>
             <id>3</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-		 <dataRef>
+        <dataRef>
             <id>4</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-		 <dataRef>
+        <dataRef>
             <id>5</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-		 <dataRef>
+        <dataRef>
             <id>6</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-		 <dataRef>
+        <dataRef>
             <id>7</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-		 <dataRef>
+        <dataRef>
             <id>8</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-		 <dataRef>
+        <dataRef>
             <id>9</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-		 <dataRef>
+        <dataRef>
             <id>10</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-		 <dataRef>
+        <dataRef>
             <id>11</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-		 <dataRef>
+        <dataRef>
             <id>12</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-		 <dataRef>
+        <dataRef>
             <id>13</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-		 <dataRef>
+        <dataRef>
             <id>14</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-		 <dataRef>
+        <dataRef>
             <id>15</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-		 <dataRef>
+        <dataRef>
             <id>16</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-		 <dataRef>
+        <dataRef>
             <id>17</id>
             <logic>
                 <behavior>editable</behavior>
@@ -899,26 +899,26 @@
         <x>937</x>
         <y>231</y>
         <label>21. Požiadavka na doplenie informácií / riešenie spornej veci _FM</label>
-		<roleRef>
-			<id>1</id>
-			<logic>
-				<perform>true</perform>
-			</logic>
-		</roleRef>
-		<roleRef>
-			<id>2</id>
-			<logic>
-				<perform>true</perform>
-				<delegate>true</delegate>
-			</logic>
-		</roleRef>
-			<dataRef>
+        <roleRef>
+            <id>1</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>2</id>
+            <logic>
+                <perform>true</perform>
+                <delegate>true</delegate>
+            </logic>
+        </roleRef>
+        <dataRef>
             <id>16</id><!--Poznámka-->
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-		<dataRef>
+        <dataRef>
             <id>2</id><!--Ukladacia jednotka-->
             <logic>
                 <behavior>visible</behavior>
@@ -930,26 +930,26 @@
         <x>725</x>
         <y>315</y>
         <label>13. Doplenie informácií / riešenie spornej veci _Client</label>
-		<roleRef>
-			<id>3</id>
-			<logic>
-				<perform>true</perform>
-			</logic>
-		</roleRef>
-		<roleRef>
-			<id>4</id>
-			<logic>
-				<perform>true</perform>
-				<delegate>true</delegate>
-			</logic>
-		</roleRef>
-			<dataRef>
+        <roleRef>
+            <id>3</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>4</id>
+            <logic>
+                <perform>true</perform>
+                <delegate>true</delegate>
+            </logic>
+        </roleRef>
+        <dataRef>
             <id>16</id><!--Poznámka-->
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-		<dataRef>
+        <dataRef>
             <id>2</id><!--Ukladacia jednotka-->
             <logic>
                 <behavior>visible</behavior>
@@ -961,31 +961,31 @@
         <x>1884</x>
         <y>598</y>
         <label>51. Požiadavka na vypožičanie</label>
-		 <dataRef><!--Klientské číslo-->
+        <dataRef><!--Klientské číslo-->
             <id>30</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-		<dataRef>
+        <dataRef>
             <id>2</id><!--Ukladacia jednotka-->
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-		<dataRef>
+        <dataRef>
             <id>39</id><!--Navrhované miesto odovzdania-->
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-		<dataRef>
+        <dataRef>
             <id>40</id><!--Navrhovaný dátum odovzdania-->
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-		<dataRef>
+        <dataRef>
             <id>45</id><!--Čas stretnutia-->
             <logic>
                 <behavior>editable</behavior>
@@ -997,162 +997,162 @@
         <x>2741</x>
         <y>761</y>
         <label>82. Odovzdanie vypožičanej UJ</label>
-		<roleRef>
-			<id>5</id>
-			<logic>
-				<perform>true</perform>
-			</logic>
-		</roleRef>
-		<roleRef>
-			<id>2</id>
-			<logic>
-				<perform>true</perform>
-				<delegate>true</delegate>
-			</logic>
-		</roleRef>
-		 <dataRef><!--Klientské číslo-->
+        <roleRef>
+            <id>5</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>2</id>
+            <logic>
+                <perform>true</perform>
+                <delegate>true</delegate>
+            </logic>
+        </roleRef>
+        <dataRef><!--Klientské číslo-->
             <id>30</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-		<dataRef>
+        <dataRef>
             <id>2</id><!--Ukladacia jednotka-->
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-		<dataRef>
+        <dataRef>
             <id>31</id><!--Odovzdal-->
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-		<dataRef>
+        <dataRef>
             <id>39</id><!--Navrhované miesto odovzdania-->
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-		<dataRef>
+        <dataRef>
             <id>31</id><!--Navrhovaný dátum odovzdania-->
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-		<dataRef>
+        <dataRef>
             <id>45</id><!--Čas stretnutia-->
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-		
+
     </transition>
     <transition>
         <id>66</id>
         <x>2747</x>
         <y>967</y>
         <label>83. Prebratie požičanej UJ</label>
-			<roleRef>
-			<id>3</id>
-			<logic>
-				<perform>true</perform>
-			</logic>
-		</roleRef>
-		<roleRef>
-			<id>4</id>
-			<logic>
-				<perform>true</perform>
-				<delegate>true</delegate>
-			</logic>
-		</roleRef>
-		 <dataRef><!--Klientské číslo-->
+        <roleRef>
+            <id>3</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>4</id>
+            <logic>
+                <perform>true</perform>
+                <delegate>true</delegate>
+            </logic>
+        </roleRef>
+        <dataRef><!--Klientské číslo-->
             <id>30</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-		<dataRef>
+        <dataRef>
             <id>2</id><!--Ukladacia jednotka-->
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-		<dataRef>
+        <dataRef>
             <id>21</id><!--Vypožičal-->
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-		<dataRef>
+        <dataRef>
             <id>39</id><!--Navrhované miesto odovzdania-->
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-		<dataRef>
+        <dataRef>
             <id>31</id><!--Navrhovaný dátum odovzdania-->
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-		<dataRef>
+        <dataRef>
             <id>45</id><!--Čas stretnutia-->
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-		
+
     </transition>
     <transition>
         <id>67</id>
         <x>1800</x>
         <y>1172</y>
         <label>49. Vrátenie požičanej UJ</label>
-		<roleRef>
-			<id>3</id>
-			<logic>
-				<perform>true</perform>
-			</logic>
-		</roleRef>
-		<roleRef>
-			<id>4</id>
-			<logic>
-				<perform>true</perform>
-				<delegate>true</delegate>
-			</logic>
-		</roleRef>
-		 <dataRef><!--Klientské číslo-->
+        <roleRef>
+            <id>3</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>4</id>
+            <logic>
+                <perform>true</perform>
+                <delegate>true</delegate>
+            </logic>
+        </roleRef>
+        <dataRef><!--Klientské číslo-->
             <id>30</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-		<dataRef>
+        <dataRef>
             <id>2</id><!--Ukladacia jednotka-->
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-		<dataRef>
+        <dataRef>
             <id>21</id><!--Vypožičal-->
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-		<dataRef>
+        <dataRef>
             <id>39</id><!--Navrhované miesto odovzdania-->
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-		<dataRef>
+        <dataRef>
             <id>31</id><!--Navrhovaný dátum odovzdania-->
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-		<dataRef>
+        <dataRef>
             <id>45</id><!--Čas stretnutia-->
             <logic>
                 <behavior>editable</behavior>
@@ -1164,572 +1164,572 @@
         <x>1793</x>
         <y>791</y>
         <label>48. Založenie vrátenej UJ</label>
-		<roleRef>
-			<id>1</id>
-			<logic>
-				<perform>true</perform>
-			</logic>
-		</roleRef>
-		<roleRef>
-			<id>2</id>
-			<logic>
-				<perform>true</perform>
-				<delegate>true</delegate>
-			</logic>
-		</roleRef>
-		 <dataRef><!--Klientské číslo-->
+        <roleRef>
+            <id>1</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>2</id>
+            <logic>
+                <perform>true</perform>
+                <delegate>true</delegate>
+            </logic>
+        </roleRef>
+        <dataRef><!--Klientské číslo-->
             <id>30</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-		<dataRef>
+        <dataRef>
             <id>2</id><!--Ukladacia jednotka-->
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-		<dataRef>
+        <dataRef>
             <id>20</id><!--Dátum vrátenia-->
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-		<dataRef>
-    <id>34</id>
-    <!--Spracoval-->
-    <logic>
-        <behavior>editable</behavior>
-    </logic>
-</dataRef>
+        <dataRef>
+            <id>34</id>
+            <!--Spracoval-->
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
     </transition>
     <transition>
         <id>122</id>
         <x>1685</x>
         <y>301</y>
         <label>45. Požiadavka na scan UJ</label>
-		<roleRef>
-			<id>3</id>
-			<logic>
-				<perform>true</perform>
-			</logic>
-		</roleRef>
-		<roleRef>
-			<id>4</id>
-			<logic>
-				<perform>true</perform>
-				<delegate>true</delegate>
-			</logic>
-		</roleRef>
-		<dataRef>
-    <id>2</id><!--Ukl. jednotka-->
-    <logic>
-        <behavior>editable</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>3</id><!--Čísla spisov-->
-    <logic>
-        <behavior>editable</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>7</id><!--Firma-->
-    <logic>
-        <behavior>editable</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>8</id><!--Oddelenie-->
-    <logic>
-        <behavior>editable</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>16</id><!--Poznámka-->
-    <logic>
-        <behavior>editable</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>23</id><!--Názov UJ na scan-->
-    <logic>
-        <behavior>editable</behavior>
-    </logic>
-</dataRef>
+        <roleRef>
+            <id>3</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>4</id>
+            <logic>
+                <perform>true</perform>
+                <delegate>true</delegate>
+            </logic>
+        </roleRef>
+        <dataRef>
+            <id>2</id><!--Ukl. jednotka-->
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>3</id><!--Čísla spisov-->
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>7</id><!--Firma-->
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>8</id><!--Oddelenie-->
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>16</id><!--Poznámka-->
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>23</id><!--Názov UJ na scan-->
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
     </transition>
     <transition>
         <id>125</id>
         <x>1534</x>
         <y>390</y>
         <label>39. Zaslanie scanu UJ</label>
-		<roleRef>
-			<id>3</id>
-			<logic>
-				<perform>true</perform>
-			</logic>
-		</roleRef>
-		<roleRef>
-			<id>4</id>
-			<logic>
-				<perform>true</perform>
-				<delegate>true</delegate>
-			</logic>
-		</roleRef>
-		<dataRef>
-    <id>2</id><!--Ukl. jednotka-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>3</id><!--Čísla spisov-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>7</id><!--Firma-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>8</id><!--Oddelenie-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>16</id><!--Poznámka-->
-    <logic>
-        <behavior>editable</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>23</id><!--Názov UJ na scan-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>41</id><!--Scan-->
-    <logic>
-        <behavior>editable</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>34</id><!--Spracoval-->
-       <logic>
-        <behavior>editable</behavior>
-    </logic>
-</dataRef>
+        <roleRef>
+            <id>3</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>4</id>
+            <logic>
+                <perform>true</perform>
+                <delegate>true</delegate>
+            </logic>
+        </roleRef>
+        <dataRef>
+            <id>2</id><!--Ukl. jednotka-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>3</id><!--Čísla spisov-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>7</id><!--Firma-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>8</id><!--Oddelenie-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>16</id><!--Poznámka-->
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>23</id><!--Názov UJ na scan-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>41</id><!--Scan-->
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>34</id><!--Spracoval-->
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
     </transition>
     <transition>
         <id>181</id>
         <x>165</x>
         <y>899</y>
         <label>3. Data UJ</label>
-		<roleRef>
-			<id>1</id>
-			<logic>
-				<perform>true</perform>
-			</logic>
-		</roleRef>
-		<roleRef>
-			<id>2</id>
-			<logic>
-				<perform>true</perform>
-				<delegate>true</delegate>
-			</logic>
-		</roleRef>
-		<dataRef>
-    <id>1</id>
-    <!--Box-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>2</id><!--Ukl. jednotka-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>3</id><!--Čísla spisov-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>4</id><!--Vecný obsah UJ-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>5</id><!--Od (rok)-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>6</id><!--Do (rok)-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>7</id><!--Firma-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>8</id><!--Oddelenie-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>9</id><!--Odovzdávajúci-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>10</id><!--Dátum odovzdania-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>11</id><!--Forma-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>12</id><!--Lehota uloženia-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>13</id><!--Znak hodnoty-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>14</id><!--Čiarový kód-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>15</id><!--Lokalizácia-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>16</id><!--Poznámka-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>17</id><!--Číslo plomby-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>18</id><!--Nový dátum skartácie-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>19</id><!--Dátum vypožičania-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>20</id><!--Dátum vrátenia-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>21</id><!--Vypožičal-->
-       <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>22</id><!--Vrátil-->
-       <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>23</id><!--Názov UJ na scan-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>24</id><!--Sporná vec-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>25</id><!--Typ dokumentu-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>26</id><!--Rok uloženia-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>27</id><!--Registratúrna značka-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>28</id><!--Poznámka-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>29</id><!--Číslo protokolu-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>30</id><!--Klientské číslo-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>31</id><!--Odovzdal-->
-      <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>32</id><!--Počet škatúľ-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>33</id><!--Kuriér-->
-       <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>34</id><!--Spracoval-->
-       <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>35</id><!--Číselný rozsah spracovaných škatúľ-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>36</id><!--Počet uvedený v systéme-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>37</id><!--Založil-->
-       <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>38</id><!--Zapísal do systému-->
-       <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>39</id><!--Navrhované miesto odovzdania-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>40</id><!--Navrhovaný dátum odovzdania-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>41</id><!--Scan-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>42</id><!--Akceptovanie termínu a miesta odovzdania-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>43</id><!--Dôvod zrušenia-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>44</id><!--Predpokladaný počet škatúľ-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>45</id><!--Čas stretnutia-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
+        <roleRef>
+            <id>1</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>2</id>
+            <logic>
+                <perform>true</perform>
+                <delegate>true</delegate>
+            </logic>
+        </roleRef>
+        <dataRef>
+            <id>1</id>
+            <!--Box-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>2</id><!--Ukl. jednotka-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>3</id><!--Čísla spisov-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>4</id><!--Vecný obsah UJ-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>5</id><!--Od (rok)-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>6</id><!--Do (rok)-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>7</id><!--Firma-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>8</id><!--Oddelenie-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>9</id><!--Odovzdávajúci-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>10</id><!--Dátum odovzdania-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>11</id><!--Forma-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>12</id><!--Lehota uloženia-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>13</id><!--Znak hodnoty-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>14</id><!--Čiarový kód-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>15</id><!--Lokalizácia-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>16</id><!--Poznámka-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>17</id><!--Číslo plomby-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>18</id><!--Nový dátum skartácie-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>19</id><!--Dátum vypožičania-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>20</id><!--Dátum vrátenia-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>21</id><!--Vypožičal-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>22</id><!--Vrátil-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>23</id><!--Názov UJ na scan-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>24</id><!--Sporná vec-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>25</id><!--Typ dokumentu-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>26</id><!--Rok uloženia-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>27</id><!--Registratúrna značka-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>28</id><!--Poznámka-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>29</id><!--Číslo protokolu-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>30</id><!--Klientské číslo-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>31</id><!--Odovzdal-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>32</id><!--Počet škatúľ-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>33</id><!--Kuriér-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>34</id><!--Spracoval-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>35</id><!--Číselný rozsah spracovaných škatúľ-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>36</id><!--Počet uvedený v systéme-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>37</id><!--Založil-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>38</id><!--Zapísal do systému-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>39</id><!--Navrhované miesto odovzdania-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>40</id><!--Navrhovaný dátum odovzdania-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>41</id><!--Scan-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>42</id><!--Akceptovanie termínu a miesta odovzdania-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>43</id><!--Dôvod zrušenia-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>44</id><!--Predpokladaný počet škatúľ-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>45</id><!--Čas stretnutia-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
     </transition>
     <transition>
         <id>242</id>
         <x>1198</x>
         <y>589</y>
         <label>30. Prve zaevidovanie UJ</label>
-		<roleRef>
-			<id>1</id>
-			<logic>
-				<perform>true</perform>
-			</logic>
-		</roleRef>
-		<roleRef>
-			<id>2</id>
-			<logic>
-				<perform>true</perform>
-				<delegate>true</delegate>
-			</logic>
-		</roleRef>
-		 <dataRef>
+        <roleRef>
+            <id>1</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>2</id>
+            <logic>
+                <perform>true</perform>
+                <delegate>true</delegate>
+            </logic>
+        </roleRef>
+        <dataRef>
             <id>1</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-		 <dataRef>
+        <dataRef>
             <id>2</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-		 <dataRef>
+        <dataRef>
             <id>3</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-		 <dataRef>
+        <dataRef>
             <id>4</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-		 <dataRef>
+        <dataRef>
             <id>5</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-		 <dataRef>
+        <dataRef>
             <id>6</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-		 <dataRef>
+        <dataRef>
             <id>7</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-		 <dataRef>
+        <dataRef>
             <id>8</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-		 <dataRef>
+        <dataRef>
             <id>9</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-		 <dataRef>
+        <dataRef>
             <id>10</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-		 <dataRef>
+        <dataRef>
             <id>11</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-		 <dataRef>
+        <dataRef>
             <id>12</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-		 <dataRef>
+        <dataRef>
             <id>13</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-		 <dataRef>
+        <dataRef>
             <id>14</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-		 <dataRef>
+        <dataRef>
             <id>15</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-		 <dataRef>
+        <dataRef>
             <id>16</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-		 <dataRef>
+        <dataRef>
             <id>17</id>
             <logic>
                 <behavior>editable</behavior>
@@ -1741,50 +1741,50 @@
         <x>812</x>
         <y>504</y>
         <label>19. Návrh náhradného termínu _FM</label>
-		<roleRef>
-			<id>5</id>
-			<logic>
-				<perform>true</perform>
-			</logic>
-		</roleRef>
-		<roleRef>
-			<id>2</id>
-			<logic>
-				<perform>true</perform>
-				<delegate>true</delegate>
-			</logic>
-		</roleRef>
-		 <dataRef><!--Klientské číslo-->
+        <roleRef>
+            <id>5</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>2</id>
+            <logic>
+                <perform>true</perform>
+                <delegate>true</delegate>
+            </logic>
+        </roleRef>
+        <dataRef><!--Klientské číslo-->
             <id>30</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-		<dataRef>
+        <dataRef>
             <id>44</id><!--Predpokladaný počet škatúľ-->
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-		<dataRef>
+        <dataRef>
             <id>32</id><!--Počet škatúľ-->
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-		<dataRef>
+        <dataRef>
             <id>39</id><!--Navrhované miesto odovzdania-->
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-		<dataRef>
+        <dataRef>
             <id>40</id><!--Navrhovaný dátum odovzdania-->
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-		<dataRef>
+        <dataRef>
             <id>45</id><!--Čas stretnutia-->
             <logic>
                 <behavior>editable</behavior>
@@ -1796,173 +1796,173 @@
         <x>1025</x>
         <y>684</y>
         <label>24. Zrušenie termínu</label>
-		<roleRef>
-			<id>5</id>
-			<logic>
-				<perform>true</perform>
-			</logic>
-		</roleRef>
-		<roleRef>
-			<id>2</id>
-			<logic>
-				<perform>true</perform>
-				<delegate>true</delegate>
-			</logic>
-		</roleRef>
-		 <dataRef><!--Klientské číslo-->
+        <roleRef>
+            <id>5</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>2</id>
+            <logic>
+                <perform>true</perform>
+                <delegate>true</delegate>
+            </logic>
+        </roleRef>
+        <dataRef><!--Klientské číslo-->
             <id>30</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-		<dataRef>
+        <dataRef>
             <id>44</id><!--Predpokladaný počet škatúľ-->
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-		<dataRef>
+        <dataRef>
             <id>32</id><!--Počet škatúľ-->
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-		<dataRef>
+        <dataRef>
             <id>39</id><!--Navrhované miesto odovzdania-->
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-		<dataRef>
+        <dataRef>
             <id>40</id><!--Navrhovaný dátum odovzdania-->
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-		<dataRef>
+        <dataRef>
             <id>45</id><!--Čas stretnutia-->
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-		<dataRef>
-    <id>43</id><!--Dôvod zrušenia-->
-    <logic>
-        <behavior>editable</behavior>
-    </logic>
-</dataRef>
+        <dataRef>
+            <id>43</id><!--Dôvod zrušenia-->
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
     </transition>
     <transition>
         <id>503</id>
         <x>1093</x>
         <y>506</y>
         <label>22. Prebratie</label>
-		<roleRef>
-			<id>5</id>
-			<logic>
-				<perform>true</perform>
-			</logic>
-		</roleRef>
-		<roleRef>
-			<id>2</id>
-			<logic>
-				<perform>true</perform>
-				<delegate>true</delegate>
-			</logic>
-		</roleRef>
-		 <dataRef><!--Klientské číslo-->
+        <roleRef>
+            <id>5</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>2</id>
+            <logic>
+                <perform>true</perform>
+                <delegate>true</delegate>
+            </logic>
+        </roleRef>
+        <dataRef><!--Klientské číslo-->
             <id>30</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-		<dataRef>
+        <dataRef>
             <id>32</id><!--Počet škatúľ-->
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-		<dataRef>
+        <dataRef>
             <id>31</id><!--Odovzdal-->
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-		<dataRef>
+        <dataRef>
             <id>39</id><!--Navrhované miesto odovzdania-->
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-		<dataRef>
+        <dataRef>
             <id>31</id><!--Navrhovaný dátum odovzdania-->
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-		<dataRef>
+        <dataRef>
             <id>45</id><!--Čas stretnutia-->
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-		<dataRef>
-    <id>33</id><!--Kuriér-->
-       <logic>
-        <behavior>editable</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>46</id><!--Pin kód-->
-    <logic>
-        <behavior>editable</behavior>
-    </logic>
-</dataRef>
-		
+        <dataRef>
+            <id>33</id><!--Kuriér-->
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>46</id><!--Pin kód-->
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+
     </transition>
     <transition>
         <id>587</id>
         <x>2099</x>
         <y>706</y>
         <label>54. Upresnenie miesta a termínu odovzdania výpožičky _FM</label>
-		<roleRef>
-			<id>5</id>
-			<logic>
-				<perform>true</perform>
-			</logic>
-		</roleRef>
-		<roleRef>
-			<id>2</id>
-			<logic>
-				<perform>true</perform>
-				<delegate>true</delegate>
-			</logic>
-		</roleRef>
-		 <dataRef><!--Klientské číslo-->
+        <roleRef>
+            <id>5</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>2</id>
+            <logic>
+                <perform>true</perform>
+                <delegate>true</delegate>
+            </logic>
+        </roleRef>
+        <dataRef><!--Klientské číslo-->
             <id>30</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-		<dataRef>
+        <dataRef>
             <id>2</id><!--Ukladacia jednotka-->
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-		<dataRef>
+        <dataRef>
             <id>39</id><!--Navrhované miesto odovzdania-->
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-		<dataRef>
+        <dataRef>
             <id>31</id><!--Navrhovaný dátum odovzdania-->
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-		<dataRef>
+        <dataRef>
             <id>45</id><!--Čas stretnutia-->
             <logic>
                 <behavior>editable</behavior>
@@ -1974,44 +1974,44 @@
         <x>2095</x>
         <y>818</y>
         <label>55. Upresnenie miesta a termínu odovzdania výpožičky _Client</label>
-		<roleRef>
-			<id>3</id>
-			<logic>
-				<perform>true</perform>
-			</logic>
-		</roleRef>
-		<roleRef>
-			<id>4</id>
-			<logic>
-				<perform>true</perform>
-				<delegate>true</delegate>
-			</logic>
-		</roleRef>
-		 <dataRef><!--Klientské číslo-->
+        <roleRef>
+            <id>3</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>4</id>
+            <logic>
+                <perform>true</perform>
+                <delegate>true</delegate>
+            </logic>
+        </roleRef>
+        <dataRef><!--Klientské číslo-->
             <id>30</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-		<dataRef>
+        <dataRef>
             <id>2</id><!--Ukladacia jednotka-->
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-		<dataRef>
+        <dataRef>
             <id>39</id><!--Navrhované miesto odovzdania-->
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-		<dataRef>
+        <dataRef>
             <id>31</id><!--Navrhovaný dátum odovzdania-->
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-		<dataRef>
+        <dataRef>
             <id>45</id><!--Čas stretnutia-->
             <logic>
                 <behavior>editable</behavior>
@@ -2023,561 +2023,561 @@
         <x>2422</x>
         <y>1071</y>
         <label>74. Riešenie spornej veci výpožičky _FM</label>
-		<roleRef>
-			<id>1</id>
-			<logic>
-				<perform>true</perform>
-			</logic>
-		</roleRef>
-		<roleRef>
-			<id>2</id>
-			<logic>
-				<perform>true</perform>
-				<delegate>true</delegate>
-			</logic>
-		</roleRef>
-		<dataRef>
-    <id>2</id><!--Ukl. jednotka-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>3</id><!--Čísla spisov-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>7</id><!--Firma-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>8</id><!--Oddelenie-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>15</id><!--Lokalizácia-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>19</id><!--Dátum vypožičania-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>21</id><!--Vypožičal-->
-       <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>24</id><!--Sporná vec-->
-    <logic>
-        <behavior>editable</behavior>
-    </logic>
-</dataRef>
+        <roleRef>
+            <id>1</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>2</id>
+            <logic>
+                <perform>true</perform>
+                <delegate>true</delegate>
+            </logic>
+        </roleRef>
+        <dataRef>
+            <id>2</id><!--Ukl. jednotka-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>3</id><!--Čísla spisov-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>7</id><!--Firma-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>8</id><!--Oddelenie-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>15</id><!--Lokalizácia-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>19</id><!--Dátum vypožičania-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>21</id><!--Vypožičal-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>24</id><!--Sporná vec-->
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
     </transition>
     <transition>
         <id>598</id>
         <x>2421</x>
         <y>997</y>
         <label>73. Riešenie spornej veci výpožicky _Client</label>
-		<roleRef>
-			<id>3</id>
-			<logic>
-				<perform>true</perform>
-			</logic>
-		</roleRef>
-		<roleRef>
-			<id>4</id>
-			<logic>
-				<perform>true</perform>
-				<delegate>true</delegate>
-			</logic>
-		</roleRef>
-		<dataRef>
-    <id>2</id><!--Ukl. jednotka-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>3</id><!--Čísla spisov-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>7</id><!--Firma-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>8</id><!--Oddelenie-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>15</id><!--Lokalizácia-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>19</id><!--Dátum vypožičania-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>21</id><!--Vypožičal-->
-       <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>24</id><!--Sporná vec-->
-    <logic>
-        <behavior>editable</behavior>
-    </logic>
-</dataRef>
+        <roleRef>
+            <id>3</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>4</id>
+            <logic>
+                <perform>true</perform>
+                <delegate>true</delegate>
+            </logic>
+        </roleRef>
+        <dataRef>
+            <id>2</id><!--Ukl. jednotka-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>3</id><!--Čísla spisov-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>7</id><!--Firma-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>8</id><!--Oddelenie-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>15</id><!--Lokalizácia-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>19</id><!--Dátum vypožičania-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>21</id><!--Vypožičal-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>24</id><!--Sporná vec-->
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
     </transition>
     <transition>
         <id>614</id>
         <x>2752</x>
         <y>1241</y>
         <label>84. Požiadavka na vrátenie</label>
-		<roleRef>
-			<id>3</id>
-			<logic>
-				<perform>true</perform>
-			</logic>
-		</roleRef>
-		<roleRef>
-			<id>4</id>
-			<logic>
-				<perform>true</perform>
-				<delegate>true</delegate>
-			</logic>
-		</roleRef>
-		<dataRef>
-    <id>2</id><!--Ukl. jednotka-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>3</id><!--Čísla spisov-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>7</id><!--Firma-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>8</id><!--Oddelenie-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>15</id><!--Lokalizácia-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>19</id><!--Dátum vypožičania-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>21</id><!--Vypožičal-->
-       <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>39</id><!--Navrhované miesto odovzdania-->
-    <logic>
-        <behavior>editable</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>40</id><!--Navrhovaný dátum odovzdania-->
-    <logic>
-        <behavior>editable</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>45</id><!--Čas stretnutia-->
-    <logic>
-        <behavior>editable</behavior>
-    </logic>
-</dataRef>
+        <roleRef>
+            <id>3</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>4</id>
+            <logic>
+                <perform>true</perform>
+                <delegate>true</delegate>
+            </logic>
+        </roleRef>
+        <dataRef>
+            <id>2</id><!--Ukl. jednotka-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>3</id><!--Čísla spisov-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>7</id><!--Firma-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>8</id><!--Oddelenie-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>15</id><!--Lokalizácia-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>19</id><!--Dátum vypožičania-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>21</id><!--Vypožičal-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>39</id><!--Navrhované miesto odovzdania-->
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>40</id><!--Navrhovaný dátum odovzdania-->
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>45</id><!--Čas stretnutia-->
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
     </transition>
     <transition>
         <id>618</id>
         <x>2451</x>
         <y>1296</y>
         <label>76. Upresnenie miesta a termínu vrátenia _Client</label>
-			<roleRef>
-			<id>3</id>
-			<logic>
-				<perform>true</perform>
-			</logic>
-		</roleRef>
-		<roleRef>
-			<id>4</id>
-			<logic>
-				<perform>true</perform>
-				<delegate>true</delegate>
-			</logic>
-		</roleRef>
-		<dataRef>
-    <id>2</id><!--Ukl. jednotka-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>3</id><!--Čísla spisov-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>7</id><!--Firma-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>8</id><!--Oddelenie-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>15</id><!--Lokalizácia-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>19</id><!--Dátum vypožičania-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>21</id><!--Vypožičal-->
-       <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>39</id><!--Navrhované miesto odovzdania-->
-    <logic>
-        <behavior>editable</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>40</id><!--Navrhovaný dátum odovzdania-->
-    <logic>
-        <behavior>editable</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>45</id><!--Čas stretnutia-->
-    <logic>
-        <behavior>editable</behavior>
-    </logic>
-</dataRef>
+        <roleRef>
+            <id>3</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>4</id>
+            <logic>
+                <perform>true</perform>
+                <delegate>true</delegate>
+            </logic>
+        </roleRef>
+        <dataRef>
+            <id>2</id><!--Ukl. jednotka-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>3</id><!--Čísla spisov-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>7</id><!--Firma-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>8</id><!--Oddelenie-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>15</id><!--Lokalizácia-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>19</id><!--Dátum vypožičania-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>21</id><!--Vypožičal-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>39</id><!--Navrhované miesto odovzdania-->
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>40</id><!--Navrhovaný dátum odovzdania-->
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>45</id><!--Čas stretnutia-->
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
     </transition>
     <transition>
         <id>619</id>
         <x>2455</x>
         <y>1178</y>
         <label>75. Upresnenie miesta a termínu vrátenia UJ _FM</label>
-			<roleRef>
-			<id>5</id>
-			<logic>
-				<perform>true</perform>
-			</logic>
-		</roleRef>
-		<roleRef>
-			<id>2</id>
-			<logic>
-				<perform>true</perform>
-				<delegate>true</delegate>
-			</logic>
-		</roleRef>
-		<dataRef>
-    <id>2</id><!--Ukl. jednotka-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>3</id><!--Čísla spisov-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>7</id><!--Firma-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>8</id><!--Oddelenie-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>15</id><!--Lokalizácia-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>19</id><!--Dátum vypožičania-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>21</id><!--Vypožičal-->
-       <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>39</id><!--Navrhované miesto odovzdania-->
-    <logic>
-        <behavior>editable</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>40</id><!--Navrhovaný dátum odovzdania-->
-    <logic>
-        <behavior>editable</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>45</id><!--Čas stretnutia-->
-    <logic>
-        <behavior>editable</behavior>
-    </logic>
-</dataRef>
+        <roleRef>
+            <id>5</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>2</id>
+            <logic>
+                <perform>true</perform>
+                <delegate>true</delegate>
+            </logic>
+        </roleRef>
+        <dataRef>
+            <id>2</id><!--Ukl. jednotka-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>3</id><!--Čísla spisov-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>7</id><!--Firma-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>8</id><!--Oddelenie-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>15</id><!--Lokalizácia-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>19</id><!--Dátum vypožičania-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>21</id><!--Vypožičal-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>39</id><!--Navrhované miesto odovzdania-->
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>40</id><!--Navrhovaný dátum odovzdania-->
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>45</id><!--Čas stretnutia-->
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
     </transition>
     <transition>
         <id>626</id>
         <x>1994</x>
         <y>998</y>
         <label>56. Riešenie spornej veci vrátenia _Client</label>
-		<roleRef>
-			<id>3</id>
-			<logic>
-				<perform>true</perform>
-			</logic>
-		</roleRef>
-		<roleRef>
-			<id>4</id>
-			<logic>
-				<perform>true</perform>
-				<delegate>true</delegate>
-			</logic>
-		</roleRef>
-		<dataRef>
-    <id>2</id><!--Ukl. jednotka-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>3</id><!--Čísla spisov-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>7</id><!--Firma-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>8</id><!--Oddelenie-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>15</id><!--Lokalizácia-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>19</id><!--Dátum vypožičania-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>21</id><!--Vypožičal-->
-       <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>24</id><!--Sporná vec-->
-    <logic>
-        <behavior>editable</behavior>
-    </logic>
-</dataRef>
+        <roleRef>
+            <id>3</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>4</id>
+            <logic>
+                <perform>true</perform>
+                <delegate>true</delegate>
+            </logic>
+        </roleRef>
+        <dataRef>
+            <id>2</id><!--Ukl. jednotka-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>3</id><!--Čísla spisov-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>7</id><!--Firma-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>8</id><!--Oddelenie-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>15</id><!--Lokalizácia-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>19</id><!--Dátum vypožičania-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>21</id><!--Vypožičal-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>24</id><!--Sporná vec-->
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
     </transition>
     <transition>
         <id>627</id>
         <x>1996</x>
         <y>1065</y>
         <label>57. Riešenie spornej veci vrátenia _FM</label>
-		<roleRef>
-			<id>1</id>
-			<logic>
-				<perform>true</perform>
-			</logic>
-		</roleRef>
-		<roleRef>
-			<id>2</id>
-			<logic>
-				<perform>true</perform>
-				<delegate>true</delegate>
-			</logic>
-		</roleRef>
-		<dataRef>
-    <id>2</id><!--Ukl. jednotka-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>3</id><!--Čísla spisov-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>7</id><!--Firma-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>8</id><!--Oddelenie-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>15</id><!--Lokalizácia-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>19</id><!--Dátum vypožičania-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>21</id><!--Vypožičal-->
-       <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>24</id><!--Sporná vec-->
-    <logic>
-        <behavior>editable</behavior>
-    </logic>
-</dataRef>
+        <roleRef>
+            <id>1</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>2</id>
+            <logic>
+                <perform>true</perform>
+                <delegate>true</delegate>
+            </logic>
+        </roleRef>
+        <dataRef>
+            <id>2</id><!--Ukl. jednotka-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>3</id><!--Čísla spisov-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>7</id><!--Firma-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>8</id><!--Oddelenie-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>15</id><!--Lokalizácia-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>19</id><!--Dátum vypožičania-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>21</id><!--Vypožičal-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>24</id><!--Sporná vec-->
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
     </transition>
     <transition>
         <id>729</id>
         <x>815</x>
         <y>628</y>
         <label>20. Potvrdenie termínu _Client</label>
-		<roleRef>
-			<id>3</id>
-			<logic>
-				<perform>true</perform>
-			</logic>
-		</roleRef>
-		<roleRef>
-			<id>4</id>
-			<logic>
-				<perform>true</perform>
-				<delegate>true</delegate>
-			</logic>
-		</roleRef>
-		 <dataRef>
+        <roleRef>
+            <id>3</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>4</id>
+            <logic>
+                <perform>true</perform>
+                <delegate>true</delegate>
+            </logic>
+        </roleRef>
+        <dataRef>
             <id>42</id><!--Akceptovanie termínu a miesta odovzdania-->
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-		 <dataRef><!--Klientské číslo-->
+        <dataRef><!--Klientské číslo-->
             <id>30</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-		<dataRef>
+        <dataRef>
             <id>44</id><!--Predpokladaný počet škatúľ-->
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-		<dataRef>
+        <dataRef>
             <id>32</id><!--Počet škatúľ-->
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-		<dataRef>
+        <dataRef>
             <id>39</id><!--Navrhované miesto odovzdania-->
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-		<dataRef>
+        <dataRef>
             <id>40</id><!--Navrhovaný dátum odovzdania-->
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-		<dataRef>
+        <dataRef>
             <id>45</id><!--Čas stretnutia-->
             <logic>
                 <behavior>visible</behavior>
@@ -2589,50 +2589,50 @@
         <x>660</x>
         <y>700</y>
         <label>15. Návrh náhradného termínu _Client</label>
-		<roleRef>
-			<id>3</id>
-			<logic>
-				<perform>true</perform>
-			</logic>
-		</roleRef>
-		<roleRef>
-			<id>4</id>
-			<logic>
-				<perform>true</perform>
-				<delegate>true</delegate>
-			</logic>
-		</roleRef>
-		 <dataRef><!--Klientské číslo-->
+        <roleRef>
+            <id>3</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>4</id>
+            <logic>
+                <perform>true</perform>
+                <delegate>true</delegate>
+            </logic>
+        </roleRef>
+        <dataRef><!--Klientské číslo-->
             <id>30</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-		<dataRef>
+        <dataRef>
             <id>44</id><!--Predpokladaný počet škatúľ-->
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-		<dataRef>
+        <dataRef>
             <id>32</id><!--Počet škatúľ-->
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
-		<dataRef>
+        <dataRef>
             <id>39</id><!--Navrhované miesto odovzdania-->
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-		<dataRef>
+        <dataRef>
             <id>40</id><!--Navrhovaný dátum odovzdania-->
             <logic>
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
-		<dataRef>
+        <dataRef>
             <id>45</id><!--Čas stretnutia-->
             <logic>
                 <behavior>editable</behavior>
@@ -2644,1720 +2644,1721 @@
         <x>1356</x>
         <y>635</y>
         <label>36. Ukáž dáta</label>
-		<roleRef>
-			<id>3</id>
-			<logic>
-				<perform>true</perform>
-			</logic>
-		</roleRef>
-		<roleRef>
-			<id>4</id>
-			<logic>
-				<perform>true</perform>
-			</logic>
-		</roleRef>
-		<dataRef>
-    <id>1</id>
-    <!--Box-->
-    <logic>
-        <behavior>editable</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>2</id><!--Ukl. jednotka-->
-    <logic>
-        <behavior>editable</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>3</id><!--Čísla spisov-->
-    <logic>
-        <behavior>editable</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>4</id><!--Vecný obsah UJ-->
-    <logic>
-        <behavior>editable</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>5</id><!--Od (rok)-->
-    <logic>
-        <behavior>editable</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>6</id><!--Do (rok)-->
-    <logic>
-        <behavior>editable</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>7</id><!--Firma-->
-    <logic>
-        <behavior>editable</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>8</id><!--Oddelenie-->
-    <logic>
-        <behavior>editable</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>9</id><!--Odovzdávajúci-->
-    <logic>
-        <behavior>editable</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>10</id><!--Dátum odovzdania-->
-    <logic>
-        <behavior>editable</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>11</id><!--Forma-->
-    <logic>
-        <behavior>editable</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>12</id><!--Lehota uloženia-->
-    <logic>
-        <behavior>editable</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>13</id><!--Znak hodnoty-->
-    <logic>
-        <behavior>editable</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>14</id><!--Čiarový kód-->
-    <logic>
-        <behavior>editable</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>15</id><!--Lokalizácia-->
-    <logic>
-        <behavior>editable</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>16</id><!--Poznámka-->
-    <logic>
-        <behavior>editable</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>17</id><!--Číslo plomby-->
-    <logic>
-        <behavior>editable</behavior>
-    </logic>
-</dataRef>
+        <roleRef>
+            <id>3</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>4</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <dataRef>
+            <id>1</id>
+            <!--Box-->
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>2</id><!--Ukl. jednotka-->
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>3</id><!--Čísla spisov-->
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>4</id><!--Vecný obsah UJ-->
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>5</id><!--Od (rok)-->
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>6</id><!--Do (rok)-->
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>7</id><!--Firma-->
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>8</id><!--Oddelenie-->
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>9</id><!--Odovzdávajúci-->
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>10</id><!--Dátum odovzdania-->
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>11</id><!--Forma-->
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>12</id><!--Lehota uloženia-->
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>13</id><!--Znak hodnoty-->
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>14</id><!--Čiarový kód-->
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>15</id><!--Lokalizácia-->
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>16</id><!--Poznámka-->
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>17</id><!--Číslo plomby-->
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
     </transition>
     <transition>
         <id>748</id>
         <x>1427</x>
         <y>499</y>
         <label>35. Zadanie lokalizácie</label>
-		<roleRef>
-			<id>1</id>
-			<logic>
-				<perform>true</perform>
-			</logic>
-		</roleRef>
-		<roleRef>
-			<id>2</id>
-			<logic>
-				<perform>true</perform>
-				<delegate>true</delegate>
-			</logic>
-		</roleRef>
-		<dataRef>
-    <id>14</id><!--Čiarový kód-->
-    <logic>
-        <behavior>editable</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>15</id><!--Lokalizácia-->
-    <logic>
-        <behavior>editable</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>16</id><!--Poznámka-->
-    <logic>
-        <behavior>editable</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>7</id><!--Firma-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>1</id>
-    <!--Box-->
-    <logic>
-        <behavior>editable</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>2</id><!--Ukl. jednotka-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>3</id><!--Čísla spisov-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-		
+        <roleRef>
+            <id>1</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>2</id>
+            <logic>
+                <perform>true</perform>
+                <delegate>true</delegate>
+            </logic>
+        </roleRef>
+        <dataRef>
+            <id>14</id><!--Čiarový kód-->
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>15</id><!--Lokalizácia-->
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>16</id><!--Poznámka-->
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>7</id><!--Firma-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>1</id>
+            <!--Box-->
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>2</id><!--Ukl. jednotka-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>3</id><!--Čísla spisov-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+
     </transition>
     <transition>
         <id>753</id>
         <x>1794</x>
         <y>340</y>
         <label>47. Trvalé vyskladnenie</label>
-			<roleRef>
-			<id>3</id>
-			<logic>
-				<perform>true</perform>
-			</logic>
-		</roleRef>
-		<roleRef>
-			<id>4</id>
-			<logic>
-				<perform>true</perform>
-				<delegate>true</delegate>
-			</logic>
-		</roleRef>
-		<dataRef>
-    <id>2</id><!--Ukl. jednotka-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>3</id><!--Čísla spisov-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>7</id><!--Firma-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>8</id><!--Oddelenie-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>15</id><!--Lokalizácia-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>39</id><!--Navrhované miesto odovzdania-->
-    <logic>
-        <behavior>editable</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>40</id><!--Navrhovaný dátum odovzdania-->
-    <logic>
-        <behavior>editable</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>45</id><!--Čas stretnutia-->
-    <logic>
-        <behavior>editable</behavior>
-    </logic>
-</dataRef>
+        <roleRef>
+            <id>3</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>4</id>
+            <logic>
+                <perform>true</perform>
+                <delegate>true</delegate>
+            </logic>
+        </roleRef>
+        <dataRef>
+            <id>2</id><!--Ukl. jednotka-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>3</id><!--Čísla spisov-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>7</id><!--Firma-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>8</id><!--Oddelenie-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>15</id><!--Lokalizácia-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>39</id><!--Navrhované miesto odovzdania-->
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>40</id><!--Navrhovaný dátum odovzdania-->
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>45</id><!--Čas stretnutia-->
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
     </transition>
     <transition>
         <id>757</id>
         <x>1642</x>
         <y>498</y>
         <label>40. Kontrola</label>
-		<roleRef>
-			<id>1</id>
-			<logic>
-				<perform>true</perform>
-			</logic>
-		</roleRef>
-		<roleRef>
-			<id>2</id>
-			<logic>
-				<perform>true</perform>
-				<delegate>true</delegate>
-			</logic>
-		</roleRef>
-		<dataRef>
-    <id>1</id>
-    <!--Box-->
-    <logic>
-        <behavior>editable</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>2</id><!--Ukl. jednotka-->
-    <logic>
-        <behavior>editable</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>3</id><!--Čísla spisov-->
-    <logic>
-        <behavior>editable</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>4</id><!--Vecný obsah UJ-->
-    <logic>
-        <behavior>editable</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>5</id><!--Od (rok)-->
-    <logic>
-        <behavior>editable</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>6</id><!--Do (rok)-->
-    <logic>
-        <behavior>editable</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>7</id><!--Firma-->
-    <logic>
-        <behavior>editable</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>8</id><!--Oddelenie-->
-    <logic>
-        <behavior>editable</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>9</id><!--Odovzdávajúci-->
-    <logic>
-        <behavior>editable</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>10</id><!--Dátum odovzdania-->
-    <logic>
-        <behavior>editable</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>11</id><!--Forma-->
-    <logic>
-        <behavior>editable</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>12</id><!--Lehota uloženia-->
-    <logic>
-        <behavior>editable</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>13</id><!--Znak hodnoty-->
-    <logic>
-        <behavior>editable</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>14</id><!--Čiarový kód-->
-    <logic>
-        <behavior>editable</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>15</id><!--Lokalizácia-->
-    <logic>
-        <behavior>editable</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>16</id><!--Poznámka-->
-    <logic>
-        <behavior>editable</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>17</id><!--Číslo plomby-->
-    <logic>
-        <behavior>editable</behavior>
-    </logic>
-</dataRef>
+        <roleRef>
+            <id>1</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>2</id>
+            <logic>
+                <perform>true</perform>
+                <delegate>true</delegate>
+            </logic>
+        </roleRef>
+        <dataRef>
+            <id>1</id>
+            <!--Box-->
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>2</id><!--Ukl. jednotka-->
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>3</id><!--Čísla spisov-->
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>4</id><!--Vecný obsah UJ-->
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>5</id><!--Od (rok)-->
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>6</id><!--Do (rok)-->
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>7</id><!--Firma-->
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>8</id><!--Oddelenie-->
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>9</id><!--Odovzdávajúci-->
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>10</id><!--Dátum odovzdania-->
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>11</id><!--Forma-->
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>12</id><!--Lehota uloženia-->
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>13</id><!--Znak hodnoty-->
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>14</id><!--Čiarový kód-->
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>15</id><!--Lokalizácia-->
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>16</id><!--Poznámka-->
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>17</id><!--Číslo plomby-->
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
     </transition>
     <transition>
         <id>763</id>
         <x>1532</x>
         <y>635</y>
         <label>41. Sprístupnenie klientovi</label>
-		<roleRef>
-			<id>1</id>
-			<logic>
-				<perform>true</perform>
-			</logic>
-		</roleRef>
-		<roleRef>
-			<id>2</id>
-			<logic>
-				<perform>true</perform>
-				<delegate>true</delegate>
-			</logic>
-		</roleRef>
-		<dataRef>
-    <id>2</id><!--Ukl. jednotka-->
-    <logic>
-        <behavior>editable</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>47</id><!--Povoliť sprístupnenie klientovi?-->
-    <logic>
-        <behavior>editable</behavior>
-    </logic>
-</dataRef>
+        <roleRef>
+            <id>1</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>2</id>
+            <logic>
+                <perform>true</perform>
+                <delegate>true</delegate>
+            </logic>
+        </roleRef>
+        <dataRef>
+            <id>2</id><!--Ukl. jednotka-->
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>47</id><!--Povoliť sprístupnenie klientovi?-->
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
     </transition>
     <transition>
         <id>768</id>
         <x>1199</x>
         <y>784</y>
         <label>31. Oprav dáta</label>
-		<roleRef>
-			<id>1</id>
-			<logic>
-				<perform>true</perform>
-			</logic>
-		</roleRef>
-		<roleRef>
-			<id>2</id>
-			<logic>
-				<perform>true</perform>
-				<delegate>true</delegate>
-			</logic>
-		</roleRef>
-		<dataRef>
-    <id>1</id>
-    <!--Box-->
-    <logic>
-        <behavior>editable</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>2</id><!--Ukl. jednotka-->
-    <logic>
-        <behavior>editable</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>3</id><!--Čísla spisov-->
-    <logic>
-        <behavior>editable</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>4</id><!--Vecný obsah UJ-->
-    <logic>
-        <behavior>editable</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>5</id><!--Od (rok)-->
-    <logic>
-        <behavior>editable</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>6</id><!--Do (rok)-->
-    <logic>
-        <behavior>editable</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>7</id><!--Firma-->
-    <logic>
-        <behavior>editable</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>8</id><!--Oddelenie-->
-    <logic>
-        <behavior>editable</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>9</id><!--Odovzdávajúci-->
-    <logic>
-        <behavior>editable</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>10</id><!--Dátum odovzdania-->
-    <logic>
-        <behavior>editable</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>11</id><!--Forma-->
-    <logic>
-        <behavior>editable</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>12</id><!--Lehota uloženia-->
-    <logic>
-        <behavior>editable</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>13</id><!--Znak hodnoty-->
-    <logic>
-        <behavior>editable</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>14</id><!--Čiarový kód-->
-    <logic>
-        <behavior>editable</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>15</id><!--Lokalizácia-->
-    <logic>
-        <behavior>editable</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>16</id><!--Poznámka-->
-    <logic>
-        <behavior>editable</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>17</id><!--Číslo plomby-->
-    <logic>
-        <behavior>editable</behavior>
-    </logic>
-</dataRef>
+        <roleRef>
+            <id>1</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>2</id>
+            <logic>
+                <perform>true</perform>
+                <delegate>true</delegate>
+            </logic>
+        </roleRef>
+        <dataRef>
+            <id>1</id>
+            <!--Box-->
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>2</id><!--Ukl. jednotka-->
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>3</id><!--Čísla spisov-->
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>4</id><!--Vecný obsah UJ-->
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>5</id><!--Od (rok)-->
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>6</id><!--Do (rok)-->
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>7</id><!--Firma-->
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>8</id><!--Oddelenie-->
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>9</id><!--Odovzdávajúci-->
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>10</id><!--Dátum odovzdania-->
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>11</id><!--Forma-->
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>12</id><!--Lehota uloženia-->
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>13</id><!--Znak hodnoty-->
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>14</id><!--Čiarový kód-->
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>15</id><!--Lokalizácia-->
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>16</id><!--Poznámka-->
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>17</id><!--Číslo plomby-->
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
     </transition>
     <transition>
         <id>773</id>
         <x>60</x>
         <y>44</y>
         <label>1. Ukáž dáta</label>
-		<roleRef>
-			<id>3</id>
-			<logic>
-				<perform>true</perform>
-			</logic>
-		</roleRef>
-		<roleRef>
-			<id>4</id>
-			<logic>
-				<perform>true</perform>
-				<delegate>true</delegate>
-			</logic>
-		</roleRef>
-		<dataRef>
-    <id>1</id>
-    <!--Box-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>2</id><!--Ukl. jednotka-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>3</id><!--Čísla spisov-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>4</id><!--Vecný obsah UJ-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>5</id><!--Od (rok)-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>6</id><!--Do (rok)-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>7</id><!--Firma-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>8</id><!--Oddelenie-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>9</id><!--Odovzdávajúci-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>10</id><!--Dátum odovzdania-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>11</id><!--Forma-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>12</id><!--Lehota uloženia-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>13</id><!--Znak hodnoty-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>14</id><!--Čiarový kód-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>15</id><!--Lokalizácia-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>16</id><!--Poznámka-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>17</id><!--Číslo plomby-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
+        <roleRef>
+            <id>3</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>4</id>
+            <logic>
+                <perform>true</perform>
+                <delegate>true</delegate>
+            </logic>
+        </roleRef>
+        <dataRef>
+            <id>1</id>
+            <!--Box-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>2</id><!--Ukl. jednotka-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>3</id><!--Čísla spisov-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>4</id><!--Vecný obsah UJ-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>5</id><!--Od (rok)-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>6</id><!--Do (rok)-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>7</id><!--Firma-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>8</id><!--Oddelenie-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>9</id><!--Odovzdávajúci-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>10</id><!--Dátum odovzdania-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>11</id><!--Forma-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>12</id><!--Lehota uloženia-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>13</id><!--Znak hodnoty-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>14</id><!--Čiarový kód-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>15</id><!--Lokalizácia-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>16</id><!--Poznámka-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>17</id><!--Číslo plomby-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
     </transition>
     <transition>
         <id>914</id>
         <x>2215</x>
         <y>203</y>
         <label>61. Potvrdenie termínu vyskladnenia _FM</label>
-			<roleRef>
-			<id>5</id>
-			<logic>
-				<perform>true</perform>
-			</logic>
-		</roleRef>
-		<roleRef>
-			<id>2</id>
-			<logic>
-				<perform>true</perform>
-				<delegate>true</delegate>
-			</logic>
-		</roleRef>
-		<dataRef>
-    <id>2</id><!--Ukl. jednotka-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>3</id><!--Čísla spisov-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>7</id><!--Firma-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>8</id><!--Oddelenie-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>15</id><!--Lokalizácia-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>39</id><!--Navrhované miesto odovzdania-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>40</id><!--Navrhovaný dátum odovzdania-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>45</id><!--Čas stretnutia-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>42</id><!--Akceptovanie termínu a miesta odovzdania-->
-    <logic>
-        <behavior>editable</behavior>
-    </logic>
-</dataRef>
+        <roleRef>
+            <id>5</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>2</id>
+            <logic>
+                <perform>true</perform>
+                <delegate>true</delegate>
+            </logic>
+        </roleRef>
+        <dataRef>
+            <id>2</id><!--Ukl. jednotka-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>3</id><!--Čísla spisov-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>7</id><!--Firma-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>8</id><!--Oddelenie-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>15</id><!--Lokalizácia-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>39</id><!--Navrhované miesto odovzdania-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>40</id><!--Navrhovaný dátum odovzdania-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>45</id><!--Čas stretnutia-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>42</id><!--Akceptovanie termínu a miesta odovzdania-->
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
     </transition>
     <transition>
         <id>915</id>
         <x>2383</x>
         <y>393</y>
         <label>70. Potvrdenie termínu vyskladnenia _Client</label>
-		<roleRef>
-			<id>3</id>
-			<logic>
-				<perform>true</perform>
-			</logic>
-		</roleRef>
-		<roleRef>
-			<id>4</id>
-			<logic>
-				<perform>true</perform>
-				<delegate>true</delegate>
-			</logic>
-		</roleRef>
-		<dataRef>
-    <id>2</id><!--Ukl. jednotka-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>3</id><!--Čísla spisov-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>7</id><!--Firma-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>8</id><!--Oddelenie-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>15</id><!--Lokalizácia-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>39</id><!--Navrhované miesto odovzdania-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>40</id><!--Navrhovaný dátum odovzdania-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>45</id><!--Čas stretnutia-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>42</id><!--Akceptovanie termínu a miesta odovzdania-->
-    <logic>
-        <behavior>editable</behavior>
-    </logic>
-</dataRef>
+        <roleRef>
+            <id>3</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>4</id>
+            <logic>
+                <perform>true</perform>
+                <delegate>true</delegate>
+            </logic>
+        </roleRef>
+        <dataRef>
+            <id>2</id><!--Ukl. jednotka-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>3</id><!--Čísla spisov-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>7</id><!--Firma-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>8</id><!--Oddelenie-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>15</id><!--Lokalizácia-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>39</id><!--Navrhované miesto odovzdania-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>40</id><!--Navrhovaný dátum odovzdania-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>45</id><!--Čas stretnutia-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>42</id><!--Akceptovanie termínu a miesta odovzdania-->
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
     </transition>
     <transition>
         <id>916</id>
         <x>2049</x>
         <y>273</y>
         <label>52. Upresnenie miesta a termínu vyskladnenia _FM</label>
-		<roleRef>
-			<id>5</id>
-			<logic>
-				<perform>true</perform>
-			</logic>
-		</roleRef>
-		<roleRef>
-			<id>2</id>
-			<logic>
-				<perform>true</perform>
-				<delegate>true</delegate>
-			</logic>
-		</roleRef>
-		<dataRef>
-    <id>2</id><!--Ukl. jednotka-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>3</id><!--Čísla spisov-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>7</id><!--Firma-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>8</id><!--Oddelenie-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>15</id><!--Lokalizácia-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>39</id><!--Navrhované miesto odovzdania-->
-    <logic>
-        <behavior>editable</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>40</id><!--Navrhovaný dátum odovzdania-->
-    <logic>
-        <behavior>editable</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>45</id><!--Čas stretnutia-->
-    <logic>
-        <behavior>editable</behavior>
-    </logic>
-</dataRef>
+        <roleRef>
+            <id>5</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>2</id>
+            <logic>
+                <perform>true</perform>
+                <delegate>true</delegate>
+            </logic>
+        </roleRef>
+        <dataRef>
+            <id>2</id><!--Ukl. jednotka-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>3</id><!--Čísla spisov-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>7</id><!--Firma-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>8</id><!--Oddelenie-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>15</id><!--Lokalizácia-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>39</id><!--Navrhované miesto odovzdania-->
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>40</id><!--Navrhovaný dátum odovzdania-->
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>45</id><!--Čas stretnutia-->
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
     </transition>
     <transition>
         <id>917</id>
         <x>2386</x>
         <y>275</y>
         <label>69. Návrh náhradného termínu vyskladnenia _FM</label>
-			<roleRef>
-			<id>5</id>
-			<logic>
-				<perform>true</perform>
-			</logic>
-		</roleRef>
-		<roleRef>
-			<id>2</id>
-			<logic>
-				<perform>true</perform>
-				<delegate>true</delegate>
-			</logic>
-		</roleRef>
-		<dataRef>
-    <id>2</id><!--Ukl. jednotka-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>3</id><!--Čísla spisov-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>7</id><!--Firma-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>8</id><!--Oddelenie-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>15</id><!--Lokalizácia-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>39</id><!--Navrhované miesto odovzdania-->
-    <logic>
-        <behavior>editable</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>40</id><!--Navrhovaný dátum odovzdania-->
-    <logic>
-        <behavior>editable</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>45</id><!--Čas stretnutia-->
-    <logic>
-        <behavior>editable</behavior>
-    </logic>
-</dataRef>
+        <roleRef>
+            <id>5</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>2</id>
+            <logic>
+                <perform>true</perform>
+                <delegate>true</delegate>
+            </logic>
+        </roleRef>
+        <dataRef>
+            <id>2</id><!--Ukl. jednotka-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>3</id><!--Čísla spisov-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>7</id><!--Firma-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>8</id><!--Oddelenie-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>15</id><!--Lokalizácia-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>39</id><!--Navrhované miesto odovzdania-->
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>40</id><!--Navrhovaný dátum odovzdania-->
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>45</id><!--Čas stretnutia-->
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
     </transition>
     <transition>
         <id>918</id>
         <x>2207</x>
         <y>450</y>
         <label>62. Návrh náhradného termínu vyskladnenia _Client</label>
-			<roleRef>
-			<id>3</id>
-			<logic>
-				<perform>true</perform>
-			</logic>
-		</roleRef>
-		<roleRef>
-			<id>4</id>
-			<logic>
-				<perform>true</perform>
-				<delegate>true</delegate>
-			</logic>
-		</roleRef>
-		<dataRef>
-    <id>2</id><!--Ukl. jednotka-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>3</id><!--Čísla spisov-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>7</id><!--Firma-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>8</id><!--Oddelenie-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>15</id><!--Lokalizácia-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>39</id><!--Navrhované miesto odovzdania-->
-    <logic>
-        <behavior>editable</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>40</id><!--Navrhovaný dátum odovzdania-->
-    <logic>
-        <behavior>editable</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>45</id><!--Čas stretnutia-->
-    <logic>
-        <behavior>editable</behavior>
-    </logic>
-</dataRef>
+        <roleRef>
+            <id>3</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>4</id>
+            <logic>
+                <perform>true</perform>
+                <delegate>true</delegate>
+            </logic>
+        </roleRef>
+        <dataRef>
+            <id>2</id><!--Ukl. jednotka-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>3</id><!--Čísla spisov-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>7</id><!--Firma-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>8</id><!--Oddelenie-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>15</id><!--Lokalizácia-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>39</id><!--Navrhované miesto odovzdania-->
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>40</id><!--Navrhovaný dátum odovzdania-->
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>45</id><!--Čas stretnutia-->
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
     </transition>
     <transition>
         <id>919</id>
         <x>2666</x>
         <y>510</y>
         <label>80. Zrušenie termínu vyskladnenia</label>
-			<roleRef>
-			<id>3</id>
-			<logic>
-				<perform>true</perform>
-			</logic>
-		</roleRef>
-		<roleRef>
-			<id>4</id>
-			<logic>
-				<perform>true</perform>
-				<delegate>true</delegate>
-			</logic>
-		</roleRef>
-		<dataRef>
-    <id>2</id><!--Ukl. jednotka-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>3</id><!--Čísla spisov-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>7</id><!--Firma-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>8</id><!--Oddelenie-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>15</id><!--Lokalizácia-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>39</id><!--Navrhované miesto odovzdania-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>40</id><!--Navrhovaný dátum odovzdania-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>45</id><!--Čas stretnutia-->
-    <logic>
-        <behavior>visible</behavior>
-    </logic>
-</dataRef>
-<dataRef>
-    <id>43</id><!--Dôvod zrušenia-->
-    <logic>
-        <behavior>editable</behavior>
-    </logic>
-</dataRef>
+        <roleRef>
+            <id>3</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>4</id>
+            <logic>
+                <perform>true</perform>
+                <delegate>true</delegate>
+            </logic>
+        </roleRef>
+        <dataRef>
+            <id>2</id><!--Ukl. jednotka-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>3</id><!--Čísla spisov-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>7</id><!--Firma-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>8</id><!--Oddelenie-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>15</id><!--Lokalizácia-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>39</id><!--Navrhované miesto odovzdania-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>40</id><!--Navrhovaný dátum odovzdania-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>45</id><!--Čas stretnutia-->
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>43</id><!--Dôvod zrušenia-->
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
     </transition>
     <transition>
         <id>920</id>
         <x>2675</x>
         <y>371</y>
         <label>79. Odovzdatie vyskladnenej UJ</label>
-		<roleRef>
-			<id>5</id>
-			<logic>
-				<perform>true</perform>
-			</logic>
-		</roleRef>
-		<roleRef>
-			<id>2</id>
-			<logic>
-				<perform>true</perform>
-				<delegate>true</delegate>
-			</logic>
-		</roleRef>
+        <roleRef>
+            <id>5</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>2</id>
+            <logic>
+                <perform>true</perform>
+                <delegate>true</delegate>
+            </logic>
+        </roleRef>
     </transition>
     <transition>
         <id>921</id>
         <x>2667</x>
         <y>220</y>
         <label>78. Prebratie vyskladnenej UJ</label>
-		<roleRef>
-			<id>3</id>
-			<logic>
-				<perform>true</perform>
-			</logic>
-		</roleRef>
-		<roleRef>
-			<id>4</id>
-			<logic>
-				<perform>true</perform>
-				<delegate>true</delegate>
-			</logic>
-		</roleRef>
+        <roleRef>
+            <id>3</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>4</id>
+            <logic>
+                <perform>true</perform>
+                <delegate>true</delegate>
+            </logic>
+        </roleRef>
     </transition>
     <transition>
         <id>922</id>
         <x>2382</x>
         <y>136</y>
         <label>68. Požiadavka na doplenie informácií vyskladnenia / riešenie spornej veci _FM</label>
-    <roleRef>
-			<id>1</id>
-			<logic>
-				<perform>true</perform>
-			</logic>
-		</roleRef>
-		<roleRef>
-			<id>2</id>
-			<logic>
-				<perform>true</perform>
-				<delegate>true</delegate>
-			</logic>
-		</roleRef>
-	</transition>
+        <roleRef>
+            <id>1</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>2</id>
+            <logic>
+                <perform>true</perform>
+                <delegate>true</delegate>
+            </logic>
+        </roleRef>
+    </transition>
     <transition>
         <id>923</id>
         <x>2384</x>
         <y>63</y>
         <label>67. Požiadavka na doplenie informácií vyskladnenia / riešenie spornej veci _Client</label>
-		<roleRef>
-			<id>3</id>
-			<logic>
-				<perform>true</perform>
-			</logic>
-		</roleRef>
-		<roleRef>
-			<id>4</id>
-			<logic>
-				<perform>true</perform>
-				<delegate>true</delegate>
-			</logic>
-		</roleRef>
+        <roleRef>
+            <id>3</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>4</id>
+            <logic>
+                <perform>true</perform>
+                <delegate>true</delegate>
+            </logic>
+        </roleRef>
     </transition>
     <transition>
         <id>959</id>
         <x>2667</x>
         <y>23</y>
         <label>77. Dokončenie vyskladnenia</label>
-		<roleRef>
-			<id>3</id>
-			<logic>
-				<perform>true</perform>
-			</logic>
-		</roleRef>
-		<roleRef>
-			<id>4</id>
-			<logic>
-				<perform>true</perform>
-				<delegate>true</delegate>
-			</logic>
-		</roleRef>
+        <roleRef>
+            <id>3</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>4</id>
+            <logic>
+                <perform>true</perform>
+                <delegate>true</delegate>
+            </logic>
+        </roleRef>
     </transition>
     <transition>
         <id>962</id>
         <x>2667</x>
         <y>593</y>
         <label>81. Zrušenie odovzdania výpožičky</label>
-		<roleRef>
-			<id>5</id>
-			<logic>
-				<perform>true</perform>
-			</logic>
-		</roleRef>
-		<roleRef>
-			<id>2</id>
-			<logic>
-				<perform>true</perform>
-				<delegate>true</delegate>
-			</logic>
-		</roleRef>
+        <roleRef>
+            <id>5</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>2</id>
+            <logic>
+                <perform>true</perform>
+                <delegate>true</delegate>
+            </logic>
+        </roleRef>
     </transition>
     <transition>
         <id>981</id>
         <x>2057</x>
         <y>389</y>
         <label>53. Upresnenie miesta a termínu vyskladnenia _Client</label>
-		<roleRef>
-			<id>3</id>
-			<logic>
-				<perform>true</perform>
-			</logic>
-		</roleRef>
-		<roleRef>
-			<id>4</id>
-			<logic>
-				<perform>true</perform>
-				<delegate>true</delegate>
-			</logic>
-		</roleRef>
+        <roleRef>
+            <id>3</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>4</id>
+            <logic>
+                <perform>true</perform>
+                <delegate>true</delegate>
+            </logic>
+        </roleRef>
     </transition>
     <transition>
         <id>1146</id>
         <x>2241</x>
         <y>1131</y>
         <label>65. Potvrdenie termínu vrátenia _FM</label>
-		<roleRef>
-			<id>5</id>
-			<logic>
-				<perform>true</perform>
-			</logic>
-		</roleRef>
-		<roleRef>
-			<id>2</id>
-			<logic>
-				<perform>true</perform>
-				<delegate>true</delegate>
-			</logic>
-		</roleRef>
+        <roleRef>
+            <id>5</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>2</id>
+            <logic>
+                <perform>true</perform>
+                <delegate>true</delegate>
+            </logic>
+        </roleRef>
     </transition>
     <transition>
         <id>1148</id>
         <x>1806</x>
         <y>1312</y>
         <label>50. Zrušenie vrátenia</label>
-		<roleRef>
-			<id>5</id>
-			<logic>
-				<perform>true</perform>
-			</logic>
-		</roleRef>
-		<roleRef>
-			<id>2</id>
-			<logic>
-				<perform>true</perform>
-				<delegate>true</delegate>
-			</logic>
-		</roleRef>
+        <roleRef>
+            <id>5</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>2</id>
+            <logic>
+                <perform>true</perform>
+                <delegate>true</delegate>
+            </logic>
+        </roleRef>
     </transition>
     <transition>
         <id>1149</id>
         <x>2441</x>
         <y>707</y>
         <label>71. Návrh náhradného termínu výpožičky _FM</label>
-		<roleRef>
-			<id>5</id>
-			<logic>
-				<perform>true</perform>
-			</logic>
-		</roleRef>
-		<roleRef>
-			<id>2</id>
-			<logic>
-				<perform>true</perform>
-				<delegate>true</delegate>
-			</logic>
-		</roleRef>
+        <roleRef>
+            <id>5</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>2</id>
+            <logic>
+                <perform>true</perform>
+                <delegate>true</delegate>
+            </logic>
+        </roleRef>
     </transition>
     <transition>
         <id>1153</id>
         <x>2096</x>
         <y>1298</y>
         <label>59. Potvrďenie termín vrátenia _Client</label>
-		<roleRef>
-			<id>3</id>
-			<logic>
-				<perform>true</perform>
-			</logic>
-		</roleRef>
-		<roleRef>
-			<id>4</id>
-			<logic>
-				<perform>true</perform>
-				<delegate>true</delegate>
-			</logic>
-		</roleRef>
+        <roleRef>
+            <id>3</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>4</id>
+            <logic>
+                <perform>true</perform>
+                <delegate>true</delegate>
+            </logic>
+        </roleRef>
     </transition>
     <transition>
         <id>1154</id>
         <x>2244</x>
         <y>1369</y>
         <label>66. Návrh náhradného termínu vrátenia _Client</label>
-		<roleRef>
-			<id>3</id>
-			<logic>
-				<perform>true</perform>
-			</logic>
-		</roleRef>
-		<roleRef>
-			<id>4</id>
-			<logic>
-				<perform>true</perform>
-				<delegate>true</delegate>
-			</logic>
-		</roleRef>
+        <roleRef>
+            <id>3</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>4</id>
+            <logic>
+                <perform>true</perform>
+                <delegate>true</delegate>
+            </logic>
+        </roleRef>
     </transition>
     <transition>
         <id>1155</id>
         <x>2441</x>
         <y>822</y>
         <label>72. Potvrdenie termínu výpožičky _Client</label>
-		<roleRef>
-			<id>3</id>
-			<logic>
-				<perform>true</perform>
-			</logic>
-		</roleRef>
-		<roleRef>
-			<id>4</id>
-			<logic>
-				<perform>true</perform>
-				<delegate>true</delegate>
-			</logic>
-		</roleRef>
+        <roleRef>
+            <id>3</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>4</id>
+            <logic>
+                <perform>true</perform>
+                <delegate>true</delegate>
+            </logic>
+        </roleRef>
     </transition>
     <transition>
         <id>1156</id>
         <x>2277</x>
         <y>905</y>
         <label>64. Návrh náhradného termínu výpožičky _Client</label>
-		<roleRef>
-			<id>3</id>
-			<logic>
-				<perform>true</perform>
-			</logic>
-		</roleRef>
-		<roleRef>
-			<id>4</id>
-			<logic>
-				<perform>true</perform>
-				<delegate>true</delegate>
-			</logic>
-		</roleRef>
+        <roleRef>
+            <id>3</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>4</id>
+            <logic>
+                <perform>true</perform>
+                <delegate>true</delegate>
+            </logic>
+        </roleRef>
     </transition>
     <transition>
         <id>1160</id>
         <x>2270</x>
         <y>649</y>
         <label>63. Potvrdenie termínu výpožičky _FM</label>
-		<roleRef>
-			<id>5</id>
-			<logic>
-				<perform>true</perform>
-			</logic>
-		</roleRef>
-		<roleRef>
-			<id>2</id>
-			<logic>
-				<perform>true</perform>
-				<delegate>true</delegate>
-			</logic>
-		</roleRef>
+        <roleRef>
+            <id>5</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>2</id>
+            <logic>
+                <perform>true</perform>
+                <delegate>true</delegate>
+            </logic>
+        </roleRef>
     </transition>
     <transition>
         <id>1162</id>
         <x>2104</x>
         <y>1177</y>
         <label>58. Návrh náhradného termínu vrátenia _FM</label>
-		<roleRef>
-			<id>5</id>
-			<logic>
-				<perform>true</perform>
-			</logic>
-		</roleRef>
-		<roleRef>
-			<id>2</id>
-			<logic>
-				<perform>true</perform>
-				<delegate>true</delegate>
-			</logic>
-		</roleRef>
+        <roleRef>
+            <id>5</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>2</id>
+            <logic>
+                <perform>true</perform>
+                <delegate>true</delegate>
+            </logic>
+        </roleRef>
     </transition>
     <transition>
         <id>1233</id>
         <x>1399</x>
         <y>1016</y>
         <label>38. Odsúhlasenie požiadavky _Client</label>
-		<roleRef>
-			<id>3</id>
-			<logic>
-				<perform>true</perform>
-			</logic>
-		</roleRef>
-		<roleRef>
-			<id>4</id>
-			<logic>
-				<perform>true</perform>
-				<delegate>true</delegate>
-			</logic>
-		</roleRef>
+        <roleRef>
+            <id>3</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>4</id>
+            <logic>
+                <perform>true</perform>
+                <delegate>true</delegate>
+            </logic>
+        </roleRef>
     </transition>
     <transition>
         <id>1234</id>
         <x>1596</x>
         <y>863</y>
         <label>42. Požiadavka na skartáciu</label>
-		<roleRef>
-			<id>3</id>
-			<logic>
-				<perform>true</perform>
-			</logic>
-		</roleRef>
-		<roleRef>
-			<id>4</id>
-			<logic>
-				<perform>true</perform>
-				<delegate>true</delegate>
-			</logic>
-		</roleRef>
+        <roleRef>
+            <id>3</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>4</id>
+            <logic>
+                <perform>true</perform>
+                <delegate>true</delegate>
+            </logic>
+        </roleRef>
     </transition>
     <transition>
         <id>1236</id>
         <x>1178</x>
         <y>1016</y>
         <label>32. Návrh skartácie</label>
-		 <roleRef>
-			<id>1</id>
-			<logic>
-				<perform>true</perform>
-			</logic>
-		</roleRef>
-		<roleRef>
-			<id>2</id>
-			<logic>
-				<perform>true</perform>
-				<delegate>true</delegate>
-			</logic>
-		</roleRef>
+        <roleRef>
+            <id>1</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>2</id>
+            <logic>
+                <perform>true</perform>
+                <delegate>true</delegate>
+            </logic>
+        </roleRef>
     </transition>
     <transition>
         <id>1237</id>
         <x>544</x>
         <y>1439</y>
         <label>12. Objednanie skartácie</label>
-		 <roleRef>
-			<id>1</id>
-			<logic>
-				<perform>true</perform>
-			</logic>
-		</roleRef>
-		<roleRef>
-			<id>2</id>
-			<logic>
-				<perform>true</perform>
-				<delegate>true</delegate>
-			</logic>
-		</roleRef>
+        <roleRef>
+            <id>1</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>2</id>
+            <logic>
+                <perform>true</perform>
+                <delegate>true</delegate>
+            </logic>
+        </roleRef>
     </transition>
     <transition>
         <id>1238</id>
         <x>1574</x>
         <y>1420</y>
         <label>44. Odovzdanie UJ Subdodávateľovi</label>
-		<roleRef>
-			<id>5</id>
-			<logic>
-				<perform>true</perform>
-			</logic>
-		</roleRef>
-		<roleRef>
-			<id>2</id>
-			<logic>
-				<perform>true</perform>
-				<delegate>true</delegate>
-			</logic>
-		</roleRef>
+        <roleRef>
+            <id>5</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>2</id>
+            <logic>
+                <perform>true</perform>
+                <delegate>true</delegate>
+            </logic>
+        </roleRef>
     </transition>
     <transition>
         <id>1239</id>
         <x>435</x>
         <y>1303</y>
         <label>11. Lokalizácia UJ</label>
-		 <roleRef>
-			<id>1</id>
-			<logic>
-				<perform>true</perform>
-			</logic>
-		</roleRef>
-		<roleRef>
-			<id>2</id>
-			<logic>
-				<perform>true</perform>
-				<delegate>true</delegate>
-			</logic>
-		</roleRef>
+        <roleRef>
+            <id>1</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>2</id>
+            <logic>
+                <perform>true</perform>
+                <delegate>true</delegate>
+            </logic>
+        </roleRef>
     </transition>
     <transition>
         <id>1240</id>
         <x>2032</x>
         <y>1565</y>
         <label>60. Skartácia</label>
-		 <roleRef>
-			<id>1</id>
-			<logic>
-				<perform>true</perform>
-			</logic>
-		</roleRef>
-		<roleRef>
-			<id>2</id>
-			<logic>
-				<perform>true</perform>
-				<delegate>true</delegate>
-			</logic>
-		</roleRef>
+        <roleRef>
+            <id>1</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>2</id>
+            <logic>
+                <perform>true</perform>
+                <delegate>true</delegate>
+            </logic>
+        </roleRef>
     </transition>
     <transition>
         <id>1241</id>
         <x>944</x>
         <y>1016</y>
         <label>25. Požiadavka pre Štátny archív</label>
-		 <roleRef>
-			<id>1</id>
-			<logic>
-				<perform>true</perform>
-			</logic>
-		</roleRef>
-		<roleRef>
-			<id>2</id>
-			<logic>
-				<perform>true</perform>
-				<delegate>true</delegate>
-			</logic>
-		</roleRef>
+        <roleRef>
+            <id>1</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>2</id>
+            <logic>
+                <perform>true</perform>
+                <delegate>true</delegate>
+            </logic>
+        </roleRef>
     </transition>
     <transition>
         <id>1242</id>
         <x>435</x>
         <y>1016</y>
         <label>10. Schválenie návrhu Štátnym archívom</label>
-		 <roleRef>
-			<id>1</id>
-			<logic>
-				<perform>true</perform>
-			</logic>
-		</roleRef>
-		<roleRef>
-			<id>2</id>
-			<logic>
-				<perform>true</perform>
-				<delegate>true</delegate>
-			</logic>
-		</roleRef>
+        <roleRef>
+            <id>1</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>2</id>
+            <logic>
+                <perform>true</perform>
+                <delegate>true</delegate>
+            </logic>
+        </roleRef>
     </transition>
     <transition>
         <id>1243</id>
         <x>1715</x>
         <y>1565</y>
         <label>46. Prebratie UJ na skartáciu</label>
-		 <roleRef>
-			<id>1</id>
-			<logic>
-				<perform>true</perform>
-			</logic>
-		</roleRef>
-		<roleRef>
-			<id>2</id>
-			<logic>
-				<perform>true</perform>
-				<delegate>true</delegate>
-			</logic>
-		</roleRef>
+        <roleRef>
+            <id>1</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>2</id>
+            <logic>
+                <perform>true</perform>
+                <delegate>true</delegate>
+            </logic>
+        </roleRef>
     </transition>
     <transition>
         <id>1244</id>
         <x>1388</x>
         <y>890</y>
         <label>37. Oddialenie skartácie o X rokov</label>
-		 <roleRef>
-			<id>1</id>
-			<logic>
-				<perform>true</perform>
-			</logic>
-		</roleRef>
-		<roleRef>
-			<id>2</id>
-			<logic>
-				<perform>true</perform>
-				<delegate>true</delegate>
-			</logic>
-		</roleRef>
+        <roleRef>
+            <id>1</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>2</id>
+            <logic>
+                <perform>true</perform>
+                <delegate>true</delegate>
+            </logic>
+        </roleRef>
     </transition>
     <transition>
         <id>1281</id>
         <x>1605</x>
         <y>1124</y>
         <label>43. Úprava informácií skartácie UJ</label>
-		 <roleRef>
-			<id>1</id>
-			<logic>
-				<perform>true</perform>
-			</logic>
-		</roleRef>
-		<roleRef>
-			<id>2</id>
-			<logic>
-				<perform>true</perform>
-				<delegate>true</delegate>
-			</logic>
-		</roleRef>
+        <roleRef>
+            <id>1</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>2</id>
+            <logic>
+                <perform>true</perform>
+                <delegate>true</delegate>
+            </logic>
+        </roleRef>
     </transition>
     <transition>
         <id>1282</id>
         <x>771</x>
         <y>1124</y>
         <label>16. Odmietnutie návrhu Štátnym archívom</label>
-		 <roleRef>
-			<id>1</id>
-			<logic>
-				<perform>true</perform>
-			</logic>
-		</roleRef>
-		<roleRef>
-			<id>2</id>
-			<logic>
-				<perform>true</perform>
-				<delegate>true</delegate>
-			</logic>
-		</roleRef>
+        <roleRef>
+            <id>1</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>2</id>
+            <logic>
+                <perform>true</perform>
+                <delegate>true</delegate>
+            </logic>
+        </roleRef>
     </transition>
     <transition>
         <id>1507</id>
         <x>1206</x>
         <y>1492</y>
-        <label>34. Potvrdenie termínu _FM</label><roleRef>
-			<id>5</id>
-			<logic>
-				<perform>true</perform>
-			</logic>
-		</roleRef>
-		<roleRef>
-			<id>2</id>
-			<logic>
-				<perform>true</perform>
-				<delegate>true</delegate>
-			</logic>
-		</roleRef>
+        <label>34. Potvrdenie termínu _FM</label>
+        <roleRef>
+            <id>5</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>2</id>
+            <logic>
+                <perform>true</perform>
+                <delegate>true</delegate>
+            </logic>
+        </roleRef>
     </transition>
     <transition>
         <id>1512</id>
         <x>1046</x>
         <y>1563</y>
         <label>27. Návrh náhradného termínu _FM</label>
-		<roleRef>
-			<id>5</id>
-			<logic>
-				<perform>true</perform>
-			</logic>
-		</roleRef>
-		<roleRef>
-			<id>2</id>
-			<logic>
-				<perform>true</perform>
-				<delegate>true</delegate>
-			</logic>
-		</roleRef>
+        <roleRef>
+            <id>5</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>2</id>
+            <logic>
+                <perform>true</perform>
+                <delegate>true</delegate>
+            </logic>
+        </roleRef>
     </transition>
     <transition>
         <id>1513</id>
         <x>1208</x>
         <y>1367</y>
-        <label>33. Návrh náhradného termínu  _Supplier</label>
-		<roleRef>
-			<id>6</id>
-			<logic>
-				<perform>true</perform>
-				<delegate>true</delegate>
-			</logic>
-		</roleRef>
+        <label>33. Návrh náhradného termínu _Supplier</label>
+        <roleRef>
+            <id>6</id>
+            <logic>
+                <perform>true</perform>
+                <delegate>true</delegate>
+            </logic>
+        </roleRef>
     </transition>
     <transition>
         <id>1514</id>
         <x>1050</x>
         <y>1643</y>
         <label>28. Zrušenie termínu objednania skartácie</label>
-		 <roleRef>
-			<id>1</id>
-			<logic>
-				<perform>true</perform>
-			</logic>
-		</roleRef>
-		<roleRef>
-			<id>2</id>
-			<logic>
-				<perform>true</perform>
-				<delegate>true</delegate>
-			</logic>
-		</roleRef>
+        <roleRef>
+            <id>1</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>2</id>
+            <logic>
+                <perform>true</perform>
+                <delegate>true</delegate>
+            </logic>
+        </roleRef>
     </transition>
     <transition>
         <id>1520</id>
         <x>869</x>
         <y>1367</y>
         <label>17. Upresnenie miesta a termínu skartácie _FM</label>
-		<roleRef>
-			<id>5</id>
-			<logic>
-				<perform>true</perform>
-			</logic>
-		</roleRef>
-		<roleRef>
-			<id>2</id>
-			<logic>
-				<perform>true</perform>
-				<delegate>true</delegate>
-			</logic>
-		</roleRef>
+        <roleRef>
+            <id>5</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>2</id>
+            <logic>
+                <perform>true</perform>
+                <delegate>true</delegate>
+            </logic>
+        </roleRef>
     </transition>
     <transition>
         <id>1521</id>
         <x>870</x>
         <y>1489</y>
         <label>18. Upresnenie miesta a termínu skartácie _Supplier</label>
-		<roleRef>
-			<id>6</id>
-			<logic>
-				<perform>true</perform>
-				<delegate>true</delegate>
-			</logic>
-		</roleRef>
+        <roleRef>
+            <id>6</id>
+            <logic>
+                <perform>true</perform>
+                <delegate>true</delegate>
+            </logic>
+        </roleRef>
     </transition>
     <transition>
         <id>1530</id>
@@ -4365,8 +4366,8 @@
         <y>1293</y>
         <label>26. Potvrdenie termínu _Supplier</label>
     </transition>
-<!--=================================PLACES========================-->
-	   <place>
+    <!--=================================PLACES========================-->
+    <place>
         <id>0</id>
         <x>58</x>
         <y>578</y>
@@ -4758,8 +4759,8 @@
         <tokens>0</tokens>
         <isStatic>false</isStatic>
     </place>
-	
-<!--=================================ARCS========================-->
+
+    <!--=================================ARCS========================-->
     <arc>
         <id>9</id>
         <type>regular</type>
