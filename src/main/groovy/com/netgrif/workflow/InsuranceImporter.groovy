@@ -69,12 +69,9 @@ class InsuranceImporter {
     }
 
     private void createUsers(Map<String, Organization> orgs, Map<String, Authority> auths, PetriNet net) {
-        def agentRole = userProcessRoleRepository.save(new UserProcessRole(
-                roleId: net.roles.values().find { it -> it.name == "Agent" }.objectId
-        ))
-        def systemRole = userProcessRoleRepository.save(new UserProcessRole(
-                roleId: net.roles.values().find { it -> it.name == "System" }.objectId
-        ))
+        def agentRole = userProcessRoleRepository.findByRoleId(net.roles.values().find { it -> it.name == "Agent" }.objectId)
+        def systemRole = userProcessRoleRepository.findByRoleId(net.roles.values().find { it -> it.name == "System" }.objectId)
+
         User agent = new User(
                 name: "Agent",
                 surname: "Smith",
