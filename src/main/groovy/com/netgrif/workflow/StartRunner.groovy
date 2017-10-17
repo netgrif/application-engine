@@ -27,7 +27,7 @@ class StartRunner  implements CommandLineRunner{
 
         insuranceImporter.run(strings)
 
-        //xlsImporter.run(strings)
+        xlsImporter.run(strings)
 
         superCreator.run(strings)
     }
