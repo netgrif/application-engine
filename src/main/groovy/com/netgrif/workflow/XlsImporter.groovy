@@ -93,7 +93,9 @@ class XlsImporter {
             if (index++ == 0)
                 return
             useCase = new Case(petriNet: net, title: fields[3], color: StartRunner.randomColor())
-//            useCase.activePlaces.put(net.places.find { it -> it.value.title == "B" }.key, 1)
+            useCase.activePlaces.put(net.places.find { it -> it.value.title == "18" }.key, 1)
+            useCase.activePlaces.put(net.places.find { it -> it.value.title == "26" }.key, 1)
+            useCase.activePlaces.put(net.places.find { it -> it.value.title == "29" }.key, 1)
 
             header_fields.eachWithIndex { entry, int i ->
                 if (i in [7])
