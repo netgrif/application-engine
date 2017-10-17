@@ -1,5 +1,7 @@
 package com.netgrif.workflow.importer;
 
+import com.netgrif.workflow.auth.domain.UserProcessRole;
+import com.netgrif.workflow.auth.domain.repositories.UserProcessRoleRepository;
 import com.netgrif.workflow.importer.model.*;
 import com.netgrif.workflow.importer.model.DataLogic;
 import com.netgrif.workflow.petrinet.domain.*;
@@ -42,6 +44,8 @@ public class Importer {
 
     @Autowired
     private ProcessRoleRepository roleRepository;
+    @Autowired
+    private UserProcessRoleRepository userProcessRoleRepository;
 
     public Importer() {
         this.roles = new HashMap<>();
@@ -230,8 +234,11 @@ public class Importer {
     @Transactional
     protected void createRole(ImportRole importRole) {
         ProcessRole role = new ProcessRole();
+        UserProcessRole userProcessRole = new UserProcessRole();
         role.setName(importRole.getName());
         role = roleRepository.save(role);
+        userProcessRole.setRoleId(role.getObjectId());
+        userProcessRoleRepository.save(userProcessRole);
 
         net.addRole(role);
         roles.put(importRole.getId(), role);

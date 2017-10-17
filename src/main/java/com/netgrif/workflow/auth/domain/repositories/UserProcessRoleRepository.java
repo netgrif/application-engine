@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface UserProcessRoleRepository extends JpaRepository<UserProcessRole, Long>{
     List<UserProcessRole> findByRoleIdIn(Iterable<String> roleIds);
+    UserProcessRole findByRoleId(String roleId);
 }
