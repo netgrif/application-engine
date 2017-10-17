@@ -51,29 +51,26 @@ class ImportHelper {
     @Autowired
     private ResourceLoader resourceLoader
 
-    private Map<String, Organization> orgs
-    private Map<String, Authority> auths
-    private Map<String, UserProcessRole> processRoles
-    private PetriNet insuranceNet
-    private PetriNet contactNet
-    private PetriNet documentNet
-
     @SuppressWarnings("GroovyAssignabilityCheck")
-    void createOrganizations(Map<String, String> organizations) {
+    Map<String, Organization> createOrganizations(Map<String, String> organizations) {
         log.info("Creating organizations")
-        orgs = new HashMap<>()
+        HashMap<String, Organization> orgsMap = new HashMap<>()
         organizations.each { org ->
-            orgs.put(org.key, organizationRepository.save(new Organization(org.value)))
+            orgsMap.put(org.key, organizationRepository.save(new Organization(org.value)))
         }
+
+        return orgsMap
     }
 
     @SuppressWarnings("GroovyAssignabilityCheck")
-    private void createAuthorities(Map<String, String> authorities) {
+    Map<String, Authority> createAuthorities(Map<String, String> authorities) {
         log.info("Creating authorities")
-        auths = new HashMap<>()
+        HashMap<String, Authority> authoritities = new HashMap<>()
         authorities.each { authority ->
-            auths.put(authority.key, authorityRepository.save(new Authority(authority.value)))
+            authoritities.put(authority.key, authorityRepository.save(new Authority(authority.value)))
         }
+
+        return authoritities
     }
 
     private void createProcessRoles() {
@@ -90,6 +87,13 @@ class ImportHelper {
                 roleId: documentNet.roles.values().find { it -> it.name == "Agent" }.stringId)))
         processRoles.put("docAdmin", userProcessRoleRepository.save(new UserProcessRole(
                 roleId: documentNet.roles.values().find { it -> it.name == "Admin" }.stringId)))
+    }
+
+    UserProcessRole createUserProcessRole(PetriNet net, String name) {
+        UserProcessRole role = userProcessRoleRepository.save(new UserProcessRole(roleId:
+                net.roles.values().find { it -> it.name == name }.stringId))
+        log.info("Created user process role $name")
+        return role
     }
 
     private void createUsers() {
@@ -109,42 +113,37 @@ class ImportHelper {
                 [auths.get(Authority.user), auths.get("permPayments"), auths.get("permActiveContracts"), auths.get("permMyContracts"), auths.get("permCreateOffers"), auths.get("permCreateContacts"), auths.get("permDashboard")] as Authority[],
                 [orgs.get("insurance")] as Organization[], [processRoles.get("agent"), processRoles.get("docAdmin"), processRoles.get("contact")] as UserProcessRole[])
 
-       /* createUser(new User(name: "Ľubomír", surname: "Dzugas", email: "lubomir.dzugas@premium-ic.sk", password: "premiumIC2017"),
-                [auths.get(Authority.admin), auths.get("permPayments"), auths.get("permActiveContracts"), auths.get("permMyContracts"), auths.get("permCreateOffers"), auths.get("permCreateContacts"), auths.get("permDashboard")] as Authority[],
-                [orgs.get("insurance")] as Organization[], [processRoles.get("agent"), processRoles.get("premium"), processRoles.get("docAdmin"), processRoles.get("contact")] as UserProcessRole[])
-*/
+        /* createUser(new User(name: "Ľubomír", surname: "Dzugas", email: "lubomir.dzugas@premium-ic.sk", password: "premiumIC2017"),
+                 [auths.get(Authority.admin), auths.get("permPayments"), auths.get("permActiveContracts"), auths.get("permMyContracts"), auths.get("permCreateOffers"), auths.get("permCreateContacts"), auths.get("permDashboard")] as Authority[],
+                 [orgs.get("insurance")] as Organization[], [processRoles.get("agent"), processRoles.get("premium"), processRoles.get("docAdmin"), processRoles.get("contact")] as UserProcessRole[])
+ */
         //Gratex users
-       /* def perms = [auths.get(Authority.user), auths.get("permMyContracts"), auths.get("permCreateOffers"), auths.get("permCreateContacts"), auths.get("permDashboard")] as Authority[]
-        def pr = [processRoles.get("agent"), processRoles.get("contact"), processRoles.get("docAgent")] as UserProcessRole[]
-        createUser(new User(name: "Renáta", surname: "Petríková", email: "rpetrikova@gratex.com", password: "gratex2017"),
-                perms, [orgs.get("gratex")] as Organization[], pr)
+        /* def perms = [auths.get(Authority.user), auths.get("permMyContracts"), auths.get("permCreateOffers"), auths.get("permCreateContacts"), auths.get("permDashboard")] as Authority[]
+         def pr = [processRoles.get("agent"), processRoles.get("contact"), processRoles.get("docAgent")] as UserProcessRole[]
+         createUser(new User(name: "Renáta", surname: "Petríková", email: "rpetrikova@gratex.com", password: "gratex2017"),
+                 perms, [orgs.get("gratex")] as Organization[], pr)
 
-        createUser(new User(name: "Martin", surname: "Blichar", email: "blichar@gratex.com", password: "gratex2017"),
-                perms, [orgs.get("gratex")] as Organization[], pr)
+         createUser(new User(name: "Martin", surname: "Blichar", email: "blichar@gratex.com", password: "gratex2017"),
+                 perms, [orgs.get("gratex")] as Organization[], pr)
 
-        createUser(new User(name: "Tomáš", surname: "Husár", email: "thusar@gratex.com", password: "gratex2017"),
-                perms, [orgs.get("gratex")] as Organization[], pr)
+         createUser(new User(name: "Tomáš", surname: "Husár", email: "thusar@gratex.com", password: "gratex2017"),
+                 perms, [orgs.get("gratex")] as Organization[], pr)
 
-        createUser(new User(name: "Martin", surname: "Marko", email: "marcus@gratex.com", password: "gratex2017"),
-                perms, [orgs.get("gratex")] as Organization[], pr)*/
+         createUser(new User(name: "Martin", surname: "Marko", email: "marcus@gratex.com", password: "gratex2017"),
+                 perms, [orgs.get("gratex")] as Organization[], pr)*/
 
     }
 
-    private void createUser(User user, Authority[] authorities, Organization[] orgs, UserProcessRole[] roles) {
+    User createUser(User user, Authority[] authorities, Organization[] orgs, UserProcessRole[] roles) {
         authorities.each { user.addAuthority(it) }
         orgs.each { user.addOrganization(it) }
         roles.each { user.addProcessRole(it) }
-        userService.saveNew(user)
+        user = userService.saveNew(user)
         log.info("User $user.name $user.surname created")
+        return user
     }
 
-    private void createCases() {
-        createCase("Zmluvné podmienky", documentNet, 4L)
-        createCase("Prvé poistenie",insuranceNet,1L)
-        Case useCase = createCase("Druhé poistenie",insuranceNet,1L)
-    }
-
-    private Case createCase(String title, PetriNet net, Long author) {
+    Case createCase(String title, PetriNet net, Long author) {
         Case useCase = new Case(title, net, net.getActivePlaces())
         useCase.setColor(StartRunner.randomColor())
         useCase.setAuthor(author)
