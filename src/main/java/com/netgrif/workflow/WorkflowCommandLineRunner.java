@@ -50,7 +50,7 @@ public class WorkflowCommandLineRunner {//implements CommandLineRunner {
     public void run(String... strings) throws Exception {
         mongoTemplate.getDb().dropDatabase();
         // TODO: 26/04/2017 title, initials
-        //importer.importPetriNet(new File("src/test/resources/poistenie_rozsirene.xml"), "Poistenie", "INS");
+        //importer.importPetriNet(new File("src/test/resources/insurance_extended.xml"), "Poistenie", "INS");
         importer.importPetriNet(new File("src/test/resources/prikladFM.xml"),"FM Servis","FM");
         PetriNet net = petriNetRepository.findAll().get(0);
 //        for (int i = 0; i < 10; i++) {
