@@ -3,7 +3,7 @@ package com.netgrif.workflow.auth.service;
 import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.auth.domain.repositories.UserRepository;
-import com.netgrif.workflow.event.events.UserLoginEvent;
+import com.netgrif.workflow.event.events.user.UserLoginEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

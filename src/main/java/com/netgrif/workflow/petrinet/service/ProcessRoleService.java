@@ -4,7 +4,7 @@ import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.auth.domain.UserProcessRole;
 import com.netgrif.workflow.auth.domain.repositories.UserProcessRoleRepository;
 import com.netgrif.workflow.auth.domain.repositories.UserRepository;
-import com.netgrif.workflow.event.events.UserRoleChangeEvent;
+import com.netgrif.workflow.event.events.user.UserRoleChangeEvent;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository;
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRole;

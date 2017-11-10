@@ -5,7 +5,7 @@ import com.netgrif.workflow.auth.domain.repositories.AuthorityRepository;
 import com.netgrif.workflow.auth.domain.repositories.OrganizationRepository;
 import com.netgrif.workflow.auth.domain.repositories.UserRepository;
 import com.netgrif.workflow.auth.service.interfaces.IUserService;
-import com.netgrif.workflow.event.events.UserRegistrationEvent;
+import com.netgrif.workflow.event.events.user.UserRegistrationEvent;
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRoleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
