@@ -14,7 +14,7 @@ import java.util.List;
 
 public interface IPetriNetService {
 
-    void importPetriNet(File xmlFile, String name, String initials) throws IOException, SAXException, ParserConfigurationException;
+    void importPetriNet(File xmlFile, String name, String initials, LoggedUser user) throws IOException, SAXException, ParserConfigurationException;
 
     void savePetriNet(PetriNet petriNet);
 
