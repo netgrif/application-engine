@@ -7,14 +7,14 @@ import lombok.Getter;
 public abstract class TaskEvent extends Event {
 
     @Getter
-    protected final Task task;
-
-    @Getter
     protected final Case useCase;
 
-    public TaskEvent(Object user, Task task, Case useCase) {
-        super(user);
-        this.task = task;
+    public TaskEvent(Task task, Case useCase) {
+        super(task);
         this.useCase = useCase;
+    }
+
+    public Task getTask() {
+        return (Task) source;
     }
 }

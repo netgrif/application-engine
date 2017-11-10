@@ -8,12 +8,15 @@ import java.time.LocalDateTime;
 
 public class TimeFinishTaskEvent extends TaskEvent {
 
+    private LocalDateTime time;
+
     public TimeFinishTaskEvent(LocalDateTime time, Task task, Case useCase) {
-        super(time, task, useCase);
+        super(task, useCase);
+        this.time = time;
     }
 
     @Override
     public String getMessage() {
-        return "System finished task " + getTask().getTitle() + " of case " + getUseCase().getTitle() + " caused by time trigger set to" + DateUtils.toString((LocalDateTime) source);
+        return "System finished task " + getTask().getTitle() + " of case " + getUseCase().getTitle() + " caused by time trigger set to" + DateUtils.toString(time);
     }
 }
