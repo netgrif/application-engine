@@ -1,4 +1,4 @@
-package com.netgrif.workflow.event.events;
+package com.netgrif.workflow.event.events.user;
 
 import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.auth.domain.User;

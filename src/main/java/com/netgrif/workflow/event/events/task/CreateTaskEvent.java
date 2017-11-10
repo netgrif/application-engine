@@ -1,4 +1,4 @@
-package com.netgrif.workflow.event.events;
+package com.netgrif.workflow.event.events.task;
 
 import com.netgrif.workflow.utils.DateUtils;
 import com.netgrif.workflow.workflow.domain.Case;
