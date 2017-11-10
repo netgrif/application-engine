@@ -299,15 +299,15 @@ public class TaskService implements ITaskService {
         return field;
     }
 
-    public Page<Task> setImmediateFields(Page<Task> tasks){
+    public Page<Task> setImmediateFields(Page<Task> tasks) {
         tasks.getContent().forEach(task -> task.setImmediateData(getImmediateFields(task)));
         return tasks;
     }
 
-    public List<Field> getImmediateFields(Task task){
+    public List<Field> getImmediateFields(Task task) {
         Case useCase = caseRepository.findOne(task.getCaseId());
 
-        List<Field> fields = task.getImmediateDataFields().stream().map(id -> buildField(useCase,id,false)).collect(Collectors.toList());
+        List<Field> fields = task.getImmediateDataFields().stream().map(id -> buildField(useCase, id, false)).collect(Collectors.toList());
         LongStream.range(0L, fields.size()).forEach(index -> fields.get((int) index).setOrder(index));
 
         return fields;
@@ -433,7 +433,7 @@ public class TaskService implements ITaskService {
                 value = set;
                 break;
             case "user":
-                if(node.get("value") == null) {
+                if (node.get("value") == null) {
                     value = null;
                     break;
                 }
@@ -445,14 +445,14 @@ public class TaskService implements ITaskService {
                 value = user;
                 break;
             case "number":
-                if(node.get("value") == null) {
+                if (node.get("value") == null) {
                     value = 0.0;
                     break;
                 }
                 value = node.get("value").asDouble();
                 break;
             default:
-                if(node.get("value") == null) {
+                if (node.get("value") == null) {
                     value = "null";
                     break;
                 }
