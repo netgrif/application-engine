@@ -5,12 +5,12 @@ import lombok.Getter;
 
 import java.io.File;
 
-public class UserImportModelEvent extends Event {
+public class UserImportModelEvent extends UserEvent {
 
     @Getter
     private File model;
 
-    public UserImportModelEvent(Object user, File model) {
+    public UserImportModelEvent(LoggedUser user, File model) {
         super(user);
         this.model = model;
     }
