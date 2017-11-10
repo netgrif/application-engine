@@ -1,8 +1,8 @@
 package com.netgrif.workflow.workflow.service;
 
 import com.netgrif.workflow.auth.domain.LoggedUser;
-import com.netgrif.workflow.event.events.CreateCaseEvent;
-import com.netgrif.workflow.event.events.DeleteCaseEvent;
+import com.netgrif.workflow.event.events.usecase.CreateCaseEvent;
+import com.netgrif.workflow.event.events.usecase.DeleteCaseEvent;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.dataset.CaseField;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
