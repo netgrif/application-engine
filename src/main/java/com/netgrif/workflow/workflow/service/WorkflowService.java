@@ -2,6 +2,7 @@ package com.netgrif.workflow.workflow.service;
 
 import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.event.events.CreateCaseEvent;
+import com.netgrif.workflow.event.events.DeleteCaseEvent;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.dataset.CaseField;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
@@ -134,8 +135,11 @@ public class WorkflowService implements IWorkflowService {
 
     @Override
     public void deleteCase(String caseId) {
-        repository.delete(caseId);
+        Case useCase = repository.findOne(caseId);
+        repository.delete(useCase);
         taskService.deleteTasksByCase(caseId);
+
+        publisher.publishEvent(new DeleteCaseEvent(useCase));
     }
 
     public List<Field> getData(String caseId) {
