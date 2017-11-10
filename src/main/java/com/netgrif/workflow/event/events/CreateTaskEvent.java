@@ -7,11 +7,11 @@ import com.netgrif.workflow.workflow.domain.Task;
 public class CreateTaskEvent extends TaskEvent {
 
     public CreateTaskEvent(Task task, Case useCase) {
-        super("System", task, useCase);
+        super(task, useCase);
     }
 
     @Override
     public String getMessage() {
-        return "Task " + task.getTitle() + " of case " + useCase.getTitle() + " created on " + DateUtils.toString(time);
+        return "Task " + getTask().getTitle() + " of case " + useCase.getTitle() + " created on " + DateUtils.toString(time);
     }
 }
