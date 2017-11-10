@@ -1,5 +1,6 @@
-package com.netgrif.workflow.event.events;
+package com.netgrif.workflow.event.events.task;
 
+import com.netgrif.workflow.event.events.Event;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.Task;
 import lombok.Getter;

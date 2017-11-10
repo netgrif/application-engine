@@ -1,6 +1,7 @@
-package com.netgrif.workflow.event.events;
+package com.netgrif.workflow.event.events.model;
 
 import com.netgrif.workflow.auth.domain.LoggedUser;
+import com.netgrif.workflow.event.events.user.UserEvent;
 import lombok.Getter;
 
 import java.io.File;
