@@ -699,8 +699,11 @@ public class TaskService implements ITaskService {
         if (transaction != null) {
             task.setTransactionId(transaction.getStringId());
         }
+        Task savedTask = taskRepository.save(task);
 
-        return taskRepository.save(task);
+        publisher.publishEvent(new CreateTaskEvent(savedTask, useCase));
+
+        return savedTask;
     }
 
     private Page<Task> loadUsers(Page<Task> tasks) {
