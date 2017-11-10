@@ -7,6 +7,7 @@ import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.auth.domain.repositories.UserRepository;
 import com.netgrif.workflow.event.events.task.*;
+import com.netgrif.workflow.event.events.usecase.SaveCaseDataEvent;
 import com.netgrif.workflow.petrinet.domain.*;
 import com.netgrif.workflow.petrinet.domain.dataset.*;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedField;
@@ -369,7 +370,7 @@ public class TaskService implements ITaskService {
         });
 
         caseRepository.save(useCase);
-
+        publisher.publishEvent(new SaveCaseDataEvent(useCase, changedFields.values()));
 
         ChangedFieldContainer container = new ChangedFieldContainer();
         container.putAll(changedFields);
