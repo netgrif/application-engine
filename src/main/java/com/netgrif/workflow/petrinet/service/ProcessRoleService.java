@@ -4,11 +4,14 @@ import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.auth.domain.UserProcessRole;
 import com.netgrif.workflow.auth.domain.repositories.UserProcessRoleRepository;
 import com.netgrif.workflow.auth.domain.repositories.UserRepository;
+import com.netgrif.workflow.event.events.UserRoleChangeEvent;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository;
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRole;
+import com.netgrif.workflow.petrinet.domain.roles.ProcessRoleRepository;
 import com.netgrif.workflow.petrinet.service.interfaces.IProcessRoleService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 import java.util.LinkedList;
@@ -17,12 +20,21 @@ import java.util.Set;
 
 @Service
 public class ProcessRoleService implements IProcessRoleService {
+
     @Autowired
     private UserRepository userRepository;
+
     @Autowired
     private UserProcessRoleRepository roleRepository;
+
+    @Autowired
+    private ProcessRoleRepository processRoleRepository;
+
     @Autowired
     private PetriNetRepository netRepository;
+
+    @Autowired
+    private ApplicationEventPublisher publisher;
 
     @Override
     public boolean assignRolesToUser(Long userId, Set<String> roleIds){
@@ -32,6 +44,8 @@ public class ProcessRoleService implements IProcessRoleService {
 
         user.getUserProcessRoles().clear();
         user.getUserProcessRoles().addAll(processRoles);
+
+        publisher.publishEvent(new UserRoleChangeEvent(user, processRoleRepository.findAllBy_idIn(roleIds)));
 
         return userRepository.save(user) != null;
     }
