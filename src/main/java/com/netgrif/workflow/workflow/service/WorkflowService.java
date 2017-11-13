@@ -1,6 +1,9 @@
 package com.netgrif.workflow.workflow.service;
 
 import com.netgrif.workflow.auth.domain.LoggedUser;
+import com.netgrif.workflow.event.events.usecase.CreateCaseEvent;
+import com.netgrif.workflow.event.events.usecase.DeleteCaseEvent;
+import com.netgrif.workflow.event.events.usecase.UpdateMarkingEvent;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.dataset.CaseField;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
@@ -12,6 +15,7 @@ import com.netgrif.workflow.workflow.domain.repositories.CaseRepository;
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -43,6 +47,9 @@ public class WorkflowService implements IWorkflowService {
 
     @Autowired
     private CaseSearchService searchService;
+
+    @Autowired
+    private ApplicationEventPublisher publisher;
 
     @Override
     public Case saveCase(Case useCase) {
@@ -111,6 +118,9 @@ public class WorkflowService implements IWorkflowService {
         useCase.setAuthor(authorId);
         useCase.setIcon(petriNet.getIcon());
         useCase = saveCase(useCase);
+
+        publisher.publishEvent(new CreateCaseEvent(useCase));
+
         taskService.createTasks(useCase);
         return setImmediateDataFields(useCase);
     }
@@ -126,8 +136,19 @@ public class WorkflowService implements IWorkflowService {
 
     @Override
     public void deleteCase(String caseId) {
-        repository.delete(caseId);
+        Case useCase = repository.findOne(caseId);
+        repository.delete(useCase);
         taskService.deleteTasksByCase(caseId);
+
+        publisher.publishEvent(new DeleteCaseEvent(useCase));
+    }
+
+    @Override
+    public void updateMarking(Case useCase) {
+        PetriNet net = useCase.getPetriNet();
+        useCase.setActivePlaces(net.getActivePlaces());
+
+        publisher.publishEvent(new UpdateMarkingEvent(useCase));
     }
 
     public List<Field> getData(String caseId) {

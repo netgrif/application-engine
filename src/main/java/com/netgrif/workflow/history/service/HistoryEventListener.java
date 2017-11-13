@@ -1,6 +1,6 @@
 package com.netgrif.workflow.history.service;
 
-import com.netgrif.workflow.event.events.UserFinishTaskEvent;
+import com.netgrif.workflow.event.events.task.UserFinishTaskEvent;
 import com.netgrif.workflow.history.domain.EventLogRepository;
 import com.netgrif.workflow.history.domain.UserEventLog;
 import org.springframework.beans.factory.annotation.Autowired;
