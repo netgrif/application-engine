@@ -1,5 +1,6 @@
-package com.netgrif.workflow.event.events;
+package com.netgrif.workflow.event.events.task;
 
+import com.netgrif.workflow.event.events.Event;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.Task;
 import lombok.Getter;
@@ -7,14 +8,14 @@ import lombok.Getter;
 public abstract class TaskEvent extends Event {
 
     @Getter
-    protected final Task task;
-
-    @Getter
     protected final Case useCase;
 
-    public TaskEvent(Object user, Task task, Case useCase) {
-        super(user);
-        this.task = task;
+    public TaskEvent(Task task, Case useCase) {
+        super(task);
         this.useCase = useCase;
+    }
+
+    public Task getTask() {
+        return (Task) source;
     }
 }

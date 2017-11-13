@@ -18,7 +18,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.xml.sax.SAXException;
-import sun.rmi.runtime.Log;
 
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
@@ -50,7 +49,8 @@ public class PetriNetController {
     @ResponseBody
     MessageResource importPetriNet(
             @RequestParam(value = "file", required = true) MultipartFile multipartFile,
-            @RequestParam(value = "meta", required = false) String fileMetaJSON) {
+            @RequestParam(value = "meta", required = false) String fileMetaJSON,
+            Authentication auth) {
         try {
             File file = new File(multipartFile.getOriginalFilename());
             file.createNewFile();
@@ -61,7 +61,7 @@ public class PetriNetController {
             ObjectMapper mapper = new ObjectMapper();
             UploadedFileMeta fileMeta = mapper.readValue(fileMetaJSON, UploadedFileMeta.class);
 
-            service.importPetriNet(file, fileMeta.name, fileMeta.initials);
+            service.importPetriNet(file, fileMeta.name, fileMeta.initials, (LoggedUser) auth.getPrincipal());
             return MessageResource.successMessage("Petri net imported successfully");
         } catch (SAXException e) {
             e.printStackTrace();
@@ -89,10 +89,11 @@ public class PetriNetController {
     }
 
     @RequestMapping(value = "/ref", method = POST)
-    public @ResponseBody PetriNetReference getReference(Authentication auth, @RequestBody PetriNetCriteria criteria){
-        if(criteria.title != null)
-            return service.getReferenceByTitle((LoggedUser) auth.getPrincipal(),criteria.title);
-        return new PetriNetReference(null,null);
+    public @ResponseBody
+    PetriNetReference getReference(Authentication auth, @RequestBody PetriNetCriteria criteria) {
+        if (criteria.title != null)
+            return service.getReferenceByTitle((LoggedUser) auth.getPrincipal(), criteria.title);
+        return new PetriNetReference(null, null);
     }
 
     @RequestMapping(value = "/transition/refs", method = POST)
