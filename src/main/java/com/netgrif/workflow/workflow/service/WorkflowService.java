@@ -3,6 +3,7 @@ package com.netgrif.workflow.workflow.service;
 import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.event.events.usecase.CreateCaseEvent;
 import com.netgrif.workflow.event.events.usecase.DeleteCaseEvent;
+import com.netgrif.workflow.event.events.usecase.UpdateMarkingEvent;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.dataset.CaseField;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
@@ -140,6 +141,14 @@ public class WorkflowService implements IWorkflowService {
         taskService.deleteTasksByCase(caseId);
 
         publisher.publishEvent(new DeleteCaseEvent(useCase));
+    }
+
+    @Override
+    public void updateMarking(Case useCase) {
+        PetriNet net = useCase.getPetriNet();
+        useCase.setActivePlaces(net.getActivePlaces());
+
+        publisher.publishEvent(new UpdateMarkingEvent(useCase));
     }
 
     public List<Field> getData(String caseId) {

@@ -137,10 +137,6 @@ public class Case {
         return null;
     }
 
-    public void updateActivePlaces() {
-        activePlaces = petriNet.getActivePlaces();
-    }
-
     public void addImmediateDataField(String fieldId) {
         this.immediateDataFields.add(fieldId);
     }
