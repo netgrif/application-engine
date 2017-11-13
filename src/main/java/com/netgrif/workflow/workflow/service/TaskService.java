@@ -6,7 +6,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.auth.domain.repositories.UserRepository;
-import com.netgrif.workflow.event.events.*;
+import com.netgrif.workflow.event.events.task.*;
+import com.netgrif.workflow.event.events.usecase.SaveCaseDataEvent;
 import com.netgrif.workflow.petrinet.domain.*;
 import com.netgrif.workflow.petrinet.domain.dataset.*;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedField;
@@ -81,6 +82,9 @@ public class TaskService implements ITaskService {
 
     @Autowired
     private FieldActionsRunner actionsRunner;
+
+    @Autowired
+    private WorkflowService workflowService;
 
     //    @Override
 //    public Page<Task> getAll(LoggedUser loggedUser, Pageable pageable) {
@@ -299,15 +303,15 @@ public class TaskService implements ITaskService {
         return field;
     }
 
-    public Page<Task> setImmediateFields(Page<Task> tasks){
+    public Page<Task> setImmediateFields(Page<Task> tasks) {
         tasks.getContent().forEach(task -> task.setImmediateData(getImmediateFields(task)));
         return tasks;
     }
 
-    public List<Field> getImmediateFields(Task task){
+    public List<Field> getImmediateFields(Task task) {
         Case useCase = caseRepository.findOne(task.getCaseId());
 
-        List<Field> fields = task.getImmediateDataFields().stream().map(id -> buildField(useCase,id,false)).collect(Collectors.toList());
+        List<Field> fields = task.getImmediateDataFields().stream().map(id -> buildField(useCase, id, false)).collect(Collectors.toList());
         LongStream.range(0L, fields.size()).forEach(index -> fields.get((int) index).setOrder(index));
 
         return fields;
@@ -369,7 +373,7 @@ public class TaskService implements ITaskService {
         });
 
         caseRepository.save(useCase);
-
+        publisher.publishEvent(new SaveCaseDataEvent(useCase, changedFields.values()));
 
         ChangedFieldContainer container = new ChangedFieldContainer();
         container.putAll(changedFields);
@@ -433,7 +437,7 @@ public class TaskService implements ITaskService {
                 value = set;
                 break;
             case "user":
-                if(node.get("value") == null) {
+                if (node.get("value") == null) {
                     value = null;
                     break;
                 }
@@ -445,14 +449,14 @@ public class TaskService implements ITaskService {
                 value = user;
                 break;
             case "number":
-                if(node.get("value") == null) {
+                if (node.get("value") == null) {
                     value = 0.0;
                     break;
                 }
                 value = node.get("value").asDouble();
                 break;
             default:
-                if(node.get("value") == null) {
+                if (node.get("value") == null) {
                     value = "null";
                     break;
                 }
@@ -489,7 +493,7 @@ public class TaskService implements ITaskService {
                     }
                     arc.rollbackExecution();
                 });
-        useCase.updateActivePlaces();
+        workflowService.updateMarking(useCase);
 
         task.setUserId(null);
         task = taskRepository.save(task);
@@ -664,7 +668,7 @@ public class TaskService implements ITaskService {
             arc.execute();
         });
 
-        useCase.updateActivePlaces();
+        workflowService.updateMarking(useCase);
     }
 
     private Task createFromTransition(Transition transition, Case useCase) {
@@ -699,8 +703,11 @@ public class TaskService implements ITaskService {
         if (transaction != null) {
             task.setTransactionId(transaction.getStringId());
         }
+        Task savedTask = taskRepository.save(task);
 
-        return taskRepository.save(task);
+        publisher.publishEvent(new CreateTaskEvent(savedTask, useCase));
+
+        return savedTask;
     }
 
     private Page<Task> loadUsers(Page<Task> tasks) {
