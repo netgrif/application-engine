@@ -22,6 +22,8 @@ public interface IWorkflowService {
 
     void deleteCase(String caseId);
 
+    void updateMarking(Case useCase);
+
     List<Field> getData(String caseId);
 
     Page<Case> search(Map<String, Object> request, Pageable pageable, LoggedUser user);

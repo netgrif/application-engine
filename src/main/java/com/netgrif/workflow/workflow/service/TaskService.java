@@ -83,6 +83,9 @@ public class TaskService implements ITaskService {
     @Autowired
     private FieldActionsRunner actionsRunner;
 
+    @Autowired
+    private WorkflowService workflowService;
+
     //    @Override
 //    public Page<Task> getAll(LoggedUser loggedUser, Pageable pageable) {
 //        User user = userRepository.findOne(loggedUser.getId());
@@ -490,7 +493,7 @@ public class TaskService implements ITaskService {
                     }
                     arc.rollbackExecution();
                 });
-        useCase.updateActivePlaces();
+        workflowService.updateMarking(useCase);
 
         task.setUserId(null);
         task = taskRepository.save(task);
@@ -665,7 +668,7 @@ public class TaskService implements ITaskService {
             arc.execute();
         });
 
-        useCase.updateActivePlaces();
+        workflowService.updateMarking(useCase);
     }
 
     private Task createFromTransition(Transition transition, Case useCase) {
