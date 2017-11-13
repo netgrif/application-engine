@@ -6,9 +6,12 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document
 public class ProcessRole {
+
     @Id
     private ObjectId _id;
+
     private String name;
+
     private String description;
 
     public ProcessRole() {

@@ -1,22 +1,18 @@
 package com.netgrif.workflow.auth.service;
 
 import com.netgrif.workflow.auth.domain.LoggedUser;
-import com.netgrif.workflow.auth.domain.Authority;
 import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.auth.domain.repositories.UserRepository;
+import com.netgrif.workflow.event.events.user.UserLoginEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.HashSet;
-import java.util.Set;
 
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
@@ -25,6 +21,9 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private ApplicationEventPublisher publisher;
 
     @Override
     @Transactional(readOnly = true)
@@ -38,6 +37,8 @@ public class UserDetailsServiceImpl implements UserDetailsService {
             loggedUser.parseProcessRoles(user.getUserProcessRoles());
         if(!user.getOrganizations().isEmpty())
             loggedUser.parseOrganizations(user.getOrganizations());
+
+        publisher.publishEvent(new UserLoginEvent(loggedUser));
 
         return loggedUser;
     }
