@@ -23,6 +23,9 @@ public class TaskEventListener {
 
     @EventListener
     public void onTimeFinishTaskEvent(TimeFinishTaskEvent event) {
+        TaskEventLog log = new TaskEventLog(event.getTask(), event.getUseCase());
+        log.setMessage(event.getMessage());
+        repository.save(log);
     }
 
     @EventListener
