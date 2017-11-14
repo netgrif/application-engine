@@ -29,7 +29,9 @@ public class CaseEventListener {
 
     @EventListener
     public void onSaveCaseDataEvent(SaveCaseDataEvent event) {
-        // TODO: 13.11.2017
+        CaseEventLog log = new CaseEventLog(event.getCase());
+        log.setMessage(event.getMessage());
+        repository.save(log);
     }
 
     @EventListener
