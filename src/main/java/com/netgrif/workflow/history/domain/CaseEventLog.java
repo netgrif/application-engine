@@ -2,26 +2,17 @@ package com.netgrif.workflow.history.domain;
 
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.DataField;
-import com.netgrif.workflow.workflow.domain.Task;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.util.Map;
 
 @Document
-public class UserTaskEventLog extends EventLog implements IUserEventLog, ITaskEventLog, ICaseEventLog {
-
-    private String email;
-
-    private String taskId;
-
-    private String taskTitle;
+public class CaseEventLog extends EventLog implements ICaseEventLog {
 
     private String caseId;
 
     private String caseTitle;
-
-    private String transitionId;
 
     @Field("activePlaces")
     private Map<String, Integer> activePlaces;
@@ -29,68 +20,31 @@ public class UserTaskEventLog extends EventLog implements IUserEventLog, ITaskEv
     @Field("dataSetValues")
     private Map<String, DataField> dataSetValues;
 
-    public UserTaskEventLog(Task task, Case useCase) {
-        this.taskId = task.getStringId();
-        this.taskTitle = task.getTitle();
-        this.transitionId = task.getTransitionId();
-
+    public CaseEventLog(Case useCase) {
         this.caseId = useCase.getStringId();
         this.caseTitle = useCase.getTitle();
         this.activePlaces = useCase.getActivePlaces();
         this.dataSetValues = useCase.getDataSet();
     }
 
-    public UserTaskEventLog() {
-    }
-
-    @Override
-    public void setTaskId(String taskId) {
-
-    }
-
-    @Override
-    public void setTaskTitle(String taskTitle) {
-
-    }
-
-    @Override
-    public void setTransitionId(String transitionId) {
-
-    }
-
     @Override
     public void setCaseId(String caseId) {
-
+        this.caseId = caseId;
     }
 
     @Override
     public void setCaseTitle(String caseTitle) {
-
+        this.caseTitle = caseTitle;
     }
 
     @Override
     public void setActivePlaces(Map<String, Integer> places) {
-
+        this.activePlaces = places;
     }
 
     @Override
     public void setDataSetValues(Map<String, DataField> values) {
-
-    }
-
-    @Override
-    public String getTaskId() {
-        return taskId;
-    }
-
-    @Override
-    public String getTaskTitle() {
-        return taskTitle;
-    }
-
-    @Override
-    public String getTransitionId() {
-        return transitionId;
+        this.dataSetValues = values;
     }
 
     @Override
@@ -111,15 +65,5 @@ public class UserTaskEventLog extends EventLog implements IUserEventLog, ITaskEv
     @Override
     public Map<String, DataField> getDataSetValues() {
         return dataSetValues;
-    }
-
-    @Override
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    @Override
-    public String getEmail() {
-        return email;
     }
 }
