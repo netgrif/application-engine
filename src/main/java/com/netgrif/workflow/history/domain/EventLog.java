@@ -9,7 +9,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import java.time.LocalDateTime;
 
 @Document
-public class EventLog {
+public abstract class EventLog {
 
     @Id
     @Getter

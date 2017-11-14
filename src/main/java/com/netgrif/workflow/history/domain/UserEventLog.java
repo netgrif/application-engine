@@ -1,22 +1,23 @@
 package com.netgrif.workflow.history.domain;
 
-import lombok.Getter;
-import lombok.Setter;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document
-public class UserEventLog extends EventLog {
+public class UserEventLog extends EventLog implements IUserEventLog {
 
-    @Getter @Setter
-    protected String email;
+    private String email;
 
-    public UserEventLog() {
-        super();
+    public UserEventLog(String email) {
+        this.email = email;
     }
 
-    public UserEventLog(String email, String message) {
-        this();
+    @Override
+    public void setEmail(String email) {
         this.email = email;
-        this.message = message;
+    }
+
+    @Override
+    public String getEmail() {
+        return email;
     }
 }
