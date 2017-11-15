@@ -18,7 +18,7 @@ class InsurancePortalImporter {
     private ImportHelper importHelper
 
     void run(String ...strings) {
-        def net = importHelper.createNet("insurance_portal_demo.xml","Insurance Portal Demo", "IPD")
+        def net = importHelper.createNet("insurance_portal_demo.xml","Insurance Demo", "IPD")
 
         def org = importHelper.createOrganization("Insurance Company")
         def auths = importHelper.createAuthorities(["user":Authority.user, "admin":Authority.admin])
