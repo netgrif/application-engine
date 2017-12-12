@@ -44,4 +44,8 @@ public class ImportTransition {
             throw new InvalidXmlException("DataGroup of Transition[id:" + id + "] element has no dataRefs", e);
         }
     }
+
+    public boolean hasNoRolesOrTriggers() {
+        return (roleRef == null || roleRef.length == 0) && (trigger == null || trigger.length == 0);
+    }
 }
