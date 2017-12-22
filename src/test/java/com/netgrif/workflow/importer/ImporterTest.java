@@ -86,6 +86,11 @@ public class ImporterTest {
         assert data != null && data.size() > 0;
     }
 
+    @Test
+    public void readArcImportTest() {
+        importer.importPetriNet(new File("src/test/resources/read_test.xml"), "R", "R");
+    }
+
     private void assertNetProperlyImported() {
         assert repository.count() == 1;
         PetriNet net = repository.findAll().get(0);
