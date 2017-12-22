@@ -52,6 +52,9 @@ public class Importer {
     @Autowired
     private ProcessRoleRepository roleRepository;
 
+    @Autowired
+    private ArcFactory arcFactory;
+
     public Importer() {
         initialize();
     }
@@ -127,7 +130,7 @@ public class Importer {
 
     @Transactional
     protected void createArc(ImportArc importArc) {
-        Arc arc = ArcFactory.getArc(importArc.getType());
+        Arc arc = arcFactory.getArc(importArc.getType());
         arc.setMultiplicity(importArc.getMultiplicity());
         arc.setSource(getNode(importArc.getSourceId()));
         arc.setDestination(getNode(importArc.getDestinationId()));
