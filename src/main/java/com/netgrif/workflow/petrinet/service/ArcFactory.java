@@ -2,10 +2,14 @@ package com.netgrif.workflow.petrinet.service;
 
 import com.netgrif.workflow.petrinet.domain.Arc;
 import com.netgrif.workflow.petrinet.domain.InhibitorArc;
+import com.netgrif.workflow.petrinet.domain.ReadArc;
 import com.netgrif.workflow.petrinet.domain.ResetArc;
+import org.springframework.stereotype.Component;
 
+@Component
 public final class ArcFactory {
-    private static Arc getArc(Type type) throws IllegalArgumentException {
+
+    private Arc getArc(Type type) throws IllegalArgumentException {
         switch (type) {
             case REGULAR:
                 return new Arc();
@@ -13,19 +17,22 @@ public final class ArcFactory {
                 return new ResetArc();
             case INHIBITOR:
                 return new InhibitorArc();
+            case READ:
+                return new ReadArc();
             default:
                 throw new IllegalArgumentException(type+" is not a valid Arc type");
         }
     }
 
-    public static Arc getArc(String type) throws IllegalArgumentException {
+    public Arc getArc(String type) throws IllegalArgumentException {
         return getArc(Type.fromString(type));
     }
 
     public enum Type {
         REGULAR("regular"),
         INHIBITOR("inhibitor"),
-        RESET("reset");
+        RESET("reset"),
+        READ("read");
 
         String name;
 
