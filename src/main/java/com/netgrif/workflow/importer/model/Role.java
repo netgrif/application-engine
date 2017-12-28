@@ -8,7 +8,10 @@
 
 package com.netgrif.workflow.importer.model;
 
-import javax.xml.bind.annotation.*;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
 
 
 /**
@@ -22,7 +25,10 @@ import javax.xml.bind.annotation.*;
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
  *       &lt;sequence&gt;
  *         &lt;element ref="{}id"/&gt;
- *         &lt;element ref="{}logic"/&gt;
+ *         &lt;choice&gt;
+ *           &lt;element ref="{}title"/&gt;
+ *           &lt;element ref="{}name"/&gt;
+ *         &lt;/choice&gt;
  *       &lt;/sequence&gt;
  *     &lt;/restriction&gt;
  *   &lt;/complexContent&gt;
@@ -34,14 +40,15 @@ import javax.xml.bind.annotation.*;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
     "id",
-    "logic"
+    "title",
+    "name"
 })
-@XmlRootElement(name = "dataRef")
-public class DataRef {
+@XmlRootElement(name = "role")
+public class Role {
 
     protected long id;
-    @XmlElement(required = true)
-    protected Logic logic;
+    protected String title;
+    protected String name;
 
     /**
      * Gets the value of the id property.
@@ -60,27 +67,51 @@ public class DataRef {
     }
 
     /**
-     * Gets the value of the logic property.
+     * Gets the value of the title property.
      * 
      * @return
      *     possible object is
-     *     {@link Logic }
+     *     {@link String }
      *     
      */
-    public Logic getLogic() {
-        return logic;
+    public String getTitle() {
+        return title;
     }
 
     /**
-     * Sets the value of the logic property.
+     * Sets the value of the title property.
      * 
      * @param value
      *     allowed object is
-     *     {@link Logic }
+     *     {@link String }
      *     
      */
-    public void setLogic(Logic value) {
-        this.logic = value;
+    public void setTitle(String value) {
+        this.title = value;
+    }
+
+    /**
+     * Gets the value of the name property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * Sets the value of the name property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setName(String value) {
+        this.name = value;
     }
 
 }

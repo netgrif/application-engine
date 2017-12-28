@@ -25,6 +25,11 @@ class CaseField extends Field<String> {
     }
 
     @Override
+    FieldType getType() {
+        return FieldType.CASEREF
+    }
+
+    @Override
     void setValue(String value) {
         super.setValue(value)
     }

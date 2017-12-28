@@ -22,7 +22,7 @@ import javax.xml.bind.annotation.*;
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
  *       &lt;sequence&gt;
  *         &lt;element ref="{}id"/&gt;
- *         &lt;element ref="{}logic"/&gt;
+ *         &lt;element ref="{}title"/&gt;
  *       &lt;/sequence&gt;
  *     &lt;/restriction&gt;
  *   &lt;/complexContent&gt;
@@ -34,14 +34,14 @@ import javax.xml.bind.annotation.*;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
     "id",
-    "logic"
+    "title"
 })
-@XmlRootElement(name = "dataRef")
-public class DataRef {
+@XmlRootElement(name = "transaction")
+public class Transaction {
 
     protected long id;
     @XmlElement(required = true)
-    protected Logic logic;
+    protected String title;
 
     /**
      * Gets the value of the id property.
@@ -60,27 +60,27 @@ public class DataRef {
     }
 
     /**
-     * Gets the value of the logic property.
+     * Gets the value of the title property.
      * 
      * @return
      *     possible object is
-     *     {@link Logic }
+     *     {@link String }
      *     
      */
-    public Logic getLogic() {
-        return logic;
+    public String getTitle() {
+        return title;
     }
 
     /**
-     * Sets the value of the logic property.
+     * Sets the value of the title property.
      * 
      * @param value
      *     allowed object is
-     *     {@link Logic }
+     *     {@link String }
      *     
      */
-    public void setLogic(Logic value) {
-        this.logic = value;
+    public void setTitle(String value) {
+        this.title = value;
     }
 
 }

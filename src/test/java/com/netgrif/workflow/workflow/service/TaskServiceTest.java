@@ -76,7 +76,7 @@ public class TaskServiceTest {
 
     @Test
     public void resetArcTest() throws TransitionNotExecutableException {
-        PetriNet net = importer.importPetriNet(new File("src/test/resources/reset_inhibitor_test.xml"), "reset", "rst");
+        PetriNet net = importer.importPetriNet(new File("src/test/resources/reset_inhibitor_test.xml"), "reset", "rst").get();
         Case useCase = workflowService.createCase(net.getStringId(), "Reset test", "color", 1L);
         User user = new User();
         user.setName("name");
