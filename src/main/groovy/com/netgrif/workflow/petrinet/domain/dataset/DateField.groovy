@@ -20,6 +20,11 @@ class DateField extends ValidableField<LocalDate> {
     }
 
     @Override
+    FieldType getType() {
+        return FieldType.DATE
+    }
+
+    @Override
     void setDefaultValue(String value) {
         super.superSetDefaultValue(LocalDate.parse(value))
     }

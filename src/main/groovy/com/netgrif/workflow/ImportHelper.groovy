@@ -83,7 +83,7 @@ class ImportHelper {
         return authorityRepository.save(new Authority(name))
     }
 
-    PetriNet createNet(String fileName, String name, String initials) {
+    Optional<PetriNet> createNet(String fileName, String name, String initials) {
         return importer.importPetriNet(new File("src/main/resources/petriNets/$fileName"), name, initials)
     }
 

@@ -1,7 +1,12 @@
 package com.netgrif.workflow.importer;
 
 import com.netgrif.workflow.importer.model.*;
+import com.netgrif.workflow.petrinet.domain.Arc;
+import com.netgrif.workflow.petrinet.domain.DataGroup;
 import com.netgrif.workflow.petrinet.domain.*;
+import com.netgrif.workflow.petrinet.domain.Place;
+import com.netgrif.workflow.petrinet.domain.Transaction;
+import com.netgrif.workflow.petrinet.domain.Transition;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.FieldBehavior;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action;
@@ -24,7 +29,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.*;
-import java.util.stream.Stream;
 
 @Component
 public class Importer {
@@ -43,8 +47,8 @@ public class Importer {
     private Map<Long, Place> places;
     private Map<Long, Transaction> transactions;
 
-    private ImportFieldFactory fieldFactory;
-    private ImportTriggerFactory triggerFactory;
+    @Autowired
+    private FieldFactory fieldFactory;
 
     @Autowired
     private PetriNetRepository repository;
@@ -52,12 +56,21 @@ public class Importer {
     @Autowired
     private ProcessRoleRepository roleRepository;
 
+    @Autowired
+    private ArcFactory arcFactory;
+
+    @Autowired
+    private RoleFactory roleFactory;
+
+    @Autowired
+    private TriggerFactory triggerFactory;
+
     public Importer() {
         initialize();
     }
 
     @Transactional
-    public PetriNet importPetriNet(File xml, String title, String initials) {
+    public Optional<PetriNet> importPetriNet(File xml, String title, String initials) {
         try {
             initialize();
             unmarshallXml(xml);
@@ -74,8 +87,6 @@ public class Importer {
         this.transitions = new HashMap<>();
         this.places = new HashMap<>();
         this.fields = new HashMap<>();
-        this.fieldFactory = new ImportFieldFactory(this);
-        this.triggerFactory = new ImportTriggerFactory(this);
         this.transactions = new HashMap<>();
     }
 
@@ -89,7 +100,7 @@ public class Importer {
     }
 
     @Transactional
-    protected PetriNet createPetriNet(String title, String initials) {
+    protected Optional<PetriNet> createPetriNet(String title, String initials) {
         net = new PetriNet();
         net.setImportXmlPath(importedXmlPath.toString());
         net.setImportId(document.getId());
@@ -97,17 +108,17 @@ public class Importer {
         net.setTitle(title);
         net.setInitials(initials);
 
-        Arrays.stream(document.getImportRoles()).forEach(this::createRole);
-        Arrays.stream(document.getImportData()).forEach(this::createDataSet);
-        Arrays.stream(document.getImportTransactions()).forEach(this::createTransaction);
-        Arrays.stream(document.getImportPlaces()).forEach(this::createPlace);
-        Arrays.stream(document.getImportTransitions()).forEach(this::createTransition);
-        Arrays.stream(document.getImportArc()).forEach(this::createArc);
+        document.getRole().forEach(this::createRole);
+        document.getData().forEach(this::createDataSet);
+        document.getTransaction().forEach(this::createTransaction);
+        document.getPlace().forEach(this::createPlace);
+        document.getTransition().forEach(this::createTransition);
+        document.getArc().forEach(this::createArc);
 
         //Resolve actions after everything has object id
-        Arrays.stream(document.getImportTransitions()).forEach(trans -> {
+        document.getTransition().forEach(trans -> {
             if (trans.getDataRef() != null) {
-                Arrays.stream(trans.getDataRef()).forEach(ref -> {
+                trans.getDataRef().forEach(ref -> {
                     if (ref.getLogic().getAction() != null) {
                         String fieldId = fields.get(ref.getId()).getStringId();
                         transitions.get(trans.getId()).addActions(fieldId, buildActions(ref.getLogic().getAction(),
@@ -117,17 +128,17 @@ public class Importer {
                 });
             }
         });
-        Arrays.stream(document.getImportData()).forEach(data -> {
+        document.getData().forEach(data -> {
             if (data.getAction() != null) {
                 fields.get(data.getId()).setActions(buildActions(data.getAction(), fields.get(data.getId()).getStringId(), null));
             }
         });
-        return repository.save(net);
+        return Optional.of(repository.save(net));
     }
 
     @Transactional
-    protected void createArc(ImportArc importArc) {
-        Arc arc = ArcFactory.getArc(importArc.getType());
+    protected void createArc(com.netgrif.workflow.importer.model.Arc importArc) {
+        Arc arc = arcFactory.getArc(importArc);
         arc.setMultiplicity(importArc.getMultiplicity());
         arc.setSource(getNode(importArc.getSourceId()));
         arc.setDestination(getNode(importArc.getDestinationId()));
@@ -136,15 +147,15 @@ public class Importer {
     }
 
     @Transactional
-    protected void createDataSet(ImportData importData) {
-        Field field = fieldFactory.getField(importData);
+    protected void createDataSet(Data importData) {
+        Field field = fieldFactory.getField(importData, this);
 
         net.addDataSetField(field);
         fields.put(importData.getId(), field);
     }
 
     @Transactional
-    protected void createTransition(ImportTransition importTransition) {
+    protected void createTransition(com.netgrif.workflow.importer.model.Transition importTransition) {
         Transition transition = new Transition();
         transition.setTitle(importTransition.getLabel());
         transition.setPosition(importTransition.getX(), importTransition.getY());
@@ -152,17 +163,17 @@ public class Importer {
         transition.setIcon(importTransition.getIcon());
 
         if (importTransition.getRoleRef() != null) {
-            Arrays.stream(importTransition.getRoleRef()).forEach(roleRef ->
+            importTransition.getRoleRef().forEach(roleRef ->
                     addRoleLogic(transition, roleRef)
             );
         }
         if (importTransition.getDataRef() != null) {
-            Arrays.stream(importTransition.getDataRef()).forEach(dataRef ->
+            importTransition.getDataRef().forEach(dataRef ->
                     addDataLogic(transition, dataRef)
             );
         }
         if (importTransition.getTrigger() != null) {
-            Arrays.stream(importTransition.getTrigger()).forEach(trigger ->
+            importTransition.getTrigger().forEach(trigger ->
                     addTrigger(transition, trigger)
             );
         }
@@ -178,10 +189,11 @@ public class Importer {
     }
 
     @Transactional
-    protected void addDataGroups(Transition transition, ImportDataGroup[] dataGroups) {
-        Stream.of(dataGroups).forEach(importDataGroup -> {
-            DataGroup dataGroup = new DataGroup(importDataGroup.getTitle(), importDataGroup.getAlignment(), importDataGroup.getStretch());
-            Stream.of(importDataGroup.getDataRef()).forEach(dataRef -> dataGroup.addData(fields.get(dataRef.getId()).getStringId()));
+    protected void addDataGroups(Transition transition, List<com.netgrif.workflow.importer.model.DataGroup> dataGroups) {
+        dataGroups.forEach(importDataGroup -> {
+            String alignment = importDataGroup.getAlignment() != null ? importDataGroup.getAlignment().value() : "";
+            DataGroup dataGroup = new DataGroup(importDataGroup.getTitle(), alignment, importDataGroup.isStretch());
+            importDataGroup.getDataRef().forEach(dataRef -> dataGroup.addData(fields.get(dataRef.getId()).getStringId()));
             transition.addDataGroup(dataGroup);
         });
     }
@@ -196,18 +208,18 @@ public class Importer {
 
     @Transactional
     protected void addRoleLogic(Transition transition, RoleRef roleRef) {
-        RoleLogic logic = roleRef.getLogic();
+        Logic logic = roleRef.getLogic();
         String roleId = roles.get(roleRef.getId()).getStringId();
 
         if (logic == null || roleId == null)
             return;
 
-        transition.addRole(roleId, ImportRoleFactory.getPermissions(logic));
+        transition.addRole(roleId, roleFactory.getPermissions(logic));
     }
 
     @Transactional
     protected void addDataLogic(Transition transition, DataRef dataRef) {
-        DataLogic logic = dataRef.getLogic();
+        Logic logic = dataRef.getLogic();
         try {
             String fieldId = fields.get(dataRef.getId()).getStringId();
             if (logic == null || fieldId == null)
@@ -215,7 +227,7 @@ public class Importer {
 
             Set<FieldBehavior> behavior = new HashSet<>();
             if (logic.getBehavior() != null)
-                Arrays.stream(logic.getBehavior()).forEach(b -> behavior.add(FieldBehavior.fromString(b)));
+                logic.getBehavior().forEach(b -> behavior.add(FieldBehavior.fromString(b)));
 
             transition.addDataSet(fieldId, behavior, null);
         } catch (NullPointerException e) {
@@ -224,19 +236,19 @@ public class Importer {
     }
 
     @Transactional
-    protected LinkedHashSet<Action> buildActions(ImportAction[] imported, String fieldId, String transitionId) {
+    protected LinkedHashSet<Action> buildActions(List<ActionType> imported, String fieldId, String transitionId) {
         final LinkedHashSet<Action> actions = new LinkedHashSet<>();
-        Arrays.stream(imported).forEach(action -> {
-            if (action.getTrigger() == null)
-                throw new IllegalArgumentException("Action [" + action.getDefinition() + "] doesn't have trigger");
+        imported.forEach(action -> {
+            if (action.getTrigger()== null)
+                throw new IllegalArgumentException("Action [" + action.getValue() + "] doesn't have trigger");
 
-            String definition = action.getDefinition();
+            String definition = action.getValue();
             try {
                 definition = parseObjectIds(definition, fieldId, FIELD_KEYWORD);
                 definition = parseObjectIds(definition, transitionId, TRANSITION_KEYWORD);
             } catch (NumberFormatException e) {
 //                todo: message
-                throw new IllegalArgumentException("Error parsing ids of action [" + action.getDefinition() + "]", e);
+                throw new IllegalArgumentException("Error parsing ids of action [" + action.getValue() + "]", e);
             }
             actions.add(new Action(definition, action.getTrigger()));
         });
@@ -281,17 +293,20 @@ public class Importer {
     }
 
     @Transactional
-    protected void addTrigger(Transition transition, ImportTrigger importTrigger) {
+    protected void addTrigger(Transition transition, com.netgrif.workflow.importer.model.Trigger importTrigger) {
         Trigger trigger = triggerFactory.buildTrigger(importTrigger);
 
         transition.addTrigger(trigger);
     }
 
     @Transactional
-    protected void createPlace(ImportPlace importPlace) {
+    protected void createPlace(com.netgrif.workflow.importer.model.Place importPlace) {
         Place place = new Place();
         place.setImportId(importPlace.getId());
-        place.setIsStatic(importPlace.getIsStatic());
+        if (importPlace.isStatic() == null)
+            place.setIsStatic(importPlace.isIsStatic());
+        else
+            place.setIsStatic(importPlace.isStatic());
         place.setTokens(importPlace.getTokens());
         place.setPosition(importPlace.getX(), importPlace.getY());
         place.setTitle(importPlace.getLabel());
@@ -301,9 +316,12 @@ public class Importer {
     }
 
     @Transactional
-    protected void createRole(ImportRole importRole) {
+    protected void createRole(Role importRole) {
         ProcessRole role = new ProcessRole();
-        role.setName(importRole.getName());
+        if (importRole.getName() == null)
+            role.setName(importRole.getTitle());
+        else
+            role.setName(importRole.getName());
         role = roleRepository.save(role);
 
         net.addRole(role);
@@ -311,7 +329,7 @@ public class Importer {
     }
 
     @Transactional
-    protected void createTransaction(ImportTransaction importTransaction) {
+    protected void createTransaction(com.netgrif.workflow.importer.model.Transaction importTransaction) {
         Transaction transaction = new Transaction();
         transaction.setTitle(importTransaction.getTitle());
 

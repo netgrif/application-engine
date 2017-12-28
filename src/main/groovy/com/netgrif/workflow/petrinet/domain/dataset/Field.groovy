@@ -20,7 +20,6 @@ abstract class Field<T> {
     private String name
     private String description
     private String placeholder
-    protected FieldType type
 
     @Transient
     private ObjectNode behavior
@@ -31,7 +30,7 @@ abstract class Field<T> {
     private Long order
 
     @JsonIgnore
-    private Boolean immediate
+    private boolean immediate
 
     @JsonIgnore
     private LinkedHashSet<Action> actions
@@ -89,13 +88,7 @@ abstract class Field<T> {
         this.placeholder = placeholder
     }
 
-    FieldType getType() {
-        return type
-    }
-
-    void setType(FieldType type) {
-        this.type = type
-    }
+    abstract FieldType getType()
 
     ObjectNode getBehavior() {
         return behavior
@@ -122,11 +115,11 @@ abstract class Field<T> {
     }
 
     Boolean isImmediate() {
-        return immediate
+        return immediate != null && immediate
     }
 
     void setImmediate(Boolean immediate) {
-        this.immediate = immediate
+        this.immediate = immediate != null && immediate
     }
 
     LinkedHashSet<Action> getActions() {
