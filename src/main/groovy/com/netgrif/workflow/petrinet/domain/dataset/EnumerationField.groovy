@@ -9,8 +9,13 @@ class EnumerationField extends ChoiceField<String> {
         super()
     }
 
-    EnumerationField(String[] values) {
+    EnumerationField(List<String> values) {
         super(values)
+    }
+
+    @Override
+    FieldType getType() {
+        return FieldType.ENUMERATION
     }
 
     @Override

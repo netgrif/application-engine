@@ -11,6 +11,11 @@ class BooleanField extends FieldWithDefault<Boolean> {
     }
 
     @Override
+    FieldType getType() {
+        return FieldType.BOOLEAN
+    }
+
+    @Override
     void setDefaultValue(String defaultValue) {
         super.defaultValue = Boolean.parseBoolean(defaultValue)
     }

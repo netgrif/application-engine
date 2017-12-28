@@ -20,9 +20,11 @@ class InsurancePortalImporter {
     void run(String ...strings) {
         def net = importHelper.createNet("insurance_portal_demo.xml","Insurance Demo", "IPD")
 
+        assert net.isPresent()
+
         def org = importHelper.createOrganization("Insurance Company")
         def auths = importHelper.createAuthorities(["user":Authority.user, "admin":Authority.admin])
-        def processRoles = importHelper.createUserProcessRoles(["agent":"Agent", "company":"Company"], net)
+        def processRoles = importHelper.createUserProcessRoles(["agent":"Agent", "company":"Company"], net.get())
 
         importHelper.createUser(new User(name: "Agent", surname: "Smith", email: "agent@company.com", password: "password"),
                 [auths.get("user")] as Authority[], [org] as Organization[], [processRoles.get("agent")] as UserProcessRole[])
