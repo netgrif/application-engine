@@ -56,7 +56,7 @@ public class Transition {
     protected short x;
     protected short y;
     @XmlElement(required = true)
-    protected String label;
+    protected I18NStringType label;
     protected String icon;
     protected Integer priority;
     protected List<Trigger> trigger;
@@ -118,10 +118,10 @@ public class Transition {
      * 
      * @return
      *     possible object is
-     *     {@link String }
+     *     {@link I18NStringType }
      *     
      */
-    public String getLabel() {
+    public I18NStringType getLabel() {
         return label;
     }
 
@@ -130,10 +130,10 @@ public class Transition {
      * 
      * @param value
      *     allowed object is
-     *     {@link String }
+     *     {@link I18NStringType }
      *     
      */
-    public void setLabel(String value) {
+    public void setLabel(I18NStringType value) {
         this.label = value;
     }
 

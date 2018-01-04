@@ -95,6 +95,18 @@
             </xs:all>
         </xs:complexType>
     </xs:element>
+    <xs:element name="i18n">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="i18nString" maxOccurs="unbounded" minOccurs="0"/>
+            </xs:sequence>
+            <xs:attribute name="locale"/>
+        </xs:complexType>
+        <xs:unique name="i18nStringUniqueName">
+            <xs:selector xpath="./i18nString"/>
+            <xs:field xpath="@name"/>
+        </xs:unique>
+    </xs:element>
     <xs:element name="document">
         <xs:complexType>
             <xs:sequence>
@@ -105,6 +117,7 @@
                 <xs:element ref="role" maxOccurs="unbounded" minOccurs="0"/>
                 <xs:element ref="data" maxOccurs="unbounded" minOccurs="0"/>
                 <xs:element ref="mapping" maxOccurs="unbounded" minOccurs="0"/>
+                <xs:element ref="i18n" maxOccurs="unbounded" minOccurs="0"/>
                 <xs:element ref="transition" maxOccurs="unbounded"/>
                 <xs:element ref="place" maxOccurs="unbounded"/>
                 <xs:element ref="arc" maxOccurs="unbounded"/>
@@ -197,7 +210,7 @@
     <!-- ===== INNER ELEMENTS ===== -->
     <xs:element name="x" type="xs:short"/>
     <xs:element name="y" type="xs:short"/>
-    <xs:element name="label" type="xs:string"/>
+    <xs:element name="label" type="i18nStringType"/>
     <xs:element name="tokens" type="nonNegativeInteger"/>
     <xs:element name="isStatic" type="xs:boolean"/>
     <xs:element name="static" type="xs:boolean"/>
@@ -214,9 +227,9 @@
         </xs:complexType>
     </xs:element>
     <xs:element name="id" type="nonNegativeLong"/>
-    <xs:element name="title" type="xs:string"/>
-    <xs:element name="name" type="xs:string"/>
-    <xs:element name="values" type="xs:string"/>
+    <xs:element name="title" type="i18nStringType"/>
+    <xs:element name="name" type="i18nStringType"/>
+    <xs:element name="values" type="i18nStringType"/>
     <xs:element name="perform" type="xs:boolean"/>
     <xs:element name="delegate" type="xs:boolean"/>
     <xs:element name="logic">
@@ -274,10 +287,10 @@
             </xs:extension>
         </xs:simpleContent>
     </xs:complexType>
-    <xs:element name="placeholder" type="xs:string"/>
+    <xs:element name="placeholder" type="i18nStringType"/>
     <xs:element name="valid" type="validation"/>
     <xs:element name="init" type="xs:string"/>
-    <xs:element name="desc" type="xs:string"/>
+    <xs:element name="desc" type="i18nStringType"/>
     <xs:element name="priority" type="nonNegativeInteger"/>
     <xs:element name="trigger">
         <xs:complexType>
@@ -308,4 +321,12 @@
         </xs:simpleContent>
     </xs:complexType>
     <xs:element name="defaultRole" type="xs:boolean"/>
+    <xs:element name="i18nString" type="i18nStringType"/>
+    <xs:complexType name="i18nStringType">
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute name="name" type="xs:string"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
 </xs:schema>

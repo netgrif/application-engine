@@ -14,7 +14,7 @@
     <!-- ========== DATA ========== -->
     <data type="date">
         <id>1</id>
-        <title>On which date would you like your cover to start?</title>
+        <title name="date_of_cover_start">On which date would you like your cover to start?</title>
     </data>
     <data type="text">
         <id>2</id>
@@ -486,6 +486,10 @@
             </logic>
         </dataRef>
     </mapping>
+    <!-- ========== I18N ========== -->
+    <i18n locale="sk">
+        <i18nString name="date_of_cover_start">Dátum začiatku poistenia</i18nString>
+    </i18n>
     <!-- ========== TRANSITIONS ========== -->
     <transition>
         <id>2</id>

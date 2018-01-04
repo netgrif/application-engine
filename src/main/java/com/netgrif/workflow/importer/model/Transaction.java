@@ -34,7 +34,7 @@ public class Transaction {
 
     protected long id;
     @XmlElement(required = true)
-    protected String title;
+    protected I18NStringType title;
 
     /**
      * Gets the value of the id property.
@@ -57,10 +57,10 @@ public class Transaction {
      * 
      * @return
      *     possible object is
-     *     {@link String }
+     *     {@link I18NStringType }
      *     
      */
-    public String getTitle() {
+    public I18NStringType getTitle() {
         return title;
     }
 
@@ -69,10 +69,10 @@ public class Transaction {
      * 
      * @param value
      *     allowed object is
-     *     {@link String }
+     *     {@link I18NStringType }
      *     
      */
-    public void setTitle(String value) {
+    public void setTitle(I18NStringType value) {
         this.title = value;
     }
 

@@ -54,10 +54,10 @@ public class Data {
 
     protected long id;
     @XmlElement(required = true)
-    protected String title;
-    protected String placeholder;
-    protected String desc;
-    protected List<String> values;
+    protected I18NStringType title;
+    protected I18NStringType placeholder;
+    protected I18NStringType desc;
+    protected List<I18NStringType> values;
     protected String valid;
     protected String init;
     protected EncryptionType encryption;
@@ -89,10 +89,10 @@ public class Data {
      * 
      * @return
      *     possible object is
-     *     {@link String }
+     *     {@link I18NStringType }
      *     
      */
-    public String getTitle() {
+    public I18NStringType getTitle() {
         return title;
     }
 
@@ -101,10 +101,10 @@ public class Data {
      * 
      * @param value
      *     allowed object is
-     *     {@link String }
+     *     {@link I18NStringType }
      *     
      */
-    public void setTitle(String value) {
+    public void setTitle(I18NStringType value) {
         this.title = value;
     }
 
@@ -113,10 +113,10 @@ public class Data {
      * 
      * @return
      *     possible object is
-     *     {@link String }
+     *     {@link I18NStringType }
      *     
      */
-    public String getPlaceholder() {
+    public I18NStringType getPlaceholder() {
         return placeholder;
     }
 
@@ -125,10 +125,10 @@ public class Data {
      * 
      * @param value
      *     allowed object is
-     *     {@link String }
+     *     {@link I18NStringType }
      *     
      */
-    public void setPlaceholder(String value) {
+    public void setPlaceholder(I18NStringType value) {
         this.placeholder = value;
     }
 
@@ -137,10 +137,10 @@ public class Data {
      * 
      * @return
      *     possible object is
-     *     {@link String }
+     *     {@link I18NStringType }
      *     
      */
-    public String getDesc() {
+    public I18NStringType getDesc() {
         return desc;
     }
 
@@ -149,10 +149,10 @@ public class Data {
      * 
      * @param value
      *     allowed object is
-     *     {@link String }
+     *     {@link I18NStringType }
      *     
      */
-    public void setDesc(String value) {
+    public void setDesc(I18NStringType value) {
         this.desc = value;
     }
 
@@ -174,13 +174,13 @@ public class Data {
      * 
      * <p>
      * Objects of the following type(s) are allowed in the list
-     * {@link String }
+     * {@link I18NStringType }
      * 
      * 
      */
-    public List<String> getValues() {
+    public List<I18NStringType> getValues() {
         if (values == null) {
-            values = new ArrayList<String>();
+            values = new ArrayList<I18NStringType>();
         }
         return this.values;
     }
