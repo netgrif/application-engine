@@ -41,6 +41,7 @@ public class Importer {
     private Path importedXmlPath;
     private Document document;
     private PetriNet net;
+    private ProcessRole defaultRole;
     private Map<Long, ProcessRole> roles;
     private Map<Long, Field> fields;
     private Map<Long, Transition> transitions;
@@ -66,7 +67,6 @@ public class Importer {
     private TriggerFactory triggerFactory;
 
     public Importer() {
-        initialize();
     }
 
     @Transactional
@@ -88,6 +88,7 @@ public class Importer {
         this.places = new HashMap<>();
         this.fields = new HashMap<>();
         this.transactions = new HashMap<>();
+        this.defaultRole = roleRepository.findByName(ProcessRole.DEFAULT_ROLE);
     }
 
     @Transactional
@@ -184,8 +185,20 @@ public class Importer {
             addDataGroups(transition, importTransition.getDataGroup());
         }
 
+        if (importTransition.hasNoRolesOrTriggers()) {
+            addDefaultRole(transition);
+        }
+
         net.addTransition(transition);
         transitions.put(importTransition.getId(), transition);
+    }
+
+    @Transactional
+    protected void addDefaultRole(Transition transition) {
+        RoleLogic logic = new Logic();
+        logic.setDelegate(true);
+        logic.setPerform(true);
+        transition.addRole(defaultRole.getStringId(), ImportRoleFactory.getPermissions(logic));
     }
 
     @Transactional

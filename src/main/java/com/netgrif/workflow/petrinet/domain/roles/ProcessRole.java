@@ -7,6 +7,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document
 public class ProcessRole {
 
+    public static final String DEFAULT_ROLE = "default";
+
     @Id
     private ObjectId _id;
 
