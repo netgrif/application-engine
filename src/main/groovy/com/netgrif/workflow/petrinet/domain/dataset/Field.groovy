@@ -18,7 +18,9 @@ abstract class Field<T> {
     protected Long importId
 
     private String name
+    
     private String description
+    
     private String placeholder
 
     @Transient
@@ -34,6 +36,9 @@ abstract class Field<T> {
 
     @JsonIgnore
     private LinkedHashSet<Action> actions
+    
+    @JsonIgnore
+    private String encryption
 
     Field() {
         _id = new ObjectId()
@@ -140,6 +145,14 @@ abstract class Field<T> {
 
     void addAction(String action, String trigger) {
         this.addAction(new Action(action, trigger))
+    }
+
+    String getEncryption() {
+        return encryption
+    }
+
+    void setEncryption(String encryption) {
+        this.encryption = encryption
     }
 
     void clearValue() {}

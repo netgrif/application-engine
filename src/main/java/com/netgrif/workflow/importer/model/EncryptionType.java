@@ -12,15 +12,15 @@ import javax.xml.bind.annotation.*;
 
 
 /**
- * <p>Java class for actionType complex type.
+ * <p>Java class for encryptionType complex type.
  * 
  * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
- * &lt;complexType name="actionType"&gt;
+ * &lt;complexType name="encryptionType"&gt;
  *   &lt;simpleContent&gt;
- *     &lt;extension base="&lt;http://www.w3.org/2001/XMLSchema&gt;string"&gt;
- *       &lt;attribute name="trigger" type="{http://www.w3.org/2001/XMLSchema}anySimpleType" /&gt;
+ *     &lt;extension base="&lt;http://www.w3.org/2001/XMLSchema&gt;boolean"&gt;
+ *       &lt;attribute name="algorithm" type="{http://www.w3.org/2001/XMLSchema}anySimpleType" /&gt;
  *     &lt;/extension&gt;
  *   &lt;/simpleContent&gt;
  * &lt;/complexType&gt;
@@ -29,63 +29,55 @@ import javax.xml.bind.annotation.*;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "actionType", propOrder = {
+@XmlType(name = "encryptionType", propOrder = {
     "value"
 })
-public class ActionType {
+public class EncryptionType {
 
     @XmlValue
-    protected String value;
-    @XmlAttribute(name = "trigger")
+    protected boolean value;
+    @XmlAttribute(name = "algorithm")
     @XmlSchemaType(name = "anySimpleType")
-    protected String trigger;
+    protected String algorithm;
 
     /**
      * Gets the value of the value property.
      * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
-    public String getValue() {
+    public boolean isValue() {
         return value;
     }
 
     /**
      * Sets the value of the value property.
      * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
      */
-    public void setValue(String value) {
+    public void setValue(boolean value) {
         this.value = value;
     }
 
     /**
-     * Gets the value of the trigger property.
+     * Gets the value of the algorithm property.
      * 
      * @return
      *     possible object is
      *     {@link String }
      *     
      */
-    public String getTrigger() {
-        return trigger;
+    public String getAlgorithm() {
+        return algorithm;
     }
 
     /**
-     * Sets the value of the trigger property.
+     * Sets the value of the algorithm property.
      * 
      * @param value
      *     allowed object is
      *     {@link String }
      *     
      */
-    public void setTrigger(String value) {
-        this.trigger = value;
+    public void setAlgorithm(String value) {
+        this.algorithm = value;
     }
 
 }
