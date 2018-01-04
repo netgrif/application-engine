@@ -1,9 +1,13 @@
 package com.netgrif.workflow.auth.service;
 
-import com.netgrif.workflow.auth.domain.*;
+import com.netgrif.workflow.auth.domain.Authority;
+import com.netgrif.workflow.auth.domain.Organization;
+import com.netgrif.workflow.auth.domain.User;
+import com.netgrif.workflow.auth.domain.UserProcessRole;
 import com.netgrif.workflow.auth.domain.repositories.AuthorityRepository;
 import com.netgrif.workflow.auth.domain.repositories.OrganizationRepository;
 import com.netgrif.workflow.auth.domain.repositories.UserRepository;
+import com.netgrif.workflow.auth.service.interfaces.IUserProcessRoleService;
 import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.event.events.user.UserRegistrationEvent;
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRoleRepository;
@@ -39,18 +43,37 @@ public class UserService implements IUserService {
     @Autowired
     private ApplicationEventPublisher publisher;
 
+    @Autowired
+    private IUserProcessRoleService userProcessRoleService;
+
     @Override
     public User saveNew(User user) {
-        user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
+        encodeUserPassword(user);
+        addDefaultRole(user);
+        addDefaultAuthorities(user);
+
+        User savedUser = userRepository.save(user);
+        publisher.publishEvent(new UserRegistrationEvent(savedUser));
+        return savedUser;
+    }
+
+    private void encodeUserPassword(User user) {
+        String pass = user.getPassword();
+        if (pass == null)
+            throw new IllegalArgumentException("User has no password");
+        user.setPassword(bCryptPasswordEncoder.encode(pass));
+    }
+
+    private void addDefaultRole(User user) {
+        user.addProcessRole(userProcessRoleService.findDefault());
+    }
+
+    private void addDefaultAuthorities(User user) {
         if (user.getAuthorities().isEmpty()) {
             HashSet<Authority> authorities = new HashSet<Authority>();
             authorities.add(authorityRepository.findByName(Authority.user));
             user.setAuthorities(authorities);
         }
-
-        User savedUser = userRepository.save(user);
-        publisher.publishEvent(new UserRegistrationEvent(savedUser));
-        return savedUser;
     }
 
     @Override
