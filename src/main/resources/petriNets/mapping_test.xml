@@ -120,6 +120,7 @@
     </mapping>
     <mapping>
         <id>4</id>
+        <transitionRef>14</transitionRef>
         <roleRef>
             <id>1</id>
             <logic>

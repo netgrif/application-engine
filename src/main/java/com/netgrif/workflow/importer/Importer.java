@@ -66,9 +66,6 @@ public class Importer {
     @Autowired
     private TriggerFactory triggerFactory;
 
-    public Importer() {
-    }
-
     @Transactional
     public Optional<PetriNet> importPetriNet(File xml, String title, String initials) {
         try {
@@ -78,7 +75,7 @@ public class Importer {
         } catch (JAXBException | IOException e) {
             e.printStackTrace();
         }
-        return null;
+        return Optional.empty();
     }
 
     private void initialize() {
@@ -97,7 +94,7 @@ public class Importer {
 
         Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
         document = (Document) jaxbUnmarshaller.unmarshal(xml);
-        importedXmlPath = Files.copy(xml.toPath(), (new File("storage/"+xml.getName())).toPath(), StandardCopyOption.REPLACE_EXISTING);
+        importedXmlPath = Files.copy(xml.toPath(), (new File("storage/" + xml.getName())).toPath(), StandardCopyOption.REPLACE_EXISTING);
     }
 
     @Transactional
@@ -115,31 +112,47 @@ public class Importer {
         document.getPlace().forEach(this::createPlace);
         document.getTransition().forEach(this::createTransition);
         document.getArc().forEach(this::createArc);
+        document.getMapping().forEach(this::applyMapping);
+        document.getTransition().forEach(this::resolveTransitionActions);
+        document.getData().forEach(this::resolveDataActions);
 
-        //Resolve actions after everything has object id
-        document.getTransition().forEach(trans -> {
-            if (trans.getDataRef() != null) {
-                trans.getDataRef().forEach(ref -> {
-                    if (ref.getLogic().getAction() != null) {
-                        String fieldId = fields.get(ref.getId()).getStringId();
-                        transitions.get(trans.getId()).addActions(fieldId, buildActions(ref.getLogic().getAction(),
-                                fieldId,
-                                transitions.get(trans.getId()).getStringId()));
-                    }
-                });
-            }
-        });
-        document.getData().forEach(data -> {
-            if (data.getAction() != null) {
-                fields.get(data.getId()).setActions(buildActions(data.getAction(), fields.get(data.getId()).getStringId(), null));
-            }
-        });
         return Optional.of(repository.save(net));
+    }
+
+    @Transactional
+    protected void applyMapping(Mapping mapping) {
+        Transition transition = transitions.get(mapping.getTransitionRef());
+        mapping.getRoleRef().forEach(roleRef -> addRoleLogic(transition, roleRef));
+        mapping.getDataRef().forEach(dataRef -> addDataLogic(transition, dataRef));
+        mapping.getDataGroup().forEach(dataGroup -> addDataGroup(transition, dataGroup));
+        mapping.getTrigger().forEach(trigger -> addTrigger(transition, trigger));
+    }
+
+    @Transactional
+    protected void resolveDataActions(Data data) {
+        if (data.getAction() != null) {
+            fields.get(data.getId()).setActions(buildActions(data.getAction(), fields.get(data.getId()).getStringId(), null));
+        }
+    }
+
+    @Transactional
+    protected void resolveTransitionActions(com.netgrif.workflow.importer.model.Transition trans) {
+        if (trans.getDataRef() != null) {
+            trans.getDataRef().forEach(ref -> {
+                if (ref.getLogic().getAction() != null) {
+                    String fieldId = fields.get(ref.getId()).getStringId();
+                    transitions.get(trans.getId()).addActions(fieldId, buildActions(ref.getLogic().getAction(),
+                            fieldId,
+                            transitions.get(trans.getId()).getStringId()));
+                }
+            });
+        }
     }
 
     @Transactional
     protected void createArc(com.netgrif.workflow.importer.model.Arc importArc) {
         Arc arc = arcFactory.getArc(importArc);
+        arc.setImportId(importArc.getId());
         arc.setMultiplicity(importArc.getMultiplicity());
         arc.setSource(getNode(importArc.getSourceId()));
         arc.setDestination(getNode(importArc.getDestinationId()));
@@ -158,6 +171,7 @@ public class Importer {
     @Transactional
     protected void createTransition(com.netgrif.workflow.importer.model.Transition importTransition) {
         Transition transition = new Transition();
+        transition.setImportId(importTransition.getId());
         transition.setTitle(importTransition.getLabel());
         transition.setPosition(importTransition.getX(), importTransition.getY());
         transition.setPriority(importTransition.getPriority());
@@ -182,10 +196,11 @@ public class Importer {
             addToTransaction(transition, importTransition.getTransactionRef());
         }
         if (importTransition.getDataGroup() != null) {
-            addDataGroups(transition, importTransition.getDataGroup());
+            importTransition.getDataGroup().forEach(dataGroup ->
+                    addDataGroup(transition, dataGroup)
+            );
         }
-
-        if (importTransition.hasNoRolesOrTriggers()) {
+        if (isDefaultRoleAllowedFor(importTransition, document)) {
             addDefaultRole(transition);
         }
 
@@ -195,20 +210,18 @@ public class Importer {
 
     @Transactional
     protected void addDefaultRole(Transition transition) {
-        RoleLogic logic = new Logic();
+        Logic logic = new Logic();
         logic.setDelegate(true);
         logic.setPerform(true);
-        transition.addRole(defaultRole.getStringId(), ImportRoleFactory.getPermissions(logic));
+        transition.addRole(defaultRole.getStringId(), roleFactory.getPermissions(logic));
     }
 
     @Transactional
-    protected void addDataGroups(Transition transition, List<com.netgrif.workflow.importer.model.DataGroup> dataGroups) {
-        dataGroups.forEach(importDataGroup -> {
-            String alignment = importDataGroup.getAlignment() != null ? importDataGroup.getAlignment().value() : "";
-            DataGroup dataGroup = new DataGroup(importDataGroup.getTitle(), alignment, importDataGroup.isStretch());
-            importDataGroup.getDataRef().forEach(dataRef -> dataGroup.addData(fields.get(dataRef.getId()).getStringId()));
-            transition.addDataGroup(dataGroup);
-        });
+    protected void addDataGroup(Transition transition, com.netgrif.workflow.importer.model.DataGroup importDataGroup) {
+        String alignment = importDataGroup.getAlignment() != null ? importDataGroup.getAlignment().value() : "";
+        DataGroup dataGroup = new DataGroup(importDataGroup.getTitle(), alignment, importDataGroup.isStretch());
+        importDataGroup.getDataRef().forEach(dataRef -> dataGroup.addData(fields.get(dataRef.getId()).getStringId()));
+        transition.addDataGroup(dataGroup);
     }
 
     @Transactional
@@ -252,7 +265,7 @@ public class Importer {
     protected LinkedHashSet<Action> buildActions(List<ActionType> imported, String fieldId, String transitionId) {
         final LinkedHashSet<Action> actions = new LinkedHashSet<>();
         imported.forEach(action -> {
-            if (action.getTrigger()== null)
+            if (action.getTrigger() == null)
                 throw new IllegalArgumentException("Action [" + action.getValue() + "] doesn't have trigger");
 
             String definition = action.getValue();
@@ -359,71 +372,24 @@ public class Importer {
             return transitions.get(id);
     }
 
+    private boolean isDefaultRoleAllowedFor(com.netgrif.workflow.importer.model.Transition transition, Document document) {
+        // FALSE if defaultRole not allowed in net
+        if (document.isDefaultRole() == null || !document.isDefaultRole())
+            return false;
+        // FALSE if role or trigger mapping
+        for (Mapping mapping : document.getMapping()) {
+            if (mapping.getTransitionRef() == transition.getId() && (mapping.getRoleRef() == null || mapping.getRoleRef().isEmpty()) && (mapping.getTrigger() == null || mapping.getTrigger().isEmpty()))
+                return false;
+        }
+        // TRUE if no roles and no triggers
+        return (transition.getRoleRef() == null || transition.getRoleRef().isEmpty()) && (transition.getTrigger() == null || transition.getTrigger().isEmpty());
+    }
+
     PetriNet getNetByImportId(Long id) {
         return repository.findByImportId(id);
     }
 
-    public Document getDocument() {
-        return document;
-    }
-
-    public void setDocument(Document document) {
-        this.document = document;
-    }
-
-    public PetriNet getNet() {
-        return net;
-    }
-
-    public void setNet(PetriNet net) {
-        this.net = net;
-    }
-
     public Map<Long, ProcessRole> getRoles() {
         return roles;
-    }
-
-    public void setRoles(Map<Long, ProcessRole> roles) {
-        this.roles = roles;
-    }
-
-    public Map<Long, Field> getFields() {
-        return fields;
-    }
-
-    public void setFields(Map<Long, Field> fields) {
-        this.fields = fields;
-    }
-
-    public Map<Long, Transition> getTransitions() {
-        return transitions;
-    }
-
-    public void setTransitions(Map<Long, Transition> transitions) {
-        this.transitions = transitions;
-    }
-
-    public Map<Long, Place> getPlaces() {
-        return places;
-    }
-
-    public void setPlaces(Map<Long, Place> places) {
-        this.places = places;
-    }
-
-    public PetriNetRepository getRepository() {
-        return repository;
-    }
-
-    public void setRepository(PetriNetRepository repository) {
-        this.repository = repository;
-    }
-
-    public ProcessRoleRepository getRoleRepository() {
-        return roleRepository;
-    }
-
-    public void setRoleRepository(ProcessRoleRepository roleRepository) {
-        this.roleRepository = roleRepository;
     }
 }
