@@ -51,6 +51,7 @@ public class ObjectFactory {
     private final static QName _SourceId_QNAME = new QName("", "sourceId");
     private final static QName _DestinationId_QNAME = new QName("", "destinationId");
     private final static QName _Multiplicity_QNAME = new QName("", "multiplicity");
+    private final static QName _I18NString_QNAME = new QName("", "i18nString");
     private final static QName _DefaultRole_QNAME = new QName("", "defaultRole");
     private final static QName _Type_QNAME = new QName("", "type");
 
@@ -67,6 +68,14 @@ public class ObjectFactory {
      */
     public Transaction createTransaction() {
         return new Transaction();
+    }
+
+    /**
+     * Create an instance of {@link I18NStringType }
+     * 
+     */
+    public I18NStringType createI18NStringType() {
+        return new I18NStringType();
     }
 
     /**
@@ -198,6 +207,14 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link I18N }
+     * 
+     */
+    public I18N createI18N() {
+        return new I18N();
+    }
+
+    /**
      * Create an instance of {@link Document }
      * 
      */
@@ -215,39 +232,39 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link I18NStringType }{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "", name = "title")
-    public JAXBElement<String> createTitle(String value) {
-        return new JAXBElement<String>(_Title_QNAME, String.class, null, value);
+    public JAXBElement<I18NStringType> createTitle(I18NStringType value) {
+        return new JAXBElement<I18NStringType>(_Title_QNAME, I18NStringType.class, null, value);
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link I18NStringType }{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "", name = "placeholder")
-    public JAXBElement<String> createPlaceholder(String value) {
-        return new JAXBElement<String>(_Placeholder_QNAME, String.class, null, value);
+    public JAXBElement<I18NStringType> createPlaceholder(I18NStringType value) {
+        return new JAXBElement<I18NStringType>(_Placeholder_QNAME, I18NStringType.class, null, value);
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link I18NStringType }{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "", name = "desc")
-    public JAXBElement<String> createDesc(String value) {
-        return new JAXBElement<String>(_Desc_QNAME, String.class, null, value);
+    public JAXBElement<I18NStringType> createDesc(I18NStringType value) {
+        return new JAXBElement<I18NStringType>(_Desc_QNAME, I18NStringType.class, null, value);
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link I18NStringType }{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "", name = "values")
-    public JAXBElement<String> createValues(String value) {
-        return new JAXBElement<String>(_Values_QNAME, String.class, null, value);
+    public JAXBElement<I18NStringType> createValues(I18NStringType value) {
+        return new JAXBElement<I18NStringType>(_Values_QNAME, I18NStringType.class, null, value);
     }
 
     /**
@@ -287,12 +304,12 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link I18NStringType }{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "", name = "name")
-    public JAXBElement<String> createName(String value) {
-        return new JAXBElement<String>(_Name_QNAME, String.class, null, value);
+    public JAXBElement<I18NStringType> createName(I18NStringType value) {
+        return new JAXBElement<I18NStringType>(_Name_QNAME, I18NStringType.class, null, value);
     }
 
     /**
@@ -368,12 +385,12 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link I18NStringType }{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "", name = "label")
-    public JAXBElement<String> createLabel(String value) {
-        return new JAXBElement<String>(_Label_QNAME, String.class, null, value);
+    public JAXBElement<I18NStringType> createLabel(I18NStringType value) {
+        return new JAXBElement<I18NStringType>(_Label_QNAME, I18NStringType.class, null, value);
     }
 
     /**
@@ -446,6 +463,15 @@ public class ObjectFactory {
     @XmlElementDecl(namespace = "", name = "multiplicity")
     public JAXBElement<Integer> createMultiplicity(Integer value) {
         return new JAXBElement<Integer>(_Multiplicity_QNAME, Integer.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link I18NStringType }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "", name = "i18nString")
+    public JAXBElement<I18NStringType> createI18NString(I18NStringType value) {
+        return new JAXBElement<I18NStringType>(_I18NString_QNAME, I18NStringType.class, null, value);
     }
 
     /**

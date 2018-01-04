@@ -41,7 +41,7 @@ import java.util.List;
 public class DataGroup {
 
     protected long id;
-    protected String title;
+    protected I18NStringType title;
     @XmlSchemaType(name = "string")
     protected DataGroupAlignment alignment;
     protected Boolean stretch;
@@ -68,10 +68,10 @@ public class DataGroup {
      * 
      * @return
      *     possible object is
-     *     {@link String }
+     *     {@link I18NStringType }
      *     
      */
-    public String getTitle() {
+    public I18NStringType getTitle() {
         return title;
     }
 
@@ -80,10 +80,10 @@ public class DataGroup {
      * 
      * @param value
      *     allowed object is
-     *     {@link String }
+     *     {@link I18NStringType }
      *     
      */
-    public void setTitle(String value) {
+    public void setTitle(I18NStringType value) {
         this.title = value;
     }
 

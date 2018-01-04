@@ -40,8 +40,8 @@ import javax.xml.bind.annotation.XmlType;
 public class Role {
 
     protected long id;
-    protected String title;
-    protected String name;
+    protected I18NStringType title;
+    protected I18NStringType name;
 
     /**
      * Gets the value of the id property.
@@ -64,10 +64,10 @@ public class Role {
      * 
      * @return
      *     possible object is
-     *     {@link String }
+     *     {@link I18NStringType }
      *     
      */
-    public String getTitle() {
+    public I18NStringType getTitle() {
         return title;
     }
 
@@ -76,10 +76,10 @@ public class Role {
      * 
      * @param value
      *     allowed object is
-     *     {@link String }
+     *     {@link I18NStringType }
      *     
      */
-    public void setTitle(String value) {
+    public void setTitle(I18NStringType value) {
         this.title = value;
     }
 
@@ -88,10 +88,10 @@ public class Role {
      * 
      * @return
      *     possible object is
-     *     {@link String }
+     *     {@link I18NStringType }
      *     
      */
-    public String getName() {
+    public I18NStringType getName() {
         return name;
     }
 
@@ -100,10 +100,10 @@ public class Role {
      * 
      * @param value
      *     allowed object is
-     *     {@link String }
+     *     {@link I18NStringType }
      *     
      */
-    public void setName(String value) {
+    public void setName(I18NStringType value) {
         this.name = value;
     }
 
