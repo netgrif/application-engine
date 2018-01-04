@@ -10,7 +10,9 @@ import java.util.List;
 import java.util.Map;
 
 public interface IWorkflowService {
-    Case saveCase(Case useCase);
+    Case save(Case useCase);
+
+    Case findOne(String caseId);
 
     Page<Case> getAll(Pageable pageable);
 

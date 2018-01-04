@@ -57,10 +57,25 @@ public final class FieldFactory {
             ((ValidableField) field).setValidationRules(data.getValid());
         if (data.getInit() != null && field instanceof FieldWithDefault)
             ((FieldWithDefault) field).setDefaultValue(data.getInit());
+        setActions(field, data);
+        setEncryption(field, data);
+
+        return field;
+    }
+
+    private void setActions(Field field, Data data) {
         if (data.getAction() != null && data.getAction().size() != 0) {
             data.getAction().forEach(action -> field.addAction(action.getValue(), action.getTrigger()));
         }
-        return field;
+    }
+
+    private void setEncryption(Field field, Data data) {
+        if (data.getEncryption() != null && data.getEncryption().isValue()) {
+            String encryption = data.getEncryption().getAlgorithm();
+            if (encryption == null)
+                encryption = "PBEWITHSHA256AND256BITAES-CBC-BC";
+            field.setEncryption(encryption);
+        }
     }
 
     private CaseField buildCaseField(Data data, Importer importer) {
