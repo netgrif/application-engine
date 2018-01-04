@@ -20,6 +20,7 @@
                 <xs:element ref="values" minOccurs="0" maxOccurs="unbounded"/>
                 <xs:element ref="valid" minOccurs="0"/>
                 <xs:element ref="init" minOccurs="0"/>
+                <xs:element ref="encryption" minOccurs="0"/>
                 <xs:element ref="action" minOccurs="0" maxOccurs="unbounded"/>
                 <xs:element ref="documentRef" minOccurs="0"/>
             </xs:sequence>
@@ -295,4 +296,12 @@
             </xs:sequence>
         </xs:complexType>
     </xs:element>
+    <xs:element name="encryption" type="encryptionType"/>
+    <xs:complexType name="encryptionType">
+        <xs:simpleContent>
+            <xs:extension base="xs:boolean">
+                <xs:attribute name="algorithm"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
 </xs:schema>

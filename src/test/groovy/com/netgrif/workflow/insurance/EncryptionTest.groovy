@@ -1,13 +1,12 @@
 package com.netgrif.workflow.insurance
 
-import com.netgrif.workflow.StartRunner
 import com.netgrif.workflow.importer.Importer
 import com.netgrif.workflow.petrinet.domain.PetriNet
 import com.netgrif.workflow.workflow.domain.Case
 import com.netgrif.workflow.workflow.domain.DataField
 import com.netgrif.workflow.workflow.domain.repositories.CaseRepository
 import com.netgrif.workflow.workflow.service.TaskService
-import org.junit.Ignore
+import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -27,54 +26,45 @@ class EncryptionTest {
     private CaseRepository caseRepository
 
     @Autowired
+    private IWorkflowService workflowService;
+
+    @Autowired
     private Importer importer
 
-    private PetriNet contactNet
-
-    def benchmark = { closure ->
-        def start = System.currentTimeMillis()
-        closure.call()
-        def now = System.currentTimeMillis()
-        return now - start
-    }
+    private final String FIELD_NAME = "City"
+    private final String FIELD_VALUE = "Bratislava"
 
     @Test
-    @Ignore
     void testEncryption() {
-        contactNet = importer.importPetriNet(new File("src/main/resources/petriNets/contact.xml"), "Contact", "CON")
-        def duration = benchmark {
-            (0..1000).inject(0) { sum, item ->
-                createContactCase("", "", "", "")
-                sum + item
-            }
-        }
-        println "Execution time $duration"
+        String id = createCase()
+
+        Case useCase = loadCase(id)
+
+        assertCorrectEncrypting(useCase)
     }
 
-    private void createContactCase(String name, String surname, String telNumber, String email) {
-        def contactCase = createCase(name+" "+surname, contactNet, 1L)
-        def nameField = contactCase.petriNet.dataSet.values().find { v -> v.name == "Meno"}
-        def surnameField = contactCase.petriNet.dataSet.values().find { v -> v.name == "Priezvisko"}
-        def telField = contactCase.petriNet.dataSet.values().find { v -> v.name == "Telefónne číslo"}
-        def emailField = contactCase.petriNet.dataSet.values().find { v -> v.name == "Email"}
-        def rcField = contactCase.petriNet.dataSet.values().find { v -> v.name == "Rodné číslo"}
+    private void assertCorrectEncrypting(Case useCase) {
+        def nameField = useCase.petriNet.dataSet.values().find { v -> v.name == FIELD_NAME}
+        DataField field = useCase.dataSet.get(nameField.stringId)
+        assert field.value == FIELD_VALUE
 
-        contactCase.dataSet.put(nameField.getStringId(), new DataField(name))
-        contactCase.dataSet.put(surnameField.getStringId(), new DataField(surname))
-        contactCase.dataSet.put(telField.getStringId(), new DataField(telNumber))
-        contactCase.dataSet.put(emailField.getStringId(), new DataField(email))
-        contactCase.dataSet.put(rcField.getStringId(), new DataField("123456789"))
-
-        caseRepository.save(contactCase)
+        def rawCase = caseRepository.findOne(useCase.stringId)
+        DataField rawField = rawCase.dataSet.get(nameField.stringId)
+        assert rawField.value != FIELD_VALUE
     }
 
-    private Case createCase(String title, PetriNet net, Long author) {
-        Case useCase = new Case(title, net, net.getActivePlaces())
-        useCase.setColor(StartRunner.randomColor())
-        useCase.setAuthor(author)
-        useCase.setIcon(net.icon)
-        useCase = caseRepository.save(useCase)
-        taskService.createTasks(useCase)
+    private Case loadCase(String id) {
+        Case useCase = workflowService.findOne(id)
+        assert useCase != null
         return useCase
+    }
+
+    private String createCase() {
+        Optional<PetriNet> net = importer.importPetriNet(new File("src/test/resources/mapping_test.xml"), "Encryption test", "ENC")
+        assert net.isPresent()
+        def useCase = workflowService.createCase(net.get().stringId, "Encryption test", "color", 1L)
+        def nameField = useCase.petriNet.dataSet.values().find { v -> v.name == FIELD_NAME}
+        useCase.dataSet.put(nameField.stringId, new DataField(FIELD_VALUE))
+        return workflowService.save(useCase).stringId
     }
 }

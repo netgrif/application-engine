@@ -84,7 +84,7 @@ public class ImporterTest {
         assert data != null && data.size() > 0;
 
         useCase.getDataSet().get(data.get(0).getStringId()).setValue(useCase.getStringId());
-        workflowService.saveCase(useCase);
+        workflowService.save(useCase);
         data = workflowService.getData(useCase.getStringId());
         assert data != null && data.size() > 0;
     }
