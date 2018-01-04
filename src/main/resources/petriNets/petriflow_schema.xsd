@@ -43,9 +43,11 @@
         <xs:complexType>
             <xs:sequence>
                 <xs:element ref="id"/>
-                <xs:element ref="transitionRef" minOccurs="0"/>
-                <xs:element ref="roleRef"/>
+                <xs:element ref="transitionRef"/>
+                <xs:element ref="roleRef" maxOccurs="unbounded" minOccurs="0"/>
                 <xs:element ref="dataRef" maxOccurs="unbounded" minOccurs="0"/>
+                <xs:element ref="dataGroup" maxOccurs="unbounded" minOccurs="0"/>
+                <xs:element ref="trigger" maxOccurs="unbounded" minOccurs="0"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
@@ -98,6 +100,7 @@
             <xs:sequence>
                 <xs:element ref="id" minOccurs="0"/>
                 <xs:element ref="icon" minOccurs="0"/>
+                <xs:element ref="defaultRole" minOccurs="0"/>
                 <xs:element ref="transaction" maxOccurs="unbounded" minOccurs="0"/>
                 <xs:element ref="role" maxOccurs="unbounded" minOccurs="0"/>
                 <xs:element ref="data" maxOccurs="unbounded" minOccurs="0"/>
@@ -226,7 +229,7 @@
             </xs:sequence>
         </xs:complexType>
     </xs:element>
-    <xs:element name="transitionRef" type="xs:byte"/>
+    <xs:element name="transitionRef" type="nonNegativeLong"/>
     <xs:element name="transactionRef">
         <xs:complexType>
             <xs:sequence>
@@ -304,4 +307,5 @@
             </xs:extension>
         </xs:simpleContent>
     </xs:complexType>
+    <xs:element name="defaultRole" type="xs:boolean"/>
 </xs:schema>

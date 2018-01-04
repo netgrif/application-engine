@@ -17,6 +17,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 import java.io.File;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.LongStream;
 
 @SpringBootTest
 @ActiveProfiles({"test"})
@@ -46,7 +48,7 @@ public class ImporterTest {
     }
 
     @Test
-    public void importPetriNet() throws Exception {
+    public void importPetriNet() {
         importer.importPetriNet(new File("src/test/resources/prikladFM_test.xml"), NET_TITLE, NET_INITIALS);
 
         assertNetProperlyImported();
@@ -87,6 +89,38 @@ public class ImporterTest {
         workflowService.save(useCase);
         data = workflowService.getData(useCase.getStringId());
         assert data != null && data.size() > 0;
+    }
+
+    @Test
+    public void externalMappingTest() {
+        Optional<PetriNet> net = importer.importPetriNet(new File("src/test/resources/mapping_test.xml"), "External mapping", "EXT");
+
+        assertExternalMappingImport(net);
+    }
+
+    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
+    private void assertExternalMappingImport(Optional<PetriNet> imported) {
+        assert imported.isPresent();
+
+        PetriNet net = imported.get();
+        long[] noDataTransitions = {2,3,4,36,49};
+
+        assert net.getPlaces().size() == 11;
+        assert net.getTransitions().size() == 11;
+        assert net.getArcs().values().stream()
+                .flatMap(List::stream)
+                .collect(Collectors.toList()).size() == 34;
+        assert net.getDataSet().size() == 14;
+        assert net.getRoles().size() == 2;
+
+        net.getTransitions().values().forEach(transition -> {
+            assert !transition.getRoles().isEmpty();
+            if (LongStream.of(noDataTransitions).anyMatch(x-> x == transition.getImportId())) {
+                assert transition.getDataSet().isEmpty();
+            } else {
+                assert !transition.getDataSet().isEmpty();
+            }
+        });
     }
 
     private void assertNetProperlyImported() {
