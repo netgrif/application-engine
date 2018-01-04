@@ -47,6 +47,7 @@ public class Importer {
     private Map<Long, Transition> transitions;
     private Map<Long, Place> places;
     private Map<Long, Transaction> transactions;
+    private Map<String, Map<String,String>> i18n;
 
     @Autowired
     private FieldFactory fieldFactory;
@@ -106,6 +107,7 @@ public class Importer {
         net.setTitle(title);
         net.setInitials(initials);
 
+        document.getI18N().forEach(this::addI18N);
         document.getRole().forEach(this::createRole);
         document.getData().forEach(this::createDataSet);
         document.getTransaction().forEach(this::createTransaction);
@@ -117,6 +119,14 @@ public class Importer {
         document.getData().forEach(this::resolveDataActions);
 
         return Optional.of(repository.save(net));
+    }
+
+    @Transactional
+    protected void addI18N(I18N importI18N) {
+        // todo: change to I18NString
+        Map<String,String> translations = new HashMap<>();
+        importI18N.getI18NString().forEach(translation -> translations.put(translation.getName(), translation.getValue()));
+        i18n.put(importI18N.getLocale(), translations);
     }
 
     @Transactional
@@ -172,7 +182,7 @@ public class Importer {
     protected void createTransition(com.netgrif.workflow.importer.model.Transition importTransition) {
         Transition transition = new Transition();
         transition.setImportId(importTransition.getId());
-        transition.setTitle(importTransition.getLabel());
+        transition.setTitle(toI18NString(importTransition.getLabel()));
         transition.setPosition(importTransition.getX(), importTransition.getY());
         transition.setPriority(importTransition.getPriority());
         transition.setIcon(importTransition.getIcon());
@@ -219,7 +229,10 @@ public class Importer {
     @Transactional
     protected void addDataGroup(Transition transition, com.netgrif.workflow.importer.model.DataGroup importDataGroup) {
         String alignment = importDataGroup.getAlignment() != null ? importDataGroup.getAlignment().value() : "";
-        DataGroup dataGroup = new DataGroup(importDataGroup.getTitle(), alignment, importDataGroup.isStretch());
+        DataGroup dataGroup = new DataGroup();
+        dataGroup.setTitle(toI18NString(importDataGroup.getTitle()));
+        dataGroup.setAlignment(alignment);
+        dataGroup.setStretch(importDataGroup.isStretch());
         importDataGroup.getDataRef().forEach(dataRef -> dataGroup.addData(fields.get(dataRef.getId()).getStringId()));
         transition.addDataGroup(dataGroup);
     }
@@ -335,7 +348,7 @@ public class Importer {
             place.setIsStatic(importPlace.isStatic());
         place.setTokens(importPlace.getTokens());
         place.setPosition(importPlace.getX(), importPlace.getY());
-        place.setTitle(importPlace.getLabel());
+        place.setTitle(toI18NString(importPlace.getLabel()));
 
         net.addPlace(place);
         places.put(importPlace.getId(), place);
@@ -345,9 +358,9 @@ public class Importer {
     protected void createRole(Role importRole) {
         ProcessRole role = new ProcessRole();
         if (importRole.getName() == null)
-            role.setName(importRole.getTitle());
+            role.setName(toI18NString(importRole.getTitle()));
         else
-            role.setName(importRole.getName());
+            role.setName(toI18NString(importRole.getName()));
         role = roleRepository.save(role);
 
         net.addRole(role);
@@ -357,7 +370,7 @@ public class Importer {
     @Transactional
     protected void createTransaction(com.netgrif.workflow.importer.model.Transaction importTransaction) {
         Transaction transaction = new Transaction();
-        transaction.setTitle(importTransaction.getTitle());
+        transaction.setTitle(toI18NString(importTransaction.getTitle()));
 
         net.addTransaction(transaction);
         transactions.put(importTransaction.getId(), transaction);
@@ -370,6 +383,10 @@ public class Importer {
             return places.get(id);
         else
             return transitions.get(id);
+    }
+
+    private I18nString toI18NString(I18NStringType i18n) {
+        return null; // todo:
     }
 
     private boolean isDefaultRoleAllowedFor(com.netgrif.workflow.importer.model.Transition transition, Document document) {
