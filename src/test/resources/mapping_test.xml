@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:noNamespaceSchemaLocation="petriNets/petriflow_schema.xsd">
+        xsi:noNamespaceSchemaLocation="../../main/resources/petriNets/petriflow_schema.xsd">
     <!-- ========== ROLES ========== -->
     <role>
         <id>1</id>
@@ -120,6 +120,7 @@
     </mapping>
     <mapping>
         <id>4</id>
+        <transitionRef>14</transitionRef>
         <roleRef>
             <id>1</id>
             <logic>
@@ -533,7 +534,7 @@
         <x>940</x>
         <y>380</y>
         <label>Contents cover calculation</label>
-        </transition>
+    </transition>
     <transition>
         <id>36</id>
         <x>1260</x>

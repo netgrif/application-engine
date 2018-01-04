@@ -12,24 +12,23 @@ import com.netgrif.workflow.petrinet.web.responsebodies.DataFieldReference;
 import com.netgrif.workflow.petrinet.web.responsebodies.PetriNetReference;
 import com.netgrif.workflow.petrinet.web.responsebodies.TransitionReference;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Lookup;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.BasicQuery;
 import org.springframework.stereotype.Service;
-import org.xml.sax.SAXException;
 
-import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
-public class PetriNetService implements IPetriNetService {
+public abstract class PetriNetService implements IPetriNetService {
 
-    @Autowired
-    private Importer importer;
+    @Lookup("importer")
+    abstract Importer getImporter();
 
     @Autowired
     private PetriNetRepository repository;
@@ -41,10 +40,11 @@ public class PetriNetService implements IPetriNetService {
     private ApplicationEventPublisher publisher;
 
     @Override
-    public void importPetriNet(File xmlFile, String name, String initials, LoggedUser user) throws IOException, SAXException, ParserConfigurationException {
-        importer.importPetriNet(xmlFile, name, initials);
+    public Optional<PetriNet> importPetriNet(File xmlFile, String name, String initials, LoggedUser user) {
+        Optional<PetriNet> imported = getImporter().importPetriNet(xmlFile, name, initials);
         publisher.publishEvent(new UserImportModelEvent(user, xmlFile));
         xmlFile.delete();
+        return imported;
     }
 
     @Override
