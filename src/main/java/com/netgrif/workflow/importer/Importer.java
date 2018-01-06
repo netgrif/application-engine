@@ -398,7 +398,10 @@ public class Importer {
     I18nString toI18NString(I18NStringType imported) {
         if (imported == null)
             return null;
-        return i18n.getOrDefault(imported.getName(), new I18nString(imported.getValue()));
+        I18nString string = i18n.getOrDefault(imported.getName(), new I18nString(imported.getValue()));
+        if (string.getDefaultValue() == null)
+            string.setDefaultValue(imported.getValue());
+        return string;
     }
 
     private boolean isDefaultRoleAllowedFor(com.netgrif.workflow.importer.model.Transition transition, Document document) {

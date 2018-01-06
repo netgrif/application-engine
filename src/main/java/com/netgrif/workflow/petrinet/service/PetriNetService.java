@@ -56,6 +56,9 @@ public abstract class PetriNetService implements IPetriNetService {
     @Override
     public PetriNet loadPetriNet(String id) {
         PetriNet net = repository.findOne(id);
+        if (net == null)
+            throw new IllegalArgumentException("No model with id="+id+" found.");
+
         net.initializeArcs();
         return net;
     }
