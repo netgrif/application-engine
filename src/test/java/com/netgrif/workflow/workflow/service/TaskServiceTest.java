@@ -89,7 +89,7 @@ public class TaskServiceTest {
         assert useCase.getActivePlaces().size() == 1;
         assert useCase.getActivePlaces().values().contains(5);
 
-        Task task = taskRepository.findAll().stream().filter(t -> t.getTitle().equalsIgnoreCase("reset")).findFirst().orElse(null);
+        Task task = taskRepository.findAll().stream().filter(t -> t.getTitle().getDefaultValue().equalsIgnoreCase("reset")).findFirst().orElse(null);
 
         service.assignTask(user.getId(), task.getStringId());
         useCase = caseRepository.findOne(useCase.getStringId());

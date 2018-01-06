@@ -1,5 +1,6 @@
 package com.netgrif.workflow
 
+import com.netgrif.workflow.petrinet.domain.I18nString
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRole
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRoleRepository
 import org.apache.log4j.Logger
@@ -20,7 +21,7 @@ class DefaultRoleRunner implements CommandLineRunner {
         log.info("Creating default process role")
 
         ProcessRole defaultRole = new ProcessRole(
-                name: ProcessRole.DEFAULT_ROLE,
+                name: new I18nString(ProcessRole.DEFAULT_ROLE),
                 description: "Default system process role"
         )
         defaultRole = repository.save(defaultRole)

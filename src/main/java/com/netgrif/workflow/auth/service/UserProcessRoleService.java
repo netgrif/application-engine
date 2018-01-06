@@ -39,7 +39,7 @@ public class UserProcessRoleService implements IUserProcessRoleService {
 
     private String getDefaultRoleId() {
         if (DEFAULT_ROLE_ID == null) {
-            ProcessRole role = processRoleRepository.findByName(ProcessRole.DEFAULT_ROLE);
+            ProcessRole role = processRoleRepository.findByName_DefaultValue(ProcessRole.DEFAULT_ROLE);
             if (role == null)
                 throw new NullPointerException("Default process role not found");
             DEFAULT_ROLE_ID = role.getStringId();

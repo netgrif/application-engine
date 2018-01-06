@@ -2,6 +2,7 @@ package com.netgrif.workflow.petrinet.domain.dataset
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.databind.node.ObjectNode
+import com.netgrif.workflow.petrinet.domain.I18nString
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action
 import org.bson.types.ObjectId
 import org.springframework.data.annotation.Id
@@ -17,11 +18,11 @@ abstract class Field<T> {
     @JsonIgnore
     protected Long importId
 
-    private String name
+    private I18nString name
     
-    private String description
+    private I18nString description
     
-    private String placeholder
+    private I18nString placeholder
 
     @Transient
     private ObjectNode behavior
@@ -69,27 +70,27 @@ abstract class Field<T> {
         this.importId = importId
     }
 
-    String getName() {
+    I18nString getName() {
         return name
     }
 
-    void setName(String name) {
+    void setName(I18nString name) {
         this.name = name
     }
 
-    String getDescription() {
+    I18nString getDescription() {
         return description
     }
 
-    void setDescription(String description) {
+    void setDescription(I18nString description) {
         this.description = description
     }
 
-    String getPlaceholder() {
+    I18nString getPlaceholder() {
         return placeholder
     }
 
-    void setPlaceholder(String placeholder) {
+    void setPlaceholder(I18nString placeholder) {
         this.placeholder = placeholder
     }
 
