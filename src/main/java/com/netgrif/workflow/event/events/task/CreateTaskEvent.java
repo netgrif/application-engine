@@ -12,6 +12,6 @@ public class CreateTaskEvent extends TaskEvent {
 
     @Override
     public String getMessage() {
-        return "Task " + getTask().getTitle() + " of case " + useCase.getTitle() + " created on " + DateUtils.toString(time);
+        return "LocalisedTask " + getTask().getTitle() + " of case " + useCase.getTitle() + " created on " + DateUtils.toString(time);
     }
 }
