@@ -98,10 +98,10 @@ public class WorkflowService implements IWorkflowService {
         return setImmediateDataFields(new PageImpl<Case>(useCases, pageable, mongoTemplate.count(new BasicQuery(queryString, "{_id:1}"), Case.class)));
     }
 
-    public Page<Case> search(Map<String, Object> request, Pageable pageable, LoggedUser user) {
+    public Page<Case> search(Map<String, Object> request, Pageable pageable, LoggedUser user, Locale locale) {
         String key = "petriNet";
 
-        List<PetriNetReference> nets = petriNetService.getAllAccessibleReferences(user);
+        List<PetriNetReference> nets = petriNetService.getAllAccessibleReferences(user, locale);
         if (request.containsKey(key)) {
             Set<String> netIds = nets.stream().map(PetriNetReference::getEntityId).collect(Collectors.toSet());
             if (request.get(key) instanceof String && !netIds.contains(request.get(key)))

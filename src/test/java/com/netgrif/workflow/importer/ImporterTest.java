@@ -60,7 +60,7 @@ public class ImporterTest {
 
         assert net.isPresent();
 
-        Case useCase = workflowService.createCase(net.get().getStringId(), net.get().getTitle(), "color", 1L);
+        Case useCase = workflowService.createCase(net.get().getStringId(), net.get().getTitle().getDefaultValue(), "color", 1L);
 
         assert useCase != null;
     }
@@ -79,7 +79,7 @@ public class ImporterTest {
         Optional<PetriNet> net = importer.importPetriNet(new File("src/test/resources/caseref_test.xml"), "Caseref test", "CRT");
         assert net.isPresent();
 
-        Case useCase = workflowService.createCase(net.get().getStringId(), net.get().getTitle(), "color", 1L);
+        Case useCase = workflowService.createCase(net.get().getStringId(), net.get().getTitle().getDefaultValue(), "color", 1L);
         assert useCase != null;
 
         List<Field> data = workflowService.getData(useCase.getStringId());

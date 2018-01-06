@@ -63,7 +63,7 @@ class EncryptionTest {
         Optional<PetriNet> net = importer.importPetriNet(new File("src/test/resources/mapping_test.xml"), "Encryption test", "ENC")
         assert net.isPresent()
         def useCase = workflowService.createCase(net.get().stringId, "Encryption test", "color", 1L)
-        def nameField = useCase.petriNet.dataSet.values().find { v -> v.name == FIELD_NAME}
+        def nameField = useCase.petriNet.dataSet.values().find { v -> v.name.defaultValue == FIELD_NAME}
         useCase.dataSet.put(nameField.stringId, new DataField(FIELD_VALUE))
         return workflowService.save(useCase).stringId
     }

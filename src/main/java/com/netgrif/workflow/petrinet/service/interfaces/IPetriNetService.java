@@ -11,6 +11,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
 public interface IPetriNetService {
@@ -23,13 +24,13 @@ public interface IPetriNetService {
 
     List<PetriNet> loadAll();
 
-    List<PetriNetReference> getAllReferences(LoggedUser user);
+    List<PetriNetReference> getAllReferences(LoggedUser user, Locale locale);
 
-    List<PetriNetReference> getAllAccessibleReferences(LoggedUser user);
+    List<PetriNetReference> getAllAccessibleReferences(LoggedUser user, Locale locale);
 
-    PetriNetReference getReferenceByTitle(LoggedUser user, String title);
+    PetriNetReference getReferenceByTitle(LoggedUser user, String title, Locale locale);
 
-    List<TransitionReference> getTransitionReferences(List<String> netsIds, LoggedUser user);
+    List<TransitionReference> getTransitionReferences(List<String> netsIds, LoggedUser user, Locale locale);
 
-    List<DataFieldReference> getDataFieldReferences(List<String> petriNetIds, List<String> transitionIds);
+    List<DataFieldReference> getDataFieldReferences(List<String> petriNetIds, List<String> transitionIds, Locale locale);
 }

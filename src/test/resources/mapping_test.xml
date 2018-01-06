@@ -18,74 +18,74 @@
     </data>
     <data type="text">
         <id>2</id>
-        <title>City</title>
+        <title name="city">City</title>
         <encryption>true</encryption>
     </data>
     <data type="enumeration">
         <id>5</id>
-        <title>Property type</title>
-        <values>Flat</values>
-        <values>House</values>
-        <values>Townhouse</values>
-        <values>Other</values>
+        <title name="property_type">Property type</title>
+        <values name="property_type_flat">Flat</values>
+        <values name="property_type_house">House</values>
+        <values name="property_type_townhouse">Townhouse</values>
+        <values name="property_type_other">Other</values>
     </data>
     <data type="enumeration">
         <id>11</id>
-        <title>Do you own or rent the property?</title>
-        <values>Mortgaged</values>
-        <values>Owned</values>
-        <values>Rented</values>
+        <title name="property_relation">Do you own or rent the property?</title>
+        <values name="mortgaged">Mortgaged</values>
+        <values name="owned">Owned</values>
+        <values name="rented">Rented</values>
     </data>
     <data type="enumeration">
         <id>14</id>
-        <title>What are the external walls built with?</title>
-        <values>Brick</values>
-        <values>Concrete</values>
-        <values>Timber</values>
+        <title name="external_walls_type">What are the external walls built with?</title>
+        <values name="external_wall_brick">Brick</values>
+        <values name="external_wall_concrete">Concrete</values>
+        <values name="external_wall_timber">Timber</values>
     </data>
     <data type="number">
         <id>18</id>
-        <title>Size of living area</title>
+        <title name="living_area_size">Size of living area</title>
     </data>
     <data type="number">
         <id>20</id>
-        <title>How much would it cost to replace the entire contents of your home as new?</title>
+        <title name="cost_of_replacement">How much would it cost to replace the entire contents of your home as new?</title>
     </data>
     <data type="multichoice">
         <id>22</id>
-        <title>Would you like to insure any individual items?</title>
-        <values>Television</values>
-        <values>Computer</values>
-        <values>Home cinema</values>
+        <title name="item_insurance">Would you like to insure any individual items?</title>
+        <values name="item_insurance_tv">Television</values>
+        <values name="item_insurance_pc">Computer</values>
+        <values name="item_insurance_cinema">Home cinema</values>
     </data>
     <data type="enumeration">
         <id>24</id>
-        <title>Locks on your property</title>
-        <values>5 lever mortice deadlock</values>
-        <values>5 lever mortice deadlock to British Standard BS3621</values>
-        <values>Rim automatic deadlatch with key</values>
-        <values>Other type of lock</values>
+        <title name="lock_type">Locks on your property</title>
+        <values name="lock_type_mortice">5 lever mortice deadlock</values>
+        <values name="lock_type_mortice_standard">5 lever mortice deadlock to British Standard BS3621</values>
+        <values name="lock_type_deadlatch">Rim automatic deadlatch with key</values>
+        <values name="lock_type_other">Other type of lock</values>
     </data>
     <data type="boolean">
         <id>25</id>
-        <title>Is a burglar alarm fitted and used?</title>
+        <title name="alarm">Is a burglar alarm fitted and used?</title>
     </data>
     <data type="user">
         <id>27</id>
-        <title>Property owner</title>
+        <title name="property_owner">Property owner</title>
         <values>1</values>
     </data>
     <data type="number">
         <id>29</id>
-        <title>How many adults 18 or over live in the property</title>
+        <title name="number_of_adults">How many adults 18 or over live in the property</title>
     </data>
     <data type="number">
         <id>30</id>
-        <title>How many children under 18 live in the property</title>
+        <title name="number_of_children">How many children under 18 live in the property</title>
     </data>
     <data type="number">
         <id>38</id>
-        <title>Quote</title>
+        <title name="quote">Quote</title>
     </data>
     <!-- ========== MAPPING ========== -->
     <mapping>

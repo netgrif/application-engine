@@ -26,9 +26,9 @@ class TextField extends ValidableField<String> {
         return FieldType.TEXT
     }
 
-    TextField(List<String> values) {
+    TextField(String subtype) {
         this()
-        this.subType = values != null ? values[0] : SIMPLE_SUBTYPE
+        this.subType = subtype != null ? subtype : SIMPLE_SUBTYPE
     }
 
     @Override

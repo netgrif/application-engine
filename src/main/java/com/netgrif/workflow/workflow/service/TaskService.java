@@ -314,9 +314,9 @@ public class TaskService implements ITaskService {
     }
 
     @Override
-    public List<TaskReference> findAllByCase(String caseId) {
+    public List<TaskReference> findAllByCase(String caseId, Locale locale) {
         return taskRepository.findAllByCaseId(caseId).stream()
-                .map(task -> new TaskReference(task.getStringId(), task.getTitle(), task.getTransitionId()))
+                .map(task -> new TaskReference(task.getStringId(), task.getTitle().getTranslation(locale), task.getTransitionId()))
                 .collect(Collectors.toList());
     }
 
