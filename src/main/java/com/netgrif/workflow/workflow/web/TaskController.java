@@ -28,6 +28,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -65,8 +66,8 @@ public class TaskController {
     }
 
     @RequestMapping(value ="/case/{id}", method = RequestMethod.GET)
-    public List<TaskReference> getTasksOfCase(@PathVariable("id") String caseId) {
-        return taskService.findAllByCase(caseId);
+    public List<TaskReference> getTasksOfCase(@PathVariable("id") String caseId, Locale locale) {
+        return taskService.findAllByCase(caseId, locale);
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
