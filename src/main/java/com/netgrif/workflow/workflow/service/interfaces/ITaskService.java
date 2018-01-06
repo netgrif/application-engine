@@ -20,7 +20,7 @@ import java.util.Locale;
 import java.util.Map;
 
 public interface ITaskService {
-    Page<Task> getAll(LoggedUser loggedUser, Pageable pageable);
+    Page<Task> getAll(LoggedUser loggedUser, Pageable pageable, Locale locale);
 
     Page<Task> search(Map<String, Object> request, Pageable pageable, LoggedUser user);
 
