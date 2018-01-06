@@ -83,13 +83,13 @@ public class TaskService implements ITaskService {
     private WorkflowService workflowService;
 
     //    @Override
-//    public Page<Task> getAll(LoggedUser loggedUser, Pageable pageable) {
+//    public Page<LocalisedTask> getAll(LoggedUser loggedUser, Pageable pageable) {
 //        User user = userRepository.findOne(loggedUser.getId());
 //        List<String> roles = new LinkedList<>(user.getUserProcessRoles()).stream().map(UserProcessRole::getRoleId).collect(Collectors.toList());
 //        return loadUsers(taskRepository.findAllByAssignRoleInOrDelegateRoleIn(pageable, roles, roles));
 //    }
     @Override
-    public Page<Task> getAll(LoggedUser loggedUser, Pageable pageable) {
+    public Page<Task> getAll(LoggedUser loggedUser, Pageable pageable, Locale locale) {
         List<Task> tasks;
         if (loggedUser.getProcessRoles().isEmpty()) {
             tasks = new ArrayList<>();
@@ -580,7 +580,7 @@ public class TaskService implements ITaskService {
      * Reloads all unassigned tasks of given case:
      * <table border="1">
      * <tr>
-     * <td></td><td>Task is present</td><td>Task is not present</td>
+     * <td></td><td>LocalisedTask is present</td><td>LocalisedTask is not present</td>
      * </tr>
      * <tr>
      * <td>Transition executable</td><td>no action</td><td>create task</td>

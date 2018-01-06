@@ -7068,13 +7068,19 @@
         <id>410001</id>
     </data>
 
+    <i18n locale="en">
+        <i18nString name="only_property">Only Property</i18nString>
+        <i18nString name="only_household">Only Household</i18nString>
+        <i18nString name="property_and_household">Property and Household</i18nString>
+    </i18n>
+
     <!--=================================TRANSITIONS================-->
     <!--================================= poistenie nehnuteľnosti ====================-->
     <transition>
         <id>2</id>
         <x>260</x>
         <y>300</y>
-        <label>Iba nehnuteľnosť</label>
+        <label name="only_property">Iba nehnuteľnosť</label>
         <icon>home</icon>
         <priority>1</priority>
         <transactionRef>
@@ -7111,7 +7117,7 @@
         <id>4</id>
         <x>180</x>
         <y>900</y>
-        <label>Iba domácnosť</label>
+        <label name="only_household">Iba domácnosť</label>
         <icon>weekend</icon>
         <priority>2</priority>
         <transactionRef>
@@ -7148,7 +7154,7 @@
         <id>3</id>
         <x>180</x>
         <y>580</y>
-        <label>Nehnuteľnosť a domácnosť</label>
+        <label name="property_and_household">Nehnuteľnosť a domácnosť</label>
         <icon>home weekend</icon>
         <priority>3</priority>
         <transactionRef>
