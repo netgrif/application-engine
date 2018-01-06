@@ -16,6 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 public interface ITaskService {
@@ -61,5 +62,5 @@ public interface ITaskService {
 
     Field buildField(Case useCase, String fieldId, boolean withValidation);
 
-    List<TaskReference> findAllByCase(String caseId);
+    List<TaskReference> findAllByCase(String caseId, Locale locale);
 }

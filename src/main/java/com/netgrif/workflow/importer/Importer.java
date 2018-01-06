@@ -47,7 +47,7 @@ public class Importer {
     private Map<Long, Transition> transitions;
     private Map<Long, Place> places;
     private Map<Long, Transaction> transactions;
-    private Map<String, Map<String,String>> i18n;
+    private Map<String, I18nString> i18n;
 
     @Autowired
     private FieldFactory fieldFactory;
@@ -86,7 +86,8 @@ public class Importer {
         this.places = new HashMap<>();
         this.fields = new HashMap<>();
         this.transactions = new HashMap<>();
-        this.defaultRole = roleRepository.findByName(ProcessRole.DEFAULT_ROLE);
+        this.defaultRole = roleRepository.findByName_DefaultValue(ProcessRole.DEFAULT_ROLE);
+        this.i18n = new HashMap<>();
     }
 
     @Transactional
@@ -123,10 +124,19 @@ public class Importer {
 
     @Transactional
     protected void addI18N(I18N importI18N) {
-        // todo: change to I18NString
-        Map<String,String> translations = new HashMap<>();
-        importI18N.getI18NString().forEach(translation -> translations.put(translation.getName(), translation.getValue()));
-        i18n.put(importI18N.getLocale(), translations);
+        String locale = importI18N.getLocale();
+        importI18N.getI18NString().forEach(translation -> addTranslation(translation, locale));
+    }
+
+    @Transactional
+    protected void addTranslation(I18NStringType i18NStringType, String locale) {
+        String name = i18NStringType.getName();
+        I18nString translation = i18n.get(name);
+        if (translation == null) {
+            translation = new I18nString();
+            i18n.put(name, translation);
+        }
+        translation.addTranslation(locale, i18NStringType.getValue());
     }
 
     @Transactional
@@ -385,8 +395,10 @@ public class Importer {
             return transitions.get(id);
     }
 
-    private I18nString toI18NString(I18NStringType i18n) {
-        return null; // todo:
+    I18nString toI18NString(I18NStringType imported) {
+        if (imported == null)
+            return null;
+        return i18n.getOrDefault(imported.getName(), new I18nString(imported.getValue()));
     }
 
     private boolean isDefaultRoleAllowedFor(com.netgrif.workflow.importer.model.Transition transition, Document document) {

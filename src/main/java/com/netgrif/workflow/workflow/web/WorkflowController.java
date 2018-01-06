@@ -19,10 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @RestController()
 @RequestMapping("/res/workflow")
@@ -56,11 +53,11 @@ public class WorkflowController {
     }
 
     @RequestMapping(value = "/case/search", method = RequestMethod.POST)
-    public PagedResources<CaseResource> search(@RequestBody Map<String, Object> searchBody, Pageable pageable, PagedResourcesAssembler<Case> assembler, Authentication auth) {
+    public PagedResources<CaseResource> search(@RequestBody Map<String, Object> searchBody, Pageable pageable, PagedResourcesAssembler<Case> assembler, Authentication auth, Locale locale) {
         log.info("Starting search");
-        Page<Case> cases = workflowService.search(searchBody, pageable, (LoggedUser) auth.getPrincipal());
+        Page<Case> cases = workflowService.search(searchBody, pageable, (LoggedUser) auth.getPrincipal(), locale);
         Link selfLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(WorkflowController.class)
-                .search(searchBody, pageable, assembler, auth)).withRel("search");
+                .search(searchBody, pageable, assembler, auth, locale)).withRel("search");
         PagedResources<CaseResource> resources = assembler.toResource(cases, new CaseResourceAssembler(), selfLink);
         ResourceLinkAssembler.addLinks(resources, Case.class, selfLink.getRel());
         return resources;
