@@ -38,7 +38,7 @@
         <id>4</id>
         <type>read</type>
         <sourceId>1</sourceId>
-        <destinationId>1</destinationId>
+        <destinationId>3</destinationId>
         <multiplicity>1</multiplicity>
     </arc>
     <arc>
