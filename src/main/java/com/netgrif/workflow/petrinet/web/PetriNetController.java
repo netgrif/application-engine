@@ -123,9 +123,9 @@ public class PetriNetController {
 
     @RequestMapping(value = "/{netId}/transactions", method = GET)
     public @ResponseBody
-    TransactionsResource getTransactions(@PathVariable("netId") String netId) {
+    TransactionsResource getTransactions(@PathVariable("netId") String netId, Locale locale) {
         PetriNet net = service.loadPetriNet(decodeUrl(netId));
-        return new TransactionsResource(net.getTransactions().values(), netId);
+        return new TransactionsResource(net.getTransactions().values(), netId, locale);
     }
 
     public static String decodeUrl(String s1) {
