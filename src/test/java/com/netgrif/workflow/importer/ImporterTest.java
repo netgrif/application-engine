@@ -92,6 +92,11 @@ public class ImporterTest {
     }
 
     @Test
+    public void readArcImportTest() {
+        importer.importPetriNet(new File("src/test/resources/read_test.xml"), "R", "R");
+    }
+
+    @Test
     public void externalMappingTest() {
         Optional<PetriNet> net = importer.importPetriNet(new File("src/test/resources/mapping_test.xml"), "External mapping", "EXT");
 
