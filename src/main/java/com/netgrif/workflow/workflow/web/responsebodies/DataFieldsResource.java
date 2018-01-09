@@ -20,7 +20,7 @@ public class DataFieldsResource extends Resources<Field> {
         if(taskId == null) return;
 
         add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
-            .getData(taskId)).withSelfRel());
+            .getData(taskId, null)).withSelfRel());
         add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
             .saveData(taskId, null)).withRel("edit"));
     }
