@@ -43,7 +43,7 @@ public class PetriNetService implements IPetriNetService {
     @Override
     public void importPetriNet(File xmlFile, String name, String initials, LoggedUser user) throws IOException, SAXException, ParserConfigurationException {
         importer.importPetriNet(xmlFile, name, initials);
-        publisher.publishEvent(new UserImportModelEvent(user, xmlFile));
+        publisher.publishEvent(new UserImportModelEvent(user, xmlFile, name, initials));
         xmlFile.delete();
     }
 
