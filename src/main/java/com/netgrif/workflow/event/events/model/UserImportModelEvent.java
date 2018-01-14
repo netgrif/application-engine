@@ -11,9 +11,17 @@ public class UserImportModelEvent extends UserEvent {
     @Getter
     private File model;
 
-    public UserImportModelEvent(LoggedUser user, File model) {
+    @Getter
+    private String title;
+
+    @Getter
+    private String initials;
+
+    public UserImportModelEvent(LoggedUser user, File model, String title, String initials) {
         super(user);
         this.model = model;
+        this.title = title;
+        this.initials = initials;
     }
 
     @Override
@@ -21,6 +29,7 @@ public class UserImportModelEvent extends UserEvent {
         return "User " +
                 ((LoggedUser) this.source).getUsername() +
                 " imported new model " +
-                this.model.getName();
+                this.model.getName() +
+                " with title " + this.getTitle() + " and initials " + this.getInitials();
     }
 }
