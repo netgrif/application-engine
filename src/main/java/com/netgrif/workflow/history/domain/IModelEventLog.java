@@ -1,10 +1,8 @@
 package com.netgrif.workflow.history.domain;
 
-import java.io.File;
-
 public interface IModelEventLog {
 
-    void setModel(File model);
+    void setModel(String model);
 
-    File getModel();
+    String getModel();
 }
