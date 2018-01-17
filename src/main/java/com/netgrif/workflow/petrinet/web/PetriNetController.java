@@ -27,6 +27,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Map;
 
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
@@ -125,6 +126,12 @@ public class PetriNetController {
     TransactionsResource getTransactions(@PathVariable("netId") String netId) {
         PetriNet net = service.loadPetriNet(decodeUrl(netId));
         return new TransactionsResource(net.getTransactions().values(), netId);
+    }
+
+    @RequestMapping(value = "/search", method = POST)
+    public @ResponseBody PetriNetSmallResources searchPetriNets(Authentication auth, @RequestBody Map<String, Object> criteria){
+        //TODO 28/11/2017 complete search for petri nets
+        return null;
     }
 
     public static String decodeUrl(String s1) {

@@ -10,6 +10,7 @@ import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository;
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.workflow.petrinet.web.responsebodies.DataFieldReference;
 import com.netgrif.workflow.petrinet.web.responsebodies.PetriNetReference;
+import com.netgrif.workflow.petrinet.web.responsebodies.PetriNetSmall;
 import com.netgrif.workflow.petrinet.web.responsebodies.TransitionReference;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
@@ -23,6 +24,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -42,7 +44,9 @@ public class PetriNetService implements IPetriNetService {
 
     @Override
     public void importPetriNet(File xmlFile, String name, String initials, LoggedUser user) throws IOException, SAXException, ParserConfigurationException {
-        importer.importPetriNet(xmlFile, name, initials);
+        PetriNet net = importer.importPetriNet(xmlFile, name, initials);
+        net.setAuthor(user.getId());
+        repository.save(net);
         publisher.publishEvent(new UserImportModelEvent(user, xmlFile, name, initials));
         xmlFile.delete();
     }
@@ -123,5 +127,27 @@ public class PetriNetService implements IPetriNetService {
         BasicQuery query = new BasicQuery(builder.toString(), "{_id:1,title:1}");
         List<PetriNet> nets = mongoTemplate.find(query, PetriNet.class);
         return nets.stream().map(PetriNetReference::new).collect(Collectors.toList());
+    }
+
+    public List<PetriNetSmall> searchPetriNet(Map<String, Object> criteria){
+        if(criteria == null || criteria.isEmpty())
+            return loadAllSmall();
+
+        StringBuilder builder = new StringBuilder();
+        builder.append("{");
+        if(criteria.containsKey("author")){
+            builder.append("\"author\":");
+            builder.append(criteria.get("author"));
+        }
+        //other parameters
+        //TODO 28/11/2017 make better search over nets
+
+        builder.append("}");
+        BasicQuery query = new BasicQuery(builder.toString());
+        return mongoTemplate.find(query,PetriNet.class).stream().map(PetriNetSmall::fromPetriNet).collect(Collectors.toList());
+    }
+
+    public List<PetriNetSmall> loadAllSmall(){
+        return repository.findAll().stream().map(PetriNetSmall::fromPetriNet).collect(Collectors.toList());
     }
 }
