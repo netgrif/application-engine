@@ -29,6 +29,9 @@ public class PetriNet extends PetriNetObject {
     @Getter @Setter
     private LocalDateTime creationDate;
 
+    @Getter @Setter
+    private Long author;
+
     @org.springframework.data.mongodb.core.mapping.Field("places")
     @Getter @Setter
     private Map<String, Place> places;
