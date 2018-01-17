@@ -43,7 +43,7 @@ public abstract class PetriNetService implements IPetriNetService {
     @Override
     public Optional<PetriNet> importPetriNet(File xmlFile, String name, String initials, LoggedUser user) {
         Optional<PetriNet> imported = getImporter().importPetriNet(xmlFile, name, initials);
-        publisher.publishEvent(new UserImportModelEvent(user, xmlFile));
+        publisher.publishEvent(new UserImportModelEvent(user, xmlFile, name, initials));
         xmlFile.delete();
         return imported;
     }
