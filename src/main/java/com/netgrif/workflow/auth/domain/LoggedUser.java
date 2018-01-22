@@ -36,6 +36,10 @@ public class LoggedUser extends org.springframework.security.core.userdetails.Us
         processRoles.forEach(role -> this.processRoles.add(role.getRoleId()));
     }
 
+    public boolean isAdmin(){
+        return getAuthorities().contains(new Authority(Authority.admin));
+    }
+
     public User transformToUser(){
         User user = new User(this.id);
         user.setEmail(getUsername());
