@@ -14,6 +14,9 @@ import com.netgrif.workflow.petrinet.web.responsebodies.PetriNetSmall;
 import com.netgrif.workflow.petrinet.web.responsebodies.TransitionReference;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.BasicQuery;
 import org.springframework.stereotype.Service;
@@ -129,25 +132,76 @@ public class PetriNetService implements IPetriNetService {
         return nets.stream().map(PetriNetReference::new).collect(Collectors.toList());
     }
 
-    public List<PetriNetSmall> searchPetriNet(Map<String, Object> criteria){
-        if(criteria == null || criteria.isEmpty())
-            return loadAllSmall();
+    public Page<PetriNetSmall> searchPetriNet(Map<String, Object> criteria, LoggedUser user, Pageable pageable) {
+        StringBuilder queryBuilder = new StringBuilder();
+        queryBuilder.append("{");
 
-        StringBuilder builder = new StringBuilder();
-        builder.append("{");
-        if(criteria.containsKey("author")){
-            builder.append("\"author\":");
-            builder.append(criteria.get("author"));
+        if(!user.isAdmin())
+            queryBuilder.append(getQueryByRoles(user));
+
+        if(criteria != null && !criteria.isEmpty()){
+            if(!user.isAdmin())
+                queryBuilder.append(",");
+
+            if(criteria.containsKey("author")){
+                queryBuilder.append(getQueryByTextValue("author",criteria.get("author")));
+                queryBuilder.append(",");
+            }
+            if(criteria.containsKey("title")){
+                queryBuilder.append(getQueryByTextValue("title",criteria.get("title")));
+                queryBuilder.append(",");
+            }
+            if(criteria.containsKey("initials")){
+                queryBuilder.append(getQueryByTextValue("initials",criteria.get("initials")));
+                queryBuilder.append(",");
+            }
+
+            queryBuilder.deleteCharAt(queryBuilder.length()-1);
         }
-        //other parameters
-        //TODO 28/11/2017 make better search over nets
+        queryBuilder.append("}");
 
-        builder.append("}");
-        BasicQuery query = new BasicQuery(builder.toString());
-        return mongoTemplate.find(query,PetriNet.class).stream().map(PetriNetSmall::fromPetriNet).collect(Collectors.toList());
+        BasicQuery query = new BasicQuery(queryBuilder.toString());
+        query = (BasicQuery)query.with(pageable);
+        List<PetriNet> nets = mongoTemplate.find(query,PetriNet.class);
+        return new PageImpl<>(nets.stream().map(PetriNetSmall::fromPetriNet).collect(Collectors.toList()),
+                pageable,mongoTemplate.count(new BasicQuery(queryBuilder.toString(),"{_id:1"),PetriNet.class));
     }
 
-    public List<PetriNetSmall> loadAllSmall(){
-        return repository.findAll().stream().map(PetriNetSmall::fromPetriNet).collect(Collectors.toList());
+    private String getQueryByRoles(LoggedUser user) {
+        final StringBuilder builder = new StringBuilder();
+        builder.append("$or:[");
+        user.getProcessRoles().forEach(role -> {
+            builder.append("{\"roles.");
+            builder.append(role);
+            builder.append("\":{$exists:true}},");
+        });
+        if(!user.getProcessRoles().isEmpty())
+            builder.deleteCharAt(builder.length() - 1);
+        builder.append("]");
+        return builder.toString();
+    }
+
+    private String getQueryByTextValue(String attributeName, Object object){
+        StringBuilder builder = new StringBuilder();
+        builder.append("\""+attributeName+"\":");
+        if(object instanceof String){
+            builder.append(object);
+        } else if(object instanceof List){
+            builder.append(getMongoInQuery((List<Object>)object));
+        }
+        return builder.toString();
+    }
+
+    private static String getMongoInQuery(List<Object> objs){
+        StringBuilder builder = new StringBuilder();
+        builder.append("{$in:[");
+        objs.forEach(o -> {
+            builder.append(o);
+            builder.append(",");
+        });
+        if(!objs.isEmpty())
+            builder.deleteCharAt(builder.length()-1);
+        builder.append("]}");
+        return builder.toString();
     }
 }
