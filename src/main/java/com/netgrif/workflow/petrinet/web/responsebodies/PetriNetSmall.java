@@ -62,4 +62,20 @@ public class PetriNetSmall extends PetriNetObject {
 
         return small;
     }
+
+    @Override
+    public String toString() {
+        return "PetriNetSmall{" +
+                "title='" + title + '\'' +
+                ", initials='" + initials + '\'' +
+                ", icon='" + icon + '\'' +
+                ", creationDate=" + creationDate +
+                ", author=" + author +
+                ", places=" + places +
+                ", transitions=" + transitions +
+                ", arcs=" + arcs +
+                ", dataSet=" + dataSet +
+                ", roles=" + roles +
+                '}';
+    }
 }
