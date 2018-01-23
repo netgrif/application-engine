@@ -40,6 +40,9 @@ public class PetriNetSmall extends PetriNetObject {
     private Integer dataSet;
 
     @Getter @Setter
+    private Integer actions;
+
+    @Getter @Setter
     private Integer roles;
 
     public PetriNetSmall(ObjectId id, String title, String initials) {
@@ -58,6 +61,9 @@ public class PetriNetSmall extends PetriNetObject {
         small.setArcs(Integer.parseInt(original.getArcs().entrySet().stream().reduce(new AbstractMap.SimpleEntry<>("0",null),
                 (x,y) -> new AbstractMap.SimpleEntry<>((Integer.parseInt(x.getKey()) + y.getValue().size()) + "", null)).getKey()));
         small.setDataSet(original.getDataSet().size());
+        small.setActions(0);
+        small.setActions(original.getDataSet().entrySet().stream()
+                .reduce(small.getActions(),(current, entry) -> entry.getValue().getActions().size(), Integer::sum));
         small.setRoles(original.getRoles().size());
 
         return small;
