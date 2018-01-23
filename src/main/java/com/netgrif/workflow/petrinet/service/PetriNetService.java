@@ -143,10 +143,10 @@ public class PetriNetService implements IPetriNetService {
             if(!user.isAdmin())
                 queryBuilder.append(",");
 
-            if(criteria.containsKey("author")){
-                queryBuilder.append(getQueryByTextValue("author",criteria.get("author")));
-                queryBuilder.append(",");
-            }
+//            if(criteria.containsKey("author")){
+//                queryBuilder.append(getQueryByTextValue("author",criteria.get("author")));
+//                queryBuilder.append(",");
+//            }
             if(criteria.containsKey("title")){
                 queryBuilder.append(getQueryByTextValue("title",criteria.get("title")));
                 queryBuilder.append(",");
