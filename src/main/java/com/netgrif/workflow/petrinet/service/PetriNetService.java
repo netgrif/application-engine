@@ -164,7 +164,7 @@ public class PetriNetService implements IPetriNetService {
         query = (BasicQuery)query.with(pageable);
         List<PetriNet> nets = mongoTemplate.find(query,PetriNet.class);
         return new PageImpl<>(nets.stream().map(PetriNetSmall::fromPetriNet).collect(Collectors.toList()),
-                pageable,mongoTemplate.count(new BasicQuery(queryBuilder.toString(),"{_id:1"),PetriNet.class));
+                pageable,mongoTemplate.count(new BasicQuery(queryBuilder.toString(),"{_id:1}"),PetriNet.class));
     }
 
     private String getQueryByRoles(LoggedUser user) {
