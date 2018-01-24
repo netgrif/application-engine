@@ -50,4 +50,13 @@ public class LoggedUser extends org.springframework.security.core.userdetails.Us
 
         return user;
     }
+
+    public Author transformToAuthor(){
+        Author author = new Author();
+        author.setId(this.id);
+        author.setEmail(getUsername());
+        author.setFullName(this.fullName);
+
+        return author;
+    }
 }

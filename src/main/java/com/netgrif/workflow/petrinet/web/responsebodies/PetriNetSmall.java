@@ -1,5 +1,6 @@
 package com.netgrif.workflow.petrinet.web.responsebodies;
 
+import com.netgrif.workflow.auth.domain.Author;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.PetriNetObject;
 import lombok.Getter;
@@ -25,7 +26,7 @@ public class PetriNetSmall extends PetriNetObject {
     private LocalDateTime creationDate;
 
     @Getter @Setter
-    private Long author;
+    private Author author;
 
     @Getter @Setter
     private Integer places;
