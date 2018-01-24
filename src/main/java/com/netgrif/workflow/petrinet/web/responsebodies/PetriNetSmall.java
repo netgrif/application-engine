@@ -55,16 +55,14 @@ public class PetriNetSmall extends PetriNetObject {
     public static PetriNetSmall fromPetriNet(PetriNet original){
         PetriNetSmall small = new PetriNetSmall(original.getObjectId(), original.getTitle(),original.getInitials());
         small.setIcon(original.getIcon());
-        small.setAuthor(original.getAuthor());
+        small.setAuthor(original.getAuthor() == null ? new Author(null, "nae@netgrif.com", "System") : original.getAuthor());
         small.setCreationDate(original.getCreationDate());
         small.setPlaces(original.getPlaces().size());
         small.setTransitions(original.getTransitions().size());
         small.setArcs(Integer.parseInt(original.getArcs().entrySet().stream().reduce(new AbstractMap.SimpleEntry<>("0",null),
                 (x,y) -> new AbstractMap.SimpleEntry<>((Integer.parseInt(x.getKey()) + y.getValue().size()) + "", null)).getKey()));
         small.setDataSet(original.getDataSet().size());
-        small.setActions(0);
-        small.setActions(original.getDataSet().entrySet().stream()
-                .reduce(small.getActions(),(current, entry) -> entry.getValue().getActions().size(), Integer::sum));
+        small.setActions(original.getDataSet().values().stream().mapToInt(f -> f.getActions() == null ? 0 : f.getActions().size()).sum());
         small.setRoles(original.getRoles().size());
 
         return small;

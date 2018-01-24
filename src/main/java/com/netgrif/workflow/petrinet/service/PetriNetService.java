@@ -136,35 +136,35 @@ public class PetriNetService implements IPetriNetService {
         StringBuilder queryBuilder = new StringBuilder();
         queryBuilder.append("{");
 
-        if(!user.isAdmin())
+        if (!user.isAdmin())
             queryBuilder.append(getQueryByRoles(user));
 
-        if(criteria != null && !criteria.isEmpty()){
-            if(!user.isAdmin())
+        if (criteria != null && !criteria.isEmpty()) {
+            if (!user.isAdmin())
                 queryBuilder.append(",");
 
 //            if(criteria.containsKey("author")){
 //                queryBuilder.append(getQueryByTextValue("author",criteria.get("author")));
 //                queryBuilder.append(",");
 //            }
-            if(criteria.containsKey("title")){
-                queryBuilder.append(getQueryByTextValue("title",criteria.get("title")));
+            if (criteria.containsKey("title")) {
+                queryBuilder.append(getQueryByTextValue("title", criteria.get("title")));
                 queryBuilder.append(",");
             }
-            if(criteria.containsKey("initials")){
-                queryBuilder.append(getQueryByTextValue("initials",criteria.get("initials")));
+            if (criteria.containsKey("initials")) {
+                queryBuilder.append(getQueryByTextValue("initials", criteria.get("initials")));
                 queryBuilder.append(",");
             }
 
-            queryBuilder.deleteCharAt(queryBuilder.length()-1);
+            queryBuilder.deleteCharAt(queryBuilder.length() - 1);
         }
         queryBuilder.append("}");
 
         BasicQuery query = new BasicQuery(queryBuilder.toString());
-        query = (BasicQuery)query.with(pageable);
-        List<PetriNet> nets = mongoTemplate.find(query,PetriNet.class);
+        query = (BasicQuery) query.with(pageable);
+        List<PetriNet> nets = mongoTemplate.find(query, PetriNet.class);
         return new PageImpl<>(nets.stream().map(PetriNetSmall::fromPetriNet).collect(Collectors.toList()),
-                pageable,mongoTemplate.count(new BasicQuery(queryBuilder.toString(),"{_id:1}"),PetriNet.class));
+                pageable, mongoTemplate.count(new BasicQuery(queryBuilder.toString(), "{_id:1}"), PetriNet.class));
     }
 
     private String getQueryByRoles(LoggedUser user) {
@@ -175,32 +175,32 @@ public class PetriNetService implements IPetriNetService {
             builder.append(role);
             builder.append("\":{$exists:true}},");
         });
-        if(!user.getProcessRoles().isEmpty())
+        if (!user.getProcessRoles().isEmpty())
             builder.deleteCharAt(builder.length() - 1);
         builder.append("]");
         return builder.toString();
     }
 
-    private String getQueryByTextValue(String attributeName, Object object){
+    private String getQueryByTextValue(String attributeName, Object object) {
         StringBuilder builder = new StringBuilder();
-        builder.append("\""+attributeName+"\":");
-        if(object instanceof String){
-            builder.append(object);
-        } else if(object instanceof List){
-            builder.append(getMongoInQuery((List<Object>)object));
+        builder.append("\"" + attributeName + "\":");
+        if (object instanceof String) {
+            builder.append("\"" + object + "\"");
+        } else if (object instanceof List) {
+            builder.append(getMongoInQuery((List<Object>) object));
         }
         return builder.toString();
     }
 
-    private static String getMongoInQuery(List<Object> objs){
+    private static String getMongoInQuery(List<Object> objs) {
         StringBuilder builder = new StringBuilder();
         builder.append("{$in:[");
         objs.forEach(o -> {
-            builder.append(o);
+            builder.append("\"" + o.toString() + "\"");
             builder.append(",");
         });
-        if(!objs.isEmpty())
-            builder.deleteCharAt(builder.length()-1);
+        if (!objs.isEmpty())
+            builder.deleteCharAt(builder.length() - 1);
         builder.append("]}");
         return builder.toString();
     }
