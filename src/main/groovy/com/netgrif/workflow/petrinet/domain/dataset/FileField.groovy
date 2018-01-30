@@ -13,6 +13,11 @@ class FileField extends FieldWithDefault<String> {
     }
 
     @Override
+    FieldType getType() {
+        return FieldType.FILE
+    }
+
+    @Override
     void clearValue() {
         super.clearValue()
         setValue(getDefaultValue())

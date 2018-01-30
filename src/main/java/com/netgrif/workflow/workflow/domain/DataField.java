@@ -1,6 +1,7 @@
 package com.netgrif.workflow.workflow.domain;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.FieldBehavior;
@@ -18,6 +19,11 @@ public class DataField {
     @Getter
     @Setter
     private Object value;
+
+    @Getter
+    @Setter
+    @JsonIgnore
+    private String encryption;
 
     public DataField() {
         behavior = new HashMap<>();

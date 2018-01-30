@@ -22,6 +22,11 @@ class UserField extends Field<User> {
     }
 
     @Override
+    FieldType getType() {
+        return FieldType.USER
+    }
+
+    @Override
     void clearValue() {
         super.clearValue()
         setValue(null)
