@@ -1,5 +1,6 @@
 package com.netgrif.workflow.petrinet.domain.roles;
 
+import com.netgrif.workflow.petrinet.domain.I18nString;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -7,10 +8,12 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document
 public class ProcessRole {
 
+    public static final String DEFAULT_ROLE = "default";
+
     @Id
     private ObjectId _id;
 
-    private String name;
+    private I18nString name;
 
     private String description;
 
@@ -30,11 +33,15 @@ public class ProcessRole {
         this._id = _id;
     }
 
-    public String getName() {
+    public I18nString getName() {
         return name;
     }
 
     public void setName(String name) {
+        setName(new I18nString(name));
+    }
+
+    public void setName(I18nString name) {
         this.name = name;
     }
 

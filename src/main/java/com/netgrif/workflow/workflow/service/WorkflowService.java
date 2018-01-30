@@ -10,7 +10,9 @@ import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository;
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.workflow.petrinet.web.responsebodies.PetriNetReference;
+import com.netgrif.workflow.security.service.EncryptionService;
 import com.netgrif.workflow.workflow.domain.Case;
+import com.netgrif.workflow.workflow.domain.DataField;
 import com.netgrif.workflow.workflow.domain.repositories.CaseRepository;
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
@@ -21,9 +23,11 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.BasicQuery;
+import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.LongStream;
 
@@ -51,15 +55,30 @@ public class WorkflowService implements IWorkflowService {
     @Autowired
     private ApplicationEventPublisher publisher;
 
+    @Autowired
+    private EncryptionService encryptionService;
+
     @Override
-    public Case saveCase(Case useCase) {
+    public Case save(Case useCase) {
+        encryptDataSet(useCase);
         return repository.save(useCase);
+    }
+
+    @Override
+    public Case findOne(String caseId) {
+        Case useCase = repository.findOne(caseId);
+        if (useCase == null)
+            return null;
+        decryptDataSet(useCase);
+        return useCase;
     }
 
     @Override
     public Page<Case> getAll(Pageable pageable) {
         //page.getContent().forEach(aCase -> aCase.getPetriNet().initializeArcs());
-        return setImmediateDataFields(repository.findAll(pageable));
+        Page<Case> page = repository.findAll(pageable);
+        decryptDataSets(page.getContent());
+        return setImmediateDataFields(page);
     }
 
     public Page<Case> searchCase(List<String> nets, Pageable pageable) {
@@ -75,25 +94,26 @@ public class WorkflowService implements IWorkflowService {
         BasicQuery query = new BasicQuery(queryString);
         query = (BasicQuery) query.with(pageable);
         List<Case> useCases = mongoTemplate.find(query, Case.class);
+        decryptDataSets(useCases);
         return setImmediateDataFields(new PageImpl<Case>(useCases, pageable, mongoTemplate.count(new BasicQuery(queryString, "{_id:1}"), Case.class)));
     }
 
-    public Page<Case> search(Map<String, Object> request, Pageable pageable, LoggedUser user) {
+    public Page<Case> search(Map<String, Object> request, Pageable pageable, LoggedUser user, Locale locale) {
         String key = "petriNet";
 
-        List<PetriNetReference> nets = petriNetService.getAllAccessibleReferences(user);
+        List<PetriNetReference> nets = petriNetService.getAllAccessibleReferences(user, locale);
         if (request.containsKey(key)) {
             Set<String> netIds = nets.stream().map(PetriNetReference::getEntityId).collect(Collectors.toSet());
             if (request.get(key) instanceof String && !netIds.contains(request.get(key)))
-                return new PageImpl<Case>(new ArrayList<>(),pageable,0);
+                return new PageImpl<Case>(new ArrayList<>(), pageable, 0);
             else if (request.get(key) instanceof List) {
-                request.put(key,((List<String>)request.get(key)).stream().filter(netIds::contains).collect(Collectors.toList()));
+                request.put(key, ((List<String>) request.get(key)).stream().filter(netIds::contains).collect(Collectors.toList()));
             }
-
         } else
             request.put(key, nets.stream().map(PetriNetReference::getEntityId).collect(Collectors.toList()));
-
-        return setImmediateDataFields(searchService.search(request, pageable,Case.class));
+        Page<Case> page = searchService.search(request, pageable, Case.class);
+        decryptDataSets(page.getContent());
+        return setImmediateDataFields(page);
     }
 
     @Override
@@ -117,7 +137,7 @@ public class WorkflowService implements IWorkflowService {
         useCase.setColor(color);
         useCase.setAuthor(authorId);
         useCase.setIcon(petriNet.getIcon());
-        useCase = saveCase(useCase);
+        useCase = save(useCase);
 
         publisher.publishEvent(new CreateCaseEvent(useCase));
 
@@ -131,6 +151,7 @@ public class WorkflowService implements IWorkflowService {
         BasicQuery query = new BasicQuery(queryString);
         query = (BasicQuery) query.with(pageable);
         List<Case> cases = mongoTemplate.find(query, Case.class);
+        decryptDataSets(cases);
         return setImmediateDataFields(new PageImpl<Case>(cases, pageable, mongoTemplate.count(new BasicQuery(queryString, "{_id:1}"), Case.class)));
     }
 
@@ -181,5 +202,48 @@ public class WorkflowService implements IWorkflowService {
 
         useCase.setImmediateData(immediateData);
         return useCase;
+    }
+
+    private void encryptDataSet(Case useCase) {
+        applyCryptoMethodOnDataSet(useCase, entry -> encryptionService.encrypt(entry.getFirst(), entry.getSecond()));
+    }
+
+    private void decryptDataSet(Case useCase) {
+        applyCryptoMethodOnDataSet(useCase, entry -> encryptionService.decrypt(entry.getFirst(), entry.getSecond()));
+    }
+
+    private void decryptDataSets(Collection<Case> cases) {
+        for (Case aCase : cases) {
+            decryptDataSet(aCase);
+        }
+    }
+
+    private void applyCryptoMethodOnDataSet(Case useCase, Function<Pair<String, String>, String> method) {
+        Map<DataField, String> dataFields = getEncryptedDataSet(useCase);
+
+        for (Map.Entry<DataField, String> entry : dataFields.entrySet()) {
+            DataField dataField = entry.getKey();
+            String value = (String) dataField.getValue();
+            String encryption = entry.getValue();
+
+            if (value == null)
+                continue;
+
+            dataField.setValue(method.apply(Pair.of(value, encryption)));
+        }
+    }
+
+    private Map<DataField, String> getEncryptedDataSet(Case useCase) {
+        PetriNet net = useCase.getPetriNet();
+        Map<DataField, String> encryptedDataSet = new HashMap<>();
+
+        for (Map.Entry<String, Field> entry : net.getDataSet().entrySet()) {
+            String encryption = entry.getValue().getEncryption();
+            if (encryption != null) {
+                encryptedDataSet.put(useCase.getDataSet().get(entry.getKey()), encryption);
+            }
+        }
+
+        return encryptedDataSet;
     }
 }

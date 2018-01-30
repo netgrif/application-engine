@@ -6,6 +6,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
+import org.springframework.hateoas.RelProvider;
 import org.springframework.hateoas.config.EnableHypermediaSupport;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 
@@ -15,6 +16,11 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 @EnableAspectJAutoProxy
 @SpringBootApplication
 public class WorkflowManagementSystemApplication {
+
+    @Bean
+    RelProvider relProvider() {
+        return new JsonRootRelProvider();
+    }
 
     @Bean
     ApplicationContextProvider applicationContextProvider() {

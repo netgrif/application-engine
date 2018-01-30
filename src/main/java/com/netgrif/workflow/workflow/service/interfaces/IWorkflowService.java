@@ -7,10 +7,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 public interface IWorkflowService {
-    Case saveCase(Case useCase);
+    Case save(Case useCase);
+
+    Case findOne(String caseId);
 
     Page<Case> getAll(Pageable pageable);
 
@@ -26,7 +29,7 @@ public interface IWorkflowService {
 
     List<Field> getData(String caseId);
 
-    Page<Case> search(Map<String, Object> request, Pageable pageable, LoggedUser user);
+    Page<Case> search(Map<String, Object> request, Pageable pageable, LoggedUser user, Locale locale);
 
     List<Case> getCaseFieldChoices(Pageable pageable, String caseId, String fieldId);
 }

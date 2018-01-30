@@ -18,8 +18,8 @@ public class Transaction extends PetriNetObject {
     @Getter @Setter
     private List<String> transitions;
 
-    @Getter @Setter
-    private String title;
+    @Getter
+    private I18nString title;
 
     public Transaction() {
         this._id = new ObjectId();
@@ -32,5 +32,13 @@ public class Transaction extends PetriNetObject {
      */
     public void addTransition(Transition transition) {
         transitions.add(transition.getStringId());
+    }
+
+    public void setTitle(I18nString title) {
+        this.title = title;
+    }
+
+    public void setTitle(String title) {
+        setTitle(new I18nString(title));
     }
 }
