@@ -16,8 +16,8 @@ import java.util.stream.Collectors;
 @Document
 public class PetriNet extends PetriNetObject {
 
-    @Getter @Setter
-    private String title;
+    @Getter
+    private I18nString title;
 
     @Getter @Setter
     private String initials;
@@ -73,7 +73,7 @@ public class PetriNet extends PetriNetObject {
 
     public PetriNet(String title, String initials) {
         this();
-        this.title = title;
+        setTitle(title);
         this.initials = initials;
     }
 
@@ -162,7 +162,7 @@ public class PetriNet extends PetriNetObject {
     public Transaction getTransactionByTransition(Transition transition) {
         return transactions.values().stream()
                 .filter(transaction ->
-                        transaction.getTransitions().contains(transition.getObjectId())
+                        transaction.getTransitions().contains(transition.getStringId())
                 ).findAny().orElse(null);
     }
 
@@ -176,6 +176,14 @@ public class PetriNet extends PetriNetObject {
 
     @Override
     public String toString() {
-        return title;
+        return title.toString();
+    }
+
+    public void setTitle(I18nString title) {
+        this.title = title;
+    }
+
+    public void setTitle(String title) {
+        setTitle(new I18nString(title));
     }
 }

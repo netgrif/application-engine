@@ -20,7 +20,6 @@ import com.netgrif.workflow.petrinet.domain.throwable.TransitionNotExecutableExc
 import com.netgrif.workflow.utils.DateUtils;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.Task;
-import com.netgrif.workflow.workflow.domain.repositories.CaseRepository;
 import com.netgrif.workflow.workflow.domain.repositories.TaskRepository;
 import com.netgrif.workflow.workflow.domain.triggers.AutoTrigger;
 import com.netgrif.workflow.workflow.domain.triggers.TimeTrigger;
@@ -66,9 +65,6 @@ public class TaskService implements ITaskService {
     private TaskRepository taskRepository;
 
     @Autowired
-    private CaseRepository caseRepository;
-
-    @Autowired
     private UserRepository userRepository;
 
     @Autowired
@@ -87,13 +83,13 @@ public class TaskService implements ITaskService {
     private WorkflowService workflowService;
 
     //    @Override
-//    public Page<Task> getAll(LoggedUser loggedUser, Pageable pageable) {
+//    public Page<LocalisedTask> getAll(LoggedUser loggedUser, Pageable pageable) {
 //        User user = userRepository.findOne(loggedUser.getId());
 //        List<String> roles = new LinkedList<>(user.getUserProcessRoles()).stream().map(UserProcessRole::getRoleId).collect(Collectors.toList());
 //        return loadUsers(taskRepository.findAllByAssignRoleInOrDelegateRoleIn(pageable, roles, roles));
 //    }
     @Override
-    public Page<Task> getAll(LoggedUser loggedUser, Pageable pageable) {
+    public Page<Task> getAll(LoggedUser loggedUser, Pageable pageable, Locale locale) {
         List<Task> tasks;
         if (loggedUser.getProcessRoles().isEmpty()) {
             tasks = new ArrayList<>();
@@ -214,7 +210,7 @@ public class TaskService implements ITaskService {
             throw new Exception("User that is not assigned tried to finish task");
         }
 
-        Case useCase = caseRepository.findOne(task.getCaseId());
+        Case useCase = workflowService.findOne(task.getCaseId());
         Transition transition = useCase.getPetriNet().getTransition(task.getTransitionId());
 
         finishExecution(transition, useCase);
@@ -222,7 +218,7 @@ public class TaskService implements ITaskService {
         task.setFinishedBy(task.getUserId());
         task.setUserId(null);
 
-        caseRepository.save(useCase);
+        workflowService.save(useCase);
         taskRepository.save(task);
         reloadTasks(useCase, userId);
 
@@ -233,7 +229,7 @@ public class TaskService implements ITaskService {
     @Transactional
     public void assignTask(Long userId, String taskId) throws TransitionNotExecutableException {
         Task task = taskRepository.findOne(taskId);
-        Case useCase = caseRepository.findOne(task.getCaseId());
+        Case useCase = workflowService.findOne(task.getCaseId());
         User user = userRepository.findOne(userId);
 
         assignTaskToUser(user, task, useCase);
@@ -246,7 +242,7 @@ public class TaskService implements ITaskService {
     @Override
     public List<Field> getData(String taskId) {
         Task task = taskRepository.findOne(taskId);
-        Case useCase = caseRepository.findOne(task.getCaseId());
+        Case useCase = workflowService.findOne(task.getCaseId());
 
         return getData(task, useCase);
     }
@@ -279,14 +275,14 @@ public class TaskService implements ITaskService {
         LongStream.range(0L, dataSetFields.size())
                 .forEach(index -> dataSetFields.get((int) index).setOrder(index));
 
-        caseRepository.save(useCase);
+        workflowService.save(useCase);
         return dataSetFields;
     }
 
     @Override
     public List<DataGroup> getDataGroups(String taskId) {
         Task task = taskRepository.findOne(taskId);
-        Case useCase = caseRepository.findOne(task.getCaseId());
+        Case useCase = workflowService.findOne(task.getCaseId());
         Transition transition = useCase.getPetriNet().getTransition(task.getTransitionId());
 
         return new ArrayList<>(transition.getDataGroups().values());
@@ -309,7 +305,7 @@ public class TaskService implements ITaskService {
     }
 
     public List<Field> getImmediateFields(Task task) {
-        Case useCase = caseRepository.findOne(task.getCaseId());
+        Case useCase = workflowService.findOne(task.getCaseId());
 
         List<Field> fields = task.getImmediateDataFields().stream().map(id -> buildField(useCase, id, false)).collect(Collectors.toList());
         LongStream.range(0L, fields.size()).forEach(index -> fields.get((int) index).setOrder(index));
@@ -318,9 +314,9 @@ public class TaskService implements ITaskService {
     }
 
     @Override
-    public List<TaskReference> findAllByCase(String caseId) {
+    public List<TaskReference> findAllByCase(String caseId, Locale locale) {
         return taskRepository.findAllByCaseId(caseId).stream()
-                .map(task -> new TaskReference(task.getStringId(), task.getTitle(), task.getTransitionId()))
+                .map(task -> new TaskReference(task.getStringId(), task.getTitle().getTranslation(locale), task.getTransitionId()))
                 .collect(Collectors.toList());
     }
 
@@ -333,7 +329,7 @@ public class TaskService implements ITaskService {
             field.setValue(new HashSet<String>(((MultichoiceField) field).getValue()));
         } else if (field instanceof CaseField && field.getValue() != null) {
             CaseField caseField = (CaseField) field;
-            Case useCase = caseRepository.findOne(caseField.getValue());
+            Case useCase = workflowService.findOne(caseField.getValue());
             PetriNet net = useCase.getPetriNet();
 
             if (caseField.getConstraintNetIds() == null || !caseField.getConstraintNetIds().containsKey(net.getImportId()))
@@ -355,7 +351,7 @@ public class TaskService implements ITaskService {
     @Override
     public ChangedFieldContainer setData(String taskId, ObjectNode values) {
         Task task = taskRepository.findOne(taskId);
-        Case useCase = caseRepository.findOne(task.getCaseId());
+        Case useCase = workflowService.findOne(task.getCaseId());
 
         Map<String, ChangedField> changedFields = new HashMap<>();
         values.fields().forEachRemaining(entry -> {
@@ -372,7 +368,7 @@ public class TaskService implements ITaskService {
             //changedFields.remove(entry.getKey());
         });
 
-        caseRepository.save(useCase);
+        workflowService.save(useCase);
         publisher.publishEvent(new SaveCaseDataEvent(useCase, changedFields.values()));
 
         ChangedFieldContainer container = new ChangedFieldContainer();
@@ -481,7 +477,7 @@ public class TaskService implements ITaskService {
     public void cancelTask(Long userId, String taskId) {
         Task task = taskRepository.findOne(taskId);
         User user = userRepository.findOne(userId);
-        Case useCase = caseRepository.findOne(task.getCaseId());
+        Case useCase = workflowService.findOne(task.getCaseId());
         PetriNet net = useCase.getPetriNet();
 
         net.getArcsOfTransition(task.getTransitionId()).stream()
@@ -497,7 +493,7 @@ public class TaskService implements ITaskService {
 
         task.setUserId(null);
         task = taskRepository.save(task);
-        caseRepository.save(useCase);
+        workflowService.save(useCase);
         reloadTasks(useCase, userId);
 
         publisher.publishEvent(new UserCancelTaskEvent(user, task, useCase));
@@ -514,7 +510,7 @@ public class TaskService implements ITaskService {
     @Override
     public FileSystemResource getFile(String taskId, String fieldId) {
         Task task = taskRepository.findOne(taskId);
-        Case useCase = caseRepository.findOne(task.getCaseId());
+        Case useCase = workflowService.findOne(task.getCaseId());
         FileField field = (FileField) useCase.getPetriNet().getDataSet().get(fieldId);
 
         if (field.isGenerated()) {
@@ -523,7 +519,7 @@ public class TaskService implements ITaskService {
             );
             if (useCase.getDataSet().get(fieldId).getValue() == null) return null;
 
-            caseRepository.save(useCase);
+            workflowService.save(useCase);
             return new FileSystemResource(field.getFilePath((String) useCase.getDataSet().get(fieldId).getValue()));
 
         } else {
@@ -538,7 +534,7 @@ public class TaskService implements ITaskService {
         User delegated = userRepository.findByEmail(delegatedEmail);
         User delegate = userRepository.findOne(userId);
         Task task = taskRepository.findOne(taskId);
-        Case useCase = caseRepository.findOne(task.getCaseId());
+        Case useCase = workflowService.findOne(task.getCaseId());
 
         task.setUserId(delegated.getId());
         taskRepository.save(task);
@@ -550,7 +546,7 @@ public class TaskService implements ITaskService {
     public boolean saveFile(String taskId, String fieldId, MultipartFile multipartFile) {
         try {
             Task task = taskRepository.findOne(taskId);
-            Case useCase = caseRepository.findOne(task.getCaseId());
+            Case useCase = workflowService.findOne(task.getCaseId());
             FileField field = (FileField) useCase.getPetriNet().getDataSet().get(fieldId);
 
             String oldFile = null;
@@ -571,7 +567,7 @@ public class TaskService implements ITaskService {
             fout.close();
 
             useCase.getDataSet().get(fieldId).setValue(multipartFile.getOriginalFilename());
-            caseRepository.save(useCase);
+            workflowService.save(useCase);
 
             return true;
         } catch (IOException e) {
@@ -584,7 +580,7 @@ public class TaskService implements ITaskService {
      * Reloads all unassigned tasks of given case:
      * <table border="1">
      * <tr>
-     * <td></td><td>Task is present</td><td>Task is not present</td>
+     * <td></td><td>LocalisedTask is present</td><td>LocalisedTask is not present</td>
      * </tr>
      * <tr>
      * <td>Transition executable</td><td>no action</td><td>create task</td>
@@ -740,7 +736,7 @@ public class TaskService implements ITaskService {
         task.setUserId(user.getId());
         task.setStartDate(LocalDateTime.now());
 
-        caseRepository.save(useCase);
+        workflowService.save(useCase);
         taskRepository.save(task);
         reloadTasks(useCase, user.getId());
     }
@@ -754,7 +750,7 @@ public class TaskService implements ITaskService {
             getData(task, useCase);
             finishExecution(transition, useCase);
 
-            caseRepository.save(useCase);
+            workflowService.save(useCase);
             reloadTasks(useCase, -1L);
         } catch (TransitionNotExecutableException e) {
             e.printStackTrace();
