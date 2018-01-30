@@ -1,16 +1,16 @@
 package com.netgrif.workflow.petrinet.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.workflow.web.responsebodies.DataFieldsResource;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import org.bson.types.ObjectId;
-import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.util.*;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 @Document
 public class DataGroup extends PetriNetObject {
@@ -23,8 +23,8 @@ public class DataGroup extends PetriNetObject {
     @Getter @Setter
     private DataFieldsResource fields;
 
-    @Getter @Setter
-    private String title;
+    @Getter @Setter(AccessLevel.NONE)
+    private I18nString title;
 
     @Getter @Setter
     private String alignment;
@@ -39,12 +39,24 @@ public class DataGroup extends PetriNetObject {
 
     public DataGroup(String title, String alignment, Boolean stretch) {
         this();
-        this.title = title;
+        this.title = new I18nString(title);
         this.alignment = alignment;
         this.stretch = stretch;
     }
 
     public void addData(String dataId) {
         data.add(dataId);
+    }
+
+    /**
+     * Sets title default value
+     * @param title default string value
+     */
+    public void setTitle(String title) {
+        setTitle(new I18nString(title));
+    }
+
+    public void setTitle(I18nString title) {
+        this.title = title;
     }
 }

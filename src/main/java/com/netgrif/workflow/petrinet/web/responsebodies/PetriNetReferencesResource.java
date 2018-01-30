@@ -16,7 +16,7 @@ public class PetriNetReferencesResource extends Resources<PetriNetReference> {
 
     private void buildLinks() {
         add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(PetriNetController.class)
-                .getAllReferences(null)).withSelfRel());
+                .getAllReferences(null, null)).withSelfRel());
         add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(PetriNetController.class)
                 .getAll()).withRel("all"));
     }

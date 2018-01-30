@@ -10,8 +10,13 @@ class MultichoiceField extends ChoiceField<Set<String>> {
         value = new HashSet<>()
     }
 
-    MultichoiceField(String[] values) {
+    MultichoiceField(List<String> values) {
         super(values)
+    }
+
+    @Override
+    FieldType getType() {
+        return FieldType.MULTICHOICE
     }
 
     @Override
