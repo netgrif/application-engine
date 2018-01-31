@@ -1,6 +1,7 @@
 package com.netgrif.workflow.workflow.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.netgrif.workflow.auth.domain.Author;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.Place;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
@@ -62,7 +63,7 @@ public class Case {
     private List<Field> immediateData;
 
     @Getter @Setter
-    private Long author;
+    private Author author;
 
     @Getter @Setter
     private Map<String, Integer> resetArcTokens;
