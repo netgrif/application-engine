@@ -9,8 +9,8 @@ import org.springframework.stereotype.Component;
 @Component
 public final class ArcFactory {
 
-    private Arc getArc(Type type) throws IllegalArgumentException {
-        switch (type) {
+    public Arc getArc(com.netgrif.workflow.importer.model.Arc arc) throws IllegalArgumentException {
+        switch (arc.getType()) {
             case REGULAR:
                 return new Arc();
             case RESET:
@@ -20,28 +20,7 @@ public final class ArcFactory {
             case READ:
                 return new ReadArc();
             default:
-                throw new IllegalArgumentException(type+" is not a valid Arc type");
-        }
-    }
-
-    public Arc getArc(String type) throws IllegalArgumentException {
-        return getArc(Type.fromString(type));
-    }
-
-    public enum Type {
-        REGULAR("regular"),
-        INHIBITOR("inhibitor"),
-        RESET("reset"),
-        READ("read");
-
-        String name;
-
-        Type(String name) {
-            this.name = name;
-        }
-
-        public static Type fromString(String name) {
-            return Type.valueOf(name.toUpperCase());
+                throw new IllegalArgumentException(arc.getType() + " is not a valid Arc type");
         }
     }
 }

@@ -2,6 +2,7 @@ package com.netgrif.workflow.petrinet.domain.dataset
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.databind.node.ObjectNode
+import com.netgrif.workflow.petrinet.domain.I18nString
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action
 import org.bson.types.ObjectId
 import org.springframework.data.annotation.Id
@@ -17,10 +18,11 @@ abstract class Field<T> {
     @JsonIgnore
     protected Long importId
 
-    private String name
-    private String description
-    private String placeholder
-    protected FieldType type
+    private I18nString name
+    
+    private I18nString description
+    
+    private I18nString placeholder
 
     @Transient
     private ObjectNode behavior
@@ -31,10 +33,13 @@ abstract class Field<T> {
     private Long order
 
     @JsonIgnore
-    private Boolean immediate
+    private boolean immediate
 
     @JsonIgnore
     private LinkedHashSet<Action> actions
+    
+    @JsonIgnore
+    private String encryption
 
     Field() {
         _id = new ObjectId()
@@ -65,37 +70,31 @@ abstract class Field<T> {
         this.importId = importId
     }
 
-    String getName() {
+    I18nString getName() {
         return name
     }
 
-    void setName(String name) {
+    void setName(I18nString name) {
         this.name = name
     }
 
-    String getDescription() {
+    I18nString getDescription() {
         return description
     }
 
-    void setDescription(String description) {
+    void setDescription(I18nString description) {
         this.description = description
     }
 
-    String getPlaceholder() {
+    I18nString getPlaceholder() {
         return placeholder
     }
 
-    void setPlaceholder(String placeholder) {
+    void setPlaceholder(I18nString placeholder) {
         this.placeholder = placeholder
     }
 
-    FieldType getType() {
-        return type
-    }
-
-    void setType(FieldType type) {
-        this.type = type
-    }
+    abstract FieldType getType()
 
     ObjectNode getBehavior() {
         return behavior
@@ -122,11 +121,11 @@ abstract class Field<T> {
     }
 
     Boolean isImmediate() {
-        return immediate
+        return immediate != null && immediate
     }
 
     void setImmediate(Boolean immediate) {
-        this.immediate = immediate
+        this.immediate = immediate != null && immediate
     }
 
     LinkedHashSet<Action> getActions() {
@@ -147,6 +146,14 @@ abstract class Field<T> {
 
     void addAction(String action, String trigger) {
         this.addAction(new Action(action, trigger))
+    }
+
+    String getEncryption() {
+        return encryption
+    }
+
+    void setEncryption(String encryption) {
+        this.encryption = encryption
     }
 
     void clearValue() {}

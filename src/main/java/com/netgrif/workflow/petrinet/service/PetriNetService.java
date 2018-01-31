@@ -13,6 +13,7 @@ import com.netgrif.workflow.petrinet.web.responsebodies.PetriNetReference;
 import com.netgrif.workflow.petrinet.web.responsebodies.PetriNetSmall;
 import com.netgrif.workflow.petrinet.web.responsebodies.TransitionReference;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Lookup;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -20,21 +21,20 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.BasicQuery;
 import org.springframework.stereotype.Service;
-import org.xml.sax.SAXException;
 
-import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+import java.util.Optional;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
-public class PetriNetService implements IPetriNetService {
+public abstract class PetriNetService implements IPetriNetService {
 
-    @Autowired
-    private Importer importer;
+    @Lookup("importer")
+    abstract Importer getImporter();
 
     @Autowired
     private PetriNetRepository repository;
@@ -46,12 +46,15 @@ public class PetriNetService implements IPetriNetService {
     private ApplicationEventPublisher publisher;
 
     @Override
-    public void importPetriNet(File xmlFile, String name, String initials, LoggedUser user) throws IOException, SAXException, ParserConfigurationException {
-        PetriNet net = importer.importPetriNet(xmlFile, name, initials);
-        net.setAuthor(user.transformToAuthor());
-        repository.save(net);
-        publisher.publishEvent(new UserImportModelEvent(user, xmlFile, name, initials));
+    public Optional<PetriNet> importPetriNet(File xmlFile, String name, String initials, LoggedUser user) {
+        Optional<PetriNet> imported = getImporter().importPetriNet(xmlFile, name, initials);
+        if (imported.isPresent()){
+            imported.get().setAuthor(user.transformToAuthor());
+            repository.save(imported.get());
+            publisher.publishEvent(new UserImportModelEvent(user, xmlFile, name, initials));
+        }
         xmlFile.delete();
+        return imported;
     }
 
     @Override
@@ -62,6 +65,9 @@ public class PetriNetService implements IPetriNetService {
     @Override
     public PetriNet loadPetriNet(String id) {
         PetriNet net = repository.findOne(id);
+        if (net == null)
+            throw new IllegalArgumentException("No model with id="+id+" found.");
+
         net.initializeArcs();
         return net;
     }
@@ -74,34 +80,34 @@ public class PetriNetService implements IPetriNetService {
     }
 
     @Override
-    public List<PetriNetReference> getAllReferences(LoggedUser user) {
+    public List<PetriNetReference> getAllReferences(LoggedUser user, Locale locale) {
         List<PetriNet> nets = loadAll();
         if (user.getAuthorities().contains(new Authority(Authority.admin)))
-            return nets.stream().map(net -> new PetriNetReference(net.getObjectId().toString(), net.getTitle())).collect(Collectors.toList());
+            return nets.stream().map(net -> new PetriNetReference(net.getObjectId().toString(), net.getTitle().getTranslation(locale))).collect(Collectors.toList());
         return nets.stream().filter(net -> net.getRoles().keySet().stream().anyMatch(user.getProcessRoles()::contains))
-                .map(net -> new PetriNetReference(net.getObjectId().toString(), net.getTitle())).collect(Collectors.toList());
+                .map(net -> new PetriNetReference(net.getObjectId().toString(), net.getTitle().getTranslation(locale))).collect(Collectors.toList());
     }
 
     @Override
-    public PetriNetReference getReferenceByTitle(LoggedUser user, String title) {
+    public PetriNetReference getReferenceByTitle(LoggedUser user, String title, Locale locale) {
         List<PetriNet> nets = repository.findByTitle(title);
         return nets.stream().filter(net -> net.getRoles().keySet().stream().anyMatch(user.getProcessRoles()::contains))
-                .map(net -> new PetriNetReference(net.getObjectId().toString(), net.getTitle())).findFirst().orElse(new PetriNetReference("", ""));
+                .map(net -> new PetriNetReference(net.getObjectId().toString(), net.getTitle().getTranslation(locale))).findFirst().orElse(new PetriNetReference("", ""));
     }
 
     @Override
-    public List<TransitionReference> getTransitionReferences(List<String> netsIds, LoggedUser user) {
+    public List<TransitionReference> getTransitionReferences(List<String> netsIds, LoggedUser user, Locale locale) {
         Iterable<PetriNet> nets = repository.findAll(netsIds);
         List<TransitionReference> transRefs = new ArrayList<>();
         nets.forEach(net -> transRefs.addAll(net.getTransitions().entrySet().stream()
                 .filter(entry -> entry.getValue().getRoles().keySet().stream().anyMatch(user.getProcessRoles()::contains))
-                .map(entry -> new TransitionReference(entry.getKey(), entry.getValue().getTitle(), net.getStringId()))
+                .map(entry -> new TransitionReference(entry.getKey(), entry.getValue().getTitle().getTranslation(locale), net.getStringId()))
                 .collect(Collectors.toList())));
         return transRefs;
     }
 
     @Override
-    public List<DataFieldReference> getDataFieldReferences(List<String> petriNetIds, List<String> transitionIds) {
+    public List<DataFieldReference> getDataFieldReferences(List<String> petriNetIds, List<String> transitionIds, Locale locale) {
         Iterable<PetriNet> nets = repository.findAll(petriNetIds);
         List<DataFieldReference> dataRefs = new ArrayList<>();
 
@@ -109,7 +115,7 @@ public class PetriNetService implements IPetriNetService {
             Transition trans;
             if ((trans = net.getTransition(transId)) != null) {
                 trans.getDataSet().forEach((key, value) ->
-                        dataRefs.add(new DataFieldReference(key, net.getDataSet().get(key).getName(), net.getStringId(), transId))
+                        dataRefs.add(new DataFieldReference(key, net.getDataSet().get(key).getName().getTranslation(locale), net.getStringId(), transId))
                 );
             }
         }));
@@ -117,7 +123,8 @@ public class PetriNetService implements IPetriNetService {
         return dataRefs;
     }
 
-    public List<PetriNetReference> getAllAccessibleReferences(LoggedUser user) {
+    @Override
+    public List<PetriNetReference> getAllAccessibleReferences(LoggedUser user, Locale locale) {
         StringBuilder builder = new StringBuilder(8 + (user.getProcessRoles().size() * 50));
         builder.append("{$or:[");
         user.getProcessRoles().forEach(role -> {
@@ -129,7 +136,7 @@ public class PetriNetService implements IPetriNetService {
         builder.append("]}");
         BasicQuery query = new BasicQuery(builder.toString(), "{_id:1,title:1}");
         List<PetriNet> nets = mongoTemplate.find(query, PetriNet.class);
-        return nets.stream().map(PetriNetReference::new).collect(Collectors.toList());
+        return nets.stream().map(pn -> new PetriNetReference(pn.getStringId(), pn.getTitle().getTranslation(locale))).collect(Collectors.toList());
     }
 
     public Page<PetriNetSmall> searchPetriNet(Map<String, Object> criteria, LoggedUser user, Pageable pageable) {

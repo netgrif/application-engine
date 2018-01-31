@@ -35,6 +35,7 @@ import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
+import java.util.Locale;
 
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
@@ -91,48 +92,48 @@ public class PetriNetController {
     @RequestMapping(value = "/refs", method = GET)
     public
     @ResponseBody
-    PetriNetReferencesResource getAllReferences(Authentication auth) {
-        List<PetriNetReference> refs = service.getAllReferences((LoggedUser) auth.getPrincipal());
+    PetriNetReferencesResource getAllReferences(Authentication auth, Locale locale) {
+        List<PetriNetReference> refs = service.getAllReferences((LoggedUser) auth.getPrincipal(), locale);
         return new PetriNetReferencesResource(refs);
     }
 
     @RequestMapping(value = "/ref", method = POST)
     public @ResponseBody
-    PetriNetReference getReference(Authentication auth, @RequestBody PetriNetCriteria criteria) {
+    PetriNetReference getReference(Authentication auth, @RequestBody PetriNetCriteria criteria, Locale locale) {
         if (criteria.title != null)
-            return service.getReferenceByTitle((LoggedUser) auth.getPrincipal(), criteria.title);
+            return service.getReferenceByTitle((LoggedUser) auth.getPrincipal(), criteria.title, locale);
         return new PetriNetReference(null, null);
     }
 
     @RequestMapping(value = "/transition/refs", method = POST)
     public
     @ResponseBody
-    TransitionReferencesResource getTransitionReferences(Authentication auth, @RequestBody List<String> ids) {
+    TransitionReferencesResource getTransitionReferences(Authentication auth, @RequestBody List<String> ids, Locale locale) {
         ids.forEach(id -> id = decodeUrl(id));
-        return new TransitionReferencesResource(service.getTransitionReferences(ids, (LoggedUser) auth.getPrincipal()));
+        return new TransitionReferencesResource(service.getTransitionReferences(ids, (LoggedUser) auth.getPrincipal(), locale));
     }
 
     @RequestMapping(value = "/data/refs", method = POST)
     public
     @ResponseBody
-    DataFieldReferencesResource getDataFieldReferences(@RequestBody PetriNetReferenceBody referenceBody) {
+    DataFieldReferencesResource getDataFieldReferences(@RequestBody PetriNetReferenceBody referenceBody, Locale locale) {
         referenceBody.petriNets.forEach(net -> net = decodeUrl(net));
         referenceBody.transitions.forEach(trans -> trans = decodeUrl(trans));
-        return new DataFieldReferencesResource(service.getDataFieldReferences(referenceBody.petriNets, referenceBody.transitions));
+        return new DataFieldReferencesResource(service.getDataFieldReferences(referenceBody.petriNets, referenceBody.transitions, locale));
     }
 
     @RequestMapping(value = "/{netId}/roles", method = GET)
     public @ResponseBody
-    RolesResource getRoles(@PathVariable("netId") String netId) {
+    LocalisedRolesResource getRoles(@PathVariable("netId") String netId, Locale locale) {
         netId = decodeUrl(netId);
-        return new RolesResource(roleService.findAll(netId), netId);
+        return new LocalisedRolesResource(roleService.findAll(netId), netId, locale);
     }
 
     @RequestMapping(value = "/{netId}/transactions", method = GET)
     public @ResponseBody
-    TransactionsResource getTransactions(@PathVariable("netId") String netId) {
+    TransactionsResource getTransactions(@PathVariable("netId") String netId, Locale locale) {
         PetriNet net = service.loadPetriNet(decodeUrl(netId));
-        return new TransactionsResource(net.getTransactions().values(), netId);
+        return new TransactionsResource(net.getTransactions().values(), netId, locale);
     }
 
     @RequestMapping(value = "/search", method = POST)

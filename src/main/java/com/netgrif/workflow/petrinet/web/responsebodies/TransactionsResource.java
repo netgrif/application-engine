@@ -7,21 +7,22 @@ import org.springframework.hateoas.mvc.ControllerLinkBuilder;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
-public class TransactionsResource extends Resources<TransactionResource> {
+public class TransactionsResource extends Resources<LocalisedTransactionResource> {
 
-    public TransactionsResource(Iterable<TransactionResource> content, String netId) {
+    public TransactionsResource(Iterable<LocalisedTransactionResource> content, String netId) {
         super(content, new ArrayList<>());
         buildLinks(netId);
     }
 
-    public TransactionsResource(Collection<Transaction> content, String netId){
-        this(content.stream().map(TransactionResource::new).collect(Collectors.toList()), netId);
+    public TransactionsResource(Collection<Transaction> content, String netId, Locale locale){
+        this(content.stream().map(t -> new LocalisedTransactionResource(t, locale)).collect(Collectors.toList()), netId);
     }
 
     private void buildLinks(String netId) {
         add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(PetriNetController.class)
-                .getTransactions(netId)).withSelfRel());
+                .getTransactions(netId, null)).withSelfRel());
     }
 }
