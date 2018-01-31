@@ -2,10 +2,10 @@ package com.netgrif.workflow
 
 import com.netgrif.workflow.mail.IMailService
 import org.apache.log4j.Logger
-import org.springframework.beans.factory.annotation.Autowire
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.CommandLineRunner
 import org.springframework.context.annotation.Profile
+import org.springframework.core.annotation.Order
 import org.springframework.core.env.Environment
 import org.springframework.data.mongodb.core.MongoTemplate
 import org.springframework.stereotype.Component
@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component
 import java.util.concurrent.ThreadLocalRandom
 
 @Component
+@Order(value = 1)
 @Profile("!test")
 class StartRunner implements CommandLineRunner {
 
@@ -39,6 +40,8 @@ class StartRunner implements CommandLineRunner {
     @Autowired
     private JMeterExport export
 
+    @Autowired
+    private DefaultRoleRunner defaultRoleRunner
 
     @Override
     void run(String... strings) throws Exception {
@@ -48,10 +51,10 @@ class StartRunner implements CommandLineRunner {
         File storage = new File("storage/generated/start.txt")
         storage.getParentFile().mkdirs()
 
+        defaultRoleRunner.run()
         insurancePortalImporter.run(strings)
         superCreator.run(strings)
         sessionsRunner.run(strings)
-//        export.run(strings)
 
         log.info("Starting test for mail connection")
         mailService.testConnection()

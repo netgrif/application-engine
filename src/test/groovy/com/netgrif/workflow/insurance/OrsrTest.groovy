@@ -2,6 +2,7 @@ package com.netgrif.workflow.insurance
 
 import com.netgrif.workflow.parser.orsr.IOrsrService
 import com.netgrif.workflow.parser.orsr.OrsrReference
+import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -18,6 +19,7 @@ class OrsrTest {
     private IOrsrService service
 
     @Test
+    @Ignore
     void parseTest() {
         def ICO = 50_903_403 as String
 
