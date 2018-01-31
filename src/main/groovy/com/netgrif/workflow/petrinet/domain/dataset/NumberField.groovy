@@ -18,6 +18,11 @@ class NumberField extends ValidableField<Double> {
     }
 
     @Override
+    FieldType getType() {
+        return FieldType.NUMBER
+    }
+
+    @Override
     void setDefaultValue(String value) {
         super.superSetDefaultValue(Double.parseDouble(value))
     }

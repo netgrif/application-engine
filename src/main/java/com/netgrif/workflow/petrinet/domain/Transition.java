@@ -96,6 +96,6 @@ public class Transition extends Node {
 
     @Override
     public String toString() {
-        return this.getTitle();
+        return this.getTitle().toString();
     }
 }
