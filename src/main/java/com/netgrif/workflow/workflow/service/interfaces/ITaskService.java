@@ -38,9 +38,9 @@ public interface ITaskService {
 
     Page<Task> findByTransitions(Pageable pageable, List<String> transitions);
 
-    void finishTask(Long userId, String taskId) throws Exception;
+    void finishTask(LoggedUser loggedUser, String taskId) throws Exception;
 
-    void assignTask(Long userId, String taskId) throws TransitionNotExecutableException;
+    void assignTask(LoggedUser loggedUser, String taskId) throws TransitionNotExecutableException;
 
     List<Field> getData(String taskId);
 
@@ -50,9 +50,9 @@ public interface ITaskService {
 
     ChangedFieldContainer setData(String taskId, ObjectNode values);
 
-    void cancelTask(Long id, String taskId);
+    void cancelTask(LoggedUser loggedUser, String taskId);
 
-    void delegateTask(Long userId, String delegatedEmail, String taskId) throws TransitionNotExecutableException;
+    void delegateTask(LoggedUser loggedUser, String delegatedEmail, String taskId) throws TransitionNotExecutableException;
 
     boolean saveFile(String taskId, String fieldId, MultipartFile multipartFile);
 
