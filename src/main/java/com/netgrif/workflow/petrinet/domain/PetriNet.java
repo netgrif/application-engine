@@ -1,5 +1,6 @@
 package com.netgrif.workflow.petrinet.domain;
 
+import com.netgrif.workflow.auth.domain.Author;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRole;
 import lombok.Getter;
@@ -28,6 +29,9 @@ public class PetriNet extends PetriNetObject {
     // TODO: 18. 3. 2017 replace with Spring auditing
     @Getter @Setter
     private LocalDateTime creationDate;
+
+    @Getter @Setter
+    private Author author;
 
     @org.springframework.data.mongodb.core.mapping.Field("places")
     @Getter @Setter
