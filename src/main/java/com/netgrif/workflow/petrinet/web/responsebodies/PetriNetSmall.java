@@ -9,6 +9,7 @@ import org.bson.types.ObjectId;
 
 import java.time.LocalDateTime;
 import java.util.AbstractMap;
+import java.util.Locale;
 
 public class PetriNetSmall extends PetriNetObject {
 
@@ -52,8 +53,9 @@ public class PetriNetSmall extends PetriNetObject {
         this.initials = initials;
     }
 
-    public static PetriNetSmall fromPetriNet(PetriNet original){
-        PetriNetSmall small = new PetriNetSmall(original.getObjectId(), original.getTitle(),original.getInitials());
+    public static PetriNetSmall fromPetriNet(PetriNet original, Locale locale){
+        String title = locale != null ? original.getTitle().getTranslation(locale) : original.getTitle().getDefaultValue();
+        PetriNetSmall small = new PetriNetSmall(original.getObjectId(), title,original.getInitials());
         small.setIcon(original.getIcon());
         small.setAuthor(original.getAuthor() == null ? new Author(null, "nae@netgrif.com", "System") : original.getAuthor());
         small.setCreationDate(original.getCreationDate());
