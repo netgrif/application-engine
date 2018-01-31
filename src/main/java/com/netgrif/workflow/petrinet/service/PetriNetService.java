@@ -48,7 +48,7 @@ public abstract class PetriNetService implements IPetriNetService {
     @Override
     public Optional<PetriNet> importPetriNet(File xmlFile, String name, String initials, LoggedUser user) {
         Optional<PetriNet> imported = getImporter().importPetriNet(xmlFile, name, initials);
-        if (imported.isPresent()){
+        if (imported.isPresent()) {
             imported.get().setAuthor(user.transformToAuthor());
             repository.save(imported.get());
             publisher.publishEvent(new UserImportModelEvent(user, xmlFile, name, initials));
@@ -66,7 +66,7 @@ public abstract class PetriNetService implements IPetriNetService {
     public PetriNet loadPetriNet(String id) {
         PetriNet net = repository.findOne(id);
         if (net == null)
-            throw new IllegalArgumentException("No model with id="+id+" found.");
+            throw new IllegalArgumentException("No model with id=" + id + " found.");
 
         net.initializeArcs();
         return net;
@@ -139,7 +139,8 @@ public abstract class PetriNetService implements IPetriNetService {
         return nets.stream().map(pn -> new PetriNetReference(pn.getStringId(), pn.getTitle().getTranslation(locale))).collect(Collectors.toList());
     }
 
-    public Page<PetriNetSmall> searchPetriNet(Map<String, Object> criteria, LoggedUser user, Pageable pageable) {
+    @Override
+    public Page<PetriNetSmall> searchPetriNet(Map<String, Object> criteria, LoggedUser user, Pageable pageable, Locale locale) {
         StringBuilder queryBuilder = new StringBuilder();
         queryBuilder.append("{");
 
@@ -170,7 +171,7 @@ public abstract class PetriNetService implements IPetriNetService {
         BasicQuery query = new BasicQuery(queryBuilder.toString());
         query = (BasicQuery) query.with(pageable);
         List<PetriNet> nets = mongoTemplate.find(query, PetriNet.class);
-        return new PageImpl<>(nets.stream().map(net -> PetriNetSmall.fromPetriNet(net,null)).collect(Collectors.toList()),
+        return new PageImpl<>(nets.stream().map(net -> PetriNetSmall.fromPetriNet(net, locale)).collect(Collectors.toList()),
                 pageable, mongoTemplate.count(new BasicQuery(queryBuilder.toString(), "{_id:1}"), PetriNet.class));
     }
 
