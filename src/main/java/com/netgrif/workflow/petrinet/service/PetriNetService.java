@@ -170,7 +170,7 @@ public abstract class PetriNetService implements IPetriNetService {
         BasicQuery query = new BasicQuery(queryBuilder.toString());
         query = (BasicQuery) query.with(pageable);
         List<PetriNet> nets = mongoTemplate.find(query, PetriNet.class);
-        return new PageImpl<>(nets.stream().map(PetriNetSmall::fromPetriNet).collect(Collectors.toList()),
+        return new PageImpl<>(nets.stream().map(net -> PetriNetSmall.fromPetriNet(net,null)).collect(Collectors.toList()),
                 pageable, mongoTemplate.count(new BasicQuery(queryBuilder.toString(), "{_id:1}"), PetriNet.class));
     }
 
