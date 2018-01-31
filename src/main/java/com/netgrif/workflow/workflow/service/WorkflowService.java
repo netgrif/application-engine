@@ -131,11 +131,11 @@ public class WorkflowService implements IWorkflowService {
     }
 
     @Override
-    public Case createCase(String netId, String title, String color, Long authorId) {
+    public Case createCase(String netId, String title, String color, LoggedUser user) {
         PetriNet petriNet = petriNetService.loadPetriNet(netId);
         Case useCase = new Case(title, petriNet, petriNet.getActivePlaces());
         useCase.setColor(color);
-        useCase.setAuthor(authorId);
+        useCase.setAuthor(user.transformToAuthor());
         useCase.setIcon(petriNet.getIcon());
         useCase = save(useCase);
 
@@ -147,7 +147,7 @@ public class WorkflowService implements IWorkflowService {
 
     @Override
     public Page<Case> findAllByAuthor(Long authorId, String petriNet, Pageable pageable) {
-        String queryString = "{author:" + authorId + ", petriNet:{$ref:\"petriNet\",$id:{$oid:\"" + petriNet + "\"}}}";
+        String queryString = "{author.id:" + authorId + ", petriNet:{$ref:\"petriNet\",$id:{$oid:\"" + petriNet + "\"}}}";
         BasicQuery query = new BasicQuery(queryString);
         query = (BasicQuery) query.with(pageable);
         List<Case> cases = mongoTemplate.find(query, Case.class);
