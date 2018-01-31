@@ -10,10 +10,14 @@ import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository;
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.workflow.petrinet.web.responsebodies.DataFieldReference;
 import com.netgrif.workflow.petrinet.web.responsebodies.PetriNetReference;
+import com.netgrif.workflow.petrinet.web.responsebodies.PetriNetSmall;
 import com.netgrif.workflow.petrinet.web.responsebodies.TransitionReference;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Lookup;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.BasicQuery;
 import org.springframework.stereotype.Service;
@@ -23,6 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -43,7 +48,11 @@ public abstract class PetriNetService implements IPetriNetService {
     @Override
     public Optional<PetriNet> importPetriNet(File xmlFile, String name, String initials, LoggedUser user) {
         Optional<PetriNet> imported = getImporter().importPetriNet(xmlFile, name, initials);
-        publisher.publishEvent(new UserImportModelEvent(user, xmlFile, name, initials));
+        if (imported.isPresent()) {
+            imported.get().setAuthor(user.transformToAuthor());
+            repository.save(imported.get());
+            publisher.publishEvent(new UserImportModelEvent(user, xmlFile, name, initials));
+        }
         xmlFile.delete();
         return imported;
     }
@@ -57,7 +66,7 @@ public abstract class PetriNetService implements IPetriNetService {
     public PetriNet loadPetriNet(String id) {
         PetriNet net = repository.findOne(id);
         if (net == null)
-            throw new IllegalArgumentException("No model with id="+id+" found.");
+            throw new IllegalArgumentException("No model with id=" + id + " found.");
 
         net.initializeArcs();
         return net;
@@ -128,5 +137,79 @@ public abstract class PetriNetService implements IPetriNetService {
         BasicQuery query = new BasicQuery(builder.toString(), "{_id:1,title:1}");
         List<PetriNet> nets = mongoTemplate.find(query, PetriNet.class);
         return nets.stream().map(pn -> new PetriNetReference(pn.getStringId(), pn.getTitle().getTranslation(locale))).collect(Collectors.toList());
+    }
+
+    @Override
+    public Page<PetriNetSmall> searchPetriNet(Map<String, Object> criteria, LoggedUser user, Pageable pageable, Locale locale) {
+        StringBuilder queryBuilder = new StringBuilder();
+        queryBuilder.append("{");
+
+        if (!user.isAdmin())
+            queryBuilder.append(getQueryByRoles(user));
+
+        if (criteria != null && !criteria.isEmpty()) {
+            if (!user.isAdmin())
+                queryBuilder.append(",");
+
+//            if(criteria.containsKey("author")){
+//                queryBuilder.append(getQueryByTextValue("author",criteria.get("author")));
+//                queryBuilder.append(",");
+//            }
+            if (criteria.containsKey("title")) {
+                queryBuilder.append(getQueryByTextValue("title", criteria.get("title")));
+                queryBuilder.append(",");
+            }
+            if (criteria.containsKey("initials")) {
+                queryBuilder.append(getQueryByTextValue("initials", criteria.get("initials")));
+                queryBuilder.append(",");
+            }
+
+            queryBuilder.deleteCharAt(queryBuilder.length() - 1);
+        }
+        queryBuilder.append("}");
+
+        BasicQuery query = new BasicQuery(queryBuilder.toString());
+        query = (BasicQuery) query.with(pageable);
+        List<PetriNet> nets = mongoTemplate.find(query, PetriNet.class);
+        return new PageImpl<>(nets.stream().map(net -> PetriNetSmall.fromPetriNet(net, locale)).collect(Collectors.toList()),
+                pageable, mongoTemplate.count(new BasicQuery(queryBuilder.toString(), "{_id:1}"), PetriNet.class));
+    }
+
+    private String getQueryByRoles(LoggedUser user) {
+        final StringBuilder builder = new StringBuilder();
+        builder.append("$or:[");
+        user.getProcessRoles().forEach(role -> {
+            builder.append("{\"roles.");
+            builder.append(role);
+            builder.append("\":{$exists:true}},");
+        });
+        if (!user.getProcessRoles().isEmpty())
+            builder.deleteCharAt(builder.length() - 1);
+        builder.append("]");
+        return builder.toString();
+    }
+
+    private String getQueryByTextValue(String attributeName, Object object) {
+        StringBuilder builder = new StringBuilder();
+        builder.append("\"" + attributeName + "\":");
+        if (object instanceof String) {
+            builder.append("\"" + object + "\"");
+        } else if (object instanceof List) {
+            builder.append(getMongoInQuery((List<Object>) object));
+        }
+        return builder.toString();
+    }
+
+    private static String getMongoInQuery(List<Object> objs) {
+        StringBuilder builder = new StringBuilder();
+        builder.append("{$in:[");
+        objs.forEach(o -> {
+            builder.append("\"" + o.toString() + "\"");
+            builder.append(",");
+        });
+        if (!objs.isEmpty())
+            builder.deleteCharAt(builder.length() - 1);
+        builder.append("]}");
+        return builder.toString();
     }
 }
