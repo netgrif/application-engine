@@ -83,13 +83,13 @@ class ImportHelper {
         return authorityRepository.save(new Authority(name))
     }
 
-    PetriNet createNet(String fileName, String name, String initials) {
+    Optional<PetriNet> createNet(String fileName, String name, String initials) {
         return importer.importPetriNet(new File("src/main/resources/petriNets/$fileName"), name, initials)
     }
 
     UserProcessRole createUserProcessRole(PetriNet net, String name) {
         UserProcessRole role = userProcessRoleRepository.save(new UserProcessRole(roleId:
-                net.roles.values().find { it -> it.name == name }.stringId))
+                net.roles.values().find { it -> it.name.defaultValue == name }.stringId))
         log.info("Created user process role $name")
         return role
     }

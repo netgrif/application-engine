@@ -19,7 +19,7 @@ public class TaskEventLog extends EventLog implements ITaskEventLog {
 
     public TaskEventLog(Task task, Case useCase) {
         this.taskId = task.getStringId();
-        this.taskTitle = task.getTitle();
+        this.taskTitle = task.getTitle().toString();
         this.transitionId = task.getTransitionId();
         this.caseId = useCase.getStringId();
         this.caseTitle = useCase.getTitle();

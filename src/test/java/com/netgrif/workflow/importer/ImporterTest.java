@@ -6,6 +6,7 @@ import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +16,9 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.File;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.LongStream;
 
 @SpringBootTest
 @ActiveProfiles({"test"})
@@ -35,7 +39,7 @@ public class ImporterTest {
     private static final Integer NET_PLACES = 17;
     private static final Integer NET_TRANSITIONS = 22;
     private static final Integer NET_ARCS = 21;
-    private static final Integer NET_FIELDS = 28;
+    private static final Integer NET_FIELDS = 27;
     private static final Integer NET_ROLES = 3;
 
     @Before
@@ -44,7 +48,7 @@ public class ImporterTest {
     }
 
     @Test
-    public void importPetriNet() throws Exception {
+    public void importPetriNet() {
         importer.importPetriNet(new File("src/test/resources/prikladFM_test.xml"), NET_TITLE, NET_INITIALS);
 
         assertNetProperlyImported();
@@ -52,36 +56,37 @@ public class ImporterTest {
 
     @Test
     public void priorityTest() {
-        PetriNet net = importer.importPetriNet(new File("src/test/resources/priority_test.xml"), "Priority test", "PT");
+        Optional<PetriNet> net = importer.importPetriNet(new File("src/test/resources/priority_test.xml"), "Priority test", "PT");
 
-        assert net != null;
+        assert net.isPresent();
 
-        Case useCase = workflowService.createCase(net.getStringId(), net.getTitle(), "color", 1L);
+        Case useCase = workflowService.createCase(net.get().getStringId(), net.get().getTitle().getDefaultValue(), "color", 1L);
 
         assert useCase != null;
     }
 
     @Test
     public void dataGroupTest() {
-        PetriNet net = importer.importPetriNet(new File("src/test/resources/datagroup_test.xml"), "DataGroup test", "DGT");
+        Optional<PetriNet> net = importer.importPetriNet(new File("src/test/resources/datagroup_test.xml"), "DataGroup test", "DGT");
 
-        assert net != null;
+        assert net.isPresent();
     }
 
     @Test
+    @Ignore
     public void caseRefTest() {
         importer.importPetriNet(new File("src/test/resources/datagroup_test.xml"), "DataGroup test", "DGT");
-        PetriNet net = importer.importPetriNet(new File("src/test/resources/caseref_test.xml"), "Caseref test", "CRT");
-        assert net != null;
+        Optional<PetriNet> net = importer.importPetriNet(new File("src/test/resources/caseref_test.xml"), "Caseref test", "CRT");
+        assert net.isPresent();
 
-        Case useCase = workflowService.createCase(net.getStringId(), net.getTitle(), "color", 1L);
+        Case useCase = workflowService.createCase(net.get().getStringId(), net.get().getTitle().getDefaultValue(), "color", 1L);
         assert useCase != null;
 
         List<Field> data = workflowService.getData(useCase.getStringId());
         assert data != null && data.size() > 0;
 
         useCase.getDataSet().get(data.get(0).getStringId()).setValue(useCase.getStringId());
-        workflowService.saveCase(useCase);
+        workflowService.save(useCase);
         data = workflowService.getData(useCase.getStringId());
         assert data != null && data.size() > 0;
     }
@@ -89,6 +94,38 @@ public class ImporterTest {
     @Test
     public void readArcImportTest() {
         importer.importPetriNet(new File("src/test/resources/read_test.xml"), "R", "R");
+    }
+
+    @Test
+    public void externalMappingTest() {
+        Optional<PetriNet> net = importer.importPetriNet(new File("src/test/resources/mapping_test.xml"), "External mapping", "EXT");
+
+        assertExternalMappingImport(net);
+    }
+
+    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
+    private void assertExternalMappingImport(Optional<PetriNet> imported) {
+        assert imported.isPresent();
+
+        PetriNet net = imported.get();
+        long[] noDataTransitions = {2,3,4,36,49};
+
+        assert net.getPlaces().size() == 11;
+        assert net.getTransitions().size() == 11;
+        assert net.getArcs().values().stream()
+                .flatMap(List::stream)
+                .collect(Collectors.toList()).size() == 34;
+        assert net.getDataSet().size() == 14;
+        assert net.getRoles().size() == 2;
+
+        net.getTransitions().values().forEach(transition -> {
+            assert !transition.getRoles().isEmpty();
+            if (LongStream.of(noDataTransitions).anyMatch(x-> x == transition.getImportId())) {
+                assert transition.getDataSet().isEmpty();
+            } else {
+                assert !transition.getDataSet().isEmpty();
+            }
+        });
     }
 
     private void assertNetProperlyImported() {

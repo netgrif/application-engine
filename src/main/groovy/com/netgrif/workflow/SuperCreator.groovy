@@ -6,8 +6,7 @@ import com.netgrif.workflow.auth.domain.User
 import com.netgrif.workflow.auth.domain.UserProcessRole
 import com.netgrif.workflow.auth.domain.repositories.AuthorityRepository
 import com.netgrif.workflow.auth.domain.repositories.OrganizationRepository
-import com.netgrif.workflow.auth.domain.repositories.UserProcessRoleRepository
-import com.netgrif.workflow.auth.domain.repositories.UserRepository
+import com.netgrif.workflow.auth.service.interfaces.IUserProcessRoleService
 import com.netgrif.workflow.auth.service.interfaces.IUserService
 import org.apache.log4j.Logger
 import org.springframework.beans.factory.annotation.Autowired
@@ -20,10 +19,13 @@ class SuperCreator {
 
     @Autowired
     private OrganizationRepository organizationRepository
+
     @Autowired
     private AuthorityRepository authorityRepository
+
     @Autowired
-    private UserProcessRoleRepository processRoleRepository
+    private IUserProcessRoleService userProcessRoleService
+
     @Autowired
     private IUserService userService
 
@@ -39,7 +41,7 @@ class SuperCreator {
                 password: "password",
                 authorities: [adminAuthority] as Set<Authority>,
                 organizations: organizationRepository.findAll() as Set<Organization>,
-                userProcessRoles: processRoleRepository.findAll() as Set<UserProcessRole>))
+                userProcessRoles: userProcessRoleService.findAllMinusDefault() as Set<UserProcessRole>))
 
         log.info("Super user created")
     }

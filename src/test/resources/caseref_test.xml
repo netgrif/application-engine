@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="/petriNets/petriflow_schema.xsd">
     <id>1</id>
 
     <data type="caseref">

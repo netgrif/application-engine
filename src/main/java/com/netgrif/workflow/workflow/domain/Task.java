@@ -2,6 +2,7 @@ package com.netgrif.workflow.workflow.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.netgrif.workflow.auth.domain.User;
+import com.netgrif.workflow.petrinet.domain.I18nString;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.petrinet.domain.roles.RolePermission;
 import com.netgrif.workflow.workflow.domain.triggers.Trigger;
@@ -29,7 +30,7 @@ public class Task {
     private String transitionId;
 
     @Getter @Setter
-    private String title;
+    private I18nString title;
 
     @Getter @Setter
     private String caseColor;
