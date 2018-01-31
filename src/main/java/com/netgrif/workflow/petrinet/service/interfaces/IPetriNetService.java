@@ -36,7 +36,7 @@ public interface IPetriNetService {
 
     List<TransitionReference> getTransitionReferences(List<String> netsIds, LoggedUser user, Locale locale);
 
-    Page<PetriNetSmall> searchPetriNet(Map<String, Object> criteria, LoggedUser user, Pageable pageable);
+    Page<PetriNetSmall> searchPetriNet(Map<String, Object> criteria, LoggedUser user, Pageable pageable, Locale locale);
 
     List<DataFieldReference> getDataFieldReferences(List<String> petriNetIds, List<String> transitionIds, Locale locale);
 }
