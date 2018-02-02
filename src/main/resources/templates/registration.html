@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
     <title>Registration mail</title>
     <link href="https://fonts.googleapis.com/css?family=Roboto:400,700" rel="stylesheet">
     <style>
@@ -11,10 +12,9 @@
         }
 
         body {
-            background-image:url(https://netgrif.com/mail/netgrif_background.png);
             background-size: cover;
-            background-repeat: no-repeat;
-            margin:0px;
+            background: url(https://netgrif.com/mail/netgrif_background.png) no-repeat;
+            margin:0;
             font-family: 'Roboto', sans-serif;
             height: 100%;
         }
@@ -91,6 +91,13 @@
             text-align: center;
             line-height: 36px;
             text-decoration: none;
+        }
+
+        @media all and (max-width: 600px) {
+
+            .center {
+                width: 80%;
+            }
         }
 
     </style>
