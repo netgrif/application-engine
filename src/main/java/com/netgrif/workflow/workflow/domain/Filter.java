@@ -1,5 +1,6 @@
 package com.netgrif.workflow.workflow.domain;
 
+import com.netgrif.workflow.auth.domain.Author;
 import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.petrinet.web.responsebodies.PetriNetReference;
 import com.netgrif.workflow.petrinet.web.responsebodies.TransitionReference;
@@ -26,7 +27,7 @@ public class Filter {
     private String organization;
 
     @Getter @Setter
-    private Long user;
+    private Author user;
 
     @Getter @Setter
     private List<PetriNetReference> petriNets;
@@ -47,7 +48,7 @@ public class Filter {
         this.name = name;
     }
 
-    public Filter(String name, String organization, Long user) {
+    public Filter(String name, String organization, Author user) {
         this.name = name;
         this.organization = organization;
         this.user = user;
@@ -65,7 +66,7 @@ public class Filter {
                 break;
             case CreateFilterBody.PRIVATE:
                 organization = null;
-                this.user = user.getId();
+                this.user = user.transformToAuthor();
                 break;
             case CreateFilterBody.ORGANIZATION:
                 organization = user.getFullName(); //TODO: 24.2.2017 change to organization id

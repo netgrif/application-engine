@@ -40,6 +40,7 @@ import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import sun.rmi.runtime.Log;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -202,11 +203,11 @@ public class TaskService implements ITaskService {
 
     @Override
     @Transactional
-    public void finishTask(Long userId, String taskId) throws Exception {
+    public void finishTask(LoggedUser loggedUser, String taskId) throws Exception {
         Task task = taskRepository.findOne(taskId);
-        User user = userRepository.findOne(userId);
+        User user = userRepository.findOne(loggedUser.getId());
         // TODO: 14. 4. 2017 replace with @PreAuthorize
-        if (!task.getUserId().equals(userId)) {
+        if (!task.getUserId().equals(loggedUser.getId())) {
             throw new Exception("User that is not assigned tried to finish task");
         }
 
@@ -220,17 +221,17 @@ public class TaskService implements ITaskService {
 
         workflowService.save(useCase);
         taskRepository.save(task);
-        reloadTasks(useCase, userId);
+        reloadTasks(useCase, loggedUser.getId());
 
         publisher.publishEvent(new UserFinishTaskEvent(user, task, useCase));
     }
 
     @Override
     @Transactional
-    public void assignTask(Long userId, String taskId) throws TransitionNotExecutableException {
+    public void assignTask(LoggedUser loggedUser, String taskId) throws TransitionNotExecutableException {
         Task task = taskRepository.findOne(taskId);
         Case useCase = workflowService.findOne(task.getCaseId());
-        User user = userRepository.findOne(userId);
+        User user = userRepository.findOne(loggedUser.getId());
 
         assignTaskToUser(user, task, useCase);
 
@@ -474,9 +475,9 @@ public class TaskService implements ITaskService {
 
     @Override
     @Transactional
-    public void cancelTask(Long userId, String taskId) {
+    public void cancelTask(LoggedUser loggedUser, String taskId) {
         Task task = taskRepository.findOne(taskId);
-        User user = userRepository.findOne(userId);
+        User user = userRepository.findOne(loggedUser.getId());
         Case useCase = workflowService.findOne(task.getCaseId());
         PetriNet net = useCase.getPetriNet();
 
@@ -494,7 +495,7 @@ public class TaskService implements ITaskService {
         task.setUserId(null);
         task = taskRepository.save(task);
         workflowService.save(useCase);
-        reloadTasks(useCase, userId);
+        reloadTasks(useCase, loggedUser.getId());
 
         publisher.publishEvent(new UserCancelTaskEvent(user, task, useCase));
     }
@@ -530,9 +531,9 @@ public class TaskService implements ITaskService {
 
     @Override
     @Transactional
-    public void delegateTask(Long userId, String delegatedEmail, String taskId) throws TransitionNotExecutableException {
+    public void delegateTask(LoggedUser loggedUser, String delegatedEmail, String taskId) throws TransitionNotExecutableException {
         User delegated = userRepository.findByEmail(delegatedEmail);
-        User delegate = userRepository.findOne(userId);
+        User delegate = userRepository.findOne(loggedUser.getId());
         Task task = taskRepository.findOne(taskId);
         Case useCase = workflowService.findOne(task.getCaseId());
 

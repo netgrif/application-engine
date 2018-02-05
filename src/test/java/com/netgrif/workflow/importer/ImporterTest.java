@@ -4,6 +4,7 @@ import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository;
 import com.netgrif.workflow.workflow.domain.Case;
+import com.netgrif.workflow.workflow.service.TaskServiceTest;
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -60,7 +61,7 @@ public class ImporterTest {
 
         assert net.isPresent();
 
-        Case useCase = workflowService.createCase(net.get().getStringId(), net.get().getTitle().getDefaultValue(), "color", 1L);
+        Case useCase = workflowService.createCase(net.get().getStringId(), net.get().getTitle().getDefaultValue(), "color", TaskServiceTest.mockLoggedUser());
 
         assert useCase != null;
     }
@@ -79,7 +80,7 @@ public class ImporterTest {
         Optional<PetriNet> net = importer.importPetriNet(new File("src/test/resources/caseref_test.xml"), "Caseref test", "CRT");
         assert net.isPresent();
 
-        Case useCase = workflowService.createCase(net.get().getStringId(), net.get().getTitle().getDefaultValue(), "color", 1L);
+        Case useCase = workflowService.createCase(net.get().getStringId(), net.get().getTitle().getDefaultValue(), "color", TaskServiceTest.mockLoggedUser());
         assert useCase != null;
 
         List<Field> data = workflowService.getData(useCase.getStringId());
