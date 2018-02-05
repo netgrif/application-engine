@@ -34,7 +34,7 @@ public class WorkflowController {
     public CaseResource createCase(@RequestBody CreateCaseBody body, Authentication auth) {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
         try {
-            Case useCase = workflowService.createCase(body.netId, body.title, body.color, loggedUser.getId());
+            Case useCase = workflowService.createCase(body.netId, body.title, body.color, loggedUser);
             return new CaseResource(useCase);
         } catch (Exception e) { // TODO: 5. 2. 2017 change to custom exception
             e.printStackTrace();

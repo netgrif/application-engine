@@ -82,7 +82,7 @@ public class TaskController {
     public MessageResource assign(Authentication auth, @PathVariable("id") String taskId) {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
         try {
-            taskService.assignTask(loggedUser.getId(), taskId);
+            taskService.assignTask(loggedUser, taskId);
             return MessageResource.successMessage("LocalisedTask " + taskId + " assigned to " + loggedUser.getFullName());
         } catch (TransitionNotExecutableException e) {
             e.printStackTrace();
@@ -95,7 +95,7 @@ public class TaskController {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
         try {
             delegatedEmail = URLDecoder.decode(delegatedEmail, StandardCharsets.UTF_8.name());
-            taskService.delegateTask(loggedUser.getId(), delegatedEmail, taskId);
+            taskService.delegateTask(loggedUser, delegatedEmail, taskId);
             return MessageResource.successMessage("LocalisedTask " + taskId + " assigned to " + delegatedEmail);
         } catch (Exception ignored) {
             ignored.printStackTrace();
@@ -107,7 +107,7 @@ public class TaskController {
     public MessageResource finish(Authentication auth, @PathVariable("id") String taskId) {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
         try {
-            taskService.finishTask(loggedUser.getId(), taskId);
+            taskService.finishTask(loggedUser, taskId);
             return MessageResource.successMessage("LocalisedTask " + taskId + " finished");
         } catch (Exception e) {
             e.printStackTrace();
@@ -119,7 +119,7 @@ public class TaskController {
     public MessageResource cancel(Authentication auth, @PathVariable("id") String taskId) {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
         try {
-            taskService.cancelTask(loggedUser.getId(), taskId);
+            taskService.cancelTask(loggedUser, taskId);
             return MessageResource.successMessage("LocalisedTask " + taskId + " canceled");
         } catch (Exception e) {
             e.printStackTrace();

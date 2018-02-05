@@ -34,7 +34,7 @@ public class CaseSearchService extends MongoSearchService<Case> {
             return id != null ? id.toString() : "";
         });
 
-        return buildQueryPart("author", obj, builder);
+        return buildQueryPart("author.id", obj, builder);
     }
 
     public String titleQuery(Object obj) {

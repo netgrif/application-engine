@@ -19,7 +19,7 @@ public interface IWorkflowService {
 
     Page<Case> searchCase(List<String> nets, Pageable pageable);
 
-    Case createCase(String netId, String title, String color, Long authorId);
+    Case createCase(String netId, String title, String color, LoggedUser user);
 
     Page<Case> findAllByAuthor(Long authorId, String petriNet, Pageable pageable);
 
