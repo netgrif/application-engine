@@ -6,8 +6,6 @@ import com.netgrif.workflow.auth.domain.Authority
 import com.netgrif.workflow.auth.domain.Organization
 import com.netgrif.workflow.auth.domain.User
 import com.netgrif.workflow.auth.domain.UserProcessRole
-import com.netgrif.workflow.auth.domain.repositories.AuthorityRepository
-import com.netgrif.workflow.auth.service.interfaces.IUserService
 import com.netgrif.workflow.importer.Importer
 import groovy.json.JsonOutput
 import groovy.json.JsonSlurper
@@ -20,7 +18,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.Authentication
-import org.springframework.security.web.FilterChainProxy
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.TestPropertySource
 import org.springframework.test.context.junit4.SpringRunner
@@ -29,15 +26,13 @@ import org.springframework.test.web.servlet.MvcResult
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.web.context.WebApplicationContext
 
-import javax.annotation.Resource
-
 import static org.springframework.http.MediaType.APPLICATION_JSON
 import static org.springframework.http.MediaType.TEXT_PLAIN
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
@@ -57,6 +52,7 @@ class InsuranceTest {
     private static final String TASK_SEARCH_URL = "/res/task/search?sort=priority"
     private static final def TASK_ASSIGN_URL = { id -> "/res/task/assign/$id" }
     private static final def TASK_FINISH_URL = { id -> "/res/task/finish/$id" }
+    private static final def TASK_DATA_URL = { id -> "/res/task/$id/data" }
 
     private static final String TASK_COVER_TYPE = "Nehnuteľnosť a domácnosť"
     private static final String TASK_BASIC_INFO = "Základné informácie"
@@ -83,17 +79,8 @@ class InsuranceTest {
     @Autowired
     private Importer importer
 
-    @Resource
-    private FilterChainProxy springSecurityFilterChain
-
     @Autowired
     private WebApplicationContext wac
-
-    @Autowired
-    private IUserService userService
-
-    @Autowired
-    private AuthorityRepository authorityRepository
 
     @Autowired
     private ImportHelper importHelper
@@ -124,40 +111,87 @@ class InsuranceTest {
     private String caseId
     private String netId
     private String taskId
+    private def datagroups
 
     @Test
     void test() {
         createCase()
+        coverType()
+        basicInfo()
+        property()
+        propertyAdditional()
+        propertyBuildings()
+        household()
+        householdAdditional()
+        summary()
+        offer()
+        end()
+    }
+
+    def coverType() {
         searchTasks(TASK_COVER_TYPE, 3)
         assignTask()
         finishTask()
+    }
+
+    def basicInfo() {
         searchTasks(TASK_BASIC_INFO, 1)
         assignTask()
+        getData()
+//        setData()
+        getData()
         finishTask()
+    }
+
+    def property() {
         searchTasks(TASK_PROPERTY, 2)
         assignTask()
         finishTask()
+    }
+
+    def propertyAdditional() {
         searchTasks(TASK_PROPERTY_ADDITIONAL, 3)
         assignTask()
         finishTask()
+    }
+
+    def propertyBuildings() {
         searchTasks(TASK_PROPERTY_BUILDINGS, 4)
         assignTask()
         finishTask()
+    }
+
+    def household() {
         searchTasks(TASK_HOUSEHOLD, 5)
         assignTask()
         finishTask()
+    }
+
+    def householdAdditional() {
         searchTasks(TASK_HOUSEHOLD_ADDITIONAL, 6)
         assignTask()
         finishTask()
+    }
+
+    def summary() {
         searchTasks(TASK_SUMMARY, 7)
         assignTask()
         finishTask()
+    }
+
+    def info() {
         searchTasks(TASK_INFO, 8)
         assignTask()
         finishTask()
+    }
+
+    def offer() {
         searchTasks(TASK_OFFER, 9)
         assignTask()
         finishTask()
+    }
+
+    def end() {
         searchTasks(TASK_END, 12)
     }
 
@@ -195,7 +229,7 @@ class InsuranceTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath('$.page.totalElements', CoreMatchers.is(expected)))
                 .andReturn()
-        def response = (new JsonSlurper()).parseText(result.response.contentAsString)
+        def response = parseResult(result)
         taskId = response?._embedded?.tasks?.find { it.title == title }?.stringId
         assert taskId != null
     }
@@ -220,6 +254,18 @@ class InsuranceTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath('$.success', CoreMatchers.isA(String)))
                 .andReturn()
+    }
+
+    def getData() {
+        def result = mvc.perform(get(TASK_DATA_URL(taskId))
+                .accept(APPLICATION_JSON, TEXT_PLAIN)
+                .locale(Locale.forLanguageTag(LOCALE_SK))
+                .with(csrf().asHeader())
+                .with(authentication(this.auth)))
+                .andExpect(status().isOk())
+                .andReturn()
+        def response = parseResult(result)
+        datagroups = response?._embedded?.dataGroups //TODO: fix get data
     }
 
     @SuppressWarnings("GrMethodMayBeStatic")
