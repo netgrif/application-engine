@@ -765,8 +765,11 @@ public class TaskService implements ITaskService {
             if (!entry.getValue().isRequired())
                 continue;
 
-            if (useCase.getDataSet().get(entry.getKey()).getValue() == null)
+            Object value = useCase.getDataSet().get(entry.getKey()).getValue();
+            if (value == null)
                 throw new IllegalArgumentException("Field " + entry.getKey() + " has null value");
+            if (value instanceof String && ((String) value).isEmpty())
+                throw new IllegalArgumentException("Field " + entry.getKey() + " has empty value");
         }
     }
 
