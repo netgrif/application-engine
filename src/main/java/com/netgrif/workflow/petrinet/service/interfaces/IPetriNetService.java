@@ -6,6 +6,7 @@ import com.netgrif.workflow.petrinet.web.responsebodies.DataFieldReference;
 import com.netgrif.workflow.petrinet.web.responsebodies.PetriNetReference;
 import com.netgrif.workflow.petrinet.web.responsebodies.PetriNetSmall;
 import com.netgrif.workflow.petrinet.web.responsebodies.TransitionReference;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.xml.sax.SAXException;
@@ -20,7 +21,7 @@ import java.util.Map;
 
 public interface IPetriNetService {
 
-    Optional<PetriNet> importPetriNet(File xmlFile, String name, String initials, LoggedUser user) throws IOException, SAXException, ParserConfigurationException;
+    Optional<PetriNet> importPetriNet(File xmlFile, String name, String initials, LoggedUser user, boolean deleteUploadedFile) throws IOException, SAXException, ParserConfigurationException;
 
     void savePetriNet(PetriNet petriNet);
 
@@ -39,4 +40,6 @@ public interface IPetriNetService {
     Page<PetriNetSmall> searchPetriNet(Map<String, Object> criteria, LoggedUser user, Pageable pageable, Locale locale);
 
     List<DataFieldReference> getDataFieldReferences(List<String> petriNetIds, List<String> transitionIds, Locale locale);
+
+    FileSystemResource getNetFile(String netId, StringBuilder title);
 }
