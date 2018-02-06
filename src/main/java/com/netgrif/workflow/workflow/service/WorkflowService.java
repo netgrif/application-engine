@@ -26,6 +26,7 @@ import org.springframework.data.mongodb.core.query.BasicQuery;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -137,6 +138,7 @@ public class WorkflowService implements IWorkflowService {
         useCase.setColor(color);
         useCase.setAuthor(user.transformToAuthor());
         useCase.setIcon(petriNet.getIcon());
+        useCase.setCreationDate(LocalDateTime.now());
         useCase = save(useCase);
 
         publisher.publishEvent(new CreateCaseEvent(useCase));

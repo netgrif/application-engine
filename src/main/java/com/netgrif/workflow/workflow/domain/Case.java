@@ -15,6 +15,7 @@ import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.NotNull;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -46,6 +47,9 @@ public class Case {
 
     @Setter
     private String icon;
+
+    @Getter @Setter
+    private LocalDateTime creationDate;
 
     @Getter
     @Setter
