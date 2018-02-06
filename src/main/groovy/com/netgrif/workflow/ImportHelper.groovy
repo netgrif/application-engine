@@ -21,6 +21,9 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.io.ResourceLoader
 import org.springframework.stereotype.Component
 
+import java.time.LocalDateTime
+import java.util.concurrent.ThreadLocalRandom
+
 @Component
 class ImportHelper {
 
@@ -85,8 +88,8 @@ class ImportHelper {
         return authorityRepository.save(new Authority(name))
     }
 
-    Optional<PetriNet> createNet(String fileName, String name, String initials) {
-        return petriNetService.importPetriNet(new File("src/main/resources/petriNets/$fileName"), name, initials, new LoggedUser(99L,"nae@system.com","password", new ArrayList<Authority>()), false)
+    Optional<PetriNet> createNet(String fileName, String name, String initials, LoggedUser loggedUser) {
+        return petriNetService.importPetriNet(new File("src/main/resources/petriNets/$fileName"), name, initials, loggedUser, false)
     }
 
     UserProcessRole createUserProcessRole(PetriNet net, String name) {
@@ -115,14 +118,19 @@ class ImportHelper {
         return user
     }
 
-    Case createCase(String title, PetriNet net, Long author) {
+    Case createCase(String title, PetriNet net, LoggedUser user) {
         Case useCase = new Case(title, net, net.getActivePlaces())
-        useCase.setColor(StartRunner.randomColor())
-        useCase.setAuthor(author)
+        useCase.setColor(getCaseColor())
+        useCase.setAuthor(user.transformToAuthor())
         useCase.setIcon(net.icon)
+        useCase.setCreationDate(LocalDateTime.now())
         useCase = caseRepository.save(useCase)
         taskService.createTasks(useCase)
         log.info("Case $title created")
         return useCase
+    }
+
+    static String getCaseColor() {
+        return "color-fg-amber-500"
     }
 }
