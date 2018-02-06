@@ -10,6 +10,7 @@ import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.LinkedHashSet;
+import java.util.Locale;
 import java.util.Set;
 
 @Document
@@ -58,5 +59,11 @@ public class DataGroup extends PetriNetObject {
 
     public void setTitle(I18nString title) {
         this.title = title;
+    }
+
+    public String getTranslatedTitle(Locale locale) {
+        if (title == null)
+            return null;
+        return title.getTranslation(locale);
     }
 }
