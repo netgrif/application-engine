@@ -40,7 +40,6 @@ import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-import sun.rmi.runtime.Log;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -214,6 +213,7 @@ public class TaskService implements ITaskService {
         Case useCase = workflowService.findOne(task.getCaseId());
         Transition transition = useCase.getPetriNet().getTransition(task.getTransitionId());
 
+        validateData(transition, useCase);
         finishExecution(transition, useCase);
         task.setFinishDate(LocalDateTime.now());
         task.setFinishedBy(task.getUserId());
@@ -749,12 +749,24 @@ public class TaskService implements ITaskService {
         try {
             startExecution(transition, useCase);
             getData(task, useCase);
+            validateData(transition, useCase);
             finishExecution(transition, useCase);
 
             workflowService.save(useCase);
             reloadTasks(useCase, -1L);
         } catch (TransitionNotExecutableException e) {
             e.printStackTrace();
+        }
+    }
+
+    @Transactional
+    void validateData(Transition transition, Case useCase) {
+        for (Map.Entry<String, DataFieldLogic> entry : transition.getDataSet().entrySet()) {
+            if (!entry.getValue().isRequired())
+                continue;
+
+            if (useCase.getDataSet().get(entry.getKey()).getValue() == null)
+                throw new IllegalArgumentException("Field " + entry.getKey() + " has null value");
         }
     }
 
