@@ -15,6 +15,7 @@ import com.netgrif.workflow.petrinet.web.responsebodies.TransitionReference;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Lookup;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -23,11 +24,8 @@ import org.springframework.data.mongodb.core.query.BasicQuery;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Optional;
-import java.util.Map;
+import java.io.IOException;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -46,14 +44,16 @@ public abstract class PetriNetService implements IPetriNetService {
     private ApplicationEventPublisher publisher;
 
     @Override
-    public Optional<PetriNet> importPetriNet(File xmlFile, String name, String initials, LoggedUser user) {
+    public Optional<PetriNet> importPetriNet(File xmlFile, String name, String initials, LoggedUser user, boolean deleteUploadedFile) throws IOException {
         Optional<PetriNet> imported = getImporter().importPetriNet(xmlFile, name, initials);
         if (imported.isPresent()) {
             imported.get().setAuthor(user.transformToAuthor());
+            getImporter().saveNetFile(imported.get(), xmlFile);
             repository.save(imported.get());
             publisher.publishEvent(new UserImportModelEvent(user, xmlFile, name, initials));
         }
-        xmlFile.delete();
+        if (deleteUploadedFile)
+            xmlFile.delete();
         return imported;
     }
 
@@ -66,7 +66,7 @@ public abstract class PetriNetService implements IPetriNetService {
     public PetriNet loadPetriNet(String id) {
         PetriNet net = repository.findOne(id);
         if (net == null)
-            throw new IllegalArgumentException("No model with id=" + id + " found.");
+            throw new IllegalArgumentException("No model with id: " + id + " was found.");
 
         net.initializeArcs();
         return net;
@@ -77,6 +77,16 @@ public abstract class PetriNetService implements IPetriNetService {
         List<PetriNet> nets = repository.findAll();
         nets.forEach(PetriNet::initializeArcs);
         return nets;
+    }
+
+    public FileSystemResource getNetFile(String netId, StringBuilder title) {
+        if (title.length() == 0) {
+            List<PetriNet> nets = mongoTemplate.find(new BasicQuery("{_id:{$oid:\"" + netId + "\"}}", "{_id:1,title:1}"), PetriNet.class);
+            if (nets.isEmpty())
+                return null;
+            title.append(nets.get(0).getTitle().getDefaultValue());
+        }
+        return new FileSystemResource(PetriNet.ARCHIVED_FILES_PATH + netId + "-" + title.toString() + PetriNet.FILE_EXTENSION);
     }
 
     @Override

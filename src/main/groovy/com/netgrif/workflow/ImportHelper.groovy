@@ -1,6 +1,7 @@
 package com.netgrif.workflow
 
 import com.netgrif.workflow.auth.domain.Authority
+import com.netgrif.workflow.auth.domain.LoggedUser
 import com.netgrif.workflow.auth.domain.Organization
 import com.netgrif.workflow.auth.domain.User
 import com.netgrif.workflow.auth.domain.UserProcessRole
@@ -11,6 +12,7 @@ import com.netgrif.workflow.auth.service.interfaces.IUserService
 import com.netgrif.workflow.importer.Importer
 import com.netgrif.workflow.petrinet.domain.PetriNet
 import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository
+import com.netgrif.workflow.petrinet.service.PetriNetService
 import com.netgrif.workflow.workflow.domain.Case
 import com.netgrif.workflow.workflow.domain.repositories.CaseRepository
 import com.netgrif.workflow.workflow.service.TaskService
@@ -46,7 +48,7 @@ class ImportHelper {
     private TaskService taskService
 
     @Autowired
-    private Importer importer
+    private PetriNetService petriNetService
 
     @Autowired
     private ResourceLoader resourceLoader
@@ -84,7 +86,7 @@ class ImportHelper {
     }
 
     Optional<PetriNet> createNet(String fileName, String name, String initials) {
-        return importer.importPetriNet(new File("src/main/resources/petriNets/$fileName"), name, initials)
+        return petriNetService.importPetriNet(new File("src/main/resources/petriNets/$fileName"), name, initials, new LoggedUser(99L,"nae@system.com","password", new ArrayList<Authority>()), false)
     }
 
     UserProcessRole createUserProcessRole(PetriNet net, String name) {
