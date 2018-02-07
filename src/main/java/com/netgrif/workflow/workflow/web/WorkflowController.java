@@ -86,13 +86,13 @@ public class WorkflowController {
     }
 
     @RequestMapping(value = "/case/{id}/data", method = RequestMethod.GET)
-    public DataFieldsResource getAllCaseData(@PathVariable("id") String caseId) {
+    public DataFieldsResource getAllCaseData(@PathVariable("id") String caseId, Locale locale) {
         try {
             caseId = URLDecoder.decode(caseId, StandardCharsets.UTF_8.name());
-            return new DataFieldsResource(workflowService.getData(caseId), null);
+            return new DataFieldsResource(workflowService.getData(caseId), null, locale);
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
-            return new DataFieldsResource(new ArrayList<>(), null);
+            return new DataFieldsResource(new ArrayList<>(), null, locale);
         }
     }
 
