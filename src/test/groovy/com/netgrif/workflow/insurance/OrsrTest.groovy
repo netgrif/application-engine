@@ -1,8 +1,7 @@
 package com.netgrif.workflow.insurance
 
-import com.netgrif.workflow.parser.orsr.IOrsrService
-import com.netgrif.workflow.parser.orsr.OrsrReference
-import org.junit.Ignore
+import com.netgrif.workflow.business.orsr.IOrsrService
+import com.netgrif.workflow.business.orsr.OrsrReference
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -19,7 +18,6 @@ class OrsrTest {
     private IOrsrService service
 
     @Test
-    @Ignore
     void parseTest() {
         def ICO = 50_903_403 as String
 
@@ -31,9 +29,9 @@ class OrsrTest {
     @SuppressWarnings("GrMethodMayBeStatic")
     private assertCorrectValidOrsrInfo(OrsrReference info) {
         assert info.name == "NETGRIF, s.r.o."
-        assert info.city == "Bratislava - mestská časť Staré Mesto"
-        assert info.postalCode == "811 07"
-        assert info.street == "Blumentálska"
-        assert info.streetNumber == "12"
+        assert info.city == "Bratislava - mestská časť Karlova Ves"
+        assert info.postalCode == "841 05"
+        assert info.street == "Jána Stanislava"
+        assert info.streetNumber == "28/A"
     }
 }
