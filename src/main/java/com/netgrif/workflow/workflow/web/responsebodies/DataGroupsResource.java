@@ -13,7 +13,7 @@ public class DataGroupsResource extends Resources<LocalisedDataGroup> {
 
     public DataGroupsResource(Collection<DataGroup> content, Locale locale) {
         super(content.stream()
-                .map(dg -> new LocalisedDataGroup(dg.getFields(), dg.getTitle().getTranslation(locale), dg.getAlignment(), dg.getStretch()))
+                .map(dg -> new LocalisedDataGroup(dg.getFields(), dg.getTranslatedTitle(locale), dg.getAlignment(), dg.getStretch()))
                 .collect(Collectors.toList()));
         buildLinks();
     }
