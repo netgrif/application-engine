@@ -1,10 +1,12 @@
 package com.netgrif.workflow.importer;
 
+import com.netgrif.workflow.auth.domain.Authority;
+import com.netgrif.workflow.auth.domain.LoggedUser;
+import com.netgrif.workflow.auth.domain.repositories.AuthorityRepository;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository;
 import com.netgrif.workflow.workflow.domain.Case;
-import com.netgrif.workflow.workflow.service.TaskServiceTest;
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -16,6 +18,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.File;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -34,6 +37,9 @@ public class ImporterTest {
 
     @Autowired
     private IWorkflowService workflowService;
+
+    @Autowired
+    private AuthorityRepository authorityRepository;
 
     private static final String NET_TITLE = "jaxb_test";
     private static final String NET_INITIALS = "TST";
@@ -61,7 +67,7 @@ public class ImporterTest {
 
         assert net.isPresent();
 
-        Case useCase = workflowService.createCase(net.get().getStringId(), net.get().getTitle().getDefaultValue(), "color", TaskServiceTest.mockLoggedUser());
+        Case useCase = workflowService.createCase(net.get().getStringId(), net.get().getTitle().getDefaultValue(), "color", mockLoggedUser());
 
         assert useCase != null;
     }
@@ -80,7 +86,7 @@ public class ImporterTest {
         Optional<PetriNet> net = importer.importPetriNet(new File("src/test/resources/caseref_test.xml"), "Caseref test", "CRT");
         assert net.isPresent();
 
-        Case useCase = workflowService.createCase(net.get().getStringId(), net.get().getTitle().getDefaultValue(), "color", TaskServiceTest.mockLoggedUser());
+        Case useCase = workflowService.createCase(net.get().getStringId(), net.get().getTitle().getDefaultValue(), "color", mockLoggedUser());
         assert useCase != null;
 
         List<Field> data = workflowService.getData(useCase.getStringId());
@@ -139,5 +145,14 @@ public class ImporterTest {
         assert net.getArcs().size() == NET_ARCS;
         assert net.getDataSet().size() == NET_FIELDS;
         assert net.getRoles().size() == NET_ROLES;
+    }
+
+    public LoggedUser mockLoggedUser(){
+        Authority authorityUser;
+        if (authorityRepository.count() > 0)
+            authorityUser = authorityRepository.findAll().get(0);
+        else
+            authorityUser = authorityRepository.save(new Authority(Authority.user));
+        return new LoggedUser(1L, "super@netgrif.com","password", Collections.singleton(authorityUser));
     }
 }
