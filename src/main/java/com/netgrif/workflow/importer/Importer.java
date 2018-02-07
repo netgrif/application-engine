@@ -251,6 +251,10 @@ public class Importer {
         dataGroup.setStretch(importDataGroup.isStretch());
         importDataGroup.getDataRef().forEach(dataRef -> dataGroup.addData(fields.get(dataRef.getId()).getStringId()));
         transition.addDataGroup(dataGroup);
+
+        for (DataRef dataRef : importDataGroup.getDataRef()) {
+            addDataLogic(transition, dataRef);
+        }
     }
 
     @Transactional
