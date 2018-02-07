@@ -1,7 +1,9 @@
 package com.netgrif.workflow.workflow.service;
 
+import com.netgrif.workflow.auth.domain.Authority;
 import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.auth.domain.User;
+import com.netgrif.workflow.auth.domain.repositories.AuthorityRepository;
 import com.netgrif.workflow.auth.domain.repositories.UserRepository;
 import com.netgrif.workflow.importer.Importer;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
@@ -23,6 +25,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.File;
+import java.util.Collections;
 
 @SpringBootTest
 @ActiveProfiles({"test"})
@@ -55,6 +58,9 @@ public class TaskServiceTest {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private AuthorityRepository authorityRepository;
 
     @Before
     public void setUp() {
@@ -108,7 +114,12 @@ public class TaskServiceTest {
         assert useCase.getActivePlaces().values().contains(5);
     }
 
-    public static LoggedUser mockLoggedUser(){
-        return new LoggedUser(1L, "super@netgrif.com","password", null);
+    public LoggedUser mockLoggedUser(){
+        Authority authorityUser;
+        if (authorityRepository.count() > 0)
+            authorityUser = authorityRepository.findAll().get(0);
+        else
+            authorityUser = authorityRepository.save(new Authority(Authority.user));
+        return new LoggedUser(1L, "super@netgrif.com","password", Collections.singleton(authorityUser));
     }
 }
