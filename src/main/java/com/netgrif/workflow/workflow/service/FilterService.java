@@ -21,13 +21,16 @@ public class FilterService implements IFilterService {
     @Autowired
     private FilterRepository repository;
 
+    @Autowired
+    private FilterSearchService searchService;
+
     @Override
     public boolean deleteFilter(String filterId, LoggedUser user) {
         Filter filter = repository.findOne(filterId);
-        if(filter == null)
+        if (filter == null)
             return false;
 
-        if(filter.getAuthor().getId().equals(user.getId()))
+        if (filter.getAuthor().getId().equals(user.getId()))
             return false;
 
         repository.delete(filter);
@@ -50,6 +53,10 @@ public class FilterService implements IFilterService {
 
     @Override
     public Page<Filter> search(Map<String, Object> request, Pageable pageable, LoggedUser user) {
-        return null;
+        if (request.containsKey("visibility") && request.get("visibility").equals(Filter.VISIBILITY_PRIVATE)) {
+            request.put("author", user.getId());
+        }
+
+        return searchService.search(request, pageable, Filter.class);
     }
 }
