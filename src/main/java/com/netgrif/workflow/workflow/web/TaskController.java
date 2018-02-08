@@ -204,25 +204,4 @@ public class TaskController {
         response.setHeader("Content-Disposition", "attachment; filename=" + fileResource.getFilename().substring(fileResource.getFilename().indexOf('-') + 1));
         return fileResource;
     }
-
-    //TODO: Paged filters resource
-    @RequestMapping(value = "/filter", method = RequestMethod.GET)
-    public FiltersResource getAllFilters(Authentication auth) {
-        return new FiltersResource(filterService.getAll(), false);
-    }
-
-    @RequestMapping(value = "/filter/roles", method = RequestMethod.POST)
-    public FiltersResource getFiltersWithRoles(@RequestBody List<String> roles) {
-        return new FiltersResource(filterService.getWithRoles(roles), true);
-    }
-
-    @RequestMapping(value = "/filter", method = RequestMethod.POST)
-    public MessageResource saveFilter(Authentication auth, @RequestBody CreateFilterBody filterBody) {
-        boolean saveSuccess = filterService.saveFilter(((LoggedUser) auth.getPrincipal()), filterBody);
-        if (saveSuccess) {
-            return MessageResource.successMessage("Filter " + filterBody.name + " saved");
-        } else {
-            return MessageResource.errorMessage("Filter " + filterBody.name + " saving failed!");
-        }
-    }
 }
