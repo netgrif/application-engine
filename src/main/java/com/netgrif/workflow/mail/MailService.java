@@ -1,19 +1,23 @@
 package com.netgrif.workflow.mail;
 
+import freemarker.template.Configuration;
+import freemarker.template.Template;
+import freemarker.template.TemplateException;
+import lombok.Setter;
 import org.apache.log4j.Logger;
-import org.apache.velocity.app.VelocityEngine;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
-import org.springframework.ui.velocity.VelocityEngineUtils;
+import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import java.io.File;
+import java.io.IOException;
 import java.net.InetAddress;
-import java.net.UnknownHostException;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
@@ -35,12 +39,14 @@ public class MailService implements IMailService {
     @Value("${mail.from}")
     String mailFrom;
 
+    @Setter
     private JavaMailSender mailSender;
 
-    private VelocityEngine velocityEngine;
+    @Setter
+    private Configuration configuration;
 
     @Override
-    public void sendRegistrationEmail(String recipient, String token) throws MessagingException, UnknownHostException {
+    public void sendRegistrationEmail(String recipient, String token) throws MessagingException, IOException, TemplateException {
         List<String> recipients = new LinkedList<>();
         recipients.add(recipient);
         Map<String, Object> model = new HashMap<>();
@@ -56,7 +62,7 @@ public class MailService implements IMailService {
 
     @Override
     @Async
-    public void sendDraftEmail(String recipient, File pdf, Map<String, Object> model) throws MessagingException, UnknownHostException {
+    public void sendDraftEmail(String recipient, File pdf, Map<String, Object> model) throws MessagingException, IOException, TemplateException {
         List<String> recipients = new LinkedList<>();
         recipients.add(recipient);
         Map<String, File> attachments = new HashMap<>();
@@ -81,13 +87,14 @@ public class MailService implements IMailService {
 //        }
     }
 
-    private MimeMessage buildEmail(EmailType type, List<String> recipients, Map<String, Object> model, Map<String, File> attachments) throws MessagingException {
+    private MimeMessage buildEmail(EmailType type, List<String> recipients, Map<String, Object> model, Map<String, File> attachments) throws MessagingException, IOException, TemplateException {
         MimeMessage message = mailSender.createMimeMessage();
         message.setSubject(type.subject);
-        MimeMessageHelper helper = new MimeMessageHelper(message, true);
+        MimeMessageHelper helper = new MimeMessageHelper(message, true, StandardCharsets.UTF_8.name());
         helper.setFrom(mailFrom);
         helper.setTo(recipients.toArray(new String[recipients.size()]));
-        helper.setText(VelocityEngineUtils.mergeTemplateIntoString(velocityEngine, type.template, "UTF-8", model), true);
+        Template template = configuration.getTemplate(type.template);
+        helper.setText(FreeMarkerTemplateUtils.processTemplateIntoString(template, model), true);
         attachments.forEach((s, inputStream) -> {
             try {
                 helper.addAttachment(s, inputStream);
@@ -96,13 +103,5 @@ public class MailService implements IMailService {
             }
         });
         return message;
-    }
-
-    public void setVelocityEngine(VelocityEngine velocityEngine) {
-        this.velocityEngine = velocityEngine;
-    }
-
-    public void setMailSender(JavaMailSender mailSender) {
-        this.mailSender = mailSender;
     }
 }

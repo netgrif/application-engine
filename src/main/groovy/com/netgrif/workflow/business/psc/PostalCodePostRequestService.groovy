@@ -6,9 +6,7 @@ import groovyx.net.http.HTTPBuilder
 import groovyx.net.http.HttpResponseDecorator
 import groovyx.net.http.Method
 import org.apache.log4j.Logger
-import org.springframework.stereotype.Service
-
-@Service
+//@Service
 class PostalCodePostRequestService {
 
     private static final Logger log = Logger.getLogger(PostalCodePostRequestService.class.name)
@@ -17,7 +15,7 @@ class PostalCodePostRequestService {
         def json = makeRequest(code)
         if (json.offices.isEmpty()) return new ArrayList<PostalCode>()
         List<PostalCode> postalCodes = new ArrayList<>()
-        json.offices.each {
+        json.ofmojefices.each {
             postalCodes.add(new PostalCode(code, it.city, "other", "L1"))
         }
         return postalCodes
