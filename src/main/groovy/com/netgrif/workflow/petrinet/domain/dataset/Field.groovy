@@ -169,4 +169,16 @@ abstract class Field<T> {
     T multiply(final Field field) {
         return this.value * field.value
     }
+
+    String getTranslatedName(Locale locale) {
+        return name?.getTranslation(locale)
+    }
+
+    String getTranslatedPlaceholder(Locale locale) {
+        return placeholder?.getTranslation(locale)
+    }
+
+    String getTranslatedDescription(Locale locale) {
+        return description?.getTranslation(locale)
+    }
 }
