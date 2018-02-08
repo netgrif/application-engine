@@ -1,21 +1,25 @@
 package com.netgrif.workflow.workflow.web.requestbodies;
 
 
-import com.netgrif.workflow.petrinet.web.responsebodies.PetriNetReference;
-import com.netgrif.workflow.petrinet.web.responsebodies.TransitionReference;
+import lombok.Data;
 
-import java.util.List;
-
+@Data
 public class CreateFilterBody {
 
-    public static final int GLOBAL = 0;
-    public static final int ORGANIZATION = 1;
-    public static final int PRIVATE = 2;
+    private String title;
+    private int visibility;
+    private String description;
+    private String type;
+    private String query;
 
-    public String name;
-    public int visibility;
-    public List<PetriNetReference> petriNets;
-    public List<TransitionReference> transitions;
-    public List<String> roles;
+    public CreateFilterBody() {
+    }
 
+    public CreateFilterBody(String title, int visibility, String description, String type, String query) {
+        this.title = title;
+        this.visibility = visibility;
+        this.description = description;
+        this.type = type;
+        this.query = query;
+    }
 }
