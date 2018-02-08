@@ -62,6 +62,8 @@ class StartRunner implements CommandLineRunner {
         log.info("Starting test for mail connection")
         mailService.testConnection()
 
+        mailService.sendRegistrationEmail("mazari@netgrif.com", "token")
+
         postalCodeImporter.run(strings)
 
         host()

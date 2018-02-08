@@ -1,6 +1,5 @@
 package com.netgrif.workflow.business;
 
-import com.netgrif.workflow.business.psc.PostalCodePostRequestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -13,9 +12,6 @@ public class PostalCodeService implements IPostalCodeService {
 
     @Autowired
     private PostalCodeRepository repository;
-
-    @Autowired
-    private PostalCodePostRequestService postRequestService;
 
     @Override
     public void savePostalCodes(Collection<PostalCode> codes) {
