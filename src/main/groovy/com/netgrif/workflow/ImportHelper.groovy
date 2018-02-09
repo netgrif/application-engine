@@ -14,8 +14,11 @@ import com.netgrif.workflow.petrinet.domain.PetriNet
 import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository
 import com.netgrif.workflow.petrinet.service.PetriNetService
 import com.netgrif.workflow.workflow.domain.Case
+import com.netgrif.workflow.workflow.domain.Filter
 import com.netgrif.workflow.workflow.domain.repositories.CaseRepository
 import com.netgrif.workflow.workflow.service.TaskService
+import com.netgrif.workflow.workflow.service.interfaces.IFilterService
+import com.netgrif.workflow.workflow.web.requestbodies.CreateFilterBody
 import org.apache.log4j.Logger
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.io.ResourceLoader
@@ -55,6 +58,9 @@ class ImportHelper {
 
     @Autowired
     private ResourceLoader resourceLoader
+
+    @Autowired
+    private IFilterService filterService
 
     @SuppressWarnings("GroovyAssignabilityCheck")
     Map<String, Organization> createOrganizations(Map<String, String> organizations) {
@@ -128,6 +134,10 @@ class ImportHelper {
         taskService.createTasks(useCase)
         log.info("Case $title created")
         return useCase
+    }
+
+    boolean createFilter(String title, String query, LoggedUser user) {
+        return filterService.saveFilter(new CreateFilterBody(title, Filter.VISIBILITY_PUBLIC, "This filter was created automatically for testing purpose only.", Filter.TYPE_TASK, query), user)
     }
 
     static String getCaseColor() {
