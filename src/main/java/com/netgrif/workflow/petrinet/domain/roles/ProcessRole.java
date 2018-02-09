@@ -5,6 +5,8 @@ import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.Locale;
+
 @Document
 public class ProcessRole {
 
@@ -51,5 +53,11 @@ public class ProcessRole {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getLocalisedName(Locale locale) {
+        if (name == null)
+            return null;
+        return name.getTranslation(locale);
     }
 }
