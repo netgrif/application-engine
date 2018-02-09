@@ -48,5 +48,19 @@ public class TaskSearchService extends MongoSearchService<Task> {
         return buildQueryPart("title", obj, builder);
     }
 
+    public String userQuery(Object obj) {
+        Map<Class, Function<Object, String>> builder = new HashMap<>();
+
+        builder.put(Long.class, o -> ((Long) o).toString());
+        builder.put(Integer.class, o -> ((Integer) o).toString());
+        builder.put(ArrayList.class, o -> in((List<Object>) obj, oo -> oo.toString(), ob -> ob instanceof Long || ob instanceof Integer));
+        builder.put(String.class, o -> {
+            Long id = resolveAuthorByEmail((String) obj);
+            return id != null ? id.toString() : "";
+        });
+
+        return buildQueryPart("userId", obj, builder);
+    }
+
 
 }
