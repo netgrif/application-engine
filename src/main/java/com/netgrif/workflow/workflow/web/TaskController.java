@@ -178,7 +178,7 @@ public class TaskController {
         List<DataGroup> dataGroups = taskService.getDataGroups(taskId);
 
         dataGroups.forEach(group -> group.setFields(new DataFieldsResource(dataFields.stream().filter(field ->
-                group.getData().contains(field.getStringId())).collect(Collectors.toList()), taskId)));
+                group.getData().contains(field.getStringId())).collect(Collectors.toList()), taskId, locale)));
 
         return new DataGroupsResource(dataGroups, locale);
     }
@@ -203,26 +203,5 @@ public class TaskController {
         response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
         response.setHeader("Content-Disposition", "attachment; filename=" + fileResource.getFilename().substring(fileResource.getFilename().indexOf('-') + 1));
         return fileResource;
-    }
-
-    //TODO: Paged filters resource
-    @RequestMapping(value = "/filter", method = RequestMethod.GET)
-    public FiltersResource getAllFilters(Authentication auth) {
-        return new FiltersResource(filterService.getAll(), false);
-    }
-
-    @RequestMapping(value = "/filter/roles", method = RequestMethod.POST)
-    public FiltersResource getFiltersWithRoles(@RequestBody List<String> roles) {
-        return new FiltersResource(filterService.getWithRoles(roles), true);
-    }
-
-    @RequestMapping(value = "/filter", method = RequestMethod.POST)
-    public MessageResource saveFilter(Authentication auth, @RequestBody CreateFilterBody filterBody) {
-        boolean saveSuccess = filterService.saveFilter(((LoggedUser) auth.getPrincipal()), filterBody);
-        if (saveSuccess) {
-            return MessageResource.successMessage("Filter " + filterBody.name + " saved");
-        } else {
-            return MessageResource.errorMessage("Filter " + filterBody.name + " saving failed!");
-        }
     }
 }
