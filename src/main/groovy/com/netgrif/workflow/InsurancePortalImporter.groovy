@@ -4,6 +4,7 @@ import com.netgrif.workflow.auth.domain.Authority
 import com.netgrif.workflow.auth.domain.Organization
 import com.netgrif.workflow.auth.domain.User
 import com.netgrif.workflow.auth.domain.UserProcessRole
+import com.netgrif.workflow.workflow.service.interfaces.IFilterService
 import org.apache.log4j.Logger
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
@@ -35,5 +36,7 @@ class InsurancePortalImporter {
                 [auths.get("user")] as Authority[], [org] as Organization[], [processRoles.get("company")] as UserProcessRole[])
 
         5.times { importHelper.createCase("Test ${it + 1}", net.get(), user.transformToLoggedUser()) }
+        importHelper.createFilter("Test Filter", "{}", superCreator.superUser.transformToLoggedUser())
+        importHelper.createFilter("Test 2", "{\"user\":\"super@netgrif.com\"}", superCreator.superUser.transformToLoggedUser())
     }
 }
