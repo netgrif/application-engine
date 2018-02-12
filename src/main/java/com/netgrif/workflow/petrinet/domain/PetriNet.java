@@ -17,9 +17,6 @@ import java.util.stream.Collectors;
 @Document
 public class PetriNet extends PetriNetObject {
 
-    public static final String ARCHIVED_FILES_PATH = "storage/uploadedModels/";
-    public static final String FILE_EXTENSION = ".xml";
-
     @Getter
     private I18nString title;
 

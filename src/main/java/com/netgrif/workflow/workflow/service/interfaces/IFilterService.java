@@ -13,6 +13,9 @@ import java.util.Map;
 public interface IFilterService {
 
     boolean deleteFilter(String filterId, LoggedUser user);
-    boolean saveFilter(CreateFilterBody newFilterBody, LoggedUser user);
+
+    Filter saveFilter(CreateFilterBody newFilterBody, LoggedUser user);
+
     Page<Filter> search(Map<String, Object> request, Pageable pageable, LoggedUser user);
+
 }

@@ -44,7 +44,15 @@ public abstract class PetriNetService implements IPetriNetService {
     private ApplicationEventPublisher publisher;
 
     @Override
-    public Optional<PetriNet> importPetriNet(File xmlFile, String name, String initials, LoggedUser user, boolean deleteUploadedFile) throws IOException {
+    public Optional<PetriNet> importPetriNetAndDeleteFile(File xmlFile, String name, String initials, LoggedUser user) throws IOException {
+        Optional<PetriNet> imported = importPetriNet(xmlFile, name, initials, user);
+        if (!xmlFile.delete())
+            throw new IOException("File of process was not deleted");
+        return imported;
+    }
+
+    @Override
+    public Optional<PetriNet> importPetriNet(File xmlFile, String name, String initials, LoggedUser user) throws IOException {
         Optional<PetriNet> imported = getImporter().importPetriNet(xmlFile, name, initials);
         if (imported.isPresent()) {
             imported.get().setAuthor(user.transformToAuthor());
@@ -52,8 +60,6 @@ public abstract class PetriNetService implements IPetriNetService {
             repository.save(imported.get());
             publisher.publishEvent(new UserImportModelEvent(user, xmlFile, name, initials));
         }
-        if (deleteUploadedFile)
-            xmlFile.delete();
         return imported;
     }
 
@@ -79,6 +85,7 @@ public abstract class PetriNetService implements IPetriNetService {
         return nets;
     }
 
+    @Override
     public FileSystemResource getNetFile(String netId, StringBuilder title) {
         if (title.length() == 0) {
             List<PetriNet> nets = mongoTemplate.find(new BasicQuery("{_id:{$oid:\"" + netId + "\"}}", "{_id:1,title:1}"), PetriNet.class);
@@ -86,7 +93,7 @@ public abstract class PetriNetService implements IPetriNetService {
                 return null;
             title.append(nets.get(0).getTitle().getDefaultValue());
         }
-        return new FileSystemResource(PetriNet.ARCHIVED_FILES_PATH + netId + "-" + title.toString() + PetriNet.FILE_EXTENSION);
+        return new FileSystemResource(Importer.ARCHIVED_FILES_PATH + netId + "-" + title.toString() + Importer.FILE_EXTENSION);
     }
 
     @Override
