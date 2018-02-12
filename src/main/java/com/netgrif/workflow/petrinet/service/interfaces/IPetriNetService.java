@@ -21,7 +21,9 @@ import java.util.Map;
 
 public interface IPetriNetService {
 
-    Optional<PetriNet> importPetriNet(File xmlFile, String name, String initials, LoggedUser user, boolean deleteUploadedFile) throws IOException, SAXException, ParserConfigurationException;
+    Optional<PetriNet> importPetriNetAndDeleteFile(File xmlFile, String name, String initials, LoggedUser user) throws IOException;
+
+    Optional<PetriNet> importPetriNet(File xmlFile, String name, String initials, LoggedUser user) throws IOException;
 
     void savePetriNet(PetriNet petriNet);
 

@@ -28,17 +28,17 @@ public class FilterService implements IFilterService {
     public boolean deleteFilter(String filterId, LoggedUser user) {
         Filter filter = repository.findOne(filterId);
         if (filter == null)
-            return false;
+            throw new IllegalArgumentException("Filter not found");
 
         if (filter.getAuthor().getId().equals(user.getId()))
-            return false;
+            throw new IllegalArgumentException("User " + user.getUsername() + " doesn't have permission to delete filter " + filter.getStringId());
 
         repository.delete(filter);
         return true;
     }
 
     @Override
-    public boolean saveFilter(CreateFilterBody newFilterBody, LoggedUser user) {
+    public Filter saveFilter(CreateFilterBody newFilterBody, LoggedUser user) {
         Filter filter = new Filter();
         filter.setAuthor(user.transformToAuthor());
         filter.setTitle(new I18nString(newFilterBody.getTitle()));
@@ -47,8 +47,7 @@ public class FilterService implements IFilterService {
         filter.setVisibility(newFilterBody.getVisibility());
         filter.setQuery(newFilterBody.getQuery());
 
-        filter = repository.save(filter);
-        return filter.get_id() != null;
+        return repository.save(filter);
     }
 
     @Override
