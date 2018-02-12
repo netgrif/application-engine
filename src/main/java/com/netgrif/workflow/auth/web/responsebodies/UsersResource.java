@@ -8,26 +8,28 @@ import org.springframework.hateoas.mvc.ControllerLinkBuilder;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 public class UsersResource extends Resources<UserResource> {
-    public UsersResource(Iterable<UserResource> content, String selfRel) {
+
+    public UsersResource(Collection<UserResource> content, String selfRel, Locale locale) {
         super(content, new ArrayList<>());
         buildLinks(selfRel);
     }
 
-    public UsersResource(Collection<User> content, String selfRel, boolean small) {
-        this(content.stream().map(user -> new UserResource(user, small?"small":"profile", small))
-                .collect(Collectors.toList()),selfRel);
+    public UsersResource(Collection<User> content, String selfRel, Locale locale, boolean small) {
+        this(content.stream().map(user -> new UserResource(user, small ? "small" : "profile", locale, small))
+                .collect(Collectors.toList()), selfRel, locale);
     }
 
     private void buildLinks(String selfRel) {
         ControllerLinkBuilder allLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder
-                .methodOn(UserController.class).getAll(null));
+                .methodOn(UserController.class).getAll(null, null));
         add(selfRel.equalsIgnoreCase("all") ? allLink.withSelfRel() : allLink.withRel("all"));
 
         ControllerLinkBuilder smallLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder
-                .methodOn(UserController.class).getAllSmall(null));
+                .methodOn(UserController.class).getAllSmall(null, null));
         add(selfRel.equalsIgnoreCase("small") ? smallLink.withSelfRel() : smallLink.withRel("small"));
     }
 }
