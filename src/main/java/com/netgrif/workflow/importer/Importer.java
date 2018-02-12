@@ -35,6 +35,9 @@ public class Importer {
 
     private static final Logger log = Logger.getLogger(Importer.class.getName());
 
+    public static final String ARCHIVED_FILES_PATH = "storage/uploadedModels/";
+    public static final String FILE_EXTENSION = ".xml";
+
     public static final String FIELD_KEYWORD = "f";
     public static final String TRANSITION_KEYWORD = "t";
 
@@ -100,7 +103,7 @@ public class Importer {
 
     @Transactional
     public Path saveNetFile(PetriNet net, File xmlFile) throws IOException {
-        File savedFile = new File(PetriNet.ARCHIVED_FILES_PATH + net.getStringId() + "-" + net.getTitle() + PetriNet.FILE_EXTENSION);
+        File savedFile = new File(ARCHIVED_FILES_PATH + net.getStringId() + "-" + net.getTitle() + FILE_EXTENSION);
         savedFile.getParentFile().mkdirs();
         net.setImportXmlPath(savedFile.getPath());
         return Files.copy(xmlFile.toPath(), savedFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
