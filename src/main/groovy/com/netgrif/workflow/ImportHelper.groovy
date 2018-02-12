@@ -95,7 +95,7 @@ class ImportHelper {
     }
 
     Optional<PetriNet> createNet(String fileName, String name, String initials, LoggedUser loggedUser) {
-        return petriNetService.importPetriNet(new File("src/main/resources/petriNets/$fileName"), name, initials, loggedUser, false)
+        return petriNetService.importPetriNet(new File("src/main/resources/petriNets/$fileName"), name, initials, loggedUser)
     }
 
     UserProcessRole createUserProcessRole(PetriNet net, String name) {
