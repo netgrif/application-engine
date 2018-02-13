@@ -1,5 +1,7 @@
 package com.netgrif.workflow.petrinet.domain.dataset.logic.action
 
+import com.netgrif.workflow.business.IPostalCodeService
+import com.netgrif.workflow.business.orsr.IOrsrService
 import com.netgrif.workflow.importer.Importer
 import com.netgrif.workflow.petrinet.domain.Transition
 import com.netgrif.workflow.petrinet.domain.dataset.Field
@@ -8,12 +10,19 @@ import com.netgrif.workflow.petrinet.domain.dataset.logic.IllegalVariableTypeExc
 import com.netgrif.workflow.workflow.domain.Case
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 
 @Component
 class FieldActionsRunner {
 
     private static final Logger log = LoggerFactory.getLogger(FieldActionsRunner.class)
+
+    @Autowired
+    private IOrsrService orsrService
+
+    @Autowired
+    private IPostalCodeService postalCodeService
 
     private Map<String, Object> actionsCache = new HashMap<>()
 
@@ -91,5 +100,13 @@ class FieldActionsRunner {
 
     def getFromCache(String key) {
         return this.actionsCache.get(key)
+    }
+
+    IPostalCodeService getPostalCodeService() {
+        return postalCodeService
+    }
+
+    IOrsrService getOrsrService() {
+        return orsrService
     }
 }
