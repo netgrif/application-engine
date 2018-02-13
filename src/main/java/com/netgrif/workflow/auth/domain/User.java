@@ -27,54 +27,65 @@ public class User {
     @NotNull
     @Email
     @Column(unique = true)
-    @Getter @Setter
+    @Getter
+    @Setter
     private String email;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private String telNumber;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private String avatar;
 
     @JsonIgnore
     @NotNull
     @Length(min = 6)
-    @Getter @Setter
+    @Getter
+    @Setter
     private String password;
 
     @NotNull
     @NotBlank
-    @Getter @Setter
+    @Getter
+    @Setter
     private String name;
 
     @NotNull
     @NotBlank
-    @Getter @Setter
+    @Getter
+    @Setter
     private String surname;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "user_organizations", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "organization_id"))
-    @Getter @Setter
+    @Getter
+    @Setter
     private Set<Organization> organizations;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "user_authorities", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "authority_id"))
-    @Getter @Setter
+    @Getter
+    @Setter
     private Set<Authority> authorities;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "user_process_roles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "user_process_role_id"))
-    @Getter @Setter
+    @Getter
+    @Setter
     private Set<UserProcessRole> userProcessRoles;
 
     @Transient
-    @Getter @Setter
+    @Getter
+    @Setter
     private Set<ProcessRole> processRoles;
 
     public User() {
         organizations = new HashSet<>();
         authorities = new HashSet<>();
         userProcessRoles = new HashSet<>();
+        processRoles = new HashSet<>();
     }
 
     public User(Long id) {
@@ -90,10 +101,10 @@ public class User {
         this.surname = surname;
     }
 
-    public User(ObjectNode json){
-        this(json.get("email").asText(),null,json.get("name").asText(),json.get("surname").asText());
-        ((ArrayNode)json.get("userProcessRoles"))
-                .forEach(node -> userProcessRoles.add(new UserProcessRole( node.get("roleId").asText())));
+    public User(ObjectNode json) {
+        this(json.get("email").asText(), null, json.get("name").asText(), json.get("surname").asText());
+        ((ArrayNode) json.get("userProcessRoles"))
+                .forEach(node -> userProcessRoles.add(new UserProcessRole(node.get("roleId").asText())));
     }
 
     public void addAuthority(Authority authority) {
@@ -108,22 +119,22 @@ public class User {
         return name + " " + surname;
     }
 
-    public void addOrganization(Organization org){
+    public void addOrganization(Organization org) {
         this.organizations.add(org);
     }
 
-    public LoggedUser transformToLoggedUser(){
+    public LoggedUser transformToLoggedUser() {
         LoggedUser loggedUser = new LoggedUser(this.getId(), this.getEmail(), this.getPassword(), this.getAuthorities());
         loggedUser.setFullName(this.getFullName());
-        if(!this.getUserProcessRoles().isEmpty())
+        if (!this.getUserProcessRoles().isEmpty())
             loggedUser.parseProcessRoles(this.getUserProcessRoles());
-        if(!this.getOrganizations().isEmpty())
+        if (!this.getOrganizations().isEmpty())
             loggedUser.parseOrganizations(this.getOrganizations());
 
         return loggedUser;
     }
 
-    public Author transformToAuthor(){
+    public Author transformToAuthor() {
         Author author = new Author();
         author.setId(this.getId());
         author.setEmail(this.getEmail());
