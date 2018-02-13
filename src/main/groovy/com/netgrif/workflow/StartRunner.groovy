@@ -43,6 +43,9 @@ class StartRunner implements CommandLineRunner {
     @Autowired
     private DefaultRoleRunner defaultRoleRunner
 
+    @Autowired
+    private PostalCodeImporter postalCodeImporter
+
     @Override
     void run(String... strings) throws Exception {
         mongoTemplate.getDb().dropDatabase()
@@ -61,6 +64,11 @@ class StartRunner implements CommandLineRunner {
 
         log.info("Starting test for mail connection")
         mailService.testConnection()
+
+        mailService.sendRegistrationEmail("mazari@netgrif.com", "token")
+
+        postalCodeImporter.run(strings)
+
         host()
     }
 
