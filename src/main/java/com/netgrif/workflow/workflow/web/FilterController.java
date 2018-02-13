@@ -30,8 +30,8 @@ public class FilterController {
 
     @RequestMapping(method = RequestMethod.POST)
     public MessageResource createFilter(@RequestBody CreateFilterBody newFilter, Authentication auth, Locale locale) {
-        boolean success = filterService.saveFilter(newFilter, (LoggedUser) auth.getPrincipal());
-        if (success)
+        Filter filter = filterService.saveFilter(newFilter, (LoggedUser) auth.getPrincipal());
+        if (filter != null)
             return MessageResource.successMessage("Filter " + newFilter.getTitle() + " successfully created");
         return MessageResource.errorMessage("Filter " + newFilter.getTitle() + " has failed to save");
     }
