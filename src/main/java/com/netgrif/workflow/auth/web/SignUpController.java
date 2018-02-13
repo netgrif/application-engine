@@ -7,6 +7,7 @@ import com.netgrif.workflow.auth.web.requestbodies.NewUserRequest;
 import com.netgrif.workflow.auth.web.requestbodies.RegistrationRequest;
 import com.netgrif.workflow.mail.IMailService;
 import com.netgrif.workflow.workflow.web.responsebodies.MessageResource;
+import freemarker.template.TemplateException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,9 +20,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.mail.MessagingException;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
-import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
@@ -66,7 +65,7 @@ public class SignUpController {
             mailService.sendRegistrationEmail(user.getEmail(), user.getToken());
 
             return MessageResource.successMessage("Mail was sent to " + user.getEmail());
-        } catch (MessagingException | UnsupportedEncodingException | UnknownHostException e) {
+        } catch (IOException | TemplateException | MessagingException e) {
             log.error(e.toString());
             return MessageResource.errorMessage("Sending mail to " + newUserRequest.email + " failed!");
         }

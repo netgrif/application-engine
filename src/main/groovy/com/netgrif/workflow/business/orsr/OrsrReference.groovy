@@ -1,4 +1,4 @@
-package com.netgrif.workflow.parser.orsr
+package com.netgrif.workflow.business.orsr
 
 class OrsrReference {
 

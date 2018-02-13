@@ -67,23 +67,23 @@ class ActionDelegate {
         }]
     }
 
-    def saveChangedValue(Field field){
+    def saveChangedValue(Field field) {
         useCase.dataSet.get(field.stringId).value = field.value
         changedField.id = field.stringId
-        changedField.addAttribute("value",field.value)
+        changedField.addAttribute("value", field.value)
     }
 
     def change(Field field) {
-        [about: { cl ->
+        [about  : { cl ->
             def value = cl()
-            if(value instanceof Closure && value() == UNCHANGED_VALUE){
+            if (value instanceof Closure && value() == UNCHANGED_VALUE) {
                 return
             }
-            if(value == null){
-                if(field instanceof FieldWithDefault && field.defaultValue != useCase.dataSet.get(field.stringId).value){
+            if (value == null) {
+                if (field instanceof FieldWithDefault && field.defaultValue != useCase.dataSet.get(field.stringId).value) {
                     field.clearValue()
                     saveChangedValue(field)
-                } else if(!(field instanceof FieldWithDefault) && useCase.dataSet.get(field.stringId).value != null){
+                } else if (!(field instanceof FieldWithDefault) && useCase.dataSet.get(field.stringId).value != null) {
                     field.clearValue()
                     saveChangedValue(field)
                 }
@@ -94,26 +94,26 @@ class ActionDelegate {
                 saveChangedValue(field)
             }
         },
-        choices: { cl ->
-            if(!(field instanceof MultichoiceField || field instanceof EnumerationField)) return
+         choices: { cl ->
+             if (!(field instanceof MultichoiceField || field instanceof EnumerationField)) return
 
-            def values = cl()
-            if(values == null || (values instanceof Closure && values() == UNCHANGED_VALUE)) return
-            if(!(values instanceof Collection)) values = [values]
-            field = (ChoiceField)field
-            field.choices = values as Set<String>
-            changedField.id = field.stringId
-            changedField.addAttribute("choices",field.choices)
-        }]
+             def values = cl()
+             if (values == null || (values instanceof Closure && values() == UNCHANGED_VALUE)) return
+             if (!(values instanceof Collection)) values = [values]
+             field = (ChoiceField) field
+             field.choices = values as Set<String>
+             changedField.id = field.stringId
+             changedField.addAttribute("choices", field.choices)
+         }]
     }
 
     def always = { return ALWAYS_GENERATE }
     def once = { return ONCE_GENERATE }
 
-    def generate(String methods, Closure repeated){
+    def generate(String methods, Closure repeated) {
         [into: { Field field ->
             if (field.type == FieldType.FILE)
-                File f = new FileGenerateReflection(useCase, field as FileField,repeated() == ALWAYS_GENERATE).callMethod(methods) as File
+                File f = new FileGenerateReflection(useCase, field as FileField, repeated() == ALWAYS_GENERATE).callMethod(methods) as File
             else if (field.type == FieldType.TEXT)
                 new TextGenerateReflection(useCase, field as TextField, repeated() == ALWAYS_GENERATE).callMethod(methods) as String
             /*if(f != null) {
@@ -123,38 +123,38 @@ class ActionDelegate {
         }]
     }
 
-    def changeCaseProperty(String property){
-        [about: {cl ->
+    def changeCaseProperty(String property) {
+        [about: { cl ->
             def value = cl()
-            if(value instanceof Closure && value() == UNCHANGED_VALUE) return
+            if (value instanceof Closure && value() == UNCHANGED_VALUE) return
             useCase."$property" = value
         }]
     }
 
     //Cache manipulation
-    def cache(String name, Object value){
-        actionsRunner.addToCache("${useCase.stringId}-${name}",value)
+    def cache(String name, Object value) {
+        actionsRunner.addToCache("${useCase.stringId}-${name}", value)
     }
 
-    def cache(String name){
+    def cache(String name) {
         return actionsRunner.getFromCache("${useCase.stringId}-${name}" as String)
     }
 
-    def cacheFree(String name){
+    def cacheFree(String name) {
         actionsRunner.removeFromCache("${useCase.stringId}-${name}")
     }
 
     //Get PSC - DSL only for Insurance
     def byCode = { String code ->
-        return actionsRunner.postalCodeService.findByCode(code)
+        return actionsRunner.postalCodeService.findAllByCode(code)
     }
 
-    def byLocality = { String locality ->
-        return actionsRunner.postalCodeService.findByLocality(locality)
+    def byCity = { String city ->
+        return actionsRunner.postalCodeService.findAllByCity(city)
     }
 
-    def psc(Closure find, String input){
-        if(find)
+    def psc(Closure find, String input) {
+        if (find)
             return find(input)
         return null
     }
