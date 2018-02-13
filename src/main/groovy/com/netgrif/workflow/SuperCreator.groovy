@@ -29,12 +29,18 @@ class SuperCreator {
     @Autowired
     private IUserService userService
 
+    private User superUser
+
     void run(String... strings) {
+        createSuperUser()
+    }
+
+    public User createSuperUser(){
         Authority adminAuthority = authorityRepository.findByName(Authority.admin)
         if (adminAuthority == null)
-            adminAuthority = authorityRepository.save(new Authority(Authority.admin))
+            adminAuthority = authorityRepository.save(new Authority(Authority.admin)) as Authority
 
-        userService.saveNew(new User(
+        this.superUser = userService.saveNew(new User(
                 name: "Super",
                 surname: "Trooper",
                 email: "super@netgrif.com",
@@ -44,5 +50,18 @@ class SuperCreator {
                 userProcessRoles: userProcessRoleService.findAllMinusDefault() as Set<UserProcessRole>))
 
         log.info("Super user created")
+        return superUser
+    }
+
+    public void setAllToSuperUser(){
+        superUser.setOrganizations(organizationRepository.findAll() as Set<Organization>)
+        superUser.setUserProcessRoles(userProcessRoleService.findAllMinusDefault() as Set<UserProcessRole>)
+
+        superUser = userService.save(superUser)
+        log.info("Super user updated")
+    }
+
+    public User getSuperUser(){
+        return superUser
     }
 }

@@ -111,4 +111,24 @@ public class User {
     public void addOrganization(Organization org){
         this.organizations.add(org);
     }
+
+    public LoggedUser transformToLoggedUser(){
+        LoggedUser loggedUser = new LoggedUser(this.getId(), this.getEmail(), this.getPassword(), this.getAuthorities());
+        loggedUser.setFullName(this.getFullName());
+        if(!this.getUserProcessRoles().isEmpty())
+            loggedUser.parseProcessRoles(this.getUserProcessRoles());
+        if(!this.getOrganizations().isEmpty())
+            loggedUser.parseOrganizations(this.getOrganizations());
+
+        return loggedUser;
+    }
+
+    public Author transformToAuthor(){
+        Author author = new Author();
+        author.setId(this.getId());
+        author.setEmail(this.getEmail());
+        author.setFullName(this.getFullName());
+
+        return author;
+    }
 }
