@@ -77,35 +77,38 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public User save(User user){
+    public User save(User user) {
         return userRepository.save(user);
     }
 
     @Override
-    public User findById(Long id, boolean small){
+    public User findById(Long id, boolean small) {
         User user = userRepository.findOne(id);
-        if(!small) return loadProcessRoles(user);
+        if (!small) return loadProcessRoles(user);
         return user;
     }
 
     @Override
     public List<User> findAll(boolean small) {
         List<User> users = userRepository.findAll();
-        if(!small) users.forEach(this::loadProcessRoles);
+        if (!small) users.forEach(this::loadProcessRoles);
         return users;
     }
 
     @Override
-    public Set<User> findByOrganizations(Set<Long> org, boolean small){
+    public Set<User> findByOrganizations(Set<Long> org, boolean small) {
         Set<User> users = new HashSet<>(userRepository.findByOrganizationsIn(org.stream()
                 .map(Organization::new).collect(Collectors.toList())));
-        if(!small) users.forEach(this::loadProcessRoles);
+        if (!small) users.forEach(this::loadProcessRoles);
         return users;
     }
 
     @Override
-    public Set<User> findByProcessRoles(Set<String> roleIds) {
-        return new HashSet<>(userRepository.findByUserProcessRoles_RoleIdIn(new ArrayList<>(roleIds)));
+    public Set<User> findByProcessRoles(Set<String> roleIds, boolean small) {
+        Set<User> users = new HashSet<>(userRepository.findByUserProcessRoles_RoleIdIn(new ArrayList<>(roleIds)));
+        if (!small)
+            users.forEach(this::loadProcessRoles);
+        return users;
     }
 
     @Override
@@ -120,11 +123,11 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public List<Organization> getAllOrganizations(){
+    public List<Organization> getAllOrganizations() {
         return organizationRepository.findAll();
     }
 
-    private User loadProcessRoles(User user){
+    private User loadProcessRoles(User user) {
         user.setProcessRoles(processRoleRepository.findAll(user.getUserProcessRoles()
                 .stream().map(UserProcessRole::getRoleId).collect(Collectors.toList())));
         return user;

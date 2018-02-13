@@ -20,7 +20,7 @@ public interface IUserService {
 
     Set<User> findByOrganizations(Set<Long> org, boolean small);
 
-    Set<User> findByProcessRoles(Set<String> roleIds);
+    Set<User> findByProcessRoles(Set<String> roleIds, boolean small);
 
     void assignAuthority(Long userId, Long authorityId);
 
