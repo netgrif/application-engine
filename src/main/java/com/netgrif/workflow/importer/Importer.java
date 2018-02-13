@@ -35,6 +35,9 @@ public class Importer {
 
     private static final Logger log = Logger.getLogger(Importer.class.getName());
 
+    public static final String ARCHIVED_FILES_PATH = "storage/uploadedModels/";
+    public static final String FILE_EXTENSION = ".xml";
+
     public static final String FIELD_KEYWORD = "f";
     public static final String TRANSITION_KEYWORD = "t";
 
@@ -72,7 +75,7 @@ public class Importer {
         try {
             initialize();
             unmarshallXml(xml);
-            return createPetriNet(title, initials);
+            return createPetriNet(title, initials, xml);
         } catch (JAXBException | IOException e) {
             e.printStackTrace();
         }
@@ -96,17 +99,23 @@ public class Importer {
 
         Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
         document = (Document) jaxbUnmarshaller.unmarshal(xml);
-        importedXmlPath = Files.copy(xml.toPath(), (new File("storage/" + xml.getName())).toPath(), StandardCopyOption.REPLACE_EXISTING);
     }
 
     @Transactional
-    protected Optional<PetriNet> createPetriNet(String title, String initials) {
+    public Path saveNetFile(PetriNet net, File xmlFile) throws IOException {
+        File savedFile = new File(ARCHIVED_FILES_PATH + net.getStringId() + "-" + net.getTitle() + FILE_EXTENSION);
+        savedFile.getParentFile().mkdirs();
+        net.setImportXmlPath(savedFile.getPath());
+        return Files.copy(xmlFile.toPath(), savedFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+    }
+
+    @Transactional
+    protected Optional<PetriNet> createPetriNet(String title, String initials, File xmlFile) {
         net = new PetriNet();
-        net.setImportXmlPath(importedXmlPath.toString());
-        net.setImportId(document.getId());
-        net.setIcon(document.getIcon());
         net.setTitle(title);
         net.setInitials(initials);
+        net.setImportId(document.getId());
+        net.setIcon(document.getIcon());
 
         document.getI18N().forEach(this::addI18N);
         document.getRole().forEach(this::createRole);

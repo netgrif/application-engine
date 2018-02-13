@@ -493,6 +493,7 @@ public class TaskService implements ITaskService {
         workflowService.updateMarking(useCase);
 
         task.setUserId(null);
+        task.setStartDate(null);
         task = taskRepository.save(task);
         workflowService.save(useCase);
         reloadTasks(useCase, loggedUser.getId());

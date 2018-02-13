@@ -1,6 +1,7 @@
 package com.netgrif.workflow
 
 import com.netgrif.workflow.auth.domain.Authority
+import com.netgrif.workflow.auth.domain.LoggedUser
 import com.netgrif.workflow.auth.domain.Organization
 import com.netgrif.workflow.auth.domain.User
 import com.netgrif.workflow.auth.domain.UserProcessRole
@@ -11,13 +12,20 @@ import com.netgrif.workflow.auth.service.interfaces.IUserService
 import com.netgrif.workflow.importer.Importer
 import com.netgrif.workflow.petrinet.domain.PetriNet
 import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository
+import com.netgrif.workflow.petrinet.service.PetriNetService
 import com.netgrif.workflow.workflow.domain.Case
+import com.netgrif.workflow.workflow.domain.Filter
 import com.netgrif.workflow.workflow.domain.repositories.CaseRepository
 import com.netgrif.workflow.workflow.service.TaskService
+import com.netgrif.workflow.workflow.service.interfaces.IFilterService
+import com.netgrif.workflow.workflow.web.requestbodies.CreateFilterBody
 import org.apache.log4j.Logger
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.io.ResourceLoader
 import org.springframework.stereotype.Component
+
+import java.time.LocalDateTime
+import java.util.concurrent.ThreadLocalRandom
 
 @Component
 class ImportHelper {
@@ -46,10 +54,13 @@ class ImportHelper {
     private TaskService taskService
 
     @Autowired
-    private Importer importer
+    private PetriNetService petriNetService
 
     @Autowired
     private ResourceLoader resourceLoader
+
+    @Autowired
+    private IFilterService filterService
 
     @SuppressWarnings("GroovyAssignabilityCheck")
     Map<String, Organization> createOrganizations(Map<String, String> organizations) {
@@ -83,8 +94,8 @@ class ImportHelper {
         return authorityRepository.save(new Authority(name))
     }
 
-    Optional<PetriNet> createNet(String fileName, String name, String initials) {
-        return importer.importPetriNet(new File("src/main/resources/petriNets/$fileName"), name, initials)
+    Optional<PetriNet> createNet(String fileName, String name, String initials, LoggedUser loggedUser) {
+        return petriNetService.importPetriNet(new File("src/main/resources/petriNets/$fileName"), name, initials, loggedUser)
     }
 
     UserProcessRole createUserProcessRole(PetriNet net, String name) {
@@ -113,14 +124,23 @@ class ImportHelper {
         return user
     }
 
-    Case createCase(String title, PetriNet net, Long author) {
+    Case createCase(String title, PetriNet net, LoggedUser user) {
         Case useCase = new Case(title, net, net.getActivePlaces())
-        useCase.setColor(StartRunner.randomColor())
-        useCase.setAuthor(author)
+        useCase.setColor(getCaseColor())
+        useCase.setAuthor(user.transformToAuthor())
         useCase.setIcon(net.icon)
+        useCase.setCreationDate(LocalDateTime.now())
         useCase = caseRepository.save(useCase)
         taskService.createTasks(useCase)
         log.info("Case $title created")
         return useCase
+    }
+
+    boolean createFilter(String title, String query, LoggedUser user) {
+        return filterService.saveFilter(new CreateFilterBody(title, Filter.VISIBILITY_PUBLIC, "This filter was created automatically for testing purpose only.", Filter.TYPE_TASK, query), user)
+    }
+
+    static String getCaseColor() {
+        return "color-fg-amber-500"
     }
 }
