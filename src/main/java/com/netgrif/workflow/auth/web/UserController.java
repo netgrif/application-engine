@@ -55,7 +55,7 @@ public class UserController {
 
     @RequestMapping(value = "/role/small", method = RequestMethod.POST)
     public UsersResource getAllWithRole(@RequestBody Set<String> roleIds, Locale locale) {
-        return new UsersResource(userService.findByProcessRoles(roleIds), "small", locale, true);
+        return new UsersResource(userService.findByProcessRoles(roleIds, true), "small", locale, true);
     }
 
     //TODO: 2.6.2017 edit user profile
