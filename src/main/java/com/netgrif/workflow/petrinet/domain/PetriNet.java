@@ -72,7 +72,7 @@ public class PetriNet extends PetriNetObject {
         arcs = new HashMap<>();
         dataSet = new LinkedHashMap<>();
         roles = new HashMap<>();
-        transactions = new HashMap<>();
+        transactions = new LinkedHashMap<>();
     }
 
     public PetriNet(String title, String initials) {

@@ -47,14 +47,14 @@ public class MongoSearchService<T> {
         boolean match = request.entrySet().stream().allMatch((Map.Entry<String, Object> entry) -> {
             try {
                 Method method = this.getClass().getMethod(entry.getKey() + "Query", Object.class);
-                log.info("Resolved attribute of "+tClass.getSimpleName()+": " + entry.getKey());
+                log.info("Resolved attribute of " + tClass.getSimpleName() + ": " + entry.getKey());
                 Object part = method.invoke(this, entry.getValue());
                 if (part != null) //TODO 23.7.2017 throw exception when cannot build query
                     queryParts.put(entry.getKey(), part);
                 return true;
             } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
                 e.printStackTrace();
-                queryParts.put(ERROR_KEY, "Parameter " + entry.getKey() + " is not supported in "+tClass.getSimpleName()+" search!");
+                queryParts.put(ERROR_KEY, "Parameter " + entry.getKey() + " is not supported in " + tClass.getSimpleName() + " search!");
                 return false;
             }
         });
@@ -101,14 +101,14 @@ public class MongoSearchService<T> {
     public String idQuery(Object obj) {
         Map<Class, Function<Object, String>> builder = new HashMap<>();
 
-        builder.put(ArrayList.class, o -> in((List<Object>)obj,ob -> oid((String)ob),null));
+        builder.put(ArrayList.class, o -> in((List<Object>) obj, ob -> oid((String) ob), null));
         builder.put(String.class, o -> oid((String) o));
 
         return buildQueryPart("_id", obj, builder);
     }
 
     public String orQuery(Object obj) throws IllegalQueryException {
-        if(!(obj instanceof Map)) throw new IllegalQueryException("Parameter or must have JSON Object as value!");
+        if (!(obj instanceof Map)) throw new IllegalQueryException("Parameter or must have JSON Object as value!");
 
         Map<String, Object> orMap = resolveRequest((Map<String, Object>) obj);
         return or(orMap.values());
@@ -120,9 +120,9 @@ public class MongoSearchService<T> {
 
     protected String buildQueryPart(String attribute, Object obj, Map<Class, Function<Object, String>> builder) {
         try {
-            String attr = attribute != null ? "\"" +attribute +"\":" : "";
-            return  attr+builder.get(obj.getClass()).apply(obj);
-        } catch (NullPointerException e){
+            String attr = attribute != null ? "\"" + attribute + "\":" : "";
+            return attr + builder.get(obj.getClass()).apply(obj);
+        } catch (NullPointerException e) {
             e.getStackTrace();
             return ":";
         }
@@ -137,7 +137,7 @@ public class MongoSearchService<T> {
         return "{$oid:\"" + id + "\"}";
     }
 
-    public static String in(List<Object> values, Function<Object,String> valueQueryBuilder, Predicate<Object> typeTest) {
+    public static String in(List<Object> values, Function<Object, String> valueQueryBuilder, Predicate<Object> typeTest) {
         StringBuilder builder = new StringBuilder();
         builder.append("{$in:[");
         values.forEach(o -> {
@@ -147,7 +147,7 @@ public class MongoSearchService<T> {
 
             builder.append(",");
         });
-        if(!values.isEmpty())
+        if (!values.isEmpty())
             builder.deleteCharAt(builder.length() - 1);
         builder.append("]}");
         return builder.toString();
@@ -165,13 +165,17 @@ public class MongoSearchService<T> {
             builder.append(obj);
             builder.append("},");
         });
-        builder.deleteCharAt(builder.length()-1);
+        builder.deleteCharAt(builder.length() - 1);
         builder.append("]");
         return builder.toString();
     }
 
-    public static String exists(boolean val){
-        return "{$exists:"+val+"}";
+    public static String exists(boolean val) {
+        return "{$exists:" + val + "}";
+    }
+
+    public static String lessThenOrEqual(Object val) {
+        return "{$lte:" + val + "}";
     }
 
     public static Object resolveDataValue(Object val, String type) {

@@ -2,6 +2,7 @@ package com.netgrif.workflow.petrinet.web;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.netgrif.workflow.auth.domain.LoggedUser;
+import com.netgrif.workflow.importer.Importer;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.workflow.petrinet.service.interfaces.IProcessRoleService;
@@ -12,21 +13,21 @@ import com.netgrif.workflow.petrinet.web.responsebodies.*;
 import com.netgrif.workflow.workflow.web.responsebodies.MessageResource;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.PagedResources;
 import org.springframework.hateoas.mvc.ControllerLinkBuilder;
+import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.xml.sax.SAXException;
-import sun.rmi.runtime.Log;
 
-import javax.xml.parsers.ParserConfigurationException;
+import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -70,14 +71,8 @@ public class PetriNetController {
             ObjectMapper mapper = new ObjectMapper();
             UploadedFileMeta fileMeta = mapper.readValue(fileMetaJSON, UploadedFileMeta.class);
 
-            service.importPetriNet(file, fileMeta.name, fileMeta.initials, (LoggedUser) auth.getPrincipal());
+            service.importPetriNetAndDeleteFile(file, fileMeta.name, fileMeta.initials, (LoggedUser) auth.getPrincipal());
             return MessageResource.successMessage("Petri net imported successfully");
-        } catch (SAXException e) {
-            e.printStackTrace();
-            return MessageResource.errorMessage("Invalid xml file");
-        } catch (ParserConfigurationException e) {
-            e.printStackTrace();
-            return MessageResource.errorMessage("Invalid parser configuration");
         } catch (IOException e) {
             e.printStackTrace();
             return MessageResource.errorMessage("IO error");
@@ -134,6 +129,19 @@ public class PetriNetController {
     TransactionsResource getTransactions(@PathVariable("netId") String netId, Locale locale) {
         PetriNet net = service.loadPetriNet(decodeUrl(netId));
         return new TransactionsResource(net.getTransactions().values(), netId, locale);
+    }
+
+    @RequestMapping(value = "/{netId}/file", method = GET, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    public FileSystemResource getNetFile(@PathVariable("netId") String netId, @RequestParam(value = "title", required = false) String title, Authentication auth, HttpServletResponse response) {
+        StringBuilder titleBuilder = new StringBuilder();
+        if (title != null && !title.isEmpty())
+            titleBuilder.append(decodeUrl(title));
+        FileSystemResource fileResource = service.getNetFile(decodeUrl(netId), titleBuilder);
+        response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
+        response.setHeader("Content-Disposition", "attachment; filename=" + titleBuilder.toString() + Importer.FILE_EXTENSION);
+        response.setHeader("Content-Length", String.valueOf(fileResource.getFile().length()));
+        log.info("Downloading Petri net file: " + titleBuilder.toString() + " [" + netId + "]");
+        return fileResource;
     }
 
     @RequestMapping(value = "/search", method = POST)
