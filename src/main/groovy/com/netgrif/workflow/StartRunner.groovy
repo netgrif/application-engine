@@ -52,37 +52,20 @@ class StartRunner implements CommandLineRunner {
         storage.getParentFile().mkdirs()
 
         defaultRoleRunner.run()
-        insurancePortalImporter.run(strings)
         superCreator.run(strings)
         sessionsRunner.run(strings)
+
+        insurancePortalImporter.run(strings)
+
+        superCreator.setAllToSuperUser()
 
         log.info("Starting test for mail connection")
         mailService.testConnection()
         host()
     }
 
-    private void host() {
+    private static void host() {
         log.info("HOST ADDRESS: " + InetAddress.localHost.hostAddress)
         log.info("HOST NAME: " + InetAddress.localHost.hostName)
-    }
-
-    static String randomColor() {
-        return "color-fg-accent-50"
-
-        int randomNum = ThreadLocalRandom.current().nextInt(0, 4)
-        switch (randomNum) {
-            case 0:
-                return "color-fg-primary-500"
-            case 1:
-                return "color-fg-teal-500"
-            case 2:
-                return "color-fg-deep-orange-500"
-            case 3:
-                return "color-fg-amber-500"
-            case 4:
-                return "color-fg-brown-500"
-            default:
-                return "color-fg-primary-500"
-        }
     }
 }
