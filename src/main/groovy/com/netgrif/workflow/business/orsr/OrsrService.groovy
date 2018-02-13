@@ -1,4 +1,4 @@
-package com.netgrif.workflow.parser.orsr
+package com.netgrif.workflow.business.orsr
 
 import org.apache.log4j.Logger
 import org.jsoup.HttpStatusException

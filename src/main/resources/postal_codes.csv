@@ -1,0 +1,4311 @@
+811 01,Bratislava
+811 02,Bratislava
+811 03,Bratislava
+811 04,Bratislava
+811 05,Bratislava
+811 06,Bratislava
+811 07,Bratislava
+811 08,Bratislava
+811 09,Bratislava
+820 01,Bratislava
+821 01,Bratislava
+821 02,Bratislava
+821 03,Bratislava
+821 04,Bratislava
+821 05,Bratislava
+821 06,Bratislava
+821 06,Bratislava - Podunajské Biskupice
+821 07,Bratislava
+821 07,Bratislava - Vrakuňa
+821 08,Bratislava
+821 09,Bratislava
+830 00,Bratislava
+830 04,Bratislava
+830 05,Bratislava
+830 06,Bratislava
+830 07,Bratislava
+831 01,Bratislava
+831 02,Bratislava
+831 03,Bratislava
+831 04,Bratislava
+831 06,Bratislava
+831 07,Bratislava
+831 07,Bratislava - Vajnory
+831 51,Bratislava
+831 52,Bratislava
+831 53,Bratislava
+831 54,Bratislava
+840 02,Bratislava
+840 08,Bratislava
+840 09,Bratislava
+841 01,Bratislava
+841 02,Bratislava
+841 03,Bratislava
+841 03,Bratislava - Lamač
+841 04,Bratislava
+841 05,Bratislava
+841 06,Bratislava
+841 06,Bratislava - Záhorská Bystrica
+841 07,Bratislava
+841 08,Bratislava
+841 10,Bratislava
+841 10,Bratislava - Devín
+850 00,Bratislava
+850 09,Bratislava
+851 01,Bratislava
+851 02,Bratislava
+851 03,Bratislava
+851 04,Bratislava
+851 05,Bratislava
+851 06,Bratislava
+851 07,Bratislava
+851 10,Bratislava
+851 10,Bratislava - Čunovo
+851 10,Bratislava - Jarovce
+851 10,Bratislava - Rusovce
+040 01,Košice
+040 01,Košice - Kavečany
+040 01,Košice - Staré Mesto
+040 01,Košice - Vyšné Opátske
+040 01,Vyšné Opátske
+040 01,Košice - Juh
+040 01,Košice - Sever
+040 11,Košice
+040 01,Košice - Lorinčík
+040 01,Košice - Pereš
+040 11,Košice - Západ
+040 11,Košice - Luník IX.
+040 11,Košice - Juh
+040 12,Košice
+040 12,Košice - Nad jazerom
+040 12,Košice - Juh
+040 13,Košice
+040 13,Košice - Ťahanovce
+040 13,Košice - Sídlisko Ťahanovce
+040 13,Košice - Džungľa
+040 14,Košice
+040 14,Košice - Košická Nová Ves
+040 15,Košice
+040 15,Košice - Poľov
+040 15,Košice - Šaca
+040 16,Košice
+040 16,Košice - Myslava
+040 17,Košice
+040 17,Košice - Barca
+040 17,Košice - Šebastovce
+040 18,Košice
+040 18,Košice - Krásna
+040 22,Košice
+040 22,Košice - Dragovských hrdinov
+040 23,Košice
+040 23,Košice - Sídlisko KVP
+044 54,Košice
+044 54,Košice - Železiarne
+974 01,Banská Bystrica
+974 04,Banská Bystrica
+974 05,Banská Bystrica
+974 09,Banská Bystrica
+974 11,Banská Bystrica
+974 01,Senica
+974 05,Iliaš
+974 01,Jakub
+974 01,Kostiviarska
+974 05,Kráľová
+974 05,Kremnička
+974 01,Majer
+974 01,Podlavice
+974 05,Radvaň
+974 05,Rakytovce
+974 11,Rudlová
+974 11,Sásová
+974 01,Skubín
+974 01,Šalková
+974 01,Uľanka
+036 01,Martin
+036 01,Ľadoveň
+036 01,Jahodníky
+036 01,Košúty
+036 01,Podháj
+038 61,Priekopa
+036 01,Tomčany
+036 01,Záturčie
+071 01,Michalovce
+949 01,Nitra
+949 05,Nitra
+949 07,Nitra
+949 11,Nitra
+949 01,Nitra - Staré mesto
+949 01,Čermáň
+949 05,Dolné Krškany
+949 01,Dražovce
+949 05,Horné Krškany
+949 01,Chrenová
+949 07,Janíkovce
+949 11,Klokočina
+949 01,Kynek
+949 01,Mlynárce
+949 01,Párovské Háje
+949 01,Zobor
+058 01,Poprad
+017 01,Považská Bystrica
+017 04,Považská Bystrica
+017 05,Považská Bystrica
+017 06,Považská Bystrica
+017 07,Považská Bystrica
+017 01,Dolný Moštenec
+017 01,Horný Moštenec
+017 06,Milochov
+017 01,Orlové
+017 01,Podmanín
+017 04,Podvažie
+017 05,Považská Teplá
+017 04,Považské Podhradie
+017 01,Praznov
+017 04,Šebešťanová
+017 07,Zemiansky Kvašov
+080 01,Prešov
+080 05,Prešov
+080 06,Prešov
+080 06,Nižná Šebastová
+080 05,Solivar
+080 01,Šalgovík
+971 01,Prievidza
+911 01,Trenčín
+911 05,Trenčín
+911 06,Trenčín
+911 08,Trenčín
+911 01,Biskupice
+911 05,Istebník
+911 01,Kubrá
+911 01,Kubrica
+911 01,Opatová
+911 05,Orechové
+911 06,Záblatie
+911 05,Zlatovce
+917 01,Trnava
+917 02,Trnava
+917 05,Trnava
+917 08,Trnava
+960 01,Zvolen
+010 01,Žilina
+010 03,Žilina
+010 04,Žilina
+010 07,Žilina
+010 08,Žilina
+010 09,Žilina
+010 14,Žilina
+010 15,Žilina
+010 04,Bánová
+010 14,Brodno
+010 03,Budatín
+010 09,Bytčica
+010 01,Mojšová Lúčka
+010 03,Považský Chlmec
+010 01,Strážov
+010 01,Trnové
+010 14,Vranie
+010 03,Zádubnie
+010 03,Zástranie
+010 04,Závodie
+010 01,Žilinská Lehota
+085 01,Bardejov
+085 01,Bardejovská Nová Ves
+086 31,Bardejovské Kúpele
+085 01,Dlhá Lúka
+977 01,Brezno
+977 03,Brezno
+977 01,Bujakovo
+977 03,Mazorníkovo
+977 01,Predné Halny
+977 01,Zadné Halny
+022 01,Čadca
+022 04,Čadca
+022 04,Butty
+022 01,Čadečka
+022 01,Drahošanka
+022 01,Horelica
+022 04,Kýčerka
+022 04,Kyzka
+022 01,Milošová
+022 01,Podzávoz
+022 01,Rieka
+022 04,Sihelník
+022 01,Vojty
+018 41,Dubnica nad Váhom
+929 01,Dunajská Streda
+929 01,Malé Blahovo
+929 01,Mliečany
+920 01,Hlohovec
+920 03,Hlohovec
+920 03,Šulekovo
+066 01,Humenné
+945 01,Komárno
+945 04,Komárno
+945 05,Komárno
+934 01,Levice
+934 05,Levice
+934 01,Čankov
+934 01,Horša
+934 01,Kalinčiakovo
+934 01,Malý Kiar
+031 01,Liptovský Mikuláš
+031 04,Liptovský Mikuláš
+031 05,Liptovský Mikuláš
+031 01,Andice
+031 01,Benice
+031 01,Bodice
+031 01,Demänová
+031 01,Iľanovo
+031 05,Liptovská Ondrašová
+031 04,Okoličné
+031 01,Palúdzka
+031 01,Ploštín
+031 04,Stošice
+031 04,Vitálišovce
+984 01,Lučenec
+984 03,Lučenec
+915 01,Nové Mesto nad Váhom
+940 02,Nové Zámky
+958 01,Partizánske
+958 03,Partizánske
+958 04,Partizánske
+958 06,Partizánske
+902 01,Pezinok
+902 03,Pezinok
+921 01,Piešťany
+979 01,Rimavská Sobota
+979 01,Bakta
+979 01,Dúžava
+979 01,Kurinec
+979 01,Mojín
+979 01,Nižná Pokoradz
+979 01,Sabová
+979 01,Sobôtka
+979 01,Včelinec
+979 01,Vinice
+979 01,Vyšná Pokoradz
+034 01,Ružomberok
+034 03,Ružomberok
+034 06,Ružomberok
+034 03,Biely Potok
+034 06,Černová
+034 01,Hrboltová
+034 03,Vlkolínec
+905 01,Senica
+069 01,Snina
+052 01,Spišská Nová Ves
+052 05,Spišská Nová Ves
+927 01,Šaľa
+927 05,Šaľa
+955 01,Topoľčany
+955 03,Topoľčany
+075 01,Trebišov
+093 01,Vranov nad Topľou
+093 02,Vranov nad Topľou
+093 03,Vranov nad Topľou
+093 03,Čemerné
+093 01,Vranov
+985 13,Ábelová
+980 44,Abovce
+925 45,Abrahám
+086 41,Abrahámovce
+059 72,Abrahámovce
+038 22,Abramová
+082 52,Abranovce
+913 05,Adamovské Kochanovce
+067 32,Adidovce
+078 01,Albínov
+951 22,Alekšince
+951 34,Alexandrov Dvor
+900 42,Alžbetin Dvor
+930 03,Amadeho Kračany
+946 51,Aňala
+946 51,Aňalské Záhrady
+951 42,Andač
+941 23,Andovce
+086 37,Andrejová
+065 43,Andrejovka
+943 42,Arad
+956 06,Ardanovce
+049 55,Ardovo
+935 41,Arma
+053 13,Arnutovce
+951 34,Báb
+094 31,Babie
+029 52,Babín
+082 67,Babin Potok
+962 61,Babiná
+951 53,Babindol
+980 26,Babinec
+013 54,Babiše
+013 11,Babkov
+916 13,Babulicov Vrch
+976 64,Bacúch
+962 61,Bacúrov
+930 30,Báč
+951 15,Bačala
+076 84,Bačka
+076 61,Bačkov
+962 68,Báčovce
+969 01,Baďan
+951 46,Bádice
+976 32,Badín
+900 84,Báhoň
+072 54,Bajany
+946 54,Bajč
+082 41,Bajerov
+082 73,Bajerovce
+935 51,Bajka
+943 65,Bajtava
+930 04,Baka
+976 11,Baláže
+053 04,Baldovce
+991 11,Balog nad Ipľom
+930 08,Baloň
+946 01,Balvany
+091 01,Baňa
+921 01,Banka
+969 01,Banky
+972 25,Banky
+941 01,Bánov
+95701,Bánovce nad Bebravou
+95704,Bánovce nad Bebravou
+072 04,Bánovce nad Ondavou
+972 48,Banská
+966 15,Banská Belá
+966 63,Banská Hodruša
+969 01,Banská Štiavnica
+094 12,Banské
+969 01,Banský Studenec
+076 32,Bara
+982 51,Barca
+085 01,Bardejovská Zábava
+941 49,Bardoňovo
+967 01,Bartošova Lehôtka
+086 42,Bartošovce
+067 23,Baškovce
+073 01,Baškovce
+922 01,Bašovce
+956 18,Baštín
+059 35,Batizovce
+980 21,Bátka
+991 26,Bátorová
+946 34,Bátorove Kosihy
+935 03,Bátovce
+916 38,Beckov
+916 31,Beckovská Vieska
+974 01,Bečov
+053 05,Beharovce
+982 01,Behynce
+956 07,Behynce
+086 35,Becherov
+930 34,Beketfa
+943 53,Belá
+013 05,Belá
+038 11,Belá - Dulice
+067 81,Belá nad Cirochou
+951 75,Beladice
+018 03,Belejov
+089 01,Belejovce
+941 48,Belek
+980 01,Belín
+986 01,Belina
+956 12,Belince
+930 52,Bellova Ves
+086 14,Beloveža
+969 01,Beluj
+018 61,Beluša
+032 04,Beňadiková
+090 42,Beňadikovce
+029 63,Beňadovo
+072 64,Beňatina
+038 42,Benice
+930 36,Benkova Potôň
+094 02,Benkovce
+014 01,Beňov
+026 01,Beňova Lehota
+976 64,Beňuš
+031 01,Beňušovce
+900 27,Bernolákovo
+082 35,Bertotovce
+018 02,Besné
+935 36,Beša
+076 72,Beša
+941 41,Bešeňov
+034 83,Bešeňová
+053 15,Betlanovce
+071 01,Betlenovce
+049 21,Betliar
+020 01,Bezdedov - Vieska
+072 53,Bežovce
+076 41,Biel
+027 05,Biela
+972 29,Biela Voda
+976 53,Biele Vody
+053 76,Biele Vody
+935 74,Bielovce
+919 34,Biely Kostol
+053 06,Bijacovce
+908 77,Bílkove Humence
+943 56,Bíňa
+053 32,Bindt
+919 07,Bíňovce
+957 01,Biskupice
+986 01,Biskupice
+956 07,Biskupová
+010 04,Bitarová
+930 52,Blahová
+930 32,Blatná na Ostrove
+072 44,Blatná Polianka
+900 82,Blatné
+072 44,Blatné Remety
+072 43,Blatné Revištia
+038 15,Blatnica
+023 02,Blažkov
+023 11,Blažková
+038 44,Blažovce
+956 01,Blesovce
+980 32,Blhovce
+913 25,Bobot
+913 25,Bobotská Lehota
+029 42,Bobrov
+032 21,Bobrovček
+032 21,Bobrovec
+032 23,Bobrovník
+930 31,Bodíky
+018 15,Bodiná
+956 08,Bodok
+038 45,Bodorová
+082 66,Bodovce
+913 11,Bodovka - Krivosúd
+090 05,Bodružal
+946 16,Bodza
+946 14,Bodzianske Lúky
+086 04,Bogliarka
+947 03,Bohatá
+919 09,Bohdanovce nad Trnavou
+929 01,Boheľov
+018 52,Bohunice
+935 05,Bohunice
+919 30,Bohunice
+049 12,Bohúňovo
+956 01,Bojná
+972 01,Bojnice
+972 01,Bojnice - kúpele
+920 55,Bojničky
+946 39,Bokroš
+091 01,Bokša
+076 53,Boľ
+925 26,Boldog
+919 08,Boleráz
+018 53,Bolešov
+984 01,Boľkovce
+038 44,Borcová
+956 36,Borčany
+018 53,Borčice
+900 32,Borinka
+068 01,Borov
+919 61,Borová
+922 09,Borovce
+908 77,Borský Mikuláš
+908 77,Borský Peter
+908 79,Borský Svätý Jur
+076 32,Borša
+935 87,Bory
+913 07,Bošáca
+956 18,Bošany
+913 26,Bošianska Neporadza
+076 43,Boťany
+980 41,Bottovo
+076 62,Božčice
+049 42,Bôrka
+072 05,Bracovce
+982 67,Brádno
+951 13,Branč
+941 31,Branovo
+962 05,Bratkovica
+976 64,Braväcovo
+049 34,Brdárka
+076 05,Brehov
+968 01,Brehy
+066 01,Brekov
+985 53,Brestina
+066 01,Brestov
+082 05,Brestov
+067 01,Brestov nad Laborcom
+919 27,Brestovany
+916 42,Brestové
+946 17,Brestovec
+907 01,Brestovec
+082 03,Bretejovce
+980 46,Bretka
+029 53,Breza
+972 12,Brezany
+010 04,Brezany
+076 12,Brezina
+962 61,Breziny
+091 01,Breznica
+985 02,Breznička
+091 01,Breznička
+957 01,Brezolupy
+087 01,Brezov
+906 13,Brezová pod Bradlom
+067 73,Brezovec
+082 74,Brezovica
+028 01,Brezovica
+082 74,Brezovička
+086 11,Brezovka
+082 41,Brežany
+935 02,Brhlovce
+018 22,Briestenné
+038 22,Brieštie
+029 57,Brišovka
+032 23,Brnice
+908 85,Brodské
+958 42,Brodzany
+013 54,Bršlica
+976 51,Bruchačka
+916 25,Brunovce
+090 31,Brusnica
+982 65,Brusník
+991 01,Brusník
+976 62,Brusno
+972 32,Brusno
+976 62,Brusno - kúpele
+053 73,Brutovce
+943 55,Bruty
+018 12,Brvnište
+049 51,Brzotín
+086 43,Buclovany
+946 35,Búč
+919 28,Bučany
+029 57,Bučina
+916 42,Bučkovec
+931 01,Bučuháza
+023 36,Budatínska Lehota
+962 33,Budča
+962 34,Budička
+980 23,Budikovany
+985 12,Budiná
+076 77,Budince
+038 23,Budiš
+072 15,Budkovce
+900 86,Budmerice
+082 71,Budzín
+053 04,Buglovce
+013 61,Buková
+919 10,Buková
+090 22,Bukovce
+906 14,Bukovec
+991 02,Bukovec
+032 23,Bukovina
+968 01,Bukovina
+966 01,Bukovina
+985 51,Bukovinka
+053 14,Bukovinka
+986 01,Bulhary
+082 33,Bunde
+072 44,Bunkovce
+991 22,Bušince
+059 93,Bušovce
+930 39,Búštelek
+985 41,Buzitka
+977 01,Bystrá
+090 23,Bystrá
+053 62,Bystrany
+094 34,Bystré
+972 45,Bystričany
+946 38,Bystrička
+038 04,Bystrička
+985 24,Bystrička
+076 13,Byšta
+014 01,Bytča
+966 01,Bzenica
+082 42,Bzenov
+956 05,Bzince
+916 11,Bzince pod Javorinou
+026 01,Bziny
+962 41,Bzovík
+962 62,Bzovská Lehôtka
+090 33,Bžany
+951 17,Cabaj
+951 17,Cabaj - Čápor
+094 14,Cabov
+980 42,Cakov
+076 05,Cejkov
+010 01,Celulózka
+080 01,Cemjata
+090 16,Cernina
+972 48,Cerová
+906 33,Cerová
+951 24,Ceroviny
+962 52,Cerovo
+916 11,Cetuna
+919 43,Cífer
+971 01,Cigeľ
+086 02,Cigeľka
+086 37,Cigla
+956 37,Cimenná
+985 22,Cinobaňa
+908 48,Cunín
+951 24,Čab
+067 16,Čabalovce
+067 02,Čabiny
+962 51,Čabradský Vrbovok
+974 01,Čačín
+905 01,Čáčov
+916 21,Čachtice
+935 61,Čajakovo
+935 24,Čajkov
+935 68,Čaka
+951 43,Čakajovce
+985 58,Čakanovce
+930 40,Čakany
+094 35,Čaklov
+946 02,Čalovec
+986 01,Čamovce
+951 17,Čápor
+953 01,Čaradice
+908 43,Čáry
+900 89,Častá
+946 03,Částa
+906 04,Častkov
+916 27,Častkovce
+935 63,Čata
+900 83,Čataj
+972 29,Čavoj
+991 25,Čebovce
+072 11,Čečehov
+930 36,Čečínska Potôň
+985 45,Čechánky
+930 34,Čechová
+941 32,Čechy
+951 07,Čechynce
+962 41,Čekovce
+951 03,Čeľadice
+956 16,Čeľadince
+991 22,Čeláre
+018 16,Čelkova Lehota
+082 14,Čelovce
+991 41,Čelovce
+076 17,Čeľovce
+929 01,Čenkesfa
+943 52,Čenkov
+930 39,Čenkovce
+972 46,Čereňany
+979 01,Čerenčany
+945 01,Čergov
+945 04,Čerhát
+076 81,Čerhov
+974 01,Čerín
+956 08,Čermany
+941 05,Černík
+067 23,Černina
+076 32,Černochov
+916 01,Černochov Vrch
+067 52,Čertižné
+985 02,Červeň
+976 71,Červená Skala
+083 01,Červená Voda
+049 64,Červeňany
+991 01,Červeňany
+082 07,Červenica
+082 56,Červenica pri Sabinove
+920 42,Červeník
+951 82,Červený Hrádok
+018 56,Červený Kameň
+900 89,Červený Kameň
+059 06,Červený Kláštor
+059 06,Červený Kláštor-kúpele
+985 03,České Brezovo
+013 54,Čiakov
+076 71,Čičarovce
+093 01,Čičava
+013 15,Čičmany
+946 19,Číčov
+076 43,Čierna
+053 33,Čierna Hora
+956 53,Čierna Lehota
+049 36,Čierna Lehota
+076 43,Čierna nad Tisou
+925 06,Čierna Voda
+013 55,Čierne
+023 13,Čierne
+023 56,Čierne
+953 05,Čierne Kľačany
+094 34,Čierne nad Topľou
+079 01,Čierne Pole
+976 52,Čierny Balog
+925 08,Čierny Brod
+946 03,Čierny Chrbát
+980 31,Čierny Potok
+032 33,Čierny Váh
+951 61,Čifáre
+941 11,Čiky
+931 01,Čilistov
+930 08,Čiližská Radvaň
+027 12,Čimhová
+065 42,Čirč
+980 43,Číž
+980 43,Číž - kúpele
+049 12,Čoltovo
+039 01,Čremošné
+048 01,Čučma
+067 35,Čukalovce
+930 51,Čukárska Paka
+956 54,Čuklasovce
+082 71,Ďačov
+991 35,Dačov Lom
+082 63,Daletice
+076 12,Dancov Potok
+053 22,Danišovce
+038 42,Ďanová
+094 05,Ďapalovce
+076 61,Dargov
+093 03,Davidov
+067 12,Dedačov
+946 03,Dedina Mládeže
+941 50,Dedinka
+900 29,Dedinka pri Dunaji
+049 73,Dedinky
+919 53,Dechtice
+969 01,Dekýš
+053 75,Delava
+935 85,Demandice
+029 57,Demänová
+031 01,Demänovská Dolina
+082 13,Demjata
+027 05,Demkovská
+020 54,Dešná
+094 31,Detrík
+962 12,Detva
+962 12,Detva - sídlisko
+962 05,Detvianska Huta
+935 04,Devičany
+962 65,Devičie
+957 03,Dežerice
+038 02,Diaková
+925 81,Diakovce
+022 01,Didka
+985 53,Diel
+943 42,Diva
+972 24,Diviacka Nová Ves
+039 01,Diviaky
+972 25,Diviaky nad Nitricou
+985 52,Divín
+013 31,Divina
+013 31,Divinka
+985 52,Divínske Lazy
+919 01,Dlhá
+032 23,Dlhá Lúka
+023 54,Dlhá nad Kysucou
+027 55,Dlhá nad Oravou
+927 05,Dlhá nad Váhom
+049 55,Dlhá Ves
+094 13,Dlhé Klčovo
+067 82,Dlhé nad Cirochou
+013 32,Dlhé Pole
+054 01,Dlhé Stráže
+090 02,Dlhoňa
+972 26,Dlžín
+935 56,Dobogov
+076 41,Dobrá
+914 01,Dobrá
+962 61,Dobrá Niva
+919 54,Dobrá Voda
+053 61,Dobrá Voľa
+094 23,Dobrianky
+976 52,Dobroč
+985 53,Dobroč
+972 27,Dobročná
+930 31,Dobrohošť
+090 01,Dobroslava
+985 26,Dobrý Potok
+049 25,Dobšiná
+049 71,Dobšinská Ľadová Jaskyňa
+049 73,Dobšinská Maša
+020 51,Dohňany
+906 02,Dojč
+053 02,Doľany
+900 88,Doľany
+027 05,Dolina
+082 38,Dolina
+991 28,Dolinka
+013 62,Dolinky
+020 53,Dolinky
+962 63,Dolinky
+020 61,Dolná Breznica
+985 51,Dolná Bzová
+919 65,Dolná Krupá
+976 98,Dolná Lehota
+027 41,Dolná Lehota
+018 02,Dolná Mariková
+974 01,Dolná Mičiná
+974 01,Dolná Môlča
+914 43,Dolná Poruba
+930 02,Dolná Potôň
+935 31,Dolná Seč
+925 63,Dolná Streda
+991 02,Dolná Strehová
+913 32,Dolná Súča
+039 01,Dolná Štubňa
+013 04,Dolná Tižina
+966 21,Dolná Trnávka
+967 01,Dolná Ves
+913 33,Dolná Závrská
+966 01,Dolná Ždaňa
+962 61,Dolné Breziny
+956 54,Dolné Držkovce
+919 52,Dolné Dubové
+966 61,Dolné Hámre
+956 31,Dolné Chlebany
+930 39,Dolné Janíky
+038 02,Dolné Jaseno
+020 01,Dolné Kočkovce
+906 15,Dolné Košariská
+951 45,Dolné Lefantovce
+972 43,Dolné Lelovce
+919 27,Dolné Lovčice
+962 41,Dolné Mladonice
+913 26,Dolné Motešice
+957 01,Dolné Naštice
+951 02,Dolné Obdokovce
+919 02,Dolné Orešany
+920 61,Dolné Otrokovce
+957 01,Dolné Ozorovce
+991 24,Dolné Plachtince
+991 25,Dolné Príbelce
+962 55,Dolné Rykynčice
+925 02,Dolné Saliby
+935 85,Dolné Semerovce
+951 71,Dolné Sľažany
+916 41,Dolné Srnie
+991 03,Dolné Strháre
+920 61,Dolné Trhovište
+935 81,Dolné Turovce
+972 23,Dolné Vestenice
+985 42,Dolné Zahorany
+920 52,Dolné Zelenice
+962 51,Dolný Badín
+930 14,Dolný Bar
+935 34,Dolný Ďur
+976 03,Dolný Harmanec
+013 41,Dolný Hričov
+925 41,Dolný Chotár
+962 41,Dolný Jalšovík
+941 10,Dolný Jatov
+976 02,Dolný Jelenec
+038 02,Dolný Kalník
+026 01,Dolný Kubín
+072 13,Dolný Les
+018 21,Dolný Lieskov
+922 04,Dolný Lopašov
+941 43,Dolný Ohaj
+935 37,Dolný Pial
+059 81,Dolný Smokovec
+930 10,Dolný Štál
+027 44,Dolný Štefanov
+962 75,Dolný Tisovník
+038 48,Dolný Turček
+023 45,Dolný Vadičov
+951 06,Dolný Vinodol
+900 44,Doma
+935 87,Domadice
+962 65,Domaníky
+018 16,Domaniža
+053 02,Domaňovce
+935 61,Domaša
+976 39,Donovaly
+985 41,Dora
+033 01,Dovalovo
+976 53,Drábsko
+076 74,Drahňov
+922 41,Drahovce
+053 14,Dravce
+980 23,Dražice
+038 02,Dražkovce
+962 68,Drážovce
+090 23,Driečna
+980 23,Drienčany
+083 01,Drienica
+082 04,Drienov
+962 51,Drienovo
+082 01,Drienovská Nová Ves
+913 03,Drietoma
+980 03,Drňa
+049 42,Drnava
+991 02,Drnava
+935 03,Drženice
+982 62,Držkovce
+985 07,Ďubákovo
+086 45,Dubie
+024 01,Dubie
+086 12,Dubinné
+020 55,Dubková
+018 41,Dubnica nad Váhom
+957 03,Dubnička
+941 35,Dubník
+082 07,Dubník
+980 35,Dubno
+913 23,Dubodiel
+976 97,Dubová
+900 90,Dubová
+090 11,Dubová
+922 08,Dubovany
+908 62,Dubovce
+038 23,Dubové
+962 61,Dubové
+980 41,Dubovec
+082 71,Dubovica
+053 05,Dúbrava
+032 12,Dúbrava
+082 06,Dúbrava
+067 73,Dúbrava
+913 33,Dúbrava
+991 02,Dúbrava
+976 33,Dúbravica
+072 15,Dúbravka
+962 12,Dúbravy
+922 21,Ducové
+962 71,Dudince
+962 52,Duchenec
+086 44,Dukovce
+038 11,Dulice
+018 52,Dulov
+029 63,Duľov
+945 01,Ďulov Dvor
+082 52,Dulova Ves
+946 56,Dulovce
+980 21,Dulovo
+023 02,Dunajov
+900 42,Dunajská Lužná
+930 21,Dunajský Klátov
+091 01,Duplín
+015 01,Ďurčiná
+094 31,Ďurďoš
+018 22,Ďurďové
+065 41,Ďurková
+991 27,Ďurkovce
+941 35,Dvor Mikuláš
+956 11,Dvorany nad Nitrou
+956 55,Dvorec
+038 45,Dvorec
+076 62,Dvorianky
+920 56,Dvorníky
+962 68,Dvorníky
+972 22,Dvorníky nad Nitricou
+941 31,Dvory nad Žitavou
+952 01,Dyčka
+075 01,Egreš
+930 38,Eliášovce
+930 03,Etreho Kračany
+013 15,Fačkov
+976 52,Fajtov
+072 05,Falkušovce
+972 46,Fančová
+935 66,Farná
+077 01,Fejséš
+072 33,Fekišovce
+032 14,Fiačice
+982 51,Figa
+090 42,Fijaš
+986 01,Fiľakovo
+986 01,Fiľakovské Kľačany
+986 01,Fiľakovské Kováče
+058 01,Filice
+982 66,Filier
+976 64,Filipovo
+082 16,Fintice
+029 57,Flajšová
+038 42,Folkušová
+013 32,Forbaky - Klukany
+065 01,Forbasy
+087 01,Francovce
+086 02,Frička
+086 42,Fričkovce
+082 37,Fričovce
+082 12,Fulianka
+082 67,Furmanec
+930 05,Gabčíkovo
+086 02,Gaboltov
+900 61,Gajary
+072 43,Gajdoš
+924 01,Galanta
+032 11,Galovany
+924 01,Gáň
+058 01,Gánovce
+972 28,Gápel
+020 53,Gaškovce
+976 64,Gašparovo
+013 02,Gbeľany
+943 42,Gbelce
+908 45,Gbely
+056 01,Gelnica
+982 01,Gemer
+980 31,Gemerček
+049 12,Gemerská Hôrka
+980 46,Gemerská Panica
+049 22,Gemerská Poloma
+982 62,Gemerská Ves
+980 04,Gemerské Dechtáre
+982 52,Gemerské Michalovce
+049 16,Gemerské Teplice
+980 35,Gemerský Jablonec
+049 16,Gemerský Milhosť
+049 13,Gemerský Sad
+934 01,Géňa
+082 67,Geraltov
+086 04,Gerlachov
+059 42,Gerlachov
+094 05,Giglovce
+087 01,Giraltovce
+094 06,Girovce
+991 22,Glabušovce
+049 32,Gočaltovo
+049 24,Gočovo
+951 08,Golianovo
+935 25,Gondovo
+951 17,Gorazdov
+980 02,Gortva
+032 14,Gôtovany
+053 05,Granč - Petrovce
+985 56,Gregorova Vieska
+082 66,Gregorovce
+982 52,Gregorovce
+090 22,Gribov
+094 31,Grodzin
+027 05,Grúne
+067 22,Gruzovce
+941 23,Gúg
+027 32,Habovka
+067 52,Habura
+981 01,Hačava
+018 02,Hadoše
+945 01,Hadovce
+053 13,Hadušovce
+038 22,Hadviga
+059 04,Hágy
+039 01,Háj
+987 01,Hájiky - Maky
+956 03,Hajná Nová Ves
+980 33,Hajnáčka
+962 31,Hájniky
+951 33,Hájske
+065 45,Hajtovka
+956 55,Haláčovce
+985 11,Halič
+065 34,Haligovce
+913 07,Haluzice
+976 66,Hámor
+053 33,Hámre
+913 21,Hámre
+966 61,Hámre - Dolné Hámre
+966 71,Hámre - Horné Hámre
+900 43,Hamuliakovo
+972 51,Handlová
+082 56,Hanigovce
+080 01,Haniska
+049 34,Hanková
+086 46,Hankovce
+067 12,Hankovce
+094 31,Hanušovce nad Topľou
+053 05,Harakovce
+086 45,Harhaj
+053 01,Harichovce
+976 03,Harmanec
+900 01,Harmónia
+023 05,Harvelka
+072 16,Hatalov
+018 02,Hatné
+090 23,Havaj
+061 01,Havka
+906 04,Havran
+090 02,Havranec
+027 05,Havrania
+053 76,Havrania Dolina
+072 34,Hažín
+067 83,Hažín nad Cirochou
+086 14,Hažlín
+929 01,Heďbeneéte
+055 63,Helcmanovce
+976 68,Heľpa
+049 23,Henckovce
+053 33,Henclová
+093 02,Hencovce
+082 35,Hendrichovce
+985 53,Herman
+082 35,Hermanovce
+094 34,Hermanovce nad Topľou
+086 42,Hertník
+086 22,Hervartov
+927 01,Hetméň
+976 61,Hiadeľ
+053 63,Hincovce
+027 13,Hladovka
+023 22,Hlavice
+018 03,Hlboké
+906 31,Hlboké
+014 01,Hlboké nad Váhom
+023 54,Hlinené
+945 01,Hliník
+032 23,Hliník
+966 01,Hliník nad Hronom
+014 01,Hliník nad Váhom
+094 35,Hlinné
+073 01,Hlivištia
+018 61,Hloža
+065 01,Hniezdne
+053 32,Hnilčík
+053 75,Hnilec
+072 33,Hnojné
+981 01,Hnúšťa
+980 31,Hodejov
+980 02,Hodejovec
+053 61,Hodkovce
+966 63,Hodruša - Hámre
+916 14,Hodulov Vrch
+935 84,Hokovce
+947 01,Holanovo
+094 05,Holčíkovce
+946 16,Holiare
+930 34,Holice
+908 51,Holíč
+985 57,Holiša
+951 42,Holotka
+059 94,Holumnica
+049 32,Honce
+935 55,Hontianska Vrbica
+962 71,Hontianske Moravce
+962 65,Hontianske Nemce
+962 68,Hontianske Tesáre
+935 86,Hontianske Trsťany
+020 61,Horenická Hôrka
+073 01,Horňa
+020 61,Horná Breznica
+906 05,Horná Dolina
+962 05,Horná Hriňová
+951 32,Horná Kráľová
+919 65,Horná Krupá
+976 81,Horná Lehota
+027 41,Horná Lehota
+018 03,Horná Mariková
+974 01,Horná Mičiná
+974 01,Horná Môlča
+018 35,Horná Poruba
+930 36,Horná Potôň
+930 52,Horná Potôň - Lúky
+935 31,Horná Seč
+916 24,Horná Streda
+991 02,Horná Strehová
+913 33,Horná Súča
+038 46,Horná Štubňa
+013 06,Horná Tižina
+966 01,Horná Trnávka
+972 48,Horná Ves
+967 01,Horná Ves
+913 33,Horná Závrská
+946 12,Horná Zlatná
+966 04,Horná Ždaňa
+913 24,Horňany
+962 61,Horné Breziny
+956 54,Horné Držkovce
+919 06,Horné Dubové
+966 71,Horné Hámre
+956 31,Horné Chlebany
+930 39,Horné Janíky
+038 02,Horné Jaseno
+020 01,Horné Kočkovce
+906 15,Horné Košariská
+951 45,Horné Lefantovce
+972 71,Horné Lelovce
+919 27,Horné Lovčice
+962 43,Horné Mladonice
+913 26,Horné Motešice
+930 13,Horné Mýto
+956 41,Horné Naštice
+956 08,Horné Obdokovce
+919 03,Horné Orešany
+920 62,Horné Otrokovce
+957 03,Horné Ozorovce
+991 24,Horné Plachtince
+991 25,Horné Príbelce
+974 05,Horné Pršany
+962 55,Horné Rykynčice
+925 03,Horné Saliby
+935 84,Horné Semerovce
+951 71,Horné Sľažany
+914 42,Horné Srnie
+991 03,Horné Strháre
+956 03,Horné Štitáre
+920 66,Horné Trhovište
+935 81,Horné Turovce
+972 22,Horné Vestenice
+980 26,Horné Zahorany
+920 52,Horné Zelenice
+962 51,Horný Badín
+930 33,Horný Bar
+926 01,Horný Čepeň
+935 34,Horný Ďur
+013 42,Horný Hričov
+962 41,Horný Jalšovík
+925 71,Horný Jatov
+976 02,Horný Jelenec
+038 02,Horný Kalník
+018 21,Horný Lieskov
+952 01,Horný Ohaj
+935 37,Horný Pial
+062 01,Horný Smokovec
+027 44,Horný Štefanov
+962 75,Horný Tisovník
+038 48,Horný Turček
+023 45,Horný Vadičov
+951 06,Horný Vinodol
+072 02,Horovce
+020 62,Horovce
+925 45,Hoste
+980 04,Hostice
+951 94,Hostie
+980 23,Hostišovce
+951 02,Hosťová
+951 91,Hosťovce
+067 35,Hostovice
+020 01,Hoštiná
+059 11,Hozelec
+059 12,Hôrka
+916 32,Hôrka nad Váhom
+010 04,Hôrky
+966 78,Hrabičov
+082 33,Hrabkov
+067 73,Hrabová Roztoka
+089 01,Hrabovčík
+014 01,Hrabové
+086 11,Hrabovec
+067 01,Hrabovec nad Laborcom
+020 01,Hrabovka
+913 32,Hrabovka
+985 01,Hrabovo
+086 06,Hrabské
+053 15,Hrabušice
+059 71,Hradisko
+082 67,Hradisko
+090 42,Hradisko
+958 54,Hradište
+985 25,Hradište
+906 12,Hradište pod Vrátnom
+072 06,Hradištská Moľva
+013 52,Hradná
+916 33,Hrádok
+916 16,Hrachovište
+980 52,Hrachovo
+076 03,Hraň
+065 22,Hraničné
+059 16,Hranovnica
+916 14,Hrašné
+076 15,Hrčeľ
+049 44,Hrhov
+076 22,Hriadky
+013 41,Hričovské Podhradie
+962 05,Hriňová
+053 51,Hrišovce
+982 62,Hrkáč
+936 01,Hrkovce
+982 66,Hrlica
+985 22,Hrnčiarky
+919 35,Hrnčiarovce nad Parnou
+916 12,Hrnčiarové
+980 13,Hrnčiarska Ves
+980 12,Hrnčiarske Zalužany
+976 37,Hrochoť
+065 45,Hromoš
+976 45,Hronec
+935 61,Hronovce
+976 31,Hronsek
+966 11,Hronská Breznica
+966 11,Hronská Dúbrava
+935 29,Hronské Kľačany
+935 27,Hronské Kosihy
+966 53,Hronský Beňadik
+925 23,Hrubá Borša
+916 11,Hrubá Strana
+951 25,Hruboňovo
+067 23,Hrubov
+023 52,Hrubý Buk
+903 01,Hrubý Šúr
+049 43,Hrušov
+076 37,Hrušov
+991 42,Hrušov
+956 13,Hrušovany
+916 11,Hrušové
+980 25,Hrušovo
+029 52,Hruštín
+930 39,Hubice
+922 21,Hubina
+082 66,Hubošovce
+034 91,Hubová
+980 50,Hubovo
+049 13,Hucín
+067 45,Hudcovce
+941 44,Hul
+059 92,Huncovce
+090 03,Hunkovce
+076 62,Hunkovce
+906 13,Hurbanova Dolina
+903 01,Hurbanova Ves
+941 50,Hurbanovce
+947 01,Hurbanovo
+947 03,Hurbanovo
+072 51,Husák
+022 04,Husarik
+985 42,Husiná
+086 36,Hutka
+027 32,Huty
+930 41,Hviezdoslavov
+013 56,Hvozdnica
+032 31,Hybe
+972 45,Chalmová
+980 44,Chanava
+943 65,Chľaba
+985 26,Chladná Studňa
+027 55,Chlebnice
+067 41,Chlmec
+064 01,Chmeľnica
+082 15,Chmeľov
+086 33,Chmeľová
+082 12,Chmeľovec
+082 33,Chmiňany
+082 33,Chminian. Jakubovany
+082 33,Chminianska Nová Ves
+951 76,Choča
+913 04,Chocholná
+072 63,Choňkovce
+935 84,Chorvatice
+900 25,Chorvátsky Grob
+968 01,Chotár
+090 21,Chotča
+946 31,Chotín
+955 01,Chrabrany
+980 42,Chrámec
+946 54,Chrasť
+053 63,Chrasť nad Hornádom
+991 08,Chrastince
+951 75,Chrašťany
+972 32,Chrenovec - Brusno
+908 64,Chropov
+991 21,Chrťany
+922 05,Chtelnica
+956 38,Chudá Lehota
+982 62,Chvalová
+976 81,Chvatimech
+906 06,Chvojnica
+972 13,Chvojnica
+956 33,Chynorany
+953 01,Chyzerovce
+049 18,Chyžné
+900 84,Igram
+059 94,Ihľany
+967 01,Ihráč
+020 01,Ihrište
+019 01,Ilava
+991 07,Iliašov
+053 11,Iliašovce
+019 01,Iliavka
+969 01,Ilija
+946 52,Imeľ
+991 21,Imrov Kopec
+935 35,Iňa
+072 11,Iňačovce
+072 64,Inovce
+985 26,Ipeľ
+985 41,Ipeľka
+991 10,Ipeľské Predmostie
+935 82,Ipeľské Úľany
+935 75,Ipeľský Sokolec
+027 53,Istebné
+034 83,Ivachnová
+038 45,Ivančiná
+980 42,Ivanice
+985 51,Ivanišovo
+900 28,Ivanka pri Dunaji
+951 12,Ivanka pri Nitre
+913 05,Ivanovce
+962 12,Iviny
+946 39,Iža
+032 23,Ižipovce
+076 72,Ižkovce
+932 01,Ižop
+067 13,Jabloň
+900 86,Jablonec
+906 32,Jablonica
+906 21,Jablonka
+053 03,Jablonov
+049 43,Jablonov nad Turňou
+935 06,Jabloňovce
+013 52,Jablonové
+900 54,Jablonové
+976 34,Jabriková
+956 21,Jacovce
+930 21,Jahodná
+055 61,Jaklovce
+083 01,Jakovany
+065 12,Jakubany
+900 63,Jakubov
+082 56,Jakubova Voľa
+032 04,Jakubovany
+083 01,Jakubovany
+090 31,Jakušovce
+935 03,Jalakšová
+966 11,Jalná
+067 61,Jalová
+032 21,Jalovec
+972 31,Jalovec
+922 31,Jalšové
+962 41,Jalšovík
+033 01,Jamník
+053 22,Jamník
+980 42,Janice
+930 39,Janíky
+067 24,Jankovce
+900 42,Jánošíková
+930 10,Jánošíkovo na Ostrov
+976 52,Jánošovka
+082 42,Janov
+966 24,Janova Lehota
+958 44,Janova Ves
+086 41,Janovce
+925 22,Jánovce
+059 13,Jánovce
+082 03,Janovík
+977 01,Jarabá
+065 31,Jarabina
+919 43,Jarná
+937 01,Jarok
+951 48,Jarok
+082 63,Jarovnice
+018 17,Jasenica
+976 75,Jasenie
+066 01,Jasenov
+072 42,Jasenov
+026 01,Jasenová
+094 05,Jasenovce
+013 19,Jasenové
+962 05,Jasenovo
+038 22,Jasenovo
+029 57,Jasenovská
+919 30,Jaslovce
+919 30,Jaslovské Bohunice
+919 31,Jaslovské Bohunice - Atomová elektráreň
+941 34,Jasová
+967 01,Jastrabá
+930 03,Jastrabie Kračany
+094 35,Jastrabie nad Topľou
+072 11,Jastrabie pri Michal
+962 25,Jašov Vrch
+941 10,Jatov
+906 05,Javorec
+976 53,Javorina
+059 56,Javorina
+925 01,Javorinka
+023 22,Javorová
+038 44,Jazernica
+916 01,Jazviny
+086 36,Jedlinka
+951 96,Jedľové Kostoľany
+023 55,Jedľovník
+951 73,Jelenec
+925 23,Jelka
+049 16,Jelšava
+049 16,Jelšavská Teplica
+951 43,Jelšovce
+985 32,Jelšovec
+072 52,Jenkovce
+976 02,Jergaly
+935 36,Jesenské
+980 02,Jesenské
+980 04,Jestice
+958 45,Ješkova Ves
+059 04,Jezersko
+972 25,Ježkova Ves nad Nitricou
+049 45,Jovice
+072 32,Jovsa
+935 57,Jur nad Hronom
+089 01,Jurkova Voľa
+930 04,Jurová
+059 94,Jurské
+943 52,Jurský Chlm
+094 12,Juskova Voľa
+072 05,Kačanov
+065 22,Kače
+925 92,Kajal
+038 22,Kaľamenová
+034 82,Kalameny
+053 42,Kaľava
+962 25,Kalinka
+900 43,Kalinkovo
+023 02,Kalinov
+068 01,Kalinov
+985 01,Kalinovo
+935 32,Kalná
+935 32,Kalná nad Hronom
+067 72,Kalná Roztoka
+935 32,Kalnica
+916 37,Kálnica
+087 01,Kalnište
+985 31,Kalonda
+982 52,Kaloša
+072 36,Kaluža
+956 12,Kamanová
+049 62,Kameňany
+934 01,Kamenec
+972 44,Kamenec pod Vtáčnikom
+082 71,Kamenica
+067 83,Kamenica nad Cirochou
+943 65,Kamenica nad Hronom
+018 54,Kameničany
+946 01,Kameničná
+943 57,Kamenín
+093 03,Kamenná Poruba
+013 14,Kamenná Poruba
+991 27,Kamenné Kosihy
+935 02,Kamenný Chotár
+943 58,Kamenný Most
+992 01,Kamenný Vrch
+067 83,Kamienka
+065 32,Kamienka
+082 21,Kanaš
+972 17,Kanianka
+951 24,Kapince
+090 01,Kapišová
+900 84,Kaplna
+076 84,Kapoňa
+082 12,Kapušany
+079 01,Kapušianske Kľačany
+079 01,Kapušianske Vojkovce
+018 16,Kardošova Vieska
+076 33,Karlov Dvor
+038 15,Karlová
+067 45,Karná
+937 01,Karolína
+076 02,Kašov
+962 34,Kašova Lehôtka
+985 22,Katarínska Huta
+018 02,Kátlina
+919 55,Kátlovce
+908 49,Kátov
+053 04,Katúň
+945 01,Kava
+076 13,Kazimír
+013 32,Keblov - Zárieč
+946 19,Kéč
+090 11,Kečkovce
+049 55,Kečovo
+941 10,Kendereš
+082 01,Kendice
+980 45,Kesovce
+935 64,Keť
+038 45,Kevice
+060 01,Kežmarok
+059 60,Kežmarské Žľaby
+991 06,Kiarov
+076 62,Kinčeš
+991 22,Kírť
+059 12,Kišovce
+920 64,Kľačany
+956 02,Kľačany
+966 11,Kľačany
+013 19,Kľače
+972 15,Kľačno
+034 01,Kľačno
+094 21,Kladzany
+966 77,Kľak
+951 53,Klasov
+969 01,Klastava
+038 43,Kláštor pod Znievom
+958 44,Klátova Nová Ves
+053 02,Klčov
+919 08,Klčovany
+991 10,Kleňany
+082 44,Klenov
+067 72,Klenová
+980 55,Klenovec
+018 02,Klieština
+023 22,Klin
+029 41,Klin
+076 31,Klin nad Bodrogom
+958 45,Klíž
+946 19,Klížska Nemá
+958 45,Klížske Hradište
+019 01,Klobušice
+962 25,Klokoč
+023 22,Klokočov
+072 36,Klokočov
+023 04,Klubina
+925 71,Kľučiareň
+930 03,Kľúčiarove Kračany
+914 41,Kľúčové
+930 07,Kľúčovec
+053 51,Kluknava
+086 22,Kľušov
+086 22,Kľušovská Zábava
+935 03,Kmeťovce
+941 62,Kmeťovo
+026 01,Kňažia
+049 23,Kobeliarovo
+087 01,Kobylnice
+086 22,Kobyly
+049 35,Koceľovce
+980 52,Kociha
+972 02,Kocurany
+921 01,Kocurice
+922 04,Kočín
+916 31,Kočovce
+086 46,Kochanovce
+066 01,Kochanovce
+913 05,Kochanovce
+956 54,Kochnáč
+082 32,Kojatice
+082 32,Kojatická Dolina
+055 52,Kojšov
+985 05,Kokava nad Rimavicou
+082 52,Kokošovce
+065 11,Kolačkov
+958 41,Kolačno
+991 09,Koláre
+013 54,Kolárovice
+946 03,Kolárovo
+067 66,Kolbasov
+090 31,Kolbovce
+072 61,Kolibabovce
+951 78,Kolíňany
+053 42,Kolinovce
+929 01,Kolónia
+930 35,Kolónia
+943 56,Kolónia
+076 42,Kolónia
+067 61,Kolonica
+941 33,Kolta
+072 15,Komanica
+093 01,Komárany
+962 05,Komárno
+086 11,Komárov
+073 01,Komárovce
+941 06,Komjatice
+034 96,Komjatná
+941 21,Komoča
+976 52,Komov
+027 05,Končitá
+956 13,Koniarovce
+947 01,Konkoľ
+980 32,Konrádovce
+032 04,Konská
+013 13,Konská
+038 52,Konské
+072 63,Koňuš
+023 56,Kopanice
+966 61,Kopanice
+908 48,Kopčany
+018 31,Kopec
+967 01,Kopernica
+920 01,Koplotovce
+049 16,Kopráš
+086 43,Koprivnica
+976 34,Kordíky
+090 05,Korejovce
+023 21,Korňa
+023 22,Kornica
+072 62,Koromľa
+090 31,Korunková
+962 04,Korytárky
+013 54,Korytné
+053 05,Korytné
+034 73,Korytnica - kúpele
+991 25,Kosihovce
+991 11,Kosihy nad Ipľom
+966 24,Kosorín
+968 01,Kostivrch
+951 77,Kostoľany pod Tribečom
+017 05,Kostolec
+900 62,Kostolište
+962 12,Kostolná
+913 04,Kostolná - Záriečie
+930 34,Kostolná Gala
+903 01,Kostolná pri Dunaji
+972 26,Kostolná Ves
+916 13,Kostolné
+930 03,Kostolné Kračany
+913 22,Kostolné Mitice
+962 71,Kostolné Moravce
+942 01,Kostolný Sek
+972 41,Koš
+906 15,Košariská
+094 06,Košarovce
+018 64,Košeca
+018 31,Košecké Podhradie
+018 32,Košecké Rovné
+067 12,Koškovce
+919 01,Košolná
+038 41,Košťany nad Turcom
+925 09,Košúty
+946 54,Kotelnica
+013 61,Kotešová
+985 53,Kotmanová
+013 02,Kotrčiná Lúčka
+943 65,Kováčov
+049 42,Kováčová
+962 37,Kováčová
+991 06,Kováčovce
+906 03,Koválov
+908 63,Koválovec
+956 15,Kovarce
+935 22,Kozárovce
+065 45,Kozelec
+966 15,Kozelník
+962 41,Kozí Vrbovok
+027 05,Kozinská
+086 12,Kožany
+076 01,Kožuchov
+090 22,Kožuchovce
+087 01,Kračúnovce
+967 01,Krahule
+090 05,Krajná Bystrá
+090 05,Krajná Poľana
+090 05,Krajná Porúbka
+916 16,Krajné
+090 03,Krajné Čierno
+922 02,Krakovany
+980 45,Kráľ
+982 01,Králik
+976 34,Králiky
+946 03,Kráľka
+925 41,Kráľov Brod
+960 01,Kráľová
+032 33,Kráľova Lehota
+925 91,Kráľová nad Váhom
+900 50,Kráľová pri Senci
+027 51,Kraľovany
+962 65,Kráľovce
+962 65,Kráľovce - Krnišov
+931 01,Kráľovianky
+935 84,Kráľovičová
+930 03,Kráľovičove Kračany
+077 01,Kráľovský Chlmec
+976 52,Krám
+980 26,Kraskovo
+985 41,Krásna
+980 51,Krásna
+027 44,Krásna Hôrka
+082 73,Krásna Lúka
+956 53,Krásna Ves
+013 03,Krasňany
+958 43,Krásno
+023 02,Krásno nad Kysucou
+049 45,Krásnohorská Dlhá Lúka
+049 41,Krásnohorské Podhradie
+072 01,Krásnovce
+068 01,Krásny Brod
+913 33,Krásny Dub
+946 32,Krátke Kesy
+059 18,Kravany
+076 61,Kravany
+946 36,Kravany nad Dunajom
+013 32,Kravárska
+072 51,Krčava
+065 22,Kremná
+967 01,Kremnica
+967 01,Kremnické Bane
+072 55,Kristy
+090 31,Krišľovce
+079 01,Krišovská Liesková
+027 55,Krivá
+067 04,Krivá Oľka
+962 04,Kriváň
+082 71,Krivany
+086 04,Krivé
+962 05,Krivec I
+962 05,Krivec II
+018 52,Krivoklát
+913 11,Krivosúd - Bodovka
+072 22,Krivošťany
+916 26,Kríž nad Váhom
+079 01,Krížany
+086 04,Kríže
+934 01,Krížny Vrch
+059 01,Krížová Ves
+082 33,Krížovany
+919 24,Križovany nad Dudváhom
+946 19,Krížový Dvor
+022 04,Krkošky
+032 13,Krmeš
+985 25,Krná
+956 19,Krnča
+962 12,Krné
+962 65,Krnišov
+982 67,Krokava
+053 42,Krompachy
+038 54,Krpeľany
+934 01,Krškany
+956 03,Krtovce
+090 32,Kručov
+963 01,Krupina
+029 54,Krušetnica
+091 01,Krušinec
+956 31,Krušovce
+086 04,Kružlov
+090 02,Kružlová
+086 04,Kružlovská Huta
+049 51,Kružná
+979 01,Kružno
+956 41,Kšinná
+935 75,Kubáňovo
+013 05,Kubíková
+029 57,Kubínska
+076 75,Kucany
+086 12,Kučín
+094 21,Kučín
+900 52,Kuchyňa
+908 78,Kuklov
+086 44,Kuková
+937 01,Kukučínov
+013 13,Kunerad
+967 01,Kunešov
+905 01,Kunov
+049 32,Kunova Teplica
+935 64,Kuraľany
+086 12,Kurima
+054 01,Kurimany
+090 16,Kurimka
+086 04,Kurov
+986 01,Kurtáň
+072 32,Kusín
+929 01,Kútniky
+971 01,Kúty
+908 01,Kúty
+956 21,Kuzmice
+076 12,Kuzmice
+032 23,Kvačany
+082 41,Kvačany
+094 02,Kvakovce
+020 62,Kvašov
+058 01,Kvetnica
+930 41,Kvetoslavov
+980 54,Kyjatice
+065 48,Kyjov
+913 04,Kykula
+974 01,Kynceľová
+930 03,Kynceľove Kračany
+930 30,Kyselica
+969 01,Kysihýbel
+076 02,Kysta
+976 53,Kysuca
+024 01,Kysucké Nové Mesto
+024 04,Kysucké Nové Mesto
+023 34,Kysucký Lieskovec
+900 67,Láb
+962 44,Lackov
+065 01,Lacková
+066 01,Lackovce
+038 22,Laclavá
+082 36,Lačnov
+082 12,Lada
+018 63,Ladce
+951 77,Ladice
+934 01,Ladislavov Dvor
+076 34,Ladmovce
+965 01,Ladomerská Vieska
+067 71,Ladomirov
+090 03,Ladomirová
+022 04,Ladunkov
+962 65,Ladzany
+908 76,Lakšárska Nová Ves
+013 31,Lalinok
+922 04,Lančár
+945 01,Lándor
+023 04,Lány
+086 45,Lascov
+038 43,Laskár
+972 71,Laskár
+072 37,Lastomír
+076 14,Lastovce
+072 01,Laškovce
+957 01,Látkovce
+985 45,Látky
+038 43,Lazany
+972 11,Lazany
+032 11,Lazisko
+020 55,Lazy pod Makytou
+082 32,Lažany
+962 63,Lažteky
+020 63,Lednica
+020 61,Lednické Rovne
+951 45,Lefantovce
+065 46,Legnava
+930 37,Lehnice
+951 36,Lehota
+980 53,Lehota nad Rimavicou
+972 42,Lehota pod Vtáčnikom
+029 57,Lehotská
+985 11,Lehôtka
+966 01,Lehôtka pod Brehmi
+059 06,Lechnica
+072 54,Lekárovce
+943 65,Leľa
+076 84,Leles
+082 03,Lemešany
+086 06,Lenartov
+980 44,Lenartovce
+059 07,Lendak
+980 50,Lenka
+985 13,Lentvora
+920 41,Leopoldov
+991 08,Lesenice
+082 07,Lesíček
+071 01,Lesné
+930 03,Lesné Kračany
+065 33,Lesnica
+962 63,Lešť
+026 01,Leštiny
+053 13,Letanovce
+908 44,Letničie
+982 62,Leváre
+982 62,Levkuška
+054 01,Levoča
+054 01,Levočská Dolina
+054 01,Levočské Lúky
+038 42,Ležiachov
+956 38,Libichava
+049 14,Licince
+082 03,Ličartovce
+929 01,Lidér Tejed
+027 12,Liesek
+018 22,Lieskov - Podskalie
+018 22,Lieskov - Tŕstie
+079 01,Liesková
+053 21,Lieskovany
+018 21,Lieskov-Dolný Lieskov
+906 33,Lieskové
+067 45,Lieskovec
+962 21,Lieskovec
+913 05,Lieskové-Zemianske Lieskové
+018 21,Lieskov-Horný Lieskov
+038 22,Liešno
+972 27,Liešťany
+013 18,Lietava
+013 11,Lietavská Lúčka
+013 11,Lietavská Svinná
+013 18,Lietavská Závadka
+034 95,Likavka
+981 01,Likier
+900 91,Limbach
+082 71,Lipany
+935 21,Lipník
+972 32,Lipník
+082 12,Lipníky
+082 15,Lipníky - Podhrabina
+086 12,Lipová
+941 02,Lipová
+985 31,Lipovany
+082 36,Lipovce
+082 36,Lipovce - chaty
+946 14,Lipové
+038 61,Lipovec
+980 23,Lipovec
+049 42,Lipovník
+956 01,Lipovník
+032 23,Liptovská Anna
+032 44,Liptovská Kokava
+034 72,Liptovská Lúžna
+034 73,Liptovská Osada
+033 01,Liptovská Porúbka
+032 23,Liptovská Sielnica
+034 01,Liptovská Štiavnica
+034 83,Liptovská Teplá
+059 40,Liptovská Teplička
+032 21,Liptovské Beharovce
+032 14,Liptovské Kľačany
+032 23,Liptovské Matiašovce
+034 74,Liptovské Revúce
+034 84,Liptovské Sliače
+033 01,Liptovský Hrádok
+032 03,Liptovský Ján
+034 83,Liptovský Michal
+032 04,Liptovský Ondrej
+033 01,Liptovský Peter
+031 01,Liptovský Trnovec
+034 81,Lisková
+962 71,Lišov
+962 44,Litava
+065 31,Litmanová
+956 32,Livina
+956 32,Livinské Opatovce
+086 05,Livov
+086 05,Livovská Huta
+023 34,Lodno
+935 38,Lok
+029 51,Lokca
+976 53,Lom nad Rimavicou
+029 54,Lomná
+090 33,Lomné
+972 27,Lomnica
+065 03,Lomnička
+962 63,Lonec
+935 75,Lontov
+908 63,Lopašov
+976 98,Lopej
+086 41,Lopúchov
+023 36,Lopušná
+023 36,Lopušné Pažite-Lopušná
+023 36,Lopušné Pažite-Pažite
+919 04,Lošonec
+951 92,Lovce
+966 21,Lovča
+966 23,Lovčica
+966 23,Lovčica - Trubín
+985 54,Lovinobaňa
+900 55,Lozorno
+072 05,Ložín
+943 53,Ľubá
+032 14,Ľubeľa
+049 18,Lubeník
+972 47,Ľubianka
+059 71,Ľubica
+985 07,Ľubienka
+976 55,Ľubietová
+916 12,Lubina
+067 11,Ľubiša
+034 91,Ľubochňa
+914 41,Ľuborča
+985 11,Ľuboreč
+991 02,Ľuboriečka
+080 06,Ľubotice
+065 41,Ľubotín
+082 42,Ľubovec
+930 03,Lúč na Ostrove
+976 61,Lučatín
+082 07,Lúčina
+059 31,Lučivná
+053 03,Lúčka
+049 42,Lúčka
+082 71,Lúčka
+087 01,Lúčka
+072 03,Lučkovce
+072 34,Lúčky
+034 82,Lúčky
+967 01,Lúčky
+034 82,Lúčky - kúpele
+951 88,Lúčnica nad Žitavou
+956 11,Ludanice
+941 11,Ľudovítov
+951 44,Ľudovítová
+034 71,Ludrová
+076 14,Luhyňa
+916 33,Lúka
+067 24,Lukačovce
+951 23,Lukáčovce
+086 21,Lukavica
+966 81,Lukavica
+962 31,Lukavica
+086 05,Lukov
+962 21,Lukové
+980 26,Lukovištia
+946 14,Lúky
+020 53,Lúky
+013 31,Lúky
+935 35,Lula
+985 11,Lupoč
+916 16,Luskovica
+966 22,Lutila
+082 57,Ľutina
+013 05,Lutiše
+957 03,Ľutov
+956 07,Lužany
+087 01,Lužany pri Topli
+951 41,Lužianky
+061 01,Lysá nad Dunajcom
+020 54,Lysá pod Makytou
+013 05,Lysica
+930 32,Macov
+925 41,Mačonáš
+972 25,Mačov
+930 14,Mad
+985 13,Madačka
+930 28,Madérét
+034 83,Madočany
+922 42,Madunice
+013 62,Madzín
+049 16,Magnezitovce
+032 15,Magurka
+059 13,Machalovce
+951 93,Machulince
+919 22,Majcichov
+082 57,Majdan
+094 31,Majer
+061 01,Majere
+935 05,Majere
+906 05,Majeríčky
+059 94,Majerka
+094 09,Majerovce
+023 56,Makov
+090 23,Makovce
+076 32,Malá Bara
+935 36,Malá Baračka
+930 34,Malá Budafa
+014 01,Malá Bytča
+991 08,Malá Čalomija
+971 01,Malá Čausa
+015 01,Malá Čierna
+985 53,Malá Dolina
+094 02,Malá Domaša
+059 78,Malá Franková
+956 54,Malá Hradná
+945 01,Malá Iža
+972 42,Malá Lehota
+966 42,Malá Lehota
+930 03,Malá Lúč
+925 21,Malá Mača
+941 45,Malá Maňa
+943 52,Malá Mužla
+943 65,Malá nad Hronom
+930 51,Malá Paka
+090 24,Malá Poľana
+076 82,Malá Tŕňa
+984 01,Malá Ves
+901 01,Malacky
+974 05,Malachov
+935 67,Málaš
+026 01,Malatiná
+032 15,Malatíny
+086 06,Malcov
+072 06,Malčice
+955 01,Malé Bedzany
+958 04,Malé Bielice
+913 05,Malé Bierovce
+027 32,Malé Borové
+956 01,Malé Dvorany
+929 01,Malé Dvorníky
+956 37,Malé Hoste
+957 01,Malé Chlievany
+951 54,Malé Chyndice
+943 61,Malé Kosihy
+018 31,Malé Košecké Podhradie
+935 21,Malé Kozmálovce
+934 01,Malé Krškany
+958 03,Malé Kršteňany
+018 16,Malé Lednice
+908 74,Malé Leváre
+937 01,Malé Ludince
+922 01,Malé Orvište
+956 34,Malé Ostratice
+078 01,Malé Ozorovce
+072 17,Malé Raškovce
+956 07,Malé Ripňany
+913 11,Malé Stankovce
+990 01,Malé Straciny
+980 51,Malé Teriakovce
+076 42,Malé Trakany
+958 03,Malé Uherce
+951 82,Malé Vozokany
+072 34,Malé Zalužice
+951 24,Malé Zálužie
+991 22,Malé Zlievce
+985 26,Málinec
+972 13,Malinová
+935 87,Malinovec
+900 45,Malinovo
+034 01,Malinô Brdo
+032 34,Malužiná
+951 34,Malý Báb
+900 24,Malý Biel
+026 01,Malý Bysterec
+951 07,Malý Cetín
+038 45,Malý Čepčín
+076 52,Malý Horeš
+941 10,Malý Jatov
+076 36,Malý Kamenec
+018 51,Malý Kolačín
+990 01,Malý Krtíš
+951 04,Malý Lapáš
+930 37,Malý Lég
+065 46,Malý Lipník
+900 44,Malý Madaras
+946 03,Malý Ostrov
+937 01,Malý Pesek
+075 01,Malý Ruskov
+060 01,Malý Slavkov
+082 67,Malý Slivník
+080 01,Malý Šariš
+919 29,Malženice
+941 45,Maňa
+962 05,Mangútovo
+951 91,Mankovce
+946 32,Marcelová
+013 32,Marček
+055 01,Margecany
+086 45,Marhaň
+900 33,Marianka
+072 06,Markovce
+049 34,Markuška
+053 21,Markušovce
+013 51,Maršová
+953 01,Martin nad Žitavou
+034 95,Martinček
+951 88,Martinová
+980 41,Martinová
+947 01,Martovce
+935 33,Marušová
+930 39,Maslovce
+930 36,Masníkovo
+985 22,Maša
+985 11,Mašková
+067 32,Maškovce
+987 01,Maštinec
+059 51,Matejovce
+053 21,Matejovce
+916 16,Matejovec
+094 31,Matiaška
+059 04,Matiašovce
+090 42,Matovce
+079 01,Maťovské Vojkovce
+972 28,Matušíková
+925 01,Matúškovo
+065 46,Matysová
+053 14,Mečedelovce
+020 61,Medné
+071 01,Meďov
+962 65,Medovarce
+935 41,Medvecké
+090 05,Medvedie
+930 07,Medveďov
+976 52,Medveďovo
+027 44,Medvedzie
+082 21,Medzany
+094 31,Medzianky
+976 96,Medzibrod
+065 22,Medzibrodie
+026 01,Medzibrodie nad Oravou
+026 01,Medzihradné
+068 01,Medzilaborce
+951 46,Mechenice
+913 05,Melčice
+952 01,Melek
+049 12,Meliata
+059 36,Mengusovce
+920 61,Merašice
+094 23,Merník
+962 71,Merovce
+020 52,Mestečko
+090 41,Mestisko
+087 01,Mičakovce
+930 41,Mierovo
+957 01,Miezgovce
+085 01,Miháľov
+067 73,Michajlov
+930 35,Michal na Ostrove
+941 62,Michal nad Žitavou
+076 14,Michaľany
+962 61,Michalková
+094 23,Michalok
+976 57,Michalová
+082 44,Miklušovce
+049 13,Mikolčany
+090 24,Miková
+014 01,Mikšová
+937 01,Mikula
+908 76,Mikulášov
+946 34,Mikulášov Sad
+086 36,Mikulášová
+018 57,Mikušovce
+984 01,Mikušovce
+075 01,Milhostov
+929 01,Milinovice
+900 42,Miloslavov
+071 01,Milovaná
+082 71,Milpoš
+090 32,Miňovce
+082 06,Mirkovce
+090 05,Miroľa
+916 12,Miškech Dedinka
+985 02,Mládzovo
+985 45,Mláky
+931 01,Mliečno
+951 76,Mlyňany
+090 16,Mlynárovce
+059 76,Mlynčeky
+059 91,Mlynica
+053 76,Mlynky
+941 02,Mlynský Sek
+913 21,Mníchova Lehota
+049 16,Mníšany
+055 64,Mníšek nad Hnilcom
+065 22,Mníšek nad Popradom
+946 37,Moča
+071 01,Močarany
+082 53,Močarmany
+951 31,Močenok
+969 82,Močiar
+020 62,Močiare
+072 51,Močidlá
+082 63,Močidľany
+018 03,Modlatín
+900 01,Modra
+067 82,Modra nad Cirochou
+917 05,Modranka
+946 33,Modrany
+916 35,Modrová
+916 35,Modrovka
+992 01,Modrý Kameň
+935 39,Mochovce
+951 15,Mojmírovce
+010 01,Mojš
+020 72,Mojtín
+941 04,Mojzesovo
+050 01,Mokrá Lúka
+026 01,Mokraď
+086 01,Mokroluh
+908 65,Mokrý Háj
+072 03,Moravany
+922 21,Moravany nad Váhom
+930 03,Moravské Kračany
+916 42,Moravské Lieskové
+908 71,Moravský Svätý Ján
+972 31,Morovno
+900 46,Most pri Bratislave
+020 51,Mostište
+925 07,Mostová
+038 44,Moškovec
+916 26,Mošovce
+038 21,Mošovce
+976 13,Moštenica
+082 67,Mošurov
+913 26,Motešice
+976 02,Motyčky
+974 01,Môlča
+960 01,Môťová
+090 34,Mrázovce
+029 57,Mrzáčka
+985 31,Mučín
+946 32,Mudroňovo
+991 22,Muľa
+985 31,Muľka
+049 01,Muráň
+050 01,Muránska Dlhá Lúka
+049 01,Muránska Huta
+049 01,Muránska Lehota
+050 01,Muránska Zdychava
+029 63,Mútňanská Píla
+029 63,Mútne
+943 52,Mužla
+907 01,Myjava
+907 03,Myjava
+902 03,Myslenice
+066 01,Myslina
+985 53,Mýtna
+956 11,Mýtna Nová Ves
+935 56,Mýtne Ludany
+976 44,Mýto pod Ďumbierom
+076 35,N.Vieska pri Bodrogu
+072 21,Nacina Ves
+048 01,Nadabula
+956 32,Nadlice
+068 01,Ňagov
+919 06,Naháč
+053 33,Nálepkovo
+029 01,Námestovo
+943 60,Nána
+049 61,Nandraž
+930 06,Ňárad
+958 04,Návojovce
+924 01,Nebojsa
+038 12,Necpaly
+958 43,Nedanovce
+956 35,Nedašovce
+925 85,Neded
+013 02,Nededza
+985 13,Nedelište
+972 12,Nedožery
+972 12,Nedožery - Brezany
+067 33,Nechválova Polianka
+930 25,Nekyje na Ostrove
+974 01,Nemce
+086 12,Nemcovce
+082 12,Nemcovce
+955 01,Nemčice
+951 81,Nemčiňany
+976 97,Nemecká
+956 22,Nemečky
+053 02,Nemešany
+914 41,Nemšová
+991 26,Nenince
+980 45,Neporadza
+913 26,Neporadza
+960 01,Neresnica
+023 41,Nesluša
+946 51,Nesvady
+951 72,Neverice
+972 27,Nevidzany
+951 62,Nevidzany
+967 01,Nevoľné
+013 24,Nezbudská Lúčka
+082 06,Niereše
+020 71,Nimnica
+985 57,Nitra nad Ipľom
+956 05,Nitrianska Blatnica
+956 16,Nitrianska Streda
+951 01,Nitrianske Hrnčiarovce
+972 13,Nitrianske Pravno
+972 26,Nitrianske Rudno
+972 21,Nitrianske Sučany
+942 01,Nitriansky Hrádok
+972 22,Nitrica
+934 01,Nixbrod
+922 06,Nižná
+027 43,Nižná
+032 34,Nižná Boca
+067 34,Nižná Jablonka
+089 01,Nižná Jedľová
+982 52,Nižná Kaloša
+023 21,Nižná Korňa
+090 32,Nižná Olšava
+090 01,Nižná Pisaná
+086 36,Nižná Polianka
+034 74,Nižná Revúca
+073 01,Nižná Rybnica
+094 07,Nižná Sitnica
+049 23,Nižná Slaná
+059 39,Nižná Šuňava
+090 23,Nižná Vladiča
+086 21,Nižná Voľa
+013 06,Nižné Kamence
+067 11,Nižné Ladičkovce
+032 23,Nižné Matiašovce
+072 52,Nižné Nemecké
+086 41,Nižné Raslavice
+053 71,Nižné Repaše
+065 02,Nižné Ružbachy
+982 52,Nižné Valice
+049 23,Nižnoslanská Baňa
+094 21,Nižný Hrabovec
+094 22,Nižný Hrušov
+023 55,Nižný Kelčov
+090 05,Nižný Komárnik
+093 01,Nižný Kručov
+090 11,Nižný Mirošov
+090 11,Nižný Orlík
+980 52,Nižný Skálnik
+082 75,Nižný Slavkov
+034 84,Nižný Sliač
+086 02,Nižný Tvarožec
+076 17,Nižný Žipov
+038 54,Nolčovo
+956 38,Norovce
+020 01,Nosice
+968 01,Nová Baňa
+980 34,Nová Bašta
+913 08,Nová Bošáca
+023 05,Nová Bystrica
+935 25,Nová Dedina
+900 29,Nová Dedinka
+018 51,Nová Dubnica
+094 04,Nová Kelča
+916 35,Nová Lehota
+972 51,Nová Lehota
+059 86,Nová Lesná
+900 42,Nová Lipnica
+065 11,Nová Ľubovňa
+976 69,Nová Maša
+945 01,Nová Osada
+943 42,Nová Osada
+059 83,Nová Polianka
+089 01,Nová Polianka
+067 68,Nová Sedlica
+945 04,Nová Stráž
+947 03,Nová Trstená
+991 05,Nová Ves
+916 31,Nová Ves nad Váhom
+951 51,Nová Ves nad Žitavou
+900 29,Nová Ves pri Dunaji
+943 42,Nová Vieska
+049 13,Nováčany
+972 71,Nováky
+985 42,Nové Hony
+900 42,Nové Košariská
+925 22,Nové Osady
+951 24,Nové Sady
+076 02,Novosad
+029 55,Novoť
+029 63,Novotský Duľov
+053 31,Novoveská Huta
+946 54,Nový Diel
+935 77,Nový Dvor
+940 02,Nový Gúg
+075 01,Nový Majer
+075 01,Nový Ruskov
+985 41,Nový Sad
+062 01,Nový Smokovec
+985 45,Nový Svet
+903 01,Nový Svet
+935 33,Nový Tekov
+930 38,Nový Život
+018 64,Nozdrovice
+935 67,Nýrovce
+991 05,Obeckov
+943 04,Obid
+013 61,Oblazov
+076 75,Oborín
+985 58,Obručná
+065 42,Obručné
+956 08,Obsolovce
+951 95,Obyce
+916 22,Očkov
+962 23,Očová
+053 22,Odorín
+930 12,Ohrady
+067 22,Ohradzany
+023 35,Ochodnica
+049 35,Ochtiná
+946 21,Okánikovo
+930 28,Okoč
+946 13,Okoličná na Ostrove
+090 42,Okrúhle
+082 12,Okružná
+053 61,Olcnava
+930 39,Oľdza
+082 57,Olejníkov
+023 52,Olešná
+951 87,Olichov
+067 04,Oľka
+991 22,Olováry
+086 46,Oľšavce
+053 73,Oľšavica
+053 61,Oľšavka
+090 22,Oľšavka
+075 01,Olšina
+067 16,Oľšinkov
+082 76,Oľšov
+956 41,Omastiná
+914 43,Omšenie
+076 52,Onča
+086 36,Ondavka
+094 01,Ondavské Matiašovce
+038 22,Ondrašová
+082 33,Ondrašovce
+059 12,Ondrej
+976 62,Ondrej nad Hronom
+935 51,Ondrejovce
+941 02,Ondrochov
+935 25,Opatová
+984 01,Opatová
+913 11,Opatovce
+951 44,Opatovce - Výčapy
+972 02,Opatovce nad Nitrou
+962 71,Opatové Moravce
+991 07,Opatovská Nová Ves
+930 28,Opatovský Sokolec
+991 25,Opava
+919 32,Opoj
+956 14,Oponice
+976 33,Oravce
+980 42,Orávka
+029 64,Oravská Jasenica
+029 57,Oravská Lesná
+029 47,Oravská Polhora
+027 54,Oravská Poruba
+029 62,Oravské Veselé
+027 42,Oravský Biely Potok
+027 41,Oravský Podzámok
+053 06,Ordzovany
+072 51,Orechová
+930 02,Orechová Potôň
+930 52,Orechová Potôň - Lúky
+072 23,Oreské
+908 63,Oreské
+956 06,Orešany
+083 01,Orkucany
+065 43,Orlov
+966 52,Orovnica
+072 14,Ortov
+086 12,Ortuťová
+026 01,Osádka
+067 34,Osadné
+086 42,Osikov
+972 47,Oslany
+976 45,Osrblie
+962 61,Ostrá Lúka
+980 26,Ostrany
+956 34,Ostratice
+922 01,Ostrov
+072 55,Ostrov
+082 22,Ostrovany
+966 77,Ostrý Grúň
+059 79,Osturňa
+906 12,Osuské
+991 02,Osušie
+023 01,Oščadnica
+023 32,Oškerda
+956 55,Otrhánky
+982 62,Otročok
+010 04,Ovčiarsko
+082 38,Ovčie
+985 24,Ozdín
+980 11,Ožďany
+919 43,Pác
+049 41,Pača
+946 03,Pačérok
+929 01,Padáň
+980 23,Padarovce
+919 30,Paderovce
+018 03,Pagaňov
+094 07,Pakostov
+941 11,Palárikovo
+053 76,Palcmanská Maša
+072 13,Palín
+068 01,Palota
+925 92,Paľovce
+951 05,Paňa
+985 32,Panické Dravce
+980 23,Papča
+067 33,Papín
+916 01,Paprad
+018 13,Papradno
+076 62,Parchovany
+067 35,Parihuzovce
+026 01,Párnica
+032 15,Partizánska Ľupča
+985 45,Paseky
+020 53,Pasiečka
+935 74,Pastovce
+065 44,Pastovník
+920 63,Pastuchov
+049 32,Pašková
+013 41,Paština Závada
+925 53,Pata
+929 01,Pataš
+946 39,Patince
+031 01,Pavčina Lehota
+945 04,Pavel
+053 71,Pavľany
+919 42,Pavlice
+943 59,Pavlová
+032 21,Pavlova Ves
+980 01,Pavlovce
+094 31,Pavlovce
+072 14,Pavlovce nad Uhom
+076 35,Pavlovo
+958 03,Pažiť
+023 36,Pažite
+067 35,Pčoliné
+922 07,Pečeňady
+956 36,Pečeňany
+935 03,Pečenice
+082 56,Pečovská Nová Ves
+013 41,Peklina
+951 26,Perkovce
+900 53,Pernek
+094 33,Petkovce
+991 06,Peťov
+913 26,Peťovka
+072 06,Petrikovce
+086 02,Petrová
+027 05,Petrová
+913 26,Petrova Lehota
+908 44,Petrova Ves
+082 53,Petrovany
+980 35,Petrovce
+072 62,Petrovce
+094 31,Petrovce
+072 21,Petrovce n/Laborcom
+985 01,Petrovec
+013 53,Petrovice
+049 35,Petrovo
+935 55,Pežerňa
+072 04,Piesky
+976 43,Piesok
+900 01,Piesok
+962 12,Piešť I 
+962 12,Piešť II
+069 01,Pichne
+059 72,Pikovce
+985 53,Píla
+900 89,Píla
+966 81,Píla
+065 22,Pilhov
+065 22,Pilhovčík
+984 01,Pinciná
+072 54,Pinkovce
+930 03,Pinkove Kračany
+094 05,Piskorovce
+966 11,Pitelová
+013 53,Pláne
+072 22,Pláne
+935 82,Plášťovce
+935 69,Plavé Vozokany
+906 36,Plavecké Podhradie
+906 35,Plavecký Mikuláš
+906 35,Plavecký Peter
+900 68,Plavecký Štvrtok
+065 44,Plaveč
+065 45,Plavnica
+075 01,Plechotice
+985 31,Pleš
+027 05,Plešivá
+049 11,Plešivec
+018 26,Plevník - Drienové
+962 63,Pliešovce
+982 65,Ploské
+916 23,Pobedim
+018 15,Počarová
+969 01,Počúvadlianske Jazero
+969 01,Počúvadlo
+082 37,Pod Braniskom
+929 01,Pódafa
+032 42,Podbanské
+027 42,Podbiel
+906 05,Podbranč
+976 81,Podbrezová
+094 09,Podčičva
+941 48,Podhájska
+976 64,Podholie
+059 93,Podhorany
+951 46,Podhorany
+082 12,Podhorany
+969 82,Podhorie
+018 54,Podhorie
+018 61,Podhorie
+906 11,Podhorie
+013 18,Podhorie
+072 64,Podhoroď
+082 15,Podhrabina
+038 52,Podhradie
+972 42,Podhradie
+955 01,Podhradie
+080 06,Podhradík
+962 63,Podjavorie
+962 63,Podjavorie
+018 13,Podjavorník
+976 13,Podkonice
+985 51,Podkriváň
+916 16,Podkylava
+094 31,Podlipníky
+956 52,Podlužany
+935 27,Podlužany
+916 22,Podolie
+065 03,Podolínec
+065 41,Podpílie
+053 73,Podproč
+985 54,Podrečany
+064 01,Podsadek
+018 22,Podskalie
+059 56,Podspády
+033 01,Podtureň
+018 52,Podvažie
+916 16,Podvrch
+023 57,Podvysoká
+962 61,Podzámčok
+906 05,Podzámok
+065 44,Podzámok
+976 69,Pohorelá
+976 69,Pohorelská Maša
+951 02,Pohranice
+976 56,Pohronská Polhora
+976 62,Pohronský Bukovec
+935 62,Pohronský Ruskov
+956 38,Pochabany
+026 01,Pokryváč
+053 05,Poľanovce
+076 84,Poľany
+038 22,Polerieka
+086 11,Poliakovce
+907 01,Polianka
+985 45,Polianky
+985 13,Polichno
+982 62,Polina
+974 01,Polkanová
+976 02,Polkanová
+913 32,Polníky
+951 15,Poľný Kesov
+981 01,Polom
+082 73,Poloma
+976 66,Polomka
+962 63,Polomy
+987 01,Poltár
+972 16,Poluvsie
+013 13,Poluvsie
+980 13,Pondelok
+053 05,Pongrácovce
+976 33,Ponická Huta
+976 33,Ponická Lehôtka
+976 33,Poniky
+982 67,Poproč
+908 61,Popudinské Močidľany
+053 23,Poráč
+906 22,Poriadie
+072 55,Porostov
+972 11,Poruba
+072 32,Poruba pod Vihorlatom
+086 12,Porúbka
+067 41,Porúbka
+072 61,Porúbka
+013 11,Porúbka
+920 56,Posádka
+094 21,Poša
+930 34,Póšfa
+991 22,Potočok
+023 56,Potok
+982 67,Potok
+034 83,Potok
+013 62,Potoky
+082 71,Potoky
+091 01,Potoky
+091 01,Potôčky
+930 52,Potônske Lúky
+916 25,Potvorice
+916 26,Považany
+023 33,Povina
+929 01,Povoda
+976 55,Povrazník
+941 51,Pozba
+072 01,Pozdišovce
+976 64,Pôbišovo
+991 03,Pôtor
+985 11,Praha
+055 62,Prakovce
+956 22,Prašice
+922 11,Prašník
+972 16,Pravenec
+991 21,Pravica
+956 35,Pravotice
+955 01,Práznovce
+018 15,Prečín
+976 63,Predajná
+013 55,Predjastrabie
+013 51,Predmier
+023 54,Predmier
+049 01,Predná Hora
+018 41,Prejta
+969 73,Prenčov
+956 12,Preseľany
+936 01,Preseľany nad Ipľom
+966 01,Prestavlky
+991 25,Príbelce
+076 51,Pribeník
+946 55,Pribeta
+027 41,Pribiš
+029 57,Pribišská
+991 01,Príboj
+038 42,Príbovce
+032 42,Pribylina
+976 11,Priechod
+072 61,Priekopa
+991 02,Prieloh
+906 15,Priepasné
+906 11,Prietrž
+908 49,Prietržka
+906 34,Prievaly
+987 01,Prievrana
+049 14,Prihradzany
+090 05,Príkra
+953 05,Prílepy
+059 12,Primovce
+067 66,Príslop
+094 08,Prituľany
+082 14,Proč
+966 04,Prochot
+094 31,Prosačov
+032 23,Prosiek
+018 01,Prosné
+974 01,Prostredná Môlča
+053 76,Prostredný Hámor
+985 41,Prša
+018 52,Pruské
+957 03,Prusy
+018 22,Pružina
+966 53,Psiare
+090 05,Pstriná
+962 12,Pstruša
+014 01,Pšurnovice
+067 41,Ptičie
+076 77,Ptrukša
+026 01,Pucov
+020 01,Púchov
+935 05,Pukanec
+922 11,Pustá Ves
+976 52,Pusté
+072 22,Pusté Čemerné
+065 41,Pusté Pole
+925 54,Pusté Sady
+925 28,Pusté Úľany
+951 75,Pustý Chotár
+082 14,Pušovce
+029 44,Rabča
+029 45,Rabčice
+972 22,Račice
+076 37,Rad
+082 42,Radatice
+941 47,Radava
+908 47,Radimov
+956 41,Radiša
+980 42,Radnovce
+972 48,Radobica
+023 36,Radoľa
+090 42,Radoma
+956 05,Radošina
+908 63,Radošovce
+919 30,Radošovce
+023 04,Radôstka
+946 38,Radvaň nad Dunajom
+067 01,Radvaň nad Laborcom
+094 31,Radvanovce
+985 58,Radzovce
+094 05,Rafajovce
+956 32,Rajčany
+015 01,Rajec
+013 15,Rajecká Lesná
+013 13,Rajecké Teplice
+916 31,Rakoľuby
+049 61,Rákoš
+049 61,Rákošská Baňa
+023 51,Raková
+089 01,Rakovčík
+956 41,Rakovec
+962 65,Rakovec
+053 76,Rakovec
+072 03,Rakovec nad Ondavou
+922 08,Rakovice
+049 31,Rakovnica
+038 42,Rakovo
+039 01,Rakša
+059 76,Rakúsy
+980 21,Rakytník
+985 31,Rapovce
+086 41,Raslavice
+919 05,Rasochov
+930 39,Rastice
+941 08,Rastislavice
+982 62,Rašice
+013 51,Rašov
+986 01,Ratka
+982 65,Ratková
+920 42,Ratkovce
+038 54,Ratkovo
+982 65,Ratkovská Lehota
+982 67,Ratkovská Suchá
+982 67,Ratkovská Zdychava
+982 66,Ratkovské Bystré
+922 31,Ratnovce
+082 66,Ratvaj
+972 31,Ráztočno
+976 97,Ráztoka
+018 03,Ráztoka
+013 62,Ráztoky
+027 05,Ráztoky
+053 32,Ráztoky
+082 61,Ražňany
+903 01,Reca 
+925 26,Reca 
+086 33,Regetovka
+049 26,Rejdová
+059 04,Reľov
+972 51,Remata
+094 31,Remeniny
+072 41,Remetské Hámre
+082 63,Renčišov
+913 33,Repákovci
+067 04,Repejov
+966 03,Repište
+982 65,Repištia
+086 21,Rešov
+027 54,Revišné
+966 81,Revištské Podzámčie
+050 01,Revúca
+049 18,Revúcka Lehota
+050 01,Revúčka
+072 16,Ridzina
+974 01,Riečka
+980 45,Riečka
+023 22,Riečky
+023 05,Riečnica
+053 51,Richnava
+085 01,Richvald
+980 53,Rimavská Baňa
+980 61,Rimavská Píla
+980 42,Rimavská Seč
+980 54,Rimavské Brezovo
+980 01,Rimavské Janovce
+980 53,Rimavské Zalužany
+951 21,Rišňovce
+906 04,Rohov
+930 30,Rohovce
+935 34,Rohožnica
+094 07,Rohožník
+906 38,Rohožník
+049 36,Rochovce
+034 92,Rojkov
+082 41,Rokycany
+086 01,Rokytov
+067 13,Rokytov pri Humennom
+068 01,Rokytovce
+013 22,Rosina
+053 02,Roškovce
+067 02,Roškovce
+049 35,Roštár
+905 01,Rovensko
+900 41,Rovinka
+985 24,Rovňany
+067 32,Rovné
+018 03,Rovné
+982 67,Rovné
+090 16,Rovné
+906 33,Rozbehy
+937 01,Rozina
+049 32,Rozložná
+090 11,Roztoky
+913 11,Rozvadze
+082 71,Rožkovany
+048 01,Rožňava
+048 01,Rožňavská Baňa
+049 31,Rožňavské Bystré
+913 26,Rožňová Neporadza
+913 22,Rožňové Mitice
+941 36,Rúbaň
+972 48,Rudica
+023 31,Rudina
+023 31,Rudinka
+023 31,Rudinská
+094 35,Rudlov
+048 01,Rudná
+053 23,Rudňany
+972 26,Rudnianska Lehota
+906 23,Rudník
+038 22,Rudno
+966 51,Rudno nad Hronom
+951 37,Rumanová
+980 50,Rumince
+067 65,Runina
+076 77,Ruská
+072 64,Ruská Bystrá
+094 07,Ruská Kajňa
+080 05,Ruská Nová Ves
+094 08,Ruská Poruba
+094 31,Ruská Voľa
+065 42,Ruská Voľa nad Popradom
+067 72,Ruská Volová
+082 42,Ruské Pekľany
+956 54,Ruskovce
+072 42,Ruskovce
+072 64,Ruský Hrabovec
+067 66,Ruský Potok
+065 02,Ružbachy - kúpele
+985 52,Ružiná
+919 61,Ružindol
+919 01,Ružová dolina
+985 42,Ružová Osada
+956 36,Rybany
+962 31,Rybáre
+023 22,Rybárie
+034 01,Rybárpole
+906 04,Rybky
+935 23,Rybník
+982 65,Rybník
+916 11,Rybníky
+969 01,Rychňava
+962 55,Rykynčice
+083 01,Sabinov
+094 13,Sačurov
+018 16,Sádočné
+958 44,Sádok
+985 03,Salajka
+943 61,Salka
+082 36,Salvátor
+962 31,Sampor
+935 87,Santovka
+930 06,Sap
+930 37,Sása
+982 65,Sása
+962 62,Sása
+920 65,Sasinkovo
+018 52,Savčina
+935 85,Sazdice
+974 01,Sebedín
+974 01,Sebedín - Bečov
+972 05,Sebedražie
+962 66,Sebechleby
+972 26,Seč
+991 10,Sečianky
+078 01,Sečovce
+094 14,Sečovská Polianka
+027 55,Sedliacka Dubová
+082 43,Sedlice
+913 11,Sedličná
+094 09,Sedliská
+018 54,Sedmerovec
+072 51,Sejkov
+908 80,Sekule
+991 27,Seľany
+976 11,Selce
+962 51,Selce
+980 13,Selce
+913 36,Selec
+991 06,Selešťany
+925 72,Selice
+941 32,Semerovo
+023 55,Semeteš
+903 01,Senec
+082 03,Seniakovce
+072 13,Senné
+991 01,Senné
+962 43,Senohrad
+926 01,Sereď
+013 53,Setechov
+080 06,Severná
+962 31,Sielnica
+082 52,Sigord
+029 46,Sihelné
+976 53,Sihla
+937 01,Sikenica
+943 59,Sikenička
+951 24,Sila
+920 52,Siladice
+049 52,Silica
+049 11,Silická Brezová
+049 43,Silická Jablonica
+049 64,Sirk
+076 03,Sirník
+969 01,Sitnianska
+962 65,Sitnianska Lehôtka
+091 01,Sitník
+958 53,Skačany
+913 31,Skala
+976 81,Skalica
+909 01,Skalica
+023 14,Skalité
+913 31,Skalka nad Váhom
+913 31,Skalská Nová Ves
+982 62,Skerešovo
+991 05,Sklabiná
+038 03,Sklabiňa
+038 03,Sklabinský Podzámok
+038 47,Sklené
+966 03,Sklené Teplice
+962 12,Skliarovo
+094 33,Skrabské
+951 85,Skýcov
+925 21,Sládkovičovo
+987 01,Slaná Lehota
+962 05,Slanec
+029 01,Slanická Osada
+966 22,Slaská
+935 84,Slatina
+956 53,Slatina nad Bebravou
+962 01,Slatinka
+956 53,Slatinka nad Bebravou
+962 25,Slatinské Lazy
+053 61,Slatvina
+049 11,Slavec
+072 17,Slavkovce
+018 54,Slavnica
+049 34,Slavoška
+049 36,Slavošovce
+951 71,Sľažany
+951 52,Slepčany
+962 31,Sliač
+962 31,Sliač - kúpele
+962 25,Sliačska Podpoľana
+072 37,Sliepkovce
+076 12,Slivník
+980 23,Slizké
+013 54,Slopkov
+018 21,Slopná
+038 43,Slovany
+094 02,Slovenská Kajňa
+976 13,Slovenská Ľupča
+919 42,Slovenská Nová Ves
+059 02,Slovenská Ves
+067 22,Slovenská Volová
+991 07,Slovenské Ďarmoty
+991 02,Slovenské Kľačany
+067 13,Slovenské Krivé
+076 33,Slovenské Nové Mesto
+925 41,Slovenské Pole
+038 22,Slovenské Pravno
+900 26,Slovenský Grob
+053 40,Slovinky
+086 33,Smilno
+053 11,Smižany
+919 04,Smolenice
+919 04,Smolenická Nová Ves
+908 42,Smolinské
+055 65,Smolnícka Huta
+055 66,Smolník
+906 03,Smrdáky
+032 05,Smrečany
+086 06,Snakov
+023 32,Snežnica
+962 05,Snohy
+913 38,Soblahov
+090 42,Soboš
+906 05,Sobotište
+073 01,Sobrance
+073 01,Sobranecké Kúpele
+038 43,Socovce
+946 17,Sokolce
+946 14,Sokolce - lúky
+951 46,Sokolníky
+922 31,Sokolovce
+094 35,Soľ
+956 17,Solčany
+956 38,Solčianky
+972 13,Solka
+013 62,Soľné
+076 53,Soľnička
+090 31,Soľník
+906 37,Sološnica
+972 25,Somorova Ves
+076 35,Somotor
+067 22,Sopkovce
+905 01,Sotina
+059 01,Spišská Belá
+058 01,Spišská Sobota
+061 01,Spišská Stará Ves
+059 34,Spišská Teplica
+059 18,Spišské Bystré
+059 04,Spišské Hanušovce
+053 04,Spišské Podhradie
+052 01,Spišské Tomášovce
+053 61,Spišské Vlachy
+053 02,Spišský Hrhov
+053 63,Spišský Hrušov
+059 14,Spišský Štiavnik
+053 14,Spišský Štvrtok
+026 01,Srňacie
+067 61,Stakčín
+067 61,Stakčínska Roztoka
+972 28,Stanáková
+076 16,Stanča
+034 92,Stankovany
+072 21,Stankovce
+076 61,Stankovce
+980 34,Stará Bašta
+023 04,Stará Bystrica
+930 34,Stará Gala
+985 11,Stará Halič
+962 25,Stará Huta
+968 01,Stará Huta
+965 01,Stará Kremnička
+916 35,Stará Lehota
+059 52,Stará Lesná
+064 01,Stará Ľubovňa
+907 01,Stará Myjava
+916 01,Stará Turá
+053 34,Stará Voda
+072 23,Staré
+976 02,Staré Hory
+065 46,Starina
+982 01,Starňa
+935 56,Starý Hrádok
+062 01,Starý Smokovec
+935 26,Starý Tekov
+023 53,Staškov
+090 23,Staškovce
+086 33,Stebnícka Huta
+086 33,Stebník
+018 03,Stolečné
+013 32,Stolečné
+059 94,Stotince
+962 12,Stožok
+065 33,Stráňany
+013 25,Stráňavy
+059 76,Stráne pod Tatrami
+982 51,Stránska
+013 13,Stránske
+049 71,Stratená
+013 04,Stráža
+908 41,Stráže nad Myjavou
+058 01,Stráže pod Tatrami
+059 01,Strážky
+076 52,Strážne
+072 22,Strážske
+013 24,Strečno
+076 31,Streda nad Bodrogom
+034 74,Stredná Revúca
+991 24,Stredné Plachtince
+935 81,Stredné Turovce
+034 84,Stredný Sliač
+941 37,Strekov
+020 54,Strelenka
+982 62,Strelnice
+976 55,Strelníky
+072 13,Stretava
+072 13,Stretavka
+020 01,Streženice
+980 25,Striežovce
+067 73,Strihovce
+089 01,Stročín
+091 01,Stropkov
+980 34,Studená
+900 46,Studené
+053 04,Studenec
+972 28,Studenec
+908 75,Studienka
+034 96,Studničná
+086 43,Stuľany
+900 31,Stupava
+018 12,Stupné
+038 52,Sučany
+962 71,Sudince
+962 71,Súdovce
+090 23,Suchá
+082 43,Suchá Dolina
+027 13,Suchá Hora
+919 01,Suchá nad Parnou
+991 35,Sucháň
+071 01,Suché
+991 03,Suché Brezovo
+900 64,Suchohrad
+067 02,Sukov
+951 25,Suľany
+065 46,Sulín
+013 52,Súľov
+956 14,Súlovce
+916 01,Súš
+980 12,Sušany
+980 01,Sútor
+032 33,Svarín
+076 35,Svätá Mária
+951 16,Svätoplukovo
+072 55,Svätuš
+941 48,Svätuša
+076 83,Svätuše
+969 72,Svätý Anton
+900 21,Svätý Jur
+935 25,Svätý Kríž
+032 11,Svätý Kríž
+903 01,Svätý Martin
+946 57,Svätý Peter
+013 32,Svederník
+017 01,Sverepec
+086 02,Sveržov
+980 52,Svetlá
+067 16,Svetlice
+090 02,Svidnička
+089 01,Svidník
+082 32,Svinia
+076 37,Svinice
+913 24,Svinná
+059 21,Svit
+943 54,Svodín
+937 01,Svodov
+956 06,Svrbice
+023 12,Svrčinovec
+053 76,Sykavka
+936 01,Šahy
+972 41,Šajby
+906 07,Šajdíkove Humence
+925 54,Šalgočka
+956 06,Šalgovce
+935 71,Šalov
+022 01,Šamaja
+065 45,Šambron
+931 01,Šamorín
+072 01,Šamudovce
+916 42,Šance
+091 01,Šandal
+935 33,Šándorhalma
+982 62,Šankovce
+090 42,Šapinec
+985 32,Šára
+090 05,Šarbov
+082 12,Šarišská Poruba
+082 14,Šarišská Trstená
+082 05,Šarišské Bohdanovce
+086 37,Šarišské Čierne
+082 73,Šarišské Dravce
+065 48,Šarišské Jastrabie
+080 06,Šarišské Lúky
+082 32,Šarišské Lužianky
+082 22,Šarišské Michaľany
+082 66,Šarišské Sokolovce
+090 42,Šarišský Štiavnik
+943 42,Šarkan
+935 52,Šarovce
+086 12,Šašová
+965 01,Šášovské Podhradie
+908 41,Šaštín
+908 41,Šaštín - Stráže
+985 41,Šávoľ
+919 09,Šelpice
+090 03,Šemetkovce
+900 81,Šenkvice
+985 58,Šiatorská Bukovinka
+086 22,Šiba
+986 01,Šíd
+980 03,Šimonovce
+082 36,Šindliar
+925 51,Šintava
+962 68,Šipice
+956 53,Šípkov
+922 03,Šípkové
+930 03,Šipošovské Kračany
+991 27,Širákov
+980 02,Širkovce
+027 41,Široká
+082 37,Široké
+956 38,Šišov
+049 14,Šivetice
+013 54,Škoruby
+022 04,Škrabáka
+991 25,Škriavnik
+972 28,Škrípov
+067 73,Šmigovec
+985 07,Šoltýska
+022 01,Šopora
+925 52,Šoporňa
+919 51,Špačince
+974 01,Špania Dolina
+980 23,Španie Pole
+946 32,Šrobárová
+968 01,Štále
+941 37,Štefan
+906 45,Štefanov
+027 44,Štefanov nad Oravou
+900 86,Štefanová
+082 35,Štefanovce
+094 01,Štefanovce
+951 15,Štefanovičová
+053 51,Štefanská Huta
+969 01,Štefultov
+090 42,Štefurov
+922 03,Šterusy
+969 81,Štiavnické Bane
+976 81,Štiavnička
+034 01,Štiavnička
+013 55,Štiavnik
+972 48,Štiefleje
+951 01,Štitáre
+049 32,Štítnik
+962 05,Štoliansko
+059 37,Štôla
+059 38,Štrba
+059 85,Štrbské Pleso
+925 52,Štrkovec
+980 45,Štrkovec
+976 02,Štubne
+946 13,Štúrová
+943 01,Štúrovo
+913 05,Štvrtok
+930 40,Štvrtok na Ostrove
+015 01,Šuja
+991 01,Šuľa
+930 33,Šuľany
+976 71,Šumiac
+059 39,Šuňava
+942 01,Šurany
+951 26,Šurianky
+980 33,Šurice
+919 25,Šúrovce
+972 01,Šutovce
+038 54,Šútovo
+976 69,Švábolka
+059 12,Švábovce
+053 34,Švedlár
+034 91,Švošov
+906 05,Švrčkov Jarok
+072 14,Ťahyňa
+980 34,Tachty
+952 01,Tajná
+976 34,Tajov
+082 12,Taľka
+029 57,Tanečník
+029 51,Ťapešovo
+922 08,Ťapkové
+086 01,Tarnov
+072 52,Tašuľa
+059 56,Tatranská Javorina
+059 54,Tatranská Kotlina
+059 60,Tatranská Lesná
+059 60,Tatranská Lomnica
+062 01,Tatranská Polianka
+059 41,Tatranská Štrba
+059 60,Tatranské Matliare
+062 01,Tatranské Zruby
+935 35,Tehla
+920 62,Tekolďany
+966 52,Tekovská Breznica
+935 25,Tekovská Nová Ves
+935 41,Tekovské Lužany
+966 54,Tekovské Nemce
+935 51,Tekovský Hrádok
+976 73,Telgárt
+951 61,Telince
+972 29,Temeš
+969 82,Teplá
+052 01,Teplička
+013 01,Teplička nad Váhom
+920 66,Tepličky
+980 23,Teplý Vrch
+962 68,Terany
+013 06,Terchová
+080 05,Teriakovce
+082 67,Terňa
+956 21,Tesáre
+951 76,Tesáre nad Žitavou
+951 76,Tesárske Mlyňany
+925 82,Tešedíkovo
+936 01,Tešmák
+049 12,Tiba
+073 01,Tibava
+053 33,Tichá Voda
+082 74,Tichý Potok
+956 52,Timoradza
+091 01,Tisinec
+980 61,Tisovec
+935 21,Tlmače
+018 54,Tlstá Hora
+929 01,Töböréte
+985 22,Točnica
+090 34,Tokajík
+925 04,Tomášikovo
+900 44,Tomášov
+985 56,Tomášovce
+980 21,Tomášovce
+930 38,Tonkovce
+067 65,Topoľa
+071 01,Topoľany
+951 93,Topoľčianky
+916 01,Topolecká
+925 92,Topoľnica
+930 11,Topoľníky
+067 45,Topoľovka
+059 95,Toporec
+982 01,Tornaľa
+082 76,Torysa
+053 71,Torysky
+094 01,Tovarné
+094 01,Tovarnianska Polianka
+955 01,Tovarníky
+946 15,Tôň
+919 33,Trakovice
+941 46,Trávnica
+946 19,Trávnik
+922 10,Trebatice
+985 31,Trebeľovce
+956 53,Trebichava
+038 41,Trebostovo
+991 27,Trebušovce
+985 32,Trenč
+914 01,Trenčianska Teplá
+913 21,Trenčianska Turná
+914 41,Trenčianska Závada
+913 07,Trenčianske Bohuslavice
+913 22,Trenčianske Jastrabie
+913 22,Trenčianske Mitice
+913 11,Trenčianske Stankovce
+914 51,Trenčianske Teplice
+930 13,Trhová Hradská
+072 04,Trhovište
+937 01,Trhyňa
+966 11,Trnavá Hora
+072 31,Trnava pri Laborci
+930 32,Trnávka
+078 01,Trnávka
+913 33,Trnávka
+962 34,Tŕnie
+082 12,Trnkov
+908 51,Trnovec
+925 71,Trnovec nad Váhom
+038 41,Trnovo
+086 41,Tročany
+023 56,Trojačka
+962 44,Trpín
+053 63,Trsťany
+028 01,Trstená
+930 04,Trstená na Ostrove
+032 21,Trstené
+925 42,Trstice
+018 22,Tŕstie
+919 05,Trstín
+966 23,Trubín
+985 12,Tuhár
+082 07,Tuhrina
+018 55,Tuchyňa
+082 13,Tulčík
+018 63,Tunežice
+935 84,Tupá
+935 51,Turá
+907 03,Turá Lúka
+038 53,Turany
+090 33,Turany nad Ondavou
+067 23,Turcovce
+038 48,Turček
+958 44,Turčianky
+038 51,Turčianska Štiavnička
+038 02,Turčianske Jaseno
+038 61,Turčianske Kľačany
+039 01,Turčianske Teplice
+038 43,Turčiansky Ďur
+039 01,Turčiansky Michal
+038 41,Turčiansky Peter
+049 18,Turčok
+976 02,Turecká
+903 01,Tureň
+985 22,Turíčky
+013 12,Turie
+034 83,Turík
+023 54,Turkov
+962 34,Turová
+023 54,Turzovka
+072 02,Tušice
+072 02,Tušická Nová Ves
+972 14,Tužina
+059 71,Tvarožná
+032 23,Tvarožná
+956 22,Tvrdomestice
+027 44,Tvrdošín
+941 10,Tvrdošovce
+022 01,U Hluška
+023 11,U Holých
+023 11,U Kľukov
+023 11,U Kordišov
+023 11,U Polievkov
+023 11,U Rulcov
+022 01,U Siheľnika
+067 73,Ubľa
+072 42,Úbrež
+067 31,Udavské
+985 54,Uderiná
+018 01,Udiča
+018 03,Udička
+065 45,Údol
+935 05,Uhliská
+055 66,Úhorná
+032 03,Uhorská Ves
+985 25,Uhorské
+956 41,Uhrovec
+956 41,Uhrovské Podhradie
+913 31,Újazd
+941 03,Úľany nad Žitavou
+067 67,Ulič
+067 67,Uličské Krivé
+053 71,Uloža
+962 41,Uňatín
+908 46,Unín
+018 01,Upohlav
+076 16,Úpor
+956 02,Urmince
+028 01,Ústie nad Priehradou
+059 11,Úsvit
+985 06,Utekáč
+082 66,Uzovce
+980 22,Uzovská Panica
+082 63,Uzovské Pekľany
+082 61,Uzovský Šalgov
+916 13,Vaďovce
+090 03,Vagrinec
+925 62,Váhovce
+951 88,Vajka nad Žitavou
+976 98,Vajsková
+976 46,Valaská
+972 28,Valaská Belá
+034 96,Valaská Dubová
+066 01,Valaškovce
+038 35,Valča
+976 02,Valentová
+038 43,Valentová
+067 01,Valentovce
+982 52,Valice
+090 42,Valkovce
+976 69,Vaľkovňa
+985 03,Vaľkovo
+086 41,Vaniškovce
+029 52,Vaňovka
+090 02,Vápeník
+086 36,Varadka
+090 23,Varechovce
+082 05,Varhaňovce
+013 03,Varín
+919 25,Varov Šúr
+029 51,Vasiľov
+029 01,Vavrečka
+094 31,Vavrinec
+032 42,Vavrišovo
+032 61,Važec
+980 50,Včelince
+076 35,Véč
+980 34,Večelkov
+094 12,Vechec
+947 01,Vék
+076 15,Veľaty
+913 04,Velčice
+951 71,Velčice
+027 54,Veličná
+058 01,Veľká
+076 32,Veľká Bara
+930 34,Veľká Budafa
+014 01,Veľká Bytča
+991 09,Veľká Čalomija
+971 01,Veľká Čausa
+015 01,Veľká Čierna
+985 53,Veľká Dolina
+951 15,Veľká Dolina
+059 78,Veľká Franková
+946 03,Veľká Gúta
+913 24,Veľká Hradná
+972 42,Veľká Lehota
+966 41,Veľká Lehota
+065 34,Veľká Lesná
+059 52,Veľká Lomnica
+930 03,Veľká Lúč
+962 31,Veľká Lúka
+925 32,Veľká Mača
+941 45,Veľká Maňa
+985 32,Veľká nad Ipľom
+930 51,Veľká Paka
+980 13,Veľká Suchá
+076 82,Veľká Tŕňa
+951 13,Veľká Ves
+985 01,Veľká Ves
+991 10,Veľká Ves nad Ipľom
+955 01,Veľké Bedzany
+958 04,Veľké Bielice
+913 11,Veľké Bierovce
+930 01,Veľké Blahovo
+027 32,Veľké Borové
+985 32,Veľké Dálovce
+985 42,Veľké Dravce
+956 54,Veľké Držkovce
+956 01,Veľké Dvorany
+929 01,Veľké Dvorníky
+956 38,Veľké Hoste
+956 55,Veľké Chlievany
+951 54,Veľké Chyndice
+079 01,Veľké Kapušany
+946 21,Veľké Kosihy
+922 07,Veľké Kostoľany
+018 31,Veľké Košecké Podhra
+935 21,Veľké Kozmálovce
+934 01,Veľké Krškany
+958 03,Veľké Kršteňany
+908 73,Veľké Leváre
+941 42,Veľké Lovce
+935 65,Veľké Ludince
+922 01,Veľké Orvište
+956 34,Veľké Ostratice
+078 01,Veľké Ozorovce
+966 74,Veľké Pole
+076 75,Veľké Raškovce
+072 43,Veľké Revištia
+956 07,Veľké Ripňany
+013 62,Veľké Rovné
+076 77,Veľké Slemence
+913 11,Veľké Stankovce
+990 01,Veľké Straciny
+980 51,Veľké Teriakovce
+076 42,Veľké Trakany
+935 81,Veľké Turovce
+958 41,Veľké Uherce
+925 22,Veľké Úľany
+951 82,Veľké Vozokany
+072 34,Veľké Zalužice
+951 35,Veľké Zálužie
+991 23,Veľké Zlievce
+091 01,Veľkrop
+951 34,Veľký Báb
+900 24,Veľký Biel
+980 22,Veľký Blh
+026 01,Veľký Bysterec
+951 05,Veľký Cetín
+038 45,Veľký Čepčín
+935 34,Veľký Ďur
+937 01,Veľký Dvor
+055 51,Veľký Folkmar
+925 27,Veľký Grob
+945 01,Veľký Harčáš
+076 52,Veľký Horeš
+076 36,Veľký Kamenec
+958 45,Veľký Klíž
+018 51,Veľký Kolačín
+990 01,Veľký Krtíš
+941 07,Veľký Kýr
+951 04,Veľký Lapáš
+930 37,Veľký Lég
+946 12,Veľký Lél
+065 33,Veľký Lipník
+991 03,Veľký Lom
+932 01,Veľký Meder
+946 03,Veľký Ostrov
+937 01,Veľký Pesek
+075 01,Veľký Ruskov
+059 91,Veľký Slavkov
+082 67,Veľký Slivník
+082 21,Veľký Šariš
+067 31,Veľopolie
+955 01,Velušovce
+059 17,Vernár
+935 52,Veselá
+922 08,Veselé
+031 04,Veterná Poruba
+985 59,Vidiná
+962 63,Vidov Vrch
+049 11,Vidová
+908 62,Vidovany
+930 02,Vieska
+916 26,Vieska
+972 45,Vieska
+908 63,Vieska
+991 02,Vieska
+965 01,Vieska
+020 01,Vieska - Bezdedov
+980 21,Vieska nad Blhom
+951 52,Vieska nad Žitavou
+962 02,Vígľaš
+962 25,Vígľašská Huta
+059 19,Vikartovce
+991 28,Vinica
+076 31,Viničky
+900 23,Viničné
+072 31,Vinné
+951 06,Vinodol
+901 01,Vinohrádok
+925 55,Vinohrady nad Váhom
+902 01,Vinosady
+946 02,Violín
+946 38,Virt
+065 41,Vislanka
+090 21,Vislava
+018 61,Visolaje
+076 61,Višňov
+013 55,Višňové
+916 16,Višňové
+982 62,Višňové
+013 23,Višňové
+900 85,Vištuk
+027 12,Vitanová
+082 38,Víťaz
+067 24,Víťazovce
+053 63,Vítkovce
+094 31,Vlača
+090 23,Vladiča
+049 24,Vlachovo
+032 13,Vlachy
+032 13,Vlašky
+925 84,Vlčany
+913 33,Vlčí Vrch
+908 62,Vlčkovany
+919 23,Vlčkovce
+957 03,Vlčkovo
+985 26,Vlčovo
+976 31,Vlkanová
+946 54,Vlkanovo
+941 44,Vlkas
+018 03,Vlkov
+059 72,Vlková
+059 71,Vlkovce
+900 44,Vlky
+980 44,Vlkyňa
+919 42,Voderady
+076 72,Vojany
+076 22,Vojčice
+076 83,Vojka
+930 31,Vojka nad Dunajom
+053 61,Vojkovce
+059 02,Vojňany
+072 61,Vojnatina
+930 38,Vojtechovce
+091 01,Vojtovce
+072 21,Voľa
+067 01,Volica
+951 87,Volkovce
+966 81,Voznica
+925 05,Vozokany
+956 05,Vozokany
+935 61,Vozokany nad Hronom
+952 01,Vráble
+908 49,Vrádište
+930 25,Vrakúň
+972 24,Vrbany
+930 08,Vrbina
+072 16,Vrbnica
+059 72,Vrbov
+945 01,Vrbová nad Váhom
+906 06,Vrbovce
+980 52,Vrbovce nad Rimavou
+922 03,Vrbové
+071 01,Vŕbovec
+991 06,Vrbovka
+962 05,Vrchdobroč
+023 22,Vrchpredmier
+023 55,Vrchrieka
+976 53,Vrchslatina
+017 05,Vrchteplá
+038 31,Vrícko
+018 52,Vršatské Podhradie
+017 05,Vrtižer
+038 61,Vrútky
+059 02,Výborná
+071 01,Vybúchanec
+951 25,Výčapky
+951 44,Výčapy - Opatovce
+068 01,Vydraň
+930 16,Vydrany
+020 53,Vydrná
+059 14,Vydrník
+976 52,Vydrovo
+080 01,Vydumanec
+966 02,Vyhne
+032 32,Východná
+023 05,Vychylovka
+067 16,Výrava
+080 01,Vysielač
+072 14,Vysocký Dvor
+956 35,Vysočany
+969 01,Vysoká
+082 74,Vysoká
+023 55,Vysoká nad Kysucou
+072 14,Vysoká nad Uhom
+900 66,Vysoká pri Morave
+062 01,Vysoké Tatry
+972 13,Vyšehradné
+090 21,Vyškovce
+935 77,Vyškovce nad Ipľom
+032 34,Vyšná Boca
+067 34,Vyšná Jablonka
+089 01,Vyšná Jedľová
+982 52,Vyšná Kaloša
+023 21,Vyšná Korňa
+090 32,Vyšná Olšava
+090 01,Vyšná Pisaná
+086 36,Vyšná Polianka
+034 74,Vyšná Revúca
+072 41,Vyšná Rybnica
+094 07,Vyšná Sitnica
+049 26,Vyšná Slaná
+080 06,Vyšná Šebastová
+090 23,Vyšná Vladiča
+086 21,Vyšná Voľa
+059 84,Vyšné Hágy
+067 11,Vyšné Ladičkovce
+032 23,Vyšné Matiašovce
+935 31,Vyšné nad Hronom
+072 51,Vyšné Nemecké
+086 41,Vyšné Raslavice
+072 41,Vyšné Remety
+053 71,Vyšné Repaše
+072 43,Vyšné Revištia
+065 02,Vyšné Ružbachy
+982 52,Vyšné Valice
+090 34,Vyšný Hrabovec
+067 32,Vyšný Hrušov
+094 09,Vyšný Kazimír
+023 55,Vyšný Kelčov
+090 05,Vyšný Komárnik
+023 54,Vyšný Koniec
+086 45,Vyšný Kručov
+026 01,Vyšný Kubín
+090 11,Vyšný Mirošov
+090 11,Vyšný Orlík
+980 52,Vyšný Skálnik
+053 73,Vyšný Slavkov
+034 84,Vyšný Sliač
+086 02,Vyšný Tvarožec
+094 33,Vyšný Žipov
+028 01,Zábiedovo
+038 03,Záborie
+082 53,Záborské
+027 54,Zábrež
+913 07,Zabudišová
+032 23,Zádiel
+980 42,Zádor
+053 33,Zahájnica
+072 53,Záhor
+991 06,Záhorce
+966 81,Záhorčie
+901 01,Záhorie
+900 65,Záhorská Ves
+955 01,Záhrada
+082 16,Záhradné
+968 01,Záhrb
+979 01,Zacharovce
+962 63,Zaježová
+029 56,Zákamenné
+023 11,Zákopčie
+023 02,Zákysučie
+937 01,Zalaba
+059 04,Zálesie
+900 28,Zálesie
+072 34,Zalužice
+911 05,Zamarovce
+976 97,Zámostie
+094 15,Zámutov
+962 12,Zapriechody
+013 32,Zárieč - Keblov
+020 52,Záriečie
+026 01,Záskalie
+017 05,Záskalie
+076 53,Zatín
+023 55,Zátoka
+094 08,Závada
+054 01,Závada
+955 01,Závada
+991 21,Závada
+951 87,Závada
+956 41,Závada pod Čiernym vrchom
+053 33,Závadka
+066 01,Závadka
+072 33,Závadka
+082 67,Závadka
+976 67,Závadka nad Hronom
+919 26,Zavar
+032 02,Závažná Poruba
+908 72,Závod
+023 54,Závodie
+065 46,Závodie
+027 05,Zázrivá
+078 01,Zbehňov
+916 16,Zbehy
+951 42,Zbehy
+067 68,Zboj
+067 13,Zbojné
+020 51,Zbora
+086 33,Zborov
+023 03,Zborov nad Bystricou
+935 55,Zbrojníky
+067 01,Zbudská Belá
+067 12,Zbudské Dlhé
+072 23,Zbudza
+013 19,Zbyňov
+987 01,Zelené
+919 21,Zeleneč
+947 01,Zelený Háj
+027 43,Zemianska Dedina
+946 14,Zemianska Olča
+018 15,Zemianska Závada
+972 43,Zemianske Kostoľany
+913 05,Zemianske Lieskové
+913 22,Zemianske Mitice
+913 07,Zemianske Podhradie
+925 54,Zemianske Sady
+962 41,Zemiansky Vrbovok
+941 22,Zemné
+076 34,Zemplín
+076 16,Zemplínska Nová Ves
+072 36,Zemplínska Šírava
+072 13,Zemplínska Široká
+076 64,Zemplínska Teplica
+067 77,Zemplínske Hámre
+076 01,Zemplínske Hradište
+076 05,Zemplínske Jastrabie
+072 17,Zemplínske Kopčany
+076 02,Zemplínsky Branč
+076 16,Zemplínsky Klečenov
+082 12,Zimná Studňa
+023 55,Zlámaná
+082 52,Zlatá Baňa
+945 01,Zlatá Osada
+086 01,Zlaté
+930 39,Zlaté Klasy
+953 01,Zlaté Moravce
+953 05,Zlaté Moravce
+946 12,Zlatná na Ostrove
+094 33,Zlatník
+956 37,Zlatníky
+976 69,Zlatno
+985 03,Zlatno
+951 91,Zlatno
+018 32,Zliechov
+900 51,Zohor
+962 21,Zolná
+991 22,Zombor
+020 64,Zubák
+027 32,Zuberec
+067 33,Zubné
+985 51,Zubria
+029 43,Zubrohlava
+962 01,Zvolenská Slatina
+919 01,Zvončín
+071 01,Žabany
+962 05,Žabica
+038 40,Žabokreky
+958 52,Žabokreky nad Nitrou
+916 16,Žadovica
+055 71,Žakarovce
+059 73,Žakovce
+969 82,Žakýl
+094 03,Žalobín
+013 62,Žarnov
+966 81,Žarnovica
+966 81,Žarnovická Huta
+027 21,Žaškov
+082 67,Žatkovce
+072 16,Žbince
+059 55,Ždiar
+082 06,Žehňa
+053 61,Žehra
+962 34,Železná Breznica
+049 64,Železník
+087 01,Železník
+032 15,Železnô
+937 01,Želiezovce
+086 44,Želmanovce
+962 12,Želobudza
+991 06,Želovce
+935 02,Žemberovce
+935 57,Žemliare
+032 05,Žiar
+982 01,Žiar
+965 01,Žiar nad Hronom
+963 01,Žibritov
+925 83,Žihárec
+985 45,Žihľava
+991 03,Žihľava
+951 92,Žikava
+980 21,Žíp
+082 41,Žipov
+951 74,Žirany
+946 38,Žitava
+951 97,Žitavany
+952 01,Žitavce
+956 41,Žitná
+956 41,Žitná - Radiša
+920 42,Žlkovce
+018 03,Žrnové
+080 01,Župčany
+966 71,Župkov
+044 45,Bačkovík
+044 25,Baňa Lucia
+040 16,Baška
+044 58,Belža
+044 42,Beniakovce
+044 13,Bernátovce
+044 45,Bidovce
+044 16,Blažice
+044 57,Bočiar
+044 16,Bohdanovce
+044 47,Boliarov
+044 45,Borda
+044 43,Budimír
+045 01,Budulov
+044 20,Bukovec
+044 47,Bunetice
+044 73,Buzica
+044 13,Buzice
+044 41,Byster
+044 71,Cestice
+044 45,Čakanovce
+044 14,Čaňa
+044 71,Čečejovce
+044 47,Čižatice
+045 01,Debraď
+044 71,Dobogov
+044 01,Drienovec
+044 31,Družstevná pri Hornáde
+044 45,Ďurďošík
+044 19,Ďurkov
+044 02,Dvorníky
+044 02,Dvorníky - Včeláre
+044 10,Geča
+044 14,Geča č. 107-110
+044 55,Gomboš
+044 57,Grajciar
+044 14,Gyňov
+044 02,Hačava
+044 02,Háj
+044 57,Haniska
+044 45,Herľany
+044 21,Hodkovce
+044 02,Hosťovce
+044 42,Hrašovík
+044 12,Hýľov
+044 02,Chorváty
+044 44,Chrastné
+044 74,Chym
+044 05,Janík
+044 23,Jasov
+044 18,Kalša
+044 47,Kecerovce
+044 47,Kecerovské Kostoľany
+044 47,Kecerovské Pekľany
+044 47,Kecerovský Lipovec
+044 58,Kechnec
+044 13,Kokšov - Bakša
+044 55,Komárovce
+044 31,Kostoľany nad Hornádom
+044 65,Košická Belá
+044 41,Košická Polianka
+044 42,Košické Oľšany
+044 45,Košický Klečenov
+044 13,Košťany
+044 44,Kráľovce
+044 81,Kysak
+040 15,Ľudvikov dvor
+044 20,Malá Ida
+044 32,Malá Lodina
+044 31,Malá Vieska
+044 25,Medzev
+044 58,Milhosť
+045 01,Mokrance
+045 01,Moldava nad Bodvou
+044 47,Mudrovce
+040 18,Nižná Hutka
+044 45,Nižná Kamenica
+044 15,Nižná Myšľa
+044 16,Nižný Čaj
+044 12,Nižný Klátov
+044 73,Nižný Lánec
+044 25,Nižný Medzev
+044 44,Nová Polhora
+044 21,Nováčany
+044 17,Nový Salaš
+044 81,Obišovce
+044 19,Olšovany
+044 65,Opátka
+044 47,Opiná
+044 44,Ortáše
+044 71,Paňovce
+044 05,Peder
+044 74,Perín
+044 74,Perín - Chym
+044 44,Ploské
+044 24,Poproč
+044 16,Rákoš
+044 45,Rankovce
+044 73,Rešica
+044 42,Rozhanovce
+044 23,Rudník
+044 19,Ruskov
+044 41,Sady nad Torysou
+044 71,Seleška
+044 58,Seňa
+044 11,Skároš
+044 17,Slančík
+044 17,Slanec
+044 17,Slanská Huta
+044 18,Slanské Nové Mesto
+044 31,Sokoľ
+044 57,Sokoľany
+044 45,Svinica
+044 21,Šemša
+044 26,Štós
+044 26,Štós - kúpele
+044 31,Tepličany
+044 81,Trebejov
+044 45,Trsťany
+044 11,Trstené pri Hornáde
+044 02,Turňa nad Bodvou
+044 02,Turnianska Nová Ves
+044 43,Vajkovce
+044 13,Valaliky
+044 02,Včeláre
+044 55,Veľká Ida
+044 81,Veľká Lodina
+044 13,Všechsvätých
+044 47,Vtáčkovce
+040 18,Vyšná Hutka
+044 45,Vyšná Kamenica
+044 15,Vyšná Myšľa
+044 16,Vyšný Čaj
+044 12,Vyšný Klátov
+044 74,Vyšný Lánec
+044 25,Vyšný Medzev
+044 02,Zádiel
+044 41,Zdoba
+044 61,Zlatá Idka
+044 02,Žarnov
+044 11,Ždaňa
+044 45,Žírovce
