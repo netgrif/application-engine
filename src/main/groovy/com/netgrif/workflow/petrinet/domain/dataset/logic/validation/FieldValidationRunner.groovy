@@ -12,6 +12,7 @@ class FieldValidationRunner {
      * @return true if value in the field is valid according to validation rules
      */
     static boolean validate(Field field, String rules){
+        return true //TODO 14.2.2018 rework all validation mechanism this is only temp fix
         def shell = new GroovyShell()
         def code = (Closure) shell.evaluate("{-> validate(${rules})}")
         code.delegate = ValidationDelegateFactory.getDelegate(field)
@@ -19,6 +20,7 @@ class FieldValidationRunner {
     }
 
     static String toJavascript(Field field, String rules){
+        return "" //TODO 14.2.2018 rework all validation mechanism this is only temp fix
         def shell = new GroovyShell()
         def code = (Closure) shell.evaluate("{-> javascript(${rules})}")
         code.delegate = ValidationDelegateFactory.getJavascriptDelegate(field)
