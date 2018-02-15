@@ -28,6 +28,8 @@ public class LocalisedUser {
 
     private String surname;
 
+    private String fullName;
+
     private Set<Organization> organizations;
 
     private Set<Authority> authorities;
@@ -42,6 +44,7 @@ public class LocalisedUser {
         avatar = user.getAvatar();
         name = user.getName();
         surname = user.getSurname();
+        fullName = user.getFullName();
         organizations = user.getOrganizations();
         authorities = user.getAuthorities();
         processRoles = user.getProcessRoles().stream()
