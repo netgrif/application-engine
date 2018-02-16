@@ -38,13 +38,6 @@ public class DataGroup extends PetriNetObject {
         this.data = new LinkedHashSet<>();
     }
 
-    public DataGroup(String title, String alignment, Boolean stretch) {
-        this();
-        this.title = new I18nString(title);
-        this.alignment = alignment;
-        this.stretch = stretch;
-    }
-
     public void addData(String dataId) {
         data.add(dataId);
     }
@@ -53,10 +46,6 @@ public class DataGroup extends PetriNetObject {
      * Sets title default value
      * @param title default string value
      */
-    public void setTitle(String title) {
-        setTitle(new I18nString(title));
-    }
-
     public void setTitle(I18nString title) {
         this.title = title;
     }
