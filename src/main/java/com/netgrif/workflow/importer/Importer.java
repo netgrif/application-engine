@@ -411,7 +411,7 @@ public class Importer {
     I18nString toI18NString(I18NStringType imported) {
         if (imported == null)
             return null;
-        I18nString string = i18n.getOrDefault(imported.getName(), new I18nString(imported.getValue()));
+        I18nString string = i18n.getOrDefault(imported.getName(), new I18nString(imported.getName(), imported.getValue()));
         if (string.getDefaultValue() == null)
             string.setDefaultValue(imported.getValue());
         return string;

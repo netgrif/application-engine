@@ -30,11 +30,6 @@ class CaseField extends Field<String> {
     }
 
     @Override
-    void setValue(String value) {
-        super.setValue(value)
-    }
-
-    @Override
     void clearValue() {
         this.setValue(null)
     }

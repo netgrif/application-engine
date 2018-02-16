@@ -167,4 +167,8 @@ public class Case {
                 this.dataSet.put(key, new DataField());
         });
     }
+
+    public Object getFieldValue(String fieldId) {
+        return dataSet.get(fieldId).getValue();
+    }
 }
