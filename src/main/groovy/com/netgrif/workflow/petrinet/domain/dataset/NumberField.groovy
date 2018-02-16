@@ -23,11 +23,6 @@ class NumberField extends ValidableField<Double> {
     }
 
     @Override
-    void setDefaultValue(String value) {
-        super.superSetDefaultValue(Double.parseDouble(value))
-    }
-
-    @Override
     void clearValue() {
         super.clearValue()
         setValue(getDefaultValue())

@@ -25,11 +25,6 @@ class DateField extends ValidableField<LocalDate> {
     }
 
     @Override
-    void setDefaultValue(String value) {
-        super.superSetDefaultValue(LocalDate.parse(value))
-    }
-
-    @Override
     void clearValue() {
         super.clearValue()
         setValue(getDefaultValue())
@@ -37,12 +32,6 @@ class DateField extends ValidableField<LocalDate> {
 
     void setValue(Date value) {
         this.value = ((Date) value).toInstant().atZone(ZoneId.systemDefault()).toLocalDate()
-    }
-
-    void convertValue() {
-        if (this.value instanceof Date) {
-            this.value = ((Date) this.value).toInstant().atZone(ZoneId.systemDefault()).toLocalDate()
-        }
     }
 
     String getMinDate() {
