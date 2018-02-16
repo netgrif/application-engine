@@ -60,7 +60,5 @@ public interface ITaskService {
 
     void deleteTasksByCase(String caseId);
 
-    Field buildField(Case useCase, String fieldId, boolean withValidation);
-
     List<TaskReference> findAllByCase(String caseId, Locale locale);
 }

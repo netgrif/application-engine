@@ -4,14 +4,14 @@ import com.netgrif.workflow.petrinet.domain.I18nString
 
 abstract class ChoiceField<T> extends FieldWithDefault<T> {
 
-    private Set<I18nString> choices
+    protected Set<I18nString> choices
 
     ChoiceField() {
         super()
-        choices = new LinkedHashSet<>()
+        choices = new LinkedHashSet<I18nString>()
     }
 
-    ChoiceField(I18nString[] values) {
+    ChoiceField(List<I18nString> values) {
         this()
         if (values != null)
             this.choices.addAll(values)

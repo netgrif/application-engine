@@ -923,7 +923,7 @@
             excess: f.208002,
             sum: f.308009;
             change sum about {
-                def n = field.value.replaceAll("[,€ ]","") as Double;
+                def n = field.value.getDefaultValue().replaceAll("[,€ ]","") as Double;
                 return ((n*coeff.value*excess.value)/1000.0) as Double;
             }
         <!--@formatter:on-->
@@ -3537,7 +3537,7 @@
             excess: f.208001,
             sum: f.308008;
             change sum about {
-                def n = field.value.replaceAll("[,€ ]","") as Double;
+                def n = field.value.getDefaultValue().replaceAll("[,€ ]","") as Double;
                 return ((n*coeff.value*excess.value)/1000.0) as Double;
             }
         <!--@formatter:on-->
@@ -3595,7 +3595,7 @@
             excess: f.208002,
             sum: f.308009;
             change sum about {
-                def n = field.value.replaceAll("[,€ ]","") as Double;
+                def n = field.value.getDefaultValue().replaceAll("[,€ ]","") as Double;
                 return ((n*coeff.value*excess.value)/1000.0) as Double;
             }
         <!--@formatter:on-->
@@ -6246,7 +6246,7 @@
         <title>Štátna príslušnosť</title>
         <id>109027</id>
         <desc>Poistený</desc>
-        <values>SR</values>
+        <values>SK</values>
         <values>CZ</values>
         <values>HU</values>
         <values>PL</values>
