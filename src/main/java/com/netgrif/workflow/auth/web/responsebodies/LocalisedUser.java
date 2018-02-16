@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonRootName;
 import com.netgrif.workflow.auth.domain.Authority;
 import com.netgrif.workflow.auth.domain.Organization;
 import com.netgrif.workflow.auth.domain.User;
+import com.netgrif.workflow.auth.domain.UserProcessRole;
 import lombok.Data;
 
 import java.util.Locale;
@@ -36,6 +37,8 @@ public class LocalisedUser {
 
     private Set<LocalisedProcessRole> processRoles;
 
+    private Set<UserProcessRole> userProcessRoles;
+
     public LocalisedUser(User user, Locale locale) {
         id = user.getId();
         email = user.getEmail();
@@ -47,6 +50,7 @@ public class LocalisedUser {
         fullName = user.getFullName();
         organizations = user.getOrganizations();
         authorities = user.getAuthorities();
+        userProcessRoles = user.getUserProcessRoles();
         processRoles = user.getProcessRoles().stream()
                 .map(role -> new LocalisedProcessRole(role, locale))
                 .collect(Collectors.toSet());
