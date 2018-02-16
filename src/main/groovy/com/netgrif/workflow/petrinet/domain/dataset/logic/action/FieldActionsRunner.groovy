@@ -2,6 +2,7 @@ package com.netgrif.workflow.petrinet.domain.dataset.logic.action
 
 import com.netgrif.workflow.business.IPostalCodeService
 import com.netgrif.workflow.business.orsr.IOrsrService
+import com.netgrif.workflow.importer.FieldFactory
 import com.netgrif.workflow.importer.Importer
 import com.netgrif.workflow.petrinet.domain.Transition
 import com.netgrif.workflow.petrinet.domain.dataset.Field
@@ -14,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 
 @Component
+@SuppressWarnings("GrMethodMayBeStatic")
 class FieldActionsRunner {
 
     private static final Logger log = LoggerFactory.getLogger(FieldActionsRunner.class)
@@ -23,6 +25,9 @@ class FieldActionsRunner {
 
     @Autowired
     private IPostalCodeService postalCodeService
+
+    @Autowired
+    private FieldFactory fieldFactory
 
     private Map<String, Object> actionsCache = new HashMap<>()
 
@@ -45,7 +50,7 @@ class FieldActionsRunner {
         return ((ActionDelegate) code.delegate).changedField
     }
 
-    static void bindVariables(String script, Binding binding, Case useCase) {
+    void bindVariables(String script, Binding binding, Case useCase) {
         String[] vars = getVariables(script)
         if (vars.length == 1.intValue() && !vars[0].contains(":"))
             return
@@ -53,19 +58,19 @@ class FieldActionsRunner {
         vars.each { binding.setVariable(getVarName(it), getVarValue(it, useCase)) }
     }
 
-    static String[] getVariables(String script) {
+    String[] getVariables(String script) {
         return script.split(";")[0].trim().split(",")
     }
 
-    static String getExpression(String script) {
+    String getExpression(String script) {
         return script.split(";", 2)[1].trim()
     }
 
-    static String getVarName(String variable) {
+    String getVarName(String variable) {
         return variable.split(":")[0].trim()
     }
 
-    static Object getVarValue(String variable, Case useCase) {
+    Object getVarValue(String variable, Case useCase) {
         String varDef = variable.split(":")[1].trim()
         String[] varParts = varDef.split("\\.")
         String clazz = varParts[0].trim()
@@ -80,13 +85,11 @@ class FieldActionsRunner {
         else throw new IllegalVariableTypeException(clazz)
     }
 
-    static Field getFieldFromVariable(String objectId, Case useCase) {
-        Field field = useCase.petriNet.dataSet.get(objectId)
-        field.value = useCase.dataSet.get(objectId).value
-        return field
+    Field getFieldFromVariable(String objectId, Case useCase) {
+        return fieldFactory.buildFieldWithoutValidation(useCase, objectId)
     }
 
-    static Transition getTransitionFromVariable(String objectId, Case useCase) {
+    Transition getTransitionFromVariable(String objectId, Case useCase) {
         return useCase.petriNet.transitions.get(objectId)
     }
 
