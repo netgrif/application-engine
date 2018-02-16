@@ -15,7 +15,7 @@ class TextField extends ValidableField<String> {
     private Integer maxLength
 
     @Transient
-    private String formating
+    private String formatting
 
     TextField() {
         super()
@@ -35,25 +35,5 @@ class TextField extends ValidableField<String> {
     void clearValue() {
         super.clearValue()
         setValue(getDefaultValue())
-    }
-
-    String getSubType() {
-        return subType
-    }
-
-    Integer getMaxLength() {
-        return maxLength
-    }
-
-    void setMaxLength(Integer maxLength) {
-        this.maxLength = maxLength
-    }
-
-    String getFormating() {
-        return formating
-    }
-
-    void setFormating(String formating) {
-        this.formating = formating
     }
 }

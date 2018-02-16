@@ -8,13 +8,14 @@ import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.auth.domain.repositories.UserRepository;
 import com.netgrif.workflow.event.events.task.*;
 import com.netgrif.workflow.event.events.usecase.SaveCaseDataEvent;
+import com.netgrif.workflow.importer.FieldFactory;
 import com.netgrif.workflow.petrinet.domain.*;
-import com.netgrif.workflow.petrinet.domain.dataset.*;
+import com.netgrif.workflow.petrinet.domain.dataset.Field;
+import com.netgrif.workflow.petrinet.domain.dataset.FileField;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedField;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldContainer;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.FieldActionsRunner;
-import com.netgrif.workflow.petrinet.domain.dataset.logic.validation.FieldValidationRunner;
 import com.netgrif.workflow.petrinet.domain.roles.RolePermission;
 import com.netgrif.workflow.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.workflow.utils.DateUtils;
@@ -35,7 +36,6 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.BasicQuery;
-import org.springframework.data.util.Pair;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -81,6 +81,9 @@ public class TaskService implements ITaskService {
 
     @Autowired
     private WorkflowService workflowService;
+
+    @Autowired
+    private FieldFactory fieldFactory;
 
     //    @Override
 //    public Page<LocalisedTask> getAll(LoggedUser loggedUser, Pageable pageable) {
@@ -261,13 +264,13 @@ public class TaskService implements ITaskService {
 
             if (useCase.hasFieldBehavior(fieldId, transition.getStringId())) {
                 if (useCase.getDataSet().get(fieldId).isDisplayable(transition.getStringId())) {
-                    Field field = buildField(useCase, fieldId, true);
+                    Field field = fieldFactory.buildFieldWithValidation(useCase, fieldId);
                     field.setBehavior(useCase.getDataSet().get(fieldId).applyBehavior(transition.getStringId()));
                     dataSetFields.add(field);
                 }
             } else {
                 if (transition.getDataSet().get(fieldId).isDisplayable()) {
-                    Field field = buildField(useCase, fieldId, true);
+                    Field field = fieldFactory.buildFieldWithValidation(useCase, fieldId);
                     field.setBehavior(transition.getDataSet().get(fieldId).applyBehavior());
                     dataSetFields.add(field);
                 }
@@ -289,17 +292,6 @@ public class TaskService implements ITaskService {
         return new ArrayList<>(transition.getDataGroups().values());
     }
 
-    @Override
-    public Field buildField(Case useCase, String fieldId, boolean withValidation) {
-        Field field = useCase.getPetriNet().getDataSet().get(fieldId);
-        field.setValue(useCase.getDataSet().get(fieldId).getValue());
-        if (withValidation && field instanceof ValidableField && ((ValidableField) field).getValidationRules() != null)
-            ((ValidableField) field).setValidationJS(FieldValidationRunner
-                    .toJavascript(field, ((ValidableField) field).getValidationRules()));
-        resolveDataValues(field);
-        return field;
-    }
-
     public Page<Task> setImmediateFields(Page<Task> tasks) {
         tasks.getContent().forEach(task -> task.setImmediateData(getImmediateFields(task)));
         return tasks;
@@ -308,7 +300,7 @@ public class TaskService implements ITaskService {
     public List<Field> getImmediateFields(Task task) {
         Case useCase = workflowService.findOne(task.getCaseId());
 
-        List<Field> fields = task.getImmediateDataFields().stream().map(id -> buildField(useCase, id, false)).collect(Collectors.toList());
+        List<Field> fields = task.getImmediateDataFields().stream().map(id -> fieldFactory.buildFieldWithoutValidation(useCase, id)).collect(Collectors.toList());
         LongStream.range(0L, fields.size()).forEach(index -> fields.get((int) index).setOrder(index));
 
         return fields;
@@ -319,34 +311,6 @@ public class TaskService implements ITaskService {
         return taskRepository.findAllByCaseId(caseId).stream()
                 .map(task -> new TaskReference(task.getStringId(), task.getTitle().getTranslation(locale), task.getTransitionId()))
                 .collect(Collectors.toList());
-    }
-
-    public void resolveDataValues(Field field) {
-        if (field instanceof DateField) {
-            ((DateField) field).convertValue();
-        } else if (field instanceof NumberField && field.getValue() instanceof Integer) {
-            field.setValue(((Integer) field.getValue()).doubleValue());
-        } else if (field instanceof MultichoiceField && field.getValue() instanceof List) {
-            field.setValue(new HashSet<String>(((MultichoiceField) field).getValue()));
-        } else if (field instanceof CaseField && field.getValue() != null) {
-            CaseField caseField = (CaseField) field;
-            Case useCase = workflowService.findOne(caseField.getValue());
-            PetriNet net = useCase.getPetriNet();
-
-            if (caseField.getConstraintNetIds() == null || !caseField.getConstraintNetIds().containsKey(net.getImportId()))
-                return;
-
-            Map<String, Object> values = caseField.getConstraintNetIds().get(net.getImportId()).stream().map(fieldId -> {
-                Optional<Field> optional = net.getDataSet().values().stream().filter(netField -> Objects.equals(netField.getImportId(), fieldId)).findFirst();
-                if (!optional.isPresent()) {
-                    throw new IllegalArgumentException("Field [" + fieldId + "] not present in net [" + net.getStringId() + "]");
-                }
-                String fieldStringId = optional.get().getStringId();
-                return Pair.of(fieldStringId, useCase.getDataSet().get(fieldStringId).getValue());
-            }).collect(Collectors.toMap(Pair::getFirst, Pair::getSecond));
-
-            ((CaseField) field).setImmediateFieldValues(values);
-        }
     }
 
     @Override
