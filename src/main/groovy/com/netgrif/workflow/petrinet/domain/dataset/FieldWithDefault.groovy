@@ -15,7 +15,7 @@ abstract class FieldWithDefault<T> extends Field<T> {
         return defaultValue
     }
 
-    void setDefaultValue(String defaultValue) {
+    void setDefaultValue(T defaultValue) {
         this.defaultValue = defaultValue
     }
 }
