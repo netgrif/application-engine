@@ -7,14 +7,14 @@ import lombok.Data;
 @JsonRootName("processRole")
 public class LocalisedProcessRole {
 
-    private String id;
+    private String stringId;
 
     private String name;
 
     private String description;
 
     public LocalisedProcessRole(String id, String name, String description) {
-        this.id = id;
+        this.stringId = id;
         this.name = name;
         this.description = description;
     }
