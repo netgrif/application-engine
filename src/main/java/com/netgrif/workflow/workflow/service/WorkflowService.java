@@ -4,6 +4,7 @@ import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.event.events.usecase.CreateCaseEvent;
 import com.netgrif.workflow.event.events.usecase.DeleteCaseEvent;
 import com.netgrif.workflow.event.events.usecase.UpdateMarkingEvent;
+import com.netgrif.workflow.importer.FieldFactory;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.dataset.CaseField;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
@@ -58,6 +59,9 @@ public class WorkflowService implements IWorkflowService {
 
     @Autowired
     private EncryptionService encryptionService;
+
+    @Autowired
+    private FieldFactory fieldFactory;
 
     @Override
     public Case save(Case useCase) {
@@ -179,7 +183,7 @@ public class WorkflowService implements IWorkflowService {
         List<Field> fields = new ArrayList<>();
         useCase.getDataSet().forEach((id, dataField) -> {
             if (dataField.isDisplayable() || useCase.getPetriNet().isDisplayableInAnyTransition(id)) {
-                Field field = taskService.buildField(useCase, id, false);
+                Field field = fieldFactory.buildFieldWithoutValidation(useCase, id);
                 field.setBehavior(dataField.applyOnlyVisibleBehavior());
                 fields.add(field);
             }
@@ -198,7 +202,7 @@ public class WorkflowService implements IWorkflowService {
         List<Field> immediateData = new ArrayList<>();
 
         useCase.getImmediateDataFields().forEach(fieldId ->
-                immediateData.add(taskService.buildField(useCase, fieldId, false))
+                immediateData.add(fieldFactory.buildFieldWithoutValidation(useCase, fieldId))
         );
         LongStream.range(0L, immediateData.size()).forEach(index -> immediateData.get((int) index).setOrder(index));
 
