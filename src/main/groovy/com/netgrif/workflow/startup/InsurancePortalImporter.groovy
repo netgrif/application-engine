@@ -1,17 +1,17 @@
-package com.netgrif.workflow
+package com.netgrif.workflow.startup
 
 import com.netgrif.workflow.auth.domain.Authority
 import com.netgrif.workflow.auth.domain.Organization
 import com.netgrif.workflow.auth.domain.User
 import com.netgrif.workflow.auth.domain.UserProcessRole
-import com.netgrif.workflow.workflow.service.interfaces.IFilterService
 import org.apache.log4j.Logger
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Component
 
-
 @Component
-class InsurancePortalImporter {
+@Profile("!test")
+class InsurancePortalImporter extends AbstractOrderedCommandLineRunner {
 
     private static final Logger log = Logger.getLogger(ImportHelper.class.name)
 
@@ -22,6 +22,8 @@ class InsurancePortalImporter {
     private SuperCreator superCreator
 
     void run(String... strings) {
+        log.info("Importing Insurance model")
+
         def net = importHelper.createNet("insurance_portal_demo.xml", "Insurance Demo", "IPD", superCreator.superUser.transformToLoggedUser())
 
         assert net.isPresent()
@@ -38,5 +40,7 @@ class InsurancePortalImporter {
         5.times { importHelper.createCase("Test ${it + 1}", net.get(), user.transformToLoggedUser()) }
         importHelper.createFilter("Test Filter", "{}", superCreator.superUser.transformToLoggedUser())
         importHelper.createFilter("Test 2", "{\"user\":\"super@netgrif.com\"}", superCreator.superUser.transformToLoggedUser())
+
+        superCreator.setAllToSuperUser()
     }
 }
