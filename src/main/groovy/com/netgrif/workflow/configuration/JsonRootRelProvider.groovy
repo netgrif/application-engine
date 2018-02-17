@@ -1,4 +1,4 @@
-package com.netgrif.workflow
+package com.netgrif.workflow.configuration
 
 import com.fasterxml.jackson.annotation.JsonRootName
 import org.atteo.evo.inflector.English

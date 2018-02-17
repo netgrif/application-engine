@@ -1,4 +1,4 @@
-package com.netgrif.workflow.context
+package com.netgrif.workflow.configuration
 
 import org.springframework.beans.BeansException
 import org.springframework.context.ApplicationContext
