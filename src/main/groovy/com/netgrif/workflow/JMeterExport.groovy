@@ -13,6 +13,7 @@ import com.netgrif.workflow.petrinet.domain.PetriNet
 import com.netgrif.workflow.petrinet.domain.dataset.Field
 import com.netgrif.workflow.petrinet.domain.dataset.FieldType
 import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository
+import com.netgrif.workflow.startup.RunnerController
 import com.netgrif.workflow.workflow.domain.Case
 import com.netgrif.workflow.workflow.domain.DataField
 import com.netgrif.workflow.workflow.domain.Task
@@ -148,7 +149,7 @@ class JMeterExport {
         Case useCase = new Case(
                 title: "Buildings cover " + index,
                 petriNet: net,
-                color: StartRunner.randomColor())
+                color: RunnerController.randomColor())
         useCase.dataSet = new HashMap<>(net.dataSet.collectEntries { [(it.key): new DataField()] })
         useCase.activePlaces.put(net.places.find { it -> it.value.title == "B" }.key, 1)
         useCase.activePlaces.put(net.places.find { it -> it.value.title == "L" }.key, 1)
