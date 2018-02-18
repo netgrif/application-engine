@@ -1,6 +1,6 @@
 package com.netgrif.workflow.insurance.mvc
 
-import com.netgrif.workflow.ImportHelper
+import com.netgrif.workflow.startup.ImportHelper
 import com.netgrif.workflow.WorkflowManagementSystemApplication
 import com.netgrif.workflow.auth.domain.Authority
 import com.netgrif.workflow.auth.domain.Organization

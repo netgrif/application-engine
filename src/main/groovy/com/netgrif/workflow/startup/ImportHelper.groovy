@@ -1,15 +1,10 @@
-package com.netgrif.workflow
+package com.netgrif.workflow.startup
 
-import com.netgrif.workflow.auth.domain.Authority
-import com.netgrif.workflow.auth.domain.LoggedUser
-import com.netgrif.workflow.auth.domain.Organization
-import com.netgrif.workflow.auth.domain.User
-import com.netgrif.workflow.auth.domain.UserProcessRole
+import com.netgrif.workflow.auth.domain.*
 import com.netgrif.workflow.auth.domain.repositories.AuthorityRepository
 import com.netgrif.workflow.auth.domain.repositories.OrganizationRepository
 import com.netgrif.workflow.auth.domain.repositories.UserProcessRoleRepository
 import com.netgrif.workflow.auth.service.interfaces.IUserService
-import com.netgrif.workflow.importer.Importer
 import com.netgrif.workflow.petrinet.domain.PetriNet
 import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository
 import com.netgrif.workflow.petrinet.service.PetriNetService
@@ -25,7 +20,6 @@ import org.springframework.core.io.ResourceLoader
 import org.springframework.stereotype.Component
 
 import java.time.LocalDateTime
-import java.util.concurrent.ThreadLocalRandom
 
 @Component
 class ImportHelper {

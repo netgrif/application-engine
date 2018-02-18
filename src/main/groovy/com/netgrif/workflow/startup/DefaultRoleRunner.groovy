@@ -1,15 +1,16 @@
-package com.netgrif.workflow
+package com.netgrif.workflow.startup
 
 import com.netgrif.workflow.petrinet.domain.I18nString
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRole
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRoleRepository
 import org.apache.log4j.Logger
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.CommandLineRunner
+import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Component
 
 @Component
-class DefaultRoleRunner implements CommandLineRunner {
+@Profile("!test")
+class DefaultRoleRunner extends AbstractOrderedCommandLineRunner {
 
     private static final Logger log = Logger.getLogger(DefaultRoleRunner.class)
 
