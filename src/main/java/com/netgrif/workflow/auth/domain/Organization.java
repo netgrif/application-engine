@@ -24,7 +24,7 @@ public class Organization {
     private String name;
 
     @JsonIgnore
-    @ManyToMany(mappedBy = "organizations")
+    @ManyToMany(mappedBy = "organizations", fetch = FetchType.LAZY)
     @Getter @Setter
     private Set<User> users;
 
@@ -44,5 +44,9 @@ public class Organization {
 
     public void addUser(User user){
         this.users.add(user);
+    }
+
+    public Long getEntityId(){
+        return id;
     }
 }

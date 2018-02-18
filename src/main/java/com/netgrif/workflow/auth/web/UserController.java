@@ -4,16 +4,17 @@ import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.auth.service.interfaces.IAuthorityService;
 import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.auth.web.responsebodies.AuthoritiesResources;
+import com.netgrif.workflow.auth.web.responsebodies.OrganizationsResource;
 import com.netgrif.workflow.auth.web.responsebodies.UserResource;
 import com.netgrif.workflow.auth.web.responsebodies.UsersResource;
 import com.netgrif.workflow.petrinet.service.interfaces.IProcessRoleService;
-import com.netgrif.workflow.petrinet.web.PetriNetController;
 import com.netgrif.workflow.workflow.web.responsebodies.MessageResource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Locale;
 import java.util.Set;
 
 @RestController
@@ -28,33 +29,33 @@ public class UserController {
     private IAuthorityService authorityService;
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
-    public UserResource getUser(@PathVariable("id") Long userId) {
-        return new UserResource(userService.findById(userId,false), "profile");
+    public UserResource getUser(@PathVariable("id") Long userId, Locale locale) {
+        return new UserResource(userService.findById(userId, false), "profile", locale);
     }
 
     @RequestMapping(value = "/me", method = RequestMethod.GET)
-    public UserResource getLoggedUser(Authentication auth) {
-        return new UserResource(userService.findById(((LoggedUser) auth.getPrincipal()).getId(),false), "profile");
+    public UserResource getLoggedUser(Authentication auth, Locale locale) {
+        return new UserResource(userService.findById(((LoggedUser) auth.getPrincipal()).getId(), false), "profile", locale);
     }
 
     @RequestMapping(value = "/{id}/small", method = RequestMethod.GET)
-    public UserResource getSmallUser(@PathVariable("id") Long userId) {
-        return new UserResource(userService.findById(userId,true), "small", true);
+    public UserResource getSmallUser(@PathVariable("id") Long userId, Locale locale) {
+        return new UserResource(userService.findById(userId, true), "small", locale, true);
     }
 
     @RequestMapping(method = RequestMethod.GET)
-    public UsersResource getAll(Authentication auth) {
-        return new UsersResource(userService.findByOrganizations(((LoggedUser) auth.getPrincipal()).getOrganizations(),false), "all", false);
+    public UsersResource getAll(Authentication auth, Locale locale) {
+        return new UsersResource(userService.findByOrganizations(((LoggedUser) auth.getPrincipal()).getOrganizations(), false), "all", locale, false);
     }
 
     @RequestMapping(value = "/small", method = RequestMethod.GET)
-    public UsersResource getAllSmall(Authentication auth) {
-        return new UsersResource(userService.findByOrganizations(((LoggedUser) auth.getPrincipal()).getOrganizations(),true), "small", true);
+    public UsersResource getAllSmall(Authentication auth, Locale locale) {
+        return new UsersResource(userService.findByOrganizations(((LoggedUser) auth.getPrincipal()).getOrganizations(), true), "small", locale, true);
     }
 
     @RequestMapping(value = "/role/small", method = RequestMethod.POST)
-    public UsersResource getAllWithRole(@RequestBody Set<String> roleIds) {
-        return new UsersResource(userService.findByProcessRoles(roleIds), "small", true);
+    public UsersResource getAllWithRole(@RequestBody Set<String> roleIds, Locale locale) {
+        return new UsersResource(userService.findByProcessRoles(roleIds, true), "small", locale, true);
     }
 
     //TODO: 2.6.2017 edit user profile
@@ -81,5 +82,9 @@ public class UserController {
         return MessageResource.successMessage("Authority " + authorityId + " assigned to user " + userId);
     }
 
-
+    @PreAuthorize("hasRole('ADMIN')")
+    @RequestMapping(value = "/organizations", method = RequestMethod.GET)
+    public OrganizationsResource getAllOrganizations() {
+        return new OrganizationsResource(userService.getAllOrganizations());
+    }
 }

@@ -1,83 +1,375 @@
+
 package com.netgrif.workflow.importer.model;
 
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.*;
+import java.util.ArrayList;
+import java.util.List;
 
-@XmlRootElement
+
+/**
+ * <p>Java class for anonymous complex type.
+ * 
+ * <p>The following schema fragment specifies the expected content contained within this class.
+ * 
+ * <pre>
+ * &lt;complexType&gt;
+ *   &lt;complexContent&gt;
+ *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
+ *       &lt;sequence&gt;
+ *         &lt;element ref="{}id" minOccurs="0"/&gt;
+ *         &lt;element ref="{}icon" minOccurs="0"/&gt;
+ *         &lt;element ref="{}defaultRole" minOccurs="0"/&gt;
+ *         &lt;element ref="{}transaction" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *         &lt;element ref="{}role" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *         &lt;element ref="{}data" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *         &lt;element ref="{}mapping" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *         &lt;element ref="{}i18n" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *         &lt;element ref="{}transition" maxOccurs="unbounded"/&gt;
+ *         &lt;element ref="{}place" maxOccurs="unbounded"/&gt;
+ *         &lt;element ref="{}arc" maxOccurs="unbounded"/&gt;
+ *       &lt;/sequence&gt;
+ *     &lt;/restriction&gt;
+ *   &lt;/complexContent&gt;
+ * &lt;/complexType&gt;
+ * </pre>
+ * 
+ * 
+ */
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlType(name = "", propOrder = {
+    "id",
+    "icon",
+    "defaultRole",
+    "transaction",
+    "role",
+    "data",
+    "mapping",
+    "i18N",
+    "transition",
+    "place",
+    "arc"
+})
+@XmlRootElement(name = "document")
 public class Document {
 
-    @XmlElement(name = "arc")
-    private ImportArc[] arcs;
+    protected Long id;
+    protected String icon;
+    protected Boolean defaultRole;
+    protected List<Transaction> transaction;
+    protected List<Role> role;
+    protected List<Data> data;
+    protected List<Mapping> mapping;
+    @XmlElement(name = "i18n")
+    protected List<I18N> i18N;
+    @XmlElement(required = true)
+    protected List<Transition> transition;
+    @XmlElement(required = true)
+    protected List<Place> place;
+    @XmlElement(required = true)
+    protected List<Arc> arc;
 
-    @XmlElement(name = "data")
-    private ImportData[] data;
-
-    @XmlElement(name = "role")
-    private ImportRole[] roles;
-
-    @XmlElement(name = "transition")
-    private ImportTransition[] transitions;
-
-    @XmlElement(name = "place")
-    private ImportPlace[] places;
-
-    @XmlElement(name = "transaction")
-    private ImportTransaction[] transactions;
-
-    public Document() {
-        arcs = new ImportArc[0];
-        data = new ImportData[0];
-        roles = new ImportRole[0];
-        transitions = new ImportTransition[0];
-        places = new ImportPlace[0];
-        transactions = new ImportTransaction[0];
+    /**
+     * Gets the value of the id property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link Long }
+     *     
+     */
+    public Long getId() {
+        return id;
     }
 
-    public ImportArc[] getImportArc() {
-        return arcs;
+    /**
+     * Sets the value of the id property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link Long }
+     *     
+     */
+    public void setId(Long value) {
+        this.id = value;
     }
 
-    public void setImportArc(ImportArc[] importArc) {
-        this.arcs = importArc;
+    /**
+     * Gets the value of the icon property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getIcon() {
+        return icon;
     }
 
-    public ImportData[] getImportData() {
-        return data;
+    /**
+     * Sets the value of the icon property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setIcon(String value) {
+        this.icon = value;
     }
 
-    public void setImportData(ImportData[] importData) {
-        this.data = importData;
+    /**
+     * Gets the value of the defaultRole property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link Boolean }
+     *     
+     */
+    public Boolean isDefaultRole() {
+        return defaultRole;
     }
 
-    public ImportRole[] getImportRoles() {
-        return roles;
+    /**
+     * Sets the value of the defaultRole property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link Boolean }
+     *     
+     */
+    public void setDefaultRole(Boolean value) {
+        this.defaultRole = value;
     }
 
-    public void setImportRoles(ImportRole[] role) {
-        this.roles = role;
+    /**
+     * Gets the value of the transaction property.
+     * 
+     * <p>
+     * This accessor method returns a reference to the live list,
+     * not a snapshot. Therefore any modification you make to the
+     * returned list will be present inside the JAXB object.
+     * This is why there is not a <CODE>set</CODE> method for the transaction property.
+     * 
+     * <p>
+     * For example, to add a new item, do as follows:
+     * <pre>
+     *    getTransaction().add(newItem);
+     * </pre>
+     * 
+     * 
+     * <p>
+     * Objects of the following type(s) are allowed in the list
+     * {@link Transaction }
+     * 
+     * 
+     */
+    public List<Transaction> getTransaction() {
+        if (transaction == null) {
+            transaction = new ArrayList<Transaction>();
+        }
+        return this.transaction;
     }
 
-    public ImportTransition[] getImportTransitions() {
-        return transitions;
+    /**
+     * Gets the value of the role property.
+     * 
+     * <p>
+     * This accessor method returns a reference to the live list,
+     * not a snapshot. Therefore any modification you make to the
+     * returned list will be present inside the JAXB object.
+     * This is why there is not a <CODE>set</CODE> method for the role property.
+     * 
+     * <p>
+     * For example, to add a new item, do as follows:
+     * <pre>
+     *    getRole().add(newItem);
+     * </pre>
+     * 
+     * 
+     * <p>
+     * Objects of the following type(s) are allowed in the list
+     * {@link Role }
+     * 
+     * 
+     */
+    public List<Role> getRole() {
+        if (role == null) {
+            role = new ArrayList<Role>();
+        }
+        return this.role;
     }
 
-    public void setImportTransitions(ImportTransition[] importTransitions) {
-        this.transitions = importTransitions;
+    /**
+     * Gets the value of the data property.
+     * 
+     * <p>
+     * This accessor method returns a reference to the live list,
+     * not a snapshot. Therefore any modification you make to the
+     * returned list will be present inside the JAXB object.
+     * This is why there is not a <CODE>set</CODE> method for the data property.
+     * 
+     * <p>
+     * For example, to add a new item, do as follows:
+     * <pre>
+     *    getData().add(newItem);
+     * </pre>
+     * 
+     * 
+     * <p>
+     * Objects of the following type(s) are allowed in the list
+     * {@link Data }
+     * 
+     * 
+     */
+    public List<Data> getData() {
+        if (data == null) {
+            data = new ArrayList<Data>();
+        }
+        return this.data;
     }
 
-    public ImportPlace[] getImportPlaces() {
-        return places;
+    /**
+     * Gets the value of the mapping property.
+     * 
+     * <p>
+     * This accessor method returns a reference to the live list,
+     * not a snapshot. Therefore any modification you make to the
+     * returned list will be present inside the JAXB object.
+     * This is why there is not a <CODE>set</CODE> method for the mapping property.
+     * 
+     * <p>
+     * For example, to add a new item, do as follows:
+     * <pre>
+     *    getMapping().add(newItem);
+     * </pre>
+     * 
+     * 
+     * <p>
+     * Objects of the following type(s) are allowed in the list
+     * {@link Mapping }
+     * 
+     * 
+     */
+    public List<Mapping> getMapping() {
+        if (mapping == null) {
+            mapping = new ArrayList<Mapping>();
+        }
+        return this.mapping;
     }
 
-    public void setImportPlaces(ImportPlace[] place) {
-        this.places = place;
+    /**
+     * Gets the value of the i18N property.
+     * 
+     * <p>
+     * This accessor method returns a reference to the live list,
+     * not a snapshot. Therefore any modification you make to the
+     * returned list will be present inside the JAXB object.
+     * This is why there is not a <CODE>set</CODE> method for the i18N property.
+     * 
+     * <p>
+     * For example, to add a new item, do as follows:
+     * <pre>
+     *    getI18N().add(newItem);
+     * </pre>
+     * 
+     * 
+     * <p>
+     * Objects of the following type(s) are allowed in the list
+     * {@link I18N }
+     * 
+     * 
+     */
+    public List<I18N> getI18N() {
+        if (i18N == null) {
+            i18N = new ArrayList<I18N>();
+        }
+        return this.i18N;
     }
 
-    public ImportTransaction[] getImportTransactions() {
-        return transactions;
+    /**
+     * Gets the value of the transition property.
+     * 
+     * <p>
+     * This accessor method returns a reference to the live list,
+     * not a snapshot. Therefore any modification you make to the
+     * returned list will be present inside the JAXB object.
+     * This is why there is not a <CODE>set</CODE> method for the transition property.
+     * 
+     * <p>
+     * For example, to add a new item, do as follows:
+     * <pre>
+     *    getTransition().add(newItem);
+     * </pre>
+     * 
+     * 
+     * <p>
+     * Objects of the following type(s) are allowed in the list
+     * {@link Transition }
+     * 
+     * 
+     */
+    public List<Transition> getTransition() {
+        if (transition == null) {
+            transition = new ArrayList<Transition>();
+        }
+        return this.transition;
     }
 
-    public void setImportTransactions(ImportTransaction[] transactions) {
-        this.transactions = transactions;
+    /**
+     * Gets the value of the place property.
+     * 
+     * <p>
+     * This accessor method returns a reference to the live list,
+     * not a snapshot. Therefore any modification you make to the
+     * returned list will be present inside the JAXB object.
+     * This is why there is not a <CODE>set</CODE> method for the place property.
+     * 
+     * <p>
+     * For example, to add a new item, do as follows:
+     * <pre>
+     *    getPlace().add(newItem);
+     * </pre>
+     * 
+     * 
+     * <p>
+     * Objects of the following type(s) are allowed in the list
+     * {@link Place }
+     * 
+     * 
+     */
+    public List<Place> getPlace() {
+        if (place == null) {
+            place = new ArrayList<Place>();
+        }
+        return this.place;
     }
+
+    /**
+     * Gets the value of the arc property.
+     * 
+     * <p>
+     * This accessor method returns a reference to the live list,
+     * not a snapshot. Therefore any modification you make to the
+     * returned list will be present inside the JAXB object.
+     * This is why there is not a <CODE>set</CODE> method for the arc property.
+     * 
+     * <p>
+     * For example, to add a new item, do as follows:
+     * <pre>
+     *    getArc().add(newItem);
+     * </pre>
+     * 
+     * 
+     * <p>
+     * Objects of the following type(s) are allowed in the list
+     * {@link Arc }
+     * 
+     * 
+     */
+    public List<Arc> getArc() {
+        if (arc == null) {
+            arc = new ArrayList<Arc>();
+        }
+        return this.arc;
+    }
+
 }

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document>
+    <!-- ROLES -->
+    <role>
+        <id>1</id>
+        <name>Role</name>
+    </role>
+    <place>
+        <id>1</id>
+        <x>142</x>
+        <y>79</y>
+        <label>IN</label>
+        <tokens>1</tokens>
+        <static>false</static>
+    </place>
+    <place>
+        <id>6</id>
+        <x>384</x>
+        <y>78</y>
+        <label>OUT</label>
+        <tokens>0</tokens>
+        <static>false</static>
+    </place>
+    <transition>
+        <id>3</id>
+        <x>265</x>
+        <y>89</y>
+        <label>Test read arc</label>
+        <roleRef>
+            <id>1</id>
+            <logic>
+                <assign>true</assign>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+    </transition>
+    <arc>
+        <id>4</id>
+        <type>read</type>
+        <sourceId>1</sourceId>
+        <destinationId>3</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>7</id>
+        <type>regular</type>
+        <sourceId>3</sourceId>
+        <destinationId>6</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+</document>
