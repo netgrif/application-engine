@@ -1,6 +1,6 @@
 package com.netgrif.workflow.business
 
-import com.netgrif.workflow.PostalCodeImporter
+import com.netgrif.workflow.startup.PostalCodeImporter
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
