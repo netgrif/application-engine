@@ -46,4 +46,19 @@ public class Authority implements GrantedAuthority {
     public String getAuthority() {
         return this.name;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Authority authority = (Authority) o;
+
+        return name.equals(authority.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return name.hashCode();
+    }
 }
