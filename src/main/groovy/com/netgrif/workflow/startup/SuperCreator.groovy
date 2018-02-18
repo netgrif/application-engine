@@ -1,4 +1,4 @@
-package com.netgrif.workflow
+package com.netgrif.workflow.startup
 
 import com.netgrif.workflow.auth.domain.Authority
 import com.netgrif.workflow.auth.domain.Organization
@@ -10,10 +10,12 @@ import com.netgrif.workflow.auth.service.interfaces.IUserProcessRoleService
 import com.netgrif.workflow.auth.service.interfaces.IUserService
 import org.apache.log4j.Logger
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Component
 
 @Component
-class SuperCreator {
+@Profile("!test")
+class SuperCreator extends AbstractOrderedCommandLineRunner {
 
     private static final Logger log = Logger.getLogger(SuperCreator.class.name)
 
@@ -31,11 +33,13 @@ class SuperCreator {
 
     private User superUser
 
+    @Override
     void run(String... strings) {
+        log.info("Creating Super user")
         createSuperUser()
     }
 
-    public User createSuperUser(){
+    private User createSuperUser() {
         Authority adminAuthority = authorityRepository.findByName(Authority.admin)
         if (adminAuthority == null)
             adminAuthority = authorityRepository.save(new Authority(Authority.admin)) as Authority
@@ -53,7 +57,7 @@ class SuperCreator {
         return superUser
     }
 
-    public void setAllToSuperUser(){
+    public void setAllToSuperUser() {
         superUser.setOrganizations(organizationRepository.findAll() as Set<Organization>)
         superUser.setUserProcessRoles(userProcessRoleService.findAllMinusDefault() as Set<UserProcessRole>)
 
@@ -61,7 +65,7 @@ class SuperCreator {
         log.info("Super user updated")
     }
 
-    public User getSuperUser(){
+    public User getSuperUser() {
         return superUser
     }
 }

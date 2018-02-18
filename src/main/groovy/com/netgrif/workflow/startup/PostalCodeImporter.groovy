@@ -1,14 +1,16 @@
-package com.netgrif.workflow
+package com.netgrif.workflow.startup
 
 import com.netgrif.workflow.business.PostalCode
 import com.netgrif.workflow.business.PostalCodeService
 import org.apache.log4j.Logger
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Component
 
 @Component
-class PostalCodeImporter {
+@Profile("!test")
+class PostalCodeImporter extends AbstractOrderedCommandLineRunner {
 
     private static final Logger log = Logger.getLogger(PostalCodeImporter.class.name)
 
