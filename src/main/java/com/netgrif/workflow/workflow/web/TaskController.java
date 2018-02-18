@@ -2,13 +2,14 @@ package com.netgrif.workflow.workflow.web;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.netgrif.workflow.auth.domain.LoggedUser;
+import com.netgrif.workflow.petrinet.domain.DataGroup;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
+import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldContainer;
 import com.netgrif.workflow.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.workflow.workflow.domain.Task;
 import com.netgrif.workflow.workflow.service.interfaces.IFilterService;
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
 import com.netgrif.workflow.workflow.web.requestbodies.CreateFilterBody;
-import com.netgrif.workflow.workflow.web.requestbodies.TaskSearchBody;
 import com.netgrif.workflow.workflow.web.responsebodies.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
@@ -26,8 +27,9 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletResponse;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
@@ -41,41 +43,50 @@ public class TaskController {
     private IFilterService filterService;
 
     @RequestMapping(method = RequestMethod.GET)
-    public PagedResources<TaskResource> getAll(Authentication auth, Pageable pageable, PagedResourcesAssembler<Task> assembler) {
+    public PagedResources<LocalisedTaskResource> getAll(Authentication auth, Pageable pageable, PagedResourcesAssembler<com.netgrif.workflow.workflow.domain.Task> assembler, Locale locale) {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
-        Page<Task> page = taskService.getAll(loggedUser, pageable);
+        Page<Task> page = taskService.getAll(loggedUser, pageable, locale);
 
         Link selfLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
-                .getAll(auth, pageable, assembler)).withRel("all");
-        PagedResources<TaskResource> resources = assembler.toResource(page,new TaskResourceAssembler(),selfLink);
-        ResourceLinkAssembler.addLinks(resources,Task.class,selfLink.getRel());
+                .getAll(auth, pageable, assembler, locale)).withRel("all");
+        PagedResources<LocalisedTaskResource> resources = assembler.toResource(page,new TaskResourceAssembler(locale),selfLink);
+        ResourceLinkAssembler.addLinks(resources, com.netgrif.workflow.workflow.domain.Task.class,selfLink.getRel());
         return resources;
     }
 
     @RequestMapping(value = "/case", method = RequestMethod.POST)
-    public PagedResources<TaskResource> getAllByCases(@RequestBody List<String> cases, Pageable pageable, PagedResourcesAssembler<Task> assembler) {
-        Page<Task> page = taskService.findByCases(pageable, cases);
+    public PagedResources<LocalisedTaskResource> getAllByCases(@RequestBody List<String> cases, Pageable pageable, PagedResourcesAssembler<com.netgrif.workflow.workflow.domain.Task> assembler, Locale locale) {
+        Page<com.netgrif.workflow.workflow.domain.Task> page = taskService.findByCases(pageable, cases);
 
         Link selfLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
-                .getAllByCases(cases, pageable, assembler)).withRel("case");
-        PagedResources<TaskResource> resources = assembler.toResource(page, new TaskResourceAssembler(), selfLink);
-        ResourceLinkAssembler.addLinks(resources,Task.class,selfLink.getRel());
+                .getAllByCases(cases, pageable, assembler, locale)).withRel("case");
+        PagedResources<LocalisedTaskResource> resources = assembler.toResource(page, new TaskResourceAssembler(locale), selfLink);
+        ResourceLinkAssembler.addLinks(resources, com.netgrif.workflow.workflow.domain.Task.class,selfLink.getRel());
         return resources;
     }
 
+    @RequestMapping(value ="/case/{id}", method = RequestMethod.GET)
+    public List<TaskReference> getTasksOfCase(@PathVariable("id") String caseId, Locale locale) {
+        return taskService.findAllByCase(caseId, locale);
+    }
+
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
-    public TaskResource getOne(@PathVariable("id") String taskId) {
-        return new TaskResource(taskService.findById(taskId));
+    public LocalisedTaskResource getOne(@PathVariable("id") String taskId, Locale locale) {
+        Task task = taskService.findById(taskId);
+        if (task == null)
+            return null;
+        return new LocalisedTaskResource(new LocalisedTask(task, locale));
     }
 
     @RequestMapping(value = "/assign/{id}", method = RequestMethod.GET)
     public MessageResource assign(Authentication auth, @PathVariable("id") String taskId) {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
         try {
-            taskService.assignTask(loggedUser.transformToUser(), taskId);
-            return MessageResource.successMessage("Task " + taskId + " assigned to " + loggedUser.getFullName());
+            taskService.assignTask(loggedUser, taskId);
+            return MessageResource.successMessage("LocalisedTask " + taskId + " assigned to " + loggedUser.getFullName());
         } catch (TransitionNotExecutableException e) {
-            return MessageResource.errorMessage("Task " + taskId + " cannot be assigned");
+            e.printStackTrace();
+            return MessageResource.errorMessage("LocalisedTask " + taskId + " cannot be assigned");
         }
     }
 
@@ -84,11 +95,11 @@ public class TaskController {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
         try {
             delegatedEmail = URLDecoder.decode(delegatedEmail, StandardCharsets.UTF_8.name());
-            taskService.delegateTask(loggedUser.getId(), delegatedEmail, taskId);
-            return MessageResource.successMessage("Task " + taskId + " assigned to " + delegatedEmail);
+            taskService.delegateTask(loggedUser, delegatedEmail, taskId);
+            return MessageResource.successMessage("LocalisedTask " + taskId + " assigned to " + delegatedEmail);
         } catch (Exception ignored) {
             ignored.printStackTrace();
-            return MessageResource.errorMessage("Task " + taskId + " cannot be assigned");
+            return MessageResource.errorMessage("LocalisedTask " + taskId + " cannot be assigned");
         }
     }
 
@@ -96,8 +107,8 @@ public class TaskController {
     public MessageResource finish(Authentication auth, @PathVariable("id") String taskId) {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
         try {
-            taskService.finishTask(loggedUser.getId(), taskId);
-            return MessageResource.successMessage("Task " + taskId + " finished");
+            taskService.finishTask(loggedUser, taskId);
+            return MessageResource.successMessage("LocalisedTask " + taskId + " finished");
         } catch (Exception e) {
             e.printStackTrace();
             return MessageResource.errorMessage(e.getMessage());
@@ -108,8 +119,8 @@ public class TaskController {
     public MessageResource cancel(Authentication auth, @PathVariable("id") String taskId) {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
         try {
-            taskService.cancelTask(loggedUser.getId(), taskId);
-            return MessageResource.successMessage("Task " + taskId + " canceled");
+            taskService.cancelTask(loggedUser, taskId);
+            return MessageResource.successMessage("LocalisedTask " + taskId + " canceled");
         } catch (Exception e) {
             e.printStackTrace();
             return MessageResource.errorMessage(e.getMessage());
@@ -117,58 +128,64 @@ public class TaskController {
     }
 
     @RequestMapping(value = "/my", method = RequestMethod.GET)
-    public PagedResources<TaskResource> getMy(Authentication auth, Pageable pageable, PagedResourcesAssembler<Task> assembler) {
-        Page<Task> page = taskService.findByUser(pageable, ((LoggedUser) auth.getPrincipal()).transformToUser());
+    public PagedResources<LocalisedTaskResource> getMy(Authentication auth, Pageable pageable, PagedResourcesAssembler<com.netgrif.workflow.workflow.domain.Task> assembler, Locale locale) {
+        Page<com.netgrif.workflow.workflow.domain.Task> page = taskService.findByUser(pageable, ((LoggedUser) auth.getPrincipal()).transformToUser());
 
         Link selfLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
-                .getMy(auth, pageable, assembler)).withRel("my");
-        PagedResources<TaskResource> resources = assembler.toResource(page, new TaskResourceAssembler(), selfLink);
-        ResourceLinkAssembler.addLinks(resources,Task.class,selfLink.getRel());
+                .getMy(auth, pageable, assembler, locale)).withRel("my");
+        PagedResources<LocalisedTaskResource> resources = assembler.toResource(page, new TaskResourceAssembler(locale), selfLink);
+        ResourceLinkAssembler.addLinks(resources, com.netgrif.workflow.workflow.domain.Task.class,selfLink.getRel());
         return resources;
     }
 
     @RequestMapping(value = "/my/finished", method = RequestMethod.GET)
-    public PagedResources<TaskResource> getMyFinished(Pageable pageable, Authentication auth, PagedResourcesAssembler<Task> assembler) {
-        Page<Task> page = taskService.findByUser(pageable, ((LoggedUser) auth.getPrincipal()).transformToUser());
+    public PagedResources<LocalisedTaskResource> getMyFinished(Pageable pageable, Authentication auth, PagedResourcesAssembler<com.netgrif.workflow.workflow.domain.Task> assembler, Locale locale) {
+        Page<com.netgrif.workflow.workflow.domain.Task> page = taskService.findByUser(pageable, ((LoggedUser) auth.getPrincipal()).transformToUser());
 
         Link selfLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
-                .getMyFinished(pageable, auth, assembler)).withRel("finished");
-        PagedResources<TaskResource> resources = assembler.toResource(page, new TaskResourceAssembler(), selfLink);
-        ResourceLinkAssembler.addLinks(resources,Task.class,selfLink.getRel());
+                .getMyFinished(pageable, auth, assembler, locale)).withRel("finished");
+        PagedResources<LocalisedTaskResource> resources = assembler.toResource(page, new TaskResourceAssembler(locale), selfLink);
+        ResourceLinkAssembler.addLinks(resources, com.netgrif.workflow.workflow.domain.Task.class,selfLink.getRel());
         return resources;
     }
 
     @RequestMapping(value = "/search", method = RequestMethod.POST)
-    public PagedResources<TaskResource> search(Authentication auth, Pageable pageable, @RequestBody TaskSearchBody searchBody, PagedResourcesAssembler<Task> assembler) {
-        Page<Task> page = null;
-        if (searchBody.searchTier == TaskSearchBody.SEARCH_TIER_1) {
-            page = taskService.findByPetriNets(pageable, searchBody.petriNets
-                    .stream()
-                    .map(net -> net.petriNet)
-                    .collect(Collectors.toList()));
-        } else if (searchBody.searchTier == TaskSearchBody.SEARCH_TIER_2) {
-            List<String> transitions = new ArrayList<>();
-            searchBody.petriNets.forEach(net -> transitions.addAll(net.transitions));
-            page = taskService.findByTransitions(pageable, transitions);
-        } else if (searchBody.searchTier == TaskSearchBody.SEARCH_TIER_3) {
-            //TODO: 4.6.2017 vyhľadanie na základe dát
-        }
+    public PagedResources<LocalisedTaskResource> search(Authentication auth, Pageable pageable, @RequestBody Map<String, Object> searchBody, PagedResourcesAssembler<com.netgrif.workflow.workflow.domain.Task> assembler, Locale locale) {
+//        Page<LocalisedTask> page = null;
+//        if (searchBody.searchTier == TaskSearchBody.SEARCH_TIER_1) {
+//            page = taskService.findByPetriNets(pageable, searchBody.petriNets
+//                    .stream()
+//                    .map(net -> net.petriNet)
+//                    .collect(Collectors.toList()));
+//        } else if (searchBody.searchTier == TaskSearchBody.SEARCH_TIER_2) {
+//            List<String> transitions = new ArrayList<>();
+//            searchBody.petriNets.forEach(net -> transitions.addAll(net.transitions));
+//            page = taskService.findByTransitions(pageable, transitions);
+//        } else if (searchBody.searchTier == TaskSearchBody.SEARCH_TIER_3) {
+//            //TODO: 4.6.2017 vyhľadanie na základe dát
+//        }
+        Page<com.netgrif.workflow.workflow.domain.Task> tasks = taskService.search(searchBody,pageable,(LoggedUser) auth.getPrincipal());
         Link selfLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
-                .search(auth, pageable, searchBody, assembler)).withRel("search");
-        PagedResources<TaskResource> resources = assembler.toResource(page,new TaskResourceAssembler(),selfLink);
-        ResourceLinkAssembler.addLinks(resources,Task.class,selfLink.getRel());
+                .search(auth, pageable, searchBody, assembler, locale)).withRel("search");
+        PagedResources<LocalisedTaskResource> resources = assembler.toResource(tasks,new TaskResourceAssembler(locale),selfLink);
+        ResourceLinkAssembler.addLinks(resources, com.netgrif.workflow.workflow.domain.Task.class,selfLink.getRel());
         return resources;
     }
 
     @RequestMapping(value = "/{id}/data", method = RequestMethod.GET)
-    public DataFieldsResource getData(@PathVariable("id") String taskId) {
+    public DataGroupsResource getData(@PathVariable("id") String taskId, Locale locale) {
         List<Field> dataFields = taskService.getData(taskId);
-        return new DataFieldsResource(dataFields, taskId);
+        List<DataGroup> dataGroups = taskService.getDataGroups(taskId);
+
+        dataGroups.forEach(group -> group.setFields(new DataFieldsResource(dataFields.stream().filter(field ->
+                group.getData().contains(field.getStringId())).collect(Collectors.toList()), taskId, locale)));
+
+        return new DataGroupsResource(dataGroups, locale);
     }
 
     @RequestMapping(value = "/{id}/data", method = RequestMethod.POST)
-    public ObjectNode saveData(@PathVariable("id") String taskId, @RequestBody ObjectNode dataBody) {
-        return taskService.setDataFieldsValues(taskId, dataBody);
+    public ChangedFieldContainer saveData(@PathVariable("id") String taskId, @RequestBody ObjectNode dataBody) {
+        return taskService.setData(taskId, dataBody);
     }
 
     @RequestMapping(value = "/{id}/file/{field}", method = RequestMethod.POST)
@@ -186,26 +203,5 @@ public class TaskController {
         response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
         response.setHeader("Content-Disposition", "attachment; filename=" + fileResource.getFilename().substring(fileResource.getFilename().indexOf('-') + 1));
         return fileResource;
-    }
-
-    //TODO: Paged filters resource
-    @RequestMapping(value = "/filter", method = RequestMethod.GET)
-    public FiltersResource getAllFilters(Authentication auth) {
-        return new FiltersResource(filterService.getAll(), false);
-    }
-
-    @RequestMapping(value = "/filter/roles", method = RequestMethod.POST)
-    public FiltersResource getFiltersWithRoles(@RequestBody List<String> roles) {
-        return new FiltersResource(filterService.getWithRoles(roles), true);
-    }
-
-    @RequestMapping(value = "/filter", method = RequestMethod.POST)
-    public MessageResource saveFilter(Authentication auth, @RequestBody CreateFilterBody filterBody) {
-        boolean saveSuccess = filterService.saveFilter(((LoggedUser) auth.getPrincipal()), filterBody);
-        if (saveSuccess) {
-            return MessageResource.successMessage("Filter " + filterBody.name + " saved");
-        } else {
-            return MessageResource.errorMessage("Filter " + filterBody.name + " saving failed!");
-        }
     }
 }

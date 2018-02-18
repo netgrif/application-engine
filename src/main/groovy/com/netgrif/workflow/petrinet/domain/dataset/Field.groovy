@@ -1,64 +1,100 @@
-package com.netgrif.workflow.petrinet.domain.dataset;
+package com.netgrif.workflow.petrinet.domain.dataset
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.bson.types.ObjectId;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.annotation.Transient;
-import org.springframework.data.mongodb.core.mapping.Document;
+import com.fasterxml.jackson.annotation.JsonIgnore
+import com.fasterxml.jackson.databind.node.ObjectNode
+import com.netgrif.workflow.petrinet.domain.I18nString
+import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action
+import org.bson.types.ObjectId
+import org.springframework.data.annotation.Id
+import org.springframework.data.annotation.Transient
+import org.springframework.data.mongodb.core.mapping.Document
 
 @Document
-public abstract class Field<T> {
+abstract class Field<T> {
 
     @Id
-    protected ObjectId _id;
-    private String name;
-    private String description;
-    protected FieldType type;
+    protected ObjectId _id
+
+    @JsonIgnore
+    protected Long importId
+
+    private I18nString name
+    
+    private I18nString description
+    
+    private I18nString placeholder
+
     @Transient
-    private ObjectNode behavior;
+    private ObjectNode behavior
+
     @Transient
-    private T value;
+    private T value
+
     private Long order
 
-    public Field(){
-        _id = new ObjectId();
+    @JsonIgnore
+    private boolean immediate
+
+    @JsonIgnore
+    private LinkedHashSet<Action> actions
+    
+    @JsonIgnore
+    private String encryption
+
+    Field() {
+        _id = new ObjectId()
     }
 
-    public String getObjectId() {
-        return _id.toString();
+    Field(Long importId) {
+        this()
+        this.importId = importId
     }
 
-    public ObjectId get_id() {
-        return _id;
+    String getStringId() {
+        return _id.toString()
     }
 
-    public void set_id(ObjectId _id) {
-        this._id = _id;
+    ObjectId get_id() {
+        return _id
     }
 
-    public String getName() {
-        return name;
+    void set_id(ObjectId _id) {
+        this._id = _id
     }
 
-    public void setName(String name) {
-        this.name = name;
+    Long getImportId() {
+        return importId
     }
 
-    public String getDescription() {
-        return description;
+    void setImportId(Long importId) {
+        this.importId = importId
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    I18nString getName() {
+        return name
     }
 
-    public FieldType getType() {
-        return type;
+    void setName(I18nString name) {
+        this.name = name
     }
 
-    public void setType(FieldType type) {
-        this.type = type;
+    I18nString getDescription() {
+        return description
     }
+
+    void setDescription(I18nString description) {
+        this.description = description
+    }
+
+    I18nString getPlaceholder() {
+        return placeholder
+    }
+
+    void setPlaceholder(I18nString placeholder) {
+        this.placeholder = placeholder
+    }
+
+    abstract FieldType getType()
 
     ObjectNode getBehavior() {
         return behavior
@@ -83,16 +119,66 @@ public abstract class Field<T> {
     void setOrder(Long order) {
         this.order = order
     }
+
+    Boolean isImmediate() {
+        return immediate != null && immediate
+    }
+
+    void setImmediate(Boolean immediate) {
+        this.immediate = immediate != null && immediate
+    }
+
+    LinkedHashSet<Action> getActions() {
+        return actions
+    }
+
+    void setActions(LinkedHashSet<Action> actions) {
+        this.actions = actions
+    }
+
+    void addAction(Action action) {
+        if (this.actions == null)
+            this.actions = new LinkedHashSet<>()
+        if (action == null) return
+
+        this.actions.add(action)
+    }
+
+    void addAction(String action, String trigger) {
+        this.addAction(new Action(action, trigger))
+    }
+
+    String getEncryption() {
+        return encryption
+    }
+
+    void setEncryption(String encryption) {
+        this.encryption = encryption
+    }
+
+    void clearValue() {}
 //operators overloading
-    T plus(final Field field){
+    T plus(final Field field) {
         return this.value + field.value
     }
 
-    T minus(final Field field){
+    T minus(final Field field) {
         return this.value - field.value
     }
 
     T multiply(final Field field) {
         return this.value * field.value
+    }
+
+    String getTranslatedName(Locale locale) {
+        return name?.getTranslation(locale)
+    }
+
+    String getTranslatedPlaceholder(Locale locale) {
+        return placeholder?.getTranslation(locale)
+    }
+
+    String getTranslatedDescription(Locale locale) {
+        return description?.getTranslation(locale)
     }
 }

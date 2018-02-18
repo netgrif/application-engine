@@ -7,19 +7,25 @@ import org.springframework.hateoas.Resources;
 import org.springframework.hateoas.mvc.ControllerLinkBuilder;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Locale;
+import java.util.stream.Collectors;
 
+public class DataFieldsResource extends Resources<LocalisedField> {
 
-public class DataFieldsResource extends Resources<Field> {
-
-    public DataFieldsResource(Iterable<Field> content, String taskId) {
-        super(content, new ArrayList<Link>());
+    public DataFieldsResource(Collection<Field> content, String taskId, Locale locale) {
+        super(content.stream()
+                .map(f -> new LocalisedField(f, locale))
+                .collect(Collectors.toList()), new ArrayList<Link>());
         buildLinks(taskId);
     }
 
-    private void buildLinks(String taskId){
+    private void buildLinks(String taskId) {
+        if (taskId == null) return;
+
         add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
-            .getData(taskId)).withSelfRel());
+                .getData(taskId, null)).withSelfRel());
         add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
-            .saveData(taskId, null)).withRel("edit"));
+                .saveData(taskId, null)).withRel("edit"));
     }
 }

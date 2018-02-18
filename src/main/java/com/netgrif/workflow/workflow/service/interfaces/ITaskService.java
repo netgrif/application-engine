@@ -3,20 +3,26 @@ package com.netgrif.workflow.workflow.service.interfaces;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.auth.domain.User;
+import com.netgrif.workflow.petrinet.domain.DataGroup;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
+import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldContainer;
 import com.netgrif.workflow.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.Task;
+import com.netgrif.workflow.workflow.web.responsebodies.TaskReference;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 public interface ITaskService {
-    Page<Task> getAll(LoggedUser loggedUser, Pageable pageable);
+    Page<Task> getAll(LoggedUser loggedUser, Pageable pageable, Locale locale);
+
+    Page<Task> search(Map<String, Object> request, Pageable pageable, LoggedUser user);
 
     Page<Task> findByCases(Pageable pageable, List<String> cases);
 
@@ -32,19 +38,27 @@ public interface ITaskService {
 
     Page<Task> findByTransitions(Pageable pageable, List<String> transitions);
 
-    void finishTask(Long userId, String taskId) throws Exception;
+    void finishTask(LoggedUser loggedUser, String taskId) throws Exception;
 
-    void assignTask(User user, String taskId) throws TransitionNotExecutableException;
+    void assignTask(LoggedUser loggedUser, String taskId) throws TransitionNotExecutableException;
 
     List<Field> getData(String taskId);
 
-    ObjectNode setDataFieldsValues(String taskId, ObjectNode values);
+    List<Field> getData(Task task, Case useCase);
 
-    void cancelTask(Long id, String taskId);
+    List<DataGroup> getDataGroups(String taskId);
 
-    void delegateTask(Long userId, String delegatedEmail, String taskId) throws TransitionNotExecutableException;
+    ChangedFieldContainer setData(String taskId, ObjectNode values);
+
+    void cancelTask(LoggedUser loggedUser, String taskId);
+
+    void delegateTask(LoggedUser loggedUser, String delegatedEmail, String taskId) throws TransitionNotExecutableException;
 
     boolean saveFile(String taskId, String fieldId, MultipartFile multipartFile);
 
     FileSystemResource getFile(String taskId, String fieldId);
+
+    void deleteTasksByCase(String caseId);
+
+    List<TaskReference> findAllByCase(String caseId, Locale locale);
 }

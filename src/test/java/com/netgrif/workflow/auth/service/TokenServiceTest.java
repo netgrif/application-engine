@@ -1,8 +1,8 @@
 package com.netgrif.workflow.auth.service;
 
-import com.netgrif.workflow.auth.domain.Token;
-import com.netgrif.workflow.auth.domain.repositories.TokenRepository;
-import com.netgrif.workflow.auth.service.interfaces.ITokenService;
+import com.netgrif.workflow.auth.domain.UnactivatedUser;
+import com.netgrif.workflow.auth.domain.repositories.UnactivatedUserRepository;
+import com.netgrif.workflow.auth.service.interfaces.IUnactivatedUserService;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -21,10 +21,10 @@ import java.time.LocalDateTime;
 public class TokenServiceTest {
 
     @Autowired
-    ITokenService service;
+    IUnactivatedUserService service;
 
     @Autowired
-    TokenRepository repository;
+    UnactivatedUserRepository repository;
 
     private final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
 
@@ -40,15 +40,17 @@ public class TokenServiceTest {
 
     @Test
     public void removeExpired() throws Exception {
-        Token expiredToken = new Token();
-        expiredToken.setEmail("test@test.com");
-        expiredToken.setHashedToken("hashedtoken");
-        expiredToken.setExpirationDate(LocalDateTime.now().minusDays(10));
-        repository.save(expiredToken);
-        Token newToken = new Token();
-        newToken.setEmail("test@test.com");
-        newToken.setHashedToken("hashedtoken");
-        repository.save(newToken);
+        UnactivatedUser expired = new UnactivatedUser();
+        expired.setEmail("test@test.com");
+        expired.setToken("token");
+        expired.setExpirationDate(LocalDateTime.now().minusDays(10));
+        repository.save(expired);
+
+        UnactivatedUser expired2 = new UnactivatedUser();
+        expired2.setEmail("test2@test.com");
+        expired2.setToken("token2");
+        //expired2.setExpirationDate(LocalDateTime.now().minusDays(10));
+        repository.save(expired2);
 
         service.removeExpired();
 
@@ -57,19 +59,19 @@ public class TokenServiceTest {
 
     @Test
     public void authorizeToken() throws Exception {
-        Token newToken = new Token();
-        newToken.setEmail("test@test.com");
-        newToken.setHashedToken("hashedtoken");
-        repository.save(newToken);
+        UnactivatedUser expired = new UnactivatedUser();
+        expired.setEmail("test3@test.com");
+        expired.setToken("token3");
+        repository.save(expired);
 
-        boolean authorized = service.authorizeToken("test@test.com", "hashedtoken");
-        Token token = repository.findByEmail("test@test.com");
+        boolean authorized = service.authorizeToken("test3@test.com", "token3");
+        UnactivatedUser token = repository.findByEmail("test3@test.com");
 
         assertTokenRemoved(authorized, token);
     }
 
-    private void assertTokenRemoved(boolean authorized, Token token) {
+    private void assertTokenRemoved(boolean authorized, UnactivatedUser token) {
         assert authorized;
-        assert token == null;
+        assert token != null;
     }
 }

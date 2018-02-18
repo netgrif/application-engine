@@ -2,11 +2,15 @@ package com.netgrif.workflow.workflow.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.netgrif.workflow.auth.domain.User;
+import com.netgrif.workflow.petrinet.domain.I18nString;
+import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.petrinet.domain.roles.RolePermission;
+import com.netgrif.workflow.workflow.domain.triggers.Trigger;
 import lombok.Getter;
 import lombok.Setter;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -26,7 +30,7 @@ public class Task {
     private String transitionId;
 
     @Getter @Setter
-    private String title;
+    private I18nString title;
 
     @Getter @Setter
     private String caseColor;
@@ -34,11 +38,8 @@ public class Task {
     @Getter @Setter
     private String caseTitle;
 
-    @Getter
-    private String visualId;
-
-    @Getter
-    private int priority;
+    @Getter @Setter
+    private Integer priority;
 
     @Setter
     private Long userId;
@@ -61,12 +62,31 @@ public class Task {
     private LocalDateTime finishDate;
 
     @Getter @Setter
+    private Long finishedBy;
+
+    @Getter @Setter
     private String transactionId;
+
+    @Getter @Setter
+    private Boolean requiredFilled;
+
+    @Getter @Setter
+    @JsonIgnore
+    private LinkedHashSet<String> immediateDataFields;
+
+    @Getter @Setter
+    @Transient
+    private List<Field> immediateData;
+
+    @Setter
+    private String icon;
 
     public Task() {
         this._id = new ObjectId();
         roles = new HashMap<>();
         this.triggers = new LinkedList<>();
+        this.immediateDataFields = new LinkedHashSet<>();
+        this.immediateData = new ArrayList<>();
     }
 
     @JsonIgnore
@@ -82,17 +102,12 @@ public class Task {
         return _id.toString();
     }
 
-    public void setVisualId(String petriNetInitials) {
-        // TODO: 9.5.2017 bullshit remove now!
-        this.visualId = petriNetInitials+"-"+this._id;
-    }
-
-    public void setPriority(int priority) {
-        this.priority = priority == Priorities.UNDEFINED ? Priorities.LOW : priority;
-    }
-
     public String getTransitionId() {
         return transitionId;
+    }
+
+    public String getIcon() {
+        return icon;
     }
 
     public void addRole(String roleId, Set<RolePermission> permissions){
@@ -113,17 +128,17 @@ public class Task {
         return triggers;
     }
 
+    public void addTrigger(Trigger trigger) {
+        triggers.add(trigger);
+    }
+
+    public void addImmediateData(Field field){
+        this.immediateData.add(field);
+    }
+
     @JsonIgnore
     public Long getUserId() {
         return userId;
-    }
-
-    public static class Priorities {
-        public static final int HIGH = 3;
-        public static final int MEDIUM = 2;
-        public static final int LOW = 1;
-        public static final int UNDEFINED = 0;
-
     }
 
     public enum Type {
