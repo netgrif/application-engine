@@ -16,6 +16,6 @@ public class DataFieldReferencesResource extends Resources<DataFieldReference>{
 
     private void buildLinks(){
         add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(PetriNetController.class)
-                .getDataFieldReferences(new PetriNetReferenceBody())).withSelfRel());
+                .getDataFieldReferences(new PetriNetReferenceBody(), null)).withSelfRel());
     }
 }

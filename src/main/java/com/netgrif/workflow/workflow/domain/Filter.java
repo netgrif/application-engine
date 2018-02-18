@@ -1,76 +1,67 @@
 package com.netgrif.workflow.workflow.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.netgrif.workflow.auth.domain.Author;
 import com.netgrif.workflow.auth.domain.LoggedUser;
+import com.netgrif.workflow.petrinet.domain.I18nString;
 import com.netgrif.workflow.petrinet.web.responsebodies.PetriNetReference;
 import com.netgrif.workflow.petrinet.web.responsebodies.TransitionReference;
 import com.netgrif.workflow.workflow.web.requestbodies.CreateFilterBody;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 @Document
+@Data
 public class Filter {
+
+    public static final int VISIBILITY_PUBLIC = 2;
+    public static final int VISIBILITY_GROUP = 1;
+    public static final int VISIBILITY_PRIVATE = 0;
+
+    public static final String TYPE_TASK = "task";
+    public static final String TYPE_CASE = "case";
 
     @Id
     private ObjectId _id;
 
-    @Getter @Setter
-    private String name;
+    private I18nString title;
 
-    @Getter @Setter
-    private String organization;
+    private I18nString description;
 
-    @Getter @Setter
-    private Long user;
+    private Integer visibility;
 
-    @Getter @Setter
-    private List<PetriNetReference> petriNets;
+    private Author author;
 
-    @Getter @Setter
-    private List<TransitionReference> transitions;
+    private LocalDateTime created;
 
-    @Getter @Setter
-    private List<String> roles;
+    private String type;
+
+    private String query;
 
     public Filter() {
-        petriNets = new ArrayList<>();
-        transitions = new ArrayList<>();
-        roles = new ArrayList<>();
+        this.created = LocalDateTime.now();
     }
 
-    public Filter(String name) {
-        this.name = name;
+    public Filter(I18nString title, I18nString description, Integer visibility, Author author, String type, String query) {
+        this();
+        this.title = title;
+        this.description = description;
+        this.visibility = visibility;
+        this.author = author;
+        this.type = type;
+        this.query = query;
     }
 
-    public Filter(String name, String organization, Long user) {
-        this.name = name;
-        this.organization = organization;
-        this.user = user;
-    }
-
-    public ObjectId get_id() {
-        return _id;
-    }
-
-    public void resolveVisibility(int visibility, LoggedUser user){
-        switch (visibility){
-            case CreateFilterBody.GLOBAL:
-                organization = null;
-                this.user = null;
-                break;
-            case CreateFilterBody.PRIVATE:
-                organization = null;
-                this.user = user.getId();
-                break;
-            case CreateFilterBody.ORGANIZATION:
-                organization = user.getFullName(); //TODO: 24.2.2017 change to organization id
-                this.user = null;
-                break;
-        }
+    public String getStringId(){
+        return this._id.toString();
     }
 }

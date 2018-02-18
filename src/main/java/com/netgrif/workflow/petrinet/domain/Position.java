@@ -6,10 +6,10 @@ import lombok.Setter;
 public class Position {
 
     @Getter @Setter
-    private int x;
+    private Integer x;
 
     @Getter @Setter
-    private int y;
+    private Integer y;
 
     public Position(int x, int y) {
         this.x = x;
