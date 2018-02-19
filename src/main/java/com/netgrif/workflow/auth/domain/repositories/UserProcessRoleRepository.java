@@ -10,4 +10,6 @@ public interface UserProcessRoleRepository extends JpaRepository<UserProcessRole
     List<UserProcessRole> findByRoleIdIn(Iterable<String> roleIds);
 
     UserProcessRole findByRoleId(String roleId);
+
+    List<UserProcessRole> findAllByNetId(String id);
 }

@@ -2,6 +2,7 @@ package com.netgrif.workflow.petrinet.service;
 
 import com.netgrif.workflow.auth.domain.Authority;
 import com.netgrif.workflow.auth.domain.LoggedUser;
+import com.netgrif.workflow.auth.service.UserProcessRoleService;
 import com.netgrif.workflow.event.events.model.UserImportModelEvent;
 import com.netgrif.workflow.importer.Importer;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
@@ -12,6 +13,7 @@ import com.netgrif.workflow.petrinet.web.responsebodies.DataFieldReference;
 import com.netgrif.workflow.petrinet.web.responsebodies.PetriNetReference;
 import com.netgrif.workflow.petrinet.web.responsebodies.PetriNetSmall;
 import com.netgrif.workflow.petrinet.web.responsebodies.TransitionReference;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Lookup;
 import org.springframework.context.ApplicationEventPublisher;
@@ -31,8 +33,13 @@ import java.util.stream.Collectors;
 @Service
 public abstract class PetriNetService implements IPetriNetService {
 
+    private static final Logger log = Logger.getLogger(PetriNetService.class);
+
     @Lookup("importer")
     abstract Importer getImporter();
+
+    @Autowired
+    private UserProcessRoleService userProcessRoleService;
 
     @Autowired
     private PetriNetRepository repository;
@@ -55,9 +62,13 @@ public abstract class PetriNetService implements IPetriNetService {
     public Optional<PetriNet> importPetriNet(File xmlFile, String name, String initials, LoggedUser user) throws IOException {
         Optional<PetriNet> imported = getImporter().importPetriNet(xmlFile, name, initials);
         if (imported.isPresent()) {
-            imported.get().setAuthor(user.transformToAuthor());
-            getImporter().saveNetFile(imported.get(), xmlFile);
+            PetriNet net = imported.get();
+            net.setAuthor(user.transformToAuthor());
+            getImporter().saveNetFile(net, xmlFile);
             repository.save(imported.get());
+            userProcessRoleService.saveRoles(net.getRoles().values(), net.getStringId());
+
+            log.info("Petri net " + name + " (" + initials + ") imported successfully");
             publisher.publishEvent(new UserImportModelEvent(user, xmlFile, name, initials));
         }
         return imported;
