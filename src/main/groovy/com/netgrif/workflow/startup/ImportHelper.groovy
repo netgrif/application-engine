@@ -109,6 +109,15 @@ class ImportHelper {
         return userRoles
     }
 
+    Map<String, UserProcessRole> getProcessRoles(PetriNet net) {
+        List<UserProcessRole> roles = userProcessRoleRepository.findAllByNetId(net.stringId)
+        Map<String, UserProcessRole> map = [:]
+        net.roles.values().each { netRole ->
+            map[netRole.name.getDefaultValue()] = roles.find { it.roleId == netRole.stringId }
+        }
+        return map
+    }
+
     User createUser(User user, Authority[] authorities, Organization[] orgs, UserProcessRole[] roles) {
         authorities.each { user.addAuthority(it) }
         orgs.each { user.addOrganization(it) }
@@ -137,4 +146,5 @@ class ImportHelper {
     static String getCaseColor() {
         return "color-fg-amber-500"
     }
+
 }

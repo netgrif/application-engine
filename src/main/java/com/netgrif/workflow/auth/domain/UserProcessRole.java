@@ -19,6 +19,9 @@ public class UserProcessRole {
     @Getter @Setter
     private String roleId;
 
+    @Getter @Setter
+    private String netId;
+
     @JsonIgnore
     @ManyToMany(mappedBy = "userProcessRoles")
     private Set<User> users;
@@ -28,5 +31,10 @@ public class UserProcessRole {
 
     public UserProcessRole(String roleId) {
         this.roleId = roleId;
+    }
+
+    public UserProcessRole(String roleId, String netId) {
+        this.roleId = roleId;
+        this.netId = netId;
     }
 }
