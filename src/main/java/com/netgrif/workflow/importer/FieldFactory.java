@@ -225,7 +225,8 @@ public final class FieldFactory {
                     return;
                 }
             }
-            throw new IllegalArgumentException("Value " + value + " is not a valid value.");
+            field.setValue(new I18nString((String) value));
+//            throw new IllegalArgumentException("Value " + value + " is not a valid value.");
         } else {
             field.setValue((I18nString) value);
         }

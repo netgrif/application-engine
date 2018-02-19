@@ -101,9 +101,9 @@ class ActionDelegate {
              if (values == null || (values instanceof Closure && values() == UNCHANGED_VALUE)) return
              if (!(values instanceof Collection)) values = [values]
              field = (ChoiceField) field
-             field.choices = values as Set<String>
+             field.setChoicesFromStrings(values as Set<String>)
              changedField.id = field.stringId
-             changedField.addAttribute("choices", field.choices)
+             changedField.addAttribute("choices", values)
          }]
     }
 
