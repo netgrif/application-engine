@@ -41,7 +41,9 @@ class MultichoiceField extends ChoiceField<Set<I18nString>> {
     void setValue(String value) {
         I18nString i18n = choices.find { it.contains(value) }
         if (i18n == null && value != null)
-            throw new IllegalArgumentException("Value $value is not a choice")
+            i18n = new I18nString(value)
+        //TODO: case save choices
+//            throw new IllegalArgumentException("Value $value is not a choice")
         super.setValue([i18n] as Set)
     }
 
@@ -50,7 +52,9 @@ class MultichoiceField extends ChoiceField<Set<I18nString>> {
         for (String value : values) {
             I18nString i18n = choices.find { it.contains(value) }
             if (i18n == null && value != null)
-                throw new IllegalArgumentException("Value $value is not a choice")
+                i18n = new I18nString(value)
+            //TODO: case save choices
+//                throw new IllegalArgumentException("Value $value is not a choice")
             newValues << i18n
         }
         super.setValue(newValues)
