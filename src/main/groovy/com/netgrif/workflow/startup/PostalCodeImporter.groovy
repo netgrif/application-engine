@@ -1,15 +1,13 @@
 package com.netgrif.workflow.startup
 
+import com.netgrif.workflow.business.IPostalCodeService
 import com.netgrif.workflow.business.PostalCode
-import com.netgrif.workflow.business.PostalCodeService
 import org.apache.log4j.Logger
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Component
 
 @Component
-@Profile("!test")
 class PostalCodeImporter extends AbstractOrderedCommandLineRunner {
 
     private static final Logger log = Logger.getLogger(PostalCodeImporter.class.name)
@@ -18,7 +16,7 @@ class PostalCodeImporter extends AbstractOrderedCommandLineRunner {
     String postalCodesPath
 
     @Autowired
-    private PostalCodeService service
+    private IPostalCodeService service
 
     void run(String... strings) {
         log.info("Importing postal codes from file " + postalCodesPath)

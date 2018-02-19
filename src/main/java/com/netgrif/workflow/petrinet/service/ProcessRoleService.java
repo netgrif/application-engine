@@ -37,17 +37,19 @@ public class ProcessRoleService implements IProcessRoleService {
     private ApplicationEventPublisher publisher;
 
     @Override
-    public boolean assignRolesToUser(Long userId, Set<String> roleIds){
+    public void assignRolesToUser(Long userId, Set<String> roleIds) {
         User user = userRepository.findOne(userId);
         List<UserProcessRole> processRoles = roleRepository.findByRoleIdIn(roleIds);
-        if(processRoles.isEmpty()) return false;
+        if (processRoles.isEmpty())
+            throw new IllegalArgumentException("No process roles found.");
+        if (processRoles.size() != roleIds.size())
+            throw new IllegalArgumentException("Not all process were found.");
 
         user.getUserProcessRoles().clear();
         user.getUserProcessRoles().addAll(processRoles);
 
+        userRepository.save(user);
         publisher.publishEvent(new UserRoleChangeEvent(user, processRoleRepository.findAllBy_idIn(roleIds)));
-
-        return userRepository.save(user) != null;
     }
 
     @Override
