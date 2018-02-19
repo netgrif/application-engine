@@ -38,8 +38,8 @@
             field: f.this,
             other: f.301006;
             change other choices {
-            def postal = psc byLocality,field.value;
-            return postal?.first()?.locality;
+            def postal = psc byCity,field.value;
+            return postal?.first()?.city;
             }
             <!--@formatter:on-->
         </action>
@@ -54,8 +54,7 @@
             zipcode: f.101001,
             obec: f.this;
             change field about {
-            def postal = psc byCode,zipcode.value;
-            return postal.find {item -> item.locality==obec.value}.regionCode;
+            return "L3" as String;
             }
             <!--@formatter:on-->
         </action>
@@ -65,7 +64,7 @@
             field: f.this,
             other: f.109048;
             change other about {
-            return field.value;
+            return field?.value?.defaultValue;
             }
             <!--@formatter:on-->
         </action>
@@ -81,7 +80,7 @@
             change obec choices {
             def postal = psc byCode,field.value;
             cache "post",postal;
-            return postal.locality;
+            return postal.city;
             }
             <!--@formatter:on-->
         </action>
@@ -92,7 +91,7 @@
             change obec about {
             def postal = cache "post";
             if (postal.size() == 1)
-            return postal.first().locality;
+            return postal?.first()?.city;
             return null;
             }
             <!--@formatter:on-->
@@ -4515,7 +4514,7 @@
     <data type="number">
         <title>Koeficient - Koľko izieb má nehnuteľnosť?</title>
         <id>202006</id>
-        <!--<init>1</init>-->
+        <init>1</init>
         <action trigger="set">
             <!--@formatter:off-->
             c1: f.202001,
@@ -4534,7 +4533,7 @@
     <data type="number">
         <title>Koeficient - Koľko kúpeľní má nehnuteľnosť?</title>
         <id>202007</id>
-        <!--<init>1</init>-->
+        <init>1</init>
         <action trigger="set">
             <!--@formatter:off-->
             c1: f.202001,
@@ -4553,7 +4552,7 @@
     <data type="number">
         <title>NEHNUTEĽNOSŤ koeficient</title>
         <id>202009</id>
-        <!--<init>0.945</init>-->
+        <init>0.945</init>
         <action trigger="set">
             <!--@formatter:off-->
             field: f.105036,
@@ -7211,6 +7210,7 @@
                 <id>101001</id>
                 <logic>
                     <behavior>editable</behavior>
+                    <behavior>required</behavior>
                 </logic>
             </dataRef>
             <!--Obec-->
@@ -7219,6 +7219,7 @@
                 <id>301005</id>
                 <logic>
                     <behavior>editable</behavior>
+                    <behavior>required</behavior>
                     <!--todo: psc and lokalita lookup -->
                 </logic>
             </dataRef>
@@ -7226,6 +7227,7 @@
                 <id>101002</id>
                 <logic>
                     <behavior>editable</behavior>
+                    <behavior>required</behavior>
                 </logic>
             </dataRef>
         </dataGroup>
@@ -7238,6 +7240,7 @@
                 <id>101003</id>
                 <logic>
                     <behavior>editable</behavior>
+                    <behavior>required</behavior>
                 </logic>
             </dataRef>
             <!--Nachádza nehnuteľnosť sa vo vzdialenosti kratšej ako 300 m od vodného toku?-->
@@ -7245,6 +7248,7 @@
                 <id>101004</id>
                 <logic>
                     <behavior>editable</behavior>
+                    <behavior>required</behavior>
                 </logic>
             </dataRef>
             <!--Koľko rokov žijete v poisťovanej nehnuteľnosti?-->
@@ -7252,6 +7256,7 @@
                 <id>101005</id>
                 <logic>
                     <behavior>editable</behavior>
+                    <behavior>required</behavior>
                 </logic>
             </dataRef>
             <!--Aký je vzťah poisteného k poisťovanej nehnuteľnosti?-->
@@ -7259,6 +7264,7 @@
                 <id>101006</id>
                 <logic>
                     <behavior>editable</behavior>
+                    <behavior>required</behavior>
                 </logic>
             </dataRef>
             <!--Koľko dospelých žije v domácnosti?-->
@@ -7266,6 +7272,7 @@
                 <id>101007</id>
                 <logic>
                     <behavior>editable</behavior>
+                    <behavior>required</behavior>
                 </logic>
             </dataRef>
             <!--Koľko detí žije v domácnosti?-->
@@ -7273,6 +7280,7 @@
                 <id>101008</id>
                 <logic>
                     <behavior>editable</behavior>
+                    <behavior>required</behavior>
                 </logic>
             </dataRef>
             <!--Žije v poisťovanej domácnosti pes alebo mačka?-->
@@ -7280,6 +7288,7 @@
                 <id>101012</id>
                 <logic>
                     <behavior>editable</behavior>
+                    <behavior>required</behavior>
                 </logic>
             </dataRef>
             <!--Je nehnuteľnosť využívaná aj na podnikanie?-->
@@ -7287,6 +7296,7 @@
                 <id>101014</id>
                 <logic>
                     <behavior>editable</behavior>
+                    <behavior>required</behavior>
                 </logic>
             </dataRef>
             <!--Počet poistných udalostí za posledné 3 roky?-->
@@ -7294,6 +7304,7 @@
                 <id>101016</id>
                 <logic>
                     <behavior>editable</behavior>
+                    <behavior>required</behavior>
                 </logic>
             </dataRef>
         </dataGroup>
@@ -7322,17 +7333,18 @@
             <dataRef>
                 <id>102001</id>
                 <logic>
+                    <behavior>required</behavior>
                     <behavior>editable</behavior>
-                    <!--<action trigger="set">-->
-                    <!--&lt;!&ndash;@formatter:off&ndash;&gt;-->
-                    <!--f1: f.102001,-->
-                    <!--f2: f.106001,-->
-                    <!--other: f.308005;-->
-                    <!--change other about {-->
-                    <!--return Boolean.logicalAnd(f1.value != null, f2.value != null);-->
-                    <!--}-->
-                    <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
-                    <!--</action>-->
+                    <action trigger="set">
+                        <!--@formatter:off-->
+                        f1: f.102001,
+                        f2: f.106001,
+                        other: f.308005;
+                        change other about {
+                            return Boolean.logicalAnd(f1.value != null, f2.value != null);
+                        }
+                        <!--@formatter:on-->
+                    </action>
                     <action trigger="get">
                         <!--@formatter:off-->
                         other: f.410001,
@@ -7358,6 +7370,7 @@
                 <id>102006</id>
                 <logic>
                     <behavior>editable</behavior>
+                    <behavior>required</behavior>
                 </logic>
             </dataRef>
             <!--Koľko kúpeľní má nehnuteľnosť?-->
@@ -7365,6 +7378,7 @@
                 <id>102007</id>
                 <logic>
                     <behavior>editable</behavior>
+                    <behavior>required</behavior>
                 </logic>
             </dataRef>
             <!--Zodpovednost nehnutelnost-->
@@ -7372,6 +7386,7 @@
                 <id>107001</id>
                 <logic>
                     <behavior>editable</behavior>
+                    <behavior>required</behavior>
                 </logic>
             </dataRef>
         </dataGroup>
@@ -7384,6 +7399,7 @@
                 <id>105001</id>
                 <logic>
                     <behavior>editable</behavior>
+                    <behavior>required</behavior>
                 </logic>
             </dataRef>
             <!--Podlahová plocha prízemia-->
@@ -7391,6 +7407,7 @@
                 <id>105002</id>
                 <logic>
                     <behavior>editable</behavior>
+                    <behavior>required</behavior>
                 </logic>
             </dataRef>
             <!--Podlahová plocha všetkých obytných poschodí-->
@@ -7398,6 +7415,7 @@
                 <id>105003</id>
                 <logic>
                     <behavior>editable</behavior>
+                    <behavior>required</behavior>
                 </logic>
             </dataRef>
             <!--Celková podlahová plocha-->
@@ -9004,6 +9022,7 @@
                 <id>103001</id>
                 <logic>
                     <behavior>editable</behavior>
+                    <behavior>required</behavior>
                 </logic>
             </dataRef>
             <!--Poistenie domácnosti - spoluúčasť-->
@@ -9011,6 +9030,7 @@
                 <id>106001</id>
                 <logic>
                     <behavior>editable</behavior>
+                    <behavior>required</behavior>
                 </logic>
             </dataRef>
         </dataGroup>
@@ -9023,6 +9043,7 @@
                 <id>107003</id>
                 <logic>
                     <behavior>editable</behavior>
+                    <behavior>required</behavior>
                 </logic>
             </dataRef>
             <!--Zodpovednost domacnost uzemna platnost-->
@@ -9042,6 +9063,7 @@
                 <id>103002</id>
                 <logic>
                     <behavior>editable</behavior>
+                    <behavior>required</behavior>
                 </logic>
             </dataRef>
             <!--Celková podlahová plocha-->
@@ -9049,6 +9071,7 @@
                 <id>106003</id>
                 <logic>
                     <behavior>editable</behavior>
+                    <behavior>required</behavior>
                 </logic>
             </dataRef>
         </dataGroup>
@@ -9062,6 +9085,7 @@
                 <id>103004</id>
                 <logic>
                     <behavior>editable</behavior>
+                    <behavior>required</behavior>
                 </logic>
             </dataRef>
         </dataGroup>
@@ -9075,6 +9099,7 @@
                 <id>103005</id>
                 <logic>
                     <behavior>editable</behavior>
+                    <behavior>required</behavior>
                 </logic>
             </dataRef>
         </dataGroup>
@@ -10018,6 +10043,7 @@
                 <id>108001</id>
                 <logic>
                     <behavior>editable</behavior>
+                    <behavior>required</behavior>
                 </logic>
             </dataRef>
         </dataGroup>
@@ -10044,6 +10070,7 @@
                 <id>108002</id>
                 <logic>
                     <behavior>editable</behavior>
+                    <behavior>required</behavior>
                 </logic>
             </dataRef>
         </dataGroup>
@@ -10212,6 +10239,7 @@
                 <id>109010</id>
                 <logic>
                     <behavior>editable</behavior>
+                    <behavior>required</behavior>
                 </logic>
             </dataRef>
             <!--Priezvisko-->
@@ -10219,6 +10247,7 @@
                 <id>109011</id>
                 <logic>
                     <behavior>editable</behavior>
+                    <behavior>required</behavior>
                 </logic>
             </dataRef>
             <!--Typ preukazu-->
@@ -10226,6 +10255,7 @@
                 <id>109016</id>
                 <logic>
                     <behavior>editable</behavior>
+                    <behavior>required</behavior>
                 </logic>
             </dataRef>
             <!--Číslo preukazu-->
@@ -10233,6 +10263,7 @@
                 <id>109017</id>
                 <logic>
                     <behavior>editable</behavior>
+                    <behavior>required</behavior>
                 </logic>
             </dataRef>
             <!--Štátna príslušnosť-->
@@ -10240,6 +10271,7 @@
                 <id>109013</id>
                 <logic>
                     <behavior>editable</behavior>
+                    <behavior>required</behavior>
                 </logic>
             </dataRef>
             <!--Dátum narodenia-->
@@ -10247,6 +10279,7 @@
                 <id>109014</id>
                 <logic>
                     <behavior>editable</behavior>
+                    <behavior>required</behavior>
                 </logic>
             </dataRef>
             <!--Rodné číslo-->
@@ -10254,6 +10287,7 @@
                 <id>109015</id>
                 <logic>
                     <behavior>editable</behavior>
+                    <behavior>required</behavior>
                 </logic>
             </dataRef>
             <!--Telefónne číslo-->
@@ -10404,24 +10438,28 @@
                 <id>109045</id>
                 <logic>
                     <behavior>editable</behavior>
+                    <behavior>required</behavior>
                 </logic>
             </dataRef>
             <dataRef>
                 <id>109046</id>
                 <logic>
                     <behavior>editable</behavior>
+                    <behavior>required</behavior>
                 </logic>
             </dataRef>
             <dataRef>
                 <id>109047</id>
                 <logic>
                     <behavior>editable</behavior>
+                    <behavior>required</behavior>
                 </logic>
             </dataRef>
             <dataRef>
                 <id>109048</id>
                 <logic>
                     <behavior>editable</behavior>
+                    <behavior>required</behavior>
                 </logic>
             </dataRef>
         </dataGroup>
@@ -10610,6 +10648,7 @@
             <dataRef>
                 <id>109006</id>
                 <logic>
+                    <behavior>required</behavior>
                     <behavior>editable</behavior>
                 </logic>
             </dataRef>
@@ -10673,6 +10712,7 @@
             <dataRef>
                 <id>109001</id>
                 <logic>
+                    <behavior>required</behavior>
                     <behavior>editable</behavior>
                 </logic>
             </dataRef>
@@ -10714,6 +10754,7 @@
             <dataRef>
                 <id>109006</id>
                 <logic>
+                    <behavior>required</behavior>
                     <behavior>editable</behavior>
                 </logic>
             </dataRef>
@@ -10777,6 +10818,7 @@
             <dataRef>
                 <id>109001</id>
                 <logic>
+                    <behavior>required</behavior>
                     <behavior>editable</behavior>
                 </logic>
             </dataRef>
@@ -10818,6 +10860,7 @@
             <dataRef>
                 <id>109006</id>
                 <logic>
+                    <behavior>required</behavior>
                     <behavior>editable</behavior>
                 </logic>
             </dataRef>
@@ -10956,6 +10999,7 @@
             <dataRef>
                 <id>110003</id>
                 <logic>
+                    <behavior>required</behavior>
                     <behavior>editable</behavior>
                 </logic>
             </dataRef>
@@ -10991,6 +11035,7 @@
             <dataRef>
                 <id>110008</id>
                 <logic>
+                    <behavior>required</behavior>
                     <behavior>editable</behavior>
                 </logic>
             </dataRef>
@@ -10998,6 +11043,7 @@
             <dataRef>
                 <id>110009</id>
                 <logic>
+                    <behavior>required</behavior>
                     <behavior>editable</behavior>
                 </logic>
             </dataRef>
@@ -11012,6 +11058,7 @@
             <dataRef>
                 <id>110011</id>
                 <logic>
+                    <behavior>required</behavior>
                     <behavior>editable</behavior>
                 </logic>
             </dataRef>
