@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Set;
 
 public interface IProcessRoleService {
-    boolean assignRolesToUser(Long userId, Set<String> roleIds);
+    void assignRolesToUser(Long userId, Set<String> roleIds);
 
     List<ProcessRole> findAll(String netId);
 }
