@@ -28,7 +28,8 @@ class PostalCodeTest {
         if (setup)
             return
 
-        importer.run()
+        if (service.findAllByCode("841 05").size() == 0)
+            importer.run()
 
         setup = true
     }
