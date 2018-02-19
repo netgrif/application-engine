@@ -9,6 +9,7 @@ import com.netgrif.workflow.auth.web.responsebodies.UserResource;
 import com.netgrif.workflow.auth.web.responsebodies.UsersResource;
 import com.netgrif.workflow.petrinet.service.interfaces.IProcessRoleService;
 import com.netgrif.workflow.workflow.web.responsebodies.MessageResource;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -21,10 +22,14 @@ import java.util.Set;
 @RequestMapping("/res/user")
 public class UserController {
 
+    private static final Logger log = Logger.getLogger(UserController.class);
+
     @Autowired
     private IUserService userService;
+
     @Autowired
     private IProcessRoleService processRoleService;
+
     @Autowired
     private IAuthorityService authorityService;
 
@@ -63,10 +68,14 @@ public class UserController {
 
     @RequestMapping(value = "/{id}/role/assign", method = RequestMethod.POST)
     public MessageResource assignRolesToUser(@PathVariable("id") Long userId, @RequestBody Set<String> roleIds) {
-        if (processRoleService.assignRolesToUser(userId, roleIds))
+        try {
+            processRoleService.assignRolesToUser(userId, roleIds);
+            log.info("Process roles " + roleIds + " assigned to user " + userId);
             return MessageResource.successMessage("Selected roles assigned to user " + userId);
-        else
+        } catch (IllegalArgumentException e) {
+            log.error(e.getMessage());
             return MessageResource.errorMessage("Assigning roles to user " + userId + " has failed!");
+        }
     }
 
     @PreAuthorize("hasRole('ADMIN')")
