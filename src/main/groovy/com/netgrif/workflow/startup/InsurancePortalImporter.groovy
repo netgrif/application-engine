@@ -30,12 +30,12 @@ class InsurancePortalImporter extends AbstractOrderedCommandLineRunner {
 
         def org = importHelper.createOrganization("Insurance Company")
         def auths = importHelper.createAuthorities(["user": Authority.user])
-        def processRoles = importHelper.createUserProcessRoles(["agent": "Agent", "company": "Company"], net.get())
+        def processRoles = importHelper.getProcessRoles(net.get())
 
         def user = importHelper.createUser(new User(name: "Agent", surname: "Smith", email: "agent@company.com", password: "password"),
-                [auths.get("user")] as Authority[], [org] as Organization[], [processRoles.get("agent")] as UserProcessRole[])
+                [auths.get("user")] as Authority[], [org] as Organization[], [processRoles.get("Agent")] as UserProcessRole[])
         importHelper.createUser(new User(name: "Great", surname: "Company", email: "company@company.com", password: "password"),
-                [auths.get("user")] as Authority[], [org] as Organization[], [processRoles.get("company")] as UserProcessRole[])
+                [auths.get("user")] as Authority[], [org] as Organization[], [processRoles.get("Company")] as UserProcessRole[])
 
         5.times { importHelper.createCase("Test ${it + 1}", net.get(), user.transformToLoggedUser()) }
         importHelper.createFilter("Test Filter", "{}", superCreator.superUser.transformToLoggedUser())
