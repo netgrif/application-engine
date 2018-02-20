@@ -139,8 +139,8 @@ class ImportHelper {
         return useCase
     }
 
-    boolean createFilter(String title, String query, LoggedUser user) {
-        return filterService.saveFilter(new CreateFilterBody(title, Filter.VISIBILITY_PUBLIC, "This filter was created automatically for testing purpose only.", Filter.TYPE_TASK, query), user)
+    boolean createFilter(String title, String query, String readable, LoggedUser user) {
+        return filterService.saveFilter(new CreateFilterBody(title, Filter.VISIBILITY_PUBLIC, "This filter was created automatically for testing purpose only.", Filter.TYPE_TASK, query, readable), user)
     }
 
     static String getCaseColor() {
