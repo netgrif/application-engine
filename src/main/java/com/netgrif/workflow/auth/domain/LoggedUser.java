@@ -9,6 +9,8 @@ import java.util.*;
 
 public class LoggedUser extends org.springframework.security.core.userdetails.User {
 
+    public static final long serialVersionUID = 3031325636490953409L;
+
     @Getter @Setter
     private Long id;
 
