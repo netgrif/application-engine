@@ -637,6 +637,7 @@ public class TaskService implements ITaskService {
         final Task task = new Task();
 
         task.setTitle(transition.getTitle());
+        task.setProcessId(useCase.getPetriNetId());
         task.setCaseId(useCase.get_id().toString());
         task.setTransitionId(transition.getObjectId().toString());
         task.setCaseColor(useCase.getColor());
