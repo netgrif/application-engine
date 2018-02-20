@@ -24,6 +24,9 @@ public class Task {
     private ObjectId _id;
 
     @Getter @Setter
+    private String processId;
+
+    @Getter @Setter
     private String caseId;
 
     @Setter
