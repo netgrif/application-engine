@@ -28,6 +28,8 @@ public class LocalisedFilter {
 
     private String query;
 
+    private String readableQuery;
+
     public LocalisedFilter(Filter filter, Locale locale) {
         this.stringId = filter.getStringId();
         this.title = filter.getTitle().getTranslation(locale);
@@ -37,6 +39,7 @@ public class LocalisedFilter {
         this.created = filter.getCreated();
         this.type = filter.getType();
         this.query = filter.getQuery();
+        this.readableQuery = filter.getReadableQuery();
     }
 
 
