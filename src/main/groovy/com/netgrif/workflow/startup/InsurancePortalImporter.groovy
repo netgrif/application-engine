@@ -37,9 +37,10 @@ class InsurancePortalImporter extends AbstractOrderedCommandLineRunner {
         importHelper.createUser(new User(name: "Great", surname: "Company", email: "company@company.com", password: "password"),
                 [auths.get("user")] as Authority[], [org] as Organization[], [processRoles.get("Company")] as UserProcessRole[])
 
-        5.times { importHelper.createCase("Test ${it + 1}", net.get(), user.transformToLoggedUser()) }
-        importHelper.createFilter("Test Filter", "{}", superCreator.superUser.transformToLoggedUser())
-        importHelper.createFilter("Test 2", "{\"user\":\"super@netgrif.com\"}", superCreator.superUser.transformToLoggedUser())
+        30.times { importHelper.createCase("Test ${it + 1}", net.get(), user.transformToLoggedUser()) }
+//        30.times { importHelper.createFilter("Test Filter", "{}", "{}",superCreator.superUser.transformToLoggedUser()) }
+
+//        importHelper.createFilter("Test 2", "{\"user\":\"super@netgrif.com\"}", "{\"User\":\"Super Trooper\"}",superCreator.superUser.transformToLoggedUser())
 
         superCreator.setAllToSuperUser()
     }

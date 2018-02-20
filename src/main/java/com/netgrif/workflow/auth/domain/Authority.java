@@ -13,6 +13,8 @@ import java.util.Set;
 @Table(name = "authority")
 public class Authority implements GrantedAuthority {
 
+    public static final long serialVersionUID = 2839744057647464485L;
+
     public static final String admin = "ROLE_ADMIN";
     public static final String user = "ROLE_USER";
 
