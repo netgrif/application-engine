@@ -42,6 +42,7 @@ import java.util.List;
         "label",
         "icon",
         "priority",
+        "assignPolicy",
         "trigger",
         "transactionRef",
         "roleRef",
