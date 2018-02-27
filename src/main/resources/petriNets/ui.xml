@@ -1,0 +1,21 @@
+<ui>
+    <view>
+        <title>Dashboard</title>
+    </view>
+    <view>
+        <title>Ponuky</title>
+        <type>case</type>
+        <filter>
+            <title></title>
+            <group>makler</group>
+            <definition> ... </definition>
+        </filter>
+    </view>
+    <view>
+        <title>Zmluvy</title>
+    </view>
+    <view>
+        <title>Platby</title>
+        <type>task</type>
+    </view>
+</ui>
