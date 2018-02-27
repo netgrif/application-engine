@@ -60,6 +60,7 @@
                 <xs:element ref="label"/>
                 <xs:element ref="icon" minOccurs="0"/>
                 <xs:element ref="priority" minOccurs="0"/>
+                <xs:element ref="dataFocusPolicy" minOccurs="0"/>
                 <xs:element ref="trigger" minOccurs="0" maxOccurs="unbounded"/>
                 <xs:element ref="transactionRef" minOccurs="0"/>
                 <xs:element ref="roleRef" maxOccurs="unbounded" minOccurs="0"/>
@@ -207,6 +208,12 @@
             <xs:minInclusive value="0"/>
         </xs:restriction>
     </xs:simpleType>
+    <xs:simpleType name="dataFocusPolicyType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="manual"/>
+            <xs:enumeration value="autoEmptyRequired"/>
+        </xs:restriction>
+    </xs:simpleType>
     <!-- ===== INNER ELEMENTS ===== -->
     <xs:element name="x" type="xs:short"/>
     <xs:element name="y" type="xs:short"/>
@@ -329,4 +336,5 @@
             </xs:extension>
         </xs:simpleContent>
     </xs:complexType>
+    <xs:element name="dataFocusPolicy" type="dataFocusPolicyType"/>
 </xs:schema>
