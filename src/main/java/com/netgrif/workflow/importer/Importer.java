@@ -205,6 +205,7 @@ public class Importer {
         transition.setPosition(importTransition.getX(), importTransition.getY());
         transition.setPriority(importTransition.getPriority());
         transition.setIcon(importTransition.getIcon());
+        transition.setAssignPolicy(AssignPolicy.valueOf(importTransition.getAssignPolicy().value()));
 
         if (importTransition.getRoleRef() != null) {
             importTransition.getRoleRef().forEach(roleRef ->
