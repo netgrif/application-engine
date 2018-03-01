@@ -129,7 +129,7 @@ public class User {
         if (!this.getUserProcessRoles().isEmpty())
             loggedUser.parseProcessRoles(this.getUserProcessRoles());
         if (!this.getGroups().isEmpty())
-            loggedUser.parseOrganizations(this.getGroups());
+            loggedUser.parseGroups(this.getGroups());
 
         return loggedUser;
     }

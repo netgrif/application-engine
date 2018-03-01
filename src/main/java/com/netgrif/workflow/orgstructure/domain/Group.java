@@ -1,9 +1,8 @@
 package com.netgrif.workflow.orgstructure.domain;
 
 
-import lombok.AccessLevel;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.Getter;
 import lombok.Setter;
 import org.neo4j.ogm.annotation.GraphId;
 import org.neo4j.ogm.annotation.NodeEntity;
@@ -14,28 +13,35 @@ import java.util.HashSet;
 import java.util.Set;
 
 @NodeEntity
-@Data
-@EqualsAndHashCode(exclude = {"members", "childGroups", "parentGroup"})
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Group {
 
     public static final String MEMBER_OF = "MEMBER_OF";
     public static final String CHILD_OF = "CHILD_OF";
 
     @GraphId
-    @Setter(AccessLevel.NONE)
+    @Getter
     private Long id;
 
     @NotNull
+    @Getter
+    @Setter
     // TODO: 3/1/18 validation: unique name on the same level path
     private String name;
 
     @Relationship(type = MEMBER_OF, direction = Relationship.INCOMING)
+    @Getter
+    @Setter
     private Set<Member> members;
 
     @Relationship(type = CHILD_OF)
+    @Getter
+    @Setter
     private Group parentGroup;
 
     @Relationship(type = CHILD_OF, direction = Relationship.INCOMING)
+    @Getter
+    @Setter
     private Set<Group> childGroups;
 
     public Group() {
@@ -46,5 +52,13 @@ public class Group {
     public Group(String name) {
         this();
         this.name = name;
+    }
+
+    @Override
+    public String toString() {
+        return "Group{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                '}';
     }
 }

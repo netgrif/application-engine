@@ -132,7 +132,12 @@ class ImportHelper {
         roles.each { user.addProcessRole(it) }
         user = userService.saveNew(user)
 
-        def member = new Member(userId: user.id)
+        def member = new Member(
+                userId: user.id,
+                name: user.name,
+                surname: user.surname,
+                email: user.email
+        )
         orgs.each { group ->
             member.addGroup(group)
         }
