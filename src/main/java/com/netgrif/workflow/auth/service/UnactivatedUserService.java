@@ -9,6 +9,7 @@ import com.netgrif.workflow.auth.domain.repositories.UserProcessRoleRepository;
 import com.netgrif.workflow.auth.service.interfaces.IUnactivatedUserService;
 import com.netgrif.workflow.auth.web.requestbodies.NewUserRequest;
 import com.netgrif.workflow.auth.web.requestbodies.RegistrationRequest;
+import com.netgrif.workflow.orgstructure.service.IGroupService;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -31,6 +32,9 @@ public class UnactivatedUserService implements IUnactivatedUserService {
 
     @Autowired
     private UserProcessRoleRepository processRoleRepository;
+
+    @Autowired
+    private IGroupService groupService;
 
     @Scheduled(cron = "0 0 1 * * *")
     public void removeExpired() {
@@ -62,7 +66,7 @@ public class UnactivatedUserService implements IUnactivatedUserService {
         UnactivatedUser unactivatedUser = repository.findByEmail(request.email);
         User user = new User(unactivatedUser.getEmail(),request.password,request.name,request.surname);
 
-//        user.setGroups(getUsersOrganizations(unactivatedUser.getOrganizations()));
+        user.setGroups(getUsersGroups(unactivatedUser.getOrganizations()));
         user.setUserProcessRoles(getUsersUserProcessRoles(unactivatedUser.getProcessRoles()));
 
         return user;
@@ -82,5 +86,7 @@ public class UnactivatedUserService implements IUnactivatedUserService {
         return new HashSet<>(processRoleRepository.findByRoleIdIn(roles));
     }
 
-
+    private Set<Group> getUsersGroups(Set<Long> groupIds){
+        return groupService.findAllById(groupIds);
+    }
 }

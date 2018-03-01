@@ -32,4 +32,8 @@ public class Member {
     public Member() {
         groups = new HashSet<>();
     }
+
+    public void addGroup(Group group) {
+        groups.add(group);
+    }
 }

@@ -30,13 +30,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         User user = userRepository.findByEmail(email);
 
-        LoggedUser loggedUser = new LoggedUser(user.getId(), user.getEmail(), user.getPassword(), user.getAuthorities());
-        loggedUser.setFullName(user.getFullName());
-
-        if(!user.getUserProcessRoles().isEmpty())
-            loggedUser.parseProcessRoles(user.getUserProcessRoles());
-//        if(!user.getGroups().isEmpty())
-//            loggedUser.parseOrganizations(user.getGroups());
+        LoggedUser loggedUser = user.transformToLoggedUser();
 
         publisher.publishEvent(new UserLoginEvent(loggedUser));
 
