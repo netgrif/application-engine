@@ -53,12 +53,12 @@ public class UserController {
 
     @RequestMapping(method = RequestMethod.GET)
     public UsersResource getAll(Authentication auth, Locale locale) {
-        return new UsersResource(userService.findByGroups(((LoggedUser) auth.getPrincipal()).getOrganizations(), false), "all", locale, false);
+        return new UsersResource(userService.findByGroups(((LoggedUser) auth.getPrincipal()).getGroups(), false), "all", locale, false);
     }
 
     @RequestMapping(value = "/small", method = RequestMethod.GET)
     public UsersResource getAllSmall(Authentication auth, Locale locale) {
-        return new UsersResource(userService.findByGroups(((LoggedUser) auth.getPrincipal()).getOrganizations(), true), "small", locale, true);
+        return new UsersResource(userService.findByGroups(((LoggedUser) auth.getPrincipal()).getGroups(), true), "small", locale, true);
     }
 
     @RequestMapping(value = "/role/small", method = RequestMethod.POST)
