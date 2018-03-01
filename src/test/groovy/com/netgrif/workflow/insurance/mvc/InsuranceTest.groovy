@@ -103,7 +103,7 @@ class InsuranceTest {
 
         netId = net.get().stringId
 
-        def org = importHelper.createOrganization("Insurance Company")
+        def org = importHelper.createGroup("Insurance Company")
         def auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])
         def processRoles = importHelper.createUserProcessRoles(["agent": "Agent", "company": "Company"], net.get())
         importHelper.createUser(new User(name: "Test", surname: "Integration", email: USER_EMAIL, password: "password"),

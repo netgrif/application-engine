@@ -1,7 +1,6 @@
 package com.netgrif.workflow.auth.service;
 
 import com.netgrif.workflow.auth.domain.Authority;
-import com.netgrif.workflow.orgstructure.domain.Group;
 import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.auth.domain.UserProcessRole;
 import com.netgrif.workflow.auth.domain.repositories.AuthorityRepository;
@@ -9,6 +8,8 @@ import com.netgrif.workflow.auth.domain.repositories.UserRepository;
 import com.netgrif.workflow.auth.service.interfaces.IUserProcessRoleService;
 import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.event.events.user.UserRegistrationEvent;
+import com.netgrif.workflow.orgstructure.domain.Member;
+import com.netgrif.workflow.orgstructure.service.IMemberService;
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRoleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
@@ -41,6 +42,9 @@ public class UserService implements IUserService {
 
     @Autowired
     private IUserProcessRoleService userProcessRoleService;
+
+    @Autowired
+    private IMemberService memberService;
 
     @Override
     public User saveNew(User user) {
@@ -91,13 +95,13 @@ public class UserService implements IUserService {
         return users;
     }
 
-//    @Override
-//    public Set<User> findByOrganizations(Set<Long> org, boolean small) {
-//        Set<User> users = new HashSet<>(userRepository.findByOrganizationsIn(org.stream()
-//                .map(Group::new).collect(Collectors.toList())));
-//        if (!small) users.forEach(this::loadProcessRoles);
-//        return users;
-//    }
+    @Override
+    public Set<User> findByGroups(Set<Long> groups, boolean small) {
+        Set<Member> members = memberService.findByGroups(groups);
+        Set<User> users = new HashSet<>(userRepository.findAll(members.parallelStream().map(Member::getUserId).collect(Collectors.toList())));
+        if (!small) users.forEach(this::loadProcessRoles);
+        return users;
+    }
 
     @Override
     public Set<User> findByProcessRoles(Set<String> roleIds, boolean small) {
