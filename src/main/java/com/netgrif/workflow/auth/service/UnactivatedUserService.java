@@ -52,7 +52,7 @@ public class UnactivatedUserService implements IUnactivatedUserService {
     @Override
     public UnactivatedUser createUnactivatedUser(NewUserRequest request) {
         UnactivatedUser user = new UnactivatedUser(request.email, new BigInteger(260, new SecureRandom()).toString(32));
-        user.setOrganizations(request.organizations);
+        user.setGroups(request.groups);
         user.setProcessRoles(request.processRoles);
 
         repository.deleteAllByEmail(user.getEmail());
@@ -66,7 +66,7 @@ public class UnactivatedUserService implements IUnactivatedUserService {
         UnactivatedUser unactivatedUser = repository.findByEmail(request.email);
         User user = new User(unactivatedUser.getEmail(),request.password,request.name,request.surname);
 
-        user.setGroups(getUsersGroups(unactivatedUser.getOrganizations()));
+        user.setGroups(getUsersGroups(unactivatedUser.getGroups()));
         user.setUserProcessRoles(getUsersUserProcessRoles(unactivatedUser.getProcessRoles()));
 
         return user;
