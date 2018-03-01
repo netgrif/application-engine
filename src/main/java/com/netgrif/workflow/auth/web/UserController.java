@@ -48,15 +48,15 @@ public class UserController {
         return new UserResource(userService.findById(userId, true), "small", locale, true);
     }
 
-    @RequestMapping(method = RequestMethod.GET)
-    public UsersResource getAll(Authentication auth, Locale locale) {
-        return new UsersResource(userService.findByOrganizations(((LoggedUser) auth.getPrincipal()).getOrganizations(), false), "all", locale, false);
-    }
-
-    @RequestMapping(value = "/small", method = RequestMethod.GET)
-    public UsersResource getAllSmall(Authentication auth, Locale locale) {
-        return new UsersResource(userService.findByOrganizations(((LoggedUser) auth.getPrincipal()).getOrganizations(), true), "small", locale, true);
-    }
+//    @RequestMapping(method = RequestMethod.GET)
+//    public UsersResource getAll(Authentication auth, Locale locale) {
+//        return new UsersResource(userService.findByOrganizations(((LoggedUser) auth.getPrincipal()).getOrganizations(), false), "all", locale, false);
+//    }
+//
+//    @RequestMapping(value = "/small", method = RequestMethod.GET)
+//    public UsersResource getAllSmall(Authentication auth, Locale locale) {
+//        return new UsersResource(userService.findByOrganizations(((LoggedUser) auth.getPrincipal()).getOrganizations(), true), "small", locale, true);
+//    }
 
     @RequestMapping(value = "/role/small", method = RequestMethod.POST)
     public UsersResource getAllWithRole(@RequestBody Set<String> roleIds, Locale locale) {
@@ -91,9 +91,9 @@ public class UserController {
         return MessageResource.successMessage("Authority " + authorityId + " assigned to user " + userId);
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
-    @RequestMapping(value = "/organizations", method = RequestMethod.GET)
-    public OrganizationsResource getAllOrganizations() {
-        return new OrganizationsResource(userService.getAllOrganizations());
-    }
+//    @PreAuthorize("hasRole('ADMIN')")
+//    @RequestMapping(value = "/organizations", method = RequestMethod.GET)
+//    public OrganizationsResource getAllOrganizations() {
+//        return new OrganizationsResource(userService.getAllOrganizations());
+//    }
 }

@@ -20,7 +20,7 @@ public class UserResource extends Resource<LocalisedUser> {
         this(content, selfRel, locale);
         if (small) {
             getContent().setTelNumber(null);
-            getContent().setOrganizations(null);
+//            getContent().setGroups(null);
             getContent().setAuthorities(null);
             getContent().setPassword(null);
             getContent().setProcessRoles(null);

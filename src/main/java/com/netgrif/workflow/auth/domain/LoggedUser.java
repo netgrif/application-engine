@@ -1,5 +1,6 @@
 package com.netgrif.workflow.auth.domain;
 
+import com.netgrif.workflow.orgstructure.domain.Group;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
@@ -30,7 +31,7 @@ public class LoggedUser extends org.springframework.security.core.userdetails.Us
         this.organizations = new HashSet<>();
     }
 
-    public void parseOrganizations(Iterable<Organization> organizations){
+    public void parseOrganizations(Iterable<Group> organizations){
         organizations.forEach(org -> this.organizations.add(org.getId()));
     }
 
