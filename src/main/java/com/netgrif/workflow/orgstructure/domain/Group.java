@@ -3,6 +3,7 @@ package com.netgrif.workflow.orgstructure.domain;
 
 import lombok.AccessLevel;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.Setter;
 import org.neo4j.ogm.annotation.GraphId;
 import org.neo4j.ogm.annotation.NodeEntity;
@@ -14,6 +15,7 @@ import java.util.Set;
 
 @NodeEntity
 @Data
+@EqualsAndHashCode(exclude = {"members", "childGroups", "parentGroup"})
 public class Group {
 
     public static final String MEMBER_OF = "MEMBER_OF";

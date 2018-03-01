@@ -4,9 +4,10 @@ import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.auth.service.interfaces.IAuthorityService;
 import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.auth.web.responsebodies.AuthoritiesResources;
-import com.netgrif.workflow.auth.web.responsebodies.OrganizationsResource;
+import com.netgrif.workflow.auth.web.responsebodies.GroupsResource;
 import com.netgrif.workflow.auth.web.responsebodies.UserResource;
 import com.netgrif.workflow.auth.web.responsebodies.UsersResource;
+import com.netgrif.workflow.orgstructure.service.IGroupService;
 import com.netgrif.workflow.petrinet.service.interfaces.IProcessRoleService;
 import com.netgrif.workflow.workflow.web.responsebodies.MessageResource;
 import org.apache.log4j.Logger;
@@ -33,6 +34,9 @@ public class UserController {
     @Autowired
     private IAuthorityService authorityService;
 
+    @Autowired
+    private IGroupService groupService;
+
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     public UserResource getUser(@PathVariable("id") Long userId, Locale locale) {
         return new UserResource(userService.findById(userId, false), "profile", locale);
@@ -48,15 +52,15 @@ public class UserController {
         return new UserResource(userService.findById(userId, true), "small", locale, true);
     }
 
-//    @RequestMapping(method = RequestMethod.GET)
-//    public UsersResource getAll(Authentication auth, Locale locale) {
-//        return new UsersResource(userService.findByOrganizations(((LoggedUser) auth.getPrincipal()).getOrganizations(), false), "all", locale, false);
-//    }
-//
-//    @RequestMapping(value = "/small", method = RequestMethod.GET)
-//    public UsersResource getAllSmall(Authentication auth, Locale locale) {
-//        return new UsersResource(userService.findByOrganizations(((LoggedUser) auth.getPrincipal()).getOrganizations(), true), "small", locale, true);
-//    }
+    @RequestMapping(method = RequestMethod.GET)
+    public UsersResource getAll(Authentication auth, Locale locale) {
+        return new UsersResource(userService.findByGroups(((LoggedUser) auth.getPrincipal()).getOrganizations(), false), "all", locale, false);
+    }
+
+    @RequestMapping(value = "/small", method = RequestMethod.GET)
+    public UsersResource getAllSmall(Authentication auth, Locale locale) {
+        return new UsersResource(userService.findByGroups(((LoggedUser) auth.getPrincipal()).getOrganizations(), true), "small", locale, true);
+    }
 
     @RequestMapping(value = "/role/small", method = RequestMethod.POST)
     public UsersResource getAllWithRole(@RequestBody Set<String> roleIds, Locale locale) {
@@ -91,9 +95,9 @@ public class UserController {
         return MessageResource.successMessage("Authority " + authorityId + " assigned to user " + userId);
     }
 
-//    @PreAuthorize("hasRole('ADMIN')")
-//    @RequestMapping(value = "/organizations", method = RequestMethod.GET)
-//    public OrganizationsResource getAllOrganizations() {
-//        return new OrganizationsResource(userService.getAllOrganizations());
-//    }
+    @PreAuthorize("hasRole('ADMIN')")
+    @RequestMapping(value = "/organizations", method = RequestMethod.GET)
+    public GroupsResource getAllOrganizations() {
+        return new GroupsResource(groupService.findAll());
+    }
 }

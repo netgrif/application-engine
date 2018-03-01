@@ -76,7 +76,13 @@ public class User {
     @Setter
     private Set<ProcessRole> processRoles;
 
+    @Transient
+    @Getter
+    @Setter
+    private Set<Group> groups;
+
     public User() {
+        groups = new HashSet<>();
         authorities = new HashSet<>();
         userProcessRoles = new HashSet<>();
         processRoles = new HashSet<>();
@@ -113,11 +119,17 @@ public class User {
         return name + " " + surname;
     }
 
+    public void addGroup(Group group) {
+        this.groups.add(group);
+    }
+
     public LoggedUser transformToLoggedUser() {
         LoggedUser loggedUser = new LoggedUser(this.getId(), this.getEmail(), this.getPassword(), this.getAuthorities());
         loggedUser.setFullName(this.getFullName());
         if (!this.getUserProcessRoles().isEmpty())
             loggedUser.parseProcessRoles(this.getUserProcessRoles());
+        if (!this.getGroups().isEmpty())
+            loggedUser.parseOrganizations(this.getGroups());
 
         return loggedUser;
     }

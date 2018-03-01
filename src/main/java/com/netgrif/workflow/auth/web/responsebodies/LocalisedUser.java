@@ -31,7 +31,7 @@ public class LocalisedUser {
 
     private String fullName;
 
-//    private Set<Group> groups;
+    private Set<Group> groups;
 
     private Set<Authority> authorities;
 
@@ -48,6 +48,7 @@ public class LocalisedUser {
         name = user.getName();
         surname = user.getSurname();
         fullName = user.getFullName();
+        groups = user.getGroups();
         authorities = user.getAuthorities();
         userProcessRoles = user.getUserProcessRoles();
         processRoles = user.getProcessRoles().stream()
