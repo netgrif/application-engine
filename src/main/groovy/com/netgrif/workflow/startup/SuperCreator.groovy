@@ -1,11 +1,9 @@
 package com.netgrif.workflow.startup
 
 import com.netgrif.workflow.auth.domain.Authority
-import com.netgrif.workflow.auth.domain.Organization
 import com.netgrif.workflow.auth.domain.User
 import com.netgrif.workflow.auth.domain.UserProcessRole
 import com.netgrif.workflow.auth.domain.repositories.AuthorityRepository
-import com.netgrif.workflow.auth.domain.repositories.OrganizationRepository
 import com.netgrif.workflow.auth.service.interfaces.IUserProcessRoleService
 import com.netgrif.workflow.auth.service.interfaces.IUserService
 import org.apache.log4j.Logger
@@ -18,9 +16,6 @@ import org.springframework.stereotype.Component
 class SuperCreator extends AbstractOrderedCommandLineRunner {
 
     private static final Logger log = Logger.getLogger(SuperCreator.class.name)
-
-    @Autowired
-    private OrganizationRepository organizationRepository
 
     @Autowired
     private AuthorityRepository authorityRepository
@@ -50,22 +45,22 @@ class SuperCreator extends AbstractOrderedCommandLineRunner {
                 email: "super@netgrif.com",
                 password: "password",
                 authorities: [adminAuthority] as Set<Authority>,
-                organizations: organizationRepository.findAll() as Set<Organization>,
+//                organizations: organizationRepository.findAll() as Set<Organization>,
                 userProcessRoles: userProcessRoleService.findAllMinusDefault() as Set<UserProcessRole>))
 
         log.info("Super user created")
         return superUser
     }
 
-    public void setAllToSuperUser() {
-        superUser.setOrganizations(organizationRepository.findAll() as Set<Organization>)
+    void setAllToSuperUser() {
+//        superUser.setGroups(organizationRepository.findAll() as Set<Group>)
         superUser.setUserProcessRoles(userProcessRoleService.findAllMinusDefault() as Set<UserProcessRole>)
 
         superUser = userService.save(superUser)
         log.info("Super user updated")
     }
 
-    public User getSuperUser() {
+    User getSuperUser() {
         return superUser
     }
 }
