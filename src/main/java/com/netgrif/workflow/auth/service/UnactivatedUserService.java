@@ -1,10 +1,9 @@
 package com.netgrif.workflow.auth.service;
 
-import com.netgrif.workflow.auth.domain.Organization;
+import com.netgrif.workflow.orgstructure.domain.Group;
 import com.netgrif.workflow.auth.domain.UnactivatedUser;
 import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.auth.domain.UserProcessRole;
-import com.netgrif.workflow.auth.domain.repositories.OrganizationRepository;
 import com.netgrif.workflow.auth.domain.repositories.UnactivatedUserRepository;
 import com.netgrif.workflow.auth.domain.repositories.UserProcessRoleRepository;
 import com.netgrif.workflow.auth.service.interfaces.IUnactivatedUserService;
@@ -21,7 +20,6 @@ import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 public class UnactivatedUserService implements IUnactivatedUserService {
@@ -30,8 +28,7 @@ public class UnactivatedUserService implements IUnactivatedUserService {
 
     @Autowired
     private UnactivatedUserRepository repository;
-    @Autowired
-    private OrganizationRepository organizationRepository;
+
     @Autowired
     private UserProcessRoleRepository processRoleRepository;
 
@@ -65,7 +62,7 @@ public class UnactivatedUserService implements IUnactivatedUserService {
         UnactivatedUser unactivatedUser = repository.findByEmail(request.email);
         User user = new User(unactivatedUser.getEmail(),request.password,request.name,request.surname);
 
-        user.setOrganizations(getUsersOrganizations(unactivatedUser.getOrganizations()));
+//        user.setGroups(getUsersOrganizations(unactivatedUser.getOrganizations()));
         user.setUserProcessRoles(getUsersUserProcessRoles(unactivatedUser.getProcessRoles()));
 
         return user;
@@ -79,10 +76,6 @@ public class UnactivatedUserService implements IUnactivatedUserService {
 
     private boolean isTokenValid(UnactivatedUser user) {
         return user != null && user.getToken() != null && user.getExpirationDate().isAfter(LocalDateTime.now());
-    }
-
-    private Set<Organization> getUsersOrganizations(Set<Long> orgs){
-        return new HashSet<>(organizationRepository.findAll(orgs));
     }
 
     private Set<UserProcessRole> getUsersUserProcessRoles(Set<String> roles){

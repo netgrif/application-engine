@@ -1,11 +1,11 @@
 package com.netgrif.workflow
 
 import com.netgrif.workflow.auth.domain.Authority
-import com.netgrif.workflow.auth.domain.Organization
+import com.netgrif.workflow.orgstructure.domain.Group
 import com.netgrif.workflow.auth.domain.User
 import com.netgrif.workflow.auth.domain.UserProcessRole
 import com.netgrif.workflow.auth.domain.repositories.AuthorityRepository
-import com.netgrif.workflow.auth.domain.repositories.OrganizationRepository
+
 import com.netgrif.workflow.auth.domain.repositories.UserProcessRoleRepository
 import com.netgrif.workflow.auth.domain.repositories.UserRepository
 import com.netgrif.workflow.auth.service.UserService
@@ -34,8 +34,6 @@ class JMeterExport {
     @Autowired
     private UserService userService
     @Autowired
-    private OrganizationRepository organizationRepository
-    @Autowired
     private AuthorityRepository authorityRepository
     @Autowired
     private UserProcessRoleRepository processRoleRepository
@@ -47,7 +45,7 @@ class JMeterExport {
     private TaskService taskService
 
     private PetriNet net
-    private Organization org
+    private Group org
     private Authority authority
     private UserProcessRole processRole
 
@@ -105,7 +103,7 @@ class JMeterExport {
                     surname: randomSurname(),
                     password: "password",
                     authorities: [authority] as Set<Authority>,
-                    organizations: [org] as Set<Organization>)
+                    setGroups: [org] as Set<Group>)
             user.addProcessRole(processRole)
             user.setEmail(generateMail(user.name, user.surname))
             user = userService.saveNew(user)

@@ -404,7 +404,7 @@ public class TaskService implements ITaskService {
                 }
                 User user = userRepository.findByEmail(node.get("value").asText());
                 user.setPassword(null);
-                user.setOrganizations(null);
+//                user.setGroups(null);
                 user.setAuthorities(null);
                 user.setUserProcessRoles(null);
                 value = user;

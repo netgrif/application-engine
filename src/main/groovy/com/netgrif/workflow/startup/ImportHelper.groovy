@@ -1,8 +1,10 @@
 package com.netgrif.workflow.startup
 
-import com.netgrif.workflow.auth.domain.*
+import com.netgrif.workflow.auth.domain.Authority
+import com.netgrif.workflow.auth.domain.LoggedUser
+import com.netgrif.workflow.auth.domain.User
+import com.netgrif.workflow.auth.domain.UserProcessRole
 import com.netgrif.workflow.auth.domain.repositories.AuthorityRepository
-import com.netgrif.workflow.auth.domain.repositories.OrganizationRepository
 import com.netgrif.workflow.auth.domain.repositories.UserProcessRoleRepository
 import com.netgrif.workflow.auth.service.interfaces.IUserService
 import com.netgrif.workflow.petrinet.domain.PetriNet
@@ -33,9 +35,6 @@ class ImportHelper {
     private IUserService userService
 
     @Autowired
-    private OrganizationRepository organizationRepository
-
-    @Autowired
     private CaseRepository caseRepository
 
     @Autowired
@@ -56,21 +55,21 @@ class ImportHelper {
     @Autowired
     private IFilterService filterService
 
-    @SuppressWarnings("GroovyAssignabilityCheck")
-    Map<String, Organization> createOrganizations(Map<String, String> organizations) {
-        HashMap<String, Organization> orgsMap = new HashMap<>()
-        organizations.each { org ->
-            orgsMap.put(org.key, organizationRepository.save(new Organization(org.value)))
-        }
+//    @SuppressWarnings("GroovyAssignabilityCheck")
+//    Map<String, Group> createOrganizations(Map<String, String> organizations) {
+//        HashMap<String, Group> orgsMap = new HashMap<>()
+//        organizations.each { org ->
+//            orgsMap.put(org.key, organizationRepository.save(new Group(org.value)))
+//        }
+//
+//        log.info("Created ${orgsMap.size()} groups")
+//        return orgsMap
+//    }
 
-        log.info("Created ${orgsMap.size()} organizations")
-        return orgsMap
-    }
-
-    Organization createOrganization(String name) {
-        log.info("Creating Organization $name")
-        return organizationRepository.save(new Organization(name))
-    }
+//    Group createOrganization(String name) {
+//        log.info("Creating Group $name")
+//        return organizationRepository.save(new Group(name))
+//    }
 
     @SuppressWarnings("GroovyAssignabilityCheck")
     Map<String, Authority> createAuthorities(Map<String, String> authorities) {
@@ -118,9 +117,9 @@ class ImportHelper {
         return map
     }
 
-    User createUser(User user, Authority[] authorities, Organization[] orgs, UserProcessRole[] roles) {
+    User createUser(User user, Authority[] authorities, /*Group[] orgs, */UserProcessRole[] roles) {
         authorities.each { user.addAuthority(it) }
-        orgs.each { user.addOrganization(it) }
+//        orgs.each { user.addOrganization(it) }
         roles.each { user.addProcessRole(it) }
         user = userService.saveNew(user)
         log.info("User $user.name $user.surname created")
