@@ -1,4 +1,4 @@
-package com.netgrif.workflow.auth.web.responsebodies;
+package com.netgrif.workflow.orgstructure.web.responsebodies;
 
 import com.netgrif.workflow.orgstructure.domain.Group;
 import com.netgrif.workflow.orgstructure.web.GroupController;

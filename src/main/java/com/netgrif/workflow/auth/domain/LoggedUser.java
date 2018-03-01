@@ -19,7 +19,7 @@ public class LoggedUser extends org.springframework.security.core.userdetails.Us
     private String fullName;
 
     @Getter @Setter
-    private Set<Long> organizations;
+    private Set<Long> groups;
 
     @Getter @Setter
     private Set<String> processRoles;
@@ -28,11 +28,11 @@ public class LoggedUser extends org.springframework.security.core.userdetails.Us
         super(username, password, authorities);
         this.id = id;
         this.processRoles = new HashSet<>();
-        this.organizations = new HashSet<>();
+        this.groups = new HashSet<>();
     }
 
-    public void parseOrganizations(Iterable<Group> organizations){
-        organizations.forEach(org -> this.organizations.add(org.getId()));
+    public void parseGroups(Iterable<Group> groups){
+        groups.forEach(org -> this.groups.add(org.getId()));
     }
 
     public void parseProcessRoles(Set<UserProcessRole> processRoles){
