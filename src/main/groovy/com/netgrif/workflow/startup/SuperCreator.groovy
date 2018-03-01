@@ -6,6 +6,9 @@ import com.netgrif.workflow.auth.domain.UserProcessRole
 import com.netgrif.workflow.auth.domain.repositories.AuthorityRepository
 import com.netgrif.workflow.auth.service.interfaces.IUserProcessRoleService
 import com.netgrif.workflow.auth.service.interfaces.IUserService
+import com.netgrif.workflow.orgstructure.domain.Member
+import com.netgrif.workflow.orgstructure.service.IGroupService
+import com.netgrif.workflow.orgstructure.service.IMemberService
 import org.apache.log4j.Logger
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Profile
@@ -26,7 +29,15 @@ class SuperCreator extends AbstractOrderedCommandLineRunner {
     @Autowired
     private IUserService userService
 
+    @Autowired
+    private IMemberService memberService
+
+    @Autowired
+    private IGroupService groupService
+
     private User superUser
+
+    private Member superMember
 
     @Override
     void run(String... strings) {
@@ -45,15 +56,16 @@ class SuperCreator extends AbstractOrderedCommandLineRunner {
                 email: "super@netgrif.com",
                 password: "password",
                 authorities: [adminAuthority] as Set<Authority>,
-//                organizations: organizationRepository.findAll() as Set<Organization>,
                 userProcessRoles: userProcessRoleService.findAllMinusDefault() as Set<UserProcessRole>))
+
+        this.superMember = memberService.save(new Member(userId: superUser.id))
 
         log.info("Super user created")
         return superUser
     }
 
     void setAllToSuperUser() {
-//        superUser.setGroups(organizationRepository.findAll() as Set<Group>)
+        superMember.setGroups(groupService.findAll())
         superUser.setUserProcessRoles(userProcessRoleService.findAllMinusDefault() as Set<UserProcessRole>)
 
         superUser = userService.save(superUser)
