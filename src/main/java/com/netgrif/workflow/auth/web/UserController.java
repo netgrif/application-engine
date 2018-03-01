@@ -4,7 +4,6 @@ import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.auth.service.interfaces.IAuthorityService;
 import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.auth.web.responsebodies.AuthoritiesResources;
-import com.netgrif.workflow.auth.web.responsebodies.GroupsResource;
 import com.netgrif.workflow.auth.web.responsebodies.UserResource;
 import com.netgrif.workflow.auth.web.responsebodies.UsersResource;
 import com.netgrif.workflow.orgstructure.service.IGroupService;
@@ -93,11 +92,5 @@ public class UserController {
     public MessageResource assignAuthorityToUser(@PathVariable("id") Long userId, @RequestBody Long authorityId) {
         userService.assignAuthority(userId, authorityId);
         return MessageResource.successMessage("Authority " + authorityId + " assigned to user " + userId);
-    }
-
-    @PreAuthorize("hasRole('ADMIN')")
-    @RequestMapping(value = "/organizations", method = RequestMethod.GET)
-    public GroupsResource getAllOrganizations() {
-        return new GroupsResource(groupService.findAll());
     }
 }
