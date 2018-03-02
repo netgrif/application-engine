@@ -1,6 +1,5 @@
 package com.netgrif.workflow.auth.service;
 
-import com.netgrif.workflow.orgstructure.domain.Group;
 import com.netgrif.workflow.auth.domain.UnactivatedUser;
 import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.auth.domain.UserProcessRole;
@@ -9,6 +8,7 @@ import com.netgrif.workflow.auth.domain.repositories.UserProcessRoleRepository;
 import com.netgrif.workflow.auth.service.interfaces.IUnactivatedUserService;
 import com.netgrif.workflow.auth.web.requestbodies.NewUserRequest;
 import com.netgrif.workflow.auth.web.requestbodies.RegistrationRequest;
+import com.netgrif.workflow.orgstructure.domain.Group;
 import com.netgrif.workflow.orgstructure.service.IGroupService;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,9 +62,9 @@ public class UnactivatedUserService implements IUnactivatedUserService {
     }
 
     @Override
-    public User createUser(RegistrationRequest request){
+    public User createUser(RegistrationRequest request) {
         UnactivatedUser unactivatedUser = repository.findByEmail(request.email);
-        User user = new User(unactivatedUser.getEmail(),request.password,request.name,request.surname);
+        User user = new User(unactivatedUser.getEmail(), request.password, request.name, request.surname);
 
         user.setGroups(getUsersGroups(unactivatedUser.getGroups()));
         user.setUserProcessRoles(getUsersUserProcessRoles(unactivatedUser.getProcessRoles()));
@@ -82,11 +82,11 @@ public class UnactivatedUserService implements IUnactivatedUserService {
         return user != null && user.getToken() != null && user.getExpirationDate().isAfter(LocalDateTime.now());
     }
 
-    private Set<UserProcessRole> getUsersUserProcessRoles(Set<String> roles){
+    private Set<UserProcessRole> getUsersUserProcessRoles(Set<String> roles) {
         return new HashSet<>(processRoleRepository.findByRoleIdIn(roles));
     }
 
-    private Set<Group> getUsersGroups(Set<Long> groupIds){
+    private Set<Group> getUsersGroups(Set<Long> groupIds) {
         return groupService.findAllById(groupIds);
     }
 }
