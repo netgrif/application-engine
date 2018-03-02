@@ -63,11 +63,21 @@ class SuperCreator extends AbstractOrderedCommandLineRunner {
     }
 
     void setAllToSuperUser() {
-        superMember.setGroups(groupService.findAll())
-        superUser.setUserProcessRoles(userProcessRoleService.findAllMinusDefault() as Set<UserProcessRole>)
-
-        superUser = userService.save(superUser)
+        setAllGroups()
+        setAllProcessRoles()
         log.info("Super user updated")
+    }
+
+    void setAllGroups() {
+        groupService.findAll().each {
+            it.addMember(superMember)
+        }
+        memberService.save(superMember)
+    }
+
+    void setAllProcessRoles() {
+        superUser.setUserProcessRoles(userProcessRoleService.findAllMinusDefault() as Set<UserProcessRole>)
+        superUser = userService.save(superUser)
     }
 
     User getSuperUser() {
