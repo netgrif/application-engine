@@ -9,4 +9,6 @@ import java.util.Set;
 public interface MemberRepository extends Neo4jRepository<Member, Long> {
 
     Set<Member> findAllByGroups(Set<Group> groups);
+
+    Member findByEmail(String email);
 }

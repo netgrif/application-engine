@@ -9,5 +9,7 @@ public interface IMemberService {
 
     Member save(Member member);
 
-    Set<Member> findByGroups(Collection<Long> groupIds);
+    Set<Member> findAllByGroups(Collection<Long> groupIds);
+
+    Member findByEmail(String email);
 }

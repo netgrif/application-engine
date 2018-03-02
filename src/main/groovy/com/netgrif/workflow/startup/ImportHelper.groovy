@@ -8,7 +8,6 @@ import com.netgrif.workflow.auth.domain.repositories.AuthorityRepository
 import com.netgrif.workflow.auth.domain.repositories.UserProcessRoleRepository
 import com.netgrif.workflow.auth.service.interfaces.IUserService
 import com.netgrif.workflow.orgstructure.domain.Group
-import com.netgrif.workflow.orgstructure.domain.Member
 import com.netgrif.workflow.orgstructure.service.IGroupService
 import com.netgrif.workflow.orgstructure.service.IMemberService
 import com.netgrif.workflow.petrinet.domain.PetriNet
@@ -130,19 +129,8 @@ class ImportHelper {
     User createUser(User user, Authority[] authorities, Group[] orgs, UserProcessRole[] roles) {
         authorities.each { user.addAuthority(it) }
         roles.each { user.addProcessRole(it) }
+        user.groups = orgs as Set
         user = userService.saveNew(user)
-
-        def member = new Member(
-                userId: user.id,
-                name: user.name,
-                surname: user.surname,
-                email: user.email
-        )
-        orgs.each { group ->
-            member.addGroup(group)
-        }
-        memberService.save(member)
-
         log.info("User $user.name $user.surname created")
         return user
     }
