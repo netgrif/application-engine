@@ -57,14 +57,7 @@ class SuperCreator extends AbstractOrderedCommandLineRunner {
                 password: "password",
                 authorities: [adminAuthority] as Set<Authority>,
                 userProcessRoles: userProcessRoleService.findAllMinusDefault() as Set<UserProcessRole>))
-
-        this.superMember = memberService.save(new Member(
-                userId: superUser.id,
-                email: superUser.email,
-                name: superUser.name,
-                surname: superUser.surname
-        ))
-
+        this.superMember = memberService.findByEmail(superUser.email)
         log.info("Super user created")
         return superUser
     }

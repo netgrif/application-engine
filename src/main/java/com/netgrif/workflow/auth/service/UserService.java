@@ -53,6 +53,10 @@ public class UserService implements IUserService {
         addDefaultAuthorities(user);
 
         User savedUser = userRepository.save(user);
+        Member member = new Member(savedUser.getId(), savedUser.getName(), savedUser.getSurname(), savedUser.getEmail());
+        member.setGroups(savedUser.getGroups());
+        memberService.save(member);
+
         publisher.publishEvent(new UserRegistrationEvent(savedUser));
         return savedUser;
     }
@@ -97,7 +101,7 @@ public class UserService implements IUserService {
 
     @Override
     public Set<User> findByGroups(Set<Long> groups, boolean small) {
-        Set<Member> members = memberService.findByGroups(groups);
+        Set<Member> members = memberService.findAllByGroups(groups);
         Set<User> users = new HashSet<>(userRepository.findAll(members.parallelStream().map(Member::getUserId).collect(Collectors.toList())));
         if (!small) users.forEach(this::loadProcessRoles);
         return users;
