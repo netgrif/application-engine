@@ -24,8 +24,13 @@ public class MemberService implements IMemberService {
     }
 
     @Override
-    public Set<Member> findByGroups(Collection<Long> groupIds) {
+    public Set<Member> findAllByGroups(Collection<Long> groupIds) {
         Set<Group> groups = groupService.findAllById(groupIds);
         return repository.findAllByGroups(groups);
+    }
+
+    @Override
+    public Member findByEmail(String email) {
+        return repository.findByEmail(email);
     }
 }
