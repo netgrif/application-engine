@@ -36,6 +36,9 @@ public class Member {
     @NotEmpty
     private String email;
 
+    /**
+     * Set of groups this entity is member of. To add member to group use group.addMember()
+     */
     @Relationship(type = Group.MEMBER_OF)
     @Getter
     @Setter
@@ -51,10 +54,6 @@ public class Member {
         this.name = name;
         this.surname = surname;
         this.email = email;
-    }
-
-    public void addGroup(Group group) {
-        groups.add(group);
     }
 
     @Override
