@@ -39,6 +39,9 @@ public class Group {
     @Setter
     private Group parentGroup;
 
+    /**
+     * Set of child groups. To add child use setParent(this) on child.
+     */
     @Relationship(type = CHILD_OF, direction = Relationship.INCOMING)
     @Getter
     @Setter
@@ -52,6 +55,11 @@ public class Group {
     public Group(String name) {
         this();
         this.name = name;
+    }
+
+    public void addMember(Member member) {
+        members.add(member);
+        member.getGroups().add(this);
     }
 
     @Override
