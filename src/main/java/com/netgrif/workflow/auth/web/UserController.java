@@ -6,7 +6,6 @@ import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.auth.web.responsebodies.AuthoritiesResources;
 import com.netgrif.workflow.auth.web.responsebodies.UserResource;
 import com.netgrif.workflow.auth.web.responsebodies.UsersResource;
-import com.netgrif.workflow.orgstructure.service.IGroupService;
 import com.netgrif.workflow.petrinet.service.interfaces.IProcessRoleService;
 import com.netgrif.workflow.workflow.web.responsebodies.MessageResource;
 import org.apache.log4j.Logger;
@@ -33,9 +32,6 @@ public class UserController {
     @Autowired
     private IAuthorityService authorityService;
 
-    @Autowired
-    private IGroupService groupService;
-
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     public UserResource getUser(@PathVariable("id") Long userId, Locale locale) {
         return new UserResource(userService.findById(userId, false), "profile", locale);
@@ -53,12 +49,12 @@ public class UserController {
 
     @RequestMapping(method = RequestMethod.GET)
     public UsersResource getAll(Authentication auth, Locale locale) {
-        return new UsersResource(userService.findByGroups(((LoggedUser) auth.getPrincipal()).getGroups(), false), "all", locale, false);
+        return new UsersResource(userService.findAllCoMembers(((LoggedUser) auth.getPrincipal()).getUsername(), false), "all", locale, false);
     }
 
     @RequestMapping(value = "/small", method = RequestMethod.GET)
     public UsersResource getAllSmall(Authentication auth, Locale locale) {
-        return new UsersResource(userService.findByGroups(((LoggedUser) auth.getPrincipal()).getGroups(), true), "small", locale, true);
+        return new UsersResource(userService.findAllCoMembers(((LoggedUser) auth.getPrincipal()).getUsername(), true), "small", locale, true);
     }
 
     @RequestMapping(value = "/role/small", method = RequestMethod.POST)
