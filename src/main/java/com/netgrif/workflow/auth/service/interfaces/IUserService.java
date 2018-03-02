@@ -17,7 +17,7 @@ public interface IUserService {
 
     List<User> findAll(boolean small);
 
-    Set<User> findByGroups(Set<Long> groups, boolean small);
+    Set<User> findAllCoMembers(String email, boolean small);
 
     Set<User> findByProcessRoles(Set<String> roleIds, boolean small);
 
