@@ -60,6 +60,7 @@
                 <xs:element ref="label"/>
                 <xs:element ref="icon" minOccurs="0"/>
                 <xs:element ref="priority" minOccurs="0"/>
+                <xs:element ref="assignPolicy" minOccurs="0"/>
                 <xs:element ref="dataFocusPolicy" minOccurs="0"/>
                 <xs:element ref="trigger" minOccurs="0" maxOccurs="unbounded"/>
                 <xs:element ref="transactionRef" minOccurs="0"/>
@@ -196,6 +197,12 @@
             <xs:enumeration value="auto"/>
             <xs:enumeration value="user"/>
             <xs:enumeration value="time"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="assignPolicyType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="auto"/>
+            <xs:enumeration value="manual"/>
         </xs:restriction>
     </xs:simpleType>
     <xs:simpleType name="nonNegativeLong">
@@ -336,5 +343,6 @@
             </xs:extension>
         </xs:simpleContent>
     </xs:complexType>
+    <xs:element name="assignPolicy" type="assignPolicyType"/>
     <xs:element name="dataFocusPolicy" type="dataFocusPolicyType"/>
 </xs:schema>
