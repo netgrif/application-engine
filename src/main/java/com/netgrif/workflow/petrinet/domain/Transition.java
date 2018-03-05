@@ -40,6 +40,9 @@ public class Transition extends Node {
     @Getter @Setter
     private String icon;
 
+    @Getter @Setter
+    private DataFocusPolicy dataFocusPolicy;
+
     public Transition() {
         super();
         dataSet = new LinkedHashMap<>();
@@ -47,6 +50,7 @@ public class Transition extends Node {
         triggers = new LinkedList<>();
         dataGroups = new LinkedHashMap<>();
         assignPolicy = AssignPolicy.MANUAL;
+        dataFocusPolicy = DataFocusPolicy.MANUAL;
     }
 
     public void addDataSet(String fieldId, DataFieldLogic logic) {
