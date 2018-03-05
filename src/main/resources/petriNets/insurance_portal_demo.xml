@@ -7082,6 +7082,7 @@
         <label name="only_property">Iba nehnuteľnosť</label>
         <icon>home</icon>
         <priority>1</priority>
+        <assignPolicy>auto</assignPolicy>
         <transactionRef>
             <id>1</id>
         </transactionRef>
@@ -7119,6 +7120,7 @@
         <label name="only_household">Iba domácnosť</label>
         <icon>weekend</icon>
         <priority>2</priority>
+        <assignPolicy>auto</assignPolicy>
         <transactionRef>
             <id>1</id>
         </transactionRef>
@@ -7156,6 +7158,7 @@
         <label name="property_and_household">Nehnuteľnosť a domácnosť</label>
         <icon>home weekend</icon>
         <priority>3</priority>
+        <assignPolicy>auto</assignPolicy>
         <transactionRef>
             <id>1</id>
         </transactionRef>
@@ -7192,6 +7195,7 @@
         <y>60</y>
         <label>Základné informácie</label>
         <priority>1</priority>
+        <assignPolicy>auto</assignPolicy>
         <transactionRef>
             <id>2</id>
         </transactionRef>
@@ -7316,6 +7320,7 @@
         <y>220</y>
         <label>Nehnuteľnosť</label>
         <priority>2</priority>
+        <assignPolicy>auto</assignPolicy>
         <transactionRef>
             <id>2</id>
         </transactionRef>
@@ -7455,6 +7460,7 @@
         <y>380</y>
         <label>Doplnkové poistenie nehnuteľnosti</label>
         <priority>3</priority>
+        <assignPolicy>auto</assignPolicy>
         <transactionRef>
             <id>2</id>
         </transactionRef>
@@ -7913,6 +7919,7 @@
         <y>540</y>
         <label>Vedľajšie stavby</label>
         <priority>4</priority>
+        <assignPolicy>auto</assignPolicy>
         <transactionRef>
             <id>2</id>
         </transactionRef>
@@ -9004,6 +9011,7 @@
         <y>700</y>
         <label>Domácnosť</label>
         <priority>5</priority>
+        <assignPolicy>auto</assignPolicy>
         <transactionRef>
             <id>2</id>
         </transactionRef>
@@ -9111,6 +9119,7 @@
         <y>860</y>
         <label>Doplnkové poistenie domácnosti</label>
         <priority>6</priority>
+        <assignPolicy>auto</assignPolicy>
         <transactionRef>
             <id>2</id>
         </transactionRef>
@@ -9903,7 +9912,6 @@
                 </logic>
             </dataRef>
         </dataGroup>
-
     </transition>
     <!--================================= Sumár =====================-->
     <transition>
@@ -9912,6 +9920,7 @@
         <y>1020</y>
         <label>Sumár</label>
         <priority>7</priority>
+        <assignPolicy>auto</assignPolicy>
         <transactionRef>
             <id>2</id>
         </transactionRef>
@@ -10170,6 +10179,7 @@
         <y>1180</y>
         <label>Údaje o poistníkovi a mieste poistenia</label>
         <priority>8</priority>
+        <assignPolicy>auto</assignPolicy>
         <transactionRef>
             <id>2</id>
         </transactionRef>
@@ -10584,6 +10594,7 @@
         <y>260</y>
         <label>Údaje o zmluve</label>
         <priority>9</priority>
+        <assignPolicy>auto</assignPolicy>
         <transactionRef>
             <id>3</id>
         </transactionRef>
@@ -10689,6 +10700,7 @@
         <y>898</y>
         <label>Údaje o zmluve</label>
         <priority>9</priority>
+        <assignPolicy>auto</assignPolicy>
         <transactionRef>
             <id>3</id>
         </transactionRef>
@@ -10795,6 +10807,7 @@
         <y>580</y>
         <label>Údaje o zmluve</label>
         <priority>9</priority>
+        <assignPolicy>auto</assignPolicy>
         <transactionRef>
             <id>3</id>
         </transactionRef>
