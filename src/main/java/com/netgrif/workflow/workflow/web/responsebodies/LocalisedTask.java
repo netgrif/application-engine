@@ -54,6 +54,8 @@ public class LocalisedTask {
 
     private String assignPolicy;
 
+    private String dataFocusPolicy;
+
     public LocalisedTask(com.netgrif.workflow.workflow.domain.Task task, Locale locale) {
         this._id = task.getObjectId();
         this.caseId = task.getCaseId();
@@ -72,6 +74,7 @@ public class LocalisedTask {
         this.immediateData = task.getImmediateData();
         this.icon = task.getIcon();
         this.assignPolicy = task.getAssignPolicy().toString();
+        this.dataFocusPolicy = task.getDataFocusPolicy().toString();
     }
 
     public String getStringId() {
