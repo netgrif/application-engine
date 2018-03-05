@@ -205,6 +205,7 @@ public class Importer {
         transition.setPosition(importTransition.getX(), importTransition.getY());
         transition.setPriority(importTransition.getPriority());
         transition.setIcon(importTransition.getIcon());
+        transition.setAssignPolicy(toAssignPolicy(importTransition.getAssignPolicy()));
 
         if (importTransition.getRoleRef() != null) {
             importTransition.getRoleRef().forEach(roleRef ->
@@ -436,5 +437,18 @@ public class Importer {
 
     public Map<Long, ProcessRole> getRoles() {
         return roles;
+    }
+
+    private AssignPolicy toAssignPolicy(AssignPolicyType type) {
+        if (type == null)
+            return AssignPolicy.MANUAL;
+
+        switch (type) {
+            case AUTO:
+                return AssignPolicy.AUTO;
+            case MANUAL:
+            default:
+                return AssignPolicy.MANUAL;
+        }
     }
 }
