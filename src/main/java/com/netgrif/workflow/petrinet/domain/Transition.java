@@ -35,6 +35,9 @@ public class Transition extends Node {
     private Integer priority;
 
     @Getter @Setter
+    private AssignPolicy assignPolicy;
+
+    @Getter @Setter
     private String icon;
 
     @Getter @Setter
@@ -46,6 +49,7 @@ public class Transition extends Node {
         roles = new HashMap<>();
         triggers = new LinkedList<>();
         dataGroups = new LinkedHashMap<>();
+        assignPolicy = AssignPolicy.MANUAL;
         dataFocusPolicy = DataFocusPolicy.MANUAL;
     }
 

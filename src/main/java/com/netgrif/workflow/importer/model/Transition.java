@@ -22,6 +22,7 @@ import java.util.List;
  *         &lt;element ref="{}label"/&gt;
  *         &lt;element ref="{}icon" minOccurs="0"/&gt;
  *         &lt;element ref="{}priority" minOccurs="0"/&gt;
+ *         &lt;element ref="{}assignPolicy" minOccurs="0"/&gt;
  *         &lt;element ref="{}dataFocusPolicy" minOccurs="0"/&gt;
  *         &lt;element ref="{}trigger" maxOccurs="unbounded" minOccurs="0"/&gt;
  *         &lt;element ref="{}transactionRef" minOccurs="0"/&gt;
@@ -33,23 +34,22 @@ import java.util.List;
  *   &lt;/complexContent&gt;
  * &lt;/complexType&gt;
  * </pre>
- *
- *
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
-        "id",
-        "x",
-        "y",
-        "label",
-        "icon",
-        "priority",
-        "dataFocusPolicy",
-        "trigger",
-        "transactionRef",
-        "roleRef",
-        "dataRef",
-        "dataGroup"
+    "id",
+    "x",
+    "y",
+    "label",
+    "icon",
+    "priority",
+    "assignPolicy",
+    "dataFocusPolicy",
+    "trigger",
+    "transactionRef",
+    "roleRef",
+    "dataRef",
+    "dataGroup"
 })
 @XmlRootElement(name = "transition")
 public class Transition {
@@ -62,6 +62,8 @@ public class Transition {
     protected String icon;
     protected Integer priority;
     @XmlSchemaType(name = "string")
+    protected AssignPolicyType assignPolicy;
+    @XmlSchemaType(name = "string")
     protected DataFocusPolicyType dataFocusPolicy;
     protected List<Trigger> trigger;
     protected TransactionRef transactionRef;
@@ -71,7 +73,6 @@ public class Transition {
 
     /**
      * Gets the value of the id property.
-     *
      */
     public long getId() {
         return id;
@@ -79,7 +80,6 @@ public class Transition {
 
     /**
      * Sets the value of the id property.
-     *
      */
     public void setId(long value) {
         this.id = value;
@@ -87,7 +87,6 @@ public class Transition {
 
     /**
      * Gets the value of the x property.
-     *
      */
     public short getX() {
         return x;
@@ -95,7 +94,6 @@ public class Transition {
 
     /**
      * Sets the value of the x property.
-     *
      */
     public void setX(short value) {
         this.x = value;
@@ -103,7 +101,6 @@ public class Transition {
 
     /**
      * Gets the value of the y property.
-     *
      */
     public short getY() {
         return y;
@@ -111,7 +108,6 @@ public class Transition {
 
     /**
      * Sets the value of the y property.
-     *
      */
     public void setY(short value) {
         this.y = value;
@@ -187,6 +183,30 @@ public class Transition {
      */
     public void setPriority(Integer value) {
         this.priority = value;
+    }
+
+    /**
+     * Gets the value of the assignPolicy property.
+     *
+     * @return
+     *     possible object is
+     *     {@link AssignPolicyType }
+     *
+     */
+    public AssignPolicyType getAssignPolicy() {
+        return assignPolicy;
+    }
+
+    /**
+     * Sets the value of the assignPolicy property.
+     *
+     * @param value
+     *     allowed object is
+     *     {@link AssignPolicyType }
+     *
+     */
+    public void setAssignPolicy(AssignPolicyType value) {
+        this.assignPolicy = value;
     }
 
     /**
