@@ -7,6 +7,7 @@ class RunnerController {
 
     private List order = [
             MongoDbRunner,
+            Neo4jRunner,
             StorageRunner,
             DefaultRoleRunner,
             SuperCreator,

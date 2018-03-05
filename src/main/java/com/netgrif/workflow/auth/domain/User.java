@@ -3,6 +3,7 @@ package com.netgrif.workflow.auth.domain;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.netgrif.workflow.orgstructure.domain.Group;
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRole;
 import lombok.Getter;
 import lombok.Setter;
@@ -59,12 +60,6 @@ public class User {
     private String surname;
 
     @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "user_organizations", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "organization_id"))
-    @Getter
-    @Setter
-    private Set<Organization> organizations;
-
-    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "user_authorities", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "authority_id"))
     @Getter
     @Setter
@@ -81,8 +76,13 @@ public class User {
     @Setter
     private Set<ProcessRole> processRoles;
 
+    @Transient
+    @Getter
+    @Setter
+    private Set<Group> groups;
+
     public User() {
-        organizations = new HashSet<>();
+        groups = new HashSet<>();
         authorities = new HashSet<>();
         userProcessRoles = new HashSet<>();
         processRoles = new HashSet<>();
@@ -119,8 +119,8 @@ public class User {
         return name + " " + surname;
     }
 
-    public void addOrganization(Organization org) {
-        this.organizations.add(org);
+    public void addGroup(Group group) {
+        this.groups.add(group);
     }
 
     public LoggedUser transformToLoggedUser() {
@@ -128,8 +128,8 @@ public class User {
         loggedUser.setFullName(this.getFullName());
         if (!this.getUserProcessRoles().isEmpty())
             loggedUser.parseProcessRoles(this.getUserProcessRoles());
-        if (!this.getOrganizations().isEmpty())
-            loggedUser.parseOrganizations(this.getOrganizations());
+        if (!this.getGroups().isEmpty())
+            loggedUser.parseGroups(this.getGroups());
 
         return loggedUser;
     }

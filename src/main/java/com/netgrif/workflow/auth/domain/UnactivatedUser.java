@@ -44,7 +44,7 @@ public class UnactivatedUser {
     @Setter
     private LocalDateTime expirationDate;
 
-    private String organizations;
+    private String groups;
 
     private String authorities;
 
@@ -60,8 +60,8 @@ public class UnactivatedUser {
         this.token = token;
     }
 
-    public void setOrganizations(Set<Long> organizations) {
-        this.organizations = join(organizations);
+    public void setGroups(Set<Long> groups) {
+        this.groups = join(groups);
     }
 
     public void setAuthorities(Set<Long> authorities) {
@@ -72,8 +72,8 @@ public class UnactivatedUser {
         this.processRoles = join(processRoles);
     }
 
-    public Set<Long> getOrganizations() {
-        return separate(this.organizations, Long::parseLong);
+    public Set<Long> getGroups() {
+        return separate(this.groups, Long::parseLong);
     }
 
     public Set<Long> getAuthorities() {
