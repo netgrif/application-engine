@@ -19,6 +19,7 @@ import javax.xml.namespace.QName;
  * type definitions, element declarations and model
  * groups.  Factory methods for each of these are
  * provided in this class.
+ * 
  */
 @XmlRegistry
 public class ObjectFactory {
@@ -44,6 +45,7 @@ public class ObjectFactory {
     private final static QName _Label_QNAME = new QName("", "label");
     private final static QName _Icon_QNAME = new QName("", "icon");
     private final static QName _Priority_QNAME = new QName("", "priority");
+    private final static QName _AssignPolicy_QNAME = new QName("", "assignPolicy");
     private final static QName _DataFocusPolicy_QNAME = new QName("", "dataFocusPolicy");
     private final static QName _Tokens_QNAME = new QName("", "tokens");
     private final static QName _IsStatic_QNAME = new QName("", "isStatic");
@@ -367,6 +369,15 @@ public class ObjectFactory {
     @XmlElementDecl(namespace = "", name = "priority")
     public JAXBElement<Integer> createPriority(Integer value) {
         return new JAXBElement<Integer>(_Priority_QNAME, Integer.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link AssignPolicyType }{@code >}}
+     *
+     */
+    @XmlElementDecl(namespace = "", name = "assignPolicy")
+    public JAXBElement<AssignPolicyType> createAssignPolicy(AssignPolicyType value) {
+        return new JAXBElement<AssignPolicyType>(_AssignPolicy_QNAME, AssignPolicyType.class, null, value);
     }
 
     /**
