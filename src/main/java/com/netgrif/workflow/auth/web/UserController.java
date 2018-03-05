@@ -4,7 +4,6 @@ import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.auth.service.interfaces.IAuthorityService;
 import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.auth.web.responsebodies.AuthoritiesResources;
-import com.netgrif.workflow.auth.web.responsebodies.OrganizationsResource;
 import com.netgrif.workflow.auth.web.responsebodies.UserResource;
 import com.netgrif.workflow.auth.web.responsebodies.UsersResource;
 import com.netgrif.workflow.petrinet.service.interfaces.IProcessRoleService;
@@ -50,12 +49,12 @@ public class UserController {
 
     @RequestMapping(method = RequestMethod.GET)
     public UsersResource getAll(Authentication auth, Locale locale) {
-        return new UsersResource(userService.findByOrganizations(((LoggedUser) auth.getPrincipal()).getOrganizations(), false), "all", locale, false);
+        return new UsersResource(userService.findAllCoMembers(((LoggedUser) auth.getPrincipal()).getUsername(), false), "all", locale, false);
     }
 
     @RequestMapping(value = "/small", method = RequestMethod.GET)
     public UsersResource getAllSmall(Authentication auth, Locale locale) {
-        return new UsersResource(userService.findByOrganizations(((LoggedUser) auth.getPrincipal()).getOrganizations(), true), "small", locale, true);
+        return new UsersResource(userService.findAllCoMembers(((LoggedUser) auth.getPrincipal()).getUsername(), true), "small", locale, true);
     }
 
     @RequestMapping(value = "/role/small", method = RequestMethod.POST)
@@ -89,11 +88,5 @@ public class UserController {
     public MessageResource assignAuthorityToUser(@PathVariable("id") Long userId, @RequestBody Long authorityId) {
         userService.assignAuthority(userId, authorityId);
         return MessageResource.successMessage("Authority " + authorityId + " assigned to user " + userId);
-    }
-
-    @PreAuthorize("hasRole('ADMIN')")
-    @RequestMapping(value = "/organizations", method = RequestMethod.GET)
-    public OrganizationsResource getAllOrganizations() {
-        return new OrganizationsResource(userService.getAllOrganizations());
     }
 }

@@ -1,14 +1,14 @@
 package com.netgrif.workflow
 
 import com.netgrif.workflow.auth.domain.Authority
-import com.netgrif.workflow.auth.domain.Organization
 import com.netgrif.workflow.auth.domain.User
 import com.netgrif.workflow.auth.domain.UserProcessRole
 import com.netgrif.workflow.auth.domain.repositories.AuthorityRepository
-import com.netgrif.workflow.auth.domain.repositories.OrganizationRepository
 import com.netgrif.workflow.auth.domain.repositories.UserProcessRoleRepository
 import com.netgrif.workflow.auth.domain.repositories.UserRepository
 import com.netgrif.workflow.auth.service.UserService
+import com.netgrif.workflow.orgstructure.domain.Group
+import com.netgrif.workflow.orgstructure.domain.GroupRepository
 import com.netgrif.workflow.petrinet.domain.PetriNet
 import com.netgrif.workflow.petrinet.domain.dataset.Field
 import com.netgrif.workflow.petrinet.domain.dataset.FieldType
@@ -31,31 +31,38 @@ class JMeterExport {
 
     @Autowired
     private UserRepository userRepository
+
     @Autowired
     private UserService userService
-    @Autowired
-    private OrganizationRepository organizationRepository
+
     @Autowired
     private AuthorityRepository authorityRepository
+
     @Autowired
     private UserProcessRoleRepository processRoleRepository
+
     @Autowired
     private PetriNetRepository petriNetRepository
+
     @Autowired
     private CaseRepository caseRepository
+
     @Autowired
     private TaskService taskService
 
+    @Autowired
+    private GroupRepository groupRepository
+
     private PetriNet net
-    private Organization org
+    private Group org
     private Authority authority
     private UserProcessRole processRole
 
     private long lastMail = 0
 
-    public run(String... strings) {
+    def run(String... strings) {
         net = petriNetRepository.findAll().first()
-        org = organizationRepository.findAll().first()
+        org = groupRepository.findAll().first()
         authority = authorityRepository.findByName(Authority.user)
         processRole = processRoleRepository.findByRoleIdIn([net.roles.values().find { it -> it.name == "Agent" }.stringId]).first()
 
@@ -104,8 +111,7 @@ class JMeterExport {
                     name: randomName(),
                     surname: randomSurname(),
                     password: "password",
-                    authorities: [authority] as Set<Authority>,
-                    organizations: [org] as Set<Organization>)
+                    authorities: [authority] as Set<Authority>)
             user.addProcessRole(processRole)
             user.setEmail(generateMail(user.name, user.surname))
             user = userService.saveNew(user)
