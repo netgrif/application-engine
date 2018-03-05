@@ -1,15 +1,15 @@
 package com.netgrif.workflow.auth.service;
 
 import com.netgrif.workflow.auth.domain.Authority;
-import com.netgrif.workflow.auth.domain.Organization;
 import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.auth.domain.UserProcessRole;
 import com.netgrif.workflow.auth.domain.repositories.AuthorityRepository;
-import com.netgrif.workflow.auth.domain.repositories.OrganizationRepository;
 import com.netgrif.workflow.auth.domain.repositories.UserRepository;
 import com.netgrif.workflow.auth.service.interfaces.IUserProcessRoleService;
 import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.event.events.user.UserRegistrationEvent;
+import com.netgrif.workflow.orgstructure.domain.Member;
+import com.netgrif.workflow.orgstructure.service.IMemberService;
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRoleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
@@ -29,9 +29,6 @@ public class UserService implements IUserService {
     private UserRepository userRepository;
 
     @Autowired
-    private OrganizationRepository organizationRepository;
-
-    @Autowired
     private AuthorityRepository authorityRepository;
 
     @Autowired
@@ -46,6 +43,9 @@ public class UserService implements IUserService {
     @Autowired
     private IUserProcessRoleService userProcessRoleService;
 
+    @Autowired
+    private IMemberService memberService;
+
     @Override
     public User saveNew(User user) {
         encodeUserPassword(user);
@@ -53,6 +53,10 @@ public class UserService implements IUserService {
         addDefaultAuthorities(user);
 
         User savedUser = userRepository.save(user);
+        Member member = new Member(savedUser.getId(), savedUser.getName(), savedUser.getSurname(), savedUser.getEmail());
+        member.setGroups(savedUser.getGroups());
+        memberService.save(member);
+
         publisher.publishEvent(new UserRegistrationEvent(savedUser));
         return savedUser;
     }
@@ -96,9 +100,9 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public Set<User> findByOrganizations(Set<Long> org, boolean small) {
-        Set<User> users = new HashSet<>(userRepository.findByOrganizationsIn(org.stream()
-                .map(Organization::new).collect(Collectors.toList())));
+    public Set<User> findAllCoMembers(String email, boolean small) {
+        Set<Long> members = memberService.findAllCoMembersIds(email);
+        Set<User> users = new HashSet<>(userRepository.findAll(members));
         if (!small) users.forEach(this::loadProcessRoles);
         return users;
     }
@@ -120,11 +124,6 @@ public class UserService implements IUserService {
         authority.addUser(user);
 
         userRepository.save(user);
-    }
-
-    @Override
-    public List<Organization> getAllOrganizations() {
-        return organizationRepository.findAll();
     }
 
     private User loadProcessRoles(User user) {
