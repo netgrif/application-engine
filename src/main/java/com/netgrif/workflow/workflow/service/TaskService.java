@@ -645,6 +645,8 @@ public class TaskService implements ITaskService {
         task.setPriority(transition.getPriority());
         task.setIcon(transition.getIcon() == null ? useCase.getIcon() : transition.getIcon());
         task.setImmediateDataFields(new LinkedHashSet<>(transition.getImmediateData()));
+        task.setAssignPolicy(transition.getAssignPolicy());
+        task.setDataFocusPolicy(transition.getDataFocusPolicy());
         for (Trigger trigger : transition.getTriggers()) {
             Trigger taskTrigger = trigger.clone();
             task.addTrigger(taskTrigger);
