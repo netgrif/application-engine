@@ -2,6 +2,8 @@ package com.netgrif.workflow.workflow.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.netgrif.workflow.auth.domain.User;
+import com.netgrif.workflow.petrinet.domain.AssignPolicy;
+import com.netgrif.workflow.petrinet.domain.DataFocusPolicy;
 import com.netgrif.workflow.petrinet.domain.I18nString;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.petrinet.domain.roles.RolePermission;
@@ -83,6 +85,12 @@ public class Task {
 
     @Setter
     private String icon;
+
+    @Getter @Setter
+    private AssignPolicy assignPolicy;
+
+    @Getter @Setter
+    private DataFocusPolicy dataFocusPolicy;
 
     public Task() {
         this._id = new ObjectId();
