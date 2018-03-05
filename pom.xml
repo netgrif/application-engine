@@ -4,11 +4,11 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.netgrif</groupId>
-    <artifactId>workflow_management_system</artifactId>
-    <version>2.0.0</version>
+    <artifactId>application-engine</artifactId>
+    <version>2.0.1-SNAPSHOT</version>
     <packaging>jar</packaging>
 
-    <name>Workflow Management System</name>
+    <name>NETGRIF Application Engine</name>
     <description>System provides workflow management functions including user, role and data management.</description>
 
     <parent>
@@ -173,6 +173,16 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                        <configuration>
+                            <classifier>exec</classifier>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>org.codehaus.gmavenplus</groupId>

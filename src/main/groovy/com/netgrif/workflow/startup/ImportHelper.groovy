@@ -59,6 +59,9 @@ class ImportHelper {
     private IFilterService filterService
 
     @Autowired
+    private SuperCreator superCreator
+
+    @Autowired
     private IGroupService groupService
 
     @Autowired
@@ -94,6 +97,10 @@ class ImportHelper {
     Authority createAuthority(String name) {
         log.info("Creating authorities $name")
         return authorityRepository.save(new Authority(name))
+    }
+
+    Optional<PetriNet> createNet(String fileName, String name, String initials) {
+        createNet(fileName, name, initials, superCreator.superUser.transformToLoggedUser())
     }
 
     Optional<PetriNet> createNet(String fileName, String name, String initials, LoggedUser loggedUser) {
