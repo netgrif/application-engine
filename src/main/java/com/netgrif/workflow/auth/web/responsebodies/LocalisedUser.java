@@ -2,7 +2,7 @@ package com.netgrif.workflow.auth.web.responsebodies;
 
 import com.fasterxml.jackson.annotation.JsonRootName;
 import com.netgrif.workflow.auth.domain.Authority;
-import com.netgrif.workflow.auth.domain.Organization;
+import com.netgrif.workflow.orgstructure.domain.Group;
 import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.auth.domain.UserProcessRole;
 import lombok.Data;
@@ -31,7 +31,7 @@ public class LocalisedUser {
 
     private String fullName;
 
-    private Set<Organization> organizations;
+    private Set<Group> groups;
 
     private Set<Authority> authorities;
 
@@ -48,7 +48,7 @@ public class LocalisedUser {
         name = user.getName();
         surname = user.getSurname();
         fullName = user.getFullName();
-        organizations = user.getOrganizations();
+        groups = user.getGroups();
         authorities = user.getAuthorities();
         userProcessRoles = user.getUserProcessRoles();
         processRoles = user.getProcessRoles().stream()
