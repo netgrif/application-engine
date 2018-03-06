@@ -167,15 +167,27 @@ public class Importer {
     @Transactional
     protected void resolveTransitionActions(com.netgrif.workflow.importer.model.Transition trans) {
         if (trans.getDataRef() != null) {
-            trans.getDataRef().forEach(ref -> {
-                if (ref.getLogic().getAction() != null) {
-                    String fieldId = fields.get(ref.getId()).getStringId();
-                    transitions.get(trans.getId()).addActions(fieldId, buildActions(ref.getLogic().getAction(),
-                            fieldId,
-                            transitions.get(trans.getId()).getStringId()));
+            resolveDataRefActions(trans.getDataRef(), trans);
+        }
+        if (trans.getDataGroup() != null) {
+            trans.getDataGroup().forEach(ref-> {
+                if (ref.getDataRef()!= null) {
+                    resolveDataRefActions(ref.getDataRef(), trans);
                 }
             });
         }
+    }
+
+    @Transactional
+    protected void resolveDataRefActions(List<DataRef> dataRef, com.netgrif.workflow.importer.model.Transition trans) {
+        dataRef.forEach(ref -> {
+            if (ref.getLogic().getAction() != null) {
+                String fieldId = fields.get(ref.getId()).getStringId();
+                transitions.get(trans.getId()).addActions(fieldId, buildActions(ref.getLogic().getAction(),
+                        fieldId,
+                        transitions.get(trans.getId()).getStringId()));
+            }
+        });
     }
 
     @Transactional
