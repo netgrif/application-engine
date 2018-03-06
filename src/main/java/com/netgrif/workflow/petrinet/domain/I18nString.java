@@ -70,6 +70,8 @@ public class I18nString {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
+        if (o instanceof String)
+            return o.equals(this.defaultValue);
         if (o == null || getClass() != o.getClass()) return false;
         I18nString that = (I18nString) o;
         return (this.key == null ? that.key == null : this.key.equals(that.key)) &&

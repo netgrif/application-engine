@@ -6,7 +6,8 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import java.util.List;
 
 public interface PetriNetRepository extends MongoRepository<PetriNet, String> {
-    List<PetriNet> findByTitle(String title);
+
+    List<PetriNet> findByTitle_DefaultValue(String title);
 
     PetriNet findByImportId(Long id);
 }
