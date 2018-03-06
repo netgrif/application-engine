@@ -670,7 +670,7 @@ public class TaskService implements ITaskService {
         }
         Task savedTask = taskRepository.save(task);
 
-        useCase.addTask(savedTask.getStringId());
+        useCase.addTask(savedTask);
         useCase = workflowService.save(useCase);
 
         publisher.publishEvent(new CreateTaskEvent(savedTask, useCase));

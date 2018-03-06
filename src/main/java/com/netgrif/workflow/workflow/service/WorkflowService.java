@@ -15,6 +15,7 @@ import com.netgrif.workflow.security.service.EncryptionService;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.DataField;
 import com.netgrif.workflow.workflow.domain.Task;
+import com.netgrif.workflow.workflow.domain.TaskPair;
 import com.netgrif.workflow.workflow.domain.repositories.CaseRepository;
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
@@ -33,6 +34,7 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.LongStream;
+import java.util.stream.StreamSupport;
 
 @Service
 public class WorkflowService implements IWorkflowService {
@@ -186,11 +188,7 @@ public class WorkflowService implements IWorkflowService {
 
     @Override
     public boolean removeTasksFromCase(Iterable<? extends Task> tasks, Case useCase){
-        final List<String> tasksIds = new ArrayList<>();
-        for(Task task : tasks){
-            tasksIds.add(task.getStringId());
-        }
-        boolean deleteSuccess = useCase.removeTasks(tasksIds);
+        boolean deleteSuccess = useCase.removeTasks(StreamSupport.stream(tasks.spliterator(),false).collect(Collectors.toList()));
         useCase = repository.save(useCase);
         return deleteSuccess;
     }
