@@ -48,7 +48,8 @@ public class Case {
     @Setter
     private String icon;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private LocalDateTime creationDate;
 
     @Getter
@@ -66,11 +67,17 @@ public class Case {
     @Transient
     private List<Field> immediateData;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private Author author;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private Map<String, Integer> resetArcTokens;
+
+    @Getter
+    @Setter
+    private Set<String> tasks;
 
     public Case() {
         _id = new ObjectId();
@@ -78,6 +85,7 @@ public class Case {
         dataSet = new LinkedHashMap<>();
         immediateDataFields = new LinkedHashSet<>();
         resetArcTokens = new HashMap<>();
+        tasks = new HashSet<>();
     }
 
     public Case(String title) {
@@ -159,7 +167,7 @@ public class Case {
         return activePlaces.containsKey(place.getStringId());
     }
 
-    private void populateDataSet(){
+    private void populateDataSet() {
         petriNet.getDataSet().forEach((key, field) -> {
             if (field instanceof FieldWithDefault)
                 this.dataSet.put(key, new DataField(((FieldWithDefault) field).getDefaultValue()));
@@ -170,5 +178,17 @@ public class Case {
 
     public Object getFieldValue(String fieldId) {
         return dataSet.get(fieldId).getValue();
+    }
+
+    public boolean addTask(String taskId) {
+        return this.tasks.add(taskId);
+    }
+
+    public boolean removeTask(String taskId) {
+        return this.tasks.remove(taskId);
+    }
+
+    public boolean removeTasks(List<String> taskIds) {
+        return this.tasks.removeAll(taskIds);
     }
 }

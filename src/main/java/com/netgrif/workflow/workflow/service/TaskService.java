@@ -567,16 +567,16 @@ public class TaskService implements ITaskService {
                     createFromTransition(transition, useCase);
                 }
             } else {
-                deleteUnassignedNotExecutableTasks(tasks, transition);
+                deleteUnassignedNotExecutableTasks(tasks, transition, useCase);
             }
         });
     }
 
     @Transactional
-    void deleteUnassignedNotExecutableTasks(List<Task> tasks, Transition transition) {
-        tasks.stream()
+    void deleteUnassignedNotExecutableTasks(List<Task> tasks, Transition transition, Case useCase) {
+        delete(tasks.stream()
                 .filter(task -> task.getTransitionId().equals(transition.getStringId()) && task.getUserId() == null)
-                .forEach(task -> taskRepository.delete(task));
+                .collect(Collectors.toList()), useCase);
     }
 
     @Transactional
@@ -670,6 +670,9 @@ public class TaskService implements ITaskService {
         }
         Task savedTask = taskRepository.save(task);
 
+        useCase.addTask(savedTask.getStringId());
+        useCase = workflowService.save(useCase);
+
         publisher.publishEvent(new CreateTaskEvent(savedTask, useCase));
 
         return savedTask;
@@ -691,9 +694,19 @@ public class TaskService implements ITaskService {
         return tasks;
     }
 
+    public void delete(Iterable<? extends Task> tasks, Case useCase) {
+        workflowService.removeTasksFromCase(tasks, useCase);
+        taskRepository.delete(tasks);
+    }
+
+    public void delete(Iterable<? extends Task> tasks, String caseId) {
+        workflowService.removeTasksFromCase(tasks, caseId);
+        taskRepository.delete(tasks);
+    }
+
     @Override
     public void deleteTasksByCase(String caseId) {
-        taskRepository.deleteAllByCaseId(caseId);
+        delete(taskRepository.findAllByCaseId(caseId), caseId);
     }
 
     @Transactional
