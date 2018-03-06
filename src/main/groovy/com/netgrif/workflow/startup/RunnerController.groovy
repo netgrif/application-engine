@@ -12,13 +12,16 @@ class RunnerController {
             DefaultRoleRunner,
             SuperCreator,
             FlushSessionsRunner,
-            InsurancePortalImporter,
             MailRunner,
             PostalCodeImporter,
     ]
 
+    protected List getOrderList() {
+        return order
+    }
+
     int getOrder(Class aClass) {
-        int runnerOrder = order.findIndexOf { it == aClass }
+        int runnerOrder = getOrderList().findIndexOf { it == aClass }
         if (runnerOrder == -1) {
             throw new IllegalArgumentException("Class ${aClass.simpleName} is not registered in ${this.class.simpleName}")
         }

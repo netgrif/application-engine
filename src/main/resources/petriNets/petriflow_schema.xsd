@@ -309,7 +309,7 @@
     <xs:element name="trigger">
         <xs:complexType>
             <!--todo: only if time -->
-            <xs:choice>
+            <xs:choice minOccurs="0">
                 <xs:element name="exact" type="xs:dateTime"/>
                 <xs:element name="delay" type="xs:duration"/>
             </xs:choice>
