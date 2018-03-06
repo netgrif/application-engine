@@ -14,6 +14,7 @@ import com.netgrif.workflow.petrinet.web.responsebodies.PetriNetReference;
 import com.netgrif.workflow.security.service.EncryptionService;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.DataField;
+import com.netgrif.workflow.workflow.domain.Task;
 import com.netgrif.workflow.workflow.domain.repositories.CaseRepository;
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
@@ -176,6 +177,22 @@ public class WorkflowService implements IWorkflowService {
         useCase.setActivePlaces(net.getActivePlaces());
 
         publisher.publishEvent(new UpdateMarkingEvent(useCase));
+    }
+
+    @Override
+    public boolean removeTasksFromCase(Iterable<? extends Task> tasks, String caseId){
+        return removeTasksFromCase(tasks, repository.findOne(caseId));
+    }
+
+    @Override
+    public boolean removeTasksFromCase(Iterable<? extends Task> tasks, Case useCase){
+        final List<String> tasksIds = new ArrayList<>();
+        for(Task task : tasks){
+            tasksIds.add(task.getStringId());
+        }
+        boolean deleteSuccess = useCase.removeTasks(tasksIds);
+        useCase = repository.save(useCase);
+        return deleteSuccess;
     }
 
     public List<Field> getData(String caseId) {
