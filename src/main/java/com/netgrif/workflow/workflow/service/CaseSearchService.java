@@ -81,15 +81,27 @@ public class CaseSearchService extends MongoSearchService<Case> {
     public String transitionQuery(Object obj) {
         Map<Class, Function<Object, String>> builder = new HashMap<>();
 
-        builder.put(String.class, o -> {
-            List<Task> tasks = taskRepository.findAllByTransitionIdIn(Collections.singletonList((String) o));
-            return in(tasks.stream().map(Task::getCaseId).collect(Collectors.toList()), ob -> oid((String) ob), null);
-        });
-        builder.put(ArrayList.class, o -> {
-            List<Task> tasks = taskRepository.findAllByTransitionIdIn((List<String>) o);
-            return in(new ArrayList<>(tasks.stream().map(Task::getCaseId).collect(Collectors.toSet())), ob -> oid((String) ob), null);
+        builder.put(String.class, o -> elemMatch(o, oo -> "{\"transition\":\"" + oo + "\"}"));
+        builder.put(ArrayList.class, o -> elemMatch(o, oo -> "{\"transition\":" + in(((List<Object>) oo), ob -> "\"" + ob + "\"", null)));
+        builder.put(HashMap.class, o -> {
+            Map<String, Object> inner = (Map<String, Object>) o;
+            if (inner.get("values") == null)
+                return "";
+            if (inner.get("combination") != null && ((Boolean) inner.get("combination")))
+                return elemMatch(inner.get("values"), oo -> "{\"transition\":" + all(((List<Object>) oo), ob -> "\"" + ob + "\""));
+            else
+                return elemMatch(inner.get("values"), oo -> "{\"transition\":" + in(((List<Object>) oo), ob -> "\"" + ob + "\"", null));
         });
 
-        return buildQueryPart("_id", obj, builder);
+//        builder.put(String.class, o -> {
+//            List<Task> tasks = taskRepository.findAllByTransitionIdIn(Collections.singletonList((String) o));
+//            return in(tasks.stream().map(Task::getCaseId).collect(Collectors.toList()), ob -> oid((String) ob), null);
+//        });
+//        builder.put(ArrayList.class, o -> {
+//            List<Task> tasks = taskRepository.findAllByTransitionIdIn((List<String>) o);
+//            return in(new ArrayList<>(tasks.stream().map(Task::getCaseId).collect(Collectors.toSet())), ob -> oid((String) ob), null);
+//        });
+
+        return buildQueryPart("tasks", obj, builder);
     }
 }
