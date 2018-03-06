@@ -118,7 +118,7 @@ public abstract class PetriNetService implements IPetriNetService {
 
     @Override
     public PetriNetReference getReferenceByTitle(LoggedUser user, String title, Locale locale) {
-        List<PetriNet> nets = repository.findByTitle(title);
+        List<PetriNet> nets = repository.findByTitle_DefaultValue(title);
         return nets.stream().filter(net -> net.getRoles().keySet().stream().anyMatch(user.getProcessRoles()::contains))
                 .map(net -> new PetriNetReference(net.getObjectId().toString(), net.getTitle().getTranslation(locale))).findFirst().orElse(new PetriNetReference("", ""));
     }

@@ -66,7 +66,7 @@ public final class FieldFactory {
             field.setPlaceholder(importer.toI18NString(data.getPlaceholder()));
         if (data.getValid() != null && field instanceof ValidableField)
             ((ValidableField) field).setValidationRules(data.getValid());
-        if (data.getInit() != null && field instanceof FieldWithDefault && ((FieldWithDefault) field).getDefaultValue() == null)
+        if (data.getInit() != null && field instanceof FieldWithDefault)
             ((FieldWithDefault) field).setDefaultValue(data.getInit());
         setActions(field, data);
         setEncryption(field, data);
