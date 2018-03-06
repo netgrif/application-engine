@@ -6,6 +6,7 @@ import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.Place;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.petrinet.domain.dataset.FieldWithDefault;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import org.bson.types.ObjectId;
@@ -77,7 +78,7 @@ public class Case {
 
     @Getter
     @Setter
-    private Set<String> tasks;
+    private Set<TaskPair> tasks;
 
     public Case() {
         _id = new ObjectId();
@@ -180,15 +181,16 @@ public class Case {
         return dataSet.get(fieldId).getValue();
     }
 
-    public boolean addTask(String taskId) {
-        return this.tasks.add(taskId);
+    public boolean addTask(Task task) {
+        return this.tasks.add(new TaskPair(task.getStringId(), task.getTransitionId()));
     }
 
-    public boolean removeTask(String taskId) {
-        return this.tasks.remove(taskId);
+    public boolean removeTask(Task task) {
+        return this.tasks.remove(new TaskPair(task.getStringId(), task.getTransitionId()));
     }
 
-    public boolean removeTasks(List<String> taskIds) {
-        return this.tasks.removeAll(taskIds);
+    public boolean removeTasks(List<Task> tasks) {
+        return this.tasks.removeAll(tasks.stream().map(task -> new TaskPair(task.getStringId(), task.getTransitionId()))
+                .collect(Collectors.toList()));
     }
 }

@@ -191,6 +191,10 @@ public class MongoSearchService<T> {
         return "{$lte:" + val + "}";
     }
 
+    public static String elemMatch(Object obj, Function<Object, String> valueQueryBuilder) {
+        return "{$elemMatch:" + valueQueryBuilder.apply(obj) + "}";
+    }
+
     public static Object resolveDataValue(Object val, String type) {
         switch (type) {
             case "string":
