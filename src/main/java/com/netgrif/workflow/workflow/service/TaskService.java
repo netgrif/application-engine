@@ -597,7 +597,7 @@ public class TaskService implements ITaskService {
             return true;
 
         return arcsOfTransition.stream()
-                .filter(arc -> arc.getDestination() == transition)
+                .filter(arc -> arc.getDestination() == transition) // todo: from same source error
                 .allMatch(Arc::isExecutable);
     }
 
