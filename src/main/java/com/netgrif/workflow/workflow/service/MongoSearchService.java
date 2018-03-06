@@ -153,6 +153,19 @@ public class MongoSearchService<T> {
         return builder.toString();
     }
 
+    public static String all(List<Object> values, Function<Object, String> valueQueryBuilder) {
+        StringBuilder builder = new StringBuilder();
+        builder.append("{$all:[");
+        values.forEach(v -> {
+            builder.append(valueQueryBuilder.apply(v));
+            builder.append(",");
+        });
+        if (!values.isEmpty())
+            builder.deleteCharAt(builder.length() - 1);
+        builder.append("]}");
+        return builder.toString();
+    }
+
     public static String ref(String attr, Object id) {
         return "{$ref:\"" + attr + "\",$id:" + oid((String) id) + "}";
     }
@@ -176,6 +189,10 @@ public class MongoSearchService<T> {
 
     public static String lessThenOrEqual(Object val) {
         return "{$lte:" + val + "}";
+    }
+
+    public static String elemMatch(Object obj, Function<Object, String> valueQueryBuilder) {
+        return "{$elemMatch:" + valueQueryBuilder.apply(obj) + "}";
     }
 
     public static Object resolveDataValue(Object val, String type) {
