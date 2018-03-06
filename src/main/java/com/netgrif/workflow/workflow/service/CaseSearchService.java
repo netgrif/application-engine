@@ -84,7 +84,13 @@ public class CaseSearchService extends MongoSearchService<Case> {
         builder.put(String.class, o -> "\"" + o + "\"");
         builder.put(ArrayList.class, o -> in(((List<Object>) obj), oo -> "\"" + oo + "\"", null));
         builder.put(HashMap.class, o -> {
-            return "";
+            Map<String, Object> inner = (Map<String, Object>) o;
+            if (inner.get("values") == null)
+                return "";
+            if (inner.get("combination") != null && ((Boolean) inner.get("combination")))
+                return all(((List<Object>) inner.get("values")), ob -> "\"" + ob + "\"");
+            else
+                return in(((List<Object>) obj), oo -> "\"" + oo + "\"", null);
         });
 
 //        builder.put(String.class, o -> {
