@@ -5,6 +5,7 @@ import com.netgrif.workflow.business.PostalCode
 import org.apache.log4j.Logger
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.core.io.ClassPathResource
 import org.springframework.stereotype.Component
 
 @Component
@@ -20,7 +21,7 @@ class PostalCodeImporter extends AbstractOrderedCommandLineRunner {
 
     void run(String... strings) {
         log.info("Importing postal codes from file " + postalCodesPath)
-        def importFile = new File(postalCodesPath)
+        def importFile = new ClassPathResource(postalCodesPath).inputStream
         def codes = []
 
         importFile.splitEachLine(',') { items ->
