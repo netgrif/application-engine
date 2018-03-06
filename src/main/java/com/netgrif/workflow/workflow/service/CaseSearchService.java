@@ -81,16 +81,16 @@ public class CaseSearchService extends MongoSearchService<Case> {
     public String transitionQuery(Object obj) {
         Map<Class, Function<Object, String>> builder = new HashMap<>();
 
-        builder.put(String.class, o -> "\"" + o + "\"");
-        builder.put(ArrayList.class, o -> in(((List<Object>) obj), oo -> "\"" + oo + "\"", null));
+        builder.put(String.class, o -> elemMatch(o, oo -> "{\"transition\":\"" + oo + "\"}"));
+        builder.put(ArrayList.class, o -> elemMatch(o, oo -> "{\"transition\":" + in(((List<Object>) oo), ob -> "\"" + ob + "\"", null)));
         builder.put(HashMap.class, o -> {
             Map<String, Object> inner = (Map<String, Object>) o;
             if (inner.get("values") == null)
                 return "";
             if (inner.get("combination") != null && ((Boolean) inner.get("combination")))
-                return all(((List<Object>) inner.get("values")), ob -> "\"" + ob + "\"");
+                return elemMatch(inner.get("values"), oo -> "{\"transition\":" + all(((List<Object>) oo), ob -> "\"" + ob + "\""));
             else
-                return in(((List<Object>) obj), oo -> "\"" + oo + "\"", null);
+                return elemMatch(inner.get("values"), oo -> "{\"transition\":" + in(((List<Object>) oo), ob -> "\"" + ob + "\"", null));
         });
 
 //        builder.put(String.class, o -> {
