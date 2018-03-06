@@ -6,6 +6,7 @@ import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.Place;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.petrinet.domain.dataset.FieldWithDefault;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import org.bson.types.ObjectId;
@@ -48,7 +49,8 @@ public class Case {
     @Setter
     private String icon;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private LocalDateTime creationDate;
 
     @Getter
@@ -66,11 +68,17 @@ public class Case {
     @Transient
     private List<Field> immediateData;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private Author author;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private Map<String, Integer> resetArcTokens;
+
+    @Getter
+    @Setter
+    private Set<TaskPair> tasks;
 
     public Case() {
         _id = new ObjectId();
@@ -78,6 +86,7 @@ public class Case {
         dataSet = new LinkedHashMap<>();
         immediateDataFields = new LinkedHashSet<>();
         resetArcTokens = new HashMap<>();
+        tasks = new HashSet<>();
     }
 
     public Case(String title) {
@@ -159,7 +168,7 @@ public class Case {
         return activePlaces.containsKey(place.getStringId());
     }
 
-    private void populateDataSet(){
+    private void populateDataSet() {
         petriNet.getDataSet().forEach((key, field) -> {
             if (field instanceof FieldWithDefault)
                 this.dataSet.put(key, new DataField(((FieldWithDefault) field).getDefaultValue()));
@@ -170,5 +179,18 @@ public class Case {
 
     public Object getFieldValue(String fieldId) {
         return dataSet.get(fieldId).getValue();
+    }
+
+    public boolean addTask(Task task) {
+        return this.tasks.add(new TaskPair(task.getStringId(), task.getTransitionId()));
+    }
+
+    public boolean removeTask(Task task) {
+        return this.tasks.remove(new TaskPair(task.getStringId(), task.getTransitionId()));
+    }
+
+    public boolean removeTasks(List<Task> tasks) {
+        return this.tasks.removeAll(tasks.stream().map(task -> new TaskPair(task.getStringId(), task.getTransitionId()))
+                .collect(Collectors.toList()));
     }
 }

@@ -3,6 +3,7 @@ package com.netgrif.workflow.workflow.service.interfaces;
 import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.workflow.domain.Case;
+import com.netgrif.workflow.workflow.domain.Task;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -32,4 +33,8 @@ public interface IWorkflowService {
     Page<Case> search(Map<String, Object> request, Pageable pageable, LoggedUser user, Locale locale);
 
     List<Case> getCaseFieldChoices(Pageable pageable, String caseId, String fieldId);
+
+    boolean removeTasksFromCase(Iterable<? extends Task> tasks, String caseId);
+
+    boolean removeTasksFromCase(Iterable<? extends Task> tasks, Case useCase);
 }
