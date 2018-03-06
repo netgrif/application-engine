@@ -81,15 +81,21 @@ public class CaseSearchService extends MongoSearchService<Case> {
     public String transitionQuery(Object obj) {
         Map<Class, Function<Object, String>> builder = new HashMap<>();
 
-        builder.put(String.class, o -> {
-            List<Task> tasks = taskRepository.findAllByTransitionIdIn(Collections.singletonList((String) o));
-            return in(tasks.stream().map(Task::getCaseId).collect(Collectors.toList()), ob -> oid((String) ob), null);
-        });
-        builder.put(ArrayList.class, o -> {
-            List<Task> tasks = taskRepository.findAllByTransitionIdIn((List<String>) o);
-            return in(new ArrayList<>(tasks.stream().map(Task::getCaseId).collect(Collectors.toSet())), ob -> oid((String) ob), null);
+        builder.put(String.class, o -> "\"" + o + "\"");
+        builder.put(ArrayList.class, o -> in(((List<Object>) obj), oo -> "\"" + oo + "\"", null));
+        builder.put(HashMap.class, o -> {
+            return "";
         });
 
-        return buildQueryPart("_id", obj, builder);
+//        builder.put(String.class, o -> {
+//            List<Task> tasks = taskRepository.findAllByTransitionIdIn(Collections.singletonList((String) o));
+//            return in(tasks.stream().map(Task::getCaseId).collect(Collectors.toList()), ob -> oid((String) ob), null);
+//        });
+//        builder.put(ArrayList.class, o -> {
+//            List<Task> tasks = taskRepository.findAllByTransitionIdIn((List<String>) o);
+//            return in(new ArrayList<>(tasks.stream().map(Task::getCaseId).collect(Collectors.toSet())), ob -> oid((String) ob), null);
+//        });
+
+        return buildQueryPart("tasks", obj, builder);
     }
 }
