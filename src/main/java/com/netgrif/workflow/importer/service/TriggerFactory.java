@@ -1,4 +1,4 @@
-package com.netgrif.workflow.importer;
+package com.netgrif.workflow.importer.service;
 
 import com.netgrif.workflow.workflow.domain.triggers.*;
 import org.springframework.stereotype.Component;

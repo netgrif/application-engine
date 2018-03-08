@@ -2,7 +2,7 @@ package com.netgrif.workflow.petrinet.web;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.netgrif.workflow.auth.domain.LoggedUser;
-import com.netgrif.workflow.importer.Importer;
+import com.netgrif.workflow.importer.service.Importer;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.workflow.petrinet.service.interfaces.IProcessRoleService;
