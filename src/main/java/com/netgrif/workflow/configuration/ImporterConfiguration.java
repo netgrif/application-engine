@@ -1,6 +1,6 @@
 package com.netgrif.workflow.configuration;
 
-import com.netgrif.workflow.importer.Importer;
+import com.netgrif.workflow.importer.service.Importer;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

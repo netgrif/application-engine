@@ -2,6 +2,9 @@ package com.netgrif.workflow.petrinet.domain;
 
 import com.netgrif.workflow.petrinet.domain.dataset.logic.FieldBehavior;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action;
+import com.netgrif.workflow.petrinet.domain.policies.AssignPolicy;
+import com.netgrif.workflow.petrinet.domain.policies.DataFocusPolicy;
+import com.netgrif.workflow.petrinet.domain.policies.FinishPolicy;
 import com.netgrif.workflow.petrinet.domain.roles.RolePermission;
 import com.netgrif.workflow.workflow.domain.triggers.Trigger;
 import lombok.Getter;
@@ -43,6 +46,9 @@ public class Transition extends Node {
     @Getter @Setter
     private DataFocusPolicy dataFocusPolicy;
 
+    @Getter @Setter
+    private FinishPolicy finishPolicy;
+
     public Transition() {
         super();
         dataSet = new LinkedHashMap<>();
@@ -51,6 +57,7 @@ public class Transition extends Node {
         dataGroups = new LinkedHashMap<>();
         assignPolicy = AssignPolicy.MANUAL;
         dataFocusPolicy = DataFocusPolicy.MANUAL;
+        finishPolicy = FinishPolicy.MANUAL;
     }
 
     public void addDataSet(String fieldId, DataFieldLogic logic) {
