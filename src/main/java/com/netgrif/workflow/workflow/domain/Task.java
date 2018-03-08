@@ -2,12 +2,15 @@ package com.netgrif.workflow.workflow.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.netgrif.workflow.auth.domain.User;
-import com.netgrif.workflow.petrinet.domain.AssignPolicy;
-import com.netgrif.workflow.petrinet.domain.DataFocusPolicy;
 import com.netgrif.workflow.petrinet.domain.I18nString;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
+import com.netgrif.workflow.petrinet.domain.policies.AssignPolicy;
+import com.netgrif.workflow.petrinet.domain.policies.DataFocusPolicy;
+import com.netgrif.workflow.petrinet.domain.policies.FinishPolicy;
 import com.netgrif.workflow.petrinet.domain.roles.RolePermission;
 import com.netgrif.workflow.workflow.domain.triggers.Trigger;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import org.bson.types.ObjectId;
@@ -20,6 +23,8 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 @Document
+@AllArgsConstructor
+@Builder(builderMethodName = "with")
 public class Task {
 
     @Id
@@ -92,12 +97,18 @@ public class Task {
     @Getter @Setter
     private DataFocusPolicy dataFocusPolicy;
 
+    @Getter @Setter
+    private FinishPolicy finishPolicy;
+
     public Task() {
         this._id = new ObjectId();
         roles = new HashMap<>();
         this.triggers = new LinkedList<>();
         this.immediateDataFields = new LinkedHashSet<>();
         this.immediateData = new ArrayList<>();
+        assignPolicy = AssignPolicy.MANUAL;
+        dataFocusPolicy = DataFocusPolicy.MANUAL;
+        finishPolicy = FinishPolicy.MANUAL;
     }
 
     @JsonIgnore

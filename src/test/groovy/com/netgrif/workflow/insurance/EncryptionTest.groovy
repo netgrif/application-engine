@@ -3,7 +3,7 @@ package com.netgrif.workflow.insurance
 import com.netgrif.workflow.auth.domain.Authority
 import com.netgrif.workflow.auth.domain.LoggedUser
 import com.netgrif.workflow.auth.domain.repositories.AuthorityRepository
-import com.netgrif.workflow.importer.Importer
+import com.netgrif.workflow.importer.service.Importer
 import com.netgrif.workflow.petrinet.domain.PetriNet
 import com.netgrif.workflow.workflow.domain.Case
 import com.netgrif.workflow.workflow.domain.DataField
