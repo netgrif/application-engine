@@ -6,7 +6,7 @@ import com.netgrif.workflow.auth.domain.Authority
 import com.netgrif.workflow.orgstructure.domain.Group
 import com.netgrif.workflow.auth.domain.User
 import com.netgrif.workflow.auth.domain.UserProcessRole
-import com.netgrif.workflow.importer.Importer
+import com.netgrif.workflow.importer.service.Importer
 import groovy.json.JsonOutput
 import groovy.json.JsonSlurper
 import org.hamcrest.CoreMatchers
