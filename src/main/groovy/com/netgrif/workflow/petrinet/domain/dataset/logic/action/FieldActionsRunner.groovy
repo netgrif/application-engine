@@ -2,8 +2,8 @@ package com.netgrif.workflow.petrinet.domain.dataset.logic.action
 
 import com.netgrif.workflow.business.IPostalCodeService
 import com.netgrif.workflow.business.orsr.IOrsrService
-import com.netgrif.workflow.importer.FieldFactory
-import com.netgrif.workflow.importer.Importer
+import com.netgrif.workflow.importer.service.FieldFactory
+import com.netgrif.workflow.importer.service.Importer
 import com.netgrif.workflow.petrinet.domain.Transition
 import com.netgrif.workflow.petrinet.domain.dataset.Field
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedField

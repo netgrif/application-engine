@@ -8,7 +8,7 @@ import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.auth.domain.repositories.UserRepository;
 import com.netgrif.workflow.event.events.task.*;
 import com.netgrif.workflow.event.events.usecase.SaveCaseDataEvent;
-import com.netgrif.workflow.importer.FieldFactory;
+import com.netgrif.workflow.importer.service.FieldFactory;
 import com.netgrif.workflow.petrinet.domain.*;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.petrinet.domain.dataset.FileField;
@@ -634,19 +634,21 @@ public class TaskService implements ITaskService {
     }
 
     private Task createFromTransition(Transition transition, Case useCase) {
-        final Task task = new Task();
+        final Task task = Task.with()
+                .title(transition.getTitle())
+                .processId(useCase.getPetriNetId())
+                .caseId(useCase.get_id().toString())
+                .transitionId(transition.getObjectId().toString())
+                .caseColor(useCase.getColor())
+                .caseTitle(useCase.getTitle())
+                .priority(transition.getPriority())
+                .icon(transition.getIcon() == null ? useCase.getIcon() : transition.getIcon())
+                .immediateDataFields(new LinkedHashSet<>(transition.getImmediateData()))
+                .assignPolicy(transition.getAssignPolicy())
+                .dataFocusPolicy(transition.getDataFocusPolicy())
+                .finishPolicy(transition.getFinishPolicy())
+                .build();
 
-        task.setTitle(transition.getTitle());
-        task.setProcessId(useCase.getPetriNetId());
-        task.setCaseId(useCase.get_id().toString());
-        task.setTransitionId(transition.getObjectId().toString());
-        task.setCaseColor(useCase.getColor());
-        task.setCaseTitle(useCase.getTitle());
-        task.setPriority(transition.getPriority());
-        task.setIcon(transition.getIcon() == null ? useCase.getIcon() : transition.getIcon());
-        task.setImmediateDataFields(new LinkedHashSet<>(transition.getImmediateData()));
-        task.setAssignPolicy(transition.getAssignPolicy());
-        task.setDataFocusPolicy(transition.getDataFocusPolicy());
         for (Trigger trigger : transition.getTriggers()) {
             Trigger taskTrigger = trigger.clone();
             task.addTrigger(taskTrigger);
