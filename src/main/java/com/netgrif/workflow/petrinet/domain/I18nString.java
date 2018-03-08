@@ -32,6 +32,12 @@ public class I18nString {
         this.key = key;
     }
 
+    public I18nString(I18nString other){
+        this(other.defaultValue);
+        this.key = other.key;
+        this.translations.putAll(other.translations);
+    }
+
     public void addTranslation(String locale, String translation) {
         translations.put(locale, translation);
     }
