@@ -1,4 +1,4 @@
-package com.netgrif.workflow.importer;
+package com.netgrif.workflow.importer.service;
 
 import com.netgrif.workflow.importer.model.*;
 import com.netgrif.workflow.petrinet.domain.Arc;
@@ -10,6 +10,9 @@ import com.netgrif.workflow.petrinet.domain.Transition;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.FieldBehavior;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action;
+import com.netgrif.workflow.petrinet.domain.policies.AssignPolicy;
+import com.netgrif.workflow.petrinet.domain.policies.DataFocusPolicy;
+import com.netgrif.workflow.petrinet.domain.policies.FinishPolicy;
 import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository;
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRole;
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRoleRepository;
@@ -219,6 +222,7 @@ public class Importer {
         transition.setIcon(importTransition.getIcon());
         transition.setAssignPolicy(toAssignPolicy(importTransition.getAssignPolicy()));
         transition.setDataFocusPolicy(toAssignPolicy(importTransition.getDataFocusPolicy()));
+        transition.setFinishPolicy(toFinishPolicy(importTransition.getFinishPolicy()));
 
         if (importTransition.getRoleRef() != null) {
             importTransition.getRoleRef().forEach(roleRef ->
@@ -477,5 +481,18 @@ public class Importer {
                 return DataFocusPolicy.MANUAL;
         }
 
+    }
+
+    private FinishPolicy toFinishPolicy(FinishPolicyType type) {
+        if (type == null)
+            return FinishPolicy.MANUAL;
+
+        switch (type) {
+            case AUTO_NO_DATA:
+                return FinishPolicy.AUTO_NO_DATA;
+            case MANUAL:
+            default:
+                return FinishPolicy.MANUAL;
+        }
     }
 }

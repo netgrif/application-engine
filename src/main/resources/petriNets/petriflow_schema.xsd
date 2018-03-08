@@ -62,6 +62,7 @@
                 <xs:element ref="priority" minOccurs="0"/>
                 <xs:element ref="assignPolicy" minOccurs="0"/>
                 <xs:element ref="dataFocusPolicy" minOccurs="0"/>
+                <xs:element ref="finishPolicy" minOccurs="0"/>
                 <xs:element ref="trigger" minOccurs="0" maxOccurs="unbounded"/>
                 <xs:element ref="transactionRef" minOccurs="0"/>
                 <xs:element ref="roleRef" maxOccurs="unbounded" minOccurs="0"/>
@@ -205,6 +206,12 @@
             <xs:enumeration value="manual"/>
         </xs:restriction>
     </xs:simpleType>
+    <xs:simpleType name="finishPolicyType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="auto_no_data"/>
+            <xs:enumeration value="manual"/>
+        </xs:restriction>
+    </xs:simpleType>
     <xs:simpleType name="nonNegativeLong">
         <xs:restriction base="xs:long">
             <xs:minInclusive value="0"/>
@@ -345,4 +352,5 @@
     </xs:complexType>
     <xs:element name="assignPolicy" type="assignPolicyType"/>
     <xs:element name="dataFocusPolicy" type="dataFocusPolicyType"/>
+    <xs:element name="finishPolicy" type="finishPolicyType"/>
 </xs:schema>

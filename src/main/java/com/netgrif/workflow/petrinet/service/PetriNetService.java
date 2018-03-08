@@ -4,7 +4,7 @@ import com.netgrif.workflow.auth.domain.Authority;
 import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.auth.service.UserProcessRoleService;
 import com.netgrif.workflow.event.events.model.UserImportModelEvent;
-import com.netgrif.workflow.importer.Importer;
+import com.netgrif.workflow.importer.service.Importer;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.Transition;
 import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository;
