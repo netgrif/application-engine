@@ -1,6 +1,7 @@
 package com.netgrif.workflow.auth.web;
 
 import com.netgrif.workflow.auth.domain.LoggedUser;
+import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.auth.service.interfaces.IAuthorityService;
 import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.auth.web.responsebodies.AuthoritiesResources;
@@ -49,12 +50,16 @@ public class UserController {
 
     @RequestMapping(method = RequestMethod.GET)
     public UsersResource getAll(Authentication auth, Locale locale) {
-        return new UsersResource(userService.findAllCoMembers(((LoggedUser) auth.getPrincipal()).getUsername(), false), "all", locale, false);
+        Set<User> coMembers = userService.findAllCoMembers(((LoggedUser) auth.getPrincipal()).getUsername(), false);
+        coMembers.add(userService.findById(((LoggedUser) auth.getPrincipal()).getId(), false));
+        return new UsersResource(coMembers, "all", locale, false);
     }
 
     @RequestMapping(value = "/small", method = RequestMethod.GET)
     public UsersResource getAllSmall(Authentication auth, Locale locale) {
-        return new UsersResource(userService.findAllCoMembers(((LoggedUser) auth.getPrincipal()).getUsername(), true), "small", locale, true);
+        Set<User> coMembers = userService.findAllCoMembers(((LoggedUser) auth.getPrincipal()).getUsername(), true);
+        coMembers.add(userService.findById(((LoggedUser) auth.getPrincipal()).getId(), true));
+        return new UsersResource(coMembers, "small", locale, true);
     }
 
     @RequestMapping(value = "/role/small", method = RequestMethod.POST)
