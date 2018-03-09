@@ -14,6 +14,7 @@ class RunnerController {
             FlushSessionsRunner,
             MailRunner,
             PostalCodeImporter,
+            FinisherRunner
     ]
 
     protected List getOrderList() {
