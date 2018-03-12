@@ -20,12 +20,12 @@ class TextValidationJavascriptDelegate extends TextValidationDelegate{
     }
 
     def email = {
-        ((TextField)this.field).setFormating("example@example.com")
+        ((TextField)this.field).setFormatting("example@example.com")
         return regex(/[a-z0-9!#\\u0024%&'*+\\/=?^_`{|}~-]+(?:\\.[a-z0-9!#\\u0024%&'*+\\/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/,"email")
     }
 
     def telnumber = {
-        ((TextField)this.field).setFormating("+421 907 123 456")
+        ((TextField)this.field).setFormatting("+421 907 123 456")
         return regex(/^(?:\\+?(\\d{1,3}))?([-. (]*(\\d{3})[-. )]*)?((\\d{3})[-. ]*(\\d{2,4})(?:[-.x ]*(\\d+))?)$/,"telnumber")
     }
 }
