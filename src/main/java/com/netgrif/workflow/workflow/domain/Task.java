@@ -9,10 +9,7 @@ import com.netgrif.workflow.petrinet.domain.policies.DataFocusPolicy;
 import com.netgrif.workflow.petrinet.domain.policies.FinishPolicy;
 import com.netgrif.workflow.petrinet.domain.roles.RolePermission;
 import com.netgrif.workflow.workflow.domain.triggers.Trigger;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
@@ -28,7 +25,8 @@ import java.util.*;
 public class Task {
 
     @Id
-    private ObjectId _id;
+    @Builder.Default
+    private ObjectId _id = new ObjectId();
 
     @Getter @Setter
     private String processId;
@@ -60,10 +58,12 @@ public class Task {
 
     @DBRef
     @Setter
-    private List<Trigger> triggers;
+    @Builder.Default
+    private List<Trigger> triggers = new LinkedList<>();
 
     @Getter @Setter
-    private Map<String, Map<String, Boolean>> roles;
+    @Builder.Default
+    private Map<String, Map<String, Boolean>> roles = new HashMap<>();
 
     @Getter @Setter
     private LocalDateTime startDate;
@@ -82,33 +82,30 @@ public class Task {
 
     @Getter @Setter
     @JsonIgnore
-    private LinkedHashSet<String> immediateDataFields;
+    @Builder.Default
+    private LinkedHashSet<String> immediateDataFields = new LinkedHashSet<>();
 
     @Getter @Setter
     @Transient
-    private List<Field> immediateData;
+    @Builder.Default
+    private List<Field> immediateData = new LinkedList<>();
 
     @Setter
     private String icon;
 
     @Getter @Setter
-    private AssignPolicy assignPolicy;
+    @Builder.Default
+    private AssignPolicy assignPolicy = AssignPolicy.MANUAL;
 
     @Getter @Setter
-    private DataFocusPolicy dataFocusPolicy;
+    @Builder.Default
+    private DataFocusPolicy dataFocusPolicy = DataFocusPolicy.MANUAL;
 
     @Getter @Setter
-    private FinishPolicy finishPolicy;
+    @Builder.Default
+    private FinishPolicy finishPolicy = FinishPolicy.MANUAL;
 
     public Task() {
-        this._id = new ObjectId();
-        roles = new HashMap<>();
-        this.triggers = new LinkedList<>();
-        this.immediateDataFields = new LinkedHashSet<>();
-        this.immediateData = new ArrayList<>();
-        assignPolicy = AssignPolicy.MANUAL;
-        dataFocusPolicy = DataFocusPolicy.MANUAL;
-        finishPolicy = FinishPolicy.MANUAL;
     }
 
     @JsonIgnore
