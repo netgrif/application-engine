@@ -342,7 +342,7 @@ public class Importer {
         try {
             while (true) {
                 int start = action.indexOf(processedObject + ".", last);
-                if (start == -1) break;
+                if (start == -1 || start > action.indexOf(';')) break;
                 int coma = action.indexOf(',', start);
                 int semicolon = action.indexOf(';', start);
                 int delimeter = coma < semicolon && coma != -1 ? coma : semicolon;

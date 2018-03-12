@@ -1,6 +1,5 @@
 package com.netgrif.workflow.pdf.service
 
-import com.netgrif.workflow.utils.ResourceFileLoader
 import org.apache.pdfbox.cos.COSName
 import org.apache.pdfbox.io.MemoryUsageSetting
 import org.apache.pdfbox.multipdf.PDFMergerUtility
@@ -18,7 +17,9 @@ class PdfUtils {
 
     private static final Logger log = LoggerFactory.getLogger(PdfUtils.class)
 
-    static File removePages(File pdfFile, int... pages) {
+    private static final int KEY_LENGTH = 128
+
+    static File removePages(File pdfFile, int ... pages) {
         PDDocument document = PDDocument.load(pdfFile)
 
         pages.each {
@@ -29,8 +30,6 @@ class PdfUtils {
 
         return pdfFile
     }
-
-    private static final int KEY_LENGTH = 128
 
     static File encryptPdfFile(String outPdfPath, File input, String ownerPassword = "", String userPassword = "") {
         PDDocument doc = PDDocument.load(input)
@@ -69,14 +68,7 @@ class PdfUtils {
             PDDocumentCatalog docCatalog = document.getDocumentCatalog()
             PDAcroForm acroForm = docCatalog.getAcroForm()
 
-            Map<String, String> fonts = new HashMap<>()
-//            fonts.put("/KlavikaBasic-Regular", addFont(document, acroForm, "classpath:fonts/Klavika Regular.ttf"))
-//            fonts.put("/KlavikaBasic-Bold", addFont(document, acroForm, "classpath:fonts/Klavika Bold.ttf"))
-//            fonts.put("/KlavikaBasic-Medium", addFont(document, acroForm, "classpath:fonts/Klavika Medium.ttf"))
-            fonts.put("/KlavikaBasic-Regular", addFont(document, acroForm, "src/main/resources/fonts/Klavika Regular.ttf"))
-            fonts.put("/KlavikaBasic-Bold", addFont(document, acroForm, "src/main/resources/fonts/Klavika Bold.ttf"))
-            fonts.put("/KlavikaBasic-Medium", addFont(document, acroForm, "src/main/resources/fonts/Klavika Medium.ttf"))
-            addFieldValues(acroForm, xml, fonts)
+            addFieldValues(acroForm, xml, [:])
             return saveToFile(document, outPdfName)
         } catch (IOException e) {
             e.printStackTrace()
@@ -84,7 +76,7 @@ class PdfUtils {
         }
     }
 
-    private static String addFont(PDDocument document, PDAcroForm acroForm, String fontPath) {
+    static String addFont(PDDocument document, PDAcroForm acroForm, String fontPath) {
         PDResources res = acroForm.getDefaultResources()
         if (res == null)
             res = new PDResources()
@@ -102,7 +94,7 @@ class PdfUtils {
         return fontName
     }
 
-    private static void addFieldValues(PDAcroForm acroForm, String xmlText, Map<String, String> fonts) {
+    static void addFieldValues(PDAcroForm acroForm, String xmlText, Map<String, String> fonts) {
         def fieldValues = new XmlSlurper().parseText(xmlText)
 
         fieldValues.children().each {
@@ -112,11 +104,11 @@ class PdfUtils {
         acroForm.flatten()
     }
 
-    private static setFieldValueAndFont(PDAcroForm acroForm, def xmlNode, Map<String, String> fonts) {
+    static setFieldValueAndFont(PDAcroForm acroForm, def xmlNode, Map<String, String> fonts) {
         def id = ((xmlNode["@xfdf:original"] as String) ?: xmlNode.name()) as String
         def field = acroForm.fieldIterator.find { it.partialName.equalsIgnoreCase(id) }
         if (field == null) {
-            log.error("Cannot find field [$id]")
+            log.warn("Cannot find field [$id]")
             return
         }
 
@@ -129,11 +121,11 @@ class PdfUtils {
             }
             field.setValue(xmlNode as String)
         } catch (NullPointerException e) {
-            log.error("Cannot find field $id", e)
+            log.warn("Cannot find field $id", e)
         }
     }
 
-    private static File saveToFile(PDDocument document, String outPdfName) {
+    static File saveToFile(PDDocument document, String outPdfName) {
         File file = new File(outPdfName)
         document.save(file)
         document.close()
