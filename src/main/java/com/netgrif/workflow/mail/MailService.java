@@ -3,12 +3,12 @@ package com.netgrif.workflow.mail;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
+import lombok.Getter;
 import lombok.Setter;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 
@@ -30,20 +30,24 @@ public class MailService implements IMailService {
 
     static final Logger log = Logger.getLogger(MailService.class.getName());
 
+    @Getter
     @Value("${mail.server.port}")
-    String port;
+    protected String port;
+    @Getter
     @Value("${mail.server.host.subdomain}")
-    String subdomain;
+    protected String subdomain;
+    @Getter
     @Value("${mail.server.host.toplevel}")
-    String topLevelDomain;
+    protected String topLevelDomain;
+    @Getter
     @Value("${mail.from}")
-    String mailFrom;
+    protected String mailFrom;
 
-    @Setter
-    private JavaMailSender mailSender;
+    @Getter @Setter
+    protected JavaMailSender mailSender;
 
-    @Setter
-    private Configuration configuration;
+    @Getter @Setter
+    protected Configuration configuration;
 
     @Override
     public void sendRegistrationEmail(String recipient, String token) throws MessagingException, IOException, TemplateException {
@@ -54,26 +58,10 @@ public class MailService implements IMailService {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
         model.put("date", LocalDate.now().plusDays(3).format(formatter));
 
-        topLevelDomain = topLevelDomain == null ? "com" : (topLevelDomain.isEmpty() ? "com" : topLevelDomain);
-        model.put("serverName", "http://" + (subdomain != null && !subdomain.isEmpty() ? (subdomain + ".") : "") + InetAddress.getLocalHost().getHostName().toLowerCase() + "." + topLevelDomain + (port != null && !port.isEmpty() ?  (":" + port) : ""));
+        String mailTopLevelDomain = topLevelDomain == null ? "com" : (topLevelDomain.isEmpty() ? "com" : topLevelDomain);
+        model.put("serverName", "http://" + (subdomain != null && !subdomain.isEmpty() ? (subdomain + ".") : "") + InetAddress.getLocalHost().getHostName().toLowerCase() + "." + mailTopLevelDomain + (port != null && !port.isEmpty() ?  (":" + port) : ""));
         MimeMessage email = buildEmail(EmailType.REGISTRATION, recipients, model, new HashMap<>());
         mailSender.send(email);
-    }
-
-    @Override
-    @Async
-    public void sendDraftEmail(String recipient, File pdf, Map<String, Object> model) throws MessagingException, IOException, TemplateException {
-        List<String> recipients = new LinkedList<>();
-        recipients.add(recipient);
-        Map<String, File> attachments = new HashMap<>();
-
-        topLevelDomain = topLevelDomain == null ? "com" : (topLevelDomain.isEmpty() ? "com" : topLevelDomain);
-        model.put("serverName", "http://" + (subdomain != null && !subdomain.isEmpty() ? (subdomain + ".") : "") + InetAddress.getLocalHost().getHostName().toLowerCase() + "." + topLevelDomain + (port != null && !port.isEmpty() ?  (":" + port) : ""));
-        attachments.put(pdf.getName(), pdf);
-        MimeMessage email = buildEmail(EmailType.DRAFT, recipients, model, attachments);
-        mailSender.send(email);
-
-        log.info("Mail with draft pdf sent to " + recipient);
     }
 
     @Override
@@ -87,7 +75,7 @@ public class MailService implements IMailService {
 //        }
     }
 
-    private MimeMessage buildEmail(EmailType type, List<String> recipients, Map<String, Object> model, Map<String, File> attachments) throws MessagingException, IOException, TemplateException {
+    protected MimeMessage buildEmail(EmailType type, List<String> recipients, Map<String, Object> model, Map<String, File> attachments) throws MessagingException, IOException, TemplateException {
         MimeMessage message = mailSender.createMimeMessage();
         message.setSubject(type.subject);
         MimeMessageHelper helper = new MimeMessageHelper(message, true, StandardCharsets.UTF_8.name());
