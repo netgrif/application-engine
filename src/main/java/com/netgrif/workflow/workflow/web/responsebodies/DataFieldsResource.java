@@ -15,7 +15,7 @@ public class DataFieldsResource extends Resources<LocalisedField> {
 
     public DataFieldsResource(Collection<Field> content, String taskId, Locale locale) {
         super(content.stream()
-                .map(f -> new LocalisedField(f, locale))
+                .map(f -> LocalisedFieldFactory.from(f, locale))
                 .collect(Collectors.toList()), new ArrayList<Link>());
         buildLinks(taskId);
     }
