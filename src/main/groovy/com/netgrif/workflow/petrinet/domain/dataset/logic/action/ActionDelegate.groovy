@@ -1,5 +1,6 @@
 package com.netgrif.workflow.petrinet.domain.dataset.logic.action
 
+import com.netgrif.workflow.petrinet.domain.I18nString
 import com.netgrif.workflow.petrinet.domain.Transition
 import com.netgrif.workflow.petrinet.domain.dataset.*
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedField
@@ -101,7 +102,11 @@ class ActionDelegate {
              if (values == null || (values instanceof Closure && values() == UNCHANGED_VALUE)) return
              if (!(values instanceof Collection)) values = [values]
              field = (ChoiceField) field
-             field.setChoicesFromStrings(values as Set<String>)
+             if (values.every {it instanceof I18nString}) {
+                 field.setChoices(values as Set<I18nString>)
+             } else {
+                 field.setChoicesFromStrings(values as Set<String>)
+             }
              changedField.id = field.stringId
              changedField.addAttribute("choices", values)
          }]
