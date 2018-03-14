@@ -25,9 +25,13 @@ class MongoDbRunner extends AbstractOrderedCommandLineRunner {
     @Value('${spring.data.mongodb.port}')
     private String port
 
+    @Value('${spring.data.mongodb.drop')
+    private boolean dropDatabase
+
     @Override
     void run(String... strings) throws Exception {
         log.info("Dropping Mongo database ${host}:${port}/${name}")
-        mongoTemplate.getDb().dropDatabase()
+        if (dropDatabase)
+            mongoTemplate.getDb().dropDatabase()
     }
 }
