@@ -54,16 +54,23 @@ class SuperCreator extends AbstractOrderedCommandLineRunner {
         if (adminAuthority == null)
             adminAuthority = authorityRepository.save(new Authority(Authority.admin)) as Authority
 
-        this.superUser = userService.saveNew(new User(
-                name: "Super",
-                surname: "Trooper",
-                email: "super@netgrif.com",
-                password: superAdminPassword,
-                authorities: [adminAuthority] as Set<Authority>,
-                userProcessRoles: userProcessRoleService.findAllMinusDefault() as Set<UserProcessRole>))
-        this.superMember = memberService.findByEmail(superUser.email)
-        log.info("Super user created")
-        return superUser
+        User superUser = userService.findByEmail("super@netgrif.com",false)
+        if(superUser == null) {
+            this.superUser = userService.saveNew(new User(
+                    name: "Super",
+                    surname: "Trooper",
+                    email: "super@netgrif.com",
+                    password: superAdminPassword,
+                    authorities: [adminAuthority] as Set<Authority>,
+                    userProcessRoles: userProcessRoleService.findAllMinusDefault() as Set<UserProcessRole>))
+            this.superMember = memberService.findByEmail(this.superUser.email)
+            log.info("Super user created")
+        } else {
+            log.info("Super user detected")
+            this.superUser = superUser
+            this.superMember = memberService.findByEmail(this.superUser.email)
+        }
+        return this.superUser
     }
 
     void setAllToSuperUser() {
