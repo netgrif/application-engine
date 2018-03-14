@@ -25,7 +25,7 @@ class MongoDbRunner extends AbstractOrderedCommandLineRunner {
     @Value('${spring.data.mongodb.port}')
     private String port
 
-    @Value('${spring.data.mongodb.drop')
+    @Value('${spring.data.mongodb.drop}')
     private boolean dropDatabase
 
     @Override
