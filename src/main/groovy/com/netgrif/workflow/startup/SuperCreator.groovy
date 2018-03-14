@@ -11,6 +11,7 @@ import com.netgrif.workflow.orgstructure.service.IGroupService
 import com.netgrif.workflow.orgstructure.service.IMemberService
 import org.apache.log4j.Logger
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Component
 
@@ -35,6 +36,9 @@ class SuperCreator extends AbstractOrderedCommandLineRunner {
     @Autowired
     private IGroupService groupService
 
+    @Value('${admin.password}')
+    private String superAdminPassword
+
     private User superUser
 
     private Member superMember
@@ -54,7 +58,7 @@ class SuperCreator extends AbstractOrderedCommandLineRunner {
                 name: "Super",
                 surname: "Trooper",
                 email: "super@netgrif.com",
-                password: "password",
+                password: superAdminPassword,
                 authorities: [adminAuthority] as Set<Authority>,
                 userProcessRoles: userProcessRoleService.findAllMinusDefault() as Set<UserProcessRole>))
         this.superMember = memberService.findByEmail(superUser.email)
