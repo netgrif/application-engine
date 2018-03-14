@@ -13,6 +13,8 @@ public class CaseMonitor {
             pointcut = "execution(* com.netgrif.workflow.workflow.domain.repositories.CaseRepository.findOne(..))",
             returning= "result")
     public void afterFindOne(JoinPoint joinPoint, Object result) {
+        if (result == null)
+            return;
         Case useCase = (Case) result;
         useCase.getPetriNet().initializeArcs();
         useCase.getPetriNet().initializeTokens(useCase.getActivePlaces());
