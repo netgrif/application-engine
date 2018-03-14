@@ -4,7 +4,7 @@ package com.netgrif.workflow.mail;
 import lombok.Getter;
 
 public enum EmailType {
-    REGISTRATION ("registration.html", "Registration to Netgrif WMS"),
+    REGISTRATION ("registration.html", "Registration invite"),
     DRAFT("draft.html", "Návrh na uzavretie poistnej zmluvy");
 
     @Getter
