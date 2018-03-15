@@ -33,20 +33,25 @@ public class MailService implements IMailService {
     @Getter
     @Value("${mail.server.port}")
     protected String port;
+
     @Getter
-    @Value("${mail.server.host.subdomain}")
-    protected String subdomain;
+    @Value("${mail.server.host.domain}")
+    protected String domain;
+
     @Getter
-    @Value("${mail.server.host.toplevel}")
-    protected String topLevelDomain;
+    @Value("${mail.server.host.ssl}")
+    protected boolean ssl;
+
     @Getter
     @Value("${mail.from}")
     protected String mailFrom;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     protected JavaMailSender mailSender;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     protected Configuration configuration;
 
     @Override
@@ -58,8 +63,9 @@ public class MailService implements IMailService {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
         model.put("date", LocalDate.now().plusDays(3).format(formatter));
 
-        String mailTopLevelDomain = topLevelDomain == null ? "com" : (topLevelDomain.isEmpty() ? "com" : topLevelDomain);
-        model.put("serverName", "http://" + (subdomain != null && !subdomain.isEmpty() ? (subdomain + ".") : "") + InetAddress.getLocalHost().getHostName().toLowerCase() + "." + mailTopLevelDomain + (port != null && !port.isEmpty() ?  (":" + port) : ""));
+        String encryptedHttp = ssl ? "https://" : "http://";
+        String usedPort = port != null && !port.isEmpty() ? (":" + port) : "";
+        model.put("serverName", encryptedHttp + domain + usedPort);
         MimeMessage email = buildEmail(EmailType.REGISTRATION, recipients, model, new HashMap<>());
         mailSender.send(email);
     }

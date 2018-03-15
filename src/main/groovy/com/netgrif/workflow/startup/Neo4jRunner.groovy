@@ -23,10 +23,15 @@ class Neo4jRunner extends AbstractOrderedCommandLineRunner {
     @Value('${spring.data.neo4j.uri}')
     private String URL
 
+    @Value('${spring.data.neo4j.drop}')
+    private boolean dropDatabase
+
     @Override
     void run(String... strings) throws Exception {
-        log.info("Deleting all nodes from Neo4j on $URL")
-        memberRepository.deleteAll()
-        groupRepository.deleteAll()
+        if (dropDatabase) {
+            log.info("Deleting all nodes from Neo4j on $URL")
+            memberRepository.deleteAll()
+            groupRepository.deleteAll()
+        }
     }
 }
