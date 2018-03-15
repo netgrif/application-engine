@@ -205,12 +205,17 @@ public class TaskService implements ITaskService {
 
     @Override
     @Transactional
-    public void finishTask(LoggedUser loggedUser, String taskId) throws Exception {
+    public void finishTask(LoggedUser loggedUser, String taskId) throws IllegalArgumentException, TransitionNotExecutableException {
         Task task = taskRepository.findOne(taskId);
         User user = userRepository.findOne(loggedUser.getId());
+        if (task == null) {
+            throw new IllegalArgumentException("Could not find task with id="+taskId);
+        } else if (task.getUserId() == null) {
+            throw new IllegalArgumentException("Task with id="+taskId+" is not assigned to any user.");
+        }
         // TODO: 14. 4. 2017 replace with @PreAuthorize
         if (!task.getUserId().equals(loggedUser.getId())) {
-            throw new Exception("User that is not assigned tried to finish task");
+            throw new IllegalArgumentException("User that is not assigned tried to finish task");
         }
 
         Case useCase = workflowService.findOne(task.getCaseId());
