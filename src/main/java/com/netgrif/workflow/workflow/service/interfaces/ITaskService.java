@@ -38,7 +38,7 @@ public interface ITaskService {
 
     Page<Task> findByTransitions(Pageable pageable, List<String> transitions);
 
-    void finishTask(LoggedUser loggedUser, String taskId) throws Exception;
+    void finishTask(LoggedUser loggedUser, String taskId) throws IllegalArgumentException, TransitionNotExecutableException;
 
     void assignTask(LoggedUser loggedUser, String taskId) throws TransitionNotExecutableException;
 
