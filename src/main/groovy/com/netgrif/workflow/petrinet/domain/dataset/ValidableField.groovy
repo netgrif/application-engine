@@ -24,11 +24,7 @@ abstract class ValidableField<T> extends FieldWithDefault<T> {
         return validationRules
     }
 
-    void setValidationRules(String validationRules) {
-        this.validationRules = validationRules
-    }
-
-    void setValidationRules(String[] rules) {
+    void setValidationRules(String... rules) {
         StringBuilder builder = new StringBuilder()
         Arrays.stream(rules).each { rule ->
             rule = rule.trim()
