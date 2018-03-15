@@ -92,6 +92,13 @@ public class UserService implements IUserService {
         return user;
     }
 
+    public User findByEmail(String email, boolean small){
+        User user = userRepository.findByEmail(email);
+        if(!small)
+            return loadProcessRoles(user);
+        return user;
+    }
+
     @Override
     public List<User> findAll(boolean small) {
         List<User> users = userRepository.findAll();
@@ -127,6 +134,8 @@ public class UserService implements IUserService {
     }
 
     private User loadProcessRoles(User user) {
+        if(user == null)
+            return user;
         user.setProcessRoles(processRoleRepository.findAll(user.getUserProcessRoles()
                 .stream().map(UserProcessRole::getRoleId).collect(Collectors.toList())));
         return user;
