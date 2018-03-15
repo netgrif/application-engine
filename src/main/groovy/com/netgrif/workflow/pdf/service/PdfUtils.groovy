@@ -3,9 +3,8 @@ package com.netgrif.workflow.pdf.service
 import org.apache.pdfbox.cos.COSName
 import org.apache.pdfbox.io.MemoryUsageSetting
 import org.apache.pdfbox.multipdf.PDFMergerUtility
-import org.apache.pdfbox.pdmodel.PDDocument
-import org.apache.pdfbox.pdmodel.PDDocumentCatalog
-import org.apache.pdfbox.pdmodel.PDResources
+import org.apache.pdfbox.pdmodel.*
+import org.apache.pdfbox.pdmodel.common.PDRectangle
 import org.apache.pdfbox.pdmodel.encryption.AccessPermission
 import org.apache.pdfbox.pdmodel.encryption.StandardProtectionPolicy
 import org.apache.pdfbox.pdmodel.font.PDType0Font
@@ -18,6 +17,43 @@ class PdfUtils {
     private static final Logger log = LoggerFactory.getLogger(PdfUtils.class)
 
     private static final int KEY_LENGTH = 128
+
+    /**
+     * Creates and returns new PDF file, created by shrinking input PDF file. To enlarge pdf, provide negative values.
+     * @param inputFile input pdf
+     * @param outputFileName output pdf file name
+     * @param left left space in mm
+     * @param right right space in mm
+     * @param up upper space in mm
+     * @param down lower space in mm
+     * @return resized PDF file
+     */
+    static File resize(File inputFile, String outputFileName, float left, float right, float up, float down) {
+        File outputFile = new File(outputFileName)
+        PDDocument inputDoc = PDDocument.load(inputFile)
+        PDDocument outputDoc = new PDDocument()
+
+        PDPageTree pages = inputDoc.getDocumentCatalog().getPages()
+        for (PDPage page : pages) {
+            PDRectangle rectangle = new PDRectangle()
+            rectangle.setLowerLeftX(-mmToPoint(left))
+            rectangle.setLowerLeftY(-mmToPoint(down))
+            rectangle.setUpperRightX(PDRectangle.A4.width + mmToPoint(right) as float)
+            rectangle.setUpperRightY(PDRectangle.A4.height + mmToPoint(up) as float)
+            page.setMediaBox(rectangle)
+            page.setCropBox(rectangle)
+            outputDoc.addPage(page)
+        }
+        outputDoc.save(outputFile)
+        inputDoc.close()
+        outputDoc.close()
+
+        return outputFile
+    }
+
+    private static float mmToPoint(float mm) {
+        return (mm * 72) / 25.4F
+    }
 
     static File removePages(File pdfFile, int ... pages) {
         PDDocument document = PDDocument.load(pdfFile)
