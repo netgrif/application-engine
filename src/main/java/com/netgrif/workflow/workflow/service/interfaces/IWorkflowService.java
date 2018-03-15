@@ -37,4 +37,6 @@ public interface IWorkflowService {
     boolean removeTasksFromCase(Iterable<? extends Task> tasks, String caseId);
 
     boolean removeTasksFromCase(Iterable<? extends Task> tasks, Case useCase);
+
+    Case decrypt(Case useCase);
 }

@@ -728,6 +728,7 @@ public class TaskService implements ITaskService {
     @Transactional
     protected void executeTransition(Task task, Case useCase) {
         log.info("executeTransition");
+        useCase = workflowService.decrypt(useCase);
         Transition transition = useCase.getPetriNet().getTransition(task.getTransitionId());
         try {
             startExecution(transition, useCase);
