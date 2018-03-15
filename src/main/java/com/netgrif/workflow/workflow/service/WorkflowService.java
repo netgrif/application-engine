@@ -192,6 +192,12 @@ public class WorkflowService implements IWorkflowService {
         return deleteSuccess;
     }
 
+    @Override
+    public Case decrypt(Case useCase) {
+        decryptDataSet(useCase);
+        return useCase;
+    }
+
     public List<Field> getData(String caseId) {
         Case useCase = repository.findOne(caseId);
         List<Field> fields = new ArrayList<>();
