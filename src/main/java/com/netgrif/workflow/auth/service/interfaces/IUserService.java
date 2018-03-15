@@ -15,6 +15,8 @@ public interface IUserService {
 
     User findById(Long id, boolean small);
 
+    User findByEmail(String email, boolean small);
+
     List<User> findAll(boolean small);
 
     Set<User> findAllCoMembers(String email, boolean small);
