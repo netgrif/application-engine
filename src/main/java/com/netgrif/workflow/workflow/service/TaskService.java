@@ -764,6 +764,7 @@ public class TaskService implements ITaskService {
 
     @Transactional
     protected void scheduleTaskExecution(Task task, LocalDateTime time, Case useCase) {
+        log.info("Task "+task.getTitle() + " scheduled to run at " + time.toString());
         scheduler.schedule(() -> executeTransition(task, useCase), DateUtils.localDateTimeToDate(time));
         publisher.publishEvent(new TimeFinishTaskEvent(time, task, useCase));
     }
