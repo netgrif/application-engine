@@ -225,5 +225,11 @@
                 <activatedProperties>dev</activatedProperties>
             </properties>
         </profile>
+        <profile>
+            <id>update</id>
+            <properties>
+                <activatedProperties>update</activatedProperties>
+            </properties>
+        </profile>
     </profiles>
 </project>
