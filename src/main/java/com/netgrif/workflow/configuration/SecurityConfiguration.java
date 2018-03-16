@@ -30,10 +30,10 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     private static final Logger log = LoggerFactory.getLogger(SecurityConfiguration.class);
 
     private final String[] PERMIT_ALL_STATIC_PATTERNS = {
-            "/bower_components/**", "/scripts/**", "/assets/**", "/styles/**", "/views/**", "/**/favicon.ico"
+            "/bower_components/**", "/scripts/**", "/assets/**", "/styles/**", "/views/**", "/**/favicon.ico", "/favicon.ico"
     };
     private final String[] PERMIT_ALL_SERVER_PATTERNS = {
-            "/index.html", "/", "/login", "/signup/{token}", "/signup", "/signup/token", "/res/test"
+            "/index.html", "/", "/login", "/signup/{token}", "/signup", "/signup/token"
     };
 
     @Autowired
@@ -49,11 +49,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @ResponseBody
     public Principal user(Principal user) {
         return user;
-    }
-
-    @RequestMapping(value = "/res/test", method = RequestMethod.GET)
-    @ResponseBody public String testForProxy(){
-        return "{ \"message\":\"It works!\" }";
     }
 
     @Override
