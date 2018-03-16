@@ -16,7 +16,7 @@ class PdfUtils {
 
     private static final Logger log = LoggerFactory.getLogger(PdfUtils.class)
 
-    private static final int KEY_LENGTH = 128
+    static final int KEY_LENGTH = 128
 
     /**
      * Creates and returns new PDF file, created by shrinking input PDF file. To enlarge pdf, provide negative values.
@@ -51,7 +51,7 @@ class PdfUtils {
         return outputFile
     }
 
-    private static float mmToPoint(float mm) {
+    static float mmToPoint(float mm) {
         return (mm * 72) / 25.4F
     }
 
