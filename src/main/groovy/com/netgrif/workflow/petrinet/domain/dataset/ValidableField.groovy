@@ -25,6 +25,9 @@ abstract class ValidableField<T> extends FieldWithDefault<T> {
     }
 
     void setValidationRules(List<String> rules) {
+        if (rules == null || rules.empty)
+            return
+
         StringBuilder builder = new StringBuilder()
         rules.each { rule ->
             rule = rule.trim()
