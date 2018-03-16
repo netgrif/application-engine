@@ -18,7 +18,7 @@
                 <xs:element ref="placeholder" minOccurs="0"/>
                 <xs:element ref="desc" minOccurs="0"/>
                 <xs:element ref="values" minOccurs="0" maxOccurs="unbounded"/>
-                <xs:element ref="valid" minOccurs="0"/>
+                <xs:element ref="valid" minOccurs="0" maxOccurs="unbounded"/>
                 <xs:element ref="init" minOccurs="0"/>
                 <xs:element ref="encryption" minOccurs="0"/>
                 <xs:element ref="action" minOccurs="0" maxOccurs="unbounded"/>
@@ -190,7 +190,8 @@
     <xs:simpleType name="dataGroupAlignment">
         <xs:restriction base="xs:string">
             <xs:enumeration value="start"/>
-            <xs:enumeration value="left"/>
+            <xs:enumeration value="center"/>
+            <xs:enumeration value="end"/>
         </xs:restriction>
     </xs:simpleType>
     <xs:simpleType name="triggerType">
