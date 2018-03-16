@@ -1,9 +1,14 @@
 
 package com.netgrif.workflow.importer.model;
 
-import javax.xml.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
 
 
 /**
@@ -21,7 +26,7 @@ import java.util.List;
  *         &lt;element ref="{}placeholder" minOccurs="0"/&gt;
  *         &lt;element ref="{}desc" minOccurs="0"/&gt;
  *         &lt;element ref="{}values" maxOccurs="unbounded" minOccurs="0"/&gt;
- *         &lt;element ref="{}valid" minOccurs="0"/&gt;
+ *         &lt;element ref="{}valid" maxOccurs="unbounded" minOccurs="0"/&gt;
  *         &lt;element ref="{}init" minOccurs="0"/&gt;
  *         &lt;element ref="{}encryption" minOccurs="0"/&gt;
  *         &lt;element ref="{}action" maxOccurs="unbounded" minOccurs="0"/&gt;
@@ -58,7 +63,7 @@ public class Data {
     protected I18NStringType placeholder;
     protected I18NStringType desc;
     protected List<I18NStringType> values;
-    protected String valid;
+    protected List<String> valid;
     protected String init;
     protected EncryptionType encryption;
     protected List<ActionType> action;
@@ -188,25 +193,30 @@ public class Data {
     /**
      * Gets the value of the valid property.
      * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getValid() {
-        return valid;
-    }
-
-    /**
-     * Sets the value of the valid property.
+     * <p>
+     * This accessor method returns a reference to the live list,
+     * not a snapshot. Therefore any modification you make to the
+     * returned list will be present inside the JAXB object.
+     * This is why there is not a <CODE>set</CODE> method for the valid property.
      * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     * <p>
+     * For example, to add a new item, do as follows:
+     * <pre>
+     *    getValid().add(newItem);
+     * </pre>
+     * 
+     * 
+     * <p>
+     * Objects of the following type(s) are allowed in the list
+     * {@link String }
+     * 
+     * 
      */
-    public void setValid(String value) {
-        this.valid = value;
+    public List<String> getValid() {
+        if (valid == null) {
+            valid = new ArrayList<String>();
+        }
+        return this.valid;
     }
 
     /**

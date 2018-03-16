@@ -24,9 +24,9 @@ abstract class ValidableField<T> extends FieldWithDefault<T> {
         return validationRules
     }
 
-    void setValidationRules(String... rules) {
+    void setValidationRules(List<String> rules) {
         StringBuilder builder = new StringBuilder()
-        Arrays.stream(rules).each { rule ->
+        rules.each { rule ->
             rule = rule.trim()
             if (rule.contains(" ") || rule.contains("(")) builder.append("{${rule}},")
             else builder.append(rule + ",")
