@@ -47,7 +47,7 @@ public class MongoSearchService<T> {
         boolean match = request.entrySet().stream().allMatch((Map.Entry<String, Object> entry) -> {
             try {
                 Method method = this.getClass().getMethod(entry.getKey() + "Query", Object.class);
-                log.info("Resolved attribute of " + tClass.getSimpleName() + ": " + entry.getKey());
+//                log.info("Resolved attribute of " + tClass.getSimpleName() + ": " + entry.getKey());
                 Object part = method.invoke(this, entry.getValue());
                 if (part != null) //TODO 23.7.2017 throw exception when cannot build query
                     queryParts.put(entry.getKey(), part);
@@ -72,7 +72,7 @@ public class MongoSearchService<T> {
                 return false;
             }
 
-            log.info("Query: " + entry.getValue());
+//            log.info("Query: " + entry.getValue());
             builder.append(entry.getValue());
             builder.append(",");
             return true;
