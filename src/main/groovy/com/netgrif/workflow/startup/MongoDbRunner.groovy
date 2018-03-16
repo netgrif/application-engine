@@ -30,8 +30,9 @@ class MongoDbRunner extends AbstractOrderedCommandLineRunner {
 
     @Override
     void run(String... strings) throws Exception {
-        log.info("Dropping Mongo database ${host}:${port}/${name}")
-        if (dropDatabase)
+        if (dropDatabase) {
+            log.info("Dropping Mongo database ${host}:${port}/${name}")
             mongoTemplate.getDb().dropDatabase()
+        }
     }
 }
