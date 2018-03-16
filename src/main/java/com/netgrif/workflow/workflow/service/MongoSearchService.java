@@ -171,6 +171,9 @@ public class MongoSearchService<T> {
     }
 
     public static String or(Collection<Object> expressions) {
+        if(expressions.isEmpty())
+            return "";
+
         StringBuilder builder = new StringBuilder();
         builder.append("$or:[");
         expressions.forEach(obj -> {
