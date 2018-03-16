@@ -110,10 +110,9 @@ public abstract class PetriNetService implements IPetriNetService {
     @Override
     public List<PetriNetReference> getAllReferences(LoggedUser user, Locale locale) {
         List<PetriNet> nets = loadAll();
-        if (user.getAuthorities().contains(new Authority(Authority.admin)))
-            return nets.stream().map(net -> new PetriNetReference(net.getObjectId().toString(), net.getTitle().getTranslation(locale))).collect(Collectors.toList());
-        return nets.stream().filter(net -> net.getRoles().keySet().stream().anyMatch(user.getProcessRoles()::contains))
-                .map(net -> new PetriNetReference(net.getObjectId().toString(), net.getTitle().getTranslation(locale))).collect(Collectors.toList());
+        return nets.stream()
+                .map(net -> new PetriNetReference(net.getObjectId().toString(), net.getTitle().getTranslation(locale)))
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -127,10 +126,11 @@ public abstract class PetriNetService implements IPetriNetService {
     public List<TransitionReference> getTransitionReferences(List<String> netsIds, LoggedUser user, Locale locale) {
         Iterable<PetriNet> nets = repository.findAll(netsIds);
         List<TransitionReference> transRefs = new ArrayList<>();
+
         nets.forEach(net -> transRefs.addAll(net.getTransitions().entrySet().stream()
-                .filter(entry -> entry.getValue().getRoles().keySet().stream().anyMatch(user.getProcessRoles()::contains))
                 .map(entry -> new TransitionReference(entry.getKey(), entry.getValue().getTitle().getTranslation(locale), net.getStringId()))
                 .collect(Collectors.toList())));
+
         return transRefs;
     }
 
