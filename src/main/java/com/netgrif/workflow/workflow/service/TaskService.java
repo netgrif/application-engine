@@ -755,16 +755,20 @@ public class TaskService implements ITaskService {
                 continue;
 
             Object value = useCase.getDataSet().get(entry.getKey()).getValue();
-            if (value == null)
-                throw new IllegalArgumentException("Field " + entry.getKey() + " has null value");
-            if (value instanceof String && ((String) value).isEmpty())
-                throw new IllegalArgumentException("Field " + entry.getKey() + " has empty value");
+            if (value == null) {
+                Field field = useCase.getField(entry.getKey());
+                throw new IllegalArgumentException("Field \"" + field.getName() + "\" has null value");
+            }
+            if (value instanceof String && ((String) value).isEmpty()) {
+                Field field = useCase.getField(entry.getKey());
+                throw new IllegalArgumentException("Field \"" + field.getName() + "\" has empty value");
+            }
         }
     }
 
     @Transactional
     protected void scheduleTaskExecution(Task task, LocalDateTime time, Case useCase) {
-        log.info("Task "+task.getTitle() + " scheduled to run at " + time.toString());
+        log.info("Task " + task.getTitle() + " scheduled to run at " + time.toString());
         scheduler.schedule(() -> executeTransition(task, useCase), DateUtils.localDateTimeToDate(time));
         publisher.publishEvent(new TimeFinishTaskEvent(time, task, useCase));
     }
