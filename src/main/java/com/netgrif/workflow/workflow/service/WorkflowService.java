@@ -166,8 +166,8 @@ public class WorkflowService implements IWorkflowService {
     @Override
     public void deleteCase(String caseId) {
         Case useCase = repository.findOne(caseId);
-        repository.delete(useCase);
         taskService.deleteTasksByCase(caseId);
+        repository.delete(useCase);
 
         publisher.publishEvent(new DeleteCaseEvent(useCase));
     }
