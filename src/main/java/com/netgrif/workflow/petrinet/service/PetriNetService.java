@@ -160,7 +160,10 @@ public abstract class PetriNetService implements IPetriNetService {
             builder.append(role);
             builder.append("\":{$exists:true}},");
         });
-        builder.deleteCharAt(builder.length() - 1);
+        if (!user.getProcessRoles().isEmpty())
+            builder.deleteCharAt(builder.length() - 1);
+        else
+            builder.append("{}");
         builder.append("]}");
         BasicQuery query = new BasicQuery(builder.toString(), "{_id:1,title:1}");
         List<PetriNet> nets = mongoTemplate.find(query, PetriNet.class);
@@ -213,6 +216,8 @@ public abstract class PetriNetService implements IPetriNetService {
         });
         if (!user.getProcessRoles().isEmpty())
             builder.deleteCharAt(builder.length() - 1);
+        else
+            builder.append("{}");
         builder.append("]");
         return builder.toString();
     }

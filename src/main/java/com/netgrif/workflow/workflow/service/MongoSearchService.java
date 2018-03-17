@@ -120,6 +120,9 @@ public class MongoSearchService<T> {
 
     protected String buildQueryPart(String attribute, Object obj, Map<Class, Function<Object, String>> builder) {
         try {
+            if (obj == null || (obj instanceof List && ((List) obj).isEmpty()))
+                return ":";
+
             String attr = attribute != null ? "\"" + attribute + "\":" : "";
             return attr + builder.get(obj.getClass()).apply(obj);
         } catch (NullPointerException e) {
@@ -171,14 +174,17 @@ public class MongoSearchService<T> {
     }
 
     public static String or(Collection<Object> expressions) {
-        if(expressions.isEmpty())
+        if (expressions.isEmpty())
             return "";
 
         StringBuilder builder = new StringBuilder();
         builder.append("$or:[");
         expressions.forEach(obj -> {
             builder.append("{");
-            builder.append(obj);
+            if (obj instanceof String && ((String) obj).equalsIgnoreCase(":"))
+                builder.append("");
+            else
+                builder.append(obj);
             builder.append("},");
         });
         builder.deleteCharAt(builder.length() - 1);

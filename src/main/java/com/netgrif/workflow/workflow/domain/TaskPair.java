@@ -23,13 +23,12 @@ public class TaskPair {
 
         TaskPair taskPair = (TaskPair) o;
 
-        return task.equals(taskPair.task) && transition.equals(taskPair.transition);
+        return transition.equals(taskPair.transition);
     }
 
     @Override
     public int hashCode() {
         int result = super.hashCode();
-        result = 31 * result + task.hashCode();
         result = 31 * result + transition.hashCode();
         return result;
     }
