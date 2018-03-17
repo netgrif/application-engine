@@ -105,7 +105,10 @@ public class TaskService implements ITaskService {
                 queryBuilder.append(role);
                 queryBuilder.append("\":{$exists:true}},");
             });
-            queryBuilder.deleteCharAt(queryBuilder.length() - 1);
+            if (!loggedUser.getProcessRoles().isEmpty())
+                queryBuilder.deleteCharAt(queryBuilder.length() - 1);
+            else
+                queryBuilder.append("{}");
             queryBuilder.append("]}");
             BasicQuery query = new BasicQuery(queryBuilder.toString());
             query = (BasicQuery) query.with(pageable);
@@ -209,9 +212,9 @@ public class TaskService implements ITaskService {
         Task task = taskRepository.findOne(taskId);
         User user = userRepository.findOne(loggedUser.getId());
         if (task == null) {
-            throw new IllegalArgumentException("Could not find task with id="+taskId);
+            throw new IllegalArgumentException("Could not find task with id=" + taskId);
         } else if (task.getUserId() == null) {
-            throw new IllegalArgumentException("Task with id="+taskId+" is not assigned to any user.");
+            throw new IllegalArgumentException("Task with id=" + taskId + " is not assigned to any user.");
         }
         // TODO: 14. 4. 2017 replace with @PreAuthorize
         if (!task.getUserId().equals(loggedUser.getId())) {
