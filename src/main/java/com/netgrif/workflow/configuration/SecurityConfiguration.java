@@ -14,7 +14,6 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
@@ -30,10 +29,10 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     private static final Logger log = LoggerFactory.getLogger(SecurityConfiguration.class);
 
     private final String[] PERMIT_ALL_STATIC_PATTERNS = {
-            "/bower_components/**", "/scripts/**", "/assets/**", "/styles/**", "/views/**", "/**/favicon.ico", "/favicon.ico"
+            "/bower_components/**", "/scripts/**", "/assets/**", "/styles/**", "/views/**", "/**/favicon.ico", "/favicon.ico", "/configuration/**", "/swagger-resources/**", "/swagger-ui.html", "/webjars/**"
     };
     private final String[] PERMIT_ALL_SERVER_PATTERNS = {
-            "/index.html", "/", "/login", "/signup/{token}", "/signup", "/signup/token"
+            "/index.html", "/", "/login", "/signup/{token}", "/signup", "/signup/token", "/v2/api-docs", "/swagger-ui.html"
     };
 
     @Autowired
