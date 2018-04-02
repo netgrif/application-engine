@@ -18,9 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Lookup;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.io.FileSystemResource;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.*;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.BasicQuery;
 import org.springframework.stereotype.Service;
@@ -94,6 +92,13 @@ public abstract class PetriNetService implements IPetriNetService {
         List<PetriNet> nets = repository.findAll();
         nets.forEach(PetriNet::initializeArcs);
         return nets;
+    }
+
+    public PetriNet getNewestByIdentifier(String identifier) {
+        List<PetriNet> nets = repository.findByIdentifier(identifier, new PageRequest(0, 1, Sort.Direction.DESC, "version")).getContent();
+        if (nets.isEmpty())
+            return null;
+        return nets.get(0);
     }
 
     @Override
