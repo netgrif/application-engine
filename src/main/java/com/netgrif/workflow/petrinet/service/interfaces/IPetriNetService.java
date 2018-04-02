@@ -31,6 +31,8 @@ public interface IPetriNetService {
 
     List<PetriNet> loadAll();
 
+    PetriNet getNewestByIdentifier(String identifier);
+
     List<PetriNetReference> getAllReferences(LoggedUser user, Locale locale);
 
     List<PetriNetReference> getAllAccessibleReferences(LoggedUser user, Locale locale);
