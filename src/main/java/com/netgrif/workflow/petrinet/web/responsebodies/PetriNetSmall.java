@@ -13,56 +13,77 @@ import java.util.Locale;
 
 public class PetriNetSmall extends PetriNetObject {
 
-    @Getter @Setter
+    @Getter
+    @Setter
+    private String identifier;
+
+    @Getter
+    @Setter
     private String title;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private String initials;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private String icon;
 
     // TODO: 18. 3. 2017 replace with Spring auditing
-    @Getter @Setter
+    @Getter
+    @Setter
     private LocalDateTime creationDate;
 
-    @Getter @Setter
+    @Getter
+    @Setter
+    private String version;
+
+    @Getter
+    @Setter
     private Author author;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private Integer places;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private Integer transitions;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private Integer arcs;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private Integer dataSet;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private Integer actions;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private Integer roles;
 
-    public PetriNetSmall(ObjectId id, String title, String initials) {
+    public PetriNetSmall(ObjectId id, String identifier, String title, String initials) {
         super._id = id;
+        this.identifier = identifier;
         this.title = title;
         this.initials = initials;
     }
 
-    public static PetriNetSmall fromPetriNet(PetriNet original, Locale locale){
+    public static PetriNetSmall fromPetriNet(PetriNet original, Locale locale) {
         String title = locale != null ? original.getTitle().getTranslation(locale) : original.getTitle().getDefaultValue();
-        PetriNetSmall small = new PetriNetSmall(original.getObjectId(), title,original.getInitials());
+        PetriNetSmall small = new PetriNetSmall(original.getObjectId(), original.getIdentifier(), title, original.getInitials());
+        small.setVersion(original.getVersion());
         small.setIcon(original.getIcon());
         small.setAuthor(original.getAuthor() == null ? new Author(null, "nae@netgrif.com", "System") : original.getAuthor());
         small.setCreationDate(original.getCreationDate());
         small.setPlaces(original.getPlaces().size());
         small.setTransitions(original.getTransitions().size());
-        small.setArcs(Integer.parseInt(original.getArcs().entrySet().stream().reduce(new AbstractMap.SimpleEntry<>("0",null),
-                (x,y) -> new AbstractMap.SimpleEntry<>((Integer.parseInt(x.getKey()) + y.getValue().size()) + "", null)).getKey()));
+        small.setArcs(Integer.parseInt(original.getArcs().entrySet().stream().reduce(new AbstractMap.SimpleEntry<>("0", null),
+                (x, y) -> new AbstractMap.SimpleEntry<>((Integer.parseInt(x.getKey()) + y.getValue().size()) + "", null)).getKey()));
         small.setDataSet(original.getDataSet().size());
         small.setActions(original.getDataSet().values().stream().mapToInt(f -> f.getActions() == null ? 0 : f.getActions().size()).sum());
         small.setRoles(original.getRoles().size());
@@ -73,10 +94,12 @@ public class PetriNetSmall extends PetriNetObject {
     @Override
     public String toString() {
         return "PetriNetSmall{" +
-                "title='" + title + '\'' +
+                "identifier='" + identifier + '\'' +
+                ", title='" + title + '\'' +
                 ", initials='" + initials + '\'' +
                 ", icon='" + icon + '\'' +
                 ", creationDate=" + creationDate +
+                ", version='" + version + '\'' +
                 ", author=" + author +
                 ", places=" + places +
                 ", transitions=" + transitions +

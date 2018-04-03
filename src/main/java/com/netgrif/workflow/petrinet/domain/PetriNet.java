@@ -18,7 +18,6 @@ import java.util.stream.Collectors;
 @Document
 public class PetriNet extends PetriNetObject {
 
-    @Indexed
     @Getter
     @Setter
     private String identifier;
