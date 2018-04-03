@@ -2,6 +2,7 @@ package com.netgrif.workflow.petrinet.service.interfaces;
 
 import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
+import com.netgrif.workflow.petrinet.web.requestbodies.UploadedFileMeta;
 import com.netgrif.workflow.petrinet.web.responsebodies.DataFieldReference;
 import com.netgrif.workflow.petrinet.web.responsebodies.PetriNetReference;
 import com.netgrif.workflow.petrinet.web.responsebodies.PetriNetSmall;
@@ -21,9 +22,9 @@ import java.util.Map;
 
 public interface IPetriNetService {
 
-    Optional<PetriNet> importPetriNetAndDeleteFile(File xmlFile, String name, String initials, LoggedUser user) throws IOException;
+    Optional<PetriNet> importPetriNetAndDeleteFile(File xmlFile, UploadedFileMeta netMetaData, LoggedUser user) throws IOException;
 
-    Optional<PetriNet> importPetriNet(File xmlFile, String name, String initials, LoggedUser user) throws IOException;
+    Optional<PetriNet> importPetriNet(File xmlFile, UploadedFileMeta metaData, LoggedUser user) throws IOException;
 
     void savePetriNet(PetriNet petriNet);
 
