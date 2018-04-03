@@ -9,6 +9,7 @@ import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.Transition;
 import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository;
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
+import com.netgrif.workflow.petrinet.web.requestbodies.UploadedFileMeta;
 import com.netgrif.workflow.petrinet.web.responsebodies.DataFieldReference;
 import com.netgrif.workflow.petrinet.web.responsebodies.PetriNetReference;
 import com.netgrif.workflow.petrinet.web.responsebodies.PetriNetSmall;
@@ -49,28 +50,57 @@ public abstract class PetriNetService implements IPetriNetService {
     private ApplicationEventPublisher publisher;
 
     @Override
-    public Optional<PetriNet> importPetriNetAndDeleteFile(File xmlFile, String name, String initials, LoggedUser user) throws IOException {
-        Optional<PetriNet> imported = importPetriNet(xmlFile, name, initials, user);
+    public Optional<PetriNet> importPetriNetAndDeleteFile(File xmlFile, UploadedFileMeta netMetaData, LoggedUser user) throws IOException {
+        Optional<PetriNet> imported = importPetriNet(xmlFile, netMetaData, user);
         if (!xmlFile.delete())
             throw new IOException("File of process was not deleted");
         return imported;
     }
 
     @Override
-    public Optional<PetriNet> importPetriNet(File xmlFile, String name, String initials, LoggedUser user) throws IOException {
-        Optional<PetriNet> imported = getImporter().importPetriNet(xmlFile, name, initials);
+    public Optional<PetriNet> importPetriNet(File xmlFile, UploadedFileMeta metaData, LoggedUser user) throws IOException {
+        PetriNet existingNet = getNewestByIdentifier(metaData.indentifier);
+        Optional<PetriNet> newPetriNet;
+        if (existingNet == null) {
+            newPetriNet = importNewPetriNet(xmlFile, metaData, user, new HashMap<>());
+        } else {
+            //TODO 3.4.2018 compare net hash with found net hash -> if equal do not save network => possible duplicate
+            Map<String, Object> importerConfig = new HashMap<>();
+            importerConfig.put("notSaveObjects", true);
+            newPetriNet = getImporter().importPetriNet(xmlFile, metaData.name, metaData.initials, importerConfig);
+            if(newPetriNet.isPresent()){
+                newPetriNet.get().setAuthor(user.transformToAuthor());
+                newPetriNet.get().setIdentifier(existingNet.getIdentifier());
+                newPetriNet.get().setVersion(existingNet.getVersion());
+                newPetriNet.get().incrementVersion(PetriNet.VersionType.valueOf(metaData.releaseType.trim().toUpperCase()));
+                newPetriNet.get().setRoles(existingNet.getRoles());
+                getImporter().saveNetFile(newPetriNet.get(), xmlFile);
+
+                repository.save(newPetriNet.get());
+                log.info("New version of Petri net " + metaData.name + " (" + metaData.initials + ") imported successfully");
+                publisher.publishEvent(new UserImportModelEvent(user, xmlFile, metaData.name, metaData.initials));
+            }
+        }
+
+        return newPetriNet;
+    }
+
+    private Optional<PetriNet> importNewPetriNet(File xmlFile, UploadedFileMeta metaData, LoggedUser user, Map<String, Object> importerConfig) throws IOException {
+        Optional<PetriNet> imported = getImporter().importPetriNet(xmlFile, metaData.name, metaData.initials, importerConfig);
         if (imported.isPresent()) {
             PetriNet net = imported.get();
             net.setAuthor(user.transformToAuthor());
+            net.setIdentifier(metaData.indentifier);
             getImporter().saveNetFile(net, xmlFile);
             repository.save(imported.get());
             userProcessRoleService.saveRoles(net.getRoles().values(), net.getStringId());
 
-            log.info("Petri net " + name + " (" + initials + ") imported successfully");
-            publisher.publishEvent(new UserImportModelEvent(user, xmlFile, name, initials));
+            log.info("Petri net " + metaData.name + " (" + metaData.initials + ") imported successfully");
+            publisher.publishEvent(new UserImportModelEvent(user, xmlFile, metaData.name, metaData.initials));
         }
         return imported;
     }
+
 
     @Override
     public void savePetriNet(PetriNet petriNet) {
