@@ -16,6 +16,11 @@ public class PetriNetReference {
     public PetriNetReference() {
     }
 
+    public PetriNetReference(String entityId, String title){
+        this.title = title;
+        this.entityId = entityId;
+    }
+
     public PetriNetReference(String entityId, String title) {
         this.entityId = entityId;
         this.title = title;

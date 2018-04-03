@@ -55,6 +55,8 @@ public class Importer {
     private Map<Long, Transaction> transactions;
     private Map<String, I18nString> i18n;
 
+    private Map<String, Object> config;
+
     @Autowired
     private FieldFactory fieldFactory;
 
@@ -74,8 +76,10 @@ public class Importer {
     private TriggerFactory triggerFactory;
 
     @Transactional
-    public Optional<PetriNet> importPetriNet(File xml, String title, String initials) {
+    public Optional<PetriNet> importPetriNet(File xml, String title, String initials, Map<String, Object> config) {
         try {
+            this.config = config == null ? new HashMap<>() : config;
+
             initialize();
             unmarshallXml(xml);
             return createPetriNet(title, initials, xml);
@@ -131,7 +135,10 @@ public class Importer {
         document.getTransition().forEach(this::resolveTransitionActions);
         document.getData().forEach(this::resolveDataActions);
 
-        return Optional.of(repository.save(net));
+        if (config.get("notSaveObjects") != null && ((Boolean) config.get("notSaveObjects")))
+            return Optional.of(net);
+        else
+            return Optional.of(repository.save(net));
     }
 
     @Transactional
@@ -173,8 +180,8 @@ public class Importer {
             resolveDataRefActions(trans.getDataRef(), trans);
         }
         if (trans.getDataGroup() != null) {
-            trans.getDataGroup().forEach(ref-> {
-                if (ref.getDataRef()!= null) {
+            trans.getDataGroup().forEach(ref -> {
+                if (ref.getDataRef() != null) {
                     resolveDataRefActions(ref.getDataRef(), trans);
                 }
             });
@@ -402,7 +409,8 @@ public class Importer {
             role.setName(toI18NString(importRole.getTitle()));
         else
             role.setName(toI18NString(importRole.getName()));
-        role = roleRepository.save(role);
+        if (config.get("notSaveObjects") == null || !((Boolean) config.get("notSaveObjects")))
+            role = roleRepository.save(role);
 
         net.addRole(role);
         roles.put(importRole.getId(), role);
