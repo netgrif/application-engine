@@ -71,17 +71,12 @@ public class PetriNetController {
             ObjectMapper mapper = new ObjectMapper();
             UploadedFileMeta fileMeta = mapper.readValue(fileMetaJSON, UploadedFileMeta.class);
 
-            service.importPetriNetAndDeleteFile(file, fileMeta.name, fileMeta.initials, (LoggedUser) auth.getPrincipal());
-            return MessageResource.successMessage("Petri net imported successfully");
+            service.importPetriNetAndDeleteFile(file, fileMeta, (LoggedUser) auth.getPrincipal());
+            return MessageResource.successMessage("Petri net "+fileMeta.name+" imported successfully");
         } catch (IOException e) {
             e.printStackTrace();
             return MessageResource.errorMessage("IO error");
         }
-    }
-
-    @RequestMapping(method = GET)
-    public List<PetriNet> getAll() {
-        return service.loadAll();
     }
 
     @RequestMapping(value = "/refs", method = GET)
