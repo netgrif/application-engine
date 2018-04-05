@@ -141,6 +141,7 @@ public class WorkflowService implements IWorkflowService {
     public Case createCase(String netId, String title, String color, LoggedUser user) {
         PetriNet petriNet = petriNetService.getPetriNet(netId);
         Case useCase = new Case(title, petriNet, petriNet.getActivePlaces());
+        useCase.setProcessIdentifier(petriNet.getIdentifier());
         useCase.setColor(color);
         useCase.setAuthor(user.transformToAuthor());
         useCase.setIcon(petriNet.getIcon());
