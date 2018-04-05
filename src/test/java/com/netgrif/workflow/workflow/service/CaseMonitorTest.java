@@ -18,6 +18,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.File;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 
 @SpringBootTest
@@ -47,7 +48,7 @@ public class CaseMonitorTest {
 
     @Test
     public void afterFindOne() throws Exception {
-        importer.importPetriNet(new File("src/test/resources/prikladFM.xml"), "net", "NET");
+        importer.importPetriNet(new File("src/test/resources/prikladFM.xml"), "net", "NET", new HashMap<>());
         workflowService.createCase(netRepository.findAll().get(0).getStringId(), "Storage Unit", "color-fg-fm-500", mockLoggedUser());
 
         List<Case> cases = repository.findAll();

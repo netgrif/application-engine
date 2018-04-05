@@ -26,6 +26,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.File;
 import java.util.Collections;
+import java.util.HashMap;
 
 @SpringBootTest
 @ActiveProfiles({"test"})
@@ -67,7 +68,7 @@ public class TaskServiceTest {
         mongoTemplate.getDb().dropDatabase();
         taskRepository.deleteAll();
 
-        importer.importPetriNet(new File("src/test/resources/prikladFM.xml"), "fm net", "fm");
+        importer.importPetriNet(new File("src/test/resources/prikladFM.xml"), "fm net", "fm", new HashMap<>());
         PetriNet net = petriNetRepository.findAll().get(0);
         workflowService.createCase(net.getStringId(), "Storage Unit", "color", mockLoggedUser());
     }
@@ -83,7 +84,7 @@ public class TaskServiceTest {
 
     @Test
     public void resetArcTest() throws TransitionNotExecutableException {
-        PetriNet net = importer.importPetriNet(new File("src/test/resources/reset_inhibitor_test.xml"), "reset", "rst").get();
+        PetriNet net = importer.importPetriNet(new File("src/test/resources/reset_inhibitor_test.xml"), "reset", "rst", new HashMap<>()).get();
         LoggedUser loggedUser = mockLoggedUser();
         Case useCase = workflowService.createCase(net.getStringId(), "Reset test", "color", loggedUser);
         User user = new User();

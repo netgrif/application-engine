@@ -1,6 +1,5 @@
 package com.netgrif.workflow.petrinet.service;
 
-import com.mongodb.DBObject;
 import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.auth.service.UserProcessRoleService;
 import com.netgrif.workflow.event.events.model.UserImportModelEvent;
@@ -15,17 +14,24 @@ import com.netgrif.workflow.petrinet.web.responsebodies.DataFieldReference;
 import com.netgrif.workflow.petrinet.web.responsebodies.PetriNetReference;
 import com.netgrif.workflow.petrinet.web.responsebodies.PetriNetSmall;
 import com.netgrif.workflow.petrinet.web.responsebodies.TransitionReference;
-import com.netgrif.workflow.workflow.domain.DataField;
 import org.apache.log4j.Logger;
+import org.bson.Document;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Lookup;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.io.FileSystemResource;
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
+import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.aggregation.GroupOperation;
 import org.springframework.data.mongodb.core.query.BasicQuery;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.repository.support.PageableExecutionUtils;
 import org.springframework.stereotype.Service;
 
 import javax.validation.constraints.NotNull;
@@ -64,7 +70,7 @@ public abstract class PetriNetService implements IPetriNetService {
 
     @Override
     public Optional<PetriNet> importPetriNet(File xmlFile, UploadedFileMeta metaData, LoggedUser user) throws IOException {
-        PetriNet existingNet = getNewestByIdentifier(metaData.identifier);
+        PetriNet existingNet = getNewestVersionByIdentifier(metaData.identifier);
         Optional<PetriNet> newPetriNet;
         if (existingNet == null) {
             newPetriNet = importNewPetriNet(xmlFile, metaData, user, new HashMap<>());
@@ -112,11 +118,12 @@ public abstract class PetriNetService implements IPetriNetService {
     private void setupImportedPetriNet(PetriNet net, File xmlFile, UploadedFileMeta meta, LoggedUser user) throws IOException {
         net.setAuthor(user.transformToAuthor());
         net.setIdentifier(meta.identifier);
-        getImporter().saveNetFile(net, xmlFile);
 
-        repository.save(net);
+        net = repository.save(net);
         log.info("Petri net " + meta.name + " (" + meta.initials + " v" + net.getVersion() + ") imported successfully");
         publisher.publishEvent(new UserImportModelEvent(user, xmlFile, meta.name, meta.initials));
+
+        getImporter().saveNetFile(net, xmlFile);
     }
 
 
@@ -135,6 +142,7 @@ public abstract class PetriNetService implements IPetriNetService {
         return net;
     }
 
+    @Override
     public PetriNet getPetriNet(String identifier, String version) {
         PetriNet net = repository.findByIdentifierAndVersion(identifier, version);
         if (net == null)
@@ -143,12 +151,14 @@ public abstract class PetriNetService implements IPetriNetService {
         return net;
     }
 
+    @Override
     public List<PetriNet> getByIdentifier(String identifier) {
         List<PetriNet> nets = repository.findAllByIdentifier(identifier);
         nets.forEach(PetriNet::initializeArcs);
         return nets;
     }
 
+    @Override
     public PetriNet getNewestVersionByIdentifier(String identifier) {
         List<PetriNet> nets = repository.findByIdentifier(identifier, new PageRequest(0, 1, Sort.Direction.DESC, "version")).getContent();
         if (nets.isEmpty())
@@ -186,148 +196,103 @@ public abstract class PetriNetService implements IPetriNetService {
         return new DataFieldReference(field.getStringId(), field.getName().getTranslation(locale), net.getStringId(), transition.getStringId());
     }
 
+    @Override
     public List<PetriNetReference> getReferences(LoggedUser user, Locale locale) {
         return getAll().stream().map(net -> transformToReference(net, locale)).collect(Collectors.toList());
     }
 
+    @Override
     public List<PetriNetReference> getReferencesByIdentifier(String identifier, LoggedUser user, Locale locale) {
         return getByIdentifier(identifier).stream().map(net -> transformToReference(net, locale)).collect(Collectors.toList());
     }
 
-    public List<PetriNetReference> getReferencesByVersion(String version, LoggedUser user, Locale locale){
-        if(version.contains("^")){
-            GroupOperation groupByIdentifier = Aggregation.group();
+    @Override
+    public List<PetriNetReference> getReferencesByVersion(String version, LoggedUser user, Locale locale) {
+        List<PetriNetReference> references;
+
+        if (version.contains("^")) {
+            GroupOperation groupByIdentifier = Aggregation.group("identifier").max("version").as("version");
+            Aggregation aggregation = Aggregation.newAggregation(groupByIdentifier);
+            AggregationResults<Document> results = mongoTemplate.aggregate(aggregation, "petriNet", Document.class);
+            references = results.getMappedResults().parallelStream()
+                    .map(doc -> getReference(doc.getString("_id"), doc.getString("version"), user, locale))
+                    .collect(Collectors.toList());
+        } else {
+            references = repository.findAllByVersion(version).stream()
+                    .map(net -> transformToReference(net, locale)).collect(Collectors.toList());
         }
 
-        return null;
+        return references;
     }
 
+    @Override
+    public List<PetriNetReference> getReferencesByUsersProcessRoles(LoggedUser user, Locale locale) {
+        Query query = Query.query(getProcessRolesCriteria(user));
+        return mongoTemplate.find(query, PetriNet.class).stream().map(net -> transformToReference(net, locale)).collect(Collectors.toList());
+    }
+
+    @Override
     public PetriNetReference getReference(String identifier, String version, LoggedUser user, Locale locale) {
         PetriNet net = version.contains("^") ? getNewestVersionByIdentifier(identifier) : getPetriNet(identifier, version);
         return net != null ? transformToReference(net, locale) : new PetriNetReference();
     }
 
     @Override
-    public List<TransitionReference> getTransitionReferences(List<String> netsIds, LoggedUser user, Locale locale) {
-        Iterable<PetriNet> nets = repository.findAll(netsIds);
-        List<TransitionReference> transRefs = new ArrayList<>();
+    public List<TransitionReference> getTransitionReferences(List<String> netIds, LoggedUser user, Locale locale) {
+        Iterable<PetriNet> nets = repository.findAll(netIds);
+        List<TransitionReference> references = new ArrayList<>();
 
-        nets.forEach(net -> transRefs.addAll(net.getTransitions().entrySet().stream()
-                .map(entry -> new TransitionReference(entry.getKey(), entry.getValue().getTitle().getTranslation(locale), net.getStringId()))
-                .collect(Collectors.toList())));
+        nets.forEach(net -> references.addAll(net.getTransitions().entrySet().stream()
+                .map(entry -> transformToReference(net, entry.getValue(), locale)).collect(Collectors.toList())));
 
-        return transRefs;
+        return references;
     }
 
     @Override
-    public List<DataFieldReference> getDataFieldReferences(List<String> petriNetIds, List<String> transitionIds, Locale locale) {
-        Iterable<PetriNet> nets = repository.findAll(petriNetIds);
+    public List<DataFieldReference> getDataFieldReferences(List<TransitionReference> transitions, Locale locale) {
+        Iterable<PetriNet> nets = repository.findAll(transitions.stream().map(TransitionReference::getPetriNetId).collect(Collectors.toList()));
         List<DataFieldReference> dataRefs = new ArrayList<>();
+        Map<String, List<TransitionReference>> transitionReferenceMap = transitions.stream()
+                .collect(Collectors.groupingBy(TransitionReference::getPetriNetId));
 
-        transitionIds.forEach(transId -> nets.forEach(net -> {
-            Transition trans;
-            if ((trans = net.getTransition(transId)) != null) {
-                trans.getDataSet().forEach((key, value) ->
-                        dataRefs.add(new DataFieldReference(key, net.getDataSet().get(key).getName().getTranslation(locale), net.getStringId(), transId))
-                );
-            }
-        }));
+        nets.forEach(net -> transitionReferenceMap.get(net.getStringId())
+                .forEach(transition -> {
+                    Transition trans;
+                    if ((trans = net.getTransition(transition.getStringId())) != null) {
+                        dataRefs.addAll(trans.getDataSet().entrySet().stream()
+                                .map(entry -> transformToReference(net, trans, net.getDataSet().get(entry.getKey()), locale))
+                                .collect(Collectors.toList()));
+                    }
+                }));
 
         return dataRefs;
     }
 
-    @Override
-    public List<PetriNetReference> getAllAccessibleReferences(LoggedUser user, Locale locale) {
-        StringBuilder builder = new StringBuilder(8 + (user.getProcessRoles().size() * 50));
-        builder.append("{$or:[");
-        user.getProcessRoles().forEach(role -> {
-            builder.append("{\"roles.");
-            builder.append(role);
-            builder.append("\":{$exists:true}},");
-        });
-        if (!user.getProcessRoles().isEmpty())
-            builder.deleteCharAt(builder.length() - 1);
-        else
-            builder.append("{}");
-        builder.append("]}");
-        BasicQuery query = new BasicQuery(builder.toString(), "{_id:1,title:1}");
-        List<PetriNet> nets = mongoTemplate.find(query, PetriNet.class);
-        return nets.stream().map(pn -> new PetriNetReference(pn.getStringId(), pn.getTitle().getTranslation(locale))).collect(Collectors.toList());
-    }
-
-    @Override
-    public Page<PetriNetSmall> searchPetriNet(Map<String, Object> criteria, LoggedUser user, Pageable pageable, Locale locale) {
-        StringBuilder queryBuilder = new StringBuilder();
-        queryBuilder.append("{");
+    public Page<PetriNetSmall> search(Map<String, Object> criteria, LoggedUser user, Pageable pageable, Locale locale) {
+        Query query = new Query();
 
         if (!user.isAdmin())
-            queryBuilder.append(getQueryByRoles(user));
+            query.addCriteria(getProcessRolesCriteria(user));
 
-        if (criteria != null && !criteria.isEmpty()) {
-            if (!user.isAdmin())
-                queryBuilder.append(",");
+        criteria.forEach((key, value) -> {
+            Criteria valueCriteria;
+            if (value instanceof List)
+                valueCriteria = Criteria.where(key).in(value);
+            else
+                valueCriteria = Criteria.where(key).is(value);
+            query.addCriteria(valueCriteria);
+        });
 
-//            if(criteria.containsKey("author")){
-//                queryBuilder.append(getQueryByTextValue("author",criteria.get("author")));
-//                queryBuilder.append(",");
-//            }
-            if (criteria.containsKey("title")) {
-                queryBuilder.append(getQueryByTextValue("title", criteria.get("title")));
-                queryBuilder.append(",");
-            }
-            if (criteria.containsKey("initials")) {
-                queryBuilder.append(getQueryByTextValue("initials", criteria.get("initials")));
-                queryBuilder.append(",");
-            }
-
-            queryBuilder.deleteCharAt(queryBuilder.length() - 1);
-        }
-        queryBuilder.append("}");
-
-        BasicQuery query = new BasicQuery(queryBuilder.toString());
-        query = (BasicQuery) query.with(pageable);
+        query.with(pageable);
         List<PetriNet> nets = mongoTemplate.find(query, PetriNet.class);
-        return new PageImpl<>(nets.stream().map(net -> PetriNetSmall.fromPetriNet(net, locale)).collect(Collectors.toList()),
-                pageable, mongoTemplate.count(new BasicQuery(queryBuilder.toString(), "{_id:1}"), PetriNet.class));
+        return PageableExecutionUtils.getPage(nets.stream()
+                        .map(net -> PetriNetSmall.fromPetriNet(net, locale)).collect(Collectors.toList()),
+                pageable,
+                () -> mongoTemplate.count(query, PetriNet.class));
     }
 
-    private String getQueryByRoles(LoggedUser user) {
-        final StringBuilder builder = new StringBuilder();
-        builder.append("$or:[");
-        user.getProcessRoles().forEach(role -> {
-            builder.append("{\"roles.");
-            builder.append(role);
-            builder.append("\":{$exists:true}},");
-        });
-        if (!user.getProcessRoles().isEmpty())
-            builder.deleteCharAt(builder.length() - 1);
-        else
-            builder.append("{}");
-        builder.append("]");
-        return builder.toString();
-    }
-
-    private String getQueryByTextValue(String attributeName, Object object) {
-        StringBuilder builder = new StringBuilder();
-        builder.append("\"" + attributeName + "\":");
-        if (object instanceof String) {
-            builder.append("\"" + object + "\"");
-        } else if (object instanceof List) {
-            builder.append(getMongoInQuery((List<Object>) object));
-        }
-        return builder.toString();
-    }
-
-    private static String getMongoInQuery(List<Object> objs) {
-        StringBuilder builder = new StringBuilder();
-        builder.append("{$in:[");
-        objs.forEach(o -> {
-            builder.append("\"" + o.toString() + "\"");
-            builder.append(",");
-        });
-        if (!objs.isEmpty())
-            builder.deleteCharAt(builder.length() - 1);
-        builder.append("]}");
-        return builder.toString();
+    private Criteria getProcessRolesCriteria(LoggedUser user) {
+        return new Criteria().orOperator((Criteria) user.getProcessRoles().stream()
+                .map(role -> Criteria.where("roles." + role).exists(true)).collect(Collectors.toList()));
     }
 }
