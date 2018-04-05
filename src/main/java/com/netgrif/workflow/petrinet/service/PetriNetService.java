@@ -13,10 +13,8 @@ import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.workflow.petrinet.web.requestbodies.UploadedFileMeta;
 import com.netgrif.workflow.petrinet.web.responsebodies.DataFieldReference;
 import com.netgrif.workflow.petrinet.web.responsebodies.PetriNetReference;
-import com.netgrif.workflow.petrinet.web.responsebodies.PetriNetSmall;
 import com.netgrif.workflow.petrinet.web.responsebodies.TransitionReference;
 import org.apache.log4j.Logger;
-import org.apache.tomcat.jni.Proc;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +29,6 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.aggregation.GroupOperation;
-import org.springframework.data.mongodb.core.query.BasicQuery;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.repository.support.PageableExecutionUtils;
@@ -41,7 +38,6 @@ import javax.validation.constraints.NotNull;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -124,7 +120,7 @@ public abstract class PetriNetService implements IPetriNetService {
         Map<String, ProcessRole> mapedByName = new HashMap<>();
         previousVersion.getRoles().forEach((id, role) -> mapedByName.put(role.getName().getDefaultValue(), role));
 
-        newVersion.getRoles().forEach((id, role)-> newRoles.add(mapedByName.getOrDefault(role.getName().getDefaultValue(), role)));
+        newVersion.getRoles().forEach((id, role) -> newRoles.add(mapedByName.getOrDefault(role.getName().getDefaultValue(), role)));
 
         newVersion.getRoles().clear();
         newRoles.forEach(newVersion::addRole);
@@ -285,7 +281,7 @@ public abstract class PetriNetService implements IPetriNetService {
         return dataRefs;
     }
 
-    public Page<PetriNetSmall> search(Map<String, Object> criteria, LoggedUser user, Pageable pageable, Locale locale) {
+    public Page<PetriNetReference> search(Map<String, Object> criteria, LoggedUser user, Pageable pageable, Locale locale) {
         Query query = new Query();
 
         if (!user.isAdmin())
@@ -303,7 +299,7 @@ public abstract class PetriNetService implements IPetriNetService {
         query.with(pageable);
         List<PetriNet> nets = mongoTemplate.find(query, PetriNet.class);
         return PageableExecutionUtils.getPage(nets.stream()
-                        .map(net -> PetriNetSmall.fromPetriNet(net, locale)).collect(Collectors.toList()),
+                        .map(net -> new PetriNetReference(net, locale)).collect(Collectors.toList()),
                 pageable,
                 () -> mongoTemplate.count(query, PetriNet.class));
     }
