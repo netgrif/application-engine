@@ -10,15 +10,13 @@ import com.netgrif.workflow.petrinet.web.responsebodies.TransitionReference;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.xml.sax.SAXException;
 
-import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
-import java.util.Optional;
 import java.util.Map;
+import java.util.Optional;
 
 public interface IPetriNetService {
 
@@ -28,23 +26,31 @@ public interface IPetriNetService {
 
     void savePetriNet(PetriNet petriNet);
 
-    PetriNet loadPetriNet(String id);
+    PetriNet getPetriNet(String id);
 
-    List<PetriNet> loadAll();
+    PetriNet getPetriNet(String identifier, String version);
 
-    PetriNet getNewestByIdentifier(String identifier);
+    List<PetriNet> getByIdentifier(String identifier);
 
-    List<PetriNetReference> getAllReferences(LoggedUser user, Locale locale);
+    PetriNet getNewestVersionByIdentifier(String identifier);
 
-    List<PetriNetReference> getAllAccessibleReferences(LoggedUser user, Locale locale);
+    List<PetriNet> getAll();
 
-    PetriNetReference getReferenceByTitle(LoggedUser user, String title, Locale locale);
+    FileSystemResource getFile(String netId, String title);
+
+    List<PetriNetReference> getReferences(LoggedUser user, Locale locale);
+
+    List<PetriNetReference> getReferencesByIdentifier(String identifier, LoggedUser user, Locale locale);
+
+    List<PetriNetReference> getReferencesByVersion(String version, LoggedUser user, Locale locale);
+
+    List<PetriNetReference> getReferencesByUsersProcessRoles(LoggedUser user, Locale locale);
+
+    PetriNetReference getReference(String identifier, String version, LoggedUser user, Locale locale);
 
     List<TransitionReference> getTransitionReferences(List<String> netsIds, LoggedUser user, Locale locale);
 
-    Page<PetriNetSmall> searchPetriNet(Map<String, Object> criteria, LoggedUser user, Pageable pageable, Locale locale);
+    List<DataFieldReference> getDataFieldReferences(List<TransitionReference> transitions, Locale locale);
 
-    List<DataFieldReference> getDataFieldReferences(List<String> petriNetIds, List<String> transitionIds, Locale locale);
-
-    FileSystemResource getNetFile(String netId, StringBuilder title);
+    Page<PetriNetSmall> search(Map<String, Object> criteria, LoggedUser user, Pageable pageable, Locale locale);
 }
