@@ -108,7 +108,7 @@ public class WorkflowService implements IWorkflowService {
     public Page<Case> search(Map<String, Object> request, Pageable pageable, LoggedUser user, Locale locale) {
         String key = "petriNet";
 
-        List<PetriNetReference> nets = petriNetService.getAllAccessibleReferences(user, locale);
+        List<PetriNetReference> nets = petriNetService.getReferencesByUsersProcessRoles(user, locale);
         if (request.containsKey(key)) {
             Set<String> netIds = nets.stream().map(PetriNetReference::getStringId).collect(Collectors.toSet());
             if (request.get(key) instanceof String && !netIds.contains(request.get(key)))
@@ -139,7 +139,7 @@ public class WorkflowService implements IWorkflowService {
 
     @Override
     public Case createCase(String netId, String title, String color, LoggedUser user) {
-        PetriNet petriNet = petriNetService.loadPetriNet(netId);
+        PetriNet petriNet = petriNetService.getPetriNet(netId);
         Case useCase = new Case(title, petriNet, petriNet.getActivePlaces());
         useCase.setColor(color);
         useCase.setAuthor(user.transformToAuthor());

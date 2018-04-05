@@ -83,7 +83,7 @@ public class PetriNetController {
     public
     @ResponseBody
     PetriNetReferencesResource getAllReferences(Authentication auth, Locale locale) {
-        List<PetriNetReference> refs = service.getAllReferences((LoggedUser) auth.getPrincipal(), locale);
+        List<PetriNetReference> refs = service.getReferences((LoggedUser) auth.getPrincipal(), locale);
         return new PetriNetReferencesResource(refs);
     }
 
@@ -91,7 +91,7 @@ public class PetriNetController {
     public @ResponseBody
     PetriNetReference getReference(Authentication auth, @RequestBody PetriNetCriteria criteria, Locale locale) {
         if (criteria.title != null)
-            return service.getReferenceByTitle((LoggedUser) auth.getPrincipal(), criteria.title, locale);
+            return service.getReference(criteria.title, "1.0.0", (LoggedUser) auth.getPrincipal(), locale);
         return new PetriNetReference(null, null);
     }
 
@@ -122,7 +122,7 @@ public class PetriNetController {
     @RequestMapping(value = "/{netId}/transactions", method = GET)
     public @ResponseBody
     TransactionsResource getTransactions(@PathVariable("netId") String netId, Locale locale) {
-        PetriNet net = service.loadPetriNet(decodeUrl(netId));
+        PetriNet net = service.getPetriNet(decodeUrl(netId));
         return new TransactionsResource(net.getTransactions().values(), netId, locale);
     }
 
