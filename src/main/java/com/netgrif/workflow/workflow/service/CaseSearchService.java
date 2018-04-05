@@ -47,12 +47,32 @@ public class CaseSearchService extends MongoSearchService<Case> {
     }
 
     public String petriNetQuery(Object obj) {
+        if (obj instanceof Map) {
+            Map<String, Object> q = (Map<String, Object>) obj;
+            if (q.containsKey("id"))
+                return petriNetIdQuery(q.get("id"));
+            else if (q.containsKey("identifier"))
+                return petriNetIdentifierQuery(q.get("identifier"));
+        }
+        return buildQueryPart("petriNet", null, null);
+    }
+
+    public String petriNetIdQuery(Object obj) {
         Map<Class, Function<Object, String>> builder = new HashMap<>();
 
         builder.put(String.class, o -> ref("petriNet", obj));
         builder.put(ArrayList.class, o -> in(((List<Object>) obj), oo -> ref("petriNet", oo), null));
 
         return buildQueryPart("petriNet", obj, builder);
+    }
+
+    public String petriNetIdentifierQuery(Object obj) {
+        Map<Class, Function<Object, String>> builder = new HashMap<>();
+
+        builder.put(ArrayList.class, o -> in(((List<Object>) obj), ob -> "\"" + ob + "\"", null));
+        builder.put(String.class, o -> "\"" + o + "\"");
+
+        return buildQueryPart("processIdentifier", obj, builder);
     }
 
     public String dataQuery(Object obj) throws IllegalQueryException {

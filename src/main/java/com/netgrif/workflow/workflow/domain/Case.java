@@ -31,6 +31,10 @@ public class Case {
     @Setter
     private PetriNet petriNet;
 
+    @NotNull
+    @Getter @Setter
+    private String processIdentifier;
+
     @org.springframework.data.mongodb.core.mapping.Field("activePlaces")
     @Getter
     @Setter
