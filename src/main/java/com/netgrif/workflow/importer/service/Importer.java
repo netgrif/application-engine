@@ -19,6 +19,7 @@ import com.netgrif.workflow.petrinet.domain.roles.ProcessRoleRepository;
 import com.netgrif.workflow.petrinet.service.ArcFactory;
 import com.netgrif.workflow.workflow.domain.triggers.Trigger;
 import org.apache.log4j.Logger;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -409,7 +410,9 @@ public class Importer {
             role.setName(toI18NString(importRole.getTitle()));
         else
             role.setName(toI18NString(importRole.getName()));
-        if (config.get("notSaveObjects") == null || !((Boolean) config.get("notSaveObjects")))
+        if (config.get("notSaveObjects") != null && ((Boolean) config.get("notSaveObjects")))
+            role.set_id(new ObjectId());
+        else
             role = roleRepository.save(role);
 
         net.addRole(role);

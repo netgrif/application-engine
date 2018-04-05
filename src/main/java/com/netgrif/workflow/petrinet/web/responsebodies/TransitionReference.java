@@ -4,11 +4,13 @@ package com.netgrif.workflow.petrinet.web.responsebodies;
 import lombok.Data;
 
 @Data
-public class TransitionReference extends PetriNetReference{
+public class TransitionReference extends Reference {
 
-    protected String petriNetId;
+    private String petriNetId;
 
-    public TransitionReference(){}
+    public TransitionReference() {
+        super();
+    }
 
     public TransitionReference(String id, String title, String petriNetId) {
         super(id, title);

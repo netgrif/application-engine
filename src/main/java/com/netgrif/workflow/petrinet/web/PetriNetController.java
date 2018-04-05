@@ -7,7 +7,6 @@ import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.workflow.petrinet.service.interfaces.IProcessRoleService;
 import com.netgrif.workflow.petrinet.web.requestbodies.PetriNetCriteria;
-import com.netgrif.workflow.petrinet.web.requestbodies.PetriNetReferenceBody;
 import com.netgrif.workflow.petrinet.web.requestbodies.UploadedFileMeta;
 import com.netgrif.workflow.petrinet.web.responsebodies.*;
 import com.netgrif.workflow.workflow.web.responsebodies.MessageResource;
@@ -92,7 +91,7 @@ public class PetriNetController {
     PetriNetReference getReference(Authentication auth, @RequestBody PetriNetCriteria criteria, Locale locale) {
         if (criteria.title != null)
             return service.getReference(criteria.title, "1.0.0", (LoggedUser) auth.getPrincipal(), locale);
-        return new PetriNetReference(null, null);
+        return new PetriNetReference();
     }
 
     @RequestMapping(value = "/transition/refs", method = POST)
@@ -106,10 +105,8 @@ public class PetriNetController {
     @RequestMapping(value = "/data/refs", method = POST)
     public
     @ResponseBody
-    DataFieldReferencesResource getDataFieldReferences(@RequestBody PetriNetReferenceBody referenceBody, Locale locale) {
-        referenceBody.petriNets.forEach(net -> net = decodeUrl(net));
-        referenceBody.transitions.forEach(trans -> trans = decodeUrl(trans));
-        return new DataFieldReferencesResource(service.getDataFieldReferences(referenceBody.petriNets, referenceBody.transitions, locale));
+    DataFieldReferencesResource getDataFieldReferences(@RequestBody List<TransitionReference> referenceBody, Locale locale) {
+        return new DataFieldReferencesResource(service.getDataFieldReferences(referenceBody, locale));
     }
 
     @RequestMapping(value = "/{netId}/roles", method = GET)
@@ -128,14 +125,11 @@ public class PetriNetController {
 
     @RequestMapping(value = "/{netId}/file", method = GET, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public FileSystemResource getNetFile(@PathVariable("netId") String netId, @RequestParam(value = "title", required = false) String title, Authentication auth, HttpServletResponse response) {
-        StringBuilder titleBuilder = new StringBuilder();
-        if (title != null && !title.isEmpty())
-            titleBuilder.append(decodeUrl(title));
-        FileSystemResource fileResource = service.getNetFile(decodeUrl(netId), titleBuilder);
+        FileSystemResource fileResource = service.getFile(decodeUrl(netId), decodeUrl(title));
         response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
-        response.setHeader("Content-Disposition", "attachment; filename=" + titleBuilder.toString() + Importer.FILE_EXTENSION);
+        response.setHeader("Content-Disposition", "attachment; filename=" + fileResource.getFilename() + Importer.FILE_EXTENSION);
         response.setHeader("Content-Length", String.valueOf(fileResource.getFile().length()));
-        log.info("Downloading Petri net file: " + titleBuilder.toString() + " [" + netId + "]");
+        log.info("Downloading Petri net file: " + fileResource.getFilename() + " [" + netId + "]");
         return fileResource;
     }
 
@@ -143,7 +137,7 @@ public class PetriNetController {
     public @ResponseBody
     PagedResources<PetriNetSmallResource> searchPetriNets(Authentication auth, @RequestBody Map<String, Object> criteria, Pageable pageable, PagedResourcesAssembler<PetriNetSmall> assembler, Locale locale) {
         LoggedUser user = (LoggedUser) auth.getPrincipal();
-        Page<PetriNetSmall> nets = service.searchPetriNet(criteria, user, pageable, locale);
+        Page<PetriNetSmall> nets = service.search(criteria, user, pageable, locale);
         Link selfLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(PetriNetController.class)
                 .searchPetriNets(auth, criteria, pageable, assembler, locale)).withRel("search");
         PagedResources<PetriNetSmallResource> resources = assembler.toResource(nets, new PetriNetSmallResourceAssembler(), selfLink);
@@ -152,6 +146,8 @@ public class PetriNetController {
 
     public static String decodeUrl(String s1) {
         try {
+            if(s1 == null)
+                return null;
             return URLDecoder.decode(s1, StandardCharsets.UTF_8.name());
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
