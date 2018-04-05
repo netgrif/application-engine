@@ -2,6 +2,8 @@ package com.netgrif.workflow.petrinet.service.interfaces;
 
 import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
+import com.netgrif.workflow.petrinet.domain.Transition;
+import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.petrinet.web.requestbodies.UploadedFileMeta;
 import com.netgrif.workflow.petrinet.web.responsebodies.DataFieldReference;
 import com.netgrif.workflow.petrinet.web.responsebodies.PetriNetReference;
@@ -52,4 +54,16 @@ public interface IPetriNetService {
     List<DataFieldReference> getDataFieldReferences(List<TransitionReference> transitions, Locale locale);
 
     Page<PetriNetReference> search(Map<String, Object> criteria, LoggedUser user, Pageable pageable, Locale locale);
+
+    static PetriNetReference transformToReference(PetriNet net, Locale locale) {
+        return new PetriNetReference(net.getStringId(), net.getIdentifier(), net.getVersion(), net.getTitle().getTranslation(locale), net.getInitials());
+    }
+
+    static TransitionReference transformToReference(PetriNet net, Transition transition, Locale locale) {
+        return new TransitionReference(transition.getStringId(), transition.getTitle().getTranslation(locale), net.getStringId());
+    }
+
+    static DataFieldReference transformToReference(PetriNet net, Transition transition, Field field, Locale locale) {
+        return new DataFieldReference(field.getStringId(), field.getName().getTranslation(locale), net.getStringId(), transition.getStringId());
+    }
 }
