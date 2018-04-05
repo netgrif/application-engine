@@ -8,6 +8,7 @@ import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.Transition;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository;
+import com.netgrif.workflow.petrinet.domain.roles.ProcessRole;
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.workflow.petrinet.web.requestbodies.UploadedFileMeta;
 import com.netgrif.workflow.petrinet.web.responsebodies.DataFieldReference;
@@ -15,7 +16,9 @@ import com.netgrif.workflow.petrinet.web.responsebodies.PetriNetReference;
 import com.netgrif.workflow.petrinet.web.responsebodies.PetriNetSmall;
 import com.netgrif.workflow.petrinet.web.responsebodies.TransitionReference;
 import org.apache.log4j.Logger;
+import org.apache.tomcat.jni.Proc;
 import org.bson.Document;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Lookup;
 import org.springframework.context.ApplicationEventPublisher;
@@ -38,6 +41,7 @@ import javax.validation.constraints.NotNull;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -103,7 +107,7 @@ public abstract class PetriNetService implements IPetriNetService {
         imported.ifPresent(petriNet -> {
             petriNet.setVersion(previousVersion.getVersion());
             petriNet.incrementVersion(PetriNet.VersionType.valueOf(meta.releaseType.trim().toUpperCase()));
-            petriNet.setRoles(previousVersion.getRoles());
+            migrateProcessRoles(petriNet, previousVersion);
 
             try {
                 setupImportedPetriNet(petriNet, xmlFile, meta, user);
@@ -113,6 +117,17 @@ public abstract class PetriNetService implements IPetriNetService {
         });
 
         return imported;
+    }
+
+    private void migrateProcessRoles(PetriNet newVersion, PetriNet previousVersion) {
+        List<ProcessRole> newRoles = new ArrayList<>();
+        Map<String, ProcessRole> mapedByName = new HashMap<>();
+        previousVersion.getRoles().forEach((id, role) -> mapedByName.put(role.getName().getDefaultValue(), role));
+
+        newVersion.getRoles().forEach((id, role)-> newRoles.add(mapedByName.getOrDefault(role.getName().getDefaultValue(), role)));
+
+        newVersion.getRoles().clear();
+        newRoles.forEach(newVersion::addRole);
     }
 
     private void setupImportedPetriNet(PetriNet net, File xmlFile, UploadedFileMeta meta, LoggedUser user) throws IOException {
@@ -176,7 +191,9 @@ public abstract class PetriNetService implements IPetriNetService {
     @Override
     public FileSystemResource getFile(String netId, String title) {
         if (title == null || title.length() == 0) {
-            List<PetriNet> nets = mongoTemplate.find(new BasicQuery("{_id:{$oid:\"" + netId + "\"}}", "{_id:1,title:1}"), PetriNet.class);
+            Query query = Query.query(Criteria.where("_id").is(new ObjectId(netId)));
+            query.fields().include("_id").include("title");
+            List<PetriNet> nets = mongoTemplate.find(query, PetriNet.class);
             if (nets.isEmpty())
                 return null;
             title = nets.get(0).getTitle().getDefaultValue();
