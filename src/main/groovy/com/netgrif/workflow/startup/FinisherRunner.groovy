@@ -26,7 +26,7 @@ class FinisherRunner extends AbstractOrderedCommandLineRunner{
                 new UploadedFileMeta("Insurance druhe","INS","Insurance","Patch"),user)
         petriNetService.importPetriNet(new File("src/main/resources/petriNets/insurance_portal_demo.xml"),
                 new UploadedFileMeta("Insurance third","INS","Insurance","minor"),user)
-        petriNetService.importPetriNet(new File("src/main/resources/petriNets/insurance_portal_demo.xml"),
+        petriNetService.importPetriNet(new File("src/main/resources/petriNets/insurance_role_test.xml"),
                 new UploadedFileMeta("Insurance foooo","INS","Insurance","patch"),user)
 
         petriNetService.importPetriNet(new File("src/main/resources/petriNets/FM_v0_2.xml")

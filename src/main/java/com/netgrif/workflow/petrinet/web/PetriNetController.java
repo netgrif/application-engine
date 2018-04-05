@@ -78,12 +78,9 @@ public class PetriNetController {
         }
     }
 
-    @RequestMapping(value = "/refs", method = GET)
-    public
-    @ResponseBody
-    PetriNetReferencesResource getAllReferences(Authentication auth, Locale locale) {
-        List<PetriNetReference> refs = service.getReferences((LoggedUser) auth.getPrincipal(), locale);
-        return new PetriNetReferencesResource(refs);
+    @RequestMapping(method = GET)
+    public @ResponseBody PetriNetReferenceResources getAll(Authentication auth, Locale locale){
+        return new PetriNetReferenceResources(service.getReferences((LoggedUser)auth.getPrincipal(), locale));
     }
 
     @RequestMapping(value = "/ref", method = POST)
@@ -135,12 +132,12 @@ public class PetriNetController {
 
     @RequestMapping(value = "/search", method = POST)
     public @ResponseBody
-    PagedResources<PetriNetSmallResource> searchPetriNets(Authentication auth, @RequestBody Map<String, Object> criteria, Pageable pageable, PagedResourcesAssembler<PetriNetSmall> assembler, Locale locale) {
+    PagedResources<PetriNetReferenceResource> searchPetriNets(Authentication auth, @RequestBody Map<String, Object> criteria, Pageable pageable, PagedResourcesAssembler<PetriNetReference> assembler, Locale locale) {
         LoggedUser user = (LoggedUser) auth.getPrincipal();
-        Page<PetriNetSmall> nets = service.search(criteria, user, pageable, locale);
+        Page<PetriNetReference> nets = service.search(criteria, user, pageable, locale);
         Link selfLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(PetriNetController.class)
                 .searchPetriNets(auth, criteria, pageable, assembler, locale)).withRel("search");
-        PagedResources<PetriNetSmallResource> resources = assembler.toResource(nets, new PetriNetSmallResourceAssembler(), selfLink);
+        PagedResources<PetriNetReferenceResource> resources = assembler.toResource(nets, new PetriNetReferenceResourceAssembler(), selfLink);
         return resources;
     }
 
