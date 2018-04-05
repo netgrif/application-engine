@@ -451,8 +451,28 @@ public class TaskService implements ITaskService {
         Task task = taskRepository.findOne(taskId);
         User user = userRepository.findOne(loggedUser.getId());
         Case useCase = workflowService.findOne(task.getCaseId());
-        PetriNet net = useCase.getPetriNet();
 
+        task = cancelTaskWithoutReload(task, useCase);
+        reloadTasks(useCase, loggedUser.getId());
+
+        publisher.publishEvent(new UserCancelTaskEvent(user, task, useCase));
+    }
+
+    @Override
+    public void cancelTasksWithoutReload(Set<String> transitions, String caseId) {
+        List<Task> tasks = taskRepository.findAllByTransitionIdInAndCaseId(transitions, caseId);
+        Case useCase = null;
+        for (Task task : tasks) {
+            if (task.getUserId() != null) {
+                if (useCase == null)
+                    useCase = workflowService.findOne(task.getCaseId());
+                cancelTaskWithoutReload(task, useCase);
+            }
+        }
+    }
+
+    private Task cancelTaskWithoutReload(Task task, Case useCase) {
+        PetriNet net = useCase.getPetriNet();
         net.getArcsOfTransition(task.getTransitionId()).stream()
                 .filter(arc -> arc.getSource() instanceof Place)
                 .forEach(arc -> {
@@ -468,9 +488,8 @@ public class TaskService implements ITaskService {
         task.setStartDate(null);
         task = taskRepository.save(task);
         workflowService.save(useCase);
-        reloadTasks(useCase, loggedUser.getId());
 
-        publisher.publishEvent(new UserCancelTaskEvent(user, task, useCase));
+        return task;
     }
 
     @Transactional
