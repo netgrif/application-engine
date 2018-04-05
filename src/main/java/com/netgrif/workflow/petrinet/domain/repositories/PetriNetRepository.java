@@ -19,4 +19,6 @@ public interface PetriNetRepository extends MongoRepository<PetriNet, String> {
     PetriNet findByIdentifierAndVersion(String identifier, String version);
 
     Page<PetriNet> findByIdentifier(String identifier, Pageable pageable);
+
+    List<PetriNet> findAllByVersion(String version);
 }

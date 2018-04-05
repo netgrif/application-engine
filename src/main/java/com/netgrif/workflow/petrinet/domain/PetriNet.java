@@ -7,7 +7,6 @@ import lombok.Getter;
 import lombok.Setter;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Transient;
-import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -20,7 +19,7 @@ public class PetriNet extends PetriNetObject {
 
     @Getter
     @Setter
-    private String identifier;
+    private String identifier; //combination of identifier and version must be unique ... maybe use @CompoundIndex?
 
     @Getter
     private I18nString title;
@@ -205,12 +204,16 @@ public class PetriNet extends PetriNetObject {
         List<Integer> versionParts = Arrays.stream(this.version.split("\\."))
                 .map(Integer::parseInt).collect(Collectors.toList());
 
-        if (type == VersionType.MAJOR)
+        if (type == VersionType.MAJOR) {
             versionParts.set(0, versionParts.get(0) + 1);
-        else if (type == VersionType.MINOR)
+            versionParts.set(1, 0);
+            versionParts.set(2, 0);
+        } else if (type == VersionType.MINOR) {
             versionParts.set(1, versionParts.get(1) + 1);
-        else if (type == VersionType.PATCH)
+            versionParts.set(2, 0);
+        } else if (type == VersionType.PATCH) {
             versionParts.set(2, versionParts.get(2) + 1);
+        }
 
         this.version = versionParts.get(0) + "." + versionParts.get(1) + "." + versionParts.get(2);
     }

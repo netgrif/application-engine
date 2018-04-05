@@ -30,7 +30,7 @@ public class CaseTest {
 
     @Before
     public void up() {
-        petriNet = service.loadPetriNet("5895bee8b71c6d0eb0649416");
+        petriNet = service.getPetriNet("5895bee8b71c6d0eb0649416");
         activePlaces = new HashMap<>();
         Place place = petriNet.getPlaces().values().stream().findFirst().get();
         activePlaces.put(place.getObjectId().toString(), 5);
