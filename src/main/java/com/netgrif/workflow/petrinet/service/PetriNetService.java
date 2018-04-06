@@ -16,7 +16,6 @@ import com.netgrif.workflow.petrinet.web.responsebodies.PetriNetReference;
 import com.netgrif.workflow.petrinet.web.responsebodies.PetriNetSmall;
 import com.netgrif.workflow.petrinet.web.responsebodies.TransitionReference;
 import org.apache.log4j.Logger;
-import org.apache.tomcat.jni.Proc;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +30,6 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.aggregation.GroupOperation;
-import org.springframework.data.mongodb.core.query.BasicQuery;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.repository.support.PageableExecutionUtils;
@@ -41,7 +39,6 @@ import javax.validation.constraints.NotNull;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -202,7 +199,7 @@ public abstract class PetriNetService implements IPetriNetService {
     }
 
     private static PetriNetReference transformToReference(PetriNet net, Locale locale) {
-        return new PetriNetReference(net.getStringId(), net.getIdentifier(), net.getVersion(), net.getTitle().getTranslation(locale), net.getInitials());
+        return new PetriNetReference(net.getStringId(), net.getIdentifier(), net.getVersion(), net.getTranslatedTitle(locale), net.getInitials(), net.getTranslatedDefaultCaseName(locale));
     }
 
     private static TransitionReference transformToReference(PetriNet net, Transition transition, Locale locale) {

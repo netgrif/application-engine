@@ -26,6 +26,10 @@ public class PetriNet extends PetriNetObject {
 
     @Getter
     @Setter
+    private I18nString defaultCaseName;
+
+    @Getter
+    @Setter
     private String initials;
 
     @Getter
@@ -229,6 +233,18 @@ public class PetriNet extends PetriNetObject {
 
     public void setTitle(String title) {
         setTitle(new I18nString(title));
+    }
+
+    public String getTranslatedDefaultCaseName(Locale locale) {
+        if (defaultCaseName == null)
+            return "";
+        return defaultCaseName.getTranslation(locale);
+    }
+
+    public String getTranslatedTitle(Locale locale) {
+        if (title == null)
+            return "";
+        return title.getTranslation(locale);
     }
 
     public enum VersionType {
