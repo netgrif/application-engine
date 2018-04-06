@@ -18,4 +18,12 @@ public class AuthorityService implements IAuthorityService {
     public List<Authority> findAll() {
         return repository.findAll();
     }
+
+    @Override
+    public Authority getOrCreate(String name) {
+        Authority authority = repository.findByName(name);
+        if (authority == null)
+            authority = repository.save(new Authority(name));
+        return authority;
+    }
 }

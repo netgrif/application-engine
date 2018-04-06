@@ -2,7 +2,7 @@ package com.netgrif.workflow.workflow.service;
 
 import com.netgrif.workflow.auth.domain.Authority;
 import com.netgrif.workflow.auth.domain.LoggedUser;
-import com.netgrif.workflow.auth.domain.repositories.AuthorityRepository;
+import com.netgrif.workflow.auth.service.interfaces.IAuthorityService;
 import com.netgrif.workflow.importer.service.Importer;
 import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository;
 import com.netgrif.workflow.workflow.domain.Case;
@@ -39,7 +39,7 @@ public class CaseMonitorTest {
     private Importer importer;
 
     @Autowired
-    private AuthorityRepository authorityRepository;
+    private IAuthorityService authorityService;
 
     @Before
     public void setUp() {
@@ -58,11 +58,7 @@ public class CaseMonitorTest {
     }
 
     public LoggedUser mockLoggedUser(){
-        Authority authorityUser;
-        if (authorityRepository.count() > 0)
-            authorityUser = authorityRepository.findAll().get(0);
-        else
-            authorityUser = authorityRepository.save(new Authority(Authority.user));
+        Authority authorityUser = authorityService.getOrCreate(Authority.user);
         return new LoggedUser(1L, "super@netgrif.com","password", Collections.singleton(authorityUser));
     }
 }

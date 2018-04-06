@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface IUserProcessRoleService {
 
-    List<UserProcessRole> findAllMinusDefault();
+    List<UserProcessRole> findAll();
 
     UserProcessRole findDefault();
 
