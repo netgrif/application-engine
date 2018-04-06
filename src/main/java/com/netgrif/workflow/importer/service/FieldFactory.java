@@ -14,6 +14,7 @@ import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -184,6 +185,9 @@ public final class FieldFactory {
             case MULTICHOICE:
                 parseMultichoiceValue((MultichoiceField) field, useCase, fieldId);
                 break;
+            case DATETIME:
+                parseDateTimeValue((DateTimeField) field, fieldId, useCase);
+                break;
             default:
                 field.setValue(useCase.getFieldValue(fieldId));
         }
@@ -216,6 +220,16 @@ public final class FieldFactory {
             field.setValue(date);
         } else {
             field.setValue((LocalDate) value);
+        }
+    }
+
+    private void parseDateTimeValue(DateTimeField field, String fieldId, Case useCase) {
+        Object value = useCase.getFieldValue(fieldId);
+        if (value instanceof Date) {
+            LocalDateTime dateTime = ((Date) value).toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+            field.setValue(dateTime);
+        } else {
+            field.setValue((LocalDateTime) value);
         }
     }
 
