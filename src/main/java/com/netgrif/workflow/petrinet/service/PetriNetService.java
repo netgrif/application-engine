@@ -8,6 +8,7 @@ import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.Transition;
 import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository;
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRole;
+import com.netgrif.workflow.petrinet.domain.roles.ProcessRoleRepository;
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.workflow.petrinet.web.requestbodies.UploadedFileMeta;
 import com.netgrif.workflow.petrinet.web.responsebodies.DataFieldReference;
@@ -51,6 +52,9 @@ public abstract class PetriNetService implements IPetriNetService {
 
     @Autowired
     private UserProcessRoleService userProcessRoleService;
+
+    @Autowired
+    private ProcessRoleRepository processRoleRepository;
 
     @Autowired
     private PetriNetRepository repository;
@@ -124,7 +128,7 @@ public abstract class PetriNetService implements IPetriNetService {
         newVersion.getRoles().forEach((id, role) -> newRoles.add(mapedByName.getOrDefault(role.getName().getDefaultValue(), role)));
 
         newVersion.getRoles().clear();
-        newRoles.forEach(newVersion::addRole);
+        processRoleRepository.save(newRoles).forEach(newVersion::addRole);
     }
 
     private void setupImportedPetriNet(PetriNet net, File xmlFile, UploadedFileMeta meta, LoggedUser user) throws IOException {
@@ -307,7 +311,7 @@ public abstract class PetriNetService implements IPetriNetService {
     }
 
     private Criteria getProcessRolesCriteria(LoggedUser user) {
-        return new Criteria().orOperator((Criteria) user.getProcessRoles().stream()
-                .map(role -> Criteria.where("roles." + role).exists(true)).collect(Collectors.toList()));
+        return new Criteria().orOperator(user.getProcessRoles().stream()
+                .map(role -> Criteria.where("roles." + role).exists(true)).toArray(Criteria[]::new));
     }
 }
