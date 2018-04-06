@@ -109,6 +109,6 @@ class Neo4jTest {
 
         def comembers = memberRepository.findAllCoMembersIds("1@parent.com")
 
-        assert comembers.size() == 4
+        assert comembers.size() == 5
     }
 }

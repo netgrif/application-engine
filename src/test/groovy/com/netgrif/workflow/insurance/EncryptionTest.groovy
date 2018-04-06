@@ -2,7 +2,7 @@ package com.netgrif.workflow.insurance
 
 import com.netgrif.workflow.auth.domain.Authority
 import com.netgrif.workflow.auth.domain.LoggedUser
-import com.netgrif.workflow.auth.domain.repositories.AuthorityRepository
+import com.netgrif.workflow.auth.service.interfaces.IAuthorityService
 import com.netgrif.workflow.importer.service.Importer
 import com.netgrif.workflow.petrinet.domain.PetriNet
 import com.netgrif.workflow.workflow.domain.Case
@@ -35,7 +35,7 @@ class EncryptionTest {
     private Importer importer
 
     @Autowired
-    private AuthorityRepository authorityRepository
+    private IAuthorityService authorityService
 
     private final String FIELD_NAME = "City"
     private final String FIELD_VALUE = "Bratislava"
@@ -66,7 +66,7 @@ class EncryptionTest {
     }
 
     private String createCase() {
-        Optional<PetriNet> net = importer.importPetriNet(new File("src/test/resources/mapping_test.xml"), "Encryption test", "ENC")
+        Optional<PetriNet> net = importer.importPetriNet(new File("src/test/resources/mapping_test.xml"), "Encryption test", "ENC", [:])
         assert net.isPresent()
         def useCase = workflowService.createCase(net.get().stringId, "Encryption test", "color", mockLoggedUser())
         def nameField = useCase.petriNet.dataSet.values().find { v -> v.name.defaultValue == FIELD_NAME}
@@ -75,11 +75,7 @@ class EncryptionTest {
     }
 
     LoggedUser mockLoggedUser(){
-        def authorityUser
-        if (authorityRepository.count() > 0)
-            authorityUser = authorityRepository.findAll().first()
-        else
-            authorityUser = authorityRepository.save(new Authority(Authority.user))
+        def authorityUser = authorityService.getOrCreate(Authority.user)
         return new LoggedUser(1L, "super@netgrif.com","password", [authorityUser])
     }
 }
