@@ -448,7 +448,7 @@ public class Importer {
 
     private boolean isDefaultRoleAllowedFor(com.netgrif.workflow.importer.model.Transition transition, Document document) {
         // FALSE if defaultRole not allowed in net
-        if (document.isDefaultRole() == null || !document.isDefaultRole())
+        if (document.isDefaultRole() != null && !document.isDefaultRole())
             return false;
         // FALSE if role or trigger mapping
         for (Mapping mapping : document.getMapping()) {

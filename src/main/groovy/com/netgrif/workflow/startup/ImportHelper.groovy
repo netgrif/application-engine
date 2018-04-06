@@ -4,8 +4,8 @@ import com.netgrif.workflow.auth.domain.Authority
 import com.netgrif.workflow.auth.domain.LoggedUser
 import com.netgrif.workflow.auth.domain.User
 import com.netgrif.workflow.auth.domain.UserProcessRole
-import com.netgrif.workflow.auth.domain.repositories.AuthorityRepository
 import com.netgrif.workflow.auth.domain.repositories.UserProcessRoleRepository
+import com.netgrif.workflow.auth.service.interfaces.IAuthorityService
 import com.netgrif.workflow.auth.service.interfaces.IUserService
 import com.netgrif.workflow.orgstructure.domain.Group
 import com.netgrif.workflow.orgstructure.service.IGroupService
@@ -45,7 +45,7 @@ class ImportHelper {
     private UserProcessRoleRepository userProcessRoleRepository
 
     @Autowired
-    private AuthorityRepository authorityRepository
+    private IAuthorityService authorityService
 
     @Autowired
     private TaskService taskService
@@ -88,7 +88,7 @@ class ImportHelper {
     Map<String, Authority> createAuthorities(Map<String, String> authorities) {
         HashMap<String, Authority> authoritities = new HashMap<>()
         authorities.each { authority ->
-            authoritities.put(authority.key, authorityRepository.save(new Authority(authority.value)))
+            authoritities.put(authority.key, authorityService.getOrCreate(authority.value))
         }
 
         log.info("Creating ${authoritities.size()} authorities")
@@ -96,8 +96,8 @@ class ImportHelper {
     }
 
     Authority createAuthority(String name) {
-        log.info("Creating authorities $name")
-        return authorityRepository.save(new Authority(name))
+        log.info("Creating authority $name")
+        return authorityService.getOrCreate(name)
     }
 
     Optional<PetriNet> createNet(String fileName, String identifier, String name, String initials, String release) {

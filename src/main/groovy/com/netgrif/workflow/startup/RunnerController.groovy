@@ -10,6 +10,7 @@ class RunnerController {
             Neo4jRunner,
             StorageRunner,
             DefaultRoleRunner,
+            AuthorityRunner,
             SuperCreator,
             FlushSessionsRunner,
             MailRunner,
