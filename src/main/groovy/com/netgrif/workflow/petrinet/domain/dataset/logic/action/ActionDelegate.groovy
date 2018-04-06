@@ -1,13 +1,17 @@
 package com.netgrif.workflow.petrinet.domain.dataset.logic.action
 
+import com.netgrif.workflow.configuration.ApplicationContextProvider
 import com.netgrif.workflow.petrinet.domain.I18nString
 import com.netgrif.workflow.petrinet.domain.Transition
 import com.netgrif.workflow.petrinet.domain.dataset.*
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedField
 import com.netgrif.workflow.workflow.domain.Case
+import org.apache.log4j.Logger
 
 @SuppressWarnings(["GrMethodMayBeStatic", "GroovyUnusedDeclaration"])
 class ActionDelegate {
+
+    private static final Logger log = Logger.getLogger(ActionDelegate)
 
     private static final String UNCHANGED_VALUE = "unchangedooo"
     private static final String ALWAYS_GENERATE = "always"
@@ -74,6 +78,17 @@ class ActionDelegate {
         changedField.addAttribute("value", field.value)
     }
 
+    def close = { Transition[] transitions ->
+        def service = ApplicationContextProvider.getBean("taskService")
+        if (!service) {
+            log.error("Could not find task service")
+            return
+        }
+
+        def transitionIds = transitions.collect { it.stringId } as Set
+        service.cancelTasksWithoutReload(transitionIds, useCase.stringId)
+    }
+
     def change(Field field) {
         [about  : { cl ->
             def value = cl()
@@ -102,7 +117,7 @@ class ActionDelegate {
              if (values == null || (values instanceof Closure && values() == UNCHANGED_VALUE)) return
              if (!(values instanceof Collection)) values = [values]
              field = (ChoiceField) field
-             if (values.every {it instanceof I18nString}) {
+             if (values.every { it instanceof I18nString }) {
                  field.setChoices(values as Set<I18nString>)
              } else {
                  field.setChoicesFromStrings(values as Set<String>)
