@@ -3,6 +3,7 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="petriflow_schema.xsd">
     <defaultRole>false</defaultRole>
+    <caseName name="case_name">Nové poistenie</caseName>
     <!-- ========== GLOBAL ================ -->
     <!--<icon>location_city</icon>-->
     <!-- ========== TRANSACTIONS ========== -->

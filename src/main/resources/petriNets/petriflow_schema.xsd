@@ -116,6 +116,7 @@
                 <xs:element ref="id" minOccurs="0"/>
                 <xs:element ref="icon" minOccurs="0"/>
                 <xs:element ref="defaultRole" minOccurs="0"/>
+                <xs:element ref="caseName" minOccurs="0"/>
                 <xs:element ref="transaction" maxOccurs="unbounded" minOccurs="0"/>
                 <xs:element ref="role" maxOccurs="unbounded" minOccurs="0"/>
                 <xs:element ref="data" maxOccurs="unbounded" minOccurs="0"/>
@@ -354,4 +355,5 @@
     <xs:element name="assignPolicy" type="assignPolicyType"/>
     <xs:element name="dataFocusPolicy" type="dataFocusPolicyType"/>
     <xs:element name="finishPolicy" type="finishPolicyType"/>
+    <xs:element name="caseName" type="i18nStringType"/>
 </xs:schema>

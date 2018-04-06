@@ -30,7 +30,11 @@ class PdfBuilder {
     File save(String path) {
         if (document == null || path == null)
             throw new IllegalArgumentException("Document=[$document] and path=[$path]")
-        return document.save(path)
+        File saved = new File(path)
+        document.save(saved)
+        document.close()
+
+        return saved
     }
 
     PDDocument build() {
@@ -69,7 +73,7 @@ class PdfBuilder {
         }
     }
 
-    PdfBuilder merge(PDDocument ... documents) {
+    PdfBuilder merge(PDDocument... documents) {
         PDFMergerUtility pdfMerger = new PDFMergerUtility()
 
         documents.each { toMerge ->
@@ -88,10 +92,11 @@ class PdfBuilder {
         return this
     }
 
-    PdfBuilder removePages(int ... pages) {
-        pages.each {
-            document.removePage(it)
-        }
+    PdfBuilder removePage(int page) {
+        if (page < 0)
+            return this
+
+        document.removePage(page)
 
         return this
     }

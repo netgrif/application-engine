@@ -136,6 +136,7 @@ public class Importer {
         document.getTransition().forEach(this::resolveTransitionActions);
         document.getData().forEach(this::resolveDataActions);
 
+        net.setDefaultCaseName(toI18NString(document.getCaseName()));
         if (config.get("notSaveObjects") != null && ((Boolean) config.get("notSaveObjects")))
             return Optional.of(net);
         else
