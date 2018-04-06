@@ -12,7 +12,8 @@ enum FieldType {
     NUMBER("number"),
     USER("user"),
     TABULAR("tabular"),
-    CASEREF("caseref")
+    CASEREF("caseref"),
+    DATETIME("dateTime")
 
     String name
 
