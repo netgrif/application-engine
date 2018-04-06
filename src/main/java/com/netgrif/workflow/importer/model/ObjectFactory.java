@@ -10,7 +10,7 @@ import javax.xml.namespace.QName;
 /**
  * This object contains factory methods for each 
  * Java content interface and Java element interface 
- * generated in the com.test package. 
+ * generated in the sk.stuba.fei.oop package. 
  * <p>An ObjectFactory allows you to programatically 
  * construct new instances of the Java representation 
  * for XML content. The Java representation of XML 
@@ -56,10 +56,11 @@ public class ObjectFactory {
     private final static QName _Multiplicity_QNAME = new QName("", "multiplicity");
     private final static QName _I18NString_QNAME = new QName("", "i18nString");
     private final static QName _DefaultRole_QNAME = new QName("", "defaultRole");
+    private final static QName _CaseName_QNAME = new QName("", "caseName");
     private final static QName _Type_QNAME = new QName("", "type");
 
     /**
-     * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: com.test
+     * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: sk.stuba.fei.oop
      * 
      */
     public ObjectFactory() {
@@ -511,6 +512,15 @@ public class ObjectFactory {
     @XmlElementDecl(namespace = "", name = "defaultRole")
     public JAXBElement<Boolean> createDefaultRole(Boolean value) {
         return new JAXBElement<Boolean>(_DefaultRole_QNAME, Boolean.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link I18NStringType }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "", name = "caseName")
+    public JAXBElement<I18NStringType> createCaseName(I18NStringType value) {
+        return new JAXBElement<I18NStringType>(_CaseName_QNAME, I18NStringType.class, null, value);
     }
 
     /**
