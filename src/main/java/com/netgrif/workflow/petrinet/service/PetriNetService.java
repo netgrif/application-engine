@@ -6,14 +6,13 @@ import com.netgrif.workflow.event.events.model.UserImportModelEvent;
 import com.netgrif.workflow.importer.service.Importer;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.Transition;
-import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository;
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRole;
+import com.netgrif.workflow.petrinet.domain.roles.ProcessRoleRepository;
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.workflow.petrinet.web.requestbodies.UploadedFileMeta;
 import com.netgrif.workflow.petrinet.web.responsebodies.DataFieldReference;
 import com.netgrif.workflow.petrinet.web.responsebodies.PetriNetReference;
-import com.netgrif.workflow.petrinet.web.responsebodies.PetriNetSmall;
 import com.netgrif.workflow.petrinet.web.responsebodies.TransitionReference;
 import org.apache.log4j.Logger;
 import org.bson.Document;
@@ -41,6 +40,8 @@ import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService.transformToReference;
+
 @Service
 public abstract class PetriNetService implements IPetriNetService {
 
@@ -51,6 +52,9 @@ public abstract class PetriNetService implements IPetriNetService {
 
     @Autowired
     private UserProcessRoleService userProcessRoleService;
+
+    @Autowired
+    private ProcessRoleRepository processRoleRepository;
 
     @Autowired
     private PetriNetRepository repository;
@@ -121,10 +125,10 @@ public abstract class PetriNetService implements IPetriNetService {
         Map<String, ProcessRole> mapedByName = new HashMap<>();
         previousVersion.getRoles().forEach((id, role) -> mapedByName.put(role.getName().getDefaultValue(), role));
 
-        newVersion.getRoles().forEach((id, role)-> newRoles.add(mapedByName.getOrDefault(role.getName().getDefaultValue(), role)));
+        newVersion.getRoles().forEach((id, role) -> newRoles.add(mapedByName.getOrDefault(role.getName().getDefaultValue(), role)));
 
         newVersion.getRoles().clear();
-        newRoles.forEach(newVersion::addRole);
+        processRoleRepository.save(newRoles).forEach(newVersion::addRole);
     }
 
     private void setupImportedPetriNet(PetriNet net, File xmlFile, UploadedFileMeta meta, LoggedUser user) throws IOException {
@@ -198,17 +202,18 @@ public abstract class PetriNetService implements IPetriNetService {
         return new FileSystemResource(Importer.ARCHIVED_FILES_PATH + netId + "-" + title + Importer.FILE_EXTENSION);
     }
 
-    private static PetriNetReference transformToReference(PetriNet net, Locale locale) {
-        return new PetriNetReference(net.getStringId(), net.getIdentifier(), net.getVersion(), net.getTranslatedTitle(locale), net.getInitials(), net.getTranslatedDefaultCaseName(locale));
-    }
 
-    private static TransitionReference transformToReference(PetriNet net, Transition transition, Locale locale) {
-        return new TransitionReference(transition.getStringId(), transition.getTitle().getTranslation(locale), net.getStringId());
-    }
-
-    private static DataFieldReference transformToReference(PetriNet net, Transition transition, Field field, Locale locale) {
-        return new DataFieldReference(field.getStringId(), field.getName().getTranslation(locale), net.getStringId(), transition.getStringId());
-    }
+//    public static PetriNetReference transformToReference(PetriNet net, Locale locale) {
+//        return new PetriNetReference(net.getStringId(), net.getIdentifier(), net.getVersion(), net.getTitle().getTranslation(locale), net.getInitials());
+//    }
+//
+//    public static TransitionReference transformToReference(PetriNet net, Transition transition, Locale locale) {
+//        return new TransitionReference(transition.getStringId(), transition.getTitle().getTranslation(locale), net.getStringId());
+//    }
+//
+//    public static DataFieldReference transformToReference(PetriNet net, Transition transition, Field field, Locale locale) {
+//        return new DataFieldReference(field.getStringId(), field.getName().getTranslation(locale), net.getStringId(), transition.getStringId());
+//    }
 
     @Override
     public List<PetriNetReference> getReferences(LoggedUser user, Locale locale) {
@@ -282,7 +287,7 @@ public abstract class PetriNetService implements IPetriNetService {
         return dataRefs;
     }
 
-    public Page<PetriNetSmall> search(Map<String, Object> criteria, LoggedUser user, Pageable pageable, Locale locale) {
+    public Page<PetriNetReference> search(Map<String, Object> criteria, LoggedUser user, Pageable pageable, Locale locale) {
         Query query = new Query();
 
         if (!user.isAdmin())
@@ -300,13 +305,13 @@ public abstract class PetriNetService implements IPetriNetService {
         query.with(pageable);
         List<PetriNet> nets = mongoTemplate.find(query, PetriNet.class);
         return PageableExecutionUtils.getPage(nets.stream()
-                        .map(net -> PetriNetSmall.fromPetriNet(net, locale)).collect(Collectors.toList()),
+                        .map(net -> new PetriNetReference(net, locale)).collect(Collectors.toList()),
                 pageable,
                 () -> mongoTemplate.count(query, PetriNet.class));
     }
 
     private Criteria getProcessRolesCriteria(LoggedUser user) {
-        return new Criteria().orOperator((Criteria) user.getProcessRoles().stream()
-                .map(role -> Criteria.where("roles." + role).exists(true)).collect(Collectors.toList()));
+        return new Criteria().orOperator(user.getProcessRoles().stream()
+                .map(role -> Criteria.where("roles." + role).exists(true)).toArray(Criteria[]::new));
     }
 }
