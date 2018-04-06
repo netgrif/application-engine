@@ -33,6 +33,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Locale;
@@ -69,40 +70,52 @@ public class PetriNetController {
 
             ObjectMapper mapper = new ObjectMapper();
             UploadedFileMeta fileMeta = mapper.readValue(fileMetaJSON, UploadedFileMeta.class);
+            fileMeta.releaseType = fileMeta.releaseType == null ? "patch" : fileMeta.releaseType;
 
             service.importPetriNetAndDeleteFile(file, fileMeta, (LoggedUser) auth.getPrincipal());
-            return MessageResource.successMessage("Petri net "+fileMeta.name+" imported successfully");
+            return MessageResource.successMessage("Petri net " + fileMeta.name + " imported successfully");
         } catch (IOException e) {
             e.printStackTrace();
             return MessageResource.errorMessage("IO error");
         }
     }
 
-    @RequestMapping(value = "/refs", method = GET)
-    public
-    @ResponseBody
-    PetriNetReferencesResource getAllReferences(Authentication auth, Locale locale) {
-        List<PetriNetReference> refs = service.getReferences((LoggedUser) auth.getPrincipal(), locale);
-        return new PetriNetReferencesResource(refs);
-    }
-
-    @RequestMapping(value = "/ref", method = POST)
+    @RequestMapping(method = GET)
     public @ResponseBody
-    PetriNetReference getReference(Authentication auth, @RequestBody PetriNetCriteria criteria, Locale locale) {
-        if (criteria.title != null)
-            return service.getReference(criteria.title, "1.0.0", (LoggedUser) auth.getPrincipal(), locale);
-        return new PetriNetReference();
+    PetriNetReferenceResources getAll(@RequestParam(value = "indentifier", required = false) String identifier, @RequestParam(value = "version", required = false) String version, Authentication auth, Locale locale) {
+        LoggedUser user = (LoggedUser) auth.getPrincipal();
+        if (identifier != null && version == null) {
+            return new PetriNetReferenceResources(service.getReferencesByIdentifier(identifier, user, locale));
+        } else if (identifier == null && version != null) {
+            return new PetriNetReferenceResources(service.getReferencesByVersion(version, user, locale));
+        } else if (identifier != null && version != null) {
+            return new PetriNetReferenceResources(Collections.singletonList(service.getReference(identifier, version, user, locale)));
+        } else {
+            return new PetriNetReferenceResources(service.getReferences(user, locale));
+        }
     }
 
-    @RequestMapping(value = "/transition/refs", method = POST)
+    @RequestMapping(value = "/{id}", method = GET)
+    public @ResponseBody
+    PetriNetReferenceResource getOne(@PathVariable("id") String id, Authentication auth, Locale locale) {
+        return new PetriNetReferenceResource(IPetriNetService.transformToReference(service.getPetriNet(decodeUrl(id)), locale));
+    }
+
+    @RequestMapping(value = "/{identifier}/{version}", method = GET)
+    public @ResponseBody
+    PetriNetReferenceResource getOne(@PathVariable("identifier") String identifier, @PathVariable("version") String version, Authentication auth, Locale locale) {
+        return new PetriNetReferenceResource(service.getReference(identifier, version, (LoggedUser) auth.getPrincipal(), locale));
+    }
+
+    @RequestMapping(value = "/transitions", method = GET)
     public
     @ResponseBody
-    TransitionReferencesResource getTransitionReferences(Authentication auth, @RequestBody List<String> ids, Locale locale) {
+    TransitionReferencesResource getTransitionReferences(@RequestParam List<String> ids, Authentication auth, Locale locale) {
         ids.forEach(id -> id = decodeUrl(id));
         return new TransitionReferencesResource(service.getTransitionReferences(ids, (LoggedUser) auth.getPrincipal(), locale));
     }
 
-    @RequestMapping(value = "/data/refs", method = POST)
+    @RequestMapping(value = "/data", method = POST)
     public
     @ResponseBody
     DataFieldReferencesResource getDataFieldReferences(@RequestBody List<TransitionReference> referenceBody, Locale locale) {
@@ -135,18 +148,19 @@ public class PetriNetController {
 
     @RequestMapping(value = "/search", method = POST)
     public @ResponseBody
-    PagedResources<PetriNetSmallResource> searchPetriNets(Authentication auth, @RequestBody Map<String, Object> criteria, Pageable pageable, PagedResourcesAssembler<PetriNetSmall> assembler, Locale locale) {
+    PagedResources<PetriNetReferenceResource> searchPetriNets(@RequestBody Map<String, Object> criteria, Authentication auth, Pageable pageable, PagedResourcesAssembler<PetriNetReference> assembler, Locale locale) {
         LoggedUser user = (LoggedUser) auth.getPrincipal();
-        Page<PetriNetSmall> nets = service.search(criteria, user, pageable, locale);
+        Page<PetriNetReference> nets = service.search(criteria, user, pageable, locale);
         Link selfLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(PetriNetController.class)
-                .searchPetriNets(auth, criteria, pageable, assembler, locale)).withRel("search");
-        PagedResources<PetriNetSmallResource> resources = assembler.toResource(nets, new PetriNetSmallResourceAssembler(), selfLink);
+                .searchPetriNets(criteria, auth, pageable, assembler, locale)).withRel("search");
+        PagedResources<PetriNetReferenceResource> resources = assembler.toResource(nets, new PetriNetReferenceResourceAssembler(), selfLink);
+        PetriNetReferenceResourceAssembler.buildLinks(resources);
         return resources;
     }
 
     public static String decodeUrl(String s1) {
         try {
-            if(s1 == null)
+            if (s1 == null)
                 return null;
             return URLDecoder.decode(s1, StandardCharsets.UTF_8.name());
         } catch (UnsupportedEncodingException e) {
