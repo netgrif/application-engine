@@ -24,10 +24,8 @@ public class UserProcessRoleService implements IUserProcessRoleService {
     private String DEFAULT_ROLE_ID;
 
     @Override
-    public List<UserProcessRole> findAllMinusDefault() {
-        List<UserProcessRole> roles = repository.findAll();
-        roles.removeIf(role -> role.getRoleId().equals(getDefaultRoleId()));
-        return roles;
+    public List<UserProcessRole> findAll() {
+        return repository.findAll();
     }
 
     @Override
