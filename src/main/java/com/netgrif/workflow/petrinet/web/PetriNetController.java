@@ -70,6 +70,7 @@ public class PetriNetController {
 
             ObjectMapper mapper = new ObjectMapper();
             UploadedFileMeta fileMeta = mapper.readValue(fileMetaJSON, UploadedFileMeta.class);
+            fileMeta.releaseType = fileMeta.releaseType == null ? "patch" : fileMeta.releaseType;
 
             service.importPetriNetAndDeleteFile(file, fileMeta, (LoggedUser) auth.getPrincipal());
             return MessageResource.successMessage("Petri net " + fileMeta.name + " imported successfully");
@@ -147,12 +148,13 @@ public class PetriNetController {
 
     @RequestMapping(value = "/search", method = POST)
     public @ResponseBody
-    PagedResources<PetriNetReferenceResource> searchPetriNets(Authentication auth, @RequestBody Map<String, Object> criteria, Pageable pageable, PagedResourcesAssembler<PetriNetReference> assembler, Locale locale) {
+    PagedResources<PetriNetReferenceResource> searchPetriNets(@RequestBody Map<String, Object> criteria, Authentication auth, Pageable pageable, PagedResourcesAssembler<PetriNetReference> assembler, Locale locale) {
         LoggedUser user = (LoggedUser) auth.getPrincipal();
         Page<PetriNetReference> nets = service.search(criteria, user, pageable, locale);
         Link selfLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(PetriNetController.class)
-                .searchPetriNets(auth, criteria, pageable, assembler, locale)).withRel("search");
+                .searchPetriNets(criteria, auth, pageable, assembler, locale)).withRel("search");
         PagedResources<PetriNetReferenceResource> resources = assembler.toResource(nets, new PetriNetReferenceResourceAssembler(), selfLink);
+        PetriNetReferenceResourceAssembler.buildLinks(resources);
         return resources;
     }
 
