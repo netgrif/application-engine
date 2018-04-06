@@ -107,6 +107,7 @@ public class WorkflowService implements IWorkflowService {
 
     public Page<Case> search(Map<String, Object> request, Pageable pageable, LoggedUser user, Locale locale) {
         String key = "petriNet";
+        Map<String, List<String>> idMap = new HashMap<>();
 
         List<PetriNetReference> nets = petriNetService.getReferencesByUsersProcessRoles(user, locale);
         if (request.containsKey(key)) {
@@ -114,10 +115,13 @@ public class WorkflowService implements IWorkflowService {
             if (request.get(key) instanceof String && !netIds.contains(request.get(key)))
                 return new PageImpl<Case>(new ArrayList<>(), pageable, 0);
             else if (request.get(key) instanceof List) {
-                request.put(key, ((List<String>) request.get(key)).stream().filter(netIds::contains).collect(Collectors.toList()));
+                idMap.put("id", ((List<String>) request.get(key)).stream().filter(netIds::contains).collect(Collectors.toList()));
+                request.put(key, idMap);
             }
-        } else
-            request.put(key, nets.stream().map(PetriNetReference::getStringId).collect(Collectors.toList()));
+        } else {
+            idMap.put("id", nets.stream().map(PetriNetReference::getStringId).collect(Collectors.toList()));
+            request.put(key, idMap);
+        }
         Page<Case> page = searchService.search(request, pageable, Case.class);
         decryptDataSets(page.getContent());
         return setImmediateDataFields(page);
@@ -182,13 +186,13 @@ public class WorkflowService implements IWorkflowService {
     }
 
     @Override
-    public boolean removeTasksFromCase(Iterable<? extends Task> tasks, String caseId){
+    public boolean removeTasksFromCase(Iterable<? extends Task> tasks, String caseId) {
         return removeTasksFromCase(tasks, repository.findOne(caseId));
     }
 
     @Override
-    public boolean removeTasksFromCase(Iterable<? extends Task> tasks, Case useCase){
-        boolean deleteSuccess = useCase.removeTasks(StreamSupport.stream(tasks.spliterator(),false).collect(Collectors.toList()));
+    public boolean removeTasksFromCase(Iterable<? extends Task> tasks, Case useCase) {
+        boolean deleteSuccess = useCase.removeTasks(StreamSupport.stream(tasks.spliterator(), false).collect(Collectors.toList()));
         useCase = repository.save(useCase);
         return deleteSuccess;
     }
