@@ -54,6 +54,9 @@ public final class FieldFactory {
             case CASEREF:
                 field = buildCaseField(data, importer);
                 break;
+            case DATE_TIME:
+                field = new DateTimeField();
+                break;
             default:
                 throw new IllegalArgumentException(data.getType() + " is not a valid Field type");
         }

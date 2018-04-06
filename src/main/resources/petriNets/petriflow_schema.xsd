@@ -173,6 +173,7 @@
             <xs:enumeration value="file"/>
             <xs:enumeration value="user"/>
             <xs:enumeration value="caseref"/>
+            <xs:enumeration value="dateTime"/>
         </xs:restriction>
     </xs:simpleType>
     <xs:simpleType name="arc_type">

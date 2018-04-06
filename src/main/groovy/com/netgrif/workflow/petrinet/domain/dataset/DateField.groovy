@@ -31,7 +31,7 @@ class DateField extends ValidableField<LocalDate> {
     }
 
     void setValue(Date value) {
-        this.value = ((Date) value).toInstant().atZone(ZoneId.systemDefault()).toLocalDate()
+        this.value = value?.toInstant()?.atZone(ZoneId.systemDefault())?.toLocalDate()
     }
 
     String getMinDate() {
