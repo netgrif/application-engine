@@ -1,13 +1,9 @@
 
 package com.netgrif.workflow.importer.model;
 
+import javax.xml.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
 
 
 /**
@@ -23,6 +19,7 @@ import javax.xml.bind.annotation.XmlType;
  *         &lt;element ref="{}id" minOccurs="0"/&gt;
  *         &lt;element ref="{}icon" minOccurs="0"/&gt;
  *         &lt;element ref="{}defaultRole" minOccurs="0"/&gt;
+ *         &lt;element ref="{}caseName" minOccurs="0"/&gt;
  *         &lt;element ref="{}transaction" maxOccurs="unbounded" minOccurs="0"/&gt;
  *         &lt;element ref="{}role" maxOccurs="unbounded" minOccurs="0"/&gt;
  *         &lt;element ref="{}data" maxOccurs="unbounded" minOccurs="0"/&gt;
@@ -44,6 +41,7 @@ import javax.xml.bind.annotation.XmlType;
     "id",
     "icon",
     "defaultRole",
+    "caseName",
     "transaction",
     "role",
     "data",
@@ -59,6 +57,7 @@ public class Document {
     protected Long id;
     protected String icon;
     protected Boolean defaultRole;
+    protected I18NStringType caseName;
     protected List<Transaction> transaction;
     protected List<Role> role;
     protected List<Data> data;
@@ -142,6 +141,30 @@ public class Document {
      */
     public void setDefaultRole(Boolean value) {
         this.defaultRole = value;
+    }
+
+    /**
+     * Gets the value of the caseName property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link I18NStringType }
+     *     
+     */
+    public I18NStringType getCaseName() {
+        return caseName;
+    }
+
+    /**
+     * Sets the value of the caseName property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link I18NStringType }
+     *     
+     */
+    public void setCaseName(I18NStringType value) {
+        this.caseName = value;
     }
 
     /**

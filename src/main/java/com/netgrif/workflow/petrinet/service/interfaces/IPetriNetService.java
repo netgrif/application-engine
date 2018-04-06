@@ -56,7 +56,7 @@ public interface IPetriNetService {
     Page<PetriNetReference> search(Map<String, Object> criteria, LoggedUser user, Pageable pageable, Locale locale);
 
     static PetriNetReference transformToReference(PetriNet net, Locale locale) {
-        return new PetriNetReference(net.getStringId(), net.getIdentifier(), net.getVersion(), net.getTitle().getTranslation(locale), net.getInitials());
+        return new PetriNetReference(net.getStringId(), net.getIdentifier(), net.getVersion(), net.getTitle().getTranslation(locale), net.getInitials(), net.getTranslatedDefaultCaseName(locale));
     }
 
     static TransitionReference transformToReference(PetriNet net, Transition transition, Locale locale) {

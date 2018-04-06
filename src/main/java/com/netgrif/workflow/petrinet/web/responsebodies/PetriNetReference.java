@@ -14,6 +14,7 @@ public class PetriNetReference extends Reference {
     private String identifier;
     private String version;
     private String initials;
+    private String defaultCaseName;
     private String icon;
     private LocalDateTime createdDate;
     private Author author;
@@ -23,11 +24,12 @@ public class PetriNetReference extends Reference {
         super();
     }
 
-    public PetriNetReference(String stringId, String identifier, String version, String title, String initials) {
+    public PetriNetReference(String stringId, String identifier, String version, String title, String initials, String defaultCaseName) {
         super(stringId, title);
         this.identifier = identifier;
         this.version = version;
         this.initials = initials;
+        this.defaultCaseName = defaultCaseName;
     }
 
     public PetriNetReference(String stringId, String title, String identifier, String version, String initials, String icon, LocalDateTime createdDate, Author author) {
@@ -41,7 +43,7 @@ public class PetriNetReference extends Reference {
     }
 
     public PetriNetReference(PetriNet net, Locale locale) {
-        this(net.getStringId(), net.getIdentifier(), net.getVersion(), net.getTitle().getTranslation(locale), net.getInitials());
+        this(net.getStringId(), net.getIdentifier(), net.getVersion(), net.getTitle().getTranslation(locale), net.getInitials(), net.getTranslatedDefaultCaseName(locale));
         this.icon = net.getIcon();
         this.createdDate = net.getCreationDate();
         this.author = net.getAuthor();
