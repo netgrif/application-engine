@@ -18,53 +18,74 @@ import java.util.stream.Collectors;
 public class PetriNet extends PetriNetObject {
 
     @Getter
+    @Setter
+    private String identifier; //combination of identifier and version must be unique ... maybe use @CompoundIndex?
+
+    @Getter
     private I18nString title;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private String initials;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private String icon;
 
     // TODO: 18. 3. 2017 replace with Spring auditing
-    @Getter @Setter
+    @Getter
+    @Setter
     private LocalDateTime creationDate;
 
-    @Getter @Setter
+    @Getter
+    @Setter
+    private String version; //in format 1.1.1 - MAJOR.MINOR.PATCH
+
+    @Getter
+    @Setter
     private Author author;
 
     @org.springframework.data.mongodb.core.mapping.Field("places")
-    @Getter @Setter
+    @Getter
+    @Setter
     private Map<String, Place> places;
 
     @org.springframework.data.mongodb.core.mapping.Field("transitions")
-    @Getter @Setter
+    @Getter
+    @Setter
     private Map<String, Transition> transitions;
 
     @org.springframework.data.mongodb.core.mapping.Field("arcs")
-    @Getter @Setter
+    @Getter
+    @Setter
     private Map<String, List<Arc>> arcs;
 
     @org.springframework.data.mongodb.core.mapping.Field("dataset")
-    @Getter @Setter
+    @Getter
+    @Setter
     private Map<String, Field> dataSet;
 
     @org.springframework.data.mongodb.core.mapping.Field("roles")
     @DBRef
-    @Getter @Setter
+    @Getter
+    @Setter
     private Map<String, ProcessRole> roles;
 
     @org.springframework.data.mongodb.core.mapping.Field("transactions")
-    @Getter @Setter
+    @Getter
+    @Setter
     private Map<String, Transaction> transactions;
 
     @Transient
     private boolean initialized;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private String importXmlPath;
 
     public PetriNet() {
+        this.identifier = "Default";
+        this.version = "1.0.0";
         initialized = false;
         creationDate = LocalDateTime.now();
         places = new HashMap<>();
@@ -75,8 +96,9 @@ public class PetriNet extends PetriNetObject {
         transactions = new LinkedHashMap<>();
     }
 
-    public PetriNet(String title, String initials) {
+    public PetriNet(String identifier, String title, String initials) {
         this();
+        this.identifier = identifier;
         setTitle(title);
         this.initials = initials;
     }
@@ -170,12 +192,30 @@ public class PetriNet extends PetriNetObject {
                 ).findAny().orElse(null);
     }
 
-    public List<Field> getImmediateFields(){
+    public List<Field> getImmediateFields() {
         return this.dataSet.values().stream().filter(Field::isImmediate).collect(Collectors.toList());
     }
 
-    public boolean isDisplayableInAnyTransition(String fieldId){
+    public boolean isDisplayableInAnyTransition(String fieldId) {
         return transitions.values().stream().parallel().anyMatch(trans -> trans.isDisplayable(fieldId));
+    }
+
+    public void incrementVersion(VersionType type) {
+        List<Integer> versionParts = Arrays.stream(this.version.split("\\."))
+                .map(Integer::parseInt).collect(Collectors.toList());
+
+        if (type == VersionType.MAJOR) {
+            versionParts.set(0, versionParts.get(0) + 1);
+            versionParts.set(1, 0);
+            versionParts.set(2, 0);
+        } else if (type == VersionType.MINOR) {
+            versionParts.set(1, versionParts.get(1) + 1);
+            versionParts.set(2, 0);
+        } else if (type == VersionType.PATCH) {
+            versionParts.set(2, versionParts.get(2) + 1);
+        }
+
+        this.version = versionParts.get(0) + "." + versionParts.get(1) + "." + versionParts.get(2);
     }
 
     @Override
@@ -189,5 +229,11 @@ public class PetriNet extends PetriNetObject {
 
     public void setTitle(String title) {
         setTitle(new I18nString(title));
+    }
+
+    public enum VersionType {
+        MAJOR,
+        MINOR,
+        PATCH
     }
 }
