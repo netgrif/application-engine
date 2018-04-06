@@ -20,6 +20,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.File;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -57,14 +58,14 @@ public class ImporterTest {
 
     @Test
     public void importPetriNet() {
-        importer.importPetriNet(new File("src/test/resources/prikladFM_test.xml"), NET_TITLE, NET_INITIALS);
+        importer.importPetriNet(new File("src/test/resources/prikladFM_test.xml"), NET_TITLE, NET_INITIALS, new HashMap<>());
 
         assertNetProperlyImported();
     }
 
     @Test
     public void priorityTest() {
-        Optional<PetriNet> net = importer.importPetriNet(new File("src/test/resources/priority_test.xml"), "Priority test", "PT");
+        Optional<PetriNet> net = importer.importPetriNet(new File("src/test/resources/priority_test.xml"), "Priority test", "PT", new HashMap<>());
 
         assert net.isPresent();
 
@@ -75,7 +76,7 @@ public class ImporterTest {
 
     @Test
     public void dataGroupTest() {
-        Optional<PetriNet> net = importer.importPetriNet(new File("src/test/resources/datagroup_test.xml"), "DataGroup test", "DGT");
+        Optional<PetriNet> net = importer.importPetriNet(new File("src/test/resources/datagroup_test.xml"), "DataGroup test", "DGT", new HashMap<>());
 
         assert net.isPresent();
     }
@@ -83,8 +84,8 @@ public class ImporterTest {
     @Test
     @Ignore
     public void caseRefTest() {
-        importer.importPetriNet(new File("src/test/resources/datagroup_test.xml"), "DataGroup test", "DGT");
-        Optional<PetriNet> net = importer.importPetriNet(new File("src/test/resources/caseref_test.xml"), "Caseref test", "CRT");
+        importer.importPetriNet(new File("src/test/resources/datagroup_test.xml"), "DataGroup test", "DGT", new HashMap<>());
+        Optional<PetriNet> net = importer.importPetriNet(new File("src/test/resources/caseref_test.xml"), "Caseref test", "CRT", new HashMap<>());
         assert net.isPresent();
 
         Case useCase = workflowService.createCase(net.get().getStringId(), net.get().getTitle().getDefaultValue(), "color", mockLoggedUser());
@@ -101,12 +102,12 @@ public class ImporterTest {
 
     @Test
     public void readArcImportTest() {
-        importer.importPetriNet(new File("src/test/resources/read_test.xml"), "R", "R");
+        importer.importPetriNet(new File("src/test/resources/read_test.xml"), "R", "R", new HashMap<>());
     }
 
     @Test
     public void externalMappingTest() {
-        Optional<PetriNet> net = importer.importPetriNet(new File("src/test/resources/mapping_test.xml"), "External mapping", "EXT");
+        Optional<PetriNet> net = importer.importPetriNet(new File("src/test/resources/mapping_test.xml"), "External mapping", "EXT", new HashMap<>());
 
         assertExternalMappingImport(net);
     }
