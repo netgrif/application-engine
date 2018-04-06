@@ -1,22 +1,27 @@
 package com.netgrif.workflow.petrinet.web.responsebodies;
 
 
-public class DataFieldReference extends TransitionReference{
+import lombok.Data;
 
+@Data
+public class DataFieldReference extends Reference {
+
+    private String petriNetId;
     private String transitionId;
 
-    public DataFieldReference(){}
+    public DataFieldReference() {
+        super();
+    }
 
-    public DataFieldReference(String entityId, String title, String petriNetId, String transitionId) {
-        super(entityId, title, petriNetId);
+    public DataFieldReference(String id, String title, String petriNetId, String transitionId) {
+        super(id, title);
+        this.petriNetId = petriNetId;
         this.transitionId = transitionId;
     }
 
-    public String getTransitionId() {
-        return transitionId;
-    }
-
-    public void setTransitionId(String transitionId) {
-        this.transitionId = transitionId;
+    public DataFieldReference(String id, String title, TransitionReference transition) {
+        super(id, title);
+        this.petriNetId = transition.getPetriNetId();
+        this.transitionId = transition.getStringId();
     }
 }
