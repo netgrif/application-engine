@@ -98,7 +98,7 @@ class InsuranceTest {
                 .apply(springSecurity())
                 .build()
 
-        def net = importer.importPetriNet(new File("src/test/resources/insurance_portal_demo_test.xml"), CASE_NAME, CASE_INITIALS)
+        def net = importer.importPetriNet(new File("src/test/resources/insurance_portal_demo_test.xml"), CASE_NAME, CASE_INITIALS, [:])
         assert net.isPresent()
 
         netId = net.get().stringId

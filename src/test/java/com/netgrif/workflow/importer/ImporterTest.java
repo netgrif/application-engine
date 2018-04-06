@@ -2,7 +2,7 @@ package com.netgrif.workflow.importer;
 
 import com.netgrif.workflow.auth.domain.Authority;
 import com.netgrif.workflow.auth.domain.LoggedUser;
-import com.netgrif.workflow.auth.domain.repositories.AuthorityRepository;
+import com.netgrif.workflow.auth.service.interfaces.IAuthorityService;
 import com.netgrif.workflow.importer.service.Importer;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
@@ -41,7 +41,7 @@ public class ImporterTest {
     private IWorkflowService workflowService;
 
     @Autowired
-    private AuthorityRepository authorityRepository;
+    private IAuthorityService authorityService;
 
     private static final String NET_TITLE = "jaxb_test";
     private static final String NET_INITIALS = "TST";
@@ -150,11 +150,7 @@ public class ImporterTest {
     }
 
     public LoggedUser mockLoggedUser(){
-        Authority authorityUser;
-        if (authorityRepository.count() > 0)
-            authorityUser = authorityRepository.findAll().get(0);
-        else
-            authorityUser = authorityRepository.save(new Authority(Authority.user));
+        Authority authorityUser = authorityService.getOrCreate(Authority.user);
         return new LoggedUser(1L, "super@netgrif.com","password", Collections.singleton(authorityUser));
     }
 }
