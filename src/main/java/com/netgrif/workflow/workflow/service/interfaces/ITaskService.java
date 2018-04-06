@@ -18,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 public interface ITaskService {
     Page<Task> getAll(LoggedUser loggedUser, Pageable pageable, Locale locale);
@@ -55,6 +56,8 @@ public interface ITaskService {
     void delegateTask(LoggedUser loggedUser, String delegatedEmail, String taskId) throws TransitionNotExecutableException;
 
     boolean saveFile(String taskId, String fieldId, MultipartFile multipartFile);
+
+    void cancelTasksWithoutReload(Set<String> transitions, String caseId);
 
     FileSystemResource getFile(String taskId, String fieldId);
 
