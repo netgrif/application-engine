@@ -13,6 +13,8 @@ import com.netgrif.workflow.orgstructure.service.IMemberService
 import com.netgrif.workflow.petrinet.domain.PetriNet
 import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository
 import com.netgrif.workflow.petrinet.service.PetriNetService
+import com.netgrif.workflow.petrinet.web.requestbodies.UploadedFileMeta
+import com.netgrif.workflow.petrinet.web.responsebodies.PetriNetReference
 import com.netgrif.workflow.workflow.domain.Case
 import com.netgrif.workflow.workflow.domain.Filter
 import com.netgrif.workflow.workflow.domain.repositories.CaseRepository
@@ -99,12 +101,14 @@ class ImportHelper {
         return authorityRepository.save(new Authority(name))
     }
 
-    Optional<PetriNet> createNet(String fileName, String name, String initials) {
-        createNet(fileName, name, initials, superCreator.superUser.transformToLoggedUser())
+    Optional<PetriNet> createNet(String fileName, String identifier, String name, String initials, PetriNet.VersionType release) {
+        createNet(fileName, identifier, name, initials, release, superCreator.superUser.transformToLoggedUser())
     }
 
-    Optional<PetriNet> createNet(String fileName, String name, String initials, LoggedUser loggedUser) {
-        return petriNetService.importPetriNet(new File("src/main/resources/petriNets/$fileName"), name, initials, loggedUser)
+    Optional<PetriNet> createNet(String fileName, String identifier, String name, String initials, PetriNet.VersionType release, LoggedUser loggedUser) {
+        return petriNetService.importPetriNet(new File("src/main/resources/petriNets/$fileName"),
+                new UploadedFileMeta(name, initials, identifier, release.toString()), loggedUser)
+
     }
 
     UserProcessRole createUserProcessRole(PetriNet net, String name) {
@@ -144,6 +148,7 @@ class ImportHelper {
 
     Case createCase(String title, PetriNet net, LoggedUser user) {
         Case useCase = new Case(title, net, net.getActivePlaces())
+        useCase.setProcessIdentifier(net.getIdentifier())
         useCase.setColor(getCaseColor())
         useCase.setAuthor(user.transformToAuthor())
         useCase.setIcon(net.icon)
