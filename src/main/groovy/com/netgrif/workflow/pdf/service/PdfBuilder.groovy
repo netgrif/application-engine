@@ -27,6 +27,18 @@ class PdfBuilder {
         return this
     }
 
+    PdfBuilder load(String ... paths) {
+        PDFMergerUtility pdfMerger = new PDFMergerUtility()
+
+        document = new PDDocument()
+        paths.each { path ->
+            PDDocument toMerge = PDDocument.load(new File(path))
+            pdfMerger.appendDocument(this.document, toMerge)
+        }
+
+        return this
+    }
+
     File save(String path) {
         if (document == null || path == null)
             throw new IllegalArgumentException("Document=[$document] and path=[$path]")
