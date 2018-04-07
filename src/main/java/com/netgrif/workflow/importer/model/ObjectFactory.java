@@ -10,7 +10,7 @@ import javax.xml.namespace.QName;
 /**
  * This object contains factory methods for each 
  * Java content interface and Java element interface 
- * generated in the sk.stuba.fei.oop package. 
+ * generated in the com.netgrif.workflow.importer.model package. 
  * <p>An ObjectFactory allows you to programatically 
  * construct new instances of the Java representation 
  * for XML content. The Java representation of XML 
@@ -60,7 +60,7 @@ public class ObjectFactory {
     private final static QName _Type_QNAME = new QName("", "type");
 
     /**
-     * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: sk.stuba.fei.oop
+     * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: com.netgrif.workflow.importer.model
      * 
      */
     public ObjectFactory() {
