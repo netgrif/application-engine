@@ -108,10 +108,11 @@ public abstract class PetriNetService implements IPetriNetService {
         imported.ifPresent(petriNet -> {
             petriNet.setVersion(previousVersion.getVersion());
             petriNet.incrementVersion(PetriNet.VersionType.valueOf(meta.releaseType.trim().toUpperCase()));
-            migrateProcessRoles(petriNet, previousVersion);
+            List<ProcessRole> newRoles = migrateProcessRoles(petriNet, previousVersion);
 
             try {
                 setupImportedPetriNet(petriNet, xmlFile, meta, user);
+                userProcessRoleService.saveRoles(newRoles,petriNet.getStringId());
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -120,15 +121,35 @@ public abstract class PetriNetService implements IPetriNetService {
         return imported;
     }
 
-    private void migrateProcessRoles(PetriNet newVersion, PetriNet previousVersion) {
+    private List<ProcessRole> migrateProcessRoles(PetriNet newVersion, PetriNet previousVersion) {
+        Map<String, String> twins = new HashMap<>(); //key is new roles, value is old role => key is which role should be replaced and value by what
         List<ProcessRole> newRoles = new ArrayList<>();
-        Map<String, ProcessRole> mapedByName = new HashMap<>();
-        previousVersion.getRoles().forEach((id, role) -> mapedByName.put(role.getName().getDefaultValue(), role));
+        Map<String, ProcessRole> oldRolesByName = new HashMap<>();
+        previousVersion.getRoles().forEach((id, role) -> oldRolesByName.put(role.getName().getDefaultValue(), role));
 
-        newVersion.getRoles().forEach((id, role) -> newRoles.add(mapedByName.getOrDefault(role.getName().getDefaultValue(), role)));
+        newVersion.getRoles().forEach((id, role) -> {
+            if (oldRolesByName.containsKey(role.getName().getDefaultValue())) {
+                twins.put(role.getStringId(), oldRolesByName.get(role.getName().getDefaultValue()).getStringId());
+            } else {
+                newRoles.add(role);
+            }
+        });
 
-        newVersion.getRoles().clear();
-        processRoleRepository.save(newRoles).forEach(newVersion::addRole);
+        //replace new role with old
+        twins.forEach((newId, oldId) -> {
+            //replace in Petri Net
+            newVersion.getRoles().remove(newId);
+            newVersion.addRole(previousVersion.getRoles().get(oldId));
+
+            //replace in transitions
+            newVersion.getTransitions().forEach((transId, transition) -> {
+                if (transition.getRoles().containsKey(newId)) {
+                    transition.addRole(oldId, transition.getRoles().remove(newId));
+                }
+            });
+        });
+
+        return processRoleRepository.save(newRoles);
     }
 
     private void setupImportedPetriNet(PetriNet net, File xmlFile, UploadedFileMeta meta, LoggedUser user) throws IOException {
