@@ -17,12 +17,6 @@ public interface TaskRepository extends MongoRepository<Task, String> {
 
     Page<Task> findByTransitionIdIn(Pageable pageable, Collection<String> ids);
 
-    /**
-     * For Case search purpose only
-     * @param ids collection of transition objectIds
-     * @return list of tasks with only set caseId
-     */
-    @Query(fields = "{caseId:1}")
     List<Task> findAllByTransitionIdIn(Collection<String> ids);
 
     Page<Task> findByUserId(Pageable pageable, Long userId);
