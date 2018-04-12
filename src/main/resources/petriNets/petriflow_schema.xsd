@@ -182,6 +182,7 @@
             <xs:enumeration value="reset"/>
             <xs:enumeration value="inhibitor"/>
             <xs:enumeration value="read"/>
+            <xs:enumeration value="variable"/>
         </xs:restriction>
     </xs:simpleType>
     <xs:simpleType name="validation">
