@@ -43,6 +43,10 @@ public class LoggedUser extends org.springframework.security.core.userdetails.Us
         return getAuthorities().contains(new Authority(Authority.admin));
     }
 
+    public String getEmail(){
+        return getUsername();
+    }
+
     public User transformToUser(){
         User user = new User(this.id);
         user.setEmail(getUsername());
