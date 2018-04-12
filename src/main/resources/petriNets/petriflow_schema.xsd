@@ -357,4 +357,22 @@
     <xs:element name="dataFocusPolicy" type="dataFocusPolicyType"/>
     <xs:element name="finishPolicy" type="finishPolicyType"/>
     <xs:element name="caseName" type="i18nStringType"/>
+    <xs:element name="event">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="id"/>
+                <xs:element ref="title" minOccurs="0"/>
+                <xs:element ref="message" minOccurs="0"/>
+                <xs:element ref="actions" minOccurs="0"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="actions">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="action" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="message" type="i18nStringType"/>
 </xs:schema>
