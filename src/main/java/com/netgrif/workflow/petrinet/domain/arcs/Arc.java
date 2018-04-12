@@ -1,5 +1,9 @@
-package com.netgrif.workflow.petrinet.domain;
+package com.netgrif.workflow.petrinet.domain.arcs;
 
+import com.netgrif.workflow.petrinet.domain.Node;
+import com.netgrif.workflow.petrinet.domain.PetriNetObject;
+import com.netgrif.workflow.petrinet.domain.Place;
+import com.netgrif.workflow.petrinet.domain.Transition;
 import lombok.Getter;
 import lombok.Setter;
 import org.bson.types.ObjectId;
