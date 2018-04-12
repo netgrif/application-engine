@@ -25,7 +25,7 @@ public interface IPetriNetService {
 
     Optional<PetriNet> importPetriNet(File xmlFile, UploadedFileMeta metaData, LoggedUser user) throws IOException;
 
-    void savePetriNet(PetriNet petriNet);
+    Optional<PetriNet> saveNew(PetriNet petriNet);
 
     PetriNet getPetriNet(String id);
 
@@ -54,6 +54,8 @@ public interface IPetriNetService {
     List<DataFieldReference> getDataFieldReferences(List<TransitionReference> transitions, Locale locale);
 
     Page<PetriNetReference> search(Map<String, Object> criteria, LoggedUser user, Pageable pageable, Locale locale);
+
+    Optional<PetriNet> findByImportId(long id);
 
     static PetriNetReference transformToReference(PetriNet net, Locale locale) {
         return new PetriNetReference(net.getStringId(), net.getIdentifier(), net.getVersion(), net.getTitle().getTranslation(locale), net.getInitials(), net.getTranslatedDefaultCaseName(locale));
