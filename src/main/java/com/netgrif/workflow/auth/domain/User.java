@@ -13,6 +13,7 @@ import org.hibernate.validator.constraints.NotBlank;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -41,8 +42,6 @@ public class User {
     private String avatar;
 
     @JsonIgnore
-    @NotNull
-    @Length(min = 6)
     @Getter
     @Setter
     private String password;
@@ -58,6 +57,19 @@ public class User {
     @Getter
     @Setter
     private String surname;
+
+    @NotNull
+    @Getter
+    @Setter
+    private UserState state;
+
+    @Getter
+    @Setter
+    private String token;
+
+    @Getter
+    @Setter
+    private LocalDateTime expirationDate;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "user_authorities", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "authority_id"))
