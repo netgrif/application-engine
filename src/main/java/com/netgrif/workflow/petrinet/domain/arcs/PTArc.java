@@ -1,4 +1,8 @@
-package com.netgrif.workflow.petrinet.domain;
+package com.netgrif.workflow.petrinet.domain.arcs;
+
+import com.netgrif.workflow.petrinet.domain.Node;
+import com.netgrif.workflow.petrinet.domain.Place;
+import com.netgrif.workflow.petrinet.domain.Transition;
 
 /**
  * Special arcs that can only lead from Place to Transition (thus PT).
