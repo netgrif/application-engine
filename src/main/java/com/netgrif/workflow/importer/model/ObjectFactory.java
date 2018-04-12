@@ -58,6 +58,7 @@ public class ObjectFactory {
     private final static QName _DefaultRole_QNAME = new QName("", "defaultRole");
     private final static QName _CaseName_QNAME = new QName("", "caseName");
     private final static QName _Type_QNAME = new QName("", "type");
+    private final static QName _Message_QNAME = new QName("", "message");
 
     /**
      * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: com.netgrif.workflow.importer.model
@@ -224,6 +225,22 @@ public class ObjectFactory {
      */
     public Document createDocument() {
         return new Document();
+    }
+
+    /**
+     * Create an instance of {@link Event }
+     * 
+     */
+    public Event createEvent() {
+        return new Event();
+    }
+
+    /**
+     * Create an instance of {@link Actions }
+     * 
+     */
+    public Actions createActions() {
+        return new Actions();
     }
 
     /**
@@ -530,6 +547,15 @@ public class ObjectFactory {
     @XmlElementDecl(namespace = "", name = "type")
     public JAXBElement<String> createType(String value) {
         return new JAXBElement<String>(_Type_QNAME, String.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link I18NStringType }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "", name = "message")
+    public JAXBElement<I18NStringType> createMessage(I18NStringType value) {
+        return new JAXBElement<I18NStringType>(_Message_QNAME, I18NStringType.class, null, value);
     }
 
 }
