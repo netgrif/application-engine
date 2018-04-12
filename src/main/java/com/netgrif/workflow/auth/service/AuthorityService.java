@@ -26,4 +26,24 @@ public class AuthorityService implements IAuthorityService {
             authority = repository.save(new Authority(name));
         return authority;
     }
+
+    @Override
+    public Authority getOrCreatePermission(String name) {
+        return getOrCreate(Authority.PERMISSION + name);
+    }
+
+    @Override
+    public Authority getOrCreateRole(String name) {
+        return getOrCreate(Authority.ROLE + name);
+    }
+
+    @Override
+    public List<Authority> getAllPermissions() {
+        return repository.findAllByNameStartsWith(Authority.PERMISSION);
+    }
+
+    @Override
+    public List<Authority> getAllRoles() {
+        return repository.findAllByNameStartsWith(Authority.ROLE);
+    }
 }
