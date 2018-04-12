@@ -154,6 +154,7 @@ public class WorkflowService implements IWorkflowService {
 
         publisher.publishEvent(new CreateCaseEvent(useCase));
 
+        useCase.getPetriNet().initializeVarArcs(useCase.getDataSet());
         taskService.createTasks(useCase);
         return setImmediateDataFields(useCase);
     }

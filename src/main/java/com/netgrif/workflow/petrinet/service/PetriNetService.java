@@ -6,6 +6,8 @@ import com.netgrif.workflow.event.events.model.UserImportModelEvent;
 import com.netgrif.workflow.importer.service.Importer;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.Transition;
+import com.netgrif.workflow.petrinet.domain.arcs.VariableArc;
+import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository;
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRole;
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRoleRepository;
@@ -112,7 +114,7 @@ public abstract class PetriNetService implements IPetriNetService {
 
             try {
                 setupImportedPetriNet(petriNet, xmlFile, meta, user);
-                userProcessRoleService.saveRoles(newRoles,petriNet.getStringId());
+                userProcessRoleService.saveRoles(newRoles, petriNet.getStringId());
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -165,8 +167,10 @@ public abstract class PetriNetService implements IPetriNetService {
 
 
     @Override
-    public void savePetriNet(PetriNet petriNet) {
-        repository.save(petriNet);
+    public Optional<PetriNet> saveNew(PetriNet petriNet) {
+        initializeVariableArcs(petriNet);
+
+        return Optional.of(repository.save(petriNet));
     }
 
     @Override
@@ -308,6 +312,11 @@ public abstract class PetriNetService implements IPetriNetService {
         return dataRefs;
     }
 
+    @Override
+    public Optional<PetriNet> findByImportId(long id) {
+        return Optional.of(repository.findByImportId(id));
+    }
+
     public Page<PetriNetReference> search(Map<String, Object> criteria, LoggedUser user, Pageable pageable, Locale locale) {
         Query query = new Query();
 
@@ -334,5 +343,19 @@ public abstract class PetriNetService implements IPetriNetService {
     private Criteria getProcessRolesCriteria(LoggedUser user) {
         return new Criteria().orOperator(user.getProcessRoles().stream()
                 .map(role -> Criteria.where("roles." + role).exists(true)).toArray(Criteria[]::new));
+    }
+
+    private void initializeVariableArcs(PetriNet net) {
+        net.getArcs().values().stream()
+                .flatMap(List::stream)
+                .filter(arc -> arc instanceof VariableArc)
+                .forEach(arc -> initializeVariableArc(net, (VariableArc) arc));
+    }
+
+    private void initializeVariableArc(PetriNet net, VariableArc arc) {
+        Optional<Field> field = net.getDataSet().values().stream().filter(f -> f.getImportId() == (long) arc.getMultiplicity()).findFirst();
+        if (!field.isPresent())
+            throw new IllegalArgumentException("Field with import id " + arc.getMultiplicity() + " not found.");
+        arc.setFieldId(field.get().getStringId());
     }
 }
