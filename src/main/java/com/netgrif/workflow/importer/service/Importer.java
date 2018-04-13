@@ -453,7 +453,7 @@ public class Importer {
             return false;
         // FALSE if role or trigger mapping
         for (Mapping mapping : document.getMapping()) {
-            if (mapping.getTransitionRef() == transition.getId() && (mapping.getRoleRef() == null || mapping.getRoleRef().isEmpty()) && (mapping.getTrigger() == null || mapping.getTrigger().isEmpty()))
+            if (mapping.getTransitionRef() == transition.getId() && (mapping.getRoleRef() != null && !mapping.getRoleRef().isEmpty()) && (mapping.getTrigger() != null && !mapping.getTrigger().isEmpty()))
                 return false;
         }
         // TRUE if no roles and no triggers
