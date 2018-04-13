@@ -10,6 +10,8 @@ import com.netgrif.workflow.event.events.task.*;
 import com.netgrif.workflow.event.events.usecase.SaveCaseDataEvent;
 import com.netgrif.workflow.importer.service.FieldFactory;
 import com.netgrif.workflow.petrinet.domain.*;
+import com.netgrif.workflow.petrinet.domain.arcs.Arc;
+import com.netgrif.workflow.petrinet.domain.arcs.ResetArc;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.petrinet.domain.dataset.FileField;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedField;
