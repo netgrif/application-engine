@@ -127,7 +127,9 @@ public class PetriNet extends PetriNetObject {
     }
 
     public List<Arc> getArcsOfTransition(String transitionId) {
-        return arcs.get(transitionId);
+        if (arcs.containsKey(transitionId))
+            return arcs.get(transitionId);
+        return new LinkedList<>();
     }
 
     public void addDataSetField(Field field) {
