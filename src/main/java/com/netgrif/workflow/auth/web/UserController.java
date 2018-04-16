@@ -69,11 +69,10 @@ public class UserController {
 
     //TODO: 2.6.2017 edit user profile
 
-
     @RequestMapping(value = "/{id}/role/assign", method = RequestMethod.POST)
-    public MessageResource assignRolesToUser(@PathVariable("id") Long userId, @RequestBody Set<String> roleIds) {
+    public MessageResource assignRolesToUser(@PathVariable("id") Long userId, @RequestBody Set<String> roleIds, Authentication auth) {
         try {
-            processRoleService.assignRolesToUser(userId, roleIds);
+            processRoleService.assignRolesToUser(userId, roleIds, (LoggedUser) auth.getPrincipal());
             log.info("Process roles " + roleIds + " assigned to user " + userId);
             return MessageResource.successMessage("Selected roles assigned to user " + userId);
         } catch (IllegalArgumentException e) {
