@@ -46,7 +46,12 @@ class FieldActionsRunner {
         log.debug("Action: $script")
         def code = (Closure) shell.evaluate("{->${getExpression(script)}}")
         code.delegate = new ActionDelegate(useCase, this)
-        code()
+        try {
+            code()
+        } catch (Exception e) {
+            log.error("Action: $script")
+            throw e
+        }
         return ((ActionDelegate) code.delegate).changedField
     }
 
