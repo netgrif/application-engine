@@ -40,7 +40,7 @@ class Action {
         return definition
     }
 
-    Boolean isTriggeredBy(ActionTrigger trigger){
+    Boolean isTriggeredBy(ActionTrigger trigger) {
         return this.trigger == trigger
     }
 
