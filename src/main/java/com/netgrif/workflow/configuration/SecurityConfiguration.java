@@ -44,12 +44,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         return "forward:/";
     }
 
-    @RequestMapping("/user")
-    @ResponseBody
-    public Principal user(Principal user) {
-        return user;
-    }
-
     @Override
     protected void configure(HttpSecurity http) throws Exception {
 //        @formatter:off

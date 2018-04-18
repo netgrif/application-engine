@@ -13,13 +13,17 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     User findByEmail(String email);
 
-    User findByEmailAndState(String email, UserState state);
-
     User findByToken(String token);
 
     List<User> findAllByExpirationDateBefore(LocalDateTime dateTime);
 
+    List<User> findAllByStateAndExpirationDateBefore(UserState userState, LocalDateTime dateTime);
+
     List<User> findAllByState(UserState state);
 
-    List<User> findByUserProcessRoles_RoleIdIn(List<String> roleId);
+    List<User> findByStateAndUserProcessRoles_RoleIdIn(UserState state, List<String> roleId);
+
+    List<User> removeAllByStateAndExpirationDateBefore(UserState state, LocalDateTime dateTime);
+
+    User removeByEmail(String email);
 }

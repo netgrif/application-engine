@@ -21,6 +21,8 @@ import java.util.Set;
 @Table(name = "user")
 public class User {
 
+    public static final String UNKNOWN = "unknown";
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Getter

@@ -7,7 +7,7 @@ import com.netgrif.workflow.auth.domain.User
 import com.netgrif.workflow.auth.domain.UserProcessRole
 import com.netgrif.workflow.auth.domain.repositories.AuthorityRepository
 import com.netgrif.workflow.auth.domain.repositories.UserRepository
-import com.netgrif.workflow.auth.web.SignUpController
+import com.netgrif.workflow.auth.web.AuthenticationController
 import com.netgrif.workflow.auth.web.requestbodies.NewUserRequest
 import com.netgrif.workflow.auth.web.requestbodies.RegistrationRequest
 import com.netgrif.workflow.importer.service.Importer
@@ -36,7 +36,7 @@ import javax.mail.internet.MimeMultipart
 @RunWith(SpringRunner.class)
 @ActiveProfiles(["test"])
 @SpringBootTest
-class SignUpControllerTest {
+class AuthenticationControllerTest {
 
     private static final String EMAIL = "tets@test.com"
     private static final String NAME = "name"
@@ -47,7 +47,7 @@ class SignUpControllerTest {
     public static final String GROUP_NAME = "Insurance Company"
 
     @Autowired
-    private SignUpController controller
+    private AuthenticationController controller
 
     @Autowired
     private Importer importer
