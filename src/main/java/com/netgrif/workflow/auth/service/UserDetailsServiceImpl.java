@@ -46,7 +46,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     private LoggedUser getLoggedUser(String email) throws UsernameNotFoundException {
         User user = userRepository.findByEmail(email);
-        if (user == null)
+        if (user == null || user.getPassword() == null)
             throw new UsernameNotFoundException("No user was found for login: " + email);
         return user.transformToLoggedUser();
     }
