@@ -1,12 +1,12 @@
 package com.netgrif.workflow.importer.service;
 
 import com.netgrif.workflow.importer.model.*;
-import com.netgrif.workflow.petrinet.domain.arcs.Arc;
 import com.netgrif.workflow.petrinet.domain.DataGroup;
 import com.netgrif.workflow.petrinet.domain.*;
 import com.netgrif.workflow.petrinet.domain.Place;
 import com.netgrif.workflow.petrinet.domain.Transaction;
 import com.netgrif.workflow.petrinet.domain.Transition;
+import com.netgrif.workflow.petrinet.domain.arcs.Arc;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.FieldBehavior;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action;
@@ -18,7 +18,6 @@ import com.netgrif.workflow.petrinet.domain.roles.ProcessRoleRepository;
 import com.netgrif.workflow.petrinet.service.ArcFactory;
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.workflow.workflow.domain.triggers.Trigger;
-import org.apache.log4j.Logger;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -33,11 +32,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Component
 public class Importer {
-
-    private static final Logger log = Logger.getLogger(Importer.class.getName());
 
     public static final String ARCHIVED_FILES_PATH = "storage/uploadedModels/";
     public static final String FILE_EXTENSION = ".xml";
@@ -45,7 +43,7 @@ public class Importer {
     public static final String FIELD_KEYWORD = "f";
     public static final String TRANSITION_KEYWORD = "t";
 
-    private Path importedXmlPath;
+    private Config config;
     private Document document;
     private PetriNet net;
     private ProcessRole defaultRole;
@@ -55,8 +53,6 @@ public class Importer {
     private Map<Long, Place> places;
     private Map<Long, Transaction> transactions;
     private Map<String, I18nString> i18n;
-
-    private Map<String, Object> config;
 
     @Autowired
     private FieldFactory fieldFactory;
@@ -77,21 +73,19 @@ public class Importer {
     private TriggerFactory triggerFactory;
 
     @Transactional
-    public Optional<PetriNet> importPetriNet(File xml, String title, String initials, Map<String, Object> config) {
+    public Optional<PetriNet> importPetriNet(File xml, String title, String initials, Config config) {
         try {
-            this.config = config == null ? new HashMap<>() : config;
-
-            initialize();
+            initialize(config);
             unmarshallXml(xml);
-            return createPetriNet(title, initials, xml);
-        } catch (JAXBException | IOException e) {
+            return createPetriNet(title, initials);
+        } catch (JAXBException e) {
             e.printStackTrace();
         }
         return Optional.empty();
     }
 
-    private void initialize() {
-        this.importedXmlPath = null;
+    private void initialize(Config config) {
+        this.config = config;
         this.roles = new HashMap<>();
         this.transitions = new HashMap<>();
         this.places = new HashMap<>();
@@ -102,7 +96,7 @@ public class Importer {
     }
 
     @Transactional
-    protected void unmarshallXml(File xml) throws JAXBException, IOException {
+    protected void unmarshallXml(File xml) throws JAXBException {
         JAXBContext jaxbContext = JAXBContext.newInstance(Document.class);
 
         Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
@@ -118,7 +112,7 @@ public class Importer {
     }
 
     @Transactional
-    protected Optional<PetriNet> createPetriNet(String title, String initials, File xmlFile) {
+    protected Optional<PetriNet> createPetriNet(String title, String initials) {
         net = new PetriNet();
         net.setTitle(title);
         net.setInitials(initials);
@@ -137,10 +131,10 @@ public class Importer {
         document.getData().forEach(this::resolveDataActions);
 
         net.setDefaultCaseName(toI18NString(document.getCaseName()));
-        if (config.get("notSaveObjects") != null && ((Boolean) config.get("notSaveObjects")))
-            return Optional.of(net);
-        else
+        if (config.isNotSaveObjects())
             return service.saveNew(net);
+        else
+            return Optional.of(net);
     }
 
     @Transactional
@@ -240,7 +234,7 @@ public class Importer {
         }
         if (importTransition.getDataRef() != null) {
             importTransition.getDataRef().forEach(dataRef ->
-                    addDataLogic(transition, dataRef)
+                    addDataWithDefaultGroup(transition, dataRef)
             );
         }
         if (importTransition.getTrigger() != null) {
@@ -270,6 +264,17 @@ public class Importer {
         logic.setDelegate(true);
         logic.setPerform(true);
         transition.addRole(defaultRole.getStringId(), roleFactory.getPermissions(logic));
+    }
+
+    @Transactional
+    protected void addDataWithDefaultGroup(Transition transition, DataRef dataRef) {
+        DataGroup dataGroup = new DataGroup();
+        dataGroup.setAlignment("start");
+        dataGroup.setStretch(true);
+        dataGroup.addData(fields.get(dataRef.getId()).getStringId());
+        transition.addDataGroup(dataGroup);
+
+        addDataLogic(transition, dataRef);
     }
 
     @Transactional
@@ -326,59 +331,93 @@ public class Importer {
 
     @Transactional
     protected LinkedHashSet<Action> buildActions(List<ActionType> imported, String fieldId, String transitionId) {
-        final LinkedHashSet<Action> actions = new LinkedHashSet<>();
-        imported.forEach(action -> {
-            if (action.getTrigger() == null)
-                throw new IllegalArgumentException("Action [" + action.getValue() + "] doesn't have trigger");
+        return imported.stream()
+                .map(action -> parseAction(fieldId, transitionId, action))
+                .collect(Collectors.toCollection(LinkedHashSet::new));
+    }
 
-            String definition = action.getValue();
-            try {
-                definition = parseObjectIds(definition, fieldId, FIELD_KEYWORD);
-                definition = parseObjectIds(definition, transitionId, TRANSITION_KEYWORD);
-            } catch (NumberFormatException e) {
-//                todo: message
-                throw new IllegalArgumentException("Error parsing ids of action [" + action.getValue() + "]", e);
-            }
-            actions.add(new Action(definition, action.getTrigger()));
-        });
-        return actions;
+    private Action parseAction(String fieldId, String transitionId, ActionType action) {
+        if (action.getTrigger() == null)
+            throw new IllegalArgumentException("Action [" + action.getValue() + "] doesn't have trigger");
+
+        try {
+            return parseIds(fieldId, transitionId, action);
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Error parsing ids of action [" + action.getValue() + "]", e);
+        }
+    }
+
+    private Action parseIds(String fieldId, String transitionId, ActionType action) {
+        String definition = action.getValue();
+        definition = parseObjectIds(definition, fieldId, transitionId);
+        return new Action(definition, action.getTrigger());
     }
 
     @Transactional
-    protected String parseObjectIds(String action, String currentId, String processedObject) {
-        action = action.replace("\n", "").replace("  ", "");
-        int last = 0;
+    protected String parseObjectIds(String action, String fieldId, String transitionId) {
+        String[] actionParts = action.split(";", 2);
+        if (actionParts.length != 2)
+            throw new IllegalArgumentException("Failed to parse action: " + action);
+
         try {
-            while (true) {
-                int start = action.indexOf(processedObject + ".", last);
-                if (start == -1 || start > action.indexOf(';')) break;
-                int coma = action.indexOf(',', start);
-                int semicolon = action.indexOf(';', start);
-                int delimeter = coma < semicolon && coma != -1 ? coma : semicolon;
-
-                String id = action.substring(start + 2, delimeter);
-                String objectId = id.equalsIgnoreCase("this") ? currentId : getObjectId(processedObject, Long.parseLong(id));
-
-                action = action.replace(processedObject + "." + id, processedObject + "." + objectId);
-
-                if (delimeter == semicolon) break;
-                else last = coma + (objectId.length() - id.length());
-            }
+            Map<String, String> ids = parseParams(actionParts[0]);
+            String definition = ids.entrySet().parallelStream()
+                    .map(entry -> replaceImportId(fieldId, transitionId, entry))
+                    .collect(Collectors.joining(","));
+            return definition + ";" + definition;
         } catch (NullPointerException e) {
-            e.printStackTrace();
-            log.error("Failed to parse action: " + action, e);
+            throw new IllegalArgumentException("Failed to parse action: " + action, e);
         }
-        return action;
     }
 
-    private String getObjectId(String processedObject, Long xmlId) {
-        try {
-            if (processedObject.equalsIgnoreCase(FIELD_KEYWORD)) return fields.get(xmlId).getStringId();
-            if (processedObject.equalsIgnoreCase(TRANSITION_KEYWORD)) return transitions.get(xmlId).getStringId();
-        } catch (Exception e) {
-            throw new IllegalArgumentException("Object " + processedObject + "." + xmlId + " does not exists");
+    private String replaceImportId(String fieldId, String transitionId, Map.Entry<String, String> entry) {
+        String[] parts = entry.getValue().split("[.]");
+        if (parts.length != 2)
+            throw new IllegalArgumentException("Can not parse id of " + entry.getValue());
+        String importId = parts[1];
+        String key = parts[0];
+
+        String objectId = findObjectId(fieldId, transitionId, importId, key);
+        return entry.getKey() + ": " + parts[0] + "." + objectId;
+    }
+
+    private String findObjectId(String fieldId, String transitionId, String importId, String key) {
+        if (importId.startsWith("this")) {
+            if (Objects.equals(key.trim(), FIELD_KEYWORD))
+                return fieldId;
+            if (Objects.equals(key.trim(), TRANSITION_KEYWORD))
+                return transitionId;
         }
-        return "";
+        Long id = Long.parseLong(importId);
+        if (Objects.equals(key.trim(), FIELD_KEYWORD))
+            return getFieldId(id);
+        if (Objects.equals(key.trim(), TRANSITION_KEYWORD))
+            return getTransitionId(id);
+        throw new IllegalArgumentException("Object " + key + "." + importId + " not supported");
+    }
+
+
+    private Map<String, String> parseParams(String definition) {
+        List<String> params = Arrays.asList(definition.split(","));
+        return params.parallelStream()
+                .map(param -> param.split(":"))
+                .collect(Collectors.toMap(o -> o[0], o -> o[1]));
+    }
+
+    private String getTransitionId(Long importId) {
+        try {
+            return transitions.get(importId).getStringId();
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Object t." + importId + " does not exists");
+        }
+    }
+
+    private String getFieldId(Long importId) {
+        try {
+            return fields.get(importId).getStringId();
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Object f." + importId + " does not exists");
+        }
     }
 
     @Transactional
@@ -411,10 +450,10 @@ public class Importer {
             role.setName(toI18NString(importRole.getTitle()));
         else
             role.setName(toI18NString(importRole.getName()));
-        if (config.get("notSaveObjects") != null && ((Boolean) config.get("notSaveObjects")))
-            role.set_id(new ObjectId());
-        else
+        if (config.isNotSaveObjects())
             role = roleRepository.save(role);
+        else
+            role.set_id(new ObjectId());
 
         net.addRole(role);
         roles.put(importRole.getId(), role);
@@ -431,11 +470,11 @@ public class Importer {
 
     @Transactional
     protected Node getNode(Long id) {
-        // TODO: 18/02/2017 maybe throw exception if transitions doesn't contain id
         if (places.containsKey(id))
             return places.get(id);
-        else
+        else if (transitions.containsKey(id))
             return transitions.get(id);
+        throw new IllegalArgumentException("Node with id [" + id + "] not found.");
     }
 
     I18nString toI18NString(I18NStringType imported) {
@@ -472,42 +511,23 @@ public class Importer {
     }
 
     private AssignPolicy toAssignPolicy(AssignPolicyType type) {
-        if (type == null)
+        if (type == null || type.value() == null)
             return AssignPolicy.MANUAL;
 
-        switch (type) {
-            case AUTO:
-                return AssignPolicy.AUTO;
-            case MANUAL:
-            default:
-                return AssignPolicy.MANUAL;
-        }
+        return AssignPolicy.valueOf(type.value().toUpperCase());
     }
 
     private DataFocusPolicy toAssignPolicy(DataFocusPolicyType type) {
-        if (type == null)
+        if (type == null || type.value() == null)
             return DataFocusPolicy.MANUAL;
 
-        switch (type) {
-            case AUTO_EMPTY_REQUIRED:
-                return DataFocusPolicy.AUTO_EMPTY_REQUIRED;
-            case MANUAL:
-            default:
-                return DataFocusPolicy.MANUAL;
-        }
-
+        return DataFocusPolicy.valueOf(type.value().toUpperCase());
     }
 
     private FinishPolicy toFinishPolicy(FinishPolicyType type) {
-        if (type == null)
+        if (type == null || type.value() == null)
             return FinishPolicy.MANUAL;
 
-        switch (type) {
-            case AUTO_NO_DATA:
-                return FinishPolicy.AUTO_NO_DATA;
-            case MANUAL:
-            default:
-                return FinishPolicy.MANUAL;
-        }
+        return FinishPolicy.valueOf(type.value().toUpperCase());
     }
 }
