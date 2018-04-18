@@ -144,10 +144,6 @@ abstract class Field<T> {
         this.actions.add(action)
     }
 
-    void addAction(String action, String trigger) {
-        this.addAction(new Action(action, trigger))
-    }
-
     String getEncryption() {
         return encryption
     }
