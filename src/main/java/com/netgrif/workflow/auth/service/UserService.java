@@ -3,6 +3,7 @@ package com.netgrif.workflow.auth.service;
 import com.netgrif.workflow.auth.domain.Authority;
 import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.auth.domain.UserProcessRole;
+import com.netgrif.workflow.auth.domain.UserState;
 import com.netgrif.workflow.auth.domain.repositories.AuthorityRepository;
 import com.netgrif.workflow.auth.domain.repositories.UserRepository;
 import com.netgrif.workflow.auth.service.interfaces.IUserProcessRoleService;
@@ -68,11 +69,13 @@ public class UserService implements IUserService {
         user.setPassword(bCryptPasswordEncoder.encode(pass));
     }
 
-    private void addDefaultRole(User user) {
+    @Override
+    public void addDefaultRole(User user) {
         user.addProcessRole(userProcessRoleService.findDefault());
     }
 
-    private void addDefaultAuthorities(User user) {
+    @Override
+    public void addDefaultAuthorities(User user) {
         if (user.getAuthorities().isEmpty()) {
             HashSet<Authority> authorities = new HashSet<Authority>();
             authorities.add(authorityRepository.findByName(Authority.user));
@@ -116,7 +119,7 @@ public class UserService implements IUserService {
 
     @Override
     public Set<User> findByProcessRoles(Set<String> roleIds, boolean small) {
-        Set<User> users = new HashSet<>(userRepository.findByUserProcessRoles_RoleIdIn(new ArrayList<>(roleIds)));
+        Set<User> users = new HashSet<>(userRepository.findByStateAndUserProcessRoles_RoleIdIn(UserState.ACTIVE, new ArrayList<>(roleIds)));
         if (!small)
             users.forEach(this::loadProcessRoles);
         return users;

@@ -1,7 +1,7 @@
 package com.netgrif.workflow.auth.web;
 
-import com.netgrif.workflow.auth.domain.UnactivatedUser;
-import com.netgrif.workflow.auth.service.interfaces.IUnactivatedUserService;
+import com.netgrif.workflow.auth.domain.User;
+import com.netgrif.workflow.auth.service.interfaces.IRegistrationService;
 import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.auth.web.requestbodies.NewUserRequest;
 import com.netgrif.workflow.auth.web.requestbodies.RegistrationRequest;
@@ -25,21 +25,21 @@ import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
 @RestController
-@RequestMapping("/signup")
-public class SignUpController {
+@RequestMapping("/api/auth")
+public class AuthenticationController {
 
-    private static final Logger log = LoggerFactory.getLogger(SignUpController.class);
+    private static final Logger log = LoggerFactory.getLogger(AuthenticationController.class);
 
     @Autowired
     private IUserService userService;
 
     @Autowired
-    private IUnactivatedUserService unactivatedUserService;
+    private IRegistrationService registrationService;
 
     @Autowired
     private IMailService mailService;
 
-    @RequestMapping(value = "/{token}", method = RequestMethod.GET)
+    @RequestMapping(value = "/signup/{token}", method = RequestMethod.GET)
     public ModelAndView registrationForward() throws IOException {
         log.info("Forwarding to / from /signup");
         return new ModelAndView("forward:/");
@@ -47,11 +47,11 @@ public class SignUpController {
 
     @RequestMapping(method = RequestMethod.POST)
     public MessageResource registration(@RequestBody RegistrationRequest regRequest) {
-        if(!unactivatedUserService.authorizeToken(regRequest.email, regRequest.token))
+        if (!registrationService.verifyToken(regRequest.email, regRequest.token))
             return MessageResource.errorMessage("Registration of " + regRequest.email + " has failed! Invalid token!");
 
         regRequest.password = new String(Base64.getDecoder().decode(regRequest.password));
-        userService.saveNew(unactivatedUserService.createUser(regRequest));
+        registrationService.registerUser(regRequest);
 
         return MessageResource.successMessage("Registration complete");
     }
@@ -61,7 +61,7 @@ public class SignUpController {
     public MessageResource invite(@RequestBody NewUserRequest newUserRequest) {
         try {
             newUserRequest.email = URLDecoder.decode(newUserRequest.email, StandardCharsets.UTF_8.name());
-            UnactivatedUser user = unactivatedUserService.createUnactivatedUser(newUserRequest);
+            User user = registrationService.createNewUser(newUserRequest);
             mailService.sendRegistrationEmail(user.getEmail(), user.getToken());
 
             return MessageResource.successMessage("Mail was sent to " + user.getEmail());
@@ -71,9 +71,9 @@ public class SignUpController {
         }
     }
 
-    @RequestMapping(value = "/token", method = RequestMethod.POST)
-    public MessageResource getEmail(@RequestBody String token) {
-        String email =  unactivatedUserService.getEmail(token);
+    @RequestMapping(value = "/signup/token", method = RequestMethod.POST)
+    public MessageResource verifyToken(@RequestBody String token) {
+        String email = registrationService.getEmailToToken(token);
         return email != null ? MessageResource.successMessage(email) : MessageResource.errorMessage("Bad token!");
     }
 

@@ -24,4 +24,8 @@ public interface IUserService {
     Set<User> findByProcessRoles(Set<String> roleIds, boolean small);
 
     void assignAuthority(Long userId, Long authorityId);
+
+    void addDefaultRole(User user);
+
+    void addDefaultAuthorities(User user);
 }
