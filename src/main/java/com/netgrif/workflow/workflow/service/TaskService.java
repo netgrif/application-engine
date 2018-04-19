@@ -269,7 +269,7 @@ public class TaskService implements ITaskService {
         List<Field> dataSetFields = new ArrayList<>();
 
         fieldsIds.forEach(fieldId -> {
-            resolveActions(useCase.getPetriNet().getDataSet().get(fieldId),
+            resolveActions(useCase.getPetriNet().getField(fieldId).get(),
                     Action.ActionTrigger.GET, useCase, transition);
 
             if (useCase.hasFieldBehavior(fieldId, transition.getStringId())) {
@@ -332,7 +332,7 @@ public class TaskService implements ITaskService {
         values.fields().forEachRemaining(entry -> {
             useCase.getDataSet().get(entry.getKey()).setValue(parseFieldsValues(entry.getValue()));
             //changedFields.put(entry.getKey(), new ChangedField(entry.getKey()));
-            resolveActions(useCase.getPetriNet().getDataSet().get(entry.getKey()),
+            resolveActions(useCase.getPetriNet().getField(entry.getKey()).get(),
                     Action.ActionTrigger.SET, useCase, useCase.getPetriNet().getTransition(task.getTransitionId()))
                     .forEach((key, changedField) -> {
                         if (changedFields.containsKey(changedField.getId()))
@@ -382,7 +382,7 @@ public class TaskService implements ITaskService {
                 changedFields.put(changedField.getId(), changedField);
 
             if ((changedField.getAttributes().containsKey("value") && changedField.getAttributes().get("value") != null) && recursive)
-                processActions(useCase.getPetriNet().getDataSet().get(changedField.getId()), trigger,
+                processActions(useCase.getPetriNet().getField(changedField.getId()).get(), trigger,
                         useCase, transition, changedFields);
 
             //getTransitionsByField(field.getId(), useCase.getPetriNet()).forEach(transition ->
@@ -667,7 +667,7 @@ public class TaskService implements ITaskService {
                 .title(transition.getTitle())
                 .processId(useCase.getPetriNetId())
                 .caseId(useCase.get_id().toString())
-                .transitionId(transition.getObjectId().toString())
+                .transitionId(transition.getImportId())
                 .caseColor(useCase.getColor())
                 .caseTitle(useCase.getTitle())
                 .priority(transition.getPriority())

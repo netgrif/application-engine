@@ -353,7 +353,7 @@ public abstract class PetriNetService implements IPetriNetService {
     }
 
     private void initializeVariableArc(PetriNet net, VariableArc arc) {
-        Optional<Field> field = net.getDataSet().values().stream().filter(f -> f.getImportId() == (long) arc.getMultiplicity()).findFirst();
+        Optional<Field> field = net.getField(arc.getMultiplicity().toString());
         if (!field.isPresent())
             throw new IllegalArgumentException("Field with import id " + arc.getMultiplicity() + " not found.");
         arc.setFieldId(field.get().getStringId());

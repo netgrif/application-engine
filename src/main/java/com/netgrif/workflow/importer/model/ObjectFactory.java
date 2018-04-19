@@ -37,7 +37,6 @@ public class ObjectFactory {
     private final static QName _TransitionRef_QNAME = new QName("", "transitionRef");
     private final static QName _Perform_QNAME = new QName("", "perform");
     private final static QName _Delegate_QNAME = new QName("", "delegate");
-    private final static QName _Behavior_QNAME = new QName("", "behavior");
     private final static QName _Alignment_QNAME = new QName("", "alignment");
     private final static QName _Stretch_QNAME = new QName("", "stretch");
     private final static QName _X_QNAME = new QName("", "x");
@@ -227,12 +226,12 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link Long }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "", name = "id")
-    public JAXBElement<Long> createId(Long value) {
-        return new JAXBElement<Long>(_Id_QNAME, Long.class, null, value);
+    public JAXBElement<String> createId(String value) {
+        return new JAXBElement<String>(_Id_QNAME, String.class, null, value);
     }
 
     /**
@@ -317,12 +316,12 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link Long }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "", name = "transitionRef")
-    public JAXBElement<Long> createTransitionRef(Long value) {
-        return new JAXBElement<Long>(_TransitionRef_QNAME, Long.class, null, value);
+    public JAXBElement<String> createTransitionRef(String value) {
+        return new JAXBElement<String>(_TransitionRef_QNAME, String.class, null, value);
     }
 
     /**
@@ -341,15 +340,6 @@ public class ObjectFactory {
     @XmlElementDecl(namespace = "", name = "delegate")
     public JAXBElement<Boolean> createDelegate(Boolean value) {
         return new JAXBElement<Boolean>(_Delegate_QNAME, Boolean.class, null, value);
-    }
-
-    /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
-     * 
-     */
-    @XmlElementDecl(namespace = "", name = "behavior")
-    public JAXBElement<String> createBehavior(String value) {
-        return new JAXBElement<String>(_Behavior_QNAME, String.class, null, value);
     }
 
     /**
@@ -470,21 +460,21 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link Long }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "", name = "sourceId")
-    public JAXBElement<Long> createSourceId(Long value) {
-        return new JAXBElement<Long>(_SourceId_QNAME, Long.class, null, value);
+    public JAXBElement<String> createSourceId(String value) {
+        return new JAXBElement<String>(_SourceId_QNAME, String.class, null, value);
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link Long }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "", name = "destinationId")
-    public JAXBElement<Long> createDestinationId(Long value) {
-        return new JAXBElement<Long>(_DestinationId_QNAME, Long.class, null, value);
+    public JAXBElement<String> createDestinationId(String value) {
+        return new JAXBElement<String>(_DestinationId_QNAME, String.class, null, value);
     }
 
     /**

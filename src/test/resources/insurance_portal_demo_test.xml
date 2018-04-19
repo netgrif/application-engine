@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document>
+    <id>1</id>
     <defaultRole>false</defaultRole>
 
     <!-- ========== GLOBAL ================ -->
@@ -12614,16 +12615,6 @@
         <y>117</y>
         <label>Send mail</label>
         <trigger type="auto"></trigger>
-        <dataGroup>
-            <id>1</id>
-            <title></title>
-            <dataRef>
-                <id>410001</id>
-                <logic>
-                    <behavior>hidden</behavior>
-                </logic>
-            </dataRef>
-        </dataGroup>
     </transition>
     <!--=================================PLACES========================-->
     <place>

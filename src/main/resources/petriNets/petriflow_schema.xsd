@@ -245,8 +245,8 @@
     <xs:element name="isStatic" type="xs:boolean"/>
     <xs:element name="static" type="xs:boolean"/>
     <xs:element name="type" type="xs:string"/>
-    <xs:element name="sourceId" type="nonNegativeLong"/>
-    <xs:element name="destinationId" type="nonNegativeLong"/>
+    <xs:element name="sourceId" type="xs:string"/>
+    <xs:element name="destinationId" type="xs:string"/>
     <xs:element name="multiplicity" type="nonNegativeInteger"/>
     <xs:element name="breakPoint">
         <xs:complexType>
@@ -256,7 +256,7 @@
             </xs:sequence>
         </xs:complexType>
     </xs:element>
-    <xs:element name="id" type="nonNegativeLong"/>
+    <xs:element name="id" type="xs:string"/>
     <xs:element name="title" type="i18nStringType"/>
     <xs:element name="name" type="i18nStringType"/>
     <xs:element name="values" type="i18nStringType"/>
@@ -272,7 +272,7 @@
             </xs:sequence>
         </xs:complexType>
     </xs:element>
-    <xs:element name="transitionRef" type="nonNegativeLong"/>
+    <xs:element name="transitionRef" type="xs:string"/>
     <xs:element name="transactionRef">
         <xs:complexType>
             <xs:sequence>

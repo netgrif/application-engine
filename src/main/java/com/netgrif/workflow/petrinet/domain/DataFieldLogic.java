@@ -66,4 +66,9 @@ public class DataFieldLogic {
     public boolean isRequired() {
         return behavior.contains(FieldBehavior.REQUIRED);
     }
+
+    @Override
+    public String toString() {
+        return behavior.stream().map(FieldBehavior::toString).collect(Collectors.joining(", "));
+    }
 }
