@@ -1,5 +1,6 @@
 package com.netgrif.workflow.insurance.mvc
 
+import com.netgrif.workflow.auth.domain.UserState
 import com.netgrif.workflow.startup.ImportHelper
 import com.netgrif.workflow.WorkflowManagementSystemApplication
 import com.netgrif.workflow.auth.domain.Authority
@@ -106,7 +107,7 @@ class InsuranceTest {
         def org = importHelper.createGroup("Insurance Company")
         def auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])
         def processRoles = importHelper.createUserProcessRoles(["agent": "Agent", "company": "Company"], net.get())
-        importHelper.createUser(new User(name: "Test", surname: "Integration", email: USER_EMAIL, password: "password"),
+        importHelper.createUser(new User(name: "Test", surname: "Integration", email: USER_EMAIL, password: "password", state: UserState.ACTIVE),
                 [auths.get("user")] as Authority[],
                 [org] as Group[],
                 [processRoles.get("agent"), processRoles.get("company")] as UserProcessRole[])
