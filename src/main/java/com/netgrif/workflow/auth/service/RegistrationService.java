@@ -70,15 +70,16 @@ public class RegistrationService implements IRegistrationService {
         userService.addDefaultRole(user);
         userService.addDefaultAuthorities(user);
 
-        if (newUser.groups != null) {
+        if (newUser.groups != null && !newUser.groups.isEmpty()) {
             user.setGroups(groupService.findAllById(newUser.groups));
         }
-        if (newUser.processRoles != null) {
+        if (newUser.processRoles != null && !newUser.processRoles.isEmpty()) {
             user.setUserProcessRoles(new HashSet<>(userProcessRoleRepository.findByRoleIdIn(newUser.processRoles)));
         }
 
-        if (userRepository.removeByEmail(user.getEmail()) != null)
-            log.info("Removed duplicate invitation for user with email " + user.getEmail());
+        List<User> deleted = userRepository.removeByEmail(user.getEmail());
+        if (deleted != null && !deleted.isEmpty())
+            deleted.forEach(u -> log.info("Removed duplicate invitation for user with email " + u.getEmail()));
         return userRepository.save(user);
     }
 
