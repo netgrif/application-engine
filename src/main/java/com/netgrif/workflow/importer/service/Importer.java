@@ -1,12 +1,12 @@
 package com.netgrif.workflow.importer.service;
 
 import com.netgrif.workflow.importer.model.*;
-import com.netgrif.workflow.petrinet.domain.arcs.Arc;
 import com.netgrif.workflow.petrinet.domain.DataGroup;
 import com.netgrif.workflow.petrinet.domain.*;
 import com.netgrif.workflow.petrinet.domain.Place;
 import com.netgrif.workflow.petrinet.domain.Transaction;
 import com.netgrif.workflow.petrinet.domain.Transition;
+import com.netgrif.workflow.petrinet.domain.arcs.Arc;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.FieldBehavior;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action;
@@ -18,6 +18,7 @@ import com.netgrif.workflow.petrinet.domain.roles.ProcessRoleRepository;
 import com.netgrif.workflow.petrinet.service.ArcFactory;
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.workflow.workflow.domain.triggers.Trigger;
+import lombok.Getter;
 import org.apache.log4j.Logger;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,11 +50,12 @@ public class Importer {
     private Document document;
     private PetriNet net;
     private ProcessRole defaultRole;
-    private Map<Long, ProcessRole> roles;
-    private Map<Long, Field> fields;
-    private Map<Long, Transition> transitions;
-    private Map<Long, Place> places;
-    private Map<Long, Transaction> transactions;
+    @Getter
+    private Map<String, ProcessRole> roles;
+    private Map<String, Field> fields;
+    private Map<String, Transition> transitions;
+    private Map<String, Place> places;
+    private Map<String, Transaction> transactions;
     private Map<String, I18nString> i18n;
 
     private Map<String, Object> config;
@@ -276,6 +278,7 @@ public class Importer {
     protected void addDataGroup(Transition transition, com.netgrif.workflow.importer.model.DataGroup importDataGroup) {
         String alignment = importDataGroup.getAlignment() != null ? importDataGroup.getAlignment().value() : "";
         DataGroup dataGroup = new DataGroup();
+        dataGroup.setImportId(importDataGroup.getId());
         dataGroup.setTitle(toI18NString(importDataGroup.getTitle()));
         dataGroup.setAlignment(alignment);
         dataGroup.setStretch(importDataGroup.isStretch());
@@ -357,7 +360,7 @@ public class Importer {
                 int delimeter = coma < semicolon && coma != -1 ? coma : semicolon;
 
                 String id = action.substring(start + 2, delimeter);
-                String objectId = id.equalsIgnoreCase("this") ? currentId : getObjectId(processedObject, Long.parseLong(id));
+                String objectId = id.equalsIgnoreCase("this") ? currentId : getObjectId(processedObject, id);
 
                 action = action.replace(processedObject + "." + id, processedObject + "." + objectId);
 
@@ -371,10 +374,10 @@ public class Importer {
         return action;
     }
 
-    private String getObjectId(String processedObject, Long xmlId) {
+    private String getObjectId(String processedObject, String xmlId) {
         try {
-            if (processedObject.equalsIgnoreCase(FIELD_KEYWORD)) return fields.get(xmlId).getStringId();
-            if (processedObject.equalsIgnoreCase(TRANSITION_KEYWORD)) return transitions.get(xmlId).getStringId();
+            if (processedObject.equalsIgnoreCase(FIELD_KEYWORD)) return fields.get(xmlId).getImportId();
+            if (processedObject.equalsIgnoreCase(TRANSITION_KEYWORD)) return transitions.get(xmlId).getImportId();
         } catch (Exception e) {
             throw new IllegalArgumentException("Object " + processedObject + "." + xmlId + " does not exists");
         }
@@ -407,6 +410,7 @@ public class Importer {
     @Transactional
     protected void createRole(Role importRole) {
         ProcessRole role = new ProcessRole();
+        role.setImportId(importRole.getId());
         if (importRole.getName() == null)
             role.setName(toI18NString(importRole.getTitle()));
         else
@@ -424,13 +428,14 @@ public class Importer {
     protected void createTransaction(com.netgrif.workflow.importer.model.Transaction importTransaction) {
         Transaction transaction = new Transaction();
         transaction.setTitle(toI18NString(importTransaction.getTitle()));
+        transaction.setImportId(importTransaction.getId());
 
         net.addTransaction(transaction);
         transactions.put(importTransaction.getId(), transaction);
     }
 
     @Transactional
-    protected Node getNode(Long id) {
+    protected Node getNode(String id) {
         // TODO: 18/02/2017 maybe throw exception if transitions doesn't contain id
         if (places.containsKey(id))
             return places.get(id);
@@ -465,10 +470,6 @@ public class Importer {
         if (!net.isPresent())
             throw new IllegalArgumentException();
         return net.get();
-    }
-
-    public Map<Long, ProcessRole> getRoles() {
-        return roles;
     }
 
     private AssignPolicy toAssignPolicy(AssignPolicyType type) {

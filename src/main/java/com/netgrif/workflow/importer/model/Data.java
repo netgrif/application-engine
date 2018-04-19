@@ -27,7 +27,7 @@ import java.util.List;
  *         &lt;element ref="{}action" maxOccurs="unbounded" minOccurs="0"/&gt;
  *         &lt;element ref="{}documentRef" minOccurs="0"/&gt;
  *       &lt;/sequence&gt;
- *       &lt;attribute name="type" type="{}data_type" /&gt;
+ *       &lt;attribute name="type" use="required" type="{}data_type" /&gt;
  *       &lt;attribute name="immediate" type="{http://www.w3.org/2001/XMLSchema}boolean" /&gt;
  *     &lt;/restriction&gt;
  *   &lt;/complexContent&gt;
@@ -52,7 +52,8 @@ import java.util.List;
 @XmlRootElement(name = "data")
 public class Data {
 
-    protected long id;
+    @XmlElement(required = true)
+    protected String id;
     @XmlElement(required = true)
     protected I18NStringType title;
     protected I18NStringType placeholder;
@@ -63,7 +64,7 @@ public class Data {
     protected EncryptionType encryption;
     protected List<ActionType> action;
     protected DocumentRef documentRef;
-    @XmlAttribute(name = "type")
+    @XmlAttribute(name = "type", required = true)
     protected DataType type;
     @XmlAttribute(name = "immediate")
     protected Boolean immediate;
@@ -71,16 +72,24 @@ public class Data {
     /**
      * Gets the value of the id property.
      * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
      */
-    public long getId() {
+    public String getId() {
         return id;
     }
 
     /**
      * Sets the value of the id property.
      * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
      */
-    public void setId(long value) {
+    public void setId(String value) {
         this.id = value;
     }
 
