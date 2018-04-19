@@ -17,11 +17,11 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.LongStream;
 
 @SpringBootTest
 @ActiveProfiles({"test"})
@@ -114,7 +114,7 @@ public class ImporterTest {
         assert imported.isPresent();
 
         PetriNet net = imported.get();
-        long[] noDataTransitions = {2, 3, 4, 36, 49};
+        String[] noDataTransitions = {"2", "3", "4", "36", "49"};
 
         assert net.getPlaces().size() == 11;
         assert net.getTransitions().size() == 11;
@@ -126,7 +126,7 @@ public class ImporterTest {
 
         net.getTransitions().values().forEach(transition -> {
             assert !transition.getRoles().isEmpty();
-            if (LongStream.of(noDataTransitions).anyMatch(x -> x == transition.getImportId())) {
+            if (Arrays.stream(noDataTransitions).anyMatch(x -> x.equals(transition.getImportId()))) {
                 assert transition.getDataSet().isEmpty();
             } else {
                 assert !transition.getDataSet().isEmpty();
