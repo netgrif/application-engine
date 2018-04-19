@@ -201,7 +201,7 @@
             <!--@formatter:on-->
         </action>
     </data>
-    <data type="multichoice">
+    <data type="enumeration">
         <id>101005</id>
         <title>Koľko rokov žijete v poisťovanej nehnuteľnosti?</title>
         <placeholder>Počet rokov</placeholder>
