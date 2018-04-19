@@ -112,7 +112,7 @@ public class UserService implements IUserService {
     @Override
     public Set<User> findAllCoMembers(String email, boolean small) {
         Set<Long> members = memberService.findAllCoMembersIds(email);
-        Set<User> users = new HashSet<>(userRepository.findAll(members));
+        Set<User> users = userRepository.findAll(members).parallelStream().filter(u -> u.getState() == UserState.ACTIVE).collect(Collectors.toSet());
         if (!small) users.forEach(this::loadProcessRoles);
         return users;
     }

@@ -13,6 +13,7 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigInteger;
 import java.security.SecureRandom;
@@ -39,8 +40,9 @@ public class RegistrationService implements IRegistrationService {
     private IGroupService groupService;
 
     @Override
+    @Transactional
     @Scheduled(cron = "0 0 1 * * *")
-    public void removeExpiredUser() {
+    public void removeExpiredUsers() {
         log.info("Removing expired unactivated invited users");
         List<User> expired = userRepository.removeAllByStateAndExpirationDateBefore(UserState.INVITED, LocalDateTime.now());
         log.info("Removed " + expired.size() + " unactivated users");
@@ -59,6 +61,7 @@ public class RegistrationService implements IRegistrationService {
     }
 
     @Override
+    @Transactional
     public User createNewUser(NewUserRequest newUser) {
         User user = new User(newUser.email, null, User.UNKNOWN, User.UNKNOWN);
         user.setToken(new BigInteger(260, new SecureRandom()).toString(32));
@@ -82,7 +85,7 @@ public class RegistrationService implements IRegistrationService {
     @Override
     public User registerUser(RegistrationRequest registrationRequest) {
         User user = userRepository.findByEmail(registrationRequest.email);
-        if (user != null)
+        if (user == null)
             return null;
 
         user.setName(registrationRequest.name);

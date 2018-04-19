@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 @Service
 public interface IRegistrationService {
 
-    void removeExpiredUser();
+    void removeExpiredUsers();
 
     boolean verifyToken(String email, String token);
 

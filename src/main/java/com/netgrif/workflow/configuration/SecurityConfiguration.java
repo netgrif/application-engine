@@ -4,6 +4,7 @@ import org.apache.commons.lang.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -18,6 +19,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
 import java.security.Principal;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Stream;
 
 @Configuration
@@ -32,11 +36,14 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             "/bower_components/**", "/scripts/**", "/assets/**", "/styles/**", "/views/**", "/**/favicon.ico", "/favicon.ico", "/configuration/**", "/swagger-resources/**", "/swagger-ui.html", "/webjars/**"
     };
     private final String[] PERMIT_ALL_SERVER_PATTERNS = {
-            "/index.html", "/", "/login", "/signup/{token}", "/signup", "/signup/token", "/v2/api-docs", "/swagger-ui.html"
+            "/index.html", "/", "/login", "/api/auth/signup/{token}", "/api/auth/signup", "/api/auth/signup/verify", "/v2/api-docs", "/swagger-ui.html"
     };
 
     @Autowired
     private Environment env;
+
+    @Value("${server.auth.open-registration}")
+    private boolean openRegistration;
 
     @RequestMapping(value = "{path:[^res][^\\.]*$}")
     public String redirect(HttpServletRequest request) {
@@ -65,9 +72,12 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     }
 
     private String[] getPatterns() {
-        String[] patterns = (String[]) ArrayUtils.addAll(PERMIT_ALL_STATIC_PATTERNS, PERMIT_ALL_SERVER_PATTERNS);
+        List<String> patterns = new ArrayList<>(Arrays.asList(PERMIT_ALL_STATIC_PATTERNS));
+        patterns.addAll(Arrays.asList(PERMIT_ALL_SERVER_PATTERNS));
+        if(openRegistration)
+            patterns.add("/api/auth/invite");
         if (Stream.of(env.getActiveProfiles()).anyMatch(it -> it.equals("dev")))
-            patterns = (String[]) ArrayUtils.add(patterns, "/dev/**");
-        return patterns;
+            patterns.add("/dev/**");
+        return patterns.toArray(new String[0]);
     }
 }
