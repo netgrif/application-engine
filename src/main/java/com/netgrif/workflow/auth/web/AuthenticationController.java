@@ -13,6 +13,7 @@ import freemarker.template.TemplateException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -43,11 +44,14 @@ public class AuthenticationController {
     @Autowired
     private IMailService mailService;
 
-    @RequestMapping(value = "/signup/{token}", method = RequestMethod.GET)
-    public ModelAndView registrationForward() throws IOException {
-        log.info("Forwarding to / from /signup");
-        return new ModelAndView("forward:/");
-    }
+    @Value("${server.auth.open-registration}")
+    private boolean openRegistration;
+
+//    @RequestMapping(value = "/signup/{token}", method = RequestMethod.GET)
+//    public ModelAndView registrationForward() throws IOException {
+//        log.info("Forwarding to / from /signup");
+//        return new ModelAndView("forward:/");
+//    }
 
     @RequestMapping(value = "/signup", method = RequestMethod.POST)
     public MessageResource signup(@RequestBody RegistrationRequest regRequest) {
@@ -62,10 +66,13 @@ public class AuthenticationController {
         return MessageResource.successMessage("Registration complete");
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
     @RequestMapping(value = "/invite", method = RequestMethod.POST)
-    public MessageResource invite(@RequestBody NewUserRequest newUserRequest) {
+    public MessageResource invite(@RequestBody NewUserRequest newUserRequest, Authentication auth) {
         try {
+            if(!openRegistration && (auth == null || !((LoggedUser)auth.getPrincipal()).isAdmin())){
+                return MessageResource.errorMessage("Only admin can invite new users!");
+            }
+
             newUserRequest.email = URLDecoder.decode(newUserRequest.email, StandardCharsets.UTF_8.name());
             User user = registrationService.createNewUser(newUserRequest);
             mailService.sendRegistrationEmail(user.getEmail(), user.getToken());
@@ -77,7 +84,7 @@ public class AuthenticationController {
         }
     }
 
-    @RequestMapping(value = "/signup/verify", method = RequestMethod.POST)
+    @RequestMapping(value = "/token/verify", method = RequestMethod.POST)
     public MessageResource verifyToken(@RequestBody String token) {
         String email = registrationService.getEmailToToken(token);
         return email != null ? MessageResource.successMessage(email) : MessageResource.errorMessage("Invalid token!");
