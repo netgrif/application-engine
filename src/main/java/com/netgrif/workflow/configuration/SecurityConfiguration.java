@@ -1,6 +1,5 @@
 package com.netgrif.workflow.configuration;
 
-import org.apache.commons.lang.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,11 +13,10 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
-import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -36,7 +34,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             "/bower_components/**", "/scripts/**", "/assets/**", "/styles/**", "/views/**", "/**/favicon.ico", "/favicon.ico", "/configuration/**", "/swagger-resources/**", "/swagger-ui.html", "/webjars/**"
     };
     private final String[] PERMIT_ALL_SERVER_PATTERNS = {
-            "/index.html", "/", "/login", "/api/auth/signup/{token}", "/api/auth/signup", "/api/auth/signup/verify", "/v2/api-docs", "/swagger-ui.html"
+            "/index.html", "/", "/login", "/signup/**", "/api/auth/signup", "/api/auth/token/verify", "/v2/api-docs", "/swagger-ui.html"
     };
 
     @Autowired
@@ -45,9 +43,15 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Value("${server.auth.open-registration}")
     private boolean openRegistration;
 
-    @RequestMapping(value = "{path:[^res][^\\.]*$}")
+    @RequestMapping(value = "{path:^(?!\\/api\\S*)\\S*(?!\\.\\S*)\\S*$}")
     public String redirect(HttpServletRequest request) {
         log.info("Forwarding to root for request URI [" + request.getRequestURI() + "]");
+        return "forward:/";
+    }
+
+    @RequestMapping(value = "/signup/{token}")
+    public String redirectWithToken(@PathVariable("token") String token, HttpServletRequest request) {
+        log.info("Forwarding to root for URI [ " + request.getRequestURI() + " ] with token " + token);
         return "forward:/";
     }
 
@@ -55,7 +59,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
 //        @formatter:off
         http
-            .httpBasic().and()
+            .httpBasic()
+            .and()
             .authorizeRequests()
                 .antMatchers(getPatterns()).permitAll()
                 .anyRequest().authenticated()
@@ -63,18 +68,21 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             .formLogin()
                 .loginPage("/login")
             .and()
+            .logout()
+                .logoutUrl("/api/auth/logout")
+            .and()
             .csrf()//.disable();
                 .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
             .and()
-                .headers()
-                    .frameOptions().sameOrigin();
+            .headers()
+                .frameOptions().sameOrigin();
 //        @formatter:on
     }
 
     private String[] getPatterns() {
         List<String> patterns = new ArrayList<>(Arrays.asList(PERMIT_ALL_STATIC_PATTERNS));
         patterns.addAll(Arrays.asList(PERMIT_ALL_SERVER_PATTERNS));
-        if(openRegistration)
+        if (openRegistration)
             patterns.add("/api/auth/invite");
         if (Stream.of(env.getActiveProfiles()).anyMatch(it -> it.equals("dev")))
             patterns.add("/dev/**");

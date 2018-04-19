@@ -18,6 +18,8 @@ public class UserResource extends Resource<LocalisedUser> {
 
     public UserResource(User content, String selfRel, Locale locale, boolean small) {
         this(content, selfRel, locale);
+        getContent().setPassword(null);
+        getContent().setUserProcessRoles(null);
         if (small) {
             getContent().setTelNumber(null);
             getContent().setGroups(null);
