@@ -25,5 +25,5 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     List<User> removeAllByStateAndExpirationDateBefore(UserState state, LocalDateTime dateTime);
 
-    User removeByEmail(String email);
+    List<User> removeByEmail(String email);
 }
