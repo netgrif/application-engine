@@ -30,7 +30,7 @@ public class ProcessRole extends Imported {
     }
 
     public String getStringId() {
-        return importId;
+        return _id.toString();
     }
 
     public void setName(String name) {
