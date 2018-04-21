@@ -35,6 +35,10 @@ public class ProcessRole {
         this._id = _id;
     }
 
+    public void set_id(String id){
+        this._id = new ObjectId(id);
+    }
+
     public I18nString getName() {
         return name;
     }

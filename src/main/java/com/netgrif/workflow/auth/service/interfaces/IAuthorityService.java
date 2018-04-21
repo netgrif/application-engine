@@ -9,4 +9,12 @@ public interface IAuthorityService {
     List<Authority> findAll();
 
     Authority getOrCreate(String name);
+
+    Authority getOrCreatePermission(String name);
+
+    Authority getOrCreateRole(String name);
+
+    List<Authority> getAllPermissions();
+
+    List<Authority> getAllRoles();
 }
