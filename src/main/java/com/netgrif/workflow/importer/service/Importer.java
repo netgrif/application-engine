@@ -224,7 +224,7 @@ public class Importer {
         transition.setPriority(importTransition.getPriority());
         transition.setIcon(importTransition.getIcon());
         transition.setAssignPolicy(toAssignPolicy(importTransition.getAssignPolicy()));
-        transition.setDataFocusPolicy(toAssignPolicy(importTransition.getDataFocusPolicy()));
+        transition.setDataFocusPolicy(toDataFocusPolicy(importTransition.getDataFocusPolicy()));
         transition.setFinishPolicy(toFinishPolicy(importTransition.getFinishPolicy()));
 
         if (importTransition.getRoleRef() != null) {
@@ -336,63 +336,73 @@ public class Importer {
                 .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
-    private Action parseAction(String fieldId, String transitionId, ActionType action) {
-        if (action.getTrigger() == null)
-            throw new IllegalArgumentException("Action [" + action.getValue() + "] doesn't have trigger");
-
+    private Action parseAction(String fieldId, String transitionId, ActionType importedAction) {
+        if (importedAction.getTrigger() == null)
+            throw new IllegalArgumentException("Action [" + importedAction.getValue() + "] doesn't have trigger");
         try {
-            return parseIds(fieldId, transitionId, action);
+            Action action = new Action(importedAction.getTrigger());
+            parseIds(fieldId, transitionId, importedAction, action);
+            wrapCode(action);
+            return action;
         } catch (NumberFormatException e) {
-            throw new IllegalArgumentException("Error parsing ids of action [" + action.getValue() + "]", e);
+            throw new IllegalArgumentException("Error parsing ids of action [" + importedAction.getValue() + "]", e);
         }
     }
 
-    private Action parseIds(String fieldId, String transitionId, ActionType action) {
-        String definition = action.getValue();
-        definition = parseObjectIds(definition, fieldId, transitionId);
-        return new Action(definition, action.getTrigger());
+    private void wrapCode(Action action) {
+        String code = action.ge
+    }
+
+    private Action parseIds(String fieldId, String transitionId, ActionType importedAction, Action action) {
+        String definition = importedAction.getValue();
+        String[] actionParts = definition.split(";", 2);
+        if (actionParts.length != 2)
+            throw new IllegalArgumentException("Failed to parse action: " + importedAction);
+        Action action = new Action(actionParts[1], importedAction.getTrigger());
+        parseObjectIds(action, fieldId, transitionId, actionParts[0]);
+        return action;
     }
 
     @Transactional
-    protected String parseObjectIds(String action, String fieldId, String transitionId) {
-        String[] actionParts = action.split(";", 2);
-        if (actionParts.length != 2)
-            throw new IllegalArgumentException("Failed to parse action: " + action);
-
+    protected void parseObjectIds(Action action, String fieldId, String transitionId, String definition) {
         try {
-            Map<String, String> ids = parseParams(actionParts[0]);
-            String definition = ids.entrySet().parallelStream()
-                    .map(entry -> replaceImportId(fieldId, transitionId, entry))
-                    .collect(Collectors.joining(","));
-            return definition + ";" + definition;
+            Map<String, String> ids = parseParams(definition);
+
+            ids.entrySet()
+                    .parallelStream()
+                    .forEach(entry -> replaceImportId(action, fieldId, transitionId, entry));
         } catch (NullPointerException e) {
             throw new IllegalArgumentException("Failed to parse action: " + action, e);
         }
     }
 
-    private String replaceImportId(String fieldId, String transitionId, Map.Entry<String, String> entry) {
+    private void replaceImportId(Action action, String fieldId, String transitionId, Map.Entry<String, String> entry) {
         String[] parts = entry.getValue().split("[.]");
         if (parts.length != 2)
             throw new IllegalArgumentException("Can not parse id of " + entry.getValue());
-        String importId = parts[1];
         String key = parts[0];
+        String importId = parts[1];
+        String paramName = entry.getKey().trim();
 
-        String objectId = findObjectId(fieldId, transitionId, importId, key);
-        return entry.getKey() + ": " + parts[0] + "." + objectId;
-    }
-
-    private String findObjectId(String fieldId, String transitionId, String importId, String key) {
         if (importId.startsWith("this")) {
-            if (Objects.equals(key.trim(), FIELD_KEYWORD))
-                return fieldId;
-            if (Objects.equals(key.trim(), TRANSITION_KEYWORD))
-                return transitionId;
+            if (Objects.equals(key.trim(), FIELD_KEYWORD)) {
+                action.addFieldId(paramName, fieldId);
+                return;
+            }
+            if (Objects.equals(key.trim(), TRANSITION_KEYWORD)) {
+                action.addTransitionId(paramName, transitionId);
+                return;
+            }
         }
         Long id = Long.parseLong(importId);
-        if (Objects.equals(key.trim(), FIELD_KEYWORD))
-            return getFieldId(id);
-        if (Objects.equals(key.trim(), TRANSITION_KEYWORD))
-            return getTransitionId(id);
+        if (Objects.equals(key.trim(), FIELD_KEYWORD)) {
+            action.addFieldId(paramName, getFieldId(id));
+            return;
+        }
+        if (Objects.equals(key.trim(), TRANSITION_KEYWORD)) {
+            action.addTransitionId(paramName, getTransitionId(id));
+            return;
+        }
         throw new IllegalArgumentException("Object " + key + "." + importId + " not supported");
     }
 
@@ -517,7 +527,7 @@ public class Importer {
         return AssignPolicy.valueOf(type.value().toUpperCase());
     }
 
-    private DataFocusPolicy toAssignPolicy(DataFocusPolicyType type) {
+    private DataFocusPolicy toDataFocusPolicy(DataFocusPolicyType type) {
         if (type == null || type.value() == null)
             return DataFocusPolicy.MANUAL;
 
