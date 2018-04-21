@@ -28,4 +28,6 @@ public interface IUserService {
     void addDefaultRole(User user);
 
     void addDefaultAuthorities(User user);
+
+    void encodeUserPassword(User user);
 }

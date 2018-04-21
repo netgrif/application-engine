@@ -34,7 +34,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             "/bower_components/**", "/scripts/**", "/assets/**", "/styles/**", "/views/**", "/**/favicon.ico", "/favicon.ico", "/configuration/**", "/swagger-resources/**", "/swagger-ui.html", "/webjars/**"
     };
     private final String[] PERMIT_ALL_SERVER_PATTERNS = {
-            "/index.html", "/", "/login", "/signup/**", "/api/auth/signup", "/api/auth/token/verify", "/v2/api-docs", "/swagger-ui.html"
+            "/index.html", "/", "/login", "/signup/**", "/api/auth/signup", "/api/auth/token/verify", "/api/auth/reset", "/api/auth/recover", "/v2/api-docs", "/swagger-ui.html"
     };
 
     @Autowired
@@ -49,7 +49,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         return "forward:/";
     }
 
-    @RequestMapping(value = "/signup/{token}")
+    @RequestMapping(value = {"/signup/{token}", "/recover/{token}"})
     public String redirectWithToken(@PathVariable("token") String token, HttpServletRequest request) {
         log.info("Forwarding to root for URI [ " + request.getRequestURI() + " ] with token " + token);
         return "forward:/";
