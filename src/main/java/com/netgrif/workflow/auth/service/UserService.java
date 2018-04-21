@@ -62,7 +62,8 @@ public class UserService implements IUserService {
         return savedUser;
     }
 
-    private void encodeUserPassword(User user) {
+    @Override
+    public void encodeUserPassword(User user) {
         String pass = user.getPassword();
         if (pass == null)
             throw new IllegalArgumentException("User has no password");
@@ -95,6 +96,7 @@ public class UserService implements IUserService {
         return user;
     }
 
+    @Override
     public User findByEmail(String email, boolean small){
         User user = userRepository.findByEmail(email);
         if(!small)
