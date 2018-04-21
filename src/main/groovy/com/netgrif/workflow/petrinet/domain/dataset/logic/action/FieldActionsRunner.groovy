@@ -30,6 +30,7 @@ class FieldActionsRunner {
     private FieldFactory fieldFactory
 
     private Map<String, Object> actionsCache = new HashMap<>()
+    private Map<String, Closure> actions = new HashMap<>()
 
     FieldActionsRunner() {
         actionsCache = new HashMap<>()
@@ -44,7 +45,13 @@ class FieldActionsRunner {
         def shell = new GroovyShell(binding)
 
         log.debug("Action: $script")
-        def code = (Closure) shell.evaluate("{->${getExpression(script)}}")
+        def code
+        if (actions.containsKey(script)) {
+            code = actions.get(script)
+        } else {
+            code = (Closure) shell.evaluate("{->${getExpression(script)}}")
+            actions.put(script, code)
+        }
         code.delegate = new ActionDelegate(useCase, this)
         try {
             code()
