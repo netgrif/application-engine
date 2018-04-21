@@ -90,7 +90,7 @@ class AuthenticationControllerTest {
     void inviteTest() {
         controller.invite(new NewUserRequest(email: EMAIL, groups: [group.id], processRoles: processRoles.values().collect {
             it.roleId
-        }))
+        }), null)
 
         MimeMessage[] messages = smtpServer.getReceivedMessages()
         assertMessageReceived(messages)
@@ -98,7 +98,7 @@ class AuthenticationControllerTest {
         String content = getTextFromMimeMultipart(messages[0].content as MimeMultipart)
         String token = content.substring(content.indexOf("/signup/") + "/signup/".length(), content.indexOf(" This is regis"))
 
-        controller.registration(new RegistrationRequest(token: token, email: EMAIL, name: NAME, surname: SURNAME, password: PASSWORD))
+        controller.signup(new RegistrationRequest(token: token, email: EMAIL, name: NAME, surname: SURNAME, password: PASSWORD))
 
         User user = userRepository.findByEmail(EMAIL)
         Member member = memberRepository.findByEmail(EMAIL)
