@@ -1,3 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="xs3p.xsl"?>
 <xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified"
            xmlns:xs="http://www.w3.org/2001/XMLSchema"
            version="1.1.0">
@@ -234,7 +236,7 @@
     <xs:simpleType name="dataFocusPolicyType">
         <xs:restriction base="xs:string">
             <xs:enumeration value="manual"/>
-            <xs:enumeration value="autoEmptyRequired"/>
+            <xs:enumeration value="auto_empty_required"/>
         </xs:restriction>
     </xs:simpleType>
     <!-- ===== INNER ELEMENTS ===== -->
