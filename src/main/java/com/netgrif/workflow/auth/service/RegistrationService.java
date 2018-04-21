@@ -105,7 +105,10 @@ public class RegistrationService implements IRegistrationService {
         if (deleted != null && !deleted.isEmpty())
             log.info("Removed " + deleted.size() + " duplicate invitation for user with email " + user.getEmail());
 
-        return userRepository.save(user);
+        User saved = userRepository.save(user);
+        saved.setGroups(user.getGroups());
+        userService.upsertGroupMember(saved);
+        return saved;
     }
 
     @Override

@@ -1,6 +1,7 @@
 package com.netgrif.workflow.auth.service.interfaces;
 
 import com.netgrif.workflow.auth.domain.User;
+import com.netgrif.workflow.orgstructure.domain.Member;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -12,6 +13,8 @@ public interface IUserService {
     User save(User user);
 
     User saveNew(User user);
+
+    Member upsertGroupMember(User user);
 
     User findById(Long id, boolean small);
 
