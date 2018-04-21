@@ -35,7 +35,7 @@ public class UserResource extends Resource<LocalisedUser> {
         add(selfRel.equalsIgnoreCase("profile") ? getLink.withSelfRel() : getLink.withRel("profile"));
 
         ControllerLinkBuilder roleLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(UserController.class)
-                .assignRolesToUser(getContent().getId(), null));
+                .assignRolesToUser(getContent().getId(), null, null));
         add(selfRel.equalsIgnoreCase("assignProcessRole") ? roleLink.withSelfRel() : roleLink.withRel("assignProcessRole"));
 
         ControllerLinkBuilder authorityLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(UserController.class)

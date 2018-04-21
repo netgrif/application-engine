@@ -71,7 +71,7 @@ public final class FieldFactory {
         if (data.getValid() != null && field instanceof ValidableField)
             ((ValidableField) field).setValidationRules(data.getValid());
         if (data.getInit() != null && field instanceof FieldWithDefault)
-            ((FieldWithDefault) field).setDefaultValue(data.getInit());
+            setFieldDefaultValue((FieldWithDefault) field,data.getInit());
         setActions(field, data);
         setEncryption(field, data);
 
@@ -146,6 +146,22 @@ public final class FieldFactory {
         }
     }
 
+    private void setFieldDefaultValue(FieldWithDefault field, String defaultValue) {
+        switch (field.getType()) {
+            case DATE:
+                field.setDefaultValue(parseDate(defaultValue));
+                break;
+            case BOOLEAN:
+                field.setDefaultValue(Boolean.valueOf(defaultValue));
+                break;
+            case NUMBER:
+                field.setDefaultValue(Double.parseDouble(defaultValue));
+                break;
+            default:
+                field.setDefaultValue(defaultValue);
+        }
+    }
+
     public Field buildFieldWithoutValidation(Case useCase, String fieldId) {
         return buildField(useCase, fieldId, false);
     }
@@ -172,6 +188,7 @@ public final class FieldFactory {
         switch (field.getType()) {
             case DATE:
                 parseDateValue((DateField) field, fieldId, useCase);
+                parseDateDefaultValue((DateField) field);
                 break;
             case NUMBER:
                 parseNumberValue((NumberField) field, useCase, fieldId);
@@ -207,7 +224,7 @@ public final class FieldFactory {
         if (value instanceof String) {
             field.setValue(Double.parseDouble((String) value));
         } else if (value instanceof Integer) {
-            field.setValue(((Integer)value)*1D);
+            field.setValue(((Integer) value) * 1D);
         } else if (value instanceof Double) {
             field.setValue((Double) value);
         }
@@ -215,12 +232,23 @@ public final class FieldFactory {
 
     private void parseDateValue(DateField field, String fieldId, Case useCase) {
         Object value = useCase.getFieldValue(fieldId);
+        field.setValue(parseDate(value));
+    }
+
+    private void parseDateDefaultValue(DateField field) {
+        Object value = field.getDefaultValue();
+        field.setDefaultValue(parseDate(value));
+    }
+
+    private LocalDate parseDate(Object value) {
         if (value instanceof Date) {
-            LocalDate date = ((Date) value).toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-            field.setValue(date);
-        } else {
-            field.setValue((LocalDate) value);
+            return ((Date) value).toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        } else if (value instanceof String) {
+            return LocalDate.parse((String) value);
+        } else if (value instanceof LocalDate) {
+            return (LocalDate) value;
         }
+        return null;
     }
 
     private void parseDateTimeValue(DateTimeField field, String fieldId, Case useCase) {

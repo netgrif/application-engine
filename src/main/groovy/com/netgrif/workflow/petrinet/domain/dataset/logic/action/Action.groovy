@@ -1,9 +1,14 @@
 package com.netgrif.workflow.petrinet.domain.dataset.logic.action
 
+import org.bson.types.ObjectId
+
 
 class Action {
 
+    private ObjectId id = new ObjectId()
+
     private String definition
+
     private ActionTrigger trigger
 
     static Action buildAction(String action, String trigger){
@@ -25,6 +30,10 @@ class Action {
     }
 
     Action() {
+    }
+
+    ObjectId getId() {
+        return id
     }
 
     String getDefinition() {
