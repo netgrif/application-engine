@@ -1,8 +1,6 @@
 package com.netgrif.workflow.importer;
 
-import com.netgrif.workflow.auth.domain.Authority;
-import com.netgrif.workflow.auth.domain.LoggedUser;
-import com.netgrif.workflow.auth.service.interfaces.IAuthorityService;
+import com.netgrif.workflow.MockService;
 import com.netgrif.workflow.importer.service.Importer;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
@@ -19,7 +17,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.File;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
@@ -41,7 +38,7 @@ public class ImporterTest {
     private IWorkflowService workflowService;
 
     @Autowired
-    private IAuthorityService authorityService;
+    private MockService mock;
 
     private static final String NET_TITLE = "jaxb_test";
     private static final String NET_INITIALS = "TST";
@@ -69,7 +66,7 @@ public class ImporterTest {
 
         assert net.isPresent();
 
-        Case useCase = workflowService.createCase(net.get().getStringId(), net.get().getTitle().getDefaultValue(), "color", mockLoggedUser());
+        Case useCase = workflowService.createCase(net.get().getStringId(), net.get().getTitle().getDefaultValue(), "color", mock.mockLoggedUser());
 
         assert useCase != null;
     }
@@ -88,7 +85,7 @@ public class ImporterTest {
         Optional<PetriNet> net = importer.importPetriNet(new File("src/test/resources/caseref_test.xml"), "Caseref test", "CRT", new HashMap<>());
         assert net.isPresent();
 
-        Case useCase = workflowService.createCase(net.get().getStringId(), net.get().getTitle().getDefaultValue(), "color", mockLoggedUser());
+        Case useCase = workflowService.createCase(net.get().getStringId(), net.get().getTitle().getDefaultValue(), "color", mock.mockLoggedUser());
         assert useCase != null;
 
         List<Field> data = workflowService.getData(useCase.getStringId());
@@ -117,7 +114,7 @@ public class ImporterTest {
         assert imported.isPresent();
 
         PetriNet net = imported.get();
-        long[] noDataTransitions = {2,3,4,36,49};
+        long[] noDataTransitions = {2, 3, 4, 36, 49};
 
         assert net.getPlaces().size() == 11;
         assert net.getTransitions().size() == 11;
@@ -129,7 +126,7 @@ public class ImporterTest {
 
         net.getTransitions().values().forEach(transition -> {
             assert !transition.getRoles().isEmpty();
-            if (LongStream.of(noDataTransitions).anyMatch(x-> x == transition.getImportId())) {
+            if (LongStream.of(noDataTransitions).anyMatch(x -> x == transition.getImportId())) {
                 assert transition.getDataSet().isEmpty();
             } else {
                 assert !transition.getDataSet().isEmpty();
@@ -147,10 +144,5 @@ public class ImporterTest {
         assert net.getArcs().size() == NET_ARCS;
         assert net.getDataSet().size() == NET_FIELDS;
         assert net.getRoles().size() == NET_ROLES;
-    }
-
-    public LoggedUser mockLoggedUser(){
-        Authority authorityUser = authorityService.getOrCreate(Authority.user);
-        return new LoggedUser(1L, "super@netgrif.com","password", Collections.singleton(authorityUser));
     }
 }
