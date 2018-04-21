@@ -3,6 +3,7 @@ package com.netgrif.workflow.workflow.service;
 import com.netgrif.workflow.auth.domain.Authority;
 import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.auth.domain.User;
+import com.netgrif.workflow.auth.domain.UserState;
 import com.netgrif.workflow.auth.domain.repositories.UserRepository;
 import com.netgrif.workflow.auth.service.interfaces.IAuthorityService;
 import com.netgrif.workflow.importer.service.Importer;
@@ -92,6 +93,7 @@ public class TaskServiceTest {
         user.setPassword("password");
         user.setSurname("surname");
         user.setEmail("email@email.com");
+        user.setState(UserState.ACTIVE);
         user = userRepository.save(user);
 
         assert useCase.getResetArcTokens().size() == 0;

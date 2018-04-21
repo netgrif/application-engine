@@ -52,6 +52,11 @@ public class Group {
         childGroups = new HashSet<>();
     }
 
+    public Group(Long id) {
+        this();
+        this.id = id;
+    }
+
     public Group(String name) {
         this();
         this.name = name;
