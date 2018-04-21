@@ -2,8 +2,8 @@ package com.netgrif.workflow.auth.web;
 
 import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.auth.domain.User;
+import com.netgrif.workflow.auth.service.InvalidUserTokenException;
 import com.netgrif.workflow.auth.service.interfaces.IRegistrationService;
-import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.auth.web.requestbodies.NewUserRequest;
 import com.netgrif.workflow.auth.web.requestbodies.RegistrationRequest;
 import com.netgrif.workflow.auth.web.responsebodies.UserResource;
@@ -14,13 +14,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.bind.annotation.*;
 
 import javax.mail.MessagingException;
 import java.io.IOException;
@@ -36,9 +31,6 @@ public class AuthenticationController {
     private static final Logger log = LoggerFactory.getLogger(AuthenticationController.class);
 
     @Autowired
-    private IUserService userService;
-
-    @Autowired
     private IRegistrationService registrationService;
 
     @Autowired
@@ -47,15 +39,9 @@ public class AuthenticationController {
     @Value("${server.auth.open-registration}")
     private boolean openRegistration;
 
-//    @RequestMapping(value = "/signup/{token}", method = RequestMethod.GET)
-//    public ModelAndView registrationForward() throws IOException {
-//        log.info("Forwarding to / from /signup");
-//        return new ModelAndView("forward:/");
-//    }
-
-    @RequestMapping(value = "/signup", method = RequestMethod.POST)
+    @PostMapping(value = "/signup")
     public MessageResource signup(@RequestBody RegistrationRequest regRequest) {
-        if (!registrationService.verifyToken(regRequest.email, regRequest.token))
+        if (!registrationService.verifyToken(regRequest.token))
             return MessageResource.errorMessage("Registration of " + regRequest.email + " has failed! Invalid token!");
 
         regRequest.password = new String(Base64.getDecoder().decode(regRequest.password));
@@ -66,16 +52,16 @@ public class AuthenticationController {
         return MessageResource.successMessage("Registration complete");
     }
 
-    @RequestMapping(value = "/invite", method = RequestMethod.POST)
+    @PostMapping(value = "/invite")
     public MessageResource invite(@RequestBody NewUserRequest newUserRequest, Authentication auth) {
         try {
-            if(!openRegistration && (auth == null || !((LoggedUser)auth.getPrincipal()).isAdmin())){
+            if (!openRegistration && (auth == null || !((LoggedUser) auth.getPrincipal()).isAdmin())) {
                 return MessageResource.errorMessage("Only admin can invite new users!");
             }
 
             newUserRequest.email = URLDecoder.decode(newUserRequest.email, StandardCharsets.UTF_8.name());
             User user = registrationService.createNewUser(newUserRequest);
-            mailService.sendRegistrationEmail(user.getEmail(), user.getToken());
+            mailService.sendRegistrationEmail(user);
 
             return MessageResource.successMessage("Mail was sent to " + user.getEmail());
         } catch (IOException | TemplateException | MessagingException e) {
@@ -84,16 +70,49 @@ public class AuthenticationController {
         }
     }
 
-    @RequestMapping(value = "/token/verify", method = RequestMethod.POST)
+    @PostMapping(value = "/token/verify")
     public MessageResource verifyToken(@RequestBody String token) {
-        String email = registrationService.getEmailToToken(token);
-        return email != null ? MessageResource.successMessage(email) : MessageResource.errorMessage("Invalid token!");
+        try {
+            if (registrationService.verifyToken(token))
+                return MessageResource.successMessage(registrationService.decodeToken(token)[0]);
+            else
+                return MessageResource.errorMessage("Invalid token!");
+        } catch (InvalidUserTokenException e) {
+            log.error(e.getMessage());
+            return MessageResource.errorMessage("Invalid token!");
+        }
     }
 
-    @RequestMapping(value = "/login", method = RequestMethod.GET)
-    public UserResource login(Authentication auth, Locale locale){
+    @GetMapping(value = "/login")
+    public UserResource login(Authentication auth, Locale locale) {
         return new UserResource(((LoggedUser) auth.getPrincipal()).transformToUser(), "profile", locale);
     }
 
+    @PostMapping(value = "/reset")
+    public MessageResource resetPassword(@RequestBody String recoveryEmail) {
+        try {
+            User user = registrationService.resetPassword(recoveryEmail);
+            if (user != null)
+                mailService.sendPasswordResetEmail(user);
+            return MessageResource.successMessage("Email with reset link was sent to address " + recoveryEmail);
+        } catch (MessagingException | IOException | TemplateException e) {
+            log.error(e.toString());
+            return MessageResource.errorMessage("Reset email has failed to be sent to address " + recoveryEmail);
+        }
+    }
 
+    @PostMapping(value = "/recover")
+    public MessageResource recoverAccount(@RequestBody RegistrationRequest request) {
+        try {
+            if (!registrationService.verifyToken(request.token))
+                return MessageResource.errorMessage("Invalid token!");
+            User user = registrationService.recover(registrationService.decodeToken(request.token)[0], new String(Base64.getDecoder().decode(request.password)));
+            if (user == null)
+                return MessageResource.errorMessage("Recovery of account has failed!");
+            return MessageResource.successMessage("Account is successfully recovered. You can login now.");
+        } catch (InvalidUserTokenException e) {
+            log.error(e.getMessage());
+            return MessageResource.errorMessage("Invalid token!");
+        }
+    }
 }
