@@ -68,7 +68,7 @@ public class MongoSearchService<T> {
         boolean result = queryParts.entrySet().stream().allMatch(entry -> {
             if (entry.getKey().equals(ERROR_KEY)) return false;
             if (((String) entry.getValue()).endsWith(":")) {
-                queryParts.put(ERROR_KEY, "Query attribute " + entry.getKey() + " has wrong value!");
+                queryParts.put(ERROR_KEY, "Query attribute " + entry.getKey() + " has wrong value " + entry.getValue());
                 return false;
             }
 
@@ -79,8 +79,8 @@ public class MongoSearchService<T> {
         });
         if (!result)
             throw new IllegalQueryException((String) (queryParts.get(ERROR_KEY)));
-
-        builder.deleteCharAt(builder.length() - 1);
+        if (builder.length() > 1)
+            builder.deleteCharAt(builder.length() - 1);
         builder.append("}");
         return builder.toString();
     }

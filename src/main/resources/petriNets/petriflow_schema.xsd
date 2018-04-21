@@ -24,7 +24,7 @@
                 <xs:element ref="action" minOccurs="0" maxOccurs="unbounded"/>
                 <xs:element ref="documentRef" minOccurs="0"/>
             </xs:sequence>
-            <xs:attribute type="data_type" name="type"/>
+            <xs:attribute type="data_type" name="type" use="required"/>
             <xs:attribute type="xs:boolean" name="immediate"/>
         </xs:complexType>
     </xs:element>
@@ -123,8 +123,8 @@
                 <xs:element ref="mapping" maxOccurs="unbounded" minOccurs="0"/>
                 <xs:element ref="i18n" maxOccurs="unbounded" minOccurs="0"/>
                 <xs:element ref="transition" maxOccurs="unbounded"/>
-                <xs:element ref="place" maxOccurs="unbounded"/>
-                <xs:element ref="arc" maxOccurs="unbounded"/>
+                <xs:element ref="place" maxOccurs="unbounded" minOccurs="0"/>
+                <xs:element ref="arc" maxOccurs="unbounded" minOccurs="0"/>
             </xs:sequence>
         </xs:complexType>
         <xs:unique name="transitionUniqueId">
@@ -145,6 +145,10 @@
         </xs:unique>
         <xs:unique name="dataUniqueId">
             <xs:selector xpath="./data"/>
+            <xs:field xpath="id"/>
+        </xs:unique>
+        <xs:unique name="mappingId">
+            <xs:selector xpath="./mapping"/>
             <xs:field xpath="id"/>
         </xs:unique>
         <xs:key name="ptIdKey">
@@ -182,6 +186,7 @@
             <xs:enumeration value="reset"/>
             <xs:enumeration value="inhibitor"/>
             <xs:enumeration value="read"/>
+            <xs:enumeration value="variable"/>
         </xs:restriction>
     </xs:simpleType>
     <xs:simpleType name="validation">
@@ -194,6 +199,7 @@
             <xs:enumeration value="start"/>
             <xs:enumeration value="center"/>
             <xs:enumeration value="end"/>
+            <xs:enumeration value="left"/>
         </xs:restriction>
     </xs:simpleType>
     <xs:simpleType name="triggerType">
@@ -261,7 +267,7 @@
             <xs:sequence>
                 <xs:element ref="perform" minOccurs="0"/>
                 <xs:element ref="delegate" minOccurs="0"/>
-                <xs:element ref="behavior" maxOccurs="unbounded" minOccurs="0"/>
+                <xs:element name="behavior" type="behavior" maxOccurs="unbounded" minOccurs="0"/>
                 <xs:element ref="action" minOccurs="0" maxOccurs="unbounded"/>
             </xs:sequence>
         </xs:complexType>
@@ -282,7 +288,16 @@
             </xs:sequence>
         </xs:complexType>
     </xs:element>
-    <xs:element name="behavior" type="xs:string"/>
+    <xs:simpleType name="behavior">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="forbidden"/>
+            <xs:enumeration value="hidden"/>
+            <xs:enumeration value="visible"/>
+            <xs:enumeration value="editable"/>
+            <xs:enumeration value="required"/>
+            <xs:enumeration value="immediate"/>
+        </xs:restriction>
+    </xs:simpleType>
     <xs:element name="dataRef">
         <xs:complexType>
             <xs:sequence>

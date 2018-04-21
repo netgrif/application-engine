@@ -118,7 +118,7 @@ public class WorkflowService implements IWorkflowService {
                 idMap.put("id", ((List<String>) request.get(key)).stream().filter(netIds::contains).collect(Collectors.toList()));
                 request.put(key, idMap);
             }
-        } else {
+        } else if (!nets.isEmpty()) {
             idMap.put("id", nets.stream().map(PetriNetReference::getStringId).collect(Collectors.toList()));
             request.put(key, idMap);
         }
@@ -154,6 +154,7 @@ public class WorkflowService implements IWorkflowService {
 
         publisher.publishEvent(new CreateCaseEvent(useCase));
 
+        useCase.getPetriNet().initializeVarArcs(useCase.getDataSet());
         taskService.createTasks(useCase);
         return setImmediateDataFields(useCase);
     }
