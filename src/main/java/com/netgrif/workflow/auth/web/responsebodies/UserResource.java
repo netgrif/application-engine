@@ -18,6 +18,8 @@ public class UserResource extends Resource<LocalisedUser> {
 
     public UserResource(User content, String selfRel, Locale locale, boolean small) {
         this(content, selfRel, locale);
+        getContent().setPassword(null);
+        getContent().setUserProcessRoles(null);
         if (small) {
             getContent().setTelNumber(null);
             getContent().setGroups(null);
@@ -29,12 +31,8 @@ public class UserResource extends Resource<LocalisedUser> {
 
     private void buildLinks(String selfRel) {
         ControllerLinkBuilder getLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(UserController.class)
-                .getUser(getContent().getId(), null));
+                .getUser(getContent().getId(),false, null));
         add(selfRel.equalsIgnoreCase("profile") ? getLink.withSelfRel() : getLink.withRel("profile"));
-
-        ControllerLinkBuilder smallLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(UserController.class)
-                .getSmallUser(getContent().getId(), null));
-        add(selfRel.equalsIgnoreCase("small") ? smallLink.withSelfRel() : smallLink.withRel("small"));
 
         ControllerLinkBuilder roleLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(UserController.class)
                 .assignRolesToUser(getContent().getId(), null, null));

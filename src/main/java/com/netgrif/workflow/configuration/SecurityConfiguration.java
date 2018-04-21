@@ -1,9 +1,9 @@
 package com.netgrif.workflow.configuration;
 
-import org.apache.commons.lang.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -13,11 +13,13 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
-import java.security.Principal;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Stream;
 
 @Configuration
@@ -32,48 +34,58 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             "/bower_components/**", "/scripts/**", "/assets/**", "/styles/**", "/views/**", "/**/favicon.ico", "/favicon.ico", "/configuration/**", "/swagger-resources/**", "/swagger-ui.html", "/webjars/**"
     };
     private final String[] PERMIT_ALL_SERVER_PATTERNS = {
-            "/index.html", "/", "/login", "/signup/{token}", "/signup", "/signup/token", "/v2/api-docs", "/swagger-ui.html"
+            "/index.html", "/", "/login", "/signup/**", "/recover/**", "/api/auth/signup", "/api/auth/token/verify", "/api/auth/reset", "/api/auth/recover", "/v2/api-docs", "/swagger-ui.html"
     };
 
     @Autowired
     private Environment env;
 
-    @RequestMapping(value = "{path:[^res][^\\.]*$}")
+    @Value("${server.auth.open-registration}")
+    private boolean openRegistration;
+
+    @RequestMapping(value = "{path:^(?!\\/api\\S*)\\S*(?!\\.\\S*)\\S*$}")
     public String redirect(HttpServletRequest request) {
         log.info("Forwarding to root for request URI [" + request.getRequestURI() + "]");
         return "forward:/";
     }
 
-    @RequestMapping("/user")
-    @ResponseBody
-    public Principal user(Principal user) {
-        return user;
+    @RequestMapping(value = {"/signup/{token}", "/recover/{token}"})
+    public String redirectWithToken(@PathVariable("token") String token, HttpServletRequest request) {
+        log.info("Forwarding to root for URI [ " + request.getRequestURI() + " ] with token " + token);
+        return "forward:/";
     }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
 //        @formatter:off
         http
-            .httpBasic().and()
+            .httpBasic()
+            .and()
             .authorizeRequests()
                 .antMatchers(getPatterns()).permitAll()
                 .anyRequest().authenticated()
             .and()
             .formLogin()
-                .loginPage("/login")
+                .loginPage("/")
+            .and()
+            .logout()
+                .logoutUrl("/api/auth/logout")
             .and()
             .csrf()//.disable();
                 .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
             .and()
-                .headers()
-                    .frameOptions().sameOrigin();
+            .headers()
+                .frameOptions().sameOrigin();
 //        @formatter:on
     }
 
     private String[] getPatterns() {
-        String[] patterns = (String[]) ArrayUtils.addAll(PERMIT_ALL_STATIC_PATTERNS, PERMIT_ALL_SERVER_PATTERNS);
+        List<String> patterns = new ArrayList<>(Arrays.asList(PERMIT_ALL_STATIC_PATTERNS));
+        patterns.addAll(Arrays.asList(PERMIT_ALL_SERVER_PATTERNS));
+        if (openRegistration)
+            patterns.add("/api/auth/invite");
         if (Stream.of(env.getActiveProfiles()).anyMatch(it -> it.equals("dev")))
-            patterns = (String[]) ArrayUtils.add(patterns, "/dev/**");
-        return patterns;
+            patterns.add("/dev/**");
+        return patterns.toArray(new String[0]);
     }
 }
