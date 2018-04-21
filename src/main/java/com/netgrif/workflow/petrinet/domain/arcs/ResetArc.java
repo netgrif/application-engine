@@ -1,5 +1,6 @@
-package com.netgrif.workflow.petrinet.domain;
+package com.netgrif.workflow.petrinet.domain.arcs;
 
+import com.netgrif.workflow.petrinet.domain.Place;
 import lombok.Getter;
 import lombok.Setter;
 

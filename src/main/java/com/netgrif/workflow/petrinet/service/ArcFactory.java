@@ -1,9 +1,10 @@
 package com.netgrif.workflow.petrinet.service;
 
-import com.netgrif.workflow.petrinet.domain.Arc;
-import com.netgrif.workflow.petrinet.domain.InhibitorArc;
-import com.netgrif.workflow.petrinet.domain.ReadArc;
-import com.netgrif.workflow.petrinet.domain.ResetArc;
+import com.netgrif.workflow.petrinet.domain.arcs.Arc;
+import com.netgrif.workflow.petrinet.domain.arcs.InhibitorArc;
+import com.netgrif.workflow.petrinet.domain.arcs.ReadArc;
+import com.netgrif.workflow.petrinet.domain.arcs.ResetArc;
+import com.netgrif.workflow.petrinet.domain.arcs.VariableArc;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -19,6 +20,8 @@ public final class ArcFactory {
                 return new InhibitorArc();
             case READ:
                 return new ReadArc();
+            case VARIABLE:
+                return new VariableArc(arc.getMultiplicity());
             default:
                 throw new IllegalArgumentException(arc.getType() + " is not a valid Arc type");
         }

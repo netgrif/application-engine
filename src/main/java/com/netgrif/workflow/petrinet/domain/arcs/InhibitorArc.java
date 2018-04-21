@@ -1,4 +1,6 @@
-package com.netgrif.workflow.petrinet.domain;
+package com.netgrif.workflow.petrinet.domain.arcs;
+
+import com.netgrif.workflow.petrinet.domain.Place;
 
 /**
  * If there is an arc <i>a</i> with a weight <i>w=W(p,t)</i> connecting a place <i>p</i> with a transition <i>t</i>,

@@ -1,7 +1,7 @@
 package com.netgrif.workflow.importer.service;
 
 import com.netgrif.workflow.importer.model.*;
-import com.netgrif.workflow.petrinet.domain.Arc;
+import com.netgrif.workflow.petrinet.domain.arcs.Arc;
 import com.netgrif.workflow.petrinet.domain.DataGroup;
 import com.netgrif.workflow.petrinet.domain.*;
 import com.netgrif.workflow.petrinet.domain.Place;
@@ -13,10 +13,10 @@ import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.workflow.petrinet.domain.policies.AssignPolicy;
 import com.netgrif.workflow.petrinet.domain.policies.DataFocusPolicy;
 import com.netgrif.workflow.petrinet.domain.policies.FinishPolicy;
-import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository;
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRole;
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRoleRepository;
 import com.netgrif.workflow.petrinet.service.ArcFactory;
+import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.workflow.workflow.domain.triggers.Trigger;
 import org.apache.log4j.Logger;
 import org.bson.types.ObjectId;
@@ -62,7 +62,7 @@ public class Importer {
     private FieldFactory fieldFactory;
 
     @Autowired
-    private PetriNetRepository repository;
+    private IPetriNetService service;
 
     @Autowired
     private ProcessRoleRepository roleRepository;
@@ -140,7 +140,7 @@ public class Importer {
         if (config.get("notSaveObjects") != null && ((Boolean) config.get("notSaveObjects")))
             return Optional.of(net);
         else
-            return Optional.of(repository.save(net));
+            return service.saveNew(net);
     }
 
     @Transactional
@@ -453,7 +453,7 @@ public class Importer {
             return false;
         // FALSE if role or trigger mapping
         for (Mapping mapping : document.getMapping()) {
-            if (mapping.getTransitionRef() == transition.getId() && (mapping.getRoleRef() == null || mapping.getRoleRef().isEmpty()) && (mapping.getTrigger() == null || mapping.getTrigger().isEmpty()))
+            if (mapping.getTransitionRef() == transition.getId() && (mapping.getRoleRef() != null && !mapping.getRoleRef().isEmpty()) && (mapping.getTrigger() != null && !mapping.getTrigger().isEmpty()))
                 return false;
         }
         // TRUE if no roles and no triggers
@@ -461,7 +461,10 @@ public class Importer {
     }
 
     PetriNet getNetByImportId(Long id) {
-        return repository.findByImportId(id);
+        Optional<PetriNet> net = service.findByImportId(id);
+        if (!net.isPresent())
+            throw new IllegalArgumentException();
+        return net.get();
     }
 
     public Map<Long, ProcessRole> getRoles() {

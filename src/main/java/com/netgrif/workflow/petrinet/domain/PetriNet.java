@@ -1,8 +1,11 @@
 package com.netgrif.workflow.petrinet.domain;
 
 import com.netgrif.workflow.auth.domain.Author;
+import com.netgrif.workflow.petrinet.domain.arcs.Arc;
+import com.netgrif.workflow.petrinet.domain.arcs.VariableArc;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRole;
+import com.netgrif.workflow.workflow.domain.DataField;
 import lombok.Getter;
 import lombok.Setter;
 import org.bson.types.ObjectId;
@@ -124,7 +127,9 @@ public class PetriNet extends PetriNetObject {
     }
 
     public List<Arc> getArcsOfTransition(String transitionId) {
-        return arcs.get(transitionId);
+        if (arcs.containsKey(transitionId))
+            return arcs.get(transitionId);
+        return new LinkedList<>();
     }
 
     public void addDataSetField(Field field) {
@@ -173,6 +178,19 @@ public class PetriNet extends PetriNetObject {
 
     public void initializeTokens(Map<String, Integer> activePlaces) {
         places.values().forEach(place -> place.setTokens(activePlaces.getOrDefault(place.getStringId(), 0)));
+    }
+
+    public void initializeVarArcs(Map<String, DataField> dataSet) {
+        arcs.values()
+                .parallelStream()
+                .flatMap(List::stream)
+                .filter(arc -> arc instanceof VariableArc)
+                .forEach(arc -> {
+                    VariableArc varc = (VariableArc) arc;
+                    String fieldId = varc.getFieldId();
+                    DataField field = dataSet.get(fieldId);
+                    varc.setField(field);
+                });
     }
 
     public Map<String, Integer> getActivePlaces() {
