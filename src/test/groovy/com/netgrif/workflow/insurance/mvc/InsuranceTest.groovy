@@ -49,11 +49,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 )
 class InsuranceTest {
 
-    private static final String CASE_CREATE_URL = "/res/workflow/case"
-    private static final String TASK_SEARCH_URL = "/res/task/search?sort=priority"
-    private static final def TASK_ASSIGN_URL = { id -> "/res/task/assign/$id" }
-    private static final def TASK_FINISH_URL = { id -> "/res/task/finish/$id" }
-    private static final def TASK_DATA_URL = { id -> "/res/task/$id/data" }
+    private static final String CASE_CREATE_URL = "/api/workflow/case"
+    private static final String TASK_SEARCH_URL = "/api/task/search?sort=priority"
+    private static final def TASK_ASSIGN_URL = { id -> "/api/task/assign/$id" }
+    private static final def TASK_FINISH_URL = { id -> "/api/task/finish/$id" }
+    private static final def TASK_DATA_URL = { id -> "/api/task/$id/data" }
 
     private static final String TASK_COVER_TYPE = "Nehnuteľnosť a domácnosť"
     private static final String TASK_BASIC_INFO = "Základné informácie"

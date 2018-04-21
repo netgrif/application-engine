@@ -66,8 +66,8 @@ public class MailService implements IMailService {
         recipients.add(user.getEmail());
         model.put("token", registrationService.encodeToken(user.getEmail(),user.getToken()));
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
-        model.put("date", registrationService.generateExpirationDate().format(formatter));
-        model.put("serverName", getServerURL());
+        model.put("expiration", registrationService.generateExpirationDate().format(formatter));
+        model.put("server", getServerURL());
 
         MimeMessage email = buildEmail(EmailType.REGISTRATION, recipients, model, new HashMap<>());
         mailSender.send(email);
@@ -77,6 +77,7 @@ public class MailService implements IMailService {
     public void sendPasswordResetEmail(User user) throws MessagingException, IOException, TemplateException {
         Map<String, Object> model = new HashMap<>();
 
+        model.put("name", user.getName());
         model.put("token", registrationService.encodeToken(user.getEmail(), user.getToken()));
         model.put("expiration", registrationService.generateExpirationDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
         model.put("server", getServerURL());
