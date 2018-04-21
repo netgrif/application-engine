@@ -54,12 +54,19 @@ public class UserService implements IUserService {
         addDefaultAuthorities(user);
 
         User savedUser = userRepository.save(user);
-        Member member = new Member(savedUser.getId(), savedUser.getName(), savedUser.getSurname(), savedUser.getEmail());
-        member.setGroups(savedUser.getGroups());
-        memberService.save(member);
-
+        savedUser.setGroups(user.getGroups());
+        upsertGroupMember(savedUser);
         publisher.publishEvent(new UserRegistrationEvent(savedUser));
         return savedUser;
+    }
+
+    @Override
+    public Member upsertGroupMember(User user){
+        Member member = memberService.findByEmail(user.getEmail());
+        if(member == null)
+            member = new Member(user.getId(), user.getName(), user.getSurname(), user.getEmail());
+        member.setGroups(user.getGroups());
+        return memberService.save(member);
     }
 
     @Override
