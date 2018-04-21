@@ -66,7 +66,7 @@ public class TokenServiceTest {
         expired.setState(UserState.INVITED);
         repository.save(expired);
 
-        boolean authorized = service.verifyToken("test3@test.com", "token3");
+        boolean authorized = service.verifyToken(service.encodeToken("test3@test.com", "token3"));
         User token = repository.findByEmail("test3@test.com");
 
         assertTokenRemoved(authorized, token);
