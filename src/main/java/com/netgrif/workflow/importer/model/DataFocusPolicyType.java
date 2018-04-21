@@ -27,8 +27,8 @@ public enum DataFocusPolicyType {
 
     @XmlEnumValue("manual")
     MANUAL("manual"),
-    @XmlEnumValue("autoEmptyRequired")
-    AUTO_EMPTY_REQUIRED("autoEmptyRequired");
+    @XmlEnumValue("auto_empty_required")
+    AUTO_EMPTY_REQUIRED("auto_empty_required");
     private final String value;
 
     DataFocusPolicyType(String v) {
