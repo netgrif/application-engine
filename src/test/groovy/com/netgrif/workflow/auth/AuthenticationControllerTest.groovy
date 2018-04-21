@@ -96,7 +96,7 @@ class AuthenticationControllerTest {
         assertMessageReceived(messages)
 
         String content = getTextFromMimeMultipart(messages[0].content as MimeMultipart)
-        String token = content.substring(content.indexOf("/signup/") + "/signup/".length(), content.indexOf(" This is regis"))
+        String token = content.substring(content.indexOf("/signup/") + "/signup/".length(), content.indexOf(" This is"))
 
         controller.signup(new RegistrationRequest(token: token, email: EMAIL, name: NAME, surname: SURNAME, password: PASSWORD))
 
