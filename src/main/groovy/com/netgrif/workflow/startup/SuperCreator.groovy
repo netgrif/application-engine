@@ -3,6 +3,7 @@ package com.netgrif.workflow.startup
 import com.netgrif.workflow.auth.domain.Authority
 import com.netgrif.workflow.auth.domain.User
 import com.netgrif.workflow.auth.domain.UserProcessRole
+import com.netgrif.workflow.auth.domain.UserState
 import com.netgrif.workflow.auth.service.interfaces.IAuthorityService
 import com.netgrif.workflow.auth.service.interfaces.IUserProcessRoleService
 import com.netgrif.workflow.auth.service.interfaces.IUserService
@@ -57,6 +58,7 @@ class SuperCreator extends AbstractOrderedCommandLineRunner {
                     surname: "Trooper",
                     email: "super@netgrif.com",
                     password: superAdminPassword,
+                    state: UserState.ACTIVE,
                     authorities: [adminAuthority] as Set<Authority>,
                     userProcessRoles: userProcessRoleService.findAll() as Set<UserProcessRole>))
             this.superMember = memberService.findByEmail(this.superUser.email)
