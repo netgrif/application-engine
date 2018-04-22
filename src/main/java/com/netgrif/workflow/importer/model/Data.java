@@ -27,7 +27,7 @@ import java.util.List;
  *         &lt;element ref="{}action" maxOccurs="unbounded" minOccurs="0"/&gt;
  *         &lt;element ref="{}documentRef" minOccurs="0"/&gt;
  *       &lt;/sequence&gt;
- *       &lt;attribute name="type" type="{}data_type" /&gt;
+ *       &lt;attribute name="type" use="required" type="{}data_type" /&gt;
  *       &lt;attribute name="immediate" type="{http://www.w3.org/2001/XMLSchema}boolean" /&gt;
  *     &lt;/restriction&gt;
  *   &lt;/complexContent&gt;
@@ -63,7 +63,7 @@ public class Data {
     protected EncryptionType encryption;
     protected List<ActionType> action;
     protected DocumentRef documentRef;
-    @XmlAttribute(name = "type")
+    @XmlAttribute(name = "type", required = true)
     protected DataType type;
     @XmlAttribute(name = "immediate")
     protected Boolean immediate;

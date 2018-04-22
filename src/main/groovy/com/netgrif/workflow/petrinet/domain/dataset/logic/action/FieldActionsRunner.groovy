@@ -55,11 +55,11 @@ abstract class FieldActionsRunner {
 
     private Closure getActionCode(Action action) {
         def code
-        if (actions.containsKey(action.definition)) {
-            code = actions.get(action.definition)
+        if (actions.containsKey(action.importId)) {
+            code = actions.get(action.importId)
         } else {
             code = (Closure) new GroovyShell().evaluate("{-> ${action.definition}}")
-            actions.put(action.definition, code)
+            actions.put(action.importId, code)
         }
         code.delegate = getActionDeleget()
         return code
