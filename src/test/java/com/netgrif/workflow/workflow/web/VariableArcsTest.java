@@ -6,8 +6,11 @@ import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.arcs.Arc;
 import com.netgrif.workflow.petrinet.domain.arcs.VariableArc;
 import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository;
+import com.netgrif.workflow.petrinet.domain.roles.ProcessRole;
+import com.netgrif.workflow.petrinet.domain.roles.ProcessRoleRepository;
 import com.netgrif.workflow.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
+import com.netgrif.workflow.startup.DefaultRoleRunner;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.Task;
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
@@ -53,9 +56,22 @@ public class VariableArcsTest {
     @Autowired
     private MockService mock;
 
+    @Autowired
+    private DefaultRoleRunner defaultRoleRunner;
+
+    @Autowired
+    private ProcessRoleRepository roleRepository;
+
     @Before
     public void before() {
         repository.deleteAll();
+        if (roleRepository.findByName_DefaultValue(ProcessRole.DEFAULT_ROLE) == null) {
+            try {
+                defaultRoleRunner.run();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     @Test
