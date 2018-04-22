@@ -321,7 +321,7 @@ public class Importer {
 
             Set<FieldBehavior> behavior = new HashSet<>();
             if (logic.getBehavior() != null)
-                logic.getBehavior().forEach(b -> behavior.add(FieldBehavior.fromString(b)));
+                logic.getBehavior().forEach(b -> behavior.add(FieldBehavior.fromString(b.value())));
 
             transition.addDataSet(fieldId, behavior, null);
         } catch (NullPointerException e) {
@@ -341,6 +341,7 @@ public class Importer {
             throw new IllegalArgumentException("Action [" + importedAction.getValue() + "] doesn't have trigger");
         try {
             Action action = new Action(importedAction.getTrigger());
+            action.setImportId(importedAction.getId());
             parseIds(fieldId, transitionId, importedAction, action);
             return action;
         } catch (NumberFormatException e) {

@@ -5,6 +5,8 @@ import org.bson.types.ObjectId
 
 class Action {
 
+    private String importId;
+
     private ObjectId id = new ObjectId()
 
     private Map<String, String> fieldIds = new HashMap<>()
@@ -67,6 +69,14 @@ class Action {
 
     void addTransitionId(String transitionName, String transitionId) {
         this.transitionIds.put(transitionName, transitionId)
+    }
+
+    String getImportId() {
+        return importId
+    }
+
+    void setImportId(String importId) {
+        this.importId = importId
     }
 
     @Override
