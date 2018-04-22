@@ -342,30 +342,19 @@ public class Importer {
         try {
             Action action = new Action(importedAction.getTrigger());
             parseIds(fieldId, transitionId, importedAction, action);
-            wrapCode(action);
             return action;
         } catch (NumberFormatException e) {
             throw new IllegalArgumentException("Error parsing ids of action [" + importedAction.getValue() + "]", e);
         }
     }
 
-    private void wrapCode(Action action) {
-        String code = action.getDefinition();
-        String fields = action.getFieldIds().keySet().stream().collect(Collectors.joining(", "));
-        String transitions = action.getTransitionIds().keySet().stream().collect(Collectors.joining(", "));
-
-        String closure = "{ " + fields + "," + transitions + " -> " + code + "}";
-        action.setDefinition(closure);
-    }
-
-    private Action parseIds(String fieldId, String transitionId, ActionType importedAction, Action action) {
+    private void parseIds(String fieldId, String transitionId, ActionType importedAction, Action action) {
         String definition = importedAction.getValue();
         String[] actionParts = definition.split(";", 2);
         if (actionParts.length != 2)
             throw new IllegalArgumentException("Failed to parse action: " + importedAction);
         action.setDefinition(actionParts[1]);
         parseObjectIds(action, fieldId, transitionId, actionParts[0]);
-        return action;
     }
 
     @Transactional
@@ -373,9 +362,7 @@ public class Importer {
         try {
             Map<String, String> ids = parseParams(definition);
 
-            ids.entrySet()
-                    .parallelStream()
-                    .forEach(entry -> replaceImportId(action, fieldId, transitionId, entry));
+            ids.entrySet().forEach(entry -> replaceImportId(action, fieldId, transitionId, entry));
         } catch (NullPointerException e) {
             throw new IllegalArgumentException("Failed to parse action: " + action, e);
         }
@@ -414,7 +401,7 @@ public class Importer {
 
     private Map<String, String> parseParams(String definition) {
         List<String> params = Arrays.asList(definition.split(","));
-        return params.parallelStream()
+        return params.stream()
                 .map(param -> param.split(":"))
                 .collect(Collectors.toMap(o -> o[0], o -> o[1]));
     }
