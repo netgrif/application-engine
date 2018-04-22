@@ -350,7 +350,12 @@ public class Importer {
     }
 
     private void wrapCode(Action action) {
-        String code = action.ge
+        String code = action.getDefinition();
+        String fields = action.getFieldIds().keySet().stream().collect(Collectors.joining(", "));
+        String transitions = action.getTransitionIds().keySet().stream().collect(Collectors.joining(", "));
+
+        String closure = "{ " + fields + "," + transitions + " -> " + code + "}";
+        action.setDefinition(closure);
     }
 
     private Action parseIds(String fieldId, String transitionId, ActionType importedAction, Action action) {
@@ -358,7 +363,7 @@ public class Importer {
         String[] actionParts = definition.split(";", 2);
         if (actionParts.length != 2)
             throw new IllegalArgumentException("Failed to parse action: " + importedAction);
-        Action action = new Action(actionParts[1], importedAction.getTrigger());
+        action.setDefinition(actionParts[1]);
         parseObjectIds(action, fieldId, transitionId, actionParts[0]);
         return action;
     }
