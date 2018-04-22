@@ -69,6 +69,11 @@ class Action {
         this.transitionIds.put(transitionName, transitionId)
     }
 
+    @Override
+    String toString() {
+        return "[$trigger] $definition"
+    }
+
     enum ActionTrigger {
         GET,
         SET
@@ -77,4 +82,6 @@ class Action {
             return valueOf(val.toUpperCase())
         }
     }
+
+
 }
