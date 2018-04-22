@@ -53,7 +53,7 @@ enum FieldBehavior {
     }
 
     public static FieldBehavior fromString(String string) {
-        return FieldBehavior.valueOf(string.toUpperCase());
+        return valueOf(string.toUpperCase());
     }
 
     FieldBehavior[] getAntonyms() {
