@@ -43,18 +43,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Value("${server.auth.open-registration}")
     private boolean openRegistration;
 
-    @RequestMapping(value = "{path:^(?!\\/api\\S*)\\S*(?!\\.\\S*)\\S*$}")
-    public String redirect(HttpServletRequest request) {
-        log.info("Forwarding to root for request URI [" + request.getRequestURI() + "]");
-        return "forward:/";
-    }
-
-    @RequestMapping(value = {"/signup/{token}", "/recover/{token}"})
-    public String redirectWithToken(@PathVariable("token") String token, HttpServletRequest request) {
-        log.info("Forwarding to root for URI [ " + request.getRequestURI() + " ] with token " + token);
-        return "forward:/";
-    }
-
     @Override
     protected void configure(HttpSecurity http) throws Exception {
 //        @formatter:off
