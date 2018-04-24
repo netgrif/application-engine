@@ -13,7 +13,8 @@ import javax.xml.bind.annotation.*;
  * &lt;complexType name="actionType"&gt;
  *   &lt;simpleContent&gt;
  *     &lt;extension base="&lt;http://www.w3.org/2001/XMLSchema&gt;string"&gt;
- *       &lt;attribute name="trigger" type="{http://www.w3.org/2001/XMLSchema}anySimpleType" /&gt;
+ *       &lt;attribute name="trigger" use="required" type="{http://www.w3.org/2001/XMLSchema}anySimpleType" /&gt;
+ *       &lt;attribute name="id" use="required" type="{http://www.w3.org/2001/XMLSchema}anySimpleType" /&gt;
  *     &lt;/extension&gt;
  *   &lt;/simpleContent&gt;
  * &lt;/complexType&gt;
@@ -29,9 +30,12 @@ public class ActionType {
 
     @XmlValue
     protected String value;
-    @XmlAttribute(name = "trigger")
+    @XmlAttribute(name = "trigger", required = true)
     @XmlSchemaType(name = "anySimpleType")
     protected String trigger;
+    @XmlAttribute(name = "id", required = true)
+    @XmlSchemaType(name = "anySimpleType")
+    protected String id;
 
     /**
      * Gets the value of the value property.
@@ -79,6 +83,30 @@ public class ActionType {
      */
     public void setTrigger(String value) {
         this.trigger = value;
+    }
+
+    /**
+     * Gets the value of the id property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getId() {
+        return id;
+    }
+
+    /**
+     * Sets the value of the id property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setId(String value) {
+        this.id = value;
     }
 
 }

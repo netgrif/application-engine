@@ -1,6 +1,7 @@
 package com.netgrif.workflow.workflow.web;
 
 import com.netgrif.workflow.MockService;
+import com.netgrif.workflow.importer.service.Config;
 import com.netgrif.workflow.importer.service.Importer;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.arcs.Arc;
@@ -76,7 +77,7 @@ public class VariableArcsTest {
 
     @Test
     public void importTest() throws TransitionNotExecutableException {
-        Optional<PetriNet> optionalNet = importer.importPetriNet(new File(NET_PATH), NET_TITLE, NET_INITIALS, new HashMap<>());
+        Optional<PetriNet> optionalNet = importer.importPetriNet(new File(NET_PATH), NET_TITLE, NET_INITIALS, new Config());
 
         assert optionalNet.isPresent();
         PetriNet net = optionalNet.get();
