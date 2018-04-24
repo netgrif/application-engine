@@ -3,6 +3,7 @@ package com.netgrif.workflow.petrinet.service;
 import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.auth.service.UserProcessRoleService;
 import com.netgrif.workflow.event.events.model.UserImportModelEvent;
+import com.netgrif.workflow.importer.service.Config;
 import com.netgrif.workflow.importer.service.Importer;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.Transition;
@@ -80,17 +81,17 @@ public abstract class PetriNetService implements IPetriNetService {
         PetriNet existingNet = getNewestVersionByIdentifier(metaData.identifier);
         Optional<PetriNet> newPetriNet;
         if (existingNet == null) {
-            newPetriNet = importNewPetriNet(xmlFile, metaData, user, new HashMap<>());
+            newPetriNet = importNewPetriNet(xmlFile, metaData, user);
         } else {
             //TODO 3.4.2018 compare net hash with found net hash -> if equal do not save network => possible duplicate
-            newPetriNet = importNewVersion(xmlFile, metaData, existingNet, user, new HashMap<>());
+            newPetriNet = importNewVersion(xmlFile, metaData, existingNet, user);
         }
 
         return newPetriNet;
     }
 
-    private Optional<PetriNet> importNewPetriNet(File xmlFile, UploadedFileMeta metaData, LoggedUser user, Map<String, Object> importerConfig) {
-        Optional<PetriNet> imported = getImporter().importPetriNet(xmlFile, metaData.name, metaData.initials, importerConfig);
+    private Optional<PetriNet> importNewPetriNet(File xmlFile, UploadedFileMeta metaData, LoggedUser user) {
+        Optional<PetriNet> imported = getImporter().importPetriNet(xmlFile, metaData.name, metaData.initials, new Config());
         imported.ifPresent(petriNet -> {
             userProcessRoleService.saveRoles(imported.get().getRoles().values(), imported.get().getStringId());
 
@@ -104,9 +105,12 @@ public abstract class PetriNetService implements IPetriNetService {
         return imported;
     }
 
-    private Optional<PetriNet> importNewVersion(File xmlFile, UploadedFileMeta meta, @NotNull PetriNet previousVersion, LoggedUser user, Map<String, Object> importerConfig) {
-        importerConfig.put("notSaveObjects", true);
-        Optional<PetriNet> imported = getImporter().importPetriNet(xmlFile, meta.name, meta.initials, importerConfig);
+    private Optional<PetriNet> importNewVersion(File xmlFile, UploadedFileMeta meta, @NotNull PetriNet previousVersion, LoggedUser user) {
+        Config config = Config.builder()
+                .notSaveObjects(true)
+                .build();
+
+        Optional<PetriNet> imported = getImporter().importPetriNet(xmlFile, meta.name, meta.initials, config);
         imported.ifPresent(petriNet -> {
             petriNet.setVersion(previousVersion.getVersion());
             petriNet.incrementVersion(PetriNet.VersionType.valueOf(meta.releaseType.trim().toUpperCase()));
