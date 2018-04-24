@@ -3,6 +3,7 @@ package com.netgrif.workflow.workflow.service;
 import com.netgrif.workflow.auth.domain.Authority;
 import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.auth.service.interfaces.IAuthorityService;
+import com.netgrif.workflow.importer.service.Config;
 import com.netgrif.workflow.importer.service.Importer;
 import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository;
 import com.netgrif.workflow.workflow.domain.Case;
@@ -18,7 +19,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.File;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 
 @SpringBootTest
@@ -48,7 +48,7 @@ public class CaseMonitorTest {
 
     @Test
     public void afterFindOne() throws Exception {
-        importer.importPetriNet(new File("src/test/resources/prikladFM.xml"), "net", "NET", new HashMap<>());
+        importer.importPetriNet(new File("src/test/resources/prikladFM.xml"), "net", "NET", new Config());
         workflowService.createCase(netRepository.findAll().get(0).getStringId(), "Storage Unit", "color-fg-fm-500", mockLoggedUser());
 
         List<Case> cases = repository.findAll();

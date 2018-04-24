@@ -221,22 +221,22 @@ public class MongoSearchService<T> {
 
     public static String resolveDateValue(String val) {
         String queryValue = "{";
-        String[] items = val.split(" ");
-        if (items.length != 2) return "";
-        switch (items[0]) {
-            case ">":
-            case ">=":
-                queryValue += "$qte:\"ISO-8601 ";
-                break;
-            case "<":
-            case "<=":
-                queryValue += "$lte:\"ISO-8601 ";
-                break;
-            default:
-                return "";
-        }
-
-        queryValue += val + "T00:00:00.000Z\"}";
+//        String[] items = val.split(" ");
+//        if (items.length != 2) return "";
+//        switch (items[0]) {
+//            case ">":
+//            case ">=":
+//                queryValue += "$qte:\"ISO-8601 ";
+//                break;
+//            case "<":
+//            case "<=":
+//                queryValue += "$lte:\"ISO-8601 ";
+//                break;
+//            default:
+//                return "";
+//        }
+//
+//        queryValue += val + "T00:00:00.000Z\"}";
         return queryValue;
     }
 }

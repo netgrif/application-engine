@@ -22,7 +22,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 @RestController()
-@RequestMapping("/res/workflow")
+@RequestMapping("/api/workflow")
 public class WorkflowController {
 
     private static final Logger log = Logger.getLogger(WorkflowController.class.getName());

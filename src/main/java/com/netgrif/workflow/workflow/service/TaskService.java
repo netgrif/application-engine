@@ -87,12 +87,6 @@ public class TaskService implements ITaskService {
     @Autowired
     private FieldFactory fieldFactory;
 
-    //    @Override
-//    public Page<LocalisedTask> getAll(LoggedUser loggedUser, Pageable pageable) {
-//        User user = userRepository.findOne(loggedUser.getId());
-//        List<String> roles = new LinkedList<>(user.getUserProcessRoles()).stream().map(UserProcessRole::getRoleId).collect(Collectors.toList());
-//        return loadUsers(taskRepository.findAllByAssignRoleInOrDelegateRoleIn(pageable, roles, roles));
-//    }
     @Override
     public Page<Task> getAll(LoggedUser loggedUser, Pageable pageable, Locale locale) {
         List<Task> tasks;
@@ -249,8 +243,6 @@ public class TaskService implements ITaskService {
         assignTaskToUser(user, task, useCase);
 
         publisher.publishEvent(new UserAssignTaskEvent(user, task, useCase));
-
-//        moveAttributes(task);
     }
 
     @Override
@@ -340,7 +332,6 @@ public class TaskService implements ITaskService {
                         else
                             changedFields.put(changedField.getId(), changedField);
                     });
-            //changedFields.remove(entry.getKey());
         });
 
         workflowService.save(useCase);
@@ -366,11 +357,10 @@ public class TaskService implements ITaskService {
 
         if (fieldActions.isEmpty()) return;
 
-        runActions(fieldActions.stream().map(Action::getDefinition).collect(Collectors.toList()),
-                actionTrigger, useCase, transition, changedFields, actionTrigger == Action.ActionTrigger.SET);
+        runActions(fieldActions, actionTrigger, useCase, transition, changedFields, actionTrigger == Action.ActionTrigger.SET);
     }
 
-    private void runActions(List<String> actions, Action.ActionTrigger trigger, Case useCase, Transition transition, Map<String, ChangedField> changedFields, boolean recursive) {
+    private void runActions(List<Action> actions, Action.ActionTrigger trigger, Case useCase, Transition transition, Map<String, ChangedField> changedFields, boolean recursive) {
         actions.forEach(action -> {
             ChangedField changedField = actionsRunner.run(action, useCase);
 
@@ -384,10 +374,6 @@ public class TaskService implements ITaskService {
             if ((changedField.getAttributes().containsKey("value") && changedField.getAttributes().get("value") != null) && recursive)
                 processActions(useCase.getPetriNet().getField(changedField.getId()).get(), trigger,
                         useCase, transition, changedFields);
-
-            //getTransitionsByField(field.getId(), useCase.getPetriNet()).forEach(transition ->
-            //        runActions(transition.getDataSet().get(field.getId()).getActions(), useCase, changedFields, recursive)
-            //);
         });
     }
 
@@ -438,15 +424,6 @@ public class TaskService implements ITaskService {
         else return value;
     }
 
-    private List<Transition> getTransitionsByField(String field, PetriNet net) {
-        List<Transition> transitions = new ArrayList<>();
-        net.getTransitions().forEach((transId, trans) -> {
-            if (trans.getDataSet().containsKey(field))
-                transitions.add(trans);
-        });
-        return transitions;
-    }
-
     @Override
     @Transactional
     public void cancelTask(LoggedUser loggedUser, String taskId) {
@@ -494,14 +471,6 @@ public class TaskService implements ITaskService {
         return task;
     }
 
-    @Transactional
-    protected void moveAttributes(Task oldTask) {
-        Task newTask = taskRepository.findByTransitionIdAndCaseId(oldTask.getTransitionId(), oldTask.getCaseId());
-        newTask.setRequiredFilled(oldTask.getRequiredFilled());
-
-        taskRepository.save(newTask);
-    }
-
     @Override
     public FileSystemResource getFile(String taskId, String fieldId) {
         Task task = taskRepository.findOne(taskId);
@@ -509,16 +478,16 @@ public class TaskService implements ITaskService {
         FileField field = (FileField) useCase.getPetriNet().getDataSet().get(fieldId);
 
         if (field.isGenerated()) {
-            field.getActions().forEach(action ->
-                    actionsRunner.run(action.getDefinition(), useCase)
-            );
-            if (useCase.getDataSet().get(fieldId).getValue() == null) return null;
+            field.getActions().forEach(action -> actionsRunner.run(action, useCase));
+            if (useCase.getDataSet().get(fieldId).getValue() == null)
+                return null;
 
             workflowService.save(useCase);
             return new FileSystemResource(field.getFilePath((String) useCase.getDataSet().get(fieldId).getValue()));
 
         } else {
-            if (useCase.getDataSet().get(fieldId).getValue() == null) return null;
+            if (useCase.getDataSet().get(fieldId).getValue() == null)
+                return null;
             return new FileSystemResource(field.getFilePath((String) useCase.getDataSet().get(fieldId).getValue()));
         }
     }

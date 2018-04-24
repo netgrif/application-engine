@@ -4,6 +4,7 @@ import com.netgrif.workflow.auth.domain.Authority
 import com.netgrif.workflow.auth.domain.LoggedUser
 import com.netgrif.workflow.auth.domain.User
 import com.netgrif.workflow.auth.domain.UserProcessRole
+import com.netgrif.workflow.auth.domain.UserState
 import com.netgrif.workflow.auth.domain.repositories.UserProcessRoleRepository
 import com.netgrif.workflow.auth.service.interfaces.IAuthorityService
 import com.netgrif.workflow.auth.service.interfaces.IUserService
@@ -140,6 +141,7 @@ class ImportHelper {
         authorities.each { user.addAuthority(it) }
         roles.each { user.addProcessRole(it) }
         user.groups = orgs as Set
+        user.state = UserState.ACTIVE
         user = userService.saveNew(user)
         log.info("User $user.name $user.surname created")
         return user

@@ -133,7 +133,7 @@ public final class FieldFactory {
 
     private void setActions(Field field, Data data) {
         if (data.getAction() != null && data.getAction().size() != 0) {
-            data.getAction().forEach(action -> field.addAction(action.getValue(), action.getTrigger()));
+//            data.getAction().forEach(action -> field.addAction(action.getValue(), action.getTrigger()));
         }
     }
 
