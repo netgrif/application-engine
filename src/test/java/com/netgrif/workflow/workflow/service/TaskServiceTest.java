@@ -6,6 +6,7 @@ import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.auth.domain.UserState;
 import com.netgrif.workflow.auth.domain.repositories.UserRepository;
 import com.netgrif.workflow.auth.service.interfaces.IAuthorityService;
+import com.netgrif.workflow.importer.service.Config;
 import com.netgrif.workflow.importer.service.Importer;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository;
@@ -27,7 +28,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.File;
 import java.util.Collections;
-import java.util.HashMap;
 
 @SpringBootTest
 @ActiveProfiles({"test"})
@@ -69,7 +69,7 @@ public class TaskServiceTest {
         mongoTemplate.getDb().dropDatabase();
         taskRepository.deleteAll();
 
-        importer.importPetriNet(new File("src/test/resources/prikladFM.xml"), "fm net", "fm", new HashMap<>());
+        importer.importPetriNet(new File("src/test/resources/prikladFM.xml"), "fm net", "fm", new Config());
         PetriNet net = petriNetRepository.findAll().get(0);
         workflowService.createCase(net.getStringId(), "Storage Unit", "color", mockLoggedUser());
     }
@@ -85,7 +85,7 @@ public class TaskServiceTest {
 
     @Test
     public void resetArcTest() throws TransitionNotExecutableException {
-        PetriNet net = importer.importPetriNet(new File("src/test/resources/reset_inhibitor_test.xml"), "reset", "rst", new HashMap<>()).get();
+        PetriNet net = importer.importPetriNet(new File("src/test/resources/reset_inhibitor_test.xml"), "reset", "rst", new Config()).get();
         LoggedUser loggedUser = mockLoggedUser();
         Case useCase = workflowService.createCase(net.getStringId(), "Reset test", "color", loggedUser);
         User user = new User();

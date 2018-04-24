@@ -26,8 +26,8 @@ import java.util.List;
  *         &lt;element ref="{}mapping" maxOccurs="unbounded" minOccurs="0"/&gt;
  *         &lt;element ref="{}i18n" maxOccurs="unbounded" minOccurs="0"/&gt;
  *         &lt;element ref="{}transition" maxOccurs="unbounded"/&gt;
- *         &lt;element ref="{}place" maxOccurs="unbounded"/&gt;
- *         &lt;element ref="{}arc" maxOccurs="unbounded"/&gt;
+ *         &lt;element ref="{}place" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *         &lt;element ref="{}arc" maxOccurs="unbounded" minOccurs="0"/&gt;
  *       &lt;/sequence&gt;
  *     &lt;/restriction&gt;
  *   &lt;/complexContent&gt;
@@ -66,9 +66,7 @@ public class Document {
     protected List<I18N> i18N;
     @XmlElement(required = true)
     protected List<Transition> transition;
-    @XmlElement(required = true)
     protected List<Place> place;
-    @XmlElement(required = true)
     protected List<Arc> arc;
 
     /**
