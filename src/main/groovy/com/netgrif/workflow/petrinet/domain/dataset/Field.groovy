@@ -138,10 +138,6 @@ abstract class Field<T> extends Imported {
         this.actions.add(action)
     }
 
-    void addAction(String action, String trigger) {
-        this.addAction(new Action(action, trigger))
-    }
-
     String getEncryption() {
         return encryption
     }
