@@ -33,6 +33,22 @@ public class ProcessRole extends Imported {
         return _id.toString();
     }
 
+    public ObjectId get_id() {
+        return _id;
+    }
+
+    public void set_id(ObjectId _id) {
+        this._id = _id;
+    }
+
+    public void set_id(String id){
+        this._id = new ObjectId(id);
+    }
+
+    public I18nString getName() {
+        return name;
+    }
+
     public void setName(String name) {
         setName(new I18nString(name));
     }

@@ -2,6 +2,7 @@ package com.netgrif.workflow;
 
 import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.ServerSetup;
+import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.mail.EmailType;
 import com.netgrif.workflow.mail.IMailService;
 import org.junit.After;
@@ -37,7 +38,7 @@ public class MailSenderServiceTest {
 
     @Test
     public void testSend() throws Exception {
-        service.sendRegistrationEmail(RECIPIENT, TOKEN);
+        service.sendRegistrationEmail(new User(RECIPIENT,"","",""));
 
         MimeMessage[] messages = smtpServer.getReceivedMessages();
 
