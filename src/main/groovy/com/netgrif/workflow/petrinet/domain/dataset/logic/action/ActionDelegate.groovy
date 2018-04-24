@@ -1,13 +1,17 @@
 package com.netgrif.workflow.petrinet.domain.dataset.logic.action
 
 import com.netgrif.workflow.configuration.ApplicationContextProvider
+import com.netgrif.workflow.importer.service.FieldFactory
 import com.netgrif.workflow.petrinet.domain.I18nString
 import com.netgrif.workflow.petrinet.domain.Transition
 import com.netgrif.workflow.petrinet.domain.dataset.*
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedField
 import com.netgrif.workflow.workflow.domain.Case
 import org.apache.log4j.Logger
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.stereotype.Component
 
+@Component
 @SuppressWarnings(["GrMethodMayBeStatic", "GroovyUnusedDeclaration"])
 class ActionDelegate {
 
@@ -17,14 +21,25 @@ class ActionDelegate {
     private static final String ALWAYS_GENERATE = "always"
     private static final String ONCE_GENERATE = "once"
 
+    @Autowired
+    private FieldFactory fieldFactory
+
+    private map = [:]
+    private Action action
     private Case useCase
     private FieldActionsRunner actionsRunner
-    ChangedField changedField
+    ChangedField changedField = new ChangedField()
 
-    ActionDelegate(Case useCase, FieldActionsRunner actionsRunner) {
+    def init(Action action, Case useCase, FieldActionsRunner actionsRunner) {
+        this.action = action
         this.useCase = useCase
         this.actionsRunner = actionsRunner
-        this.changedField = new ChangedField()
+        action.fieldIds.each { name, id ->
+            set(name, fieldFactory.buildFieldWithoutValidation(useCase, id))
+        }
+        action.transitionIds.each { name, id ->
+            set(name, useCase.petriNet.transitions[id])
+        }
     }
 
     def copyBehavior(Field field, Transition transition) {
@@ -88,6 +103,17 @@ class ActionDelegate {
         def transitionIds = transitions.collect { it.stringId } as Set
         service.cancelTasksWithoutReload(transitionIds, useCase.stringId)
     }
+
+//    def finish = { Transition[] transitions ->
+//        def service = ApplicationContextProvider.getBean("taskService")
+//        if (!service) {
+//            log.error("Could not find task service")
+//            return
+//        }
+//
+//        def transitionIds = transitions.collect { it.stringId } as Set
+//        service.finishTasksWithoutReload(transitionIds, useCase.stringId)
+//    }
 
     def change(Field field) {
         [about  : { cl ->
@@ -186,4 +212,8 @@ class ActionDelegate {
     def orsr(Closure find, String ico) {
         return find?.call(ico)
     }
+
+    Object get(String key) { map[key] }
+
+    void set(String key, Object value) { map[key] = value }
 }

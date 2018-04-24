@@ -17,6 +17,7 @@ import javax.xml.bind.annotation.XmlType;
  *     &lt;enumeration value="start"/&gt;
  *     &lt;enumeration value="center"/&gt;
  *     &lt;enumeration value="end"/&gt;
+ *     &lt;enumeration value="left"/&gt;
  *   &lt;/restriction&gt;
  * &lt;/simpleType&gt;
  * </pre>
@@ -31,7 +32,9 @@ public enum DataGroupAlignment {
     @XmlEnumValue("center")
     CENTER("center"),
     @XmlEnumValue("end")
-    END("end");
+    END("end"),
+    @XmlEnumValue("left")
+    LEFT("left");
     private final String value;
 
     DataGroupAlignment(String v) {
