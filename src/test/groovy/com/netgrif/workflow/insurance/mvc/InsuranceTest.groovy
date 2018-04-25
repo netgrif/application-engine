@@ -1,6 +1,7 @@
 package com.netgrif.workflow.insurance.mvc
 
 import com.netgrif.workflow.auth.domain.UserState
+import com.netgrif.workflow.importer.service.Config
 import com.netgrif.workflow.startup.ImportHelper
 import com.netgrif.workflow.WorkflowManagementSystemApplication
 import com.netgrif.workflow.auth.domain.Authority
@@ -99,7 +100,7 @@ class InsuranceTest {
                 .apply(springSecurity())
                 .build()
 
-        def net = importer.importPetriNet(new File("src/test/resources/insurance_portal_demo_test.xml"), CASE_NAME, CASE_INITIALS, [:])
+        def net = importer.importPetriNet(new File("src/test/resources/insurance_portal_demo_test.xml"), CASE_NAME, CASE_INITIALS, new Config())
         assert net.isPresent()
 
         netId = net.get().stringId
