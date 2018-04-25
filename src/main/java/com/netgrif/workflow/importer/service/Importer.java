@@ -271,6 +271,7 @@ public class Importer {
     @Transactional
     protected void addDataWithDefaultGroup(Transition transition, DataRef dataRef) {
         DataGroup dataGroup = new DataGroup();
+        dataGroup.setImportId(transition.getImportId() + "_" + System.currentTimeMillis());
         dataGroup.setAlignment("start");
         dataGroup.setStretch(true);
         dataGroup.addData(getField(dataRef.getId()).getStringId());
@@ -570,9 +571,6 @@ public class Importer {
     }
 
     public I18nString getI18n(String id) {
-        I18nString title = i18n.get(id);
-        if (title == null)
-            throw new IllegalArgumentException("I18nString "+id+" not found");
-        return title;
+        return i18n.get(id);
     }
 }
