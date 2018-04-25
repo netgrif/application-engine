@@ -344,13 +344,21 @@ public class Importer {
         if (importedAction.getTrigger() == null)
             throw new IllegalArgumentException("Action [" + importedAction.getValue() + "] doesn't have trigger");
         try {
-            Action action = new Action(importedAction.getTrigger());
-            action.setImportId(importedAction.getId());
+            Action action = createAction(importedAction);
             parseIds(fieldId, transitionId, importedAction, action);
             return action;
         } catch (NumberFormatException e) {
             throw new IllegalArgumentException("Error parsing ids of action [" + importedAction.getValue() + "]", e);
         }
+    }
+
+    private Action createAction(ActionType importedAction) {
+        Action action = new Action(importedAction.getTrigger());
+        if (importedAction.getId() != null)
+            action.setImportId(importedAction.getId());
+        else
+            action.setImportId(new ObjectId().toString());
+        return action;
     }
 
     private void parseIds(String fieldId, String transitionId, ActionType importedAction, Action action) {
@@ -538,35 +546,35 @@ public class Importer {
     public ProcessRole getRole(String id) {
         ProcessRole role = roles.get(id);
         if (role == null)
-            throw new IllegalArgumentException("Role "+id+" not found");
+            throw new IllegalArgumentException("Role " + id + " not found");
         return role;
     }
 
     public Field getField(String id) {
         Field field = fields.get(id);
         if (field == null)
-            throw new IllegalArgumentException("Field "+id+" not found");
+            throw new IllegalArgumentException("Field " + id + " not found");
         return field;
     }
 
     public Transition getTransition(String id) {
         Transition transition = transitions.get(id);
         if (transition == null)
-            throw new IllegalArgumentException("Transition "+id+" not found");
+            throw new IllegalArgumentException("Transition " + id + " not found");
         return transition;
     }
 
     public Place getPlace(String id) {
         Place place = places.get(id);
         if (place == null)
-            throw new IllegalArgumentException("Place "+id+" not found");
+            throw new IllegalArgumentException("Place " + id + " not found");
         return place;
     }
 
     public Transaction getTransaction(String id) {
         Transaction transaction = transactions.get(id);
         if (transaction == null)
-            throw new IllegalArgumentException("Transaction "+id+" not found");
+            throw new IllegalArgumentException("Transaction " + id + " not found");
         return transaction;
     }
 
