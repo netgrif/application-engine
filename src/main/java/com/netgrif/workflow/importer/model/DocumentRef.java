@@ -66,7 +66,7 @@ public class DocumentRef {
      * <p>
      * For example, to add a new item, do as follows:
      * <pre>
-     *    getFields().add(newItem);
+     *    getField().add(newItem);
      * </pre>
      * 
      * 
