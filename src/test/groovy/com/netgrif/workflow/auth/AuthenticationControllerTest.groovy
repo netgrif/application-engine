@@ -10,6 +10,7 @@ import com.netgrif.workflow.auth.domain.repositories.UserRepository
 import com.netgrif.workflow.auth.web.AuthenticationController
 import com.netgrif.workflow.auth.web.requestbodies.NewUserRequest
 import com.netgrif.workflow.auth.web.requestbodies.RegistrationRequest
+import com.netgrif.workflow.importer.service.Config
 import com.netgrif.workflow.importer.service.Importer
 import com.netgrif.workflow.mail.EmailType
 import com.netgrif.workflow.orgstructure.domain.Group
@@ -77,7 +78,7 @@ class AuthenticationControllerTest {
         smtpServer = new GreenMail(new ServerSetup(2525, null, "smtp"))
         smtpServer.start()
 
-        def net = importer.importPetriNet(new File("src/test/resources/insurance_portal_demo_test.xml"), CASE_NAME, CASE_INITIALS, [:])
+        def net = importer.importPetriNet(new File("src/test/resources/insurance_portal_demo_test.xml"), CASE_NAME, CASE_INITIALS, new Config())
         assert net.isPresent()
         if (authorityRepository.count() == 0)
             importHelper.createAuthority(Authority.user)
