@@ -119,6 +119,8 @@ public class Importer {
         net.setTitle(title);
         net.setInitials(initials);
         net.setImportId(document.getId());
+        if (document.getId() == null)
+            net.setImportId(new ObjectId().toString());
         net.setIcon(document.getIcon());
 
         document.getI18N().forEach(this::addI18N);
