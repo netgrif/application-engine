@@ -35,28 +35,39 @@ import javax.xml.bind.annotation.*;
 @XmlRootElement(name = "arc")
 public class Arc {
 
-    protected long id;
+    @XmlElement(required = true)
+    protected String id;
     @XmlElement(required = true, defaultValue = "regular")
     @XmlSchemaType(name = "string")
     protected ArcType type;
-    protected long sourceId;
-    protected long destinationId;
+    @XmlElement(required = true)
+    protected String sourceId;
+    @XmlElement(required = true)
+    protected String destinationId;
     protected int multiplicity;
     protected BreakPoint breakPoint;
 
     /**
      * Gets the value of the id property.
      * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
      */
-    public long getId() {
+    public String getId() {
         return id;
     }
 
     /**
      * Sets the value of the id property.
      * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
      */
-    public void setId(long value) {
+    public void setId(String value) {
         this.id = value;
     }
 
@@ -87,32 +98,48 @@ public class Arc {
     /**
      * Gets the value of the sourceId property.
      * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
      */
-    public long getSourceId() {
+    public String getSourceId() {
         return sourceId;
     }
 
     /**
      * Sets the value of the sourceId property.
      * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
      */
-    public void setSourceId(long value) {
+    public void setSourceId(String value) {
         this.sourceId = value;
     }
 
     /**
      * Gets the value of the destinationId property.
      * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
      */
-    public long getDestinationId() {
+    public String getDestinationId() {
         return destinationId;
     }
 
     /**
      * Sets the value of the destinationId property.
      * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
      */
-    public void setDestinationId(long value) {
+    public void setDestinationId(String value) {
         this.destinationId = value;
     }
 

@@ -58,7 +58,8 @@ import java.util.List;
 @XmlRootElement(name = "transition")
 public class Transition {
 
-    protected long id;
+    @XmlElement(required = true)
+    protected String id;
     protected short x;
     protected short y;
     @XmlElement(required = true)
@@ -80,16 +81,24 @@ public class Transition {
     /**
      * Gets the value of the id property.
      * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
      */
-    public long getId() {
+    public String getId() {
         return id;
     }
 
     /**
      * Sets the value of the id property.
      * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
      */
-    public void setId(long value) {
+    public void setId(String value) {
         this.id = value;
     }
 

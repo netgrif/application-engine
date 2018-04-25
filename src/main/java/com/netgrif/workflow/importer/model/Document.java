@@ -54,7 +54,7 @@ import java.util.List;
 @XmlRootElement(name = "document")
 public class Document {
 
-    protected Long id;
+    protected String id;
     protected String icon;
     protected Boolean defaultRole;
     protected I18NStringType caseName;
@@ -74,10 +74,10 @@ public class Document {
      * 
      * @return
      *     possible object is
-     *     {@link Long }
+     *     {@link String }
      *     
      */
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
@@ -86,10 +86,10 @@ public class Document {
      * 
      * @param value
      *     allowed object is
-     *     {@link Long }
+     *     {@link String }
      *     
      */
-    public void setId(Long value) {
+    public void setId(String value) {
         this.id = value;
     }
 
