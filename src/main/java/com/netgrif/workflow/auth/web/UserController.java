@@ -8,7 +8,6 @@ import com.netgrif.workflow.auth.web.requestbodies.UpdateUserRequest;
 import com.netgrif.workflow.auth.web.responsebodies.AuthoritiesResources;
 import com.netgrif.workflow.auth.web.responsebodies.UserResource;
 import com.netgrif.workflow.auth.web.responsebodies.UsersResource;
-import com.netgrif.workflow.event.events.usecase.UpdateMarkingEvent;
 import com.netgrif.workflow.petrinet.service.interfaces.IProcessRoleService;
 import com.netgrif.workflow.workflow.web.responsebodies.MessageResource;
 import org.apache.log4j.Logger;
@@ -16,7 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-import sun.rmi.runtime.Log;
 
 import java.util.Locale;
 import java.util.Objects;
@@ -66,7 +64,7 @@ public class UserController {
         if (!logged.isAdmin() && !Objects.equals(logged.getId(), userId)) {
             return null;
         }
-        if(!logged.isAdmin() && Objects.equals(logged.getId(), userId)){
+        if (!logged.isAdmin() && Objects.equals(logged.getId(), userId)) {
             return null; //TODO update user
         } else {
             return null; //TODO update user
