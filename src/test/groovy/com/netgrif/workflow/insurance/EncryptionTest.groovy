@@ -3,6 +3,7 @@ package com.netgrif.workflow.insurance
 import com.netgrif.workflow.auth.domain.Authority
 import com.netgrif.workflow.auth.domain.LoggedUser
 import com.netgrif.workflow.auth.service.interfaces.IAuthorityService
+import com.netgrif.workflow.importer.service.Config
 import com.netgrif.workflow.importer.service.Importer
 import com.netgrif.workflow.petrinet.domain.PetriNet
 import com.netgrif.workflow.workflow.domain.Case
@@ -66,7 +67,7 @@ class EncryptionTest {
     }
 
     private String createCase() {
-        Optional<PetriNet> net = importer.importPetriNet(new File("src/test/resources/mapping_test.xml"), "Encryption test", "ENC", [:])
+        Optional<PetriNet> net = importer.importPetriNet(new File("src/test/resources/mapping_test.xml"), "Encryption test", "ENC", new Config())
         assert net.isPresent()
         def useCase = workflowService.createCase(net.get().stringId, "Encryption test", "color", mockLoggedUser())
         def nameField = useCase.petriNet.dataSet.values().find { v -> v.name.defaultValue == FIELD_NAME}
