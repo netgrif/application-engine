@@ -226,12 +226,12 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link Long }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "", name = "id")
-    public JAXBElement<Long> createId(Long value) {
-        return new JAXBElement<Long>(_Id_QNAME, Long.class, null, value);
+    public JAXBElement<String> createId(String value) {
+        return new JAXBElement<String>(_Id_QNAME, String.class, null, value);
     }
 
     /**
@@ -316,12 +316,12 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link Long }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "", name = "transitionRef")
-    public JAXBElement<Long> createTransitionRef(Long value) {
-        return new JAXBElement<Long>(_TransitionRef_QNAME, Long.class, null, value);
+    public JAXBElement<String> createTransitionRef(String value) {
+        return new JAXBElement<String>(_TransitionRef_QNAME, String.class, null, value);
     }
 
     /**
@@ -460,21 +460,21 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link Long }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "", name = "sourceId")
-    public JAXBElement<Long> createSourceId(Long value) {
-        return new JAXBElement<Long>(_SourceId_QNAME, Long.class, null, value);
+    public JAXBElement<String> createSourceId(String value) {
+        return new JAXBElement<String>(_SourceId_QNAME, String.class, null, value);
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link Long }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "", name = "destinationId")
-    public JAXBElement<Long> createDestinationId(Long value) {
-        return new JAXBElement<Long>(_DestinationId_QNAME, Long.class, null, value);
+    public JAXBElement<String> createDestinationId(String value) {
+        return new JAXBElement<String>(_DestinationId_QNAME, String.class, null, value);
     }
 
     /**
