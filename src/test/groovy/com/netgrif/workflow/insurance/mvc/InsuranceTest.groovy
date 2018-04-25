@@ -103,7 +103,7 @@ class InsuranceTest {
         def net = importer.importPetriNet(new File("src/test/resources/insurance_portal_demo_test.xml"), CASE_NAME, CASE_INITIALS, new Config())
         assert net.isPresent()
 
-        netId = net.get().stringId
+        netId = net.get().getStringId()
 
         def org = importHelper.createGroup("Insurance Company")
         def auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])

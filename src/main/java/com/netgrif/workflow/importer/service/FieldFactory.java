@@ -126,7 +126,7 @@ public final class FieldFactory {
 
     private UserField buildUserField(Data data, Importer importer) {
         String[] roles = data.getValues().stream()
-                .map(value -> importer.getRoles().get(Long.parseLong(value.getValue())).getStringId())
+                .map(value -> importer.getRoles().get(value.getValue()).getStringId())
                 .toArray(String[]::new);
         return new UserField(roles);
     }

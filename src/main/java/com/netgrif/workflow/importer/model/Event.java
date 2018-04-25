@@ -1,7 +1,10 @@
 
 package com.netgrif.workflow.importer.model;
 
-import javax.xml.bind.annotation.*;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
 
 
 /**
@@ -15,10 +18,9 @@ import javax.xml.bind.annotation.*;
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
  *       &lt;sequence&gt;
  *         &lt;element ref="{}id"/&gt;
- *         &lt;choice&gt;
- *           &lt;element ref="{}title"/&gt;
- *           &lt;element ref="{}name"/&gt;
- *         &lt;/choice&gt;
+ *         &lt;element ref="{}title" minOccurs="0"/&gt;
+ *         &lt;element ref="{}message" minOccurs="0"/&gt;
+ *         &lt;element ref="{}actions" minOccurs="0"/&gt;
  *       &lt;/sequence&gt;
  *     &lt;/restriction&gt;
  *   &lt;/complexContent&gt;
@@ -31,37 +33,30 @@ import javax.xml.bind.annotation.*;
 @XmlType(name = "", propOrder = {
     "id",
     "title",
-    "name"
+    "message",
+    "actions"
 })
-@XmlRootElement(name = "role")
-public class Role {
+@XmlRootElement(name = "event")
+public class Event {
 
-    @XmlElement(required = true)
-    protected String id;
+    protected long id;
     protected I18NStringType title;
-    protected I18NStringType name;
+    protected I18NStringType message;
+    protected Actions actions;
 
     /**
      * Gets the value of the id property.
      * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
      */
-    public String getId() {
+    public long getId() {
         return id;
     }
 
     /**
      * Sets the value of the id property.
      * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
      */
-    public void setId(String value) {
+    public void setId(long value) {
         this.id = value;
     }
 
@@ -90,27 +85,51 @@ public class Role {
     }
 
     /**
-     * Gets the value of the name property.
+     * Gets the value of the message property.
      * 
      * @return
      *     possible object is
      *     {@link I18NStringType }
      *     
      */
-    public I18NStringType getName() {
-        return name;
+    public I18NStringType getMessage() {
+        return message;
     }
 
     /**
-     * Sets the value of the name property.
+     * Sets the value of the message property.
      * 
      * @param value
      *     allowed object is
      *     {@link I18NStringType }
      *     
      */
-    public void setName(I18NStringType value) {
-        this.name = value;
+    public void setMessage(I18NStringType value) {
+        this.message = value;
+    }
+
+    /**
+     * Gets the value of the actions property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link Actions }
+     *     
+     */
+    public Actions getActions() {
+        return actions;
+    }
+
+    /**
+     * Sets the value of the actions property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link Actions }
+     *     
+     */
+    public void setActions(Actions value) {
+        this.actions = value;
     }
 
 }

@@ -40,7 +40,8 @@ import java.util.List;
 @XmlRootElement(name = "dataGroup")
 public class DataGroup {
 
-    protected long id;
+    @XmlElement(required = true)
+    protected String id;
     protected I18NStringType title;
     @XmlSchemaType(name = "string")
     protected DataGroupAlignment alignment;
@@ -50,16 +51,24 @@ public class DataGroup {
     /**
      * Gets the value of the id property.
      * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
      */
-    public long getId() {
+    public String getId() {
         return id;
     }
 
     /**
      * Sets the value of the id property.
      * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
      */
-    public void setId(long value) {
+    public void setId(String value) {
         this.id = value;
     }
 

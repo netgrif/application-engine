@@ -15,13 +15,13 @@ public class Arc extends PetriNetObject {
     protected Node source;
 
     @Getter @Setter
-    protected ObjectId sourceId;
+    protected String sourceId;
 
     @Transient
     protected Node destination;
 
     @Getter @Setter
-    protected ObjectId destinationId;
+    protected String destinationId;
 
     @Getter @Setter
     protected Integer multiplicity;
@@ -51,7 +51,7 @@ public class Arc extends PetriNetObject {
 
     public void setSource(Node source) {
         this.source = source;
-        this.sourceId = source.getObjectId();
+        this.sourceId = source.getImportId();
     }
 
     public Node getDestination() {
@@ -60,7 +60,7 @@ public class Arc extends PetriNetObject {
 
     public void setDestination(Node destination) {
         this.destination = destination;
-        this.destinationId = destination.getObjectId();
+        this.destinationId = destination.getImportId();
     }
 
     @Override
