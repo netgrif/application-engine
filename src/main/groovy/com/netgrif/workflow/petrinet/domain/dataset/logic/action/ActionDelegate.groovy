@@ -6,9 +6,12 @@ import com.netgrif.workflow.petrinet.domain.I18nString
 import com.netgrif.workflow.petrinet.domain.Transition
 import com.netgrif.workflow.petrinet.domain.dataset.*
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedField
+import com.netgrif.workflow.startup.ImportHelper
 import com.netgrif.workflow.workflow.domain.Case
+import com.netgrif.workflow.workflow.service.TaskService
 import org.apache.log4j.Logger
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Component
 
 @Component
@@ -23,6 +26,9 @@ class ActionDelegate {
 
     @Autowired
     private FieldFactory fieldFactory
+
+    @Autowired
+    private TaskService taskService
 
     private map = [:]
     private Action action
@@ -114,6 +120,18 @@ class ActionDelegate {
 //        def transitionIds = transitions.collect { it.stringId } as Set
 //        service.finishTasksWithoutReload(transitionIds, useCase.stringId)
 //    }
+
+    def execute(String taskId) {
+        [with: { Map map ->
+//            def dataSet = map.collectEntries { [(it.key as String): [value: it.value]] }
+            def tasksPage = taskService.findByTransitions(new PageRequest(0, Integer.MAX_VALUE), [taskId])
+            tasksPage?.content?.each { task ->
+                taskService.assignTask(task.stringId)
+                taskService.setData(task.stringId, ImportHelper.populateDataset(map as Map<String, Map<String, String>>))
+                taskService.finishTask(task.stringId)
+            }
+        }]
+    }
 
     def change(Field field) {
         [about  : { cl ->

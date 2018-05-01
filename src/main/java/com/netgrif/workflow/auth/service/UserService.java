@@ -1,9 +1,6 @@
 package com.netgrif.workflow.auth.service;
 
-import com.netgrif.workflow.auth.domain.Authority;
-import com.netgrif.workflow.auth.domain.User;
-import com.netgrif.workflow.auth.domain.UserProcessRole;
-import com.netgrif.workflow.auth.domain.UserState;
+import com.netgrif.workflow.auth.domain.*;
 import com.netgrif.workflow.auth.domain.repositories.AuthorityRepository;
 import com.netgrif.workflow.auth.domain.repositories.UserRepository;
 import com.netgrif.workflow.auth.service.interfaces.IUserProcessRoleService;
@@ -12,8 +9,10 @@ import com.netgrif.workflow.event.events.user.UserRegistrationEvent;
 import com.netgrif.workflow.orgstructure.domain.Member;
 import com.netgrif.workflow.orgstructure.service.IMemberService;
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRoleRepository;
+import com.netgrif.workflow.startup.SystemUserRunner;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -143,6 +142,15 @@ public class UserService implements IUserService {
         authority.addUser(user);
 
         userRepository.save(user);
+    }
+
+    @Override
+    public LoggedUser getLoggedOrSystem() {
+        try {
+            return (LoggedUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        } catch (NullPointerException e) {
+            return userRepository.findOne(SystemUserRunner.SYSTEM_USER_ID).transformToLoggedUser();
+        }
     }
 
     private User loadProcessRoles(User user) {

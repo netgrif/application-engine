@@ -1,10 +1,8 @@
 package com.netgrif.workflow.startup
 
-import com.netgrif.workflow.auth.domain.Authority
-import com.netgrif.workflow.auth.domain.LoggedUser
-import com.netgrif.workflow.auth.domain.User
-import com.netgrif.workflow.auth.domain.UserProcessRole
-import com.netgrif.workflow.auth.domain.UserState
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.node.ObjectNode
+import com.netgrif.workflow.auth.domain.*
 import com.netgrif.workflow.auth.domain.repositories.UserProcessRoleRepository
 import com.netgrif.workflow.auth.service.interfaces.IAuthorityService
 import com.netgrif.workflow.auth.service.interfaces.IUserService
@@ -12,6 +10,7 @@ import com.netgrif.workflow.orgstructure.domain.Group
 import com.netgrif.workflow.orgstructure.service.IGroupService
 import com.netgrif.workflow.orgstructure.service.IMemberService
 import com.netgrif.workflow.petrinet.domain.PetriNet
+import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldContainer
 import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository
 import com.netgrif.workflow.petrinet.service.PetriNetService
 import com.netgrif.workflow.petrinet.web.requestbodies.UploadedFileMeta
@@ -21,6 +20,8 @@ import com.netgrif.workflow.workflow.domain.repositories.CaseRepository
 import com.netgrif.workflow.workflow.service.TaskService
 import com.netgrif.workflow.workflow.service.interfaces.IFilterService
 import com.netgrif.workflow.workflow.web.requestbodies.CreateFilterBody
+import com.netgrif.workflow.workflow.web.responsebodies.TaskReference
+import groovy.json.JsonOutput
 import org.apache.log4j.Logger
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.io.ResourceLoader
@@ -30,6 +31,14 @@ import java.time.LocalDateTime
 
 @Component
 class ImportHelper {
+
+    public static final String PATCH = "patch"
+
+    public static final String FIELD_BOOLEAN = "boolean"
+    public static final String FIELD_ENUMERATION = "enumeration"
+    public static final String FIELD_TEXT = "text"
+    public static final String FIELD_NUMBER = "number"
+    public static final String FIELD_DATE = "date"
 
     private static final Logger log = Logger.getLogger(ImportHelper.class.name)
 
@@ -69,6 +78,8 @@ class ImportHelper {
     @Autowired
     private IMemberService memberService
 
+    private final ClassLoader loader = ImportHelper.getClassLoader()
+
     @SuppressWarnings("GroovyAssignabilityCheck")
     Map<String, Group> createGroups(Map<String, String> groups) {
         HashMap<String, Group> groupsMap = new HashMap<>()
@@ -102,13 +113,12 @@ class ImportHelper {
     }
 
     Optional<PetriNet> createNet(String fileName, String identifier, String name, String initials, String release) {
-        createNet(fileName, identifier, name, initials, release, superCreator.superUser.transformToLoggedUser())
+        createNet(fileName, identifier, name, initials, release, superCreator.loggedSuper)
     }
 
     Optional<PetriNet> createNet(String fileName, String identifier, String name, String initials, String release, LoggedUser loggedUser) {
         return petriNetService.importPetriNet(new File("src/main/resources/petriNets/$fileName"),
                 new UploadedFileMeta(name, initials, identifier, release), loggedUser)
-
     }
 
     UserProcessRole createUserProcessRole(PetriNet net, String name) {
@@ -160,8 +170,48 @@ class ImportHelper {
         return useCase
     }
 
+    Case createCase(String title, PetriNet net) {
+        return createCase(title, net, superCreator.loggedSuper)
+    }
+
     boolean createFilter(String title, String query, String readable, LoggedUser user) {
         return filterService.saveFilter(new CreateFilterBody(title, Filter.VISIBILITY_PUBLIC, "This filter was created automatically for testing purpose only.", Filter.TYPE_TASK, query, readable), user)
+    }
+
+    void assignTask(String taskTitle, String caseId, LoggedUser author) {
+        taskService.assignTask(author, getTaskId(taskTitle, caseId))
+    }
+
+    void assignTaskToSuper(String taskTitle, String caseId) {
+        assignTask(taskTitle, caseId, superCreator.loggedSuper)
+    }
+
+    void finishTask(String taskTitle, String caseId, LoggedUser author) {
+        taskService.finishTask(author, getTaskId(taskTitle, caseId))
+    }
+
+    void finishTaskAsSuper(String taskTitle, String caseId) {
+        finishTask(taskTitle, caseId, superCreator.loggedSuper)
+    }
+
+    String getTaskId(String taskTitle, String caseId) {
+        List<TaskReference> references = taskService.findAllByCase(caseId, null)
+        return references.find { it.getTitle() == taskTitle }.stringId
+    }
+
+    ChangedFieldContainer setTaskData(String taskId, Map<String, Map<String,String>> data) {
+        ObjectNode dataSet = populateDataset(data)
+         taskService.setData(taskId, dataSet)
+    }
+
+    ChangedFieldContainer setTaskData(String taskTitle, String caseId, Map<String, Map<String,String>> data) {
+        setTaskData(getTaskId(taskTitle, caseId), data)
+    }
+
+    static ObjectNode populateDataset(Map<String, Map<String, String>> data) {
+        ObjectMapper mapper = new ObjectMapper()
+        String json = JsonOutput.toJson(data)
+        return mapper.readTree(json) as ObjectNode
     }
 
     static String getCaseColor() {
