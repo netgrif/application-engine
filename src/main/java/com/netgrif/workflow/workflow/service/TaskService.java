@@ -14,6 +14,7 @@ import com.netgrif.workflow.petrinet.domain.*;
 import com.netgrif.workflow.petrinet.domain.arcs.Arc;
 import com.netgrif.workflow.petrinet.domain.arcs.ResetArc;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
+import com.netgrif.workflow.petrinet.domain.dataset.FieldWithDefault;
 import com.netgrif.workflow.petrinet.domain.dataset.FileField;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedField;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldContainer;
@@ -339,7 +340,6 @@ public class TaskService implements ITaskService {
         Map<String, ChangedField> changedFields = new HashMap<>();
         values.fields().forEachRemaining(entry -> {
             useCase.getDataSet().get(entry.getKey()).setValue(parseFieldsValues(entry.getValue()));
-            //changedFields.put(entry.getKey(), new ChangedField(entry.getKey()));
             resolveActions(useCase.getPetriNet().getField(entry.getKey()).get(),
                     Action.ActionTrigger.SET, useCase, useCase.getPetriNet().getTransition(task.getTransitionId()))
                     .forEach((key, changedField) -> {
@@ -349,7 +349,17 @@ public class TaskService implements ITaskService {
                             changedFields.put(changedField.getId(), changedField);
                     });
         });
-
+        Case actual = workflowService.findOne(task.getCaseId());
+        actual.getDataSet().forEach((id, dataField) -> {
+            try {
+                // if actual
+                if (Double.compare((Double)dataField.getValue(), (Double)((FieldWithDefault)useCase.getField(id)).getDefaultValue()) != 0) {
+                    useCase.getDataSet().put(id, dataField);
+                }
+            } catch (Exception e) {
+                log.debug(e.getMessage());
+            }
+        });
         workflowService.save(useCase);
         publisher.publishEvent(new SaveCaseDataEvent(useCase, changedFields.values()));
 

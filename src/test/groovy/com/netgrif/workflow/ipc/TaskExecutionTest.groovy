@@ -4,11 +4,13 @@ import com.netgrif.workflow.importer.service.Importer
 import com.netgrif.workflow.petrinet.domain.PetriNet
 import com.netgrif.workflow.startup.ImportHelper
 import com.netgrif.workflow.workflow.domain.Case
+import com.netgrif.workflow.workflow.domain.repositories.CaseRepository
 import com.netgrif.workflow.workflow.service.TaskService
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.data.mongodb.core.MongoTemplate
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit4.SpringRunner
 
@@ -31,9 +33,14 @@ class TaskExecutionTest {
     @Autowired
     private ImportHelper helper
 
+    @Autowired
+    private CaseRepository caseRepository
 
     @Autowired
     private TaskService taskService
+
+    @Autowired
+    private MongoTemplate mongo
 
     private def stream = { String name ->
         return TaskExecutionTest.getClassLoader().getResourceAsStream(name)
@@ -41,6 +48,8 @@ class TaskExecutionTest {
 
     @Test
     void testTaskExecution() {
+        caseRepository.deleteAll()
+
         def limitsNetOptional = importer.importPetriNet(stream(LIMITS_NET_FILE), LIMITS_NET_TITLE, LIMITS_NET_INITIALS)
         def leasingNetOptional = importer.importPetriNet(stream(LEASING_NET_FILE), LEASING_NET_TITLE, LEASING_NET_INITIALS)
 
@@ -62,6 +71,17 @@ class TaskExecutionTest {
                 ]
         ])
         helper.finishTaskAsSuper(LEASING_NET_TASK_EDIT_COST, leasing1.stringId)
-        //TODO: fires only leasing2#available, leasing1#available is still 0 ???
+
+        limits = caseRepository.findOne(limits.stringId)
+        leasing1 = caseRepository.findOne(leasing1.stringId)
+        leasing2 = caseRepository.findOne(leasing2.stringId)
+
+//@formatter:off
+        assert limits.dataSet["limit"].value as Double  == 970_000 as Double
+        assert leasing1.dataSet["2"].value as Double    == 970_000 as Double
+        assert leasing1.dataSet["1"].value as Double    ==  30_000 as Double
+        assert leasing2.dataSet["2"].value as Double    == 970_000 as Double
+        assert leasing2.dataSet["1"].value as Double    ==       0 as Double
+//@formatter:on
     }
 }
