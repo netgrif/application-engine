@@ -2,15 +2,16 @@ package com.netgrif.workflow.ipc
 
 import com.netgrif.workflow.importer.service.Importer
 import com.netgrif.workflow.petrinet.domain.PetriNet
+import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository
 import com.netgrif.workflow.startup.ImportHelper
 import com.netgrif.workflow.workflow.domain.Case
 import com.netgrif.workflow.workflow.domain.repositories.CaseRepository
+import com.netgrif.workflow.workflow.domain.repositories.TaskRepository
 import com.netgrif.workflow.workflow.service.TaskService
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.data.mongodb.core.MongoTemplate
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit4.SpringRunner
 
@@ -40,7 +41,10 @@ class TaskExecutionTest {
     private TaskService taskService
 
     @Autowired
-    private MongoTemplate mongo
+    private PetriNetRepository netRepository
+
+    @Autowired
+    private TaskRepository taskRepository
 
     private def stream = { String name ->
         return TaskExecutionTest.getClassLoader().getResourceAsStream(name)
@@ -49,6 +53,8 @@ class TaskExecutionTest {
     @Test
     void testTaskExecution() {
         caseRepository.deleteAll()
+        taskRepository.deleteAll()
+        netRepository.deleteAll()
 
         def limitsNetOptional = importer.importPetriNet(stream(LIMITS_NET_FILE), LIMITS_NET_TITLE, LIMITS_NET_INITIALS)
         def leasingNetOptional = importer.importPetriNet(stream(LEASING_NET_FILE), LEASING_NET_TITLE, LEASING_NET_INITIALS)
@@ -82,6 +88,27 @@ class TaskExecutionTest {
         assert leasing1.dataSet["1"].value as Double    ==  30_000 as Double
         assert leasing2.dataSet["2"].value as Double    == 970_000 as Double
         assert leasing2.dataSet["1"].value as Double    ==       0 as Double
+//@formatter:on
+
+        helper.assignTaskToSuper(LEASING_NET_TASK_EDIT_COST, leasing2.stringId)
+        helper.setTaskData(LEASING_NET_TASK_EDIT_COST, leasing2.stringId, [
+                "1": [
+                        value: 20_000 as Double,
+                        type : helper.FIELD_NUMBER
+                ]
+        ])
+        helper.finishTaskAsSuper(LEASING_NET_TASK_EDIT_COST, leasing2.stringId)
+
+        limits = caseRepository.findOne(limits.stringId)
+        leasing1 = caseRepository.findOne(leasing1.stringId)
+        leasing2 = caseRepository.findOne(leasing2.stringId)
+
+//@formatter:off
+        assert limits.dataSet["limit"].value as Double  == 950_000 as Double
+        assert leasing1.dataSet["2"].value as Double    == 950_000 as Double
+        assert leasing1.dataSet["1"].value as Double    ==  30_000 as Double
+        assert leasing2.dataSet["2"].value as Double    == 950_000 as Double
+        assert leasing2.dataSet["1"].value as Double    ==  20_000 as Double
 //@formatter:on
     }
 }

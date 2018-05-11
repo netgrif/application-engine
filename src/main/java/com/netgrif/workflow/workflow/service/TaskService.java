@@ -14,7 +14,6 @@ import com.netgrif.workflow.petrinet.domain.*;
 import com.netgrif.workflow.petrinet.domain.arcs.Arc;
 import com.netgrif.workflow.petrinet.domain.arcs.ResetArc;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
-import com.netgrif.workflow.petrinet.domain.dataset.FieldWithDefault;
 import com.netgrif.workflow.petrinet.domain.dataset.FileField;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedField;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldContainer;
@@ -349,23 +348,22 @@ public class TaskService implements ITaskService {
                             changedFields.put(changedField.getId(), changedField);
                     });
         });
-        Case actual = workflowService.findOne(task.getCaseId());
-        actual.getDataSet().forEach((id, dataField) -> {
-            try {
-                // if actual
-                if (Double.compare((Double)dataField.getValue(), (Double)((FieldWithDefault)useCase.getField(id)).getDefaultValue()) != 0) {
-                    useCase.getDataSet().put(id, dataField);
-                }
-            } catch (Exception e) {
-                log.debug(e.getMessage());
-            }
-        });
+        updateDataset(useCase);
         workflowService.save(useCase);
         publisher.publishEvent(new SaveCaseDataEvent(useCase, changedFields.values()));
 
         ChangedFieldContainer container = new ChangedFieldContainer();
         container.putAll(changedFields);
         return container;
+    }
+
+    private void updateDataset(Case useCase) {
+        Case actual = workflowService.findOne(useCase.getStringId());
+        actual.getDataSet().forEach((id, dataField) -> {
+            if (dataField.isNewerThen(useCase.getDataField(id))) {
+                useCase.getDataSet().put(id, dataField);
+            }
+        });
     }
 
     private Map<String, ChangedField> resolveActions(Field field, Action.ActionTrigger actionTrigger, Case useCase, Transition transition) {

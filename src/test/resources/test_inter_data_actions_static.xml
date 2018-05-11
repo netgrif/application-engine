@@ -15,9 +15,6 @@
                     value: limit.value,
                     type: "number",
                 ],
-                "1": [
-
-                ]
             ] as Map)
             <!--@formatter:on-->
         </action>
