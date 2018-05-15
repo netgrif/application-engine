@@ -207,4 +207,8 @@ public class Case {
     public Field getField(String id) {
         return petriNet.getDataSet().get(id);
     }
+
+    public DataField getDataField(String id) {
+        return dataSet.get(id);
+    }
 }
