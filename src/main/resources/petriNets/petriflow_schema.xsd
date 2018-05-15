@@ -263,12 +263,14 @@
     <xs:element name="name" type="i18nStringType"/>
     <xs:element name="values" type="i18nStringType"/>
     <xs:element name="perform" type="xs:boolean"/>
+    <xs:element name="view" type="xs:boolean"/>
     <xs:element name="delegate" type="xs:boolean"/>
     <xs:element name="logic">
         <xs:complexType>
             <xs:sequence>
                 <xs:element ref="perform" minOccurs="0"/>
                 <xs:element ref="delegate" minOccurs="0"/>
+                <xs:element ref="view" minOccurs="0"/>
                 <xs:element name="behavior" type="behavior" maxOccurs="unbounded" minOccurs="0"/>
                 <xs:element ref="action" minOccurs="0" maxOccurs="unbounded"/>
             </xs:sequence>
