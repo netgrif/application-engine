@@ -14,7 +14,7 @@ class NumberField extends ValidableField<Double> {
 
     NumberField() {
         super()
-        super.superSetDefaultValue(0)
+        super.superSetDefaultValue(0.0d)
     }
 
     @Override
