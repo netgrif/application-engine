@@ -27,8 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -75,7 +74,7 @@ public class Importer {
     private TriggerFactory triggerFactory;
 
     @Transactional
-    public Optional<PetriNet> importPetriNet(File xml, String title, String initials, Config config) {
+    public Optional<PetriNet> importPetriNet(InputStream xml, String title, String initials, Config config) {
         try {
             initialize(config);
             unmarshallXml(xml);
@@ -84,6 +83,26 @@ public class Importer {
             e.printStackTrace();
         }
         return Optional.empty();
+    }
+
+    @Transactional
+    public Optional<PetriNet> importPetriNet(File xml, String title, String initials, Config config) {
+        try {
+            return importPetriNet(new FileInputStream(xml), title, initials, config);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        return Optional.empty();
+    }
+
+    @Transactional
+    public Optional<PetriNet> importPetriNet(InputStream xml, String title, String initials) {
+        return importPetriNet(xml, title, initials, new Config());
+    }
+
+    @Transactional
+    public Optional<PetriNet> importPetriNet(File xml, String title, String initials) {
+        return importPetriNet(xml, title, initials, new Config());
     }
 
     private void initialize(Config config) {
@@ -98,7 +117,7 @@ public class Importer {
     }
 
     @Transactional
-    protected void unmarshallXml(File xml) throws JAXBException {
+    protected void unmarshallXml(InputStream xml) throws JAXBException {
         JAXBContext jaxbContext = JAXBContext.newInstance(Document.class);
 
         Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
@@ -406,26 +425,17 @@ public class Importer {
             return;
         }
         if (Objects.equals(key.trim(), TRANSITION_KEYWORD)) {
-            action.addTransitionId(paramName, getTransitionId(importId));
+            action.addTransitionId(paramName, importId);
             return;
         }
         throw new IllegalArgumentException("Object " + key + "." + importId + " not supported");
     }
-
 
     private Map<String, String> parseParams(String definition) {
         List<String> params = Arrays.asList(definition.split(","));
         return params.stream()
                 .map(param -> param.split(":"))
                 .collect(Collectors.toMap(o -> o[0], o -> o[1]));
-    }
-
-    private String getTransitionId(String importId) {
-        try {
-            return getTransition(importId).getStringId();
-        } catch (Exception e) {
-            throw new IllegalArgumentException("Object t." + importId + " does not exists");
-        }
     }
 
     private String getFieldId(String importId) {

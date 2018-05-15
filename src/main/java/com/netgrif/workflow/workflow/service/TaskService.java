@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.auth.domain.repositories.UserRepository;
+import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.event.events.task.*;
 import com.netgrif.workflow.event.events.usecase.SaveCaseDataEvent;
 import com.netgrif.workflow.importer.service.FieldFactory;
@@ -68,6 +69,9 @@ public class TaskService implements ITaskService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private IUserService userService;
 
     @Autowired
     private MongoTemplate mongoTemplate;
@@ -234,6 +238,12 @@ public class TaskService implements ITaskService {
     }
 
     @Override
+    public void finishTask(String taskId) throws IllegalArgumentException, TransitionNotExecutableException {
+        LoggedUser user = userService.getLoggedOrSystem();
+        finishTask(user, taskId);
+    }
+
+    @Override
     @Transactional
     public void assignTask(LoggedUser loggedUser, String taskId) throws TransitionNotExecutableException {
         Task task = taskRepository.findOne(taskId);
@@ -243,6 +253,12 @@ public class TaskService implements ITaskService {
         assignTaskToUser(user, task, useCase);
 
         publisher.publishEvent(new UserAssignTaskEvent(user, task, useCase));
+    }
+
+    @Override
+    public void assignTask(String taskId) throws TransitionNotExecutableException {
+        LoggedUser user = userService.getLoggedOrSystem();
+        assignTask(user, taskId);
     }
 
     @Override
@@ -323,7 +339,6 @@ public class TaskService implements ITaskService {
         Map<String, ChangedField> changedFields = new HashMap<>();
         values.fields().forEachRemaining(entry -> {
             useCase.getDataSet().get(entry.getKey()).setValue(parseFieldsValues(entry.getValue()));
-            //changedFields.put(entry.getKey(), new ChangedField(entry.getKey()));
             resolveActions(useCase.getPetriNet().getField(entry.getKey()).get(),
                     Action.ActionTrigger.SET, useCase, useCase.getPetriNet().getTransition(task.getTransitionId()))
                     .forEach((key, changedField) -> {
@@ -333,13 +348,22 @@ public class TaskService implements ITaskService {
                             changedFields.put(changedField.getId(), changedField);
                     });
         });
-
+        updateDataset(useCase);
         workflowService.save(useCase);
         publisher.publishEvent(new SaveCaseDataEvent(useCase, changedFields.values()));
 
         ChangedFieldContainer container = new ChangedFieldContainer();
         container.putAll(changedFields);
         return container;
+    }
+
+    private void updateDataset(Case useCase) {
+        Case actual = workflowService.findOne(useCase.getStringId());
+        actual.getDataSet().forEach((id, dataField) -> {
+            if (dataField.isNewerThen(useCase.getDataField(id))) {
+                useCase.getDataSet().put(id, dataField);
+            }
+        });
     }
 
     private Map<String, ChangedField> resolveActions(Field field, Action.ActionTrigger actionTrigger, Case useCase, Transition transition) {

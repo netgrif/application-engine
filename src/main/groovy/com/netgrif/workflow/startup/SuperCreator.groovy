@@ -1,6 +1,7 @@
 package com.netgrif.workflow.startup
 
 import com.netgrif.workflow.auth.domain.Authority
+import com.netgrif.workflow.auth.domain.LoggedUser
 import com.netgrif.workflow.auth.domain.User
 import com.netgrif.workflow.auth.domain.UserProcessRole
 import com.netgrif.workflow.auth.domain.UserState
@@ -91,5 +92,9 @@ class SuperCreator extends AbstractOrderedCommandLineRunner {
 
     User getSuperUser() {
         return superUser
+    }
+
+    LoggedUser getLoggedSuper() {
+        return superUser.transformToLoggedUser()
     }
 }
