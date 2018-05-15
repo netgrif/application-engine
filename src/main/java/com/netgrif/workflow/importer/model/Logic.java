@@ -18,6 +18,7 @@ import java.util.List;
  *       &lt;sequence&gt;
  *         &lt;element ref="{}perform" minOccurs="0"/&gt;
  *         &lt;element ref="{}delegate" minOccurs="0"/&gt;
+ *         &lt;element ref="{}view" minOccurs="0"/&gt;
  *         &lt;element name="behavior" type="{}behavior" maxOccurs="unbounded" minOccurs="0"/&gt;
  *         &lt;element ref="{}action" maxOccurs="unbounded" minOccurs="0"/&gt;
  *       &lt;/sequence&gt;
@@ -32,6 +33,7 @@ import java.util.List;
 @XmlType(name = "", propOrder = {
     "perform",
     "delegate",
+    "view",
     "behavior",
     "action"
 })
@@ -40,6 +42,7 @@ public class Logic {
 
     protected Boolean perform;
     protected Boolean delegate;
+    protected Boolean view;
     @XmlSchemaType(name = "string")
     protected List<Behavior> behavior;
     protected List<ActionType> action;
@@ -90,6 +93,30 @@ public class Logic {
      */
     public void setDelegate(Boolean value) {
         this.delegate = value;
+    }
+
+    /**
+     * Gets the value of the view property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link Boolean }
+     *     
+     */
+    public Boolean isView() {
+        return view;
+    }
+
+    /**
+     * Sets the value of the view property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link Boolean }
+     *     
+     */
+    public void setView(Boolean value) {
+        this.view = value;
     }
 
     /**
