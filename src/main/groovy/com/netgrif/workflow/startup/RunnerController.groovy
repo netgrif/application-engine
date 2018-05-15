@@ -12,6 +12,7 @@ class RunnerController {
             DefaultRoleRunner,
             AuthorityRunner,
             SuperCreator,
+            SystemUserRunner,
             FlushSessionsRunner,
             MailRunner,
             PostalCodeImporter,
