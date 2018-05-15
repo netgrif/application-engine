@@ -1,6 +1,11 @@
 package com.netgrif.workflow.workflow.web;
 
 import com.netgrif.workflow.MockService;
+import com.netgrif.workflow.auth.domain.Authority;
+import com.netgrif.workflow.auth.domain.User;
+import com.netgrif.workflow.auth.domain.UserProcessRole;
+import com.netgrif.workflow.auth.domain.UserState;
+import com.netgrif.workflow.auth.service.interfaces.IAuthorityService;
 import com.netgrif.workflow.importer.service.Config;
 import com.netgrif.workflow.importer.service.Importer;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
@@ -12,6 +17,7 @@ import com.netgrif.workflow.petrinet.domain.roles.ProcessRoleRepository;
 import com.netgrif.workflow.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.workflow.startup.DefaultRoleRunner;
+import com.netgrif.workflow.startup.ImportHelper;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.Task;
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
@@ -27,7 +33,10 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.File;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @SpringBootTest
@@ -63,6 +72,12 @@ public class VariableArcsTest {
     @Autowired
     private ProcessRoleRepository roleRepository;
 
+    @Autowired
+    private ImportHelper importHelper;
+
+    @Autowired
+    private IAuthorityService authorityService;
+
     @Before
     public void before() {
         repository.deleteAll();
@@ -82,6 +97,16 @@ public class VariableArcsTest {
         assert optionalNet.isPresent();
         PetriNet net = optionalNet.get();
         PetriNet loaded = service.getPetriNet(net.getStringId());
+        User user = new User();
+        user.setName("Test");
+        user.setSurname("Test");
+        user.setPassword("password");
+        user.setState(UserState.ACTIVE);
+        user.setEmail("VariableArcsTest@test.com");
+        user = importHelper.createUser(user,
+                new Authority[]{authorityService.getOrCreate(Authority.user)},
+                new com.netgrif.workflow.orgstructure.domain.Group[]{importHelper.createGroup("VariableArcsTest")},
+                new UserProcessRole[]{});
 
         List<Arc> arcs = loaded.getArcs().values().stream().flatMap(List::stream).collect(Collectors.toList());
         assert arcs.size() > 0;
@@ -102,8 +127,8 @@ public class VariableArcsTest {
         assert tasks.getContent() != null && tasks.getContent().size() > 0;
 
         Task task = tasks.getContent().get(0);
-        taskService.assignTask(mock.mockLoggedUser(), task.getStringId());
-        taskService.finishTask(mock.mockLoggedUser(), task.getStringId());
+        taskService.assignTask(user.transformToLoggedUser(), task.getStringId());
+        taskService.finishTask(user.transformToLoggedUser(), task.getStringId());
 
         useCase = workflowService.findOne(useCase.getStringId());
         Map<String, Integer> activePlaces = useCase.getActivePlaces();
