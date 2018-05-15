@@ -102,14 +102,16 @@ public class TaskServiceTest {
 
         Task task = taskRepository.findAll().stream().filter(t -> t.getTitle().getDefaultValue().equalsIgnoreCase("reset")).findFirst().orElse(null);
 
-        service.assignTask(loggedUser, task.getStringId());
+        assert task != null;
+
+        service.assignTask(user.transformToLoggedUser(), task.getStringId());
         useCase = caseRepository.findOne(useCase.getStringId());
 
         assert useCase.getResetArcTokens().size() == 1;
         assert useCase.getResetArcTokens().values().contains(5);
         assert useCase.getActivePlaces().size() == 0;
 
-        service.cancelTask(loggedUser, task.getStringId());
+        service.cancelTask(user.transformToLoggedUser(), task.getStringId());
         useCase = caseRepository.findOne(useCase.getStringId());
 
         assert useCase.getResetArcTokens().size() == 0;
