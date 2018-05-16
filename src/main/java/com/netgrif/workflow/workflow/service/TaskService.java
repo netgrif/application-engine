@@ -619,14 +619,14 @@ public class TaskService implements ITaskService {
             return true;
 
         return arcsOfTransition.stream()
-                .filter(arc -> arc.getDestination() == transition) // todo: from same source error
+                .filter(arc -> arc.getDestination().equals(transition)) // todo: from same source error
                 .allMatch(Arc::isExecutable);
     }
 
     @Transactional
     void finishExecution(Transition transition, Case useCase) throws TransitionNotExecutableException {
         log.info("Finish execution of " + transition.getTitle() + " in case " + useCase.getTitle());
-        execute(transition, useCase, arc -> arc.getSource() == transition);
+        execute(transition, useCase, arc -> arc.getSource().equals(transition));
         useCase.getPetriNet().getArcsOfTransition(transition.getStringId()).stream()
                 .filter(arc -> arc instanceof ResetArc)
                 .forEach(arc -> useCase.getResetArcTokens().remove(arc.getStringId()));
@@ -635,7 +635,7 @@ public class TaskService implements ITaskService {
     @Transactional
     public void startExecution(Transition transition, Case useCase) throws TransitionNotExecutableException {
         log.info("Start execution of " + transition.getTitle() + " in case " + useCase.getTitle());
-        execute(transition, useCase, arc -> arc.getDestination() == transition);
+        execute(transition, useCase, arc -> arc.getDestination().equals(transition));
     }
 
     @Transactional
