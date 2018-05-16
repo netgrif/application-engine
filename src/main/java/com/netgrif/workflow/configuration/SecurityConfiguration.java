@@ -13,10 +13,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -43,6 +40,9 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Value("${server.auth.open-registration}")
     private boolean openRegistration;
 
+    @Value("${server.security.csrf}")
+    private boolean csrf = true;
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
 //        @formatter:off
@@ -59,13 +59,20 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             .logout()
                 .logoutUrl("/api/auth/logout")
             .and()
-            .csrf()//.disable();
-                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-            .and()
             .headers()
                 .frameOptions().sameOrigin();
 //        @formatter:on
+        setCsrf(http);
     }
+
+    private void setCsrf(HttpSecurity http) throws Exception {
+        if (csrf) {
+            http.csrf().csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse());
+        } else {
+            http.csrf().disable();
+        }
+    }
+
 
     private String[] getPatterns() {
         List<String> patterns = new ArrayList<>(Arrays.asList(PERMIT_ALL_STATIC_PATTERNS));

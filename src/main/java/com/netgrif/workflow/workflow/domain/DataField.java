@@ -5,6 +5,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.FieldBehavior;
+import com.querydsl.core.annotations.PropertyType;
+import com.querydsl.core.annotations.QueryType;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -116,5 +118,12 @@ public class DataField {
 
     public boolean isNewerThen(DataField other) {
         return version > other.getVersion();
+    }
+
+    @QueryType(PropertyType.STRING)
+    String getStringValue() {
+        if (value == null)
+            return "";
+        return value.toString();
     }
 }
