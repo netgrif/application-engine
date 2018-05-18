@@ -33,7 +33,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/res/task")
+@RequestMapping("/api/task")
 public class TaskController {
 
     @Autowired

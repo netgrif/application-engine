@@ -22,15 +22,15 @@ class DateValidationJavascriptDelegate extends DateValidationDelegate{
 
         if(startDate.equals(past())) {
             field.setMaxDate(endDate.toString())
-            return "const endDate = new Date('${endDate.toString()}'); ${setupJavascriptValidation("between","(value - endDate) > 0")}"
+            return "const endDate = new Date('${endDate.toString()}'); ${setupJavascriptValidation("between","(value - endDate) > 86400000")}"
         }
         if(endDate.equals(future())) {
             field.setMinDate(startDate.toString())
-            return "const startDate = new Date('${startDate.toString()}'); ${setupJavascriptValidation( "between","(value - startDate) < 0")}"
+            return "const startDate = new Date('${startDate.toString()}'); ${setupJavascriptValidation( "between","(value - startDate) < -86400000")}"
         }
         field.setMinDate(startDate.toString())
         field.setMaxDate(endDate.toString())
-        return "const endDate = new Date('${endDate.toString()}'); const startDate = new Date('${startDate.toString()}'); ${setupJavascriptValidation("between","(value - endDate) > 0 || (value - startDate) < 0")}"
+        return "const endDate = new Date('${endDate.toString()}'); const startDate = new Date('${startDate.toString()}'); ${setupJavascriptValidation("between","(value - endDate) > 86400000 || (value - startDate) < -86400000")}"
     }
 
     def workday = {

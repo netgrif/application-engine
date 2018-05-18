@@ -7,9 +7,10 @@ import com.netgrif.workflow.auth.domain.User
 import com.netgrif.workflow.auth.domain.UserProcessRole
 import com.netgrif.workflow.auth.domain.repositories.AuthorityRepository
 import com.netgrif.workflow.auth.domain.repositories.UserRepository
-import com.netgrif.workflow.auth.web.SignUpController
+import com.netgrif.workflow.auth.web.AuthenticationController
 import com.netgrif.workflow.auth.web.requestbodies.NewUserRequest
 import com.netgrif.workflow.auth.web.requestbodies.RegistrationRequest
+import com.netgrif.workflow.importer.service.Config
 import com.netgrif.workflow.importer.service.Importer
 import com.netgrif.workflow.mail.EmailType
 import com.netgrif.workflow.orgstructure.domain.Group
@@ -36,7 +37,7 @@ import javax.mail.internet.MimeMultipart
 @RunWith(SpringRunner.class)
 @ActiveProfiles(["test"])
 @SpringBootTest
-class SignUpControllerTest {
+class AuthenticationControllerTest {
 
     private static final String EMAIL = "tets@test.com"
     private static final String NAME = "name"
@@ -47,7 +48,7 @@ class SignUpControllerTest {
     public static final String GROUP_NAME = "Insurance Company"
 
     @Autowired
-    private SignUpController controller
+    private AuthenticationController controller
 
     @Autowired
     private Importer importer
@@ -77,7 +78,7 @@ class SignUpControllerTest {
         smtpServer = new GreenMail(new ServerSetup(2525, null, "smtp"))
         smtpServer.start()
 
-        def net = importer.importPetriNet(new File("src/test/resources/insurance_portal_demo_test.xml"), CASE_NAME, CASE_INITIALS, [:])
+        def net = importer.importPetriNet(new File("src/test/resources/insurance_portal_demo_test.xml"), CASE_NAME, CASE_INITIALS, new Config())
         assert net.isPresent()
         if (authorityRepository.count() == 0)
             importHelper.createAuthority(Authority.user)
@@ -90,15 +91,15 @@ class SignUpControllerTest {
     void inviteTest() {
         controller.invite(new NewUserRequest(email: EMAIL, groups: [group.id], processRoles: processRoles.values().collect {
             it.roleId
-        }))
+        }), null)
 
         MimeMessage[] messages = smtpServer.getReceivedMessages()
         assertMessageReceived(messages)
 
         String content = getTextFromMimeMultipart(messages[0].content as MimeMultipart)
-        String token = content.substring(content.indexOf("/signup/") + "/signup/".length(), content.indexOf(" This is regis"))
+        String token = content.substring(content.indexOf("/signup/") + "/signup/".length(), content.indexOf(" This is"))
 
-        controller.registration(new RegistrationRequest(token: token, email: EMAIL, name: NAME, surname: SURNAME, password: PASSWORD))
+        controller.signup(new RegistrationRequest(token: token, email: EMAIL, name: NAME, surname: SURNAME, password: PASSWORD))
 
         User user = userRepository.findByEmail(EMAIL)
         Member member = memberRepository.findByEmail(EMAIL)

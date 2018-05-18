@@ -1,8 +1,6 @@
 package com.netgrif.workflow.auth.service;
 
-import com.netgrif.workflow.auth.domain.Authority;
-import com.netgrif.workflow.auth.domain.User;
-import com.netgrif.workflow.auth.domain.UserProcessRole;
+import com.netgrif.workflow.auth.domain.*;
 import com.netgrif.workflow.auth.domain.repositories.AuthorityRepository;
 import com.netgrif.workflow.auth.domain.repositories.UserRepository;
 import com.netgrif.workflow.auth.service.interfaces.IUserProcessRoleService;
@@ -11,8 +9,10 @@ import com.netgrif.workflow.event.events.user.UserRegistrationEvent;
 import com.netgrif.workflow.orgstructure.domain.Member;
 import com.netgrif.workflow.orgstructure.service.IMemberService;
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRoleRepository;
+import com.netgrif.workflow.startup.SystemUserRunner;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -53,26 +53,36 @@ public class UserService implements IUserService {
         addDefaultAuthorities(user);
 
         User savedUser = userRepository.save(user);
-        Member member = new Member(savedUser.getId(), savedUser.getName(), savedUser.getSurname(), savedUser.getEmail());
-        member.setGroups(savedUser.getGroups());
-        memberService.save(member);
-
+        savedUser.setGroups(user.getGroups());
+        upsertGroupMember(savedUser);
         publisher.publishEvent(new UserRegistrationEvent(savedUser));
         return savedUser;
     }
 
-    private void encodeUserPassword(User user) {
+    @Override
+    public Member upsertGroupMember(User user){
+        Member member = memberService.findByEmail(user.getEmail());
+        if(member == null)
+            member = new Member(user.getId(), user.getName(), user.getSurname(), user.getEmail());
+        member.setGroups(user.getGroups());
+        return memberService.save(member);
+    }
+
+    @Override
+    public void encodeUserPassword(User user) {
         String pass = user.getPassword();
         if (pass == null)
             throw new IllegalArgumentException("User has no password");
         user.setPassword(bCryptPasswordEncoder.encode(pass));
     }
 
-    private void addDefaultRole(User user) {
+    @Override
+    public void addDefaultRole(User user) {
         user.addProcessRole(userProcessRoleService.findDefault());
     }
 
-    private void addDefaultAuthorities(User user) {
+    @Override
+    public void addDefaultAuthorities(User user) {
         if (user.getAuthorities().isEmpty()) {
             HashSet<Authority> authorities = new HashSet<Authority>();
             authorities.add(authorityRepository.findByName(Authority.user));
@@ -92,6 +102,7 @@ public class UserService implements IUserService {
         return user;
     }
 
+    @Override
     public User findByEmail(String email, boolean small){
         User user = userRepository.findByEmail(email);
         if(!small)
@@ -109,14 +120,14 @@ public class UserService implements IUserService {
     @Override
     public Set<User> findAllCoMembers(String email, boolean small) {
         Set<Long> members = memberService.findAllCoMembersIds(email);
-        Set<User> users = new HashSet<>(userRepository.findAll(members));
+        Set<User> users = userRepository.findAll(members).parallelStream().filter(u -> u.getState() == UserState.ACTIVE).collect(Collectors.toSet());
         if (!small) users.forEach(this::loadProcessRoles);
         return users;
     }
 
     @Override
     public Set<User> findByProcessRoles(Set<String> roleIds, boolean small) {
-        Set<User> users = new HashSet<>(userRepository.findByUserProcessRoles_RoleIdIn(new ArrayList<>(roleIds)));
+        Set<User> users = new HashSet<>(userRepository.findByStateAndUserProcessRoles_RoleIdIn(UserState.ACTIVE, new ArrayList<>(roleIds)));
         if (!small)
             users.forEach(this::loadProcessRoles);
         return users;
@@ -131,6 +142,15 @@ public class UserService implements IUserService {
         authority.addUser(user);
 
         userRepository.save(user);
+    }
+
+    @Override
+    public LoggedUser getLoggedOrSystem() {
+        try {
+            return (LoggedUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        } catch (NullPointerException e) {
+            return userRepository.findOne(SystemUserRunner.SYSTEM_USER_ID).transformToLoggedUser();
+        }
     }
 
     private User loadProcessRoles(User user) {

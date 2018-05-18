@@ -1,10 +1,7 @@
 
 package com.netgrif.workflow.importer.model;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.*;
 
 
 /**
@@ -39,23 +36,32 @@ import javax.xml.bind.annotation.XmlType;
 @XmlRootElement(name = "role")
 public class Role {
 
-    protected long id;
+    @XmlElement(required = true)
+    protected String id;
     protected I18NStringType title;
     protected I18NStringType name;
 
     /**
      * Gets the value of the id property.
      * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
      */
-    public long getId() {
+    public String getId() {
         return id;
     }
 
     /**
      * Sets the value of the id property.
      * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
      */
-    public void setId(long value) {
+    public void setId(String value) {
         this.id = value;
     }
 
