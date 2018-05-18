@@ -33,6 +33,10 @@
     </role>
     <!-- ========== DATA ========== -->
     <!-- ===== Základné informácie - DONE ===== -->
+    <data type="number">
+        <id>301001</id>
+        <title></title>
+    </data>
     <data type="text">
         <title>Obec</title>
         <id>301001</id>

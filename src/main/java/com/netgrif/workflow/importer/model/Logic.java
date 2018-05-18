@@ -1,10 +1,7 @@
 
 package com.netgrif.workflow.importer.model;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,7 +18,8 @@ import java.util.List;
  *       &lt;sequence&gt;
  *         &lt;element ref="{}perform" minOccurs="0"/&gt;
  *         &lt;element ref="{}delegate" minOccurs="0"/&gt;
- *         &lt;element ref="{}behavior" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *         &lt;element ref="{}view" minOccurs="0"/&gt;
+ *         &lt;element name="behavior" type="{}behavior" maxOccurs="unbounded" minOccurs="0"/&gt;
  *         &lt;element ref="{}action" maxOccurs="unbounded" minOccurs="0"/&gt;
  *       &lt;/sequence&gt;
  *     &lt;/restriction&gt;
@@ -35,6 +33,7 @@ import java.util.List;
 @XmlType(name = "", propOrder = {
     "perform",
     "delegate",
+    "view",
     "behavior",
     "action"
 })
@@ -43,7 +42,9 @@ public class Logic {
 
     protected Boolean perform;
     protected Boolean delegate;
-    protected List<String> behavior;
+    protected Boolean view;
+    @XmlSchemaType(name = "string")
+    protected List<Behavior> behavior;
     protected List<ActionType> action;
 
     /**
@@ -95,6 +96,30 @@ public class Logic {
     }
 
     /**
+     * Gets the value of the view property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link Boolean }
+     *     
+     */
+    public Boolean isView() {
+        return view;
+    }
+
+    /**
+     * Sets the value of the view property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link Boolean }
+     *     
+     */
+    public void setView(Boolean value) {
+        this.view = value;
+    }
+
+    /**
      * Gets the value of the behavior property.
      * 
      * <p>
@@ -112,13 +137,13 @@ public class Logic {
      * 
      * <p>
      * Objects of the following type(s) are allowed in the list
-     * {@link String }
+     * {@link Behavior }
      * 
      * 
      */
-    public List<String> getBehavior() {
+    public List<Behavior> getBehavior() {
         if (behavior == null) {
-            behavior = new ArrayList<String>();
+            behavior = new ArrayList<Behavior>();
         }
         return this.behavior;
     }

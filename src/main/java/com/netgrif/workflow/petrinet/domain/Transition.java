@@ -113,4 +113,12 @@ public class Transition extends Node {
     public String toString() {
         return this.getTitle().toString();
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Transition that = (Transition) o;
+        return importId.equals(that.importId);
+    }
 }

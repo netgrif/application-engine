@@ -3,9 +3,12 @@ package com.netgrif.workflow.petrinet.service;
 import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.auth.service.UserProcessRoleService;
 import com.netgrif.workflow.event.events.model.UserImportModelEvent;
+import com.netgrif.workflow.importer.service.Config;
 import com.netgrif.workflow.importer.service.Importer;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.Transition;
+import com.netgrif.workflow.petrinet.domain.arcs.VariableArc;
+import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository;
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRole;
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRoleRepository;
@@ -78,17 +81,17 @@ public abstract class PetriNetService implements IPetriNetService {
         PetriNet existingNet = getNewestVersionByIdentifier(metaData.identifier);
         Optional<PetriNet> newPetriNet;
         if (existingNet == null) {
-            newPetriNet = importNewPetriNet(xmlFile, metaData, user, new HashMap<>());
+            newPetriNet = importNewPetriNet(xmlFile, metaData, user);
         } else {
             //TODO 3.4.2018 compare net hash with found net hash -> if equal do not save network => possible duplicate
-            newPetriNet = importNewVersion(xmlFile, metaData, existingNet, user, new HashMap<>());
+            newPetriNet = importNewVersion(xmlFile, metaData, existingNet, user);
         }
 
         return newPetriNet;
     }
 
-    private Optional<PetriNet> importNewPetriNet(File xmlFile, UploadedFileMeta metaData, LoggedUser user, Map<String, Object> importerConfig) {
-        Optional<PetriNet> imported = getImporter().importPetriNet(xmlFile, metaData.name, metaData.initials, importerConfig);
+    private Optional<PetriNet> importNewPetriNet(File xmlFile, UploadedFileMeta metaData, LoggedUser user) {
+        Optional<PetriNet> imported = getImporter().importPetriNet(xmlFile, metaData.name, metaData.initials, new Config());
         imported.ifPresent(petriNet -> {
             userProcessRoleService.saveRoles(imported.get().getRoles().values(), imported.get().getStringId());
 
@@ -102,9 +105,12 @@ public abstract class PetriNetService implements IPetriNetService {
         return imported;
     }
 
-    private Optional<PetriNet> importNewVersion(File xmlFile, UploadedFileMeta meta, @NotNull PetriNet previousVersion, LoggedUser user, Map<String, Object> importerConfig) {
-        importerConfig.put("notSaveObjects", true);
-        Optional<PetriNet> imported = getImporter().importPetriNet(xmlFile, meta.name, meta.initials, importerConfig);
+    private Optional<PetriNet> importNewVersion(File xmlFile, UploadedFileMeta meta, @NotNull PetriNet previousVersion, LoggedUser user) {
+        Config config = Config.builder()
+                .notSaveObjects(true)
+                .build();
+
+        Optional<PetriNet> imported = getImporter().importPetriNet(xmlFile, meta.name, meta.initials, config);
         imported.ifPresent(petriNet -> {
             petriNet.setVersion(previousVersion.getVersion());
             petriNet.incrementVersion(PetriNet.VersionType.valueOf(meta.releaseType.trim().toUpperCase()));
@@ -112,7 +118,7 @@ public abstract class PetriNetService implements IPetriNetService {
 
             try {
                 setupImportedPetriNet(petriNet, xmlFile, meta, user);
-                userProcessRoleService.saveRoles(newRoles,petriNet.getStringId());
+                userProcessRoleService.saveRoles(newRoles, petriNet.getStringId());
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -165,8 +171,10 @@ public abstract class PetriNetService implements IPetriNetService {
 
 
     @Override
-    public void savePetriNet(PetriNet petriNet) {
-        repository.save(petriNet);
+    public Optional<PetriNet> saveNew(PetriNet petriNet) {
+        initializeVariableArcs(petriNet);
+
+        return Optional.of(repository.save(petriNet));
     }
 
     @Override
@@ -308,6 +316,11 @@ public abstract class PetriNetService implements IPetriNetService {
         return dataRefs;
     }
 
+    @Override
+    public Optional<PetriNet> findByImportId(long id) {
+        return Optional.of(repository.findByImportId(id));
+    }
+
     public Page<PetriNetReference> search(Map<String, Object> criteria, LoggedUser user, Pageable pageable, Locale locale) {
         Query query = new Query();
 
@@ -334,5 +347,19 @@ public abstract class PetriNetService implements IPetriNetService {
     private Criteria getProcessRolesCriteria(LoggedUser user) {
         return new Criteria().orOperator(user.getProcessRoles().stream()
                 .map(role -> Criteria.where("roles." + role).exists(true)).toArray(Criteria[]::new));
+    }
+
+    private void initializeVariableArcs(PetriNet net) {
+        net.getArcs().values().stream()
+                .flatMap(List::stream)
+                .filter(arc -> arc instanceof VariableArc)
+                .forEach(arc -> initializeVariableArc(net, (VariableArc) arc));
+    }
+
+    private void initializeVariableArc(PetriNet net, VariableArc arc) {
+        Optional<Field> field = net.getField(arc.getMultiplicity().toString());
+        if (!field.isPresent())
+            throw new IllegalArgumentException("Field with import id " + arc.getMultiplicity() + " not found.");
+        arc.setFieldId(field.get().getStringId());
     }
 }
