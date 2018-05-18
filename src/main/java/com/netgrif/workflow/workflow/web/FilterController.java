@@ -22,7 +22,7 @@ import java.util.Locale;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/res/filter")
+@RequestMapping("/api/filter")
 public class FilterController {
 
     @Autowired

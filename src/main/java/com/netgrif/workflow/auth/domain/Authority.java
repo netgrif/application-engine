@@ -15,8 +15,11 @@ public class Authority implements GrantedAuthority {
 
     public static final long serialVersionUID = 2839744057647464485L;
 
-    public static final String admin = "ROLE_ADMIN";
-    public static final String user = "ROLE_USER";
+    public static final String PERMISSION = "PERM_";
+    public static final String ROLE = "ROLE_";
+
+    public static final String admin = ROLE + "ADMIN";
+    public static final String user = ROLE + "USER";
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -26,18 +29,29 @@ public class Authority implements GrantedAuthority {
     @NotNull
     @Column(unique = true)
     @JsonIgnore
-    @Getter @Setter
+    @Getter
+    @Setter
     private String name;
 
     @JsonIgnore
     @ManyToMany(mappedBy = "authorities")
-    @Getter @Setter
+    @Getter
+    @Setter
     private Set<User> users;
 
-    public Authority(){}
+    public Authority() {
+    }
 
     public Authority(String name) {
         this.name = name;
+    }
+
+    public static Authority createRole(String name) {
+        return new Authority(ROLE + name);
+    }
+
+    public static Authority createPermission(String name) {
+        return new Authority(PERMISSION + name);
     }
 
     public void addUser(User user) {

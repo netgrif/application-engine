@@ -23,14 +23,14 @@ class FileField extends FieldWithDefault<String> {
         setValue(getDefaultValue())
     }
 
-    @Override
+//    @Override
     void addAction(String action, String trigger) {
-        super.addAction(action, trigger)
+//        super.addAction(action, trigger)
         this.generated = (Action.ActionTrigger.fromString(trigger) == Action.ActionTrigger.GET && action.contains("generate")) || this.generated
     }
 
     String getFilePath(String fileName) {
-        return "storage/" + (this.generated ? "generated/" : "") + getStringId() + "-" + fileName
+        return "storage/" + (this.generated ? "generated/" : "") + get_id().toString() + "-" + fileName
     }
 
     boolean isGenerated() {

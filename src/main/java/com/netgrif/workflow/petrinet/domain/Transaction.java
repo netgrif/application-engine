@@ -41,4 +41,9 @@ public class Transaction extends PetriNetObject {
     public void setTitle(String title) {
         setTitle(new I18nString(title));
     }
+
+    @Override
+    public String toString() {
+        return title.getDefaultValue();
+    }
 }

@@ -6,16 +6,14 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document
-public abstract class PetriNetObject {
+public abstract class PetriNetObject extends Imported {
 
     @Id
     @JsonIgnore
     protected ObjectId _id;
 
-    protected Long importId;
-
     public String getStringId() {
-        return _id.toString();
+        return importId;
     }
 
     @JsonIgnore
@@ -25,13 +23,5 @@ public abstract class PetriNetObject {
 
     public void setObjectId(ObjectId _id) {
         this._id = _id;
-    }
-
-    public Long getImportId() {
-        return importId;
-    }
-
-    public void setImportId(Long importId) {
-        this.importId = importId;
     }
 }
