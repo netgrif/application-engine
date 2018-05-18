@@ -1,6 +1,8 @@
 package com.netgrif.workflow.auth.service.interfaces;
 
+import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.auth.domain.User;
+import com.netgrif.workflow.orgstructure.domain.Member;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -13,6 +15,8 @@ public interface IUserService {
 
     User saveNew(User user);
 
+    Member upsertGroupMember(User user);
+
     User findById(Long id, boolean small);
 
     User findByEmail(String email, boolean small);
@@ -24,4 +28,12 @@ public interface IUserService {
     Set<User> findByProcessRoles(Set<String> roleIds, boolean small);
 
     void assignAuthority(Long userId, Long authorityId);
+
+    void addDefaultRole(User user);
+
+    void addDefaultAuthorities(User user);
+
+    void encodeUserPassword(User user);
+
+    LoggedUser getLoggedOrSystem();
 }

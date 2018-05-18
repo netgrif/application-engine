@@ -3,6 +3,7 @@ package com.netgrif.workflow.petrinet.domain.dataset
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.netgrif.workflow.petrinet.domain.I18nString
+import com.netgrif.workflow.petrinet.domain.Imported
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action
 import org.bson.types.ObjectId
 import org.springframework.data.annotation.Id
@@ -10,13 +11,10 @@ import org.springframework.data.annotation.Transient
 import org.springframework.data.mongodb.core.mapping.Document
 
 @Document
-abstract class Field<T> {
+abstract class Field<T> extends Imported {
 
     @Id
     protected ObjectId _id
-
-    @JsonIgnore
-    protected Long importId
 
     private I18nString name
     
@@ -51,7 +49,7 @@ abstract class Field<T> {
     }
 
     String getStringId() {
-        return _id.toString()
+        return importId
     }
 
     ObjectId get_id() {
@@ -60,10 +58,6 @@ abstract class Field<T> {
 
     void set_id(ObjectId _id) {
         this._id = _id
-    }
-
-    Long getImportId() {
-        return importId
     }
 
     void setImportId(Long importId) {
@@ -144,10 +138,6 @@ abstract class Field<T> {
         this.actions.add(action)
     }
 
-    void addAction(String action, String trigger) {
-        this.addAction(new Action(action, trigger))
-    }
-
     String getEncryption() {
         return encryption
     }
@@ -180,5 +170,10 @@ abstract class Field<T> {
 
     String getTranslatedDescription(Locale locale) {
         return description?.getTranslation(locale)
+    }
+
+    @Override
+    String toString() {
+        return name.defaultValue
     }
 }

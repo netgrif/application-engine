@@ -1,11 +1,15 @@
 package com.netgrif.workflow.mail;
 
+import com.netgrif.workflow.auth.domain.User;
+import com.netgrif.workflow.auth.service.RegistrationService;
+import com.netgrif.workflow.auth.service.interfaces.IRegistrationService;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -20,15 +24,15 @@ import java.net.InetAddress;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Component
 public class MailService implements IMailService {
 
     static final Logger log = Logger.getLogger(MailService.class.getName());
+
+    @Autowired
+    private IRegistrationService registrationService;
 
     @Getter
     @Value("${mail.server.port}")
@@ -55,18 +59,30 @@ public class MailService implements IMailService {
     protected Configuration configuration;
 
     @Override
-    public void sendRegistrationEmail(String recipient, String token) throws MessagingException, IOException, TemplateException {
+    public void sendRegistrationEmail(User user) throws MessagingException, IOException, TemplateException {
         List<String> recipients = new LinkedList<>();
-        recipients.add(recipient);
         Map<String, Object> model = new HashMap<>();
-        model.put("token", token);
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
-        model.put("date", LocalDate.now().plusDays(3).format(formatter));
 
-        String encryptedHttp = ssl ? "https://" : "http://";
-        String usedPort = port != null && !port.isEmpty() ? (":" + port) : "";
-        model.put("serverName", encryptedHttp + domain + usedPort);
+        recipients.add(user.getEmail());
+        model.put("token", registrationService.encodeToken(user.getEmail(),user.getToken()));
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+        model.put("expiration", registrationService.generateExpirationDate().format(formatter));
+        model.put("server", getServerURL());
+
         MimeMessage email = buildEmail(EmailType.REGISTRATION, recipients, model, new HashMap<>());
+        mailSender.send(email);
+    }
+
+    @Override
+    public void sendPasswordResetEmail(User user) throws MessagingException, IOException, TemplateException {
+        Map<String, Object> model = new HashMap<>();
+
+        model.put("name", user.getName());
+        model.put("token", registrationService.encodeToken(user.getEmail(), user.getToken()));
+        model.put("expiration", registrationService.generateExpirationDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
+        model.put("server", getServerURL());
+
+        MimeMessage email = buildEmail(EmailType.PASSWORD_RESET, Collections.singletonList(user.getEmail()), model, new HashMap<>());
         mailSender.send(email);
     }
 
@@ -97,5 +113,11 @@ public class MailService implements IMailService {
             }
         });
         return message;
+    }
+
+    protected String getServerURL() {
+        String encryptedHttp = ssl ? "https://" : "http://";
+        String usedPort = port != null && !port.isEmpty() ? (":" + port) : "";
+        return encryptedHttp + domain + usedPort;
     }
 }

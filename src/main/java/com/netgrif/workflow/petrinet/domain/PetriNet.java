@@ -1,11 +1,13 @@
 package com.netgrif.workflow.petrinet.domain;
 
 import com.netgrif.workflow.auth.domain.Author;
+import com.netgrif.workflow.petrinet.domain.arcs.Arc;
+import com.netgrif.workflow.petrinet.domain.arcs.VariableArc;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRole;
+import com.netgrif.workflow.workflow.domain.DataField;
 import lombok.Getter;
 import lombok.Setter;
-import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -62,7 +64,7 @@ public class PetriNet extends PetriNetObject {
     @org.springframework.data.mongodb.core.mapping.Field("arcs")
     @Getter
     @Setter
-    private Map<String, List<Arc>> arcs;
+    private Map<String, List<Arc>> arcs;//todo: import id
 
     @org.springframework.data.mongodb.core.mapping.Field("dataset")
     @Getter
@@ -78,7 +80,7 @@ public class PetriNet extends PetriNetObject {
     @org.springframework.data.mongodb.core.mapping.Field("transactions")
     @Getter
     @Setter
-    private Map<String, Transaction> transactions;
+    private Map<String, Transaction> transactions;//todo: import id
 
     @Transient
     private boolean initialized;
@@ -108,11 +110,11 @@ public class PetriNet extends PetriNetObject {
     }
 
     public void addPlace(Place place) {
-        this.places.put(place.getObjectId().toString(), place);
+        this.places.put(place.getStringId(), place);
     }
 
     public void addTransition(Transition transition) {
-        this.transitions.put(transition.getObjectId().toString(), transition);
+        this.transitions.put(transition.getStringId(), transition);
     }
 
     public void addRole(ProcessRole role) {
@@ -120,11 +122,13 @@ public class PetriNet extends PetriNetObject {
     }
 
     public List<Arc> getArcsOfTransition(Transition transition) {
-        return getArcsOfTransition(transition.getObjectId().toString());
+        return getArcsOfTransition(transition.getStringId());
     }
 
     public List<Arc> getArcsOfTransition(String transitionId) {
-        return arcs.get(transitionId);
+        if (arcs.containsKey(transitionId))
+            return arcs.get(transitionId);
+        return new LinkedList<>();
     }
 
     public void addDataSetField(Field field) {
@@ -136,7 +140,7 @@ public class PetriNet extends PetriNetObject {
     }
 
     public void addArc(Arc arc) {
-        String transitionId = arc.getTransition().getObjectId().toString();
+        String transitionId = arc.getTransition().getStringId();
         if (arcs.containsKey(transitionId))
             arcs.get(transitionId).add(arc);
         else {
@@ -146,13 +150,16 @@ public class PetriNet extends PetriNetObject {
         }
     }
 
-    public Node getNode(ObjectId id) {
-        String stringId = id.toString();
-        if (places.containsKey(stringId))
-            return getPlace(stringId);
-        if (transitions.containsKey(stringId))
-            return getTransition(stringId);
+    public Node getNode(String importId) {
+        if (places.containsKey(importId))
+            return getPlace(importId);
+        if (transitions.containsKey(importId))
+            return getTransition(importId);
         return null;
+    }
+
+    public Optional<Field> getField(String id) {
+        return Optional.ofNullable(dataSet.get(id));
     }
 
     public Place getPlace(String id) {
@@ -175,11 +182,24 @@ public class PetriNet extends PetriNetObject {
         places.values().forEach(place -> place.setTokens(activePlaces.getOrDefault(place.getStringId(), 0)));
     }
 
+    public void initializeVarArcs(Map<String, DataField> dataSet) {
+        arcs.values()
+                .parallelStream()
+                .flatMap(List::stream)
+                .filter(arc -> arc instanceof VariableArc)
+                .forEach(arc -> {
+                    VariableArc varc = (VariableArc) arc;
+                    String fieldId = varc.getFieldId();
+                    DataField field = dataSet.get(fieldId);
+                    varc.setField(field);
+                });
+    }
+
     public Map<String, Integer> getActivePlaces() {
         Map<String, Integer> activePlaces = new HashMap<>();
         for (Place place : places.values()) {
             if (place.getTokens() > 0) {
-                activePlaces.put(place.getObjectId().toString(), place.getTokens());
+                activePlaces.put(place.getStringId(), place.getTokens());
             }
         }
         return activePlaces;
@@ -251,5 +271,10 @@ public class PetriNet extends PetriNetObject {
         MAJOR,
         MINOR,
         PATCH
+    }
+
+    @Override
+    public String getStringId() {
+        return _id.toString();
     }
 }

@@ -5,7 +5,8 @@ import lombok.Getter;
 
 public enum EmailType {
     REGISTRATION ("registration.html", "Registration invite"),
-    DRAFT("draft.html", "Návrh na uzavretie poistnej zmluvy");
+    DRAFT("draft.html", "Návrh na uzavretie poistnej zmluvy"),
+    PASSWORD_RESET("password-reset.html", "Reset password");
 
     @Getter
     String template;

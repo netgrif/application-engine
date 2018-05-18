@@ -4,6 +4,7 @@ import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.auth.service.interfaces.IAuthorityService;
 import com.netgrif.workflow.auth.service.interfaces.IUserService;
+import com.netgrif.workflow.auth.web.requestbodies.UpdateUserRequest;
 import com.netgrif.workflow.auth.web.responsebodies.AuthoritiesResources;
 import com.netgrif.workflow.auth.web.responsebodies.UserResource;
 import com.netgrif.workflow.auth.web.responsebodies.UsersResource;
@@ -16,10 +17,11 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Locale;
+import java.util.Objects;
 import java.util.Set;
 
 @RestController
-@RequestMapping("/res/user")
+@RequestMapping("/api/user")
 public class UserController {
 
     private static final Logger log = Logger.getLogger(UserController.class);
@@ -33,47 +35,52 @@ public class UserController {
     @Autowired
     private IAuthorityService authorityService;
 
+    @RequestMapping(method = RequestMethod.GET)
+    public UsersResource getAll(@RequestParam(value = "small", required = false) Boolean small, Authentication auth, Locale locale) {
+        small = small == null ? false : small;
+        Set<User> coMembers = userService.findAllCoMembers(((LoggedUser) auth.getPrincipal()).getUsername(), small);
+        coMembers.add(userService.findById(((LoggedUser) auth.getPrincipal()).getId(), small));
+        return new UsersResource(coMembers, "all", locale, small);
+    }
+
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
-    public UserResource getUser(@PathVariable("id") Long userId, Locale locale) {
-        return new UserResource(userService.findById(userId, false), "profile", locale);
+    public UserResource getUser(@PathVariable("id") Long userId, @RequestParam(value = "small", required = false) Boolean small, Locale locale) {
+        small = small == null ? false : small;
+        return new UserResource(userService.findById(userId, small), "profile", locale, small);
     }
 
     @RequestMapping(value = "/me", method = RequestMethod.GET)
-    public UserResource getLoggedUser(Authentication auth, Locale locale) {
-        return new UserResource(userService.findById(((LoggedUser) auth.getPrincipal()).getId(), false), "profile", locale);
+    public UserResource getLoggedUser(@RequestParam(value = "small", required = false) Boolean small, Authentication auth, Locale locale) {
+        small = small == null ? false : small;
+        if (!small)
+            return new UserResource(userService.findById(((LoggedUser) auth.getPrincipal()).getId(), false), "profile", locale);
+        else
+            return new UserResource(((LoggedUser) auth.getPrincipal()).transformToUser(), "profile", locale);
     }
 
-    @RequestMapping(value = "/{id}/small", method = RequestMethod.GET)
-    public UserResource getSmallUser(@PathVariable("id") Long userId, Locale locale) {
-        return new UserResource(userService.findById(userId, true), "small", locale, true);
+    @RequestMapping(value = "/{id}", method = RequestMethod.POST)
+    public UsersResource updateUser(@PathVariable("id") Long userId, @RequestBody UpdateUserRequest updates, Authentication auth, Locale locale) {
+        LoggedUser logged = (LoggedUser) auth.getPrincipal();
+        if (!logged.isAdmin() && !Objects.equals(logged.getId(), userId)) {
+            return null;
+        }
+        if (!logged.isAdmin() && Objects.equals(logged.getId(), userId)) {
+            return null; //TODO update user
+        } else {
+            return null; //TODO update user
+        }
     }
 
-    @RequestMapping(method = RequestMethod.GET)
-    public UsersResource getAll(Authentication auth, Locale locale) {
-        Set<User> coMembers = userService.findAllCoMembers(((LoggedUser) auth.getPrincipal()).getUsername(), false);
-        coMembers.add(userService.findById(((LoggedUser) auth.getPrincipal()).getId(), false));
-        return new UsersResource(coMembers, "all", locale, false);
+    @RequestMapping(value = "/role", method = RequestMethod.POST)
+    public UsersResource getAllWithRole(@RequestBody Set<String> roleIds, @RequestParam(value = "small", required = false) Boolean small, Locale locale) {
+        small = small == null ? false : small;
+        return new UsersResource(userService.findByProcessRoles(roleIds, small), "small", locale, small);
     }
-
-    @RequestMapping(value = "/small", method = RequestMethod.GET)
-    public UsersResource getAllSmall(Authentication auth, Locale locale) {
-        Set<User> coMembers = userService.findAllCoMembers(((LoggedUser) auth.getPrincipal()).getUsername(), true);
-        coMembers.add(userService.findById(((LoggedUser) auth.getPrincipal()).getId(), true));
-        return new UsersResource(coMembers, "small", locale, true);
-    }
-
-    @RequestMapping(value = "/role/small", method = RequestMethod.POST)
-    public UsersResource getAllWithRole(@RequestBody Set<String> roleIds, Locale locale) {
-        return new UsersResource(userService.findByProcessRoles(roleIds, true), "small", locale, true);
-    }
-
-    //TODO: 2.6.2017 edit user profile
-
 
     @RequestMapping(value = "/{id}/role/assign", method = RequestMethod.POST)
-    public MessageResource assignRolesToUser(@PathVariable("id") Long userId, @RequestBody Set<String> roleIds) {
+    public MessageResource assignRolesToUser(@PathVariable("id") Long userId, @RequestBody Set<String> roleIds, Authentication auth) {
         try {
-            processRoleService.assignRolesToUser(userId, roleIds);
+            processRoleService.assignRolesToUser(userId, roleIds, (LoggedUser) auth.getPrincipal());
             log.info("Process roles " + roleIds + " assigned to user " + userId);
             return MessageResource.successMessage("Selected roles assigned to user " + userId);
         } catch (IllegalArgumentException e) {

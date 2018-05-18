@@ -13,17 +13,19 @@ import java.util.*;
 public class DataField {
 
     @Getter
-    @Setter
     private Map<String, Set<FieldBehavior>> behavior;
 
     @Getter
-    @Setter
     private Object value;
 
     @Getter
     @Setter
     @JsonIgnore
     private String encryption;
+
+    @Getter
+    @Setter
+    private Long version = 0l;
 
     public DataField() {
         behavior = new HashMap<>();
@@ -32,6 +34,16 @@ public class DataField {
     public DataField(Object value) {
         this();
         this.value = value;
+    }
+
+    public void setBehavior(Map<String, Set<FieldBehavior>> behavior) {
+        this.behavior = behavior;
+        update();
+    }
+
+    public void setValue(Object value) {
+        this.value = value;
+        update();
     }
 
     public ObjectNode applyBehavior(String transition, ObjectNode json) {
@@ -95,5 +107,14 @@ public class DataField {
         List<FieldBehavior> tmp = Arrays.asList(behavior.getAntonyms());
         tmp.forEach(beh -> this.behavior.get(transition).remove(beh));
         this.behavior.get(transition).add(behavior);
+        update();
+    }
+
+    private void update() {
+        version++;
+    }
+
+    public boolean isNewerThen(DataField other) {
+        return version > other.getVersion();
     }
 }

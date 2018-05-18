@@ -41,7 +41,11 @@ public interface ITaskService {
 
     void finishTask(LoggedUser loggedUser, String taskId) throws IllegalArgumentException, TransitionNotExecutableException;
 
+    void finishTask(String taskId) throws IllegalArgumentException, TransitionNotExecutableException;
+
     void assignTask(LoggedUser loggedUser, String taskId) throws TransitionNotExecutableException;
+
+    void assignTask(String taskId) throws TransitionNotExecutableException;
 
     List<Field> getData(String taskId);
 

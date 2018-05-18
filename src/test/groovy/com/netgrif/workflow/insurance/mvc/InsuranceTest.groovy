@@ -1,5 +1,7 @@
 package com.netgrif.workflow.insurance.mvc
 
+import com.netgrif.workflow.auth.domain.UserState
+import com.netgrif.workflow.importer.service.Config
 import com.netgrif.workflow.startup.ImportHelper
 import com.netgrif.workflow.WorkflowManagementSystemApplication
 import com.netgrif.workflow.auth.domain.Authority
@@ -48,11 +50,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 )
 class InsuranceTest {
 
-    private static final String CASE_CREATE_URL = "/res/workflow/case"
-    private static final String TASK_SEARCH_URL = "/res/task/search?sort=priority"
-    private static final def TASK_ASSIGN_URL = { id -> "/res/task/assign/$id" }
-    private static final def TASK_FINISH_URL = { id -> "/res/task/finish/$id" }
-    private static final def TASK_DATA_URL = { id -> "/res/task/$id/data" }
+    private static final String CASE_CREATE_URL = "/api/workflow/case"
+    private static final String TASK_SEARCH_URL = "/api/task/search?sort=priority"
+    private static final def TASK_ASSIGN_URL = { id -> "/api/task/assign/$id" }
+    private static final def TASK_FINISH_URL = { id -> "/api/task/finish/$id" }
+    private static final def TASK_DATA_URL = { id -> "/api/task/$id/data" }
 
     private static final String TASK_COVER_TYPE = "Nehnuteľnosť a domácnosť"
     private static final String TASK_BASIC_INFO = "Základné informácie"
@@ -98,15 +100,15 @@ class InsuranceTest {
                 .apply(springSecurity())
                 .build()
 
-        def net = importer.importPetriNet(new File("src/test/resources/insurance_portal_demo_test.xml"), CASE_NAME, CASE_INITIALS, [:])
+        def net = importer.importPetriNet(new File("src/test/resources/insurance_portal_demo_test.xml"), CASE_NAME, CASE_INITIALS, new Config())
         assert net.isPresent()
 
-        netId = net.get().stringId
+        netId = net.get().getStringId()
 
         def org = importHelper.createGroup("Insurance Company")
         def auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])
         def processRoles = importHelper.createUserProcessRoles(["agent": "Agent", "company": "Company"], net.get())
-        importHelper.createUser(new User(name: "Test", surname: "Integration", email: USER_EMAIL, password: "password"),
+        importHelper.createUser(new User(name: "Test", surname: "Integration", email: USER_EMAIL, password: "password", state: UserState.ACTIVE),
                 [auths.get("user")] as Authority[],
                 [org] as Group[],
                 [processRoles.get("agent"), processRoles.get("company")] as UserProcessRole[])
