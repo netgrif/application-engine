@@ -41,7 +41,7 @@ public interface ITaskService {
 
     EventOutcome assignTask(String taskId) throws TransitionNotExecutableException;
 
-    ChangedFieldContainer cancelTask(LoggedUser loggedUser, String taskId);
+    EventOutcome cancelTask(LoggedUser loggedUser, String taskId);
 
     ChangedFieldContainer delegateTask(LoggedUser loggedUser, String delegatedEmail, String taskId) throws TransitionNotExecutableException;
 
