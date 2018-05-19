@@ -1,9 +1,14 @@
 package com.netgrif.workflow.ipc
 
+import com.netgrif.workflow.auth.domain.repositories.UserProcessRoleRepository
+import com.netgrif.workflow.auth.domain.repositories.UserRepository
 import com.netgrif.workflow.importer.service.Importer
 import com.netgrif.workflow.petrinet.domain.PetriNet
 import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository
+import com.netgrif.workflow.startup.DefaultRoleRunner
 import com.netgrif.workflow.startup.ImportHelper
+import com.netgrif.workflow.startup.SuperCreator
+import com.netgrif.workflow.startup.SystemUserRunner
 import com.netgrif.workflow.workflow.domain.Case
 import com.netgrif.workflow.workflow.domain.repositories.CaseRepository
 import com.netgrif.workflow.workflow.domain.repositories.TaskRepository
@@ -12,6 +17,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.data.mongodb.core.MongoTemplate
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit4.SpringRunner
 
@@ -46,15 +52,36 @@ class TaskExecutionTest {
     @Autowired
     private TaskRepository taskRepository
 
+    @Autowired
+    private SuperCreator superCreator
+
+    @Autowired
+    private MongoTemplate template
+
+    @Autowired
+    private UserRepository userRepository
+
+    @Autowired
+    private UserProcessRoleRepository roleRepository
+
+    @Autowired
+    private SystemUserRunner systemUserRunner
+
+    @Autowired
+    private DefaultRoleRunner roleRunner
+
     private def stream = { String name ->
         return TaskExecutionTest.getClassLoader().getResourceAsStream(name)
     }
 
     @Test
     void testTaskExecution() {
-        caseRepository.deleteAll()
-        taskRepository.deleteAll()
-        netRepository.deleteAll()
+        template.db.dropDatabase()
+        userRepository.deleteAll()
+        roleRepository.deleteAll()
+        roleRunner.run()
+        superCreator.run()
+        systemUserRunner.run()
 
         def limitsNetOptional = importer.importPetriNet(stream(LIMITS_NET_FILE), LIMITS_NET_TITLE, LIMITS_NET_INITIALS)
         def leasingNetOptional = importer.importPetriNet(stream(LEASING_NET_FILE), LEASING_NET_TITLE, LEASING_NET_INITIALS)

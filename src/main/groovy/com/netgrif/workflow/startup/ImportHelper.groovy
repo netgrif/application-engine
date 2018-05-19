@@ -19,6 +19,7 @@ import com.netgrif.workflow.workflow.domain.Filter
 import com.netgrif.workflow.workflow.domain.repositories.CaseRepository
 import com.netgrif.workflow.workflow.service.EventOutcome
 import com.netgrif.workflow.workflow.service.TaskService
+import com.netgrif.workflow.workflow.service.interfaces.IDataService
 import com.netgrif.workflow.workflow.service.interfaces.IFilterService
 import com.netgrif.workflow.workflow.web.requestbodies.CreateFilterBody
 import com.netgrif.workflow.workflow.web.responsebodies.TaskReference
@@ -78,6 +79,9 @@ class ImportHelper {
 
     @Autowired
     private IMemberService memberService
+
+    @Autowired
+    private IDataService dataService
 
     private final ClassLoader loader = ImportHelper.getClassLoader()
 
@@ -210,7 +214,7 @@ class ImportHelper {
 
     ChangedFieldContainer setTaskData(String taskId, Map<String, Map<String,String>> data) {
         ObjectNode dataSet = populateDataset(data)
-         taskService.setData(taskId, dataSet)
+         dataService.setData(taskId, dataSet)
     }
 
     ChangedFieldContainer setTaskData(String taskTitle, String caseId, Map<String, Map<String,String>> data) {
