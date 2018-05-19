@@ -268,6 +268,25 @@ public class TaskService implements ITaskService {
         return outcome;
     }
 
+    /**
+     * Used in cancel task action
+     */
+    @Override
+    public void cancelTasksWithoutReload(Set<String> transitions, String caseId) {
+        List<Task> tasks = taskRepository.findAllByTransitionIdInAndCaseId(transitions, caseId);
+        Case useCase = null;
+        for (Task task : tasks) {
+            if (task.getUserId() != null) {
+                if (useCase == null)
+                    useCase = workflowService.findOne(task.getCaseId());
+                Transition transition = useCase.getPetriNet().getTransition(task.getTransitionId());
+                dataService.runActions(transition.getPreCancelActions(), useCase, transition);
+                returnTokens(task, useCase);
+                dataService.runActions(transition.getPostCancelActions(), useCase, transition);
+            }
+        }
+    }
+
     private Task returnTokens(Task task, Case useCase) {
         PetriNet net = useCase.getPetriNet();
         net.getArcsOfTransition(task.getTransitionId()).stream()

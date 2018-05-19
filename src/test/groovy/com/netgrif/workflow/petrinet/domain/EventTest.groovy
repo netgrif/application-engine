@@ -1,9 +1,13 @@
 package com.netgrif.workflow.petrinet.domain
 
+import com.netgrif.workflow.auth.domain.repositories.UserProcessRoleRepository
+import com.netgrif.workflow.auth.domain.repositories.UserRepository
 import com.netgrif.workflow.importer.service.Importer
 import com.netgrif.workflow.ipc.TaskExecutionTest
 import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository
+import com.netgrif.workflow.startup.DefaultRoleRunner
 import com.netgrif.workflow.startup.ImportHelper
+import com.netgrif.workflow.startup.SuperCreator
 import com.netgrif.workflow.workflow.domain.Case
 import com.netgrif.workflow.workflow.domain.repositories.CaseRepository
 import com.netgrif.workflow.workflow.domain.repositories.TaskRepository
@@ -13,6 +17,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.data.mongodb.core.MongoTemplate
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit4.SpringRunner
 
@@ -45,6 +50,21 @@ class EventTest {
     @Autowired
     private TaskRepository taskRepository
 
+    @Autowired
+    private SuperCreator superCreator
+
+    @Autowired
+    private DefaultRoleRunner roleRunner
+
+    @Autowired
+    private MongoTemplate template
+
+    @Autowired
+    private UserRepository userRepository
+
+    @Autowired
+    private UserProcessRoleRepository roleRepository
+
     private def stream = { String name ->
         return TaskExecutionTest.getClassLoader().getResourceAsStream(name)
     }
@@ -54,9 +74,11 @@ class EventTest {
 
     @Test
     void testEventImport() {
-        caseRepository.deleteAll()
-        taskRepository.deleteAll()
-        netRepository.deleteAll()
+        template.db.dropDatabase()
+        userRepository.deleteAll()
+        roleRepository.deleteAll()
+        roleRunner.run()
+        superCreator.run()
 
         def net = importer.importPetriNet(stream(EVENT_NET_FILE), EVENT_NET_TITLE, EVENT_NET_INITS).get()
         instance = helper.createCase(EVENT_NET_CASE, net)
@@ -82,7 +104,7 @@ class EventTest {
 
     private void assertCancelOutcome() {
         assertActionsRuned("${EVENT_NET_TASK}_cancel", "Uloha vzrusena")
-        assert outcome.changedFields["chained"].attributes["value"].value == "chained"
+        assert (outcome.changedFields["chained"].attributes["value"].value as String) == "chained"
     }
 
     private void assertActionsRuned(String fieldIdWithoutPhase, String message) {

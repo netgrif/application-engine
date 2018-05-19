@@ -13,6 +13,7 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 public interface ITaskService {
 
@@ -41,6 +42,12 @@ public interface ITaskService {
     EventOutcome assignTask(String taskId) throws TransitionNotExecutableException;
 
     EventOutcome cancelTask(LoggedUser loggedUser, String taskId);
+
+    /**
+     * cancel task action
+     */
+    @SuppressWarnings("unused")
+    void cancelTasksWithoutReload(Set<String> transitions, String caseId);
 
     EventOutcome delegateTask(LoggedUser loggedUser, String delegatedEmail, String taskId) throws TransitionNotExecutableException;
 
