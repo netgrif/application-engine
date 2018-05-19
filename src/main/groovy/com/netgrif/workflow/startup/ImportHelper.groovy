@@ -194,6 +194,14 @@ class ImportHelper {
         finishTask(taskTitle, caseId, superCreator.loggedSuper)
     }
 
+    void cancelTask(String taskTitle, String caseId, LoggedUser user) {
+        taskService.cancelTask(user, getTaskId(taskTitle, caseId))
+    }
+
+    void cancelTaskAsSuper(String taskTitle, String caseId) {
+        cancelTask(taskTitle, caseId, superCreator.loggedSuper)
+    }
+
     String getTaskId(String taskTitle, String caseId) {
         List<TaskReference> references = taskService.findAllByCase(caseId, null)
         return references.find { it.getTitle() == taskTitle }.stringId
