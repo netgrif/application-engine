@@ -252,16 +252,21 @@ public class TaskService implements ITaskService {
 
     @Override
     @Transactional
-    public ChangedFieldContainer cancelTask(LoggedUser loggedUser, String taskId) {
+    public EventOutcome cancelTask(LoggedUser loggedUser, String taskId) {
         Task task = taskRepository.findOne(taskId);
         User user = userRepository.findOne(loggedUser.getId());
         Case useCase = workflowService.findOne(task.getCaseId());
+        Transition transition = useCase.getPetriNet().getTransition(task.getTransitionId());
+        EventOutcome outcome = new EventOutcome(transition.getCancelMessage());
 
+        outcome.add(dataService.runActions(transition.getPreCancelActions(), useCase, transition));
         task = cancelTaskWithoutReload(task, useCase);
+        outcome.add(dataService.runActions(transition.getPostCancelActions(), useCase, transition));
+        workflowService.save(useCase);
         reloadTasks(useCase);
 
         publisher.publishEvent(new UserCancelTaskEvent(user, task, useCase));
-        return null;//todo:
+        return outcome;
     }
 
     private Task cancelTaskWithoutReload(Task task, Case useCase) {

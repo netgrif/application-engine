@@ -20,10 +20,22 @@
     <data type="text">
         <id>task_cancel_pre</id>
         <title>task_cancel_pre</title>
+        <action trigger="set">
+            <!-- @formatter:off -->
+            field: f.chained;
+            change field about {
+                return "chained";
+            }
+            <!-- @formatter:on -->
+        </action>
     </data>
     <data type="text">
         <id>task_cancel_post</id>
         <title>task_cancel_post</title>
+    </data>
+    <data type="text">
+        <id>chained</id>
+        <title>chained</title>
     </data>
     <transition>
         <id>task</id>

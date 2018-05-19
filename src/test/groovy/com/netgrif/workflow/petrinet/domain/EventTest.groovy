@@ -7,6 +7,7 @@ import com.netgrif.workflow.startup.ImportHelper
 import com.netgrif.workflow.workflow.domain.Case
 import com.netgrif.workflow.workflow.domain.repositories.CaseRepository
 import com.netgrif.workflow.workflow.domain.repositories.TaskRepository
+import com.netgrif.workflow.workflow.service.EventOutcome
 import com.netgrif.workflow.workflow.service.TaskService
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -49,6 +50,7 @@ class EventTest {
     }
 
     Case instance
+    EventOutcome outcome
 
     @Test
     void testEventImport() {
@@ -59,20 +61,38 @@ class EventTest {
         def net = importer.importPetriNet(stream(EVENT_NET_FILE), EVENT_NET_TITLE, EVENT_NET_INITS).get()
         instance = helper.createCase(EVENT_NET_CASE, net)
 
-        def outcome = helper.assignTaskToSuper(EVENT_NET_TASK, instance.stringId)
-        assertActionsRuned("${EVENT_NET_TASK}_assign")
+        outcome = helper.assignTaskToSuper(EVENT_NET_TASK, instance.stringId)
+        assertAssignOutcome()
 
-        helper.finishTaskAsSuper(EVENT_NET_TASK, instance.stringId)
-        assertActionsRuned("${EVENT_NET_TASK}_finish")
+        outcome = helper.finishTaskAsSuper(EVENT_NET_TASK, instance.stringId)
+        assertFinishOutcome()
 
         helper.assignTaskToSuper(EVENT_NET_TASK, instance.stringId)
-        helper.cancelTaskAsSuper(EVENT_NET_TASK, instance.stringId)
-        assertActionsRuned("${EVENT_NET_TASK}_cancel")
+        outcome = helper.cancelTaskAsSuper(EVENT_NET_TASK, instance.stringId)
+        assertCancelOutcome()
     }
 
-    private void assertActionsRuned(String fieldIdWithoutPhase) {
+    private void assertAssignOutcome() {
+        assertActionsRuned("${EVENT_NET_TASK}_assign", "Uloha priradena")
+    }
+
+    private void assertFinishOutcome() {
+        assertActionsRuned("${EVENT_NET_TASK}_finish", "Uloha zrobena")
+    }
+
+    private void assertCancelOutcome() {
+        assertActionsRuned("${EVENT_NET_TASK}_cancel", "Uloha vzrusena")
+        assert outcome.changedFields["chained"].attributes["value"].value == "chained"
+    }
+
+    private void assertActionsRuned(String fieldIdWithoutPhase, String message) {
         instance = caseRepository.findOne(instance.stringId)
+
         assert instance.dataSet["${fieldIdWithoutPhase}_pre" as String].value as String == "${fieldIdWithoutPhase}_pre"
         assert instance.dataSet["${fieldIdWithoutPhase}_post" as String].value as String == "${fieldIdWithoutPhase}_post"
+
+        assert outcome.message.defaultValue == message
+        assert outcome.changedFields["${fieldIdWithoutPhase}_pre" as String]
+        assert outcome.changedFields["${fieldIdWithoutPhase}_post" as String]
     }
 }
