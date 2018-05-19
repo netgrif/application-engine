@@ -9,7 +9,6 @@ import com.netgrif.workflow.petrinet.domain.*;
 import com.netgrif.workflow.petrinet.domain.arcs.Arc;
 import com.netgrif.workflow.petrinet.domain.arcs.ResetArc;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
-import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldContainer;
 import com.netgrif.workflow.petrinet.domain.roles.RolePermission;
 import com.netgrif.workflow.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.workflow.utils.DateUtils;
@@ -260,7 +259,7 @@ public class TaskService implements ITaskService {
         EventOutcome outcome = new EventOutcome(transition.getCancelMessage());
 
         outcome.add(dataService.runActions(transition.getPreCancelActions(), useCase, transition));
-        task = cancelTaskWithoutReload(task, useCase);
+        task = returnTokens(task, useCase);
         outcome.add(dataService.runActions(transition.getPostCancelActions(), useCase, transition));
         workflowService.save(useCase);
         reloadTasks(useCase);
@@ -269,7 +268,7 @@ public class TaskService implements ITaskService {
         return outcome;
     }
 
-    private Task cancelTaskWithoutReload(Task task, Case useCase) {
+    private Task returnTokens(Task task, Case useCase) {
         PetriNet net = useCase.getPetriNet();
         net.getArcsOfTransition(task.getTransitionId()).stream()
                 .filter(arc -> arc.getSource() instanceof Place)
@@ -292,17 +291,22 @@ public class TaskService implements ITaskService {
 
     @Override
     @Transactional
-    public ChangedFieldContainer delegateTask(LoggedUser loggedUser, String delegatedEmail, String taskId) throws TransitionNotExecutableException {
+    public EventOutcome delegateTask(LoggedUser loggedUser, String delegatedEmail, String taskId) throws TransitionNotExecutableException {
         User delegated = userRepository.findByEmail(delegatedEmail);
         User delegate = userRepository.findOne(loggedUser.getId());
         Task task = taskRepository.findOne(taskId);
         Case useCase = workflowService.findOne(task.getCaseId());
+        Transition transition = useCase.getPetriNet().getTransition(task.getTransitionId());
+        EventOutcome outcome = new EventOutcome(transition.getDelegateMessage());
 
+        outcome.add(dataService.runActions(transition.getPreDelegateActions(), useCase, transition));
         task.setUserId(delegated.getId());
         taskRepository.save(task);
+        outcome.add(dataService.runActions(transition.getPostDelegateActions(), useCase, transition));
+        workflowService.save(useCase);
 
         publisher.publishEvent(new UserDelegateTaskEvent(delegate, task, useCase, delegated));
-        return null;//todo
+        return outcome;
     }
 
     /**
@@ -486,21 +490,29 @@ public class TaskService implements ITaskService {
     }
 
     @Transactional
-    protected void executeTransition(Task task, Case useCase) {
+    protected EventOutcome executeTransition(Task task, Case useCase) {
         log.info("executeTransition");
         useCase = workflowService.decrypt(useCase);
         Transition transition = useCase.getPetriNet().getTransition(task.getTransitionId());
+        EventOutcome outcome = new EventOutcome();
         try {
+            outcome.add(dataService.runActions(transition.getPreAssignActions(), useCase, transition));
             startExecution(transition, useCase);
+            outcome.add(dataService.runActions(transition.getPostAssignActions(), useCase, transition));
             dataService.getData(task, useCase);
             validateData(transition, useCase);
+            outcome.add(dataService.runActions(transition.getPreFinishActions(), useCase, transition));
             finishExecution(transition, useCase);
+            outcome.add(dataService.runActions(transition.getPostFinishActions(), useCase, transition));
 
             workflowService.save(useCase);
             reloadTasks(useCase);
+
+            outcome.setMessage(new I18nString("Task " + task.getTitle() + " executed"));
         } catch (TransitionNotExecutableException e) {
             e.printStackTrace();
         }
+        return outcome;
     }
 
     @Transactional
