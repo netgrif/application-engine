@@ -406,7 +406,7 @@ public class TaskService implements ITaskService {
                 .dataFocusPolicy(transition.getDataFocusPolicy())
                 .finishPolicy(transition.getFinishPolicy())
                 .build();
-
+        transition.getEvents().forEach((type, event) -> task.addEventTitle(type, event.getTitle()));
         for (Trigger trigger : transition.getTriggers()) {
             Trigger taskTrigger = trigger.clone();
             task.addTrigger(taskTrigger);
