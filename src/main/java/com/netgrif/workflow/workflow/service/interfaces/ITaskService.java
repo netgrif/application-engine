@@ -2,7 +2,6 @@ package com.netgrif.workflow.workflow.service.interfaces;
 
 import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.auth.domain.User;
-import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldContainer;
 import com.netgrif.workflow.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.Task;
@@ -43,7 +42,7 @@ public interface ITaskService {
 
     EventOutcome cancelTask(LoggedUser loggedUser, String taskId);
 
-    ChangedFieldContainer delegateTask(LoggedUser loggedUser, String delegatedEmail, String taskId) throws TransitionNotExecutableException;
+    EventOutcome delegateTask(LoggedUser loggedUser, String delegatedEmail, String taskId) throws TransitionNotExecutableException;
 
     void delete(Iterable<? extends Task> tasks, Case useCase);
 
