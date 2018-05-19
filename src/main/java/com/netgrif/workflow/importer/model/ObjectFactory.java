@@ -48,6 +48,7 @@ public class ObjectFactory {
     private final static QName _AssignPolicy_QNAME = new QName("", "assignPolicy");
     private final static QName _DataFocusPolicy_QNAME = new QName("", "dataFocusPolicy");
     private final static QName _FinishPolicy_QNAME = new QName("", "finishPolicy");
+    private final static QName _Message_QNAME = new QName("", "message");
     private final static QName _Tokens_QNAME = new QName("", "tokens");
     private final static QName _IsStatic_QNAME = new QName("", "isStatic");
     private final static QName _Static_QNAME = new QName("", "static");
@@ -58,7 +59,6 @@ public class ObjectFactory {
     private final static QName _DefaultRole_QNAME = new QName("", "defaultRole");
     private final static QName _CaseName_QNAME = new QName("", "caseName");
     private final static QName _Type_QNAME = new QName("", "type");
-    private final static QName _Message_QNAME = new QName("", "message");
 
     /**
      * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: com.netgrif.workflow.importer.model
@@ -188,6 +188,22 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link Event }
+     * 
+     */
+    public Event createEvent() {
+        return new Event();
+    }
+
+    /**
+     * Create an instance of {@link Actions }
+     * 
+     */
+    public Actions createActions() {
+        return new Actions();
+    }
+
+    /**
      * Create an instance of {@link Place }
      * 
      */
@@ -225,22 +241,6 @@ public class ObjectFactory {
      */
     public Document createDocument() {
         return new Document();
-    }
-
-    /**
-     * Create an instance of {@link Event }
-     *
-     */
-    public Event createEvent() {
-        return new Event();
-    }
-
-    /**
-     * Create an instance of {@link Actions }
-     *
-     */
-    public Actions createActions() {
-        return new Actions();
     }
 
     /**
@@ -460,6 +460,15 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link I18NStringType }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "", name = "message")
+    public JAXBElement<I18NStringType> createMessage(I18NStringType value) {
+        return new JAXBElement<I18NStringType>(_Message_QNAME, I18NStringType.class, null, value);
+    }
+
+    /**
      * Create an instance of {@link JAXBElement }{@code <}{@link Integer }{@code >}}
      * 
      */
@@ -547,15 +556,6 @@ public class ObjectFactory {
     @XmlElementDecl(namespace = "", name = "type")
     public JAXBElement<String> createType(String value) {
         return new JAXBElement<String>(_Type_QNAME, String.class, null, value);
-    }
-
-    /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link I18NStringType }{@code >}}
-     *
-     */
-    @XmlElementDecl(namespace = "", name = "message")
-    public JAXBElement<I18NStringType> createMessage(I18NStringType value) {
-        return new JAXBElement<I18NStringType>(_Message_QNAME, I18NStringType.class, null, value);
     }
 
 }
