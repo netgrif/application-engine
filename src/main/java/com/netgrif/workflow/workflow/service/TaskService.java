@@ -343,7 +343,7 @@ public class TaskService implements ITaskService {
      * </table>
      */
     @Transactional
-    protected void reloadTasks(Case useCase, Long userId) {
+    protected void reloadTasks(Case useCase) {
         PetriNet net = useCase.getPetriNet();
 
         net.getTransitions().values().forEach(transition -> {
