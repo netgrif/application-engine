@@ -165,7 +165,7 @@ public class Task {
     }
 
     public String getTranslatedEventTitle(EventType assign, Locale locale) {
-        if (!eventTitles.containsKey(assign))
+        if (eventTitles == null || !eventTitles.containsKey(assign))
             return null;
         return eventTitles.get(assign).getTranslation(locale);
     }
