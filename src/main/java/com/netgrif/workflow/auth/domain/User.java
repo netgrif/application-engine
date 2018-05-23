@@ -8,7 +8,6 @@ import com.netgrif.workflow.petrinet.domain.roles.ProcessRole;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.validator.constraints.Email;
-import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotBlank;
 
 import javax.persistence.*;
@@ -155,5 +154,9 @@ public class User {
         author.setFullName(this.getFullName());
 
         return author;
+    }
+
+    public boolean isActive() {
+        return UserState.ACTIVE.equals(state);
     }
 }

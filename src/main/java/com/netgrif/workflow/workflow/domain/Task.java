@@ -2,6 +2,7 @@ package com.netgrif.workflow.workflow.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.netgrif.workflow.auth.domain.User;
+import com.netgrif.workflow.petrinet.domain.EventType;
 import com.netgrif.workflow.petrinet.domain.I18nString;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.petrinet.domain.policies.AssignPolicy;
@@ -9,7 +10,10 @@ import com.netgrif.workflow.petrinet.domain.policies.DataFocusPolicy;
 import com.netgrif.workflow.petrinet.domain.policies.FinishPolicy;
 import com.netgrif.workflow.petrinet.domain.roles.RolePermission;
 import com.netgrif.workflow.workflow.domain.triggers.Trigger;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
@@ -105,16 +109,16 @@ public class Task {
     @Builder.Default
     private FinishPolicy finishPolicy = FinishPolicy.MANUAL;
 
+    @Getter @Setter
+    @Builder.Default
+    private Map<EventType, I18nString> eventTitles = new HashMap<>();
+
     public Task() {
     }
 
     @JsonIgnore
     public ObjectId getObjectId() {
         return _id;
-    }
-
-    public void setObjectId(ObjectId id) {
-        this._id = id;
     }
 
     public String getStringId() {
@@ -151,13 +155,19 @@ public class Task {
         triggers.add(trigger);
     }
 
-    public void addImmediateData(Field field){
-        this.immediateData.add(field);
+    public void addEventTitle(EventType type, I18nString title) {
+        eventTitles.put(type, title);
     }
 
     @JsonIgnore
     public Long getUserId() {
         return userId;
+    }
+
+    public String getTranslatedEventTitle(EventType assign, Locale locale) {
+        if (eventTitles == null || !eventTitles.containsKey(assign))
+            return null;
+        return eventTitles.get(assign).getTranslation(locale);
     }
 
     public enum Type {

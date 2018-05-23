@@ -49,6 +49,9 @@ public class Transition extends Node {
     @Getter @Setter
     private FinishPolicy finishPolicy;
 
+    @Getter @Setter
+    private Map<EventType, Event> events;
+
     public Transition() {
         super();
         dataSet = new LinkedHashMap<>();
@@ -58,14 +61,7 @@ public class Transition extends Node {
         assignPolicy = AssignPolicy.MANUAL;
         dataFocusPolicy = DataFocusPolicy.MANUAL;
         finishPolicy = FinishPolicy.MANUAL;
-    }
-
-    public void addDataSet(String fieldId, DataFieldLogic logic) {
-        if (dataSet.containsKey(fieldId) && dataSet.get(fieldId) != null) {
-            dataSet.get(fieldId).merge(logic);
-        } else {
-            dataSet.put(fieldId, logic);
-        }
+        events = new HashMap<>();
     }
 
     public void addDataSet(String field, Set<FieldBehavior> behavior, Set<Action> actions){
@@ -109,8 +105,86 @@ public class Transition extends Node {
                 .map(Map.Entry::getKey).collect(Collectors.toList());
     }
 
+    public List<Action> getPreFinishActions() {
+        return getPreActions(EventType.FINISH);
+    }
+
+    public List<Action> getPostFinishActions() {
+        return getPostActions(EventType.FINISH);
+    }
+
+    public List<Action> getPreAssignActions() {
+        return getPreActions(EventType.ASSIGN);
+    }
+
+    public List<Action> getPostAssignActions() {
+        return getPostActions(EventType.ASSIGN);
+    }
+
+    public List<Action> getPreCancelActions() {
+        return getPreActions(EventType.CANCEL);
+    }
+
+    public List<Action> getPostCancelActions() {
+        return getPostActions(EventType.CANCEL);
+    }
+
+    public List<Action> getPreDelegateActions() {
+        return getPreActions(EventType.DELEGATE);
+    }
+
+    public List<Action> getPostDelegateActions() {
+        return getPostActions(EventType.DELEGATE);
+    }
+
+    private List<Action> getPreActions(EventType type) {
+        if (events.containsKey(type))
+            return events.get(type).getPreActions();
+        return new LinkedList<>();
+    }
+
+    private List<Action> getPostActions(EventType type) {
+        if (events.containsKey(type))
+            return events.get(type).getPostActions();
+        return new LinkedList<>();
+    }
+
+    public I18nString getFinishMessage() {
+        return getMessage(EventType.FINISH);
+    }
+
+    public I18nString getAssignMessage() {
+        return getMessage(EventType.ASSIGN);
+    }
+
+    public I18nString getCancelMessage() {
+        return getMessage(EventType.CANCEL);
+    }
+
+    public I18nString getDelegateMessage() {
+        return getMessage(EventType.DELEGATE);
+    }
+
+    private I18nString getMessage(EventType type) {
+        if (events.containsKey(type) )
+            return events.get(type).getMessage();
+        return null;
+    }
+
     @Override
     public String toString() {
         return this.getTitle().toString();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Transition that = (Transition) o;
+        return importId.equals(that.importId);
+    }
+
+    public void addEvent(Event event) {
+        events.put(event.getType(), event);
     }
 }

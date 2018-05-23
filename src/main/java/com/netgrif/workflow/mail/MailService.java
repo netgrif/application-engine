@@ -1,7 +1,6 @@
 package com.netgrif.workflow.mail;
 
 import com.netgrif.workflow.auth.domain.User;
-import com.netgrif.workflow.auth.service.RegistrationService;
 import com.netgrif.workflow.auth.service.interfaces.IRegistrationService;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
@@ -20,9 +19,7 @@ import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import java.io.File;
 import java.io.IOException;
-import java.net.InetAddress;
 import java.nio.charset.StandardCharsets;
-import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
@@ -30,6 +27,10 @@ import java.util.*;
 public class MailService implements IMailService {
 
     static final Logger log = Logger.getLogger(MailService.class.getName());
+    public static final String TOKEN = "token";
+    public static final String EXPIRATION = "expiration";
+    public static final String SERVER = "server";
+    public static final String NAME = "name";
 
     @Autowired
     private IRegistrationService registrationService;
@@ -64,26 +65,30 @@ public class MailService implements IMailService {
         Map<String, Object> model = new HashMap<>();
 
         recipients.add(user.getEmail());
-        model.put("token", registrationService.encodeToken(user.getEmail(),user.getToken()));
+        model.put(TOKEN, registrationService.encodeToken(user.getEmail(), user.getToken()));
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
-        model.put("expiration", registrationService.generateExpirationDate().format(formatter));
-        model.put("server", getServerURL());
+        model.put(EXPIRATION, registrationService.generateExpirationDate().format(formatter));
+        model.put(SERVER, getServerURL());
 
         MimeMessage email = buildEmail(EmailType.REGISTRATION, recipients, model, new HashMap<>());
         mailSender.send(email);
+
+        log.info("Registration email sent to [" + user.getEmail() + "] with token [" + model.get(TOKEN) + "], expiring on [" + model.get(EXPIRATION) + "]");
     }
 
     @Override
     public void sendPasswordResetEmail(User user) throws MessagingException, IOException, TemplateException {
         Map<String, Object> model = new HashMap<>();
 
-        model.put("name", user.getName());
-        model.put("token", registrationService.encodeToken(user.getEmail(), user.getToken()));
-        model.put("expiration", registrationService.generateExpirationDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
-        model.put("server", getServerURL());
+        model.put(NAME, user.getName());
+        model.put(TOKEN, registrationService.encodeToken(user.getEmail(), user.getToken()));
+        model.put(EXPIRATION, registrationService.generateExpirationDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
+        model.put(SERVER, getServerURL());
 
         MimeMessage email = buildEmail(EmailType.PASSWORD_RESET, Collections.singletonList(user.getEmail()), model, new HashMap<>());
         mailSender.send(email);
+
+        log.info("Reset email sent to [" + user.getEmail() + "] with token [" + model.get(TOKEN) + "], expiring on [" + model.get(EXPIRATION) + "]");
     }
 
     @Override
