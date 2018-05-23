@@ -17,7 +17,9 @@ import com.netgrif.workflow.petrinet.web.requestbodies.UploadedFileMeta
 import com.netgrif.workflow.workflow.domain.Case
 import com.netgrif.workflow.workflow.domain.Filter
 import com.netgrif.workflow.workflow.domain.repositories.CaseRepository
+import com.netgrif.workflow.workflow.service.EventOutcome
 import com.netgrif.workflow.workflow.service.TaskService
+import com.netgrif.workflow.workflow.service.interfaces.IDataService
 import com.netgrif.workflow.workflow.service.interfaces.IFilterService
 import com.netgrif.workflow.workflow.web.requestbodies.CreateFilterBody
 import com.netgrif.workflow.workflow.web.responsebodies.TaskReference
@@ -77,6 +79,9 @@ class ImportHelper {
 
     @Autowired
     private IMemberService memberService
+
+    @Autowired
+    private IDataService dataService
 
     private final ClassLoader loader = ImportHelper.getClassLoader()
 
@@ -178,20 +183,28 @@ class ImportHelper {
         return filterService.saveFilter(new CreateFilterBody(title, Filter.VISIBILITY_PUBLIC, "This filter was created automatically for testing purpose only.", Filter.TYPE_TASK, query, readable), user)
     }
 
-    void assignTask(String taskTitle, String caseId, LoggedUser author) {
-        taskService.assignTask(author, getTaskId(taskTitle, caseId))
+    EventOutcome assignTask(String taskTitle, String caseId, LoggedUser author) {
+        return taskService.assignTask(author, getTaskId(taskTitle, caseId))
     }
 
-    void assignTaskToSuper(String taskTitle, String caseId) {
-        assignTask(taskTitle, caseId, superCreator.loggedSuper)
+    EventOutcome assignTaskToSuper(String taskTitle, String caseId) {
+        return assignTask(taskTitle, caseId, superCreator.loggedSuper)
     }
 
-    void finishTask(String taskTitle, String caseId, LoggedUser author) {
-        taskService.finishTask(author, getTaskId(taskTitle, caseId))
+    EventOutcome finishTask(String taskTitle, String caseId, LoggedUser author) {
+        return taskService.finishTask(author, getTaskId(taskTitle, caseId))
     }
 
-    void finishTaskAsSuper(String taskTitle, String caseId) {
-        finishTask(taskTitle, caseId, superCreator.loggedSuper)
+    EventOutcome finishTaskAsSuper(String taskTitle, String caseId) {
+        return finishTask(taskTitle, caseId, superCreator.loggedSuper)
+    }
+
+    EventOutcome cancelTask(String taskTitle, String caseId, LoggedUser user) {
+        return taskService.cancelTask(user, getTaskId(taskTitle, caseId))
+    }
+
+    EventOutcome cancelTaskAsSuper(String taskTitle, String caseId) {
+        return cancelTask(taskTitle, caseId, superCreator.loggedSuper)
     }
 
     String getTaskId(String taskTitle, String caseId) {
@@ -201,7 +214,7 @@ class ImportHelper {
 
     ChangedFieldContainer setTaskData(String taskId, Map<String, Map<String,String>> data) {
         ObjectNode dataSet = populateDataset(data)
-         taskService.setData(taskId, dataSet)
+         dataService.setData(taskId, dataSet)
     }
 
     ChangedFieldContainer setTaskData(String taskTitle, String caseId, Map<String, Map<String,String>> data) {
