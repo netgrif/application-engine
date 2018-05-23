@@ -60,9 +60,9 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public Member upsertGroupMember(User user){
+    public Member upsertGroupMember(User user) {
         Member member = memberService.findByEmail(user.getEmail());
-        if(member == null)
+        if (member == null)
             member = new Member(user.getId(), user.getName(), user.getSurname(), user.getEmail());
         member.setGroups(user.getGroups());
         return memberService.save(member);
@@ -103,9 +103,9 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public User findByEmail(String email, boolean small){
+    public User findByEmail(String email, boolean small) {
         User user = userRepository.findByEmail(email);
-        if(!small)
+        if (!small)
             return loadProcessRoles(user);
         return user;
     }
@@ -149,12 +149,12 @@ public class UserService implements IUserService {
         try {
             return (LoggedUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         } catch (NullPointerException e) {
-            return userRepository.findOne(SystemUserRunner.SYSTEM_USER_ID).transformToLoggedUser();
+            return userRepository.findByEmail(SystemUserRunner.SYSTEM_USER_NAME).transformToLoggedUser();
         }
     }
 
     private User loadProcessRoles(User user) {
-        if(user == null)
+        if (user == null)
             return user;
         user.setProcessRoles(processRoleRepository.findAll(user.getUserProcessRoles()
                 .stream().map(UserProcessRole::getRoleId).collect(Collectors.toList())));
