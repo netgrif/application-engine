@@ -70,6 +70,7 @@
                 <xs:element ref="roleRef" maxOccurs="unbounded" minOccurs="0"/>
                 <xs:element ref="dataRef" maxOccurs="unbounded" minOccurs="0"/>
                 <xs:element ref="dataGroup" maxOccurs="unbounded" minOccurs="0"/>
+                <xs:element ref="event" maxOccurs="unbounded" minOccurs="0"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
@@ -300,6 +301,7 @@
             <xs:enumeration value="editable"/>
             <xs:enumeration value="required"/>
             <xs:enumeration value="immediate"/>
+            <xs:enumeration value="optional"/>
         </xs:restriction>
     </xs:simpleType>
     <xs:element name="dataRef">
@@ -326,7 +328,7 @@
     <xs:complexType name="actionType">
         <xs:simpleContent>
             <xs:extension base="xs:string">
-                <xs:attribute name="trigger" use="required"/>
+                <xs:attribute name="trigger"/>
                 <xs:attribute name="id"/>
             </xs:extension>
         </xs:simpleContent>
@@ -377,4 +379,38 @@
     <xs:element name="dataFocusPolicy" type="dataFocusPolicyType"/>
     <xs:element name="finishPolicy" type="finishPolicyType"/>
     <xs:element name="caseName" type="i18nStringType"/>
+    <xs:element name="event">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="id"/>
+                <xs:element ref="title" minOccurs="0"/>
+                <xs:element ref="message" minOccurs="0"/>
+                <xs:element ref="actions" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+            <xs:attribute name="type" use="required" type="eventType"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:simpleType name="eventType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="assign"/>
+            <xs:enumeration value="cancel"/>
+            <xs:enumeration value="finish"/>
+            <xs:enumeration value="delegate"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="eventPhaseType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="pre"/>
+            <xs:enumeration value="post"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:element name="actions">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="action" maxOccurs="unbounded" minOccurs="0"/>
+            </xs:sequence>
+            <xs:attribute type="eventPhaseType" name="phase" use="required"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="message" type="i18nStringType"/>
 </xs:schema>

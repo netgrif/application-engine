@@ -7,9 +7,9 @@ import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldContainer;
 import com.netgrif.workflow.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.workflow.workflow.domain.Task;
+import com.netgrif.workflow.workflow.service.interfaces.IDataService;
 import com.netgrif.workflow.workflow.service.interfaces.IFilterService;
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
-import com.netgrif.workflow.workflow.web.requestbodies.CreateFilterBody;
 import com.netgrif.workflow.workflow.web.responsebodies.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
@@ -41,6 +41,9 @@ public class TaskController {
 
     @Autowired
     private IFilterService filterService;
+
+    @Autowired
+    private IDataService dataService;
 
     @RequestMapping(method = RequestMethod.GET)
     public PagedResources<LocalisedTaskResource> getAll(Authentication auth, Pageable pageable, PagedResourcesAssembler<com.netgrif.workflow.workflow.domain.Task> assembler, Locale locale) {
@@ -174,8 +177,8 @@ public class TaskController {
 
     @RequestMapping(value = "/{id}/data", method = RequestMethod.GET)
     public DataGroupsResource getData(@PathVariable("id") String taskId, Locale locale) {
-        List<Field> dataFields = taskService.getData(taskId);
-        List<DataGroup> dataGroups = taskService.getDataGroups(taskId);
+        List<Field> dataFields = dataService.getData(taskId);
+        List<DataGroup> dataGroups = dataService.getDataGroups(taskId);
 
         dataGroups.forEach(group -> group.setFields(new DataFieldsResource(dataFields.stream().filter(field ->
                 group.getData().contains(field.getStringId())).collect(Collectors.toList()), taskId, locale)));
@@ -185,13 +188,13 @@ public class TaskController {
 
     @RequestMapping(value = "/{id}/data", method = RequestMethod.POST)
     public ChangedFieldContainer saveData(@PathVariable("id") String taskId, @RequestBody ObjectNode dataBody) {
-        return taskService.setData(taskId, dataBody);
+        return dataService.setData(taskId, dataBody);
     }
 
     @RequestMapping(value = "/{id}/file/{field}", method = RequestMethod.POST)
     public MessageResource saveFile(@PathVariable("id") String taskId, @PathVariable("field") String fieldId,
                                     @RequestParam(value = "file") MultipartFile multipartFile) {
-        if (taskService.saveFile(taskId, fieldId, multipartFile))
+        if (dataService.saveFile(taskId, fieldId, multipartFile))
             return MessageResource.successMessage("File " + multipartFile.getOriginalFilename() + " successfully uploaded");
         else
             return MessageResource.errorMessage("File " + multipartFile.getOriginalFilename() + " failed to upload");
@@ -199,7 +202,7 @@ public class TaskController {
 
     @RequestMapping(value = "/{id}/file/{field}", method = RequestMethod.GET, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public FileSystemResource getFile(@PathVariable("id") String taskId, @PathVariable("field") String fieldId, HttpServletResponse response) {
-        FileSystemResource fileResource = taskService.getFile(taskId, fieldId);
+        FileSystemResource fileResource = dataService.getFile(taskId, fieldId);
         response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
         response.setHeader("Content-Disposition", "attachment; filename=" + fileResource.getFilename().substring(fileResource.getFilename().indexOf('-') + 1));
         return fileResource;

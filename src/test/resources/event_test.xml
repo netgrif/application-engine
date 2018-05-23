@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="../../main/resources/petriNets/petriflow_schema.xsd">
+    <data type="text">
+        <id>task_assign_pre</id>
+        <title>task_assign_pre</title>
+    </data>
+    <data type="text">
+        <id>task_assign_post</id>
+        <title>task_assign_post</title>
+    </data>
+    <data type="text">
+        <id>task_finish_pre</id>
+        <title>task_finish_pre</title>
+    </data>
+    <data type="text">
+        <id>task_finish_post</id>
+        <title>task_finish_post</title>
+    </data>
+    <data type="text">
+        <id>task_cancel_pre</id>
+        <title>task_cancel_pre</title>
+        <action trigger="set">
+            <!-- @formatter:off -->
+            field: f.chained;
+            change field about {
+                return "chained";
+            }
+            <!-- @formatter:on -->
+        </action>
+    </data>
+    <data type="text">
+        <id>task_cancel_post</id>
+        <title>task_cancel_post</title>
+    </data>
+    <data type="text">
+        <id>chained</id>
+        <title>chained</title>
+    </data>
+    <transition>
+        <id>task</id>
+        <x>0</x>
+        <y>0</y>
+        <label>task</label>
+        <event type="assign">
+            <id>task_assign</id>
+            <title>Prirad</title>
+            <message>Uloha priradena</message>
+            <actions phase="post">
+                <action>
+                    <!-- @formatter:off -->
+                    field: f.task_assign_post;
+                    change field about {
+                        return "task_assign_post";
+                    }
+                    <!-- @formatter:on -->
+                </action>
+            </actions>
+            <actions phase="pre">
+                <action>
+                    <!-- @formatter:off -->
+                    field: f.task_assign_pre;
+                    change field about {
+                        return "task_assign_pre";
+                    }
+                    <!-- @formatter:on -->
+                </action>
+            </actions>
+        </event>
+        <event type="finish">
+            <id>task_finish</id>
+            <title>Dokonic</title>
+            <message>Uloha zrobena</message>
+            <actions phase="post">
+                <action>
+                    <!-- @formatter:off -->
+                    field: f.task_finish_post;
+                    change field about {
+                        return "task_finish_post";
+                    }
+                    <!-- @formatter:on -->
+                </action>
+            </actions>
+            <actions phase="pre">
+                <action>
+                    <!-- @formatter:off -->
+                    field: f.task_finish_pre;
+                    change field about {
+                        return "task_finish_pre";
+                    }
+                    <!-- @formatter:on -->
+                </action>
+            </actions>
+        </event>
+        <event type="cancel">
+            <id>task_cancel</id>
+            <title>Zrus</title>
+            <message>Uloha vzrusena</message>
+            <actions phase="post">
+                <action>
+                    <!-- @formatter:off -->
+                    field: f.task_cancel_post;
+                    change field about {
+                        return "task_cancel_post";
+                    }
+                    <!-- @formatter:on -->
+                </action>
+            </actions>
+            <actions phase="pre">
+                <action>
+                    <!-- @formatter:off -->
+                    field: f.task_cancel_pre;
+                    change field about {
+                        return "task_cancel_pre";
+                    }
+                    <!-- @formatter:on -->
+                </action>
+            </actions>
+        </event>
+    </transition>
+</document>

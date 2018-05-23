@@ -2,7 +2,9 @@ package com.netgrif.workflow.importer.service;
 
 import com.netgrif.workflow.importer.model.*;
 import com.netgrif.workflow.petrinet.domain.DataGroup;
+import com.netgrif.workflow.petrinet.domain.Event;
 import com.netgrif.workflow.petrinet.domain.*;
+import com.netgrif.workflow.petrinet.domain.EventType;
 import com.netgrif.workflow.petrinet.domain.Place;
 import com.netgrif.workflow.petrinet.domain.Transaction;
 import com.netgrif.workflow.petrinet.domain.Transition;
@@ -33,6 +35,7 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Component
 public class Importer {
@@ -276,9 +279,43 @@ public class Importer {
         if (isDefaultRoleAllowedFor(importTransition, document)) {
             addDefaultRole(transition);
         }
+        if (importTransition.getEvent() != null) {
+            importTransition.getEvent().forEach(event ->
+                    addEvent(transition, event)
+            );
+        }
 
         net.addTransition(transition);
         transitions.put(importTransition.getId(), transition);
+    }
+
+    @Transactional
+    protected void addEvent(Transition transition, com.netgrif.workflow.importer.model.Event imported) {
+        Event event = new Event();
+        event.setImportId(imported.getId());
+        event.setMessage(toI18NString(imported.getMessage()));
+        event.setTitle(toI18NString(imported.getTitle()));
+        event.setType(EventType.valueOf(imported.getType().value().toUpperCase()));
+        event.setPostActions(parsePostActions(transition, imported));
+        event.setPreActions(parsePreActions(transition, imported));
+        transition.addEvent(event);
+    }
+
+    private List<Action> parsePostActions(Transition transition, com.netgrif.workflow.importer.model.Event imported) {
+        return parsePhaseActions(EventPhaseType.POST, transition, imported);
+    }
+
+    private List<Action> parsePreActions(Transition transition, com.netgrif.workflow.importer.model.Event imported) {
+        return parsePhaseActions(EventPhaseType.PRE, transition, imported);
+    }
+
+    private List<Action> parsePhaseActions(EventPhaseType phase, Transition transition, com.netgrif.workflow.importer.model.Event imported) {
+        return imported.getActions().stream()
+                .filter(actions -> actions.getPhase().equals(phase))
+                .map(actions -> actions.getAction().parallelStream()
+                        .map(action -> parseAction(transition.getImportId(), action)))
+                .flatMap(Stream::sorted)
+                .collect(Collectors.toList());
     }
 
     @Transactional
@@ -361,9 +398,15 @@ public class Importer {
                 .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
+    private Action parseAction(String transitionId, ActionType action) {
+        if (action.getValue().contains("f.this"))
+            throw new IllegalArgumentException("Event action can not reference field using 'this'");
+        return parseAction(null, transitionId, action);
+    }
+
     private Action parseAction(String fieldId, String transitionId, ActionType importedAction) {
-        if (importedAction.getTrigger() == null)
-            throw new IllegalArgumentException("Action [" + importedAction.getValue() + "] doesn't have trigger");
+        if (fieldId != null && importedAction.getTrigger() == null)
+            throw new IllegalArgumentException("Data field action [" + importedAction.getValue() + "] doesn't have trigger");
         try {
             Action action = createAction(importedAction);
             parseIds(fieldId, transitionId, importedAction, action);

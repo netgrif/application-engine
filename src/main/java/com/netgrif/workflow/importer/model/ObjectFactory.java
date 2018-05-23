@@ -48,6 +48,7 @@ public class ObjectFactory {
     private final static QName _AssignPolicy_QNAME = new QName("", "assignPolicy");
     private final static QName _DataFocusPolicy_QNAME = new QName("", "dataFocusPolicy");
     private final static QName _FinishPolicy_QNAME = new QName("", "finishPolicy");
+    private final static QName _Message_QNAME = new QName("", "message");
     private final static QName _Tokens_QNAME = new QName("", "tokens");
     private final static QName _IsStatic_QNAME = new QName("", "isStatic");
     private final static QName _Static_QNAME = new QName("", "static");
@@ -184,6 +185,22 @@ public class ObjectFactory {
      */
     public TransactionRef createTransactionRef() {
         return new TransactionRef();
+    }
+
+    /**
+     * Create an instance of {@link Event }
+     * 
+     */
+    public Event createEvent() {
+        return new Event();
+    }
+
+    /**
+     * Create an instance of {@link Actions }
+     * 
+     */
+    public Actions createActions() {
+        return new Actions();
     }
 
     /**
@@ -440,6 +457,15 @@ public class ObjectFactory {
     @XmlElementDecl(namespace = "", name = "finishPolicy")
     public JAXBElement<FinishPolicyType> createFinishPolicy(FinishPolicyType value) {
         return new JAXBElement<FinishPolicyType>(_FinishPolicy_QNAME, FinishPolicyType.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link I18NStringType }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "", name = "message")
+    public JAXBElement<I18NStringType> createMessage(I18NStringType value) {
+        return new JAXBElement<I18NStringType>(_Message_QNAME, I18NStringType.class, null, value);
     }
 
     /**
