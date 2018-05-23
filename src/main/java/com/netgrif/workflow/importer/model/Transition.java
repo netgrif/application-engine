@@ -30,6 +30,7 @@ import java.util.List;
  *         &lt;element ref="{}roleRef" maxOccurs="unbounded" minOccurs="0"/&gt;
  *         &lt;element ref="{}dataRef" maxOccurs="unbounded" minOccurs="0"/&gt;
  *         &lt;element ref="{}dataGroup" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *         &lt;element ref="{}event" maxOccurs="unbounded" minOccurs="0"/&gt;
  *       &lt;/sequence&gt;
  *     &lt;/restriction&gt;
  *   &lt;/complexContent&gt;
@@ -53,7 +54,8 @@ import java.util.List;
     "transactionRef",
     "roleRef",
     "dataRef",
-    "dataGroup"
+    "dataGroup",
+    "event"
 })
 @XmlRootElement(name = "transition")
 public class Transition {
@@ -77,6 +79,7 @@ public class Transition {
     protected List<RoleRef> roleRef;
     protected List<DataRef> dataRef;
     protected List<DataGroup> dataGroup;
+    protected List<Event> event;
 
     /**
      * Gets the value of the id property.
@@ -416,6 +419,35 @@ public class Transition {
             dataGroup = new ArrayList<DataGroup>();
         }
         return this.dataGroup;
+    }
+
+    /**
+     * Gets the value of the event property.
+     * 
+     * <p>
+     * This accessor method returns a reference to the live list,
+     * not a snapshot. Therefore any modification you make to the
+     * returned list will be present inside the JAXB object.
+     * This is why there is not a <CODE>set</CODE> method for the event property.
+     * 
+     * <p>
+     * For example, to add a new item, do as follows:
+     * <pre>
+     *    getEvent().add(newItem);
+     * </pre>
+     * 
+     * 
+     * <p>
+     * Objects of the following type(s) are allowed in the list
+     * {@link Event }
+     * 
+     * 
+     */
+    public List<Event> getEvent() {
+        if (event == null) {
+            event = new ArrayList<Event>();
+        }
+        return this.event;
     }
 
 }
