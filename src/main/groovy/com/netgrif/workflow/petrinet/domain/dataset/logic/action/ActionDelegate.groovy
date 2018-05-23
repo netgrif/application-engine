@@ -9,6 +9,7 @@ import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedField
 import com.netgrif.workflow.startup.ImportHelper
 import com.netgrif.workflow.workflow.domain.Case
 import com.netgrif.workflow.workflow.service.TaskService
+import com.netgrif.workflow.workflow.service.interfaces.IDataService
 import org.apache.log4j.Logger
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.PageRequest
@@ -29,6 +30,9 @@ class ActionDelegate {
 
     @Autowired
     private TaskService taskService
+
+    @Autowired
+    private IDataService dataService
 
     private map = [:]
     private Action action
@@ -127,7 +131,7 @@ class ActionDelegate {
             def tasksPage = taskService.findByTransitions(new PageRequest(0, Integer.MAX_VALUE), [taskId])
             tasksPage?.content?.each { task ->
                 taskService.assignTask(task.stringId)
-                taskService.setData(task.stringId, ImportHelper.populateDataset(map as Map<String, Map<String, String>>))
+                dataService.setData(task.stringId, ImportHelper.populateDataset(map as Map<String, Map<String, String>>))
                 taskService.finishTask(task.stringId)
             }
         }]

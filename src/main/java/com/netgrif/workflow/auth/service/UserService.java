@@ -149,7 +149,7 @@ public class UserService implements IUserService {
         try {
             return (LoggedUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         } catch (NullPointerException e) {
-            return userRepository.findByEmail(SystemUserRunner.SYSTEM_USER_NAME).transformToLoggedUser();
+            return userRepository.findByEmail(SystemUserRunner.SYSTEM_USER_EMAIL).transformToLoggedUser();
         }
     }
 
