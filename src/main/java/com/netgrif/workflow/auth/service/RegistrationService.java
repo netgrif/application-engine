@@ -131,8 +131,11 @@ public class RegistrationService implements IRegistrationService {
     @Override
     public User resetPassword(String email) {
         User user = userRepository.findByEmail(email);
-        if (user == null)
+        if (user == null || !user.isActive()) {
+            String state = user == null ? "Non-existing" : "Inactive";
+            log.info(state + " user [" + email + "] tried to reset his password");
             return null;
+        }
 
         user.setState(UserState.BLOCKED);
         user.setPassword(null);
