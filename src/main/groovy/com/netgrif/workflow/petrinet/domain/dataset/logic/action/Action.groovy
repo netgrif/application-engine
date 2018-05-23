@@ -89,9 +89,9 @@ class Action {
         SET
 
         static ActionTrigger fromString(String val) {
+            if (!val)
+                return null
             return valueOf(val.toUpperCase())
         }
     }
-
-
 }

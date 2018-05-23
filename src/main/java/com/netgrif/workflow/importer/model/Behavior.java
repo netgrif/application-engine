@@ -20,6 +20,7 @@ import javax.xml.bind.annotation.XmlType;
  *     &lt;enumeration value="editable"/&gt;
  *     &lt;enumeration value="required"/&gt;
  *     &lt;enumeration value="immediate"/&gt;
+ *     &lt;enumeration value="optional"/&gt;
  *   &lt;/restriction&gt;
  * &lt;/simpleType&gt;
  * </pre>
@@ -40,7 +41,9 @@ public enum Behavior {
     @XmlEnumValue("required")
     REQUIRED("required"),
     @XmlEnumValue("immediate")
-    IMMEDIATE("immediate");
+    IMMEDIATE("immediate"),
+    @XmlEnumValue("optional")
+    OPTIONAL("optional");
     private final String value;
 
     Behavior(String v) {
