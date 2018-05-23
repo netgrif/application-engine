@@ -92,9 +92,12 @@ public class AuthenticationController {
     public MessageResource resetPassword(@RequestBody String recoveryEmail) {
         try {
             User user = registrationService.resetPassword(recoveryEmail);
-            if (user != null)
+            if (user != null) {
                 mailService.sendPasswordResetEmail(user);
-            return MessageResource.successMessage("Email with reset link was sent to address " + recoveryEmail);
+                return MessageResource.successMessage("Email with reset link was sent to address " + recoveryEmail);
+            } else {
+                return MessageResource.errorMessage("User with email " + recoveryEmail + " has not yet registered");
+            }
         } catch (MessagingException | IOException | TemplateException e) {
             log.error(e.toString());
             return MessageResource.errorMessage("Reset email has failed to be sent to address " + recoveryEmail);

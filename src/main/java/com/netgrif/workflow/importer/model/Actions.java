@@ -16,8 +16,9 @@ import java.util.List;
  *   &lt;complexContent&gt;
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
  *       &lt;sequence&gt;
- *         &lt;element ref="{}action" maxOccurs="unbounded"/&gt;
+ *         &lt;element ref="{}action" maxOccurs="unbounded" minOccurs="0"/&gt;
  *       &lt;/sequence&gt;
+ *       &lt;attribute name="phase" use="required" type="{}eventPhaseType" /&gt;
  *     &lt;/restriction&gt;
  *   &lt;/complexContent&gt;
  * &lt;/complexType&gt;
@@ -32,8 +33,9 @@ import java.util.List;
 @XmlRootElement(name = "actions")
 public class Actions {
 
-    @XmlElement(required = true)
     protected List<ActionType> action;
+    @XmlAttribute(name = "phase", required = true)
+    protected EventPhaseType phase;
 
     /**
      * Gets the value of the action property.
@@ -62,6 +64,30 @@ public class Actions {
             action = new ArrayList<ActionType>();
         }
         return this.action;
+    }
+
+    /**
+     * Gets the value of the phase property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link EventPhaseType }
+     *     
+     */
+    public EventPhaseType getPhase() {
+        return phase;
+    }
+
+    /**
+     * Sets the value of the phase property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link EventPhaseType }
+     *     
+     */
+    public void setPhase(EventPhaseType value) {
+        this.phase = value;
     }
 
 }

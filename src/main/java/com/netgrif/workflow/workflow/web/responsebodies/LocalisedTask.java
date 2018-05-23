@@ -3,7 +3,9 @@ package com.netgrif.workflow.workflow.web.responsebodies;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonRootName;
 import com.netgrif.workflow.auth.domain.User;
+import com.netgrif.workflow.petrinet.domain.EventType;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
+import com.netgrif.workflow.workflow.domain.Task;
 import lombok.Data;
 import org.bson.types.ObjectId;
 
@@ -58,7 +60,15 @@ public class LocalisedTask {
 
     private String finishPolicy;
 
-    public LocalisedTask(com.netgrif.workflow.workflow.domain.Task task, Locale locale) {
+    private String finishTitle;
+
+    private String cancelTitle;
+
+    private String delegateTitle;
+
+    private String assignTitle;
+
+    public LocalisedTask(Task task, Locale locale) {
         this._id = task.getObjectId();
         this.caseId = task.getCaseId();
         this.transitionId = task.getTransitionId();
@@ -78,6 +88,10 @@ public class LocalisedTask {
         this.assignPolicy = task.getAssignPolicy().toString();
         this.dataFocusPolicy = task.getDataFocusPolicy().toString();
         this.finishPolicy = task.getFinishPolicy().toString();
+        this.finishTitle = task.getTranslatedEventTitle(EventType.FINISH, locale);
+        this.assignTitle = task.getTranslatedEventTitle(EventType.ASSIGN, locale);
+        this.cancelTitle = task.getTranslatedEventTitle(EventType.CANCEL, locale);
+        this.delegateTitle = task.getTranslatedEventTitle(EventType.DELEGATE, locale);
     }
 
     public String getStringId() {
