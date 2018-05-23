@@ -78,6 +78,18 @@ public class DataField {
                 behavior.get(transition).contains(FieldBehavior.HIDDEN));
     }
 
+    public boolean isRequired(String transitionId) {
+        return behavior.containsKey(transitionId) && behavior.get(transitionId).contains(FieldBehavior.REQUIRED);
+    }
+
+    public boolean isVisible(String transitionId) {
+        return behavior.containsKey(transitionId) && behavior.get(transitionId).contains(FieldBehavior.VISIBLE);
+    }
+
+    public boolean isUndefined(String transitionId) {
+        return !behavior.containsKey(transitionId);
+    }
+
     public boolean isDisplayable(){
         return behavior.values().stream().parallel()
                 .anyMatch(bs -> bs.contains(FieldBehavior.VISIBLE) || bs.contains(FieldBehavior.EDITABLE) || bs.contains(FieldBehavior.HIDDEN));
