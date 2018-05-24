@@ -4,6 +4,7 @@ import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.Task;
+import com.querydsl.core.types.Predicate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -39,4 +40,6 @@ public interface IWorkflowService {
     boolean removeTasksFromCase(Iterable<? extends Task> tasks, Case useCase);
 
     Case decrypt(Case useCase);
+
+    Page<Case> search(Predicate predicate, Pageable pageable);
 }

@@ -18,6 +18,7 @@ import com.netgrif.workflow.workflow.domain.Task;
 import com.netgrif.workflow.workflow.domain.repositories.CaseRepository;
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
+import com.querydsl.core.types.Predicate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
@@ -202,6 +203,12 @@ public class WorkflowService implements IWorkflowService {
     public Case decrypt(Case useCase) {
         decryptDataSet(useCase);
         return useCase;
+    }
+
+    @Override
+    public Page<Case> search(Predicate predicate, Pageable pageable) {
+        Page<Case> page = repository.findAll(predicate, pageable);
+        return setImmediateDataFields(page);
     }
 
     public List<Field> getData(String caseId) {
