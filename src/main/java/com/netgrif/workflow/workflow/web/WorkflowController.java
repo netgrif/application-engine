@@ -2,7 +2,6 @@ package com.netgrif.workflow.workflow.web;
 
 import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.workflow.domain.Case;
-import com.netgrif.workflow.workflow.domain.repositories.CaseRepository;
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
 import com.netgrif.workflow.workflow.web.requestbodies.CreateCaseBody;
 import com.netgrif.workflow.workflow.web.responsebodies.*;
@@ -17,7 +16,6 @@ import org.springframework.hateoas.Link;
 import org.springframework.hateoas.PagedResources;
 import org.springframework.hateoas.mvc.ControllerLinkBuilder;
 import org.springframework.security.core.Authentication;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.UnsupportedEncodingException;
@@ -56,14 +54,12 @@ public class WorkflowController {
         return resources;
     }
 
-    @Autowired
-    private CaseRepository repository;
-
     @PostMapping("/case/search2")
-    public Iterable<Case> search2(@QuerydslPredicate(root = Case.class) Predicate predicate, @RequestParam MultiValueMap<String, String> params) {
-        if (predicate == null)
-            return repository.findAll();
-        return repository.findAll(predicate);
+    public PagedResources<CaseResource> search2(@QuerydslPredicate(root = Case.class) Predicate predicate, Pageable pageable, PagedResourcesAssembler<Case> assembler) {
+        Page<Case> cases = workflowService.search(predicate, pageable);
+        Link selfLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(WorkflowController.class)
+                .search2(predicate, pageable, assembler)).withRel("search2");
+        return assembler.toResource(cases, new CaseResourceAssembler(), selfLink);
     }
 
     @RequestMapping(value = "/case/search", method = RequestMethod.POST)
