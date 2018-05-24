@@ -1,5 +1,7 @@
 package com.netgrif.workflow.migration
 
+import com.querydsl.core.annotations.PropertyType
+import com.querydsl.core.annotations.QueryType
 import org.bson.types.ObjectId
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document
@@ -19,5 +21,11 @@ class Migration {
     Migration(String title) {
         this.title = title
         this.runDateTime = LocalDateTime.now()
+    }
+
+    @Override
+    @QueryType(PropertyType.NONE)
+    MetaClass getMetaClass() {
+        return this.metaClass
     }
 }
