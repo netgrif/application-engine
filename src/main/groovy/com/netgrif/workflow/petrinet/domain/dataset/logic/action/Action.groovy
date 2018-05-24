@@ -1,5 +1,7 @@
 package com.netgrif.workflow.petrinet.domain.dataset.logic.action
 
+import com.querydsl.core.annotations.PropertyType
+import com.querydsl.core.annotations.QueryType
 import org.bson.types.ObjectId
 
 
@@ -93,5 +95,11 @@ class Action {
                 return null
             return valueOf(val.toUpperCase())
         }
+    }
+
+    @Override
+    @QueryType(PropertyType.NONE)
+    MetaClass getMetaClass() {
+        return this.metaClass
     }
 }
