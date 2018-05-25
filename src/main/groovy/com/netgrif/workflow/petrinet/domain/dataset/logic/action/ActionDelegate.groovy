@@ -134,6 +134,9 @@ class ActionDelegate {
                 dataService.setData(task.stringId, ImportHelper.populateDataset(map as Map<String, Map<String, String>>))
                 taskService.finishTask(task.stringId)
             }
+        },
+        where: { List<String> predicates ->
+            println(predicates)
         }]
     }
 
