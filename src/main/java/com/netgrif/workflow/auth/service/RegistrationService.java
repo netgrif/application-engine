@@ -90,6 +90,8 @@ public class RegistrationService implements IRegistrationService {
         User user;
         if (userRepository.existsByEmail(newUser.email)) {
             user = userRepository.findByEmail(newUser.email);
+            if (user.isRegistered())
+                return null;
             log.info("Renewing old user [" + newUser.email + "]");
         } else {
             user = new User(newUser.email, null, User.UNKNOWN, User.UNKNOWN);
