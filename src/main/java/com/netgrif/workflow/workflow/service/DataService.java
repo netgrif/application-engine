@@ -141,10 +141,12 @@ public class DataService implements IDataService {
                 return null;
 
             workflowService.save(useCase);
+            field.setValue((String) useCase.getDataSet().get(fieldId).getValue());
             return new FileSystemResource(field.getFilePath(useCase.getStringId()));
         } else {
             if (useCase.getDataSet().get(fieldId).getValue() == null)
                 return null;
+            field.setValue((String) useCase.getDataSet().get(fieldId).getValue());
             return new FileSystemResource(field.getFilePath(useCase.getStringId()));
         }
     }
