@@ -156,7 +156,7 @@ public class User {
         return author;
     }
 
-    public boolean isActive() {
-        return UserState.ACTIVE.equals(state);
+    public boolean isRegistered() {
+        return UserState.ACTIVE.equals(state) || UserState.BLOCKED.equals(state);
     }
 }
