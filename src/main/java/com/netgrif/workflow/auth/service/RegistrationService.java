@@ -87,7 +87,16 @@ public class RegistrationService implements IRegistrationService {
     @Override
     @Transactional
     public User createNewUser(NewUserRequest newUser) {
-        User user = new User(newUser.email, null, User.UNKNOWN, User.UNKNOWN);
+        User user;
+        if (userRepository.existsByEmail(newUser.email)) {
+            user = userRepository.findByEmail(newUser.email);
+            if (user.isRegistered())
+                return null;
+            log.info("Renewing old user [" + newUser.email + "]");
+        } else {
+            user = new User(newUser.email, null, User.UNKNOWN, User.UNKNOWN);
+            log.info("Creating new user [" + newUser.email + "]");
+        }
         user.setToken(generateTokenKey());
         user.setExpirationDate(generateExpirationDate());
         user.setState(UserState.INVITED);
@@ -100,10 +109,6 @@ public class RegistrationService implements IRegistrationService {
         if (newUser.processRoles != null && !newUser.processRoles.isEmpty()) {
             user.setUserProcessRoles(new HashSet<>(userProcessRoleRepository.findByRoleIdIn(newUser.processRoles)));
         }
-
-        List<User> deleted = userRepository.removeByEmail(user.getEmail());
-        if (deleted != null && !deleted.isEmpty())
-            log.info("Removed " + deleted.size() + " duplicate invitation for user with email " + user.getEmail());
 
         User saved = userRepository.save(user);
         saved.setGroups(user.getGroups());
@@ -131,7 +136,7 @@ public class RegistrationService implements IRegistrationService {
     @Override
     public User resetPassword(String email) {
         User user = userRepository.findByEmail(email);
-        if (user == null || !user.isActive()) {
+        if (user == null || !user.isRegistered()) {
             String state = user == null ? "Non-existing" : "Inactive";
             log.info(state + " user [" + email + "] tried to reset his password");
             return null;
