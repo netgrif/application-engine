@@ -52,8 +52,8 @@ public class TaskController {
 
         Link selfLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
                 .getAll(auth, pageable, assembler, locale)).withRel("all");
-        PagedResources<LocalisedTaskResource> resources = assembler.toResource(page,new TaskResourceAssembler(locale),selfLink);
-        ResourceLinkAssembler.addLinks(resources, com.netgrif.workflow.workflow.domain.Task.class,selfLink.getRel());
+        PagedResources<LocalisedTaskResource> resources = assembler.toResource(page, new TaskResourceAssembler(locale), selfLink);
+        ResourceLinkAssembler.addLinks(resources, com.netgrif.workflow.workflow.domain.Task.class, selfLink.getRel());
         return resources;
     }
 
@@ -64,11 +64,11 @@ public class TaskController {
         Link selfLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
                 .getAllByCases(cases, pageable, assembler, locale)).withRel("case");
         PagedResources<LocalisedTaskResource> resources = assembler.toResource(page, new TaskResourceAssembler(locale), selfLink);
-        ResourceLinkAssembler.addLinks(resources, com.netgrif.workflow.workflow.domain.Task.class,selfLink.getRel());
+        ResourceLinkAssembler.addLinks(resources, com.netgrif.workflow.workflow.domain.Task.class, selfLink.getRel());
         return resources;
     }
 
-    @RequestMapping(value ="/case/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = "/case/{id}", method = RequestMethod.GET)
     public List<TaskReference> getTasksOfCase(@PathVariable("id") String caseId, Locale locale) {
         return taskService.findAllByCase(caseId, locale);
     }
@@ -137,7 +137,7 @@ public class TaskController {
         Link selfLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
                 .getMy(auth, pageable, assembler, locale)).withRel("my");
         PagedResources<LocalisedTaskResource> resources = assembler.toResource(page, new TaskResourceAssembler(locale), selfLink);
-        ResourceLinkAssembler.addLinks(resources, com.netgrif.workflow.workflow.domain.Task.class,selfLink.getRel());
+        ResourceLinkAssembler.addLinks(resources, com.netgrif.workflow.workflow.domain.Task.class, selfLink.getRel());
         return resources;
     }
 
@@ -148,7 +148,7 @@ public class TaskController {
         Link selfLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
                 .getMyFinished(pageable, auth, assembler, locale)).withRel("finished");
         PagedResources<LocalisedTaskResource> resources = assembler.toResource(page, new TaskResourceAssembler(locale), selfLink);
-        ResourceLinkAssembler.addLinks(resources, com.netgrif.workflow.workflow.domain.Task.class,selfLink.getRel());
+        ResourceLinkAssembler.addLinks(resources, com.netgrif.workflow.workflow.domain.Task.class, selfLink.getRel());
         return resources;
     }
 
@@ -167,11 +167,11 @@ public class TaskController {
 //        } else if (searchBody.searchTier == TaskSearchBody.SEARCH_TIER_3) {
 //            //TODO: 4.6.2017 vyhľadanie na základe dát
 //        }
-        Page<com.netgrif.workflow.workflow.domain.Task> tasks = taskService.search(searchBody,pageable,(LoggedUser) auth.getPrincipal());
+        Page<com.netgrif.workflow.workflow.domain.Task> tasks = taskService.search(searchBody, pageable, (LoggedUser) auth.getPrincipal());
         Link selfLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
                 .search(auth, pageable, searchBody, assembler, locale)).withRel("search");
-        PagedResources<LocalisedTaskResource> resources = assembler.toResource(tasks,new TaskResourceAssembler(locale),selfLink);
-        ResourceLinkAssembler.addLinks(resources, com.netgrif.workflow.workflow.domain.Task.class,selfLink.getRel());
+        PagedResources<LocalisedTaskResource> resources = assembler.toResource(tasks, new TaskResourceAssembler(locale), selfLink);
+        ResourceLinkAssembler.addLinks(resources, com.netgrif.workflow.workflow.domain.Task.class, selfLink.getRel());
         return resources;
     }
 
@@ -204,7 +204,7 @@ public class TaskController {
     public FileSystemResource getFile(@PathVariable("id") String taskId, @PathVariable("field") String fieldId, HttpServletResponse response) {
         FileSystemResource fileResource = dataService.getFile(taskId, fieldId);
         response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
-        response.setHeader("Content-Disposition", "attachment; filename=" + fileResource.getFilename().substring(fileResource.getFilename().indexOf('-') + 1));
+        response.setHeader("Content-Disposition", "attachment; filename=" + fileResource.getFilename().substring(fileResource.getFilename().indexOf('-', fileResource.getFilename().indexOf('-') + 1) + 1));
         return fileResource;
     }
 }

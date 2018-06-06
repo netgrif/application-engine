@@ -61,6 +61,8 @@ public class AuthenticationController {
 
             newUserRequest.email = URLDecoder.decode(newUserRequest.email, StandardCharsets.UTF_8.name());
             User user = registrationService.createNewUser(newUserRequest);
+            if (user == null)
+                return MessageResource.errorMessage("User with email "+newUserRequest.email+" has been already registered.");
             mailService.sendRegistrationEmail(user);
 
             return MessageResource.successMessage("Mail was sent to " + user.getEmail());
