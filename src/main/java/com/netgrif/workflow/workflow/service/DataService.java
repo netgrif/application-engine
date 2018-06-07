@@ -169,6 +169,7 @@ public class DataService implements IDataService {
             fout.close();
 
             useCase.getDataSet().get(fieldId).setValue(multipartFile.getOriginalFilename());
+            field.getActions().forEach(action -> actionsRunner.run(action, useCase));
             workflowService.save(useCase);
 
             return true;
