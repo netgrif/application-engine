@@ -29,6 +29,8 @@ public interface IWorkflowService {
 
     void updateMarking(Case useCase);
 
+    Page<Case> searchAll(Predicate predicate);
+
     List<Field> getData(String caseId);
 
     Page<Case> search(Map<String, Object> request, Pageable pageable, LoggedUser user, Locale locale);

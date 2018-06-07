@@ -10,6 +10,7 @@ import com.netgrif.workflow.startup.ImportHelper
 import com.netgrif.workflow.startup.SuperCreator
 import com.netgrif.workflow.startup.SystemUserRunner
 import com.netgrif.workflow.workflow.domain.Case
+import com.netgrif.workflow.workflow.domain.repositories.CaseRepository
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -51,6 +52,9 @@ class CaseFilterTest {
     @Autowired
     private DefaultRoleRunner roleRunner
 
+    @Autowired
+    private CaseRepository caseRepository
+
     private Optional<PetriNet> testNet
 
     @Autowired
@@ -80,5 +84,8 @@ class CaseFilterTest {
 
         importHelper.assignTaskToSuper("Task", cases[0].stringId)
         importHelper.finishTaskAsSuper("Task", cases[0].stringId)
+
+        cases = caseRepository.findAll()
+        assert cases.find {it.title == "Case 1"}.dataSet["field"].value != 0
     }
 }

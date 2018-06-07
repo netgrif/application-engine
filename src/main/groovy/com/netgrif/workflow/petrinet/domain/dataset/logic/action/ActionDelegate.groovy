@@ -8,11 +8,17 @@ import com.netgrif.workflow.petrinet.domain.dataset.*
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedField
 import com.netgrif.workflow.startup.ImportHelper
 import com.netgrif.workflow.workflow.domain.Case
+import com.netgrif.workflow.workflow.domain.QCase
+import com.netgrif.workflow.workflow.domain.QTask
+import com.netgrif.workflow.workflow.domain.Task
 import com.netgrif.workflow.workflow.service.TaskService
 import com.netgrif.workflow.workflow.service.interfaces.IDataService
+import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService
+import com.querydsl.core.types.dsl.BooleanExpression
+import com.querydsl.core.types.dsl.Expressions
 import org.apache.log4j.Logger
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Page
 import org.springframework.stereotype.Component
 
 @Component
@@ -33,6 +39,9 @@ class ActionDelegate {
 
     @Autowired
     private IDataService dataService
+
+    @Autowired
+    private IWorkflowService workflowService
 
     private map = [:]
     private Action action
@@ -126,18 +135,37 @@ class ActionDelegate {
 //    }
 
     def execute(String taskId) {
-        [with: { Map map ->
-//            def dataSet = map.collectEntries { [(it.key as String): [value: it.value]] }
-            def tasksPage = taskService.findByTransitions(new PageRequest(0, Integer.MAX_VALUE), [taskId])
-            tasksPage?.content?.each { task ->
-                taskService.assignTask(task.stringId)
-                dataService.setData(task.stringId, ImportHelper.populateDataset(map as Map<String, Map<String, String>>))
-                taskService.finishTask(task.stringId)
-            }
+        [with: { Map dataSet ->
+            executeTasks(dataSet, taskId, [])
         },
         where: { List<String> predicates ->
-            println(predicates)
+            [with: { Map dataSet ->
+                executeTasks(dataSet, taskId, predicates)
+            }]
         }]
+    }
+
+    private void executeTasks(Map dataSet, String taskId, List<String> predicates) {
+        List<String> caseIds = searchCases(predicates)
+        QTask qTask = new QTask("task")
+        Page<Task> tasksPage = taskService.searchAll(qTask.transitionId.eq(taskId).and(qTask.caseId.in(caseIds)))
+        tasksPage?.content?.each { task ->
+            taskService.assignTask(task.stringId)
+            dataService.setData(task.stringId, ImportHelper.populateDataset(dataSet as Map<String, Map<String, String>>))
+            taskService.finishTask(task.stringId)
+        }
+    }
+
+    private List<String> searchCases(List<String> predicates) {
+        def expressions = []
+        QCase qCase = new QCase("case")
+        predicates.each { predicate ->
+            String[] params = predicate.split(" ", 3) // property,
+            expressions << qCase."${params[0]}"."${params[1]}"(params[2])
+        }
+        Page<Case> page = workflowService.searchAll(Expressions.allOf(expressions as BooleanExpression[]))
+
+        return page.content.collect {it.stringId}
     }
 
     def change(Field field) {

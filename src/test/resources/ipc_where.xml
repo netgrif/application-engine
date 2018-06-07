@@ -19,17 +19,23 @@
                 <action>
                     <!-- @formatter:off -->
                     field: f.field;
-                    execute "task" where ([
+                    execute "synchronized" where ([
                         "title eq Case 1"
                     ] as List) with ([
                         "field": [
-                            value: 69,
-                            type: number
+                            value: 69.0,
+                            type: "number"
                         ]
                     ] as Map)
                     <!-- @formatter:on -->
                 </action>
             </actions>
         </event>
+    </transition>
+    <transition>
+        <id>synchronized</id>
+        <x>0</x>
+        <y>0</y>
+        <label>Synchronized</label>
     </transition>
 </document>

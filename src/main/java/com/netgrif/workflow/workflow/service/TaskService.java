@@ -12,6 +12,7 @@ import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.petrinet.domain.roles.RolePermission;
 import com.netgrif.workflow.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.workflow.utils.DateUtils;
+import com.netgrif.workflow.utils.FullPageRequest;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.Task;
 import com.netgrif.workflow.workflow.domain.repositories.TaskRepository;
@@ -172,6 +173,13 @@ public class TaskService implements ITaskService {
     public Page<Task> findByTransitions(Pageable pageable, List<String> transitions) {
         return loadUsers(taskRepository.findByTransitionIdIn(pageable, transitions));
     }
+
+    @Override
+    public Page<Task> searchAll(com.querydsl.core.types.Predicate predicate) {
+        Page<Task> tasks = taskRepository.findAll(predicate, new FullPageRequest());
+        return loadUsers(tasks);
+    }
+
 
     //TODO: 2/4/2017 findByDataFields
 
