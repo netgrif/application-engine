@@ -12,6 +12,7 @@ import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository;
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.workflow.petrinet.web.responsebodies.PetriNetReference;
 import com.netgrif.workflow.security.service.EncryptionService;
+import com.netgrif.workflow.utils.FullPageRequest;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.DataField;
 import com.netgrif.workflow.workflow.domain.Task;
@@ -209,6 +210,11 @@ public class WorkflowService implements IWorkflowService {
     public Page<Case> search(Predicate predicate, Pageable pageable) {
         Page<Case> page = repository.findAll(predicate, pageable);
         return setImmediateDataFields(page);
+    }
+
+    @Override
+    public Page<Case> searchAll(Predicate predicate) {
+        return search(predicate, new FullPageRequest());
     }
 
     public List<Field> getData(String caseId) {
