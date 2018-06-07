@@ -20,8 +20,6 @@ class StorageRunner extends AbstractOrderedCommandLineRunner {
     @Override
     void run(String... strings) throws Exception {
         log.info("Creating storage folder")
-        File storage = new File("storage/generated/start.txt")
-        storage.getParentFile().mkdirs()
         storage = new File("storage/uploadedModels/model.txt")
         storage.getParentFile().mkdirs()
 
