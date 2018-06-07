@@ -135,20 +135,13 @@ public class DataService implements IDataService {
         Case useCase = workflowService.findOne(task.getCaseId());
         FileField field = (FileField) useCase.getPetriNet().getDataSet().get(fieldId);
 
-        if (field.isGenerated()) {
-            field.getActions().forEach(action -> actionsRunner.run(action, useCase));
-            if (useCase.getDataSet().get(fieldId).getValue() == null)
-                return null;
+        field.getActions().forEach(action -> actionsRunner.run(action, useCase));
+        if (useCase.getDataSet().get(fieldId).getValue() == null)
+            return null;
 
-            workflowService.save(useCase);
-            field.setValue((String) useCase.getDataSet().get(fieldId).getValue());
-            return new FileSystemResource(field.getFilePath(useCase.getStringId()));
-        } else {
-            if (useCase.getDataSet().get(fieldId).getValue() == null)
-                return null;
-            field.setValue((String) useCase.getDataSet().get(fieldId).getValue());
-            return new FileSystemResource(field.getFilePath(useCase.getStringId()));
-        }
+        workflowService.save(useCase);
+        field.setValue((String) useCase.getDataSet().get(fieldId).getValue());
+        return new FileSystemResource(field.getFilePath(useCase.getStringId()));
     }
 
     @Override
