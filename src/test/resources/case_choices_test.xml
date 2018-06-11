@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="../../main/resources/petriNets/petriflow_schema.xsd">
+    <id>2</id>
+    <defaultRole>true</defaultRole>
+
+    <data type="enumeration">
+        <id>enum</id>
+        <title>Enum</title>
+        <values>Choice 1</values>
+        <values>Choice 2</values>
+        <values>Choice 3</values>
+    </data>
+    <data type="boolean">
+        <id>bool</id>
+        <title>Switch</title>
+        <action trigger="set">
+            <!-- @formatter:off -->
+            enume: f.enum,
+            check: f.this;
+            change enume choices {
+                if (check.value)
+                    return ["Choice 1","Choice 2","Choice 3"]
+                return ["Choice A","Choice B","Choice C"]
+            }
+            <!-- @formatter:on -->
+        </action>
+    </data>
+
+    <transition>
+        <id>1</id>
+        <x>1</x>
+        <y>1</y>
+        <label>Tran</label>
+        <dataGroup>
+            <id>1</id>
+            <dataRef>
+                <id>bool</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>enum</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+    </transition>
+</document>
