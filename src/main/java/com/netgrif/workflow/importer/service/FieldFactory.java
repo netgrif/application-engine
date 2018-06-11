@@ -157,6 +157,10 @@ public final class FieldFactory {
             case NUMBER:
                 field.setDefaultValue(Double.parseDouble(defaultValue));
                 break;
+            case MULTICHOICE:
+                if (field.getDefaultValue() != null)
+                    break;
+                ((MultichoiceField) field).setDefaultValue(defaultValue);
             default:
                 field.setDefaultValue(defaultValue);
         }
