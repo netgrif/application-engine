@@ -31,7 +31,7 @@ class MultichoiceField extends ChoiceField<Set<I18nString>> {
             def defaults = []
             vls.each { s ->
                 defaults << choices.find { it ->
-                    it.contains(s)
+                    it.defaultValue == s.trim()
                 }
             }
             super.setDefaultValue(defaults)
