@@ -4,6 +4,7 @@ package com.netgrif.workflow.workflow.domain;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.netgrif.workflow.petrinet.domain.I18nString;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.FieldBehavior;
 import lombok.Getter;
 import lombok.Setter;
@@ -17,6 +18,9 @@ public class DataField {
 
     @Getter
     private Object value;
+
+    @Getter @Setter
+    private Set<I18nString> choices;
 
     @Getter
     @Setter
