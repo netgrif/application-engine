@@ -10,6 +10,7 @@ import com.netgrif.workflow.orgstructure.domain.Group
 import com.netgrif.workflow.orgstructure.service.IGroupService
 import com.netgrif.workflow.orgstructure.service.IMemberService
 import com.netgrif.workflow.petrinet.domain.PetriNet
+import com.netgrif.workflow.petrinet.domain.dataset.Field
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldContainer
 import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository
 import com.netgrif.workflow.petrinet.service.PetriNetService
@@ -221,6 +222,10 @@ class ImportHelper {
         setTaskData(getTaskId(taskTitle, caseId), data)
     }
 
+    List<Field> getTaskData(String taskTitle, String caseId) {
+        return dataService.getData(getTaskId(taskTitle, caseId))
+    }
+
     static ObjectNode populateDataset(Map<String, Map<String, String>> data) {
         ObjectMapper mapper = new ObjectMapper()
         String json = JsonOutput.toJson(data)
@@ -230,5 +235,4 @@ class ImportHelper {
     static String getCaseColor() {
         return "color-fg-amber-500"
     }
-
 }

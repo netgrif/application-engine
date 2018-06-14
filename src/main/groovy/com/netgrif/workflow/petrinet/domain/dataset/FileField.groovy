@@ -1,12 +1,10 @@
 package com.netgrif.workflow.petrinet.domain.dataset
 
-import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action
+
 import org.springframework.data.mongodb.core.mapping.Document
 
 @Document
 class FileField extends FieldWithDefault<String> {
-
-    private boolean generated = false
 
     FileField() {
         super()
@@ -23,17 +21,15 @@ class FileField extends FieldWithDefault<String> {
         setValue(getDefaultValue())
     }
 
-//    @Override
-    void addAction(String action, String trigger) {
-//        super.addAction(action, trigger)
-        this.generated = (Action.ActionTrigger.fromString(trigger) == Action.ActionTrigger.GET && action.contains("generate")) || this.generated
-    }
-
-    String getFilePath(String fileName) {
-        return "storage/" + (this.generated ? "generated/" : "") + get_id().toString() + "-" + fileName
-    }
-
-    boolean isGenerated() {
-        return generated
+    /**
+     * Get complete file path to the file
+     * Path is generated as follow:
+     * - always starts with directory storage/
+     * - saved file name consists of Case id, field import id and original file name separated by dash
+     * @param caseId
+     * @return path to the saved file
+     */
+    String getFilePath(String caseId) {
+        return "storage/${caseId}-${getStringId()}-${getValue()}"
     }
 }

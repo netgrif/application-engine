@@ -1,0 +1,62 @@
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="../../main/resources/petriNets/petriflow_schema.xsd">
+    <id>2</id>
+    <defaultRole>true</defaultRole>
+    <!-- ========== DATA ========== -->
+    <data type="file">
+        <id>1</id>
+        <title>file</title>
+        <action trigger="get">
+            <!-- @formatter:off -->
+            field: f.2;
+            change field about {
+                return "2";
+            }
+            <!-- @formatter:on -->
+        </action>
+        <action trigger="set">
+            <!-- @formatter:off -->
+            field: f.3;
+            change field about {
+                return "3";
+            }
+            <!-- @formatter:on -->
+        </action>
+    </data>
+    <data type="text">
+        <id>2</id>
+        <title>2</title>
+    </data>
+    <data type="text">
+        <id>3</id>
+        <title>3</title>
+    </data>
+    <!-- ========== TRANSITION ========== -->
+    <transition>
+        <id>tran</id>
+        <x>0</x>
+        <y>0</y>
+        <label>tran</label>
+        <dataGroup>
+            <id>1</id>
+            <dataRef>
+                <id>1</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>2</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>3</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+    </transition>
+</document>
