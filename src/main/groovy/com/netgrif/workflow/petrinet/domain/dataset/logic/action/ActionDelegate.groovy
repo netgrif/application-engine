@@ -18,6 +18,8 @@ import com.querydsl.core.types.dsl.BooleanExpression
 import com.querydsl.core.types.dsl.Expressions
 import org.apache.log4j.Logger
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.context.i18n.LocaleContextHolder
+import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Page
 import org.springframework.stereotype.Component
 
@@ -112,6 +114,12 @@ class ActionDelegate {
         changedField.addAttribute("value", field.value)
     }
 
+    def saveChangedChoices(ChoiceField field) {
+        useCase.dataSet.get(field.stringId).choices = field.choices
+        changedField.id = field.stringId
+        changedField.addAttribute("choices", field.choices.collect { it.getTranslation(LocaleContextHolder.locale) })
+    }
+
     def close = { Transition[] transitions ->
         def service = ApplicationContextProvider.getBean("taskService")
         if (!service) {
@@ -190,19 +198,21 @@ class ActionDelegate {
             }
         },
          choices: { cl ->
-             if (!(field instanceof MultichoiceField || field instanceof EnumerationField)) return
+             if (!(field instanceof MultichoiceField || field instanceof EnumerationField))
+                 return
 
              def values = cl()
-             if (values == null || (values instanceof Closure && values() == UNCHANGED_VALUE)) return
-             if (!(values instanceof Collection)) values = [values]
+             if (values == null || (values instanceof Closure && values() == UNCHANGED_VALUE))
+                 return
+             if (!(values instanceof Collection))
+                 values = [values]
              field = (ChoiceField) field
              if (values.every { it instanceof I18nString }) {
                  field.setChoices(values as Set<I18nString>)
              } else {
                  field.setChoicesFromStrings(values as Set<String>)
              }
-             changedField.id = field.stringId
-             changedField.addAttribute("choices", values)
+             saveChangedChoices(field)
          }]
     }
 
