@@ -329,7 +329,7 @@ public class Importer {
     @Transactional
     protected void addDataWithDefaultGroup(Transition transition, DataRef dataRef) {
         DataGroup dataGroup = new DataGroup();
-        dataGroup.setImportId(transition.getImportId() + "_" + System.currentTimeMillis());
+        dataGroup.setImportId(transition.getImportId() + "_" + dataRef.getId() + "_" + System.currentTimeMillis());
         dataGroup.setAlignment("start");
         dataGroup.setStretch(true);
         dataGroup.addData(getField(dataRef.getId()).getStringId());

@@ -135,18 +135,13 @@ public class DataService implements IDataService {
         Case useCase = workflowService.findOne(task.getCaseId());
         FileField field = (FileField) useCase.getPetriNet().getDataSet().get(fieldId);
 
-        if (field.isGenerated()) {
-            field.getActions().forEach(action -> actionsRunner.run(action, useCase));
-            if (useCase.getDataSet().get(fieldId).getValue() == null)
-                return null;
+        field.getActions().forEach(action -> actionsRunner.run(action, useCase));
+        if (useCase.getDataSet().get(fieldId).getValue() == null)
+            return null;
 
-            workflowService.save(useCase);
-            return new FileSystemResource(field.getFilePath((String) useCase.getDataSet().get(fieldId).getValue()));
-        } else {
-            if (useCase.getDataSet().get(fieldId).getValue() == null)
-                return null;
-            return new FileSystemResource(field.getFilePath((String) useCase.getDataSet().get(fieldId).getValue()));
-        }
+        workflowService.save(useCase);
+        field.setValue((String) useCase.getDataSet().get(fieldId).getValue());
+        return new FileSystemResource(field.getFilePath(useCase.getStringId()));
     }
 
     @Override
@@ -156,13 +151,13 @@ public class DataService implements IDataService {
             Case useCase = workflowService.findOne(task.getCaseId());
             FileField field = (FileField) useCase.getPetriNet().getDataSet().get(fieldId);
 
-            String oldFile = null;
-            if ((oldFile = (String) useCase.getDataSet().get(fieldId).getValue()) != null) {
-                new File(field.getFilePath(oldFile)).delete();
+            if (useCase.getDataSet().get(fieldId).getValue() != null) {
+                new File(field.getFilePath(useCase.getStringId())).delete();
                 useCase.getDataSet().get(fieldId).setValue(null);
             }
 
-            File file = new File(field.getFilePath(multipartFile.getOriginalFilename()));
+            field.setValue(multipartFile.getOriginalFilename());
+            File file = new File(field.getFilePath(useCase.getStringId()));
             file.getParentFile().mkdirs();
             if (!file.createNewFile()) {
                 file.delete();
@@ -174,6 +169,7 @@ public class DataService implements IDataService {
             fout.close();
 
             useCase.getDataSet().get(fieldId).setValue(multipartFile.getOriginalFilename());
+            field.getActions().forEach(action -> actionsRunner.run(action, useCase));
             workflowService.save(useCase);
 
             return true;

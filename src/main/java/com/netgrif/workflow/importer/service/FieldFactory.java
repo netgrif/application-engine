@@ -157,6 +157,10 @@ public final class FieldFactory {
             case NUMBER:
                 field.setDefaultValue(Double.parseDouble(defaultValue));
                 break;
+            case MULTICHOICE:
+                if (field.getDefaultValue() != null)
+                    break;
+                ((MultichoiceField) field).setDefaultValue(defaultValue);
             default:
                 field.setDefaultValue(defaultValue);
         }
@@ -174,7 +178,16 @@ public final class FieldFactory {
         Field field = useCase.getPetriNet().getDataSet().get(fieldId);
         resolveValidation(field, withValidation);
         resolveDataValues(field, useCase, fieldId);
+        if (field instanceof  ChoiceField)
+            resolveChoices((ChoiceField) field, useCase);
         return field;
+    }
+
+    private void resolveChoices(ChoiceField field, Case useCase) {
+        Set<I18nString> choices = useCase.getDataField(field.getImportId()).getChoices();
+        if (choices == null)
+            return;
+        field.setChoices(choices);
     }
 
     private void resolveValidation(Field field, boolean withValidation) {
