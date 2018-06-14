@@ -55,8 +55,8 @@ class SuperCreator extends AbstractOrderedCommandLineRunner {
         User superUser = userService.findByEmail("super@netgrif.com",false)
         if(superUser == null) {
             this.superUser = userService.saveNew(new User(
-                    name: "Super",
-                    surname: "Trooper",
+                    name: "Admin",
+                    surname: "Netgrif",
                     email: "super@netgrif.com",
                     password: superAdminPassword,
                     state: UserState.ACTIVE,
