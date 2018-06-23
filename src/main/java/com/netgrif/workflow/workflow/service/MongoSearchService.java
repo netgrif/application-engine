@@ -196,6 +196,10 @@ public class MongoSearchService<T> {
         return "{$exists:" + val + "}";
     }
 
+    public static String regex(String val, String opt) {
+        return "{$regex:'" + val + "',$options:'" + opt + "'}";
+    }
+
     public static String lessThenOrEqual(Object val) {
         return "{$lte:" + val + "}";
     }
