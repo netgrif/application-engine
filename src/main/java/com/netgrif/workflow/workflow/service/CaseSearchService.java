@@ -1,7 +1,6 @@
 package com.netgrif.workflow.workflow.service;
 
 import com.netgrif.workflow.workflow.domain.Case;
-import com.netgrif.workflow.workflow.domain.Task;
 import com.netgrif.workflow.workflow.domain.repositories.TaskRepository;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,7 +8,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 @Service
 public class CaseSearchService extends MongoSearchService<Case> {
@@ -41,7 +39,7 @@ public class CaseSearchService extends MongoSearchService<Case> {
         Map<Class, Function<Object, String>> builder = new HashMap<>();
 
         builder.put(ArrayList.class, o -> in(((List<Object>) obj), ob -> "\"" + ob + "\"", null));
-        builder.put(String.class, o -> "\"" + o + "\"");
+        builder.put(String.class, o -> regex((String) o, "i"));
 
         return buildQueryPart("title", obj, builder);
     }
