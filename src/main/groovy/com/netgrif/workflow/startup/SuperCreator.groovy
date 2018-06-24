@@ -1,10 +1,6 @@
 package com.netgrif.workflow.startup
 
-import com.netgrif.workflow.auth.domain.Authority
-import com.netgrif.workflow.auth.domain.LoggedUser
-import com.netgrif.workflow.auth.domain.User
-import com.netgrif.workflow.auth.domain.UserProcessRole
-import com.netgrif.workflow.auth.domain.UserState
+import com.netgrif.workflow.auth.domain.*
 import com.netgrif.workflow.auth.service.interfaces.IAuthorityService
 import com.netgrif.workflow.auth.service.interfaces.IUserProcessRoleService
 import com.netgrif.workflow.auth.service.interfaces.IUserService
@@ -52,8 +48,8 @@ class SuperCreator extends AbstractOrderedCommandLineRunner {
     private User createSuperUser() {
         Authority adminAuthority = authorityService.getOrCreate(Authority.admin)
 
-        User superUser = userService.findByEmail("super@netgrif.com",false)
-        if(superUser == null) {
+        User superUser = userService.findByEmail("super@netgrif.com", false)
+        if (superUser == null) {
             this.superUser = userService.saveNew(new User(
                     name: "Admin",
                     surname: "Netgrif",
@@ -75,6 +71,7 @@ class SuperCreator extends AbstractOrderedCommandLineRunner {
     void setAllToSuperUser() {
         setAllGroups()
         setAllProcessRoles()
+        setAllAuthorities()
         log.info("Super user updated")
     }
 
@@ -87,6 +84,11 @@ class SuperCreator extends AbstractOrderedCommandLineRunner {
 
     void setAllProcessRoles() {
         superUser.setUserProcessRoles(userProcessRoleService.findAll() as Set<UserProcessRole>)
+        superUser = userService.save(superUser)
+    }
+
+    void setAllAuthorities() {
+        superUser.setAuthorities(authorityService.findAll() as Set<Authority>)
         superUser = userService.save(superUser)
     }
 

@@ -49,7 +49,7 @@ public class ProcessRoleService implements IProcessRoleService {
         if (processRoles.isEmpty())
             throw new IllegalArgumentException("No process roles found.");
         if (processRoles.size() != roleIds.size())
-            throw new IllegalArgumentException("Not all process were found.");
+            throw new IllegalArgumentException("Not all process roles were found!");
 
         user.getUserProcessRoles().clear();
         user.getUserProcessRoles().addAll(processRoles);
