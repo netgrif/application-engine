@@ -14,6 +14,7 @@ import com.netgrif.workflow.petrinet.domain.dataset.Field
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldContainer
 import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository
 import com.netgrif.workflow.petrinet.service.PetriNetService
+import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.workflow.petrinet.web.requestbodies.UploadedFileMeta
 import com.netgrif.workflow.workflow.domain.Case
 import com.netgrif.workflow.workflow.domain.Filter
@@ -22,6 +23,7 @@ import com.netgrif.workflow.workflow.service.EventOutcome
 import com.netgrif.workflow.workflow.service.TaskService
 import com.netgrif.workflow.workflow.service.interfaces.IDataService
 import com.netgrif.workflow.workflow.service.interfaces.IFilterService
+import com.netgrif.workflow.workflow.service.interfaces.ITaskService
 import com.netgrif.workflow.workflow.web.requestbodies.CreateFilterBody
 import com.netgrif.workflow.workflow.web.responsebodies.TaskReference
 import groovy.json.JsonOutput
@@ -61,10 +63,10 @@ class ImportHelper {
     private IAuthorityService authorityService
 
     @Autowired
-    private TaskService taskService
+    private ITaskService taskService
 
     @Autowired
-    private PetriNetService petriNetService
+    private IPetriNetService petriNetService
 
     @Autowired
     private ResourceLoader resourceLoader
