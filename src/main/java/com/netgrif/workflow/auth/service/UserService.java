@@ -153,6 +153,11 @@ public class UserService implements IUserService {
         }
     }
 
+    @Override
+    public User getSystem() {
+        return userRepository.findByEmail(SystemUserRunner.SYSTEM_USER_EMAIL);
+    }
+
     private User loadProcessRoles(User user) {
         if (user == null)
             return user;
