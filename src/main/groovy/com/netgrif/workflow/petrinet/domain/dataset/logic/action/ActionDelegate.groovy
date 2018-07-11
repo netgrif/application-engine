@@ -14,12 +14,11 @@ import com.netgrif.workflow.workflow.domain.Task
 import com.netgrif.workflow.workflow.service.TaskService
 import com.netgrif.workflow.workflow.service.interfaces.IDataService
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService
-import com.querydsl.core.types.dsl.BooleanExpression
-import com.querydsl.core.types.dsl.Expressions
+import com.querydsl.core.types.ExpressionUtils
+import com.querydsl.core.types.Predicate
 import org.apache.log4j.Logger
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.i18n.LocaleContextHolder
-import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Page
 import org.springframework.stereotype.Component
 
@@ -144,17 +143,17 @@ class ActionDelegate {
 
     def execute(String taskId) {
         [with: { Map dataSet ->
-            executeTasks(dataSet, taskId, [])
+            executeTasks(dataSet, taskId, { ExpressionUtils.anyOf([])})
         },
-        where: { List<String> predicates ->
+        where: { Closure<Predicate> closure ->
             [with: { Map dataSet ->
-                executeTasks(dataSet, taskId, predicates)
+                executeTasks(dataSet, taskId, closure)
             }]
         }]
     }
 
-    private void executeTasks(Map dataSet, String taskId, List<String> predicates) {
-        List<String> caseIds = searchCases(predicates)
+    private void executeTasks(Map dataSet, String taskId, Closure<Predicate> predicateClosure) {
+        List<String> caseIds = searchCases(predicateClosure)
         QTask qTask = new QTask("task")
         Page<Task> tasksPage = taskService.searchAll(qTask.transitionId.eq(taskId).and(qTask.caseId.in(caseIds)))
         tasksPage?.content?.each { task ->
@@ -164,14 +163,10 @@ class ActionDelegate {
         }
     }
 
-    private List<String> searchCases(List<String> predicates) {
-        def expressions = []
+    private List<String> searchCases(Closure<Predicate> predicates) {
         QCase qCase = new QCase("case")
-        predicates.each { predicate ->
-            String[] params = predicate.split(" ", 3) // property,
-            expressions << qCase."${params[0]}"."${params[1]}"(params[2])
-        }
-        Page<Case> page = workflowService.searchAll(Expressions.allOf(expressions as BooleanExpression[]))
+        def expression = predicates(qCase)
+        Page<Case> page = workflowService.searchAll(expression)
 
         return page.content.collect {it.stringId}
     }
