@@ -313,23 +313,22 @@ class ActionDelegate {
         return assignTask(task.stringId, user)
     }
 
-    Task cancelTask(String transitionId) {
+    void cancelTask(String transitionId) {
         String taskId = getTaskId(transitionId)
         taskService.cancelTask(userService.loggedOrSystem.transformToLoggedUser(), taskId)
-        return taskService.findOne(taskId)
     }
 
-    Task cancelTask(Task task) {
+    void cancelTask(Task task) {
         taskService.cancelTask(userService.loggedOrSystem.transformToLoggedUser(), task.stringId)
-        return taskService.findOne(task.stringId)
     }
 
-    Task finishTask(String transitionId) {
-        return null
+    void finishTask(String transitionId) {
+        String taskId = getTaskId(transitionId)
+        taskService.finishTask(userService.loggedOrSystem.transformToLoggedUser(), taskId)
     }
 
-    Task finishTask(Task task) {
-        return null
+    void finishTask(Task task) {
+        taskService.finishTask(userService.loggedOrSystem.transformToLoggedUser(), task.stringId)
     }
 
     private String getTaskId(String transitionId) {
