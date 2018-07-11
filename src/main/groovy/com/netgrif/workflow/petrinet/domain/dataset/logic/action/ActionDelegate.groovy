@@ -18,6 +18,7 @@ import com.netgrif.workflow.workflow.domain.Task
 import com.netgrif.workflow.workflow.service.TaskService
 import com.netgrif.workflow.workflow.service.interfaces.IDataService
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService
+import com.netgrif.workflow.workflow.web.responsebodies.TaskReference
 import com.querydsl.core.types.ExpressionUtils
 import com.querydsl.core.types.Predicate
 import org.apache.log4j.Logger
@@ -152,14 +153,14 @@ class ActionDelegate {
 //    }
 
     def execute(String taskId) {
-        [with: { Map dataSet ->
-            executeTasks(dataSet, taskId, { ExpressionUtils.anyOf([])})
+        [with : { Map dataSet ->
+            executeTasks(dataSet, taskId, { ExpressionUtils.anyOf([]) })
         },
-        where: { Closure<Predicate> closure ->
-            [with: { Map dataSet ->
-                executeTasks(dataSet, taskId, closure)
-            }]
-        }]
+         where: { Closure<Predicate> closure ->
+             [with: { Map dataSet ->
+                 executeTasks(dataSet, taskId, closure)
+             }]
+         }]
     }
 
     private void executeTasks(Map dataSet, String taskId, Closure<Predicate> predicateClosure) {
@@ -178,7 +179,7 @@ class ActionDelegate {
         def expression = predicates(qCase)
         Page<Case> page = workflowService.searchAll(expression)
 
-        return page.content.collect {it.stringId}
+        return page.content.collect { it.stringId }
     }
 
     def change(Field field) {
@@ -295,10 +296,21 @@ class ActionDelegate {
         PetriNet net = petriNetService.getNewestVersionByIdentifier(identifier)
         if (net == null)
             throw new IllegalArgumentException("Petri net with identifier [$identifier] does not exist.")
-        return workflowService.createCase(net.stringId, title?:net.defaultCaseName.defaultValue, color, author.transformToLoggedUser())
+        return createCase(net, title ?: net.defaultCaseName.defaultValue, color, author)
     }
 
     Case createCase(PetriNet net, String title = net.defaultCaseName.defaultValue, String color = "", User author = userService.system) {
         return workflowService.createCase(net.stringId, title, color, author.transformToLoggedUser())
+    }
+
+    Task assignTask(String transitionId, User user = userService.loggedOrSystem) {
+        List<TaskReference> refs = taskService.findAllByCase(useCase.stringId, null)
+        String taskId = refs.find {it.transitionId == transitionId}.stringId
+        taskService.assignTask(user.transformToLoggedUser(), taskId)
+        return taskService.findOne(taskId)
+    }
+
+    Task assignTask(Task task, User user = userService.loggedOrSystem) {
+        return assignTask(task.stringId, user)
     }
 }
