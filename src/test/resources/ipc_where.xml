@@ -19,9 +19,9 @@
                 <action>
                     <!-- @formatter:off -->
                     field: f.field;
-                    execute "synchronized" where ([
-                        "title eq Case 1"
-                    ] as List) with ([
+                    execute "synchronized" where {
+                        it.title.eq("Case 1")
+                    } with ([
                         "field": [
                             value: 69.0,
                             type: "number"
