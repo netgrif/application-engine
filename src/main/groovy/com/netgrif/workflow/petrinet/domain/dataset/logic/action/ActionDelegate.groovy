@@ -304,13 +304,36 @@ class ActionDelegate {
     }
 
     Task assignTask(String transitionId, User user = userService.loggedOrSystem) {
-        List<TaskReference> refs = taskService.findAllByCase(useCase.stringId, null)
-        String taskId = refs.find {it.transitionId == transitionId}.stringId
+        String taskId = getTaskId(transitionId)
         taskService.assignTask(user.transformToLoggedUser(), taskId)
         return taskService.findOne(taskId)
     }
 
     Task assignTask(Task task, User user = userService.loggedOrSystem) {
         return assignTask(task.stringId, user)
+    }
+
+    Task cancelTask(String transitionId) {
+        String taskId = getTaskId(transitionId)
+        taskService.cancelTask(userService.loggedOrSystem.transformToLoggedUser(), taskId)
+        return taskService.findOne(taskId)
+    }
+
+    Task cancelTask(Task task) {
+        taskService.cancelTask(userService.loggedOrSystem.transformToLoggedUser(), task.stringId)
+        return taskService.findOne(task.stringId)
+    }
+
+    Task finishTask(String transitionId) {
+        return null
+    }
+
+    Task finishTask(Task task) {
+        return null
+    }
+
+    private String getTaskId(String transitionId) {
+        List<TaskReference> refs = taskService.findAllByCase(useCase.stringId, null)
+        refs.find {it.transitionId == transitionId}.stringId
     }
 }
