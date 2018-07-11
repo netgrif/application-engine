@@ -29,6 +29,15 @@
                     ] as Map)
                     <!-- @formatter:on -->
                 </action>
+                <action>
+                    <!-- @formatter:off -->
+                    field: f.field;
+                    change field about {
+                        findCase({it.title.eq("Case 1")});
+                        return 0 as Double;
+                    }
+                    <!-- @formatter:on -->
+                </action>
             </actions>
         </event>
     </transition>
