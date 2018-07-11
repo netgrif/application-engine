@@ -2,7 +2,7 @@ package com.netgrif.workflow.petrinet.domain.dataset
 
 import com.netgrif.workflow.TestHelper
 import com.netgrif.workflow.importer.service.Importer
-import com.netgrif.workflow.ipc.TaskExecutionTest
+import com.netgrif.workflow.ipc.TaskApiTest
 import com.netgrif.workflow.petrinet.domain.I18nString
 import com.netgrif.workflow.startup.ImportHelper
 import com.netgrif.workflow.workflow.domain.Case
@@ -34,7 +34,7 @@ class ChoiceFieldTest {
     private TestHelper testHelper
 
     private def stream = { String name ->
-        return TaskExecutionTest.getClassLoader().getResourceAsStream(name)
+        return TaskApiTest.getClassLoader().getResourceAsStream(name)
     }
 
     @Before
