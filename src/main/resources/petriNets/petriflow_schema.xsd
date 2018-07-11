@@ -117,6 +117,8 @@
         <xs:complexType>
             <xs:sequence>
                 <xs:element ref="id" minOccurs="0"/>
+                <xs:element ref="initials" minOccurs="0"/>
+                <xs:element name="title" minOccurs="0" type="i18nStringType"/>
                 <xs:element ref="icon" minOccurs="0"/>
                 <xs:element ref="defaultRole" minOccurs="0"/>
                 <xs:element ref="caseName" minOccurs="0"/>
@@ -262,6 +264,12 @@
     <xs:element name="id" type="xs:string"/>
     <xs:element name="title" type="i18nStringType"/>
     <xs:element name="name" type="i18nStringType"/>
+    <xs:element name="initials" type="initialsType"/>
+    <xs:simpleType name="initialsType">
+        <xs:restriction base="xs:string">
+            <xs:length value="3"/>
+        </xs:restriction>
+    </xs:simpleType>
     <xs:element name="values" type="i18nStringType"/>
     <xs:element name="perform" type="xs:boolean"/>
     <xs:element name="view" type="xs:boolean"/>
