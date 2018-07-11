@@ -151,7 +151,7 @@ public class TaskService implements ITaskService {
         PetriNet net = useCase.getPetriNet();
         Collection<Transition> transitions = net.getTransitions().values();
 
-        for (Transition transition : transitions) {
+        for (Transition transition: transitions) {
             if (isExecutable(transition, net)) {
                 Task task = createFromTransition(transition, useCase);
                 // TODO: 16. 3. 2017 there should be some fancy logic
@@ -216,6 +216,7 @@ public class TaskService implements ITaskService {
         reloadTasks(useCase);
 
         publisher.publishEvent(new UserFinishTaskEvent(user, task, useCase));
+        log.info("Task [" + task.getTitle() + "] assigned to [" + loggedUser.getEmail() + "] was finished");
 
         return outcome;
     }
@@ -241,6 +242,7 @@ public class TaskService implements ITaskService {
         workflowService.save(useCase);
 
         publisher.publishEvent(new UserAssignTaskEvent(user, task, useCase));
+        log.info("Task [" + task.getTitle() + "] assigned to [" + loggedUser.getEmail() + "]");
         return outcome;
     }
 
@@ -273,6 +275,7 @@ public class TaskService implements ITaskService {
         reloadTasks(useCase);
 
         publisher.publishEvent(new UserCancelTaskEvent(user, task, useCase));
+        log.info("Task [" + task.getTitle() + "] assigned to [" + loggedUser.getEmail() + "] was cancelled");
         return outcome;
     }
 
@@ -283,7 +286,7 @@ public class TaskService implements ITaskService {
     public void cancelTasksWithoutReload(Set<String> transitions, String caseId) {
         List<Task> tasks = taskRepository.findAllByTransitionIdInAndCaseId(transitions, caseId);
         Case useCase = null;
-        for (Task task : tasks) {
+        for (Task task: tasks) {
             if (task.getUserId() != null) {
                 if (useCase == null)
                     useCase = workflowService.findOne(task.getCaseId());
@@ -438,7 +441,7 @@ public class TaskService implements ITaskService {
                 .finishPolicy(transition.getFinishPolicy())
                 .build();
         transition.getEvents().forEach((type, event) -> task.addEventTitle(type, event.getTitle()));
-        for (Trigger trigger : transition.getTriggers()) {
+        for (Trigger trigger: transition.getTriggers()) {
             Trigger taskTrigger = trigger.clone();
             task.addTrigger(taskTrigger);
 
@@ -451,7 +454,7 @@ public class TaskService implements ITaskService {
                 return null;
             }
         }
-        for (Map.Entry<String, Set<RolePermission>> entry : transition.getRoles().entrySet()) {
+        for (Map.Entry<String, Set<RolePermission>> entry: transition.getRoles().entrySet()) {
             task.addRole(entry.getKey(), entry.getValue());
         }
 
@@ -544,7 +547,7 @@ public class TaskService implements ITaskService {
 
     @Transactional
     void validateData(Transition transition, Case useCase) {
-        for (Map.Entry<String, DataFieldLogic> entry : transition.getDataSet().entrySet()) {
+        for (Map.Entry<String, DataFieldLogic> entry: transition.getDataSet().entrySet()) {
             if (!useCase.getDataField(entry.getKey()).isRequired(transition.getImportId()))
                 continue;
             if (useCase.getDataField(entry.getKey()).isUndefined(transition.getImportId()) && !entry.getValue().isRequired())
