@@ -274,4 +274,10 @@ class ActionDelegate {
     Object get(String key) { map[key] }
 
     void set(String key, Object value) { map[key] = value }
+
+    List<Case> findCase(Closure<Predicate> predicate) {
+        QCase qCase = new QCase("case")
+        Page<Case> result = workflowService.searchAll(predicate(qCase))
+        return result.content
+    }
 }
