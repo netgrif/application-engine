@@ -222,7 +222,7 @@ public class TaskService implements ITaskService {
 
     @Override
     public EventOutcome finishTask(String taskId) throws IllegalArgumentException, TransitionNotExecutableException {
-        LoggedUser user = userService.getLoggedOrSystem();
+        LoggedUser user = userService.getLoggedOrSystem().transformToLoggedUser();
         return finishTask(user, taskId);
     }
 
@@ -246,7 +246,7 @@ public class TaskService implements ITaskService {
 
     @Override
     public EventOutcome assignTask(String taskId) throws TransitionNotExecutableException {
-        LoggedUser user = userService.getLoggedOrSystem();
+        LoggedUser user = userService.getLoggedOrSystem().transformToLoggedUser();
         return assignTask(user, taskId);
     }
 

@@ -1,38 +1,27 @@
 package com.netgrif.workflow.ipc
 
-import com.netgrif.workflow.auth.domain.repositories.UserProcessRoleRepository
-import com.netgrif.workflow.auth.domain.repositories.UserRepository
+import com.netgrif.workflow.TestHelper
+import com.netgrif.workflow.auth.domain.User
+import com.netgrif.workflow.auth.service.interfaces.IUserService
+import com.netgrif.workflow.history.domain.repository.EventLogRepository
 import com.netgrif.workflow.importer.service.Importer
 import com.netgrif.workflow.petrinet.domain.PetriNet
-import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository
-import com.netgrif.workflow.startup.DefaultRoleRunner
 import com.netgrif.workflow.startup.ImportHelper
-import com.netgrif.workflow.startup.SuperCreator
-import com.netgrif.workflow.startup.SystemUserRunner
 import com.netgrif.workflow.workflow.domain.Case
 import com.netgrif.workflow.workflow.domain.repositories.CaseRepository
 import com.netgrif.workflow.workflow.domain.repositories.TaskRepository
-import com.netgrif.workflow.workflow.service.TaskService
+import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.data.mongodb.core.MongoTemplate
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit4.SpringRunner
 
 @RunWith(SpringRunner.class)
 @ActiveProfiles(["test"])
 @SpringBootTest
-class TaskExecutionTest {
-
-    public static final String LIMITS_NET_FILE = "test_inter_data_actions_static.xml"
-    public static final String LIMITS_NET_TITLE = "Limits"
-    public static final String LIMITS_NET_INITIALS = "Lim"
-    public static final String LEASING_NET_FILE = "test_inter_data_actions_dynamic.xml"
-    public static final String LEASING_NET_INITIALS = "LEA"
-    public static final String LEASING_NET_TITLE = "Leasing"
-    public static final String LEASING_NET_TASK_EDIT_COST = "T2"
+class TaskApiTest {
 
     @Autowired
     private Importer importer
@@ -44,45 +33,61 @@ class TaskExecutionTest {
     private CaseRepository caseRepository
 
     @Autowired
-    private TaskService taskService
-
-    @Autowired
-    private PetriNetRepository netRepository
-
-    @Autowired
     private TaskRepository taskRepository
 
     @Autowired
-    private SuperCreator superCreator
+    private IUserService userService
 
     @Autowired
-    private MongoTemplate template
+    private EventLogRepository eventLogRepository
 
     @Autowired
-    private UserRepository userRepository
-
-    @Autowired
-    private UserProcessRoleRepository roleRepository
-
-    @Autowired
-    private SystemUserRunner systemUserRunner
-
-    @Autowired
-    private DefaultRoleRunner roleRunner
+    private TestHelper testHelper
 
     private def stream = { String name ->
-        return TaskExecutionTest.getClassLoader().getResourceAsStream(name)
+        return TaskApiTest.getClassLoader().getResourceAsStream(name)
     }
+    private boolean initialised = false
+
+    @Before
+    void setup() {
+        if (!initialised) {
+            testHelper.truncateDbs()
+            initialised = true
+        }
+    }
+
+    public static final String TASK_EVENTS_NET_FILE = "task_events.xml"
+    public static final String TASK_EVENTS_NET_TITLE = "Task events"
+    public static final String TASK_EVENTS_NET_INITIALS = "TEN"
+    public static final String TASK_EVENTS_TASK = "Task"
+
+    @Test
+    void testTaskEventActions() {
+        def netOptional = importer.importPetriNet(stream(TASK_EVENTS_NET_FILE), TASK_EVENTS_NET_TITLE, TASK_EVENTS_NET_INITIALS)
+
+        assert netOptional.isPresent()
+
+        PetriNet net = netOptional.get()
+        Case useCase = helper.createCase(TASK_EVENTS_NET_TITLE, net)
+        helper.assignTaskToSuper(TASK_EVENTS_TASK, useCase.stringId)
+        helper.finishTaskAsSuper(TASK_EVENTS_TASK, useCase.stringId)
+
+        User logged = userService.loggedOrSystem
+
+        assert eventLogRepository.findAll()
+    }
+
+    public static final String LIMITS_NET_FILE = "test_inter_data_actions_static.xml"
+    public static final String LIMITS_NET_TITLE = "Limits"
+    public static final String LIMITS_NET_INITIALS = "Lim"
+    public static final String LEASING_NET_FILE = "test_inter_data_actions_dynamic.xml"
+    public static final String LEASING_NET_INITIALS = "LEA"
+    public static final String LEASING_NET_TITLE = "Leasing"
+    public static final String LEASING_NET_TASK_EDIT_COST = "T2"
 
     @Test
     void testTaskExecution() {
-        template.db.dropDatabase()
-        userRepository.deleteAll()
-        roleRepository.deleteAll()
-        roleRunner.run()
-        superCreator.run()
-        systemUserRunner.run()
-
         def limitsNetOptional = importer.importPetriNet(stream(LIMITS_NET_FILE), LIMITS_NET_TITLE, LIMITS_NET_INITIALS)
         def leasingNetOptional = importer.importPetriNet(stream(LEASING_NET_FILE), LEASING_NET_TITLE, LEASING_NET_INITIALS)
 
