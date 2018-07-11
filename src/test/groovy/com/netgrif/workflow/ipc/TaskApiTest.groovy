@@ -1,8 +1,9 @@
 package com.netgrif.workflow.ipc
 
 import com.netgrif.workflow.TestHelper
-import com.netgrif.workflow.auth.domain.User
 import com.netgrif.workflow.auth.service.interfaces.IUserService
+import com.netgrif.workflow.history.domain.EventLog
+import com.netgrif.workflow.history.domain.UserTaskEventLog
 import com.netgrif.workflow.history.domain.repository.EventLogRepository
 import com.netgrif.workflow.importer.service.Importer
 import com.netgrif.workflow.petrinet.domain.PetriNet
@@ -73,9 +74,17 @@ class TaskApiTest {
         helper.assignTaskToSuper(TASK_EVENTS_TASK, useCase.stringId)
         helper.finishTaskAsSuper(TASK_EVENTS_TASK, useCase.stringId)
 
-        User logged = userService.loggedOrSystem
+        List<EventLog> log = eventLogRepository.findAll()
 
-        assert eventLogRepository.findAll()
+        assert log.findAll {
+            it instanceof UserTaskEventLog && it.transitionId == "work_task" && it.message.contains("assigned")
+        }.size() == 2
+        assert log.findAll {
+            it instanceof UserTaskEventLog && it.transitionId == "work_task" && it.message.contains("canceled")
+        }.size() == 1
+        assert log.findAll {
+            it instanceof UserTaskEventLog && it.transitionId == "work_task" && it.message.contains("finished")
+        }.size() == 1
     }
 
     public static final String LIMITS_NET_FILE = "test_inter_data_actions_static.xml"
