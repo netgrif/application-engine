@@ -36,4 +36,6 @@ public interface IUserService {
     void encodeUserPassword(User user);
 
     LoggedUser getLoggedOrSystem();
+
+    User getSystem();
 }
