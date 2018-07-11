@@ -1,11 +1,15 @@
 package com.netgrif.workflow.petrinet.domain.dataset.logic.action
 
+import com.netgrif.workflow.auth.domain.User
+import com.netgrif.workflow.auth.service.interfaces.IUserService
 import com.netgrif.workflow.configuration.ApplicationContextProvider
 import com.netgrif.workflow.importer.service.FieldFactory
 import com.netgrif.workflow.petrinet.domain.I18nString
+import com.netgrif.workflow.petrinet.domain.PetriNet
 import com.netgrif.workflow.petrinet.domain.Transition
 import com.netgrif.workflow.petrinet.domain.dataset.*
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedField
+import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.workflow.startup.ImportHelper
 import com.netgrif.workflow.workflow.domain.Case
 import com.netgrif.workflow.workflow.domain.QCase
@@ -43,6 +47,12 @@ class ActionDelegate {
 
     @Autowired
     private IWorkflowService workflowService
+
+    @Autowired
+    private IUserService userService
+
+    @Autowired
+    private IPetriNetService petriNetService
 
     private map = [:]
     private Action action
@@ -279,5 +289,16 @@ class ActionDelegate {
         QCase qCase = new QCase("case")
         Page<Case> result = workflowService.searchAll(predicate(qCase))
         return result.content
+    }
+
+    Case createCase(String identifier, String title = null, String color = "", User author = userService.system) {
+        PetriNet net = petriNetService.getNewestVersionByIdentifier(identifier)
+        if (net == null)
+            throw new IllegalArgumentException("Petri net with identifier [$identifier] does not exist.")
+        return workflowService.createCase(net.stringId, title?:net.defaultCaseName.defaultValue, color, author.transformToLoggedUser())
+    }
+
+    Case createCase(PetriNet net, String title = net.defaultCaseName.defaultValue, String color = "", User author = userService.system) {
+        return workflowService.createCase(net.stringId, title, color, author.transformToLoggedUser())
     }
 }
