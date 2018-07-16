@@ -292,14 +292,14 @@ class ActionDelegate {
         return result.content
     }
 
-    Case createCase(String identifier, String title = null, String color = "", User author = userService.system) {
+    Case createCase(String identifier, String title = null, String color = "", User author = userService.loggedOrSystem) {
         PetriNet net = petriNetService.getNewestVersionByIdentifier(identifier)
         if (net == null)
             throw new IllegalArgumentException("Petri net with identifier [$identifier] does not exist.")
         return createCase(net, title ?: net.defaultCaseName.defaultValue, color, author)
     }
 
-    Case createCase(PetriNet net, String title = net.defaultCaseName.defaultValue, String color = "", User author = userService.system) {
+    Case createCase(PetriNet net, String title = net.defaultCaseName.defaultValue, String color = "", User author = userService.loggedOrSystem) {
         return workflowService.createCase(net.stringId, title, color, author.transformToLoggedUser())
     }
 
