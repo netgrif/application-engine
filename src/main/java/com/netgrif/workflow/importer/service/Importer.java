@@ -57,6 +57,8 @@ public class Importer {
     private Map<String, Place> places;
     private Map<String, Transaction> transactions;
     private Map<String, I18nString> i18n;
+    private Map<String, Action> actions;
+    private Map<String, Action> actionRefs;
 
     @Autowired
     private FieldFactory fieldFactory;
@@ -117,6 +119,8 @@ public class Importer {
         this.transactions = new HashMap<>();
         this.defaultRole = roleRepository.findByName_DefaultValue(ProcessRole.DEFAULT_ROLE);
         this.i18n = new HashMap<>();
+        this.actions = new HashMap<>();
+        this.actionRefs = new HashMap<>();
     }
 
     @Transactional
@@ -155,12 +159,22 @@ public class Importer {
         document.getMapping().forEach(this::applyMapping);
         document.getTransition().forEach(this::resolveTransitionActions);
         document.getData().forEach(this::resolveDataActions);
+        actionRefs.forEach(this::resolveActionRefs);
 
         net.setDefaultCaseName(toI18NString(document.getCaseName()));
         if (config.isNotSaveObjects())
             return service.saveNew(net);
         else
             return Optional.of(net);
+    }
+
+    @Transactional
+    protected void resolveActionRefs(String actionId, Action action) {
+        Action referenced = actions.get(actionId);
+        if (referenced == null)
+            throw new IllegalArgumentException("Invalid action reference with id ["+actionId+"]");
+        action.setDefinition(referenced.getDefinition());
+        action.setTrigger(referenced.getTrigger());
     }
 
     @Transactional
@@ -194,6 +208,24 @@ public class Importer {
         if (data.getAction() != null) {
             getField(data.getId()).setActions(buildActions(data.getAction(), getField(data.getId()).getStringId(), null));
         }
+        if (data.getActionRef() != null) {
+            getField(data.getId()).addActions(buildActionRefs(data.getActionRef()));
+        }
+    }
+
+    private LinkedHashSet<Action> buildActionRefs(List<ActionRefType> actionRefs) {
+        LinkedHashSet<Action> refs = new LinkedHashSet<>();
+        for (ActionRefType actionRef: actionRefs) {
+            refs.add(fromActionRef(actionRef));
+        }
+        return refs;
+    }
+
+    private Action fromActionRef(ActionRefType actionRef) {
+        Action placeholder = new Action();
+        placeholder.setImportId(actionRef.getId());
+        this.actionRefs.put(actionRef.getId(), placeholder);
+        return placeholder;
     }
 
     @Transactional
@@ -213,11 +245,14 @@ public class Importer {
     @Transactional
     protected void resolveDataRefActions(List<DataRef> dataRef, com.netgrif.workflow.importer.model.Transition trans) {
         dataRef.forEach(ref -> {
+            String fieldId = getField(ref.getId()).getStringId();
             if (ref.getLogic().getAction() != null) {
-                String fieldId = getField(ref.getId()).getStringId();
                 getTransition(trans.getId()).addActions(fieldId, buildActions(ref.getLogic().getAction(),
                         fieldId,
                         getTransition(trans.getId()).getStringId()));
+            }
+            if (ref.getLogic().getActionRef() != null) {
+                getTransition(trans.getId()).addActions(fieldId, buildActionRefs(ref.getLogic().getActionRef()));
             }
         });
     }
@@ -310,12 +345,18 @@ public class Importer {
     }
 
     private List<Action> parsePhaseActions(EventPhaseType phase, Transition transition, com.netgrif.workflow.importer.model.Event imported) {
-        return imported.getActions().stream()
+        List<Action> actionList = imported.getActions().stream()
                 .filter(actions -> actions.getPhase().equals(phase))
                 .map(actions -> actions.getAction().parallelStream()
                         .map(action -> parseAction(transition.getImportId(), action)))
                 .flatMap(Function.identity())
                 .collect(Collectors.toList());
+        actionList.addAll(imported.getActions().stream()
+                .filter(actions->actions.getPhase().equals(phase))
+                .map(actions -> actions.getActionRef().parallelStream().map(this::fromActionRef))
+                .flatMap(Function.identity())
+                .collect(Collectors.toList()));
+        return actionList;
     }
 
     @Transactional
@@ -410,6 +451,7 @@ public class Importer {
         try {
             Action action = createAction(importedAction);
             parseIds(fieldId, transitionId, importedAction, action);
+            actions.put(action.getImportId(), action);
             return action;
         } catch (NumberFormatException e) {
             throw new IllegalArgumentException("Error parsing ids of action [" + importedAction.getValue() + "]", e);

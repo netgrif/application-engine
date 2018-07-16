@@ -75,7 +75,7 @@ public class Transition extends Node {
 
     public void addActions(String field, LinkedHashSet<Action> actions){
         if(dataSet.containsKey(field)){
-            dataSet.get(field).setActions(actions);
+            dataSet.get(field).addActions(actions);
         }
     }
 
