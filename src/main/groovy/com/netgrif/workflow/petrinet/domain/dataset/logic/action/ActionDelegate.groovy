@@ -335,4 +335,15 @@ class ActionDelegate {
         List<TaskReference> refs = taskService.findAllByCase(useCase.stringId, null)
         refs.find {it.transitionId == transitionId}.stringId
     }
+
+    List<Task> findTasks(Closure<Predicate> predicate) {
+        QTask qTask = new QTask("task")
+        Page<Task> result = taskService.searchAll(predicate(qTask))
+        return result.content
+    }
+
+    Task findTask(Closure<Predicate> predicate) {
+        QTask qTask = new QTask("task")
+        return taskService.searchOne(predicate(qTask))
+    }
 }
