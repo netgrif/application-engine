@@ -1,15 +1,18 @@
 package com.netgrif.workflow.workflow.domain.repositories;
 
+import com.netgrif.workflow.workflow.domain.QTask;
 import com.netgrif.workflow.workflow.domain.Task;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
-import org.springframework.data.mongodb.repository.Query;
+import org.springframework.data.querydsl.QueryDslPredicateExecutor;
+import org.springframework.data.querydsl.binding.QuerydslBinderCustomizer;
+import org.springframework.data.querydsl.binding.QuerydslBindings;
 
 import java.util.Collection;
 import java.util.List;
 
-public interface TaskRepository extends MongoRepository<Task, String> {
+public interface TaskRepository extends MongoRepository<Task, String>, QueryDslPredicateExecutor<Task>, QuerydslBinderCustomizer<QTask> {
 
     List<Task> findAllByCaseId(String id);
 
@@ -32,4 +35,9 @@ public interface TaskRepository extends MongoRepository<Task, String> {
     void deleteAllByCaseIdAndFinishDateIsNotNull(String caseId);
 
     void deleteAllByCaseId(String caseId);
+
+    @Override
+    default void customize(QuerydslBindings bindings, QTask qTask) {
+        //
+    }
 }
