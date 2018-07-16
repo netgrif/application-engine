@@ -76,6 +76,9 @@ public class Importer {
     @Autowired
     private TriggerFactory triggerFactory;
 
+    @Autowired
+    private IActionValidator actionValidator;
+
     @Transactional
     public Optional<PetriNet> importPetriNet(InputStream xml, String title, String initials, Config config) {
         try {
@@ -430,6 +433,7 @@ public class Importer {
         String[] actionParts = definition.split(";", 2);
         if (actionParts.length != 2)
             throw new IllegalArgumentException("Failed to parse action: " + importedAction);
+        actionValidator.validateAction(actionParts[1]);
         action.setDefinition(actionParts[1]);
         parseObjectIds(action, fieldId, transitionId, actionParts[0]);
     }
