@@ -28,6 +28,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.BasicQuery;
@@ -178,6 +179,14 @@ public class TaskService implements ITaskService {
     public Page<Task> searchAll(com.querydsl.core.types.Predicate predicate) {
         Page<Task> tasks = taskRepository.findAll(predicate, new FullPageRequest());
         return loadUsers(tasks);
+    }
+
+    @Override
+    public Task searchOne(com.querydsl.core.types.Predicate predicate) {
+        Page<Task> tasks = taskRepository.findAll(predicate, new PageRequest(0,1));
+        if (tasks.getTotalElements() > 0)
+            return tasks.getContent().get(0);
+        return null;
     }
 
 
