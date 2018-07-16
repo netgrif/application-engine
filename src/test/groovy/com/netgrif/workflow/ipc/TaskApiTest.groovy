@@ -58,6 +58,32 @@ class TaskApiTest {
         }
     }
 
+    public static final String TASK_SEARCH_NET_FILE = "ipc_task_search.xml"
+    public static final String TASK_SEARCH_NET_TITLE = "Task search"
+    public static final String TASK_SEARCH_NET_INITIALS = "TS"
+    public static final String TASK_SEARCH_TASK = "Task"
+
+    @Test
+    void testTaskSearch() {
+        def netOptional = importer.importPetriNet(stream(TASK_SEARCH_NET_FILE), TASK_SEARCH_NET_TITLE, TASK_SEARCH_NET_INITIALS)
+
+        assert netOptional.isPresent()
+
+        PetriNet net = netOptional.get()
+        5.times {
+            helper.createCase(TASK_EVENTS_NET_TITLE, net)
+        }
+        Case useCase = helper.createCase(TASK_EVENTS_NET_TITLE, net)
+
+        helper.assignTaskToSuper(TASK_EVENTS_TASK, useCase.stringId)
+        helper.finishTaskAsSuper(TASK_EVENTS_TASK, useCase.stringId)
+
+        useCase = caseRepository.findOne(useCase.stringId)
+
+        assert useCase.dataSet["field"].value == 6
+        assert useCase.dataSet["task_one"].value == net.stringId
+    }
+
     public static final String TASK_EVENTS_NET_FILE = "task_events.xml"
     public static final String TASK_EVENTS_NET_TITLE = "Task events"
     public static final String TASK_EVENTS_NET_INITIALS = "TEN"
