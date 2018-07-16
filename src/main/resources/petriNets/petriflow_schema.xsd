@@ -24,6 +24,7 @@
                 <xs:element ref="init" minOccurs="0"/>
                 <xs:element ref="encryption" minOccurs="0"/>
                 <xs:element ref="action" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:element ref="actionRef" minOccurs="0" maxOccurs="unbounded"/>
                 <xs:element ref="documentRef" minOccurs="0"/>
             </xs:sequence>
             <xs:attribute type="data_type" name="type" use="required"/>
@@ -274,6 +275,7 @@
                 <xs:element ref="view" minOccurs="0"/>
                 <xs:element name="behavior" type="behavior" maxOccurs="unbounded" minOccurs="0"/>
                 <xs:element ref="action" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:element ref="actionRef" minOccurs="0" maxOccurs="unbounded"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
@@ -408,9 +410,16 @@
         <xs:complexType>
             <xs:sequence>
                 <xs:element ref="action" maxOccurs="unbounded" minOccurs="0"/>
+                <xs:element ref="actionRef" maxOccurs="unbounded" minOccurs="0"/>
             </xs:sequence>
             <xs:attribute type="eventPhaseType" name="phase" use="required"/>
         </xs:complexType>
     </xs:element>
     <xs:element name="message" type="i18nStringType"/>
+    <xs:element name="actionRef" type="actionRefType"/>
+    <xs:complexType name="actionRefType">
+        <xs:sequence>
+            <xs:element ref="id"/>
+        </xs:sequence>
+    </xs:complexType>
 </xs:schema>
