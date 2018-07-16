@@ -33,6 +33,8 @@ public interface ITaskService {
 
     Page<Task> findByTransitions(Pageable pageable, List<String> transitions);
 
+    Page<Task> searchAll(com.querydsl.core.types.Predicate predicate);
+
     EventOutcome finishTask(LoggedUser loggedUser, String taskId) throws IllegalArgumentException, TransitionNotExecutableException;
 
     EventOutcome finishTask(String taskId) throws IllegalArgumentException, TransitionNotExecutableException;

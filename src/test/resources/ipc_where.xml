@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="../../main/resources/petriNets/petriflow_schema.xsd">
+    <id>1</id>
+    <defaultRole>true</defaultRole>
+    <data type="number">
+        <id>field</id>
+        <title>Field</title>
+        <init>0</init>
+    </data>
+    <transition>
+        <id>task</id>
+        <x>0</x>
+        <y>0</y>
+        <label>Task</label>
+        <event type="finish">
+            <id>1</id>
+            <actions phase="post">
+                <action>
+                    <!-- @formatter:off -->
+                    field: f.field;
+                    execute "synchronized" where {
+                        it.title.eq("Case 1")
+                    } with ([
+                        "field": [
+                            value: 69.0,
+                            type: "number"
+                        ]
+                    ] as Map)
+                    <!-- @formatter:on -->
+                </action>
+                <action>
+                    <!-- @formatter:off -->
+                    field: f.field;
+                    change field about {
+                        findCase({it.title.eq("Case 1")});
+                        return 0 as Double;
+                    }
+                    <!-- @formatter:on -->
+                </action>
+            </actions>
+        </event>
+    </transition>
+    <transition>
+        <id>synchronized</id>
+        <x>0</x>
+        <y>0</y>
+        <label>Synchronized</label>
+    </transition>
+</document>
