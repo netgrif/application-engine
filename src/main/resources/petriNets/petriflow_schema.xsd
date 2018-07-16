@@ -91,14 +91,14 @@
     </xs:element>
     <xs:element name="arc">
         <xs:complexType>
-            <xs:all>
+            <xs:sequence>
                 <xs:element ref="id"/>
                 <xs:element name="type" type="arc_type" default="regular"/>
                 <xs:element ref="sourceId"/>
                 <xs:element ref="destinationId"/>
                 <xs:element ref="multiplicity"/>
-                <xs:element ref="breakPoint" minOccurs="0"/>
-            </xs:all>
+                <xs:element ref="breakPoint" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
         </xs:complexType>
     </xs:element>
     <xs:element name="i18n">
