@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode
 import com.netgrif.workflow.petrinet.domain.I18nString
 import com.netgrif.workflow.petrinet.domain.Imported
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action
+import com.querydsl.core.annotations.PropertyType
+import com.querydsl.core.annotations.QueryType
 import org.bson.types.ObjectId
 import org.springframework.data.annotation.Id
 import org.springframework.data.annotation.Transient
@@ -175,5 +177,11 @@ abstract class Field<T> extends Imported {
     @Override
     String toString() {
         return name.defaultValue
+    }
+
+    @Override
+    @QueryType(PropertyType.NONE)
+    MetaClass getMetaClass() {
+        return this.metaClass
     }
 }

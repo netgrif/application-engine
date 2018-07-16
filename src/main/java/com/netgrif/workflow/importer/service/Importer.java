@@ -3,8 +3,8 @@ package com.netgrif.workflow.importer.service;
 import com.netgrif.workflow.importer.model.*;
 import com.netgrif.workflow.petrinet.domain.DataGroup;
 import com.netgrif.workflow.petrinet.domain.Event;
-import com.netgrif.workflow.petrinet.domain.*;
 import com.netgrif.workflow.petrinet.domain.EventType;
+import com.netgrif.workflow.petrinet.domain.*;
 import com.netgrif.workflow.petrinet.domain.Place;
 import com.netgrif.workflow.petrinet.domain.Transaction;
 import com.netgrif.workflow.petrinet.domain.Transition;
@@ -34,8 +34,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Component
 public class Importer {
@@ -314,7 +314,7 @@ public class Importer {
                 .filter(actions -> actions.getPhase().equals(phase))
                 .map(actions -> actions.getAction().parallelStream()
                         .map(action -> parseAction(transition.getImportId(), action)))
-                .flatMap(Stream::sorted)
+                .flatMap(Function.identity())
                 .collect(Collectors.toList());
     }
 
