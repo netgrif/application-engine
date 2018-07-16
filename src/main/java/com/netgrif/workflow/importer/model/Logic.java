@@ -1,9 +1,13 @@
 
 package com.netgrif.workflow.importer.model;
 
-import javax.xml.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlSchemaType;
+import javax.xml.bind.annotation.XmlType;
 
 
 /**
@@ -21,6 +25,7 @@ import java.util.List;
  *         &lt;element ref="{}view" minOccurs="0"/&gt;
  *         &lt;element name="behavior" type="{}behavior" maxOccurs="unbounded" minOccurs="0"/&gt;
  *         &lt;element ref="{}action" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *         &lt;element ref="{}actionRef" maxOccurs="unbounded" minOccurs="0"/&gt;
  *       &lt;/sequence&gt;
  *     &lt;/restriction&gt;
  *   &lt;/complexContent&gt;
@@ -35,7 +40,8 @@ import java.util.List;
     "delegate",
     "view",
     "behavior",
-    "action"
+    "action",
+    "actionRef"
 })
 @XmlRootElement(name = "logic")
 public class Logic {
@@ -46,6 +52,7 @@ public class Logic {
     @XmlSchemaType(name = "string")
     protected List<Behavior> behavior;
     protected List<ActionType> action;
+    protected List<ActionRefType> actionRef;
 
     /**
      * Gets the value of the perform property.
@@ -175,6 +182,35 @@ public class Logic {
             action = new ArrayList<ActionType>();
         }
         return this.action;
+    }
+
+    /**
+     * Gets the value of the actionRef property.
+     * 
+     * <p>
+     * This accessor method returns a reference to the live list,
+     * not a snapshot. Therefore any modification you make to the
+     * returned list will be present inside the JAXB object.
+     * This is why there is not a <CODE>set</CODE> method for the actionRef property.
+     * 
+     * <p>
+     * For example, to add a new item, do as follows:
+     * <pre>
+     *    getActionRef().add(newItem);
+     * </pre>
+     * 
+     * 
+     * <p>
+     * Objects of the following type(s) are allowed in the list
+     * {@link ActionRefType }
+     * 
+     * 
+     */
+    public List<ActionRefType> getActionRef() {
+        if (actionRef == null) {
+            actionRef = new ArrayList<ActionRefType>();
+        }
+        return this.actionRef;
     }
 
 }

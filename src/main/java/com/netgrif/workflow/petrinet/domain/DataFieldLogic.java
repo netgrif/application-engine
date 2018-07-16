@@ -7,10 +7,7 @@ import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -35,6 +32,10 @@ public class DataFieldLogic {
             this.behavior.addAll(behavior);
         if (actions != null)
             this.actions.addAll(actions);
+    }
+
+    public void addActions(Collection<Action> actions) {
+        this.actions.addAll(actions);
     }
 
     public ObjectNode applyBehavior(ObjectNode jsonNode) {
