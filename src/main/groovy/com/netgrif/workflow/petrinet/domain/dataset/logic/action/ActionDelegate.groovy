@@ -142,14 +142,14 @@ class ActionDelegate {
 //    }
 
     def execute(String taskId) {
-        [with: { Map dataSet ->
-            executeTasks(dataSet, taskId, { ExpressionUtils.anyOf([])})
+        [with : { Map dataSet ->
+            executeTasks(dataSet, taskId, { ExpressionUtils.anyOf([]) })
         },
-        where: { Closure<Predicate> closure ->
-            [with: { Map dataSet ->
-                executeTasks(dataSet, taskId, closure)
-            }]
-        }]
+         where: { Closure<Predicate> closure ->
+             [with: { Map dataSet ->
+                 executeTasks(dataSet, taskId, closure)
+             }]
+         }]
     }
 
     private void executeTasks(Map dataSet, String taskId, Closure<Predicate> predicateClosure) {
@@ -168,30 +168,16 @@ class ActionDelegate {
         def expression = predicates(qCase)
         Page<Case> page = workflowService.searchAll(expression)
 
-        return page.content.collect {it.stringId}
+        return page.content.collect { it.stringId }
     }
 
     def change(Field field) {
-        [about  : { cl ->
-            def value = cl()
-            if (value instanceof Closure && value() == UNCHANGED_VALUE) {
-                return
-            }
-            if (value == null) {
-                if (field instanceof FieldWithDefault && field.defaultValue != useCase.dataSet.get(field.stringId).value) {
-                    field.clearValue()
-                    saveChangedValue(field)
-                } else if (!(field instanceof FieldWithDefault) && useCase.dataSet.get(field.stringId).value != null) {
-                    field.clearValue()
-                    saveChangedValue(field)
-                }
-                return
-            }
-            if (value != null) {
-                field.value = value
-                saveChangedValue(field)
-            }
+        [about  : { cl -> // TODO: deprecated
+            changeFieldValue(field, cl)
         },
+         value  : { cl ->
+            changeFieldValue(field, cl)
+         },
          choices: { cl ->
              if (!(field instanceof MultichoiceField || field instanceof EnumerationField))
                  return
@@ -209,6 +195,27 @@ class ActionDelegate {
              }
              saveChangedChoices(field)
          }]
+    }
+
+    private void changeFieldValue(Field field, def cl) {
+        def value = cl()
+        if (value instanceof Closure && value() == UNCHANGED_VALUE) {
+            return
+        }
+        if (value == null) {
+            if (field instanceof FieldWithDefault && field.defaultValue != useCase.dataSet.get(field.stringId).value) {
+                field.clearValue()
+                saveChangedValue(field)
+            } else if (!(field instanceof FieldWithDefault) && useCase.dataSet.get(field.stringId).value != null) {
+                field.clearValue()
+                saveChangedValue(field)
+            }
+            return
+        }
+        if (value != null) {
+            field.value = value
+            saveChangedValue(field)
+        }
     }
 
     def always = { return ALWAYS_GENERATE }
