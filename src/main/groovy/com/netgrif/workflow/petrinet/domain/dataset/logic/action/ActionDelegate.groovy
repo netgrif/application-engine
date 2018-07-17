@@ -1,5 +1,7 @@
 package com.netgrif.workflow.petrinet.domain.dataset.logic.action
 
+import com.netgrif.workflow.auth.domain.User
+import com.netgrif.workflow.auth.service.interfaces.IUserService
 import com.netgrif.workflow.configuration.ApplicationContextProvider
 import com.netgrif.workflow.importer.service.FieldFactory
 import com.netgrif.workflow.petrinet.domain.I18nString
@@ -43,6 +45,9 @@ class ActionDelegate {
 
     @Autowired
     private IWorkflowService workflowService
+
+    @Autowired
+    private IUserService userService
 
     private map = [:]
     private Action action
@@ -279,5 +284,9 @@ class ActionDelegate {
         QCase qCase = new QCase("case")
         Page<Case> result = workflowService.searchAll(predicate(qCase))
         return result.content
+    }
+
+    User assignRole(String roleImportId, User user = userService.loggedUser) {
+        return userService.addRole(user, roleImportId)
     }
 }

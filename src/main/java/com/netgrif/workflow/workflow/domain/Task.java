@@ -156,6 +156,8 @@ public class Task {
     }
 
     public void addEventTitle(EventType type, I18nString title) {
+        if (type == null || title == null)
+            return;
         eventTitles.put(type, title);
     }
 
