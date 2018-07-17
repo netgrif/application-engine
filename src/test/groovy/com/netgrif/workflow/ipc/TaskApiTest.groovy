@@ -9,6 +9,7 @@ import com.netgrif.workflow.importer.service.Importer
 import com.netgrif.workflow.petrinet.domain.PetriNet
 import com.netgrif.workflow.startup.ImportHelper
 import com.netgrif.workflow.workflow.domain.Case
+import com.netgrif.workflow.workflow.domain.QTask
 import com.netgrif.workflow.workflow.domain.repositories.CaseRepository
 import com.netgrif.workflow.workflow.domain.repositories.TaskRepository
 import org.junit.Before
@@ -186,25 +187,19 @@ class TaskApiTest {
 
     @Test
     void testTaskBulkActions() {
-        def netOptional = importer.importPetriNet(stream(TASK_EVENTS_NET_FILE), TASK_EVENTS_NET_TITLE, TASK_EVENTS_NET_INITIALS)
+        def netOptional = importer.importPetriNet(stream(TASK_BULK_NET_FILE), TASK_BULK_NET_TITLE, TASK_BULK_NET_INITIALS)
 
         assert netOptional.isPresent()
-
         PetriNet net = netOptional.get()
-        Case useCase = helper.createCase(TASK_EVENTS_NET_TITLE, net)
-        helper.assignTaskToSuper(TASK_EVENTS_TASK, useCase.stringId)
-        helper.finishTaskAsSuper(TASK_EVENTS_TASK, useCase.stringId)
 
-        List<EventLog> log = eventLogRepository.findAll()
+        10.times {
+            helper.createCase("Case $it", net)
+        }
 
-        assert log.findAll {
-            it instanceof UserTaskEventLog && it.transitionId == "work_task" && it.message.contains("assigned")
-        }.size() == 2
-        assert log.findAll {
-            it instanceof UserTaskEventLog && it.transitionId == "work_task" && it.message.contains("canceled")
-        }.size() == 1
-        assert log.findAll {
-            it instanceof UserTaskEventLog && it.transitionId == "work_task" && it.message.contains("finished")
-        }.size() == 1
+        Case control = helper.createCase("Control case", net)
+        helper.assignTaskToSuper(TASK_BULK_TASK, control.stringId)
+        helper.finishTaskAsSuper(TASK_BULK_TASK, control.stringId)
+
+        assert taskRepository.findAll(QTask.task.userId.eq(userService.system.id)).size() == 2
     }
 }
