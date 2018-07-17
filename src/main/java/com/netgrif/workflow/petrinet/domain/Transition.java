@@ -52,6 +52,9 @@ public class Transition extends Node {
     @Getter @Setter
     private Map<EventType, Event> events;
 
+    @Getter @Setter
+    private String defaultRoleId;
+
     public Transition() {
         super();
         dataSet = new LinkedHashMap<>();

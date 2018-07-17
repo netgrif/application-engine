@@ -36,4 +36,8 @@ public interface IUserService {
     void encodeUserPassword(User user);
 
     LoggedUser getLoggedOrSystem();
+
+    User getLoggedUser();
+
+    User addRole(User user, String roleStringId);
 }

@@ -65,7 +65,7 @@ class TransitionRoleTest {
         assert netOptional.isPresent()
 
         def net = netOptional.get()
-        assert net.transitions["task"].roles.values().size() == 2
-        assert processRoleRepository.count() == 2
+        assert net.transitions["task"].roles.values().size() == 1
+        assert processRoleRepository.count() == 4
     }
 }
