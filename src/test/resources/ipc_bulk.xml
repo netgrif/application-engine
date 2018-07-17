@@ -18,7 +18,10 @@
             <actions phase="post">
                 <action>
                     <!-- @formatter:off -->
-
+                    def tasks = findTasks( { it.transitionId.eq("work_task"); } );
+                    assignTasks(tasks);
+                    finishTasks(tasks[0..5]);
+                    cancelTasks(tasks[7..9]);
                     <!-- @formatter:on -->
                 </action>
             </actions>

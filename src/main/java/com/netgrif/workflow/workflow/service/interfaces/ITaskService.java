@@ -9,6 +9,7 @@ import com.netgrif.workflow.workflow.service.EventOutcome;
 import com.netgrif.workflow.workflow.web.responsebodies.TaskReference;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Locale;
@@ -37,13 +38,31 @@ public interface ITaskService {
 
     Task searchOne(com.querydsl.core.types.Predicate predicate);
 
+    @Transactional(rollbackFor = Exception.class)
+    void finishTasks(List<Task> tasks, User user) throws TransitionNotExecutableException;
+
+    @Transactional
+    EventOutcome finishTask(Task task, User user) throws TransitionNotExecutableException;
+
     EventOutcome finishTask(LoggedUser loggedUser, String taskId) throws IllegalArgumentException, TransitionNotExecutableException;
 
     EventOutcome finishTask(String taskId) throws IllegalArgumentException, TransitionNotExecutableException;
 
+    @Transactional
+    void assignTasks(List<Task> tasks, User user) throws TransitionNotExecutableException;
+
+    @Transactional
+    EventOutcome assignTask(Task task, User user) throws TransitionNotExecutableException;
+
     EventOutcome assignTask(LoggedUser loggedUser, String taskId) throws TransitionNotExecutableException;
 
     EventOutcome assignTask(String taskId) throws TransitionNotExecutableException;
+
+    @Transactional(rollbackFor = Exception.class)
+    void cancelTasks(List<Task> tasks, User user);
+
+    @Transactional
+    EventOutcome cancelTask(Task task, User user);
 
     EventOutcome cancelTask(LoggedUser loggedUser, String taskId);
 

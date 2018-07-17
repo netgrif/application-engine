@@ -310,7 +310,8 @@ class ActionDelegate {
     }
 
     Task assignTask(Task task, User user = userService.loggedOrSystem) {
-        return assignTask(task.stringId, user)
+        taskService.assignTask(task, user)
+        return taskService.findOne(task.stringId)
     }
 
     void cancelTask(String transitionId) {
@@ -319,7 +320,7 @@ class ActionDelegate {
     }
 
     void cancelTask(Task task) {
-        taskService.cancelTask(userService.loggedOrSystem.transformToLoggedUser(), task.stringId)
+        taskService.cancelTask(task, userService.loggedOrSystem)
     }
 
     void finishTask(String transitionId) {
@@ -333,7 +334,7 @@ class ActionDelegate {
 
     private String getTaskId(String transitionId) {
         List<TaskReference> refs = taskService.findAllByCase(useCase.stringId, null)
-        refs.find {it.transitionId == transitionId}.stringId
+        refs.find { it.transitionId == transitionId }.stringId
     }
 
     List<Task> findTasks(Closure<Predicate> predicate) {
@@ -345,5 +346,17 @@ class ActionDelegate {
     Task findTask(Closure<Predicate> predicate) {
         QTask qTask = new QTask("task")
         return taskService.searchOne(predicate(qTask))
+    }
+
+    void finishTasks(List<Task> tasks, User finisher = userService.loggedOrSystem) {
+        taskService.finishTasks(tasks, finisher)
+    }
+
+    void assignTasks(List<Task> tasks, User assignee = userService.loggedOrSystem) {
+        taskService.assignTasks(tasks, assignee)
+    }
+
+    void cancelTasks(List<Task> tasks, User user = userService.loggedOrSystem) {
+        taskService.cancelTasks(tasks, user)
     }
 }
