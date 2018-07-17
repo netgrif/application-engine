@@ -178,4 +178,33 @@ class TaskApiTest {
         assert leasing2.dataSet["1"].value as Double    ==  20_000 as Double
 //@formatter:on
     }
+
+    public static final String TASK_BULK_NET_FILE = "ipc_bulk.xml"
+    public static final String TASK_BULK_NET_TITLE = "Bulk events"
+    public static final String TASK_BULK_NET_INITIALS = "BLK"
+    public static final String TASK_BULK_TASK = "Task"
+
+    @Test
+    void testTaskBulkActions() {
+        def netOptional = importer.importPetriNet(stream(TASK_EVENTS_NET_FILE), TASK_EVENTS_NET_TITLE, TASK_EVENTS_NET_INITIALS)
+
+        assert netOptional.isPresent()
+
+        PetriNet net = netOptional.get()
+        Case useCase = helper.createCase(TASK_EVENTS_NET_TITLE, net)
+        helper.assignTaskToSuper(TASK_EVENTS_TASK, useCase.stringId)
+        helper.finishTaskAsSuper(TASK_EVENTS_TASK, useCase.stringId)
+
+        List<EventLog> log = eventLogRepository.findAll()
+
+        assert log.findAll {
+            it instanceof UserTaskEventLog && it.transitionId == "work_task" && it.message.contains("assigned")
+        }.size() == 2
+        assert log.findAll {
+            it instanceof UserTaskEventLog && it.transitionId == "work_task" && it.message.contains("canceled")
+        }.size() == 1
+        assert log.findAll {
+            it instanceof UserTaskEventLog && it.transitionId == "work_task" && it.message.contains("finished")
+        }.size() == 1
+    }
 }
