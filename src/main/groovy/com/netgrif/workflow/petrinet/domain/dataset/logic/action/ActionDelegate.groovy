@@ -141,17 +141,6 @@ class ActionDelegate {
         service.cancelTasksWithoutReload(transitionIds, useCase.stringId)
     }
 
-//    def finish = { Transition[] transitions ->
-//        def service = ApplicationContextProvider.getBean("taskService")
-//        if (!service) {
-//            log.error("Could not find task service")
-//            return
-//        }
-//
-//        def transitionIds = transitions.collect { it.stringId } as Set
-//        service.finishTasksWithoutReload(transitionIds, useCase.stringId)
-//    }
-
     def execute(String taskId) {
         [with : { Map dataSet ->
             executeTasks(dataSet, taskId, { ExpressionUtils.anyOf([]) })
@@ -314,27 +303,34 @@ class ActionDelegate {
         return taskService.findOne(task.stringId)
     }
 
-    void cancelTask(String transitionId) {
-        String taskId = getTaskId(transitionId)
-        taskService.cancelTask(userService.loggedOrSystem.transformToLoggedUser(), taskId)
+    void assignTasks(List<Task> tasks, User assignee = userService.loggedOrSystem) {
+        taskService.assignTasks(tasks, assignee)
     }
 
-    void cancelTask(Task task) {
+    void cancelTask(String transitionId, User user = userService.loggedOrSystem) {
+        String taskId = getTaskId(transitionId)
+        taskService.cancelTask(user.transformToLoggedUser(), taskId)
+    }
+
+    void cancelTask(Task task, User user = userService.loggedOrSystem) {
         taskService.cancelTask(task, userService.loggedOrSystem)
     }
 
-    void finishTask(String transitionId) {
+    void cancelTasks(List<Task> tasks, User user = userService.loggedOrSystem) {
+        taskService.cancelTasks(tasks, user)
+    }
+
+    void finishTask(String transitionId, User user = userService.loggedOrSystem) {
         String taskId = getTaskId(transitionId)
-        taskService.finishTask(userService.loggedOrSystem.transformToLoggedUser(), taskId)
+        taskService.finishTask(user.transformToLoggedUser(), taskId)
     }
 
-    void finishTask(Task task) {
-        taskService.finishTask(userService.loggedOrSystem.transformToLoggedUser(), task.stringId)
+    void finishTask(Task task, User user = userService.loggedOrSystem) {
+        taskService.finishTask(task, user)
     }
 
-    private String getTaskId(String transitionId) {
-        List<TaskReference> refs = taskService.findAllByCase(useCase.stringId, null)
-        refs.find { it.transitionId == transitionId }.stringId
+    void finishTasks(List<Task> tasks, User finisher = userService.loggedOrSystem) {
+        taskService.finishTasks(tasks, finisher)
     }
 
     List<Task> findTasks(Closure<Predicate> predicate) {
@@ -348,15 +344,8 @@ class ActionDelegate {
         return taskService.searchOne(predicate(qTask))
     }
 
-    void finishTasks(List<Task> tasks, User finisher = userService.loggedOrSystem) {
-        taskService.finishTasks(tasks, finisher)
-    }
-
-    void assignTasks(List<Task> tasks, User assignee = userService.loggedOrSystem) {
-        taskService.assignTasks(tasks, assignee)
-    }
-
-    void cancelTasks(List<Task> tasks, User user = userService.loggedOrSystem) {
-        taskService.cancelTasks(tasks, user)
+    private String getTaskId(String transitionId) {
+        List<TaskReference> refs = taskService.findAllByCase(useCase.stringId, null)
+        refs.find { it.transitionId == transitionId }.stringId
     }
 }
