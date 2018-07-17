@@ -17,6 +17,7 @@ import com.netgrif.workflow.petrinet.domain.policies.DataFocusPolicy;
 import com.netgrif.workflow.petrinet.domain.policies.FinishPolicy;
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRole;
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRoleRepository;
+import com.netgrif.workflow.petrinet.domain.roles.RolePermission;
 import com.netgrif.workflow.petrinet.service.ArcFactory;
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.workflow.workflow.domain.triggers.Trigger;
@@ -279,14 +280,23 @@ public class Importer {
         if (isDefaultRoleAllowedFor(importTransition, document)) {
             addDefaultRole(transition);
         }
+        if (isTransitionRoleAllowed()) {
+            addTransitionRole(transition);
+        }
         if (importTransition.getEvent() != null) {
             importTransition.getEvent().forEach(event ->
                     addEvent(transition, event)
             );
         }
 
+
         net.addTransition(transition);
         transitions.put(importTransition.getId(), transition);
+    }
+
+    private void addTransitionRole(Transition transition) {
+        ProcessRole role = roleFactory.transitionRole(transition);
+        transition.addRole(role.getStringId(), Collections.singleton(RolePermission.PERFORM));
     }
 
     @Transactional
@@ -635,5 +645,9 @@ public class Importer {
 
     public I18nString getI18n(String id) {
         return i18n.get(id);
+    }
+
+    private boolean isTransitionRoleAllowed() {
+        return document.isTransitionRole() != null && document.isTransitionRole();
     }
 }

@@ -57,6 +57,7 @@ public class ObjectFactory {
     private final static QName _Multiplicity_QNAME = new QName("", "multiplicity");
     private final static QName _I18NString_QNAME = new QName("", "i18nString");
     private final static QName _DefaultRole_QNAME = new QName("", "defaultRole");
+    private final static QName _TransitionRole_QNAME = new QName("", "transitionRole");
     private final static QName _CaseName_QNAME = new QName("", "caseName");
     private final static QName _Type_QNAME = new QName("", "type");
 
@@ -535,9 +536,18 @@ public class ObjectFactory {
      * Create an instance of {@link JAXBElement }{@code <}{@link Boolean }{@code >}}
      * 
      */
-    @XmlElementDecl(namespace = "", name = "defaultRole")
+    @XmlElementDecl(namespace = "", name = "defaultRole", defaultValue = "true")
     public JAXBElement<Boolean> createDefaultRole(Boolean value) {
         return new JAXBElement<Boolean>(_DefaultRole_QNAME, Boolean.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link Boolean }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "", name = "transitionRole", defaultValue = "true")
+    public JAXBElement<Boolean> createTransitionRole(Boolean value) {
+        return new JAXBElement<Boolean>(_TransitionRole_QNAME, Boolean.class, null, value);
     }
 
     /**

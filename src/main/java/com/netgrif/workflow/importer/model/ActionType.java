@@ -1,7 +1,12 @@
 
 package com.netgrif.workflow.importer.model;
 
-import javax.xml.bind.annotation.*;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlSchemaType;
+import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.XmlValue;
 
 
 /**
@@ -13,7 +18,7 @@ import javax.xml.bind.annotation.*;
  * &lt;complexType name="actionType"&gt;
  *   &lt;simpleContent&gt;
  *     &lt;extension base="&lt;http://www.w3.org/2001/XMLSchema&gt;string"&gt;
- *       &lt;attribute name="trigger" use="required" type="{http://www.w3.org/2001/XMLSchema}anySimpleType" /&gt;
+ *       &lt;attribute name="trigger" type="{http://www.w3.org/2001/XMLSchema}anySimpleType" /&gt;
  *       &lt;attribute name="id" type="{http://www.w3.org/2001/XMLSchema}anySimpleType" /&gt;
  *     &lt;/extension&gt;
  *   &lt;/simpleContent&gt;
@@ -30,7 +35,7 @@ public class ActionType {
 
     @XmlValue
     protected String value;
-    @XmlAttribute(name = "trigger", required = true)
+    @XmlAttribute(name = "trigger")
     @XmlSchemaType(name = "anySimpleType")
     protected String trigger;
     @XmlAttribute(name = "id")

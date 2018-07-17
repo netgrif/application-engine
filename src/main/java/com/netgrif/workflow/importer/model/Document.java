@@ -1,9 +1,13 @@
 
 package com.netgrif.workflow.importer.model;
 
-import javax.xml.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
 
 
 /**
@@ -19,6 +23,7 @@ import java.util.List;
  *         &lt;element ref="{}id" minOccurs="0"/&gt;
  *         &lt;element ref="{}icon" minOccurs="0"/&gt;
  *         &lt;element ref="{}defaultRole" minOccurs="0"/&gt;
+ *         &lt;element ref="{}transitionRole" minOccurs="0"/&gt;
  *         &lt;element ref="{}caseName" minOccurs="0"/&gt;
  *         &lt;element ref="{}transaction" maxOccurs="unbounded" minOccurs="0"/&gt;
  *         &lt;element ref="{}role" maxOccurs="unbounded" minOccurs="0"/&gt;
@@ -41,6 +46,7 @@ import java.util.List;
     "id",
     "icon",
     "defaultRole",
+    "transitionRole",
     "caseName",
     "transaction",
     "role",
@@ -56,7 +62,10 @@ public class Document {
 
     protected String id;
     protected String icon;
+    @XmlElement(defaultValue = "true")
     protected Boolean defaultRole;
+    @XmlElement(defaultValue = "true")
+    protected Boolean transitionRole;
     protected I18NStringType caseName;
     protected List<Transaction> transaction;
     protected List<Role> role;
@@ -139,6 +148,30 @@ public class Document {
      */
     public void setDefaultRole(Boolean value) {
         this.defaultRole = value;
+    }
+
+    /**
+     * Gets the value of the transitionRole property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link Boolean }
+     *     
+     */
+    public Boolean isTransitionRole() {
+        return transitionRole;
+    }
+
+    /**
+     * Sets the value of the transitionRole property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link Boolean }
+     *     
+     */
+    public void setTransitionRole(Boolean value) {
+        this.transitionRole = value;
     }
 
     /**
