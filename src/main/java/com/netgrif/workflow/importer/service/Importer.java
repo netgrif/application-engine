@@ -289,14 +289,14 @@ public class Importer {
             );
         }
 
-
         net.addTransition(transition);
         transitions.put(importTransition.getId(), transition);
     }
 
     private void addTransitionRole(Transition transition) {
-        ProcessRole role = roleFactory.transitionRole(transition);
+        ProcessRole role = roleFactory.transitionRole(net, transition);
         transition.addRole(role.getStringId(), Collections.singleton(RolePermission.PERFORM));
+        transition.setDefaultRoleId(role.getStringId());
     }
 
     @Transactional
@@ -648,6 +648,6 @@ public class Importer {
     }
 
     private boolean isTransitionRoleAllowed() {
-        return document.isTransitionRole() != null && document.isTransitionRole();
+        return document.isTransitionRole() == null || document.isTransitionRole();
     }
 }

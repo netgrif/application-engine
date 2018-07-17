@@ -1,7 +1,10 @@
 package com.netgrif.workflow.importer.service;
 
 
+import com.netgrif.workflow.auth.domain.UserProcessRole;
+import com.netgrif.workflow.auth.domain.repositories.UserProcessRoleRepository;
 import com.netgrif.workflow.importer.model.Logic;
+import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.Transition;
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRole;
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRoleRepository;
@@ -18,7 +21,10 @@ public class RoleFactory {
     @Autowired
     private ProcessRoleRepository repository;
 
-    public Set<RolePermission> getPermissions(Logic roleLogic) {
+    @Autowired
+    private UserProcessRoleRepository userProcessRoleRepository;
+
+    Set<RolePermission> getPermissions(Logic roleLogic) {
         Set<RolePermission> permissions = new HashSet<>();
 
         addPerform(permissions, roleLogic);
@@ -37,11 +43,13 @@ public class RoleFactory {
             permissions.add(RolePermission.DELEGATE);
     }
 
-    public ProcessRole transitionRole(Transition transition) {
+    ProcessRole transitionRole(PetriNet net, Transition transition) {
         ProcessRole role = new ProcessRole();
         role.setName(transition.getImportId());
-        role.setImportId(transition.getImportId());
-        role.setDescription("Default role of transition "+transition.getImportId());
-        return repository.save(role);
+        role.setImportId(net.getStringId() + "_" + transition.getImportId());
+        role.setDescription("Default role of transition "+transition.getTitle().getDefaultValue() + " in process "+net.getTitle().getDefaultValue());
+        role = repository.save(role);
+        userProcessRoleRepository.save(new UserProcessRole(role.getStringId()));
+        return role;
     }
 }
