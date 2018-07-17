@@ -266,6 +266,30 @@
                 </executions>
             </plugin>
             <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>jaxb2-maven-plugin</artifactId>
+                <version>2.3</version>
+                <executions>
+                    <execution>
+                        <id>xjc_pos</id>
+                        <goals>
+                            <goal>xjc</goal>
+                        </goals>
+                        <configuration>
+                            <!-- The package of your generated sources -->
+                            <packageName>com.netgrif.workflow.importer.model</packageName>
+                            <outputDirectory>src/main/java</outputDirectory>
+                            <sources>
+                                <source>src/main/resources/petriNets/petriflow_schema.xsd</source>
+                            </sources>
+                            <generateEpisode>false</generateEpisode>
+                            <clearOutputDir>false</clearOutputDir>
+                            <noGeneratedHeaderComments>true</noGeneratedHeaderComments>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-clean-plugin</artifactId>
                 <configuration>

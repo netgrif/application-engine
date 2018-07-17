@@ -119,6 +119,7 @@
                 <xs:element ref="id" minOccurs="0"/>
                 <xs:element ref="icon" minOccurs="0"/>
                 <xs:element ref="defaultRole" minOccurs="0"/>
+                <xs:element ref="transitionRole" minOccurs="0"/>
                 <xs:element ref="caseName" minOccurs="0"/>
                 <xs:element ref="transaction" maxOccurs="unbounded" minOccurs="0"/>
                 <xs:element ref="role" maxOccurs="unbounded" minOccurs="0"/>
@@ -366,7 +367,8 @@
             </xs:extension>
         </xs:simpleContent>
     </xs:complexType>
-    <xs:element name="defaultRole" type="xs:boolean"/>
+    <xs:element name="defaultRole" type="xs:boolean" default="true"/>
+    <xs:element name="transitionRole" type="xs:boolean" default="true"/>
     <xs:element name="i18nString" type="i18nStringType"/>
     <xs:complexType name="i18nStringType">
         <xs:simpleContent>
