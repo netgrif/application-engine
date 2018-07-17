@@ -189,24 +189,17 @@ public class TaskService implements ITaskService {
         return null;
     }
 
-
-    //TODO: 2/4/2017 findByDataFields
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void finishTasks(List<Task> tasks, User user) throws TransitionNotExecutableException {
+        for (Task task: tasks) {
+            finishTask(task, user);
+        }
+    }
 
     @Override
     @Transactional
-    public EventOutcome finishTask(LoggedUser loggedUser, String taskId) throws IllegalArgumentException, TransitionNotExecutableException {
-        Task task = taskRepository.findOne(taskId);
-        User user = userRepository.findOne(loggedUser.getId());
-        if (task == null) {
-            throw new IllegalArgumentException("Could not find task with id=" + taskId);
-        } else if (task.getUserId() == null) {
-            throw new IllegalArgumentException("Task with id=" + taskId + " is not assigned to any user.");
-        }
-        // TODO: 14. 4. 2017 replace with @PreAuthorize
-        if (!task.getUserId().equals(loggedUser.getId())) {
-            throw new IllegalArgumentException("User that is not assigned tried to finish task");
-        }
-
+    public EventOutcome finishTask(Task task, User user) throws TransitionNotExecutableException {
         Case useCase = workflowService.findOne(task.getCaseId());
         Transition transition = useCase.getPetriNet().getTransition(task.getTransitionId());
         EventOutcome outcome = new EventOutcome(transition.getFinishMessage());
@@ -225,9 +218,28 @@ public class TaskService implements ITaskService {
         reloadTasks(useCase);
 
         publisher.publishEvent(new UserFinishTaskEvent(user, task, useCase));
-        log.info("Task [" + task.getTitle() + "] assigned to [" + loggedUser.getEmail() + "] was finished");
+        log.info("Task [" + task.getTitle() + "] assigned to [" + user.getEmail() + "] was finished");
 
         return outcome;
+    }
+
+
+    @Override
+    @Transactional
+    public EventOutcome finishTask(LoggedUser loggedUser, String taskId) throws IllegalArgumentException, TransitionNotExecutableException {
+        Task task = taskRepository.findOne(taskId);
+        User user = userRepository.findOne(loggedUser.getId());
+        if (task == null) {
+            throw new IllegalArgumentException("Could not find task with id=" + taskId);
+        } else if (task.getUserId() == null) {
+            throw new IllegalArgumentException("Task with id=" + taskId + " is not assigned to any user.");
+        }
+        // TODO: 14. 4. 2017 replace with @PreAuthorize
+        if (!task.getUserId().equals(loggedUser.getId())) {
+            throw new IllegalArgumentException("User that is not assigned tried to finish task");
+        }
+
+        return finishTask(task, user);
     }
 
     @Override
@@ -237,11 +249,17 @@ public class TaskService implements ITaskService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void assignTasks(List<Task> tasks, User user) throws TransitionNotExecutableException {
+        for (Task task: tasks) {
+            assignTask(task, user);
+        }
+    }
+
+    @Override
     @Transactional
-    public EventOutcome assignTask(LoggedUser loggedUser, String taskId) throws TransitionNotExecutableException {
-        Task task = taskRepository.findOne(taskId);
+    public EventOutcome assignTask(Task task, User user) throws TransitionNotExecutableException {
         Case useCase = workflowService.findOne(task.getCaseId());
-        User user = userRepository.findOne(loggedUser.getId());
         Transition transition = useCase.getPetriNet().getTransition(task.getTransitionId());
         EventOutcome outcome = new EventOutcome(transition.getAssignMessage());
 
@@ -251,8 +269,16 @@ public class TaskService implements ITaskService {
         workflowService.save(useCase);
 
         publisher.publishEvent(new UserAssignTaskEvent(user, task, useCase));
-        log.info("Task [" + task.getTitle() + "] assigned to [" + loggedUser.getEmail() + "]");
+        log.info("Task [" + task.getTitle() + "] assigned to [" + user.getEmail() + "]");
         return outcome;
+    }
+
+    @Override
+    @Transactional
+    public EventOutcome assignTask(LoggedUser loggedUser, String taskId) throws TransitionNotExecutableException {
+        Task task = taskRepository.findOne(taskId);
+        User user = userRepository.findOne(loggedUser.getId());
+        return assignTask(task, user);
     }
 
     @Override
@@ -269,10 +295,16 @@ public class TaskService implements ITaskService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void cancelTasks(List<Task> tasks, User user) {
+        for (Task task: tasks) {
+            cancelTask(task, user);
+        }
+    }
+
+    @Override
     @Transactional
-    public EventOutcome cancelTask(LoggedUser loggedUser, String taskId) {
-        Task task = taskRepository.findOne(taskId);
-        User user = userRepository.findOne(loggedUser.getId());
+    public EventOutcome cancelTask(Task task, User user) {
         Case useCase = workflowService.findOne(task.getCaseId());
         Transition transition = useCase.getPetriNet().getTransition(task.getTransitionId());
         EventOutcome outcome = new EventOutcome(transition.getCancelMessage());
@@ -284,8 +316,16 @@ public class TaskService implements ITaskService {
         reloadTasks(useCase);
 
         publisher.publishEvent(new UserCancelTaskEvent(user, task, useCase));
-        log.info("Task [" + task.getTitle() + "] assigned to [" + loggedUser.getEmail() + "] was cancelled");
+        log.info("Task [" + task.getTitle() + "] assigned to [" + user.getEmail() + "] was cancelled");
         return outcome;
+    }
+
+    @Override
+    @Transactional
+    public EventOutcome cancelTask(LoggedUser loggedUser, String taskId) {
+        Task task = taskRepository.findOne(taskId);
+        User user = userRepository.findOne(loggedUser.getId());
+        return cancelTask(task, user);
     }
 
     /**
