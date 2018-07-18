@@ -139,11 +139,7 @@ public class Importer {
     @Transactional
     protected Optional<PetriNet> createPetriNet(String title, String initials) {
         net = new PetriNet();
-        net.setTitle(title);
-        net.setInitials(initials);
-        net.setImportId(document.getId());
-        if (document.getId() == null)
-            net.setImportId(new ObjectId().toString());
+        net.setImportId(document.getId() != null ? document.getId() : new ObjectId().toString());
         net.setIcon(document.getIcon());
 
         document.getI18N().forEach(this::addI18N);
@@ -157,7 +153,11 @@ public class Importer {
         document.getTransition().forEach(this::resolveTransitionActions);
         document.getData().forEach(this::resolveDataActions);
 
+        net.setTitle(title != null ? new I18nString(title) : toI18NString(document.getTitle()));
+        net.setInitials(initials != null ? initials : document.getInitials());
         net.setDefaultCaseName(toI18NString(document.getCaseName()));
+        net.setIdentifier(document.getId());
+
         if (config.isNotSaveObjects())
             return service.saveNew(net);
         else
@@ -359,7 +359,7 @@ public class Importer {
         importDataGroup.getDataRef().forEach(dataRef -> dataGroup.addData(getField(dataRef.getId()).getStringId()));
         transition.addDataGroup(dataGroup);
 
-        for (DataRef dataRef : importDataGroup.getDataRef()) {
+        for (DataRef dataRef: importDataGroup.getDataRef()) {
             addDataLogic(transition, dataRef);
         }
     }
@@ -437,11 +437,21 @@ public class Importer {
 
     private void parseIds(String fieldId, String transitionId, ActionType importedAction, Action action) {
         String definition = importedAction.getValue();
-        String[] actionParts = definition.split(";", 2);
-        if (actionParts.length != 2)
-            throw new IllegalArgumentException("Failed to parse action: " + importedAction);
+        action.setDefinition(definition);
+
+        if (containsParams(definition)) {
+            parseParamsAndObjectIds(action, fieldId, transitionId);
+        }
+    }
+
+    private void parseParamsAndObjectIds(Action action, String fieldId, String transitionId) {
+        String[] actionParts = action.getDefinition().split(";", 2);
         action.setDefinition(actionParts[1]);
         parseObjectIds(action, fieldId, transitionId, actionParts[0]);
+    }
+
+    private boolean containsParams(String definition) {
+        return definition.matches("[\\W\\w\\s]*[\\w]*:[\\s][ft].[\\w]+;[\\w\\W\\s]*");
     }
 
     @Transactional
@@ -572,7 +582,7 @@ public class Importer {
         if (document.isDefaultRole() != null && !document.isDefaultRole())
             return false;
         // FALSE if role or trigger mapping
-        for (Mapping mapping : document.getMapping()) {
+        for (Mapping mapping: document.getMapping()) {
             if (mapping.getTransitionRef() == transition.getId() && (mapping.getRoleRef() != null && !mapping.getRoleRef().isEmpty()) && (mapping.getTrigger() != null && !mapping.getTrigger().isEmpty()))
                 return false;
         }
