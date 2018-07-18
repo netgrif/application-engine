@@ -3,10 +3,13 @@ package com.netgrif.workflow.petrinet.web.responsebodies;
 
 import com.netgrif.workflow.auth.domain.Author;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
+import com.netgrif.workflow.workflow.web.responsebodies.DataFieldReference;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
 
 @Data
 public class PetriNetReference extends Reference {
@@ -18,6 +21,7 @@ public class PetriNetReference extends Reference {
     private String icon;
     private LocalDateTime createdDate;
     private Author author;
+    private List<DataFieldReference> immediateData;
 
 
     public PetriNetReference() {
@@ -47,5 +51,6 @@ public class PetriNetReference extends Reference {
         this.icon = net.getIcon();
         this.createdDate = net.getCreationDate();
         this.author = net.getAuthor();
+        this.immediateData = net.getImmediateFields().stream().map(field -> new DataFieldReference(field, locale)).collect(Collectors.toList());
     }
 }
