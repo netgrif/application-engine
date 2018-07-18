@@ -331,6 +331,8 @@ public abstract class PetriNetService implements IPetriNetService {
             Criteria valueCriteria;
             if (value instanceof List)
                 valueCriteria = Criteria.where(key).in(value);
+            else if (key.equalsIgnoreCase("title") || key.equalsIgnoreCase("initials") || key.equalsIgnoreCase("identifier"))
+                valueCriteria = Criteria.where(key).regex((String) value, "i");
             else
                 valueCriteria = Criteria.where(key).is(value);
             query.addCriteria(valueCriteria);

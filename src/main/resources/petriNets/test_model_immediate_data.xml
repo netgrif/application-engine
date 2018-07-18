@@ -8,36 +8,40 @@
 			<i18nString name="case_name">New case</i18nString>
 		</i18n>
 		<!-- ROLES -->
+		<role>
+			<id>tester</id>
+			<name>Tester</name>
+		</role>
 		<!-- DATA -->
 		<data type="boolean" immediate="true">
 			<id>boolean_field</id>
 			<title>Boolean</title>
 			<init>true</init>
     	</data>
-    	<data type="text">
+    	<data type="text" immediate="true">
 			<id>text_field</id>
 			<title>Text</title>
 			<init>Example text</init>
     	</data>
-		<data type="text">
+		<data type="text" immediate="true">
 			<id>text_area_field</id>
-			<title>Text</title>
+			<title>Text Area</title>
 			<init>The 39th International Conference on Applications and Theory of Petri Nets and Concurrency will be held
 				June 24-29, 2018 Austria Trend Hotel Bratislava, Vysoka 2A, 811 06 Bratislava, Slovakia. The conference will
 				be co-located with the 18th International Conference on Application of Concurrency to System Design (ACSD
 				2018).</init>
 			<values>area</values>
 		</data>
-    	<data type="number">
+    	<data type="number" immediate="true">
 			<id>number_field</id>
 			<title>Number</title>
 			<init>38</init>
     	</data>
-		<data type="date">
+		<data type="date" immediate="true">
 			<id>date_field</id>
 			<title>Date</title>
 		</data>
-    	<data type="enumeration">
+    	<data type="enumeration" immediate="true">
 			<id>enumeration_field</id>
 			<title>Enumeration</title>
    			<values>Value 1</values>
@@ -45,18 +49,19 @@
    			<values>Value 3</values>
    			<init>Value 1</init>
     	</data>
-		<data type="multichoice">
+		<data type="multichoice" immediate="true">
 			<id>multichoice_field</id>
 			<title>Multichoice</title>
 			<values>Value 1</values>
 			<values>Value 2</values>
 			<values>Value 3</values>
 		</data>
-		<data type="user">
+		<data type="user" immediate="true">
 			<id>user_field</id>
 			<title>User</title>
+			<values>tester</values>
 		</data>
-		<data type="file">
+		<data type="file" immediate="true">
 			<id>file_field</id>
 			<title>File</title>
 		</data>
