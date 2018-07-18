@@ -21,6 +21,8 @@ import javax.xml.bind.annotation.XmlType;
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
  *       &lt;sequence&gt;
  *         &lt;element ref="{}id" minOccurs="0"/&gt;
+ *         &lt;element ref="{}initials" minOccurs="0"/&gt;
+ *         &lt;element name="title" type="{}i18nStringType" minOccurs="0"/&gt;
  *         &lt;element ref="{}icon" minOccurs="0"/&gt;
  *         &lt;element ref="{}defaultRole" minOccurs="0"/&gt;
  *         &lt;element ref="{}transitionRole" minOccurs="0"/&gt;
@@ -44,6 +46,8 @@ import javax.xml.bind.annotation.XmlType;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
     "id",
+    "initials",
+    "title",
     "icon",
     "defaultRole",
     "transitionRole",
@@ -61,6 +65,8 @@ import javax.xml.bind.annotation.XmlType;
 public class Document {
 
     protected String id;
+    protected String initials;
+    protected I18NStringType title;
     protected String icon;
     @XmlElement(defaultValue = "true")
     protected Boolean defaultRole;
@@ -100,6 +106,54 @@ public class Document {
      */
     public void setId(String value) {
         this.id = value;
+    }
+
+    /**
+     * Gets the value of the initials property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getInitials() {
+        return initials;
+    }
+
+    /**
+     * Sets the value of the initials property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setInitials(String value) {
+        this.initials = value;
+    }
+
+    /**
+     * Gets the value of the title property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link I18NStringType }
+     *     
+     */
+    public I18NStringType getTitle() {
+        return title;
+    }
+
+    /**
+     * Sets the value of the title property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link I18NStringType }
+     *     
+     */
+    public void setTitle(I18NStringType value) {
+        this.title = value;
     }
 
     /**
