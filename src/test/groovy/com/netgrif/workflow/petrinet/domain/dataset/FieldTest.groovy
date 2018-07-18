@@ -1,7 +1,7 @@
 package com.netgrif.workflow.petrinet.domain.dataset
 
 import com.netgrif.workflow.importer.service.Importer
-import com.netgrif.workflow.ipc.TaskExecutionTest
+import com.netgrif.workflow.ipc.TaskApiTest
 import com.netgrif.workflow.petrinet.domain.PetriNet
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -23,7 +23,7 @@ class FieldTest {
     private Importer importer
 
     private def stream = { String name ->
-        return TaskExecutionTest.getClassLoader().getResourceAsStream(name)
+        return TaskApiTest.getClassLoader().getResourceAsStream(name)
     }
 
     def limitsNetOptional

@@ -137,7 +137,7 @@ public class WorkflowService implements IWorkflowService {
         List<Case> list = new LinkedList<>();
         field.getConstraintNetIds().forEach((netImportId, fieldImportIds) -> {
             PetriNet net = petriNetRepository.findOne(netImportId);
-            list.addAll(repository.findAllByPetriNetId(net.getStringId()));
+            list.addAll(repository.findAllByProcessIdentifier(net.getIdentifier()));
         });
 
         return list;
