@@ -15,6 +15,7 @@ import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.NotNull;
+import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -25,6 +26,9 @@ public class Case {
     @Id
     private ObjectId _id;
 
+    @Getter
+    private String visualId;
+
     @DBRef
     @NotNull
     @JsonIgnore
@@ -32,7 +36,8 @@ public class Case {
     private PetriNet petriNet;
 
     @NotNull
-    @Getter @Setter
+    @Getter
+    @Setter
     private String processIdentifier;
 
     @org.springframework.data.mongodb.core.mapping.Field("activePlaces")
@@ -91,11 +96,13 @@ public class Case {
         immediateDataFields = new LinkedHashSet<>();
         resetArcTokens = new HashMap<>();
         tasks = new HashSet<>();
+        visualId = generateVisualId();
     }
 
     public Case(String title) {
         this();
         this.title = title;
+        visualId = generateVisualId();
     }
 
     public Case(String title, PetriNet petriNet, Map<String, Integer> activePlaces) {
@@ -104,6 +111,7 @@ public class Case {
         this.activePlaces = activePlaces;
         populateDataSet();
         this.immediateDataFields = this.petriNet.getImmediateFields().stream().map(Field::getStringId).collect(Collectors.toCollection(LinkedHashSet::new));
+        visualId = generateVisualId();
     }
 
     public ObjectId get_id() {
@@ -144,12 +152,6 @@ public class Case {
         return this.dataSet.get(field).hasDefinedBehavior(transition);
     }
 
-    public String getVisualId() {
-        int n = _id.getTimestamp() + title.length();
-        if (this.petriNet != null) return petriNet.getInitials() + "-" + n;
-        return n + "";
-    }
-
     public String getPetriNetId() {
         if (this.petriNet != null) return petriNet.getStringId();
         return null;
@@ -179,6 +181,14 @@ public class Case {
             else
                 this.dataSet.put(key, new DataField());
         });
+    }
+
+    private String generateVisualId() {
+        SecureRandom random = new SecureRandom();
+        int n = _id.getTimestamp() + random.nextInt(99999999);
+        if (this.title != null) n += title.length();
+        if (this.petriNet != null) return petriNet.getInitials() + "-" + n;
+        return n + "";
     }
 
     public Object getFieldValue(String fieldId) {
