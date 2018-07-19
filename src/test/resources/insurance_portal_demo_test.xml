@@ -43,7 +43,7 @@
             <!--@formatter:off-->
             field: f.this,
             other: f.109048;
-            change other about {
+            change other value {
                 return field.value;
             }
             <!--@formatter:on-->
@@ -58,7 +58,7 @@
             <!--@formatter:off-->
             field: f.this,
             other: f.109047;
-            change other about {
+            change other value {
                 return field.value;
             }
             <!--@formatter:on-->
@@ -77,7 +77,7 @@
             <!--@formatter:off-->
             field: f.this,
             coeff: f.201001;
-            change coeff about {
+            change coeff value {
             if (field.value=="L5")
                 return 3.8 as Double;
             if (field.value=="L4")
@@ -96,7 +96,7 @@
             <!--@formatter:off-->
             field: f.this,
             coeff: f.201018;
-            change coeff about {
+            change coeff value {
                 if (field.value=="L5")
                     return 3.8 as Double;
                 if (field.value=="L4")
@@ -118,7 +118,7 @@
             <!--@formatter:off-->
             field: f.this,
             coeff: f.201002;
-            change coeff about {
+            change coeff value {
                 if (field.value)
                     return 1.2 as Double;
                 return 1.0 as Double;
@@ -133,7 +133,7 @@
             <!--@formatter:off-->
             field: f.this,
             coeff: f.201003;
-            change coeff about {
+            change coeff value {
                 if (field.value)
                     return 1.5 as Double;
                 return 1.0 as Double;
@@ -148,7 +148,7 @@
             <!--@formatter:off-->
             field: f.this,
             coeff: f.201004;
-            change coeff about {
+            change coeff value {
                 if (field.value)
                     return 1.3 as Double;
                 return 1.0 as Double;
@@ -169,7 +169,7 @@
             <!--@formatter:off-->
             field: f.this,
             coeff: f.201005;
-            change coeff about {
+            change coeff value {
                 if (field.value=="menej ako 1")
                     return 1.0 as Double;
                 if (field.value=="1 až 5")
@@ -195,7 +195,7 @@
             <!--@formatter:off-->
             field: f.this,
             coeff: f.201006;
-            change coeff about {
+            change coeff value {
                 if (field.value=="vlastník nehnuteľnosti")
                     return 1.0 as Double;
                 if (field.value=="vlastník má úver alebo hypotéku na nehnuteľnosť")
@@ -221,7 +221,7 @@
             <!--@formatter:off-->
             field: f.this,
             coeff: f.201007;
-            change coeff about {
+            change coeff value {
                 if (field.value=="1")
                     return 0.95 as Double;
                 if (field.value=="2")
@@ -247,7 +247,7 @@
             <!--@formatter:off-->
             field: f.this,
             coeff: f.201008;
-            change coeff about {
+            change coeff value {
                 if (field.value=="0")
                     return 1.0 as Double;
                 if (field.value=="1")
@@ -267,7 +267,7 @@
             <!--@formatter:off-->
             field: f.this,
             coeff: f.201012;
-            change coeff about {
+            change coeff value {
                 if (field.value)
                     return 1.05 as Double;
                 return 1.0 as Double;
@@ -282,7 +282,7 @@
             <!--@formatter:off-->
             field: f.this,
             coeff: f.201014;
-            change coeff about {
+            change coeff value {
                 if (field.value)
                     return 1.1 as Double;
             return 1.0 as Double;
@@ -302,7 +302,7 @@
             <!--@formatter:off-->
             field: f.this,
             coeff: f.201016;
-            change coeff about{
+            change coeff value{
                  if (field.value=="0")
                         return 1.0 as Double;
                  if (field.value=="1")
@@ -326,7 +326,7 @@
             <!--@formatter:off-->
             field: f.this,
             coeff: f.208001;
-            change coeff about {
+            change coeff value {
             if (field.value=="0.00 €")
             return 1.1 as Double;
             if (field.value=="50.00 €")
@@ -349,7 +349,7 @@
             <!--@formatter:off-->
             field: f.this,
             coeff: f.202001;
-            change coeff about {
+            change coeff value {
             if (field.value=="byt")
             return 1.0 as Double;
             if (field.value=="rodinný dom")
@@ -367,7 +367,7 @@
             <!--@formatter:off-->
             field: f.this,
             coeff: f.201019;
-            change coeff about {
+            change coeff value {
             if (field.value=="byt")
             return 0.9 as Double;
             if (field.value=="rodinný dom")
@@ -385,7 +385,7 @@
             <!--@formatter:off-->
             field: f.this,
             coeff: f.103001;
-            change coeff about {
+            change coeff value {
             if (field.value=="byt")
             return "byt";
             if (field.value=="rodinný dom")
@@ -401,7 +401,7 @@
             <!--@formatter:off-->
             field: f.this,
             coeff: f.102003;
-            change coeff about {
+            change coeff value {
             if (field.value=="byt")
             return "škridla";
             }
@@ -504,7 +504,7 @@
             p2: f.105002,
             p3: f.105003,
             field: f.305001;
-            change field about {
+            change field value {
             return p1.value+p2.value+p3.value as Double;
             }
         <!--@formatter:on-->
@@ -524,7 +524,7 @@
             <!--@formatter:off-->
             field: f.this,
             coeff: f.202002;
-            change coeff about {
+            change coeff value {
             if (field.value=="tehla a/alebo betón")
             return 1.0 as Double;
             if (field.value=="porobetón (ytong)")
@@ -554,7 +554,7 @@
             <!--@formatter:off-->
             field: f.this,
             coeff: f.202003;
-            change coeff about {
+            change coeff value {
             if (field.value=="škridla")
             return 1.0 as Double;
             if (field.value=="plech")
@@ -584,7 +584,7 @@
             <!--@formatter:off-->
             field: f.this,
             coeff: f.202004;
-            change coeff about {
+            change coeff value {
             if (field.value=="menej ako 5")
             return 1.0 as Double;
             if (field.value=="6 až 10")
@@ -610,7 +610,7 @@
             <!--@formatter:off-->
             field: f.this,
             coeff: f.202006;
-            change coeff about {
+            change coeff value {
             if (field.value=="1")
             return 0.9 as Double;
             if (field.value=="2")
@@ -676,7 +676,7 @@
             <!--@formatter:off-->
             field: f.this,
             coeff: f.202007;
-            change coeff about {
+            change coeff value {
             if (field.value=="1")
             return 1.0 as Double;
             if (field.value=="2")
@@ -700,7 +700,7 @@
             <!--@formatter:off-->
             field: f.this,
             coeff: f.203001;
-            change coeff about {
+            change coeff value {
             if (field.value=="byt")
             return 1.0 as Double;
             if (field.value=="rodinný dom")
@@ -763,7 +763,7 @@
             <!--@formatter:off-->
             field: f.this,
             coeff: f.203002;
-            change coeff about {
+            change coeff value {
             if (field.value=="trvalá")
             return 1.0 as Double;
             if (field.value=="dočasná")
@@ -824,7 +824,7 @@
             field: f.106002,
             check: f.103002,
             other: f.106022;
-            change other about {
+            change other value {
                 if (check.value=="trvalá")
                     return field.value as Double;
                 return 1.0 as Double;
@@ -836,7 +836,7 @@
             field: f.106002,
             check: f.103002,
             other: f.106023;
-            change other about {
+            change other value {
                 if(check.value=="dočasná")
                     return field.value as Double;
                 return 1.0 as Double;
@@ -852,7 +852,7 @@
             ppc: f.203006,
             bic: f.201017,
             sum: f.306001;
-            change sum about {
+            change sum value {
                 return ((field.value*field2.value*excess.value*ppc.value*bic.value*loc.value)/1000.0) as Double;
             }
             <!--@formatter:on-->
@@ -866,7 +866,7 @@
             <!--@formatter:off-->
             field: f.this,
             coeff: f.203004;
-            change coeff about {
+            change coeff value {
             if (field.value)
             return 0.97 as Double;
             return 1.0 as Double;
@@ -877,7 +877,7 @@
             <!--@formatter:off-->
              field: f.this,
              check: f.108005;
-             change check about {
+             change check value {
                 return field.value;
                 }
             <!--@formatter:on-->
@@ -892,7 +892,7 @@
             <!--@formatter:off-->
             field: f.this,
             coeff: f.203005;
-            change coeff about {
+            change coeff value {
             if (field.value)
             return 0.97 as Double;
             return 1.0 as Double;
@@ -911,7 +911,7 @@
             field: f.this,
             coeff1: f.204002,
             coeff: f.204003;
-            change coeff about {
+            change coeff value {
             if (field.value=="Slovenská republika")
                 return 1.0*coeff1.value as Double;
              if (field.value=="Európa")
@@ -925,7 +925,7 @@
             coeff: f.204003,
             excess: f.208002,
             sum: f.308009;
-            change sum about {
+            change sum value {
                 def n = field.value.getDefaultValue().replaceAll("[,€ ]","") as Double;
                 return ((n*coeff.value*excess.value)/1000.0) as Double;
             }
@@ -945,7 +945,7 @@
             field: f.this,
             location: f.301002,
             coeff: f.205002;
-            change coeff about {
+            change coeff value {
             if (location.value=="L5")
             return 850*field.value as Double;
             if (location.value=="L4")
@@ -965,7 +965,7 @@
             p2: f.105002,
             p3: f.105003,
             field: f.305001;
-            change field about {
+            change field value {
             return p1.value+p2.value+p3.value as Double;
             }
         <!--@formatter:on-->
@@ -983,7 +983,7 @@
             field: f.this,
             location: f.301002,
             coeff: f.205003;
-            change coeff about {
+            change coeff value {
             if (location.value=="L5")
             return 1400*field.value as Double;
             if (location.value=="L4")
@@ -1003,7 +1003,7 @@
             p2: f.105002,
             p3: f.105003,
             field: f.305001;
-            change field about {
+            change field value {
             return p1.value+p2.value+p3.value as Double;
             }
         <!--@formatter:on-->
@@ -1022,7 +1022,7 @@
             field: f.this,
             location: f.301002,
             coeff: f.205004;
-            change coeff about {
+            change coeff value {
             if (location.value=="L5")
             return 1200*field.value as Double;
             if (location.value=="L4")
@@ -1042,7 +1042,7 @@
             p2: f.105002,
             p3: f.105003,
             field: f.305001;
-            change field about {
+            change field value {
             return p1.value+p2.value+p3.value as Double;
             }
         <!--@formatter:on-->
@@ -1060,7 +1060,7 @@
             field: f.this,
             location: f.301002,
             coeff: f.105007;
-            change coeff about {
+            change coeff value {
              if (location.value=="L5")
             return 850*field.value as Double;
             if (location.value=="L4")
@@ -1081,7 +1081,7 @@
                     <!--exces: f.208001,-->
                     <!--coeff: f.208003,-->
                     <!--other: f.305003;-->
-                    <!--change other about {-->
+                    <!--change other value {-->
                     <!--return ((field.value*coeff.value*exces.value)/1000.0) as Double;-->
                     <!--}-->
                     <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
@@ -1102,7 +1102,7 @@
             p2: f.205003,
             p3: f.205004,
             field: f.105006;
-            change field about {
+            change field value {
                 if (check.value != "byt")
                     return p1.value+p2.value+p3.value as Double;
                 if (location.value=="L5")
@@ -1123,7 +1123,7 @@
             field: f.this,
             location: f.301002,
             coeff: f.205001;
-            change coeff about {
+            change coeff value {
             if (location.value=="L5")
             return 1900*field.value as Double;
             if (location.value=="L4")
@@ -1160,7 +1160,7 @@
             field: f.this,
             check: f.410001,
             other: f.106003;
-            change other about {
+            change other value {
                 if (check.value == "Nehnutelnost a domacnost" )
                     return field.value as Double;
                 return other.value as Double;
@@ -1172,7 +1172,7 @@
             f1: f.305001,
             f2: f.106003,
             other: f.308005;
-            change other about {
+            change other value {
                 return Boolean.logicalAnd(f1.value != 0.0, f2.value != 0.0);
             }
             <!--@formatter:on-->
@@ -1252,35 +1252,35 @@
             <!--@formatter:off-->
             field: f.this,
             other: f.105007;
-            change other about { null; }
+            change other value { null; }
         <!--@formatter:on-->
         </action>
         <action id="91" trigger="set">
             <!--@formatter:off-->
             field: f.this,
             other: f.305003;
-            change other about { null; }
+            change other value { null; }
         <!--@formatter:on-->
         </action>
         <action id="92" trigger="set">
             <!--@formatter:off-->
             field: f.this,
             other: f.105008;
-            change other about { null; }
+            change other value { null; }
         <!--@formatter:on-->
         </action>
         <action id="93" trigger="set">
             <!--@formatter:off-->
             field: f.this,
             other: f.305019;
-            change other about { null; }
+            change other value { null; }
         <!--@formatter:on-->
         </action>
         <action id="94" trigger="set">
             <!--@formatter:off-->
             field: f.this,
             other: f.105004;
-            change other about { null; }
+            change other value { null; }
         <!--@formatter:on-->
         </action>
     </data>
@@ -1294,7 +1294,7 @@
             <!--@formatter:off-->
             field: f.this,
             sum: f.305019;
-            change sum about {
+            change sum value {
             return field.value as Double;
             }
         <!--@formatter:on-->
@@ -1312,7 +1312,7 @@
                     exces: f.208001,
                     coeff: f.208003,
                     other: f.305003;
-                    change other about {
+                    change other value {
                     return ((field.value*coeff.value*exces.value)/1000.0) as Double;
                     }
                     <!--@formatter:on-->
@@ -1340,7 +1340,7 @@
             c14: f.305015,
             c15: f.305016,
             sum: f.308001;
-            change sum about {
+            change sum value {
             return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
             }
         <!--@formatter:on-->
@@ -1354,7 +1354,7 @@
             <!--@formatter:off-->
             field: f.this,
             coeff: f.208003;
-            change coeff about {
+            change coeff value {
             if (field.value)
             return 1.0 as Double;
             return 1.1 as Double;
@@ -1368,7 +1368,7 @@
                     exces: f.208001,
                     coeff: f.208003,
                     other: f.305003;
-                    change other about {
+                    change other value {
                     return ((field.value*coeff.value*exces.value)/1000.0) as Double;
                     }
                     <!--@formatter:on-->
@@ -1381,7 +1381,7 @@
             <!--@formatter:off-->
             field: f.this,
             coeff: f.205007;
-            change coeff about {
+            change coeff value {
             if (field.value)
             return 1.0 as Double;
             return 0 as Double;
@@ -1435,14 +1435,14 @@
             <!--@formatter:off-->
             field: f.this,
             other: f.105010;
-            change other about { null; }
+            change other value { null; }
         <!--@formatter:on-->
         </action>
         <action id="107" trigger="set">
             <!--@formatter:off-->
             field: f.this,
             other: f.305004;
-            change other about { null; }
+            change other value { null; }
         <!--@formatter:on-->
         </action>
     </data>
@@ -1457,7 +1457,7 @@
             coeff: f.205007,
             excess: f.208001,
             sum: f.305004;
-            change sum about {
+            change sum value {
             return ((field.value*coeff.value*excess.value)/1000.0) as Double;
             }
         <!--@formatter:on-->
@@ -1476,7 +1476,7 @@
             c10: f.105028,
             c11: f.105030,
             sum: f.305017;
-            change sum about {
+            change sum value {
             return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value;
             }
         <!--@formatter:on-->
@@ -1504,7 +1504,7 @@
             c14: f.305015,
             c15: f.305016,
             sum: f.308001;
-            change sum about {
+            change sum value {
             return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
             }
         <!--@formatter:on-->
@@ -1523,7 +1523,7 @@
             c10: f.305013,
             c11: f.305014,
             sum: f.305018;
-            change sum about {
+            change sum value {
             return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value;
             }
         <!--@formatter:on-->
@@ -1536,7 +1536,7 @@
             <!--@formatter:off-->
             field: f.this,
             coeff: f.205008;
-            change coeff about {
+            change coeff value {
             if (field.value)
             return 1.0 as Double;
             return 0 as Double;
@@ -1582,14 +1582,14 @@
             <!--@formatter:off-->
             field: f.this,
             other: f.105012;
-            change other about { null; }
+            change other value { null; }
         <!--@formatter:on-->
         </action>
         <action id="118" trigger="set">
             <!--@formatter:off-->
             field: f.this,
             other: f.305005;
-            change other about { null; }
+            change other value { null; }
         <!--@formatter:on-->
         </action>
     </data>
@@ -1604,7 +1604,7 @@
             coeff: f.205008,
             excess: f.208001,
             sum: f.305005;
-            change sum about {
+            change sum value {
             return ((field.value*coeff.value*excess.value)/1000.0) as Double;
             }
         <!--@formatter:on-->
@@ -1623,7 +1623,7 @@
             c10: f.105028,
             c11: f.105030,
             sum: f.305017;
-            change sum about {
+            change sum value {
             return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value;
             }
         <!--@formatter:on-->
@@ -1651,7 +1651,7 @@
             c14: f.305015,
             c15: f.305016,
             sum: f.308001;
-            change sum about {
+            change sum value {
             return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
             }
         <!--@formatter:on-->
@@ -1670,7 +1670,7 @@
             c10: f.305013,
             c11: f.305014,
             sum: f.305018;
-            change sum about {
+            change sum value {
             return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value;
             }
         <!--@formatter:on-->
@@ -1683,7 +1683,7 @@
             <!--@formatter:off-->
             field: f.this,
             coeff: f.205009;
-            change coeff about {
+            change coeff value {
             if (field.value)
             return 1.0 as Double;
             return 0 as Double;
@@ -1703,7 +1703,7 @@
             coeff: f.205009,
             excess: f.208001,
             sum: f.305006;
-            change sum about {
+            change sum value {
             return ((field.value*coeff.value*excess.value)/1000.0) as Double;
             }
         <!--@formatter:on-->
@@ -1722,7 +1722,7 @@
             c10: f.105028,
             c11: f.105030,
             sum: f.305017;
-            change sum about {
+            change sum value {
             return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value;
             }
         <!--@formatter:on-->
@@ -1750,7 +1750,7 @@
             c14: f.305015,
             c15: f.305016,
             sum: f.308001;
-            change sum about {
+            change sum value {
             return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
             }
         <!--@formatter:on-->
@@ -1769,7 +1769,7 @@
             c10: f.305013,
             c11: f.305014,
             sum: f.305018;
-            change sum about {
+            change sum value {
             return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value;
             }
         <!--@formatter:on-->
@@ -1782,7 +1782,7 @@
             <!--@formatter:off-->
             field: f.this,
             coeff: f.205010;
-            change coeff about {
+            change coeff value {
             if (field.value)
             return 1.0 as Double;
             return 0 as Double;
@@ -1801,7 +1801,7 @@
             coeff: f.205010,
             excess: f.208001,
             sum: f.305007;
-            change sum about {
+            change sum value {
             return ((field.value*coeff.value*excess.value)/1000.0) as Double;
             }
         <!--@formatter:on-->
@@ -1820,7 +1820,7 @@
             c10: f.105028,
             c11: f.105030,
             sum: f.305017;
-            change sum about {
+            change sum value {
             return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value;
             }
         <!--@formatter:on-->
@@ -1848,7 +1848,7 @@
             c14: f.305015,
             c15: f.305016,
             sum: f.308001;
-            change sum about {
+            change sum value {
             return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
             }
         <!--@formatter:on-->
@@ -1867,7 +1867,7 @@
             c10: f.305013,
             c11: f.305014,
             sum: f.305018;
-            change sum about {
+            change sum value {
             return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value;
             }
         <!--@formatter:on-->
@@ -1880,7 +1880,7 @@
             <!--@formatter:off-->
             field: f.this,
             coeff: f.205011;
-            change coeff about {
+            change coeff value {
                 if (field.value)
                     return 1.0 as Double;
                 return 0 as Double;
@@ -1899,7 +1899,7 @@
             coeff: f.205011,
             excess: f.208001,
             sum: f.305008;
-            change sum about {
+            change sum value {
             return ((field.value*coeff.value*excess.value)/1000.0) as Double;
             }
         <!--@formatter:on-->
@@ -1918,7 +1918,7 @@
             c10: f.105028,
             c11: f.105030,
             sum: f.305017;
-            change sum about {
+            change sum value {
             return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value;
             }
         <!--@formatter:on-->
@@ -1946,7 +1946,7 @@
             c14: f.305015,
             c15: f.305016,
             sum: f.308001;
-            change sum about {
+            change sum value {
             return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
             }
         <!--@formatter:on-->
@@ -1965,7 +1965,7 @@
             c10: f.305013,
             c11: f.305014,
             sum: f.305018;
-            change sum about {
+            change sum value {
             return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value;
             }
         <!--@formatter:on-->
@@ -1978,7 +1978,7 @@
             <!--@formatter:off-->
             field: f.this,
             coeff: f.205012;
-            change coeff about {
+            change coeff value {
             if (field.value)
             return 1.0 as Double;
             return 0 as Double;
@@ -1997,7 +1997,7 @@
             coeff: f.205012,
             excess: f.208001,
             sum: f.305009;
-            change sum about {
+            change sum value {
             return ((field.value*coeff.value*excess.value)/1000.0) as Double;
             }
         <!--@formatter:on-->
@@ -2016,7 +2016,7 @@
             c10: f.105028,
             c11: f.105030,
             sum: f.305017;
-            change sum about {
+            change sum value {
             return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value;
             }
         <!--@formatter:on-->
@@ -2044,7 +2044,7 @@
             c14: f.305015,
             c15: f.305016,
             sum: f.308001;
-            change sum about {
+            change sum value {
             return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
             }
         <!--@formatter:on-->
@@ -2063,7 +2063,7 @@
             c10: f.305013,
             c11: f.305014,
             sum: f.305018;
-            change sum about {
+            change sum value {
             return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value;
             }
         <!--@formatter:on-->
@@ -2076,7 +2076,7 @@
             <!--@formatter:off-->
             field: f.this,
             coeff: f.205013;
-            change coeff about {
+            change coeff value {
             if (field.value)
             return 1.0 as Double;
             return 0 as Double;
@@ -2095,7 +2095,7 @@
             coeff: f.205013,
             excess: f.208001,
             sum: f.305010;
-            change sum about {
+            change sum value {
             return ((field.value*coeff.value*excess.value)/1000.0) as Double;
             }
         <!--@formatter:on-->
@@ -2114,7 +2114,7 @@
             c10: f.105028,
             c11: f.105030,
             sum: f.305017;
-            change sum about {
+            change sum value {
             return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value;
             }
         <!--@formatter:on-->
@@ -2142,7 +2142,7 @@
             c14: f.305015,
             c15: f.305016,
             sum: f.308001;
-            change sum about {
+            change sum value {
             return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
             }
         <!--@formatter:on-->
@@ -2161,7 +2161,7 @@
             c10: f.305013,
             c11: f.305014,
             sum: f.305018;
-            change sum about {
+            change sum value {
             return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value;
             }
         <!--@formatter:on-->
@@ -2174,7 +2174,7 @@
             <!--@formatter:off-->
             field: f.this,
             coeff: f.205014;
-            change coeff about {
+            change coeff value {
             if (field.value)
             return 1.0 as Double;
             return 0 as Double;
@@ -2193,7 +2193,7 @@
             coeff: f.205014,
             excess: f.208001,
             sum: f.305011;
-            change sum about {
+            change sum value {
             return ((field.value*coeff.value*excess.value)/1000.0) as Double;
             }
         <!--@formatter:on-->
@@ -2212,7 +2212,7 @@
             c10: f.105028,
             c11: f.105030,
             sum: f.305017;
-            change sum about {
+            change sum value {
             return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value;
             }
         <!--@formatter:on-->
@@ -2240,7 +2240,7 @@
             c14: f.305015,
             c15: f.305016,
             sum: f.308001;
-            change sum about {
+            change sum value {
             return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
             }
         <!--@formatter:on-->
@@ -2259,7 +2259,7 @@
             c10: f.305013,
             c11: f.305014,
             sum: f.305018;
-            change sum about {
+            change sum value {
             return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value;
             }
         <!--@formatter:on-->
@@ -2272,7 +2272,7 @@
             <!--@formatter:off-->
             field: f.this,
             coeff: f.205015;
-            change coeff about {
+            change coeff value {
             if (field.value)
             return 1.0 as Double;
             return 0 as Double;
@@ -2291,7 +2291,7 @@
             coeff: f.205015,
             excess: f.208001,
             sum: f.305012;
-            change sum about {
+            change sum value {
             return ((field.value*coeff.value*excess.value)/1000.0) as Double;
             }
         <!--@formatter:on-->
@@ -2310,7 +2310,7 @@
             c10: f.105028,
             c11: f.105030,
             sum: f.305017;
-            change sum about {
+            change sum value {
             return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value;
             }
         <!--@formatter:on-->
@@ -2338,7 +2338,7 @@
             c14: f.305015,
             c15: f.305016,
             sum: f.308001;
-            change sum about {
+            change sum value {
             return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
             }
         <!--@formatter:on-->
@@ -2357,7 +2357,7 @@
             c10: f.305013,
             c11: f.305014,
             sum: f.305018;
-            change sum about {
+            change sum value {
             return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value;
             }
         <!--@formatter:on-->
@@ -2370,7 +2370,7 @@
             <!--@formatter:off-->
             field: f.this,
             coeff: f.205016;
-            change coeff about {
+            change coeff value {
             if (field.value)
             return 1.0 as Double;
             return 0 as Double;
@@ -2389,7 +2389,7 @@
             coeff: f.205016,
             excess: f.208001,
             sum: f.305013;
-            change sum about {
+            change sum value {
             return ((field.value*coeff.value*excess.value)/1000.0) as Double;
             }
         <!--@formatter:on-->
@@ -2408,7 +2408,7 @@
             c10: f.105028,
             c11: f.105030,
             sum: f.305017;
-            change sum about {
+            change sum value {
             return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value;
             }
         <!--@formatter:on-->
@@ -2436,7 +2436,7 @@
             c14: f.305015,
             c15: f.305016,
             sum: f.308001;
-            change sum about {
+            change sum value {
             return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
             }
         <!--@formatter:on-->
@@ -2455,7 +2455,7 @@
             c10: f.305013,
             c11: f.305014,
             sum: f.305018;
-            change sum about {
+            change sum value {
             return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value;
             }
         <!--@formatter:on-->
@@ -2468,7 +2468,7 @@
             <!--@formatter:off-->
             field: f.this,
             coeff: f.205017;
-            change coeff about {
+            change coeff value {
             if (field.value)
             return 1.0 as Double;
             return 0 as Double;
@@ -2487,7 +2487,7 @@
             coeff: f.205017,
             excess: f.208001,
             sum: f.305014;
-            change sum about {
+            change sum value {
             return ((field.value*coeff.value*excess.value)/1000.0) as Double;
             }
         <!--@formatter:on-->
@@ -2506,7 +2506,7 @@
             c10: f.105028,
             c11: f.105030,
             sum: f.305017;
-            change sum about {
+            change sum value {
             return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value;
             }
         <!--@formatter:on-->
@@ -2534,7 +2534,7 @@
             c14: f.305015,
             c15: f.305016,
             sum: f.308001;
-            change sum about {
+            change sum value {
             return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
             }
         <!--@formatter:on-->
@@ -2553,7 +2553,7 @@
             c10: f.305013,
             c11: f.305014,
             sum: f.305018;
-            change sum about {
+            change sum value {
             return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value;
             }
         <!--@formatter:on-->
@@ -2585,7 +2585,7 @@
             coeff: f.205018,
             excess: f.208001,
             sum: f.305015;
-            change sum about {
+            change sum value {
             return ((field.value*coeff.value*excess.value)/1000.0) as Double;
             }
         <!--@formatter:on-->
@@ -2613,7 +2613,7 @@
             c14: f.305015,
             c15: f.305016,
             sum: f.308001;
-            change sum about {
+            change sum value {
             return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
             }
         <!--@formatter:on-->
@@ -2634,7 +2634,7 @@
             coeff: f.205019,
             excess: f.208001,
             sum: f.305016;
-            change sum about {
+            change sum value {
             return ((field.value*coeff.value*excess.value)/1000.0) as Double;
             }
         <!--@formatter:on-->
@@ -2662,7 +2662,7 @@
             c14: f.305015,
             c15: f.305016,
             sum: f.308001;
-            change sum about {
+            change sum value {
             return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
             }
         <!--@formatter:on-->
@@ -2681,7 +2681,7 @@
             <!--@formatter:off-->
         field: f.this,
         coeff: f.208002;
-        change coeff about {
+        change coeff value {
         if (field.value=="0.00 €")
         return 1.1 as Double;
         if (field.value=="50.00 €")
@@ -2700,7 +2700,7 @@
             ppc: f.203006,
             bic: f.201017,
             sum: f.306001;
-            change sum about {
+            change sum value {
                 return ((field2.value*field.value*excess.value*ppc.value*bic.value*loc.value)/1000.0) as Double;
             }
             <!--@formatter:on-->
@@ -2765,7 +2765,7 @@
             field: f.106002,
             check: f.103002,
             other: f.106022;
-            change other about {
+            change other value {
                 if (check.value=="trvalá")
                     return field.value as Double;
                 return 1.0 as Double;
@@ -2777,7 +2777,7 @@
             field: f.106002,
             check: f.103002,
             other: f.106023;
-            change other about {
+            change other value {
                 if(check.value=="dočasná")
                     return field.value as Double;
                 return 1.0 as Double;
@@ -2800,7 +2800,7 @@
             ppc: f.203006,
             bic: f.201017,
             sum: f.306001;
-            change sum about {
+            change sum value {
                 return ((field.value*field2.value*excess.value*ppc.value*bic.value*loc.value)/1000.0) as Double;
             }
             <!--@formatter:on-->
@@ -2821,7 +2821,7 @@
             ppc: f.203006,
             bic: f.201017,
             sum: f.306001;
-            change sum about {
+            change sum value {
                 return ((field.value*field2.value*excess.value*ppc.value*bic.value*loc.value)/1000.0) as Double;
             }
             <!--@formatter:on-->
@@ -2844,7 +2844,7 @@
             c9: f.306009,
             c10: f.306010,
             sum: f.308002;
-            change sum about {
+            change sum value {
                 return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value;
             }
         <!--@formatter:on-->
@@ -2861,7 +2861,7 @@
             <!--field: f.this,-->
             <!--location: f.301002,-->
             <!--coeff: f.106002;-->
-            <!--change coeff about {-->
+            <!--change coeff value {-->
                 <!--if (location.value=="L5")-->
                     <!--return 1900*field.value as Double;-->
                 <!--if (location.value=="L4")-->
@@ -2879,7 +2879,7 @@
             <!--@formatter:off-->
             field: f.this,
             coeff: f.106002;
-            change coeff about {
+            change coeff value {
                 if (field.value &gt; 100)
                     return 25000 + (field.value - 100) * 100  as Double;
                 return 250*field.value as Double;
@@ -2891,7 +2891,7 @@
             f1: f.305001,
             f2: f.106003,
             other: f.308005;
-            change other about {
+            change other value {
                 return Boolean.logicalAnd(f1.value != 0.0, f2.value != 0.0);
             }
             <!--@formatter:on-->
@@ -2919,7 +2919,7 @@
             c8: f.106019,
             c9: f.106021,
             sum: f.106024;
-            change sum about {
+            change sum value {
             return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value;
             }
         <!--@formatter:on-->
@@ -2942,7 +2942,7 @@
             c9: f.306009,
             c10: f.306010,
             sum: f.308002;
-            change sum about {
+            change sum value {
             return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value;
             }
         <!--@formatter:on-->
@@ -2959,7 +2959,7 @@
             c8: f.306009,
             c9: f.306010,
             sum: f.106025;
-            change sum about {
+            change sum value {
             return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value;
             }
         <!--@formatter:on-->
@@ -2986,7 +2986,7 @@
             c8: f.106019,
             c9: f.106021,
             sum: f.106024;
-            change sum about {
+            change sum value {
             return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value;
             }
         <!--@formatter:on-->
@@ -3009,7 +3009,7 @@
             c9: f.306009,
             c10: f.306010,
             sum: f.308002;
-            change sum about {
+            change sum value {
            return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value;
             }
         <!--@formatter:on-->
@@ -3026,7 +3026,7 @@
             c8: f.306009,
             c9: f.306010,
             sum: f.106025;
-            change sum about {
+            change sum value {
             return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value;
             }
         <!--@formatter:on-->
@@ -3053,7 +3053,7 @@
             c8: f.106019,
             c9: f.106021,
             sum: f.106024;
-            change sum about {
+            change sum value {
             return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value;
             }
         <!--@formatter:on-->
@@ -3076,7 +3076,7 @@
             c9: f.306009,
             c10: f.306010,
             sum: f.308002;
-            change sum about {
+            change sum value {
            return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value;
             }
         <!--@formatter:on-->
@@ -3093,7 +3093,7 @@
             c8: f.306009,
             c9: f.306010,
             sum: f.106025;
-            change sum about {
+            change sum value {
             return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value;
             }
         <!--@formatter:on-->
@@ -3120,7 +3120,7 @@
             c8: f.106019,
             c9: f.106021,
             sum: f.106024;
-            change sum about {
+            change sum value {
             return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value;
             }
         <!--@formatter:on-->
@@ -3143,7 +3143,7 @@
             c9: f.306009,
             c10: f.306010,
             sum: f.308002;
-            change sum about {
+            change sum value {
             return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value;
             }
         <!--@formatter:on-->
@@ -3160,7 +3160,7 @@
             c8: f.306009,
             c9: f.306010,
             sum: f.106025;
-            change sum about {
+            change sum value {
             return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value;
             }
         <!--@formatter:on-->
@@ -3187,7 +3187,7 @@
             c8: f.106019,
             c9: f.106021,
             sum: f.106024;
-            change sum about {
+            change sum value {
             return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value;
             }
         <!--@formatter:on-->
@@ -3210,7 +3210,7 @@
             c9: f.306009,
             c10: f.306010,
             sum: f.308002;
-            change sum about {
+            change sum value {
            return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value;
             }
         <!--@formatter:on-->
@@ -3227,7 +3227,7 @@
             c8: f.306009,
             c9: f.306010,
             sum: f.106025;
-            change sum about {
+            change sum value {
             return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value;
             }
         <!--@formatter:on-->
@@ -3254,7 +3254,7 @@
             c8: f.106019,
             c9: f.106021,
             sum: f.106024;
-            change sum about {
+            change sum value {
             return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value;
             }
         <!--@formatter:on-->
@@ -3277,7 +3277,7 @@
             c9: f.306009,
             c10: f.306010,
             sum: f.308002;
-            change sum about {
+            change sum value {
            return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value;
             }
         <!--@formatter:on-->
@@ -3294,7 +3294,7 @@
             c8: f.306009,
             c9: f.306010,
             sum: f.106025;
-            change sum about {
+            change sum value {
             return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value;
             }
         <!--@formatter:on-->
@@ -3321,7 +3321,7 @@
             c8: f.106019,
             c9: f.106021,
             sum: f.106024;
-            change sum about {
+            change sum value {
             return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value;
             }
         <!--@formatter:on-->
@@ -3344,7 +3344,7 @@
             c9: f.306009,
             c10: f.306010,
             sum: f.308002;
-            change sum about {
+            change sum value {
            return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value;
             }
         <!--@formatter:on-->
@@ -3361,7 +3361,7 @@
             c8: f.306009,
             c9: f.306010,
             sum: f.106025;
-            change sum about {
+            change sum value {
             return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value;
             }
         <!--@formatter:on-->
@@ -3388,7 +3388,7 @@
             c8: f.106019,
             c9: f.106021,
             sum: f.106024;
-            change sum about {
+            change sum value {
             return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value;
             }
         <!--@formatter:on-->
@@ -3411,7 +3411,7 @@
             c9: f.306009,
             c10: f.306010,
             sum: f.308002;
-            change sum about {
+            change sum value {
           return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value;
             }
         <!--@formatter:on-->
@@ -3428,7 +3428,7 @@
             c8: f.306009,
             c9: f.306010,
             sum: f.106025;
-            change sum about {
+            change sum value {
             return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value;
             }
         <!--@formatter:on-->
@@ -3455,7 +3455,7 @@
             c8: f.106019,
             c9: f.106021,
             sum: f.106024;
-            change sum about {
+            change sum value {
             return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value;
             }
         <!--@formatter:on-->
@@ -3478,7 +3478,7 @@
             c9: f.306009,
             c10: f.306010,
             sum: f.308002;
-            change sum about {
+            change sum value {
            return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value;
             }
         <!--@formatter:on-->
@@ -3495,7 +3495,7 @@
             c8: f.306009,
             c9: f.306010,
             sum: f.106025;
-            change sum about {
+            change sum value {
             return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value;
             }
         <!--@formatter:on-->
@@ -3526,7 +3526,7 @@
             <!--@formatter:off-->
             field: f.this,
             coeff: f.204001;
-            change coeff about {
+            change coeff value {
                 if (field.value == "0.00 €")
                     return 0.0 as Double;
                 return 0.2 as Double;
@@ -3539,7 +3539,7 @@
             coeff: f.204001,
             excess: f.208001,
             sum: f.308008;
-            change sum about {
+            change sum value {
                 def n = field.value.getDefaultValue().replaceAll("[,€ ]","") as Double;
                 return ((n*coeff.value*excess.value)/1000.0) as Double;
             }
@@ -3584,7 +3584,7 @@
             <!--@formatter:off-->
             field: f.this,
             coeff: f.204002;
-            change coeff about {
+            change coeff value {
                 if (field.value == "0.00 €")
                     return 0.0 as Double;
                 return 0.2 as Double;
@@ -3597,7 +3597,7 @@
             coeff: f.204003,
             excess: f.208002,
             sum: f.308009;
-            change sum about {
+            change sum value {
                 def n = field.value.getDefaultValue().replaceAll("[,€ ]","") as Double;
                 return ((n*coeff.value*excess.value)/1000.0) as Double;
             }
@@ -3631,7 +3631,7 @@
             <!--@formatter:off-->
             check: f.this,
             other: f.104003;
-            change other about {
+            change other value {
                 if (check.value == "0.00 €")
                     return null;
                 return other.value;
@@ -3676,7 +3676,7 @@
             <!--@formatter:off-->
             field: f.this,
             other: f.308009;
-            change other about { null; }
+            change other value { null; }
         <!--@formatter:on-->
         </action>
         <action id="231" trigger="set">
@@ -3699,7 +3699,7 @@
         s2: f.308002,
         s3: f.308003,
         sum: f.308004;
-        change sum about {
+        change sum value {
             return s1.value+s2.value+s3.value as Double;
         }
     <!--@formatter:on-->
@@ -3728,7 +3728,7 @@
             c14: f.305015,
             c15: f.305016,
             sum: f.308001;
-            change sum about {
+            change sum value {
                 return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
             }
             <!--@formatter:on-->
@@ -3743,7 +3743,7 @@
             <!--@formatter:off-->
             field: f.105006,
             other: f.105036;
-            change other about {
+            change other value {
                 return field.value as Double;
             }
             <!--@formatter:on-->
@@ -3762,7 +3762,7 @@
             sadzba: f.201019,
             bic: f.201017,
             sum: f.305002;
-            change sum about {
+            change sum value {
                 return ((field.value*excess.value*hhc.value*bic.value*sadzba.value)/1000.0) as Double;
             }
             <!--@formatter:on-->
@@ -3785,7 +3785,7 @@
             c14: f.305015,
             c15: f.305016,
             sum: f.308001;
-            change sum about {
+            change sum value {
                 return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
             }
         <!--@formatter:on-->
@@ -3801,7 +3801,7 @@
         s2: f.308002,
         s3: f.308003,
         sum: f.308004;
-        change sum about {
+        change sum value {
             return s1.value+s2.value+s3.value as Double;
         }
     <!--@formatter:on-->
@@ -3816,7 +3816,7 @@
             c1: f.308008,
             c2: f.308009,
             sum: f.308003;
-            change sum about {
+            change sum value {
                 return c1.value+c2.value as Double;
             }
         <!--@formatter:on-->
@@ -3831,7 +3831,7 @@
             c1: f.308008,
             c2: f.308009,
             sum: f.308003;
-            change sum about {
+            change sum value {
                 return c1.value+c2.value as Double;
             }
         <!--@formatter:on-->
@@ -3847,7 +3847,7 @@
             s2: f.308002,
             s3: f.308003,
             sum: f.308004;
-            change sum about {
+            change sum value {
                 return s1.value+s2.value+s3.value as Double;
             }
             <!--@formatter:on-->
@@ -3866,7 +3866,7 @@
             c6: f.208007,
             c7: f.203004,
             sum: f.308006;
-            change sum about {
+            change sum value {
                 return (Math.round(100.0*c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value/4.0)/100.0)*4.0 as Double;
             }
         <!--@formatter:on-->
@@ -3883,7 +3883,7 @@
             <!--@formatter:off-->
             field: f.this,
             coeff: f.208004;
-            change coeff about {
+            change coeff value {
             if (field.value == "ročná")
             return 0.95 as Double;
             if (field.value == "polročná")
@@ -3898,7 +3898,7 @@
            check: f.108001,
             field: f.308006,
             sum: f.308010;
-            change sum about {
+            change sum value {
             if (check.value=="ročná")
                 return field.value as Double;
             if (check.value=="polročná")
@@ -3918,7 +3918,7 @@
             c6: f.208007,
             c7: f.203004,
             sum: f.308006;
-            change sum about {
+            change sum value {
                 return (Math.round(100.0*c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value/4.0)/100.0)*4.0 as Double;
             }
         <!--@formatter:on-->
@@ -3931,7 +3931,7 @@
             <!--@formatter:off-->
             field: f.this,
             coeff: f.208008;
-            change coeff about {
+            change coeff value {
             if (field.value)
             return 0.95 as Double;
             return 1.0 as Double;
@@ -3948,7 +3948,7 @@
             c6: f.208007,
             c7: f.203004,
             sum: f.308006;
-            change sum about {
+            change sum value {
                 return (Math.round(100.0*c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value/4.0)/100.0)*4.0 as Double;
             }
         <!--@formatter:on-->
@@ -3961,7 +3961,7 @@
             <!--@formatter:off-->
             field: f.this,
             coeff: f.208005;
-            change coeff about {
+            change coeff value {
             if (field.value)
             return 0.95 as Double;
             return 1.0 as Double;
@@ -3978,7 +3978,7 @@
             c6: f.208007,
             c7: f.203004,
             sum: f.308006;
-            change sum about {
+            change sum value {
                 return (Math.round(100.0*c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value/4.0)/100.0)*4.0 as Double;
             }
         <!--@formatter:on-->
@@ -4003,7 +4003,7 @@
             <!--@formatter:off-->
             field: f.this,
             coeff: f.208006;
-            change coeff about {
+            change coeff value {
             if (field.value=="0%")
             return 1.0 as Double;
             if (field.value=="5%")
@@ -4029,7 +4029,7 @@
             c6: f.208007,
             c7: f.203004,
             sum: f.308006;
-            change sum about {
+            change sum value {
                 return (Math.round(100.0*c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value/4.0)/100.0)*4.0 as Double;
             }
         <!--@formatter:on-->
@@ -4042,7 +4042,7 @@
             <!--@formatter:off-->
             field: f.this,
             coeff: f.208007;
-            change coeff about {
+            change coeff value {
             if (field.value)
             return 0.9 as Double;
             return 1.0 as Double;
@@ -4059,7 +4059,7 @@
             c6: f.208007,
             c7: f.203004,
             sum: f.308006;
-            change sum about {
+            change sum value {
                 return (Math.round(100.0*c1.value*c2.value*c3.value*c4.value*c5.value*c6.value*c7.value/4.0)/100.0)*4.0 as Double;
             }
         <!--@formatter:on-->
@@ -4073,7 +4073,7 @@
            check: f.108001,
             field: f.308006,
             sum: f.308010;
-            change sum about {
+            change sum value {
             if (check.value=="ročná")
                 return field.value as Double;
             if (check.value=="polročná")
@@ -4107,7 +4107,7 @@
             c14: f.201014,
             c16: f.201016,
             sum: f.201017;
-            change sum about {
+            change sum value {
             return c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c12.value*c14.value*c16.value;
             }
         <!--@formatter:on-->
@@ -4140,7 +4140,7 @@
             c14: f.201014,
             c16: f.201016,
             sum: f.201017;
-            change sum about {
+            change sum value {
             return c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c12.value*c14.value*c16.value;
             }
         <!--@formatter:on-->
@@ -4163,7 +4163,7 @@
             c14: f.201014,
             c16: f.201016,
             sum: f.201017;
-            change sum about {
+            change sum value {
             return c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c12.value*c14.value*c16.value;
             }
         <!--@formatter:on-->
@@ -4186,7 +4186,7 @@
             c14: f.201014,
             c16: f.201016,
             sum: f.201017;
-            change sum about {
+            change sum value {
             return c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c12.value*c14.value*c16.value;
             }
         <!--@formatter:on-->
@@ -4209,7 +4209,7 @@
             c14: f.201014,
             c16: f.201016,
             sum: f.201017;
-            change sum about {
+            change sum value {
             return c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c12.value*c14.value*c16.value;
             }
         <!--@formatter:on-->
@@ -4232,7 +4232,7 @@
             c14: f.201014,
             c16: f.201016,
             sum: f.201017;
-            change sum about {
+            change sum value {
             return c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c12.value*c14.value*c16.value;
             }
         <!--@formatter:on-->
@@ -4255,7 +4255,7 @@
             c14: f.201014,
             c16: f.201016,
             sum: f.201017;
-            change sum about {
+            change sum value {
             return c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c12.value*c14.value*c16.value;
             }
         <!--@formatter:on-->
@@ -4278,7 +4278,7 @@
             c14: f.201014,
             c16: f.201016,
             sum: f.201017;
-            change sum about {
+            change sum value {
             return c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c12.value*c14.value*c16.value;
             }
         <!--@formatter:on-->
@@ -4301,7 +4301,7 @@
             c14: f.201014,
             c16: f.201016,
             sum: f.201017;
-            change sum about {
+            change sum value {
             return c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c12.value*c14.value*c16.value;
             }
         <!--@formatter:on-->
@@ -4324,7 +4324,7 @@
             c14: f.201014,
             c16: f.201016,
             sum: f.201017;
-            change sum about {
+            change sum value {
             return c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c12.value*c14.value*c16.value;
             }
         <!--@formatter:on-->
@@ -4348,7 +4348,7 @@
             c14: f.201014,
             c16: f.201016,
             sum: f.201017;
-            change sum about {
+            change sum value {
             return c2.value*c3.value*c4.value*c5.value*c6.value*c7.value*c8.value*c12.value*c14.value*c16.value;
             }
         <!--@formatter:on-->
@@ -4366,7 +4366,7 @@
             sadzba: f.201019,
             bic: f.201017,
             sum: f.305002;
-            change sum about {
+            change sum value {
                 return ((field.value*excess.value*hhc.value*bic.value*sadzba.value)/1000.0) as Double;
             }
             <!--@formatter:on-->
@@ -4380,7 +4380,7 @@
             ppc: f.203006,
             bic: f.201017,
             sum: f.306001;
-            change sum about {
+            change sum value {
                 return ((field.value*field2.value*excess.value*ppc.value*bic.value*loc.value)/1000.0) as Double;
             }
             <!--@formatter:on-->
@@ -4405,7 +4405,7 @@
             c6: f.202006,
             c7: f.202007,
             sum: f.202009;
-            change sum about {
+            change sum value {
                 return c1.value*c2.value*c3.value*c4.value*c6.value*c7.value;
             }
         <!--@formatter:on-->
@@ -4424,7 +4424,7 @@
             c6: f.202006,
             c7: f.202007,
             sum: f.202009;
-            change sum about {
+            change sum value {
                 return c1.value*c2.value*c3.value*c4.value*c6.value*c7.value;
             }
         <!--@formatter:on-->
@@ -4443,7 +4443,7 @@
             c6: f.202006,
             c7: f.202007,
             sum: f.202009;
-            change sum about {
+            change sum value {
                 return c1.value*c2.value*c3.value*c4.value*c6.value*c7.value;
             }
         <!--@formatter:on-->
@@ -4462,7 +4462,7 @@
             c6: f.202006,
             c7: f.202007,
             sum: f.202009;
-            change sum about {
+            change sum value {
                 return c1.value*c2.value*c3.value*c4.value*c6.value*c7.value;
             }
         <!--@formatter:on-->
@@ -4481,7 +4481,7 @@
             c6: f.202006,
             c7: f.202007,
             sum: f.202009;
-            change sum about {
+            change sum value {
                 return c1.value*c2.value*c3.value*c4.value*c6.value*c7.value;
             }
         <!--@formatter:on-->
@@ -4500,7 +4500,7 @@
             c6: f.202006,
             c7: f.202007,
             sum: f.202009;
-            change sum about {
+            change sum value {
                 return c1.value*c2.value*c3.value*c4.value*c6.value*c7.value;
             }
         <!--@formatter:on-->
@@ -4518,7 +4518,7 @@
             sadzba: f.201019,
             bic: f.201017,
             sum: f.305002;
-            change sum about {
+            change sum value {
                 return ((field.value*excess.value*hhc.value*bic.value*sadzba.value)/1000.0) as Double;
             }
             <!--@formatter:on-->
@@ -4538,7 +4538,7 @@
             ppc: f.203006,
             bic: f.201017,
             sum: f.306001;
-            change sum about {
+            change sum value {
                 return ((field.value*field2.value*excess.value*ppc.value*bic.value*loc.value)/1000.0) as Double;
             }
             <!--@formatter:on-->
@@ -4554,7 +4554,7 @@
             c2: f.203002,
             c5: f.203005,
             sum: f.203006;
-            change sum about {
+            change sum value {
             return c1.value*c2.value*c5.value;
             }
         <!--@formatter:on-->
@@ -4570,7 +4570,7 @@
             c2: f.203002,
             c5: f.203005,
             sum: f.203006;
-            change sum about {
+            change sum value {
             return c1.value*c2.value*c5.value;
             }
         <!--@formatter:on-->
@@ -4587,7 +4587,7 @@
             <!--c4: f.203004,-->
             <!--c5: f.203005,-->
             <!--sum: f.203006;-->
-            <!--change sum about {-->
+            <!--change sum value {-->
             <!--return c1.value*c2.value*c4.value*c5.value;-->
             <!--}-->
         <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
@@ -4605,7 +4605,7 @@
             c2: f.203002,
             c5: f.203005,
             sum: f.203006;
-            change sum about {
+            change sum value {
             return c1.value*c2.value*c5.value;
             }
         <!--@formatter:on-->
@@ -4624,7 +4624,7 @@
             ppc: f.203006,
             bic: f.201017,
             sum: f.306001;
-            change sum about {
+            change sum value {
                 return ((field.value*field2.value*excess.value*ppc.value*bic.value*loc.value)/1000.0) as Double;
             }
             <!--@formatter:on-->
@@ -4689,7 +4689,7 @@
             sadzba: f.201019,
             bic: f.201017,
             sum: f.305002;
-            change sum about {
+            change sum value {
                 return ((field.value*excess.value*hhc.value*bic.value*sadzba.value)/1000.0) as Double;
             }
             <!--@formatter:on-->
@@ -4712,7 +4712,7 @@
             c14: f.305015,
             c15: f.305016,
             sum: f.308001;
-            change sum about {
+            change sum value {
                 return c1.value+c2.value+c3.value+c4.value+c5.value+c6.value+c7.value+c8.value+c9.value+c10.value+c11.value+c12.value+c13.value+c14.value+c15.value;
             }
             <!--@formatter:on-->
@@ -4861,7 +4861,7 @@
             <!--@formatter:off-->
             field: f.this,
             other: f.308007;
-            change other about {
+            change other value {
                 return field.value;
             }
             <!--@formatter:on-->
@@ -5025,7 +5025,7 @@
             <!--@formatter:off-->
             field: f.this,
             other: f.109065;
-            change other about { return null; }
+            change other value { return null; }
             <!--@formatter:off-->
         </action>
     </data>
@@ -5057,7 +5057,7 @@
             field: f.109020,
             f_1: f.109007,
             f_2: f.109021;
-            change f_2 about {
+            change f_2 value {
                 if (field.value == false)
                     return f_1.value as String;
                 return null;
@@ -5109,7 +5109,7 @@
             <!--@formatter:off-->
             check: f.109007,
             field: f.109058;
-            change field about {
+            change field value {
                 if (check.value == "fyzická osoba")
                     return null;
                 return field.value;
@@ -5161,7 +5161,7 @@
             <!--@formatter:off-->
             check: f.109007,
             field: f.109012;
-            change field about {
+            change field value {
                 if (check.value == "fyzická osoba")
                     return null;
                 return field.value;
@@ -5205,7 +5205,7 @@
             <!--@formatter:off-->
             check: f.109007,
             field: f.109061;
-            change field about {
+            change field value {
                 if (check.value == "právnická osoba")
                     return field.value;
                 return null;
@@ -5249,7 +5249,7 @@
             <!--@formatter:off-->
             check: f.109007,
             field: f.109062;
-            change field about {
+            change field value {
                 if (check.value == "právnická osoba")
                     return field.value;
                 return null;
@@ -5266,7 +5266,7 @@
             field: f.109020,
             f_1: f.109008,
             f_2: f.109022;
-            change f_2 about {
+            change f_2 value {
                 if (field.value == false)
                     return f_1.value as String;
                 return null;
@@ -5283,7 +5283,7 @@
             field: f.109020,
             f_1: f.109009,
             f_2: f.109023;
-            change f_2 about {
+            change f_2 value {
                 if (field.value == false)
                     return f_1.value as String;
                 return null;
@@ -5300,7 +5300,7 @@
             field: f.109020,
             f_1: f.109010,
             f_2: f.109024;
-            change f_2 about {
+            change f_2 value {
                 if (field.value == false)
                     return f_1.value as String;
                 return null;
@@ -5317,7 +5317,7 @@
             field: f.109020,
             f_1: f.109011,
             f_2: f.109025;
-            change f_2 about {
+            change f_2 value {
                 if (field.value == false)
                     return f_1.value as String;
                 return null;
@@ -5334,7 +5334,7 @@
             field: f.109020,
             f_1: f.109012,
             f_2: f.109026;
-            change f_2 about {
+            change f_2 value {
                 if (field.value == false)
                     return f_1.value as String;
                 return null;
@@ -5357,7 +5357,7 @@
             field: f.109020,
             f_1: f.109013,
             f_2: f.109027;
-            change f_2 about {
+            change f_2 value {
                 if (field.value == false)
                     return f_1.value as String;
                 return null;
@@ -5374,7 +5374,7 @@
             field: f.109020,
             f_1: f.109014,
             f_2: f.109028;
-            change f_2 about {
+            change f_2 value {
                 if (field.value == false)
                     return f_1.value;
                 return f_2.value;
@@ -5391,7 +5391,7 @@
             field: f.109020,
             f_1: f.109015,
             f_2: f.109029;
-            change f_2 about {
+            change f_2 value {
                 if (field.value == false)
                     return f_1.value as String;
                 return null;
@@ -5435,7 +5435,7 @@
             field: f.109020,
             f_1: f.109016,
             f_2: f.109030;
-            change f_2 about {
+            change f_2 value {
                 if (field.value == false)
                     return f_1.value as String;
                 return null;
@@ -5452,7 +5452,7 @@
             field: f.109020,
             f_1: f.109017,
             f_2: f.109031;
-            change f_2 about {
+            change f_2 value {
                 if (field.value == false)
                     return f_1.value as String;
                 return null;
@@ -5470,7 +5470,7 @@
             field: f.109020,
             f_1: f.109018,
             f_2: f.109032;
-            change f_2 about {
+            change f_2 value {
                 if (field.value == false)
                     return f_1.value as String;
                 return null;
@@ -5488,7 +5488,7 @@
             field: f.109020,
             f_1: f.109019,
             f_2: f.109033;
-            change f_2 about {
+            change f_2 value {
                 if (field.value == false)
                     return f_1.value as String;
                 return null;
@@ -5638,7 +5638,7 @@
             field: f.109020,
             f_1: f.109007,
             f_2: f.109021;
-            change f_2 about {
+            change f_2 value {
                 if (field.value == false)
                     return f_1.value as String;
                 return null;
@@ -5650,7 +5650,7 @@
             field: f.109020,
             f_1: f.109008,
             f_2: f.109022;
-            change f_2 about {
+            change f_2 value {
                 if (field.value == false)
                     return f_1.value as String;
                 return null;
@@ -5662,7 +5662,7 @@
             field: f.109020,
             f_1: f.109009,
             f_2: f.109023;
-            change f_2 about {
+            change f_2 value {
                 if (field.value == false)
                     return f_1.value as String;
                 return null;
@@ -5674,7 +5674,7 @@
             field: f.109020,
             f_1: f.109010,
             f_2: f.109024;
-            change f_2 about {
+            change f_2 value {
                 if (field.value == false)
                     return f_1.value as String;
                 return null;
@@ -5686,7 +5686,7 @@
             field: f.109020,
             f_1: f.109011,
             f_2: f.109025;
-            change f_2 about {
+            change f_2 value {
                 if (field.value == false)
                     return f_1.value as String;
                 return null;
@@ -5698,7 +5698,7 @@
             field: f.109020,
             f_1: f.109012,
             f_2: f.109026;
-            change f_2 about {
+            change f_2 value {
                 if (field.value == false)
                     return f_1.value as String;
                 return null;
@@ -5710,7 +5710,7 @@
             field: f.109020,
             f_1: f.109013,
             f_2: f.109027;
-            change f_2 about {
+            change f_2 value {
                 if (field.value == false)
                     return f_1.value as String;
                 return null;
@@ -5722,7 +5722,7 @@
             field: f.109020,
             f_1: f.109014,
             f_2: f.109028;
-            change f_2 about {
+            change f_2 value {
                 if (field.value == false)
                     return f_1.value;
                 return f_2.value;
@@ -5734,7 +5734,7 @@
             field: f.109020,
             f_1: f.109015,
             f_2: f.109029;
-            change f_2 about {
+            change f_2 value {
                 if (field.value == false)
                     return f_1.value as String;
                 return null;
@@ -5746,7 +5746,7 @@
             field: f.109020,
             f_1: f.109016,
             f_2: f.109030;
-            change f_2 about {
+            change f_2 value {
                 if (field.value == false)
                     return f_1.value as String;
                 return null;
@@ -5758,7 +5758,7 @@
             field: f.109020,
             f_1: f.109017,
             f_2: f.109031;
-            change f_2 about {
+            change f_2 value {
                 if (field.value == false)
                     return f_1.value as String;
                 return null;
@@ -5770,7 +5770,7 @@
             field: f.109020,
             f_1: f.109018,
             f_2: f.109032;
-            change f_2 about {
+            change f_2 value {
                 if (field.value == false)
                     return f_1.value as String;
                 return null;
@@ -5782,7 +5782,7 @@
             field: f.109020,
             f_1: f.109019,
             f_2: f.109033;
-            change f_2 about {
+            change f_2 value {
                 if (field.value == false)
                     return f_1.value as String;
                 return null;
@@ -5794,7 +5794,7 @@
             field: f.109020,
             f_1: f.109058,
             f_2: f.109059;
-            change f_2 about {
+            change f_2 value {
                 if (field.value == false)
                     return f_1.value as String;
                 return null;
@@ -5806,7 +5806,7 @@
             field: f.109020,
             f_1: f.109061,
             f_2: f.109063;
-            change f_2 about {
+            change f_2 value {
                 if (field.value == false)
                     return f_1.value as String;
                 return null;
@@ -5818,7 +5818,7 @@
             field: f.109020,
             f_1: f.109062,
             f_2: f.109064;
-            change f_2 about {
+            change f_2 value {
                 if (field.value == false)
                     return f_1.value as String;
                 return null;
@@ -5932,7 +5932,7 @@
             field: f.109020,
             f_1: f.109058,
             f_2: f.109059;
-            change f_2 about {
+            change f_2 value {
                 if (field.value == false)
                     return f_1.value as String;
                 return null;
@@ -5949,7 +5949,7 @@
             field: f.109020,
             f_1: f.109061,
             f_2: f.109063;
-            change f_2 about {
+            change f_2 value {
                 if (field.value == false)
                     return f_1.value as String;
                 return null;
@@ -5966,7 +5966,7 @@
             field: f.109020,
             f_1: f.109062,
             f_2: f.109064;
-            change f_2 about {
+            change f_2 value {
                 if (field.value == false)
                     return f_1.value as String;
                 return null;
@@ -6028,7 +6028,7 @@
             <!--@formatter:off-->
             check: f.109021,
             field: f.109059;
-            change field about {
+            change field value {
                 if (check.value == "fyzická osoba")
                     return null;
                 return field.value;
@@ -6080,7 +6080,7 @@
             <!--@formatter:off-->
             check: f.109021,
             field: f.109026;
-            change field about {
+            change field value {
                 if (check.value == "fyzická osoba")
                     return null;
                 return field.value;
@@ -6124,7 +6124,7 @@
             <!--@formatter:off-->
             check: f.109021,
             field: f.109029;
-            change field about {
+            change field value {
                 if (check.value == "fyzická osoba")
                     return field.value;
                 return null;
@@ -6168,7 +6168,7 @@
             <!--@formatter:off-->
             check: f.109021,
             field: f.109063;
-            change field about {
+            change field value {
                 if (check.value == "právnická osoba")
                     return field.value;
                 return null;
@@ -6212,7 +6212,7 @@
             <!--@formatter:off-->
             check: f.109021,
             field: f.109064;
-            change field about {
+            change field value {
                 if (check.value == "právnická osoba")
                     return field.value;
                 return null;
@@ -6420,7 +6420,7 @@
             field: f.109035,
             f_1: f.109045,
             f_2: f.109036;
-            change f_2 about {
+            change f_2 value {
                 if (field.value)
                     return f_1.value as String;
                 return null;
@@ -6432,7 +6432,7 @@
             field: f.this,
             f_1: f.109046,
             f_2: f.109037;
-            change f_2 about {
+            change f_2 value {
                 if (field.value)
                     return f_1.value as String;
                 return null;
@@ -6444,7 +6444,7 @@
             field: f.this,
             f_1: f.109047,
             f_2: f.109038;
-            change f_2 about {
+            change f_2 value {
                 if (field.value)
                     return f_1.value as String;
                 return null;
@@ -6456,7 +6456,7 @@
             field: f.this,
             f_1: f.109048,
             f_2: f.109039;
-            change f_2 about {
+            change f_2 value {
                 if (field.value)
                     return f_1.value as String;
                 return null;
@@ -6473,7 +6473,7 @@
             field: f.109034,
             f_1: f.109036,
             f_2: f.109041;
-            change f_2 about {
+            change f_2 value {
                 if (field.value)
                     return f_1.value as String;
                 return f_2.value;
@@ -6490,7 +6490,7 @@
             field: f.109034,
             f_1: f.109037,
             f_2: f.109042;
-            change f_2 about {
+            change f_2 value {
                 if (field.value)
                     return f_1.value as String;
                 return f_2.value;
@@ -6507,7 +6507,7 @@
             field: f.109034,
             f_1: f.109038,
             f_2: f.109043;
-            change f_2 about {
+            change f_2 value {
                 if (field.value)
                     return f_1.value as String;
                 return f_2.value;
@@ -6524,7 +6524,7 @@
             field: f.109034,
             f_1: f.109039,
             f_2: f.109044;
-            change f_2 about {
+            change f_2 value {
                 if (field.value)
                     return f_1.value as String;
                 return f_2.value;
@@ -6618,7 +6618,7 @@
             field: f.109034,
             f_1: f.109036,
             f_2: f.109041;
-            change f_2 about {
+            change f_2 value {
                 if (field.value)
                     return f_1.value as String;
                 return null;
@@ -6630,7 +6630,7 @@
             field: f.109034,
             f_1: f.109037,
             f_2: f.109042;
-            change f_2 about {
+            change f_2 value {
                 if (field.value)
                     return f_1.value as String;
                 return null;
@@ -6642,7 +6642,7 @@
             field: f.109034,
             f_1: f.109038,
             f_2: f.109043;
-            change f_2 about {
+            change f_2 value {
                 if (field.value)
                     return f_1.value as String;
                 return null;
@@ -6654,7 +6654,7 @@
             field: f.109034,
             f_1: f.109039,
             f_2: f.109044;
-            change f_2 about {
+            change f_2 value {
                 if (field.value)
                     return f_1.value as String;
                 return null;
@@ -6692,7 +6692,7 @@
             field: f.109035,
             f_1: f.109045,
             f_2: f.109036;
-            change f_2 about {
+            change f_2 value {
                 if (field.value)
                     return f_1.value as String;
                 return null;
@@ -6709,7 +6709,7 @@
             field: f.109035,
             f_1: f.109046,
             f_2: f.109037;
-            change f_2 about {
+            change f_2 value {
                 if (field.value)
                     return f_1.value as String;
                 return null;
@@ -6726,7 +6726,7 @@
             field: f.109035,
             f_1: f.109047,
             f_2: f.109038;
-            change f_2 about {
+            change f_2 value {
                 if (field.value)
                     return f_1.value as String;
                 return null;
@@ -6743,7 +6743,7 @@
             field: f.109035,
             f_1: f.109048,
             f_2: f.109039;
-            change f_2 about {
+            change f_2 value {
                 if (field.value)
                     return f_1.value as String;
                 return null;
@@ -6936,7 +6936,7 @@
                     </action>
                     <action id="462" trigger="get">
                         self: f.this;
-                        change self about { "Nehnutelnost" }
+                        change self value { "Nehnutelnost" }
                     </action>
                 </logic>
             </dataRef>
@@ -6973,7 +6973,7 @@
                     </action>
                     <action id="464" trigger="get">
                         self: f.this;
-                        change self about { "Domacnost" }
+                        change self value { "Domacnost" }
                     </action>
                 </logic>
             </dataRef>
@@ -7010,7 +7010,7 @@
                     </action>
                     <action id="466" trigger="get">
                         self: f.this;
-                        change self about { "Nehnutelnost a domacnost" }
+                        change self value { "Nehnutelnost a domacnost" }
                     </action>
                 </logic>
             </dataRef>
@@ -7171,7 +7171,7 @@
                         <!--f1: f.102001,-->
                         <!--f2: f.106001,-->
                         <!--other: f.308005;-->
-                        <!--change other about {-->
+                        <!--change other value {-->
                             <!--return Boolean.logicalAnd(f1.value != null, f2.value != null);-->
                         <!--}-->
                         <!--&lt;!&ndash;@formatter:on&ndash;&gt;-->
@@ -7308,7 +7308,7 @@
                         <!--@formatter:off-->
                         field: f.this,
                         coeff: f.205018;
-                        change coeff about {
+                        change coeff value {
                             if (field.value)
                                 return 3.0 as Double;
                             return 0 as Double;
@@ -7360,14 +7360,14 @@
                         <!--@formatter:off-->
                         check: f.105031,
                         other: f.105032;
-                        change other about { null; }
+                        change other value { null; }
                         <!--@formatter:on-->
                     </action>
                     <action id="476" trigger="set">
                         <!--@formatter:off-->
                         check: f.105031,
                         other: f.105032;
-                        change other about { null; }
+                        change other value { null; }
                         <!--@formatter:on-->
                     </action>
                 </logic>
@@ -7405,7 +7405,7 @@
                         <!--@formatter:off-->
                         field: f.this,
                         coeff: f.205019;
-                        change coeff about {
+                        change coeff value {
                             if (field.value)
                                 return 5.0 as Double;
                             return 0 as Double;
@@ -7457,14 +7457,14 @@
                         <!--@formatter:off-->
             check: f.105033,
             other: f.105034;
-            change other about { null; }
+            change other value { null; }
             <!--@formatter:on-->
                     </action>
                     <action id="484" trigger="set">
                         <!--@formatter:off-->
             check: f.105033,
             other: f.105034;
-            change other about { null; }
+            change other value { null; }
             <!--@formatter:on-->
                     </action>
                 </logic>
@@ -7813,7 +7813,7 @@
                     check: f.105009,
                     exces: f.208001,
                     other: f.305004;
-                    change other about {
+                    change other value {
                         if (check.value)
                             return ((field.value*exces.value)/1000.0) as Double;
                         return other.value as Double;
@@ -7899,7 +7899,7 @@
                     check: f.105011,
                     exces: f.208001,
                     other: f.305005;
-                    change other about {
+                    change other value {
                         if (check.value)
                             return ((field.value*exces.value)/1000.0) as Double;
                         return other.value as Double;
@@ -7985,7 +7985,7 @@
                     check: f.105013,
                     exces: f.208001,
                     other: f.305006;
-                    change other about {
+                    change other value {
                         if (check.value)
                             return ((field.value*exces.value)/1000.0) as Double;
                         return other.value as Double;
@@ -8058,14 +8058,14 @@
                         <!--@formatter:off-->
                     idTrue: f.105015,
                     other: f.105016;
-                    change other about { null; }
+                    change other value { null; }
                 <!--@formatter:on-->
                     </action>
                     <action id="532" trigger="set">
                         <!--@formatter:off-->
                     idTrue: f.105015,
                     other: f.305007;
-                    change other about { null; }
+                    change other value { null; }
                 <!--@formatter:on-->
                     </action>
                 </logic>
@@ -8086,7 +8086,7 @@
                     check: f.105015,
                     exces: f.208001,
                     other: f.305007;
-                    change other about {
+                    change other value {
                         if (check.value)
                             return ((field.value*exces.value)/1000.0) as Double;
                         return other.value as Double;
@@ -8160,14 +8160,14 @@
                         <!--@formatter:off-->
                     idTrue: f.105017,
                     other: f.105018;
-                    change other about { null; }
+                    change other value { null; }
                 <!--@formatter:on-->
                     </action>
                     <action id="540" trigger="set">
                         <!--@formatter:off-->
                     idTrue: f.105017,
                     other: f.305008;
-                    change other about { null; }
+                    change other value { null; }
                 <!--@formatter:on-->
                     </action>
                 </logic>
@@ -8188,7 +8188,7 @@
                     check: f.105017,
                     exces: f.208001,
                     other: f.305008;
-                    change other about {
+                    change other value {
                         if (check.value)
                             return ((field.value*exces.value)/1000.0) as Double;
                         return other.value as Double;
@@ -8261,14 +8261,14 @@
                         <!--@formatter:off-->
                     idTrue: f.105019,
                     other: f.105020;
-                    change other about { null; }
+                    change other value { null; }
                 <!--@formatter:on-->
                     </action>
                     <action id="548" trigger="set">
                         <!--@formatter:off-->
                     idTrue: f.105019,
                     other: f.305009;
-                    change other about { null; }
+                    change other value { null; }
                 <!--@formatter:on-->
                     </action>
                 </logic>
@@ -8289,7 +8289,7 @@
                     check: f.105019,
                     exces: f.208001,
                     other: f.305009;
-                    change other about {
+                    change other value {
                         if (check.value)
                             return ((field.value*exces.value)/1000.0) as Double;
                         return other.value as Double;
@@ -8362,14 +8362,14 @@
                         <!--@formatter:off-->
                     idTrue: f.105021,
                     other: f.105022;
-                    change other about { null; }
+                    change other value { null; }
                 <!--@formatter:on-->
                     </action>
                     <action id="556" trigger="set">
                         <!--@formatter:off-->
                     idTrue: f.105021,
                     other: f.305010;
-                    change other about { null; }
+                    change other value { null; }
                 <!--@formatter:on-->
                     </action>
                 </logic>
@@ -8390,7 +8390,7 @@
                     check: f.105021,
                     exces: f.208001,
                     other: f.305010;
-                    change other about {
+                    change other value {
                         if (check.value)
                             return ((field.value*exces.value)/1000.0) as Double;
                         return other.value as Double;
@@ -8463,14 +8463,14 @@
                         <!--@formatter:off-->
                     idTrue: f.105023,
                     other: f.105024;
-                    change other about { null; }
+                    change other value { null; }
                 <!--@formatter:on-->
                     </action>
                     <action id="564" trigger="set">
                         <!--@formatter:off-->
                     idTrue: f.105023,
                     other: f.305011;
-                    change other about { null; }
+                    change other value { null; }
                 <!--@formatter:on-->
                     </action>
                 </logic>
@@ -8491,7 +8491,7 @@
                     check: f.105023,
                     exces: f.208001,
                     other: f.305011;
-                    change other about {
+                    change other value {
                         if (check.value)
                             return ((field.value*exces.value)/1000.0) as Double;
                         return other.value as Double;
@@ -8564,14 +8564,14 @@
                         <!--@formatter:off-->
                     idTrue: f.105025,
                     other: f.105026;
-                    change other about { null; }
+                    change other value { null; }
                 <!--@formatter:on-->
                     </action>
                     <action id="572" trigger="set">
                         <!--@formatter:off-->
                     idTrue: f.105025,
                     other: f.305012;
-                    change other about { null; }
+                    change other value { null; }
                 <!--@formatter:on-->
                     </action>
                 </logic>
@@ -8592,7 +8592,7 @@
                     check: f.105025,
                     exces: f.208001,
                     other: f.305012;
-                    change other about {
+                    change other value {
                         if (check.value)
                             return ((field.value*exces.value)/1000.0) as Double;
                         return other.value as Double;
@@ -8665,14 +8665,14 @@
                         <!--@formatter:off-->
                     idTrue: f.105027,
                     other: f.105028;
-                    change other about { null; }
+                    change other value { null; }
                 <!--@formatter:on-->
                     </action>
                     <action id="580" trigger="set">
                         <!--@formatter:off-->
                     idTrue: f.105027,
                     other: f.305013;
-                    change other about { null; }
+                    change other value { null; }
                 <!--@formatter:on-->
                     </action>
                 </logic>
@@ -8692,7 +8692,7 @@
                         check: f.105027,
                         exces: f.208001,
                         other: f.305013;
-                        change other about {
+                        change other value {
                         if (check.value)
                         return ((field.value*exces.value)/1000.0) as Double;
                         return other.value as Double;
@@ -8765,14 +8765,14 @@
                         <!--@formatter:off-->
                     idTrue: f.105029,
                     other: f.105030;
-                    change other about { null; }
+                    change other value { null; }
                 <!--@formatter:on-->
                     </action>
                     <action id="588" trigger="set">
                         <!--@formatter:off-->
                     idTrue: f.105029,
                     other: f.305014;
-                    change other about { null; }
+                    change other value { null; }
                 <!--@formatter:on-->
                     </action>
                 </logic>
@@ -8792,7 +8792,7 @@
                         check: f.105029,
                         exces: f.208001,
                         other: f.305014;
-                        change other about {
+                        change other value {
                         if (check.value)
                         return ((field.value*exces.value)/1000.0) as Double;
                         return other.value as Double;
@@ -8996,12 +8996,12 @@
                     <action id="595" trigger="set">
                         idTrue: f.106004,
                         other: f.106005;
-                        change other about { null; }
+                        change other value { null; }
                     </action>
                     <action id="596" trigger="set">
                         idTrue: f.106004,
                         other: f.306002;
-                        change other about { null; }
+                        change other value { null; }
                     </action>
                 </logic>
             </dataRef>
@@ -9020,7 +9020,7 @@
                         check: f.106004,
                         exces: f.208002,
                         other: f.306002;
-                        change other about {
+                        change other value {
                         if (check.value)
                         return ((field.value*exces.value*4.2)/1000.0) as Double;
                         return other.value as Double;
@@ -9081,12 +9081,12 @@
                     <action id="603" trigger="set">
                         idTrue: f.106006,
                         other: f.106007;
-                        change other about { null; }
+                        change other value { null; }
                     </action>
                     <action id="604" trigger="set">
                         idTrue: f.106006,
                         other: f.306003;
-                        change other about { null; }
+                        change other value { null; }
                     </action>
                 </logic>
             </dataRef>
@@ -9105,7 +9105,7 @@
                         check: f.106006,
                         exces: f.208002,
                         other: f.306003;
-                        change other about {
+                        change other value {
                         if (check.value)
                         return ((field.value*exces.value*4.2)/1000.0) as Double;
                         return other.value as Double;
@@ -9166,12 +9166,12 @@
                     <action id="611" trigger="set">
                         idTrue: f.106008,
                         other: f.106009;
-                        change other about { null; }
+                        change other value { null; }
                     </action>
                     <action id="612" trigger="set">
                         idTrue: f.106008,
                         other: f.306004;
-                        change other about { null; }
+                        change other value { null; }
                     </action>
                 </logic>
             </dataRef>
@@ -9190,7 +9190,7 @@
                         check: f.106008,
                         exces: f.208002,
                         other: f.306004;
-                        change other about {
+                        change other value {
                         if (check.value)
                         return ((field.value*exces.value*4.2)/1000.0) as Double;
                         return other.value as Double;
@@ -9251,12 +9251,12 @@
                     <action id="619" trigger="set">
                         idTrue: f.106010,
                         other: f.106011;
-                        change other about { null; }
+                        change other value { null; }
                     </action>
                     <action id="620" trigger="set">
                         idTrue: f.106010,
                         other: f.306005;
-                        change other about { null; }
+                        change other value { null; }
                     </action>
                 </logic>
             </dataRef>
@@ -9275,7 +9275,7 @@
                         check: f.106010,
                         exces: f.208002,
                         other: f.306005;
-                        change other about {
+                        change other value {
                         if (check.value)
                         return ((field.value*exces.value*25.0)/1000.0) as Double;
                         return other.value as Double;
@@ -9336,12 +9336,12 @@
                     <action id="627" trigger="set">
                         idTrue: f.106012,
                         other: f.106013;
-                        change other about { null; }
+                        change other value { null; }
                     </action>
                     <action id="628" trigger="set">
                         idTrue: f.106012,
                         other: f.306006;
-                        change other about { null; }
+                        change other value { null; }
                     </action>
                 </logic>
             </dataRef>
@@ -9360,7 +9360,7 @@
                         check: f.106012,
                         exces: f.208002,
                         other: f.306006;
-                        change other about {
+                        change other value {
                         if (check.value)
                         return ((field.value*exces.value*15.0)/1000.0) as Double;
                         return other.value as Double;
@@ -9421,12 +9421,12 @@
                     <action id="635" trigger="set">
                         idTrue: f.106014,
                         other: f.106015;
-                        change other about { null; }
+                        change other value { null; }
                     </action>
                     <action id="636" trigger="set">
                         idTrue: f.106014,
                         other: f.306007;
-                        change other about { null; }
+                        change other value { null; }
                     </action>
                 </logic>
             </dataRef>
@@ -9445,7 +9445,7 @@
                         check: f.106014,
                         exces: f.208002,
                         other: f.306007;
-                        change other about {
+                        change other value {
                         if (check.value)
                         return ((field.value*exces.value*50.0)/1000.0) as Double;
                         return other.value as Double;
@@ -9506,12 +9506,12 @@
                     <action id="643" trigger="set">
                         idTrue: f.106016,
                         other: f.106017;
-                        change other about { null; }
+                        change other value { null; }
                     </action>
                     <action id="644" trigger="set">
                         idTrue: f.106016,
                         other: f.306008;
-                        change other about { null; }
+                        change other value { null; }
                     </action>
                 </logic>
             </dataRef>
@@ -9530,7 +9530,7 @@
                         check: f.106016,
                         exces: f.208002,
                         other: f.306008;
-                        change other about {
+                        change other value {
                         if (check.value)
                         return ((field.value*exces.value*3.5)/1000.0) as Double;
                         return other.value as Double;
@@ -9591,12 +9591,12 @@
                     <action id="651" trigger="set">
                         idTrue: f.106018,
                         other: f.106019;
-                        change other about { null; }
+                        change other value { null; }
                     </action>
                     <action id="652" trigger="set">
                         idTrue: f.106018,
                         other: f.306009;
-                        change other about { null; }
+                        change other value { null; }
                     </action>
                 </logic>
             </dataRef>
@@ -9615,7 +9615,7 @@
                         check: f.106018,
                         exces: f.208002,
                         other: f.306009;
-                        change other about {
+                        change other value {
                         if (check.value)
                         return ((field.value*exces.value*7.0)/1000.0) as Double;
                         return other.value as Double;
@@ -9676,12 +9676,12 @@
                     <action id="659" trigger="set">
                         idTrue: f.106020,
                         other: f.106021;
-                        change other about { null; }
+                        change other value { null; }
                     </action>
                     <action id="660" trigger="set">
                         idTrue: f.106020,
                         other: f.306010;
-                        change other about { null; }
+                        change other value { null; }
                     </action>
                 </logic>
             </dataRef>
@@ -9700,7 +9700,7 @@
                         check: f.106020,
                         exces: f.208002,
                         other: f.306010;
-                        change other about {
+                        change other value {
                         if (check.value)
                         return ((field.value*exces.value*10.0)/1000.0) as Double;
                         return other.value as Double;
