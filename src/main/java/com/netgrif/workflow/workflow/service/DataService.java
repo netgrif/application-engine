@@ -130,17 +130,26 @@ public class DataService implements IDataService {
     }
 
     @Override
-    public FileSystemResource getFile(String taskId, String fieldId) {
+    public FileSystemResource getFileByTask(String taskId, String fieldId) {
         Task task = taskService.findOne(taskId);
-        Case useCase = workflowService.findOne(task.getCaseId());
-        FileField field = (FileField) useCase.getPetriNet().getDataSet().get(fieldId);
+        return getFileByCase(task.getCaseId(), fieldId);
+    }
 
+    @Override
+    public FileSystemResource getFileByCase(String caseId, String fieldId){
+        Case useCase = workflowService.findOne(caseId);
+        FileField field = (FileField) useCase.getPetriNet().getDataSet().get(fieldId);
+        return getFile(useCase, field);
+    }
+
+    @Override
+    public FileSystemResource getFile(Case useCase, FileField field){
         field.getActions().forEach(action -> actionsRunner.run(action, useCase));
-        if (useCase.getDataSet().get(fieldId).getValue() == null)
+        if (useCase.getDataSet().get(field.getStringId()).getValue() == null)
             return null;
 
         workflowService.save(useCase);
-        field.setValue((String) useCase.getDataSet().get(fieldId).getValue());
+        field.setValue((String) useCase.getDataSet().get(field.getStringId()).getValue());
         return new FileSystemResource(field.getFilePath(useCase.getStringId()));
     }
 
