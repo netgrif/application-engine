@@ -33,6 +33,7 @@ public class ObjectFactory {
     private final static QName _Init_QNAME = new QName("", "init");
     private final static QName _Encryption_QNAME = new QName("", "encryption");
     private final static QName _Action_QNAME = new QName("", "action");
+    private final static QName _ActionRef_QNAME = new QName("", "actionRef");
     private final static QName _Name_QNAME = new QName("", "name");
     private final static QName _TransitionRef_QNAME = new QName("", "transitionRef");
     private final static QName _Perform_QNAME = new QName("", "perform");
@@ -107,6 +108,14 @@ public class ObjectFactory {
      */
     public ActionType createActionType() {
         return new ActionType();
+    }
+
+    /**
+     * Create an instance of {@link ActionRefType }
+     * 
+     */
+    public ActionRefType createActionRefType() {
+        return new ActionRefType();
     }
 
     /**
@@ -324,6 +333,15 @@ public class ObjectFactory {
     @XmlElementDecl(namespace = "", name = "action")
     public JAXBElement<ActionType> createAction(ActionType value) {
         return new JAXBElement<ActionType>(_Action_QNAME, ActionType.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link ActionRefType }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "", name = "actionRef")
+    public JAXBElement<ActionRefType> createActionRef(ActionRefType value) {
+        return new JAXBElement<ActionRefType>(_ActionRef_QNAME, ActionRefType.class, null, value);
     }
 
     /**

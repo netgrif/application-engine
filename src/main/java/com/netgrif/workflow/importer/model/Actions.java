@@ -21,6 +21,7 @@ import javax.xml.bind.annotation.XmlType;
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
  *       &lt;sequence&gt;
  *         &lt;element ref="{}action" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *         &lt;element ref="{}actionRef" maxOccurs="unbounded" minOccurs="0"/&gt;
  *       &lt;/sequence&gt;
  *       &lt;attribute name="phase" use="required" type="{}eventPhaseType" /&gt;
  *     &lt;/restriction&gt;
@@ -32,12 +33,14 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
-    "action"
+    "action",
+    "actionRef"
 })
 @XmlRootElement(name = "actions")
 public class Actions {
 
     protected List<ActionType> action;
+    protected List<ActionRefType> actionRef;
     @XmlAttribute(name = "phase", required = true)
     protected EventPhaseType phase;
 
@@ -68,6 +71,35 @@ public class Actions {
             action = new ArrayList<ActionType>();
         }
         return this.action;
+    }
+
+    /**
+     * Gets the value of the actionRef property.
+     * 
+     * <p>
+     * This accessor method returns a reference to the live list,
+     * not a snapshot. Therefore any modification you make to the
+     * returned list will be present inside the JAXB object.
+     * This is why there is not a <CODE>set</CODE> method for the actionRef property.
+     * 
+     * <p>
+     * For example, to add a new item, do as follows:
+     * <pre>
+     *    getActionRef().add(newItem);
+     * </pre>
+     * 
+     * 
+     * <p>
+     * Objects of the following type(s) are allowed in the list
+     * {@link ActionRefType }
+     * 
+     * 
+     */
+    public List<ActionRefType> getActionRef() {
+        if (actionRef == null) {
+            actionRef = new ArrayList<ActionRefType>();
+        }
+        return this.actionRef;
     }
 
     /**
