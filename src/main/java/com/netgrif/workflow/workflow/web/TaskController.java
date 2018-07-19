@@ -202,7 +202,7 @@ public class TaskController {
 
     @RequestMapping(value = "/{id}/file/{field}", method = RequestMethod.GET, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public FileSystemResource getFile(@PathVariable("id") String taskId, @PathVariable("field") String fieldId, HttpServletResponse response) {
-        FileSystemResource fileResource = dataService.getFile(taskId, fieldId);
+        FileSystemResource fileResource = dataService.getFileByTask(taskId, fieldId);
         response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
         response.setHeader("Content-Disposition", "attachment; filename=" + fileResource.getFilename().substring(fileResource.getFilename().indexOf('-', fileResource.getFilename().indexOf('-') + 1) + 1));
         return fileResource;
