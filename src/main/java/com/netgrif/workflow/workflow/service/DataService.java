@@ -17,6 +17,7 @@ import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldContainer;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.FieldActionsRunner;
 import com.netgrif.workflow.workflow.domain.Case;
+import com.netgrif.workflow.workflow.domain.DataField;
 import com.netgrif.workflow.workflow.domain.Task;
 import com.netgrif.workflow.workflow.service.interfaces.IDataService;
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
@@ -73,6 +74,16 @@ public class DataService implements IDataService {
         List<Field> dataSetFields = new ArrayList<>();
 
         fieldsIds.forEach(fieldId -> {
+            DataField dataField = useCase.getDataField(fieldId);
+            if (dataField.getBehavior().containsKey(transition.getImportId())) {
+                if (dataField.isForbidden(transition.getImportId())) {
+                    return;
+                }
+            } else {
+                if (transition.getDataSet().get(fieldId).isForbidden())
+                    return;
+            }
+
             resolveActions(useCase.getPetriNet().getField(fieldId).get(),
                     Action.ActionTrigger.GET, useCase, transition);
 
