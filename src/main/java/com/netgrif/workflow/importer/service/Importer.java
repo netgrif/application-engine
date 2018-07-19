@@ -77,6 +77,9 @@ public class Importer {
     @Autowired
     private TriggerFactory triggerFactory;
 
+    @Autowired
+    private IActionValidator actionValidator;
+
     @Transactional
     public Optional<PetriNet> importPetriNet(InputStream xml, String title, String initials, Config config) {
         try {
@@ -442,6 +445,7 @@ public class Importer {
         if (containsParams(definition)) {
             parseParamsAndObjectIds(action, fieldId, transitionId);
         }
+        actionValidator.validateAction(action.getDefinition());
     }
 
     private void parseParamsAndObjectIds(Action action, String fieldId, String transitionId) {
