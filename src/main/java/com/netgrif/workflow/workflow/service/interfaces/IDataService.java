@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.netgrif.workflow.petrinet.domain.DataGroup;
 import com.netgrif.workflow.petrinet.domain.Transition;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
+import com.netgrif.workflow.petrinet.domain.dataset.FileField;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedField;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldContainer;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action;
@@ -24,7 +25,11 @@ public interface IDataService {
 
     ChangedFieldContainer setData(String taskId, ObjectNode values);
 
-    FileSystemResource getFile(String taskId, String fieldId);
+    FileSystemResource getFileByTask(String taskId, String fieldId);
+
+    FileSystemResource getFileByCase(String caseId, String fieldId);
+
+    FileSystemResource getFile(Case useCase, FileField field);
 
     boolean saveFile(String taskId, String fieldId, MultipartFile multipartFile);
 
