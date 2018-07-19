@@ -19,9 +19,9 @@ abstract class Field<T> extends Imported {
     protected ObjectId _id
 
     private I18nString name
-    
+
     private I18nString description
-    
+
     private I18nString placeholder
 
     @Transient
@@ -37,7 +37,7 @@ abstract class Field<T> extends Imported {
 
     @JsonIgnore
     private LinkedHashSet<Action> actions
-    
+
     @JsonIgnore
     private String encryption
 
@@ -130,6 +130,10 @@ abstract class Field<T> extends Imported {
 
     void setActions(LinkedHashSet<Action> actions) {
         this.actions = actions
+    }
+
+    void addActions(Collection<Action> actions) {
+        actions.each { addAction(it) }
     }
 
     void addAction(Action action) {
