@@ -3,7 +3,6 @@ package com.netgrif.workflow.petrinet.domain
 import com.netgrif.workflow.auth.domain.repositories.UserProcessRoleRepository
 import com.netgrif.workflow.auth.domain.repositories.UserRepository
 import com.netgrif.workflow.importer.service.Importer
-import com.netgrif.workflow.ipc.TaskExecutionTest
 import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository
 import com.netgrif.workflow.startup.DefaultRoleRunner
 import com.netgrif.workflow.startup.ImportHelper
@@ -64,7 +63,7 @@ class ActionRefTest {
     private UserProcessRoleRepository roleRepository
 
     private def stream = { String name ->
-        return TaskExecutionTest.getClassLoader().getResourceAsStream(name)
+        return ActionRefTest.getClassLoader().getResourceAsStream(name)
     }
 
     Case instance

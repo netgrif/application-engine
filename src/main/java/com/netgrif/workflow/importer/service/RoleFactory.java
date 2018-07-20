@@ -47,7 +47,7 @@ public class RoleFactory {
         ProcessRole role = new ProcessRole();
         role.setName(transition.getImportId());
         role.setImportId(net.getStringId() + "_" + transition.getImportId());
-        role.setDescription("Default role of transition "+transition.getTitle().getDefaultValue() + " in process "+net.getTitle().getDefaultValue());
+//        role.setDescription("Default role of transition "+transition.getTitle().getDefaultValue() + " in process "+net.getTitle().getDefaultValue());
         role = repository.save(role);
         userProcessRoleRepository.save(new UserProcessRole(role.getStringId()));
         return role;
