@@ -154,12 +154,6 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public User getLoggedUser() {
-        LoggedUser loggedUser = (LoggedUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return findByEmail(loggedUser.getEmail(), false);
-    }
-
-    @Override
     public User getSystem() {
         return userRepository.findByEmail(SystemUserRunner.SYSTEM_USER_EMAIL);
     }

@@ -20,6 +20,7 @@ import com.netgrif.workflow.workflow.domain.repositories.CaseRepository;
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
 import com.querydsl.core.types.Predicate;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
@@ -39,6 +40,8 @@ import java.util.stream.StreamSupport;
 
 @Service
 public class WorkflowService implements IWorkflowService {
+
+    private static final Logger log = Logger.getLogger(WorkflowService.class);
 
     @Autowired
     private CaseRepository repository;
@@ -155,6 +158,7 @@ public class WorkflowService implements IWorkflowService {
         useCase = save(useCase);
 
         publisher.publishEvent(new CreateCaseEvent(useCase));
+        log.info("Case " + title + " created");
 
         useCase.getPetriNet().initializeVarArcs(useCase.getDataSet());
         taskService.createTasks(useCase);

@@ -3,7 +3,6 @@ package com.netgrif.workflow.petrinet.domain.roles
 import com.netgrif.workflow.auth.domain.repositories.UserProcessRoleRepository
 import com.netgrif.workflow.auth.domain.repositories.UserRepository
 import com.netgrif.workflow.importer.service.Importer
-import com.netgrif.workflow.ipc.TaskExecutionTest
 import com.netgrif.workflow.startup.DefaultRoleRunner
 import com.netgrif.workflow.startup.SuperCreator
 import com.netgrif.workflow.startup.SystemUserRunner

@@ -152,7 +152,7 @@ public class TaskService implements ITaskService {
         PetriNet net = useCase.getPetriNet();
         Collection<Transition> transitions = net.getTransitions().values();
 
-        for (Transition transition: transitions) {
+        for (Transition transition : transitions) {
             if (isExecutable(transition, net)) {
                 Task task = createFromTransition(transition, useCase);
                 // TODO: 16. 3. 2017 there should be some fancy logic
@@ -183,7 +183,7 @@ public class TaskService implements ITaskService {
 
     @Override
     public Task searchOne(com.querydsl.core.types.Predicate predicate) {
-        Page<Task> tasks = taskRepository.findAll(predicate, new PageRequest(0,1));
+        Page<Task> tasks = taskRepository.findAll(predicate, new PageRequest(0, 1));
         if (tasks.getTotalElements() > 0)
             return tasks.getContent().get(0);
         return null;
@@ -192,7 +192,7 @@ public class TaskService implements ITaskService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void finishTasks(List<Task> tasks, User user) throws TransitionNotExecutableException {
-        for (Task task: tasks) {
+        for (Task task : tasks) {
             finishTask(task, user);
         }
     }
@@ -218,7 +218,7 @@ public class TaskService implements ITaskService {
         reloadTasks(useCase);
 
         publisher.publishEvent(new UserFinishTaskEvent(user, task, useCase));
-        log.info("Task [" + task.getTitle() + "] assigned to [" + user.getEmail() + "] was finished");
+        log.info("Task [" + task.getTitle() + "] in case [" + useCase.getTitle() + "] assigned to [" + user.getEmail() + "] was finished");
 
         return outcome;
     }
@@ -251,7 +251,7 @@ public class TaskService implements ITaskService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void assignTasks(List<Task> tasks, User user) throws TransitionNotExecutableException {
-        for (Task task: tasks) {
+        for (Task task : tasks) {
             assignTask(task, user);
         }
     }
@@ -269,7 +269,7 @@ public class TaskService implements ITaskService {
         workflowService.save(useCase);
 
         publisher.publishEvent(new UserAssignTaskEvent(user, task, useCase));
-        log.info("Task [" + task.getTitle() + "] assigned to [" + user.getEmail() + "]");
+        log.info("Task [" + task.getTitle() + "] in case ["+useCase.getTitle()+"] assigned to [" + user.getEmail() + "]");
         return outcome;
     }
 
@@ -297,7 +297,7 @@ public class TaskService implements ITaskService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void cancelTasks(List<Task> tasks, User user) {
-        for (Task task: tasks) {
+        for (Task task : tasks) {
             cancelTask(task, user);
         }
     }
@@ -316,7 +316,7 @@ public class TaskService implements ITaskService {
         reloadTasks(useCase);
 
         publisher.publishEvent(new UserCancelTaskEvent(user, task, useCase));
-        log.info("Task [" + task.getTitle() + "] assigned to [" + user.getEmail() + "] was cancelled");
+        log.info("Task [" + task.getTitle() + "] in case ["+useCase.getTitle()+"] assigned to [" + user.getEmail() + "] was cancelled");
         return outcome;
     }
 
@@ -335,7 +335,7 @@ public class TaskService implements ITaskService {
     public void cancelTasksWithoutReload(Set<String> transitions, String caseId) {
         List<Task> tasks = taskRepository.findAllByTransitionIdInAndCaseId(transitions, caseId);
         Case useCase = null;
-        for (Task task: tasks) {
+        for (Task task : tasks) {
             if (task.getUserId() != null) {
                 if (useCase == null)
                     useCase = workflowService.findOne(task.getCaseId());
@@ -415,6 +415,13 @@ public class TaskService implements ITaskService {
                 deleteUnassignedNotExecutableTasks(tasks, transition, useCase);
             }
         });
+        List<Task> tasks = taskRepository.findAllByCaseId(useCase.getStringId());
+        for (Task task : tasks) {
+            if (Objects.equals(task.getUserId(), userService.getSystem().getId())) {
+                executeTransition(task, workflowService.findOne(useCase.getStringId()));
+                break;
+            }
+        }
     }
 
     @Transactional
@@ -489,7 +496,7 @@ public class TaskService implements ITaskService {
                 .finishPolicy(transition.getFinishPolicy())
                 .build();
         transition.getEvents().forEach((type, event) -> task.addEventTitle(type, event.getTitle()));
-        for (Trigger trigger: transition.getTriggers()) {
+        for (Trigger trigger : transition.getTriggers()) {
             Trigger taskTrigger = trigger.clone();
             task.addTrigger(taskTrigger);
 
@@ -497,12 +504,10 @@ public class TaskService implements ITaskService {
                 TimeTrigger timeTrigger = (TimeTrigger) taskTrigger;
                 scheduleTaskExecution(task, timeTrigger.getStartDate(), useCase);
             } else if (taskTrigger instanceof AutoTrigger) {
-                executeTransition(task, useCase);
-                log.info("Auto trigger triggered");
-                return null;
+                task.setUserId(userService.getSystem().getId());
             }
         }
-        for (Map.Entry<String, Set<RolePermission>> entry: transition.getRoles().entrySet()) {
+        for (Map.Entry<String, Set<RolePermission>> entry : transition.getRoles().entrySet()) {
             task.addRole(entry.getKey(), entry.getValue());
         }
 
@@ -574,15 +579,24 @@ public class TaskService implements ITaskService {
         Transition transition = useCase.getPetriNet().getTransition(task.getTransitionId());
         EventOutcome outcome = new EventOutcome();
         try {
+//            assignTask(task.getStringId());
+//            dataService.getData(task.getStringId());
+//            finishTask(task.getStringId());
             outcome.add(dataService.runActions(transition.getPreAssignActions(), useCase, transition));
             startExecution(transition, useCase);
+//            useCase = workflowService.save(useCase);
+//            reloadTasks(useCase);
+//            useCase = workflowService.save(useCase);
             outcome.add(dataService.runActions(transition.getPostAssignActions(), useCase, transition));
             dataService.getData(task, useCase);
+//            useCase = workflowService.save(useCase);
+//            reloadTasks(useCase);
             validateData(transition, useCase);
             outcome.add(dataService.runActions(transition.getPreFinishActions(), useCase, transition));
             finishExecution(transition, useCase);
+//            useCase = workflowService.save(useCase);
+//            reloadTasks(useCase);
             outcome.add(dataService.runActions(transition.getPostFinishActions(), useCase, transition));
-
             workflowService.save(useCase);
             reloadTasks(useCase);
 
@@ -595,7 +609,7 @@ public class TaskService implements ITaskService {
 
     @Transactional
     void validateData(Transition transition, Case useCase) {
-        for (Map.Entry<String, DataFieldLogic> entry: transition.getDataSet().entrySet()) {
+        for (Map.Entry<String, DataFieldLogic> entry : transition.getDataSet().entrySet()) {
             if (!useCase.getDataField(entry.getKey()).isRequired(transition.getImportId()))
                 continue;
             if (useCase.getDataField(entry.getKey()).isUndefined(transition.getImportId()) && !entry.getValue().isRequired())
