@@ -101,6 +101,10 @@ public class DataField {
                 .anyMatch(bs -> bs.contains(FieldBehavior.VISIBLE) || bs.contains(FieldBehavior.EDITABLE) || bs.contains(FieldBehavior.HIDDEN));
     }
 
+    public boolean isForbidden(String transitionId) {
+        return behavior.containsKey(transitionId) && behavior.get(transitionId).contains(FieldBehavior.REQUIRED);
+    }
+
     public void makeVisible(String transition) {
         changeBehavior(FieldBehavior.VISIBLE, transition);
     }
