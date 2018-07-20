@@ -31,34 +31,34 @@ import org.springframework.stereotype.Component
 @SuppressWarnings(["GrMethodMayBeStatic", "GroovyUnusedDeclaration"])
 class ActionDelegate {
 
-    private static final Logger log = Logger.getLogger(ActionDelegate)
+    static final Logger log = Logger.getLogger(ActionDelegate)
 
-    private static final String UNCHANGED_VALUE = "unchangedooo"
-    private static final String ALWAYS_GENERATE = "always"
-    private static final String ONCE_GENERATE = "once"
-
-    @Autowired
-    private FieldFactory fieldFactory
+    static final String UNCHANGED_VALUE = "unchangedooo"
+    static final String ALWAYS_GENERATE = "always"
+    static final String ONCE_GENERATE = "once"
 
     @Autowired
-    private TaskService taskService
+    FieldFactory fieldFactory
 
     @Autowired
-    private IDataService dataService
+    TaskService taskService
 
     @Autowired
-    private IWorkflowService workflowService
+    IDataService dataService
 
     @Autowired
-    private IUserService userService
+    IWorkflowService workflowService
 
     @Autowired
-    private IPetriNetService petriNetService
+    IUserService userService
 
-    private map = [:]
-    private Action action
-    private Case useCase
-    private FieldActionsRunner actionsRunner
+    @Autowired
+    IPetriNetService petriNetService
+
+    def map = [:]
+    Action action
+    Case useCase
+    FieldActionsRunner actionsRunner
     ChangedField changedField = new ChangedField()
 
     def init(Action action, Case useCase, FieldActionsRunner actionsRunner) {
@@ -152,7 +152,7 @@ class ActionDelegate {
          }]
     }
 
-    private void executeTasks(Map dataSet, String taskId, Closure<Predicate> predicateClosure) {
+    void executeTasks(Map dataSet, String taskId, Closure<Predicate> predicateClosure) {
         List<String> caseIds = searchCases(predicateClosure)
         QTask qTask = new QTask("task")
         Page<Task> tasksPage = taskService.searchAll(qTask.transitionId.eq(taskId).and(qTask.caseId.in(caseIds)))
@@ -163,7 +163,7 @@ class ActionDelegate {
         }
     }
 
-    private List<String> searchCases(Closure<Predicate> predicates) {
+    List<String> searchCases(Closure<Predicate> predicates) {
         QCase qCase = new QCase("case")
         def expression = predicates(qCase)
         Page<Case> page = workflowService.searchAll(expression)
@@ -197,7 +197,7 @@ class ActionDelegate {
          }]
     }
 
-    private void changeFieldValue(Field field, def cl) {
+    void changeFieldValue(Field field, def cl) {
         def value = cl()
         if (value instanceof Closure && value() == UNCHANGED_VALUE) {
             return
@@ -351,7 +351,7 @@ class ActionDelegate {
         return taskService.searchOne(predicate(qTask))
     }
 
-    private String getTaskId(String transitionId) {
+    String getTaskId(String transitionId) {
         List<TaskReference> refs = taskService.findAllByCase(useCase.stringId, null)
         refs.find { it.transitionId == transitionId }.stringId
     }
