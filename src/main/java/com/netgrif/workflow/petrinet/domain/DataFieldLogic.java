@@ -71,4 +71,8 @@ public class DataFieldLogic {
     public String toString() {
         return behavior.stream().map(FieldBehavior::toString).collect(Collectors.joining(", "));
     }
+
+    public boolean isForbidden() {
+        return behavior.contains(FieldBehavior.FORBIDDEN);
+    }
 }
