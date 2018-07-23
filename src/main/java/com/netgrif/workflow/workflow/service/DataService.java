@@ -74,15 +74,8 @@ public class DataService implements IDataService {
         List<Field> dataSetFields = new ArrayList<>();
 
         fieldsIds.forEach(fieldId -> {
-            DataField dataField = useCase.getDataField(fieldId);
-            if (dataField.getBehavior().containsKey(transition.getImportId())) {
-                if (dataField.isForbidden(transition.getImportId())) {
-                    return;
-                }
-            } else {
-                if (transition.getDataSet().get(fieldId).isForbidden())
-                    return;
-            }
+            if (isForbidden(fieldId, transition, useCase.getDataField(fieldId)))
+                return;
 
             resolveActions(useCase.getPetriNet().getField(fieldId).get(),
                     Action.ActionTrigger.GET, useCase, transition);
@@ -106,6 +99,14 @@ public class DataService implements IDataService {
 
         workflowService.save(useCase);
         return dataSetFields;
+    }
+
+    private boolean isForbidden(String fieldId, Transition transition, DataField dataField) {
+        if (dataField.getBehavior().containsKey(transition.getImportId())) {
+            return dataField.isForbidden(transition.getImportId());
+        } else {
+            return transition.getDataSet().get(fieldId).isForbidden();
+        }
     }
 
     @Override
