@@ -25,6 +25,7 @@ import org.apache.log4j.Logger
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.i18n.LocaleContextHolder
 import org.springframework.data.domain.Page
+import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Component
 
 @Component
@@ -358,5 +359,10 @@ class ActionDelegate {
 
     User assignRole(String roleImportId, User user = userService.loggedUser) {
         return userService.addRole(user, roleImportId)
+    }
+
+    @Async
+    void async(Closure closure) {
+        closure()
     }
 }
