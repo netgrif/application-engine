@@ -34,5 +34,5 @@ public interface IDataService {
 
     List<Field> getImmediateFields(Task task);
 
-    Map<String, ChangedField> runActions(List<Action> actions, Case useCase, Transition transition);
+    Map<String, ChangedField> runActions(List<Action> actions, String useCaseId, Transition transition);
 }
