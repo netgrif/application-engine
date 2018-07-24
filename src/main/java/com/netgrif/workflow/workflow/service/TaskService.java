@@ -104,11 +104,9 @@ public class TaskService implements ITaskService {
         Transition transition = useCase.getPetriNet().getTransition(task.getTransitionId());
         EventOutcome outcome = new EventOutcome(transition.getAssignMessage());
 
-        outcome.add(dataService.runActions(transition.getPreAssignActions(), useCase, transition));
-        assignTaskToUser(user, task, useCase);
-        useCase = workflowService.findOne(useCase.getStringId());
-        outcome.add(dataService.runActions(transition.getPostAssignActions(), useCase, transition));
-        workflowService.save(useCase);
+        outcome.add(dataService.runActions(transition.getPreAssignActions(), useCase.getStringId(), transition));
+        assignTaskToUser(user, task, useCase.getStringId());
+        outcome.add(dataService.runActions(transition.getPostAssignActions(), useCase.getStringId(), transition));
 
         publisher.publishEvent(new UserAssignTaskEvent(user, task, useCase));
         log.info("Task [" + task.getTitle() + "] in case [" + useCase.getTitle() + "] assigned to [" + user.getEmail() + "]");
@@ -116,7 +114,8 @@ public class TaskService implements ITaskService {
     }
 
     @Transactional
-    protected void assignTaskToUser(User user, Task task, Case useCase) throws TransitionNotExecutableException {
+    protected void assignTaskToUser(User user, Task task, String useCaseId) throws TransitionNotExecutableException {
+        Case useCase = workflowService.findOne(useCaseId);
         useCase.getPetriNet().initializeArcs();// TODO: 19/06/2017 remove?
         Transition transition = useCase.getPetriNet().getTransition(task.getTransitionId());
 
@@ -169,15 +168,15 @@ public class TaskService implements ITaskService {
         EventOutcome outcome = new EventOutcome(transition.getFinishMessage());
 
         validateData(transition, useCase);
-        outcome.add(dataService.runActions(transition.getPreFinishActions(), useCase, transition));
-        finishExecution(transition, useCase);
-        outcome.add(dataService.runActions(transition.getPostFinishActions(), useCase, transition));
+        outcome.add(dataService.runActions(transition.getPreFinishActions(), useCase.getStringId(), transition));
+        finishExecution(transition, useCase.getStringId());
+        outcome.add(dataService.runActions(transition.getPostFinishActions(), useCase.getStringId(), transition));
 
         task.setFinishDate(LocalDateTime.now());
         task.setFinishedBy(task.getUserId());
         task.setUserId(null);
 
-        useCase = workflowService.save(useCase);
+        useCase = workflowService.findOne(useCase.getStringId());
         taskRepository.save(task);
         reloadTasks(useCase);
 
@@ -210,10 +209,10 @@ public class TaskService implements ITaskService {
         Transition transition = useCase.getPetriNet().getTransition(task.getTransitionId());
         EventOutcome outcome = new EventOutcome(transition.getCancelMessage());
 
-        outcome.add(dataService.runActions(transition.getPreCancelActions(), useCase, transition));
-        task = returnTokens(task, useCase);
-        outcome.add(dataService.runActions(transition.getPostCancelActions(), useCase, transition));
-        useCase = workflowService.save(useCase);
+        outcome.add(dataService.runActions(transition.getPreCancelActions(), useCase.getStringId(), transition));
+        task = returnTokens(task, useCase.getStringId());
+        outcome.add(dataService.runActions(transition.getPostCancelActions(), useCase.getStringId(), transition));
+        useCase = workflowService.findOne(useCase.getStringId());
         reloadTasks(useCase);
 
         publisher.publishEvent(new UserCancelTaskEvent(user, task, useCase));
@@ -233,14 +232,15 @@ public class TaskService implements ITaskService {
                 if (useCase == null)
                     useCase = workflowService.findOne(task.getCaseId());
                 Transition transition = useCase.getPetriNet().getTransition(task.getTransitionId());
-                dataService.runActions(transition.getPreCancelActions(), useCase, transition);
-                returnTokens(task, useCase);
-                dataService.runActions(transition.getPostCancelActions(), useCase, transition);
+                dataService.runActions(transition.getPreCancelActions(), useCase.getStringId(), transition);
+                returnTokens(task, useCase.getStringId());
+                dataService.runActions(transition.getPostCancelActions(), useCase.getStringId(), transition);
             }
         }
     }
 
-    private Task returnTokens(Task task, Case useCase) {
+    private Task returnTokens(Task task, String useCaseId) {
+        Case useCase = workflowService.findOne(useCaseId);
         PetriNet net = useCase.getPetriNet();
         net.getArcsOfTransition(task.getTransitionId()).stream()
                 .filter(arc -> arc.getSource() instanceof Place)
@@ -271,9 +271,9 @@ public class TaskService implements ITaskService {
         Transition transition = useCase.getPetriNet().getTransition(task.getTransitionId());
         EventOutcome outcome = new EventOutcome(transition.getDelegateMessage());
 
-        outcome.add(dataService.runActions(transition.getPreDelegateActions(), useCase, transition));
-        assignTaskToUser(delegated, task, useCase);
-        outcome.add(dataService.runActions(transition.getPostDelegateActions(), useCase, transition));
+        outcome.add(dataService.runActions(transition.getPreDelegateActions(), useCase.getStringId(), transition));
+        assignTaskToUser(delegated, task, useCase.getStringId());
+        outcome.add(dataService.runActions(transition.getPostDelegateActions(), useCase.getStringId(), transition));
         workflowService.save(useCase);
 
         publisher.publishEvent(new UserDelegateTaskEvent(delegate, task, useCase, delegated));
@@ -343,12 +343,14 @@ public class TaskService implements ITaskService {
     }
 
     @Transactional
-    void finishExecution(Transition transition, Case useCase) throws TransitionNotExecutableException {
+    void finishExecution(Transition transition, String useCaseId) throws TransitionNotExecutableException {
+        Case useCase = workflowService.findOne(useCaseId);
         log.info("Finish execution of " + transition.getTitle() + " in case " + useCase.getTitle());
         execute(transition, useCase, arc -> arc.getSource().equals(transition));
         useCase.getPetriNet().getArcsOfTransition(transition.getStringId()).stream()
                 .filter(arc -> arc instanceof ResetArc)
                 .forEach(arc -> useCase.getResetArcTokens().remove(arc.getStringId()));
+        workflowService.save(useCase);
     }
 
     @Transactional

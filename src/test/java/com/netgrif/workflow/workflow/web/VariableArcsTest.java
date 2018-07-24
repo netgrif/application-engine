@@ -18,6 +18,7 @@ import com.netgrif.workflow.petrinet.domain.throwable.TransitionNotExecutableExc
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.workflow.startup.DefaultRoleRunner;
 import com.netgrif.workflow.startup.ImportHelper;
+import com.netgrif.workflow.startup.SystemUserRunner;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.Task;
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
@@ -78,8 +79,12 @@ public class VariableArcsTest {
     @Autowired
     private IAuthorityService authorityService;
 
+    @Autowired
+    private SystemUserRunner userRunner;
+
     @Before
-    public void before() {
+    public void before() throws Exception {
+        userRunner.run("");
         repository.deleteAll();
         if (roleRepository.findByName_DefaultValue(ProcessRole.DEFAULT_ROLE) == null) {
             try {

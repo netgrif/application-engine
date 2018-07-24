@@ -48,7 +48,7 @@ class TransitionRoleTest {
     private ProcessRoleRepository processRoleRepository
 
     private def stream = { String name ->
-        return TaskExecutionTest.getClassLoader().getResourceAsStream(name)
+        return TransitionRoleTest.getClassLoader().getResourceAsStream(name)
     }
 
     @Test
