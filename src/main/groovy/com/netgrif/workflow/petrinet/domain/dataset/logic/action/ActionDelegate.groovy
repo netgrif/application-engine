@@ -108,6 +108,11 @@ class ActionDelegate {
         useCase.dataSet.get(field.stringId).makeHidden(trans.stringId)
     }
 
+    def forbidden = { Field field, Transition trans ->
+        copyBehavior(field, trans)
+        useCase.dataSet.get(field.stringId).makeForbidden(trans.stringId)
+    }
+
     def unchanged = { return UNCHANGED_VALUE }
 
     def make(Field field, Closure behavior) {

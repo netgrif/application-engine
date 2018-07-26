@@ -107,10 +107,11 @@
             <version>2.9.0</version>
         </dependency>
 
+        <!-- https://mvnrepository.com/artifact/org.codehaus.groovy/groovy-all -->
         <dependency>
             <groupId>org.codehaus.groovy</groupId>
             <artifactId>groovy-all</artifactId>
-            <version>2.4.11</version>
+            <version>2.4.15</version>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/org.codehaus.groovy.modules.http-builder/http-builder -->
@@ -218,7 +219,7 @@
             <plugin>
                 <groupId>org.codehaus.gmavenplus</groupId>
                 <artifactId>gmavenplus-plugin</artifactId>
-                <version>1.5</version>
+                <version>1.6.1</version>
                 <executions>
                     <execution>
                         <goals>
@@ -226,8 +227,8 @@
                             <goal>addTestSources</goal>
                             <goal>generateStubs</goal>
                             <goal>compile</goal>
-                            <goal>testGenerateStubs</goal>
-                            <goal>testCompile</goal>
+                            <goal>generateTestStubs</goal>
+                            <goal>compileTests</goal>
                             <goal>removeStubs</goal>
                             <goal>removeTestStubs</goal>
                         </goals>
