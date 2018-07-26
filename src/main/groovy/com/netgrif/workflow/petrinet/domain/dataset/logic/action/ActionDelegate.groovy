@@ -1,11 +1,16 @@
 package com.netgrif.workflow.petrinet.domain.dataset.logic.action
 
+import com.netgrif.workflow.AsyncRunner
+import com.netgrif.workflow.auth.domain.User
+import com.netgrif.workflow.auth.service.interfaces.IUserService
 import com.netgrif.workflow.configuration.ApplicationContextProvider
 import com.netgrif.workflow.importer.service.FieldFactory
 import com.netgrif.workflow.petrinet.domain.I18nString
+import com.netgrif.workflow.petrinet.domain.PetriNet
 import com.netgrif.workflow.petrinet.domain.Transition
 import com.netgrif.workflow.petrinet.domain.dataset.*
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedField
+import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.workflow.startup.ImportHelper
 import com.netgrif.workflow.workflow.domain.Case
 import com.netgrif.workflow.workflow.domain.QCase
@@ -14,6 +19,7 @@ import com.netgrif.workflow.workflow.domain.Task
 import com.netgrif.workflow.workflow.service.TaskService
 import com.netgrif.workflow.workflow.service.interfaces.IDataService
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService
+import com.netgrif.workflow.workflow.web.responsebodies.TaskReference
 import com.querydsl.core.types.ExpressionUtils
 import com.querydsl.core.types.Predicate
 import org.apache.log4j.Logger
@@ -26,28 +32,37 @@ import org.springframework.stereotype.Component
 @SuppressWarnings(["GrMethodMayBeStatic", "GroovyUnusedDeclaration"])
 class ActionDelegate {
 
-    private static final Logger log = Logger.getLogger(ActionDelegate)
+    static final Logger log = Logger.getLogger(ActionDelegate)
 
-    private static final String UNCHANGED_VALUE = "unchangedooo"
-    private static final String ALWAYS_GENERATE = "always"
-    private static final String ONCE_GENERATE = "once"
-
-    @Autowired
-    private FieldFactory fieldFactory
+    static final String UNCHANGED_VALUE = "unchangedooo"
+    static final String ALWAYS_GENERATE = "always"
+    static final String ONCE_GENERATE = "once"
 
     @Autowired
-    private TaskService taskService
+    FieldFactory fieldFactory
 
     @Autowired
-    private IDataService dataService
+    TaskService taskService
 
     @Autowired
-    private IWorkflowService workflowService
+    IDataService dataService
 
-    private map = [:]
-    private Action action
-    private Case useCase
-    private FieldActionsRunner actionsRunner
+    @Autowired
+    IWorkflowService workflowService
+
+    @Autowired
+    IUserService userService
+
+    @Autowired
+    IPetriNetService petriNetService
+
+    @Autowired
+    AsyncRunner async
+
+    def map = [:]
+    Action action
+    Case useCase
+    FieldActionsRunner actionsRunner
     ChangedField changedField = new ChangedField()
 
     def init(Action action, Case useCase, FieldActionsRunner actionsRunner) {
@@ -135,29 +150,18 @@ class ActionDelegate {
         service.cancelTasksWithoutReload(transitionIds, useCase.stringId)
     }
 
-//    def finish = { Transition[] transitions ->
-//        def service = ApplicationContextProvider.getBean("taskService")
-//        if (!service) {
-//            log.error("Could not find task service")
-//            return
-//        }
-//
-//        def transitionIds = transitions.collect { it.stringId } as Set
-//        service.finishTasksWithoutReload(transitionIds, useCase.stringId)
-//    }
-
     def execute(String taskId) {
-        [with: { Map dataSet ->
-            executeTasks(dataSet, taskId, { ExpressionUtils.anyOf([])})
+        [with : { Map dataSet ->
+            executeTasks(dataSet, taskId, { ExpressionUtils.anyOf([]) })
         },
-        where: { Closure<Predicate> closure ->
-            [with: { Map dataSet ->
-                executeTasks(dataSet, taskId, closure)
-            }]
-        }]
+         where: { Closure<Predicate> closure ->
+             [with: { Map dataSet ->
+                 executeTasks(dataSet, taskId, closure)
+             }]
+         }]
     }
 
-    private void executeTasks(Map dataSet, String taskId, Closure<Predicate> predicateClosure) {
+    void executeTasks(Map dataSet, String taskId, Closure<Predicate> predicateClosure) {
         List<String> caseIds = searchCases(predicateClosure)
         QTask qTask = new QTask("task")
         Page<Task> tasksPage = taskService.searchAll(qTask.transitionId.eq(taskId).and(qTask.caseId.in(caseIds)))
@@ -168,35 +172,29 @@ class ActionDelegate {
         }
     }
 
-    private List<String> searchCases(Closure<Predicate> predicates) {
+    void executeTask(String transitionId, Map dataSet) {
+        QTask qTask = new QTask("task")
+        Task task = taskService.searchOne(qTask.transitionId.eq(transitionId).and(qTask.caseId.eq(useCase.stringId)))
+        taskService.assignTask(task.stringId)
+        dataService.setData(task.stringId, ImportHelper.populateDataset(dataSet as Map<String, Map<String,String>>))
+        taskService.finishTask(task.stringId)
+    }
+
+    List<String> searchCases(Closure<Predicate> predicates) {
         QCase qCase = new QCase("case")
         def expression = predicates(qCase)
         Page<Case> page = workflowService.searchAll(expression)
 
-        return page.content.collect {it.stringId}
+        return page.content.collect { it.stringId }
     }
 
     def change(Field field) {
-        [about  : { cl ->
-            def value = cl()
-            if (value instanceof Closure && value() == UNCHANGED_VALUE) {
-                return
-            }
-            if (value == null) {
-                if (field instanceof FieldWithDefault && field.defaultValue != useCase.dataSet.get(field.stringId).value) {
-                    field.clearValue()
-                    saveChangedValue(field)
-                } else if (!(field instanceof FieldWithDefault) && useCase.dataSet.get(field.stringId).value != null) {
-                    field.clearValue()
-                    saveChangedValue(field)
-                }
-                return
-            }
-            if (value != null) {
-                field.value = value
-                saveChangedValue(field)
-            }
+        [about  : { cl -> // TODO: deprecated
+            changeFieldValue(field, cl)
         },
+         value  : { cl ->
+            changeFieldValue(field, cl)
+         },
          choices: { cl ->
              if (!(field instanceof MultichoiceField || field instanceof EnumerationField))
                  return
@@ -214,6 +212,27 @@ class ActionDelegate {
              }
              saveChangedChoices(field)
          }]
+    }
+
+    void changeFieldValue(Field field, def cl) {
+        def value = cl()
+        if (value instanceof Closure && value() == UNCHANGED_VALUE) {
+            return
+        }
+        if (value == null) {
+            if (field instanceof FieldWithDefault && field.defaultValue != useCase.dataSet.get(field.stringId).value) {
+                field.clearValue()
+                saveChangedValue(field)
+            } else if (!(field instanceof FieldWithDefault) && useCase.dataSet.get(field.stringId).value != null) {
+                field.clearValue()
+                saveChangedValue(field)
+            }
+            return
+        }
+        if (value != null) {
+            field.value = value
+            saveChangedValue(field)
+        }
     }
 
     def always = { return ALWAYS_GENERATE }
@@ -284,5 +303,77 @@ class ActionDelegate {
         QCase qCase = new QCase("case")
         Page<Case> result = workflowService.searchAll(predicate(qCase))
         return result.content
+    }
+
+    Case createCase(String identifier, String title = null, String color = "", User author = userService.loggedOrSystem) {
+        PetriNet net = petriNetService.getNewestVersionByIdentifier(identifier)
+        if (net == null)
+            throw new IllegalArgumentException("Petri net with identifier [$identifier] does not exist.")
+        return createCase(net, title ?: net.defaultCaseName.defaultValue, color, author)
+    }
+
+    Case createCase(PetriNet net, String title = net.defaultCaseName.defaultValue, String color = "", User author = userService.loggedOrSystem) {
+        return workflowService.createCase(net.stringId, title, color, author.transformToLoggedUser())
+    }
+
+    Task assignTask(String transitionId, User user = userService.loggedOrSystem) {
+        String taskId = getTaskId(transitionId)
+        taskService.assignTask(user.transformToLoggedUser(), taskId)
+        return taskService.findOne(taskId)
+    }
+
+    Task assignTask(Task task, User user = userService.loggedOrSystem) {
+        taskService.assignTask(task, user)
+        return taskService.findOne(task.stringId)
+    }
+
+    void assignTasks(List<Task> tasks, User assignee = userService.loggedOrSystem) {
+        taskService.assignTasks(tasks, assignee)
+    }
+
+    void cancelTask(String transitionId, User user = userService.loggedOrSystem) {
+        String taskId = getTaskId(transitionId)
+        taskService.cancelTask(user.transformToLoggedUser(), taskId)
+    }
+
+    void cancelTask(Task task, User user = userService.loggedOrSystem) {
+        taskService.cancelTask(task, userService.loggedOrSystem)
+    }
+
+    void cancelTasks(List<Task> tasks, User user = userService.loggedOrSystem) {
+        taskService.cancelTasks(tasks, user)
+    }
+
+    void finishTask(String transitionId, User user = userService.loggedOrSystem) {
+        String taskId = getTaskId(transitionId)
+        taskService.finishTask(user.transformToLoggedUser(), taskId)
+    }
+
+    void finishTask(Task task, User user = userService.loggedOrSystem) {
+        taskService.finishTask(task, user)
+    }
+
+    void finishTasks(List<Task> tasks, User finisher = userService.loggedOrSystem) {
+        taskService.finishTasks(tasks, finisher)
+    }
+
+    List<Task> findTasks(Closure<Predicate> predicate) {
+        QTask qTask = new QTask("task")
+        Page<Task> result = taskService.searchAll(predicate(qTask))
+        return result.content
+    }
+
+    Task findTask(Closure<Predicate> predicate) {
+        QTask qTask = new QTask("task")
+        return taskService.searchOne(predicate(qTask))
+    }
+
+    String getTaskId(String transitionId) {
+        List<TaskReference> refs = taskService.findAllByCase(useCase.stringId, null)
+        refs.find { it.transitionId == transitionId }.stringId
+    }
+
+    User assignRole(String roleImportId, User user = userService.loggedUser) {
+        return userService.addRole(user, roleImportId)
     }
 }

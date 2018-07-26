@@ -57,6 +57,14 @@ class Action {
         return this.trigger == trigger
     }
 
+    ActionTrigger getTrigger() {
+        return trigger;
+    }
+
+    void setTrigger(ActionTrigger trigger) {
+        this.trigger = trigger;
+    }
+
     Map<String, String> getFieldIds() {
         return fieldIds
     }

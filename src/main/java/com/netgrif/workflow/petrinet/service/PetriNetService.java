@@ -160,7 +160,9 @@ public abstract class PetriNetService implements IPetriNetService {
 
     private void setupImportedPetriNet(PetriNet net, File xmlFile, UploadedFileMeta meta, LoggedUser user) throws IOException {
         net.setAuthor(user.transformToAuthor());
-        net.setIdentifier(meta.identifier);
+        if (meta.identifier != null && !meta.identifier.isEmpty()) {
+            net.setIdentifier(meta.identifier);
+        }
 
         net = repository.save(net);
         log.info("Petri net " + meta.name + " (" + meta.initials + " v" + net.getVersion() + ") imported successfully");

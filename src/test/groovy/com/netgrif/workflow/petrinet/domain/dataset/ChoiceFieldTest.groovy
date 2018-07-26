@@ -1,10 +1,12 @@
 package com.netgrif.workflow.petrinet.domain.dataset
 
+import com.netgrif.workflow.TestHelper
 import com.netgrif.workflow.importer.service.Importer
-import com.netgrif.workflow.ipc.TaskExecutionTest
+import com.netgrif.workflow.ipc.TaskApiTest
 import com.netgrif.workflow.petrinet.domain.I18nString
 import com.netgrif.workflow.startup.ImportHelper
 import com.netgrif.workflow.workflow.domain.Case
+import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -28,8 +30,16 @@ class ChoiceFieldTest {
     @Autowired
     private ImportHelper helper
 
+    @Autowired
+    private TestHelper testHelper
+
     private def stream = { String name ->
-        return TaskExecutionTest.getClassLoader().getResourceAsStream(name)
+        return TaskApiTest.getClassLoader().getResourceAsStream(name)
+    }
+
+    @Before
+    void setup() {
+        testHelper.truncateDbs()
     }
 
     @Test
