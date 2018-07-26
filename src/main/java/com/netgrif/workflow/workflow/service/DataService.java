@@ -17,6 +17,7 @@ import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldContainer;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.FieldActionsRunner;
 import com.netgrif.workflow.workflow.domain.Case;
+import com.netgrif.workflow.workflow.domain.DataField;
 import com.netgrif.workflow.workflow.domain.Task;
 import com.netgrif.workflow.workflow.service.interfaces.IDataService;
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
@@ -73,6 +74,9 @@ public class DataService implements IDataService {
         List<Field> dataSetFields = new ArrayList<>();
 
         fieldsIds.forEach(fieldId -> {
+            if (isForbidden(fieldId, transition, useCase.getDataField(fieldId)))
+                return;
+
             resolveActions(useCase.getPetriNet().getField(fieldId).get(),
                     Action.ActionTrigger.GET, useCase, transition);
 
@@ -95,6 +99,14 @@ public class DataService implements IDataService {
 
         workflowService.save(useCase);
         return dataSetFields;
+    }
+
+    private boolean isForbidden(String fieldId, Transition transition, DataField dataField) {
+        if (dataField.getBehavior().containsKey(transition.getImportId())) {
+            return dataField.isForbidden(transition.getImportId());
+        } else {
+            return transition.getDataSet().get(fieldId).isForbidden();
+        }
     }
 
     @Override
@@ -130,17 +142,26 @@ public class DataService implements IDataService {
     }
 
     @Override
-    public FileSystemResource getFile(String taskId, String fieldId) {
+    public FileSystemResource getFileByTask(String taskId, String fieldId) {
         Task task = taskService.findOne(taskId);
-        Case useCase = workflowService.findOne(task.getCaseId());
-        FileField field = (FileField) useCase.getPetriNet().getDataSet().get(fieldId);
+        return getFileByCase(task.getCaseId(), fieldId);
+    }
 
+    @Override
+    public FileSystemResource getFileByCase(String caseId, String fieldId){
+        Case useCase = workflowService.findOne(caseId);
+        FileField field = (FileField) useCase.getPetriNet().getDataSet().get(fieldId);
+        return getFile(useCase, field);
+    }
+
+    @Override
+    public FileSystemResource getFile(Case useCase, FileField field){
         field.getActions().forEach(action -> actionsRunner.run(action, useCase));
-        if (useCase.getDataSet().get(fieldId).getValue() == null)
+        if (useCase.getDataSet().get(field.getStringId()).getValue() == null)
             return null;
 
         workflowService.save(useCase);
-        field.setValue((String) useCase.getDataSet().get(fieldId).getValue());
+        field.setValue((String) useCase.getDataSet().get(field.getStringId()).getValue());
         return new FileSystemResource(field.getFilePath(useCase.getStringId()));
     }
 
