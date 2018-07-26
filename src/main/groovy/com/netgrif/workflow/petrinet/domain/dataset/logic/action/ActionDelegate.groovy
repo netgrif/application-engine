@@ -1,5 +1,6 @@
 package com.netgrif.workflow.petrinet.domain.dataset.logic.action
 
+import com.netgrif.workflow.AsyncRunner
 import com.netgrif.workflow.auth.domain.User
 import com.netgrif.workflow.auth.service.interfaces.IUserService
 import com.netgrif.workflow.configuration.ApplicationContextProvider
@@ -25,7 +26,6 @@ import org.apache.log4j.Logger
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.i18n.LocaleContextHolder
 import org.springframework.data.domain.Page
-import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Component
 
 @Component
@@ -55,6 +55,9 @@ class ActionDelegate {
 
     @Autowired
     IPetriNetService petriNetService
+
+    @Autowired
+    AsyncRunner async
 
     def map = [:]
     Action action
@@ -162,6 +165,14 @@ class ActionDelegate {
             dataService.setData(task.stringId, ImportHelper.populateDataset(dataSet as Map<String, Map<String, String>>))
             taskService.finishTask(task.stringId)
         }
+    }
+
+    void executeTask(String transitionId, Map dataSet) {
+        QTask qTask = new QTask("task")
+        Task task = taskService.searchOne(qTask.transitionId.eq(transitionId).and(qTask.caseId.eq(useCase.stringId)))
+        taskService.assignTask(task.stringId)
+        dataService.setData(task.stringId, ImportHelper.populateDataset(dataSet as Map<String, Map<String,String>>))
+        taskService.finishTask(task.stringId)
     }
 
     List<String> searchCases(Closure<Predicate> predicates) {
@@ -359,10 +370,5 @@ class ActionDelegate {
 
     User assignRole(String roleImportId, User user = userService.loggedUser) {
         return userService.addRole(user, roleImportId)
-    }
-
-    @Async
-    void async(Closure closure) {
-        closure()
     }
 }
