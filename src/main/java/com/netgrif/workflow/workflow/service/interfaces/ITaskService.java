@@ -18,6 +18,9 @@ import java.util.Set;
 
 public interface ITaskService {
 
+    @Transactional
+    void reloadTasks(Case useCase);
+
     Task findOne(String taskId);
 
     Page<Task> getAll(LoggedUser loggedUser, Pageable pageable, Locale locale);

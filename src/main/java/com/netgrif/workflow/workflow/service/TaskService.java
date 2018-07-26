@@ -15,6 +15,7 @@ import com.netgrif.workflow.utils.DateUtils;
 import com.netgrif.workflow.utils.FullPageRequest;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.Task;
+import com.netgrif.workflow.workflow.domain.TaskPair;
 import com.netgrif.workflow.workflow.domain.repositories.TaskRepository;
 import com.netgrif.workflow.workflow.domain.triggers.AutoTrigger;
 import com.netgrif.workflow.workflow.domain.triggers.TimeTrigger;
@@ -294,9 +295,10 @@ public class TaskService implements ITaskService {
      * </tr>
      * </table>
      */
+    @Override
     @Transactional
-    protected void reloadTasks(Case useCase) {
-        log.info("Reloading tasks in ["+useCase+"]");
+    public void reloadTasks(Case useCase) {
+        log.info("Reloading tasks in ["+useCase.getTitle()+"]");
         PetriNet net = useCase.getPetriNet();
 
         net.getTransitions().values().forEach(transition -> {
@@ -310,6 +312,7 @@ public class TaskService implements ITaskService {
             }
         });
         List<Task> tasks = taskRepository.findAllByCaseId(useCase.getStringId());
+
         for (Task task : tasks) {
             if (Objects.equals(task.getUserId(), userService.getSystem().getId()) && task.getStartDate() == null) {
                 executeTransition(task, workflowService.findOne(useCase.getStringId()));
