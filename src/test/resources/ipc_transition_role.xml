@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="../../main/resources/petriNets/petriflow_schema.xsd">
+    <transitionRole>true</transitionRole>
+    <defaultRole>false</defaultRole>
+    <!-- ROLES -->
+    <role>
+        <id>user_role</id>
+        <name>user role</name>
+    </role>
+    <!-- TRANSITIONS -->
+    <transition>
+        <id>user_task</id>
+        <x>0</x>
+        <y>0</y>
+        <label>User Task</label>
+        <assignPolicy>auto</assignPolicy>
+        <finishPolicy>auto_no_data</finishPolicy>
+        <roleRef>
+            <id>user_role</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <event type="finish">
+            <id>0</id>
+            <actions phase="pre">
+                <action>
+                    trans: t.task;
+                    assignRole(trans.defaultRoleId);
+                </action>
+            </actions>
+        </event>
+    </transition>
+    <transition>
+        <id>task</id>
+        <x>0</x>
+        <y>0</y>
+        <label>Task</label>
+    </transition>
+</document>

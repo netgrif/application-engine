@@ -11,6 +11,7 @@ import com.netgrif.workflow.importer.service.Importer;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository;
 import com.netgrif.workflow.petrinet.domain.throwable.TransitionNotExecutableException;
+import com.netgrif.workflow.startup.SystemUserRunner;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.Task;
 import com.netgrif.workflow.workflow.domain.repositories.CaseRepository;
@@ -64,10 +65,14 @@ public class TaskServiceTest {
     @Autowired
     private IAuthorityService authorityService;
 
+    @Autowired
+    private SystemUserRunner userRunner;
+
     @Before
-    public void setUp() {
+    public void setUp() throws Exception {
         mongoTemplate.getDb().dropDatabase();
         taskRepository.deleteAll();
+        userRunner.run("");
 
         importer.importPetriNet(new File("src/test/resources/prikladFM.xml"), "fm net", "fm", new Config());
         PetriNet net = petriNetRepository.findAll().get(0);

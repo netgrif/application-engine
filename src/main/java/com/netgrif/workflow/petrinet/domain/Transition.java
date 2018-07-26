@@ -52,6 +52,9 @@ public class Transition extends Node {
     @Getter @Setter
     private Map<EventType, Event> events;
 
+    @Getter @Setter
+    private String defaultRoleId;
+
     public Transition() {
         super();
         dataSet = new LinkedHashMap<>();
@@ -75,7 +78,7 @@ public class Transition extends Node {
 
     public void addActions(String field, LinkedHashSet<Action> actions){
         if(dataSet.containsKey(field)){
-            dataSet.get(field).setActions(actions);
+            dataSet.get(field).addActions(actions);
         }
     }
 

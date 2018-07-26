@@ -1,9 +1,14 @@
 
 package com.netgrif.workflow.importer.model;
 
-import javax.xml.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
 
 
 /**
@@ -25,6 +30,7 @@ import java.util.List;
  *         &lt;element ref="{}init" minOccurs="0"/&gt;
  *         &lt;element ref="{}encryption" minOccurs="0"/&gt;
  *         &lt;element ref="{}action" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *         &lt;element ref="{}actionRef" maxOccurs="unbounded" minOccurs="0"/&gt;
  *         &lt;element ref="{}documentRef" minOccurs="0"/&gt;
  *       &lt;/sequence&gt;
  *       &lt;attribute name="type" use="required" type="{}data_type" /&gt;
@@ -47,6 +53,7 @@ import java.util.List;
     "init",
     "encryption",
     "action",
+    "actionRef",
     "documentRef"
 })
 @XmlRootElement(name = "data")
@@ -63,6 +70,7 @@ public class Data {
     protected String init;
     protected EncryptionType encryption;
     protected List<ActionType> action;
+    protected List<ActionRefType> actionRef;
     protected DocumentRef documentRef;
     @XmlAttribute(name = "type", required = true)
     protected DataType type;
@@ -298,6 +306,35 @@ public class Data {
             action = new ArrayList<ActionType>();
         }
         return this.action;
+    }
+
+    /**
+     * Gets the value of the actionRef property.
+     * 
+     * <p>
+     * This accessor method returns a reference to the live list,
+     * not a snapshot. Therefore any modification you make to the
+     * returned list will be present inside the JAXB object.
+     * This is why there is not a <CODE>set</CODE> method for the actionRef property.
+     * 
+     * <p>
+     * For example, to add a new item, do as follows:
+     * <pre>
+     *    getActionRef().add(newItem);
+     * </pre>
+     * 
+     * 
+     * <p>
+     * Objects of the following type(s) are allowed in the list
+     * {@link ActionRefType }
+     * 
+     * 
+     */
+    public List<ActionRefType> getActionRef() {
+        if (actionRef == null) {
+            actionRef = new ArrayList<ActionRefType>();
+        }
+        return this.actionRef;
     }
 
     /**

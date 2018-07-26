@@ -1,12 +1,18 @@
 package com.netgrif.workflow.petrinet.domain.dataset
 
+import com.netgrif.workflow.auth.domain.repositories.UserProcessRoleRepository
+import com.netgrif.workflow.auth.domain.repositories.UserRepository
 import com.netgrif.workflow.importer.service.Importer
-import com.netgrif.workflow.ipc.TaskExecutionTest
+import com.netgrif.workflow.ipc.TaskApiTest
 import com.netgrif.workflow.petrinet.domain.PetriNet
+import com.netgrif.workflow.startup.DefaultRoleRunner
+import com.netgrif.workflow.startup.SuperCreator
+import com.netgrif.workflow.startup.SystemUserRunner
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.data.mongodb.core.MongoTemplate
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit4.SpringRunner
 
@@ -22,8 +28,26 @@ class FieldTest {
     @Autowired
     private Importer importer
 
+    @Autowired
+    private MongoTemplate template
+
+    @Autowired
+    private UserRepository userRepository
+
+    @Autowired
+    private UserProcessRoleRepository roleRepository
+
+    @Autowired
+    private SystemUserRunner systemUserRunner
+
+    @Autowired
+    private DefaultRoleRunner roleRunner
+
+    @Autowired
+    private SuperCreator superCreator
+
     private def stream = { String name ->
-        return TaskExecutionTest.getClassLoader().getResourceAsStream(name)
+        return TaskApiTest.getClassLoader().getResourceAsStream(name)
     }
 
     def limitsNetOptional
@@ -31,6 +55,13 @@ class FieldTest {
 
     @Test
     void testImport() {
+        template.db.dropDatabase()
+        userRepository.deleteAll()
+        roleRepository.deleteAll()
+        roleRunner.run()
+        superCreator.run()
+        systemUserRunner.run()
+
         limitsNetOptional = importer.importPetriNet(stream(LIMITS_NET_FILE), LIMITS_NET_TITLE, LIMITS_NET_INITIALS)
 
         assertNet()

@@ -17,6 +17,7 @@ import com.netgrif.workflow.petrinet.domain.policies.DataFocusPolicy;
 import com.netgrif.workflow.petrinet.domain.policies.FinishPolicy;
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRole;
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRoleRepository;
+import com.netgrif.workflow.petrinet.domain.roles.RolePermission;
 import com.netgrif.workflow.petrinet.service.ArcFactory;
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.workflow.workflow.domain.triggers.Trigger;
@@ -57,6 +58,8 @@ public class Importer {
     private Map<String, Place> places;
     private Map<String, Transaction> transactions;
     private Map<String, I18nString> i18n;
+    private Map<String, Action> actions;
+    private Map<String, Action> actionRefs;
 
     @Autowired
     private FieldFactory fieldFactory;
@@ -75,6 +78,9 @@ public class Importer {
 
     @Autowired
     private TriggerFactory triggerFactory;
+
+    @Autowired
+    private IActionValidator actionValidator;
 
     @Transactional
     public Optional<PetriNet> importPetriNet(InputStream xml, String title, String initials, Config config) {
@@ -117,6 +123,8 @@ public class Importer {
         this.transactions = new HashMap<>();
         this.defaultRole = roleRepository.findByName_DefaultValue(ProcessRole.DEFAULT_ROLE);
         this.i18n = new HashMap<>();
+        this.actions = new HashMap<>();
+        this.actionRefs = new HashMap<>();
     }
 
     @Transactional
@@ -138,11 +146,7 @@ public class Importer {
     @Transactional
     protected Optional<PetriNet> createPetriNet(String title, String initials) {
         net = new PetriNet();
-        net.setTitle(title);
-        net.setInitials(initials);
-        net.setImportId(document.getId());
-        if (document.getId() == null)
-            net.setImportId(new ObjectId().toString());
+        net.setImportId(document.getId() != null ? document.getId() : new ObjectId().toString());
         net.setIcon(document.getIcon());
 
         document.getI18N().forEach(this::addI18N);
@@ -155,12 +159,26 @@ public class Importer {
         document.getMapping().forEach(this::applyMapping);
         document.getTransition().forEach(this::resolveTransitionActions);
         document.getData().forEach(this::resolveDataActions);
+        actionRefs.forEach(this::resolveActionRefs);
 
+        net.setTitle(title != null ? new I18nString(title) : toI18NString(document.getTitle()));
+        net.setInitials(initials != null ? initials : document.getInitials());
         net.setDefaultCaseName(toI18NString(document.getCaseName()));
+        net.setIdentifier(document.getId());
+
         if (config.isNotSaveObjects())
             return service.saveNew(net);
         else
             return Optional.of(net);
+    }
+
+    @Transactional
+    protected void resolveActionRefs(String actionId, Action action) {
+        Action referenced = actions.get(actionId);
+        if (referenced == null)
+            throw new IllegalArgumentException("Invalid action reference with id ["+actionId+"]");
+        action.setDefinition(referenced.getDefinition());
+        action.setTrigger(referenced.getTrigger());
     }
 
     @Transactional
@@ -194,6 +212,24 @@ public class Importer {
         if (data.getAction() != null) {
             getField(data.getId()).setActions(buildActions(data.getAction(), getField(data.getId()).getStringId(), null));
         }
+        if (data.getActionRef() != null) {
+            getField(data.getId()).addActions(buildActionRefs(data.getActionRef()));
+        }
+    }
+
+    private LinkedHashSet<Action> buildActionRefs(List<ActionRefType> actionRefs) {
+        LinkedHashSet<Action> refs = new LinkedHashSet<>();
+        for (ActionRefType actionRef: actionRefs) {
+            refs.add(fromActionRef(actionRef));
+        }
+        return refs;
+    }
+
+    private Action fromActionRef(ActionRefType actionRef) {
+        Action placeholder = new Action();
+        placeholder.setImportId(actionRef.getId());
+        this.actionRefs.put(actionRef.getId(), placeholder);
+        return placeholder;
     }
 
     @Transactional
@@ -213,11 +249,14 @@ public class Importer {
     @Transactional
     protected void resolveDataRefActions(List<DataRef> dataRef, com.netgrif.workflow.importer.model.Transition trans) {
         dataRef.forEach(ref -> {
+            String fieldId = getField(ref.getId()).getStringId();
             if (ref.getLogic().getAction() != null) {
-                String fieldId = getField(ref.getId()).getStringId();
                 getTransition(trans.getId()).addActions(fieldId, buildActions(ref.getLogic().getAction(),
                         fieldId,
                         getTransition(trans.getId()).getStringId()));
+            }
+            if (ref.getLogic().getActionRef() != null) {
+                getTransition(trans.getId()).addActions(fieldId, buildActionRefs(ref.getLogic().getActionRef()));
             }
         });
     }
@@ -279,6 +318,9 @@ public class Importer {
         if (isDefaultRoleAllowedFor(importTransition, document)) {
             addDefaultRole(transition);
         }
+        if (isTransitionRoleAllowed()) {
+            addTransitionRole(transition);
+        }
         if (importTransition.getEvent() != null) {
             importTransition.getEvent().forEach(event ->
                     addEvent(transition, event)
@@ -287,6 +329,12 @@ public class Importer {
 
         net.addTransition(transition);
         transitions.put(importTransition.getId(), transition);
+    }
+
+    private void addTransitionRole(Transition transition) {
+        ProcessRole role = roleFactory.transitionRole(net, transition);
+        transition.addRole(role.getStringId(), Collections.singleton(RolePermission.PERFORM));
+        transition.setDefaultRoleId(role.getStringId());
     }
 
     @Transactional
@@ -310,12 +358,18 @@ public class Importer {
     }
 
     private List<Action> parsePhaseActions(EventPhaseType phase, Transition transition, com.netgrif.workflow.importer.model.Event imported) {
-        return imported.getActions().stream()
+        List<Action> actionList = imported.getActions().stream()
                 .filter(actions -> actions.getPhase().equals(phase))
                 .map(actions -> actions.getAction().parallelStream()
                         .map(action -> parseAction(transition.getImportId(), action)))
                 .flatMap(Function.identity())
                 .collect(Collectors.toList());
+        actionList.addAll(imported.getActions().stream()
+                .filter(actions->actions.getPhase().equals(phase))
+                .map(actions -> actions.getActionRef().parallelStream().map(this::fromActionRef))
+                .flatMap(Function.identity())
+                .collect(Collectors.toList()));
+        return actionList;
     }
 
     @Transactional
@@ -349,7 +403,7 @@ public class Importer {
         importDataGroup.getDataRef().forEach(dataRef -> dataGroup.addData(getField(dataRef.getId()).getStringId()));
         transition.addDataGroup(dataGroup);
 
-        for (DataRef dataRef : importDataGroup.getDataRef()) {
+        for (DataRef dataRef: importDataGroup.getDataRef()) {
             addDataLogic(transition, dataRef);
         }
     }
@@ -410,6 +464,7 @@ public class Importer {
         try {
             Action action = createAction(importedAction);
             parseIds(fieldId, transitionId, importedAction, action);
+            actions.put(action.getImportId(), action);
             return action;
         } catch (NumberFormatException e) {
             throw new IllegalArgumentException("Error parsing ids of action [" + importedAction.getValue() + "]", e);
@@ -427,11 +482,22 @@ public class Importer {
 
     private void parseIds(String fieldId, String transitionId, ActionType importedAction, Action action) {
         String definition = importedAction.getValue();
-        String[] actionParts = definition.split(";", 2);
-        if (actionParts.length != 2)
-            throw new IllegalArgumentException("Failed to parse action: " + importedAction);
+        action.setDefinition(definition);
+
+        if (containsParams(definition)) {
+            parseParamsAndObjectIds(action, fieldId, transitionId);
+        }
+        actionValidator.validateAction(action.getDefinition());
+    }
+
+    private void parseParamsAndObjectIds(Action action, String fieldId, String transitionId) {
+        String[] actionParts = action.getDefinition().split(";", 2);
         action.setDefinition(actionParts[1]);
         parseObjectIds(action, fieldId, transitionId, actionParts[0]);
+    }
+
+    private boolean containsParams(String definition) {
+        return definition.matches("[\\W\\w\\s]*[\\w]*:[\\s][ft].[\\w]+;[\\w\\W\\s]*");
     }
 
     @Transactional
@@ -562,7 +628,7 @@ public class Importer {
         if (document.isDefaultRole() != null && !document.isDefaultRole())
             return false;
         // FALSE if role or trigger mapping
-        for (Mapping mapping : document.getMapping()) {
+        for (Mapping mapping: document.getMapping()) {
             if (mapping.getTransitionRef() == transition.getId() && (mapping.getRoleRef() != null && !mapping.getRoleRef().isEmpty()) && (mapping.getTrigger() != null && !mapping.getTrigger().isEmpty()))
                 return false;
         }
@@ -635,5 +701,9 @@ public class Importer {
 
     public I18nString getI18n(String id) {
         return i18n.get(id);
+    }
+
+    private boolean isTransitionRoleAllowed() {
+        return document.isTransitionRole() == null || document.isTransitionRole();
     }
 }

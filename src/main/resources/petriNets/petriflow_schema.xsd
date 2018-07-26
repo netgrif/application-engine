@@ -24,6 +24,7 @@
                 <xs:element ref="init" minOccurs="0"/>
                 <xs:element ref="encryption" minOccurs="0"/>
                 <xs:element ref="action" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:element ref="actionRef" minOccurs="0" maxOccurs="unbounded"/>
                 <xs:element ref="documentRef" minOccurs="0"/>
             </xs:sequence>
             <xs:attribute type="data_type" name="type" use="required"/>
@@ -91,14 +92,14 @@
     </xs:element>
     <xs:element name="arc">
         <xs:complexType>
-            <xs:all>
+            <xs:sequence>
                 <xs:element ref="id"/>
                 <xs:element name="type" type="arc_type" default="regular"/>
                 <xs:element ref="sourceId"/>
                 <xs:element ref="destinationId"/>
                 <xs:element ref="multiplicity"/>
-                <xs:element ref="breakPoint" minOccurs="0"/>
-            </xs:all>
+                <xs:element ref="breakPoint" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
         </xs:complexType>
     </xs:element>
     <xs:element name="i18n">
@@ -117,8 +118,11 @@
         <xs:complexType>
             <xs:sequence>
                 <xs:element ref="id" minOccurs="0"/>
+                <xs:element ref="initials" minOccurs="0"/>
+                <xs:element name="title" minOccurs="0" type="i18nStringType"/>
                 <xs:element ref="icon" minOccurs="0"/>
                 <xs:element ref="defaultRole" minOccurs="0"/>
+                <xs:element ref="transitionRole" minOccurs="0"/>
                 <xs:element ref="caseName" minOccurs="0"/>
                 <xs:element ref="transaction" maxOccurs="unbounded" minOccurs="0"/>
                 <xs:element ref="role" maxOccurs="unbounded" minOccurs="0"/>
@@ -262,6 +266,12 @@
     <xs:element name="id" type="xs:string"/>
     <xs:element name="title" type="i18nStringType"/>
     <xs:element name="name" type="i18nStringType"/>
+    <xs:element name="initials" type="initialsType"/>
+    <xs:simpleType name="initialsType">
+        <xs:restriction base="xs:string">
+            <xs:length value="3"/>
+        </xs:restriction>
+    </xs:simpleType>
     <xs:element name="values" type="i18nStringType"/>
     <xs:element name="perform" type="xs:boolean"/>
     <xs:element name="view" type="xs:boolean"/>
@@ -274,6 +284,7 @@
                 <xs:element ref="view" minOccurs="0"/>
                 <xs:element name="behavior" type="behavior" maxOccurs="unbounded" minOccurs="0"/>
                 <xs:element ref="action" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:element ref="actionRef" minOccurs="0" maxOccurs="unbounded"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
@@ -366,7 +377,8 @@
             </xs:extension>
         </xs:simpleContent>
     </xs:complexType>
-    <xs:element name="defaultRole" type="xs:boolean"/>
+    <xs:element name="defaultRole" type="xs:boolean" default="true"/>
+    <xs:element name="transitionRole" type="xs:boolean" default="true"/>
     <xs:element name="i18nString" type="i18nStringType"/>
     <xs:complexType name="i18nStringType">
         <xs:simpleContent>
@@ -408,9 +420,16 @@
         <xs:complexType>
             <xs:sequence>
                 <xs:element ref="action" maxOccurs="unbounded" minOccurs="0"/>
+                <xs:element ref="actionRef" maxOccurs="unbounded" minOccurs="0"/>
             </xs:sequence>
             <xs:attribute type="eventPhaseType" name="phase" use="required"/>
         </xs:complexType>
     </xs:element>
     <xs:element name="message" type="i18nStringType"/>
+    <xs:element name="actionRef" type="actionRefType"/>
+    <xs:complexType name="actionRefType">
+        <xs:sequence>
+            <xs:element ref="id"/>
+        </xs:sequence>
+    </xs:complexType>
 </xs:schema>
