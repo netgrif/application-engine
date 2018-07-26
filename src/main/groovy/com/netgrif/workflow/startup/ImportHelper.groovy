@@ -24,6 +24,7 @@ import com.netgrif.workflow.workflow.service.TaskService
 import com.netgrif.workflow.workflow.service.interfaces.IDataService
 import com.netgrif.workflow.workflow.service.interfaces.IFilterService
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService
+import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService
 import com.netgrif.workflow.workflow.web.requestbodies.CreateFilterBody
 import com.netgrif.workflow.workflow.web.responsebodies.TaskReference
 import groovy.json.JsonOutput
@@ -85,6 +86,9 @@ class ImportHelper {
 
     @Autowired
     private IDataService dataService
+
+    @Autowired
+    private IWorkflowService workflowService
 
     private final ClassLoader loader = ImportHelper.getClassLoader()
 
@@ -166,16 +170,7 @@ class ImportHelper {
     }
 
     Case createCase(String title, PetriNet net, LoggedUser user) {
-        Case useCase = new Case(title, net, net.getActivePlaces())
-        useCase.setProcessIdentifier(net.getIdentifier())
-        useCase.setColor(getCaseColor())
-        useCase.setAuthor(user.transformToAuthor())
-        useCase.setIcon(net.icon)
-        useCase.setCreationDate(LocalDateTime.now())
-        useCase = caseRepository.save(useCase)
-        taskService.createTasks(useCase)
-        log.info("Case $title created")
-        return useCase
+        return workflowService.createCase(net.getStringId(), title, "", user)
     }
 
     Case createCase(String title, PetriNet net) {
