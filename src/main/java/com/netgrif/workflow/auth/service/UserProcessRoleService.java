@@ -49,6 +49,11 @@ public class UserProcessRoleService implements IUserProcessRoleService {
         return repository.save(userProcessRoles);
     }
 
+    @Override
+    public UserProcessRole findByRoleId(String roleId) {
+        return repository.findByRoleId(roleId);
+    }
+
     private String getDefaultRoleId() {
         if (DEFAULT_ROLE_ID == null) {
             ProcessRole role = processRoleRepository.findByName_DefaultValue(ProcessRole.DEFAULT_ROLE);

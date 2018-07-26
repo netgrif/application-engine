@@ -145,12 +145,30 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public LoggedUser getLoggedOrSystem() {
+    public User getLoggedOrSystem() {
         try {
-            return (LoggedUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            return getLoggedUser();
         } catch (NullPointerException e) {
-            return userRepository.findByEmail(SystemUserRunner.SYSTEM_USER_EMAIL).transformToLoggedUser();
+            return userRepository.findByEmail(SystemUserRunner.SYSTEM_USER_EMAIL);
         }
+    }
+
+    @Override
+    public User getSystem() {
+        return userRepository.findByEmail(SystemUserRunner.SYSTEM_USER_EMAIL);
+    }
+
+    @Override
+    public User getLoggedUser() {
+        LoggedUser loggedUser = (LoggedUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return findByEmail(loggedUser.getEmail(), false);
+    }
+
+    @Override
+    public User addRole(User user, String roleStringId) {
+        UserProcessRole role = userProcessRoleService.findByRoleId(roleStringId);
+        user.addProcessRole(role);
+        return userRepository.save(user);
     }
 
     private User loadProcessRoles(User user) {

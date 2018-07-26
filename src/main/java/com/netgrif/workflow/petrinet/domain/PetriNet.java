@@ -8,6 +8,7 @@ import com.netgrif.workflow.petrinet.domain.roles.ProcessRole;
 import com.netgrif.workflow.workflow.domain.DataField;
 import lombok.Getter;
 import lombok.Setter;
+import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -90,6 +91,7 @@ public class PetriNet extends PetriNetObject {
     private String importXmlPath;
 
     public PetriNet() {
+        this._id = new ObjectId();
         this.identifier = "Default";
         this.version = "1.0.0";
         initialized = false;

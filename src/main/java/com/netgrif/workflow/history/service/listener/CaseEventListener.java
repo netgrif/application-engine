@@ -1,6 +1,9 @@
 package com.netgrif.workflow.history.service.listener;
 
-import com.netgrif.workflow.event.events.usecase.*;
+import com.netgrif.workflow.event.events.usecase.CreateCaseEvent;
+import com.netgrif.workflow.event.events.usecase.DeleteCaseEvent;
+import com.netgrif.workflow.event.events.usecase.SaveCaseDataEvent;
+import com.netgrif.workflow.event.events.usecase.UpdateMarkingEvent;
 import com.netgrif.workflow.history.domain.CaseEventLog;
 import com.netgrif.workflow.history.domain.repository.EventLogRepository;
 import org.springframework.beans.factory.annotation.Autowired;
