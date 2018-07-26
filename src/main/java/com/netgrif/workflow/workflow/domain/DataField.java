@@ -102,7 +102,7 @@ public class DataField {
     }
 
     public boolean isForbidden(String transitionId) {
-        return behavior.containsKey(transitionId) && behavior.get(transitionId).contains(FieldBehavior.REQUIRED);
+        return behavior.containsKey(transitionId) && behavior.get(transitionId).contains(FieldBehavior.FORBIDDEN);
     }
 
     public void makeVisible(String transition) {
@@ -123,6 +123,10 @@ public class DataField {
 
     public void makeHidden(String transition) {
         changeBehavior(FieldBehavior.HIDDEN, transition);
+    }
+
+    public void makeForbidden(String transition) {
+        changeBehavior(FieldBehavior.FORBIDDEN, transition);
     }
 
     private void changeBehavior(FieldBehavior behavior, String transition) {

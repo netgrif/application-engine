@@ -58,7 +58,8 @@ public interface IPetriNetService {
     Optional<PetriNet> findByImportId(long id);
 
     static PetriNetReference transformToReference(PetriNet net, Locale locale) {
-        return new PetriNetReference(net.getStringId(), net.getIdentifier(), net.getVersion(), net.getTitle().getTranslation(locale), net.getInitials(), net.getTranslatedDefaultCaseName(locale));
+        //return new PetriNetReference(net.getStringId(), net.getIdentifier(), net.getVersion(), net.getTitle().getTranslation(locale), net.getInitials(), net.getTranslatedDefaultCaseName(locale));
+        return new PetriNetReference(net, locale);
     }
 
     static TransitionReference transformToReference(PetriNet net, Transition transition, Locale locale) {
