@@ -13,4 +13,6 @@ public interface IUserProcessRoleService {
     UserProcessRole findDefault();
 
     List<UserProcessRole> saveRoles(Collection<ProcessRole> values, String netId);
+
+    UserProcessRole findByRoleId(String roleId);
 }

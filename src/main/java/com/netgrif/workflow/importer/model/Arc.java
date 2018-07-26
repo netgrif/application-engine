@@ -1,7 +1,14 @@
 
 package com.netgrif.workflow.importer.model;
 
-import javax.xml.bind.annotation.*;
+import java.util.ArrayList;
+import java.util.List;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlSchemaType;
+import javax.xml.bind.annotation.XmlType;
 
 
 /**
@@ -13,14 +20,14 @@ import javax.xml.bind.annotation.*;
  * &lt;complexType&gt;
  *   &lt;complexContent&gt;
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
- *       &lt;all&gt;
+ *       &lt;sequence&gt;
  *         &lt;element ref="{}id"/&gt;
  *         &lt;element name="type" type="{}arc_type"/&gt;
  *         &lt;element ref="{}sourceId"/&gt;
  *         &lt;element ref="{}destinationId"/&gt;
  *         &lt;element ref="{}multiplicity"/&gt;
- *         &lt;element ref="{}breakPoint" minOccurs="0"/&gt;
- *       &lt;/all&gt;
+ *         &lt;element ref="{}breakPoint" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *       &lt;/sequence&gt;
  *     &lt;/restriction&gt;
  *   &lt;/complexContent&gt;
  * &lt;/complexType&gt;
@@ -30,7 +37,12 @@ import javax.xml.bind.annotation.*;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
-
+    "id",
+    "type",
+    "sourceId",
+    "destinationId",
+    "multiplicity",
+    "breakPoint"
 })
 @XmlRootElement(name = "arc")
 public class Arc {
@@ -45,7 +57,7 @@ public class Arc {
     @XmlElement(required = true)
     protected String destinationId;
     protected int multiplicity;
-    protected BreakPoint breakPoint;
+    protected List<BreakPoint> breakPoint;
 
     /**
      * Gets the value of the id property.
@@ -162,25 +174,30 @@ public class Arc {
     /**
      * Gets the value of the breakPoint property.
      * 
-     * @return
-     *     possible object is
-     *     {@link BreakPoint }
-     *     
-     */
-    public BreakPoint getBreakPoint() {
-        return breakPoint;
-    }
-
-    /**
-     * Sets the value of the breakPoint property.
+     * <p>
+     * This accessor method returns a reference to the live list,
+     * not a snapshot. Therefore any modification you make to the
+     * returned list will be present inside the JAXB object.
+     * This is why there is not a <CODE>set</CODE> method for the breakPoint property.
      * 
-     * @param value
-     *     allowed object is
-     *     {@link BreakPoint }
-     *     
+     * <p>
+     * For example, to add a new item, do as follows:
+     * <pre>
+     *    getBreakPoint().add(newItem);
+     * </pre>
+     * 
+     * 
+     * <p>
+     * Objects of the following type(s) are allowed in the list
+     * {@link BreakPoint }
+     * 
+     * 
      */
-    public void setBreakPoint(BreakPoint value) {
-        this.breakPoint = value;
+    public List<BreakPoint> getBreakPoint() {
+        if (breakPoint == null) {
+            breakPoint = new ArrayList<BreakPoint>();
+        }
+        return this.breakPoint;
     }
 
 }

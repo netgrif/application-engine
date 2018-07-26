@@ -217,15 +217,17 @@ public class DataService implements IDataService {
     }
 
     @Override
-    public Map<String, ChangedField> runActions(List<Action> actions, Case useCase, Transition transition) {
+    public Map<String, ChangedField> runActions(List<Action> actions, String useCaseId, Transition transition) {
+        Case case$ = workflowService.findOne(useCaseId);
         Map<String, ChangedField> changedFields = new HashMap<>();
         actions.forEach(action -> {
-            ChangedField changedField = actionsRunner.run(action, useCase);
+            ChangedField changedField = actionsRunner.run(action, case$);
             if (changedField.getId() == null)
                 return;
             mergeChanges(changedFields, changedField);
-            runActionsOnChanged(Action.ActionTrigger.SET, useCase, transition, changedFields, true, changedField);
+            runActionsOnChanged(Action.ActionTrigger.SET, case$, transition, changedFields, true, changedField);
         });
+        workflowService.save(case$);
         return changedFields;
     }
 

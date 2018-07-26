@@ -3,11 +3,12 @@ package com.netgrif.workflow.petrinet.domain
 import com.netgrif.workflow.auth.domain.repositories.UserProcessRoleRepository
 import com.netgrif.workflow.auth.domain.repositories.UserRepository
 import com.netgrif.workflow.importer.service.Importer
-import com.netgrif.workflow.ipc.TaskExecutionTest
+import com.netgrif.workflow.ipc.TaskApiTest
 import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository
 import com.netgrif.workflow.startup.DefaultRoleRunner
 import com.netgrif.workflow.startup.ImportHelper
 import com.netgrif.workflow.startup.SuperCreator
+import com.netgrif.workflow.startup.SystemUserRunner
 import com.netgrif.workflow.workflow.domain.Case
 import com.netgrif.workflow.workflow.domain.repositories.CaseRepository
 import com.netgrif.workflow.workflow.domain.repositories.TaskRepository
@@ -65,8 +66,11 @@ class EventTest {
     @Autowired
     private UserProcessRoleRepository roleRepository
 
+    @Autowired
+    private SystemUserRunner userRunner
+
     private def stream = { String name ->
-        return TaskExecutionTest.getClassLoader().getResourceAsStream(name)
+        return TaskApiTest.getClassLoader().getResourceAsStream(name)
     }
 
     Case instance
@@ -76,6 +80,7 @@ class EventTest {
     void testEventImport() {
         template.db.dropDatabase()
         userRepository.deleteAll()
+        userRunner.run("")
         roleRepository.deleteAll()
         roleRunner.run()
         superCreator.run()
