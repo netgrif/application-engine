@@ -14,6 +14,7 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.data.domain.Page;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 
@@ -27,9 +28,9 @@ public interface IDataService {
 
     FileSystemResource getFileByTask(String taskId, String fieldId);
 
-    FileSystemResource getFileByCase(String caseId, String fieldId);
+    InputStream getFileByCase(String caseId, String fieldId);
 
-    FileSystemResource getFile(Case useCase, FileField field);
+    InputStream getFile(Case useCase, FileField field);
 
     boolean saveFile(String taskId, String fieldId, MultipartFile multipartFile);
 
