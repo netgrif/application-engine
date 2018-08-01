@@ -38,7 +38,7 @@ public final class FieldFactory {
                 field = new DateField();
                 break;
             case FILE:
-                field = new FileField();
+                field = buildFileField(data, importer);
                 break;
             case ENUMERATION:
                 field = buildEnumerationField(data.getValues(), data.getInit(), importer);
@@ -71,7 +71,7 @@ public final class FieldFactory {
         if (data.getValid() != null && field instanceof ValidableField)
             ((ValidableField) field).setValidationRules(data.getValid());
         if (data.getInit() != null && field instanceof FieldWithDefault)
-            setFieldDefaultValue((FieldWithDefault) field,data.getInit());
+            setFieldDefaultValue((FieldWithDefault) field, data.getInit());
         setActions(field, data);
         setEncryption(field, data);
 
@@ -131,6 +131,12 @@ public final class FieldFactory {
         return new UserField(roles);
     }
 
+    private FileField buildFileField(Data data, Importer importer) {
+        FileField fileField = new FileField();
+        fileField.setRemote(data.getRemote() != null);
+        return fileField;
+    }
+
     private void setActions(Field field, Data data) {
         if (data.getAction() != null && data.getAction().size() != 0) {
 //            data.getAction().forEach(action -> field.addAction(action.getValue(), action.getTrigger()));
@@ -178,7 +184,7 @@ public final class FieldFactory {
         Field field = useCase.getPetriNet().getDataSet().get(fieldId);
         resolveValidation(field, withValidation);
         resolveDataValues(field, useCase, fieldId);
-        if (field instanceof  ChoiceField)
+        if (field instanceof ChoiceField)
             resolveChoices((ChoiceField) field, useCase);
         return field;
     }

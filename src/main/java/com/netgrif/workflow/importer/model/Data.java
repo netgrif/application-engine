@@ -32,6 +32,7 @@ import javax.xml.bind.annotation.XmlType;
  *         &lt;element ref="{}action" maxOccurs="unbounded" minOccurs="0"/&gt;
  *         &lt;element ref="{}actionRef" maxOccurs="unbounded" minOccurs="0"/&gt;
  *         &lt;element ref="{}documentRef" minOccurs="0"/&gt;
+ *         &lt;element ref="{}remote" minOccurs="0"/&gt;
  *       &lt;/sequence&gt;
  *       &lt;attribute name="type" use="required" type="{}data_type" /&gt;
  *       &lt;attribute name="immediate" type="{http://www.w3.org/2001/XMLSchema}boolean" /&gt;
@@ -54,7 +55,8 @@ import javax.xml.bind.annotation.XmlType;
     "encryption",
     "action",
     "actionRef",
-    "documentRef"
+    "documentRef",
+    "remote"
 })
 @XmlRootElement(name = "data")
 public class Data {
@@ -72,6 +74,7 @@ public class Data {
     protected List<ActionType> action;
     protected List<ActionRefType> actionRef;
     protected DocumentRef documentRef;
+    protected String remote;
     @XmlAttribute(name = "type", required = true)
     protected DataType type;
     @XmlAttribute(name = "immediate")
@@ -359,6 +362,30 @@ public class Data {
      */
     public void setDocumentRef(DocumentRef value) {
         this.documentRef = value;
+    }
+
+    /**
+     * Gets the value of the remote property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getRemote() {
+        return remote;
+    }
+
+    /**
+     * Sets the value of the remote property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setRemote(String value) {
+        this.remote = value;
     }
 
     /**
