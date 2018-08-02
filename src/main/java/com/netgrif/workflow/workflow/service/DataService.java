@@ -25,13 +25,11 @@ import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.io.FileSystemResource;
-import org.springframework.core.io.InputStreamResource;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.LocalDate;
 import java.util.*;
@@ -143,21 +141,20 @@ public class DataService implements IDataService {
     }
 
     @Override
-    public FileSystemResource getFileByTask(String taskId, String fieldId) {
+    public FileFieldInputStream getFileByTask(String taskId, String fieldId) {
         Task task = taskService.findOne(taskId);
-//        return getFileByCase(task.getCaseId(), fieldId);
-        return null;
+        return getFileByCase(task.getCaseId(), fieldId);
     }
 
     @Override
-    public InputStream getFileByCase(String caseId, String fieldId){
+    public FileFieldInputStream getFileByCase(String caseId, String fieldId) {
         Case useCase = workflowService.findOne(caseId);
         FileField field = (FileField) useCase.getPetriNet().getDataSet().get(fieldId);
         return getFile(useCase, field);
     }
 
     @Override
-    public InputStream getFile(Case useCase, FileField field){
+    public FileFieldInputStream getFile(Case useCase, FileField field) {
         field.getActions().forEach(action -> actionsRunner.run(action, useCase));
         if (useCase.getDataSet().get(field.getStringId()).getValue() == null)
             return null;
@@ -165,25 +162,25 @@ public class DataService implements IDataService {
         workflowService.save(useCase);
         field.setValue((String) useCase.getDataSet().get(field.getStringId()).getValue());
 
-        if(field.isRemote()){
+        if (field.isRemote()) {
             try {
-                return download(field.getValue());
+                return new FileFieldInputStream(field, download(field.getValue().getPath()));
             } catch (IOException e) {
                 e.printStackTrace();
                 return null;
             }
         } else {
             try {
-                return new FileInputStream(field.getFilePath(useCase.getStringId()));
+                return new FileFieldInputStream(field, new FileInputStream(field.getFilePath(useCase.getStringId())));
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
                 return null;
             }
-//            return new FileSystemResource(field.getFilePath(useCase.getStringId()));
         }
     }
 
-    private InputStream download(String url) throws IOException {
+    @Override
+    public InputStream download(String url) throws IOException {
         URL connection = new URL(url);
         return new BufferedInputStream(connection.openStream());
     }
