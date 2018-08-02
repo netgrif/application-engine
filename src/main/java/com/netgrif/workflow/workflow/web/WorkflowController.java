@@ -2,6 +2,7 @@ package com.netgrif.workflow.workflow.web;
 
 import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.workflow.domain.Case;
+import com.netgrif.workflow.workflow.service.FileFieldInputStream;
 import com.netgrif.workflow.workflow.service.interfaces.IDataService;
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
 import com.netgrif.workflow.workflow.web.requestbodies.CreateCaseBody;
@@ -130,16 +131,16 @@ public class WorkflowController {
 
     @RequestMapping(value = "/case/{id}/file/{field}", method = RequestMethod.GET, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public ResponseEntity<Resource> getFile(@PathVariable("id") String caseId, @PathVariable("field") String fieldId) {
-        InputStreamResource resource = new InputStreamResource(dataService.getFileByCase(caseId, fieldId));
+        FileFieldInputStream fileFieldInputStream = dataService.getFileByCase(caseId, fieldId);
 
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_OCTET_STREAM_VALUE);
-        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + fieldId);
+        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + fileFieldInputStream.getFileName());
 
         return ResponseEntity
                 .ok()
                 .headers(headers)
-                .body(resource);
+                .body(new InputStreamResource(fileFieldInputStream.getInputStream()));
 
 
 //        FileSystemResource fileResource = dataService.getFileByCase(caseId, fieldId);

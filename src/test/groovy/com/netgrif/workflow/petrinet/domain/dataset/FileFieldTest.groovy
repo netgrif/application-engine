@@ -1,6 +1,7 @@
 package com.netgrif.workflow.petrinet.domain.dataset
 
 import com.netgrif.workflow.TestHelper
+import com.netgrif.workflow.WorkflowManagementSystemApplication
 import com.netgrif.workflow.auth.domain.User
 import com.netgrif.workflow.auth.service.interfaces.IUserService
 import com.netgrif.workflow.importer.service.Importer
@@ -8,32 +9,44 @@ import com.netgrif.workflow.petrinet.domain.PetriNet
 import com.netgrif.workflow.startup.ImportHelper
 import com.netgrif.workflow.workflow.domain.Case
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService
-import com.netgrif.workflow.workflow.web.WorkflowController
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.internal.matchers.Contains
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.MediaType
+import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors
+import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit4.SpringRunner
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.MvcResult
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
+import org.springframework.test.web.servlet.setup.MockMvcBuilders
+import org.springframework.web.context.WebApplicationContext
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
+import static org.hamcrest.core.StringContains.containsString
 
 @RunWith(SpringRunner.class)
 @ActiveProfiles(["test"])
-@SpringBootTest
+@SpringBootTest(
+        webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
+        classes = WorkflowManagementSystemApplication.class
+)
 @AutoConfigureMockMvc
 class FileFieldTest {
 
-    public static final String NET_ID = "remote_file_field_net"
     public static final String FIELD_ID = "file"
     public static final String TASK_TITLE = "Task"
+    public static final String USER_EMAIL = "super@netgrif.com"
+
+    @Value('${admin.password:password}')
+    private String userPassword
 
     @Autowired
     private ImportHelper importHelper
@@ -45,17 +58,23 @@ class FileFieldTest {
     private Importer importer
 
     @Autowired
-    private MockMvc mockMvc
-
-    @Autowired
     private IWorkflowService workflowService
 
     @Autowired
     private IUserService userService
 
+    @Autowired
+    private WebApplicationContext context
+
+    private MockMvc mockMvc
+
     @Before
     void setup() {
         testHelper.truncateDbs()
+        mockMvc = MockMvcBuilders
+                .webAppContextSetup(context)
+                .apply(SecurityMockMvcConfigurers.springSecurity())
+                .build()
     }
 
     PetriNet getNet() {
@@ -72,23 +91,36 @@ class FileFieldTest {
     }
 
     @Test
-    void downloadFile() {
-        testHelper.truncateDbs()
+    void downloadFileByCase() {
         PetriNet net = getNet()
 
-        User user = userService.findByEmail("super@netgrif.com", true)
+        User user = userService.findByEmail(USER_EMAIL, true)
         assert user != null
 
         Case useCase = workflowService.createCase(net.getStringId(), "Test file download", "black", user.transformToLoggedUser())
         importHelper.assignTask(TASK_TITLE, useCase.getStringId(), user.transformToLoggedUser())
-//        importHelper.setTaskData(TASK_TITLE, useCase.getStringId(), ["file": ["type": "file", "value": "https://google.com"]])
-//        importHelper.finishTask(TASK_TITLE, useCase.getStringId(), user.transformToLoggedUser())
 
-
-        MvcResult result = mockMvc.perform(get("/api/workflow/case/" + useCase.getStringId() + "/file/" + FIELD_ID))
+        MvcResult result = mockMvc.perform(get("/api/workflow/case/" + useCase.getStringId() + "/file/" + FIELD_ID)
+                .with(SecurityMockMvcRequestPostProcessors.httpBasic(USER_EMAIL, userPassword)))
+                .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_OCTET_STREAM))
+                .andExpect(MockMvcResultMatchers.content().string(containsString("Netgrif")))
                 .andReturn()
-        assert result.response.contentType == MediaType.APPLICATION_OCTET_STREAM_VALUE
+    }
+
+    @Test
+    void downloadFileByTask(){
+        PetriNet net = getNet()
+
+        User user = userService.findByEmail(USER_EMAIL,true)
+        assert user != null
+
+        Case useCase = workflowService.createCase(net.getStringId(), "Test file download", "black", user.transformToLoggedUser())
+        importHelper.assignTask(TASK_TITLE, useCase.getStringId(), user.transformToLoggedUser())
+        //TODO set data
+
+        mockMvc.perform(get("/api/task/"+importHelper.getTaskId(TASK_TITLE,useCase.getStringId()+"/file/"+FIELD_ID)))
     }
 
 
