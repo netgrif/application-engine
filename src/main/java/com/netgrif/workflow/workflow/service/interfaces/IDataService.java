@@ -10,10 +10,12 @@ import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldContainer;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.Task;
+import com.netgrif.workflow.workflow.service.FileFieldInputStream;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.data.domain.Page;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
@@ -26,11 +28,13 @@ public interface IDataService {
 
     ChangedFieldContainer setData(String taskId, ObjectNode values);
 
-    FileSystemResource getFileByTask(String taskId, String fieldId);
+    FileFieldInputStream getFileByTask(String taskId, String fieldId);
 
-    InputStream getFileByCase(String caseId, String fieldId);
+    FileFieldInputStream getFileByCase(String caseId, String fieldId);
 
-    InputStream getFile(Case useCase, FileField field);
+    FileFieldInputStream getFile(Case useCase, FileField field);
+
+    InputStream download(String url) throws IOException;
 
     boolean saveFile(String taskId, String fieldId, MultipartFile multipartFile);
 

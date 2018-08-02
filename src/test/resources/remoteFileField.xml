@@ -7,7 +7,7 @@
         <id>file</id>
         <title>Remote File</title>
         <placeholder>Remote file</placeholder>
-        <init>REMOTE FILE</init>
+        <init>test-file.txt:https://netgrif.com</init>
         <remote/>
     </data>
     <transition>
@@ -15,14 +15,11 @@
         <x>0</x>
         <y>0</y>
         <label>Task</label>
-        <event type="assign">
-            <id>1</id>
-            <actions phase="post">
-                <action>
-                    field: f.file;
-                    change field value { "https://google.com" }
-                </action>
-            </actions>
-        </event>
+        <dataRef>
+            <id>file</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
     </transition>
 </document>
