@@ -61,6 +61,7 @@ public final class FieldFactory {
             default:
                 throw new IllegalArgumentException(data.getType() + " is not a valid Field type");
         }
+
         field.setName(importer.toI18NString(data.getTitle()));
         field.setImportId(data.getId());
         field.setImmediate(data.isImmediate());
@@ -167,6 +168,10 @@ public final class FieldFactory {
                 if (field.getDefaultValue() != null)
                     break;
                 ((MultichoiceField) field).setDefaultValue(defaultValue);
+                break;
+            case FILE:
+                ((FileField) field).setDefaultValue(defaultValue);
+                break;
             default:
                 field.setDefaultValue(defaultValue);
         }

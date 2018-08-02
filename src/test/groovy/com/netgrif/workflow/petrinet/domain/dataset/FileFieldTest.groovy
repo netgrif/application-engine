@@ -29,8 +29,12 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.web.context.WebApplicationContext
 
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import static org.hamcrest.core.StringContains.containsString
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
 @RunWith(SpringRunner.class)
 @ActiveProfiles(["test"])
@@ -100,27 +104,32 @@ class FileFieldTest {
         Case useCase = workflowService.createCase(net.getStringId(), "Test file download", "black", user.transformToLoggedUser())
         importHelper.assignTask(TASK_TITLE, useCase.getStringId(), user.transformToLoggedUser())
 
-        MvcResult result = mockMvc.perform(get("/api/workflow/case/" + useCase.getStringId() + "/file/" + FIELD_ID)
-                .with(SecurityMockMvcRequestPostProcessors.httpBasic(USER_EMAIL, userPassword)))
-                .andDo(MockMvcResultHandlers.print())
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_OCTET_STREAM))
-                .andExpect(MockMvcResultMatchers.content().string(containsString("Netgrif")))
+        mockMvc.perform(get("/api/workflow/case/" + useCase.getStringId() + "/file/" + FIELD_ID)
+                .with(httpBasic(USER_EMAIL, userPassword)))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_OCTET_STREAM))
+                .andExpect(content().string(containsString("Netgrif")))
                 .andReturn()
     }
 
     @Test
-    void downloadFileByTask(){
+    void downloadFileByTask() {
         PetriNet net = getNet()
 
-        User user = userService.findByEmail(USER_EMAIL,true)
+        User user = userService.findByEmail(USER_EMAIL, true)
         assert user != null
 
         Case useCase = workflowService.createCase(net.getStringId(), "Test file download", "black", user.transformToLoggedUser())
         importHelper.assignTask(TASK_TITLE, useCase.getStringId(), user.transformToLoggedUser())
-        //TODO set data
 
-        mockMvc.perform(get("/api/task/"+importHelper.getTaskId(TASK_TITLE,useCase.getStringId()+"/file/"+FIELD_ID)))
+        mockMvc.perform(get("/api/task/" + importHelper.getTaskId(TASK_TITLE, useCase.getStringId()) + "/file/" + FIELD_ID).
+                with(httpBasic(USER_EMAIL, userPassword)))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_OCTET_STREAM))
+                .andExpect(content().string(containsString("Netgrif")))
+                .andReturn()
     }
 
 
