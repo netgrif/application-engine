@@ -12,6 +12,7 @@ import com.netgrif.workflow.petrinet.domain.DataGroup;
 import com.netgrif.workflow.petrinet.domain.Transition;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.petrinet.domain.dataset.FileField;
+import com.netgrif.workflow.petrinet.domain.dataset.FileFieldValue;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedField;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldContainer;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action;
@@ -160,7 +161,7 @@ public class DataService implements IDataService {
             return null;
 
         workflowService.save(useCase);
-        field.setValue((String) useCase.getDataSet().get(field.getStringId()).getValue());
+        field.setValue((FileFieldValue) useCase.getDataSet().get(field.getStringId()).getValue());
 
         if (field.isRemote()) {
             try {
@@ -192,24 +193,13 @@ public class DataService implements IDataService {
             Case useCase = workflowService.findOne(task.getCaseId());
             FileField field = (FileField) useCase.getPetriNet().getDataSet().get(fieldId);
 
-            if (useCase.getDataSet().get(fieldId).getValue() != null) {
-                new File(field.getFilePath(useCase.getStringId())).delete();
-                useCase.getDataSet().get(fieldId).setValue(null);
+            if (field.isRemote()) {
+                upload(useCase, field, multipartFile);
+            } else {
+                if (!saveLocalFile(useCase, field, multipartFile))
+                    return false;
             }
 
-            field.setValue(multipartFile.getOriginalFilename());
-            File file = new File(field.getFilePath(useCase.getStringId()));
-            file.getParentFile().mkdirs();
-            if (!file.createNewFile()) {
-                file.delete();
-                file.createNewFile();
-            }
-
-            FileOutputStream fout = new FileOutputStream(file);
-            fout.write(multipartFile.getBytes());
-            fout.close();
-
-            useCase.getDataSet().get(fieldId).setValue(multipartFile.getOriginalFilename());
             field.getActions().forEach(action -> actionsRunner.run(action, useCase));
             workflowService.save(useCase);
 
@@ -218,6 +208,32 @@ public class DataService implements IDataService {
             e.printStackTrace();
             return false;
         }
+    }
+
+    public boolean saveLocalFile(Case useCase, FileField field, MultipartFile multipartFile) throws IOException {
+        if (useCase.getDataSet().get(field.getStringId()).getValue() != null) {
+            new File(field.getFilePath(useCase.getStringId())).delete();
+            useCase.getDataSet().get(field.getStringId()).setValue(null);
+        }
+
+        field.setValue(multipartFile.getOriginalFilename());
+        File file = new File(field.getFilePath(useCase.getStringId()));
+        file.getParentFile().mkdirs();
+        if (!file.createNewFile()) {
+            file.delete();
+            file.createNewFile();
+        }
+
+        FileOutputStream fout = new FileOutputStream(file);
+        fout.write(multipartFile.getBytes());
+        fout.close();
+
+        useCase.getDataSet().get(field.getStringId()).setValue(field.getValue());
+        return true;
+    }
+
+    public boolean upload(Case useCase, FileField field, MultipartFile multipartFile) {
+        throw new UnsupportedOperationException("Upload new file to the remote storage is not implemented yet.");
     }
 
     @Override
