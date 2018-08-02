@@ -23,8 +23,24 @@ class FileField extends FieldWithDefault<FileFieldValue> {
         setValue(getDefaultValue())
     }
 
+    @Override
+    void setValue(FileFieldValue value) {
+        if (value instanceof String)
+            this.setValue((String) value)
+        else
+            super.setValue(value)
+    }
+
     void setValue(String value) {
         this.setValue(FileFieldValue.fromString(value))
+    }
+
+    @Override
+    void setDefaultValue(FileFieldValue defaultValue) {
+        if (value instanceof String)
+            this.setDefaultValue((String) value)
+        else
+            super.setDefaultValue(defaultValue)
     }
 
     void setDefaultValue(String defaultValue) {
