@@ -15,7 +15,6 @@ import com.netgrif.workflow.utils.DateUtils;
 import com.netgrif.workflow.utils.FullPageRequest;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.Task;
-import com.netgrif.workflow.workflow.domain.TaskPair;
 import com.netgrif.workflow.workflow.domain.repositories.TaskRepository;
 import com.netgrif.workflow.workflow.domain.triggers.AutoTrigger;
 import com.netgrif.workflow.workflow.domain.triggers.TimeTrigger;
@@ -171,8 +170,6 @@ public class TaskService implements ITaskService {
         validateData(transition, useCase);
         outcome.add(dataService.runActions(transition.getPreFinishActions(), useCase.getStringId(), transition));
         finishExecution(transition, useCase.getStringId());
-        outcome.add(dataService.runActions(transition.getPostFinishActions(), useCase.getStringId(), transition));
-
         task.setFinishDate(LocalDateTime.now());
         task.setFinishedBy(task.getUserId());
         task.setUserId(null);
@@ -180,6 +177,7 @@ public class TaskService implements ITaskService {
         useCase = workflowService.findOne(useCase.getStringId());
         taskRepository.save(task);
         reloadTasks(useCase);
+        outcome.add(dataService.runActions(transition.getPostFinishActions(), useCase.getStringId(), transition));
 
         publisher.publishEvent(new UserFinishTaskEvent(user, task, useCase));
         log.info("Task [" + task.getTitle() + "] in case [" + useCase.getTitle() + "] assigned to [" + user.getEmail() + "] was finished");
@@ -312,7 +310,9 @@ public class TaskService implements ITaskService {
             }
         });
         List<Task> tasks = taskRepository.findAllByCaseId(useCase.getStringId());
-
+        if (tasks.stream().anyMatch(task -> Objects.equals(task.getUserId(), userService.getSystem().getId()) && task.getStartDate() != null)) {
+            return;
+        }
         for (Task task : tasks) {
             if (Objects.equals(task.getUserId(), userService.getSystem().getId()) && task.getStartDate() == null) {
                 executeTransition(task, workflowService.findOne(useCase.getStringId()));
