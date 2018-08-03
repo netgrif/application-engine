@@ -354,6 +354,13 @@ public class DataService implements IDataService {
                 }
                 value = node.get("value").asDouble();
                 break;
+            case "file":
+                if (node.get("value") == null) {
+                    value = new FileFieldValue();
+                    break;
+                }
+                value = FileFieldValue.fromString(node.get("value").asText());
+                break;
             default:
                 if (node.get("value") == null) {
                     value = "null";
