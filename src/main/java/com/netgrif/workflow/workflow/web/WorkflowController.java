@@ -2,6 +2,7 @@ package com.netgrif.workflow.workflow.web;
 
 import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.workflow.domain.Case;
+import com.netgrif.workflow.workflow.domain.QCase;
 import com.netgrif.workflow.workflow.service.FileFieldInputStream;
 import com.netgrif.workflow.workflow.service.interfaces.IDataService;
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
@@ -72,7 +73,9 @@ public class WorkflowController {
         Page<Case> cases = workflowService.search(predicate, pageable);
         Link selfLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(WorkflowController.class)
                 .search2(predicate, pageable, assembler)).withRel("search2");
-        return assembler.toResource(cases, new CaseResourceAssembler(), selfLink);
+        PagedResources<CaseResource> resources = assembler.toResource(cases, new CaseResourceAssembler(), selfLink);
+        ResourceLinkAssembler.addLinks(resources, Case.class, selfLink.getRel());
+        return resources;
     }
 
     @RequestMapping(value = "/case/search", method = RequestMethod.POST)
