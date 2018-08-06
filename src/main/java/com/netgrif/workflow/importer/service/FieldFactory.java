@@ -229,6 +229,9 @@ public final class FieldFactory {
             case DATETIME:
                 parseDateTimeValue((DateTimeField) field, fieldId, useCase);
                 break;
+            case FILE:
+                parseFileValue((FileField) field, useCase, fieldId);
+                break;
             default:
                 field.setValue(useCase.getFieldValue(fieldId));
         }
@@ -318,5 +321,15 @@ public final class FieldFactory {
         }).collect(Collectors.toMap(Pair::getFirst, Pair::getSecond));
 
         field.setImmediateFieldValues(values);
+    }
+
+    private void parseFileValue(FileField field, Case useCase, String fieldId) {
+        Object value = useCase.getFieldValue(fieldId);
+        if (value instanceof String) {
+            field.setValue((String) value);
+        } else if (value instanceof FileFieldValue) {
+            field.setValue((FileFieldValue) value);
+        } else
+            throw new IllegalArgumentException("Object " + value.toString() + " cannot be set as value to the File field [" + fieldId + "] !");
     }
 }
