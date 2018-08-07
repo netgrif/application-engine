@@ -325,6 +325,9 @@ public final class FieldFactory {
 
     private void parseFileValue(FileField field, Case useCase, String fieldId) {
         Object value = useCase.getFieldValue(fieldId);
+        if (value == null)
+            return;
+
         if (value instanceof String) {
             field.setValue((String) value);
         } else if (value instanceof FileFieldValue) {
