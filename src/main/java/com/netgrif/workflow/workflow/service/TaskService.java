@@ -15,7 +15,6 @@ import com.netgrif.workflow.utils.DateUtils;
 import com.netgrif.workflow.utils.FullPageRequest;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.Task;
-import com.netgrif.workflow.workflow.domain.TaskPair;
 import com.netgrif.workflow.workflow.domain.repositories.TaskRepository;
 import com.netgrif.workflow.workflow.domain.triggers.AutoTrigger;
 import com.netgrif.workflow.workflow.domain.triggers.TimeTrigger;
@@ -298,7 +297,7 @@ public class TaskService implements ITaskService {
     @Override
     @Transactional
     public void reloadTasks(Case useCase) {
-        log.info("Reloading tasks in ["+useCase.getTitle()+"]");
+        log.info("Reloading tasks in [" + useCase.getTitle() + "]");
         PetriNet net = useCase.getPetriNet();
 
         net.getTransitions().values().forEach(transition -> {
@@ -394,7 +393,7 @@ public class TaskService implements ITaskService {
 
             outcome.setMessage(new I18nString("Task " + task.getTitle() + " executed"));
         } catch (TransitionNotExecutableException e) {
-            log.error("execution of task ["+task.getTitle()+"] in case ["+useCase.getTitle()+"] failed");
+            log.error("execution of task [" + task.getTitle() + "] in case [" + useCase.getTitle() + "] failed");
             e.printStackTrace();
         }
         return outcome;
@@ -423,7 +422,13 @@ public class TaskService implements ITaskService {
     @Transactional
     protected void scheduleTaskExecution(Task task, LocalDateTime time, Case useCase) {
         log.info("Task " + task.getTitle() + " scheduled to run at " + time.toString());
-        scheduler.schedule(() -> executeTransition(task, useCase), DateUtils.localDateTimeToDate(time));
+        scheduler.schedule(() -> {
+            try {
+                executeTransition(task, useCase);
+            } catch (Exception e) {
+                log.info("Scheduled task [" + task.getTitle() + "] of case [" + useCase.getTitle() + "] could not be executed: " + e);
+            }
+        }, DateUtils.localDateTimeToDate(time));
         publisher.publishEvent(new TimeFinishTaskEvent(time, task, useCase));
     }
 
