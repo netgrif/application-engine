@@ -48,5 +48,6 @@ public abstract class CaseRepositoryImpl implements CaseRepository {
                             return field.value.eq(o.getValue().getValue().toString());
                         })
                         .reduce(BooleanExpression::and).get());
+        bindings.bind(qCase.title).first(StringExpression::likeIgnoreCase);
     }
 }
