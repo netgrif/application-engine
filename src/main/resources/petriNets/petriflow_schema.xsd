@@ -26,6 +26,7 @@
                 <xs:element ref="action" minOccurs="0" maxOccurs="unbounded"/>
                 <xs:element ref="actionRef" minOccurs="0" maxOccurs="unbounded"/>
                 <xs:element ref="documentRef" minOccurs="0"/>
+                <xs:element ref="remote" minOccurs="0"/>
             </xs:sequence>
             <xs:attribute type="data_type" name="type" use="required"/>
             <xs:attribute type="xs:boolean" name="immediate"/>
@@ -118,6 +119,7 @@
         <xs:complexType>
             <xs:sequence>
                 <xs:element ref="id" minOccurs="0"/>
+                <xs:element ref="version" minOccurs="0"/>
                 <xs:element ref="initials" minOccurs="0"/>
                 <xs:element name="title" minOccurs="0" type="i18nStringType"/>
                 <xs:element ref="icon" minOccurs="0"/>
@@ -266,6 +268,7 @@
     <xs:element name="id" type="xs:string"/>
     <xs:element name="title" type="i18nStringType"/>
     <xs:element name="name" type="i18nStringType"/>
+    <xs:element name="version" type="xs:string"/>
     <xs:element name="initials" type="initialsType"/>
     <xs:simpleType name="initialsType">
         <xs:restriction base="xs:string">
@@ -347,6 +350,12 @@
     <xs:element name="placeholder" type="i18nStringType"/>
     <xs:element name="valid" type="validation"/>
     <xs:element name="init" type="xs:string"/>
+    <xs:simpleType name="remoteType">
+        <xs:restriction base="xs:string">
+            <xs:maxLength value="0"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:element name="remote" type="remoteType"/>
     <xs:element name="desc" type="i18nStringType"/>
     <xs:element name="priority" type="nonNegativeInteger"/>
     <xs:element name="trigger">
