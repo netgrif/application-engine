@@ -34,6 +34,7 @@ public class ObjectFactory {
     private final static QName _Encryption_QNAME = new QName("", "encryption");
     private final static QName _Action_QNAME = new QName("", "action");
     private final static QName _ActionRef_QNAME = new QName("", "actionRef");
+    private final static QName _Remote_QNAME = new QName("", "remote");
     private final static QName _Name_QNAME = new QName("", "name");
     private final static QName _TransitionRef_QNAME = new QName("", "transitionRef");
     private final static QName _Perform_QNAME = new QName("", "perform");
@@ -57,6 +58,7 @@ public class ObjectFactory {
     private final static QName _DestinationId_QNAME = new QName("", "destinationId");
     private final static QName _Multiplicity_QNAME = new QName("", "multiplicity");
     private final static QName _I18NString_QNAME = new QName("", "i18nString");
+    private final static QName _Version_QNAME = new QName("", "version");
     private final static QName _Initials_QNAME = new QName("", "initials");
     private final static QName _DefaultRole_QNAME = new QName("", "defaultRole");
     private final static QName _TransitionRole_QNAME = new QName("", "transitionRole");
@@ -345,6 +347,15 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "", name = "remote")
+    public JAXBElement<String> createRemote(String value) {
+        return new JAXBElement<String>(_Remote_QNAME, String.class, null, value);
+    }
+
+    /**
      * Create an instance of {@link JAXBElement }{@code <}{@link I18NStringType }{@code >}}
      * 
      */
@@ -549,6 +560,15 @@ public class ObjectFactory {
     @XmlElementDecl(namespace = "", name = "i18nString")
     public JAXBElement<I18NStringType> createI18NString(I18NStringType value) {
         return new JAXBElement<I18NStringType>(_I18NString_QNAME, I18NStringType.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "", name = "version")
+    public JAXBElement<String> createVersion(String value) {
+        return new JAXBElement<String>(_Version_QNAME, String.class, null, value);
     }
 
     /**
