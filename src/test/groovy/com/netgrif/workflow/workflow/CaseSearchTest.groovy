@@ -13,15 +13,15 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.hateoas.MediaTypes
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit4.SpringRunner
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.web.context.WebApplicationContext
 
-import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity
+import static org.hamcrest.core.StringContains.containsString
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic
+import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content
@@ -60,19 +60,10 @@ class CaseSearchTest {
                 .apply(springSecurity())
                 .build()
         testHelper.truncateDbs()
-    }
 
-    PetriNet getNet() {
-        def netOptional = importer.importPetriNet(CaseSearchTest.getClassLoader().getResourceAsStream("case_search_test.xml"), "Case search test", "CST")
-        assert netOptional.isPresent()
-        return netOptional.get()
-    }
-
-    @Test
-    void searchTest() {
         PetriNet net = getNet()
 
-        Case case1 = importHelper.createCase("Case1", net)
+        Case case1 = importHelper.createCase("Case1-Prdel", net)
         Case case2 = importHelper.createCase("Case2", net)
         Case case3 = importHelper.createCase("Case3", net)
 
@@ -102,23 +93,57 @@ class CaseSearchTest {
                 "3": [
                         "type" : "text",
                         "value": "Prdel"
+                ],
+                "4": [
+                        type   : "date",
+                        "value": "2018-05-13"
                 ]
         ])
+    }
 
+    PetriNet getNet() {
+        def netOptional = importer.importPetriNet(CaseSearchTest.getClassLoader().getResourceAsStream("case_search_test.xml"), "Case search test", "CST")
+        assert netOptional.isPresent()
+        return netOptional.get()
+    }
+
+    @Test
+    void searchByAuthorEmail() {
+        performSearch("super@netgrif.com")
+    }
+
+    @Test
+    void searchByNumberField() {
         performSearch("25")
+    }
+
+    @Test
+    void searchByTextField() {
         performSearch("Bratislava")
+    }
+
+    @Test
+    void searchByMoreValues() {
         performSearch("Prdel")
     }
+
+    @Test
+    void searchByDate() {
+        performSearch("2018-05-13")
+    }
+
 
     void performSearch(String input) {
         mvc.perform(get("/api/workflow/case/fulltext")
                 .param("process", "net")
-                .param("search", input).with(httpBasic("super@netgrif.com", userPassword)))
+                .param("search", input)
+                .with(httpBasic("super@netgrif.com", userPassword)))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("application/hal+json;charset=UTF-8"))
-                .andExpect(content().string("cases"))
-                .andExpect(content().string(input))
+                .andExpect(content().string(containsString("_links")))
+                .andExpect(content().string(containsString("cases")))
+                .andExpect(content().string(containsString(input)))
                 .andReturn()
     }
 
