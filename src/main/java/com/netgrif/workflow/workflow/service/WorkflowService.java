@@ -15,11 +15,13 @@ import com.netgrif.workflow.security.service.EncryptionService;
 import com.netgrif.workflow.utils.FullPageRequest;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.DataField;
+import com.netgrif.workflow.workflow.domain.QCase;
 import com.netgrif.workflow.workflow.domain.Task;
 import com.netgrif.workflow.workflow.domain.repositories.CaseRepository;
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
 import com.querydsl.core.types.Predicate;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
@@ -136,6 +138,24 @@ public class WorkflowService implements IWorkflowService {
     public Page<Case> search(Predicate predicate, Pageable pageable) {
         Page<Case> page = repository.findAll(predicate, pageable);
         return setImmediateDataFields(page);
+    }
+
+    @Override
+    public Page<Case> fullTextSearch(String processIdentifier, String searchPhrase, Pageable pageable) {
+        PetriNet petriNet = petriNetService.getNewestVersionByIdentifier(processIdentifier);
+        if (petriNet == null)
+            throw new IllegalArgumentException("Process with identifier " + processIdentifier + " was not found");
+        //TODO include createDate
+        List<BooleanExpression> predicates = new ArrayList<>();
+        predicates.add(QCase.case$.visualId.contains(searchPhrase));
+        predicates.add(QCase.case$.title.contains(searchPhrase));
+        predicates.add(QCase.case$.author.fullName.contains(searchPhrase));
+        predicates.add(QCase.case$.author.email.contains(searchPhrase));
+        petriNet.getImmediateFields().forEach(field -> predicates.add(QCase.case$.dataSet.get(field.getStringId()).stringValue.contains(searchPhrase)));
+
+        Predicate casePredicate = QCase.case$.processIdentifier.eq(processIdentifier)
+                .andAnyOf(predicates.toArray(new BooleanExpression[0]));
+        return search(casePredicate, pageable);
     }
 
     @Override
