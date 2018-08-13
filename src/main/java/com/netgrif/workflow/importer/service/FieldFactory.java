@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -215,16 +216,16 @@ public final class FieldFactory {
                 parseDateDefaultValue((DateField) field);
                 break;
             case NUMBER:
-                parseNumberValue((NumberField) field, useCase, fieldId);
+                field.setValue(parseNumberValue(useCase, fieldId));
                 break;
             case CASEREF:
                 parseCaseRefValue((CaseField) field);
                 break;
             case ENUMERATION:
-                parseEnumValue(useCase, fieldId, (EnumerationField) field);
+                field.setValue(parseEnumValue(useCase, fieldId, (EnumerationField) field));
                 break;
             case MULTICHOICE:
-                parseMultichoiceValue((MultichoiceField) field, useCase, fieldId);
+                field.setValue(parseMultichoiceValue(useCase, fieldId));
                 break;
             case DATETIME:
                 parseDateTimeValue((DateTimeField) field, fieldId, useCase);
@@ -237,24 +238,29 @@ public final class FieldFactory {
         }
     }
 
-    private void parseMultichoiceValue(MultichoiceField field, Case useCase, String fieldId) {
+    public static Set<I18nString> parseMultichoiceValue(Case useCase, String fieldId) {
         Object values = useCase.getFieldValue(fieldId);
         if (values instanceof ArrayList) {
-            field.setValue(new HashSet<String>((Collection<? extends String>) values));
+            return (Set<I18nString>) ((ArrayList) values).stream().map(val -> new I18nString(val.toString())).collect(Collectors.toSet());
         } else {
-            field.setValue((Set<I18nString>) values);
+            return (Set<I18nString>) values;
         }
     }
 
-    private void parseNumberValue(NumberField field, Case useCase, String fieldId) {
+    private Double parseNumberValue(Case useCase, String fieldId) {
         Object value = useCase.getFieldValue(fieldId);
+        return parseDouble(value);
+    }
+
+    public static Double parseDouble(Object value) {
         if (value instanceof String) {
-            field.setValue(Double.parseDouble((String) value));
+            return Double.parseDouble((String) value);
         } else if (value instanceof Integer) {
-            field.setValue(((Integer) value) * 1D);
+            return ((Integer) value) * 1D;
         } else if (value instanceof Double) {
-            field.setValue((Double) value);
+            return (Double) value;
         }
+        return null;
     }
 
     private void parseDateValue(DateField field, String fieldId, Case useCase) {
@@ -267,7 +273,7 @@ public final class FieldFactory {
         field.setDefaultValue(parseDate(value));
     }
 
-    private LocalDate parseDate(Object value) {
+    public static LocalDate parseDate(Object value) {
         if (value instanceof Date) {
             return ((Date) value).toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
         } else if (value instanceof String) {
@@ -280,27 +286,34 @@ public final class FieldFactory {
 
     private void parseDateTimeValue(DateTimeField field, String fieldId, Case useCase) {
         Object value = useCase.getFieldValue(fieldId);
-        if (value instanceof Date) {
-            LocalDateTime dateTime = ((Date) value).toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-            field.setValue(dateTime);
-        } else {
-            field.setValue((LocalDateTime) value);
-        }
+        field.setValue(parseDateTime(value));
     }
 
-    private void parseEnumValue(Case useCase, String fieldId, EnumerationField field) {
+    public static LocalDateTime parseDateTime(Object value) {
+        if (value == null)
+            return null;
+
+        if (value instanceof LocalDate)
+            return LocalDateTime.of((LocalDate) value, LocalTime.NOON);
+        else if (value instanceof String)
+            return LocalDateTime.parse((String) value);
+        else if (value instanceof Date)
+            return LocalDateTime.ofInstant(((Date) value).toInstant(), ZoneId.systemDefault());
+        return (LocalDateTime) value;
+    }
+
+    public static I18nString parseEnumValue(Case useCase, String fieldId, EnumerationField field) {
         Object value = useCase.getFieldValue(fieldId);
         if (value instanceof String) {
             for (I18nString i18nString : field.getChoices()) {
                 if (i18nString.contains((String) value)) {
-                    field.setValue(i18nString);
-                    return;
+                    return i18nString;
                 }
             }
-            field.setValue(new I18nString((String) value));
+            return new I18nString((String) value);
 //            throw new IllegalArgumentException("Value " + value + " is not a valid value.");
         } else {
-            field.setValue((I18nString) value);
+            return (I18nString) value;
         }
     }
 

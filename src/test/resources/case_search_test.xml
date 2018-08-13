@@ -15,6 +15,10 @@
         <id>3</id>
         <title>3</title>
     </data>
+    <data type="date" immediate="true">
+        <id>4</id>
+        <title>date</title>
+    </data>
     <!-- ========== TRANSITION ========== -->
     <transition>
         <id>tran</id>
@@ -37,6 +41,12 @@
             </dataRef>
             <dataRef>
                 <id>3</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>4</id>
                 <logic>
                     <behavior>editable</behavior>
                 </logic>
