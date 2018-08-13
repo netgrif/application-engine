@@ -1,0 +1,46 @@
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="../../main/resources/petriNets/petriflow_schema.xsd">
+    <id>net</id>
+    <defaultRole>true</defaultRole>
+    <!-- ========== DATA ========== -->
+    <data type="number" immediate="true">
+        <id>1</id>
+        <title>1</title>
+    </data>
+    <data type="text" immediate="true">
+        <id>2</id>
+        <title>2</title>
+    </data>
+    <data type="text" immediate="true">
+        <id>3</id>
+        <title>3</title>
+    </data>
+    <!-- ========== TRANSITION ========== -->
+    <transition>
+        <id>tran</id>
+        <x>0</x>
+        <y>0</y>
+        <label>tran</label>
+        <dataGroup>
+            <id>1</id>
+            <dataRef>
+                <id>1</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>2</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>3</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+    </transition>
+</document>
