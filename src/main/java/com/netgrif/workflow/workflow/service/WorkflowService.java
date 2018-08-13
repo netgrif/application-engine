@@ -8,6 +8,7 @@ import com.netgrif.workflow.importer.service.FieldFactory;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.dataset.CaseField;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
+import com.netgrif.workflow.petrinet.domain.dataset.FieldType;
 import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository;
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.workflow.petrinet.web.responsebodies.PetriNetReference;
@@ -20,8 +21,12 @@ import com.netgrif.workflow.workflow.domain.Task;
 import com.netgrif.workflow.workflow.domain.repositories.CaseRepository;
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
+import com.querydsl.core.types.Expression;
+import com.querydsl.core.types.Ops;
+import com.querydsl.core.types.Path;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.Expressions;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
@@ -33,6 +38,7 @@ import org.springframework.data.mongodb.core.query.BasicQuery;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.function.Function;
@@ -147,11 +153,43 @@ public class WorkflowService implements IWorkflowService {
             throw new IllegalArgumentException("Process with identifier " + processIdentifier + " was not found");
         //TODO include createDate
         List<BooleanExpression> predicates = new ArrayList<>();
-        predicates.add(QCase.case$.visualId.contains(searchPhrase));
-        predicates.add(QCase.case$.title.contains(searchPhrase));
-        predicates.add(QCase.case$.author.fullName.contains(searchPhrase));
-        predicates.add(QCase.case$.author.email.contains(searchPhrase));
-        petriNet.getImmediateFields().forEach(field -> predicates.add(QCase.case$.dataSet.get(field.getStringId()).stringValue.contains(searchPhrase)));
+        predicates.add(QCase.case$.visualId.containsIgnoreCase(searchPhrase));
+        predicates.add(QCase.case$.title.containsIgnoreCase(searchPhrase));
+        predicates.add(QCase.case$.author.fullName.containsIgnoreCase(searchPhrase));
+        predicates.add(QCase.case$.author.email.containsIgnoreCase(searchPhrase));
+
+        try {
+            LocalDateTime creation = FieldFactory.parseDateTime(searchPhrase);
+            if (creation != null)
+                predicates.add(QCase.case$.creationDate.eq(creation));
+        } catch (Exception e) {
+            //ignore
+        }
+
+        petriNet.getImmediateFields().forEach(field -> {
+            try {
+                if (field.getType() == FieldType.TEXT || field.getType() == FieldType.ENUMERATION) {
+                    Path<?> path = QCase.case$.dataSet.get(field.getStringId()).value;
+                    Expression<String> constant = Expressions.constant(searchPhrase);
+                    predicates.add(Expressions.predicate(Ops.STRING_CONTAINS_IC, path, constant));
+                } else if (field.getType() == FieldType.NUMBER) {
+                    Double value = FieldFactory.parseDouble(searchPhrase);
+                    if (value != null)
+                        predicates.add(QCase.case$.dataSet.get(field.getStringId()).value.eq(value));
+                } else if (field.getType() == FieldType.DATE) {
+                    LocalDate value = FieldFactory.parseDate(searchPhrase);
+                    if (value != null)
+                        predicates.add(QCase.case$.dataSet.get(field.getStringId()).value.eq(value));
+                } else if (field.getType() == FieldType.DATETIME) {
+                    LocalDateTime value = FieldFactory.parseDateTime(searchPhrase);
+                    if (value != null)
+                        predicates.add(QCase.case$.dataSet.get(field.getStringId()).value.eq(value));
+                }
+            } catch (Exception e) {
+                log.error(e.getMessage());
+                //Skip this field in search
+            }
+        });
 
         Predicate casePredicate = QCase.case$.processIdentifier.eq(processIdentifier)
                 .andAnyOf(predicates.toArray(new BooleanExpression[0]));
