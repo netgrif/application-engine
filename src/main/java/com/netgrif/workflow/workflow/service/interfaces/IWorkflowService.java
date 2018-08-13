@@ -44,4 +44,6 @@ public interface IWorkflowService {
     Case decrypt(Case useCase);
 
     Page<Case> search(Predicate predicate, Pageable pageable);
+
+    Page<Case> fullTextSearch(String processIdentifier, String searchPhrase, Pageable pageable);
 }
