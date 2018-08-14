@@ -223,6 +223,10 @@ class ImportHelper {
         return dataService.getData(getTaskId(taskTitle, caseId))
     }
 
+    void updateSuperUser(){
+        superCreator.setAllToSuperUser();
+    }
+
     static ObjectNode populateDataset(Map<String, Map<String, String>> data) {
         ObjectMapper mapper = new ObjectMapper()
         String json = JsonOutput.toJson(data)
