@@ -2,6 +2,10 @@
           xsi:noNamespaceSchemaLocation="../../main/resources/petriNets/petriflow_schema.xsd">
     <id>net</id>
     <defaultRole>true</defaultRole>
+    <role>
+        <id>99</id>
+        <name>Rola1</name>
+    </role>
     <!-- ========== DATA ========== -->
     <data type="number" immediate="true">
         <id>1</id>
@@ -25,6 +29,13 @@
         <x>0</x>
         <y>0</y>
         <label>tran</label>
+        <roleRef>
+            <id>99</id>
+            <logic>
+                <perform>true</perform>
+                <delegate>true</delegate>
+            </logic>
+        </roleRef>
         <dataGroup>
             <id>1</id>
             <dataRef>
