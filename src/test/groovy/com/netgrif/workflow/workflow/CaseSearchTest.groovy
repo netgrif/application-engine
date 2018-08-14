@@ -1,5 +1,6 @@
 package com.netgrif.workflow.workflow
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.netgrif.workflow.TestHelper
 import com.netgrif.workflow.WorkflowManagementSystemApplication
 import com.netgrif.workflow.importer.service.Importer
@@ -22,7 +23,7 @@ import org.springframework.web.context.WebApplicationContext
 import static org.hamcrest.core.StringContains.containsString
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
@@ -134,9 +135,9 @@ class CaseSearchTest {
 
 
     void performSearch(String input) {
-        mvc.perform(get("/api/workflow/case/fulltext")
-                .param("process", "net")
-                .param("search", input)
+        String request = buildRequestBody("net", input)
+        mvc.perform(post("/api/workflow/case/search")
+                .content(request)
                 .with(httpBasic("super@netgrif.com", userPassword)))
                 .andDo(print())
                 .andExpect(status().isOk())
@@ -147,5 +148,15 @@ class CaseSearchTest {
                 .andReturn()
     }
 
+    String buildRequestBody(String process, String fullText) {
+        def map = [
+                "petriNet": [
+                        "identifier": process
+                ],
+                "fullText": fullText
+        ]
 
+        ObjectMapper mapper = new ObjectMapper()
+        return mapper.writeValueAsString(map)
+    }
 }

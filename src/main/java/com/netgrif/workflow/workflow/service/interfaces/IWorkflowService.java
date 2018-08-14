@@ -45,5 +45,5 @@ public interface IWorkflowService {
 
     Page<Case> search(Predicate predicate, Pageable pageable);
 
-    Page<Case> fullTextSearch(String processIdentifier, String searchPhrase, Pageable pageable);
+//    Page<Case> fullTextSearch(String processIdentifier, String searchPhrase, Pageable pageable);
 }
