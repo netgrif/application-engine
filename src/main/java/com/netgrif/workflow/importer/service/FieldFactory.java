@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -155,6 +156,9 @@ public final class FieldFactory {
 
     private void setFieldDefaultValue(FieldWithDefault field, String defaultValue) {
         switch (field.getType()) {
+            case DATETIME:
+                field.setDefaultValue(parseDateTime(defaultValue));
+                break;
             case DATE:
                 field.setDefaultValue(parseDate(defaultValue));
                 break;
@@ -280,12 +284,20 @@ public final class FieldFactory {
 
     private void parseDateTimeValue(DateTimeField field, String fieldId, Case useCase) {
         Object value = useCase.getFieldValue(fieldId);
-        if (value instanceof Date) {
-            LocalDateTime dateTime = ((Date) value).toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-            field.setValue(dateTime);
-        } else {
-            field.setValue((LocalDateTime) value);
-        }
+        field.setValue(parseDateTime(value));
+    }
+
+    public static LocalDateTime parseDateTime(Object value) {
+        if (value == null)
+            return null;
+
+        if (value instanceof LocalDate)
+            return LocalDateTime.of((LocalDate) value, LocalTime.NOON);
+        else if (value instanceof String)
+            return LocalDateTime.parse((String) value);
+        else if (value instanceof Date)
+            return LocalDateTime.ofInstant(((Date) value).toInstant(), ZoneId.systemDefault());
+        return (LocalDateTime) value;
     }
 
     private void parseEnumValue(Case useCase, String fieldId, EnumerationField field) {
