@@ -32,11 +32,17 @@ public abstract class CaseRepositoryImpl implements CaseRepository {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         List<PetriNetReference> nets = petriNetService.getReferencesByUsersProcessRoles((LoggedUser) auth.getPrincipal(), null);
         Set<String> netIds = nets.parallelStream().map(Reference::getStringId).collect(Collectors.toSet());
+        Set<String> netIdentifiers = nets.parallelStream().map(PetriNetReference::getIdentifier).collect(Collectors.toSet());
 
         bindings.bind(qCase.petriNetId).first((stringPath, s) -> {
             if (!netIds.contains(s))
                 return Expressions.asBoolean(false);
             return stringPath.equalsIgnoreCase(s);
+        });
+        bindings.bind(qCase.processIdentifier).first((path, string) -> {
+            if (!netIdentifiers.contains(string))
+                return Expressions.asBoolean(false);
+            return path.equalsIgnoreCase(string);
         });
         bindings.bind(String.class).first((SingleValueBinding<StringPath, String>) StringExpression::equalsIgnoreCase);
         bindings.bind(qCase.dataSet).first((path, map) ->

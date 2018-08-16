@@ -18,7 +18,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.querydsl.binding.QuerydslPredicate;
 import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.data.web.PagedResourcesAssemblerArgumentResolver;
 import org.springframework.hateoas.Link;
+import org.springframework.hateoas.MediaTypes;
 import org.springframework.hateoas.PagedResources;
 import org.springframework.hateoas.mvc.ControllerLinkBuilder;
 import org.springframework.http.HttpHeaders;
@@ -27,6 +29,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import javax.persistence.criteria.CriteriaBuilder;
 import javax.servlet.http.HttpServletResponse;
 import java.io.FileNotFoundException;
 import java.io.UnsupportedEncodingException;
@@ -78,7 +81,7 @@ public class WorkflowController {
         return resources;
     }
 
-    @RequestMapping(value = "/case/search", method = RequestMethod.POST)
+    @PostMapping(value = "/case/search", produces = MediaTypes.HAL_JSON_VALUE)
     public PagedResources<CaseResource> search(@RequestBody Map<String, Object> searchBody, Pageable pageable, PagedResourcesAssembler<Case> assembler, Authentication auth, Locale locale) {
         Page<Case> cases = workflowService.search(searchBody, pageable, (LoggedUser) auth.getPrincipal(), locale);
         Link selfLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(WorkflowController.class)
@@ -87,6 +90,16 @@ public class WorkflowController {
         ResourceLinkAssembler.addLinks(resources, Case.class, selfLink.getRel());
         return resources;
     }
+
+//    @GetMapping(value = "/case/fulltext", produces = MediaTypes.HAL_JSON_VALUE)
+//    public PagedResources<CaseResource> fullTextSearch(@RequestParam("process") String process, @RequestParam("search") String searchInput, Pageable pageable, PagedResourcesAssembler<Case> assembler, Authentication auth, Locale locale) {
+//        Page<Case> cases = workflowService.fullTextSearch(process, searchInput, pageable);
+//        Link selfLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(WorkflowController.class)
+//                .fullTextSearch(process, searchInput, pageable, assembler, auth, locale)).withRel("fullTextSearch");
+//        PagedResources<CaseResource> resources = assembler.toResource(cases, new CaseResourceAssembler(), selfLink);
+//        ResourceLinkAssembler.addLinks(resources, Case.class, selfLink.getRel());
+//        return resources;
+//    }
 
     @RequestMapping(value = "/case/author/{id}", method = RequestMethod.POST)
     public PagedResources<CaseResource> findAllByAuthor(@PathVariable("id") Long authorId, @RequestBody String petriNet, Pageable pageable, PagedResourcesAssembler<Case> assembler) {
