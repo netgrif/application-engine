@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -38,7 +39,7 @@ public final class FieldFactory {
                 field = new DateField();
                 break;
             case FILE:
-                field = new FileField();
+                field = buildFileField(data, importer);
                 break;
             case ENUMERATION:
                 field = buildEnumerationField(data.getValues(), data.getInit(), importer);
@@ -61,6 +62,7 @@ public final class FieldFactory {
             default:
                 throw new IllegalArgumentException(data.getType() + " is not a valid Field type");
         }
+
         field.setName(importer.toI18NString(data.getTitle()));
         field.setImportId(data.getId());
         field.setImmediate(data.isImmediate());
@@ -71,7 +73,7 @@ public final class FieldFactory {
         if (data.getValid() != null && field instanceof ValidableField)
             ((ValidableField) field).setValidationRules(data.getValid());
         if (data.getInit() != null && field instanceof FieldWithDefault)
-            setFieldDefaultValue((FieldWithDefault) field,data.getInit());
+            setFieldDefaultValue((FieldWithDefault) field, data.getInit());
         setActions(field, data);
         setEncryption(field, data);
 
@@ -131,6 +133,12 @@ public final class FieldFactory {
         return new UserField(roles);
     }
 
+    private FileField buildFileField(Data data, Importer importer) {
+        FileField fileField = new FileField();
+        fileField.setRemote(data.getRemote() != null);
+        return fileField;
+    }
+
     private void setActions(Field field, Data data) {
         if (data.getAction() != null && data.getAction().size() != 0) {
 //            data.getAction().forEach(action -> field.addAction(action.getValue(), action.getTrigger()));
@@ -148,6 +156,9 @@ public final class FieldFactory {
 
     private void setFieldDefaultValue(FieldWithDefault field, String defaultValue) {
         switch (field.getType()) {
+            case DATETIME:
+                field.setDefaultValue(parseDateTime(defaultValue));
+                break;
             case DATE:
                 field.setDefaultValue(parseDate(defaultValue));
                 break;
@@ -161,6 +172,10 @@ public final class FieldFactory {
                 if (field.getDefaultValue() != null)
                     break;
                 ((MultichoiceField) field).setDefaultValue(defaultValue);
+                break;
+            case FILE:
+                ((FileField) field).setDefaultValue(defaultValue);
+                break;
             default:
                 field.setDefaultValue(defaultValue);
         }
@@ -178,7 +193,7 @@ public final class FieldFactory {
         Field field = useCase.getPetriNet().getDataSet().get(fieldId);
         resolveValidation(field, withValidation);
         resolveDataValues(field, useCase, fieldId);
-        if (field instanceof  ChoiceField)
+        if (field instanceof ChoiceField)
             resolveChoices((ChoiceField) field, useCase);
         return field;
     }
@@ -217,6 +232,9 @@ public final class FieldFactory {
                 break;
             case DATETIME:
                 parseDateTimeValue((DateTimeField) field, fieldId, useCase);
+                break;
+            case FILE:
+                parseFileValue((FileField) field, useCase, fieldId);
                 break;
             default:
                 field.setValue(useCase.getFieldValue(fieldId));
@@ -266,12 +284,20 @@ public final class FieldFactory {
 
     private void parseDateTimeValue(DateTimeField field, String fieldId, Case useCase) {
         Object value = useCase.getFieldValue(fieldId);
-        if (value instanceof Date) {
-            LocalDateTime dateTime = ((Date) value).toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-            field.setValue(dateTime);
-        } else {
-            field.setValue((LocalDateTime) value);
-        }
+        field.setValue(parseDateTime(value));
+    }
+
+    public static LocalDateTime parseDateTime(Object value) {
+        if (value == null)
+            return null;
+
+        if (value instanceof LocalDate)
+            return LocalDateTime.of((LocalDate) value, LocalTime.NOON);
+        else if (value instanceof String)
+            return LocalDateTime.parse((String) value);
+        else if (value instanceof Date)
+            return LocalDateTime.ofInstant(((Date) value).toInstant(), ZoneId.systemDefault());
+        return (LocalDateTime) value;
     }
 
     private void parseEnumValue(Case useCase, String fieldId, EnumerationField field) {
@@ -307,5 +333,18 @@ public final class FieldFactory {
         }).collect(Collectors.toMap(Pair::getFirst, Pair::getSecond));
 
         field.setImmediateFieldValues(values);
+    }
+
+    private void parseFileValue(FileField field, Case useCase, String fieldId) {
+        Object value = useCase.getFieldValue(fieldId);
+        if (value == null)
+            return;
+
+        if (value instanceof String) {
+            field.setValue((String) value);
+        } else if (value instanceof FileFieldValue) {
+            field.setValue((FileFieldValue) value);
+        } else
+            throw new IllegalArgumentException("Object " + value.toString() + " cannot be set as value to the File field [" + fieldId + "] !");
     }
 }
