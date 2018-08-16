@@ -263,20 +263,29 @@ public class TaskService implements ITaskService {
     @Override
     @Transactional
     public EventOutcome delegateTask(LoggedUser loggedUser, String delegatedEmail, String taskId) throws TransitionNotExecutableException {
-        User delegated = userRepository.findByEmail(delegatedEmail);
-        User delegate = userRepository.findOne(loggedUser.getId());
+        User delegatedUser = userRepository.findByEmail(delegatedEmail);
+        User delegateUser = userRepository.findOne(loggedUser.getId());
         Task task = taskRepository.findOne(taskId);
         Case useCase = workflowService.findOne(task.getCaseId());
         Transition transition = useCase.getPetriNet().getTransition(task.getTransitionId());
         EventOutcome outcome = new EventOutcome(transition.getDelegateMessage());
 
         outcome.add(dataService.runActions(transition.getPreDelegateActions(), useCase.getStringId(), transition));
-        assignTaskToUser(delegated, task, useCase.getStringId());
+        delegate(delegatedUser, task, useCase);
         outcome.add(dataService.runActions(transition.getPostDelegateActions(), useCase.getStringId(), transition));
         workflowService.save(useCase);
 
-        publisher.publishEvent(new UserDelegateTaskEvent(delegate, task, useCase, delegated));
+        publisher.publishEvent(new UserDelegateTaskEvent(delegateUser, task, useCase, delegatedUser));
         return outcome;
+    }
+
+    protected void delegate(User delegated, Task task, Case useCase) throws TransitionNotExecutableException {
+        if (task.getUserId() != null) {
+            task.setUserId(delegated.getId());
+            taskRepository.save(task);
+        } else {
+            assignTaskToUser(delegated, task, useCase.getStringId());
+        }
     }
 
     /**
