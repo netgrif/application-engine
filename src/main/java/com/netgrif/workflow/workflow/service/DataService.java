@@ -12,6 +12,7 @@ import com.netgrif.workflow.petrinet.domain.DataGroup;
 import com.netgrif.workflow.petrinet.domain.Transition;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.petrinet.domain.dataset.FileField;
+import com.netgrif.workflow.petrinet.domain.dataset.FileFieldValue;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedField;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldContainer;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action;
@@ -29,9 +30,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
+import java.net.URL;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -142,27 +142,48 @@ public class DataService implements IDataService {
     }
 
     @Override
-    public FileSystemResource getFileByTask(String taskId, String fieldId) {
+    public FileFieldInputStream getFileByTask(String taskId, String fieldId) {
         Task task = taskService.findOne(taskId);
         return getFileByCase(task.getCaseId(), fieldId);
     }
 
     @Override
-    public FileSystemResource getFileByCase(String caseId, String fieldId){
+    public FileFieldInputStream getFileByCase(String caseId, String fieldId) {
         Case useCase = workflowService.findOne(caseId);
         FileField field = (FileField) useCase.getPetriNet().getDataSet().get(fieldId);
         return getFile(useCase, field);
     }
 
     @Override
-    public FileSystemResource getFile(Case useCase, FileField field){
+    public FileFieldInputStream getFile(Case useCase, FileField field) {
         field.getActions().forEach(action -> actionsRunner.run(action, useCase));
         if (useCase.getDataSet().get(field.getStringId()).getValue() == null)
             return null;
 
         workflowService.save(useCase);
-        field.setValue((String) useCase.getDataSet().get(field.getStringId()).getValue());
-        return new FileSystemResource(field.getFilePath(useCase.getStringId()));
+        field.setValue((FileFieldValue) useCase.getDataSet().get(field.getStringId()).getValue());
+
+        if (field.isRemote()) {
+            try {
+                return new FileFieldInputStream(field, download(field.getValue().getPath()));
+            } catch (IOException e) {
+                e.printStackTrace();
+                return null;
+            }
+        } else {
+            try {
+                return new FileFieldInputStream(field, new FileInputStream(field.getFilePath(useCase.getStringId())));
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+                return null;
+            }
+        }
+    }
+
+    @Override
+    public InputStream download(String url) throws IOException {
+        URL connection = new URL(url);
+        return new BufferedInputStream(connection.openStream());
     }
 
     @Override
@@ -172,24 +193,13 @@ public class DataService implements IDataService {
             Case useCase = workflowService.findOne(task.getCaseId());
             FileField field = (FileField) useCase.getPetriNet().getDataSet().get(fieldId);
 
-            if (useCase.getDataSet().get(fieldId).getValue() != null) {
-                new File(field.getFilePath(useCase.getStringId())).delete();
-                useCase.getDataSet().get(fieldId).setValue(null);
+            if (field.isRemote()) {
+                upload(useCase, field, multipartFile);
+            } else {
+                if (!saveLocalFile(useCase, field, multipartFile))
+                    return false;
             }
 
-            field.setValue(multipartFile.getOriginalFilename());
-            File file = new File(field.getFilePath(useCase.getStringId()));
-            file.getParentFile().mkdirs();
-            if (!file.createNewFile()) {
-                file.delete();
-                file.createNewFile();
-            }
-
-            FileOutputStream fout = new FileOutputStream(file);
-            fout.write(multipartFile.getBytes());
-            fout.close();
-
-            useCase.getDataSet().get(fieldId).setValue(multipartFile.getOriginalFilename());
             field.getActions().forEach(action -> actionsRunner.run(action, useCase));
             workflowService.save(useCase);
 
@@ -198,6 +208,32 @@ public class DataService implements IDataService {
             e.printStackTrace();
             return false;
         }
+    }
+
+    public boolean saveLocalFile(Case useCase, FileField field, MultipartFile multipartFile) throws IOException {
+        if (useCase.getDataSet().get(field.getStringId()).getValue() != null) {
+            new File(field.getFilePath(useCase.getStringId())).delete();
+            useCase.getDataSet().get(field.getStringId()).setValue(null);
+        }
+
+        field.setValue(multipartFile.getOriginalFilename());
+        File file = new File(field.getFilePath(useCase.getStringId()));
+        file.getParentFile().mkdirs();
+        if (!file.createNewFile()) {
+            file.delete();
+            file.createNewFile();
+        }
+
+        FileOutputStream fout = new FileOutputStream(file);
+        fout.write(multipartFile.getBytes());
+        fout.close();
+
+        useCase.getDataSet().get(field.getStringId()).setValue(field.getValue());
+        return true;
+    }
+
+    public boolean upload(Case useCase, FileField field, MultipartFile multipartFile) {
+        throw new UnsupportedOperationException("Upload new file to the remote storage is not implemented yet.");
     }
 
     @Override
@@ -317,6 +353,13 @@ public class DataService implements IDataService {
                     break;
                 }
                 value = node.get("value").asDouble();
+                break;
+            case "file":
+                if (node.get("value") == null) {
+                    value = new FileFieldValue();
+                    break;
+                }
+                value = FileFieldValue.fromString(node.get("value").asText());
                 break;
             default:
                 if (node.get("value") == null) {

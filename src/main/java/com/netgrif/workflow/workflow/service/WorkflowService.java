@@ -133,6 +133,12 @@ public class WorkflowService implements IWorkflowService {
     }
 
     @Override
+    public Page<Case> search(Predicate predicate, Pageable pageable) {
+        Page<Case> page = repository.findAll(predicate, pageable);
+        return setImmediateDataFields(page);
+    }
+
+    @Override
     public List<Case> getCaseFieldChoices(Pageable pageable, String caseId, String fieldId) {
         Case useCase = repository.findOne(caseId);
         CaseField field = (CaseField) useCase.getPetriNet().getDataSet().get(fieldId);
@@ -212,12 +218,6 @@ public class WorkflowService implements IWorkflowService {
     public Case decrypt(Case useCase) {
         decryptDataSet(useCase);
         return useCase;
-    }
-
-    @Override
-    public Page<Case> search(Predicate predicate, Pageable pageable) {
-        Page<Case> page = repository.findAll(predicate, pageable);
-        return setImmediateDataFields(page);
     }
 
     @Override

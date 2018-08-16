@@ -5,6 +5,7 @@ import org.springframework.hateoas.Link;
 import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.mvc.ControllerLinkBuilder;
 
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 
 
@@ -31,7 +32,11 @@ public class LocalisedTaskResource extends Resource<LocalisedTask> {
                 .getData(task.getStringId(), null)).withRel("data"));
         add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
                 .saveData(task.getStringId(), null)).withRel("data-edit"));
-        add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
-                .getFile(task.getStringId(), "", null)).withRel("file"));
+        try {
+            add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
+                    .getFile(task.getStringId(), "", null)).withRel("file"));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
     }
 }
