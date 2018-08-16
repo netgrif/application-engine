@@ -9,6 +9,7 @@ import com.netgrif.workflow.event.events.usecase.SaveCaseDataEvent;
 import com.netgrif.workflow.importer.service.FieldFactory;
 import com.netgrif.workflow.petrinet.domain.DataFieldLogic;
 import com.netgrif.workflow.petrinet.domain.DataGroup;
+import com.netgrif.workflow.petrinet.domain.I18nString;
 import com.netgrif.workflow.petrinet.domain.Transition;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.petrinet.domain.dataset.FileField;
@@ -331,9 +332,17 @@ public class DataService implements IDataService {
                 break;
             case "multichoice":
                 ArrayNode arrayNode = (ArrayNode) node.get("value");
-                HashSet<String> set = new HashSet<>();
-                arrayNode.forEach(item -> set.add(item.asText()));
+                HashSet<I18nString> set = new HashSet<>();
+                arrayNode.forEach(item -> set.add(new I18nString(item.asText())));
                 value = set;
+                break;
+            case "enumeration":
+                String val = node.get("value").asText();
+                if(val == null){
+                    value = null;
+                    break;
+                }
+                value = new I18nString(val);
                 break;
             case "user":
                 if (node.get("value") == null) {
