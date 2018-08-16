@@ -325,7 +325,10 @@ public class DataService implements IDataService {
         Object value;
         switch (node.get("type").asText()) {
             case "date":
-                value = LocalDate.parse(node.get("value").asText());
+                value = FieldFactory.parseDate(node.get("value").asText());
+                break;
+            case "dateTime":
+                value = FieldFactory.parseDateTime(node.get("value").asText());
                 break;
             case "boolean":
                 value = node.get("value") != null && node.get("value").asBoolean();
@@ -338,7 +341,7 @@ public class DataService implements IDataService {
                 break;
             case "enumeration":
                 String val = node.get("value").asText();
-                if(val == null){
+                if (val == null) {
                     value = null;
                     break;
                 }

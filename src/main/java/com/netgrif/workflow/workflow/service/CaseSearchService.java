@@ -161,7 +161,7 @@ public class CaseSearchService extends MongoSearchService<Case> {
         if (query instanceof ArrayList) {
             BooleanBuilder builder = new BooleanBuilder();
             List<BooleanExpression> expressions = (List<BooleanExpression>) ((ArrayList) query).parallelStream().filter(q -> q instanceof HashMap).map(q -> petriNetObject((HashMap<String, String>) q, allowedNets)).collect(Collectors.toList());
-            expressions.forEach(builder::and);
+            expressions.forEach(builder::or);
             return builder;
         } else if (query instanceof HashMap) {
             return petriNetObject((HashMap<String, String>) query, allowedNets);
@@ -181,7 +181,7 @@ public class CaseSearchService extends MongoSearchService<Case> {
         if (query instanceof ArrayList) {
             BooleanBuilder builder = new BooleanBuilder();
             List<BooleanExpression> expressions = (List<BooleanExpression>) ((ArrayList) query).parallelStream().filter(q -> q instanceof HashMap).map(q -> authorObject((HashMap<String, Object>) q)).collect(Collectors.toList());
-            expressions.forEach(builder::and);
+            expressions.forEach(builder::or);
             return builder;
         } else if (query instanceof HashMap) {
             return authorObject((HashMap<String, Object>) query);
@@ -209,7 +209,7 @@ public class CaseSearchService extends MongoSearchService<Case> {
         if (query instanceof ArrayList) {
             BooleanBuilder builder = new BooleanBuilder();
             List<BooleanExpression> expressions = (List<BooleanExpression>) ((ArrayList) query).parallelStream().filter(q -> q instanceof String).map(q -> transitionString((String) q)).collect(Collectors.toList());
-            expressions.forEach(builder::and);
+            expressions.forEach(builder::or);
             return builder;
         } else if (query instanceof String) {
             return transitionString((String) query);
