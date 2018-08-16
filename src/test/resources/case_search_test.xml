@@ -23,6 +23,15 @@
         <id>4</id>
         <title>date</title>
     </data>
+    <data type="enumeration" immediate="true">
+        <id>5</id>
+        <title>enumeration</title>
+        <init>VALUE1</init>
+        <values>VALUE1</values>
+        <values>VALUE2</values>
+        <values>VALUE3</values>
+        <values>VALUE4</values>
+    </data>
     <!-- ========== TRANSITION ========== -->
     <transition>
         <id>tran</id>
@@ -58,6 +67,12 @@
             </dataRef>
             <dataRef>
                 <id>4</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>5</id>
                 <logic>
                     <behavior>editable</behavior>
                 </logic>

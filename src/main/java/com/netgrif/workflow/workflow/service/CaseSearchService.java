@@ -3,7 +3,9 @@ package com.netgrif.workflow.workflow.service;
 import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.importer.service.FieldFactory;
+import com.netgrif.workflow.petrinet.domain.I18nString;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
+import com.netgrif.workflow.petrinet.domain.QI18nString;
 import com.netgrif.workflow.petrinet.domain.dataset.FieldType;
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.workflow.petrinet.web.responsebodies.PetriNetReference;
@@ -19,6 +21,7 @@ import com.querydsl.core.types.Path;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.core.types.dsl.SimplePath;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -158,7 +161,7 @@ public class CaseSearchService extends MongoSearchService<Case> {
         if (query instanceof ArrayList) {
             BooleanBuilder builder = new BooleanBuilder();
             List<BooleanExpression> expressions = (List<BooleanExpression>) ((ArrayList) query).parallelStream().filter(q -> q instanceof HashMap).map(q -> petriNetObject((HashMap<String, String>) q, allowedNets)).collect(Collectors.toList());
-            expressions.forEach(builder::and);
+            expressions.forEach(builder::or);
             return builder;
         } else if (query instanceof HashMap) {
             return petriNetObject((HashMap<String, String>) query, allowedNets);
@@ -178,7 +181,7 @@ public class CaseSearchService extends MongoSearchService<Case> {
         if (query instanceof ArrayList) {
             BooleanBuilder builder = new BooleanBuilder();
             List<BooleanExpression> expressions = (List<BooleanExpression>) ((ArrayList) query).parallelStream().filter(q -> q instanceof HashMap).map(q -> authorObject((HashMap<String, Object>) q)).collect(Collectors.toList());
-            expressions.forEach(builder::and);
+            expressions.forEach(builder::or);
             return builder;
         } else if (query instanceof HashMap) {
             return authorObject((HashMap<String, Object>) query);
@@ -206,7 +209,7 @@ public class CaseSearchService extends MongoSearchService<Case> {
         if (query instanceof ArrayList) {
             BooleanBuilder builder = new BooleanBuilder();
             List<BooleanExpression> expressions = (List<BooleanExpression>) ((ArrayList) query).parallelStream().filter(q -> q instanceof String).map(q -> transitionString((String) q)).collect(Collectors.toList());
-            expressions.forEach(builder::and);
+            expressions.forEach(builder::or);
             return builder;
         } else if (query instanceof String) {
             return transitionString((String) query);
@@ -253,7 +256,7 @@ public class CaseSearchService extends MongoSearchService<Case> {
         petriNets.forEach(net -> {
             net.getImmediateFields().forEach(field -> {
                 try {
-                    if (field.getType() == FieldType.TEXT || field.getType() == FieldType.ENUMERATION) {
+                    if (field.getType() == FieldType.TEXT) {
                         Path<?> path = QCase.case$.dataSet.get(field.getStringId()).value;
                         Expression<String> constant = Expressions.constant(searchPhrase);
                         predicates.add(Expressions.predicate(Ops.STRING_CONTAINS_IC, path, constant));
@@ -269,6 +272,11 @@ public class CaseSearchService extends MongoSearchService<Case> {
                         LocalDateTime value = FieldFactory.parseDateTime(searchPhrase);
                         if (value != null)
                             predicates.add(QCase.case$.dataSet.get(field.getStringId()).value.eq(value));
+                    } else if(field.getType() == FieldType.ENUMERATION) {
+                        Path valuePath = Expressions.simplePath(I18nString.class, QCase.case$.dataSet.get(field.getStringId()),"value");
+                        Path defaultValuePath = Expressions.stringPath(valuePath,"defaultValue");
+                        Expression<String> constant = Expressions.constant(searchPhrase);
+                        predicates.add(Expressions.predicate(Ops.STRING_CONTAINS_IC, defaultValuePath, constant));
                     }
                 } catch (Exception e) {
                     log.error(e.getMessage());
