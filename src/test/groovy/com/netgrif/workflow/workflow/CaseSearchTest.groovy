@@ -102,8 +102,12 @@ class CaseSearchTest {
                         "value": "Prdel"
                 ],
                 "4": [
-                        type   : "date",
+                        "type" : "date",
                         "value": "2018-05-13"
+                ],
+                "5": [
+                        "type" : "enumeration",
+                        "value": "VALUE3"
                 ]
         ])
 
@@ -121,32 +125,37 @@ class CaseSearchTest {
 
     @Test
     void searchByAuthorEmail() {
-        performSearch("super@netgrif.com")
+        performSearch("super@netgrif.com","Case2")
     }
 
     @Test
     void searchByNumberField() {
-        performSearch("25")
+        performSearch("25","Case2")
     }
 
     @Test
     void searchByTextField() {
-        performSearch("Bratislava")
+        performSearch("Bratislava","Case2")
     }
 
     @Test
     void searchByMoreValues() {
-        performSearch("Prdel")
+        performSearch("Prdel","Case1")
     }
 
     @Test
     @Ignore
     void searchByDate() {
-        performSearch("2018-05-13")
+        performSearch("2018-05-13","Case3")
+    }
+
+    @Test
+    void searchByEnum(){
+        performSearch("value","Case3")
     }
 
 
-    void performSearch(String input) {
+    void performSearch(String input, String expect = "") {
         String request = buildRequestBody("net", input)
         mvc.perform(post("/api/workflow/case/search")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -158,6 +167,7 @@ class CaseSearchTest {
                 .andExpect(content().contentType("application/hal+json;charset=UTF-8"))
                 .andExpect(content().string(containsString("_links")))
                 .andExpect(content().string(containsString("cases")))
+                .andExpect(content().string(containsString(expect)))
                 .andExpect(content().string(containsString(input)))
                 .andReturn()
     }

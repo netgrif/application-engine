@@ -302,6 +302,12 @@ public final class FieldFactory {
         return (LocalDateTime) value;
     }
 
+    public static LocalDateTime complexParseDateTime(String value){
+        if(value == null)
+            return null;
+        return null;
+    }
+
     public static I18nString parseEnumValue(Case useCase, String fieldId, EnumerationField field) {
         Object value = useCase.getFieldValue(fieldId);
         if (value instanceof String) {
