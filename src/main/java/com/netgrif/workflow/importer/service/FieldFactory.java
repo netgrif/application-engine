@@ -17,6 +17,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -277,9 +279,38 @@ public final class FieldFactory {
         if (value instanceof Date) {
             return ((Date) value).toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
         } else if (value instanceof String) {
-            return LocalDate.parse((String) value);
+            return parseDateFromString((String) value);
         } else if (value instanceof LocalDate) {
             return (LocalDate) value;
+        }
+        return null;
+    }
+
+    /**
+     * Available formats - YYYYMMDD; YYYY-MM-DD; DD.MM.YYYY
+     *
+     * @param value - Date as string
+     * @return Parsed date as LocalDate object or null if date cannot be parsed
+     */
+    public static LocalDate parseDateFromString(String value) {
+        if (value == null)
+            return null;
+
+        List<String> patterns = Arrays.asList("dd.MM.yyyy");
+        try {
+            return LocalDate.parse(value, DateTimeFormatter.BASIC_ISO_DATE);
+        } catch (DateTimeParseException e) {
+            try {
+                return LocalDate.parse(value, DateTimeFormatter.ISO_DATE);
+            } catch (DateTimeParseException ex) {
+                for (String pattern : patterns) {
+                    try {
+                        return LocalDate.parse(value, DateTimeFormatter.ofPattern(pattern));
+                    } catch (DateTimeParseException | IllegalArgumentException exc) {
+                        continue;
+                    }
+                }
+            }
         }
         return null;
     }
@@ -296,15 +327,36 @@ public final class FieldFactory {
         if (value instanceof LocalDate)
             return LocalDateTime.of((LocalDate) value, LocalTime.NOON);
         else if (value instanceof String)
-            return LocalDateTime.parse((String) value);
+            return parseDateTimeFromString((String) value);
         else if (value instanceof Date)
             return LocalDateTime.ofInstant(((Date) value).toInstant(), ZoneId.systemDefault());
         return (LocalDateTime) value;
     }
 
-    public static LocalDateTime complexParseDateTime(String value){
-        if(value == null)
+    public static LocalDateTime parseDateTimeFromString(String value) {
+        if (value == null)
             return null;
+
+        List<String> patterns = Arrays.asList("dd.MM.yyyy HH:mm", "dd.MM.yyyy HH:mm:ss");
+        try {
+            return LocalDateTime.parse(value, DateTimeFormatter.ISO_DATE_TIME);
+        } catch (DateTimeParseException e) {
+            try {
+                return LocalDateTime.parse(value, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+            } catch (DateTimeParseException ex) {
+                try {
+                    return LocalDateTime.parse(value, DateTimeFormatter.ISO_INSTANT);
+                } catch (DateTimeParseException exc) {
+                    for (String pattern : patterns) {
+                        try {
+                            return LocalDateTime.parse(value, DateTimeFormatter.ofPattern(pattern));
+                        } catch (DateTimeParseException | IllegalArgumentException excp) {
+                            continue;
+                        }
+                    }
+                }
+            }
+        }
         return null;
     }
 

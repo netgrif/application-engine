@@ -103,7 +103,7 @@ class CaseSearchTest {
                 ],
                 "4": [
                         "type" : "date",
-                        "value": "2018-05-13"
+                        "value": "12.05.2018"
                 ],
                 "5": [
                         "type" : "enumeration",
@@ -144,9 +144,8 @@ class CaseSearchTest {
     }
 
     @Test
-    @Ignore
     void searchByDate() {
-        performSearch("2018-05-13","Case3")
+        performSearch("12.05.2018","Case3", false)
     }
 
     @Test
@@ -155,7 +154,7 @@ class CaseSearchTest {
     }
 
 
-    void performSearch(String input, String expect = "") {
+    void performSearch(String input, String expect = "", Boolean includeInput = true) {
         String request = buildRequestBody("net", input)
         mvc.perform(post("/api/workflow/case/search")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -168,7 +167,7 @@ class CaseSearchTest {
                 .andExpect(content().string(containsString("_links")))
                 .andExpect(content().string(containsString("cases")))
                 .andExpect(content().string(containsString(expect)))
-                .andExpect(content().string(containsString(input)))
+                .andExpect(content().string(containsString(includeInput ? input : "")))
                 .andReturn()
     }
 
