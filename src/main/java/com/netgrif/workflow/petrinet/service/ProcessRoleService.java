@@ -4,8 +4,8 @@ import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.auth.domain.UserProcessRole;
 import com.netgrif.workflow.auth.domain.repositories.UserProcessRoleRepository;
-import com.netgrif.workflow.auth.domain.repositories.UserRepository;
 import com.netgrif.workflow.auth.service.UserDetailsServiceImpl;
+import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.event.events.user.UserRoleChangeEvent;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository;
@@ -25,7 +25,7 @@ import java.util.Set;
 public class ProcessRoleService implements IProcessRoleService {
 
     @Autowired
-    private UserRepository userRepository;
+    private IUserService userService;
 
     @Autowired
     private UserProcessRoleRepository roleRepository;
@@ -44,7 +44,7 @@ public class ProcessRoleService implements IProcessRoleService {
 
     @Override
     public void assignRolesToUser(Long userId, Set<String> roleIds, LoggedUser loggedUser) {
-        User user = userRepository.findOne(userId);
+        User user = userService.findById(userId, true);
         List<UserProcessRole> processRoles = roleRepository.findByRoleIdIn(roleIds);
         if (processRoles.isEmpty())
             throw new IllegalArgumentException("No process roles found.");
@@ -54,7 +54,7 @@ public class ProcessRoleService implements IProcessRoleService {
         user.getUserProcessRoles().clear();
         user.getUserProcessRoles().addAll(processRoles);
 
-        userRepository.save(user);
+        userService.save(user);
         publisher.publishEvent(new UserRoleChangeEvent(user, processRoleRepository.findAllBy_idIn(roleIds)));
 
         if (Objects.equals(userId, loggedUser.getId())) {
