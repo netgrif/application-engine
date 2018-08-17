@@ -4,8 +4,10 @@ import com.netgrif.workflow.auth.domain.User
 import com.netgrif.workflow.auth.domain.UserState
 import com.netgrif.workflow.auth.service.interfaces.IUserService
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.stereotype.Component
 
+@ConditionalOnProperty(value = "admin.create-system-user", matchIfMissing = true)
 @Component
 class SystemUserRunner extends AbstractOrderedCommandLineRunner {
 

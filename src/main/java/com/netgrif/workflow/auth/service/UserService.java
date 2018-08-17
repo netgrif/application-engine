@@ -173,7 +173,7 @@ public class UserService implements IUserService {
 
     private User loadProcessRoles(User user) {
         if (user == null)
-            return user;
+            return null;
         user.setProcessRoles(processRoleRepository.findAll(user.getUserProcessRoles()
                 .stream().map(UserProcessRole::getRoleId).collect(Collectors.toList())));
         return user;

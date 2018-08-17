@@ -2,7 +2,6 @@ package com.netgrif.workflow.workflow.service;
 
 import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.auth.domain.User;
-import com.netgrif.workflow.auth.domain.repositories.UserRepository;
 import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.event.events.task.*;
 import com.netgrif.workflow.petrinet.domain.*;
@@ -55,9 +54,6 @@ public class TaskService implements ITaskService {
     private TaskRepository taskRepository;
 
     @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
     private IUserService userService;
 
     @Autowired
@@ -87,7 +83,7 @@ public class TaskService implements ITaskService {
     @Transactional
     public EventOutcome assignTask(LoggedUser loggedUser, String taskId) throws TransitionNotExecutableException {
         Task task = taskRepository.findOne(taskId);
-        User user = userRepository.findOne(loggedUser.getId());
+        User user = userService.findById(loggedUser.getId(), true);
         return assignTask(task, user);
     }
 
@@ -146,7 +142,7 @@ public class TaskService implements ITaskService {
     @Transactional
     public EventOutcome finishTask(LoggedUser loggedUser, String taskId) throws IllegalArgumentException, TransitionNotExecutableException {
         Task task = taskRepository.findOne(taskId);
-        User user = userRepository.findOne(loggedUser.getId());
+        User user = userService.findById(loggedUser.getId(), true);
         if (task == null) {
             throw new IllegalArgumentException("Could not find task with id=" + taskId);
         } else if (task.getUserId() == null) {
@@ -197,7 +193,7 @@ public class TaskService implements ITaskService {
     @Transactional
     public EventOutcome cancelTask(LoggedUser loggedUser, String taskId) {
         Task task = taskRepository.findOne(taskId);
-        User user = userRepository.findOne(loggedUser.getId());
+        User user = userService.findById(loggedUser.getId(), true);
         return cancelTask(task, user);
     }
 
@@ -263,8 +259,8 @@ public class TaskService implements ITaskService {
     @Override
     @Transactional
     public EventOutcome delegateTask(LoggedUser loggedUser, String delegatedEmail, String taskId) throws TransitionNotExecutableException {
-        User delegatedUser = userRepository.findByEmail(delegatedEmail);
-        User delegateUser = userRepository.findOne(loggedUser.getId());
+        User delegatedUser = userService.findByEmail(delegatedEmail, true);
+        User delegateUser = userService.findById(loggedUser.getId(), true);
         Task task = taskRepository.findOne(taskId);
         Case useCase = workflowService.findOne(task.getCaseId());
         Transition transition = useCase.getPetriNet().getTransition(task.getTransitionId());
@@ -509,7 +505,7 @@ public class TaskService implements ITaskService {
     public Task findById(String id) {
         Task task = taskRepository.findOne(id);
         if (task.getUserId() != null)
-            task.setUser(userRepository.findOne(task.getUserId()));
+            task.setUser(userService.findById(task.getUserId(), true));
         return task;
     }
 
@@ -615,7 +611,7 @@ public class TaskService implements ITaskService {
                 if (users.containsKey(task.getUserId()))
                     task.setUser(users.get(task.getUserId()));
                 else {
-                    task.setUser(userRepository.findOne(task.getUserId()));
+                    task.setUser(userService.findById(task.getUserId(), true));
                     users.put(task.getUserId(), task.getUser());
                 }
             }

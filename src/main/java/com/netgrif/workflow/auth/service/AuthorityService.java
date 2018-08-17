@@ -46,4 +46,8 @@ public class AuthorityService implements IAuthorityService {
     public List<Authority> getAllRoles() {
         return repository.findAllByNameStartsWith(Authority.ROLE);
     }
+
+    public Authority getOne(Long id){
+        return repository.findOne(id);
+    }
 }

@@ -10,8 +10,10 @@ import com.netgrif.workflow.orgstructure.service.IMemberService
 import org.apache.log4j.Logger
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.stereotype.Component
 
+@ConditionalOnProperty(value = "admin.create-super", matchIfMissing = true)
 @Component
 class SuperCreator extends AbstractOrderedCommandLineRunner {
 
