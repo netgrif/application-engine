@@ -1,6 +1,6 @@
 package com.netgrif.workflow.startup
 
-import com.netgrif.workflow.auth.domain.repositories.UserRepository
+
 import org.apache.log4j.Logger
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Profile
@@ -16,9 +16,6 @@ class FlushSessionsRunner extends AbstractOrderedCommandLineRunner {
 
     @Autowired
     private JedisConnectionFactory connectionFactory
-
-    @Autowired
-    private UserRepository userRepository
 
     @Override
     void run(String... args) {
