@@ -17,4 +17,6 @@ public interface IAuthorityService {
     List<Authority> getAllPermissions();
 
     List<Authority> getAllRoles();
+
+    Authority getOne(Long id);
 }

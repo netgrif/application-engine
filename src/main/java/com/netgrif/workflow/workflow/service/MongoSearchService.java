@@ -1,7 +1,7 @@
 package com.netgrif.workflow.workflow.service;
 
 import com.netgrif.workflow.auth.domain.User;
-import com.netgrif.workflow.auth.domain.repositories.UserRepository;
+import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -25,7 +25,7 @@ public class MongoSearchService<T> {
     private static final String ERROR_KEY = "ERROR";
 
     @Autowired
-    private UserRepository userRepository;
+    private IUserService userService;
 
     @Autowired
     private MongoTemplate mongoTemplate;
@@ -132,7 +132,7 @@ public class MongoSearchService<T> {
     }
 
     protected Long resolveAuthorByEmail(String email) {
-        User user = userRepository.findByEmail(email);
+        User user = userService.findByEmail(email, true);
         return user != null ? user.getId() : null;
     }
 
