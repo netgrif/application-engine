@@ -75,7 +75,7 @@ public interface ITaskService {
     @SuppressWarnings("unused")
     void cancelTasksWithoutReload(Set<String> transitions, String caseId);
 
-    EventOutcome delegateTask(LoggedUser loggedUser, String delegatedEmail, String taskId) throws TransitionNotExecutableException;
+    EventOutcome delegateTask(LoggedUser loggedUser, Long delegatedId, String taskId) throws TransitionNotExecutableException;
 
     void delete(Iterable<? extends Task> tasks, Case useCase);
 

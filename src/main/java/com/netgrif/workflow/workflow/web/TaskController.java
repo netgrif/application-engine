@@ -13,7 +13,6 @@ import com.netgrif.workflow.workflow.service.interfaces.IFilterService;
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
 import com.netgrif.workflow.workflow.web.responsebodies.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
@@ -31,8 +30,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.FileNotFoundException;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -100,12 +97,11 @@ public class TaskController {
     }
 
     @RequestMapping(value = "/delegate/{id}", method = RequestMethod.POST)
-    public MessageResource delegate(Authentication auth, @PathVariable("id") String taskId, @RequestBody String delegatedEmail) {
+    public MessageResource delegate(Authentication auth, @PathVariable("id") String taskId, @RequestBody Long delegatedId) {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
         try {
-            delegatedEmail = URLDecoder.decode(delegatedEmail, StandardCharsets.UTF_8.name());
-            taskService.delegateTask(loggedUser, delegatedEmail, taskId);
-            return MessageResource.successMessage("LocalisedTask " + taskId + " assigned to " + delegatedEmail);
+            taskService.delegateTask(loggedUser, delegatedId, taskId);
+            return MessageResource.successMessage("LocalisedTask " + taskId + " assigned to [" + delegatedId + "]");
         } catch (Exception ignored) {
             ignored.printStackTrace();
             return MessageResource.errorMessage("LocalisedTask " + taskId + " cannot be assigned");
