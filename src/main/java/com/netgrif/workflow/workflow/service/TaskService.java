@@ -258,8 +258,8 @@ public class TaskService implements ITaskService {
 
     @Override
     @Transactional
-    public EventOutcome delegateTask(LoggedUser loggedUser, String delegatedEmail, String taskId) throws TransitionNotExecutableException {
-        User delegatedUser = userService.findByEmail(delegatedEmail, true);
+    public EventOutcome delegateTask(LoggedUser loggedUser, Long delegatedId, String taskId) throws TransitionNotExecutableException {
+        User delegatedUser = userService.findById(delegatedId, true);
         User delegateUser = userService.findById(loggedUser.getId(), true);
         Task task = taskRepository.findOne(taskId);
         Case useCase = workflowService.findOne(task.getCaseId());
