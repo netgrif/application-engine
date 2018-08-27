@@ -12,6 +12,8 @@ import com.netgrif.workflow.petrinet.domain.roles.ProcessRoleRepository;
 import com.netgrif.workflow.startup.SystemUserRunner;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -118,18 +120,22 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public Set<User> findAllCoMembers(String email, boolean small) {
-        Set<Long> members = memberService.findAllCoMembersIds(email);
-        Set<User> users = userRepository.findAll(members).parallelStream().filter(u -> u.getState() == UserState.ACTIVE).collect(Collectors.toSet());
-        if (!small) users.forEach(this::loadProcessRoles);
+    public Page<User> findAllCoMembers(LoggedUser loggedUser, boolean small, Pageable pageable) {
+        // TODO: 8/27/18 make all pageable
+        Set<Long> members = memberService.findAllCoMembersIds(loggedUser.getEmail());
+        members.add(loggedUser.getId());
+        Page<User> users = userRepository.findAllByIdInAndState(members, UserState.ACTIVE, pageable);
+        if (!small)
+            users.forEach(this::loadProcessRoles);
         return users;
     }
 
     @Override
-    public Set<User> findByProcessRoles(Set<String> roleIds, boolean small) {
-        Set<User> users = new HashSet<>(userRepository.findByStateAndUserProcessRoles_RoleIdIn(UserState.ACTIVE, new ArrayList<>(roleIds)));
-        if (!small)
+    public Page<User> findAllActiveByProcessRoles(Set<String> roleIds, boolean small, Pageable pageable) {
+        Page<User> users = userRepository.findByStateAndUserProcessRoles_RoleIdIn(UserState.ACTIVE, new ArrayList<>(roleIds), pageable);
+        if (!small) {
             users.forEach(this::loadProcessRoles);
+        }
         return users;
     }
 

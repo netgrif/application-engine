@@ -1,7 +1,10 @@
 package com.netgrif.workflow.auth.service.interfaces;
 
+import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.orgstructure.domain.Member;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -22,9 +25,9 @@ public interface IUserService {
 
     List<User> findAll(boolean small);
 
-    Set<User> findAllCoMembers(String email, boolean small);
+    Page<User> findAllCoMembers(LoggedUser loggedUser, boolean small, Pageable pageable);
 
-    Set<User> findByProcessRoles(Set<String> roleIds, boolean small);
+    Page<User> findAllActiveByProcessRoles(Set<String> roleIds, boolean small, Pageable pageable);
 
     void assignAuthority(Long userId, Long authorityId);
 
