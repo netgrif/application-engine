@@ -91,6 +91,12 @@ public class WorkflowController {
         return resources;
     }
 
+    @PostMapping(value = "/case/count", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public CountResponse count(@RequestBody Map<String, Object> query, Authentication auth, Locale locale) {
+        long count = workflowService.count(query, (LoggedUser) auth.getPrincipal(), locale);
+        return CountResponse.caseCount(count);
+    }
+
 //    @GetMapping(value = "/case/fulltext", produces = MediaTypes.HAL_JSON_VALUE)
 //    public PagedResources<CaseResource> fullTextSearch(@RequestParam("process") String process, @RequestParam("search") String searchInput, Pageable pageable, PagedResourcesAssembler<Case> assembler, Authentication auth, Locale locale) {
 //        Page<Case> cases = workflowService.fullTextSearch(process, searchInput, pageable);
