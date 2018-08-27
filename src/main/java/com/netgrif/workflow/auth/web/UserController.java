@@ -5,13 +5,18 @@ import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.auth.service.interfaces.IAuthorityService;
 import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.auth.web.requestbodies.UpdateUserRequest;
-import com.netgrif.workflow.auth.web.responsebodies.AuthoritiesResources;
-import com.netgrif.workflow.auth.web.responsebodies.UserResource;
-import com.netgrif.workflow.auth.web.responsebodies.UsersResource;
+import com.netgrif.workflow.auth.web.responsebodies.*;
 import com.netgrif.workflow.petrinet.service.interfaces.IProcessRoleService;
 import com.netgrif.workflow.workflow.web.responsebodies.MessageResource;
+import com.netgrif.workflow.workflow.web.responsebodies.ResourceLinkAssembler;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.Link;
+import org.springframework.hateoas.PagedResources;
+import org.springframework.hateoas.mvc.ControllerLinkBuilder;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -36,11 +41,14 @@ public class UserController {
     private IAuthorityService authorityService;
 
     @RequestMapping(method = RequestMethod.GET)
-    public UsersResource getAll(@RequestParam(value = "small", required = false) Boolean small, Authentication auth, Locale locale) {
+    public PagedResources<UserResource> getAll(@RequestParam(value = "small", required = false) Boolean small, Pageable pageable, PagedResourcesAssembler<User> assembler, Authentication auth, Locale locale) {
         small = small == null ? false : small;
-        Set<User> coMembers = userService.findAllCoMembers(((LoggedUser) auth.getPrincipal()).getUsername(), small);
-        coMembers.add(userService.findById(((LoggedUser) auth.getPrincipal()).getId(), small));
-        return new UsersResource(coMembers, "all", locale, small);
+        Page<User> page = userService.findAllCoMembers(((LoggedUser) auth.getPrincipal()), small, pageable);
+        Link selfLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(UserController.class)
+                .getAll(small, pageable, assembler, auth, locale)).withRel("all");
+        PagedResources<UserResource> resources = assembler.toResource(page, new UserResourceAssembler(locale, small, "all"), selfLink);
+        ResourceLinkAssembler.addLinks(resources, User.class, selfLink.getRel());
+        return resources;
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
@@ -72,9 +80,14 @@ public class UserController {
     }
 
     @RequestMapping(value = "/role", method = RequestMethod.POST)
-    public UsersResource getAllWithRole(@RequestBody Set<String> roleIds, @RequestParam(value = "small", required = false) Boolean small, Locale locale) {
+    public PagedResources<UserResource> getAllWithRole(@RequestBody Set<String> roleIds, @RequestParam(value = "small", required = false) Boolean small, Pageable pageable, PagedResourcesAssembler<User> assembler, Locale locale) {
         small = small == null ? false : small;
-        return new UsersResource(userService.findByProcessRoles(roleIds, small), "small", locale, small);
+        Page<User> page = userService.findAllActiveByProcessRoles(roleIds, small, pageable);
+        Link selfLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(UserController.class)
+            .getAllWithRole(roleIds, small, pageable, assembler, locale)).withRel("role");
+        PagedResources<UserResource> resources = assembler.toResource(page, new UserResourceAssembler(locale, small, "role"), selfLink);
+        ResourceLinkAssembler.addLinks(resources, User.class, selfLink.getRel());
+        return resources;
     }
 
     @RequestMapping(value = "/{id}/role/assign", method = RequestMethod.POST)

@@ -2,14 +2,19 @@ package com.netgrif.workflow.auth.domain.repositories;
 
 import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.auth.domain.UserState;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
+
+    Page<User> findAllByIdInAndState(Set<Long> ids, UserState state, Pageable pageable);
 
     User findByEmail(String email);
 
@@ -22,6 +27,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
     List<User> findAllByState(UserState state);
 
     List<User> findByStateAndUserProcessRoles_RoleIdIn(UserState state, List<String> roleId);
+
+    Page<User> findByStateAndUserProcessRoles_RoleIdIn(UserState state, List<String> roleId, Pageable pageable);
 
     List<User> removeAllByStateAndExpirationDateBefore(UserState state, LocalDateTime dateTime);
 
