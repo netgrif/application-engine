@@ -140,24 +140,33 @@ public class WorkflowService implements IWorkflowService {
 
     @Override
     public Page<Case> search(Map<String, Object> request, Pageable pageable, LoggedUser user, Locale locale) {
-        BooleanBuilder builder = new BooleanBuilder();
-
-        if (request.containsKey(CaseSearchService.PETRINET)) {
-            builder.and(searchService.petriNet(request.get(CaseSearchService.PETRINET), user, locale));
-        }
-        if (request.containsKey(CaseSearchService.AUTHOR)) {
-            builder.and(searchService.author(request.get(CaseSearchService.AUTHOR)));
-        }
-        if (request.containsKey(CaseSearchService.TRANSITION)) {
-            builder.and(searchService.transition(request.get(CaseSearchService.TRANSITION)));
-        }
-        if (request.containsKey(CaseSearchService.FULLTEXT) && request.containsKey(CaseSearchService.PETRINET)) {
-            builder.and(searchService.fullText(request.get(CaseSearchService.PETRINET), (String) request.get(CaseSearchService.FULLTEXT)));
-        }
-
-        Page<Case> page = repository.findAll(builder, pageable);
+        Page<Case> page = repository.findAll(buildQuery(request, user, locale), pageable);
         decryptDataSets(page.getContent());
         return setImmediateDataFields(page);
+    }
+
+    @Override
+    public long count(Map<String, Object> request, LoggedUser user, Locale locale) {
+        return repository.count(buildQuery(request, user, locale));
+    }
+
+    protected Predicate buildQuery(Map<String, Object> requestQuery, LoggedUser user, Locale locale) {
+        BooleanBuilder builder = new BooleanBuilder();
+
+        if (requestQuery.containsKey(CaseSearchService.PETRINET)) {
+            builder.and(searchService.petriNet(requestQuery.get(CaseSearchService.PETRINET), user, locale));
+        }
+        if (requestQuery.containsKey(CaseSearchService.AUTHOR)) {
+            builder.and(searchService.author(requestQuery.get(CaseSearchService.AUTHOR)));
+        }
+        if (requestQuery.containsKey(CaseSearchService.TRANSITION)) {
+            builder.and(searchService.transition(requestQuery.get(CaseSearchService.TRANSITION)));
+        }
+        if (requestQuery.containsKey(CaseSearchService.FULLTEXT) && requestQuery.containsKey(CaseSearchService.PETRINET)) {
+            builder.and(searchService.fullText(requestQuery.get(CaseSearchService.PETRINET), (String) requestQuery.get(CaseSearchService.FULLTEXT)));
+        }
+
+        return builder;
     }
 
     @Override
