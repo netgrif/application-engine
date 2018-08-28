@@ -23,7 +23,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>1.8</java.version>
         <jasypt.version>1.9.2</jasypt.version>
-        <querydsl.version>4.1.4</querydsl.version>
+        <querydsl.version>4.2.1</querydsl.version>
     </properties>
 
     <dependencies>
@@ -189,6 +189,11 @@
         </dependency>
         <dependency>
             <groupId>com.querydsl</groupId>
+            <artifactId>querydsl-jpa</artifactId>
+            <version>${querydsl.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.querydsl</groupId>
             <artifactId>querydsl-core</artifactId>
             <version>${querydsl.version}</version>
         </dependency>
@@ -246,7 +251,10 @@
                         </goals>
                         <configuration>
                             <outputDirectory>target/generated-sources/java</outputDirectory>
-                            <processor>org.springframework.data.mongodb.repository.support.MongoAnnotationProcessor</processor>
+                            <processors>
+                                <processor>org.springframework.data.mongodb.repository.support.MongoAnnotationProcessor</processor>
+                                <processor>com.querydsl.apt.jpa.JPAAnnotationProcessor</processor>
+                            </processors>
                             <options>
                                 <querydsl.excludedClasses>groovy.lang.MetaClass</querydsl.excludedClasses>
                             </options>
