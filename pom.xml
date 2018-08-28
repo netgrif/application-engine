@@ -252,8 +252,8 @@
                         <configuration>
                             <outputDirectory>target/generated-sources/java</outputDirectory>
                             <processors>
-                                <processor>org.springframework.data.mongodb.repository.support.MongoAnnotationProcessor</processor>
                                 <processor>com.querydsl.apt.jpa.JPAAnnotationProcessor</processor>
+                                <processor>org.springframework.data.mongodb.repository.support.MongoAnnotationProcessor</processor>
                             </processors>
                             <options>
                                 <querydsl.excludedClasses>groovy.lang.MetaClass</querydsl.excludedClasses>
