@@ -10,6 +10,7 @@ import com.netgrif.workflow.orgstructure.domain.Member;
 import com.netgrif.workflow.orgstructure.service.IMemberService;
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRoleRepository;
 import com.netgrif.workflow.startup.SystemUserRunner;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
@@ -125,6 +126,23 @@ public class UserService implements IUserService {
         Set<Long> members = memberService.findAllCoMembersIds(loggedUser.getEmail());
         members.add(loggedUser.getId());
         Page<User> users = userRepository.findAllByIdInAndState(members, UserState.ACTIVE, pageable);
+        if (!small)
+            users.forEach(this::loadProcessRoles);
+        return users;
+    }
+
+    @Override
+    public Page<User> searchAllCoMembers(String query, LoggedUser loggedUser, Boolean small, Pageable pageable) {
+        Set<Long> members = memberService.findAllCoMembersIds(loggedUser.getEmail());
+        members.add(loggedUser.getId());
+        BooleanExpression predicate = QUser.user
+                .id.in(members)
+                .and(QUser.user.state.eq(UserState.ACTIVE))
+                .andAnyOf(
+                        QUser.user.email.containsIgnoreCase(query),
+                        QUser.user.name.containsIgnoreCase(query),
+                        QUser.user.surname.containsIgnoreCase(query));
+        Page<User> users = userRepository.findAll(predicate, pageable);
         if (!small)
             users.forEach(this::loadProcessRoles);
         return users;
