@@ -27,6 +27,8 @@ public interface ITaskService {
 
     Page<Task> search(Map<String, Object> request, Pageable pageable, LoggedUser user);
 
+    long count(Map<String, Object> request, LoggedUser user, Locale locale);
+
     Page<Task> findByCases(Pageable pageable, List<String> cases);
 
     void createTasks(Case useCase);
