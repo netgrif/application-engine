@@ -177,6 +177,12 @@ public class TaskController {
         return resources;
     }
 
+    @PostMapping(value = "/count", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public CountResponse count(@RequestBody Map<String, Object> query, Authentication auth, Locale locale){
+        long count = taskService.count(query, (LoggedUser)auth.getPrincipal(), locale);
+        return CountResponse.taskCount(count);
+    }
+
     @RequestMapping(value = "/{id}/data", method = RequestMethod.GET)
     public DataGroupsResource getData(@PathVariable("id") String taskId, Locale locale) {
         List<Field> dataFields = dataService.getData(taskId);

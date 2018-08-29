@@ -166,13 +166,13 @@ public class CaseSearchService extends MongoSearchService<Case> {
         } else if (query instanceof HashMap) {
             return petriNetObject((HashMap<String, String>) query, allowedNets);
         }
-        return Expressions.FALSE;
+        return null;
     }
 
     private static BooleanExpression petriNetObject(HashMap<String, String> query, List<PetriNetReference> allowedNets) {
         if (query.containsKey(PETRINET_IDENTIFIER) && allowedNets.parallelStream().anyMatch(net -> net.getIdentifier().equalsIgnoreCase(query.get(PETRINET_IDENTIFIER))))
             return QCase.case$.processIdentifier.equalsIgnoreCase(query.get(PETRINET_IDENTIFIER));
-        return Expressions.FALSE;
+        return null;
 //        else if(query.containsKey(PETRINET_ID) && allowedNets.parallelStream().anyMatch(net->net.getStringId().equalsIgnoreCase(query.get(PETRINET_ID))))
 //            return QCase.case$.petriNet._id.e
     }
@@ -186,7 +186,7 @@ public class CaseSearchService extends MongoSearchService<Case> {
         } else if (query instanceof HashMap) {
             return authorObject((HashMap<String, Object>) query);
         }
-        return Expressions.FALSE;
+        return null;
     }
 
     private static BooleanExpression authorObject(HashMap<String, Object> query) {
@@ -202,7 +202,7 @@ public class CaseSearchService extends MongoSearchService<Case> {
                 searchValue = ((Integer) query.get(AUTHOR_ID)).longValue();
             return QCase.case$.author.id.eq(searchValue);
         }
-        return Expressions.FALSE;
+        return null;
     }
 
     public Predicate transition(Object query) {
@@ -214,7 +214,7 @@ public class CaseSearchService extends MongoSearchService<Case> {
         } else if (query instanceof String) {
             return transitionString((String) query);
         }
-        return Expressions.FALSE;
+        return null;
     }
 
     private static BooleanExpression transitionString(String transition) {
@@ -233,11 +233,11 @@ public class CaseSearchService extends MongoSearchService<Case> {
         }
 
         if(processes.isEmpty())
-            return Expressions.FALSE;
+            return null;
 
         List<PetriNet> petriNets = processes.parallelStream().map(process -> petriNetService.getNewestVersionByIdentifier(process)).collect(Collectors.toList());
         if(petriNets.isEmpty())
-            return Expressions.FALSE;
+            return null;
 
         List<BooleanExpression> predicates = new ArrayList<>();
         predicates.add(QCase.case$.visualId.containsIgnoreCase(searchPhrase));
