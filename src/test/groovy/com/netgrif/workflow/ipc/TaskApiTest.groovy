@@ -236,4 +236,25 @@ class TaskApiTest {
         assert control.dataSet[DATA_TEXT].value == "text"
         assert control.dataSet[DATA_NUMBER].value == 13
     }
+
+    public static final String TASK_SETTER_NET_FILE = "ipc_set_data.xml"
+    public static final String TASK_SETTER_NET_TITLE = "Data śetter"
+    public static final String TASK_SETTER_NET_INITIALS = "SET"
+    public static final String TASK_SETTER_TASK = "Enabled"
+
+    @Test
+    void testSetData() {
+        def netOptional = importer.importPetriNet(stream(TASK_SETTER_NET_FILE), TASK_SETTER_NET_TITLE, TASK_SETTER_NET_INITIALS)
+
+        assert netOptional.isPresent()
+        PetriNet net = netOptional.get()
+
+        def control = helper.createCase("Control case", net)
+        def case1 = helper.createCase("Case 1", net)
+
+        helper.assignTaskToSuper(TASK_SETTER_TASK, control.stringId)
+        case1 = caseRepository.findOne(case1.stringId)
+        assert case1.dataSet[DATA_TEXT].value == "some text"
+        assert case1.dataSet[DATA_NUMBER].value == 10
+    }
 }
