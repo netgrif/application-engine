@@ -377,6 +377,19 @@ class ActionDelegate {
         return userService.addRole(user, roleImportId)
     }
 
+    def setData(Task task, Map dataSet) {
+        dataService.setData(task.stringId, ImportHelper.populateDataset(dataSet))
+    }
+
+    def setData(Transition transition, Map dataSet) {
+        setData(transition.importId, this.useCase, dataSet)
+    }
+
+    def setData(String transitionId, Case useCase, Map dataSet) {
+        def predicate = QTask.task.caseId.eq(useCase.stringId) & QTask.task.transitionId.eq(transitionId)
+        def task = taskService.searchOne(predicate)
+        dataService.setData(task.stringId, ImportHelper.populateDataset(dataSet))
+    }
 
     Map<String, Field> getData(Task task) {
         def useCase = workflowService.findOne(task.caseId);
