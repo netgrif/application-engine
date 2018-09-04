@@ -31,6 +31,8 @@ public interface IWorkflowService {
 
     Page<Case> searchAll(Predicate predicate);
 
+    Case searchOne(Predicate predicate);
+
     List<Field> getData(String caseId);
 
     Page<Case> search(Map<String, Object> request, Pageable pageable, LoggedUser user, Locale locale);
