@@ -269,9 +269,11 @@ public class TaskService implements ITaskService {
         outcome.add(dataService.runActions(transition.getPreDelegateActions(), useCase.getStringId(), transition));
         delegate(delegatedUser, task, useCase);
         outcome.add(dataService.runActions(transition.getPostDelegateActions(), useCase.getStringId(), transition));
-        workflowService.save(useCase);
+        useCase = workflowService.findOne(useCase.getStringId());
+        reloadTasks(useCase);
 
         publisher.publishEvent(new UserDelegateTaskEvent(delegateUser, task, useCase, delegatedUser));
+        log.info("Task [" + task.getTitle() + "] in case [" + useCase.getTitle() + "] assigned to [" + delegateUser.getEmail() + "] was delegated to [" + delegatedUser.getEmail() + "]");
         return outcome;
     }
 
