@@ -25,6 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.BasicQuery;
@@ -256,6 +257,14 @@ public class WorkflowService implements IWorkflowService {
         return search(predicate, new FullPageRequest());
     }
 
+    @Override
+    public Case searchOne(Predicate predicate) {
+        Page<Case> page = search(predicate, new PageRequest(0,1));
+        if (page.getContent().isEmpty())
+            return null;
+        return page.getContent().get(0);
+    }
+
     public List<Field> getData(String caseId) {
         Case useCase = repository.findOne(caseId);
         List<Field> fields = new ArrayList<>();
@@ -276,7 +285,7 @@ public class WorkflowService implements IWorkflowService {
         return cases;
     }
 
-    private Case setImmediateDataFields(Case useCase) {
+    protected Case setImmediateDataFields(Case useCase) {
         List<Field> immediateData = new ArrayList<>();
 
         useCase.getImmediateDataFields().forEach(fieldId ->

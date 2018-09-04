@@ -299,10 +299,15 @@ class ActionDelegate {
 
     void set(String key, Object value) { map[key] = value }
 
-    List<Case> findCase(Closure<Predicate> predicate) {
+    List<Case> findCases(Closure<Predicate> predicate) {
         QCase qCase = new QCase("case")
         Page<Case> result = workflowService.searchAll(predicate(qCase))
         return result.content
+    }
+
+    Case findCase(Closure<Predicate> predicate) {
+        QCase qCase = new QCase("case")
+        return workflowService.searchOne(predicate(qCase))
     }
 
     Case createCase(String identifier, String title = null, String color = "", User author = userService.loggedOrSystem) {
