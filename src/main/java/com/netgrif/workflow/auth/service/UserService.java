@@ -149,6 +149,27 @@ public class UserService implements IUserService {
     }
 
     @Override
+    public Page<User> searchAllCoMembers(String query, List<String> roleIds, LoggedUser loggedUser, Boolean small, Pageable pageable) {
+        if (roleIds == null || roleIds.isEmpty())
+            return searchAllCoMembers(query, loggedUser, small, pageable);
+
+        Set<Long> members = memberService.findAllCoMembersIds(loggedUser.getEmail());
+        members.add(loggedUser.getId());
+        BooleanExpression predicate = QUser.user
+                .id.in(members)
+                .and(QUser.user.state.eq(UserState.ACTIVE))
+                .and(QUser.user.userProcessRoles.any().roleId.in(roleIds))
+                .andAnyOf(
+                        QUser.user.email.containsIgnoreCase(query),
+                        QUser.user.name.containsIgnoreCase(query),
+                        QUser.user.surname.containsIgnoreCase(query));
+        Page<User> users = userRepository.findAll(predicate, pageable);
+        if (!small)
+            users.forEach(this::loadProcessRoles);
+        return users;
+    }
+
+    @Override
     public Page<User> findAllActiveByProcessRoles(Set<String> roleIds, boolean small, Pageable pageable) {
         Page<User> users = userRepository.findByStateAndUserProcessRoles_RoleIdIn(UserState.ACTIVE, new ArrayList<>(roleIds), pageable);
         if (!small) {
