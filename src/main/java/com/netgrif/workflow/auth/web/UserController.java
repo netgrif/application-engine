@@ -58,7 +58,7 @@ public class UserController {
     @PostMapping(value = "/search")
     public PagedResources<UserResource> search(@RequestParam(value = "small", required = false) Boolean small, @RequestBody UserSearchRequestBody query, Pageable pageable, PagedResourcesAssembler<User> assembler, Authentication auth, Locale locale) {
         small = small == null ? false : small;
-        Page<User> page = userService.searchAllCoMembers(query.getFulltext(), ((LoggedUser) auth.getPrincipal()), small, pageable);
+        Page<User> page = userService.searchAllCoMembers(query.getFulltext(), query.getRoles(), ((LoggedUser) auth.getPrincipal()), small, pageable);
         Link selfLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(UserController.class)
                 .search(small, query, pageable, assembler, auth, locale)).withRel("search");
         PagedResources<UserResource> resources = assembler.toResource(page, new UserResourceAssembler(locale, small, "search"), selfLink);
