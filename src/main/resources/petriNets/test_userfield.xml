@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="https://modeler.netgrif.com/petriflow_schema.xsd">
+    <!-- ROLE -->
+    <role>
+        <id>1</id>
+        <title>User</title>
+    </role>
+    <!-- DATA -->
+    <data type="user">
+        <id>user</id>
+        <title>User</title>
+        <values>1</values>
+    </data>
+    <!-- TRANSITIONS -->
+    <transition>
+        <id>transition</id>
+        <x>0</x>
+        <y>0</y>
+        <label>Task</label>
+        <assignPolicy>auto</assignPolicy>
+        <dataRef>
+            <id>user</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+    </transition>
+    <!-- PLACES -->
+    <!-- ARCS -->
+</document>
