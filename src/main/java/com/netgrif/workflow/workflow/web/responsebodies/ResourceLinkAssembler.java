@@ -33,6 +33,9 @@ public class ResourceLinkAssembler {
         if (!selfRel.equalsIgnoreCase("search"))
             pagedResources.add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
                     .search(null, null, null, null, null)).withRel("search"));
+        if (!selfRel.equalsIgnoreCase("count"))
+            pagedResources.add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
+                    .count(null, null, null)).withRel("count"));
     }
 
     private static void addCasesLinks(PagedResources pagedResources, String selfRel) {
