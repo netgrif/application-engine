@@ -1,5 +1,6 @@
 package com.netgrif.workflow.importer.service;
 
+import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.importer.model.Data;
 import com.netgrif.workflow.importer.model.DocumentRef;
 import com.netgrif.workflow.importer.model.I18NStringType;
@@ -8,6 +9,7 @@ import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.dataset.*;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.validation.FieldValidationRunner;
 import com.netgrif.workflow.workflow.domain.Case;
+import com.netgrif.workflow.workflow.domain.DataField;
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.util.Pair;
@@ -238,9 +240,21 @@ public final class FieldFactory {
             case FILE:
                 parseFileValue((FileField) field, useCase, fieldId);
                 break;
+            case USER:
+                parseUserValues((UserField) field, useCase, fieldId);
+                break;
             default:
                 field.setValue(useCase.getFieldValue(fieldId));
         }
+    }
+
+    private void parseUserValues(UserField field, Case useCase, String fieldId) {
+        DataField userField = useCase.getDataField(fieldId);
+        if (userField.getChoices() != null) {
+            Set<String> roles = userField.getChoices().stream().map(I18nString::getDefaultValue).collect(Collectors.toSet());
+            field.setRoles(roles);
+        }
+        field.setValue((User) useCase.getFieldValue(fieldId));
     }
 
     public static Set<I18nString> parseMultichoiceValue(Case useCase, String fieldId) {
