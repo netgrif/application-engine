@@ -2,10 +2,12 @@ package com.netgrif.workflow.workflow.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.netgrif.workflow.auth.domain.Author;
+import com.netgrif.workflow.petrinet.domain.I18nString;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.Place;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.petrinet.domain.dataset.FieldWithDefault;
+import com.netgrif.workflow.petrinet.domain.dataset.UserField;
 import lombok.Getter;
 import lombok.Setter;
 import org.bson.types.ObjectId;
@@ -89,6 +91,11 @@ public class Case {
     @JsonIgnore
     private Set<TaskPair> tasks;
 
+    @Getter
+    @Setter
+    @JsonIgnore
+    private Set<String> enabledRoles;
+
     public Case() {
         _id = new ObjectId();
         activePlaces = new HashMap<>();
@@ -97,6 +104,7 @@ public class Case {
         resetArcTokens = new HashMap<>();
         tasks = new HashSet<>();
         visualId = generateVisualId();
+        enabledRoles = new HashSet<>();
     }
 
     public Case(String title) {
@@ -112,6 +120,7 @@ public class Case {
         populateDataSet();
         this.immediateDataFields = this.petriNet.getImmediateFields().stream().map(Field::getStringId).collect(Collectors.toCollection(LinkedHashSet::new));
         visualId = generateVisualId();
+        this.enabledRoles = petriNet.getRoles().keySet();
     }
 
     public ObjectId get_id() {
@@ -180,6 +189,9 @@ public class Case {
                 this.dataSet.put(key, new DataField(((FieldWithDefault) field).getDefaultValue()));
             else
                 this.dataSet.put(key, new DataField());
+            if (field instanceof UserField) {
+                this.dataSet.get(key).setChoices(((UserField) field).getRoles().stream().map(I18nString::new).collect(Collectors.toSet()));
+            }
         });
     }
 
