@@ -644,7 +644,9 @@ public class TaskService implements ITaskService {
             }
         }
         for (Map.Entry<String, Set<RolePermission>> entry : transition.getRoles().entrySet()) {
-            task.addRole(entry.getKey(), entry.getValue());
+            if (useCase.getEnabledRoles().contains(entry.getKey())) {
+                task.addRole(entry.getKey(), entry.getValue());
+            }
         }
 
         Transaction transaction = useCase.getPetriNet().getTransactionByTransition(transition);
