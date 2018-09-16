@@ -36,7 +36,7 @@ abstract class FieldActionsRunner {
         actionsCache = new HashMap<>()
     }
 
-    ChangedField run(Action action, Case useCase) {
+    Map<String, ChangedField> run(Action action, Case useCase) {
         if (!actionsCache)
             actionsCache = new HashMap<>()
 
@@ -50,7 +50,7 @@ abstract class FieldActionsRunner {
             log.error("Action: $action.definition")
             throw e
         }
-        return ((ActionDelegate) code.delegate).changedField
+        return ((ActionDelegate) code.delegate).changedFields
     }
 
     private Closure getActionCode(Action action) {
