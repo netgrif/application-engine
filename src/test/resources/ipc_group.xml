@@ -5,7 +5,7 @@
     <!-- DATA -->
     <data type="enumeration">
         <id>orgs</id>
-        <title>Organizations</title>
+        <title>Organisations</title>
     </data>
     <!-- TRANSITIONS -->
     <transition>
@@ -18,16 +18,16 @@
             <actions phase="pre">
                 <action>
                     <!--@formatter:off-->
-                    createOrganization("Test organization", groupService.findAll().first(), [userService.findAll(true).first()] as Set)
+                    createOrganisation("Test organisation", groupService.findAll().first(), [userService.findAll(true).first()] as Set)
                     <!--@formatter:on-->
                 </action>
             </actions>
             <actions phase="post">
                 <action>
                     <!--@formatter:off-->
-                    organizations: f.orgs;
-                    def orgs = findOrganization(userService.findAll(true).first())
-                    change organizations choices {
+                    organisations: f.orgs;
+                    def orgs = findOrganisation(userService.findAll(true).first())
+                    change organisations choices {
                         orgs.collect { it.name }
                     }
                     <!--@formatter:on-->
