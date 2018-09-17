@@ -116,11 +116,9 @@ public class DataService implements IDataService {
         Map<String, ChangedField> changedFields = new HashMap<>();
         values.fields().forEachRemaining(entry -> {
             useCase.getDataSet().get(entry.getKey()).setValue(parseFieldsValues(entry.getValue()));
-            resolveActions(useCase.getPetriNet().getField(entry.getKey()).get(),
-                    Action.ActionTrigger.SET, useCase, useCase.getPetriNet().getTransition(task.getTransitionId()))
-                    .forEach((key, changedField) -> {
-                        mergeChanges(changedFields, changedField);
-                    });
+            Map<String, ChangedField> changedFieldMap = resolveActions(useCase.getPetriNet().getField(entry.getKey()).get(),
+                    Action.ActionTrigger.SET, useCase, useCase.getPetriNet().getTransition(task.getTransitionId()));
+            mergeChanges(changedFields, changedFieldMap);
         });
         updateDataset(useCase);
         workflowService.save(useCase);
@@ -256,8 +254,8 @@ public class DataService implements IDataService {
         Case case$ = workflowService.findOne(useCaseId);
         Map<String, ChangedField> changedFields = new HashMap<>();
         actions.forEach(action -> {
-            ChangedField changedField = actionsRunner.run(action, case$);
-            if (changedField.getId() == null)
+            Map<String, ChangedField> changedField = actionsRunner.run(action, case$);
+            if (changedField.isEmpty())
                 return;
             mergeChanges(changedFields, changedField);
             runActionsOnChanged(Action.ActionTrigger.SET, case$, transition, changedFields, true, changedField);
@@ -295,27 +293,31 @@ public class DataService implements IDataService {
 
     private void runActions(List<Action> actions, Action.ActionTrigger trigger, Case useCase, Transition transition, Map<String, ChangedField> changedFields, boolean recursive) {
         actions.forEach(action -> {
-            ChangedField changedField = actionsRunner.run(action, useCase);
-            if (changedField.getId() == null)
+            Map<String ,ChangedField> currentChangedFields = actionsRunner.run(action, useCase);
+            if (currentChangedFields.isEmpty())
                 return;
 
-            mergeChanges(changedFields, changedField);
-            runActionsOnChanged(trigger, useCase, transition, changedFields, recursive, changedField);
+            mergeChanges(changedFields, currentChangedFields);
+            runActionsOnChanged(trigger, useCase, transition, changedFields, recursive, currentChangedFields);
         });
     }
 
-    private void runActionsOnChanged(Action.ActionTrigger trigger, Case useCase, Transition transition, Map<String, ChangedField> changedFields, boolean recursive, ChangedField changedField) {
-        if ((changedField.getAttributes().containsKey("value") && changedField.getAttributes().get("value") != null) && recursive) {
-            Field field = useCase.getField(changedField.getId());
-            processActions(field, trigger, useCase, transition, changedFields);
-        }
+    private void runActionsOnChanged(Action.ActionTrigger trigger, Case useCase, Transition transition, Map<String, ChangedField> changedFields, boolean recursive, Map<String, ChangedField> newChangedField) {
+        newChangedField.forEach((s, changedField) -> {
+            if ((changedField.getAttributes().containsKey("value") && changedField.getAttributes().get("value") != null) && recursive) {
+                Field field = useCase.getField(s);
+                processActions(field, trigger, useCase, transition, changedFields);
+            }
+        });
     }
 
-    private void mergeChanges(Map<String, ChangedField> changedFields, ChangedField changedField) {
-        if (changedFields.containsKey(changedField.getId()))
-            changedFields.get(changedField.getId()).merge(changedField);
-        else
-            changedFields.put(changedField.getId(), changedField);
+    private void mergeChanges(Map<String, ChangedField> changedFields, Map<String, ChangedField> newChangedFields) {
+        newChangedFields.forEach((s, changedField) -> {
+            if (changedFields.containsKey(s))
+                changedFields.get(s).merge(changedField);
+            else
+                changedFields.put(s, changedField);
+        });
     }
 
     private Object parseFieldsValues(JsonNode jsonNode) {
