@@ -5,6 +5,10 @@ import com.netgrif.workflow.auth.domain.User
 import com.netgrif.workflow.auth.service.interfaces.IUserService
 import com.netgrif.workflow.configuration.ApplicationContextProvider
 import com.netgrif.workflow.importer.service.FieldFactory
+import com.netgrif.workflow.orgstructure.domain.Group
+import com.netgrif.workflow.orgstructure.domain.Member
+import com.netgrif.workflow.orgstructure.service.GroupService
+import com.netgrif.workflow.orgstructure.service.MemberService
 import com.netgrif.workflow.petrinet.domain.I18nString
 import com.netgrif.workflow.petrinet.domain.PetriNet
 import com.netgrif.workflow.petrinet.domain.Transition
@@ -58,6 +62,12 @@ class ActionDelegate {
 
     @Autowired
     AsyncRunner async
+
+    @Autowired
+    GroupService groupService
+
+    @Autowired
+    MemberService memberService
 
     def map = [:]
     Action action
@@ -423,5 +433,26 @@ class ActionDelegate {
         return data.collectEntries {
             [(it.importId): it]
         }
+    }
+
+    Set<Group> findOrganization(User user = loggedUser()) {
+        return memberService.findByEmail(user.email)?.groups
+    }
+
+    Group createOrganization(String name, Group parent = null, Set<User> users = [] as Set) {
+        Group org = new Group(name)
+        if (parent)
+            org.setParentGroup(parent)
+        users.collect { user ->
+            def member = memberService.findByEmail(user.email)
+            if (member == null)
+                member = memberService.save(Member.from(user))
+            org.addMember(member)
+        }
+        return groupService.save(org)
+    }
+
+    User loggedUser() {
+        return userService.loggedUser
     }
 }
