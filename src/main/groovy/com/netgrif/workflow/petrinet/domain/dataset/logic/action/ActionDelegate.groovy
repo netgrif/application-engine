@@ -63,7 +63,7 @@ class ActionDelegate {
     Action action
     Case useCase
     FieldActionsRunner actionsRunner
-    ChangedField changedField = new ChangedField()
+    Map<String, ChangedField> changedFields = new HashMap<>()
 
     def init(Action action, Case useCase, FieldActionsRunner actionsRunner) {
         this.action = action
@@ -120,8 +120,10 @@ class ActionDelegate {
             [when: { Closure condition ->
                 if (condition()) {
                     behavior(field, trans)
-                    changedField.id = field.stringId
-                    changedField.addBehavior(useCase.dataSet.get(field.stringId).behavior)
+                    if (!changedFields.containsKey(field.stringId)) {
+                        changedFields[field.stringId] = new ChangedField(field.stringId)
+                    }
+                    changedFields[field.stringId].addBehavior(useCase.dataSet.get(field.stringId).behavior)
                 }
             }]
         }]
@@ -129,14 +131,18 @@ class ActionDelegate {
 
     def saveChangedValue(Field field) {
         useCase.dataSet.get(field.stringId).value = field.value
-        changedField.id = field.stringId
-        changedField.addAttribute("value", field.value)
+        if (!changedFields.containsKey(field.stringId)) {
+            changedFields[field.stringId] = new ChangedField(field.stringId)
+        }
+        changedFields[field.stringId].addAttribute("value", field.value)
     }
 
     def saveChangedChoices(ChoiceField field) {
         useCase.dataSet.get(field.stringId).choices = field.choices
-        changedField.id = field.stringId
-        changedField.addAttribute("choices", field.choices.collect { it.getTranslation(LocaleContextHolder.locale) })
+        if (!changedFields.containsKey(field.stringId)) {
+            changedFields[field.stringId] = new ChangedField(field.stringId)
+        }
+        changedFields[field.stringId].addAttribute("choices", field.choices.collect { it.getTranslation(LocaleContextHolder.locale) })
     }
 
     def close = { Transition[] transitions ->
