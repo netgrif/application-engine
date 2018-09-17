@@ -202,4 +202,59 @@ class TaskApiTest {
 
         assert taskRepository.findAll(QTask.task.userId.eq(userService.system.id)).size() == 2
     }
+
+    public static final String TASK_GETTER_NET_FILE = "ipc_data.xml"
+    public static final String TASK_GETTER_NET_TITLE = "Data getter"
+    public static final String TASK_GETTER_NET_INITIALS = "GET"
+    public static final String TASK_GETTER_TASK = "Enabled"
+    public static final String DATA_TEXT = "data_text"
+    public static final String DATA_NUMBER = "data_number"
+
+    @Test
+    void testGetData() {
+        def netOptional = importer.importPetriNet(stream(TASK_GETTER_NET_FILE), TASK_GETTER_NET_TITLE, TASK_GETTER_NET_INITIALS)
+
+        assert netOptional.isPresent()
+        PetriNet net = netOptional.get()
+
+        def case1 = helper.createCase("Case 1", net)
+        helper.setTaskData(TASK_GETTER_TASK, case1.stringId, [
+                (DATA_TEXT)  : [
+                        "value": "text",
+                        "type" : "text"
+                ],
+                (DATA_NUMBER): [
+                        "value": 13,
+                        "type" : "number"
+                ]
+        ])
+
+        Case control = helper.createCase("Control case", net)
+        helper.assignTaskToSuper(TASK_GETTER_TASK, control.stringId)
+
+        control = caseRepository.findOne(control.stringId)
+        assert control.dataSet[DATA_TEXT].value == "text"
+        assert control.dataSet[DATA_NUMBER].value == 13
+    }
+
+    public static final String TASK_SETTER_NET_FILE = "ipc_set_data.xml"
+    public static final String TASK_SETTER_NET_TITLE = "Data śetter"
+    public static final String TASK_SETTER_NET_INITIALS = "SET"
+    public static final String TASK_SETTER_TASK = "Enabled"
+
+    @Test
+    void testSetData() {
+        def netOptional = importer.importPetriNet(stream(TASK_SETTER_NET_FILE), TASK_SETTER_NET_TITLE, TASK_SETTER_NET_INITIALS)
+
+        assert netOptional.isPresent()
+        PetriNet net = netOptional.get()
+
+        def control = helper.createCase("Control case", net)
+        def case1 = helper.createCase("Case 1", net)
+
+        helper.assignTaskToSuper(TASK_SETTER_TASK, control.stringId)
+        case1 = caseRepository.findOne(case1.stringId)
+        assert case1.dataSet[DATA_TEXT].value == "some text"
+        assert case1.dataSet[DATA_NUMBER].value == 10
+    }
 }
