@@ -435,21 +435,44 @@ class ActionDelegate {
         }
     }
 
-    Set<Group> findOrganization(User user = loggedUser()) {
+    Set<Group> findOrganisation(User user = loggedUser()) {
         return memberService.findByEmail(user.email)?.groups
     }
 
-    Group createOrganization(String name, Group parent = null, Set<User> users = [] as Set) {
+    Group createOrganisation(String name, Group parent = null, Set<User> users = [] as Set) {
         Group org = new Group(name)
         if (parent)
             org.setParentGroup(parent)
         users.collect { user ->
-            def member = memberService.findByEmail(user.email)
-            if (member == null)
-                member = memberService.save(Member.from(user))
-            org.addMember(member)
+            org.addMember(findMember(user))
         }
         return groupService.save(org)
+    }
+
+    def deleteOrganisation(Group organisation) {
+        groupService.delete(organisation)
+    }
+
+    Group saveOrganisation(Group organisation) {
+        return groupService.save(organisation)
+    }
+
+    Group removeMember(Group organisation, User user) {
+        organisation.members.removeAll { it.email == user.email }
+        return groupService.save(organisation)
+    }
+
+    Group addMember(Group organisation, User user) {
+        def member = findMember(user)
+        organisation.members.add(member)
+        return groupService.save(organisation)
+    }
+
+    Member findMember(User user) {
+        def member = memberService.findByEmail(user.email)
+        if (member == null)
+            return memberService.save(Member.from(user))
+        return member
     }
 
     User loggedUser() {
