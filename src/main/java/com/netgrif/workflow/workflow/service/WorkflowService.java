@@ -39,6 +39,8 @@ import java.util.stream.Collectors;
 import java.util.stream.LongStream;
 import java.util.stream.StreamSupport;
 
+import static com.netgrif.workflow.workflow.service.CaseSearchService.*;
+
 @Service
 public class WorkflowService implements IWorkflowService {
 
@@ -154,17 +156,20 @@ public class WorkflowService implements IWorkflowService {
     protected Predicate buildQuery(Map<String, Object> requestQuery, LoggedUser user, Locale locale) {
         BooleanBuilder builder = new BooleanBuilder();
 
-        if (requestQuery.containsKey(CaseSearchService.PETRINET)) {
-            builder.and(searchService.petriNet(requestQuery.get(CaseSearchService.PETRINET), user, locale));
+        if (requestQuery.containsKey(PETRINET)) {
+            builder.and(searchService.petriNet(requestQuery.get(PETRINET), user, locale));
         }
-        if (requestQuery.containsKey(CaseSearchService.AUTHOR)) {
-            builder.and(searchService.author(requestQuery.get(CaseSearchService.AUTHOR)));
+        if (requestQuery.containsKey(AUTHOR)) {
+            builder.and(searchService.author(requestQuery.get(AUTHOR)));
         }
-        if (requestQuery.containsKey(CaseSearchService.TRANSITION)) {
-            builder.and(searchService.transition(requestQuery.get(CaseSearchService.TRANSITION)));
+        if (requestQuery.containsKey(TRANSITION)) {
+            builder.and(searchService.transition(requestQuery.get(TRANSITION)));
         }
-        if (requestQuery.containsKey(CaseSearchService.FULLTEXT) && requestQuery.containsKey(CaseSearchService.PETRINET)) {
-            builder.and(searchService.fullText(requestQuery.get(CaseSearchService.PETRINET), (String) requestQuery.get(CaseSearchService.FULLTEXT)));
+        if (requestQuery.containsKey(FULLTEXT) && requestQuery.containsKey(PETRINET)) {
+            builder.and(searchService.fullText(requestQuery.get(PETRINET), (String) requestQuery.get(FULLTEXT)));
+        }
+        if (requestQuery.containsKey(ROLE)) {
+            builder.and(searchService.role(requestQuery.get(ROLE)));
         }
 
         return builder;
@@ -289,7 +294,7 @@ public class WorkflowService implements IWorkflowService {
         List<Field> immediateData = new ArrayList<>();
 
         useCase.getImmediateDataFields().forEach(fieldId ->
-                immediateData.add(fieldFactory.buildFieldWithoutValidation(useCase, fieldId))
+                immediateData.add(fieldFactory.buildImmediateField(useCase, fieldId))
         );
         LongStream.range(0L, immediateData.size()).forEach(index -> immediateData.get((int) index).setOrder(index));
 

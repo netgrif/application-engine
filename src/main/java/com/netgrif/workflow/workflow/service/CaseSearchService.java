@@ -1,18 +1,14 @@
 package com.netgrif.workflow.workflow.service;
 
 import com.netgrif.workflow.auth.domain.LoggedUser;
-import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.importer.service.FieldFactory;
 import com.netgrif.workflow.petrinet.domain.I18nString;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
-import com.netgrif.workflow.petrinet.domain.QI18nString;
 import com.netgrif.workflow.petrinet.domain.dataset.FieldType;
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.workflow.petrinet.web.responsebodies.PetriNetReference;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.QCase;
-import com.netgrif.workflow.workflow.domain.QTaskPair;
-import com.netgrif.workflow.workflow.domain.TaskPair;
 import com.netgrif.workflow.workflow.domain.repositories.TaskRepository;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Expression;
@@ -21,7 +17,6 @@ import com.querydsl.core.types.Path;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
-import com.querydsl.core.types.dsl.SimplePath;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -37,6 +32,7 @@ public class CaseSearchService extends MongoSearchService<Case> {
 
     private static final Logger log = Logger.getLogger(CaseSearchService.class.getName());
 
+    public static final String ROLE = "role";
     public static final String PETRINET_IDENTIFIER = "identifier";
     public static final String PETRINET_ID = "id";
     public static final String PETRINET = "petriNet";
@@ -185,6 +181,13 @@ public class CaseSearchService extends MongoSearchService<Case> {
             return builder;
         } else if (query instanceof HashMap) {
             return authorObject((HashMap<String, Object>) query);
+        }
+        return null;
+    }
+
+    public Predicate role(Object o) {
+        if (o instanceof ArrayList) {
+            return QCase.case$.enabledRoles.any().in((ArrayList<String>) o);
         }
         return null;
     }
