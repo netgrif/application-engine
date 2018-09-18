@@ -251,8 +251,11 @@ public class DataService implements IDataService {
 
     @Override
     public Map<String, ChangedField> runActions(List<Action> actions, String useCaseId, Transition transition) {
-        Case case$ = workflowService.findOne(useCaseId);
         Map<String, ChangedField> changedFields = new HashMap<>();
+        if (actions.isEmpty())
+            return changedFields;
+
+        Case case$ = workflowService.findOne(useCaseId);
         actions.forEach(action -> {
             Map<String, ChangedField> changedField = actionsRunner.run(action, case$);
             if (changedField.isEmpty())
