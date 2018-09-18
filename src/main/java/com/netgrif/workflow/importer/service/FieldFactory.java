@@ -215,6 +215,12 @@ public final class FieldFactory {
                     .toJavascript(field, ((ValidableField) field).getValidationRules()));
     }
 
+    public Field buildImmediateField(Case useCase, String fieldId) {
+        Field field = useCase.getPetriNet().getDataSet().get(fieldId);
+        resolveDataValues(field, useCase, fieldId);
+        return field;
+    }
+
     @SuppressWarnings("RedundantCast")
     private void resolveDataValues(Field field, Case useCase, String fieldId) {
         switch (field.getType()) {
