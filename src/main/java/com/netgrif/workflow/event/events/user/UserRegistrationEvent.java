@@ -22,6 +22,6 @@ public class UserRegistrationEvent extends UserEvent {
 
     @Override
     public String getMessage() {
-        return "New user " + user.getUsername() + " registered on " + DateUtils.toString(time);
+        return "Nový užívateľ " + user.getUsername() + " zaregistrovaný o " + DateUtils.toString(time);
     }
 }
