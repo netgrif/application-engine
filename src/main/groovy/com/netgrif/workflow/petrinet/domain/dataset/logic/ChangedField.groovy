@@ -1,7 +1,9 @@
 package com.netgrif.workflow.petrinet.domain.dataset.logic
 
 import com.netgrif.workflow.petrinet.domain.I18nString
+import com.querydsl.core.annotations.QueryExclude
 
+@QueryExclude
 class ChangedField {
 
     String id

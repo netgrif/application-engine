@@ -122,7 +122,7 @@ public class DataService implements IDataService {
         });
         updateDataset(useCase);
         workflowService.save(useCase);
-        publisher.publishEvent(new SaveCaseDataEvent(useCase, changedFields.values()));
+        publisher.publishEvent(new SaveCaseDataEvent(useCase, values, changedFields.values()));
 
         ChangedFieldContainer container = new ChangedFieldContainer();
         container.putAll(changedFields);
