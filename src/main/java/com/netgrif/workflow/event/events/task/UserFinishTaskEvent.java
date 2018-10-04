@@ -12,6 +12,6 @@ public class UserFinishTaskEvent extends UserTaskEvent {
 
     @Override
     public String getMessage() {
-        return "User " + getEmail() + " finished task " + getTask().getTitle() + " of case " + getUseCase().getTitle();
+        return "Užívateľ " + getEmail() + " dokončil úlohu " + getTask().getTitle() + " na prípade " + getUseCase().getTitle();
     }
 }

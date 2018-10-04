@@ -12,6 +12,6 @@ public class UserAssignTaskEvent extends UserTaskEvent{
 
     @Override
     public String getMessage() {
-        return "User " + getEmail() + " assigned task " + getTask().getTitle() + " of case " + getUseCase().getTitle();
+        return "Užívateľ " + getEmail() + " si priradil úlohu " + getTask().getTitle() + " na prípade " + getUseCase().getTitle();
     }
 }
