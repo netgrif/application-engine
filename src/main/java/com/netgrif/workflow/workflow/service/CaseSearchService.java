@@ -1,6 +1,7 @@
 package com.netgrif.workflow.workflow.service;
 
 import com.netgrif.workflow.auth.domain.LoggedUser;
+import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.importer.service.FieldFactory;
 import com.netgrif.workflow.petrinet.domain.I18nString;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
@@ -33,6 +34,7 @@ public class CaseSearchService extends MongoSearchService<Case> {
     private static final Logger log = Logger.getLogger(CaseSearchService.class.getName());
 
     public static final String ROLE = "role";
+    public static final String DATA = "data";
     public static final String PETRINET_IDENTIFIER = "identifier";
     public static final String PETRINET_ID = "id";
     public static final String PETRINET = "petriNet";
@@ -222,6 +224,40 @@ public class CaseSearchService extends MongoSearchService<Case> {
 
     private static BooleanExpression transitionString(String transition) {
         return QCase.case$.tasks.any().transition.eq(transition);
+    }
+
+    public Predicate data(Object data) {
+        if (!(data instanceof Map)) {
+            throw new IllegalArgumentException("Unsupported class " + data.getClass().getName());
+        }
+        Map dataQueries = (Map) data;
+
+        List<BooleanExpression> predicates = new ArrayList<>();
+        (dataQueries).forEach((k, v) -> {
+            if (v instanceof Map) {
+                Map.Entry<String, Object> entry = (Map.Entry<String, Object>) ((Map) v).entrySet().iterator().next();
+                Object fieldValue = entry.getValue();
+                try {
+                    FieldType type = FieldType.fromString(entry.getKey());
+
+                    switch (type) {
+                        case USER:
+                            Path valuePath = Expressions.simplePath(User.class, QCase.case$.dataSet.get((String) k),"value");
+                            Path idPath = Expressions.stringPath(valuePath,"id");
+                            Expression<Long> constant = Expressions.constant(Long.valueOf(""+fieldValue));
+                            predicates.add(Expressions.predicate(Ops.EQ, idPath, constant));
+                            break;
+                    }
+                } catch (IllegalArgumentException e) {
+                    log.error("Unrecognized Field type "+entry.getKey());
+                }
+            } else {
+                predicates.add(QCase.case$.dataSet.get((String) k).value.eq(v));
+            }
+        });
+        BooleanBuilder builder = new BooleanBuilder();
+        predicates.forEach(builder::and);
+        return builder;
     }
 
     public Predicate fullText(Object petriNetQuery, String searchPhrase) {

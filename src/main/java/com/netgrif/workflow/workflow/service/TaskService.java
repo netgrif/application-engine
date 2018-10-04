@@ -317,12 +317,13 @@ public class TaskService implements ITaskService {
                 deleteUnassignedNotExecutableTasks(tasks, transition, useCase);
             }
         });
+        Long sysemId = userService.getSystem().getId();
         List<Task> tasks = taskRepository.findAllByCaseId(useCase.getStringId());
-        if (tasks.stream().anyMatch(task -> Objects.equals(task.getUserId(), userService.getSystem().getId()) && task.getStartDate() != null)) {
+        if (tasks.stream().anyMatch(task -> Objects.equals(task.getUserId(), sysemId) && task.getStartDate() != null)) {
             return;
         }
         for (Task task : tasks) {
-            if (Objects.equals(task.getUserId(), userService.getSystem().getId()) && task.getStartDate() == null) {
+            if (Objects.equals(task.getUserId(), sysemId) && task.getStartDate() == null) {
                 executeTransition(task, workflowService.findOne(useCase.getStringId()));
                 return;
             }
