@@ -11,6 +11,6 @@ public class DeleteCaseEvent extends CaseEvent {
 
     @Override
     public String getMessage() {
-        return "Case " + getCase().getTitle() + " deleted on " + DateUtils.toString(time);
+        return "Prípad " + getCase().getTitle() + " bol zmazaný o " + DateUtils.toString(time);
     }
 }

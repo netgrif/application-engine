@@ -12,6 +12,6 @@ public class UserCancelTaskEvent extends UserTaskEvent {
 
     @Override
     public String getMessage() {
-        return "User " + getEmail() + " canceled task " + getTask().getTitle() + " of case " + getUseCase().getTitle();
+        return "Užívateľ " + getEmail() + " si zrušil úlohu " + getTask().getTitle() + " na prípade " + getUseCase().getTitle();
     }
 }
