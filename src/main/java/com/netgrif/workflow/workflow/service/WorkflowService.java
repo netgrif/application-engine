@@ -171,6 +171,9 @@ public class WorkflowService implements IWorkflowService {
         if (requestQuery.containsKey(ROLE)) {
             builder.and(searchService.role(requestQuery.get(ROLE)));
         }
+        if (requestQuery.containsKey(DATA)) {
+            builder.and(searchService.data(requestQuery.get(DATA)));
+        }
 
         return builder;
     }

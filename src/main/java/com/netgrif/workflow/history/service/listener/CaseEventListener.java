@@ -5,6 +5,8 @@ import com.netgrif.workflow.event.events.usecase.DeleteCaseEvent;
 import com.netgrif.workflow.event.events.usecase.SaveCaseDataEvent;
 import com.netgrif.workflow.event.events.usecase.UpdateMarkingEvent;
 import com.netgrif.workflow.history.domain.CaseEventLog;
+import com.netgrif.workflow.history.domain.CaseSaveDataEventLog;
+import com.netgrif.workflow.history.domain.repository.CaseSaveDataEventLogRepository;
 import com.netgrif.workflow.history.domain.repository.EventLogRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
@@ -31,16 +33,19 @@ public class CaseEventListener {
     }
 
     @EventListener
-    public void onSaveCaseDataEvent(SaveCaseDataEvent event) {
+    public void onUpdateMarkingEvent(UpdateMarkingEvent event) {
         CaseEventLog log = new CaseEventLog(event.getCase());
         log.setMessage(event.getMessage());
         repository.save(log);
     }
 
+    @Autowired
+    private CaseSaveDataEventLogRepository caseSaveDataEventLogRepository;
+
     @EventListener
-    public void onUpdateMarkingEvent(UpdateMarkingEvent event) {
-        CaseEventLog log = new CaseEventLog(event.getCase());
+    public void onSaveCaseDataEvent(SaveCaseDataEvent event) {
+        CaseSaveDataEventLog log = new CaseSaveDataEventLog(event.getCase(), event.getData(), event.getUserData());
         log.setMessage(event.getMessage());
-        repository.save(log);
+        caseSaveDataEventLogRepository.save(log);
     }
 }
