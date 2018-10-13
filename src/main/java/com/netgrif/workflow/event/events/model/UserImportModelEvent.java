@@ -26,7 +26,7 @@ public class UserImportModelEvent extends UserEvent {
 
     @Override
     public String getMessage() {
-        return "Užívateľ " +
+        return "Používateľ " +
                 ((LoggedUser) this.source).getUsername() +
                 " importoval nový model " +
                 this.model.getName() +

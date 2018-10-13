@@ -12,6 +12,6 @@ public class CreateTaskEvent extends TaskEvent {
 
     @Override
     public String getMessage() {
-        return "Úloha " + getTask().getTitle() + " na prípade " + useCase.getTitle() + " bola vytvorená o " + DateUtils.toString(time);
+        return "Úloha " + getTask().getTitle() + " na prípade " + useCase.getTitle() + " bola vytvorená " + DateUtils.toString(time);
     }
 }
