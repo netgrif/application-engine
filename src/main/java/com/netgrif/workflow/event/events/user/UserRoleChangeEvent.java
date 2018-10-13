@@ -24,12 +24,12 @@ public class UserRoleChangeEvent extends UserEvent {
 
     @Override
     public String getMessage() {
-        StringBuilder sb = new StringBuilder("Role ");
+        StringBuilder sb = new StringBuilder("Roly ");
         roles.forEach(role -> {
             sb.append(role.getName());
             sb.append(",");
         });
-        sb.append(" boli priradené užívateľovi ");
+        sb.append(" boli priradené používateľovi ");
         sb.append(user.getUsername());
         return sb.toString();
     }

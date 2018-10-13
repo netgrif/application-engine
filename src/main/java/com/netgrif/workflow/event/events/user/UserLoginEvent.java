@@ -1,7 +1,6 @@
 package com.netgrif.workflow.event.events.user;
 
 import com.netgrif.workflow.auth.domain.LoggedUser;
-import com.netgrif.workflow.event.events.user.UserEvent;
 import com.netgrif.workflow.utils.DateUtils;
 
 public class UserLoginEvent extends UserEvent {
@@ -12,6 +11,6 @@ public class UserLoginEvent extends UserEvent {
 
     @Override
     public String getMessage() {
-        return "Užívateľ " + user.getUsername() + " sa prihlásil o " + DateUtils.toString(time);
+        return "Používateľ " + user.getUsername() + " sa prihlásil o " + DateUtils.toString(time);
     }
 }
