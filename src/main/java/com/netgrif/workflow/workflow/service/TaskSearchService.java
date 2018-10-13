@@ -4,7 +4,6 @@ import com.netgrif.workflow.workflow.domain.QTask;
 import com.netgrif.workflow.workflow.domain.Task;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Predicate;
-import com.querydsl.core.types.dsl.Expressions;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -101,7 +100,7 @@ public class TaskSearchService extends MongoSearchService<Task> {
     public Predicate role(Object query) {
         if (query instanceof ArrayList) {
             BooleanBuilder builder = new BooleanBuilder();
-            ((ArrayList<String>) query).parallelStream().map(this::roleString).forEach(builder::or);
+            ((ArrayList<String>) query).stream().map(this::roleString).forEach(builder::or);
             return builder;
         } else if (query instanceof String)
             return roleString((String) query);
@@ -137,7 +136,7 @@ public class TaskSearchService extends MongoSearchService<Task> {
 
     private Predicate caseArray(ArrayList<String> query, String key) {
         BooleanBuilder builder = new BooleanBuilder();
-        query.parallelStream().map(q -> {
+        query.stream().map(q -> {
             if (key.equalsIgnoreCase(TITLE))
                 return caseTitle(q);
             else
@@ -157,7 +156,7 @@ public class TaskSearchService extends MongoSearchService<Task> {
     public Predicate title(Object query) {
         if (query instanceof ArrayList) {
             BooleanBuilder builder = new BooleanBuilder();
-            ((ArrayList<String>) query).parallelStream().map(this::titleString).forEach(builder::or);
+            ((ArrayList<String>) query).stream().map(this::titleString).forEach(builder::or);
             return builder;
         } else if (query instanceof String)
             return titleString((String) query);
@@ -172,7 +171,7 @@ public class TaskSearchService extends MongoSearchService<Task> {
     public Predicate user(Object query) {
         if (query instanceof ArrayList) {
             BooleanBuilder builder = new BooleanBuilder();
-            ((ArrayList<Number>) query).parallelStream().map(this::userLong).forEach(builder::or);
+            ((ArrayList<Number>) query).stream().map(this::userLong).forEach(builder::or);
             return builder;
         } else if (query instanceof Integer)
             return userLong(Long.valueOf(((Integer) query).longValue()));
@@ -202,7 +201,7 @@ public class TaskSearchService extends MongoSearchService<Task> {
     public Predicate transition(Object query) {
         if (query instanceof ArrayList) {
             BooleanBuilder builder = new BooleanBuilder();
-            ((ArrayList<String>) query).parallelStream().map(this::transitionString).forEach(builder::or);
+            ((ArrayList<String>) query).stream().map(this::transitionString).forEach(builder::or);
             return builder;
         } else if (query instanceof String)
             return transitionString((String) query);
@@ -217,7 +216,7 @@ public class TaskSearchService extends MongoSearchService<Task> {
     public Predicate process(Object query) {
         if (query instanceof ArrayList) {
             BooleanBuilder builder = new BooleanBuilder();
-            ((ArrayList<String>) query).parallelStream().map(this::processString).forEach(builder::or);
+            ((ArrayList<String>) query).stream().map(this::processString).forEach(builder::or);
             return builder;
         } else if (query instanceof String)
             return processString((String) query);
