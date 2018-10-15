@@ -30,7 +30,7 @@ public class Neo4jConfiguration {
         return config;
     }
 
-    @Bean
+    @Bean(name = "sessionFactory")
     public SessionFactory getSessionFactory() {
         return new SessionFactory(getConfiguration(),"com.netgrif.workflow.orgstructure.domain");
     }
