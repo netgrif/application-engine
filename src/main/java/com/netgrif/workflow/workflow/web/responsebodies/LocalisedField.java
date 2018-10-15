@@ -26,6 +26,9 @@ public class LocalisedField {
 
     private Long order;
 
+    public LocalisedField() {
+    }
+
     public LocalisedField(Field field, Locale locale) {
         stringId = field.getStringId();
         type = field.getType();
