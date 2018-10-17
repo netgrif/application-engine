@@ -7,6 +7,10 @@ import com.netgrif.workflow.auth.domain.repositories.UserProcessRoleRepository;
 import com.netgrif.workflow.auth.service.UserDetailsServiceImpl;
 import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.event.events.user.UserRoleChangeEvent;
+import com.netgrif.workflow.importer.model.EventPhaseType;
+import com.netgrif.workflow.petrinet.domain.Event;
+import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action;
+import com.netgrif.workflow.petrinet.domain.EventType;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository;
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRole;
@@ -17,6 +21,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class ProcessRoleService implements IProcessRoleService {
@@ -50,27 +55,98 @@ public class ProcessRoleService implements IProcessRoleService {
 
         Set<UserProcessRole> userOldRoles = user.getUserProcessRoles();
 
+        Set<UserProcessRole> rolesNewToUser = getRolesNewToUser(userOldRoles, requestedRoles);
+        Set<UserProcessRole> rolesRemovedFromUser = getRolesRemovedFromUser(userOldRoles, requestedRoles);
 
-        Set<UserProcessRole> rolesAddedToUser = new HashSet<>(requestedRoles);
-        rolesAddedToUser.removeAll(userOldRoles);
+        Set<String> rolesNewToUserIds = mapUserRolesToIds(rolesNewToUser);
+        Set<String> rolesRemovedFromUserIds = mapUserRolesToIds(rolesRemovedFromUser);
 
-        Set<UserProcessRole> rolesRemovedFromUser = new HashSet<>(userOldRoles);
-        rolesRemovedFromUser.removeAll(requestedRoles);
-
-
+        Set<ProcessRole> newRoles = processRoleRepository.findAllBy_idIn(rolesNewToUserIds);
+        Set<ProcessRole> removedRoles = processRoleRepository.findAllBy_idIn(rolesRemovedFromUserIds);
 
 
-        user.getUserProcessRoles().clear();
-        user.getUserProcessRoles().addAll(requestedRoles);
+        runAllPreActions(newRoles, removedRoles);
+        replaceUserRolesAndPublishEvent(requestedRolesIds, user, requestedRoles);
+        runAllPostActions(newRoles, removedRoles);
 
-        userService.save(user);
-        publisher.publishEvent(new UserRoleChangeEvent(user, processRoleRepository.findAllBy_idIn(requestedRolesIds)));
 
         if (Objects.equals(userId, loggedUser.getId())) {
             loggedUser.getProcessRoles().clear();
             loggedUser.parseProcessRoles(user.getUserProcessRoles());
             userDetailsService.reloadSecurityContext(loggedUser);
         }
+    }
+
+    private void replaceUserRolesAndPublishEvent(Set<String> requestedRolesIds, User user, List<UserProcessRole> requestedRoles) {
+        assignNewRolesToUser(user, requestedRoles);
+        publisher.publishEvent(new UserRoleChangeEvent(user, processRoleRepository.findAllBy_idIn(requestedRolesIds)));
+    }
+
+    private Set<UserProcessRole> getRolesNewToUser(Set<UserProcessRole> userOldRoles, List<UserProcessRole> newRequestedRoles) {
+        Set<UserProcessRole> rolesNewToUser = new HashSet<>(newRequestedRoles);
+        rolesNewToUser.removeAll(userOldRoles);
+
+        return rolesNewToUser;
+    }
+
+    private Set<UserProcessRole> getRolesRemovedFromUser(Set<UserProcessRole> userOldRoles, List<UserProcessRole> newRequestedRoles) {
+        Set<UserProcessRole> rolesRemovedFromUser = new HashSet<>(userOldRoles);
+        rolesRemovedFromUser.removeAll(newRequestedRoles);
+
+        return rolesRemovedFromUser;
+    }
+
+    private Set<String> mapUserRolesToIds(Collection<UserProcessRole> userProcessRoles) {
+        return userProcessRoles.stream()
+                .map(this::getRoleId)
+                .collect(Collectors.toSet());
+    }
+
+    private void runAllPreActions(Set<ProcessRole> newRoles, Set<ProcessRole> removedRoles) {
+        runAllSuitableActionsOnRoles(newRoles, EventType.ASSIGN, EventPhaseType.PRE);
+        runAllSuitableActionsOnRoles(removedRoles, EventType.CANCEL, EventPhaseType.PRE);
+    }
+
+    private void runAllPostActions(Set<ProcessRole> newRoles, Set<ProcessRole> removedRoles) {
+        runAllSuitableActionsOnRoles(newRoles, EventType.ASSIGN, EventPhaseType.POST);
+        runAllSuitableActionsOnRoles(removedRoles, EventType.CANCEL, EventPhaseType.POST);
+    }
+
+    private void runAllSuitableActionsOnRoles(Set<ProcessRole> roles, EventType requiredEventType, EventPhaseType requiredPhase) {
+        roles.forEach(role -> runAllSuitableActionsOnOneRole(role.getEvents(), requiredEventType, requiredPhase));
+    }
+
+    private void runAllSuitableActionsOnOneRole(Map<EventType, Event> eventMap, EventType requiredEventType, EventPhaseType requiredPhase) {
+        eventMap.forEach((eventType, event) -> {
+
+            if(eventType != requiredEventType) {
+                return;
+            }
+
+            runActionsBasedOnPhase(event, requiredPhase);
+        });
+    }
+
+    private void runActionsBasedOnPhase(Event event, EventPhaseType requiredPhase) {
+        switch (requiredPhase) {
+            case PRE:
+                runActions(event.getPreActions());
+                break;
+            case POST:
+                runActions(event.getPostActions());
+                break;
+        }
+    }
+
+    private void runActions(List<Action> actions) {
+        //TODO: Potrebujeme spustit kazdu akciu ktora sem prisla
+    }
+
+    private void assignNewRolesToUser(User user, List<UserProcessRole> requestedRoles) {
+        user.getUserProcessRoles().clear();
+        user.getUserProcessRoles().addAll(requestedRoles);
+
+        userService.save(user);
     }
 
     @Override
