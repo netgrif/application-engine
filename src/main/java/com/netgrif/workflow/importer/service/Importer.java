@@ -150,8 +150,8 @@ public class Importer {
         net.setIcon(document.getIcon());
 
         document.getI18N().forEach(this::addI18N);
-        document.getRole().forEach(this::createRole);
         document.getData().forEach(this::createDataSet);
+        document.getRole().forEach(this::createRole);
         document.getTransaction().forEach(this::createTransaction);
         document.getPlace().forEach(this::createPlace);
         document.getTransition().forEach(this::createTransition);
@@ -593,7 +593,6 @@ public class Importer {
         else
             role.set_id(new ObjectId());
 
-        //TODO: Vyhadzuje exception, treba to nejako osetit aby null bola vhodna hodnota pretransitionID?
         Map<EventType, Event> events = createEventsMap(importRole.getEvent());
         role.setEvents(events);
 
