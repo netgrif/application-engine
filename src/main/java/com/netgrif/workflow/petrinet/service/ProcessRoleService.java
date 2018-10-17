@@ -16,10 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 @Service
 public class ProcessRoleService implements IProcessRoleService {
@@ -43,19 +40,31 @@ public class ProcessRoleService implements IProcessRoleService {
     private ApplicationEventPublisher publisher;
 
     @Override
-    public void assignRolesToUser(Long userId, Set<String> roleIds, LoggedUser loggedUser) {
+    public void assignRolesToUser(Long userId, Set<String> requestedRolesIds, LoggedUser loggedUser) {
         User user = userService.findById(userId, true);
-        List<UserProcessRole> processRoles = roleRepository.findByRoleIdIn(roleIds);
-        if (processRoles.isEmpty())
+        List<UserProcessRole> requestedRoles = roleRepository.findByRoleIdIn(requestedRolesIds);
+        if (requestedRoles.isEmpty())
             throw new IllegalArgumentException("No process roles found.");
-        if (processRoles.size() != roleIds.size())
+        if (requestedRoles.size() != requestedRolesIds.size())
             throw new IllegalArgumentException("Not all process roles were found!");
 
+        Set<UserProcessRole> userOldRoles = user.getUserProcessRoles();
+
+
+        Set<UserProcessRole> rolesAddedToUser = new HashSet<>(requestedRoles);
+        rolesAddedToUser.removeAll(userOldRoles);
+
+        Set<UserProcessRole> rolesRemovedFromUser = new HashSet<>(userOldRoles);
+        rolesRemovedFromUser.removeAll(requestedRoles);
+
+
+
+
         user.getUserProcessRoles().clear();
-        user.getUserProcessRoles().addAll(processRoles);
+        user.getUserProcessRoles().addAll(requestedRoles);
 
         userService.save(user);
-        publisher.publishEvent(new UserRoleChangeEvent(user, processRoleRepository.findAllBy_idIn(roleIds)));
+        publisher.publishEvent(new UserRoleChangeEvent(user, processRoleRepository.findAllBy_idIn(requestedRolesIds)));
 
         if (Objects.equals(userId, loggedUser.getId())) {
             loggedUser.getProcessRoles().clear();

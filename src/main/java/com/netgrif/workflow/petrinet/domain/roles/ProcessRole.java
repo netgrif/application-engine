@@ -1,14 +1,20 @@
 package com.netgrif.workflow.petrinet.domain.roles;
 
+import com.netgrif.workflow.petrinet.domain.Event;
+import com.netgrif.workflow.petrinet.domain.EventType;
 import com.netgrif.workflow.petrinet.domain.I18nString;
 import com.netgrif.workflow.petrinet.domain.Imported;
+import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action;
 import lombok.Getter;
 import lombok.Setter;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 @Document
 @Getter
@@ -24,6 +30,9 @@ public class ProcessRole extends Imported {
 
     @Setter
     private String description;
+
+    @Getter @Setter
+    private Map<EventType, Event> events;
 
     public ProcessRole() {
         _id = new ObjectId();
@@ -61,6 +70,34 @@ public class ProcessRole extends Imported {
         if (name == null)
             return null;
         return name.getTranslation(locale);
+    }
+
+    public List<Action> getPreAssignActions() {
+        return getPreActions(EventType.ASSIGN);
+    }
+
+    public List<Action> getPostAssignActions() {
+        return getPostActions(EventType.ASSIGN);
+    }
+
+    public List<Action> getPreCancelActions() {
+        return getPreActions(EventType.CANCEL);
+    }
+
+    public List<Action> getPostCancelActions() {
+        return getPostActions(EventType.CANCEL);
+    }
+
+    private List<Action> getPreActions(EventType type) {
+        if (events.containsKey(type))
+            return events.get(type).getPreActions();
+        return new LinkedList<>();
+    }
+
+    private List<Action> getPostActions(EventType type) {
+        if (events.containsKey(type))
+            return events.get(type).getPostActions();
+        return new LinkedList<>();
     }
 
     @Override
