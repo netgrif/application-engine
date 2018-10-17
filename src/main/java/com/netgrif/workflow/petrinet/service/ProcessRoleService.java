@@ -98,7 +98,7 @@ public class ProcessRoleService implements IProcessRoleService {
 
     private Set<String> mapUserRolesToIds(Collection<UserProcessRole> userProcessRoles) {
         return userProcessRoles.stream()
-                .map(this::getRoleId)
+                .map(role -> role.getRoleId())
                 .collect(Collectors.toSet());
     }
 
