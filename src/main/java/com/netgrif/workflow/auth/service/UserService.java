@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -91,6 +92,11 @@ public class UserService implements IUserService {
             authorities.add(authorityRepository.findByName(Authority.user));
             user.setAuthorities(authorities);
         }
+    }
+
+    @Override
+    public User findByAuth(Authentication auth) {
+        return findByEmail(auth.getName(), false);
     }
 
     @Override
