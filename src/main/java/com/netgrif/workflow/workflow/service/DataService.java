@@ -273,7 +273,7 @@ public class DataService implements IDataService {
         });
     }
 
-    private Map<String, ChangedField> resolveActions(Field field, Action.ActionTrigger actionTrigger, Case useCase, Transition transition) {
+    public Map<String, ChangedField> resolveActions(Field field, Action.ActionTrigger actionTrigger, Case useCase, Transition transition) {
         Map<String, ChangedField> changedFields = new HashMap<>();
         processActions(field, actionTrigger, useCase, transition, changedFields);
         return changedFields;
