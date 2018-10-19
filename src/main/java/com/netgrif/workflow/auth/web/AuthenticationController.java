@@ -4,6 +4,7 @@ import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.auth.service.InvalidUserTokenException;
 import com.netgrif.workflow.auth.service.interfaces.IRegistrationService;
+import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.auth.web.requestbodies.NewUserRequest;
 import com.netgrif.workflow.auth.web.requestbodies.RegistrationRequest;
 import com.netgrif.workflow.auth.web.responsebodies.UserResource;
@@ -35,6 +36,9 @@ public class AuthenticationController {
 
     @Autowired
     private IMailService mailService;
+
+    @Autowired
+    private IUserService userService;
 
     @Value("${server.auth.open-registration}")
     private boolean openRegistration;
@@ -87,7 +91,7 @@ public class AuthenticationController {
 
     @GetMapping(value = "/login")
     public UserResource login(Authentication auth, Locale locale) {
-        return new UserResource(((LoggedUser) auth.getPrincipal()).transformToUser(), "profile", locale);
+        return new UserResource(userService.findByAuth(auth), "profile", locale);
     }
 
     @PostMapping(value = "/reset")
