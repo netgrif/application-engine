@@ -85,4 +85,15 @@ public class Arc extends PetriNetObject {
     public void rollbackExecution() {
         ((Place) source).addTokens(multiplicity);
     }
+
+    @SuppressWarnings("Duplicates")
+    public Arc clone() {
+        Arc clone = new Arc();
+        clone.setSourceId(this.sourceId);
+        clone.setDestinationId(this.destinationId);
+        clone.setMultiplicity(this.multiplicity);
+        clone.setObjectId(this.getObjectId());
+        clone.setImportId(this.importId);
+        return clone;
+    }
 }
