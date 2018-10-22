@@ -68,6 +68,21 @@ public abstract class PetriNetService implements IPetriNetService {
     @Autowired
     private ApplicationEventPublisher publisher;
 
+    private Map<ObjectId, PetriNet> cache = new HashMap<>();
+
+    @Override
+    public PetriNet clone(ObjectId petriNetId) {
+        PetriNet net = cache.get(petriNetId);
+        if (net == null) {
+            net = repository.findOne(petriNetId.toString());
+            if (net == null) {
+                throw new IllegalArgumentException("Petri net with id [" + petriNetId + "] not found");
+            }
+            cache.put(petriNetId, net);
+        }
+        return net.clone();
+    }
+
     @Override
     public Optional<PetriNet> importPetriNetAndDeleteFile(File xmlFile, UploadedFileMeta netMetaData, LoggedUser user) throws IOException {
         Optional<PetriNet> imported = importPetriNet(xmlFile, netMetaData, user);
@@ -85,6 +100,11 @@ public abstract class PetriNetService implements IPetriNetService {
         } else {
             //TODO 3.4.2018 compare net hash with found net hash -> if equal do not save network => possible duplicate
             newPetriNet = importNewVersion(xmlFile, metaData, existingNet, user);
+        }
+
+        if (newPetriNet.isPresent()) {
+            PetriNet net = newPetriNet.get();
+            cache.put(net.getObjectId(), net);
         }
 
         return newPetriNet;
