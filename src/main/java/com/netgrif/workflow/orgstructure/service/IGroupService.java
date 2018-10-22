@@ -12,4 +12,6 @@ public interface IGroupService {
     Set<Group> findAll();
 
     Set<Group> findAllById(Collection<Long> groupIds);
+
+    void delete(Group group);
 }

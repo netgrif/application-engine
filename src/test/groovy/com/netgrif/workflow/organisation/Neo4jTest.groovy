@@ -1,9 +1,13 @@
 package com.netgrif.workflow.organisation
 
+import com.netgrif.workflow.importer.service.Importer
 import com.netgrif.workflow.orgstructure.domain.Group
 import com.netgrif.workflow.orgstructure.domain.GroupRepository
 import com.netgrif.workflow.orgstructure.domain.Member
 import com.netgrif.workflow.orgstructure.domain.MemberRepository
+import com.netgrif.workflow.startup.ImportHelper
+import com.netgrif.workflow.startup.SuperCreator
+import com.netgrif.workflow.workflow.domain.repositories.CaseRepository
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -110,5 +114,44 @@ class Neo4jTest {
         def comembers = memberRepository.findAllCoMembersIds("1@parent.com")
 
         assert comembers.size() == 5
+    }
+
+    public static final String SEARCH_NET_FILE = "ipc_group.xml"
+    public static final String SEARCH_NET_NAME = "Groups"
+    public static final String SEARCH_NET_INITIALS = "GRP"
+
+    @Autowired
+    private ImportHelper helper
+    @Autowired
+    private Importer importer
+    @Autowired
+    private CaseRepository caseRepository
+    @Autowired
+    private SuperCreator superCreator
+
+    private def stream = { String name ->
+        return Neo4jTest.getClassLoader().getResourceAsStream(name)
+    }
+
+    @Test
+    void testFindOrganization() {
+        groupRepository.deleteAll()
+        memberRepository.deleteAll()
+
+        def testNet = importer.importPetriNet(stream(SEARCH_NET_FILE), SEARCH_NET_NAME, SEARCH_NET_INITIALS)
+        assert testNet.isPresent()
+
+        def acase = helper.createCase("Case Group" as String, testNet.get())
+
+        Group parent = groupRepository.save(new Group(PARENT))
+        Member member1 = memberRepository.save(Member.from(superCreator.superUser))
+        parent.addMember(member1)
+        groupRepository.save(parent)
+
+        helper.assignTaskToSuper("Task", acase.stringId)
+        acase = caseRepository.findOne(acase.stringId)
+
+        assert acase.dataSet["orgs"].choices.find {it.defaultValue == PARENT}
+        assert acase.dataSet["orgs"].choices.find {it.defaultValue == "Test organization"}
     }
 }
