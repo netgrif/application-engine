@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.netgrif.workflow.auth.domain.Author;
 import com.netgrif.workflow.petrinet.domain.I18nString;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
-import com.netgrif.workflow.petrinet.domain.Place;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.petrinet.domain.dataset.FieldWithDefault;
 import com.netgrif.workflow.petrinet.domain.dataset.UserField;
@@ -13,7 +12,7 @@ import lombok.Setter;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
-import org.springframework.data.mongodb.core.mapping.DBRef;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.NotNull;
@@ -26,20 +25,27 @@ import java.util.stream.Collectors;
 public class Case {
 
     @Id
+    @Getter
     private ObjectId _id;
 
     @Getter
     private String visualId;
 
-    @DBRef
     @NotNull
+    @Getter
+    @Setter
+    private ObjectId petriNetObjectId;
+
     @JsonIgnore
+    @Transient
+    @Getter
     @Setter
     private PetriNet petriNet;
 
     @NotNull
     @Getter
     @Setter
+    @Indexed
     private String processIdentifier;
 
     @org.springframework.data.mongodb.core.mapping.Field("activePlaces")
@@ -56,6 +62,7 @@ public class Case {
     @Getter
     private String color;
 
+    @Getter
     @Setter
     private String icon;
 
@@ -80,6 +87,7 @@ public class Case {
 
     @Getter
     @Setter
+    @Indexed
     private Author author;
 
     @Getter
@@ -115,80 +123,34 @@ public class Case {
 
     public Case(String title, PetriNet petriNet, Map<String, Integer> activePlaces) {
         this(title);
+        this.petriNetObjectId = petriNet.getObjectId();
         this.petriNet = petriNet;
         this.activePlaces = activePlaces;
         populateDataSet();
-        this.immediateDataFields = this.petriNet.getImmediateFields().stream().map(Field::getStringId).collect(Collectors.toCollection(LinkedHashSet::new));
+        this.immediateDataFields = petriNet.getImmediateFields().stream().map(Field::getStringId).collect(Collectors.toCollection(LinkedHashSet::new));
         visualId = generateVisualId();
         this.enabledRoles = petriNet.getRoles().keySet();
-    }
-
-    public ObjectId get_id() {
-        return _id;
     }
 
     public String getStringId() {
         return _id.toString();
     }
 
-    public String getIcon() {
-        return icon;
-    }
-
-    public PetriNet getPetriNet() {
-        if (petriNet.isNotInitialized())
-            petriNet.initializeArcs();
-        return petriNet;
-    }
-
-    public void addActivePlace(String placeId, Integer tokens) {
-        this.activePlaces.put(placeId, tokens);
-    }
-
     public void setColor(String color) {
         this.color = color == null || color.isEmpty() ? "color-fg-fm-500" : color;
-    }
-
-    private void addTokensToPlace(Place place, Integer tokens) {
-        Integer newTokens = tokens;
-        String id = place.getStringId();
-        if (activePlaces.containsKey(id))
-            newTokens += activePlaces.get(id);
-        activePlaces.put(id, newTokens);
     }
 
     public boolean hasFieldBehavior(String field, String transition) {
         return this.dataSet.get(field).hasDefinedBehavior(transition);
     }
 
-    public String getPetriNetId() {
-        if (this.petriNet != null) return petriNet.getStringId();
-        return null;
-    }
-
-    public void addImmediateDataField(String fieldId) {
-        this.immediateDataFields.add(fieldId);
-    }
-
-    private void removeTokensFromActivePlace(Place place, Integer tokens) {
-        String id = place.getStringId();
-        activePlaces.put(id, activePlaces.get(id) - tokens);
-    }
-
-    private boolean isNotActivePlace(Place place) {
-        return !isActivePlace(place);
-    }
-
-    private boolean isActivePlace(Place place) {
-        return activePlaces.containsKey(place.getStringId());
-    }
-
     private void populateDataSet() {
         petriNet.getDataSet().forEach((key, field) -> {
-            if (field instanceof FieldWithDefault)
+            if (field instanceof FieldWithDefault) {
                 this.dataSet.put(key, new DataField(((FieldWithDefault) field).getDefaultValue()));
-            else
+            } else {
                 this.dataSet.put(key, new DataField());
+            }
             if (field instanceof UserField) {
                 this.dataSet.get(key).setChoices(((UserField) field).getRoles().stream().map(I18nString::new).collect(Collectors.toSet()));
             }
@@ -198,8 +160,12 @@ public class Case {
     private String generateVisualId() {
         SecureRandom random = new SecureRandom();
         int n = _id.getTimestamp() + random.nextInt(99999999);
-        if (this.title != null) n += title.length();
-        if (this.petriNet != null) return petriNet.getInitials() + "-" + n;
+        if (this.title != null) {
+            n += title.length();
+        }
+        if (this.petriNet != null) {
+            return petriNet.getInitials() + "-" + n;
+        }
         return n + "";
     }
 
@@ -232,5 +198,9 @@ public class Case {
 
     public DataField getDataField(String id) {
         return dataSet.get(id);
+    }
+
+    public String getPetriNetId() {
+        return petriNetObjectId.toString();
     }
 }
