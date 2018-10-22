@@ -12,6 +12,7 @@ import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository;
 import com.netgrif.workflow.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.workflow.startup.SystemUserRunner;
+import com.netgrif.workflow.utils.FullPageRequest;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.Task;
 import com.netgrif.workflow.workflow.domain.repositories.CaseRepository;
@@ -81,7 +82,7 @@ public class TaskServiceTest {
 
     @Test
     public void createTasks() throws Exception {
-        Case useCase = caseRepository.findAll().get(0);
+        Case useCase = workflowService.getAll(new FullPageRequest()).getContent().get(0);
 
         service.createTasks(useCase);
 

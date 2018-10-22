@@ -128,8 +128,9 @@ public class PetriNet extends PetriNetObject {
     }
 
     public List<Arc> getArcsOfTransition(String transitionId) {
-        if (arcs.containsKey(transitionId))
+        if (arcs.containsKey(transitionId)) {
             return arcs.get(transitionId);
+        }
         return new LinkedList<>();
     }
 
@@ -143,9 +144,9 @@ public class PetriNet extends PetriNetObject {
 
     public void addArc(Arc arc) {
         String transitionId = arc.getTransition().getStringId();
-        if (arcs.containsKey(transitionId))
+        if (arcs.containsKey(transitionId)) {
             arcs.get(transitionId).add(arc);
-        else {
+        } else {
             List<Arc> arcList = new LinkedList<>();
             arcList.add(arc);
             arcs.put(transitionId, arcList);
@@ -153,10 +154,12 @@ public class PetriNet extends PetriNetObject {
     }
 
     public Node getNode(String importId) {
-        if (places.containsKey(importId))
+        if (places.containsKey(importId)) {
             return getPlace(importId);
-        if (transitions.containsKey(importId))
+        }
+        if (transitions.containsKey(importId)) {
             return getTransition(importId);
+        }
         return null;
     }
 
@@ -186,7 +189,7 @@ public class PetriNet extends PetriNetObject {
 
     public void initializeVarArcs(Map<String, DataField> dataSet) {
         arcs.values()
-                .parallelStream()
+                .stream()
                 .flatMap(List::stream)
                 .filter(arc -> arc instanceof VariableArc)
                 .forEach(arc -> {
@@ -258,14 +261,16 @@ public class PetriNet extends PetriNetObject {
     }
 
     public String getTranslatedDefaultCaseName(Locale locale) {
-        if (defaultCaseName == null)
+        if (defaultCaseName == null) {
             return "";
+        }
         return defaultCaseName.getTranslation(locale);
     }
 
     public String getTranslatedTitle(Locale locale) {
-        if (title == null)
+        if (title == null) {
             return "";
+        }
         return title.getTranslation(locale);
     }
 
@@ -278,5 +283,35 @@ public class PetriNet extends PetriNetObject {
     @Override
     public String getStringId() {
         return _id.toString();
+    }
+
+    public PetriNet clone() {
+        PetriNet clone = new PetriNet();
+        clone.setIdentifier(this.identifier);
+        clone.setTitle(this.title);
+        clone.setDefaultCaseName(this.defaultCaseName);
+        clone.setIcon(this.icon);
+        clone.setCreationDate(this.creationDate);
+        clone.setVersion(this.version);
+        clone.setAuthor(this.author);
+        clone.setTransitions(this.transitions);
+        clone.setDataSet(this.dataSet);
+        clone.setRoles(this.roles);
+        clone.setTransactions(this.transactions);
+        clone.setImportXmlPath(this.importXmlPath);
+        clone.setImportId(this.importId);
+        clone.setObjectId(this._id);
+        clone.setPlaces(this.places.entrySet()
+                .stream()
+                .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone()))
+        );
+        clone.setArcs(this.arcs.entrySet()
+                .stream()
+                .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().stream()
+                        .map(Arc::clone)
+                        .collect(Collectors.toList())))
+        );
+        clone.initializeArcs();
+        return clone;
     }
 }
