@@ -78,7 +78,9 @@ public class WorkflowService implements IWorkflowService {
     public Case save(Case useCase) {
         encryptDataSet(useCase);
         useCase = repository.save(useCase);
-        setPetriNet(useCase);
+        if (useCase.getPetriNet() == null) {
+            setPetriNet(useCase);
+        }
         return useCase;
     }
 
@@ -359,9 +361,8 @@ public class WorkflowService implements IWorkflowService {
 
     private void setPetriNet(Case useCase) {
         PetriNet model = petriNetService.clone(useCase.getPetriNetObjectId());
-        PetriNet net = model.clone();
-        net.initializeTokens(useCase.getActivePlaces());
-        net.initializeVarArcs(useCase.getDataSet());
-        useCase.setPetriNet(net);
+        model.initializeTokens(useCase.getActivePlaces());
+        model.initializeVarArcs(useCase.getDataSet());
+        useCase.setPetriNet(model);
     }
 }
