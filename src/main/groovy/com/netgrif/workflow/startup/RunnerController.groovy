@@ -16,6 +16,7 @@ class RunnerController {
             FlushSessionsRunner,
             MailRunner,
             PostalCodeImporter,
+            FileTestRunner,
             FinisherRunner
     ]
 
