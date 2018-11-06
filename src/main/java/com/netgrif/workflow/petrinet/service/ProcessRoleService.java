@@ -12,6 +12,7 @@ import com.netgrif.workflow.petrinet.domain.Event;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.workflow.petrinet.domain.EventType;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
+import com.netgrif.workflow.petrinet.domain.dataset.logic.action.FieldActionsRunner;
 import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository;
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRole;
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRoleRepository;
@@ -43,6 +44,9 @@ public class ProcessRoleService implements IProcessRoleService {
 
     @Autowired
     private ApplicationEventPublisher publisher;
+
+    @Autowired
+    private FieldActionsRunner fieldActionsRunner;
 
     @Override
     public void assignRolesToUser(Long userId, Set<String> requestedRolesIds, LoggedUser loggedUser) {
@@ -139,7 +143,7 @@ public class ProcessRoleService implements IProcessRoleService {
     }
 
     private void runActions(List<Action> actions) {
-        //TODO: Potrebujeme spustit kazdu akciu ktora sem prisla
+        actions.forEach(fieldActionsRunner::run);
     }
 
     private void assignNewRolesToUser(User user, List<UserProcessRole> requestedRoles) {
