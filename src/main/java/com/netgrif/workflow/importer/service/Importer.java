@@ -583,7 +583,11 @@ public class Importer {
     @Transactional
     protected void createRole(Role importRole) {
         ProcessRole role = new ProcessRole();
+        Map<EventType, Event> events = createEventsMap(importRole.getEvent());
+
         role.setImportId(importRole.getId());
+        role.setEvents(events);
+
         if (importRole.getName() == null)
             role.setName(toI18NString(importRole.getTitle()));
         else
@@ -592,9 +596,6 @@ public class Importer {
             role = roleRepository.save(role);
         else
             role.set_id(new ObjectId());
-
-        Map<EventType, Event> events = createEventsMap(importRole.getEvent());
-        role.setEvents(events);
 
         net.addRole(role);
         roles.put(importRole.getId(), role);
