@@ -53,7 +53,7 @@ abstract class FieldActionsRunner {
         return ((ActionDelegate) code.delegate).changedFields
     }
 
-    private Closure getActionCode(Action action) {
+    Closure getActionCode(Action action) {
         def code
         if (actions.containsKey(action.importId)) {
             code = actions.get(action.importId)

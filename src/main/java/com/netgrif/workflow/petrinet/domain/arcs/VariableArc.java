@@ -57,6 +57,7 @@ public class VariableArc extends Arc {
     }
 
     @SuppressWarnings("Duplicates")
+    @Override
     public VariableArc clone() {
         VariableArc clone = new VariableArc();
         clone.setSourceId(this.sourceId);
