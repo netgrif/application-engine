@@ -189,7 +189,7 @@ public class TaskController {
         List<DataGroup> dataGroups = dataService.getDataGroups(taskId);
 
         dataGroups.forEach(group -> group.setFields(new DataFieldsResource(dataFields.stream().filter(field ->
-                group.getData().contains(field.getStringId())).collect(Collectors.toList()), taskId, locale)));
+                group.getData().contains(field.getStringId())).collect(Collectors.toList()), locale)));
 
         return new DataGroupsResource(dataGroups, locale);
     }

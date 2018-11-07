@@ -210,9 +210,7 @@ public class WorkflowService implements IWorkflowService {
         log.info("Case " + title + " created");
 
         useCase.getPetriNet().initializeVarArcs(useCase.getDataSet());
-//        taskService.createTasks(useCase);
         taskService.reloadTasks(useCase);
-//        useCase = save(useCase);
 
         useCase = findOne(useCase.getStringId());
         return setImmediateDataFields(useCase);
@@ -252,6 +250,9 @@ public class WorkflowService implements IWorkflowService {
 
     @Override
     public boolean removeTasksFromCase(Iterable<? extends Task> tasks, Case useCase) {
+        if (StreamSupport.stream(tasks.spliterator(), false).count() == 0) {
+            return true;
+        }
         boolean deleteSuccess = useCase.removeTasks(StreamSupport.stream(tasks.spliterator(), false).collect(Collectors.toList()));
         useCase = repository.save(useCase);
         return deleteSuccess;

@@ -284,7 +284,7 @@ public abstract class PetriNetService implements IPetriNetService {
             GroupOperation groupByIdentifier = Aggregation.group("identifier").max("version").as("version");
             Aggregation aggregation = Aggregation.newAggregation(groupByIdentifier);
             AggregationResults<Document> results = mongoTemplate.aggregate(aggregation, "petriNet", Document.class);
-            references = results.getMappedResults().parallelStream()
+            references = results.getMappedResults().stream()
                     .map(doc -> getReference(doc.getString("_id"), doc.getString("version"), user, locale))
                     .collect(Collectors.toList());
         } else {
