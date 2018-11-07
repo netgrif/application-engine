@@ -160,7 +160,7 @@ public class CaseSearchService extends MongoSearchService<Case> {
         List<PetriNetReference> allowedNets = petriNetService.getReferencesByUsersProcessRoles(user, locale);
         if (query instanceof ArrayList) {
             BooleanBuilder builder = new BooleanBuilder();
-            List<BooleanExpression> expressions = (List<BooleanExpression>) ((ArrayList) query).parallelStream().filter(q -> q instanceof HashMap).map(q -> petriNetObject((HashMap<String, String>) q, allowedNets)).collect(Collectors.toList());
+            List<BooleanExpression> expressions = (List<BooleanExpression>) ((ArrayList) query).stream().filter(q -> q instanceof HashMap).map(q -> petriNetObject((HashMap<String, String>) q, allowedNets)).collect(Collectors.toList());
             expressions.forEach(builder::or);
             return builder;
         } else if (query instanceof HashMap) {
@@ -170,17 +170,17 @@ public class CaseSearchService extends MongoSearchService<Case> {
     }
 
     private static BooleanExpression petriNetObject(HashMap<String, String> query, List<PetriNetReference> allowedNets) {
-        if (query.containsKey(PETRINET_IDENTIFIER) && allowedNets.parallelStream().anyMatch(net -> net.getIdentifier().equalsIgnoreCase(query.get(PETRINET_IDENTIFIER))))
+        if (query.containsKey(PETRINET_IDENTIFIER) && allowedNets.stream().anyMatch(net -> net.getIdentifier().equalsIgnoreCase(query.get(PETRINET_IDENTIFIER))))
             return QCase.case$.processIdentifier.equalsIgnoreCase(query.get(PETRINET_IDENTIFIER));
         return null;
-//        else if(query.containsKey(PETRINET_ID) && allowedNets.parallelStream().anyMatch(net->net.getStringId().equalsIgnoreCase(query.get(PETRINET_ID))))
+//        else if(query.containsKey(PETRINET_ID) && allowedNets.stream().anyMatch(net->net.getStringId().equalsIgnoreCase(query.get(PETRINET_ID))))
 //            return QCase.case$.petriNet._id.e
     }
 
     public Predicate author(Object query) {
         if (query instanceof ArrayList) {
             BooleanBuilder builder = new BooleanBuilder();
-            List<BooleanExpression> expressions = (List<BooleanExpression>) ((ArrayList) query).parallelStream().filter(q -> q instanceof HashMap).map(q -> authorObject((HashMap<String, Object>) q)).collect(Collectors.toList());
+            List<BooleanExpression> expressions = (List<BooleanExpression>) ((ArrayList) query).stream().filter(q -> q instanceof HashMap).map(q -> authorObject((HashMap<String, Object>) q)).collect(Collectors.toList());
             expressions.forEach(builder::or);
             return builder;
         } else if (query instanceof HashMap) {
@@ -208,7 +208,7 @@ public class CaseSearchService extends MongoSearchService<Case> {
     public Predicate transition(Object query) {
         if (query instanceof ArrayList) {
             BooleanBuilder builder = new BooleanBuilder();
-            List<BooleanExpression> expressions = (List<BooleanExpression>) ((ArrayList) query).parallelStream().filter(q -> q instanceof String).map(q -> transitionString((String) q)).collect(Collectors.toList());
+            List<BooleanExpression> expressions = (List<BooleanExpression>) ((ArrayList) query).stream().filter(q -> q instanceof String).map(q -> transitionString((String) q)).collect(Collectors.toList());
             expressions.forEach(builder::or);
             return builder;
         } else if (query instanceof String) {
@@ -235,12 +235,12 @@ public class CaseSearchService extends MongoSearchService<Case> {
         if(processes.isEmpty())
             return null;
 
-        List<PetriNet> petriNets = processes.parallelStream().map(process -> petriNetService.getNewestVersionByIdentifier(process)).collect(Collectors.toList());
+        List<PetriNet> petriNets = processes.stream().map(process -> petriNetService.getNewestVersionByIdentifier(process)).collect(Collectors.toList());
         if(petriNets.isEmpty())
             return null;
 
         List<BooleanExpression> predicates = new ArrayList<>();
-        predicates.add(QCase.case$.visualId.containsIgnoreCase(searchPhrase));
+        predicates.add(QCase.case$.visualId.startsWithIgnoreCase(searchPhrase));
         predicates.add(QCase.case$.title.containsIgnoreCase(searchPhrase));
         predicates.add(QCase.case$.author.fullName.containsIgnoreCase(searchPhrase));
         predicates.add(QCase.case$.author.email.containsIgnoreCase(searchPhrase));

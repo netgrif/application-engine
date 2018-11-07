@@ -47,6 +47,7 @@ public class ResetArc extends PTArc {
     }
 
     @SuppressWarnings("Duplicates")
+    @Override
     public ResetArc clone() {
         ResetArc clone = new ResetArc();
         clone.setSourceId(this.sourceId);
