@@ -34,6 +34,15 @@ class CaseField extends Field<String> {
         this.setValue(null)
     }
 
+    @Override
+    Field clone() {
+        CaseField clone = new CaseField()
+        super.clone(clone)
+        clone.constraintNetIds = this.constraintNetIds
+
+        return clone
+    }
+
     Map<String, LinkedHashSet<String>> getConstraintNetIds() {
         return constraintNetIds
     }

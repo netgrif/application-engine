@@ -31,8 +31,8 @@ public abstract class CaseRepositoryImpl implements CaseRepository {
     public void customize(QuerydslBindings bindings, QCase qCase) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         List<PetriNetReference> nets = petriNetService.getReferencesByUsersProcessRoles((LoggedUser) auth.getPrincipal(), null);
-        Set<String> netIds = nets.parallelStream().map(Reference::getStringId).collect(Collectors.toSet());
-        Set<String> netIdentifiers = nets.parallelStream().map(PetriNetReference::getIdentifier).collect(Collectors.toSet());
+        Set<String> netIds = nets.stream().map(Reference::getStringId).collect(Collectors.toSet());
+        Set<String> netIdentifiers = nets.stream().map(PetriNetReference::getIdentifier).collect(Collectors.toSet());
 
         bindings.bind(qCase.petriNetId).first((stringPath, s) -> {
             if (!netIds.contains(s))
