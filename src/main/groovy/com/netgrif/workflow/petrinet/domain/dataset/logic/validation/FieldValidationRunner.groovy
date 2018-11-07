@@ -2,7 +2,6 @@ package com.netgrif.workflow.petrinet.domain.dataset.logic.validation
 
 import com.netgrif.workflow.petrinet.domain.dataset.Field
 
-
 class FieldValidationRunner {
 
     /**

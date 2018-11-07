@@ -23,6 +23,7 @@ import javax.xml.bind.annotation.XmlType;
  *           &lt;element ref="{}title"/&gt;
  *           &lt;element ref="{}name"/&gt;
  *         &lt;/choice&gt;
+ *         &lt;element ref="{}event" maxOccurs="unbounded" minOccurs="0"/&gt;
  *       &lt;/sequence&gt;
  *     &lt;/restriction&gt;
  *   &lt;/complexContent&gt;
