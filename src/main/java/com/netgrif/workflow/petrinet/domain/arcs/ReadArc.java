@@ -34,4 +34,16 @@ public class ReadArc extends PTArc {
     @Override
     public void rollbackExecution() {
     }
+
+    @SuppressWarnings("Duplicates")
+    @Override
+    public ReadArc clone() {
+        ReadArc clone = new ReadArc();
+        clone.setSourceId(this.sourceId);
+        clone.setDestinationId(this.destinationId);
+        clone.setMultiplicity(this.multiplicity);
+        clone.setObjectId(this.getObjectId());
+        clone.setImportId(this.importId);
+        return clone;
+    }
 }

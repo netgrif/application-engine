@@ -65,7 +65,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     private void setGroups(LoggedUser loggedUser) {
         Member member = memberService.findByEmail(loggedUser.getUsername());
         if (member != null) {
-            loggedUser.setGroups(member.getGroups().parallelStream().map(Group::getId).collect(Collectors.toSet()));
+            loggedUser.setGroups(member.getGroups().stream().map(Group::getId).collect(Collectors.toSet()));
         }
     }
 }
