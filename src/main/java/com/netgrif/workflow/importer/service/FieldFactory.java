@@ -78,6 +78,9 @@ public final class FieldFactory {
             ((ValidableField) field).setValidationRules(data.getValid());
         if (data.getInit() != null && field instanceof FieldWithDefault)
             setFieldDefaultValue((FieldWithDefault) field, data.getInit());
+        if (field instanceof ValidableField) {
+            resolveValidation(field);
+        }
         setActions(field, data);
         setEncryption(field, data);
 
@@ -195,7 +198,13 @@ public final class FieldFactory {
 
     private Field buildField(Case useCase, String fieldId, boolean withValidation) {
         Field field = useCase.getPetriNet().getDataSet().get(fieldId);
-        resolveValidation(field, withValidation);
+        if (field instanceof ValidableField) {
+            if (!withValidation) {
+                ((ValidableField) field).setValidationJS(null);
+            } else {
+                resolveValidation(field);
+            }
+        }
         resolveDataValues(field, useCase, fieldId);
         if (field instanceof ChoiceField)
             resolveChoices((ChoiceField) field, useCase);
@@ -209,8 +218,8 @@ public final class FieldFactory {
         field.setChoices(choices);
     }
 
-    private void resolveValidation(Field field, boolean withValidation) {
-        if (withValidation && field instanceof ValidableField && ((ValidableField) field).getValidationRules() != null)
+    private void resolveValidation(Field field) {
+        if (((ValidableField) field).getValidationRules() != null)
             ((ValidableField) field).setValidationJS(FieldValidationRunner
                     .toJavascript(field, ((ValidableField) field).getValidationRules()));
     }
