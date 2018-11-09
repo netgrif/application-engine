@@ -11,6 +11,6 @@ public class CreateCaseEvent extends CaseEvent {
 
     @Override
     public String getMessage() {
-        return "Prípad " + getCase().getTitle() + " bol vytvorený " + DateUtils.toString(time);
+        return "Case " + getCase().getTitle() + " create on " + DateUtils.toString(time);
     }
 }
