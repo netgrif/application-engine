@@ -24,6 +24,7 @@
         <java.version>1.8</java.version>
         <jasypt.version>1.9.2</jasypt.version>
         <querydsl.version>4.2.1</querydsl.version>
+        <version.jsonOutputPath>${project.basedir}/src/main/resources/static/scripts</version.jsonOutputPath>
     </properties>
 
     <dependencies>
@@ -314,6 +315,22 @@
                         <phase>install</phase>
                         <goals>
                             <goal>clean</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>com.netgrif.maven</groupId>
+                <artifactId>version-plugin</artifactId>
+                <version>1.0.0</version>
+                <configuration>
+                    <jsonOutputDir>${version.jsonOutputPath}</jsonOutputDir>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>simple</goal>
                         </goals>
                     </execution>
                 </executions>
