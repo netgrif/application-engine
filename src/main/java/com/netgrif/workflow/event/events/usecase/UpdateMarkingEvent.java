@@ -10,6 +10,6 @@ public class UpdateMarkingEvent extends CaseEvent {
 
     @Override
     public String getMessage() {
-        return "Aktualizované značkovanie na prípade " + getCase().getTitle();
+        return "Updated marking on case " + getCase().getTitle();
     }
 }

@@ -17,6 +17,6 @@ public class TimeFinishTaskEvent extends TaskEvent {
 
     @Override
     public String getMessage() {
-        return "Systém dokončil úlohu " + getTask().getTitle() + " na prípade " + getUseCase().getTitle() + " spustenú časovým spúšťačom nastaveným na " + DateUtils.toString(time);
+        return "System finished task " + getTask().getTitle() + " of case " + getUseCase().getTitle() + " caused by time trigger set to" + DateUtils.toString(time);
     }
 }
