@@ -42,6 +42,8 @@ public class ProcessRoleService implements IProcessRoleService {
     @Autowired
     private ApplicationEventPublisher publisher;
 
+    private ProcessRole defaultRole;
+
     @Override
     public void assignRolesToUser(Long userId, Set<String> roleIds, LoggedUser loggedUser) {
         User user = userService.findById(userId, true);
@@ -68,5 +70,12 @@ public class ProcessRoleService implements IProcessRoleService {
     public List<ProcessRole> findAll(String netId) {
         PetriNet net = netRepository.findOne(netId);
         return new LinkedList<>(net.getRoles().values());
+    }
+
+    @Override
+    public ProcessRole defaultRole() {
+        if (defaultRole == null)
+            defaultRole = processRoleRepository.findByName_DefaultValue(ProcessRole.DEFAULT_ROLE);
+        return defaultRole;
     }
 }
