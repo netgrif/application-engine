@@ -189,6 +189,7 @@ public class DataService implements IDataService {
             Task task = taskService.findOne(taskId);
             Case useCase = workflowService.findOne(task.getCaseId());
             FileField field = (FileField) useCase.getPetriNet().getDataSet().get(fieldId);
+            field.setValue((FileFieldValue) useCase.getDataField(field.getStringId()).getValue());
 
             if (field.isRemote()) {
                 upload(useCase, field, multipartFile);
@@ -214,6 +215,7 @@ public class DataService implements IDataService {
         }
 
         field.setValue(multipartFile.getOriginalFilename());
+        field.getValue().setPath(field.getFilePath(useCase.getStringId()));
         File file = new File(field.getFilePath(useCase.getStringId()));
         file.getParentFile().mkdirs();
         if (!file.createNewFile()) {
@@ -293,7 +295,7 @@ public class DataService implements IDataService {
 
     private void runActions(List<Action> actions, Action.ActionTrigger trigger, Case useCase, Transition transition, Map<String, ChangedField> changedFields, boolean recursive) {
         actions.forEach(action -> {
-            Map<String ,ChangedField> currentChangedFields = actionsRunner.run(action, useCase);
+            Map<String, ChangedField> currentChangedFields = actionsRunner.run(action, useCase);
             if (currentChangedFields.isEmpty())
                 return;
 
