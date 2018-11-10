@@ -58,7 +58,7 @@ class EnumerationField extends ChoiceField<I18nString> {
     }
 
     @Override
-    EnumerationField clone() {
+    Field clone() {
         EnumerationField clone = new EnumerationField()
         super.clone(clone)
 
