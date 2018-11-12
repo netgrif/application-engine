@@ -35,4 +35,14 @@ public class Place extends Node {
     public String toString() {
         return getTitle() + " (" + tokens + ")";
     }
+
+    public Place clone() {
+        Place clone = new Place();
+        clone.setTokens(this.tokens);
+        clone.setIsStatic(this.isStatic);
+        clone.setTitle(this.getTitle());
+        clone.setObjectId(this.getObjectId());
+        clone.setImportId(this.getImportId());
+        return clone;
+    }
 }

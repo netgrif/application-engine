@@ -55,4 +55,18 @@ public class VariableArc extends Arc {
     public void setMultiplicity(Integer multiplicity) {
         // Readonly
     }
+
+    @SuppressWarnings("Duplicates")
+    @Override
+    public VariableArc clone() {
+        VariableArc clone = new VariableArc();
+        clone.setSourceId(this.sourceId);
+        clone.setDestinationId(this.destinationId);
+        clone.setMultiplicity(this.multiplicity);
+        clone.setObjectId(this.getObjectId());
+        clone.setImportId(this.importId);
+        clone.setField(this.field);
+        clone.setFieldId(this.fieldId);
+        return clone;
+    }
 }

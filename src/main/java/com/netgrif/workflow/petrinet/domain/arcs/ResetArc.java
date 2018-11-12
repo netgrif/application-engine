@@ -45,4 +45,17 @@ public class ResetArc extends PTArc {
     public void rollbackExecution() {
         ((Place) source).addTokens(removedTokens);
     }
+
+    @SuppressWarnings("Duplicates")
+    @Override
+    public ResetArc clone() {
+        ResetArc clone = new ResetArc();
+        clone.setSourceId(this.sourceId);
+        clone.setDestinationId(this.destinationId);
+        clone.setMultiplicity(this.multiplicity);
+        clone.setObjectId(this.getObjectId());
+        clone.setImportId(this.importId);
+        clone.setRemovedTokens(this.removedTokens);
+        return clone;
+    }
 }
