@@ -1,5 +1,6 @@
 package com.netgrif.workflow.orgstructure.domain;
 
+import com.netgrif.workflow.auth.domain.User;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.validator.constraints.NotEmpty;
@@ -54,6 +55,10 @@ public class Member {
         this.name = name;
         this.surname = surname;
         this.email = email;
+    }
+
+    public static Member from(User user) {
+        return new Member(user.getId(), user.getName(), user.getSurname(), user.getEmail());
     }
 
     @Override

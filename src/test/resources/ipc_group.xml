@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="https://modeler.netgrif.com/petriflow_schema.xsd">
+    <!-- ROLE -->
+    <!-- DATA -->
+    <data type="enumeration">
+        <id>orgs</id>
+        <title>Organisations</title>
+    </data>
+    <!-- TRANSITIONS -->
+    <transition>
+        <id>task</id>
+        <x>0</x>
+        <y>0</y>
+        <label>Task</label>
+        <event type="assign">
+            <id>task_assign</id>
+            <actions phase="pre">
+                <action>
+                    <!--@formatter:off-->
+                    createOrganisation("Test organisation", groupService.findAll().first(), [userService.findAll(true).first()] as Set)
+                    <!--@formatter:on-->
+                </action>
+            </actions>
+            <actions phase="post">
+                <action>
+                    <!--@formatter:off-->
+                    organisations: f.orgs;
+                    def orgs = findOrganisation(userService.findAll(true).first())
+                    change organisations choices {
+                        orgs.collect { it.name }
+                    }
+                    <!--@formatter:on-->
+                </action>
+            </actions>
+        </event>
+    </transition>
+    <!-- PLACES -->
+    <!-- ARCS -->
+</document>

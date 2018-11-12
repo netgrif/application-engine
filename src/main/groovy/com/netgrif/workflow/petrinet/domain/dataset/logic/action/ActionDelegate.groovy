@@ -5,6 +5,10 @@ import com.netgrif.workflow.auth.domain.User
 import com.netgrif.workflow.auth.service.interfaces.IUserService
 import com.netgrif.workflow.configuration.ApplicationContextProvider
 import com.netgrif.workflow.importer.service.FieldFactory
+import com.netgrif.workflow.orgstructure.domain.Group
+import com.netgrif.workflow.orgstructure.domain.Member
+import com.netgrif.workflow.orgstructure.service.GroupService
+import com.netgrif.workflow.orgstructure.service.MemberService
 import com.netgrif.workflow.petrinet.domain.I18nString
 import com.netgrif.workflow.petrinet.domain.PetriNet
 import com.netgrif.workflow.petrinet.domain.Transition
@@ -58,6 +62,12 @@ class ActionDelegate {
 
     @Autowired
     AsyncRunner async
+
+    @Autowired
+    GroupService groupService
+
+    @Autowired
+    MemberService memberService
 
     def map = [:]
     Action action
@@ -423,5 +433,49 @@ class ActionDelegate {
         return data.collectEntries {
             [(it.importId): it]
         }
+    }
+
+    Set<Group> findOrganisation(User user = loggedUser()) {
+        return memberService.findByEmail(user.email)?.groups
+    }
+
+    Group createOrganisation(String name, Group parent = null, Set<User> users = [] as Set) {
+        Group org = new Group(name)
+        if (parent)
+            org.setParentGroup(parent)
+        users.collect { user ->
+            org.addMember(findMember(user))
+        }
+        return groupService.save(org)
+    }
+
+    def deleteOrganisation(Group organisation) {
+        groupService.delete(organisation)
+    }
+
+    Group saveOrganisation(Group organisation) {
+        return groupService.save(organisation)
+    }
+
+    Group removeMember(Group organisation, User user) {
+        organisation.members.removeAll { it.email == user.email }
+        return groupService.save(organisation)
+    }
+
+    Group addMember(Group organisation, User user) {
+        def member = findMember(user)
+        organisation.members.add(member)
+        return groupService.save(organisation)
+    }
+
+    Member findMember(User user) {
+        def member = memberService.findByEmail(user.email)
+        if (member == null)
+            return memberService.save(Member.from(user))
+        return member
+    }
+
+    User loggedUser() {
+        return userService.loggedUser
     }
 }
