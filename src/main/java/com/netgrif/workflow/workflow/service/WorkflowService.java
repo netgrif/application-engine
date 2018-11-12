@@ -21,6 +21,7 @@ import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Predicate;
 import org.apache.log4j.Logger;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
@@ -74,7 +75,11 @@ public class WorkflowService implements IWorkflowService {
     @Override
     public Case save(Case useCase) {
         encryptDataSet(useCase);
-        return repository.save(useCase);
+        useCase = repository.save(useCase);
+        if (useCase.getPetriNet() == null) {
+            setPetriNet(useCase);
+        }
+        return useCase;
     }
 
     @Override
@@ -82,6 +87,7 @@ public class WorkflowService implements IWorkflowService {
         Case useCase = repository.findOne(caseId);
         if (useCase == null)
             return null;
+        setPetriNet(useCase);
         decryptDataSet(useCase);
         return useCase;
     }
@@ -90,10 +96,12 @@ public class WorkflowService implements IWorkflowService {
     public Page<Case> getAll(Pageable pageable) {
         //page.getContent().forEach(aCase -> aCase.getPetriNet().initializeArcs());
         Page<Case> page = repository.findAll(pageable);
+        page.getContent().forEach(this::setPetriNet);
         decryptDataSets(page.getContent());
         return setImmediateDataFields(page);
     }
 
+    @Override
     public Page<Case> searchCase(List<String> nets, Pageable pageable) {
         StringBuilder queryBuilder = new StringBuilder();
         nets.forEach(net -> {
@@ -107,6 +115,7 @@ public class WorkflowService implements IWorkflowService {
         BasicQuery query = new BasicQuery(queryString);
         query = (BasicQuery) query.with(pageable);
         List<Case> useCases = mongoTemplate.find(query, Case.class);
+        useCases.forEach(this::setPetriNet);
         decryptDataSets(useCases);
         return setImmediateDataFields(new PageImpl<Case>(useCases, pageable, mongoTemplate.count(new BasicQuery(queryString, "{_id:1}"), Case.class)));
     }
@@ -118,10 +127,10 @@ public class WorkflowService implements IWorkflowService {
 //        List<PetriNetReference> nets = petriNetService.getReferencesByUsersProcessRoles(user, locale);
 //        if (request.containsKey(key)) {
 //            Set<String> netIds = nets.stream().map(PetriNetReference::getStringId).collect(Collectors.toSet());
-//            if (request.get(key) instanceof String && !netIds.contains(request.get(key)))
+//            if (request.clone(key) instanceof String && !netIds.contains(request.clone(key)))
 //                return new PageImpl<Case>(new ArrayList<>(), pageable, 0);
-//            else if (request.get(key) instanceof List) {
-//                idMap.put("id", ((List<String>) request.get(key)).stream().filter(netIds::contains).collect(Collectors.toList()));
+//            else if (request.clone(key) instanceof List) {
+//                idMap.put("id", ((List<String>) request.clone(key)).stream().filter(netIds::contains).collect(Collectors.toList()));
 //                request.put(key, idMap);
 //            }
 //        } else if (!nets.isEmpty()) {
@@ -136,12 +145,14 @@ public class WorkflowService implements IWorkflowService {
     @Override
     public Page<Case> search(Predicate predicate, Pageable pageable) {
         Page<Case> page = repository.findAll(predicate, pageable);
+        page.getContent().forEach(this::setPetriNet);
         return setImmediateDataFields(page);
     }
 
     @Override
     public Page<Case> search(Map<String, Object> request, Pageable pageable, LoggedUser user, Locale locale) {
         Page<Case> page = repository.findAll(buildQuery(request, user, locale), pageable);
+        page.getContent().forEach(this::setPetriNet);
         decryptDataSets(page.getContent());
         return setImmediateDataFields(page);
     }
@@ -186,7 +197,7 @@ public class WorkflowService implements IWorkflowService {
 
     @Override
     public Case createCase(String netId, String title, String color, LoggedUser user) {
-        PetriNet petriNet = petriNetService.getPetriNet(netId);
+        PetriNet petriNet = petriNetService.clone(new ObjectId(netId));
         Case useCase = new Case(title, petriNet, petriNet.getActivePlaces());
         useCase.setProcessIdentifier(petriNet.getIdentifier());
         useCase.setColor(color);
@@ -199,9 +210,7 @@ public class WorkflowService implements IWorkflowService {
         log.info("Case " + title + " created");
 
         useCase.getPetriNet().initializeVarArcs(useCase.getDataSet());
-//        taskService.createTasks(useCase);
         taskService.reloadTasks(useCase);
-//        useCase = save(useCase);
 
         useCase = findOne(useCase.getStringId());
         return setImmediateDataFields(useCase);
@@ -241,6 +250,9 @@ public class WorkflowService implements IWorkflowService {
 
     @Override
     public boolean removeTasksFromCase(Iterable<? extends Task> tasks, Case useCase) {
+        if (StreamSupport.stream(tasks.spliterator(), false).count() == 0) {
+            return true;
+        }
         boolean deleteSuccess = useCase.removeTasks(StreamSupport.stream(tasks.spliterator(), false).collect(Collectors.toList()));
         useCase = repository.save(useCase);
         return deleteSuccess;
@@ -338,5 +350,12 @@ public class WorkflowService implements IWorkflowService {
         }
 
         return encryptedDataSet;
+    }
+
+    private void setPetriNet(Case useCase) {
+        PetriNet model = petriNetService.clone(useCase.getPetriNetObjectId());
+        model.initializeTokens(useCase.getActivePlaces());
+        model.initializeVarArcs(useCase.getDataSet());
+        useCase.setPetriNet(model);
     }
 }
