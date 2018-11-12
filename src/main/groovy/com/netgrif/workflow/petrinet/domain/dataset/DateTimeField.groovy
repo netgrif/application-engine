@@ -23,4 +23,15 @@ class DateTimeField extends ValidableField<LocalDateTime> {
     void setValue(Date value) {
         this.value = value?.toInstant()?.atZone(ZoneId.systemDefault())?.toLocalDateTime()
     }
+
+    @Override
+    DateTimeField clone() {
+        DateTimeField clone = new DateTimeField()
+        super.clone(clone)
+
+        clone.validationRules = this.validationRules
+        clone.defaultValue = this.defaultValue
+
+        return clone
+    }
 }
