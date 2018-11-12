@@ -32,4 +32,9 @@ public class GroupService implements IGroupService {
     public Set<Group> findAllById(Collection<Long> groupIds) {
         return new HashSet<>((Collection<Group>) repository.findAll(groupIds));
     }
+
+    @Override
+    public void delete(Group group) {
+        repository.delete(group);
+    }
 }
