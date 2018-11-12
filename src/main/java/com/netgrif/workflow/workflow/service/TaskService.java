@@ -6,6 +6,7 @@ import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.event.events.task.*;
 import com.netgrif.workflow.petrinet.domain.*;
 import com.netgrif.workflow.petrinet.domain.arcs.Arc;
+import com.netgrif.workflow.petrinet.domain.arcs.ArcOrderComparator;
 import com.netgrif.workflow.petrinet.domain.arcs.ResetArc;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.petrinet.domain.roles.RolePermission;
@@ -377,7 +378,7 @@ public class TaskService implements ITaskService {
         if (!filteredSupplier.get().allMatch(Arc::isExecutable))
             throw new TransitionNotExecutableException("Not all arcs can be executed task [" + transition.getStringId() + "] in case [" + useCase.getTitle() + "]");
 
-        filteredSupplier.get().forEach(arc -> {
+        filteredSupplier.get().sorted((o1, o2) -> ArcOrderComparator.getInstance().compare(o1,o2)).forEach(arc -> {
             if (arc instanceof ResetArc) {
                 useCase.getResetArcTokens().put(arc.getStringId(), ((Place) arc.getSource()).getTokens());
             }
