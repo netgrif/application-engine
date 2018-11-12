@@ -17,6 +17,7 @@ import lombok.Setter;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -32,12 +33,15 @@ public class Task {
     @Builder.Default
     private ObjectId _id = new ObjectId();
 
+    @Indexed
     @Getter @Setter
     private String processId;
 
+    @Indexed
     @Getter @Setter
     private String caseId;
 
+    @Indexed
     @Setter
     private String transitionId;
 
@@ -53,6 +57,7 @@ public class Task {
     @Getter @Setter
     private Integer priority;
 
+    @Indexed
     @Setter
     private Long userId;
 

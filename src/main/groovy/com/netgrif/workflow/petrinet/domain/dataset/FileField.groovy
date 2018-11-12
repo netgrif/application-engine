@@ -70,4 +70,15 @@ class FileField extends FieldWithDefault<FileFieldValue> {
     void setRemote(boolean remote) {
         this.remote = remote
     }
+
+    @Override
+    Field clone() {
+        FileField clone = new FileField()
+        super.clone(clone)
+
+        clone.remote = this.remote
+        clone.defaultValue = this.defaultValue
+
+        return clone
+    }
 }
