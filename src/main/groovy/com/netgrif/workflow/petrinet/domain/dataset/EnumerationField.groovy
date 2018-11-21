@@ -56,4 +56,15 @@ class EnumerationField extends ChoiceField<I18nString> {
     String getTranslatedValue(Locale locale) {
         return value?.getTranslation(locale)
     }
+
+    @Override
+    Field clone() {
+        EnumerationField clone = new EnumerationField()
+        super.clone(clone)
+
+        clone.choices = this.choices
+        clone.defaultValue = this.defaultValue
+
+        return clone
+    }
 }

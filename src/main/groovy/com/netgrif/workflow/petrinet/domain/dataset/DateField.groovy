@@ -57,4 +57,14 @@ class DateField extends ValidableField<LocalDate> {
     void setMaxDate(String maxDate) {
         this.maxDate = maxDate
     }
+
+    @Override
+    Field clone() {
+        DateField clone = new DateField()
+        super.clone(clone)
+        clone.validationRules = this.validationRules
+        clone.defaultValue = this.defaultValue
+
+        return clone
+    }
 }

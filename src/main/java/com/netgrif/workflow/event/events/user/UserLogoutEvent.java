@@ -11,6 +11,6 @@ public class UserLogoutEvent extends UserEvent {
 
     @Override
     public String getMessage() {
-        return "Používateľ " + user.getUsername() + " sa odhlásil o " + DateUtils.toString(time);
+        return "User " + user.getUsername() + " logged out on " + DateUtils.toString(time);
     }
 }

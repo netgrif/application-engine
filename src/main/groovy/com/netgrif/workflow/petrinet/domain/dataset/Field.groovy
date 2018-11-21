@@ -188,4 +188,17 @@ abstract class Field<T> extends Imported {
     MetaClass getMetaClass() {
         return this.metaClass
     }
+
+    void clone(Field clone) {
+        clone._id = this._id
+        clone.importId = this.importId
+        clone.name = this.name
+        clone.description = this.description
+        clone.order = this.order
+        clone.immediate = this.immediate
+        clone.actions = this.actions
+        clone.encryption = this.encryption
+    }
+
+    abstract Field clone()
 }

@@ -288,6 +288,7 @@ public class PetriNet extends PetriNetObject {
     public PetriNet clone() {
         PetriNet clone = new PetriNet();
         clone.setIdentifier(this.identifier);
+        clone.setInitials(this.initials);
         clone.setTitle(this.title);
         clone.setDefaultCaseName(this.defaultCaseName);
         clone.setIcon(this.icon);
@@ -295,12 +296,15 @@ public class PetriNet extends PetriNetObject {
         clone.setVersion(this.version);
         clone.setAuthor(this.author);
         clone.setTransitions(this.transitions);
-        clone.setDataSet(this.dataSet);
         clone.setRoles(this.roles);
         clone.setTransactions(this.transactions);
         clone.setImportXmlPath(this.importXmlPath);
         clone.setImportId(this.importId);
         clone.setObjectId(this._id);
+        clone.setDataSet(this.dataSet.entrySet()
+                .stream()
+                .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone()))
+        );
         clone.setPlaces(this.places.entrySet()
                 .stream()
                 .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone()))
@@ -308,7 +312,7 @@ public class PetriNet extends PetriNetObject {
         clone.setArcs(this.arcs.entrySet()
                 .stream()
                 .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().stream()
-                        .map(Arc::clone)
+                        .map(arc -> arc.clone())
                         .collect(Collectors.toList())))
         );
         clone.initializeArcs();

@@ -17,6 +17,6 @@ public class UserDelegateTaskEvent extends UserTaskEvent {
 
     @Override
     public String getMessage() {
-        return "Používateľ " + getEmail() + " delegoval úlohu " + getTask().getTitle() + " na prípade " + getUseCase().getTitle() + " užívateľovi " + delegated.getEmail();
+        return "User " + getEmail() + " delegated task " + getTask().getTitle() + " of case " + getUseCase().getTitle() + " to user " + delegated.getEmail();
     }
 }
