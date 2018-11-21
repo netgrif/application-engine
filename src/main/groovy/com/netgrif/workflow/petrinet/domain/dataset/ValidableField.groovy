@@ -24,6 +24,10 @@ abstract class ValidableField<T> extends FieldWithDefault<T> {
         return validationRules
     }
 
+    void setValidationRules(String rules) {
+        this.validationRules = rules
+    }
+
     void setValidationRules(List<String> rules) {
         if (rules == null || rules.empty)
             return

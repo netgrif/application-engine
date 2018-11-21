@@ -36,6 +36,6 @@ public class SaveCaseDataEvent extends CaseEvent {
 
     @Override
     public String getMessage() {
-        return "Nové dáta uložené na prípade " + getCase().getTitle() + " " + DateUtils.toString(time);
+        return "New data saved in case " + getCase().getTitle() + " on " + DateUtils.toString(time);
     }
 }

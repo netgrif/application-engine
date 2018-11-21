@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://modeler.netgrif.com/petriflow_schema.xsd">
+	<!-- TRANSITIONS -->
+	<transition>
+		<id>2</id>
+		<x>620</x>
+		<y>260</y>
+		<label></label>
+	</transition>
+	<!-- PLACES -->
+	<place>
+		<id>1</id>
+		<x>380</x>
+		<y>260</y>
+		<label></label>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
+	<!-- ARCS -->
+	<arc>
+		<id>3</id>
+		<type>regular</type>
+		<sourceId>1</sourceId>
+		<destinationId>2</destinationId>
+		<multiplicity>1</multiplicity>
+		<breakPoint><x>500</x><y>220</y></breakPoint>
+	</arc>
+	<arc>
+		<id>4</id>
+		<type>reset</type>
+		<sourceId>1</sourceId>
+		<destinationId>2</destinationId>
+		<multiplicity>1</multiplicity>
+		<breakPoint><x>500</x><y>180</y></breakPoint>
+	</arc>
+	<arc>
+		<id>5</id>
+		<type>inhibitor</type>
+		<sourceId>1</sourceId>
+		<destinationId>2</destinationId>
+		<multiplicity>1</multiplicity>
+		<breakPoint><x>500</x><y>300</y></breakPoint>
+	</arc>
+	<arc>
+		<id>6</id>
+		<type>read</type>
+		<sourceId>1</sourceId>
+		<destinationId>2</destinationId>
+		<multiplicity>1</multiplicity>
+		<breakPoint><x>500</x><y>340</y></breakPoint>
+	</arc>
+</document>
