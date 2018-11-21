@@ -60,4 +60,16 @@ class TextField extends ValidableField<String> {
     void setFormatting(String formatting) {
         this.formatting = formatting
     }
+
+    @Override
+    Field clone() {
+        TextField clone = new TextField()
+        super.clone(clone)
+
+        clone.subType = this.subType
+        clone.defaultValue = this.defaultValue
+        clone.validationRules = this.validationRules
+
+        return clone
+    }
 }

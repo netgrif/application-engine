@@ -10,7 +10,6 @@ import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.workflow.petrinet.web.responsebodies.PetriNetReference;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.QCase;
-import com.netgrif.workflow.workflow.domain.repositories.TaskRepository;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.Ops;
@@ -25,7 +24,6 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -45,120 +43,39 @@ public class CaseSearchService extends MongoSearchService<Case> {
     public static final String TRANSITION = "transition";
     public static final String FULLTEXT = "fullText";
 
-
-    @Autowired
-    private TaskRepository taskRepository;
-
     @Autowired
     private IPetriNetService petriNetService;
 
-    // **************************
-    // * Query building methods *
-    // **************************
+    public Predicate buildQuery(Map<String, Object> requestQuery, LoggedUser user, Locale locale) {
+        BooleanBuilder builder = new BooleanBuilder();
 
-    public String authorQuery(Object obj) {
-        Map<Class, Function<Object, String>> builder = new HashMap<>();
-
-        builder.put(Long.class, o -> ((Long) o).toString());
-        builder.put(Integer.class, o -> ((Integer) o).toString());
-        builder.put(ArrayList.class, o -> in((List<Object>) obj, oo -> oo.toString(), ob -> ob instanceof Long || ob instanceof Integer));
-        builder.put(String.class, o -> {
-            Long id = resolveAuthorByEmail((String) obj);
-            return id != null ? id.toString() : "";
-        });
-
-        return buildQueryPart("author.id", obj, builder);
-    }
-
-    public String titleQuery(Object obj) {
-        Map<Class, Function<Object, String>> builder = new HashMap<>();
-
-        builder.put(ArrayList.class, o -> in(((List<Object>) obj), ob -> "\"" + ob + "\"", null));
-        builder.put(String.class, o -> regex((String) o, "i"));
-
-        return buildQueryPart("title", obj, builder);
-    }
-
-    public String petriNetQuery(Object obj) {
-        if (obj instanceof Map) {
-            Map<String, Object> q = (Map<String, Object>) obj;
-            if (q.containsKey("id"))
-                return petriNetIdQuery(q.get("id"));
-            else if (q.containsKey("identifier"))
-                return petriNetIdentifierQuery(q.get("identifier"));
+        if (requestQuery.containsKey(PETRINET)) {
+            builder.and(petriNet(requestQuery.get(PETRINET), user, locale));
         }
-        return buildQueryPart("petriNet", null, null);
+        if (requestQuery.containsKey(AUTHOR)) {
+            builder.and(author(requestQuery.get(AUTHOR)));
+        }
+        if (requestQuery.containsKey(TRANSITION)) {
+            builder.and(transition(requestQuery.get(TRANSITION)));
+        }
+        if (requestQuery.containsKey(FULLTEXT)) {
+            builder.and(fullText(requestQuery.getOrDefault(PETRINET, null), (String) requestQuery.get(FULLTEXT)));
+        }
+        if (requestQuery.containsKey(ROLE)) {
+            builder.and(role(requestQuery.get(ROLE)));
+        }
+        if (requestQuery.containsKey(DATA)) {
+            builder.and(data(requestQuery.get(DATA)));
+        }
+
+        return builder;
     }
-
-    public String petriNetIdQuery(Object obj) {
-        Map<Class, Function<Object, String>> builder = new HashMap<>();
-
-        builder.put(String.class, o -> ref("petriNet", obj));
-        builder.put(ArrayList.class, o -> in(((List<Object>) obj), oo -> ref("petriNet", oo), null));
-
-        return buildQueryPart("petriNet", obj, builder);
-    }
-
-    public String petriNetIdentifierQuery(Object obj) {
-        Map<Class, Function<Object, String>> builder = new HashMap<>();
-
-        builder.put(ArrayList.class, o -> in(((List<Object>) obj), ob -> "\"" + ob + "\"", null));
-        builder.put(String.class, o -> "\"" + o + "\"");
-
-        return buildQueryPart("processIdentifier", obj, builder);
-    }
-
-    public String dataQuery(Object obj) throws IllegalQueryException {
-        Map<Class, Function<Object, String>> builder = new HashMap<>();
-
-        builder.put(ArrayList.class, o -> {
-            StringBuilder strBuilder = new StringBuilder();
-            ((List<Object>) o).forEach(dataObj -> {
-                strBuilder.append(buildDataSetQuery(dataObj));
-                strBuilder.append(",");
-            });
-            strBuilder.deleteCharAt(strBuilder.length() - 1);
-            return strBuilder.toString();
-        });
-        builder.put(LinkedHashSet.class, CaseSearchService::buildDataSetQuery);
-
-        return buildQueryPart(null, obj, builder);
-    }
-
-    private static String buildDataSetQuery(Object o) {
-        LinkedHashMap<String, Object> dataObj = (LinkedHashMap<String, Object>) o;
-        if (!dataObj.containsKey("id") || !dataObj.containsKey("type") || !dataObj.containsKey("value")) return "";
-        return "\"dataSet." + dataObj.get("id") + ".value\":" + resolveDataValue(dataObj.get("value"), (String) dataObj.get("type"));
-    }
-
-    public String transitionQuery(Object obj) {
-        Map<Class, Function<Object, String>> builder = new HashMap<>();
-
-        builder.put(String.class, o -> elemMatch(o, oo -> "{\"transition\":\"" + oo + "\"}"));
-        builder.put(ArrayList.class, o -> elemMatch(o, oo -> "{\"transition\":" + in(((List<Object>) oo), ob -> "\"" + ob + "\"", null) + "}"));
-        builder.put(HashMap.class, o -> {
-            Map<String, Object> inner = (Map<String, Object>) o;
-            if (inner.get("values") == null)
-                return "";
-            if (inner.get("combination") != null && ((Boolean) inner.get("combination")))
-                return elemMatch(inner.get("values"), oo -> "{\"transition\":" + all(((List<Object>) oo), ob -> "\"" + ob + "\"") + "}");
-            else
-                return elemMatch(inner.get("values"), oo -> "{\"transition\":" + in(((List<Object>) oo), ob -> "\"" + ob + "\"", null) + "}");
-        });
-
-        return buildQueryPart("tasks", obj, builder);
-    }
-
-
-    // **********************
-    // *      QueryDSL      *
-    // **********************
 
     public Predicate petriNet(Object query, LoggedUser user, Locale locale) {
         List<PetriNetReference> allowedNets = petriNetService.getReferencesByUsersProcessRoles(user, locale);
         if (query instanceof ArrayList) {
             BooleanBuilder builder = new BooleanBuilder();
-            List<BooleanExpression> expressions = (List<BooleanExpression>) ((ArrayList) query).parallelStream().filter(q -> q instanceof HashMap).map(q -> petriNetObject((HashMap<String, String>) q, allowedNets)).collect(Collectors.toList());
+            List<BooleanExpression> expressions = (List<BooleanExpression>) ((ArrayList) query).stream().filter(q -> q instanceof HashMap).map(q -> petriNetObject((HashMap<String, String>) q, allowedNets)).collect(Collectors.toList());
             expressions.forEach(builder::or);
             return builder;
         } else if (query instanceof HashMap) {
@@ -168,17 +85,17 @@ public class CaseSearchService extends MongoSearchService<Case> {
     }
 
     private static BooleanExpression petriNetObject(HashMap<String, String> query, List<PetriNetReference> allowedNets) {
-        if (query.containsKey(PETRINET_IDENTIFIER) && allowedNets.parallelStream().anyMatch(net -> net.getIdentifier().equalsIgnoreCase(query.get(PETRINET_IDENTIFIER))))
+        if (query.containsKey(PETRINET_IDENTIFIER) && allowedNets.stream().anyMatch(net -> net.getIdentifier().equalsIgnoreCase(query.get(PETRINET_IDENTIFIER))))
             return QCase.case$.processIdentifier.equalsIgnoreCase(query.get(PETRINET_IDENTIFIER));
         return null;
-//        else if(query.containsKey(PETRINET_ID) && allowedNets.parallelStream().anyMatch(net->net.getStringId().equalsIgnoreCase(query.get(PETRINET_ID))))
+//        else if(query.containsKey(PETRINET_ID) && allowedNets.stream().anyMatch(net->net.getStringId().equalsIgnoreCase(query.get(PETRINET_ID))))
 //            return QCase.case$.petriNet._id.e
     }
 
     public Predicate author(Object query) {
         if (query instanceof ArrayList) {
             BooleanBuilder builder = new BooleanBuilder();
-            List<BooleanExpression> expressions = (List<BooleanExpression>) ((ArrayList) query).parallelStream().filter(q -> q instanceof HashMap).map(q -> authorObject((HashMap<String, Object>) q)).collect(Collectors.toList());
+            List<BooleanExpression> expressions = (List<BooleanExpression>) ((ArrayList) query).stream().filter(q -> q instanceof HashMap).map(q -> authorObject((HashMap<String, Object>) q)).collect(Collectors.toList());
             expressions.forEach(builder::or);
             return builder;
         } else if (query instanceof HashMap) {
@@ -213,7 +130,7 @@ public class CaseSearchService extends MongoSearchService<Case> {
     public Predicate transition(Object query) {
         if (query instanceof ArrayList) {
             BooleanBuilder builder = new BooleanBuilder();
-            List<BooleanExpression> expressions = (List<BooleanExpression>) ((ArrayList) query).parallelStream().filter(q -> q instanceof String).map(q -> transitionString((String) q)).collect(Collectors.toList());
+            List<BooleanExpression> expressions = (List<BooleanExpression>) ((ArrayList) query).stream().filter(q -> q instanceof String).map(q -> transitionString((String) q)).collect(Collectors.toList());
             expressions.forEach(builder::or);
             return builder;
         } else if (query instanceof String) {
@@ -271,15 +188,17 @@ public class CaseSearchService extends MongoSearchService<Case> {
             processes.add(parseProcessIdentifier((HashMap) petriNetQuery));
         }
 
-        if(processes.isEmpty())
-            return null;
-
-        List<PetriNet> petriNets = processes.parallelStream().map(process -> petriNetService.getNewestVersionByIdentifier(process)).collect(Collectors.toList());
+        List<PetriNet> petriNets;
+        if(processes.isEmpty()) {
+            petriNets = petriNetService.getAll();
+        } else {
+            petriNets = processes.stream().map(process -> petriNetService.getNewestVersionByIdentifier(process)).collect(Collectors.toList());
+        }
         if(petriNets.isEmpty())
             return null;
 
         List<BooleanExpression> predicates = new ArrayList<>();
-        predicates.add(QCase.case$.visualId.containsIgnoreCase(searchPhrase));
+        predicates.add(QCase.case$.visualId.startsWithIgnoreCase(searchPhrase));
         predicates.add(QCase.case$.title.containsIgnoreCase(searchPhrase));
         predicates.add(QCase.case$.author.fullName.containsIgnoreCase(searchPhrase));
         predicates.add(QCase.case$.author.email.containsIgnoreCase(searchPhrase));
