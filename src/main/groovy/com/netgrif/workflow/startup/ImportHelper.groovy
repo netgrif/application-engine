@@ -135,7 +135,7 @@ class ImportHelper {
 
     UserProcessRole createUserProcessRole(PetriNet net, String name) {
         UserProcessRole role = userProcessRoleRepository.save(new UserProcessRole(roleId:
-                net.roles.values().find { it -> it.name.defaultValue == name }.stringId))
+                net.roles.values().find { it -> it.name.defaultValue == name }.stringId, netId: net.getStringId()))
         log.info("Created user process role $name")
         return role
     }
