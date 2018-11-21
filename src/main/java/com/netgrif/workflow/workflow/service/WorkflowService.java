@@ -18,7 +18,6 @@ import com.netgrif.workflow.workflow.domain.Task;
 import com.netgrif.workflow.workflow.domain.repositories.CaseRepository;
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
-import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Predicate;
 import org.apache.log4j.Logger;
 import org.bson.types.ObjectId;
@@ -39,8 +38,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.LongStream;
 import java.util.stream.StreamSupport;
-
-import static com.netgrif.workflow.workflow.service.CaseSearchService.*;
 
 @Service
 public class WorkflowService implements IWorkflowService {
@@ -96,53 +93,11 @@ public class WorkflowService implements IWorkflowService {
 
     @Override
     public Page<Case> getAll(Pageable pageable) {
-        //page.getContent().forEach(aCase -> aCase.getPetriNet().initializeArcs());
         Page<Case> page = repository.findAll(pageable);
         page.getContent().forEach(this::setPetriNet);
         decryptDataSets(page.getContent());
         return setImmediateDataFields(page);
     }
-
-    @Override
-    public Page<Case> searchCase(List<String> nets, Pageable pageable) {
-        StringBuilder queryBuilder = new StringBuilder();
-        nets.forEach(net -> {
-            queryBuilder.append("{$ref:\"petriNet\",$id:{$oid:\"");
-            queryBuilder.append(net);
-            queryBuilder.append("\"}},");
-        });
-        if (queryBuilder.length() > 0)
-            queryBuilder.deleteCharAt(queryBuilder.length() - 1);
-        String queryString = nets.isEmpty() ? "{}" : "{petriNet:{$in:[" + queryBuilder.toString() + "]}}";
-        BasicQuery query = new BasicQuery(queryString);
-        query = (BasicQuery) query.with(pageable);
-        List<Case> useCases = mongoTemplate.find(query, Case.class);
-        useCases.forEach(this::setPetriNet);
-        decryptDataSets(useCases);
-        return setImmediateDataFields(new PageImpl<Case>(useCases, pageable, mongoTemplate.count(new BasicQuery(queryString, "{_id:1}"), Case.class)));
-    }
-
-//    public Page<Case> search(Map<String, Object> request, Pageable pageable, LoggedUser user, Locale locale) {
-//        String key = "petriNet";
-//        Map<String, List<String>> idMap = new HashMap<>();
-//
-//        List<PetriNetReference> nets = petriNetService.getReferencesByUsersProcessRoles(user, locale);
-//        if (request.containsKey(key)) {
-//            Set<String> netIds = nets.stream().map(PetriNetReference::getStringId).collect(Collectors.toSet());
-//            if (request.clone(key) instanceof String && !netIds.contains(request.clone(key)))
-//                return new PageImpl<Case>(new ArrayList<>(), pageable, 0);
-//            else if (request.clone(key) instanceof List) {
-//                idMap.put("id", ((List<String>) request.clone(key)).stream().filter(netIds::contains).collect(Collectors.toList()));
-//                request.put(key, idMap);
-//            }
-//        } else if (!nets.isEmpty()) {
-//            idMap.put("id", nets.stream().map(PetriNetReference::getStringId).collect(Collectors.toList()));
-//            request.put(key, idMap);
-//        }
-//        Page<Case> page = searchService.search(request, pageable, Case.class);
-//        decryptDataSets(page.getContent());
-//        return setImmediateDataFields(page);
-//    }
 
     @Override
     public Page<Case> search(Predicate predicate, Pageable pageable) {
@@ -153,7 +108,8 @@ public class WorkflowService implements IWorkflowService {
 
     @Override
     public Page<Case> search(Map<String, Object> request, Pageable pageable, LoggedUser user, Locale locale) {
-        Page<Case> page = repository.findAll(buildQuery(request, user, locale), pageable);
+        Predicate searchPredicate = searchService.buildQuery(request, user, locale);
+        Page<Case> page = repository.findAll(searchPredicate, pageable);
         page.getContent().forEach(this::setPetriNet);
         decryptDataSets(page.getContent());
         return setImmediateDataFields(page);
@@ -161,32 +117,8 @@ public class WorkflowService implements IWorkflowService {
 
     @Override
     public long count(Map<String, Object> request, LoggedUser user, Locale locale) {
-        return repository.count(buildQuery(request, user, locale));
-    }
-
-    protected Predicate buildQuery(Map<String, Object> requestQuery, LoggedUser user, Locale locale) {
-        BooleanBuilder builder = new BooleanBuilder();
-
-        if (requestQuery.containsKey(PETRINET)) {
-            builder.and(searchService.petriNet(requestQuery.get(PETRINET), user, locale));
-        }
-        if (requestQuery.containsKey(AUTHOR)) {
-            builder.and(searchService.author(requestQuery.get(AUTHOR)));
-        }
-        if (requestQuery.containsKey(TRANSITION)) {
-            builder.and(searchService.transition(requestQuery.get(TRANSITION)));
-        }
-        if (requestQuery.containsKey(FULLTEXT) && requestQuery.containsKey(PETRINET)) {
-            builder.and(searchService.fullText(requestQuery.get(PETRINET), (String) requestQuery.get(FULLTEXT)));
-        }
-        if (requestQuery.containsKey(ROLE)) {
-            builder.and(searchService.role(requestQuery.get(ROLE)));
-        }
-        if (requestQuery.containsKey(DATA)) {
-            builder.and(searchService.data(requestQuery.get(DATA)));
-        }
-
-        return builder;
+        Predicate searchPredicate = searchService.buildQuery(request, user, locale);
+        return repository.count(searchPredicate);
     }
 
     @Override
@@ -218,9 +150,7 @@ public class WorkflowService implements IWorkflowService {
         log.info("Case " + title + " created");
 
         useCase.getPetriNet().initializeVarArcs(useCase.getDataSet());
-//        taskService.createTasks(useCase);
         taskService.reloadTasks(useCase);
-//        useCase = save(useCase);
 
         useCase = findOne(useCase.getStringId());
         return setImmediateDataFields(useCase);
@@ -260,6 +190,9 @@ public class WorkflowService implements IWorkflowService {
 
     @Override
     public boolean removeTasksFromCase(Iterable<? extends Task> tasks, Case useCase) {
+        if (StreamSupport.stream(tasks.spliterator(), false).count() == 0) {
+            return true;
+        }
         boolean deleteSuccess = useCase.removeTasks(StreamSupport.stream(tasks.spliterator(), false).collect(Collectors.toList()));
         useCase = repository.save(useCase);
         return deleteSuccess;

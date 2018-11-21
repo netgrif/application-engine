@@ -53,24 +53,7 @@ abstract class FieldActionsRunner {
         return ((ActionDelegate) code.delegate).changedFields
     }
 
-    void run(Action action) {
-
-        if (!actionsCache)
-            actionsCache = new HashMap<>()
-
-        log.debug("Action: $action")
-        def code = getActionCode(action)
-
-        try {
-            code.init(action, null, this)
-            code()
-        } catch (Exception e) {
-            log.error("Action: $action.definition")
-            throw e
-        }
-    }
-
-    private Closure getActionCode(Action action) {
+    Closure getActionCode(Action action) {
         def code
         if (actions.containsKey(action.importId)) {
             code = actions.get(action.importId)

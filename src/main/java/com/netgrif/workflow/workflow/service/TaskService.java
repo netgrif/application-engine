@@ -8,8 +8,10 @@ import com.netgrif.workflow.petrinet.domain.*;
 import com.netgrif.workflow.petrinet.domain.arcs.Arc;
 import com.netgrif.workflow.petrinet.domain.arcs.ResetArc;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
+import com.netgrif.workflow.petrinet.domain.roles.ProcessRole;
 import com.netgrif.workflow.petrinet.domain.roles.RolePermission;
 import com.netgrif.workflow.petrinet.domain.throwable.TransitionNotExecutableException;
+import com.netgrif.workflow.petrinet.service.interfaces.IProcessRoleService;
 import com.netgrif.workflow.utils.DateUtils;
 import com.netgrif.workflow.utils.FullPageRequest;
 import com.netgrif.workflow.workflow.domain.Case;
@@ -22,7 +24,6 @@ import com.netgrif.workflow.workflow.service.interfaces.IDataService;
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
 import com.netgrif.workflow.workflow.web.responsebodies.TaskReference;
-import com.querydsl.core.BooleanBuilder;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
@@ -71,6 +72,9 @@ public class TaskService implements ITaskService {
 
     @Autowired
     private IDataService dataService;
+
+    @Autowired
+    private IProcessRoleService processRoleService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -474,36 +478,11 @@ public class TaskService implements ITaskService {
         }
     }
 
-//    @Override
-//    public Page<Task> search(Map<String, Object> request, Pageable pageable, LoggedUser user) {
-//        if (request.containsKey("or")) {
-//            if (((Map<String, Object>) request.get("or")).containsKey("role")) {
-//                Object roles = ((Map<String, Object>) request.get("or")).get("role");
-//                Set<String> union = new HashSet<>(user.getProcessRoles());
-//                if (roles instanceof String)
-//                    union.add((String) roles);
-//                else if (roles instanceof List)
-//                    union.addAll((List) roles);
-//
-//                ((Map<String, Object>) request.get("or")).put("role", new ArrayList<>(union));
-//
-//            } else
-//                ((Map<String, Object>) request.get("or")).put("role", new ArrayList<>(user.getProcessRoles()));
-//
-//        } else {
-//            Map<String, Object> orMap = new LinkedHashMap<>();
-//            orMap.put("role", new ArrayList<>(user.getProcessRoles()));
-//            request.put("or", orMap);
-//        }
-//
-//        Page<Task> page = loadUsers(searchService.search(request, pageable, Task.class));
-//        return dataService.setImmediateFields(page);
-//    }
-
     @Override
     public Page<Task> search(Map<String, Object> request, Pageable pageable, LoggedUser user) {
         request = addRolesQueryContraint(request, user);
-        Page<Task> page = taskRepository.findAll(buildQuery(request, user, null), pageable);
+        com.querydsl.core.types.Predicate searchPredicate = searchService.buildQuery(request, user, null);
+        Page<Task> page = taskRepository.findAll(searchPredicate, pageable);
         page = loadUsers(page);
         page = dataService.setImmediateFields(page);
         return page;
@@ -512,34 +491,8 @@ public class TaskService implements ITaskService {
     @Override
     public long count(Map<String, Object> request, LoggedUser user, Locale locale) {
         request = addRolesQueryContraint(request, user);
-        return taskRepository.count(buildQuery(request, user, locale));
-    }
-
-    protected com.querydsl.core.types.Predicate buildQuery(Map<String, Object> request, LoggedUser user, Locale locale) {
-        BooleanBuilder builder = new BooleanBuilder();
-
-        if (request.containsKey(TaskSearchService.ROLE))
-            builder.and(searchService.role(request.get(TaskSearchService.ROLE)));
-
-        if (request.containsKey(TaskSearchService.CASE))
-            builder.and(searchService.useCase(request.get(TaskSearchService.CASE)));
-
-        if (request.containsKey(TaskSearchService.TITLE))
-            builder.and(searchService.title(request.get(TaskSearchService.TITLE)));
-
-        if (request.containsKey(TaskSearchService.USER))
-            builder.and(searchService.user(request.get(TaskSearchService.USER)));
-
-        if (request.containsKey(TaskSearchService.TRANSITION))
-            builder.and(searchService.transition(request.get(TaskSearchService.TRANSITION)));
-
-        if (request.containsKey(TaskSearchService.PROCESS))
-            builder.and(searchService.process(request.get(TaskSearchService.PROCESS)));
-
-        if (request.containsKey(TaskSearchService.FULL_TEXT))
-            builder.and(searchService.fullText((String) request.get(TaskSearchService.FULL_TEXT)));
-
-        return builder;
+        com.querydsl.core.types.Predicate searchPredicate = searchService.buildQuery(request, user, locale);
+        return taskRepository.count(searchPredicate);
     }
 
     protected Map<String, Object> addRolesQueryContraint(Map<String, Object> request, LoggedUser user) {
@@ -644,8 +597,9 @@ public class TaskService implements ITaskService {
                 task.setUserId(userService.getSystem().getId());
             }
         }
+        ProcessRole defaultRole = processRoleService.defaultRole();
         for (Map.Entry<String, Set<RolePermission>> entry : transition.getRoles().entrySet()) {
-            if (useCase.getEnabledRoles().contains(entry.getKey())) {
+            if (useCase.getEnabledRoles().contains(entry.getKey()) || defaultRole.getStringId().equals(entry.getKey())) {
                 task.addRole(entry.getKey(), entry.getValue());
             }
         }

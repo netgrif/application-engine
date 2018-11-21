@@ -28,7 +28,7 @@ class MultichoiceField extends ChoiceField<Set<I18nString>> {
             this.defaultValue = null
         } else {
             String[] vls = value.split(",")
-            def defaults = []
+            def defaults = new HashSet()
             vls.each { s ->
                 defaults << choices.find { it ->
                     it.defaultValue == s.trim()
@@ -69,5 +69,16 @@ class MultichoiceField extends ChoiceField<Set<I18nString>> {
     void clearValue() {
         super.clearValue()
         setValue(getDefaultValue())
+    }
+
+    @Override
+    Field clone() {
+        MultichoiceField clone = new MultichoiceField()
+        super.clone(clone)
+
+        clone.defaultValue = this.defaultValue
+        clone.choices = this.choices
+
+        return clone
     }
 }

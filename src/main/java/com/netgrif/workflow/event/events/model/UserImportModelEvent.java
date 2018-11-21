@@ -26,10 +26,10 @@ public class UserImportModelEvent extends UserEvent {
 
     @Override
     public String getMessage() {
-        return "Používateľ " +
+        return "User " +
                 ((LoggedUser) this.source).getUsername() +
-                " importoval nový model " +
+                " imported new model " +
                 this.model.getName() +
-                " s názvom " + this.getTitle() + " a iniciálmi " + this.getInitials();
+                " with title " + this.getTitle() + " and initials " + this.getInitials();
     }
 }

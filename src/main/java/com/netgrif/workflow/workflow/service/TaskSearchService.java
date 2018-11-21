@@ -1,5 +1,6 @@
 package com.netgrif.workflow.workflow.service;
 
+import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.workflow.domain.QTask;
 import com.netgrif.workflow.workflow.domain.Task;
 import com.querydsl.core.BooleanBuilder;
@@ -8,9 +9,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
+import java.util.Locale;
 import java.util.Map;
-import java.util.function.Function;
 
 @Service
 public class TaskSearchService extends MongoSearchService<Task> {
@@ -24,78 +24,32 @@ public class TaskSearchService extends MongoSearchService<Task> {
     public static final String TRANSITION = "transition";
     public static final String FULL_TEXT = "fullText";
 
-    public String roleQuery(Object obj) {
-        Map<Class, Function<Object, String>> builder = new HashMap<>();
+    public com.querydsl.core.types.Predicate buildQuery(Map<String, Object> request, LoggedUser user, Locale locale) {
+        BooleanBuilder builder = new BooleanBuilder();
 
-        builder.put(String.class, o -> "\"roles." + obj + "\":" + exists(true));
-        builder.put(ArrayList.class, o -> {
-            StringBuilder expression = new StringBuilder();
-            ((List) o).forEach(role -> {
-                expression.append("{\"roles.");
-                expression.append(role);
-                expression.append("\":");
-                expression.append(exists(true));
-                expression.append("},");
-            });
-            return expression.substring(1, expression.length() - 2);
-        });
+        if (request.containsKey(ROLE))
+            builder.and(role(request.get(ROLE)));
 
-        return buildQueryPart(null, obj, builder);
+        if (request.containsKey(CASE))
+            builder.and(useCase(request.get(CASE)));
+
+        if (request.containsKey(TITLE))
+            builder.and(title(request.get(TITLE)));
+
+        if (request.containsKey(USER))
+            builder.and(user(request.get(USER)));
+
+        if (request.containsKey(TRANSITION))
+            builder.and(transition(request.get(TRANSITION)));
+
+        if (request.containsKey(PROCESS))
+            builder.and(process(request.get(PROCESS)));
+
+        if (request.containsKey(FULL_TEXT))
+            builder.and(fullText((String) request.get(FULL_TEXT)));
+
+        return builder;
     }
-
-    public String caseQuery(Object obj) {
-        Map<Class, Function<Object, String>> builder = new HashMap<>();
-
-        builder.put(String.class, o -> "\"" + o + "\"");
-
-        return buildQueryPart("caseId", obj, builder);
-    }
-
-    public String titleQuery(Object obj) {
-        Map<Class, Function<Object, String>> builder = new HashMap<>();
-
-        builder.put(String.class, o -> "\"" + o + "\"");
-        builder.put(ArrayList.class, o -> in(((List<Object>) obj), oo -> "\"" + oo + "\"", null));
-
-        return buildQueryPart("title", obj, builder);
-    }
-
-    public String userQuery(Object obj) {
-        Map<Class, Function<Object, String>> builder = new HashMap<>();
-
-        builder.put(Long.class, o -> ((Long) o).toString());
-        builder.put(Integer.class, o -> ((Integer) o).toString());
-        builder.put(ArrayList.class, o -> in((List<Object>) obj, oo -> oo.toString(), ob -> ob instanceof Long || ob instanceof Integer));
-        builder.put(String.class, o -> {
-            Long id = resolveAuthorByEmail((String) obj);
-            return id != null ? id.toString() : "";
-        });
-
-        return buildQueryPart("userId", obj, builder);
-    }
-
-    public String transitionQuery(Object obj) {
-        Map<Class, Function<Object, String>> builder = new HashMap<>();
-
-        builder.put(String.class, o -> "\"" + o + "\"");
-        builder.put(ArrayList.class, o -> in(((List<Object>) obj), oo -> "\"" + oo + "\"", null));
-
-        return buildQueryPart("transitionId", obj, builder);
-    }
-
-    public String processQuery(Object obj) {
-        Map<Class, Function<Object, String>> builder = new HashMap<>();
-
-        builder.put(String.class, o -> "\"" + o + "\"");
-        builder.put(ArrayList.class, o -> in(((List<Object>) obj), oo -> "\"" + oo + "\"", null));
-
-        return buildQueryPart("processId", obj, builder);
-    }
-
-
-//    ********************
-//    *     QueryDSL     *
-//    ********************
 
     public Predicate role(Object query) {
         if (query instanceof ArrayList) {
@@ -177,8 +131,13 @@ public class TaskSearchService extends MongoSearchService<Task> {
             return userLong(Long.valueOf(((Integer) query).longValue()));
         else if (query instanceof Long)
             return userLong((Long) query);
-        else if (query instanceof String)
-            return userString((String) query);
+        else if (query instanceof String) {
+            try {
+                return userLong(Long.parseLong((String) query));
+            } catch (NumberFormatException queryShouldBeEmail) {
+                return userString((String) query);
+            }
+        }
 
         return null;
     }
@@ -234,6 +193,4 @@ public class TaskSearchService extends MongoSearchService<Task> {
         builder.or(QTask.task.caseTitle.containsIgnoreCase(query));
         return builder;
     }
-
-
 }

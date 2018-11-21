@@ -11,6 +11,6 @@ public class UserLoginEvent extends UserEvent {
 
     @Override
     public String getMessage() {
-        return "Používateľ " + user.getUsername() + " sa prihlásil o " + DateUtils.toString(time);
+        return "User " + user.getUsername() + " logged in on " + DateUtils.toString(time);
     }
 }

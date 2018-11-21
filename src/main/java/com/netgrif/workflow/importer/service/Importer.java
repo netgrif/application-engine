@@ -4,14 +4,15 @@ import com.netgrif.workflow.importer.model.*;
 import com.netgrif.workflow.petrinet.domain.DataGroup;
 import com.netgrif.workflow.petrinet.domain.Event;
 import com.netgrif.workflow.petrinet.domain.EventType;
-import com.netgrif.workflow.petrinet.domain.*;
 import com.netgrif.workflow.petrinet.domain.Place;
 import com.netgrif.workflow.petrinet.domain.Transaction;
 import com.netgrif.workflow.petrinet.domain.Transition;
+import com.netgrif.workflow.petrinet.domain.*;
 import com.netgrif.workflow.petrinet.domain.arcs.Arc;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.FieldBehavior;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action;
+import com.netgrif.workflow.petrinet.domain.dataset.logic.action.FieldActionsRunner;
 import com.netgrif.workflow.petrinet.domain.policies.AssignPolicy;
 import com.netgrif.workflow.petrinet.domain.policies.DataFocusPolicy;
 import com.netgrif.workflow.petrinet.domain.policies.FinishPolicy;
@@ -82,6 +83,9 @@ public class Importer {
     @Autowired
     private IActionValidator actionValidator;
 
+    @Autowired
+    private FieldActionsRunner actionsRunner;
+
     @Transactional
     public Optional<PetriNet> importPetriNet(InputStream xml, String title, String initials, Config config) {
         try {
@@ -150,8 +154,8 @@ public class Importer {
         net.setIcon(document.getIcon());
 
         document.getI18N().forEach(this::addI18N);
-        document.getData().forEach(this::createDataSet);
         document.getRole().forEach(this::createRole);
+        document.getData().forEach(this::createDataSet);
         document.getTransaction().forEach(this::createTransaction);
         document.getPlace().forEach(this::createPlace);
         document.getTransition().forEach(this::createTransition);
@@ -160,23 +164,35 @@ public class Importer {
         document.getTransition().forEach(this::resolveTransitionActions);
         document.getData().forEach(this::resolveDataActions);
         actionRefs.forEach(this::resolveActionRefs);
+        actions.forEach(this::evaluateActions);
 
         net.setTitle(title != null ? new I18nString(title) : toI18NString(document.getTitle()));
         net.setInitials(initials != null ? initials : document.getInitials());
         net.setDefaultCaseName(toI18NString(document.getCaseName()));
         net.setIdentifier(document.getId());
 
-        if (config.isNotSaveObjects())
+        if (config.isNotSaveObjects()) {
             return service.saveNew(net);
-        else
+        } else {
             return Optional.of(net);
+        }
+    }
+
+    @Transactional
+    protected void evaluateActions(String s, Action action) {
+        try {
+            actionsRunner.getActionCode(action);
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Could not evaluate action[" + action.getImportId() + "]: \n " + action.getDefinition());
+        }
     }
 
     @Transactional
     protected void resolveActionRefs(String actionId, Action action) {
         Action referenced = actions.get(actionId);
-        if (referenced == null)
-            throw new IllegalArgumentException("Invalid action reference with id ["+actionId+"]");
+        if (referenced == null) {
+            throw new IllegalArgumentException("Invalid action reference with id [" + actionId + "]");
+        }
         action.setDefinition(referenced.getDefinition());
         action.setTrigger(referenced.getTrigger());
     }
@@ -219,7 +235,7 @@ public class Importer {
 
     private LinkedHashSet<Action> buildActionRefs(List<ActionRefType> actionRefs) {
         LinkedHashSet<Action> refs = new LinkedHashSet<>();
-        for (ActionRefType actionRef: actionRefs) {
+        for (ActionRefType actionRef : actionRefs) {
             refs.add(fromActionRef(actionRef));
         }
         return refs;
@@ -323,8 +339,7 @@ public class Importer {
         }
         if (importTransition.getEvent() != null) {
             importTransition.getEvent().forEach(event ->
-                    //TODO: Rename probably
-                    transition.addEvent(addEvent(transition.getImportId(), event))
+                    addEvent(transition, event)
             );
         }
 
@@ -339,36 +354,35 @@ public class Importer {
     }
 
     @Transactional
-    protected Event addEvent(String transitionId, com.netgrif.workflow.importer.model.Event imported) {
+    protected void addEvent(Transition transition, com.netgrif.workflow.importer.model.Event imported) {
         Event event = new Event();
         event.setImportId(imported.getId());
         event.setMessage(toI18NString(imported.getMessage()));
         event.setTitle(toI18NString(imported.getTitle()));
         event.setType(EventType.valueOf(imported.getType().value().toUpperCase()));
-        event.setPostActions(parsePostActions(transitionId, imported));
-        event.setPreActions(parsePreActions(transitionId, imported));
-
-        return event;
+        event.setPostActions(parsePostActions(transition, imported));
+        event.setPreActions(parsePreActions(transition, imported));
+        transition.addEvent(event);
     }
 
-    private List<Action> parsePostActions(String transitionId, com.netgrif.workflow.importer.model.Event imported) {
-        return parsePhaseActions(EventPhaseType.POST, transitionId, imported);
+    private List<Action> parsePostActions(Transition transition, com.netgrif.workflow.importer.model.Event imported) {
+        return parsePhaseActions(EventPhaseType.POST, transition, imported);
     }
 
-    private List<Action> parsePreActions(String transitionId, com.netgrif.workflow.importer.model.Event imported) {
-        return parsePhaseActions(EventPhaseType.PRE, transitionId, imported);
+    private List<Action> parsePreActions(Transition transition, com.netgrif.workflow.importer.model.Event imported) {
+        return parsePhaseActions(EventPhaseType.PRE, transition, imported);
     }
 
-    private List<Action> parsePhaseActions(EventPhaseType phase, String transitionId, com.netgrif.workflow.importer.model.Event imported) {
+    private List<Action> parsePhaseActions(EventPhaseType phase, Transition transition, com.netgrif.workflow.importer.model.Event imported) {
         List<Action> actionList = imported.getActions().stream()
                 .filter(actions -> actions.getPhase().equals(phase))
                 .map(actions -> actions.getAction().parallelStream()
-                        .map(action -> parseAction(transitionId, action)))
+                        .map(action -> parseAction(transition.getImportId(), action)))
                 .flatMap(Function.identity())
                 .collect(Collectors.toList());
         actionList.addAll(imported.getActions().stream()
-                .filter(actions->actions.getPhase().equals(phase))
-                .map(actions -> actions.getActionRef().parallelStream().map(this::fromActionRef))
+                .filter(actions -> actions.getPhase().equals(phase))
+                .map(actions -> actions.getActionRef().stream().map(this::fromActionRef))
                 .flatMap(Function.identity())
                 .collect(Collectors.toList()));
         return actionList;
@@ -405,7 +419,7 @@ public class Importer {
         importDataGroup.getDataRef().forEach(dataRef -> dataGroup.addData(getField(dataRef.getId()).getStringId()));
         transition.addDataGroup(dataGroup);
 
-        for (DataRef dataRef: importDataGroup.getDataRef()) {
+        for (DataRef dataRef : importDataGroup.getDataRef()) {
             addDataLogic(transition, dataRef);
         }
     }
@@ -413,8 +427,9 @@ public class Importer {
     @Transactional
     protected void addToTransaction(Transition transition, TransactionRef transactionRef) {
         Transaction transaction = getTransaction(transactionRef.getId());
-        if (transaction == null)
+        if (transaction == null) {
             throw new IllegalArgumentException("Referenced transaction [" + transactionRef.getId() + "] in transition [" + transition.getTitle() + "] doesn't exist.");
+        }
         transaction.addTransition(transition);
     }
 
@@ -423,8 +438,9 @@ public class Importer {
         Logic logic = roleRef.getLogic();
         String roleId = getRole(roleRef.getId()).getStringId();
 
-        if (logic == null || roleId == null)
+        if (logic == null || roleId == null) {
             return;
+        }
 
         transition.addRole(roleId, roleFactory.getPermissions(logic));
     }
@@ -434,12 +450,14 @@ public class Importer {
         Logic logic = dataRef.getLogic();
         try {
             String fieldId = getField(dataRef.getId()).getStringId();
-            if (logic == null || fieldId == null)
+            if (logic == null || fieldId == null) {
                 return;
+            }
 
             Set<FieldBehavior> behavior = new HashSet<>();
-            if (logic.getBehavior() != null)
+            if (logic.getBehavior() != null) {
                 logic.getBehavior().forEach(b -> behavior.add(FieldBehavior.fromString(b)));
+            }
 
             transition.addDataSet(fieldId, behavior, null);
         } catch (NullPointerException e) {
@@ -455,14 +473,16 @@ public class Importer {
     }
 
     private Action parseAction(String transitionId, ActionType action) {
-        if (action.getValue().contains("f.this"))
+        if (action.getValue().contains("f.this")) {
             throw new IllegalArgumentException("Event action can not reference field using 'this'");
+        }
         return parseAction(null, transitionId, action);
     }
 
     private Action parseAction(String fieldId, String transitionId, ActionType importedAction) {
-        if (fieldId != null && importedAction.getTrigger() == null)
+        if (fieldId != null && importedAction.getTrigger() == null) {
             throw new IllegalArgumentException("Data field action [" + importedAction.getValue() + "] doesn't have trigger");
+        }
         try {
             Action action = createAction(importedAction);
             parseIds(fieldId, transitionId, importedAction, action);
@@ -475,10 +495,11 @@ public class Importer {
 
     private Action createAction(ActionType importedAction) {
         Action action = new Action(importedAction.getTrigger());
-        if (importedAction.getId() != null)
+        if (importedAction.getId() != null) {
             action.setImportId(importedAction.getId());
-        else
+        } else {
             action.setImportId(new ObjectId().toString());
+        }
         return action;
     }
 
@@ -515,8 +536,9 @@ public class Importer {
 
     private void replaceImportId(Action action, String fieldId, String transitionId, Map.Entry<String, String> entry) {
         String[] parts = entry.getValue().split("[.]");
-        if (parts.length != 2)
+        if (parts.length != 2) {
             throw new IllegalArgumentException("Can not parse id of " + entry.getValue());
+        }
         String key = parts[0];
         String importId = parts[1];
         String paramName = entry.getKey().trim();
@@ -568,10 +590,11 @@ public class Importer {
     protected void createPlace(com.netgrif.workflow.importer.model.Place importPlace) {
         Place place = new Place();
         place.setImportId(importPlace.getId());
-        if (importPlace.isStatic() == null)
+        if (importPlace.isStatic() == null) {
             place.setIsStatic(importPlace.isIsStatic());
-        else
+        } else {
             place.setIsStatic(importPlace.isStatic());
+        }
         place.setTokens(importPlace.getTokens());
         place.setPosition(importPlace.getX(), importPlace.getY());
         place.setTitle(toI18NString(importPlace.getLabel()));
@@ -583,31 +606,20 @@ public class Importer {
     @Transactional
     protected void createRole(Role importRole) {
         ProcessRole role = new ProcessRole();
-        Map<EventType, Event> events = createEventsMap(importRole.getEvent());
-
         role.setImportId(importRole.getId());
-        role.setEvents(events);
-
-        if (importRole.getName() == null)
+        if (importRole.getName() == null) {
             role.setName(toI18NString(importRole.getTitle()));
-        else
+        } else {
             role.setName(toI18NString(importRole.getName()));
-        if (config.isNotSaveObjects())
+        }
+        if (config.isNotSaveObjects()) {
             role = roleRepository.save(role);
-        else
+        } else {
             role.set_id(new ObjectId());
+        }
 
         net.addRole(role);
         roles.put(importRole.getId(), role);
-    }
-
-    private Map<EventType, Event> createEventsMap(List<com.netgrif.workflow.importer.model.Event> events) {
-        Map<EventType, Event> finalEvents = new HashMap<>();
-        events.forEach(event ->
-                finalEvents.put(EventType.valueOf(event.getType().value().toUpperCase()), addEvent(null, event))
-        );
-
-        return finalEvents;
     }
 
     @Transactional
@@ -622,30 +634,35 @@ public class Importer {
 
     @Transactional
     protected Node getNode(String id) {
-        if (places.containsKey(id))
+        if (places.containsKey(id)) {
             return getPlace(id);
-        else if (transitions.containsKey(id))
+        } else if (transitions.containsKey(id)) {
             return getTransition(id);
+        }
         throw new IllegalArgumentException("Node with id [" + id + "] not found.");
     }
 
     I18nString toI18NString(I18NStringType imported) {
-        if (imported == null)
+        if (imported == null) {
             return null;
+        }
         I18nString string = i18n.getOrDefault(imported.getName(), new I18nString(imported.getName(), imported.getValue()));
-        if (string.getDefaultValue() == null)
+        if (string.getDefaultValue() == null) {
             string.setDefaultValue(imported.getValue());
+        }
         return string;
     }
 
     private boolean isDefaultRoleAllowedFor(com.netgrif.workflow.importer.model.Transition transition, Document document) {
         // FALSE if defaultRole not allowed in net
-        if (document.isDefaultRole() != null && !document.isDefaultRole())
+        if (document.isDefaultRole() != null && !document.isDefaultRole()) {
             return false;
+        }
         // FALSE if role or trigger mapping
-        for (Mapping mapping: document.getMapping()) {
-            if (mapping.getTransitionRef() == transition.getId() && (mapping.getRoleRef() != null && !mapping.getRoleRef().isEmpty()) && (mapping.getTrigger() != null && !mapping.getTrigger().isEmpty()))
+        for (Mapping mapping : document.getMapping()) {
+            if (mapping.getTransitionRef() == transition.getId() && (mapping.getRoleRef() != null && !mapping.getRoleRef().isEmpty()) && (mapping.getTrigger() != null && !mapping.getTrigger().isEmpty())) {
                 return false;
+            }
         }
         // TRUE if no roles and no triggers
         return (transition.getRoleRef() == null || transition.getRoleRef().isEmpty()) && (transition.getTrigger() == null || transition.getTrigger().isEmpty());
@@ -653,64 +670,73 @@ public class Importer {
 
     PetriNet getNetByImportId(Long id) {
         Optional<PetriNet> net = service.findByImportId(id);
-        if (!net.isPresent())
+        if (!net.isPresent()) {
             throw new IllegalArgumentException();
+        }
         return net.get();
     }
 
     private AssignPolicy toAssignPolicy(AssignPolicyType type) {
-        if (type == null || type.value() == null)
+        if (type == null || type.value() == null) {
             return AssignPolicy.MANUAL;
+        }
 
         return AssignPolicy.valueOf(type.value().toUpperCase());
     }
 
     private DataFocusPolicy toDataFocusPolicy(DataFocusPolicyType type) {
-        if (type == null || type.value() == null)
+        if (type == null || type.value() == null) {
             return DataFocusPolicy.MANUAL;
+        }
 
         return DataFocusPolicy.valueOf(type.value().toUpperCase());
     }
 
     private FinishPolicy toFinishPolicy(FinishPolicyType type) {
-        if (type == null || type.value() == null)
+        if (type == null || type.value() == null) {
             return FinishPolicy.MANUAL;
+        }
 
         return FinishPolicy.valueOf(type.value().toUpperCase());
     }
 
     public ProcessRole getRole(String id) {
         ProcessRole role = roles.get(id);
-        if (role == null)
+        if (role == null) {
             throw new IllegalArgumentException("Role " + id + " not found");
+        }
         return role;
     }
 
     public Field getField(String id) {
         Field field = fields.get(id);
-        if (field == null)
+        if (field == null) {
             throw new IllegalArgumentException("Field " + id + " not found");
+        }
         return field;
     }
 
     public Transition getTransition(String id) {
         Transition transition = transitions.get(id);
-        if (transition == null)
+        if (transition == null) {
             throw new IllegalArgumentException("Transition " + id + " not found");
+        }
         return transition;
     }
 
     public Place getPlace(String id) {
         Place place = places.get(id);
-        if (place == null)
+        if (place == null) {
             throw new IllegalArgumentException("Place " + id + " not found");
+        }
         return place;
     }
 
     public Transaction getTransaction(String id) {
         Transaction transaction = transactions.get(id);
-        if (transaction == null)
+        if (transaction == null) {
             throw new IllegalArgumentException("Transaction " + id + " not found");
+        }
         return transaction;
     }
 
