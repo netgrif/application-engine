@@ -62,7 +62,7 @@ class TextField extends ValidableField<String> {
     }
 
     @Override
-    TextField clone() {
+    Field clone() {
         TextField clone = new TextField()
         super.clone(clone)
 

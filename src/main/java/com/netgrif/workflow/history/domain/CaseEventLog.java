@@ -26,7 +26,6 @@ public class CaseEventLog extends EventLog implements ICaseEventLog {
         this.caseId = useCase.getStringId();
         this.caseTitle = useCase.getTitle();
         this.activePlaces = useCase.getActivePlaces();
-        this.dataSetValues = useCase.getDataSet();
     }
 
     @Override
