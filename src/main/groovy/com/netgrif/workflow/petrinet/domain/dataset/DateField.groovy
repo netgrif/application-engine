@@ -59,7 +59,7 @@ class DateField extends ValidableField<LocalDate> {
     }
 
     @Override
-    DateField clone() {
+    Field clone() {
         DateField clone = new DateField()
         super.clone(clone)
         clone.validationRules = this.validationRules

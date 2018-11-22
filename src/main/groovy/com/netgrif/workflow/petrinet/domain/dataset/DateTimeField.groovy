@@ -25,7 +25,7 @@ class DateTimeField extends ValidableField<LocalDateTime> {
     }
 
     @Override
-    DateTimeField clone() {
+    Field clone() {
         DateTimeField clone = new DateTimeField()
         super.clone(clone)
 

@@ -10,4 +10,6 @@ public interface IProcessRoleService {
     void assignRolesToUser(Long userId, Set<String> roleIds, LoggedUser user);
 
     List<ProcessRole> findAll(String netId);
+
+    ProcessRole defaultRole();
 }

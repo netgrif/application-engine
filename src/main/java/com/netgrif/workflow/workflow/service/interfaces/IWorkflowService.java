@@ -13,13 +13,12 @@ import java.util.Locale;
 import java.util.Map;
 
 public interface IWorkflowService {
+
     Case save(Case useCase);
 
     Case findOne(String caseId);
 
     Page<Case> getAll(Pageable pageable);
-
-    Page<Case> searchCase(List<String> nets, Pageable pageable);
 
     Case createCase(String netId, String title, String color, LoggedUser user);
 
@@ -48,6 +47,4 @@ public interface IWorkflowService {
     Case decrypt(Case useCase);
 
     Page<Case> search(Predicate predicate, Pageable pageable);
-
-//    Page<Case> fullTextSearch(String processIdentifier, String searchPhrase, Pageable pageable);
 }

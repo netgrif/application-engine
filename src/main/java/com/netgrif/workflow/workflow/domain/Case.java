@@ -99,6 +99,11 @@ public class Case {
     @JsonIgnore
     private Set<TaskPair> tasks;
 
+    @Getter
+    @Setter
+    @JsonIgnore
+    private Set<String> enabledRoles;
+
     public Case() {
         _id = new ObjectId();
         activePlaces = new HashMap<>();
@@ -107,6 +112,7 @@ public class Case {
         resetArcTokens = new HashMap<>();
         tasks = new HashSet<>();
         visualId = generateVisualId();
+        enabledRoles = new HashSet<>();
     }
 
     public Case(String title) {
@@ -123,6 +129,7 @@ public class Case {
         populateDataSet();
         this.immediateDataFields = petriNet.getImmediateFields().stream().map(Field::getStringId).collect(Collectors.toCollection(LinkedHashSet::new));
         visualId = generateVisualId();
+        this.enabledRoles = petriNet.getRoles().keySet();
     }
 
     public String getStringId() {

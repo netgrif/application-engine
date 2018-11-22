@@ -288,6 +288,7 @@ public class PetriNet extends PetriNetObject {
     public PetriNet clone() {
         PetriNet clone = new PetriNet();
         clone.setIdentifier(this.identifier);
+        clone.setInitials(this.initials);
         clone.setTitle(this.title);
         clone.setDefaultCaseName(this.defaultCaseName);
         clone.setIcon(this.icon);
