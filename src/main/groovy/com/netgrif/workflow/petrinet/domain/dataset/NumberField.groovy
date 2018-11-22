@@ -45,7 +45,7 @@ class NumberField extends ValidableField<Double> {
     }
 
     @Override
-    NumberField clone() {
+    Field clone() {
         NumberField clone = new NumberField()
         super.clone(clone)
 

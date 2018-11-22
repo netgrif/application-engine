@@ -22,15 +22,19 @@ public class LocalisedMultichoiceField extends LocalisedField {
         }
 
         this.defaultValue = new LinkedList<String>();
-        Collection<I18nString> fieldDefaults = field.getDefaultValue();//todo:multichoice if only one is not collection
-        for (I18nString fieldDefault : fieldDefaults) {
-            ((List<String>) this.defaultValue).add(fieldDefault.getTranslation(locale));
+        Collection<I18nString> fieldDefaults = field.getDefaultValue();
+        if (fieldDefaults != null) {
+            for (I18nString fieldDefault : fieldDefaults) {
+                ((List<String>) this.defaultValue).add(fieldDefault.getTranslation(locale));
+            }
         }
 
         this.setValue(new LinkedList<>());
         Collection<I18nString> values = field.getValue();
-        for (I18nString value : values) {
-            ((List) this.getValue()).add(value.getTranslation(locale));
+        if (values != null) {
+            for (I18nString value : values) {
+                ((List) this.getValue()).add(value.getTranslation(locale));
+            }
         }
     }
 }

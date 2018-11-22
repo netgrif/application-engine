@@ -37,7 +37,6 @@ public class UserTaskEventLog extends EventLog implements IUserEventLog, ITaskEv
         this.caseId = useCase.getStringId();
         this.caseTitle = useCase.getTitle();
         this.activePlaces = useCase.getActivePlaces();
-        this.dataSetValues = useCase.getDataSet();
     }
 
     public UserTaskEventLog() {
