@@ -30,6 +30,9 @@ public final class FieldFactory {
     @Autowired
     private IWorkflowService workflowService;
 
+    @Autowired
+    private FormatFactory formatFactory;
+
     Field getField(Data data, Importer importer) throws IllegalArgumentException {
         Field field;
         switch (data.getType()) {
@@ -80,6 +83,10 @@ public final class FieldFactory {
             setFieldDefaultValue((FieldWithDefault) field, data.getInit());
         if (field instanceof ValidableField) {
             resolveValidation(field);
+        }
+        if (data.getFormat() != null) {
+            Format format = formatFactory.buildFormat(data.getFormat());
+            field.setFormat(format);
         }
         setActions(field, data);
         setEncryption(field, data);
