@@ -1,7 +1,7 @@
 package com.netgrif.workflow.importer.service;
 
-import com.netgrif.workflow.petrinet.domain.dataset.Format;
-import com.netgrif.workflow.petrinet.domain.dataset.format.CurrencyFormat;
+import com.netgrif.workflow.petrinet.domain.CurrencyFormat;
+import com.netgrif.workflow.petrinet.domain.Format;
 import org.springframework.stereotype.Component;
 
 @Component

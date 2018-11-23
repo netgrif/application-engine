@@ -1,9 +1,9 @@
 package com.netgrif.workflow.workflow.web.responsebodies;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.netgrif.workflow.petrinet.domain.Format;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.petrinet.domain.dataset.FieldType;
-import com.netgrif.workflow.petrinet.domain.dataset.Format;
 import lombok.Data;
 
 import java.util.Locale;
