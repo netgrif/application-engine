@@ -9,6 +9,8 @@ import org.apache.pdfbox.pdmodel.encryption.AccessPermission
 import org.apache.pdfbox.pdmodel.encryption.StandardProtectionPolicy
 import org.apache.pdfbox.pdmodel.font.PDType0Font
 import org.apache.pdfbox.pdmodel.interactive.form.PDAcroForm
+import org.apache.pdfbox.pdmodel.interactive.form.PDField
+import org.apache.pdfbox.pdmodel.interactive.form.PDNonTerminalField
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -166,5 +168,37 @@ class PdfUtils {
         document.save(file)
         document.close()
         return file
+    }
+
+    static Map<String,String> readPdfForm(InputStream inputStream) {
+
+        Map<String, String> result = new HashMap<>()
+
+        PDDocument document = PDDocument.load(inputStream)
+        PDDocumentCatalog docCatalog = document.getDocumentCatalog()
+        PDAcroForm acroForm = docCatalog.getAcroForm()
+
+        List<PDField> fields = acroForm.getFields()
+
+        fields.forEach({
+            addAllFieldsAndChildFields(it, result)
+        })
+
+        return result
+    }
+
+    static addAllFieldsAndChildFields(PDField field, Map<String,String> result) {
+
+        if (field instanceof PDNonTerminalField)
+        {
+            PDNonTerminalField nonTerminalField = (PDNonTerminalField) field
+            nonTerminalField.getChildren().forEach({
+                //Non terminal fields are not written to map at the moment
+                //If needed, add it here
+                addAllFieldsAndChildFields(it ,result)
+            })
+        } else {
+            result.put(field.getFullyQualifiedName(), field.getValueAsString())
+        }
     }
 }
