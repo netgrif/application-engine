@@ -1,14 +1,9 @@
 
 package com.netgrif.workflow.importer.model;
 
+import javax.xml.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
 
 
 /**
@@ -28,6 +23,7 @@ import javax.xml.bind.annotation.XmlType;
  *         &lt;element ref="{}values" maxOccurs="unbounded" minOccurs="0"/&gt;
  *         &lt;element ref="{}valid" maxOccurs="unbounded" minOccurs="0"/&gt;
  *         &lt;element ref="{}init" minOccurs="0"/&gt;
+ *         &lt;element ref="{}format" minOccurs="0"/&gt;
  *         &lt;element ref="{}encryption" minOccurs="0"/&gt;
  *         &lt;element ref="{}action" maxOccurs="unbounded" minOccurs="0"/&gt;
  *         &lt;element ref="{}actionRef" maxOccurs="unbounded" minOccurs="0"/&gt;
@@ -52,6 +48,7 @@ import javax.xml.bind.annotation.XmlType;
     "values",
     "valid",
     "init",
+    "format",
     "encryption",
     "action",
     "actionRef",
@@ -70,6 +67,7 @@ public class Data {
     protected List<I18NStringType> values;
     protected List<String> valid;
     protected String init;
+    protected Format format;
     protected EncryptionType encryption;
     protected List<ActionType> action;
     protected List<ActionRefType> actionRef;
@@ -256,6 +254,30 @@ public class Data {
      */
     public void setInit(String value) {
         this.init = value;
+    }
+
+    /**
+     * Gets the value of the format property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link Format }
+     *     
+     */
+    public Format getFormat() {
+        return format;
+    }
+
+    /**
+     * Sets the value of the format property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link Format }
+     *     
+     */
+    public void setFormat(Format value) {
+        this.format = value;
     }
 
     /**
