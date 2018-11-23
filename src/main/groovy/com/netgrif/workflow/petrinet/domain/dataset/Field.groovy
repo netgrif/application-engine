@@ -41,6 +41,8 @@ abstract class Field<T> extends Imported {
     @JsonIgnore
     private String encryption
 
+    private Format format
+
     Field() {
         _id = new ObjectId()
     }
@@ -178,6 +180,14 @@ abstract class Field<T> extends Imported {
         return description?.getTranslation(locale)
     }
 
+    Format getFormat() {
+        return format
+    }
+
+    void setFormat(Format format) {
+        this.format = format
+    }
+
     @Override
     String toString() {
         return name.defaultValue
@@ -198,6 +208,7 @@ abstract class Field<T> extends Imported {
         clone.immediate = this.immediate
         clone.actions = this.actions
         clone.encryption = this.encryption
+        clone.format = this.format
     }
 
     abstract Field clone()
