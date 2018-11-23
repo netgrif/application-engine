@@ -4,6 +4,7 @@ import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.importer.model.Data;
 import com.netgrif.workflow.importer.model.DocumentRef;
 import com.netgrif.workflow.importer.model.I18NStringType;
+import com.netgrif.workflow.petrinet.domain.Format;
 import com.netgrif.workflow.petrinet.domain.I18nString;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.dataset.*;
