@@ -31,6 +31,9 @@ public class ObjectFactory {
     private final static QName _Values_QNAME = new QName("", "values");
     private final static QName _Valid_QNAME = new QName("", "valid");
     private final static QName _Init_QNAME = new QName("", "init");
+    private final static QName _Code_QNAME = new QName("", "code");
+    private final static QName _FractionSize_QNAME = new QName("", "fractionSize");
+    private final static QName _Locale_QNAME = new QName("", "locale");
     private final static QName _Encryption_QNAME = new QName("", "encryption");
     private final static QName _Action_QNAME = new QName("", "action");
     private final static QName _ActionRef_QNAME = new QName("", "actionRef");
@@ -94,6 +97,22 @@ public class ObjectFactory {
      */
     public Data createData() {
         return new Data();
+    }
+
+    /**
+     * Create an instance of {@link Format }
+     * 
+     */
+    public Format createFormat() {
+        return new Format();
+    }
+
+    /**
+     * Create an instance of {@link Currency }
+     * 
+     */
+    public Currency createCurrency() {
+        return new Currency();
     }
 
     /**
@@ -317,6 +336,33 @@ public class ObjectFactory {
     @XmlElementDecl(namespace = "", name = "init")
     public JAXBElement<String> createInit(String value) {
         return new JAXBElement<String>(_Init_QNAME, String.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "", name = "code", defaultValue = "EUR")
+    public JAXBElement<String> createCode(String value) {
+        return new JAXBElement<String>(_Code_QNAME, String.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link Integer }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "", name = "fractionSize", defaultValue = "2")
+    public JAXBElement<Integer> createFractionSize(Integer value) {
+        return new JAXBElement<Integer>(_FractionSize_QNAME, Integer.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "", name = "locale")
+    public JAXBElement<String> createLocale(String value) {
+        return new JAXBElement<String>(_Locale_QNAME, String.class, null, value);
     }
 
     /**

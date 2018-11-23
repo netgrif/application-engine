@@ -3,6 +3,7 @@ package com.netgrif.workflow.workflow.web.responsebodies;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.petrinet.domain.dataset.FieldType;
+import com.netgrif.workflow.petrinet.domain.dataset.Format;
 import lombok.Data;
 
 import java.util.Locale;
@@ -26,6 +27,8 @@ public class LocalisedField {
 
     private Long order;
 
+    private Format formatFilter;
+
     public LocalisedField() {
     }
 
@@ -38,5 +41,6 @@ public class LocalisedField {
         behavior = field.getBehavior();
         value = field.getValue();
         order = field.getOrder();
+        formatFilter = field.getFormat();
     }
 }
