@@ -32,6 +32,18 @@
         <id>number_field</id>
         <title>Number</title>
         <init>38</init>
+        <format>
+            <currency>
+                <code>EUR</code>
+                <fractionSize>3</fractionSize>
+                <locale>sk_SK</locale>
+            </currency>
+        </format>
+    </data>
+    <data type="number" immediate="true">
+        <id>number_field2</id>
+        <title>Number2</title>
+        <init>38</init>
     </data>
     <data type="date" immediate="true">
         <id>date_field</id>
@@ -99,6 +111,12 @@
             </dataRef>
             <dataRef>
                 <id>number_field</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>number_field2</id>
                 <logic>
                     <behavior>editable</behavior>
                 </logic>
