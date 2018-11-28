@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="../../main/resources/petriNets/petriflow_schema.xsd">
+    <!-- ROLE -->
+    <!-- DATA -->
+    <data type="boolean">
+        <id>boo</id>
+        <title>boo</title>
+        <view>
+            <image>
+                <true>ok</true>
+                <false>ko</false>
+            </image>
+        </view>
+    </data>
+    <!-- TRANSITIONS -->
+    <transition>
+        <id>0</id>
+        <x>0</x>
+        <y>0</y>
+        <label>task</label>
+        <dataRef>
+            <id>boo</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+    </transition>
+    <!-- PLACES -->
+    <!-- ARCS -->
+</document>
