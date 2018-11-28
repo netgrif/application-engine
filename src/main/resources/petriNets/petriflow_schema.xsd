@@ -22,6 +22,7 @@
                 <xs:element ref="values" minOccurs="0" maxOccurs="unbounded"/>
                 <xs:element ref="valid" minOccurs="0" maxOccurs="unbounded"/>
                 <xs:element ref="init" minOccurs="0"/>
+                <xs:element ref="format" minOccurs="0"/>
                 <xs:element ref="encryption" minOccurs="0"/>
                 <xs:element ref="action" minOccurs="0" maxOccurs="unbounded"/>
                 <xs:element ref="actionRef" minOccurs="0" maxOccurs="unbounded"/>
@@ -441,4 +442,24 @@
             <xs:element ref="id"/>
         </xs:sequence>
     </xs:complexType>
+    <xs:element name="format">
+        <xs:complexType>
+            <xs:choice>
+                <xs:element ref="currency"/>
+            </xs:choice>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="currency">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="code"/>
+                <xs:element ref="fractionSize"/>
+                <xs:element ref="locale"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <!-- ISO 4217 currency code -->
+    <xs:element name="code" type="xs:string" default="EUR"/>
+    <xs:element name="fractionSize" type="xs:int" default="2"/>
+    <xs:element name="locale" type="xs:string"/>
 </xs:schema>

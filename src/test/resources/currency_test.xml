@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="../../main/resources/petriNets/petriflow_schema.xsd">
+    <!-- ROLE -->
+    <!-- DATA -->
+    <data type="number">
+        <id>number</id>
+        <title>Number</title>
+        <format>
+            <currency>
+                <!--default: EUR-->
+                <code>EUR</code>
+                <!--default: 2-->
+                <fractionSize>3</fractionSize>
+                <!--default: user locale-->
+                <locale>sk_SK</locale>
+            </currency>
+        </format>
+    </data>
+    <!-- TRANSITIONS -->
+    <!-- PLACES -->
+    <!-- ARCS -->
+</document>

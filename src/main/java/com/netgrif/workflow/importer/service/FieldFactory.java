@@ -4,6 +4,7 @@ import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.importer.model.Data;
 import com.netgrif.workflow.importer.model.DocumentRef;
 import com.netgrif.workflow.importer.model.I18NStringType;
+import com.netgrif.workflow.petrinet.domain.Format;
 import com.netgrif.workflow.petrinet.domain.I18nString;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.dataset.*;
@@ -29,6 +30,9 @@ public final class FieldFactory {
 
     @Autowired
     private IWorkflowService workflowService;
+
+    @Autowired
+    private FormatFactory formatFactory;
 
     Field getField(Data data, Importer importer) throws IllegalArgumentException {
         Field field;
@@ -80,6 +84,10 @@ public final class FieldFactory {
             setFieldDefaultValue((FieldWithDefault) field, data.getInit());
         if (field instanceof ValidableField) {
             resolveValidation(field);
+        }
+        if (data.getFormat() != null) {
+            Format format = formatFactory.buildFormat(data.getFormat());
+            field.setFormat(format);
         }
         setActions(field, data);
         setEncryption(field, data);
