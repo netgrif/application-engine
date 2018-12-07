@@ -67,6 +67,9 @@ public final class FieldFactory {
             case DATE_TIME:
                 field = new DateTimeField();
                 break;
+            case BUTTON:
+                field = new ButtonField();
+                break;
             default:
                 throw new IllegalArgumentException(data.getType() + " is not a valid Field type");
         }
