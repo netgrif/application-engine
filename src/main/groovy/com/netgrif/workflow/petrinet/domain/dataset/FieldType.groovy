@@ -3,6 +3,7 @@ package com.netgrif.workflow.petrinet.domain.dataset
 import com.fasterxml.jackson.annotation.JsonValue
 
 enum FieldType {
+
     TEXT("text"),
     DATE("date"),
     BOOLEAN("boolean"),
@@ -13,7 +14,8 @@ enum FieldType {
     USER("user"),
     TABULAR("tabular"),
     CASEREF("caseref"),
-    DATETIME("dateTime")
+    DATETIME("dateTime"),
+    BUTTON("button")
 
     String name
 
@@ -22,7 +24,7 @@ enum FieldType {
     }
 
     static FieldType fromString(String name) {
-        return FieldType.valueOf(name.toUpperCase())
+        return valueOf(name.toUpperCase())
     }
 
     @JsonValue
