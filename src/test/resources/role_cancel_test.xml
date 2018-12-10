@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="../../main/resources/petriNets/petriflow_schema.xsd">
+    <!-- ROLE -->
+    <role>
+        <id>worker</id>
+        <title>worker</title>
+    </role>
+    <role>
+        <id>manager</id>
+        <title>manager</title>
+    </role>
+    <!-- DATA -->
+    <!-- TRANSITIONS -->
+    <transition>
+        <id>Task</id>
+        <x>0</x>
+        <y>0</y>
+        <label>Task</label>
+        <roleRef>
+            <id>worker</id>
+            <logic><perform>true</perform></logic>
+        </roleRef>
+        <roleRef>
+            <id>manager</id>
+            <logic><cancel>true</cancel></logic>
+        </roleRef>
+    </transition>
+    <!-- PLACES -->
+    <!-- ARCS -->
+</document>

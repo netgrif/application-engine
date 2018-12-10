@@ -29,6 +29,7 @@ public class RoleFactory {
 
         addPerform(permissions, roleLogic);
         addDelegate(permissions, roleLogic);
+        addCancel(permissions, roleLogic);
 
         return permissions;
     }
@@ -41,6 +42,11 @@ public class RoleFactory {
     private void addDelegate(Set<RolePermission> permissions, Logic roleLogic) {
         if (roleLogic.isDelegate() != null && roleLogic.isDelegate())
             permissions.add(RolePermission.DELEGATE);
+    }
+
+    private void addCancel(Set<RolePermission> permissions, Logic roleLogic) {
+        if (roleLogic.isCancel() != null && roleLogic.isCancel())
+            permissions.add(RolePermission.CANCEL);
     }
 
     ProcessRole transitionRole(PetriNet net, Transition transition) {
