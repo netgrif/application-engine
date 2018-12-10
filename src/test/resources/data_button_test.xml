@@ -7,6 +7,17 @@
     <data type="button">
         <id>button</id>
         <title>button</title>
+        <action trigger="set">
+            <!-- @formatter:off -->
+            sequence: f.num;
+            change sequence value { sequence.value + 1 }
+            <!-- @formatter:on -->
+        </action>
+    </data>
+    <data type="number">
+        <id>num</id>
+        <title>number</title>
+        <init>0</init>
     </data>
     <!-- TRANSITIONS -->
     <transition>
@@ -17,6 +28,10 @@
         <dataRef>
             <id>button</id>
             <logic><behavior>editable</behavior></logic>
+        </dataRef>
+        <dataRef>
+            <id>number</id>
+            <logic><behavior>visible</behavior></logic>
         </dataRef>
     </transition>
     <!-- PLACES -->
