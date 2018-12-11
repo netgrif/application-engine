@@ -94,6 +94,7 @@ public class PetriNet extends PetriNetObject {
         this._id = new ObjectId();
         this.identifier = "Default";
         this.version = "1.0.0";
+        defaultCaseName = new I18nString("");
         initialized = false;
         creationDate = LocalDateTime.now();
         places = new HashMap<>();
