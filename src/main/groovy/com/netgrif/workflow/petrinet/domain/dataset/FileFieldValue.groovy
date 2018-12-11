@@ -45,6 +45,6 @@ class FileFieldValue {
 
     @Override
     public String toString() {
-        return name + " [" + path + "]"
+        return path
     }
 }
