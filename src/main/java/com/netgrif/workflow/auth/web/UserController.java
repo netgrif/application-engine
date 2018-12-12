@@ -149,8 +149,10 @@ public class UserController {
     }
 
     @PostMapping("/preferences")
-    public MessageResource savePreferences(@RequestBody Preferences preferences) {
+    public MessageResource savePreferences(@RequestBody Preferences preferences, Authentication auth) {
         try {
+            Long userId = ((LoggedUser) auth.getPrincipal()).getId();
+            preferences.setUserId(userId);
             preferencesService.save(preferences);
             return MessageResource.successMessage("User preferences saved");
         } catch (Exception e) {
