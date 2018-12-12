@@ -28,6 +28,7 @@ public class MailService implements IMailService {
 
     static final Logger log = Logger.getLogger(MailService.class.getName());
     public static final String TOKEN = "token";
+    public static final String VALIDITY = "validity";
     public static final String EXPIRATION = "expiration";
     public static final String SERVER = "server";
     public static final String NAME = "name";
@@ -52,6 +53,10 @@ public class MailService implements IMailService {
     protected String mailFrom;
 
     @Getter
+    @Value("${server.auth.token-validity-period}")
+    protected String validityPeriod;
+
+    @Getter
     @Setter
     protected JavaMailSender mailSender;
 
@@ -67,6 +72,7 @@ public class MailService implements IMailService {
         recipients.add(user.getEmail());
         model.put(TOKEN, registrationService.encodeToken(user.getEmail(), user.getToken()));
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+        model.put(VALIDITY, validityPeriod);
         model.put(EXPIRATION, registrationService.generateExpirationDate().format(formatter));
         model.put(SERVER, getServerURL());
 
@@ -82,6 +88,7 @@ public class MailService implements IMailService {
 
         model.put(NAME, user.getName());
         model.put(TOKEN, registrationService.encodeToken(user.getEmail(), user.getToken()));
+        model.put(VALIDITY, validityPeriod);
         model.put(EXPIRATION, registrationService.generateExpirationDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
         model.put(SERVER, getServerURL());
 

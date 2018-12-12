@@ -1,13 +1,9 @@
 
 package com.netgrif.workflow.importer.model;
 
+import javax.xml.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlSchemaType;
-import javax.xml.bind.annotation.XmlType;
 
 
 /**
@@ -23,6 +19,7 @@ import javax.xml.bind.annotation.XmlType;
  *         &lt;element ref="{}perform" minOccurs="0"/&gt;
  *         &lt;element ref="{}delegate" minOccurs="0"/&gt;
  *         &lt;element ref="{}view" minOccurs="0"/&gt;
+ *         &lt;element ref="{}cancel" minOccurs="0"/&gt;
  *         &lt;element name="behavior" type="{}behavior" maxOccurs="unbounded" minOccurs="0"/&gt;
  *         &lt;element ref="{}action" maxOccurs="unbounded" minOccurs="0"/&gt;
  *         &lt;element ref="{}actionRef" maxOccurs="unbounded" minOccurs="0"/&gt;
@@ -39,6 +36,7 @@ import javax.xml.bind.annotation.XmlType;
     "perform",
     "delegate",
     "view",
+    "cancel",
     "behavior",
     "action",
     "actionRef"
@@ -49,6 +47,7 @@ public class Logic {
     protected Boolean perform;
     protected Boolean delegate;
     protected Boolean view;
+    protected Boolean cancel;
     @XmlSchemaType(name = "string")
     protected List<Behavior> behavior;
     protected List<ActionType> action;
@@ -124,6 +123,30 @@ public class Logic {
      */
     public void setView(Boolean value) {
         this.view = value;
+    }
+
+    /**
+     * Gets the value of the cancel property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link Boolean }
+     *     
+     */
+    public Boolean isCancel() {
+        return cancel;
+    }
+
+    /**
+     * Sets the value of the cancel property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link Boolean }
+     *     
+     */
+    public void setCancel(Boolean value) {
+        this.cancel = value;
     }
 
     /**

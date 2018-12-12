@@ -43,6 +43,7 @@ public class ObjectFactory {
     private final static QName _Perform_QNAME = new QName("", "perform");
     private final static QName _Delegate_QNAME = new QName("", "delegate");
     private final static QName _View_QNAME = new QName("", "view");
+    private final static QName _Cancel_QNAME = new QName("", "cancel");
     private final static QName _Alignment_QNAME = new QName("", "alignment");
     private final static QName _Stretch_QNAME = new QName("", "stretch");
     private final static QName _X_QNAME = new QName("", "x");
@@ -444,6 +445,15 @@ public class ObjectFactory {
     @XmlElementDecl(namespace = "", name = "view")
     public JAXBElement<Boolean> createView(Boolean value) {
         return new JAXBElement<Boolean>(_View_QNAME, Boolean.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link Boolean }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "", name = "cancel")
+    public JAXBElement<Boolean> createCancel(Boolean value) {
+        return new JAXBElement<Boolean>(_Cancel_QNAME, Boolean.class, null, value);
     }
 
     /**
