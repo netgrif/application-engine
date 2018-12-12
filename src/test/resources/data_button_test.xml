@@ -5,8 +5,22 @@
     <!-- ROLE -->
     <!-- DATA -->
     <data type="button">
-        <id>button</id>
+        <id>btn1</id>
         <title>button</title>
+        <placeholder>Button title</placeholder>
+        <desc>Button field description</desc>
+        <action trigger="set">
+            <!-- @formatter:off -->
+            sequence: f.num;
+            change sequence value { sequence.value + 1 }
+            <!-- @formatter:on -->
+        </action>
+    </data>
+    <data type="button">
+        <id>btn2</id>
+        <title>button</title>
+        <placeholder>Button title</placeholder>
+        <desc>Button field description</desc>
         <action trigger="set">
             <!-- @formatter:off -->
             sequence: f.num;
@@ -26,11 +40,15 @@
         <y>0</y>
         <label>task</label>
         <dataRef>
-            <id>button</id>
+            <id>btn1</id>
             <logic><behavior>editable</behavior></logic>
         </dataRef>
         <dataRef>
-            <id>number</id>
+            <id>btn2</id>
+            <logic><behavior>visible</behavior></logic>
+        </dataRef>
+        <dataRef>
+            <id>num</id>
             <logic><behavior>visible</behavior></logic>
         </dataRef>
     </transition>
