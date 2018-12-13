@@ -41,6 +41,7 @@
                     <xs:element ref="title"/>
                     <xs:element ref="name"/>
                 </xs:choice>
+                <xs:element ref="event" maxOccurs="unbounded" minOccurs="0"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
