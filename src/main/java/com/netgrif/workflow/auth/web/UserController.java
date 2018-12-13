@@ -11,6 +11,9 @@ import com.netgrif.workflow.auth.web.responsebodies.UserResource;
 import com.netgrif.workflow.auth.web.responsebodies.UserResourceAssembler;
 import com.netgrif.workflow.auth.web.responsebodies.UsersResource;
 import com.netgrif.workflow.petrinet.service.interfaces.IProcessRoleService;
+import com.netgrif.workflow.settings.domain.Preferences;
+import com.netgrif.workflow.settings.service.IPreferencesService;
+import com.netgrif.workflow.settings.web.PreferencesResource;
 import com.netgrif.workflow.workflow.web.responsebodies.MessageResource;
 import com.netgrif.workflow.workflow.web.responsebodies.ResourceLinkAssembler;
 import org.apache.log4j.Logger;
@@ -44,6 +47,9 @@ public class UserController {
     @Autowired
     private IAuthorityService authorityService;
 
+    @Autowired
+    private IPreferencesService preferencesService;
+
     @GetMapping
     public PagedResources<UserResource> getAll(@RequestParam(value = "small", required = false) Boolean small, Pageable pageable, PagedResourcesAssembler<User> assembler, Authentication auth, Locale locale) {
         small = small == null ? false : small;
@@ -66,13 +72,13 @@ public class UserController {
         return resources;
     }
 
-    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
+    @GetMapping("/{id}")
     public UserResource getUser(@PathVariable("id") Long userId, @RequestParam(value = "small", required = false) Boolean small, Locale locale) {
         small = small == null ? false : small;
         return new UserResource(userService.findById(userId, small), "profile", locale, small);
     }
 
-    @RequestMapping(value = "/me", method = RequestMethod.GET)
+    @GetMapping("/me")
     public UserResource getLoggedUser(@RequestParam(value = "small", required = false) Boolean small, Authentication auth, Locale locale) {
         small = small == null ? false : small;
         if (!small)
@@ -81,7 +87,7 @@ public class UserController {
             return new UserResource(((LoggedUser) auth.getPrincipal()).transformToUser(), "profile", locale);
     }
 
-    @RequestMapping(value = "/{id}", method = RequestMethod.POST)
+    @PostMapping("/{id}")
     public UsersResource updateUser(@PathVariable("id") Long userId, @RequestBody UpdateUserRequest updates, Authentication auth, Locale locale) {
         LoggedUser logged = (LoggedUser) auth.getPrincipal();
         if (!logged.isAdmin() && !Objects.equals(logged.getId(), userId)) {
@@ -94,7 +100,7 @@ public class UserController {
         }
     }
 
-    @RequestMapping(value = "/role", method = RequestMethod.POST)
+    @PostMapping("/role")
     public PagedResources<UserResource> getAllWithRole(@RequestBody Set<String> roleIds, @RequestParam(value = "small", required = false) Boolean small, Pageable pageable, PagedResourcesAssembler<User> assembler, Locale locale) {
         small = small == null ? false : small;
         Page<User> page = userService.findAllActiveByProcessRoles(roleIds, small, pageable);
@@ -105,7 +111,7 @@ public class UserController {
         return resources;
     }
 
-    @RequestMapping(value = "/{id}/role/assign", method = RequestMethod.POST)
+    @PostMapping("/{id}/role/assign")
     public MessageResource assignRolesToUser(@PathVariable("id") Long userId, @RequestBody Set<String> roleIds, Authentication auth) {
         try {
             processRoleService.assignRolesToUser(userId, roleIds, (LoggedUser) auth.getPrincipal());
@@ -118,15 +124,40 @@ public class UserController {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @RequestMapping(value = "/authority", method = RequestMethod.GET)
+    @GetMapping("/authority")
     public AuthoritiesResources getAllAuthorities(Authentication auth) {
         return new AuthoritiesResources(authorityService.findAll());
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @RequestMapping(value = "/{id}/authority/assign", method = RequestMethod.POST)
+    @PostMapping("/{id}/authority/assign")
     public MessageResource assignAuthorityToUser(@PathVariable("id") Long userId, @RequestBody Long authorityId) {
         userService.assignAuthority(userId, authorityId);
         return MessageResource.successMessage("Authority " + authorityId + " assigned to user " + userId);
+    }
+
+    @GetMapping("/preferences")
+    public PreferencesResource preferences(Authentication auth) {
+        Long userId = ((LoggedUser)auth.getPrincipal()).getId();
+        Preferences preferences = preferencesService.get(userId);
+
+        if (preferences == null) {
+            preferences = new Preferences(userId);
+        }
+
+        return new PreferencesResource(preferences);
+    }
+
+    @PostMapping("/preferences")
+    public MessageResource savePreferences(@RequestBody Preferences preferences, Authentication auth) {
+        try {
+            Long userId = ((LoggedUser) auth.getPrincipal()).getId();
+            preferences.setUserId(userId);
+            preferencesService.save(preferences);
+            return MessageResource.successMessage("User preferences saved");
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return MessageResource.errorMessage("Saving user preferences failed");
+        }
     }
 }
