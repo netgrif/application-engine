@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://modeler.netgrif.com/petriflow_schema.xsd">
+
+	<!-- ROLES -->
+	<role>
+        <id>worker</id>
+        <title>worker</title>
+    </role>
+    <role>
+        <id>manager</id>
+        <title>manager</title>
+    </role>
+
+	<!-- DATA -->
+	<data type="text" immediate="true">
+		<id>test_text_file</id>
+		<title>Field 1</title>
+	</data>
+
+	<!-- TRANSITIONS -->
+	<transition>
+		<id>2</id>
+		<x>327</x>
+		<y>196</y>
+		<label>Task (always enabled, autoAssign)</label>
+		<assignPolicy>auto</assignPolicy>
+
+		<roleRef>
+            <id>worker</id>
+            <logic>
+            	<perform>true</perform>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>manager</id>
+            <logic>
+            	<cancel>true</cancel>
+            </logic>
+        </roleRef>
+
+		<dataRef>
+			<id>test_text_file</id>
+			<logic>
+				<behavior>editable</behavior>
+			</logic>
+		</dataRef>
+
+	</transition>
+
+	<!-- PLACES -->
+	<place>
+		<id>1</id>
+		<x>177</x>
+		<y>194</y>
+		<label>start</label>
+		<tokens>1</tokens>
+		<isStatic>false</isStatic>
+	</place>
+
+	<!-- ARCS -->
+	<arc>
+		<id>4</id>
+		<type>read</type>
+		<sourceId>1</sourceId>
+		<destinationId>2</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+
+</document>
