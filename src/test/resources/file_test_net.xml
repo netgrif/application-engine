@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://modeler.netgrif.com/petriflow_schema.xsd">
+
+	<data type="file" immediate="true">
+		<id>file_1</id>
+		<title>File 1</title>
+	</data>
+
+	<data type="file" immediate="true">
+		<id>file_2</id>
+		<title>File 2</title>
+	</data>
+
+	<data type="file" immediate="true">
+		<id>file_3</id>
+		<title>File 3</title>
+	</data>
+	<!-- TRANSITIONS -->
+	<transition>
+		<id>2</id>
+		<x>327</x>
+		<y>196</y>
+		<label>Task (editable files)</label>
+		<assignPolicy>auto</assignPolicy>
+
+		<dataRef>
+			<id>file_1</id>
+			<logic>
+				<behavior>editable</behavior>
+			</logic>
+		</dataRef>
+
+		<dataRef>
+			<id>file_2</id>
+			<logic>
+				<behavior>editable</behavior>
+			</logic>
+		</dataRef>
+
+		<dataRef>
+			<id>file_3</id>
+			<logic>
+				<behavior>editable</behavior>
+			</logic>
+		</dataRef>
+	</transition>
+
+	<transition>
+		<id>6</id>
+		<x>327</x>
+		<y>250</y>
+		<label>Task (visible files)</label>
+		<assignPolicy>auto</assignPolicy>
+
+		<dataRef>
+			<id>file_1</id>
+			<logic>
+				<behavior>visible</behavior>
+			</logic>
+		</dataRef>
+
+		<dataRef>
+			<id>file_2</id>
+			<logic>
+				<behavior>visible</behavior>
+			</logic>
+		</dataRef>
+
+		<dataRef>
+			<id>file_3</id>
+			<logic>
+				<behavior>visible</behavior>
+			</logic>
+		</dataRef>
+	</transition>
+
+	<!-- PLACES -->
+	<place>
+		<id>1</id>
+		<x>177</x>
+		<y>194</y>
+		<label>start</label>
+		<tokens>1</tokens>
+		<isStatic>false</isStatic>
+	</place>
+	<!-- ARCS -->
+	<arc>
+		<id>4</id>
+		<type>read</type>
+		<sourceId>1</sourceId>
+		<destinationId>2</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>7</id>
+		<type>read</type>
+		<sourceId>1</sourceId>
+		<destinationId>6</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+</document>
