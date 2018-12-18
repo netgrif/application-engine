@@ -15,6 +15,8 @@ public interface IRegistrationService {
 
     void resetExpiredToken();
 
+    void changePassword(User user, String newPassword);
+
     boolean verifyToken(String token);
 
     User createNewUser(NewUserRequest newUser);
@@ -32,5 +34,4 @@ public interface IRegistrationService {
     String encodeToken(String email, String tokenKey);
 
     LocalDateTime generateExpirationDate();
-
 }

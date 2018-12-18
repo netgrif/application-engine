@@ -5,6 +5,7 @@ import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.auth.service.InvalidUserTokenException;
 import com.netgrif.workflow.auth.service.interfaces.IRegistrationService;
 import com.netgrif.workflow.auth.service.interfaces.IUserService;
+import com.netgrif.workflow.auth.web.requestbodies.ChangePasswordRequest;
 import com.netgrif.workflow.auth.web.requestbodies.NewUserRequest;
 import com.netgrif.workflow.auth.web.requestbodies.RegistrationRequest;
 import com.netgrif.workflow.auth.web.responsebodies.UserResource;
@@ -66,7 +67,7 @@ public class AuthenticationController {
             newUserRequest.email = URLDecoder.decode(newUserRequest.email, StandardCharsets.UTF_8.name());
             User user = registrationService.createNewUser(newUserRequest);
             if (user == null)
-                return MessageResource.errorMessage("User with email "+newUserRequest.email+" has been already registered.");
+                return MessageResource.errorMessage("User with email " + newUserRequest.email + " has been already registered.");
             mailService.sendRegistrationEmail(user);
 
             return MessageResource.successMessage("Mail was sent to " + user.getEmail());
@@ -124,4 +125,26 @@ public class AuthenticationController {
             return MessageResource.errorMessage("Invalid token!");
         }
     }
+
+    @PostMapping(value = "/changePassword")
+    public MessageResource changePassword(Authentication auth, @RequestBody ChangePasswordRequest request) {
+        try {
+            User user = userService.findByEmail(request.login, true);
+            String password = new String(Base64.getDecoder().decode(request.password));
+            if (user != null && userService.stringMatchesUserPassword(user, password)) {
+                registrationService.changePassword(
+                        user,
+                        new String(Base64.getDecoder().decode(request.newPassword))
+                );
+            } else {
+                return MessageResource.errorMessage("Incorrect credentials!");
+            }
+
+            return MessageResource.successMessage("Password is successfully changed.");
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return MessageResource.errorMessage("There has been a problem!");
+        }
+    }
+
 }

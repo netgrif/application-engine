@@ -40,6 +40,8 @@ public interface IUserService {
 
     void encodeUserPassword(User user);
 
+    boolean stringMatchesUserPassword(User user, String passwordToCompare);
+
     User getLoggedOrSystem();
 
     User getLoggedUser();
