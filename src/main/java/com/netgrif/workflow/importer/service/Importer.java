@@ -339,7 +339,7 @@ public class Importer {
         }
         if (importTransition.getEvent() != null) {
             importTransition.getEvent().forEach(event ->
-                    addEvent(transition, event)
+                    transition.addEvent(addEvent(transition.getImportId(), event))
             );
         }
 
@@ -354,30 +354,31 @@ public class Importer {
     }
 
     @Transactional
-    protected void addEvent(Transition transition, com.netgrif.workflow.importer.model.Event imported) {
+    protected Event addEvent(String transitionId, com.netgrif.workflow.importer.model.Event imported) {
         Event event = new Event();
         event.setImportId(imported.getId());
         event.setMessage(toI18NString(imported.getMessage()));
         event.setTitle(toI18NString(imported.getTitle()));
         event.setType(EventType.valueOf(imported.getType().value().toUpperCase()));
-        event.setPostActions(parsePostActions(transition, imported));
-        event.setPreActions(parsePreActions(transition, imported));
-        transition.addEvent(event);
+        event.setPostActions(parsePostActions(transitionId, imported));
+        event.setPreActions(parsePreActions(transitionId, imported));
+
+        return event;
     }
 
-    private List<Action> parsePostActions(Transition transition, com.netgrif.workflow.importer.model.Event imported) {
-        return parsePhaseActions(EventPhaseType.POST, transition, imported);
+    private List<Action> parsePostActions(String transitionId, com.netgrif.workflow.importer.model.Event imported) {
+        return parsePhaseActions(EventPhaseType.POST, transitionId, imported);
     }
 
-    private List<Action> parsePreActions(Transition transition, com.netgrif.workflow.importer.model.Event imported) {
-        return parsePhaseActions(EventPhaseType.PRE, transition, imported);
+    private List<Action> parsePreActions(String transitionId, com.netgrif.workflow.importer.model.Event imported) {
+        return parsePhaseActions(EventPhaseType.PRE, transitionId, imported);
     }
 
-    private List<Action> parsePhaseActions(EventPhaseType phase, Transition transition, com.netgrif.workflow.importer.model.Event imported) {
+    private List<Action> parsePhaseActions(EventPhaseType phase, String transitionId, com.netgrif.workflow.importer.model.Event imported) {
         List<Action> actionList = imported.getActions().stream()
                 .filter(actions -> actions.getPhase().equals(phase))
                 .map(actions -> actions.getAction().parallelStream()
-                        .map(action -> parseAction(transition.getImportId(), action)))
+                        .map(action -> parseAction(transitionId, action)))
                 .flatMap(Function.identity())
                 .collect(Collectors.toList());
         actionList.addAll(imported.getActions().stream()
@@ -606,7 +607,11 @@ public class Importer {
     @Transactional
     protected void createRole(Role importRole) {
         ProcessRole role = new ProcessRole();
+        Map<EventType, Event> events = createEventsMap(importRole.getEvent());
+
         role.setImportId(importRole.getId());
+        role.setEvents(events);
+
         if (importRole.getName() == null) {
             role.setName(toI18NString(importRole.getTitle()));
         } else {
@@ -620,6 +625,15 @@ public class Importer {
 
         net.addRole(role);
         roles.put(importRole.getId(), role);
+    }
+
+    private Map<EventType, Event> createEventsMap(List<com.netgrif.workflow.importer.model.Event> events) {
+        Map<EventType, Event> finalEvents = new HashMap<>();
+        events.forEach(event ->
+                finalEvents.put(EventType.valueOf(event.getType().value().toUpperCase()), addEvent(null, event))
+        );
+
+        return finalEvents;
     }
 
     @Transactional
