@@ -205,6 +205,7 @@ abstract class Field<T> extends Imported {
         clone.importId = this.importId
         clone.name = this.name
         clone.description = this.description
+        clone.placeholder = this.placeholder
         clone.order = this.order
         clone.immediate = this.immediate
         clone.actions = this.actions
