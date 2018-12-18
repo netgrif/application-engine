@@ -81,6 +81,11 @@ public class UserService implements IUserService {
     }
 
     @Override
+    public boolean stringMatchesUserPassword(User user, String passwordToCompare) {
+        return bCryptPasswordEncoder.matches(passwordToCompare, user.getPassword());
+    }
+
+    @Override
     public void addDefaultRole(User user) {
         user.addProcessRole(userProcessRoleService.findDefault());
     }
