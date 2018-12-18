@@ -39,6 +39,7 @@ public class ObjectFactory {
     private final static QName _ActionRef_QNAME = new QName("", "actionRef");
     private final static QName _Remote_QNAME = new QName("", "remote");
     private final static QName _Name_QNAME = new QName("", "name");
+    private final static QName _Message_QNAME = new QName("", "message");
     private final static QName _TransitionRef_QNAME = new QName("", "transitionRef");
     private final static QName _Perform_QNAME = new QName("", "perform");
     private final static QName _Delegate_QNAME = new QName("", "delegate");
@@ -54,7 +55,6 @@ public class ObjectFactory {
     private final static QName _AssignPolicy_QNAME = new QName("", "assignPolicy");
     private final static QName _DataFocusPolicy_QNAME = new QName("", "dataFocusPolicy");
     private final static QName _FinishPolicy_QNAME = new QName("", "finishPolicy");
-    private final static QName _Message_QNAME = new QName("", "message");
     private final static QName _Tokens_QNAME = new QName("", "tokens");
     private final static QName _IsStatic_QNAME = new QName("", "isStatic");
     private final static QName _Static_QNAME = new QName("", "static");
@@ -157,6 +157,22 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link Event }
+     * 
+     */
+    public Event createEvent() {
+        return new Event();
+    }
+
+    /**
+     * Create an instance of {@link Actions }
+     * 
+     */
+    public Actions createActions() {
+        return new Actions();
+    }
+
+    /**
      * Create an instance of {@link Mapping }
      * 
      */
@@ -218,22 +234,6 @@ public class ObjectFactory {
      */
     public TransactionRef createTransactionRef() {
         return new TransactionRef();
-    }
-
-    /**
-     * Create an instance of {@link Event }
-     * 
-     */
-    public Event createEvent() {
-        return new Event();
-    }
-
-    /**
-     * Create an instance of {@link Actions }
-     * 
-     */
-    public Actions createActions() {
-        return new Actions();
     }
 
     /**
@@ -412,6 +412,15 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link I18NStringType }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "", name = "message")
+    public JAXBElement<I18NStringType> createMessage(I18NStringType value) {
+        return new JAXBElement<I18NStringType>(_Message_QNAME, I18NStringType.class, null, value);
+    }
+
+    /**
      * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
      * 
      */
@@ -544,15 +553,6 @@ public class ObjectFactory {
     @XmlElementDecl(namespace = "", name = "finishPolicy")
     public JAXBElement<FinishPolicyType> createFinishPolicy(FinishPolicyType value) {
         return new JAXBElement<FinishPolicyType>(_FinishPolicy_QNAME, FinishPolicyType.class, null, value);
-    }
-
-    /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link I18NStringType }{@code >}}
-     * 
-     */
-    @XmlElementDecl(namespace = "", name = "message")
-    public JAXBElement<I18NStringType> createMessage(I18NStringType value) {
-        return new JAXBElement<I18NStringType>(_Message_QNAME, I18NStringType.class, null, value);
     }
 
     /**
