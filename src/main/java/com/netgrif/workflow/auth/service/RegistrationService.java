@@ -73,6 +73,13 @@ public class RegistrationService implements IRegistrationService {
     }
 
     @Override
+    public void changePassword(User user, String newPassword) {
+        user.setPassword(newPassword);
+        userService.encodeUserPassword(user);
+        userRepository.save(user);
+    }
+
+    @Override
     public boolean verifyToken(String token) {
         try {
             String[] tokenParts = decodeToken(token);
