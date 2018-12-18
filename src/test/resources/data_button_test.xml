@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="../../main/resources/petriNets/petriflow_schema.xsd">
+    <defaultRole>true</defaultRole>
+    <!-- ROLE -->
+    <!-- DATA -->
+    <data type="button">
+        <id>btn1</id>
+        <title>button</title>
+        <placeholder>Button title</placeholder>
+        <desc>Button field description</desc>
+        <action trigger="set">
+            <!-- @formatter:off -->
+            sequence: f.num;
+            change sequence value { sequence.value + 1 }
+            <!-- @formatter:on -->
+        </action>
+    </data>
+    <data type="button">
+        <id>btn2</id>
+        <title>button</title>
+        <placeholder>Button title</placeholder>
+        <desc>Button field description</desc>
+        <action trigger="set">
+            <!-- @formatter:off -->
+            sequence: f.num;
+            change sequence value { sequence.value + 1 }
+            <!-- @formatter:on -->
+        </action>
+    </data>
+    <data type="number">
+        <id>num</id>
+        <title>number</title>
+        <init>0</init>
+    </data>
+    <!-- TRANSITIONS -->
+    <transition>
+        <id>task</id>
+        <x>0</x>
+        <y>0</y>
+        <label>task</label>
+        <dataRef>
+            <id>btn1</id>
+            <logic><behavior>editable</behavior></logic>
+        </dataRef>
+        <dataRef>
+            <id>btn2</id>
+            <logic><behavior>visible</behavior></logic>
+        </dataRef>
+        <dataRef>
+            <id>num</id>
+            <logic><behavior>visible</behavior></logic>
+        </dataRef>
+    </transition>
+    <!-- PLACES -->
+    <!-- ARCS -->
+</document>
