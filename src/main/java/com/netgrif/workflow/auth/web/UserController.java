@@ -88,15 +88,21 @@ public class UserController {
     }
 
     @PostMapping("/{id}")
-    public UsersResource updateUser(@PathVariable("id") Long userId, @RequestBody UpdateUserRequest updates, Authentication auth, Locale locale) {
+    public UserResource updateUser(@PathVariable("id") Long userId, @RequestBody UpdateUserRequest updates, Authentication auth, Locale locale) {
         LoggedUser logged = (LoggedUser) auth.getPrincipal();
+        User user = userService.findById(userId, false);
+        if (user == null)
+            return null;
+
         if (!logged.isAdmin() && !Objects.equals(logged.getId(), userId)) {
             return null;
         }
         if (!logged.isAdmin() && Objects.equals(logged.getId(), userId)) {
-            return null; //TODO update user
+            user = userService.update(user, updates);
+            return new UserResource(user, "profile", locale);
         } else {
-            return null; //TODO update user
+            user = userService.update(user, updates);
+            return new UserResource(user, "profile", locale);
         }
     }
 

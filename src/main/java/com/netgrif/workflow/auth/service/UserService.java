@@ -5,6 +5,7 @@ import com.netgrif.workflow.auth.domain.repositories.AuthorityRepository;
 import com.netgrif.workflow.auth.domain.repositories.UserRepository;
 import com.netgrif.workflow.auth.service.interfaces.IUserProcessRoleService;
 import com.netgrif.workflow.auth.service.interfaces.IUserService;
+import com.netgrif.workflow.auth.web.requestbodies.UpdateUserRequest;
 import com.netgrif.workflow.event.events.user.UserRegistrationEvent;
 import com.netgrif.workflow.orgstructure.domain.Member;
 import com.netgrif.workflow.orgstructure.service.IMemberService;
@@ -61,6 +62,24 @@ public class UserService implements IUserService {
         upsertGroupMember(savedUser);
         publisher.publishEvent(new UserRegistrationEvent(savedUser));
         return savedUser;
+    }
+
+    @Override
+    public User update(User user, UpdateUserRequest updates) {
+        if (updates.telNumber != null) {
+            user.setTelNumber(updates.telNumber);
+        }
+        if (updates.avatar != null) {
+            user.setAvatar(updates.avatar);
+        }
+        if (updates.name != null) {
+            user.setName(updates.name);
+        }
+        if (updates.surname != null) {
+            user.setSurname(updates.surname);
+        }
+        user = userRepository.save(user);
+        return user;
     }
 
     @Override
