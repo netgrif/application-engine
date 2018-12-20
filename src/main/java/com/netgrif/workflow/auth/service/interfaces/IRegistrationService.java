@@ -34,4 +34,6 @@ public interface IRegistrationService {
     String encodeToken(String email, String tokenKey);
 
     LocalDateTime generateExpirationDate();
+
+    boolean isPasswordSufficient(String password);
 }
