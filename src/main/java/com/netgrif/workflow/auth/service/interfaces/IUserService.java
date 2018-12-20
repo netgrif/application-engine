@@ -2,6 +2,7 @@ package com.netgrif.workflow.auth.service.interfaces;
 
 import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.auth.domain.User;
+import com.netgrif.workflow.auth.web.requestbodies.UpdateUserRequest;
 import com.netgrif.workflow.orgstructure.domain.Member;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -19,6 +20,8 @@ public interface IUserService {
     User save(User user);
 
     User saveNew(User user);
+
+    User update(User user, UpdateUserRequest updates);
 
     Member upsertGroupMember(User user);
 

@@ -129,15 +129,21 @@ public class AuthenticationController {
     @PostMapping(value = "/changePassword")
     public MessageResource changePassword(Authentication auth, @RequestBody ChangePasswordRequest request) {
         try {
-            User user = userService.findByEmail(request.login, true);
+            User user = userService.findByEmail(request.login, false);
+            if (user == null || request.password == null || request.newPassword == null) {
+                return MessageResource.errorMessage("Incorrect login!");
+            }
+
+            String newPassword = new String(Base64.getDecoder().decode(request.newPassword));
+            if (!registrationService.isPasswordSufficient(newPassword)) {
+                return MessageResource.errorMessage("Insufficient password!");
+            }
+
             String password = new String(Base64.getDecoder().decode(request.password));
-            if (user != null && userService.stringMatchesUserPassword(user, password)) {
-                registrationService.changePassword(
-                        user,
-                        new String(Base64.getDecoder().decode(request.newPassword))
-                );
+            if (userService.stringMatchesUserPassword(user, password)) {
+                registrationService.changePassword(user, newPassword);
             } else {
-                return MessageResource.errorMessage("Incorrect credentials!");
+                return MessageResource.errorMessage("Incorrect password!");
             }
 
             return MessageResource.successMessage("Password is successfully changed.");
