@@ -44,6 +44,8 @@ public class RegistrationService implements IRegistrationService {
     @Value("${server.auth.token-validity-period}")
     private int tokenValidityPeriod;
 
+    private static final int MIN_PASSWORD_LENGTH = 6;
+
     @Override
     @Transactional
     @Scheduled(cron = "0 0 1 * * *")
@@ -77,6 +79,7 @@ public class RegistrationService implements IRegistrationService {
         user.setPassword(newPassword);
         userService.encodeUserPassword(user);
         userRepository.save(user);
+        log.info("Changed password for user " + user.getEmail() + ".");
     }
 
     @Override
@@ -192,5 +195,10 @@ public class RegistrationService implements IRegistrationService {
     @Override
     public LocalDateTime generateExpirationDate() {
         return LocalDateTime.now().plusDays(tokenValidityPeriod);
+    }
+
+    @Override
+    public boolean isPasswordSufficient(String password) {
+        return password.length() >= MIN_PASSWORD_LENGTH;
     }
 }
