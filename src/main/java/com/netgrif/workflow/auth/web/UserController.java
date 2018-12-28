@@ -2,6 +2,7 @@ package com.netgrif.workflow.auth.web;
 
 import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.auth.domain.User;
+import com.netgrif.workflow.auth.service.UserDetailsServiceImpl;
 import com.netgrif.workflow.auth.service.interfaces.IAuthorityService;
 import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.auth.web.requestbodies.UpdateUserRequest;
@@ -9,7 +10,6 @@ import com.netgrif.workflow.auth.web.requestbodies.UserSearchRequestBody;
 import com.netgrif.workflow.auth.web.responsebodies.AuthoritiesResources;
 import com.netgrif.workflow.auth.web.responsebodies.UserResource;
 import com.netgrif.workflow.auth.web.responsebodies.UserResourceAssembler;
-import com.netgrif.workflow.auth.web.responsebodies.UsersResource;
 import com.netgrif.workflow.petrinet.service.interfaces.IProcessRoleService;
 import com.netgrif.workflow.settings.domain.Preferences;
 import com.netgrif.workflow.settings.service.IPreferencesService;
@@ -40,6 +40,9 @@ public class UserController {
 
     @Autowired
     private IUserService userService;
+
+    @Autowired
+    private UserDetailsServiceImpl userDetailsService;
 
     @Autowired
     private IProcessRoleService processRoleService;
@@ -94,16 +97,16 @@ public class UserController {
         if (user == null)
             return null;
 
-        if (!logged.isAdmin() && !Objects.equals(logged.getId(), userId)) {
+        if (!logged.isAdmin() && !Objects.equals(logged.getId(), userId))
             return null;
+
+        user = userService.update(user, updates);
+        if (Objects.equals(logged.getId(), userId)) {
+            logged.setFullName(user.getFullName());
+            userDetailsService.reloadSecurityContext(logged);
         }
-        if (!logged.isAdmin() && Objects.equals(logged.getId(), userId)) {
-            user = userService.update(user, updates);
-            return new UserResource(user, "profile", locale);
-        } else {
-            user = userService.update(user, updates);
-            return new UserResource(user, "profile", locale);
-        }
+        log.info("Updating user " + user.getEmail() + " with data " + updates.toString());
+        return new UserResource(user, "profile", locale);
     }
 
     @PostMapping("/role")
