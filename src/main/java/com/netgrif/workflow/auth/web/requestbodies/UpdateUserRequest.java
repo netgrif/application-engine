@@ -9,4 +9,14 @@ public class UpdateUserRequest {
 
     public UpdateUserRequest() {
     }
+
+    @Override
+    public String toString() {
+        return "UpdateUserRequest{" +
+                "telNumber='" + telNumber + '\'' +
+                ", avatar='" + avatar + '\'' +
+                ", name='" + name + '\'' +
+                ", surname='" + surname + '\'' +
+                '}';
+    }
 }
