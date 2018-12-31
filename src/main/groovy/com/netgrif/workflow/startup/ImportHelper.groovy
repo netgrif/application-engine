@@ -13,14 +13,12 @@ import com.netgrif.workflow.petrinet.domain.PetriNet
 import com.netgrif.workflow.petrinet.domain.dataset.Field
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldContainer
 import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository
-import com.netgrif.workflow.petrinet.service.PetriNetService
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.workflow.petrinet.web.requestbodies.UploadedFileMeta
 import com.netgrif.workflow.workflow.domain.Case
 import com.netgrif.workflow.workflow.domain.Filter
 import com.netgrif.workflow.workflow.domain.repositories.CaseRepository
 import com.netgrif.workflow.workflow.service.EventOutcome
-import com.netgrif.workflow.workflow.service.TaskService
 import com.netgrif.workflow.workflow.service.interfaces.IDataService
 import com.netgrif.workflow.workflow.service.interfaces.IFilterService
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService
@@ -28,12 +26,11 @@ import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService
 import com.netgrif.workflow.workflow.web.requestbodies.CreateFilterBody
 import com.netgrif.workflow.workflow.web.responsebodies.TaskReference
 import groovy.json.JsonOutput
-import org.apache.log4j.Logger
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.io.ResourceLoader
 import org.springframework.stereotype.Component
-
-import java.time.LocalDateTime
 
 @Component
 class ImportHelper {
@@ -46,7 +43,7 @@ class ImportHelper {
     public static final String FIELD_NUMBER = "number"
     public static final String FIELD_DATE = "date"
 
-    private static final Logger log = Logger.getLogger(ImportHelper.class.name)
+    private static final Logger log = LoggerFactory.getLogger(ImportHelper.class.name)
 
     @Autowired
     private PetriNetRepository petriNetRepository

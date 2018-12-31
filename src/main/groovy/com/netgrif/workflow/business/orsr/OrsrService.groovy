@@ -1,18 +1,19 @@
 package com.netgrif.workflow.business.orsr
 
-import org.apache.log4j.Logger
 import org.jsoup.HttpStatusException
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
 import org.jsoup.select.Elements
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 
 @Service
 @SuppressWarnings("GrMethodMayBeStatic")
 class OrsrService implements IOrsrService {
 
-    static final Logger log = Logger.getLogger(OrsrService.class.getName())
+    static final Logger log = LoggerFactory.getLogger(OrsrService.class.getName())
 
     def ORSR_URL_BASE = "http://www.orsr.sk/"
 
