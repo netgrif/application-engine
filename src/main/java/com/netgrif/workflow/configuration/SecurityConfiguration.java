@@ -22,7 +22,7 @@ import java.util.stream.Stream;
 @Configuration
 @Controller
 @EnableWebSecurity
-@Order(SecurityProperties.ACCESS_OVERRIDE_ORDER)
+@Order(SecurityProperties.BASIC_AUTH_ORDER)
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     private static final Logger log = LoggerFactory.getLogger(SecurityConfiguration.class);
