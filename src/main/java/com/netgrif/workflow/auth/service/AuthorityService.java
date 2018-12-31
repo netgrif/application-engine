@@ -5,8 +5,10 @@ import com.netgrif.workflow.auth.domain.repositories.AuthorityRepository;
 import com.netgrif.workflow.auth.service.interfaces.IAuthorityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class AuthorityService implements IAuthorityService {
@@ -20,6 +22,7 @@ public class AuthorityService implements IAuthorityService {
     }
 
     @Override
+    @Transactional
     public Authority getOrCreate(String name) {
         Authority authority = repository.findByName(name);
         if (authority == null)
@@ -48,6 +51,9 @@ public class AuthorityService implements IAuthorityService {
     }
 
     public Authority getOne(Long id){
-        return repository.findOne(id);
+        Optional<Authority> authority = repository.findById(id);
+        if (!authority.isPresent())
+            throw new IllegalArgumentException("Could not find authority with id ["+id+"]");
+        return authority.get();
     }
 }

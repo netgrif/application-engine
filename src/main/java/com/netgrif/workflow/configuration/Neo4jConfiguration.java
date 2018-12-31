@@ -1,6 +1,5 @@
 package com.netgrif.workflow.configuration;
 
-import org.neo4j.ogm.drivers.http.driver.HttpDriver;
 import org.neo4j.ogm.session.SessionFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -22,12 +21,10 @@ public class Neo4jConfiguration {
 
     @Bean
     public org.neo4j.ogm.config.Configuration getConfiguration() {
-        org.neo4j.ogm.config.Configuration config = new org.neo4j.ogm.config.Configuration();
-        config.driverConfiguration()
-                .setDriverClassName(HttpDriver.class.getName())
-                .setCredentials(USERNAME, PASSWORD)
-                .setURI(URL);
-        return config;
+        return new org.neo4j.ogm.config.Configuration.Builder()
+                .uri(URL)
+                .credentials(USERNAME, PASSWORD)
+                .build();
     }
 
     @Bean(name = "sessionFactory")

@@ -71,7 +71,7 @@ public class TaskServiceTest {
 
     @Before
     public void setUp() throws Exception {
-        mongoTemplate.getDb().dropDatabase();
+        mongoTemplate.getDb().drop();
         taskRepository.deleteAll();
         userRunner.run("");
 
@@ -111,14 +111,14 @@ public class TaskServiceTest {
         assert task != null;
 
         service.assignTask(user.transformToLoggedUser(), task.getStringId());
-        useCase = caseRepository.findOne(useCase.getStringId());
+        useCase = caseRepository.findById(useCase.getStringId()).get();
 
         assert useCase.getResetArcTokens().size() == 1;
         assert useCase.getResetArcTokens().values().contains(5);
         assert useCase.getActivePlaces().size() == 0;
 
         service.cancelTask(user.transformToLoggedUser(), task.getStringId());
-        useCase = caseRepository.findOne(useCase.getStringId());
+        useCase = caseRepository.findById(useCase.getStringId()).get();
 
         assert useCase.getResetArcTokens().size() == 0;
         assert useCase.getActivePlaces().size() == 1;

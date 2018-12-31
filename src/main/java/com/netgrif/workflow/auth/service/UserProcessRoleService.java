@@ -46,7 +46,7 @@ public class UserProcessRoleService implements IUserProcessRoleService {
             userRole.setNetId(netId);
             userProcessRoles.add(userRole);
         }
-        return repository.save(userProcessRoles);
+        return repository.saveAll(userProcessRoles);
     }
 
     @Override

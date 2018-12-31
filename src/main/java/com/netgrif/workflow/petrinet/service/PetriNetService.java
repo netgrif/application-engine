@@ -17,7 +17,8 @@ import com.netgrif.workflow.petrinet.web.requestbodies.UploadedFileMeta;
 import com.netgrif.workflow.petrinet.web.responsebodies.DataFieldReference;
 import com.netgrif.workflow.petrinet.web.responsebodies.PetriNetReference;
 import com.netgrif.workflow.petrinet.web.responsebodies.TransitionReference;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,7 +49,7 @@ import static com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService.
 @Service
 public abstract class PetriNetService implements IPetriNetService {
 
-    private static final Logger log = Logger.getLogger(PetriNetService.class);
+    private static final Logger log = LoggerFactory.getLogger(PetriNetService.class);
 
     @Lookup("importer")
     abstract Importer getImporter();
@@ -74,10 +75,11 @@ public abstract class PetriNetService implements IPetriNetService {
     public PetriNet clone(ObjectId petriNetId) {
         PetriNet net = cache.get(petriNetId);
         if (net == null) {
-            net = repository.findOne(petriNetId.toString());
-            if (net == null) {
+            Optional<PetriNet> optional = repository.findById(petriNetId.toString());
+            if (!optional.isPresent()) {
                 throw new IllegalArgumentException("Petri net with id [" + petriNetId + "] not found");
             }
+            net = optional.get();
             cache.put(petriNetId, net);
         }
         return net.clone();
@@ -175,7 +177,7 @@ public abstract class PetriNetService implements IPetriNetService {
             });
         });
 
-        return processRoleRepository.save(newRoles);
+        return processRoleRepository.saveAll(newRoles);
     }
 
     private void setupImportedPetriNet(PetriNet net, File xmlFile, UploadedFileMeta meta, LoggedUser user) throws IOException {
@@ -201,12 +203,12 @@ public abstract class PetriNetService implements IPetriNetService {
 
     @Override
     public PetriNet getPetriNet(String id) {
-        PetriNet net = repository.findOne(id);
-        if (net == null)
+        Optional<PetriNet> net = repository.findById(id);
+        if (!net.isPresent())
             throw new IllegalArgumentException("No Petri net with id: " + id + " was found.");
 
-        net.initializeArcs();
-        return net;
+        net.get().initializeArcs();
+        return net.get();
     }
 
     @Override
@@ -309,7 +311,7 @@ public abstract class PetriNetService implements IPetriNetService {
 
     @Override
     public List<TransitionReference> getTransitionReferences(List<String> netIds, LoggedUser user, Locale locale) {
-        Iterable<PetriNet> nets = repository.findAll(netIds);
+        Iterable<PetriNet> nets = repository.findAllById(netIds);
         List<TransitionReference> references = new ArrayList<>();
 
         nets.forEach(net -> references.addAll(net.getTransitions().entrySet().stream()
@@ -320,7 +322,7 @@ public abstract class PetriNetService implements IPetriNetService {
 
     @Override
     public List<DataFieldReference> getDataFieldReferences(List<TransitionReference> transitions, Locale locale) {
-        Iterable<PetriNet> nets = repository.findAll(transitions.stream().map(TransitionReference::getPetriNetId).collect(Collectors.toList()));
+        Iterable<PetriNet> nets = repository.findAllById(transitions.stream().map(TransitionReference::getPetriNetId).collect(Collectors.toList()));
         List<DataFieldReference> dataRefs = new ArrayList<>();
         Map<String, List<TransitionReference>> transitionReferenceMap = transitions.stream()
                 .collect(Collectors.groupingBy(TransitionReference::getPetriNetId));
