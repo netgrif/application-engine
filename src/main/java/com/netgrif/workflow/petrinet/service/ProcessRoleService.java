@@ -193,8 +193,10 @@ public class ProcessRoleService implements IProcessRoleService {
 
     @Override
     public List<ProcessRole> findAll(String netId) {
-        PetriNet net = netRepository.findOne(netId);
-        return new LinkedList<>(net.getRoles().values());
+        Optional<PetriNet> netOptional = netRepository.findById(netId);
+        if (!netOptional.isPresent())
+            throw new IllegalArgumentException("Could not find model with id ["+netId+"]");
+        return new LinkedList<>(netOptional.get().getRoles().values());
     }
 
     @Override

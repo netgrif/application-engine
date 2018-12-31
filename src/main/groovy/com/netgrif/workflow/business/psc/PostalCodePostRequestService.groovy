@@ -5,11 +5,13 @@ import groovyx.net.http.ContentType
 import groovyx.net.http.HTTPBuilder
 import groovyx.net.http.HttpResponseDecorator
 import groovyx.net.http.Method
-import org.apache.log4j.Logger
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
+
 //@Service
 class PostalCodePostRequestService {
 
-    private static final Logger log = Logger.getLogger(PostalCodePostRequestService.class.name)
+    private static final Logger log = LoggerFactory.getLogger(PostalCodePostRequestService.class.name)
 
     List<PostalCode> getByCode(String code) {
         def json = makeRequest(code)

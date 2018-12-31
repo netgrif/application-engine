@@ -5,7 +5,8 @@ import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedField;
 import com.netgrif.workflow.utils.DateUtils;
 import com.netgrif.workflow.workflow.domain.Case;
 import lombok.Getter;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -13,7 +14,7 @@ import java.util.Map;
 
 public class SaveCaseDataEvent extends CaseEvent {
 
-    private static final Logger log = Logger.getLogger(SaveCaseDataEvent.class);
+    private static final Logger log = LoggerFactory.getLogger(SaveCaseDataEvent.class);
 
     @Getter
     private Collection<ChangedField> data;

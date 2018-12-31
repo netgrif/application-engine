@@ -20,10 +20,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -106,9 +103,13 @@ public class UserService implements IUserService {
 
     @Override
     public User findById(Long id, boolean small) {
-        User user = userRepository.findOne(id);
-        if (!small) return loadProcessRoles(user);
-        return user;
+        Optional<User> user = userRepository.findById(id);
+        if (!user.isPresent())
+            throw new IllegalArgumentException("Could not find user with id ["+id+"]");
+        if (!small) {
+            return loadProcessRoles(user.get());
+        }
+        return user.get();
     }
 
     @Override
@@ -186,13 +187,18 @@ public class UserService implements IUserService {
 
     @Override
     public void assignAuthority(Long userId, Long authorityId) {
-        User user = userRepository.findOne(userId);
-        Authority authority = authorityRepository.findOne(authorityId);
+        Optional<User> user = userRepository.findById(userId);
+        Optional<Authority> authority = authorityRepository.findById(authorityId);
 
-        user.addAuthority(authority);
-        authority.addUser(user);
+        if (!user.isPresent())
+            throw new IllegalArgumentException("Could not find user with id ["+userId+"]");
+        if (!authority.isPresent())
+            throw new IllegalArgumentException("Could not find authority with id ["+authorityId+"]");
 
-        userRepository.save(user);
+        user.get().addAuthority(authority.get());
+        authority.get().addUser(user.get());
+
+        userRepository.save(user.get());
     }
 
     @Override
@@ -225,7 +231,7 @@ public class UserService implements IUserService {
     private User loadProcessRoles(User user) {
         if (user == null)
             return null;
-        user.setProcessRoles(processRoleRepository.findAll(user.getUserProcessRoles()
+        user.setProcessRoles(processRoleRepository.findAllById(user.getUserProcessRoles()
                 .stream().map(UserProcessRole::getRoleId).collect(Collectors.toList())));
         return user;
     }

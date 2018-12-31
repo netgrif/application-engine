@@ -2,7 +2,8 @@ package com.netgrif.workflow.workflow.service;
 
 import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.auth.service.interfaces.IUserService;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -21,7 +22,7 @@ import java.util.function.Predicate;
 @Service
 public class MongoSearchService<T> {
 
-    private static final Logger log = Logger.getLogger(MongoSearchService.class.getName());
+    private static final Logger log = LoggerFactory.getLogger(MongoSearchService.class.getName());
     private static final String ERROR_KEY = "ERROR";
 
     @Autowired
