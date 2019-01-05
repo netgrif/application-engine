@@ -44,7 +44,8 @@ public class RegistrationService implements IRegistrationService {
     @Value("${server.auth.token-validity-period}")
     private int tokenValidityPeriod;
 
-    private static final int MIN_PASSWORD_LENGTH = 6;
+    @Value("${server.auth.minimal-password-length}")
+    private int minimalPasswordLength;
 
     @Override
     @Transactional
@@ -199,6 +200,6 @@ public class RegistrationService implements IRegistrationService {
 
     @Override
     public boolean isPasswordSufficient(String password) {
-        return password.length() >= MIN_PASSWORD_LENGTH;
+        return password.length() >= minimalPasswordLength;
     }
 }
