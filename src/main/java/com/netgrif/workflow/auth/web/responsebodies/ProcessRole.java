@@ -1,14 +1,11 @@
 package com.netgrif.workflow.auth.web.responsebodies;
 
-import com.fasterxml.jackson.annotation.JsonRootName;
-import com.netgrif.workflow.petrinet.domain.roles.ProcessRole;
 import lombok.Data;
 
 import java.util.Locale;
 
 @Data
-@JsonRootName("processRole")
-public class LocalisedProcessRole {
+public class ProcessRole {
 
     private String stringId;
 
@@ -16,7 +13,7 @@ public class LocalisedProcessRole {
 
     private String description;
 
-    public LocalisedProcessRole(ProcessRole role, Locale locale) {
+    public ProcessRole(com.netgrif.workflow.petrinet.domain.roles.ProcessRole role, Locale locale) {
         stringId = role.getStringId();
         name = role.getLocalisedName(locale);
         description = role.getDescription();
