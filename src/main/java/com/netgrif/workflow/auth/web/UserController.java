@@ -18,6 +18,7 @@ import com.netgrif.workflow.workflow.web.responsebodies.MessageResource;
 import com.netgrif.workflow.workflow.web.responsebodies.ResourceLinkAssembler;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedResourcesAssembler;
@@ -52,6 +53,9 @@ public class UserController {
 
     @Autowired
     private IPreferencesService preferencesService;
+
+    @Value("${server.auth.enable-profile-edit}")
+    private boolean enableProfileEdit;
 
     @GetMapping
     public PagedResources<UserResource> getAll(@RequestParam(value = "small", required = false) Boolean small, Pageable pageable, PagedResourcesAssembler<User> assembler, Authentication auth, Locale locale) {
@@ -92,12 +96,11 @@ public class UserController {
 
     @PostMapping("/{id}")
     public UserResource updateUser(@PathVariable("id") Long userId, @RequestBody UpdateUserRequest updates, Authentication auth, Locale locale) {
+        if (!enableProfileEdit) return null;
+
         LoggedUser logged = (LoggedUser) auth.getPrincipal();
         User user = userService.findById(userId, false);
-        if (user == null)
-            return null;
-
-        if (!logged.isAdmin() && !Objects.equals(logged.getId(), userId))
+        if (user == null || (!logged.isAdmin() && !Objects.equals(logged.getId(), userId)))
             return null;
 
         user = userService.update(user, updates);
