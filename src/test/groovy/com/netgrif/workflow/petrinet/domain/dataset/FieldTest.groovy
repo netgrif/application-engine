@@ -55,7 +55,7 @@ class FieldTest {
 
     @Test
     void testImport() {
-        template.db.dropDatabase()
+        template.db.drop()
         userRepository.deleteAll()
         roleRepository.deleteAll()
         roleRunner.run()

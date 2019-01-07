@@ -78,7 +78,7 @@ class EventTest {
 
     @Test
     void testEventImport() {
-        template.db.dropDatabase()
+        template.db.drop()
         userRepository.deleteAll()
         userRunner.run("")
         roleRepository.deleteAll()
@@ -113,7 +113,10 @@ class EventTest {
     }
 
     private void assertActionsRuned(String fieldIdWithoutPhase, String message) {
-        instance = caseRepository.findOne(instance.stringId)
+        def instanceOptional = caseRepository.findById(instance.stringId)
+
+        assert instanceOptional.isPresent()
+        instance = instanceOptional.get()
 
         assert instance.dataSet["${fieldIdWithoutPhase}_pre" as String].value as String == "${fieldIdWithoutPhase}_pre"
         assert instance.dataSet["${fieldIdWithoutPhase}_post" as String].value as String == "${fieldIdWithoutPhase}_post"

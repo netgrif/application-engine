@@ -124,9 +124,9 @@ public class PetriNetController {
 
     @RequestMapping(value = "/{netId}/roles", method = GET)
     public @ResponseBody
-    LocalisedRolesResource getRoles(@PathVariable("netId") String netId, Locale locale) {
+    ProcessRolesResource getRoles(@PathVariable("netId") String netId, Locale locale) {
         netId = decodeUrl(netId);
-        return new LocalisedRolesResource(roleService.findAll(netId), netId, locale);
+        return new ProcessRolesResource(roleService.findAll(netId), netId, locale);
     }
 
     @RequestMapping(value = "/{netId}/transactions", method = GET)
