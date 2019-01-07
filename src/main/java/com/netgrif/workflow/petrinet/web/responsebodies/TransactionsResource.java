@@ -10,15 +10,15 @@ import java.util.Collection;
 import java.util.Locale;
 import java.util.stream.Collectors;
 
-public class TransactionsResource extends Resources<LocalisedTransactionResource> {
+public class TransactionsResource extends Resources<TransactionResource> {
 
-    public TransactionsResource(Iterable<LocalisedTransactionResource> content, String netId) {
+    public TransactionsResource(Iterable<TransactionResource> content, String netId) {
         super(content, new ArrayList<>());
         buildLinks(netId);
     }
 
     public TransactionsResource(Collection<Transaction> content, String netId, Locale locale){
-        this(content.stream().map(t -> new LocalisedTransactionResource(t, locale)).collect(Collectors.toList()), netId);
+        this(content.stream().map(t -> new TransactionResource(t, locale)).collect(Collectors.toList()), netId);
     }
 
     private void buildLinks(String netId) {

@@ -9,15 +9,15 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 
 
-public class LocalisedTaskResource extends Resource<LocalisedTask> {
+public class LocalisedTaskResource extends Resource<Task> {
 
-    public LocalisedTaskResource(LocalisedTask content) {
+    public LocalisedTaskResource(Task content) {
         super(content, new ArrayList<Link>());
         buildLinks();
     }
 
     private void buildLinks() {
-        LocalisedTask task = getContent();
+        Task task = getContent();
         add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
                 .getOne(task.getStringId(), null)).withSelfRel());
         add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)

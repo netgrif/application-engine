@@ -71,7 +71,7 @@ class ActionRefTest {
 
     @Test
     void testEventImport() {
-        template.db.dropDatabase()
+        template.db.drop()
         userRepository.deleteAll()
         roleRepository.deleteAll()
         roleRunner.run()

@@ -81,7 +81,7 @@ public class TaskController {
         Task task = taskService.findById(taskId);
         if (task == null)
             return null;
-        return new LocalisedTaskResource(new LocalisedTask(task, locale));
+        return new LocalisedTaskResource(new com.netgrif.workflow.workflow.web.responsebodies.Task(task, locale));
     }
 
     @RequestMapping(value = "/assign/{id}", method = RequestMethod.GET)

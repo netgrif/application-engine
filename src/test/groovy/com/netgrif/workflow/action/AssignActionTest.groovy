@@ -117,7 +117,7 @@ class AssignActionTest {
     }
 
     private void cleanDatabases() {
-        template.db.dropDatabase()
+        template.db.drop()
         userRepository.deleteAll()
         userProcessRoleRepository.deleteAll()
     }

@@ -31,7 +31,7 @@ class TestHelper {
     private DefaultRoleRunner roleRunner
 
     void truncateDbs() {
-        template.db.dropDatabase()
+        template.db.drop()
         userRepository.deleteAll()
         roleRepository.deleteAll()
         roleRunner.run()
