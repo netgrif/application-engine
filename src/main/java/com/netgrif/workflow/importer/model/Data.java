@@ -268,11 +268,11 @@ public class Data {
 
     /**
      * Gets the value of the format property.
-     *
+     * 
      * @return
      *     possible object is
      *     {@link Format }
-     *
+     *     
      */
     public Format getFormat() {
         return format;
@@ -280,11 +280,11 @@ public class Data {
 
     /**
      * Sets the value of the format property.
-     *
+     * 
      * @param value
      *     allowed object is
      *     {@link Format }
-     *
+     *     
      */
     public void setFormat(Format value) {
         this.format = value;
@@ -292,11 +292,11 @@ public class Data {
 
     /**
      * Gets the value of the view property.
-     *
+     * 
      * @return
      *     possible object is
      *     {@link FieldView }
-     *
+     *     
      */
     public FieldView getView() {
         return view;
@@ -304,11 +304,11 @@ public class Data {
 
     /**
      * Sets the value of the view property.
-     *
+     * 
      * @param value
      *     allowed object is
      *     {@link FieldView }
-     *
+     *     
      */
     public void setView(FieldView value) {
         this.view = value;
