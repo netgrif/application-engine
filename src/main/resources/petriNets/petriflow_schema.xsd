@@ -23,6 +23,9 @@
                 <xs:element ref="valid" minOccurs="0" maxOccurs="unbounded"/>
                 <xs:element ref="init" minOccurs="0"/>
                 <xs:element ref="format" minOccurs="0"/>
+                <xs:choice>
+                    <xs:element name="view" minOccurs="0" type="fieldView"/>
+                </xs:choice>
                 <xs:element ref="encryption" minOccurs="0"/>
                 <xs:element ref="action" minOccurs="0" maxOccurs="unbounded"/>
                 <xs:element ref="actionRef" minOccurs="0" maxOccurs="unbounded"/>
@@ -448,6 +451,18 @@
     <xs:complexType name="actionRefType">
         <xs:sequence>
             <xs:element ref="id"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="fieldView">
+        <xs:choice>
+            <xs:element name="area" type="xs:string"/>
+            <xs:element name="image" type="booleanImageView"/>
+        </xs:choice>
+    </xs:complexType>
+    <xs:complexType name="booleanImageView">
+        <xs:sequence>
+            <xs:element name="true" type="xs:string"/>
+            <xs:element name="false" type="xs:string"/>
         </xs:sequence>
     </xs:complexType>
     <xs:element name="format">
