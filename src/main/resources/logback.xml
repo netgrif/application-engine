@@ -33,6 +33,12 @@
     <!-- CUSTOM CONFIG -->
     <logger name="org.apache.pdfbox.pdmodel" level="ERROR"/>
     <logger name="org.neo4j.ogm.drivers.http.request" level="ERROR"/>
+    <logger name="com.netgrif.workflow.ControllerRequestLoggingFilter">
+        <level value="DEBUG" />
+    </logger>
+    <logger name="org.springframework.web.filter.CommonsRequestLoggingFilter">
+        <level value="DEBUG" />
+    </logger>
 
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
