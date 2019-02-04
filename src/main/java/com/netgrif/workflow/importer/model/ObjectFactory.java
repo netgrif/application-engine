@@ -102,7 +102,7 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link Format }
-     * 
+     *
      */
     public Format createFormat() {
         return new Format();
@@ -110,10 +110,18 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link Currency }
-     * 
+     *
      */
     public Currency createCurrency() {
         return new Currency();
+    }
+
+    /**
+     * Create an instance of {@link FieldView }
+     *
+     */
+    public FieldView createFieldView() {
+        return new FieldView();
     }
 
     /**
@@ -158,7 +166,7 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link Event }
-     * 
+     *
      */
     public Event createEvent() {
         return new Event();
@@ -166,7 +174,7 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link Actions }
-     * 
+     *
      */
     public Actions createActions() {
         return new Actions();
@@ -277,6 +285,14 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link BooleanImageView }
+     *
+     */
+    public BooleanImageView createBooleanImageView() {
+        return new BooleanImageView();
+    }
+
+    /**
      * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
      * 
      */
@@ -341,7 +357,7 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
-     * 
+     *
      */
     @XmlElementDecl(namespace = "", name = "code", defaultValue = "EUR")
     public JAXBElement<String> createCode(String value) {
@@ -350,7 +366,7 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link Integer }{@code >}}
-     * 
+     *
      */
     @XmlElementDecl(namespace = "", name = "fractionSize", defaultValue = "2")
     public JAXBElement<Integer> createFractionSize(Integer value) {
@@ -359,7 +375,7 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
-     * 
+     *
      */
     @XmlElementDecl(namespace = "", name = "locale")
     public JAXBElement<String> createLocale(String value) {
@@ -413,7 +429,7 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link I18NStringType }{@code >}}
-     * 
+     *
      */
     @XmlElementDecl(namespace = "", name = "message")
     public JAXBElement<I18NStringType> createMessage(I18NStringType value) {
@@ -458,7 +474,7 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link Boolean }{@code >}}
-     * 
+     *
      */
     @XmlElementDecl(namespace = "", name = "cancel")
     public JAXBElement<Boolean> createCancel(Boolean value) {
