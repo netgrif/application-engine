@@ -147,7 +147,7 @@ public class WorkflowService implements IWorkflowService {
         useCase = save(useCase);
 
         publisher.publishEvent(new CreateCaseEvent(useCase));
-        log.info("Case " + title + " created");
+        log.info("["+useCase.getStringId()+"]: Case " + title + " created");
 
         useCase.getPetriNet().initializeVarArcs(useCase.getDataSet());
         taskService.reloadTasks(useCase);
@@ -169,6 +169,8 @@ public class WorkflowService implements IWorkflowService {
     @Override
     public void deleteCase(String caseId) {
         Case useCase = repository.findOne(caseId);
+        log.info("["+caseId+"]: Deleting case " + useCase.getTitle());
+
         taskService.deleteTasksByCase(caseId);
         repository.delete(useCase);
 

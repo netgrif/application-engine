@@ -1,6 +1,5 @@
-package com.netgrif.workflow.configuration;
+package com.netgrif.workflow.configuration.logging;
 
-import com.netgrif.workflow.ControllerRequestLoggingFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.filter.CommonsRequestLoggingFilter;
