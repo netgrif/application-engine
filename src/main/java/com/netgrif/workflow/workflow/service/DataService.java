@@ -24,6 +24,7 @@ import com.netgrif.workflow.workflow.domain.Task;
 import com.netgrif.workflow.workflow.service.interfaces.IDataService;
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
@@ -38,6 +39,8 @@ import java.util.stream.LongStream;
 
 @Service
 public class DataService implements IDataService {
+
+    private static final Logger log = Logger.getLogger(DataService.class);
 
     @Autowired
     private ApplicationEventPublisher publisher;
@@ -67,6 +70,7 @@ public class DataService implements IDataService {
 
     @Override
     public List<Field> getData(Task task, Case useCase) {
+        log.info("[" + useCase.getStringId() + "]: Getting data of task " + task.getTransitionId() + " [" + task.getStringId() + "]");
         Transition transition = useCase.getPetriNet().getTransition(task.getTransitionId());
 
         Set<String> fieldsIds = transition.getDataSet().keySet();
@@ -112,6 +116,8 @@ public class DataService implements IDataService {
     public ChangedFieldContainer setData(String taskId, ObjectNode values) {
         Task task = taskService.findOne(taskId);
         Case useCase = workflowService.findOne(task.getCaseId());
+
+        log.info("[" + useCase.getStringId() + "]: Setting data of task " + task.getTransitionId() + " [" + task.getStringId() + "]");
 
         Map<String, ChangedField> changedFields = new HashMap<>();
         values.fields().forEachRemaining(entry -> {
@@ -253,6 +259,7 @@ public class DataService implements IDataService {
 
     @Override
     public Map<String, ChangedField> runActions(List<Action> actions, String useCaseId, Transition transition) {
+        log.info("[" + useCaseId + "]: Running actions of transition " + transition.getStringId());
         Map<String, ChangedField> changedFields = new HashMap<>();
         if (actions.isEmpty())
             return changedFields;
