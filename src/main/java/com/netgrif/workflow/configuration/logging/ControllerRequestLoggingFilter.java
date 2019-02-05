@@ -6,6 +6,13 @@ import javax.servlet.http.HttpServletRequest;
 
 public class ControllerRequestLoggingFilter extends CommonsRequestLoggingFilter {
 
+    public ControllerRequestLoggingFilter() {
+        super.setIncludeQueryString(true);
+        super.setIncludeHeaders(true);
+        super.setBeforeMessagePrefix("");
+        super.setBeforeMessageSuffix("");
+    }
+
     @Override
     protected boolean shouldLog(HttpServletRequest request) {
         return request.getRequestURI().contains("/api");
