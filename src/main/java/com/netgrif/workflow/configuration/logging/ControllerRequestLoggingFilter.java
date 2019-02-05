@@ -1,4 +1,4 @@
-package com.netgrif.workflow;
+package com.netgrif.workflow.configuration.logging;
 
 import org.springframework.web.filter.CommonsRequestLoggingFilter;
 
