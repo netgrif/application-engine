@@ -1,4 +1,4 @@
-package com.netgrif.workflow.workflow.service;
+package com.netgrif.workflow.workflow.domain;
 
 import com.netgrif.workflow.petrinet.domain.I18nString;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedField;
