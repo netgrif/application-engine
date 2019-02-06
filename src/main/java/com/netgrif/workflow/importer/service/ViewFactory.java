@@ -12,9 +12,15 @@ public class ViewFactory {
     public View buildView(Data data) {
         if (data.getView().getImage() != null) {
             return buildImageView(data);
+        } else if (data.getView().getList() != null) {
+            return buildListView();
         } else {
             throw new UnsupportedViewException();
         }
+    }
+
+    public View buildListView() {
+        return new View("list");
     }
 
     public View buildImageView(Data data) {
