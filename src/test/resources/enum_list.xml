@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="../../main/resources/petriNets/petriflow_schema.xsd">
+    <defaultRole>true</defaultRole>
+    <!-- DATA -->
+    <data type="enumeration">
+        <id>enumeration</id>
+        <title>Enumeration</title>
+        <values>Item 1</values>
+        <values>Item 2</values>
+        <values>Item 3</values>
+        <values>Item 4</values>
+        <values>Item 5</values>
+        <values>Item 6</values>
+        <values>Item 7</values>
+        <values>Item 8</values>
+        <values>Item 9</values>
+        <values>Item 10</values>
+        <view>
+            <list/>
+        </view>
+    </data>
+    <data type="enumeration">
+        <id>enumeration2</id>
+        <title>Enumeration 2</title>
+        <values>Item 1</values>
+        <values>Item 2</values>
+        <values>Item 3</values>
+        <values>Item 4</values>
+        <values>Item 5</values>
+        <values>Item 6</values>
+        <values>Item 7</values>
+        <values>Item 8</values>
+        <values>Item 9</values>
+        <values>Item 10</values>
+        <view>
+            <list/>
+        </view>
+    </data>
+    <data type="multichoice">
+        <id>multichoice</id>
+        <title>Multichoice</title>
+        <values>Item 1</values>
+        <values>Item 2</values>
+        <values>Item 3</values>
+        <values>Item 4</values>
+        <view>
+            <list/>
+        </view>
+    </data>
+    <data type="multichoice">
+        <id>multichoice2</id>
+        <title>Multichoice 2</title>
+        <values>Item 1</values>
+        <values>Item 2</values>
+        <values>Item 3</values>
+        <values>Item 4</values>
+        <view>
+            <list/>
+        </view>
+    </data>
+    <!-- TRANSITIONS -->
+    <transition>
+        <id>task</id>
+        <x>0</x>
+        <y>0</y>
+        <label>Task</label>
+        <dataGroup>
+            <id>task_1</id>
+            <stretch>false</stretch>
+            <dataRef>
+                <id>enumeration</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>enumeration2</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>task_2</id>
+            <stretch>false</stretch>
+            <dataRef>
+                <id>multichoice</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>multichoice2</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+    </transition>
+</document>

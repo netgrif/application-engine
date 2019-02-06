@@ -457,6 +457,7 @@
         <xs:choice>
             <xs:element name="area" type="xs:string"/>
             <xs:element name="image" type="booleanImageView"/>
+            <xs:element name="list" type="xs:string"/>
         </xs:choice>
     </xs:complexType>
     <xs:complexType name="booleanImageView">
