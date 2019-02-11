@@ -16,9 +16,18 @@
         <values>Item 8</values>
         <values>Item 9</values>
         <values>Item 10</values>
+        <init>Item 5</init>
         <view>
-            <list/>
+            <list>5</list>
         </view>
+        <action trigger="set">
+            <!--  @formatter:off -->
+            m1: f.enumeration,
+            m2: f.enumeration2;
+
+            change m2 value { m1.value }
+            <!--  @formatter:on -->
+        </action>
     </data>
     <data type="enumeration">
         <id>enumeration2</id>
@@ -45,8 +54,16 @@
         <values>Item 3</values>
         <values>Item 4</values>
         <view>
-            <list/>
+            <list>2</list>
         </view>
+        <action trigger="set">
+            <!--  @formatter:off -->
+            m1: f.multichoice,
+            m2: f.multichoice2;
+
+            change m2 value { m1.value }
+            <!--  @formatter:on -->
+        </action>
     </data>
     <data type="multichoice">
         <id>multichoice2</id>
@@ -56,8 +73,16 @@
         <values>Item 3</values>
         <values>Item 4</values>
         <view>
-            <list/>
+            <list>10</list>
         </view>
+    </data>
+    <data type="multichoice">
+        <id>multichoice3</id>
+        <title>Multichoice 3</title>
+        <values>Item 1</values>
+        <values>Item 2</values>
+        <values>Item 3</values>
+        <values>Item 4</values>
     </data>
     <!-- TRANSITIONS -->
     <transition>
@@ -65,11 +90,19 @@
         <x>0</x>
         <y>0</y>
         <label>Task</label>
+        <assignPolicy>auto</assignPolicy>
         <dataGroup>
             <id>task_1</id>
             <stretch>false</stretch>
             <dataRef>
                 <id>enumeration</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>multichoice3</id>
                 <logic>
                     <behavior>editable</behavior>
                     <behavior>required</behavior>
@@ -85,6 +118,13 @@
         <dataGroup>
             <id>task_2</id>
             <stretch>false</stretch>
+            <dataRef>
+                <id>multichoice3</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                </logic>
+            </dataRef>
             <dataRef>
                 <id>multichoice</id>
                 <logic>
