@@ -3,6 +3,7 @@ package com.netgrif.workflow.importer.service;
 import com.netgrif.workflow.importer.model.Data;
 import com.netgrif.workflow.importer.model.DataType;
 import com.netgrif.workflow.petrinet.domain.views.BooleanImageView;
+import com.netgrif.workflow.petrinet.domain.views.ListView;
 import com.netgrif.workflow.petrinet.domain.views.View;
 import org.springframework.stereotype.Component;
 
@@ -12,9 +13,18 @@ public class ViewFactory {
     public View buildView(Data data) {
         if (data.getView().getImage() != null) {
             return buildImageView(data);
+        } else if (data.getView().getList() != null) {
+            return buildListView(data);
         } else {
             throw new UnsupportedViewException();
         }
+    }
+
+    public View buildListView(Data data) {
+        if (data.getView().getList().length() > 0) {
+            return new ListView(Integer.parseInt(data.getView().getList()));
+        }
+        return new ListView();
     }
 
     public View buildImageView(Data data) {
