@@ -5,7 +5,7 @@ import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.Task;
-import com.netgrif.workflow.workflow.service.EventOutcome;
+import com.netgrif.workflow.workflow.domain.EventOutcome;
 import com.netgrif.workflow.workflow.web.responsebodies.TaskReference;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
