@@ -457,6 +457,20 @@
         <xs:choice>
             <xs:element name="area" type="xs:string"/>
             <xs:element name="image" type="booleanImageView"/>
+            <xs:element name="list">
+                <xs:simpleType>
+                    <xs:union>
+                        <xs:simpleType>
+                            <xs:restriction base='xs:string'>
+                                <xs:length value="0"/>
+                            </xs:restriction>
+                        </xs:simpleType>
+                        <xs:simpleType>
+                            <xs:restriction base='xs:int' />
+                        </xs:simpleType>
+                    </xs:union>
+                </xs:simpleType>
+            </xs:element>
         </xs:choice>
     </xs:complexType>
     <xs:complexType name="booleanImageView">
@@ -485,4 +499,11 @@
     <xs:element name="code" type="xs:string" default="EUR"/>
     <xs:element name="fractionSize" type="xs:int" default="2"/>
     <xs:element name="locale" type="xs:string"/>
+
+    <!-- UTILS -->
+    <xs:simpleType name="empty">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value=""/>
+        </xs:restriction>
+    </xs:simpleType>
 </xs:schema>
