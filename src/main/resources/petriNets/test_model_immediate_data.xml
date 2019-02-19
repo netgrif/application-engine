@@ -1,0 +1,283 @@
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="petriflow_schema.xsd">
+    <defaultRole>true</defaultRole>
+    <caseName name="case_name">Nový prípad</caseName>
+    <!-- ROLES -->
+    <role>
+        <id>tester</id>
+        <name>Tester</name>
+    </role>
+    <!-- DATA -->
+    <data type="boolean" immediate="true">
+        <id>boolean_field</id>
+        <title>Boolean</title>
+        <init>true</init>
+    </data>
+    <data type="text" immediate="true">
+        <id>text_field</id>
+        <title>Text</title>
+        <init>Example text</init>
+    </data>
+    <data type="text" immediate="true">
+        <id>text_area_field</id>
+        <title>Text Area</title>
+        <values>area</values>
+        <init>The 39th International Conference on Applications and Theory of Petri Nets and Concurrency will be held
+            June 24-29, 2018 Austria Trend Hotel Bratislava, Vysoka 2A, 811 06 Bratislava, Slovakia. The conference will
+            be co-located with the 18th International Conference on Application of Concurrency to System Design (ACSD
+            2018).
+        </init>
+    </data>
+    <data type="number" immediate="true">
+        <id>number_field</id>
+        <title>Number</title>
+        <init>38</init>
+        <format>
+            <currency>
+                <code>EUR</code>
+                <fractionSize>3</fractionSize>
+                <locale>sk_SK</locale>
+            </currency>
+        </format>
+    </data>
+    <data type="number" immediate="true">
+        <id>number_field2</id>
+        <title>Number2</title>
+        <init>38</init>
+    </data>
+    <data type="date" immediate="true">
+        <id>date_field</id>
+        <title>Date</title>
+    </data>
+    <data type="enumeration" immediate="true">
+        <id>enumeration_field</id>
+        <title>Enumeration</title>
+        <values>Value 1</values>
+        <values>Value 2</values>
+        <values>Value 3</values>
+        <init>Value 1</init>
+    </data>
+    <data type="multichoice" immediate="true">
+        <id>multichoice_field</id>
+        <title>Multichoice</title>
+        <values>Value 1</values>
+        <values>Value 2</values>
+        <values>Value 3</values>
+        <init>Value 3</init>
+    </data>
+    <data type="user" immediate="true">
+        <id>user_field</id>
+        <title>User</title>
+        <values>tester</values>
+    </data>
+    <data type="file" immediate="true">
+        <id>file_field</id>
+        <title>File</title>
+    </data>
+
+    <i18n locale="en">
+        <i18nString name="case_name">New case</i18nString>
+    </i18n>
+    <!-- TASKS -->
+    <transition>
+        <id>2</id>
+        <x>220</x>
+        <y>180</y>
+        <label>Repeatable Task</label>
+        <icon>edit</icon>
+        <priority>1</priority>
+        <assignPolicy>auto</assignPolicy>
+        <dataGroup>
+            <id>1</id>
+            <title>Simple fields</title>
+            <alignment>start</alignment>
+            <dataRef>
+                <id>boolean_field</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>text_field</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>text_area_field</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>number_field</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>number_field2</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>date_field</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>2</id>
+            <title>Select fields</title>
+            <alignment>start</alignment>
+            <dataRef>
+                <id>enumeration_field</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>multichoice_field</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>3</id>
+            <title>Complex fields</title>
+            <alignment>start</alignment>
+            <dataRef>
+                <id>user_field</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>file_field</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+    </transition>
+    <transition>
+        <id>3</id>
+        <x>340</x>
+        <y>300</y>
+        <label>One-time task</label>
+        <icon>done</icon>
+        <priority>2</priority>
+        <dataGroup>
+            <id>1</id>
+            <title>Simple fields</title>
+            <alignment>start</alignment>
+            <dataRef>
+                <id>boolean_field</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>text_field</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>number_field</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>date_field</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>2</id>
+            <title>Select fields</title>
+            <alignment>start</alignment>
+            <dataRef>
+                <id>enumeration_field</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>multichoice_field</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>3</id>
+            <title>Complex fields</title>
+            <alignment>start</alignment>
+            <dataRef>
+                <id>user_field</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>file_field</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+    </transition>
+    <!-- PLACES -->
+    <place>
+        <id>1</id>
+        <x>220</x>
+        <y>300</y>
+        <label>IN</label>
+        <tokens>1</tokens>
+        <static>false</static>
+    </place>
+    <place>
+        <id>7</id>
+        <x>500</x>
+        <y>300</y>
+        <label>OUT</label>
+        <tokens>0</tokens>
+        <static>false</static>
+    </place>
+    <!-- ARCS -->
+    <arc>
+        <id>4</id>
+        <type>regular</type>
+        <sourceId>1</sourceId>
+        <destinationId>2</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>5</id>
+        <type>regular</type>
+        <sourceId>1</sourceId>
+        <destinationId>3</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>6</id>
+        <type>regular</type>
+        <sourceId>2</sourceId>
+        <destinationId>1</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>8</id>
+        <type>regular</type>
+        <sourceId>3</sourceId>
+        <destinationId>7</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+</document>

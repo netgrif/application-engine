@@ -1,7 +1,12 @@
 
 package com.netgrif.workflow.importer.model;
 
-import javax.xml.bind.annotation.*;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlSchemaType;
+import javax.xml.bind.annotation.XmlType;
 import javax.xml.datatype.Duration;
 import javax.xml.datatype.XMLGregorianCalendar;
 
@@ -15,7 +20,7 @@ import javax.xml.datatype.XMLGregorianCalendar;
  * &lt;complexType&gt;
  *   &lt;complexContent&gt;
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
- *       &lt;choice&gt;
+ *       &lt;choice minOccurs="0"&gt;
  *         &lt;element name="exact" type="{http://www.w3.org/2001/XMLSchema}dateTime"/&gt;
  *         &lt;element name="delay" type="{http://www.w3.org/2001/XMLSchema}duration"/&gt;
  *       &lt;/choice&gt;

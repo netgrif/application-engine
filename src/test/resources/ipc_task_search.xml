@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="../../main/resources/petriNets/petriflow_schema.xsd">
+    <id>create_case_net</id>
+    <defaultRole>true</defaultRole>
+    <data type="number">
+        <id>field</id>
+        <title>Field</title>
+        <init>0</init>
+    </data>
+    <data type="text">
+        <id>task_one</id>
+        <title>one task</title>
+        <init>0</init>
+    </data>
+    <transition>
+        <id>task</id>
+        <x>0</x>
+        <y>0</y>
+        <label>Task</label>
+        <event type="finish">
+            <id>1</id>
+            <actions phase="post">
+                <action>
+                    field: f.field;
+                    def taskId = "work_task";
+                    def tasks = findTasks( { it.transitionId.eq(taskId) } );
+                    change field about { return tasks.size(); };
+                </action>
+                <action>
+                    field: f.task_one;
+                    def taskId = "work_task";
+                    def task = findTask( { it.transitionId.eq(taskId) } );
+                    change field about { return task.processId; };
+                </action>
+            </actions>
+        </event>
+    </transition>
+    <transition>
+        <id>work_task</id>
+        <x>0</x>
+        <y>0</y>
+        <label>Work task 1</label>
+    </transition>
+</document>

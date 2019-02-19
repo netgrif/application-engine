@@ -2,7 +2,6 @@ package com.netgrif.workflow.petrinet.web.responsebodies;
 
 
 import com.netgrif.workflow.petrinet.web.PetriNetController;
-import com.netgrif.workflow.petrinet.web.requestbodies.PetriNetReferenceBody;
 import org.springframework.hateoas.Resources;
 import org.springframework.hateoas.mvc.ControllerLinkBuilder;
 
@@ -16,6 +15,6 @@ public class DataFieldReferencesResource extends Resources<DataFieldReference>{
 
     private void buildLinks(){
         add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(PetriNetController.class)
-                .getDataFieldReferences(new PetriNetReferenceBody(), null)).withSelfRel());
+                .getDataFieldReferences(new ArrayList<>(), null)).withSelfRel());
     }
 }

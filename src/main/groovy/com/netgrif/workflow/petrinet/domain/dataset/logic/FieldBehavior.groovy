@@ -1,5 +1,7 @@
 package com.netgrif.workflow.petrinet.domain.dataset.logic
 
+import com.netgrif.workflow.importer.model.Behavior
+
 enum FieldBehavior {
     REQUIRED("required"),
     OPTIONAL("optional"),
@@ -8,7 +10,7 @@ enum FieldBehavior {
     HIDDEN("hidden"),
     FORBIDDEN("forbidden"),
     IMMEDIATE("immediate"),
-    ANTONYM_SETUP("",true);
+    ANTONYM_SETUP("", true);
 
 
     private final String name
@@ -52,8 +54,10 @@ enum FieldBehavior {
         }
     }
 
-    public static FieldBehavior fromString(String string) {
-        return FieldBehavior.valueOf(string.toUpperCase());
+    static FieldBehavior fromString(Behavior string) {
+        if (string == null)
+            throw new IllegalArgumentException("Bahavior can not be null")
+        return valueOf(string.value().toUpperCase())
     }
 
     FieldBehavior[] getAntonyms() {
@@ -64,7 +68,9 @@ enum FieldBehavior {
         this.antonyms = addAntonyms()
     }
 
-    public String toString() {
-        return this.name
+
+    @Override
+    String toString() {
+        return name
     }
 }

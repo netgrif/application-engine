@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="../../main/resources/petriNets/petriflow_schema.xsd">
+    <id>remote_file_field_net</id>
+    <defaultRole>true</defaultRole>
+    <data type="file">
+        <id>file</id>
+        <title>Remote File</title>
+        <placeholder>Remote file</placeholder>
+        <init>test-file.txt:https://netgrif.com</init>
+        <remote/>
+    </data>
+    <transition>
+        <id>task</id>
+        <x>0</x>
+        <y>0</y>
+        <label>Task</label>
+        <dataRef>
+            <id>file</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+    </transition>
+</document>

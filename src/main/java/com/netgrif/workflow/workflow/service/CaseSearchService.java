@@ -1,14 +1,29 @@
 package com.netgrif.workflow.workflow.service;
 
+import com.netgrif.workflow.auth.domain.LoggedUser;
+import com.netgrif.workflow.auth.domain.User;
+import com.netgrif.workflow.importer.service.FieldFactory;
+import com.netgrif.workflow.petrinet.domain.I18nString;
+import com.netgrif.workflow.petrinet.domain.PetriNet;
+import com.netgrif.workflow.petrinet.domain.dataset.FieldType;
+import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
+import com.netgrif.workflow.petrinet.web.responsebodies.PetriNetReference;
 import com.netgrif.workflow.workflow.domain.Case;
-import com.netgrif.workflow.workflow.domain.Task;
-import com.netgrif.workflow.workflow.domain.repositories.TaskRepository;
+import com.netgrif.workflow.workflow.domain.QCase;
+import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.Expression;
+import com.querydsl.core.types.Ops;
+import com.querydsl.core.types.Path;
+import com.querydsl.core.types.Predicate;
+import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.Expressions;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -16,80 +31,226 @@ public class CaseSearchService extends MongoSearchService<Case> {
 
     private static final Logger log = Logger.getLogger(CaseSearchService.class.getName());
 
+    public static final String ROLE = "role";
+    public static final String DATA = "data";
+    public static final String PETRINET_IDENTIFIER = "identifier";
+    public static final String PETRINET_ID = "id";
+    public static final String PETRINET = "petriNet";
+    public static final String AUTHOR = "author";
+    public static final String AUTHOR_ID = "id";
+    public static final String AUTHOR_EMAIL = "email";
+    public static final String AUTHOR_NAME = "name";
+    public static final String TRANSITION = "transition";
+    public static final String FULLTEXT = "fullText";
+
     @Autowired
-    private TaskRepository taskRepository;
+    private IPetriNetService petriNetService;
 
-    // **************************
-    // * Query building methods *
-    // **************************
+    public Predicate buildQuery(Map<String, Object> requestQuery, LoggedUser user, Locale locale) {
+        BooleanBuilder builder = new BooleanBuilder();
 
-    public String authorQuery(Object obj) {
-        Map<Class, Function<Object, String>> builder = new HashMap<>();
+        if (requestQuery.containsKey(PETRINET)) {
+            builder.and(petriNet(requestQuery.get(PETRINET), user, locale));
+        }
+        if (requestQuery.containsKey(AUTHOR)) {
+            builder.and(author(requestQuery.get(AUTHOR)));
+        }
+        if (requestQuery.containsKey(TRANSITION)) {
+            builder.and(transition(requestQuery.get(TRANSITION)));
+        }
+        if (requestQuery.containsKey(FULLTEXT)) {
+            builder.and(fullText(requestQuery.getOrDefault(PETRINET, null), (String) requestQuery.get(FULLTEXT)));
+        }
+        if (requestQuery.containsKey(ROLE)) {
+            builder.and(role(requestQuery.get(ROLE)));
+        }
+        if (requestQuery.containsKey(DATA)) {
+            builder.and(data(requestQuery.get(DATA)));
+        }
 
-        builder.put(Long.class, o -> ((Long) o).toString());
-        builder.put(Integer.class, o -> ((Integer) o).toString());
-        builder.put(ArrayList.class, o -> in((List<Object>) obj, oo -> oo.toString(), ob -> ob instanceof Long || ob instanceof Integer));
-        builder.put(String.class, o -> {
-            Long id = resolveAuthorByEmail((String) obj);
-            return id != null ? id.toString() : "";
+        return builder;
+    }
+
+    public Predicate petriNet(Object query, LoggedUser user, Locale locale) {
+        List<PetriNetReference> allowedNets = petriNetService.getReferencesByUsersProcessRoles(user, locale);
+        if (query instanceof ArrayList) {
+            BooleanBuilder builder = new BooleanBuilder();
+            List<BooleanExpression> expressions = (List<BooleanExpression>) ((ArrayList) query).stream().filter(q -> q instanceof HashMap).map(q -> petriNetObject((HashMap<String, String>) q, allowedNets)).collect(Collectors.toList());
+            expressions.forEach(builder::or);
+            return builder;
+        } else if (query instanceof HashMap) {
+            return petriNetObject((HashMap<String, String>) query, allowedNets);
+        }
+        return null;
+    }
+
+    private static BooleanExpression petriNetObject(HashMap<String, String> query, List<PetriNetReference> allowedNets) {
+        if (query.containsKey(PETRINET_IDENTIFIER) && allowedNets.stream().anyMatch(net -> net.getIdentifier().equalsIgnoreCase(query.get(PETRINET_IDENTIFIER))))
+            return QCase.case$.processIdentifier.equalsIgnoreCase(query.get(PETRINET_IDENTIFIER));
+        return null;
+//        else if(query.containsKey(PETRINET_ID) && allowedNets.stream().anyMatch(net->net.getStringId().equalsIgnoreCase(query.get(PETRINET_ID))))
+//            return QCase.case$.petriNet._id.e
+    }
+
+    public Predicate author(Object query) {
+        if (query instanceof ArrayList) {
+            BooleanBuilder builder = new BooleanBuilder();
+            List<BooleanExpression> expressions = (List<BooleanExpression>) ((ArrayList) query).stream().filter(q -> q instanceof HashMap).map(q -> authorObject((HashMap<String, Object>) q)).collect(Collectors.toList());
+            expressions.forEach(builder::or);
+            return builder;
+        } else if (query instanceof HashMap) {
+            return authorObject((HashMap<String, Object>) query);
+        }
+        return null;
+    }
+
+    public Predicate role(Object o) {
+        if (o instanceof ArrayList) {
+            return QCase.case$.enabledRoles.any().in((ArrayList<String>) o);
+        }
+        return null;
+    }
+
+    private static BooleanExpression authorObject(HashMap<String, Object> query) {
+        if (query.containsKey(AUTHOR_EMAIL))
+            return QCase.case$.author.email.equalsIgnoreCase((String) query.get(AUTHOR_EMAIL));
+        else if (query.containsKey(AUTHOR_NAME))
+            return QCase.case$.author.fullName.equalsIgnoreCase((String) query.get(AUTHOR_NAME));
+        else if (query.containsKey(AUTHOR_ID)) {
+            Long searchValue = -1L;
+            if (query.get(AUTHOR_ID) instanceof Long)
+                searchValue = (Long) query.get(AUTHOR_ID);
+            else if (query.get(AUTHOR_ID) instanceof Integer)
+                searchValue = ((Integer) query.get(AUTHOR_ID)).longValue();
+            return QCase.case$.author.id.eq(searchValue);
+        }
+        return null;
+    }
+
+    public Predicate transition(Object query) {
+        if (query instanceof ArrayList) {
+            BooleanBuilder builder = new BooleanBuilder();
+            List<BooleanExpression> expressions = (List<BooleanExpression>) ((ArrayList) query).stream().filter(q -> q instanceof String).map(q -> transitionString((String) q)).collect(Collectors.toList());
+            expressions.forEach(builder::or);
+            return builder;
+        } else if (query instanceof String) {
+            return transitionString((String) query);
+        }
+        return null;
+    }
+
+    private static BooleanExpression transitionString(String transition) {
+        return QCase.case$.tasks.any().transition.eq(transition);
+    }
+
+    public Predicate data(Object data) {
+        if (!(data instanceof Map)) {
+            throw new IllegalArgumentException("Unsupported class " + data.getClass().getName());
+        }
+        Map dataQueries = (Map) data;
+
+        List<BooleanExpression> predicates = new ArrayList<>();
+        (dataQueries).forEach((k, v) -> {
+            if (v instanceof Map) {
+                Map.Entry<String, Object> entry = (Map.Entry<String, Object>) ((Map) v).entrySet().iterator().next();
+                Object fieldValue = entry.getValue();
+                try {
+                    FieldType type = FieldType.fromString(entry.getKey());
+
+                    switch (type) {
+                        case USER:
+                            Path valuePath = Expressions.simplePath(User.class, QCase.case$.dataSet.get((String) k),"value");
+                            Path idPath = Expressions.stringPath(valuePath,"id");
+                            Expression<Long> constant = Expressions.constant(Long.valueOf(""+fieldValue));
+                            predicates.add(Expressions.predicate(Ops.EQ, idPath, constant));
+                            break;
+                    }
+                } catch (IllegalArgumentException e) {
+                    log.error("Unrecognized Field type "+entry.getKey());
+                }
+            } else {
+                predicates.add(QCase.case$.dataSet.get((String) k).value.eq(v));
+            }
         });
-
-        return buildQueryPart("author.id", obj, builder);
+        BooleanBuilder builder = new BooleanBuilder();
+        predicates.forEach(builder::and);
+        return builder;
     }
 
-    public String titleQuery(Object obj) {
-        Map<Class, Function<Object, String>> builder = new HashMap<>();
-
-        builder.put(ArrayList.class, o -> in(((List<Object>) obj), ob -> "\"" + ob + "\"", null));
-        builder.put(String.class, o -> "\"" + o + "\"");
-
-        return buildQueryPart("title", obj, builder);
-    }
-
-    public String petriNetQuery(Object obj) {
-        Map<Class, Function<Object, String>> builder = new HashMap<>();
-
-        builder.put(String.class, o -> ref("petriNet", obj));
-        builder.put(ArrayList.class, o -> in(((List<Object>) obj), oo -> ref("petriNet", oo), null));
-
-        return buildQueryPart("petriNet", obj, builder);
-    }
-
-    public String dataQuery(Object obj) throws IllegalQueryException {
-        Map<Class, Function<Object, String>> builder = new HashMap<>();
-
-        builder.put(ArrayList.class, o -> {
-            StringBuilder strBuilder = new StringBuilder();
-            ((List<Object>) o).forEach(dataObj -> {
-                strBuilder.append(buildDataSetQuery(dataObj));
-                strBuilder.append(",");
+    public Predicate fullText(Object petriNetQuery, String searchPhrase) {
+        List<String> processes = new ArrayList<>();
+        if (petriNetQuery instanceof ArrayList) {
+            ((ArrayList) petriNetQuery).forEach(net -> {
+                if (net instanceof HashMap)
+                    processes.add(parseProcessIdentifier((HashMap) net));
             });
-            strBuilder.deleteCharAt(strBuilder.length() - 1);
-            return strBuilder.toString();
-        });
-        builder.put(LinkedHashSet.class, CaseSearchService::buildDataSetQuery);
+        } else if (petriNetQuery instanceof HashMap) {
+            processes.add(parseProcessIdentifier((HashMap) petriNetQuery));
+        }
 
-        return buildQueryPart(null, obj, builder);
+        List<PetriNet> petriNets;
+        if(processes.isEmpty()) {
+            petriNets = petriNetService.getAll();
+        } else {
+            petriNets = processes.stream().map(process -> petriNetService.getNewestVersionByIdentifier(process)).collect(Collectors.toList());
+        }
+        if(petriNets.isEmpty())
+            return null;
+
+        List<BooleanExpression> predicates = new ArrayList<>();
+        predicates.add(QCase.case$.visualId.startsWithIgnoreCase(searchPhrase));
+        predicates.add(QCase.case$.title.containsIgnoreCase(searchPhrase));
+        predicates.add(QCase.case$.author.fullName.containsIgnoreCase(searchPhrase));
+        predicates.add(QCase.case$.author.email.containsIgnoreCase(searchPhrase));
+
+        try {
+            LocalDateTime creation = FieldFactory.parseDateTime(searchPhrase);
+            if (creation != null)
+                predicates.add(QCase.case$.creationDate.eq(creation));
+        } catch (Exception e) {
+            //ignore
+        }
+
+        petriNets.forEach(net -> {
+            net.getImmediateFields().forEach(field -> {
+                try {
+                    if (field.getType() == FieldType.TEXT) {
+                        Path<?> path = QCase.case$.dataSet.get(field.getStringId()).value;
+                        Expression<String> constant = Expressions.constant(searchPhrase);
+                        predicates.add(Expressions.predicate(Ops.STRING_CONTAINS_IC, path, constant));
+                    } else if (field.getType() == FieldType.NUMBER) {
+                        Double value = FieldFactory.parseDouble(searchPhrase);
+                        if (value != null)
+                            predicates.add(QCase.case$.dataSet.get(field.getStringId()).value.eq(value));
+                    } else if (field.getType() == FieldType.DATE) {
+                        LocalDate value = FieldFactory.parseDate(searchPhrase);
+                        if (value != null)
+                            predicates.add(QCase.case$.dataSet.get(field.getStringId()).value.eq(value));
+                    } else if (field.getType() == FieldType.DATETIME) {
+                        LocalDateTime value = FieldFactory.parseDateTime(searchPhrase);
+                        if (value != null)
+                            predicates.add(QCase.case$.dataSet.get(field.getStringId()).value.eq(value));
+                    } else if(field.getType() == FieldType.ENUMERATION) {
+                        Path valuePath = Expressions.simplePath(I18nString.class, QCase.case$.dataSet.get(field.getStringId()),"value");
+                        Path defaultValuePath = Expressions.stringPath(valuePath,"defaultValue");
+                        Expression<String> constant = Expressions.constant(searchPhrase);
+                        predicates.add(Expressions.predicate(Ops.STRING_CONTAINS_IC, defaultValuePath, constant));
+                    }
+                } catch (Exception e) {
+                    log.error(e.getMessage());
+                    //Skip this field in search
+                }
+            });
+        });
+
+        BooleanBuilder builder = new BooleanBuilder();
+        predicates.forEach(builder::or);
+        return builder;
     }
 
-    private static String buildDataSetQuery(Object o) {
-        LinkedHashMap<String, Object> dataObj = (LinkedHashMap<String, Object>) o;
-        if (!dataObj.containsKey("id") || !dataObj.containsKey("type") || !dataObj.containsKey("value")) return "";
-        return "\"dataSet." + dataObj.get("id") + ".value\":" + resolveDataValue(dataObj.get("value"), (String) dataObj.get("type"));
-    }
-
-    public String transitionQuery(Object obj) {
-        Map<Class, Function<Object, String>> builder = new HashMap<>();
-
-        builder.put(String.class, o -> {
-            List<Task> tasks = taskRepository.findAllByTransitionIdIn(Collections.singletonList((String) o));
-            return in(tasks.stream().map(Task::getCaseId).collect(Collectors.toList()), ob -> oid((String) ob), null);
-        });
-        builder.put(ArrayList.class, o -> {
-            List<Task> tasks = taskRepository.findAllByTransitionIdIn((List<String>) o);
-            return in(new ArrayList<>(tasks.stream().map(Task::getCaseId).collect(Collectors.toSet())), ob -> oid((String) ob), null);
-        });
-
-        return buildQueryPart("_id", obj, builder);
+    private String parseProcessIdentifier(HashMap<String, String> petriNet) {
+        if (petriNet.containsKey(PETRINET_IDENTIFIER))
+            return petriNet.get(PETRINET_IDENTIFIER);
+        return "";
     }
 }

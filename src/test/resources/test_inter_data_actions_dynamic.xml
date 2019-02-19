@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="../../main/resources/petriNets/petriflow_schema.xsd">
+    <id>2</id>
+    <defaultRole>true</defaultRole>
+    <data type="number">
+        <id>1</id>
+        <title>Cost</title>
+        <action trigger="set">
+            <!--@formatter:off-->
+            cost: f.1;
+            execute "static_edit_limits" with ([
+                "delta_limit": [
+                    value: cost.value,
+                    type: "number",
+                ]
+            ] as Map)
+            <!--@formatter:on-->
+        </action>
+    </data>
+    <data type="number">
+        <id>2</id>
+        <title>Available</title>
+    </data>
+    <transition>
+        <id>2</id>
+        <x>270</x>
+        <y>108</y>
+        <label>T2</label>
+        <dataGroup>
+            <id>1</id>
+            <title>Limits</title>
+            <dataRef>
+                <id>1</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+    </transition>
+    <transition>
+        <id>dynamic_edit_available</id>
+        <x>100</x>
+        <y>100</y>
+        <label>Edit available</label>
+        <dataRef>
+            <id>2</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+            </logic>
+        </dataRef>
+    </transition>
+    <place>
+        <id>1</id>
+        <x>134</x>
+        <y>111</y>
+        <label>IN</label>
+        <tokens>1</tokens>
+        <static>false</static>
+    </place>
+    <arc>
+        <id>3</id>
+        <type>regular</type>
+        <sourceId>1</sourceId>
+        <destinationId>2</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+</document>

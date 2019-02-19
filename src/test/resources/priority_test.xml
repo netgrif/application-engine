@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document>
+    <defaultRole>false</defaultRole>
     <place>
         <id>1</id>
         <x>180</x>

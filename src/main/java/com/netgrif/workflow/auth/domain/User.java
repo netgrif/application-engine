@@ -3,21 +3,24 @@ package com.netgrif.workflow.auth.domain;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.netgrif.workflow.orgstructure.domain.Group;
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRole;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.validator.constraints.Email;
-import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotBlank;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
 @Entity
 @Table(name = "user")
 public class User {
+
+    public static final String UNKNOWN = "unknown";
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -40,8 +43,6 @@ public class User {
     private String avatar;
 
     @JsonIgnore
-    @NotNull
-    @Length(min = 6)
     @Getter
     @Setter
     private String password;
@@ -58,11 +59,18 @@ public class User {
     @Setter
     private String surname;
 
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "user_organizations", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "organization_id"))
+    @NotNull
     @Getter
     @Setter
-    private Set<Organization> organizations;
+    private UserState state;
+
+    @Getter
+    @Setter
+    private String token;
+
+    @Getter
+    @Setter
+    private LocalDateTime expirationDate;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "user_authorities", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "authority_id"))
@@ -81,8 +89,13 @@ public class User {
     @Setter
     private Set<ProcessRole> processRoles;
 
+    @Transient
+    @Getter
+    @Setter
+    private Set<Group> groups;
+
     public User() {
-        organizations = new HashSet<>();
+        groups = new HashSet<>();
         authorities = new HashSet<>();
         userProcessRoles = new HashSet<>();
         processRoles = new HashSet<>();
@@ -119,8 +132,8 @@ public class User {
         return name + " " + surname;
     }
 
-    public void addOrganization(Organization org) {
-        this.organizations.add(org);
+    public void addGroup(Group group) {
+        this.groups.add(group);
     }
 
     public LoggedUser transformToLoggedUser() {
@@ -128,8 +141,8 @@ public class User {
         loggedUser.setFullName(this.getFullName());
         if (!this.getUserProcessRoles().isEmpty())
             loggedUser.parseProcessRoles(this.getUserProcessRoles());
-        if (!this.getOrganizations().isEmpty())
-            loggedUser.parseOrganizations(this.getOrganizations());
+        if (!this.getGroups().isEmpty())
+            loggedUser.parseGroups(this.getGroups());
 
         return loggedUser;
     }
@@ -141,5 +154,9 @@ public class User {
         author.setFullName(this.getFullName());
 
         return author;
+    }
+
+    public boolean isRegistered() {
+        return UserState.ACTIVE.equals(state) || UserState.BLOCKED.equals(state);
     }
 }

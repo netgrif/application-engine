@@ -3,12 +3,16 @@ package com.netgrif.workflow.workflow.service;
 import com.netgrif.workflow.auth.domain.Authority;
 import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.auth.domain.User;
-import com.netgrif.workflow.auth.domain.repositories.AuthorityRepository;
+import com.netgrif.workflow.auth.domain.UserState;
 import com.netgrif.workflow.auth.domain.repositories.UserRepository;
-import com.netgrif.workflow.importer.Importer;
+import com.netgrif.workflow.auth.service.interfaces.IAuthorityService;
+import com.netgrif.workflow.importer.service.Config;
+import com.netgrif.workflow.importer.service.Importer;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository;
 import com.netgrif.workflow.petrinet.domain.throwable.TransitionNotExecutableException;
+import com.netgrif.workflow.startup.SystemUserRunner;
+import com.netgrif.workflow.utils.FullPageRequest;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.Task;
 import com.netgrif.workflow.workflow.domain.repositories.CaseRepository;
@@ -60,21 +64,25 @@ public class TaskServiceTest {
     private UserRepository userRepository;
 
     @Autowired
-    private AuthorityRepository authorityRepository;
+    private IAuthorityService authorityService;
+
+    @Autowired
+    private SystemUserRunner userRunner;
 
     @Before
-    public void setUp() {
+    public void setUp() throws Exception {
         mongoTemplate.getDb().dropDatabase();
         taskRepository.deleteAll();
+        userRunner.run("");
 
-        importer.importPetriNet(new File("src/test/resources/prikladFM.xml"), "fm net", "fm");
+        importer.importPetriNet(new File("src/test/resources/prikladFM.xml"), "fm net", "fm", new Config());
         PetriNet net = petriNetRepository.findAll().get(0);
         workflowService.createCase(net.getStringId(), "Storage Unit", "color", mockLoggedUser());
     }
 
     @Test
     public void createTasks() throws Exception {
-        Case useCase = caseRepository.findAll().get(0);
+        Case useCase = workflowService.getAll(new FullPageRequest()).getContent().get(0);
 
         service.createTasks(useCase);
 
@@ -83,7 +91,7 @@ public class TaskServiceTest {
 
     @Test
     public void resetArcTest() throws TransitionNotExecutableException {
-        PetriNet net = importer.importPetriNet(new File("src/test/resources/reset_inhibitor_test.xml"), "reset", "rst").get();
+        PetriNet net = importer.importPetriNet(new File("src/test/resources/reset_inhibitor_test.xml"), "reset", "rst", new Config()).get();
         LoggedUser loggedUser = mockLoggedUser();
         Case useCase = workflowService.createCase(net.getStringId(), "Reset test", "color", loggedUser);
         User user = new User();
@@ -91,6 +99,7 @@ public class TaskServiceTest {
         user.setPassword("password");
         user.setSurname("surname");
         user.setEmail("email@email.com");
+        user.setState(UserState.ACTIVE);
         user = userRepository.save(user);
 
         assert useCase.getResetArcTokens().size() == 0;
@@ -99,14 +108,16 @@ public class TaskServiceTest {
 
         Task task = taskRepository.findAll().stream().filter(t -> t.getTitle().getDefaultValue().equalsIgnoreCase("reset")).findFirst().orElse(null);
 
-        service.assignTask(loggedUser, task.getStringId());
+        assert task != null;
+
+        service.assignTask(user.transformToLoggedUser(), task.getStringId());
         useCase = caseRepository.findOne(useCase.getStringId());
 
         assert useCase.getResetArcTokens().size() == 1;
         assert useCase.getResetArcTokens().values().contains(5);
         assert useCase.getActivePlaces().size() == 0;
 
-        service.cancelTask(loggedUser, task.getStringId());
+        service.cancelTask(user.transformToLoggedUser(), task.getStringId());
         useCase = caseRepository.findOne(useCase.getStringId());
 
         assert useCase.getResetArcTokens().size() == 0;
@@ -115,11 +126,7 @@ public class TaskServiceTest {
     }
 
     public LoggedUser mockLoggedUser(){
-        Authority authorityUser;
-        if (authorityRepository.count() > 0)
-            authorityUser = authorityRepository.findAll().get(0);
-        else
-            authorityUser = authorityRepository.save(new Authority(Authority.user));
+        Authority authorityUser = authorityService.getOrCreate(Authority.user);
         return new LoggedUser(1L, "super@netgrif.com","password", Collections.singleton(authorityUser));
     }
 }

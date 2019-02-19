@@ -1,7 +1,7 @@
 package com.netgrif.workflow.workflow.service;
 
 import com.netgrif.workflow.auth.domain.User;
-import com.netgrif.workflow.auth.domain.repositories.UserRepository;
+import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -25,7 +25,7 @@ public class MongoSearchService<T> {
     private static final String ERROR_KEY = "ERROR";
 
     @Autowired
-    private UserRepository userRepository;
+    private IUserService userService;
 
     @Autowired
     private MongoTemplate mongoTemplate;
@@ -47,7 +47,7 @@ public class MongoSearchService<T> {
         boolean match = request.entrySet().stream().allMatch((Map.Entry<String, Object> entry) -> {
             try {
                 Method method = this.getClass().getMethod(entry.getKey() + "Query", Object.class);
-                log.info("Resolved attribute of " + tClass.getSimpleName() + ": " + entry.getKey());
+//                log.info("Resolved attribute of " + tClass.getSimpleName() + ": " + entry.getKey());
                 Object part = method.invoke(this, entry.getValue());
                 if (part != null) //TODO 23.7.2017 throw exception when cannot build query
                     queryParts.put(entry.getKey(), part);
@@ -68,19 +68,19 @@ public class MongoSearchService<T> {
         boolean result = queryParts.entrySet().stream().allMatch(entry -> {
             if (entry.getKey().equals(ERROR_KEY)) return false;
             if (((String) entry.getValue()).endsWith(":")) {
-                queryParts.put(ERROR_KEY, "Query attribute " + entry.getKey() + " has wrong value!");
+                queryParts.put(ERROR_KEY, "Query attribute " + entry.getKey() + " has wrong value " + entry.getValue());
                 return false;
             }
 
-            log.info("Query: " + entry.getValue());
+//            log.info("Query: " + entry.getValue());
             builder.append(entry.getValue());
             builder.append(",");
             return true;
         });
         if (!result)
             throw new IllegalQueryException((String) (queryParts.get(ERROR_KEY)));
-
-        builder.deleteCharAt(builder.length() - 1);
+        if (builder.length() > 1)
+            builder.deleteCharAt(builder.length() - 1);
         builder.append("}");
         return builder.toString();
     }
@@ -120,6 +120,9 @@ public class MongoSearchService<T> {
 
     protected String buildQueryPart(String attribute, Object obj, Map<Class, Function<Object, String>> builder) {
         try {
+            if (obj == null || (obj instanceof List && ((List) obj).isEmpty()))
+                return ":";
+
             String attr = attribute != null ? "\"" + attribute + "\":" : "";
             return attr + builder.get(obj.getClass()).apply(obj);
         } catch (NullPointerException e) {
@@ -129,7 +132,7 @@ public class MongoSearchService<T> {
     }
 
     protected Long resolveAuthorByEmail(String email) {
-        User user = userRepository.findByEmail(email);
+        User user = userService.findByEmail(email, true);
         return user != null ? user.getId() : null;
     }
 
@@ -153,16 +156,35 @@ public class MongoSearchService<T> {
         return builder.toString();
     }
 
+    public static String all(List<Object> values, Function<Object, String> valueQueryBuilder) {
+        StringBuilder builder = new StringBuilder();
+        builder.append("{$all:[");
+        values.forEach(v -> {
+            builder.append(valueQueryBuilder.apply(v));
+            builder.append(",");
+        });
+        if (!values.isEmpty())
+            builder.deleteCharAt(builder.length() - 1);
+        builder.append("]}");
+        return builder.toString();
+    }
+
     public static String ref(String attr, Object id) {
         return "{$ref:\"" + attr + "\",$id:" + oid((String) id) + "}";
     }
 
     public static String or(Collection<Object> expressions) {
+        if (expressions.isEmpty())
+            return "";
+
         StringBuilder builder = new StringBuilder();
         builder.append("$or:[");
         expressions.forEach(obj -> {
             builder.append("{");
-            builder.append(obj);
+            if (obj instanceof String && ((String) obj).equalsIgnoreCase(":"))
+                builder.append("");
+            else
+                builder.append(obj);
             builder.append("},");
         });
         builder.deleteCharAt(builder.length() - 1);
@@ -174,8 +196,16 @@ public class MongoSearchService<T> {
         return "{$exists:" + val + "}";
     }
 
+    public static String regex(String val, String opt) {
+        return "{$regex:'" + val + "',$options:'" + opt + "'}";
+    }
+
     public static String lessThenOrEqual(Object val) {
         return "{$lte:" + val + "}";
+    }
+
+    public static String elemMatch(Object obj, Function<Object, String> valueQueryBuilder) {
+        return "{$elemMatch:" + valueQueryBuilder.apply(obj) + "}";
     }
 
     public static Object resolveDataValue(Object val, String type) {
@@ -195,22 +225,22 @@ public class MongoSearchService<T> {
 
     public static String resolveDateValue(String val) {
         String queryValue = "{";
-        String[] items = val.split(" ");
-        if (items.length != 2) return "";
-        switch (items[0]) {
-            case ">":
-            case ">=":
-                queryValue += "$qte:\"ISO-8601 ";
-                break;
-            case "<":
-            case "<=":
-                queryValue += "$lte:\"ISO-8601 ";
-                break;
-            default:
-                return "";
-        }
-
-        queryValue += val + "T00:00:00.000Z\"}";
+//        String[] items = val.split(" ");
+//        if (items.length != 2) return "";
+//        switch (items[0]) {
+//            case ">":
+//            case ">=":
+//                queryValue += "$qte:\"ISO-8601 ";
+//                break;
+//            case "<":
+//            case "<=":
+//                queryValue += "$lte:\"ISO-8601 ";
+//                break;
+//            default:
+//                return "";
+//        }
+//
+//        queryValue += val + "T00:00:00.000Z\"}";
         return queryValue;
     }
 }

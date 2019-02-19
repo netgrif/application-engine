@@ -2,12 +2,14 @@ package com.netgrif.workflow.history.domain;
 
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.DataField;
+import lombok.NoArgsConstructor;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.util.Map;
 
 @Document
+@NoArgsConstructor
 public class CaseEventLog extends EventLog implements ICaseEventLog {
 
     private String caseId;
@@ -24,7 +26,6 @@ public class CaseEventLog extends EventLog implements ICaseEventLog {
         this.caseId = useCase.getStringId();
         this.caseTitle = useCase.getTitle();
         this.activePlaces = useCase.getActivePlaces();
-        this.dataSetValues = useCase.getDataSet();
     }
 
     @Override

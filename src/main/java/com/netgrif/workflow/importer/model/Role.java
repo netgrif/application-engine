@@ -1,8 +1,11 @@
 
 package com.netgrif.workflow.importer.model;
 
+import java.util.ArrayList;
+import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
@@ -22,6 +25,7 @@ import javax.xml.bind.annotation.XmlType;
  *           &lt;element ref="{}title"/&gt;
  *           &lt;element ref="{}name"/&gt;
  *         &lt;/choice&gt;
+ *         &lt;element ref="{}event" maxOccurs="unbounded" minOccurs="0"/&gt;
  *       &lt;/sequence&gt;
  *     &lt;/restriction&gt;
  *   &lt;/complexContent&gt;
@@ -34,28 +38,39 @@ import javax.xml.bind.annotation.XmlType;
 @XmlType(name = "", propOrder = {
     "id",
     "title",
-    "name"
+    "name",
+    "event"
 })
 @XmlRootElement(name = "role")
 public class Role {
 
-    protected long id;
+    @XmlElement(required = true)
+    protected String id;
     protected I18NStringType title;
     protected I18NStringType name;
+    protected List<Event> event;
 
     /**
      * Gets the value of the id property.
      * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
      */
-    public long getId() {
+    public String getId() {
         return id;
     }
 
     /**
      * Sets the value of the id property.
      * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
      */
-    public void setId(long value) {
+    public void setId(String value) {
         this.id = value;
     }
 
@@ -105,6 +120,35 @@ public class Role {
      */
     public void setName(I18NStringType value) {
         this.name = value;
+    }
+
+    /**
+     * Gets the value of the event property.
+     * 
+     * <p>
+     * This accessor method returns a reference to the live list,
+     * not a snapshot. Therefore any modification you make to the
+     * returned list will be present inside the JAXB object.
+     * This is why there is not a <CODE>set</CODE> method for the event property.
+     * 
+     * <p>
+     * For example, to add a new item, do as follows:
+     * <pre>
+     *    getEvent().add(newItem);
+     * </pre>
+     * 
+     * 
+     * <p>
+     * Objects of the following type(s) are allowed in the list
+     * {@link Event }
+     * 
+     * 
+     */
+    public List<Event> getEvent() {
+        if (event == null) {
+            event = new ArrayList<Event>();
+        }
+        return this.event;
     }
 
 }
