@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://modeler.netgrif.com/petriflow_schema.xsd">
+    <!-- DATA -->
+    <data type="text">
+        <id>data_text</id>
+        <title>Text</title>
+    </data>
+    <data type="number">
+        <id>data_number</id>
+        <title>Number</title>
+    </data>
+    <!-- TRANSITIONS -->
+    <transition>
+        <id>2</id>
+        <x>380</x>
+        <y>180</y>
+        <label>Enabled</label>
+        <dataRef>
+            <id>data_text</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>data_number</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <event type="assign">
+            <id>2_assign</id>
+            <actions phase="post">
+                <action>
+                    <!-- @formatter:off -->
+                    text: f.data_text,
+                    number: f.data_number;
+                    def usecase = findCase({ it.title.eq("Case 1") })
+                    def data = getData("2", usecase)
+                    change text value {
+                        data["data_text"].value
+                    }
+                    change number value {
+                        data["data_number"].value
+                    }
+                    <!-- @formatter:on  -->
+                </action>
+            </actions>
+        </event>
+    </transition>
+    <transition>
+        <id>3</id>
+        <x>380</x>
+        <y>340</y>
+        <label>Disabled</label>
+    </transition>
+    <!-- PLACES -->
+    <place>
+        <id>1</id>
+        <x>220</x>
+        <y>180</y>
+        <label></label>
+        <tokens>1</tokens>
+        <static>false</static>
+    </place>
+    <place>
+        <id>5</id>
+        <x>220</x>
+        <y>340</y>
+        <label></label>
+        <tokens>0</tokens>
+        <static>false</static>
+    </place>
+    <!-- ARCS -->
+    <arc>
+        <id>4</id>
+        <type>regular</type>
+        <sourceId>1</sourceId>
+        <destinationId>2</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>6</id>
+        <type>regular</type>
+        <sourceId>5</sourceId>
+        <destinationId>3</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+</document>

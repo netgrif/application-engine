@@ -1,3 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="xs3p.xsl"?>
 <xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified"
            xmlns:xs="http://www.w3.org/2001/XMLSchema"
            version="1.1.0">
@@ -18,13 +20,16 @@
                 <xs:element ref="placeholder" minOccurs="0"/>
                 <xs:element ref="desc" minOccurs="0"/>
                 <xs:element ref="values" minOccurs="0" maxOccurs="unbounded"/>
-                <xs:element ref="valid" minOccurs="0"/>
+                <xs:element ref="valid" minOccurs="0" maxOccurs="unbounded"/>
                 <xs:element ref="init" minOccurs="0"/>
+                <xs:element ref="format" minOccurs="0"/>
                 <xs:element ref="encryption" minOccurs="0"/>
                 <xs:element ref="action" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:element ref="actionRef" minOccurs="0" maxOccurs="unbounded"/>
                 <xs:element ref="documentRef" minOccurs="0"/>
+                <xs:element ref="remote" minOccurs="0"/>
             </xs:sequence>
-            <xs:attribute type="data_type" name="type"/>
+            <xs:attribute type="data_type" name="type" use="required"/>
             <xs:attribute type="xs:boolean" name="immediate"/>
         </xs:complexType>
     </xs:element>
@@ -36,6 +41,7 @@
                     <xs:element ref="title"/>
                     <xs:element ref="name"/>
                 </xs:choice>
+                <xs:element ref="event" maxOccurs="unbounded" minOccurs="0"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
@@ -60,11 +66,15 @@
                 <xs:element ref="label"/>
                 <xs:element ref="icon" minOccurs="0"/>
                 <xs:element ref="priority" minOccurs="0"/>
+                <xs:element ref="assignPolicy" minOccurs="0"/>
+                <xs:element ref="dataFocusPolicy" minOccurs="0"/>
+                <xs:element ref="finishPolicy" minOccurs="0"/>
                 <xs:element ref="trigger" minOccurs="0" maxOccurs="unbounded"/>
                 <xs:element ref="transactionRef" minOccurs="0"/>
                 <xs:element ref="roleRef" maxOccurs="unbounded" minOccurs="0"/>
                 <xs:element ref="dataRef" maxOccurs="unbounded" minOccurs="0"/>
                 <xs:element ref="dataGroup" maxOccurs="unbounded" minOccurs="0"/>
+                <xs:element ref="event" maxOccurs="unbounded" minOccurs="0"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
@@ -85,14 +95,14 @@
     </xs:element>
     <xs:element name="arc">
         <xs:complexType>
-            <xs:all>
+            <xs:sequence>
                 <xs:element ref="id"/>
                 <xs:element name="type" type="arc_type" default="regular"/>
                 <xs:element ref="sourceId"/>
                 <xs:element ref="destinationId"/>
                 <xs:element ref="multiplicity"/>
-                <xs:element ref="breakPoint" minOccurs="0"/>
-            </xs:all>
+                <xs:element ref="breakPoint" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
         </xs:complexType>
     </xs:element>
     <xs:element name="i18n">
@@ -111,16 +121,21 @@
         <xs:complexType>
             <xs:sequence>
                 <xs:element ref="id" minOccurs="0"/>
+                <xs:element ref="version" minOccurs="0"/>
+                <xs:element ref="initials" minOccurs="0"/>
+                <xs:element name="title" minOccurs="0" type="i18nStringType"/>
                 <xs:element ref="icon" minOccurs="0"/>
                 <xs:element ref="defaultRole" minOccurs="0"/>
+                <xs:element ref="transitionRole" minOccurs="0"/>
+                <xs:element ref="caseName" minOccurs="0"/>
                 <xs:element ref="transaction" maxOccurs="unbounded" minOccurs="0"/>
                 <xs:element ref="role" maxOccurs="unbounded" minOccurs="0"/>
                 <xs:element ref="data" maxOccurs="unbounded" minOccurs="0"/>
                 <xs:element ref="mapping" maxOccurs="unbounded" minOccurs="0"/>
                 <xs:element ref="i18n" maxOccurs="unbounded" minOccurs="0"/>
                 <xs:element ref="transition" maxOccurs="unbounded"/>
-                <xs:element ref="place" maxOccurs="unbounded"/>
-                <xs:element ref="arc" maxOccurs="unbounded"/>
+                <xs:element ref="place" maxOccurs="unbounded" minOccurs="0"/>
+                <xs:element ref="arc" maxOccurs="unbounded" minOccurs="0"/>
             </xs:sequence>
         </xs:complexType>
         <xs:unique name="transitionUniqueId">
@@ -141,6 +156,10 @@
         </xs:unique>
         <xs:unique name="dataUniqueId">
             <xs:selector xpath="./data"/>
+            <xs:field xpath="id"/>
+        </xs:unique>
+        <xs:unique name="mappingId">
+            <xs:selector xpath="./mapping"/>
             <xs:field xpath="id"/>
         </xs:unique>
         <xs:key name="ptIdKey">
@@ -169,6 +188,8 @@
             <xs:enumeration value="file"/>
             <xs:enumeration value="user"/>
             <xs:enumeration value="caseref"/>
+            <xs:enumeration value="dateTime"/>
+            <xs:enumeration value="button"/>
         </xs:restriction>
     </xs:simpleType>
     <xs:simpleType name="arc_type">
@@ -177,6 +198,7 @@
             <xs:enumeration value="reset"/>
             <xs:enumeration value="inhibitor"/>
             <xs:enumeration value="read"/>
+            <xs:enumeration value="variable"/>
         </xs:restriction>
     </xs:simpleType>
     <xs:simpleType name="validation">
@@ -187,6 +209,8 @@
     <xs:simpleType name="dataGroupAlignment">
         <xs:restriction base="xs:string">
             <xs:enumeration value="start"/>
+            <xs:enumeration value="center"/>
+            <xs:enumeration value="end"/>
             <xs:enumeration value="left"/>
         </xs:restriction>
     </xs:simpleType>
@@ -195,6 +219,18 @@
             <xs:enumeration value="auto"/>
             <xs:enumeration value="user"/>
             <xs:enumeration value="time"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="assignPolicyType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="auto"/>
+            <xs:enumeration value="manual"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="finishPolicyType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="auto_no_data"/>
+            <xs:enumeration value="manual"/>
         </xs:restriction>
     </xs:simpleType>
     <xs:simpleType name="nonNegativeLong">
@@ -207,6 +243,12 @@
             <xs:minInclusive value="0"/>
         </xs:restriction>
     </xs:simpleType>
+    <xs:simpleType name="dataFocusPolicyType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="manual"/>
+            <xs:enumeration value="auto_empty_required"/>
+        </xs:restriction>
+    </xs:simpleType>
     <!-- ===== INNER ELEMENTS ===== -->
     <xs:element name="x" type="xs:short"/>
     <xs:element name="y" type="xs:short"/>
@@ -215,8 +257,8 @@
     <xs:element name="isStatic" type="xs:boolean"/>
     <xs:element name="static" type="xs:boolean"/>
     <xs:element name="type" type="xs:string"/>
-    <xs:element name="sourceId" type="nonNegativeLong"/>
-    <xs:element name="destinationId" type="nonNegativeLong"/>
+    <xs:element name="sourceId" type="xs:string"/>
+    <xs:element name="destinationId" type="xs:string"/>
     <xs:element name="multiplicity" type="nonNegativeInteger"/>
     <xs:element name="breakPoint">
         <xs:complexType>
@@ -226,23 +268,35 @@
             </xs:sequence>
         </xs:complexType>
     </xs:element>
-    <xs:element name="id" type="nonNegativeLong"/>
+    <xs:element name="id" type="xs:string"/>
     <xs:element name="title" type="i18nStringType"/>
     <xs:element name="name" type="i18nStringType"/>
+    <xs:element name="version" type="xs:string"/>
+    <xs:element name="initials" type="initialsType"/>
+    <xs:simpleType name="initialsType">
+        <xs:restriction base="xs:string">
+            <xs:length value="3"/>
+        </xs:restriction>
+    </xs:simpleType>
     <xs:element name="values" type="i18nStringType"/>
     <xs:element name="perform" type="xs:boolean"/>
+    <xs:element name="view" type="xs:boolean"/>
     <xs:element name="delegate" type="xs:boolean"/>
+    <xs:element name="cancel" type="xs:boolean"/>
     <xs:element name="logic">
         <xs:complexType>
             <xs:sequence>
                 <xs:element ref="perform" minOccurs="0"/>
                 <xs:element ref="delegate" minOccurs="0"/>
-                <xs:element ref="behavior" maxOccurs="unbounded" minOccurs="0"/>
+                <xs:element ref="view" minOccurs="0"/>
+                <xs:element ref="cancel" minOccurs="0"/>
+                <xs:element name="behavior" type="behavior" maxOccurs="unbounded" minOccurs="0"/>
                 <xs:element ref="action" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:element ref="actionRef" minOccurs="0" maxOccurs="unbounded"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
-    <xs:element name="transitionRef" type="nonNegativeLong"/>
+    <xs:element name="transitionRef" type="xs:string"/>
     <xs:element name="transactionRef">
         <xs:complexType>
             <xs:sequence>
@@ -258,7 +312,17 @@
             </xs:sequence>
         </xs:complexType>
     </xs:element>
-    <xs:element name="behavior" type="xs:string"/>
+    <xs:simpleType name="behavior">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="forbidden"/>
+            <xs:enumeration value="hidden"/>
+            <xs:enumeration value="visible"/>
+            <xs:enumeration value="editable"/>
+            <xs:enumeration value="required"/>
+            <xs:enumeration value="immediate"/>
+            <xs:enumeration value="optional"/>
+        </xs:restriction>
+    </xs:simpleType>
     <xs:element name="dataRef">
         <xs:complexType>
             <xs:sequence>
@@ -284,18 +348,25 @@
         <xs:simpleContent>
             <xs:extension base="xs:string">
                 <xs:attribute name="trigger"/>
+                <xs:attribute name="id"/>
             </xs:extension>
         </xs:simpleContent>
     </xs:complexType>
     <xs:element name="placeholder" type="i18nStringType"/>
     <xs:element name="valid" type="validation"/>
     <xs:element name="init" type="xs:string"/>
+    <xs:simpleType name="remoteType">
+        <xs:restriction base="xs:string">
+            <xs:maxLength value="0"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:element name="remote" type="remoteType"/>
     <xs:element name="desc" type="i18nStringType"/>
     <xs:element name="priority" type="nonNegativeInteger"/>
     <xs:element name="trigger">
         <xs:complexType>
             <!--todo: only if time -->
-            <xs:choice>
+            <xs:choice minOccurs="0">
                 <xs:element name="exact" type="xs:dateTime"/>
                 <xs:element name="delay" type="xs:duration"/>
             </xs:choice>
@@ -320,7 +391,8 @@
             </xs:extension>
         </xs:simpleContent>
     </xs:complexType>
-    <xs:element name="defaultRole" type="xs:boolean"/>
+    <xs:element name="defaultRole" type="xs:boolean" default="true"/>
+    <xs:element name="transitionRole" type="xs:boolean" default="true"/>
     <xs:element name="i18nString" type="i18nStringType"/>
     <xs:complexType name="i18nStringType">
         <xs:simpleContent>
@@ -329,4 +401,69 @@
             </xs:extension>
         </xs:simpleContent>
     </xs:complexType>
+    <xs:element name="assignPolicy" type="assignPolicyType"/>
+    <xs:element name="dataFocusPolicy" type="dataFocusPolicyType"/>
+    <xs:element name="finishPolicy" type="finishPolicyType"/>
+    <xs:element name="caseName" type="i18nStringType"/>
+    <xs:element name="event">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="id"/>
+                <xs:element ref="title" minOccurs="0"/>
+                <xs:element ref="message" minOccurs="0"/>
+                <xs:element ref="actions" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+            <xs:attribute name="type" use="required" type="eventType"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:simpleType name="eventType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="assign"/>
+            <xs:enumeration value="cancel"/>
+            <xs:enumeration value="finish"/>
+            <xs:enumeration value="delegate"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="eventPhaseType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="pre"/>
+            <xs:enumeration value="post"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:element name="actions">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="action" maxOccurs="unbounded" minOccurs="0"/>
+                <xs:element ref="actionRef" maxOccurs="unbounded" minOccurs="0"/>
+            </xs:sequence>
+            <xs:attribute type="eventPhaseType" name="phase" use="required"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="message" type="i18nStringType"/>
+    <xs:element name="actionRef" type="actionRefType"/>
+    <xs:complexType name="actionRefType">
+        <xs:sequence>
+            <xs:element ref="id"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:element name="format">
+        <xs:complexType>
+            <xs:choice>
+                <xs:element ref="currency"/>
+            </xs:choice>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="currency">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="code"/>
+                <xs:element ref="fractionSize"/>
+                <xs:element ref="locale"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <!-- ISO 4217 currency code -->
+    <xs:element name="code" type="xs:string" default="EUR"/>
+    <xs:element name="fractionSize" type="xs:int" default="2"/>
+    <xs:element name="locale" type="xs:string"/>
 </xs:schema>

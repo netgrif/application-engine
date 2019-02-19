@@ -1,23 +1,13 @@
 package com.netgrif.workflow.workflow.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.netgrif.workflow.auth.domain.Author;
-import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.petrinet.domain.I18nString;
-import com.netgrif.workflow.petrinet.web.responsebodies.PetriNetReference;
-import com.netgrif.workflow.petrinet.web.responsebodies.TransitionReference;
-import com.netgrif.workflow.workflow.web.requestbodies.CreateFilterBody;
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 @Document
 @Data
@@ -47,11 +37,13 @@ public class Filter {
 
     private String query;
 
+    private String readableQuery;
+
     public Filter() {
         this.created = LocalDateTime.now();
     }
 
-    public Filter(I18nString title, I18nString description, Integer visibility, Author author, String type, String query) {
+    public Filter(I18nString title, I18nString description, Integer visibility, Author author, String type, String query, String readableQuery) {
         this();
         this.title = title;
         this.description = description;
@@ -59,9 +51,10 @@ public class Filter {
         this.author = author;
         this.type = type;
         this.query = query;
+        this.readableQuery = readableQuery;
     }
 
-    public String getStringId(){
+    public String getStringId() {
         return this._id.toString();
     }
 }

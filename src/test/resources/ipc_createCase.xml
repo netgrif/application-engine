@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="../../main/resources/petriNets/petriflow_schema.xsd">
+    <id>create_case_net</id>
+    <defaultRole>true</defaultRole>
+    <data type="number">
+        <id>field</id>
+        <title>Field</title>
+        <init>0</init>
+    </data>
+    <data type="number">
+        <id>field2</id>
+        <title>Field2</title>
+        <init>0</init>
+    </data>
+    <transition>
+        <id>task</id>
+        <x>0</x>
+        <y>0</y>
+        <label>Task</label>
+        <event type="finish">
+            <id>1</id>
+            <actions phase="post">
+                <action>
+                    createCase("create_case_net","Create Case Case");
+                </action>
+            </actions>
+        </event>
+    </transition>
+</document>

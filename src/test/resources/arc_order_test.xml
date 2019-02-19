@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="https://modeler.netgrif.com/petriflow_schema.xsd">
+    <!-- TRANSITIONS -->
+    <transition>
+        <id>1</id>
+        <x>0</x>
+        <y>0</y>
+        <label>1</label>
+    </transition>
+    <!-- PLACES -->
+    <place>
+        <id>2</id>
+        <x>0</x>
+        <y>0</y>
+        <label/>
+        <tokens>5</tokens>
+        <static>false</static>
+    </place>
+    <!-- ARCS -->
+    <arc>
+        <id>7</id>
+        <type>reset</type>
+        <sourceId>2</sourceId>
+        <destinationId>1</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>3</id>
+        <type>regular</type>
+        <sourceId>2</sourceId>
+        <destinationId>1</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+</document>

@@ -21,16 +21,21 @@ class EnumerationField extends ChoiceField<I18nString> {
 
     @Override
     void setValue(I18nString value) {
-        if (!value || choices.find { (it == value) }) {
-            super.setValue(value)
-        } else {
-            throw new IllegalArgumentException("Value $value is not a choice")
-        }
+        super.setValue(value)
+        //TODO: case save choices
+//        if (!value || choices.find { (it == value) }) {
+//            super.setValue(value)
+//        } else {
+//            throw new IllegalArgumentException("Value $value is not a choice")
+//        }
     }
 
     void setValue(String value) {
         def i18n = choices.find {it.contains(value)}
-        setValue(i18n)
+        //TODO: case save choices
+        if (i18n == null)
+            i18n = new I18nString(value)
+        super.setValue(i18n)
     }
 
     @Override
@@ -42,11 +47,24 @@ class EnumerationField extends ChoiceField<I18nString> {
     void setDefaultValue(String defaultValue) {
         I18nString value = choices.find { it.contains(defaultValue) }
         if (!value && defaultValue)
-            throw new IllegalArgumentException("Value $defaultValue is not a choice.")
+            value = new I18nString(defaultValue)
+        //TODO: case save choices
+//            throw new IllegalArgumentException("Value $defaultValue is not a choice.")
         this.defaultValue = value
     }
 
     String getTranslatedValue(Locale locale) {
         return value?.getTranslation(locale)
+    }
+
+    @Override
+    Field clone() {
+        EnumerationField clone = new EnumerationField()
+        super.clone(clone)
+
+        clone.choices = this.choices
+        clone.defaultValue = this.defaultValue
+
+        return clone
     }
 }

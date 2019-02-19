@@ -18,26 +18,22 @@ public class UserResource extends Resource<LocalisedUser> {
 
     public UserResource(User content, String selfRel, Locale locale, boolean small) {
         this(content, selfRel, locale);
+        getContent().setPassword(null);
         if (small) {
             getContent().setTelNumber(null);
-            getContent().setOrganizations(null);
+            getContent().setGroups(null);
             getContent().setAuthorities(null);
-            getContent().setPassword(null);
             getContent().setProcessRoles(null);
         }
     }
 
     private void buildLinks(String selfRel) {
         ControllerLinkBuilder getLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(UserController.class)
-                .getUser(getContent().getId(), null));
+                .getUser(getContent().getId(),false, null));
         add(selfRel.equalsIgnoreCase("profile") ? getLink.withSelfRel() : getLink.withRel("profile"));
 
-        ControllerLinkBuilder smallLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(UserController.class)
-                .getSmallUser(getContent().getId(), null));
-        add(selfRel.equalsIgnoreCase("small") ? smallLink.withSelfRel() : smallLink.withRel("small"));
-
         ControllerLinkBuilder roleLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(UserController.class)
-                .assignRolesToUser(getContent().getId(), null));
+                .assignRolesToUser(getContent().getId(), null, null));
         add(selfRel.equalsIgnoreCase("assignProcessRole") ? roleLink.withSelfRel() : roleLink.withRel("assignProcessRole"));
 
         ControllerLinkBuilder authorityLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(UserController.class)

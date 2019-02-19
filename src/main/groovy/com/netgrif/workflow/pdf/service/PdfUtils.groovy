@@ -1,16 +1,16 @@
 package com.netgrif.workflow.pdf.service
 
-import com.netgrif.workflow.utils.ResourceFileLoader
 import org.apache.pdfbox.cos.COSName
 import org.apache.pdfbox.io.MemoryUsageSetting
 import org.apache.pdfbox.multipdf.PDFMergerUtility
-import org.apache.pdfbox.pdmodel.PDDocument
-import org.apache.pdfbox.pdmodel.PDDocumentCatalog
-import org.apache.pdfbox.pdmodel.PDResources
+import org.apache.pdfbox.pdmodel.*
+import org.apache.pdfbox.pdmodel.common.PDRectangle
 import org.apache.pdfbox.pdmodel.encryption.AccessPermission
 import org.apache.pdfbox.pdmodel.encryption.StandardProtectionPolicy
 import org.apache.pdfbox.pdmodel.font.PDType0Font
 import org.apache.pdfbox.pdmodel.interactive.form.PDAcroForm
+import org.apache.pdfbox.pdmodel.interactive.form.PDField
+import org.apache.pdfbox.pdmodel.interactive.form.PDNonTerminalField
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -18,7 +18,46 @@ class PdfUtils {
 
     private static final Logger log = LoggerFactory.getLogger(PdfUtils.class)
 
-    static File removePages(File pdfFile, int... pages) {
+    static final int KEY_LENGTH = 128
+
+    /**
+     * Creates and returns new PDF file, created by shrinking input PDF file. To enlarge pdf, provide negative values.
+     * @param inputFile input pdf
+     * @param outputFileName output pdf file name
+     * @param left left space in mm
+     * @param right right space in mm
+     * @param up upper space in mm
+     * @param down lower space in mm
+     * @return resized PDF file
+     */
+    static File resize(File inputFile, String outputFileName, float left, float right, float up, float down) {
+        File outputFile = new File(outputFileName)
+        PDDocument inputDoc = PDDocument.load(inputFile)
+        PDDocument outputDoc = new PDDocument()
+
+        PDPageTree pages = inputDoc.getDocumentCatalog().getPages()
+        for (PDPage page : pages) {
+            PDRectangle rectangle = new PDRectangle()
+            rectangle.setLowerLeftX(-mmToPoint(left))
+            rectangle.setLowerLeftY(-mmToPoint(down))
+            rectangle.setUpperRightX(PDRectangle.A4.width + mmToPoint(right) as float)
+            rectangle.setUpperRightY(PDRectangle.A4.height + mmToPoint(up) as float)
+            page.setMediaBox(rectangle)
+            page.setCropBox(rectangle)
+            outputDoc.addPage(page)
+        }
+        outputDoc.save(outputFile)
+        inputDoc.close()
+        outputDoc.close()
+
+        return outputFile
+    }
+
+    static float mmToPoint(float mm) {
+        return (mm * 72) / 25.4F
+    }
+
+    static File removePages(File pdfFile, int ... pages) {
         PDDocument document = PDDocument.load(pdfFile)
 
         pages.each {
@@ -29,8 +68,6 @@ class PdfUtils {
 
         return pdfFile
     }
-
-    private static final int KEY_LENGTH = 128
 
     static File encryptPdfFile(String outPdfPath, File input, String ownerPassword = "", String userPassword = "") {
         PDDocument doc = PDDocument.load(input)
@@ -69,14 +106,7 @@ class PdfUtils {
             PDDocumentCatalog docCatalog = document.getDocumentCatalog()
             PDAcroForm acroForm = docCatalog.getAcroForm()
 
-            Map<String, String> fonts = new HashMap<>()
-//            fonts.put("/KlavikaBasic-Regular", addFont(document, acroForm, "classpath:fonts/Klavika Regular.ttf"))
-//            fonts.put("/KlavikaBasic-Bold", addFont(document, acroForm, "classpath:fonts/Klavika Bold.ttf"))
-//            fonts.put("/KlavikaBasic-Medium", addFont(document, acroForm, "classpath:fonts/Klavika Medium.ttf"))
-            fonts.put("/KlavikaBasic-Regular", addFont(document, acroForm, "src/main/resources/fonts/Klavika Regular.ttf"))
-            fonts.put("/KlavikaBasic-Bold", addFont(document, acroForm, "src/main/resources/fonts/Klavika Bold.ttf"))
-            fonts.put("/KlavikaBasic-Medium", addFont(document, acroForm, "src/main/resources/fonts/Klavika Medium.ttf"))
-            addFieldValues(acroForm, xml, fonts)
+            addFieldValues(acroForm, xml, [:])
             return saveToFile(document, outPdfName)
         } catch (IOException e) {
             e.printStackTrace()
@@ -84,7 +114,7 @@ class PdfUtils {
         }
     }
 
-    private static String addFont(PDDocument document, PDAcroForm acroForm, String fontPath) {
+    static String addFont(PDDocument document, PDAcroForm acroForm, String fontPath) {
         PDResources res = acroForm.getDefaultResources()
         if (res == null)
             res = new PDResources()
@@ -102,7 +132,7 @@ class PdfUtils {
         return fontName
     }
 
-    private static void addFieldValues(PDAcroForm acroForm, String xmlText, Map<String, String> fonts) {
+    static void addFieldValues(PDAcroForm acroForm, String xmlText, Map<String, String> fonts) {
         def fieldValues = new XmlSlurper().parseText(xmlText)
 
         fieldValues.children().each {
@@ -112,11 +142,11 @@ class PdfUtils {
         acroForm.flatten()
     }
 
-    private static setFieldValueAndFont(PDAcroForm acroForm, def xmlNode, Map<String, String> fonts) {
+    static setFieldValueAndFont(PDAcroForm acroForm, def xmlNode, Map<String, String> fonts) {
         def id = ((xmlNode["@xfdf:original"] as String) ?: xmlNode.name()) as String
         def field = acroForm.fieldIterator.find { it.partialName.equalsIgnoreCase(id) }
         if (field == null) {
-            log.error("Cannot find field [$id]")
+            log.warn("Cannot find field [$id]")
             return
         }
 
@@ -129,14 +159,46 @@ class PdfUtils {
             }
             field.setValue(xmlNode as String)
         } catch (NullPointerException e) {
-            log.error("Cannot find field $id", e)
+            log.warn("Cannot find field $id", e)
         }
     }
 
-    private static File saveToFile(PDDocument document, String outPdfName) {
+    static File saveToFile(PDDocument document, String outPdfName) {
         File file = new File(outPdfName)
         document.save(file)
         document.close()
         return file
+    }
+
+    static Map<String,String> readPdfForm(InputStream inputStream) {
+
+        Map<String, String> result = new HashMap<>()
+
+        PDDocument document = PDDocument.load(inputStream)
+        PDDocumentCatalog docCatalog = document.getDocumentCatalog()
+        PDAcroForm acroForm = docCatalog.getAcroForm()
+
+        List<PDField> fields = acroForm.getFields()
+
+        fields.forEach({
+            addAllFieldsAndChildFields(it, result)
+        })
+
+        return result
+    }
+
+    static addAllFieldsAndChildFields(PDField field, Map<String,String> result) {
+
+        if (field instanceof PDNonTerminalField)
+        {
+            PDNonTerminalField nonTerminalField = (PDNonTerminalField) field
+            nonTerminalField.getChildren().forEach({
+                //Non terminal fields are not written to map at the moment
+                //If needed, add it here
+                addAllFieldsAndChildFields(it ,result)
+            })
+        } else {
+            result.put(field.getFullyQualifiedName(), field.getValueAsString())
+        }
     }
 }

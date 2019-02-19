@@ -24,13 +24,16 @@ abstract class ValidableField<T> extends FieldWithDefault<T> {
         return validationRules
     }
 
-    void setValidationRules(String validationRules) {
-        this.validationRules = validationRules
+    void setValidationRules(String rules) {
+        this.validationRules = rules
     }
 
-    void setValidationRules(String[] rules) {
+    void setValidationRules(List<String> rules) {
+        if (rules == null || rules.empty)
+            return
+
         StringBuilder builder = new StringBuilder()
-        Arrays.stream(rules).each { rule ->
+        rules.each { rule ->
             rule = rule.trim()
             if (rule.contains(" ") || rule.contains("(")) builder.append("{${rule}},")
             else builder.append(rule + ",")

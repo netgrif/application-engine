@@ -14,7 +14,7 @@ class NumberField extends ValidableField<Double> {
 
     NumberField() {
         super()
-        super.superSetDefaultValue(0)
+        super.superSetDefaultValue(0.0d)
     }
 
     @Override
@@ -42,5 +42,16 @@ class NumberField extends ValidableField<Double> {
 
     void setMaxValue(Double maxValue) {
         this.maxValue = maxValue
+    }
+
+    @Override
+    Field clone() {
+        NumberField clone = new NumberField()
+        super.clone(clone)
+
+        clone.validationRules = this.validationRules
+        clone.defaultValue = this.defaultValue
+
+        return clone
     }
 }

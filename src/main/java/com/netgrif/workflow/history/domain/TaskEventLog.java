@@ -2,9 +2,11 @@ package com.netgrif.workflow.history.domain;
 
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.Task;
+import lombok.NoArgsConstructor;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document
+@NoArgsConstructor
 public class TaskEventLog extends EventLog implements ITaskEventLog {
 
     private String taskId;

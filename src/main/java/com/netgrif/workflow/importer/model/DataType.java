@@ -23,6 +23,8 @@ import javax.xml.bind.annotation.XmlType;
  *     &lt;enumeration value="file"/&gt;
  *     &lt;enumeration value="user"/&gt;
  *     &lt;enumeration value="caseref"/&gt;
+ *     &lt;enumeration value="dateTime"/&gt;
+ *     &lt;enumeration value="button"/&gt;
  *   &lt;/restriction&gt;
  * &lt;/simpleType&gt;
  * </pre>
@@ -49,7 +51,11 @@ public enum DataType {
     @XmlEnumValue("user")
     USER("user"),
     @XmlEnumValue("caseref")
-    CASEREF("caseref");
+    CASEREF("caseref"),
+    @XmlEnumValue("dateTime")
+    DATE_TIME("dateTime"),
+    @XmlEnumValue("button")
+    BUTTON("button");
     private final String value;
 
     DataType(String v) {

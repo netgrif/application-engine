@@ -31,7 +31,15 @@ class DateField extends ValidableField<LocalDate> {
     }
 
     void setValue(Date value) {
-        this.value = ((Date) value).toInstant().atZone(ZoneId.systemDefault()).toLocalDate()
+        this.value = value?.toInstant()?.atZone(ZoneId.systemDefault())?.toLocalDate()
+    }
+
+    void setDefaultValue(String value) {
+        this.setDefaultValue(LocalDate.parse(value))
+    }
+
+    void setDefaultValue(Date value) {
+        this.setDefaultValue(value.toInstant().atZone(ZoneId.systemDefault()).toLocalDate())
     }
 
     String getMinDate() {
@@ -48,5 +56,15 @@ class DateField extends ValidableField<LocalDate> {
 
     void setMaxDate(String maxDate) {
         this.maxDate = maxDate
+    }
+
+    @Override
+    Field clone() {
+        DateField clone = new DateField()
+        super.clone(clone)
+        clone.validationRules = this.validationRules
+        clone.defaultValue = this.defaultValue
+
+        return clone
     }
 }
