@@ -6,6 +6,7 @@ import org.apache.pdfbox.pdmodel.common.PDRectangle
 import org.apache.pdfbox.pdmodel.encryption.AccessPermission
 import org.apache.pdfbox.pdmodel.encryption.StandardProtectionPolicy
 import org.apache.pdfbox.pdmodel.font.PDType0Font
+import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject
 import org.apache.pdfbox.pdmodel.interactive.form.PDAcroForm
 
 import static com.netgrif.workflow.pdf.service.PdfUtils.mmToPoint
@@ -47,6 +48,21 @@ class PdfBuilder {
 
     PDDocument build() {
         return document
+    }
+
+    PdfBuilder includeImage(String filePath, int pageNumber, float x, float y, float width, float height) {
+        return includeImage(new File(filePath), pageNumber, x, y, width, height)
+    }
+
+    PdfBuilder includeImage(File file, int pageNumber, float x, float y, float width, float height) {
+        PDPage page = document.getPage(pageNumber)
+        PDImageXObject pdImage = PDImageXObject.createFromFileByContent(file, document)
+
+        PDPageContentStream contentStream = new PDPageContentStream(document, page, true, true)
+        contentStream.drawImage(pdImage, x, y, width, height)
+        contentStream.close()
+
+        return this
     }
 
     PdfBuilder fill(String xml, Map<String, String> fonts) {
