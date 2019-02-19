@@ -28,4 +28,12 @@ class BooleanField extends FieldWithDefault<Boolean> {
     Boolean and(final BooleanField field) {
         return this.value && field.value
     }
+
+    @Override
+    Field clone() {
+        BooleanField clone = new BooleanField()
+        super.clone(clone)
+        clone.defaultValue = this.defaultValue
+        return clone
+    }
 }

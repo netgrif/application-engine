@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="../../main/resources/petriNets/petriflow_schema.xsd">
+    <data type="number">
+        <id>1</id>
+        <title>x</title>
+        <init>5</init>
+    </data>
+    <data type="number">
+        <id>2</id>
+        <title>y</title>
+        <init>2</init>
+    </data>
+    <place>
+        <id>1</id>
+        <x>220</x>
+        <y>220</y>
+        <label/>
+        <tokens>10</tokens>
+        <static>false</static>
+    </place>
+    <place>
+        <id>3</id>
+        <x>460</x>
+        <y>220</y>
+        <label/>
+        <tokens>0</tokens>
+        <static>false</static>
+    </place>
+    <transition>
+        <id>2</id>
+        <x>340</x>
+        <y>220</y>
+        <label>TEST</label>
+    </transition>
+    <arc>
+        <id>4</id>
+        <type>variable</type>
+        <sourceId>1</sourceId>
+        <destinationId>2</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>5</id>
+        <type>variable</type>
+        <sourceId>2</sourceId>
+        <destinationId>3</destinationId>
+        <multiplicity>2</multiplicity>
+    </arc>
+</document>

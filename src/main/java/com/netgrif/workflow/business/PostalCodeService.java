@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 
 import javax.persistence.PersistenceException;
 import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
 
 @Service
@@ -33,17 +34,15 @@ public class PostalCodeService implements IPostalCodeService {
 
     @Override
     public List<PostalCode> findAllByCode(String code) {
-        List<PostalCode> results = repository.findAllByCode(code.replaceAll("\\s", "").trim());
-        //TODO: ošetriť requesty na poštu
-//        if (results.isEmpty()) { }
-        return results;
+        if (code == null)
+            return new LinkedList<>();
+        return repository.findAllByCode(code.replaceAll("\\s", "").trim());
     }
 
     @Override
     public List<PostalCode> findAllByCity(String city) {
-        List<PostalCode> results = repository.findAllByCity(city.trim());
-        //TODO: ošetriť requesty na poštu
-//        if (results.isEmpty()) { }
-        return results;
+        if (city == null)
+            return new LinkedList<>();
+        return repository.findAllByCity(city.trim());
     }
 }

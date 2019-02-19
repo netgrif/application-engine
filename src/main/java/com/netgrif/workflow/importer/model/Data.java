@@ -1,9 +1,14 @@
 
 package com.netgrif.workflow.importer.model;
 
-import javax.xml.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
 
 
 /**
@@ -21,13 +26,16 @@ import java.util.List;
  *         &lt;element ref="{}placeholder" minOccurs="0"/&gt;
  *         &lt;element ref="{}desc" minOccurs="0"/&gt;
  *         &lt;element ref="{}values" maxOccurs="unbounded" minOccurs="0"/&gt;
- *         &lt;element ref="{}valid" minOccurs="0"/&gt;
+ *         &lt;element ref="{}valid" maxOccurs="unbounded" minOccurs="0"/&gt;
  *         &lt;element ref="{}init" minOccurs="0"/&gt;
+ *         &lt;element ref="{}format" minOccurs="0"/&gt;
  *         &lt;element ref="{}encryption" minOccurs="0"/&gt;
  *         &lt;element ref="{}action" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *         &lt;element ref="{}actionRef" maxOccurs="unbounded" minOccurs="0"/&gt;
  *         &lt;element ref="{}documentRef" minOccurs="0"/&gt;
+ *         &lt;element ref="{}remote" minOccurs="0"/&gt;
  *       &lt;/sequence&gt;
- *       &lt;attribute name="type" type="{}data_type" /&gt;
+ *       &lt;attribute name="type" use="required" type="{}data_type" /&gt;
  *       &lt;attribute name="immediate" type="{http://www.w3.org/2001/XMLSchema}boolean" /&gt;
  *     &lt;/restriction&gt;
  *   &lt;/complexContent&gt;
@@ -45,25 +53,32 @@ import java.util.List;
     "values",
     "valid",
     "init",
+    "format",
     "encryption",
     "action",
-    "documentRef"
+    "actionRef",
+    "documentRef",
+    "remote"
 })
 @XmlRootElement(name = "data")
 public class Data {
 
-    protected long id;
+    @XmlElement(required = true)
+    protected String id;
     @XmlElement(required = true)
     protected I18NStringType title;
     protected I18NStringType placeholder;
     protected I18NStringType desc;
     protected List<I18NStringType> values;
-    protected String valid;
+    protected List<String> valid;
     protected String init;
+    protected Format format;
     protected EncryptionType encryption;
     protected List<ActionType> action;
+    protected List<ActionRefType> actionRef;
     protected DocumentRef documentRef;
-    @XmlAttribute(name = "type")
+    protected String remote;
+    @XmlAttribute(name = "type", required = true)
     protected DataType type;
     @XmlAttribute(name = "immediate")
     protected Boolean immediate;
@@ -71,16 +86,24 @@ public class Data {
     /**
      * Gets the value of the id property.
      * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
      */
-    public long getId() {
+    public String getId() {
         return id;
     }
 
     /**
      * Sets the value of the id property.
      * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
      */
-    public void setId(long value) {
+    public void setId(String value) {
         this.id = value;
     }
 
@@ -188,25 +211,30 @@ public class Data {
     /**
      * Gets the value of the valid property.
      * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getValid() {
-        return valid;
-    }
-
-    /**
-     * Sets the value of the valid property.
+     * <p>
+     * This accessor method returns a reference to the live list,
+     * not a snapshot. Therefore any modification you make to the
+     * returned list will be present inside the JAXB object.
+     * This is why there is not a <CODE>set</CODE> method for the valid property.
      * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     * <p>
+     * For example, to add a new item, do as follows:
+     * <pre>
+     *    getValid().add(newItem);
+     * </pre>
+     * 
+     * 
+     * <p>
+     * Objects of the following type(s) are allowed in the list
+     * {@link String }
+     * 
+     * 
      */
-    public void setValid(String value) {
-        this.valid = value;
+    public List<String> getValid() {
+        if (valid == null) {
+            valid = new ArrayList<String>();
+        }
+        return this.valid;
     }
 
     /**
@@ -231,6 +259,30 @@ public class Data {
      */
     public void setInit(String value) {
         this.init = value;
+    }
+
+    /**
+     * Gets the value of the format property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link Format }
+     *     
+     */
+    public Format getFormat() {
+        return format;
+    }
+
+    /**
+     * Sets the value of the format property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link Format }
+     *     
+     */
+    public void setFormat(Format value) {
+        this.format = value;
     }
 
     /**
@@ -287,6 +339,35 @@ public class Data {
     }
 
     /**
+     * Gets the value of the actionRef property.
+     * 
+     * <p>
+     * This accessor method returns a reference to the live list,
+     * not a snapshot. Therefore any modification you make to the
+     * returned list will be present inside the JAXB object.
+     * This is why there is not a <CODE>set</CODE> method for the actionRef property.
+     * 
+     * <p>
+     * For example, to add a new item, do as follows:
+     * <pre>
+     *    getActionRef().add(newItem);
+     * </pre>
+     * 
+     * 
+     * <p>
+     * Objects of the following type(s) are allowed in the list
+     * {@link ActionRefType }
+     * 
+     * 
+     */
+    public List<ActionRefType> getActionRef() {
+        if (actionRef == null) {
+            actionRef = new ArrayList<ActionRefType>();
+        }
+        return this.actionRef;
+    }
+
+    /**
      * Gets the value of the documentRef property.
      * 
      * @return
@@ -308,6 +389,30 @@ public class Data {
      */
     public void setDocumentRef(DocumentRef value) {
         this.documentRef = value;
+    }
+
+    /**
+     * Gets the value of the remote property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getRemote() {
+        return remote;
+    }
+
+    /**
+     * Sets the value of the remote property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setRemote(String value) {
+        this.remote = value;
     }
 
     /**

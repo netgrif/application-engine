@@ -24,4 +24,11 @@ abstract class ChoiceField<T> extends FieldWithDefault<T> {
     void setChoices(Set<I18nString> choices) {
         this.choices = choices
     }
+
+    void setChoicesFromStrings(Collection<String> choices) {
+        this.choices = new LinkedHashSet<>()
+        choices.each {
+            this.choices.add(new I18nString(it))
+        }
+    }
 }

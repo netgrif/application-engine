@@ -8,6 +8,8 @@ import com.netgrif.workflow.petrinet.domain.roles.ProcessRoleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
 
 @Service
@@ -22,10 +24,8 @@ public class UserProcessRoleService implements IUserProcessRoleService {
     private String DEFAULT_ROLE_ID;
 
     @Override
-    public List<UserProcessRole> findAllMinusDefault() {
-        List<UserProcessRole> roles = repository.findAll();
-        roles.removeIf(role -> role.getRoleId().equals(getDefaultRoleId()));
-        return roles;
+    public List<UserProcessRole> findAll() {
+        return repository.findAll();
     }
 
     @Override
@@ -35,6 +35,23 @@ public class UserProcessRoleService implements IUserProcessRoleService {
             defaultRole = repository.save(new UserProcessRole(getDefaultRoleId()));
         }
         return defaultRole;
+    }
+
+    @Override
+    public List<UserProcessRole> saveRoles(Collection<ProcessRole> values, String netId) {
+        List<UserProcessRole> userProcessRoles = new LinkedList<>();
+        for (ProcessRole value : values) {
+            UserProcessRole userRole = new UserProcessRole();
+            userRole.setRoleId(value.getStringId());
+            userRole.setNetId(netId);
+            userProcessRoles.add(userRole);
+        }
+        return repository.save(userProcessRoles);
+    }
+
+    @Override
+    public UserProcessRole findByRoleId(String roleId) {
+        return repository.findByRoleId(roleId);
     }
 
     private String getDefaultRoleId() {

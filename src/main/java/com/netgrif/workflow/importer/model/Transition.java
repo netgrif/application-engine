@@ -1,9 +1,14 @@
 
 package com.netgrif.workflow.importer.model;
 
-import javax.xml.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlSchemaType;
+import javax.xml.bind.annotation.XmlType;
 
 
 /**
@@ -22,11 +27,15 @@ import java.util.List;
  *         &lt;element ref="{}label"/&gt;
  *         &lt;element ref="{}icon" minOccurs="0"/&gt;
  *         &lt;element ref="{}priority" minOccurs="0"/&gt;
+ *         &lt;element ref="{}assignPolicy" minOccurs="0"/&gt;
+ *         &lt;element ref="{}dataFocusPolicy" minOccurs="0"/&gt;
+ *         &lt;element ref="{}finishPolicy" minOccurs="0"/&gt;
  *         &lt;element ref="{}trigger" maxOccurs="unbounded" minOccurs="0"/&gt;
  *         &lt;element ref="{}transactionRef" minOccurs="0"/&gt;
  *         &lt;element ref="{}roleRef" maxOccurs="unbounded" minOccurs="0"/&gt;
  *         &lt;element ref="{}dataRef" maxOccurs="unbounded" minOccurs="0"/&gt;
  *         &lt;element ref="{}dataGroup" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *         &lt;element ref="{}event" maxOccurs="unbounded" minOccurs="0"/&gt;
  *       &lt;/sequence&gt;
  *     &lt;/restriction&gt;
  *   &lt;/complexContent&gt;
@@ -43,41 +52,61 @@ import java.util.List;
     "label",
     "icon",
     "priority",
+    "assignPolicy",
+    "dataFocusPolicy",
+    "finishPolicy",
     "trigger",
     "transactionRef",
     "roleRef",
     "dataRef",
-    "dataGroup"
+    "dataGroup",
+    "event"
 })
 @XmlRootElement(name = "transition")
 public class Transition {
 
-    protected long id;
+    @XmlElement(required = true)
+    protected String id;
     protected short x;
     protected short y;
     @XmlElement(required = true)
     protected I18NStringType label;
     protected String icon;
     protected Integer priority;
+    @XmlSchemaType(name = "string")
+    protected AssignPolicyType assignPolicy;
+    @XmlSchemaType(name = "string")
+    protected DataFocusPolicyType dataFocusPolicy;
+    @XmlSchemaType(name = "string")
+    protected FinishPolicyType finishPolicy;
     protected List<Trigger> trigger;
     protected TransactionRef transactionRef;
     protected List<RoleRef> roleRef;
     protected List<DataRef> dataRef;
     protected List<DataGroup> dataGroup;
+    protected List<Event> event;
 
     /**
      * Gets the value of the id property.
      * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
      */
-    public long getId() {
+    public String getId() {
         return id;
     }
 
     /**
      * Sets the value of the id property.
      * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
      */
-    public void setId(long value) {
+    public void setId(String value) {
         this.id = value;
     }
 
@@ -183,6 +212,78 @@ public class Transition {
      */
     public void setPriority(Integer value) {
         this.priority = value;
+    }
+
+    /**
+     * Gets the value of the assignPolicy property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link AssignPolicyType }
+     *     
+     */
+    public AssignPolicyType getAssignPolicy() {
+        return assignPolicy;
+    }
+
+    /**
+     * Sets the value of the assignPolicy property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link AssignPolicyType }
+     *     
+     */
+    public void setAssignPolicy(AssignPolicyType value) {
+        this.assignPolicy = value;
+    }
+
+    /**
+     * Gets the value of the dataFocusPolicy property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link DataFocusPolicyType }
+     *     
+     */
+    public DataFocusPolicyType getDataFocusPolicy() {
+        return dataFocusPolicy;
+    }
+
+    /**
+     * Sets the value of the dataFocusPolicy property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link DataFocusPolicyType }
+     *     
+     */
+    public void setDataFocusPolicy(DataFocusPolicyType value) {
+        this.dataFocusPolicy = value;
+    }
+
+    /**
+     * Gets the value of the finishPolicy property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link FinishPolicyType }
+     *     
+     */
+    public FinishPolicyType getFinishPolicy() {
+        return finishPolicy;
+    }
+
+    /**
+     * Sets the value of the finishPolicy property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link FinishPolicyType }
+     *     
+     */
+    public void setFinishPolicy(FinishPolicyType value) {
+        this.finishPolicy = value;
     }
 
     /**
@@ -323,6 +424,35 @@ public class Transition {
             dataGroup = new ArrayList<DataGroup>();
         }
         return this.dataGroup;
+    }
+
+    /**
+     * Gets the value of the event property.
+     * 
+     * <p>
+     * This accessor method returns a reference to the live list,
+     * not a snapshot. Therefore any modification you make to the
+     * returned list will be present inside the JAXB object.
+     * This is why there is not a <CODE>set</CODE> method for the event property.
+     * 
+     * <p>
+     * For example, to add a new item, do as follows:
+     * <pre>
+     *    getEvent().add(newItem);
+     * </pre>
+     * 
+     * 
+     * <p>
+     * Objects of the following type(s) are allowed in the list
+     * {@link Event }
+     * 
+     * 
+     */
+    public List<Event> getEvent() {
+        if (event == null) {
+            event = new ArrayList<Event>();
+        }
+        return this.event;
     }
 
 }

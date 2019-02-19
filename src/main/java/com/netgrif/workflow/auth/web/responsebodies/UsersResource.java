@@ -25,11 +25,7 @@ public class UsersResource extends Resources<UserResource> {
 
     private void buildLinks(String selfRel) {
         ControllerLinkBuilder allLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder
-                .methodOn(UserController.class).getAll(null, null));
+                .methodOn(UserController.class).getAll(false, null,null, null, null));
         add(selfRel.equalsIgnoreCase("all") ? allLink.withSelfRel() : allLink.withRel("all"));
-
-        ControllerLinkBuilder smallLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder
-                .methodOn(UserController.class).getAllSmall(null, null));
-        add(selfRel.equalsIgnoreCase("small") ? smallLink.withSelfRel() : smallLink.withRel("small"));
     }
 }

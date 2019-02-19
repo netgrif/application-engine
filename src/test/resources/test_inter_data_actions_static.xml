@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="../../main/resources/petriNets/petriflow_schema.xsd">
+    <id>1</id>
+    <defaultRole>true</defaultRole>
+    <data type="number">
+        <id>limit</id>
+        <title>Limit</title>
+        <init>1000000</init>
+        <action trigger="set">
+            <!--@formatter:off-->
+            limit: f.limit;
+            execute "dynamic_edit_available" with ([
+                "2": [
+                    value: limit.value,
+                    type: "number",
+                ],
+            ] as Map)
+            <!--@formatter:on-->
+        </action>
+    </data>
+    <data type="number">
+        <id>delta_limit</id>
+        <title>Delta limit</title>
+    </data>
+    <transition>
+        <id>2</id>
+        <x>300</x>
+        <y>220</y>
+        <label>T1</label>
+        <dataGroup>
+            <id>1</id>
+            <title>Limits</title>
+            <dataRef>
+                <id>limit</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+    </transition>
+    <transition>
+        <id>static_edit_limits</id>
+        <x>100</x>
+        <y>100</y>
+        <label>Edit limits</label>
+        <dataRef>
+            <id>delta_limit</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+                <action trigger="set">
+                    <!--@formatter:off-->
+                    limit: f.limit,
+                    delta: f.delta_limit;
+                    change limit about {
+                        limit.value - delta.value;
+                    }
+                    <!--@formatter:on-->
+                </action>
+            </logic>
+        </dataRef>
+    </transition>
+    <place>
+        <id>1</id>
+        <x>180</x>
+        <y>220</y>
+        <label>IN</label>
+        <tokens>1</tokens>
+        <static>false</static>
+    </place>
+    <arc>
+        <id>3</id>
+        <type>regular</type>
+        <sourceId>1</sourceId>
+        <destinationId>2</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>4</id>
+        <type>regular</type>
+        <sourceId>2</sourceId>
+        <destinationId>1</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+</document>

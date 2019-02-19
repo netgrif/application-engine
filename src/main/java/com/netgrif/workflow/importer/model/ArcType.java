@@ -18,6 +18,7 @@ import javax.xml.bind.annotation.XmlType;
  *     &lt;enumeration value="reset"/&gt;
  *     &lt;enumeration value="inhibitor"/&gt;
  *     &lt;enumeration value="read"/&gt;
+ *     &lt;enumeration value="variable"/&gt;
  *   &lt;/restriction&gt;
  * &lt;/simpleType&gt;
  * </pre>
@@ -34,7 +35,9 @@ public enum ArcType {
     @XmlEnumValue("inhibitor")
     INHIBITOR("inhibitor"),
     @XmlEnumValue("read")
-    READ("read");
+    READ("read"),
+    @XmlEnumValue("variable")
+    VARIABLE("variable");
     private final String value;
 
     ArcType(String v) {

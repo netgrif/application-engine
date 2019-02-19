@@ -2,6 +2,9 @@ package com.netgrif.workflow.petrinet.domain;
 
 import com.netgrif.workflow.petrinet.domain.dataset.logic.FieldBehavior;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action;
+import com.netgrif.workflow.petrinet.domain.policies.AssignPolicy;
+import com.netgrif.workflow.petrinet.domain.policies.DataFocusPolicy;
+import com.netgrif.workflow.petrinet.domain.policies.FinishPolicy;
 import com.netgrif.workflow.petrinet.domain.roles.RolePermission;
 import com.netgrif.workflow.workflow.domain.triggers.Trigger;
 import lombok.Getter;
@@ -35,7 +38,22 @@ public class Transition extends Node {
     private Integer priority;
 
     @Getter @Setter
+    private AssignPolicy assignPolicy;
+
+    @Getter @Setter
     private String icon;
+
+    @Getter @Setter
+    private DataFocusPolicy dataFocusPolicy;
+
+    @Getter @Setter
+    private FinishPolicy finishPolicy;
+
+    @Getter @Setter
+    private Map<EventType, Event> events;
+
+    @Getter @Setter
+    private String defaultRoleId;
 
     public Transition() {
         super();
@@ -43,14 +61,10 @@ public class Transition extends Node {
         roles = new HashMap<>();
         triggers = new LinkedList<>();
         dataGroups = new LinkedHashMap<>();
-    }
-
-    public void addDataSet(String fieldId, DataFieldLogic logic) {
-        if (dataSet.containsKey(fieldId) && dataSet.get(fieldId) != null) {
-            dataSet.get(fieldId).merge(logic);
-        } else {
-            dataSet.put(fieldId, logic);
-        }
+        assignPolicy = AssignPolicy.MANUAL;
+        dataFocusPolicy = DataFocusPolicy.MANUAL;
+        finishPolicy = FinishPolicy.MANUAL;
+        events = new HashMap<>();
     }
 
     public void addDataSet(String field, Set<FieldBehavior> behavior, Set<Action> actions){
@@ -64,7 +78,7 @@ public class Transition extends Node {
 
     public void addActions(String field, LinkedHashSet<Action> actions){
         if(dataSet.containsKey(field)){
-            dataSet.get(field).setActions(actions);
+            dataSet.get(field).addActions(actions);
         }
     }
 
@@ -94,8 +108,86 @@ public class Transition extends Node {
                 .map(Map.Entry::getKey).collect(Collectors.toList());
     }
 
+    public List<Action> getPreFinishActions() {
+        return getPreActions(EventType.FINISH);
+    }
+
+    public List<Action> getPostFinishActions() {
+        return getPostActions(EventType.FINISH);
+    }
+
+    public List<Action> getPreAssignActions() {
+        return getPreActions(EventType.ASSIGN);
+    }
+
+    public List<Action> getPostAssignActions() {
+        return getPostActions(EventType.ASSIGN);
+    }
+
+    public List<Action> getPreCancelActions() {
+        return getPreActions(EventType.CANCEL);
+    }
+
+    public List<Action> getPostCancelActions() {
+        return getPostActions(EventType.CANCEL);
+    }
+
+    public List<Action> getPreDelegateActions() {
+        return getPreActions(EventType.DELEGATE);
+    }
+
+    public List<Action> getPostDelegateActions() {
+        return getPostActions(EventType.DELEGATE);
+    }
+
+    private List<Action> getPreActions(EventType type) {
+        if (events.containsKey(type))
+            return events.get(type).getPreActions();
+        return new LinkedList<>();
+    }
+
+    private List<Action> getPostActions(EventType type) {
+        if (events.containsKey(type))
+            return events.get(type).getPostActions();
+        return new LinkedList<>();
+    }
+
+    public I18nString getFinishMessage() {
+        return getMessage(EventType.FINISH);
+    }
+
+    public I18nString getAssignMessage() {
+        return getMessage(EventType.ASSIGN);
+    }
+
+    public I18nString getCancelMessage() {
+        return getMessage(EventType.CANCEL);
+    }
+
+    public I18nString getDelegateMessage() {
+        return getMessage(EventType.DELEGATE);
+    }
+
+    private I18nString getMessage(EventType type) {
+        if (events.containsKey(type) )
+            return events.get(type).getMessage();
+        return null;
+    }
+
     @Override
     public String toString() {
         return this.getTitle().toString();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Transition that = (Transition) o;
+        return importId.equals(that.importId);
+    }
+
+    public void addEvent(Event event) {
+        events.put(event.getType(), event);
     }
 }

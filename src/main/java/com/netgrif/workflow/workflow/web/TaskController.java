@@ -7,33 +7,36 @@ import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldContainer;
 import com.netgrif.workflow.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.workflow.workflow.domain.Task;
+import com.netgrif.workflow.workflow.service.FileFieldInputStream;
+import com.netgrif.workflow.workflow.service.interfaces.IDataService;
 import com.netgrif.workflow.workflow.service.interfaces.IFilterService;
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
-import com.netgrif.workflow.workflow.web.requestbodies.CreateFilterBody;
 import com.netgrif.workflow.workflow.web.responsebodies.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.PagedResources;
 import org.springframework.hateoas.mvc.ControllerLinkBuilder;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
+import java.io.FileNotFoundException;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/res/task")
+@RequestMapping("/api/task")
 public class TaskController {
 
     @Autowired
@@ -42,6 +45,9 @@ public class TaskController {
     @Autowired
     private IFilterService filterService;
 
+    @Autowired
+    private IDataService dataService;
+
     @RequestMapping(method = RequestMethod.GET)
     public PagedResources<LocalisedTaskResource> getAll(Authentication auth, Pageable pageable, PagedResourcesAssembler<com.netgrif.workflow.workflow.domain.Task> assembler, Locale locale) {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
@@ -49,8 +55,8 @@ public class TaskController {
 
         Link selfLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
                 .getAll(auth, pageable, assembler, locale)).withRel("all");
-        PagedResources<LocalisedTaskResource> resources = assembler.toResource(page,new TaskResourceAssembler(locale),selfLink);
-        ResourceLinkAssembler.addLinks(resources, com.netgrif.workflow.workflow.domain.Task.class,selfLink.getRel());
+        PagedResources<LocalisedTaskResource> resources = assembler.toResource(page, new TaskResourceAssembler(locale), selfLink);
+        ResourceLinkAssembler.addLinks(resources, com.netgrif.workflow.workflow.domain.Task.class, selfLink.getRel());
         return resources;
     }
 
@@ -61,11 +67,11 @@ public class TaskController {
         Link selfLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
                 .getAllByCases(cases, pageable, assembler, locale)).withRel("case");
         PagedResources<LocalisedTaskResource> resources = assembler.toResource(page, new TaskResourceAssembler(locale), selfLink);
-        ResourceLinkAssembler.addLinks(resources, com.netgrif.workflow.workflow.domain.Task.class,selfLink.getRel());
+        ResourceLinkAssembler.addLinks(resources, com.netgrif.workflow.workflow.domain.Task.class, selfLink.getRel());
         return resources;
     }
 
-    @RequestMapping(value ="/case/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = "/case/{id}", method = RequestMethod.GET)
     public List<TaskReference> getTasksOfCase(@PathVariable("id") String caseId, Locale locale) {
         return taskService.findAllByCase(caseId, locale);
     }
@@ -91,12 +97,11 @@ public class TaskController {
     }
 
     @RequestMapping(value = "/delegate/{id}", method = RequestMethod.POST)
-    public MessageResource delegate(Authentication auth, @PathVariable("id") String taskId, @RequestBody String delegatedEmail) {
+    public MessageResource delegate(Authentication auth, @PathVariable("id") String taskId, @RequestBody Long delegatedId) {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
         try {
-            delegatedEmail = URLDecoder.decode(delegatedEmail, StandardCharsets.UTF_8.name());
-            taskService.delegateTask(loggedUser, delegatedEmail, taskId);
-            return MessageResource.successMessage("LocalisedTask " + taskId + " assigned to " + delegatedEmail);
+            taskService.delegateTask(loggedUser, delegatedId, taskId);
+            return MessageResource.successMessage("LocalisedTask " + taskId + " assigned to [" + delegatedId + "]");
         } catch (Exception ignored) {
             ignored.printStackTrace();
             return MessageResource.errorMessage("LocalisedTask " + taskId + " cannot be assigned");
@@ -134,7 +139,7 @@ public class TaskController {
         Link selfLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
                 .getMy(auth, pageable, assembler, locale)).withRel("my");
         PagedResources<LocalisedTaskResource> resources = assembler.toResource(page, new TaskResourceAssembler(locale), selfLink);
-        ResourceLinkAssembler.addLinks(resources, com.netgrif.workflow.workflow.domain.Task.class,selfLink.getRel());
+        ResourceLinkAssembler.addLinks(resources, com.netgrif.workflow.workflow.domain.Task.class, selfLink.getRel());
         return resources;
     }
 
@@ -145,7 +150,7 @@ public class TaskController {
         Link selfLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
                 .getMyFinished(pageable, auth, assembler, locale)).withRel("finished");
         PagedResources<LocalisedTaskResource> resources = assembler.toResource(page, new TaskResourceAssembler(locale), selfLink);
-        ResourceLinkAssembler.addLinks(resources, com.netgrif.workflow.workflow.domain.Task.class,selfLink.getRel());
+        ResourceLinkAssembler.addLinks(resources, com.netgrif.workflow.workflow.domain.Task.class, selfLink.getRel());
         return resources;
     }
 
@@ -164,44 +169,59 @@ public class TaskController {
 //        } else if (searchBody.searchTier == TaskSearchBody.SEARCH_TIER_3) {
 //            //TODO: 4.6.2017 vyhľadanie na základe dát
 //        }
-        Page<com.netgrif.workflow.workflow.domain.Task> tasks = taskService.search(searchBody,pageable,(LoggedUser) auth.getPrincipal());
+        Page<com.netgrif.workflow.workflow.domain.Task> tasks = taskService.search(searchBody, pageable, (LoggedUser) auth.getPrincipal());
         Link selfLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
                 .search(auth, pageable, searchBody, assembler, locale)).withRel("search");
-        PagedResources<LocalisedTaskResource> resources = assembler.toResource(tasks,new TaskResourceAssembler(locale),selfLink);
-        ResourceLinkAssembler.addLinks(resources, com.netgrif.workflow.workflow.domain.Task.class,selfLink.getRel());
+        PagedResources<LocalisedTaskResource> resources = assembler.toResource(tasks, new TaskResourceAssembler(locale), selfLink);
+        ResourceLinkAssembler.addLinks(resources, com.netgrif.workflow.workflow.domain.Task.class, selfLink.getRel());
         return resources;
+    }
+
+    @PostMapping(value = "/count", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public CountResponse count(@RequestBody Map<String, Object> query, Authentication auth, Locale locale){
+        long count = taskService.count(query, (LoggedUser)auth.getPrincipal(), locale);
+        return CountResponse.taskCount(count);
     }
 
     @RequestMapping(value = "/{id}/data", method = RequestMethod.GET)
     public DataGroupsResource getData(@PathVariable("id") String taskId, Locale locale) {
-        List<Field> dataFields = taskService.getData(taskId);
-        List<DataGroup> dataGroups = taskService.getDataGroups(taskId);
+        List<Field> dataFields = dataService.getData(taskId);
+        List<DataGroup> dataGroups = dataService.getDataGroups(taskId);
 
         dataGroups.forEach(group -> group.setFields(new DataFieldsResource(dataFields.stream().filter(field ->
-                group.getData().contains(field.getStringId())).collect(Collectors.toList()), taskId, locale)));
+                group.getData().contains(field.getStringId())).collect(Collectors.toList()), locale)));
 
         return new DataGroupsResource(dataGroups, locale);
     }
 
     @RequestMapping(value = "/{id}/data", method = RequestMethod.POST)
     public ChangedFieldContainer saveData(@PathVariable("id") String taskId, @RequestBody ObjectNode dataBody) {
-        return taskService.setData(taskId, dataBody);
+        return dataService.setData(taskId, dataBody);
     }
 
     @RequestMapping(value = "/{id}/file/{field}", method = RequestMethod.POST)
     public MessageResource saveFile(@PathVariable("id") String taskId, @PathVariable("field") String fieldId,
                                     @RequestParam(value = "file") MultipartFile multipartFile) {
-        if (taskService.saveFile(taskId, fieldId, multipartFile))
+        if (dataService.saveFile(taskId, fieldId, multipartFile))
             return MessageResource.successMessage("File " + multipartFile.getOriginalFilename() + " successfully uploaded");
         else
             return MessageResource.errorMessage("File " + multipartFile.getOriginalFilename() + " failed to upload");
     }
 
     @RequestMapping(value = "/{id}/file/{field}", method = RequestMethod.GET, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
-    public FileSystemResource getFile(@PathVariable("id") String taskId, @PathVariable("field") String fieldId, HttpServletResponse response) {
-        FileSystemResource fileResource = taskService.getFile(taskId, fieldId);
-        response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
-        response.setHeader("Content-Disposition", "attachment; filename=" + fileResource.getFilename().substring(fileResource.getFilename().indexOf('-') + 1));
-        return fileResource;
+    public ResponseEntity<Resource> getFile(@PathVariable("id") String taskId, @PathVariable("field") String fieldId, HttpServletResponse response) throws FileNotFoundException {
+        FileFieldInputStream fileFieldInputStream = dataService.getFileByTask(taskId, fieldId);
+
+        if (fileFieldInputStream.getInputStream() == null)
+            throw new FileNotFoundException("File in field " + fieldId + " within task " + taskId + " was not found!");
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_OCTET_STREAM_VALUE);
+        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + fileFieldInputStream.getFileName());
+
+        return ResponseEntity
+                .ok()
+                .headers(headers)
+                .body(new InputStreamResource(fileFieldInputStream.getInputStream()));
     }
 }

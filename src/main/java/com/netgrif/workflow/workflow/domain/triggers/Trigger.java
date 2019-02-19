@@ -1,22 +1,19 @@
 package com.netgrif.workflow.workflow.domain.triggers;
 
 import com.fasterxml.jackson.annotation.JsonValue;
+import com.netgrif.workflow.petrinet.domain.Imported;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document
-public abstract class Trigger {
+public abstract class Trigger extends Imported {
 
     @Id
     protected ObjectId _id;
 
     protected Trigger() {
         this._id = new ObjectId();
-    }
-
-    public String getStringId() {
-        return _id.toString();
     }
 
     public ObjectId get_id() {

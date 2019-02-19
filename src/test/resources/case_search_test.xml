@@ -1,0 +1,82 @@
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="../../main/resources/petriNets/petriflow_schema.xsd">
+    <id>net</id>
+    <defaultRole>true</defaultRole>
+    <role>
+        <id>99</id>
+        <name>Rola1</name>
+    </role>
+    <!-- ========== DATA ========== -->
+    <data type="number" immediate="true">
+        <id>1</id>
+        <title>1</title>
+    </data>
+    <data type="text" immediate="true">
+        <id>2</id>
+        <title>2</title>
+    </data>
+    <data type="text" immediate="true">
+        <id>3</id>
+        <title>3</title>
+    </data>
+    <data type="date" immediate="true">
+        <id>4</id>
+        <title>date</title>
+    </data>
+    <data type="enumeration" immediate="true">
+        <id>5</id>
+        <title>enumeration</title>
+        <init>VALUE1</init>
+        <values>VALUE1</values>
+        <values>VALUE2</values>
+        <values>VALUE3</values>
+        <values>VALUE4</values>
+    </data>
+    <!-- ========== TRANSITION ========== -->
+    <transition>
+        <id>tran</id>
+        <x>0</x>
+        <y>0</y>
+        <label>tran</label>
+        <roleRef>
+            <id>99</id>
+            <logic>
+                <perform>true</perform>
+                <delegate>true</delegate>
+            </logic>
+        </roleRef>
+        <dataGroup>
+            <id>1</id>
+            <dataRef>
+                <id>1</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>2</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>3</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>4</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>5</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+    </transition>
+</document>

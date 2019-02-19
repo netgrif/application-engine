@@ -1,28 +1,33 @@
 package com.netgrif.workflow.workflow.service.interfaces;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.auth.domain.User;
-import com.netgrif.workflow.petrinet.domain.DataGroup;
-import com.netgrif.workflow.petrinet.domain.dataset.Field;
-import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldContainer;
 import com.netgrif.workflow.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.Task;
+import com.netgrif.workflow.workflow.service.EventOutcome;
 import com.netgrif.workflow.workflow.web.responsebodies.TaskReference;
-import org.springframework.core.io.FileSystemResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.web.multipart.MultipartFile;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 public interface ITaskService {
+
+    @Transactional
+    void reloadTasks(Case useCase);
+
+    Task findOne(String taskId);
+
     Page<Task> getAll(LoggedUser loggedUser, Pageable pageable, Locale locale);
 
     Page<Task> search(Map<String, Object> request, Pageable pageable, LoggedUser user);
+
+    long count(Map<String, Object> request, LoggedUser user, Locale locale);
 
     Page<Task> findByCases(Pageable pageable, List<String> cases);
 
@@ -32,31 +37,51 @@ public interface ITaskService {
 
     Task findById(String id);
 
-    List<Task> findUserFinishedTasks(User user);
-
-    Page<Task> findByPetriNets(Pageable pageable, List<String> petriNets);
-
     Page<Task> findByTransitions(Pageable pageable, List<String> transitions);
 
-    void finishTask(LoggedUser loggedUser, String taskId) throws Exception;
+    Page<Task> searchAll(com.querydsl.core.types.Predicate predicate);
 
-    void assignTask(LoggedUser loggedUser, String taskId) throws TransitionNotExecutableException;
+    Task searchOne(com.querydsl.core.types.Predicate predicate);
 
-    List<Field> getData(String taskId);
+    @Transactional(rollbackFor = Exception.class)
+    void finishTasks(List<Task> tasks, User user) throws TransitionNotExecutableException;
 
-    List<Field> getData(Task task, Case useCase);
+    @Transactional
+    EventOutcome finishTask(Task task, User user) throws TransitionNotExecutableException;
 
-    List<DataGroup> getDataGroups(String taskId);
+    EventOutcome finishTask(LoggedUser loggedUser, String taskId) throws IllegalArgumentException, TransitionNotExecutableException;
 
-    ChangedFieldContainer setData(String taskId, ObjectNode values);
+    EventOutcome finishTask(String taskId) throws IllegalArgumentException, TransitionNotExecutableException;
 
-    void cancelTask(LoggedUser loggedUser, String taskId);
+    @Transactional
+    void assignTasks(List<Task> tasks, User user) throws TransitionNotExecutableException;
 
-    void delegateTask(LoggedUser loggedUser, String delegatedEmail, String taskId) throws TransitionNotExecutableException;
+    @Transactional
+    EventOutcome assignTask(Task task, User user) throws TransitionNotExecutableException;
 
-    boolean saveFile(String taskId, String fieldId, MultipartFile multipartFile);
+    EventOutcome assignTask(LoggedUser loggedUser, String taskId) throws TransitionNotExecutableException;
 
-    FileSystemResource getFile(String taskId, String fieldId);
+    EventOutcome assignTask(String taskId) throws TransitionNotExecutableException;
+
+    @Transactional(rollbackFor = Exception.class)
+    void cancelTasks(List<Task> tasks, User user);
+
+    @Transactional
+    EventOutcome cancelTask(Task task, User user);
+
+    EventOutcome cancelTask(LoggedUser loggedUser, String taskId);
+
+    /**
+     * cancel task action
+     */
+    @SuppressWarnings("unused")
+    void cancelTasksWithoutReload(Set<String> transitions, String caseId);
+
+    EventOutcome delegateTask(LoggedUser loggedUser, Long delegatedId, String taskId) throws TransitionNotExecutableException;
+
+    void delete(Iterable<? extends Task> tasks, Case useCase);
+
+    void delete(Iterable<? extends Task> tasks, String caseId);
 
     void deleteTasksByCase(String caseId);
 
