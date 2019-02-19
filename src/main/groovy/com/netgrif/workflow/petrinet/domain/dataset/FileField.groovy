@@ -1,12 +1,12 @@
 package com.netgrif.workflow.petrinet.domain.dataset
 
-import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action
+
 import org.springframework.data.mongodb.core.mapping.Document
 
 @Document
-class FileField extends FieldWithDefault<String> {
+class FileField extends FieldWithDefault<FileFieldValue> {
 
-    private boolean generated = false
+    private Boolean remote
 
     FileField() {
         super()
@@ -24,16 +24,61 @@ class FileField extends FieldWithDefault<String> {
     }
 
     @Override
-    void addAction(String action, String trigger) {
-        super.addAction(action, trigger)
-        this.generated = (Action.ActionTrigger.fromString(trigger) == Action.ActionTrigger.GET && action.contains("generate")) || this.generated
+    void setValue(FileFieldValue value) {
+        if (value instanceof String)
+            this.setValue((String) value)
+        else
+            super.setValue(value)
     }
 
-    String getFilePath(String fileName) {
-        return "storage/" + (this.generated ? "generated/" : "") + getStringId() + "-" + fileName
+    void setValue(String value) {
+        this.setValue(FileFieldValue.fromString(value))
     }
 
-    boolean isGenerated() {
-        return generated
+    @Override
+    void setDefaultValue(FileFieldValue defaultValue) {
+        if (value instanceof String)
+            this.setDefaultValue((String) value)
+        else
+            super.setDefaultValue(defaultValue)
+    }
+
+    void setDefaultValue(String defaultValue) {
+        this.setDefaultValue(FileFieldValue.fromString(defaultValue))
+    }
+
+    /**
+     * Get complete file path to the file
+     * Path is generated as follow:
+     * - if file is remote, path is field value / remote URI
+     * - if file is local
+     *    - always starts with directory storage/
+     *    - saved file name consists of Case id, field import id and original file name separated by dash
+     * @param caseId
+     * @return path to the saved file
+     */
+    String getFilePath(String caseId) {
+        if (this.remote)
+            return this.getValue().getPath()
+        return this.getValue().getPath(caseId, getStringId())
+    }
+
+    boolean isRemote() {
+        return this.remote
+    }
+
+    void setRemote(boolean remote) {
+        this.remote = remote
+    }
+
+    @Override
+    Field clone() {
+        FileField clone = new FileField()
+        super.clone(clone)
+
+        clone.remote = this.remote
+        clone.defaultValue = this.defaultValue
+
+        return clone
     }
 }

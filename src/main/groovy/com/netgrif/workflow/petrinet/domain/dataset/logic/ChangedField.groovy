@@ -1,5 +1,9 @@
 package com.netgrif.workflow.petrinet.domain.dataset.logic
 
+import com.netgrif.workflow.petrinet.domain.I18nString
+import com.querydsl.core.annotations.QueryExclude
+
+@QueryExclude
 class ChangedField {
 
     String id
@@ -15,7 +19,10 @@ class ChangedField {
     }
 
     void addAttribute(String name, Object value) {
-        attributes.put(name, value)
+        if (value instanceof I18nString)
+            attributes.put(name, value.defaultValue)
+        else
+            attributes.put(name, value)
     }
 
     void addBehavior(Map<String, Set<FieldBehavior>> behavior) {

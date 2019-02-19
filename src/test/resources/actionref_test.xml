@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="../../main/resources/petriNets/petriflow_schema.xsd">
+    <!-- ROLE -->
+    <!-- DATA -->
+    <data type="text">
+        <id>text_1</id>
+        <title>Text 1</title>
+        <action trigger="set" id="data_action_set">
+            field: f.text_1;
+            def a = "data_action_set";
+        </action>
+        <action trigger="get" id="data_action_get">
+            field: f.text_1;
+            def a = "data_action_get";
+        </action>
+        <actionRef>
+            <id>data_action_set</id>
+        </actionRef>
+        <actionRef>
+            <id>data_action_get</id>
+        </actionRef>
+        <actionRef>
+            <id>dataref_action_set</id>
+        </actionRef>
+        <actionRef>
+            <id>dataref_action_get</id>
+        </actionRef>
+        <actionRef>
+            <id>event_action_pre</id>
+        </actionRef>
+        <actionRef>
+            <id>event_action_post</id>
+        </actionRef>
+    </data>
+    <!-- TRANSITIONS -->
+    <transition>
+        <id>task</id>
+        <x>0</x>
+        <y>0</y>
+        <label>Task</label>
+        <dataRef>
+            <id>text_1</id>
+            <logic>
+                <action trigger="get" id="dataref_action_get">
+                    field: f.text_1;
+                    def a = "dataref_action_get";
+                </action>
+                <action trigger="set" id="dataref_action_set">
+                    field: f.text_1;
+                    def a = "dataref_action_set";
+                </action>
+                <actionRef>
+                    <id>data_action_set</id>
+                </actionRef>
+                <actionRef>
+                    <id>data_action_get</id>
+                </actionRef>
+                <actionRef>
+                    <id>dataref_action_set</id>
+                </actionRef>
+                <actionRef>
+                    <id>dataref_action_get</id>
+                </actionRef>
+                <actionRef>
+                    <id>event_action_pre</id>
+                </actionRef>
+                <actionRef>
+                    <id>event_action_post</id>
+                </actionRef>
+            </logic>
+        </dataRef>
+        <event type="finish">
+            <id>onFinish</id>
+            <actions phase="pre">
+                <action id="event_action_pre">
+                    field: f.text_1;
+                    def a = "event_action_pre";
+                </action>
+                <actionRef>
+                    <id>data_action_set</id>
+                </actionRef>
+                <actionRef>
+                    <id>data_action_get</id>
+                </actionRef>
+                <actionRef>
+                    <id>dataref_action_set</id>
+                </actionRef>
+                <actionRef>
+                    <id>dataref_action_get</id>
+                </actionRef>
+                <actionRef>
+                    <id>event_action_pre</id>
+                </actionRef>
+                <actionRef>
+                    <id>event_action_post</id>
+                </actionRef>
+            </actions>
+            <actions phase="post">
+                <action id="event_action_post">
+                    field: f.text_1;
+                    def a = "event_action_post";
+                </action>
+                <actionRef>
+                    <id>data_action_set</id>
+                </actionRef>
+                <actionRef>
+                    <id>data_action_get</id>
+                </actionRef>
+                <actionRef>
+                    <id>dataref_action_set</id>
+                </actionRef>
+                <actionRef>
+                    <id>dataref_action_get</id>
+                </actionRef>
+                <actionRef>
+                    <id>event_action_pre</id>
+                </actionRef>
+                <actionRef>
+                    <id>event_action_post</id>
+                </actionRef>
+            </actions>
+        </event>
+    </transition>
+</document>

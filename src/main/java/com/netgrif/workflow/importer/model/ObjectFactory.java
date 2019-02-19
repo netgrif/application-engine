@@ -10,7 +10,7 @@ import javax.xml.namespace.QName;
 /**
  * This object contains factory methods for each 
  * Java content interface and Java element interface 
- * generated in the com.test package. 
+ * generated in the com.netgrif.workflow.importer.model package. 
  * <p>An ObjectFactory allows you to programatically 
  * construct new instances of the Java representation 
  * for XML content. The Java representation of XML 
@@ -31,13 +31,20 @@ public class ObjectFactory {
     private final static QName _Values_QNAME = new QName("", "values");
     private final static QName _Valid_QNAME = new QName("", "valid");
     private final static QName _Init_QNAME = new QName("", "init");
+    private final static QName _Code_QNAME = new QName("", "code");
+    private final static QName _FractionSize_QNAME = new QName("", "fractionSize");
+    private final static QName _Locale_QNAME = new QName("", "locale");
     private final static QName _Encryption_QNAME = new QName("", "encryption");
     private final static QName _Action_QNAME = new QName("", "action");
+    private final static QName _ActionRef_QNAME = new QName("", "actionRef");
+    private final static QName _Remote_QNAME = new QName("", "remote");
     private final static QName _Name_QNAME = new QName("", "name");
+    private final static QName _Message_QNAME = new QName("", "message");
     private final static QName _TransitionRef_QNAME = new QName("", "transitionRef");
     private final static QName _Perform_QNAME = new QName("", "perform");
     private final static QName _Delegate_QNAME = new QName("", "delegate");
-    private final static QName _Behavior_QNAME = new QName("", "behavior");
+    private final static QName _View_QNAME = new QName("", "view");
+    private final static QName _Cancel_QNAME = new QName("", "cancel");
     private final static QName _Alignment_QNAME = new QName("", "alignment");
     private final static QName _Stretch_QNAME = new QName("", "stretch");
     private final static QName _X_QNAME = new QName("", "x");
@@ -45,6 +52,9 @@ public class ObjectFactory {
     private final static QName _Label_QNAME = new QName("", "label");
     private final static QName _Icon_QNAME = new QName("", "icon");
     private final static QName _Priority_QNAME = new QName("", "priority");
+    private final static QName _AssignPolicy_QNAME = new QName("", "assignPolicy");
+    private final static QName _DataFocusPolicy_QNAME = new QName("", "dataFocusPolicy");
+    private final static QName _FinishPolicy_QNAME = new QName("", "finishPolicy");
     private final static QName _Tokens_QNAME = new QName("", "tokens");
     private final static QName _IsStatic_QNAME = new QName("", "isStatic");
     private final static QName _Static_QNAME = new QName("", "static");
@@ -52,11 +62,15 @@ public class ObjectFactory {
     private final static QName _DestinationId_QNAME = new QName("", "destinationId");
     private final static QName _Multiplicity_QNAME = new QName("", "multiplicity");
     private final static QName _I18NString_QNAME = new QName("", "i18nString");
+    private final static QName _Version_QNAME = new QName("", "version");
+    private final static QName _Initials_QNAME = new QName("", "initials");
     private final static QName _DefaultRole_QNAME = new QName("", "defaultRole");
+    private final static QName _TransitionRole_QNAME = new QName("", "transitionRole");
+    private final static QName _CaseName_QNAME = new QName("", "caseName");
     private final static QName _Type_QNAME = new QName("", "type");
 
     /**
-     * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: com.test
+     * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: com.netgrif.workflow.importer.model
      * 
      */
     public ObjectFactory() {
@@ -87,6 +101,22 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link Format }
+     * 
+     */
+    public Format createFormat() {
+        return new Format();
+    }
+
+    /**
+     * Create an instance of {@link Currency }
+     * 
+     */
+    public Currency createCurrency() {
+        return new Currency();
+    }
+
+    /**
      * Create an instance of {@link EncryptionType }
      * 
      */
@@ -103,6 +133,14 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link ActionRefType }
+     * 
+     */
+    public ActionRefType createActionRefType() {
+        return new ActionRefType();
+    }
+
+    /**
      * Create an instance of {@link DocumentRef }
      * 
      */
@@ -116,6 +154,22 @@ public class ObjectFactory {
      */
     public Role createRole() {
         return new Role();
+    }
+
+    /**
+     * Create an instance of {@link Event }
+     * 
+     */
+    public Event createEvent() {
+        return new Event();
+    }
+
+    /**
+     * Create an instance of {@link Actions }
+     * 
+     */
+    public Actions createActions() {
+        return new Actions();
     }
 
     /**
@@ -223,12 +277,12 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link Long }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "", name = "id")
-    public JAXBElement<Long> createId(Long value) {
-        return new JAXBElement<Long>(_Id_QNAME, Long.class, null, value);
+    public JAXBElement<String> createId(String value) {
+        return new JAXBElement<String>(_Id_QNAME, String.class, null, value);
     }
 
     /**
@@ -286,6 +340,33 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "", name = "code", defaultValue = "EUR")
+    public JAXBElement<String> createCode(String value) {
+        return new JAXBElement<String>(_Code_QNAME, String.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link Integer }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "", name = "fractionSize", defaultValue = "2")
+    public JAXBElement<Integer> createFractionSize(Integer value) {
+        return new JAXBElement<Integer>(_FractionSize_QNAME, Integer.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "", name = "locale")
+    public JAXBElement<String> createLocale(String value) {
+        return new JAXBElement<String>(_Locale_QNAME, String.class, null, value);
+    }
+
+    /**
      * Create an instance of {@link JAXBElement }{@code <}{@link EncryptionType }{@code >}}
      * 
      */
@@ -304,6 +385,24 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link ActionRefType }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "", name = "actionRef")
+    public JAXBElement<ActionRefType> createActionRef(ActionRefType value) {
+        return new JAXBElement<ActionRefType>(_ActionRef_QNAME, ActionRefType.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "", name = "remote")
+    public JAXBElement<String> createRemote(String value) {
+        return new JAXBElement<String>(_Remote_QNAME, String.class, null, value);
+    }
+
+    /**
      * Create an instance of {@link JAXBElement }{@code <}{@link I18NStringType }{@code >}}
      * 
      */
@@ -313,12 +412,21 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link Long }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link I18NStringType }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "", name = "message")
+    public JAXBElement<I18NStringType> createMessage(I18NStringType value) {
+        return new JAXBElement<I18NStringType>(_Message_QNAME, I18NStringType.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "", name = "transitionRef")
-    public JAXBElement<Long> createTransitionRef(Long value) {
-        return new JAXBElement<Long>(_TransitionRef_QNAME, Long.class, null, value);
+    public JAXBElement<String> createTransitionRef(String value) {
+        return new JAXBElement<String>(_TransitionRef_QNAME, String.class, null, value);
     }
 
     /**
@@ -340,12 +448,21 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link Boolean }{@code >}}
      * 
      */
-    @XmlElementDecl(namespace = "", name = "behavior")
-    public JAXBElement<String> createBehavior(String value) {
-        return new JAXBElement<String>(_Behavior_QNAME, String.class, null, value);
+    @XmlElementDecl(namespace = "", name = "view")
+    public JAXBElement<Boolean> createView(Boolean value) {
+        return new JAXBElement<Boolean>(_View_QNAME, Boolean.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link Boolean }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "", name = "cancel")
+    public JAXBElement<Boolean> createCancel(Boolean value) {
+        return new JAXBElement<Boolean>(_Cancel_QNAME, Boolean.class, null, value);
     }
 
     /**
@@ -412,6 +529,33 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link AssignPolicyType }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "", name = "assignPolicy")
+    public JAXBElement<AssignPolicyType> createAssignPolicy(AssignPolicyType value) {
+        return new JAXBElement<AssignPolicyType>(_AssignPolicy_QNAME, AssignPolicyType.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link DataFocusPolicyType }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "", name = "dataFocusPolicy")
+    public JAXBElement<DataFocusPolicyType> createDataFocusPolicy(DataFocusPolicyType value) {
+        return new JAXBElement<DataFocusPolicyType>(_DataFocusPolicy_QNAME, DataFocusPolicyType.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link FinishPolicyType }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "", name = "finishPolicy")
+    public JAXBElement<FinishPolicyType> createFinishPolicy(FinishPolicyType value) {
+        return new JAXBElement<FinishPolicyType>(_FinishPolicy_QNAME, FinishPolicyType.class, null, value);
+    }
+
+    /**
      * Create an instance of {@link JAXBElement }{@code <}{@link Integer }{@code >}}
      * 
      */
@@ -439,21 +583,21 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link Long }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "", name = "sourceId")
-    public JAXBElement<Long> createSourceId(Long value) {
-        return new JAXBElement<Long>(_SourceId_QNAME, Long.class, null, value);
+    public JAXBElement<String> createSourceId(String value) {
+        return new JAXBElement<String>(_SourceId_QNAME, String.class, null, value);
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link Long }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "", name = "destinationId")
-    public JAXBElement<Long> createDestinationId(Long value) {
-        return new JAXBElement<Long>(_DestinationId_QNAME, Long.class, null, value);
+    public JAXBElement<String> createDestinationId(String value) {
+        return new JAXBElement<String>(_DestinationId_QNAME, String.class, null, value);
     }
 
     /**
@@ -475,12 +619,48 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "", name = "version")
+    public JAXBElement<String> createVersion(String value) {
+        return new JAXBElement<String>(_Version_QNAME, String.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "", name = "initials")
+    public JAXBElement<String> createInitials(String value) {
+        return new JAXBElement<String>(_Initials_QNAME, String.class, null, value);
+    }
+
+    /**
      * Create an instance of {@link JAXBElement }{@code <}{@link Boolean }{@code >}}
      * 
      */
-    @XmlElementDecl(namespace = "", name = "defaultRole")
+    @XmlElementDecl(namespace = "", name = "defaultRole", defaultValue = "true")
     public JAXBElement<Boolean> createDefaultRole(Boolean value) {
         return new JAXBElement<Boolean>(_DefaultRole_QNAME, Boolean.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link Boolean }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "", name = "transitionRole", defaultValue = "true")
+    public JAXBElement<Boolean> createTransitionRole(Boolean value) {
+        return new JAXBElement<Boolean>(_TransitionRole_QNAME, Boolean.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link I18NStringType }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "", name = "caseName")
+    public JAXBElement<I18NStringType> createCaseName(I18NStringType value) {
+        return new JAXBElement<I18NStringType>(_CaseName_QNAME, I18NStringType.class, null, value);
     }
 
     /**

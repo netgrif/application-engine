@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="../../main/resources/petriNets/petriflow_schema.xsd">
+    <role>
+        <id>1</id>
+        <name>View</name>
+    </role>
+    <role>
+        <id>2</id>
+        <name>Perform</name>
+    </role>
+    <data type="text">
+        <id>1</id>
+        <title>Name</title>
+    </data>
+    <!---->
+    <transition>
+        <id>1</id>
+        <x>300</x>
+        <y>100</y>
+        <label>Perform</label>
+        <roleRef>
+            <id>2</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <dataRef>
+            <id>1</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+    </transition>
+    <transition>
+        <id>2</id>
+        <x>300</x>
+        <y>180</y>
+        <label>View</label>
+        <roleRef>
+            <id>1</id>
+            <logic>
+                <view>true</view>
+            </logic>
+        </roleRef>
+    </transition>
+</document>

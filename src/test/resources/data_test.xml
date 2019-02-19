@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="../../main/resources/petriNets/petriflow_schema.xsd">
+    <id>1</id>
+    <defaultRole>true</defaultRole>
+    <!-- NUMBER -->
+    <data type="number">
+        <id>number</id>
+        <title>Number</title>
+        <init>10</init>
+        <desc>Number field description</desc>
+        <placeholder>Number field placeholder</placeholder>
+        <valid>inrange 0,inf</valid>
+    </data>
+    <!-- TEXT -->
+    <data type="text">
+        <id>text</id>
+        <title>Text</title>
+        <init>text</init>
+        <desc>Text field description</desc>
+        <placeholder>Text field placeholder</placeholder>
+        <valid>email</valid>
+    </data>
+    <!-- ENUMERATION -->
+    <data type="enumeration">
+        <id>enumeration</id>
+        <title>Enumeration</title>
+        <init>enumeration</init>
+        <desc>Enumeration field description</desc>
+        <placeholder>Enumeration field placeholder</placeholder>
+        <values>enumeration</values>
+        <values>enumeration2</values>
+        <values>enumeration3</values>
+    </data>
+    <!-- MULTICHOICE -->
+    <data type="multichoice">
+        <id>multichoice</id>
+        <title>Multichoice</title>
+        <init>multichoice, multichoice2</init>
+        <desc>Multichoice field description</desc>
+        <placeholder>Multichoice field placeholder</placeholder>
+        <values>multichoice</values>
+        <values>multichoice2</values>
+        <values>multichoice3</values>
+    </data>
+    <!-- BOOLEAN -->
+    <data type="boolean">
+        <id>boolean</id>
+        <title>Boolean</title>
+        <init>true</init>
+        <desc>Boolean field description</desc>
+        <placeholder>Boolean field placeholder</placeholder>
+    </data>
+    <!-- DATE -->
+    <data type="date">
+        <id>date</id>
+        <title>Date</title>
+        <desc>Date field description</desc>
+        <placeholder>Date field placeholder</placeholder>
+        <valid>between today,future</valid>
+    </data>
+    <!-- FILE -->
+    <data type="file">
+        <id>file</id>
+        <title>File</title>
+        <desc>File field description</desc>
+        <placeholder>File field placeholder</placeholder>
+    </data>
+    <!-- USER -->
+    <data type="user">
+        <id>user</id>
+        <title>User</title>
+        <!--<init></init>-->
+        <desc>User field description</desc>
+        <placeholder>User field placeholder</placeholder>
+        <!--<valid></valid>-->
+    </data>
+    <!-- DATETIME-->
+    <data type="dateTime">
+        <id>dateTime</id>
+        <title>DateTime</title>
+        <desc>DateTime field description</desc>
+        <placeholder>DateTime field placeholder</placeholder>
+    </data>
+    <transition>
+        <id>1</id>
+        <x>1</x>
+        <y>1</y>
+        <label>Transition</label>
+        <dataRef>
+            <id>number</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>text</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>enumeration</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>multichoice</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>boolean</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>date</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>file</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>user</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+    </transition>
+</document>

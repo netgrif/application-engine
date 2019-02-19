@@ -19,4 +19,4 @@ target/
 _issues/
 
 storage
-wms.log*
+*.log*

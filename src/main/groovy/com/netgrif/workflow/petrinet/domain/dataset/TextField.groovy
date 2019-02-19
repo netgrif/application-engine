@@ -36,4 +36,40 @@ class TextField extends ValidableField<String> {
         super.clearValue()
         setValue(getDefaultValue())
     }
+
+    String getSubType() {
+        return subType
+    }
+
+    Integer getMaxLength() {
+        return maxLength
+    }
+
+    String getFormatting() {
+        return formatting
+    }
+
+    void setSubType(String subType) {
+        this.subType = subType
+    }
+
+    void setMaxLength(Integer maxLength) {
+        this.maxLength = maxLength
+    }
+
+    void setFormatting(String formatting) {
+        this.formatting = formatting
+    }
+
+    @Override
+    Field clone() {
+        TextField clone = new TextField()
+        super.clone(clone)
+
+        clone.subType = this.subType
+        clone.defaultValue = this.defaultValue
+        clone.validationRules = this.validationRules
+
+        return clone
+    }
 }

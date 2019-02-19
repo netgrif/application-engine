@@ -3,6 +3,8 @@ package com.netgrif.workflow.petrinet.domain.dataset.logic.validation
 import com.netgrif.workflow.petrinet.domain.dataset.DateField
 import com.netgrif.workflow.petrinet.domain.dataset.Field
 
+import java.time.LocalDate
+
 class DateValidationJavascriptDelegate extends DateValidationDelegate{
 
     DateValidationJavascriptDelegate(Field field) {
@@ -11,17 +13,24 @@ class DateValidationJavascriptDelegate extends DateValidationDelegate{
 
     def between = { start, end ->
         DateField field = (DateField)this.field
-        if(start instanceof Closure && start() == INFINITY) {
-            field.setMaxDate((String)end)
-            return "const endDate = new Date('${end}'); ${setupJavascriptValidation("between","(value - endDate) > 0")}"
+
+        LocalDate startDate = parseDate(start)
+        LocalDate endDate = parseDate(end)
+
+        if(startDate == null || endDate == null)
+            return ""
+
+        if(startDate.equals(past())) {
+            field.setMaxDate(endDate.toString())
+            return "const endDate = new Date('${endDate.toString()}'); ${setupJavascriptValidation("between","(value - endDate) > 86400000")}"
         }
-        if(end instanceof Closure && end() == INFINITY) {
-            field.setMinDate((String)start)
-            return "const startDate = new Date('${start}'); ${setupJavascriptValidation( "between","(value - startDate) < 0")}"
+        if(endDate.equals(future())) {
+            field.setMinDate(startDate.toString())
+            return "const startDate = new Date('${startDate.toString()}'); ${setupJavascriptValidation( "between","(value - startDate) < -86400000")}"
         }
-        field.setMinDate((String)start)
-        field.setMaxDate((String)end)
-        return "const endDate = new Date('${end}'); const startDate = new Date('${start}'); ${setupJavascriptValidation("between","(value - endDate) > 0 || (value - startDate) < 0")}"
+        field.setMinDate(startDate.toString())
+        field.setMaxDate(endDate.toString())
+        return "const endDate = new Date('${endDate.toString()}'); const startDate = new Date('${startDate.toString()}'); ${setupJavascriptValidation("between","(value - endDate) > 86400000 || (value - startDate) < -86400000")}"
     }
 
     def workday = {

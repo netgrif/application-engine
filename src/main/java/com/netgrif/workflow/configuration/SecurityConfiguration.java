@@ -1,9 +1,9 @@
 package com.netgrif.workflow.configuration;
 
-import org.apache.commons.lang.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -13,12 +13,10 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.servlet.http.HttpServletRequest;
-import java.security.Principal;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Stream;
 
 @Configuration
@@ -30,56 +28,59 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     private static final Logger log = LoggerFactory.getLogger(SecurityConfiguration.class);
 
     private final String[] PERMIT_ALL_STATIC_PATTERNS = {
-            "/bower_components/**", "/scripts/**", "/assets/**", "/styles/**", "/views/**", "/**/favicon.ico"
+            "/bower_components/**", "/scripts/**", "/assets/**", "/styles/**", "/views/**", "/**/favicon.ico", "/favicon.ico", "/**/manifest.json", "/manifest.json", "/configuration/**", "/swagger-resources/**", "/swagger-ui.html", "/webjars/**"
     };
     private final String[] PERMIT_ALL_SERVER_PATTERNS = {
-            "/index.html", "/", "/login", "/signup/{token}", "/signup", "/signup/token", "/res/test"
+            "/index.html", "/", "/login", "/signup/**", "/recover/**", "/api/auth/signup", "/api/auth/token/verify", "/api/auth/reset", "/api/auth/recover", "/v2/api-docs", "/swagger-ui.html"
     };
 
     @Autowired
     private Environment env;
 
-    @RequestMapping(value = "{path:[^res][^\\.]*$}")
-    public String redirect(HttpServletRequest request) {
-        log.info("Forwarding to root for request URI [" + request.getRequestURI() + "]");
-        return "forward:/";
-    }
+    @Value("${server.auth.open-registration}")
+    private boolean openRegistration;
 
-    @RequestMapping("/user")
-    @ResponseBody
-    public Principal user(Principal user) {
-        return user;
-    }
-
-    @RequestMapping(value = "/res/test", method = RequestMethod.GET)
-    @ResponseBody public String testForProxy(){
-        return "{ \"message\":\"It works!\" }";
-    }
+    @Value("${server.security.csrf}")
+    private boolean csrf = true;
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
 //        @formatter:off
         http
-            .httpBasic().and()
+            .httpBasic()
+            .and()
             .authorizeRequests()
                 .antMatchers(getPatterns()).permitAll()
                 .anyRequest().authenticated()
             .and()
             .formLogin()
-                .loginPage("/login")
+                .loginPage("/")
             .and()
-            .csrf()//.disable();
-                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+            .logout()
+                .logoutUrl("/api/auth/logout")
             .and()
-                .headers()
-                    .frameOptions().sameOrigin();
+            .headers()
+                .frameOptions().sameOrigin();
 //        @formatter:on
+        setCsrf(http);
     }
 
+    private void setCsrf(HttpSecurity http) throws Exception {
+        if (csrf) {
+            http.csrf().csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse());
+        } else {
+            http.csrf().disable();
+        }
+    }
+
+
     private String[] getPatterns() {
-        String[] patterns = (String[]) ArrayUtils.addAll(PERMIT_ALL_STATIC_PATTERNS, PERMIT_ALL_SERVER_PATTERNS);
+        List<String> patterns = new ArrayList<>(Arrays.asList(PERMIT_ALL_STATIC_PATTERNS));
+        patterns.addAll(Arrays.asList(PERMIT_ALL_SERVER_PATTERNS));
+        if (openRegistration)
+            patterns.add("/api/auth/invite");
         if (Stream.of(env.getActiveProfiles()).anyMatch(it -> it.equals("dev")))
-            patterns = (String[]) ArrayUtils.add(patterns, "/dev/**");
-        return patterns;
+            patterns.add("/dev/**");
+        return patterns.toArray(new String[0]);
     }
 }

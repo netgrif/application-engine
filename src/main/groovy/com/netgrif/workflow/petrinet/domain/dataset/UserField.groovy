@@ -7,7 +7,7 @@ import org.springframework.data.mongodb.core.mapping.Document
 @Document
 class UserField extends Field<User> {
 
-    private Set<String> roles
+    Set<String> roles
 
     UserField() {
         super()
@@ -39,5 +39,15 @@ class UserField extends Field<User> {
 
     Set<String> getRoles() {
         return roles
+    }
+
+    @Override
+    Field clone() {
+        UserField clone = new UserField()
+        super.clone(clone)
+
+        clone.roles = this.roles
+
+        return clone
     }
 }
