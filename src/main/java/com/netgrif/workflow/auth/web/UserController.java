@@ -2,6 +2,7 @@ package com.netgrif.workflow.auth.web;
 
 import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.auth.domain.User;
+import com.netgrif.workflow.auth.service.UserDetailsServiceImpl;
 import com.netgrif.workflow.auth.service.interfaces.IAuthorityService;
 import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.auth.web.requestbodies.UpdateUserRequest;
@@ -9,7 +10,6 @@ import com.netgrif.workflow.auth.web.requestbodies.UserSearchRequestBody;
 import com.netgrif.workflow.auth.web.responsebodies.AuthoritiesResources;
 import com.netgrif.workflow.auth.web.responsebodies.UserResource;
 import com.netgrif.workflow.auth.web.responsebodies.UserResourceAssembler;
-import com.netgrif.workflow.auth.web.responsebodies.UsersResource;
 import com.netgrif.workflow.petrinet.service.interfaces.IProcessRoleService;
 import com.netgrif.workflow.settings.domain.Preferences;
 import com.netgrif.workflow.settings.service.IPreferencesService;
@@ -18,6 +18,7 @@ import com.netgrif.workflow.workflow.web.responsebodies.MessageResource;
 import com.netgrif.workflow.workflow.web.responsebodies.ResourceLinkAssembler;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedResourcesAssembler;
@@ -42,6 +43,9 @@ public class UserController {
     private IUserService userService;
 
     @Autowired
+    private UserDetailsServiceImpl userDetailsService;
+
+    @Autowired
     private IProcessRoleService processRoleService;
 
     @Autowired
@@ -49,6 +53,9 @@ public class UserController {
 
     @Autowired
     private IPreferencesService preferencesService;
+
+    @Value("${server.auth.enable-profile-edit}")
+    private boolean enableProfileEdit;
 
     @GetMapping
     public PagedResources<UserResource> getAll(@RequestParam(value = "small", required = false) Boolean small, Pageable pageable, PagedResourcesAssembler<User> assembler, Authentication auth, Locale locale) {
@@ -88,16 +95,21 @@ public class UserController {
     }
 
     @PostMapping("/{id}")
-    public UsersResource updateUser(@PathVariable("id") Long userId, @RequestBody UpdateUserRequest updates, Authentication auth, Locale locale) {
+    public UserResource updateUser(@PathVariable("id") Long userId, @RequestBody UpdateUserRequest updates, Authentication auth, Locale locale) {
+        if (!enableProfileEdit) return null;
+
         LoggedUser logged = (LoggedUser) auth.getPrincipal();
-        if (!logged.isAdmin() && !Objects.equals(logged.getId(), userId)) {
+        User user = userService.findById(userId, false);
+        if (user == null || (!logged.isAdmin() && !Objects.equals(logged.getId(), userId)))
             return null;
+
+        user = userService.update(user, updates);
+        if (Objects.equals(logged.getId(), userId)) {
+            logged.setFullName(user.getFullName());
+            userDetailsService.reloadSecurityContext(logged);
         }
-        if (!logged.isAdmin() && Objects.equals(logged.getId(), userId)) {
-            return null; //TODO update user
-        } else {
-            return null; //TODO update user
-        }
+        log.info("Updating user " + user.getEmail() + " with data " + updates.toString());
+        return new UserResource(user, "profile", locale);
     }
 
     @PostMapping("/role")
