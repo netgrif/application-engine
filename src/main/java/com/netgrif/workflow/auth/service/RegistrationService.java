@@ -44,6 +44,9 @@ public class RegistrationService implements IRegistrationService {
     @Value("${server.auth.token-validity-period}")
     private int tokenValidityPeriod;
 
+    @Value("${server.auth.minimal-password-length}")
+    private int minimalPasswordLength;
+
     @Override
     @Transactional
     @Scheduled(cron = "0 0 1 * * *")
@@ -70,6 +73,14 @@ public class RegistrationService implements IRegistrationService {
         });
         users = userRepository.save(users);
         log.info("Reset " + users.size() + " expired user tokens");
+    }
+
+    @Override
+    public void changePassword(User user, String newPassword) {
+        user.setPassword(newPassword);
+        userService.encodeUserPassword(user);
+        userRepository.save(user);
+        log.info("Changed password for user " + user.getEmail() + ".");
     }
 
     @Override
@@ -189,5 +200,10 @@ public class RegistrationService implements IRegistrationService {
     @Override
     public LocalDateTime generateExpirationDate() {
         return LocalDateTime.now().plusDays(tokenValidityPeriod);
+    }
+
+    @Override
+    public boolean isPasswordSufficient(String password) {
+        return password.length() >= minimalPasswordLength;
     }
 }
