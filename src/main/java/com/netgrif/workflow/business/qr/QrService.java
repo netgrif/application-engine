@@ -1,23 +1,40 @@
 package com.netgrif.workflow.business.qr;
 
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.EncodeHintType;
+import com.google.zxing.WriterException;
+import com.google.zxing.client.j2se.MatrixToImageConfig;
+import com.google.zxing.client.j2se.MatrixToImageWriter;
+import com.google.zxing.common.BitMatrix;
+import com.google.zxing.qrcode.QRCodeWriter;
+import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
 import net.glxn.qrgen.javase.QRCode;
+import org.apache.log4j.Logger;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
+import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Random;
 
 @Service
 public class QrService implements IQrService {
+
+    private static Logger log = Logger.getLogger(QrService.class);
 
     @Override
     public Optional<InputStream> generateToStream(QrCode code) {
         try {
             return Optional.of(new FileInputStream(generateFile(code)));
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            log.error("Error creating qr code.", e);
             return Optional.empty();
         }
     }
@@ -27,7 +44,43 @@ public class QrService implements IQrService {
         try {
             return Optional.ofNullable(generateFile(code));
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("Error creating qr code.", e);
+            return Optional.empty();
+        }
+    }
+
+    @Override
+    public Optional<File> generateWithLogo(QrCode code, InputStream imageStream) {
+        try {
+            ByteArrayOutputStream os = new ByteArrayOutputStream();
+            BitMatrix bitMatrix = QRCode.from(code.getContent())
+                    .to(code.getImageType())
+                    .withSize(code.getWidth(), code.getHeight())
+                    .withColor(code.getOnColor(), code.getOffColor())
+                    .withErrorCorrection(code.getErrorCorrectionLevel())
+                    .withCharset(code.getCharset())
+                    .getQrWriter().encode(code.getContent(), BarcodeFormat.QR_CODE, code.getWidth(), code.getHeight());
+            MatrixToImageConfig config = new MatrixToImageConfig(code.getOnColor(), code.getOffColor());
+
+            BufferedImage qrImage = MatrixToImageWriter.toBufferedImage(bitMatrix, config);
+            BufferedImage overly = ImageIO.read(imageStream);
+
+            int deltaHeight = qrImage.getHeight() - overly.getHeight();
+            int deltaWidth = qrImage.getWidth() - overly.getWidth();
+
+            BufferedImage combined = new BufferedImage(qrImage.getHeight(), qrImage.getWidth(), BufferedImage.TYPE_INT_ARGB);
+            Graphics2D g = (Graphics2D) combined.getGraphics();
+
+            g.drawImage(qrImage, 0, 0, null);
+            g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
+            g.drawImage(overly, Math.round(deltaWidth / 2), Math.round(deltaHeight / 2), null);
+
+            ImageIO.write(combined, "png", os);
+            Files.copy( new ByteArrayInputStream(os.toByteArray()), Paths.get(code.getFileName()), StandardCopyOption.REPLACE_EXISTING);
+
+            return Optional.of(new File(code.getFileName()));
+        } catch (WriterException | IOException e) {
+            log.error("Error creating qr code.", e);
             return Optional.empty();
         }
     }
