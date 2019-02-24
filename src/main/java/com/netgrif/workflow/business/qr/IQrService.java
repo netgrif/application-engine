@@ -9,4 +9,6 @@ public interface IQrService {
     Optional<InputStream> generateToStream(QrCode content);
 
     Optional<File> generateToFile(QrCode content);
+
+    Optional<File> generateWithLogo(QrCode code, InputStream imageStream);
 }
