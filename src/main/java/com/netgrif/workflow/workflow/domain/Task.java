@@ -70,6 +70,9 @@ public class Task {
     @Builder.Default
     private List<Trigger> triggers = new LinkedList<>();
 
+    /**
+     * Role ObjectId : [ RolePermission, true/false ]
+     */
     @Getter @Setter
     @Builder.Default
     private Map<String, Map<String, Boolean>> roles = new HashMap<>();
