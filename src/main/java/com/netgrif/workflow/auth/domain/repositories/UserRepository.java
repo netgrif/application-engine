@@ -19,21 +19,11 @@ public interface UserRepository extends JpaRepository<User, Long>, QueryDslPredi
 
     User findByEmail(String email);
 
-    User findByToken(String token);
-
-    List<User> findAllByExpirationDateBefore(LocalDateTime dateTime);
-
     List<User> findAllByStateAndExpirationDateBefore(UserState userState, LocalDateTime dateTime);
 
-    List<User> findAllByState(UserState state);
-
-    List<User> findByStateAndUserProcessRoles_RoleIdIn(UserState state, List<String> roleId);
-
-    Page<User> findByStateAndUserProcessRoles_RoleIdIn(UserState state, List<String> roleId, Pageable pageable);
+    Page<User> findDistinctByStateAndUserProcessRoles_RoleIdIn(UserState state, List<String> roleId, Pageable pageable);
 
     List<User> removeAllByStateAndExpirationDateBefore(UserState state, LocalDateTime dateTime);
-
-    List<User> removeByEmail(String email);
 
     boolean existsByEmail(String email);
 }
