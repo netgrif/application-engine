@@ -201,7 +201,7 @@ public class UserService implements IUserService {
 
     @Override
     public Page<User> findAllActiveByProcessRoles(Set<String> roleIds, boolean small, Pageable pageable) {
-        Page<User> users = userRepository.findByStateAndUserProcessRoles_RoleIdIn(UserState.ACTIVE, new ArrayList<>(roleIds), pageable);
+        Page<User> users = userRepository.findDistinctByStateAndUserProcessRoles_RoleIdIn(UserState.ACTIVE, new ArrayList<>(roleIds), pageable);
         if (!small) {
             users.forEach(this::loadProcessRoles);
         }
