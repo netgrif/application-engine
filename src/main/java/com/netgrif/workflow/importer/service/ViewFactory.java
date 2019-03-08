@@ -15,6 +15,8 @@ public class ViewFactory {
             return buildImageView(data);
         } else if (data.getView().getList() != null) {
             return buildListView(data);
+        } else if (data.getView().getAutocomplete() != null) {
+            return new View("autocomplete");
         } else {
             throw new UnsupportedViewException();
         }
