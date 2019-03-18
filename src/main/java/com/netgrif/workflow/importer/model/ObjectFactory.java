@@ -38,6 +38,7 @@ public class ObjectFactory {
     private final static QName _Action_QNAME = new QName("", "action");
     private final static QName _ActionRef_QNAME = new QName("", "actionRef");
     private final static QName _Remote_QNAME = new QName("", "remote");
+    private final static QName _Length_QNAME = new QName("", "length");
     private final static QName _Name_QNAME = new QName("", "name");
     private final static QName _Message_QNAME = new QName("", "message");
     private final static QName _TransitionRef_QNAME = new QName("", "transitionRef");
@@ -416,6 +417,15 @@ public class ObjectFactory {
     @XmlElementDecl(namespace = "", name = "remote")
     public JAXBElement<String> createRemote(String value) {
         return new JAXBElement<String>(_Remote_QNAME, String.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link Integer }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "", name = "length")
+    public JAXBElement<Integer> createLength(Integer value) {
+        return new JAXBElement<Integer>(_Length_QNAME, Integer.class, null, value);
     }
 
     /**

@@ -12,11 +12,13 @@
         <id>boolean_field</id>
         <title>Boolean</title>
         <init>true</init>
+        <length>3</length>
     </data>
     <data type="text" immediate="true">
         <id>text_field</id>
         <title>Text</title>
         <init>Example text</init>
+        <length>5</length>
     </data>
     <data type="text" immediate="true">
         <id>text_area_field</id>
@@ -27,6 +29,7 @@
             be co-located with the 18th International Conference on Application of Concurrency to System Design (ACSD
             2018).
         </init>
+        <length>10</length>
     </data>
     <data type="number" immediate="true">
         <id>number_field</id>
@@ -39,15 +42,18 @@
                 <locale>sk_SK</locale>
             </currency>
         </format>
+        <length>5</length>
     </data>
     <data type="number" immediate="true">
         <id>number_field2</id>
         <title>Number2</title>
         <init>38</init>
+        <length>2</length>
     </data>
     <data type="date" immediate="true">
         <id>date_field</id>
         <title>Date</title>
+        <length>3</length>
     </data>
     <data type="enumeration" immediate="true">
         <id>enumeration_field</id>
@@ -56,6 +62,37 @@
         <values>Value 2</values>
         <values>Value 3</values>
         <init>Value 1</init>
+    </data>
+    <data type="enumeration" immediate="true">
+        <id>enumeration_field_old</id>
+        <title>Enumeration</title>
+        <placeholder>WTF</placeholder>
+        <values>Alfa</values>
+        <values>Bravo</values>
+        <values>Charlie</values>
+        <values>Delta</values>
+        <values>Echo</values>
+        <values>Foxtrot</values>
+        <values>Golf</values>
+        <values>Hotel</values>
+        <values>India</values>
+        <values>Juliett</values>
+        <values>Kilo</values>
+        <values>Lima</values>
+        <values>Mike</values>
+        <values>November</values>
+        <values>Oscar</values>
+        <values>Papa</values>
+        <values>Quebec</values>
+        <values>Romeo</values>
+        <values>Sierra</values>
+        <values>Tango</values>
+        <values>Uniform</values>
+        <values>Victor</values>
+        <values>Whiskey</values>
+        <values>X-ray</values>
+        <values>Yankee</values>
+        <values>Zulu</values>
     </data>
     <data type="multichoice" immediate="true">
         <id>multichoice_field</id>
@@ -134,6 +171,12 @@
             <alignment>start</alignment>
             <dataRef>
                 <id>enumeration_field</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>enumeration_field_old</id>
                 <logic>
                     <behavior>editable</behavior>
                 </logic>
