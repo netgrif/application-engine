@@ -28,111 +28,51 @@
     </properties>
 
     <dependencies>
+
+        <!-- Batch -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-batch</artifactId>
         </dependency>
+
+        <!-- Cache -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-cache</artifactId>
         </dependency>
+
+        <!-- MongoDB -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-mongodb</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-redis</artifactId>
-        </dependency>
+
+        <!-- Data REST -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-rest</artifactId>
         </dependency>
+
+        <!-- HATEOAS -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-hateoas</artifactId>
         </dependency>
+
+        <!-- Mail -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-mail</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-security</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.session</groupId>
-            <artifactId>spring-session</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-devtools</artifactId>
-            <scope>runtime</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-jpa</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-neo4j</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.security</groupId>
-            <artifactId>spring-security-test</artifactId>
-            <!--<version>4.2.3.RELEASE</version>-->
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-freemarker</artifactId>
         </dependency>
-        <dependency>
-            <groupId>com.icegreen</groupId>
-            <artifactId>greenmail</artifactId>
-            <version>1.5.5</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
-            <scope>runtime</scope>
-        </dependency>
-        <dependency>
-            <groupId>redis.clients</groupId>
-            <artifactId>jedis</artifactId>
-            <version>2.9.0</version>
-        </dependency>
 
-        <!-- https://mvnrepository.com/artifact/org.codehaus.groovy/groovy-all -->
+        <!-- Security -->
         <dependency>
-            <groupId>org.codehaus.groovy</groupId>
-            <artifactId>groovy-all</artifactId>
-            <version>2.4.15</version>
-        </dependency>
-
-        <!-- https://mvnrepository.com/artifact/org.codehaus.groovy.modules.http-builder/http-builder -->
-        <dependency>
-            <groupId>org.codehaus.groovy.modules.http-builder</groupId>
-            <artifactId>http-builder</artifactId>
-            <version>0.7.1</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <optional>true</optional>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.pdfbox</groupId>
-            <artifactId>pdfbox</artifactId>
-            <!-- NEVER EVER CHANGE THIS VERSION TO 2.0.7 -->
-            <version>2.0.6</version>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
         </dependency>
         <dependency>
             <groupId>org.bouncycastle</groupId>
@@ -144,13 +84,6 @@
             <artifactId>bcprov-jdk15on</artifactId>
             <version>1.57</version>
         </dependency>
-
-        <dependency>
-            <groupId>org.jsoup</groupId>
-            <artifactId>jsoup</artifactId>
-            <version>1.10.3</version>
-        </dependency>
-        <!-- Encryption -->
         <dependency>
             <groupId>org.jasypt</groupId>
             <artifactId>jasypt</artifactId>
@@ -162,6 +95,72 @@
             <artifactId>jasypt-hibernate4</artifactId>
             <version>${jasypt.version}</version>
             <scope>compile</scope>
+        </dependency>
+
+        <!-- Session -->
+        <dependency>
+            <groupId>org.springframework.session</groupId>
+            <artifactId>spring-session</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>redis.clients</groupId>
+            <artifactId>jedis</artifactId>
+            <version>2.9.0</version>
+        </dependency>
+
+        <!-- SQL -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+
+        <!-- Neo4j -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-neo4j</artifactId>
+        </dependency>
+
+        <!-- Groovy -->
+        <dependency>
+            <groupId>org.codehaus.groovy</groupId>
+            <artifactId>groovy-all</artifactId>
+            <version>2.4.15</version>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.groovy.modules.http-builder</groupId>
+            <artifactId>http-builder</artifactId>
+            <version>0.7.1</version>
+        </dependency>
+
+        <!-- Lombok -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+        <!-- PDF box -->
+        <dependency>
+            <groupId>org.apache.pdfbox</groupId>
+            <artifactId>pdfbox</artifactId>
+            <!-- NEVER EVER CHANGE THIS VERSION TO 2.0.7 -->
+            <version>2.0.6</version>
+        </dependency>
+
+        <!-- Jsoup -->
+        <dependency>
+            <groupId>org.jsoup</groupId>
+            <artifactId>jsoup</artifactId>
+            <version>1.10.3</version>
         </dependency>
 
          <!--SWAGGER -->
@@ -198,11 +197,47 @@
             <artifactId>querydsl-core</artifactId>
             <version>${querydsl.version}</version>
         </dependency>
+
         <!-- QR code -->
         <dependency>
             <groupId>com.github.kenglxn.qrgen</groupId>
             <artifactId>javase</artifactId>
             <version>2.5.0</version>
+        </dependency>
+
+        <!-- ElasticSearch -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-elasticsearch</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>net.java.dev.jna</groupId>
+            <artifactId>jna</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+
+        <!-- Dev tools -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-devtools</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+
+        <!-- Test -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.icegreen</groupId>
+            <artifactId>greenmail</artifactId>
+            <version>1.5.5</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-test</artifactId>
         </dependency>
     </dependencies>
 
