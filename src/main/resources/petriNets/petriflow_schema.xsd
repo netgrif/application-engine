@@ -457,6 +457,7 @@
         <xs:choice>
             <xs:element name="area" type="xs:string"/>
             <xs:element name="image" type="booleanImageView"/>
+            <xs:element name="editor"/>
             <xs:element name="list">
                 <xs:simpleType>
                     <xs:union>
