@@ -17,6 +17,7 @@ import javax.xml.bind.annotation.XmlType;
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
  *       &lt;choice&gt;
  *         &lt;element name="area" type="{http://www.w3.org/2001/XMLSchema}string"/&gt;
+ *         &lt;element name="tree" type="{http://www.w3.org/2001/XMLSchema}string"/&gt;
  *         &lt;element name="image" type="{}booleanImageView"/&gt;
  *         &lt;element name="list"&gt;
  *           &lt;simpleType&gt;
@@ -44,12 +45,14 @@ import javax.xml.bind.annotation.XmlType;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "fieldView", propOrder = {
     "area",
+    "tree",
     "image",
     "list"
 })
 public class FieldView {
 
     protected String area;
+    protected String tree;
     protected BooleanImageView image;
     protected String list;
 
@@ -75,6 +78,30 @@ public class FieldView {
      */
     public void setArea(String value) {
         this.area = value;
+    }
+
+    /**
+     * Gets the value of the tree property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getTree() {
+        return tree;
+    }
+
+    /**
+     * Sets the value of the tree property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setTree(String value) {
+        this.tree = value;
     }
 
     /**
