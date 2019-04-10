@@ -24,7 +24,8 @@ import com.netgrif.workflow.workflow.domain.Task;
 import com.netgrif.workflow.workflow.service.interfaces.IDataService;
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
@@ -40,7 +41,7 @@ import java.util.stream.LongStream;
 @Service
 public class DataService implements IDataService {
 
-    private static final Logger log = Logger.getLogger(DataService.class);
+    private static final Logger log = LoggerFactory.getLogger(DataService.class);
 
     @Autowired
     private ApplicationEventPublisher publisher;

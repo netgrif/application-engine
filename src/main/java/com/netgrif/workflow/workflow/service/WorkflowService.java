@@ -19,9 +19,9 @@ import com.netgrif.workflow.workflow.domain.repositories.CaseRepository;
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
 import com.querydsl.core.types.Predicate;
+import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
@@ -176,7 +176,7 @@ public class WorkflowService implements IWorkflowService {
 
     @Override
     public void deleteCase(String caseId) {
-        Case useCase = repository.findOne(caseId);
+        Optional<Case> caseOptional = repository.findById(caseId);
         if (!caseOptional.isPresent())
             throw new IllegalArgumentException("Could not find case with id ["+caseId+"]");
         Case useCase = caseOptional.get();
