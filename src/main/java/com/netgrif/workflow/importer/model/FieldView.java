@@ -88,11 +88,11 @@ public class FieldView {
 
     /**
      * Gets the value of the autocomplete property.
-     *
+     * 
      * @return
      *     possible object is
      *     {@link String }
-     *
+     *     
      */
     public String getAutocomplete() {
         return autocomplete;
@@ -100,11 +100,11 @@ public class FieldView {
 
     /**
      * Sets the value of the autocomplete property.
-     *
+     * 
      * @param value
      *     allowed object is
      *     {@link String }
-     *
+     *     
      */
     public void setAutocomplete(String value) {
         this.autocomplete = value;
@@ -112,11 +112,11 @@ public class FieldView {
 
     /**
      * Gets the value of the tree property.
-     *
+     * 
      * @return
      *     possible object is
      *     {@link String }
-     *
+     *     
      */
     public String getTree() {
         return tree;
@@ -124,11 +124,11 @@ public class FieldView {
 
     /**
      * Sets the value of the tree property.
-     *
+     * 
      * @param value
      *     allowed object is
      *     {@link String }
-     *
+     *     
      */
     public void setTree(String value) {
         this.tree = value;
@@ -160,11 +160,11 @@ public class FieldView {
 
     /**
      * Gets the value of the editor property.
-     *
+     * 
      * @return
      *     possible object is
      *     {@link Object }
-     *
+     *     
      */
     public Object getEditor() {
         return editor;
@@ -172,11 +172,11 @@ public class FieldView {
 
     /**
      * Sets the value of the editor property.
-     *
+     * 
      * @param value
      *     allowed object is
      *     {@link Object }
-     *
+     *     
      */
     public void setEditor(Object value) {
         this.editor = value;
