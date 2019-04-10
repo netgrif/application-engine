@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://modeler.netgrif.com/petriflow_schema.xsd">
+    <data type="text">
+        <id>text</id>
+        <title>text</title>
+    </data>
+    <!-- TRANSITIONS -->
+    <transition>
+        <id>5</id>
+        <x>260</x>
+        <y>340</y>
+        <label>Step 1</label>
+        <event type="finish">
+            <id>step1_finish</id>
+            <title>Ďalej</title>
+        </event>
+    </transition>
+    <transition>
+        <id>6</id>
+        <x>500</x>
+        <y>340</y>
+        <label>Step 2</label>
+        <event type="finish">
+            <id>step2_finish</id>
+            <title>Ďalej</title>
+        </event>
+        <event type="cancel">
+            <id>step2_cancel</id>
+            <title>Späť</title>
+            <actions phase="post">
+                <action>
+                    textf: f.text;
+                    change textf about {
+                        "changed"
+                    }
+                </action>
+                <action>
+                    task: t.7;
+                    executeTask("8",[:] as Map)
+                </action>
+            </actions>
+        </event>
+    </transition>
+    <transition>
+        <id>7</id>
+        <x>740</x>
+        <y>340</y>
+        <label>Step 3</label>
+        <event type="finish">
+            <id>step3_finish</id>
+            <title>Ďalej</title>
+        </event>
+        <event type="cancel">
+            <id>step3_cancel</id>
+            <title>Späť</title>
+            <actions phase="post">
+                <action>
+                    task: t.7;
+                    executeTask("9",[:] as Map)
+                </action>
+            </actions>
+        </event>
+    </transition>
+    <transition>
+        <id>23</id>
+        <x>980</x>
+        <y>260</y>
+        <label>Final</label>
+        <event type="cancel">
+            <id>step2_cancel</id>
+            <title>Späť</title>
+        </event>
+    </transition>
+    <transition>
+        <id>8</id>
+        <x>260</x>
+        <y>180</y>
+        <label>goto 1</label>
+    </transition>
+    <transition>
+        <id>9</id>
+        <x>500</x>
+        <y>180</y>
+        <label>goto 2</label>
+    </transition>
+    <transition>
+        <id>24</id>
+        <x>740</x>
+        <y>180</y>
+        <label>goto 3</label>
+    </transition>
+    <transition>
+        <id>26</id>
+        <x>1220</x>
+        <y>260</y>
+        <label>Status</label>
+    </transition>
+    <!-- PLACES -->
+    <place>
+        <id>1</id>
+        <x>140</x>
+        <y>260</y>
+        <label></label>
+        <tokens>1</tokens>
+        <static>false</static>
+    </place>
+    <place>
+        <id>2</id>
+        <x>380</x>
+        <y>260</y>
+        <label></label>
+        <tokens>0</tokens>
+        <static>false</static>
+    </place>
+    <place>
+        <id>3</id>
+        <x>620</x>
+        <y>260</y>
+        <label></label>
+        <tokens>0</tokens>
+        <static>false</static>
+    </place>
+    <place>
+        <id>4</id>
+        <x>860</x>
+        <y>260</y>
+        <label></label>
+        <tokens>0</tokens>
+        <static>false</static>
+    </place>
+    <place>
+        <id>25</id>
+        <x>1100</x>
+        <y>260</y>
+        <label></label>
+        <tokens>0</tokens>
+        <static>false</static>
+    </place>
+    <!-- ARCS -->
+    <arc>
+        <id>11</id>
+        <type>regular</type>
+        <sourceId>1</sourceId>
+        <destinationId>5</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>12</id>
+        <type>regular</type>
+        <sourceId>5</sourceId>
+        <destinationId>2</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>13</id>
+        <type>regular</type>
+        <sourceId>2</sourceId>
+        <destinationId>6</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>14</id>
+        <type>regular</type>
+        <sourceId>6</sourceId>
+        <destinationId>3</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>15</id>
+        <type>regular</type>
+        <sourceId>3</sourceId>
+        <destinationId>7</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>16</id>
+        <type>regular</type>
+        <sourceId>7</sourceId>
+        <destinationId>4</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>19</id>
+        <type>regular</type>
+        <sourceId>3</sourceId>
+        <destinationId>9</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>20</id>
+        <type>regular</type>
+        <sourceId>9</sourceId>
+        <destinationId>2</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>21</id>
+        <type>regular</type>
+        <sourceId>2</sourceId>
+        <destinationId>8</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>22</id>
+        <type>regular</type>
+        <sourceId>8</sourceId>
+        <destinationId>1</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>27</id>
+        <type>read</type>
+        <sourceId>25</sourceId>
+        <destinationId>26</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>28</id>
+        <type>regular</type>
+        <sourceId>4</sourceId>
+        <destinationId>23</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>29</id>
+        <type>regular</type>
+        <sourceId>23</sourceId>
+        <destinationId>25</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>30</id>
+        <type>regular</type>
+        <sourceId>4</sourceId>
+        <destinationId>24</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>31</id>
+        <type>regular</type>
+        <sourceId>24</sourceId>
+        <destinationId>3</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+</document>
