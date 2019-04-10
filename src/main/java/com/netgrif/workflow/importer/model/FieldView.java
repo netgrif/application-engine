@@ -17,6 +17,7 @@ import javax.xml.bind.annotation.XmlType;
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
  *       &lt;choice&gt;
  *         &lt;element name="area" type="{http://www.w3.org/2001/XMLSchema}string"/&gt;
+ *         &lt;element name="autocomplete" type="{http://www.w3.org/2001/XMLSchema}string"/&gt;
  *         &lt;element name="tree" type="{http://www.w3.org/2001/XMLSchema}string"/&gt;
  *         &lt;element name="image" type="{}booleanImageView"/&gt;
  *         &lt;element name="editor" type="{http://www.w3.org/2001/XMLSchema}anyType"/&gt;
@@ -46,6 +47,7 @@ import javax.xml.bind.annotation.XmlType;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "fieldView", propOrder = {
     "area",
+    "autocomplete",
     "tree",
     "image",
     "editor",
@@ -54,6 +56,7 @@ import javax.xml.bind.annotation.XmlType;
 public class FieldView {
 
     protected String area;
+    protected String autocomplete;
     protected String tree;
     protected BooleanImageView image;
     protected Object editor;
@@ -84,12 +87,36 @@ public class FieldView {
     }
 
     /**
-     * Gets the value of the tree property.
-     * 
+     * Gets the value of the autocomplete property.
+     *
      * @return
      *     possible object is
      *     {@link String }
-     *     
+     *
+     */
+    public String getAutocomplete() {
+        return autocomplete;
+    }
+
+    /**
+     * Sets the value of the autocomplete property.
+     *
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *
+     */
+    public void setAutocomplete(String value) {
+        this.autocomplete = value;
+    }
+
+    /**
+     * Gets the value of the tree property.
+     *
+     * @return
+     *     possible object is
+     *     {@link String }
+     *
      */
     public String getTree() {
         return tree;
@@ -97,11 +124,11 @@ public class FieldView {
 
     /**
      * Sets the value of the tree property.
-     * 
+     *
      * @param value
      *     allowed object is
      *     {@link String }
-     *     
+     *
      */
     public void setTree(String value) {
         this.tree = value;
@@ -133,11 +160,11 @@ public class FieldView {
 
     /**
      * Gets the value of the editor property.
-     * 
+     *
      * @return
      *     possible object is
      *     {@link Object }
-     *     
+     *
      */
     public Object getEditor() {
         return editor;
@@ -145,11 +172,11 @@ public class FieldView {
 
     /**
      * Sets the value of the editor property.
-     * 
+     *
      * @param value
      *     allowed object is
      *     {@link Object }
-     *     
+     *
      */
     public void setEditor(Object value) {
         this.editor = value;
