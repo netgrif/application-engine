@@ -19,7 +19,8 @@ import com.netgrif.workflow.workflow.domain.repositories.CaseRepository;
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
 import com.querydsl.core.types.Predicate;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
@@ -42,7 +43,7 @@ import java.util.stream.StreamSupport;
 @Service
 public class WorkflowService implements IWorkflowService {
 
-    private static final Logger log = Logger.getLogger(WorkflowService.class);
+    private static final Logger log = LoggerFactory.getLogger(WorkflowService.class);
 
     @Autowired
     private CaseRepository repository;
@@ -83,9 +84,10 @@ public class WorkflowService implements IWorkflowService {
 
     @Override
     public Case findOne(String caseId) {
-        Case useCase = repository.findOne(caseId);
-        if (useCase == null)
-            return null;
+        Optional<Case> caseOptional = repository.findById(caseId);
+        if (!caseOptional.isPresent())
+            throw new IllegalArgumentException("Could not find Case with id ["+caseId+"]");
+        Case useCase = caseOptional.get();
         setPetriNet(useCase);
         decryptDataSet(useCase);
         return useCase;
@@ -123,13 +125,19 @@ public class WorkflowService implements IWorkflowService {
 
     @Override
     public List<Case> getCaseFieldChoices(Pageable pageable, String caseId, String fieldId) {
-        Case useCase = repository.findOne(caseId);
+        Optional<Case> caseOptional = repository.findById(caseId);
+        if (!caseOptional.isPresent())
+            throw new IllegalArgumentException("Could not find case with id ["+caseId+"]");
+        Case useCase = caseOptional.get();
+
         CaseField field = (CaseField) useCase.getPetriNet().getDataSet().get(fieldId);
 
         List<Case> list = new LinkedList<>();
         field.getConstraintNetIds().forEach((netImportId, fieldImportIds) -> {
-            PetriNet net = petriNetRepository.findOne(netImportId);
-            list.addAll(repository.findAllByProcessIdentifier(net.getIdentifier()));
+            Optional<PetriNet> netOptional = petriNetRepository.findById(netImportId);
+            if (!netOptional.isPresent())
+                throw new IllegalArgumentException("Could not find model with id ["+netImportId+"]");
+            list.addAll(repository.findAllByProcessIdentifier(netOptional.get().getIdentifier()));
         });
 
         return list;
@@ -169,6 +177,9 @@ public class WorkflowService implements IWorkflowService {
     @Override
     public void deleteCase(String caseId) {
         Case useCase = repository.findOne(caseId);
+        if (!caseOptional.isPresent())
+            throw new IllegalArgumentException("Could not find case with id ["+caseId+"]");
+        Case useCase = caseOptional.get();
         log.info("["+caseId+"]: Deleting case " + useCase.getTitle());
 
         taskService.deleteTasksByCase(caseId);
@@ -187,7 +198,11 @@ public class WorkflowService implements IWorkflowService {
 
     @Override
     public boolean removeTasksFromCase(Iterable<? extends Task> tasks, String caseId) {
-        return removeTasksFromCase(tasks, repository.findOne(caseId));
+        Optional<Case> caseOptional = repository.findById(caseId);
+        if (!caseOptional.isPresent())
+            throw new IllegalArgumentException("Could not find case with id ["+caseId+"]");
+        Case useCase = caseOptional.get();
+        return removeTasksFromCase(tasks, useCase);
     }
 
     @Override
@@ -220,7 +235,10 @@ public class WorkflowService implements IWorkflowService {
     }
 
     public List<Field> getData(String caseId) {
-        Case useCase = repository.findOne(caseId);
+        Optional<Case> optionalUseCase = repository.findById(caseId);
+        if (!optionalUseCase.isPresent())
+            throw new IllegalArgumentException("Could not find case with id ["+caseId+"]");
+        Case useCase = optionalUseCase.get();
         List<Field> fields = new ArrayList<>();
         useCase.getDataSet().forEach((id, dataField) -> {
             if (dataField.isDisplayable() || useCase.getPetriNet().isDisplayableInAnyTransition(id)) {
