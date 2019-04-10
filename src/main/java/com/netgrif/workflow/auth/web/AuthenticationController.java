@@ -3,8 +3,10 @@ package com.netgrif.workflow.auth.web;
 import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.auth.service.InvalidUserTokenException;
+import com.netgrif.workflow.auth.service.UserDetailsServiceImpl;
 import com.netgrif.workflow.auth.service.interfaces.IRegistrationService;
 import com.netgrif.workflow.auth.service.interfaces.IUserService;
+import com.netgrif.workflow.auth.web.requestbodies.ChangePasswordRequest;
 import com.netgrif.workflow.auth.web.requestbodies.NewUserRequest;
 import com.netgrif.workflow.auth.web.requestbodies.RegistrationRequest;
 import com.netgrif.workflow.auth.web.responsebodies.UserResource;
@@ -33,6 +35,9 @@ public class AuthenticationController {
 
     @Autowired
     private IRegistrationService registrationService;
+
+    @Autowired
+    private UserDetailsServiceImpl userDetailsService;
 
     @Autowired
     private IMailService mailService;
@@ -66,7 +71,7 @@ public class AuthenticationController {
             newUserRequest.email = URLDecoder.decode(newUserRequest.email, StandardCharsets.UTF_8.name());
             User user = registrationService.createNewUser(newUserRequest);
             if (user == null)
-                return MessageResource.errorMessage("User with email "+newUserRequest.email+" has been already registered.");
+                return MessageResource.errorMessage("User with email " + newUserRequest.email + " has been already registered.");
             mailService.sendRegistrationEmail(user);
 
             return MessageResource.successMessage("Mail was sent to " + user.getEmail());
@@ -124,4 +129,34 @@ public class AuthenticationController {
             return MessageResource.errorMessage("Invalid token!");
         }
     }
+
+    @PostMapping(value = "/changePassword")
+    public MessageResource changePassword(Authentication auth, @RequestBody ChangePasswordRequest request) {
+        try {
+            User user = userService.findByEmail(request.login, false);
+            if (user == null || request.password == null || request.newPassword == null) {
+                return MessageResource.errorMessage("Incorrect login!");
+            }
+
+            String newPassword = new String(Base64.getDecoder().decode(request.newPassword));
+            if (!registrationService.isPasswordSufficient(newPassword)) {
+                return MessageResource.errorMessage("Insufficient password!");
+            }
+
+            String password = new String(Base64.getDecoder().decode(request.password));
+            if (userService.stringMatchesUserPassword(user, password)) {
+                registrationService.changePassword(user, newPassword);
+                userDetailsService.reloadSecurityContext((LoggedUser) auth.getPrincipal());
+
+            } else {
+                return MessageResource.errorMessage("Incorrect password!");
+            }
+
+            return MessageResource.successMessage("Password is successfully changed.");
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return MessageResource.errorMessage("There has been a problem!");
+        }
+    }
+
 }

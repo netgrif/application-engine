@@ -4,7 +4,13 @@ import lombok.Data;
 
 @Data
 public class TaskPair {
+    /**
+     * ObjectId
+     */
     private String task;
+    /**
+     * Import Id
+     */
     private String transition;
 
     public TaskPair() {

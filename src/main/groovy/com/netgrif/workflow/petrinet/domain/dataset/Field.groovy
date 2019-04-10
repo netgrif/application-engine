@@ -6,6 +6,7 @@ import com.netgrif.workflow.petrinet.domain.Format
 import com.netgrif.workflow.petrinet.domain.I18nString
 import com.netgrif.workflow.petrinet.domain.Imported
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action
+import com.netgrif.workflow.petrinet.domain.views.View
 import com.querydsl.core.annotations.PropertyType
 import com.querydsl.core.annotations.QueryType
 import org.bson.types.ObjectId
@@ -43,6 +44,8 @@ abstract class Field<T> extends Imported {
     private String encryption
 
     private Format format
+
+    private View view
 
     Field() {
         _id = new ObjectId()
@@ -189,6 +192,14 @@ abstract class Field<T> extends Imported {
         this.format = format
     }
 
+    View getView() {
+        return view
+    }
+
+    void setView(View view) {
+        this.view = view
+    }
+
     @Override
     String toString() {
         return name.defaultValue
@@ -210,6 +221,7 @@ abstract class Field<T> extends Imported {
         clone.immediate = this.immediate
         clone.actions = this.actions
         clone.encryption = this.encryption
+        clone.view = this.view
         clone.format = this.format
     }
 
