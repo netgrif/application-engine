@@ -55,10 +55,36 @@
     <data type="enumeration" immediate="true">
         <id>enumeration_field</id>
         <title>Enumeration</title>
-        <values>Value 1</values>
-        <values>Value 2</values>
-        <values>Value 3</values>
-        <init>Value 1</init>
+        <placeholder>WTF</placeholder>
+        <values>Alfa</values>
+        <values>Bravo</values>
+        <values>Charlie</values>
+        <values>Delta</values>
+        <values>Echo</values>
+        <values>Foxtrot</values>
+        <values>Golf</values>
+        <values>Hotel</values>
+        <values>India</values>
+        <values>Juliett</values>
+        <values>Kilo</values>
+        <values>Lima</values>
+        <values>Mike</values>
+        <values>November</values>
+        <values>Oscar</values>
+        <values>Papa</values>
+        <values>Quebec</values>
+        <values>Romeo</values>
+        <values>Sierra</values>
+        <values>Tango</values>
+        <values>Uniform</values>
+        <values>Victor</values>
+        <values>Whiskey</values>
+        <values>X-ray</values>
+        <values>Yankee</values>
+        <values>Zulu</values>
+        <view>
+            <autocomplete/>
+        </view>
     </data>
     <data type="multichoice" immediate="true">
         <id>multichoice_field</id>
