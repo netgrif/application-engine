@@ -1,11 +1,9 @@
 package com.netgrif.workflow.petrinet.web.responsebodies;
 
-import com.fasterxml.jackson.annotation.JsonRootName;
 import lombok.Data;
 
 @Data
-@JsonRootName("processRole")
-public class LocalisedProcessRole {
+public class ProcessRole {
 
     private String stringId;
 
@@ -13,12 +11,12 @@ public class LocalisedProcessRole {
 
     private String description;
 
-    public LocalisedProcessRole(String id, String name, String description) {
+    public ProcessRole(String id, String name, String description) {
         this.stringId = id;
         this.name = name;
         this.description = description;
     }
 
-    public LocalisedProcessRole() {
+    public ProcessRole() {
     }
 }

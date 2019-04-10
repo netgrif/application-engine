@@ -3,13 +3,15 @@ package com.netgrif.workflow.workflow.domain.repositories;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.QCase;
 import org.springframework.data.mongodb.repository.MongoRepository;
-import org.springframework.data.querydsl.QueryDslPredicateExecutor;
+import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import org.springframework.data.querydsl.binding.QuerydslBinderCustomizer;
 import org.springframework.data.querydsl.binding.QuerydslBindings;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-public interface CaseRepository extends MongoRepository<Case, String>, QueryDslPredicateExecutor<Case>, QuerydslBinderCustomizer<QCase> {
+@Repository
+public interface CaseRepository extends MongoRepository<Case, String>, QuerydslPredicateExecutor<Case>, QuerydslBinderCustomizer<QCase> {
 
     List<Case> findAllByProcessIdentifier(String identifier);
 

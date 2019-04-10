@@ -1,14 +1,15 @@
 package com.netgrif.workflow.migration
 
 import com.netgrif.workflow.startup.AbstractOrderedCommandLineRunner
-import org.apache.log4j.Logger
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 
 @Component
 abstract class MigrationOrderedCommandLineRunner extends AbstractOrderedCommandLineRunner {
 
-    private static final Logger log = Logger.getLogger(MigrationOrderedCommandLineRunner)
+    private static final Logger log = LoggerFactory.getLogger(MigrationOrderedCommandLineRunner)
 
     private String title = this.class.simpleName
 
