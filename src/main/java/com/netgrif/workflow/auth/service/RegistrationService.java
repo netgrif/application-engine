@@ -44,6 +44,9 @@ public class RegistrationService implements IRegistrationService {
     @Value("${server.auth.token-validity-period}")
     private int tokenValidityPeriod;
 
+    @Value("${server.auth.minimal-password-length}")
+    private int minimalPasswordLength;
+
     @Override
     @Transactional
     @Scheduled(cron = "0 0 1 * * *")
@@ -73,8 +76,17 @@ public class RegistrationService implements IRegistrationService {
     }
 
     @Override
+    public void changePassword(User user, String newPassword) {
+        user.setPassword(newPassword);
+        userService.encodeUserPassword(user);
+        userRepository.save(user);
+        log.info("Changed password for user " + user.getEmail() + ".");
+    }
+
+    @Override
     public boolean verifyToken(String token) {
         try {
+            log.info("Verifying token:" + token);
             String[] tokenParts = decodeToken(token);
             User user = userRepository.findByEmail(tokenParts[0]);
             return user != null && Objects.equals(user.getToken(), tokenParts[1]) && user.getExpirationDate().isAfter(LocalDateTime.now());
@@ -118,6 +130,7 @@ public class RegistrationService implements IRegistrationService {
 
     @Override
     public User registerUser(RegistrationRequest registrationRequest) {
+        log.info("Registering user " + registrationRequest.email);
         User user = userRepository.findByEmail(registrationRequest.email);
         if (user == null)
             return null;
@@ -135,6 +148,7 @@ public class RegistrationService implements IRegistrationService {
 
     @Override
     public User resetPassword(String email) {
+        log.info("Resetting password of " + email);
         User user = userRepository.findByEmail(email);
         if (user == null || !user.isRegistered()) {
             String state = user == null ? "Non-existing" : "Inactive";
@@ -151,6 +165,7 @@ public class RegistrationService implements IRegistrationService {
 
     @Override
     public User recover(String email, String newPassword) {
+        log.info("Recovering user " + email);
         User user = userRepository.findByEmail(email);
         if (user == null)
             return null;
@@ -185,5 +200,10 @@ public class RegistrationService implements IRegistrationService {
     @Override
     public LocalDateTime generateExpirationDate() {
         return LocalDateTime.now().plusDays(tokenValidityPeriod);
+    }
+
+    @Override
+    public boolean isPasswordSufficient(String password) {
+        return password.length() >= minimalPasswordLength;
     }
 }

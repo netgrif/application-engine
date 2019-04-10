@@ -117,6 +117,14 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link FieldView }
+     * 
+     */
+    public FieldView createFieldView() {
+        return new FieldView();
+    }
+
+    /**
      * Create an instance of {@link EncryptionType }
      * 
      */
@@ -274,6 +282,14 @@ public class ObjectFactory {
      */
     public Document createDocument() {
         return new Document();
+    }
+
+    /**
+     * Create an instance of {@link BooleanImageView }
+     * 
+     */
+    public BooleanImageView createBooleanImageView() {
+        return new BooleanImageView();
     }
 
     /**
