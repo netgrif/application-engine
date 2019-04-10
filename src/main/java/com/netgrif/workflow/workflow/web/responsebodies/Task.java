@@ -1,11 +1,9 @@
 package com.netgrif.workflow.workflow.web.responsebodies;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonRootName;
 import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.petrinet.domain.EventType;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
-import com.netgrif.workflow.workflow.domain.Task;
 import lombok.Data;
 import org.bson.types.ObjectId;
 
@@ -18,8 +16,7 @@ import java.util.Map;
  * Localised task data object
  */
 @Data
-@JsonRootName("task")
-public class LocalisedTask {
+public class Task {
 
     @JsonIgnore
     private ObjectId _id;
@@ -68,7 +65,7 @@ public class LocalisedTask {
 
     private String assignTitle;
 
-    public LocalisedTask(Task task, Locale locale) {
+    public Task(com.netgrif.workflow.workflow.domain.Task task, Locale locale) {
         this._id = task.getObjectId();
         this.caseId = task.getCaseId();
         this.transitionId = task.getTransitionId();

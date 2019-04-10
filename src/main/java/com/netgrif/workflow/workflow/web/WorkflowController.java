@@ -8,7 +8,8 @@ import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
 import com.netgrif.workflow.workflow.web.requestbodies.CreateCaseBody;
 import com.netgrif.workflow.workflow.web.responsebodies.*;
 import com.querydsl.core.types.Predicate;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
@@ -36,7 +37,7 @@ import java.util.*;
 @RequestMapping("/api/workflow")
 public class WorkflowController {
 
-    private static final Logger log = Logger.getLogger(WorkflowController.class.getName());
+    private static final Logger log = LoggerFactory.getLogger(WorkflowController.class.getName());
 
     @Autowired
     private IWorkflowService workflowService;
