@@ -1,6 +1,4 @@
-# WMS - App
-
-Workflow Management System web application
+# Netgrif Application Engine
 
 ## MySQL
 
