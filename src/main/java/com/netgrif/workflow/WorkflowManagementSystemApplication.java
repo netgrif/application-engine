@@ -1,7 +1,7 @@
 package com.netgrif.workflow;
 
-import com.netgrif.workflow.configuration.JsonRootRelProvider;
 import com.netgrif.workflow.configuration.ApplicationContextProvider;
+import com.netgrif.workflow.configuration.JsonRootRelProvider;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cache.annotation.EnableCaching;

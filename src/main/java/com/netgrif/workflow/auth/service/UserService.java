@@ -5,6 +5,7 @@ import com.netgrif.workflow.auth.domain.repositories.AuthorityRepository;
 import com.netgrif.workflow.auth.domain.repositories.UserRepository;
 import com.netgrif.workflow.auth.service.interfaces.IUserProcessRoleService;
 import com.netgrif.workflow.auth.service.interfaces.IUserService;
+import com.netgrif.workflow.auth.web.requestbodies.UpdateUserRequest;
 import com.netgrif.workflow.event.events.user.UserRegistrationEvent;
 import com.netgrif.workflow.orgstructure.domain.Member;
 import com.netgrif.workflow.orgstructure.service.IMemberService;
@@ -64,6 +65,24 @@ public class UserService implements IUserService {
     }
 
     @Override
+    public User update(User user, UpdateUserRequest updates) {
+        if (updates.telNumber != null) {
+            user.setTelNumber(updates.telNumber);
+        }
+        if (updates.avatar != null) {
+            user.setAvatar(updates.avatar);
+        }
+        if (updates.name != null) {
+            user.setName(updates.name);
+        }
+        if (updates.surname != null) {
+            user.setSurname(updates.surname);
+        }
+        user = userRepository.save(user);
+        return user;
+    }
+
+    @Override
     public Member upsertGroupMember(User user) {
         Member member = memberService.findByEmail(user.getEmail());
         if (member == null)
@@ -78,6 +97,11 @@ public class UserService implements IUserService {
         if (pass == null)
             throw new IllegalArgumentException("User has no password");
         user.setPassword(bCryptPasswordEncoder.encode(pass));
+    }
+
+    @Override
+    public boolean stringMatchesUserPassword(User user, String passwordToCompare) {
+        return bCryptPasswordEncoder.matches(passwordToCompare, user.getPassword());
     }
 
     @Override
@@ -177,7 +201,7 @@ public class UserService implements IUserService {
 
     @Override
     public Page<User> findAllActiveByProcessRoles(Set<String> roleIds, boolean small, Pageable pageable) {
-        Page<User> users = userRepository.findByStateAndUserProcessRoles_RoleIdIn(UserState.ACTIVE, new ArrayList<>(roleIds), pageable);
+        Page<User> users = userRepository.findDistinctByStateAndUserProcessRoles_RoleIdIn(UserState.ACTIVE, new ArrayList<>(roleIds), pageable);
         if (!small) {
             users.forEach(this::loadProcessRoles);
         }
