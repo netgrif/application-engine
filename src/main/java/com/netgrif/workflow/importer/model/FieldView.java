@@ -19,6 +19,7 @@ import javax.xml.bind.annotation.XmlType;
  *         &lt;element name="area" type="{http://www.w3.org/2001/XMLSchema}string"/&gt;
  *         &lt;element name="tree" type="{http://www.w3.org/2001/XMLSchema}string"/&gt;
  *         &lt;element name="image" type="{}booleanImageView"/&gt;
+ *         &lt;element name="editor" type="{http://www.w3.org/2001/XMLSchema}anyType"/&gt;
  *         &lt;element name="list"&gt;
  *           &lt;simpleType&gt;
  *             &lt;union&gt;
@@ -47,6 +48,7 @@ import javax.xml.bind.annotation.XmlType;
     "area",
     "tree",
     "image",
+    "editor",
     "list"
 })
 public class FieldView {
@@ -54,6 +56,7 @@ public class FieldView {
     protected String area;
     protected String tree;
     protected BooleanImageView image;
+    protected Object editor;
     protected String list;
 
     /**
@@ -126,6 +129,30 @@ public class FieldView {
      */
     public void setImage(BooleanImageView value) {
         this.image = value;
+    }
+
+    /**
+     * Gets the value of the editor property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link Object }
+     *     
+     */
+    public Object getEditor() {
+        return editor;
+    }
+
+    /**
+     * Sets the value of the editor property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link Object }
+     *     
+     */
+    public void setEditor(Object value) {
+        this.editor = value;
     }
 
     /**
