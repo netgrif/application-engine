@@ -23,6 +23,7 @@ import java.util.function.Predicate;
 public class MongoSearchService<T> {
 
     private static final Logger log = LoggerFactory.getLogger(MongoSearchService.class.getName());
+
     private static final String ERROR_KEY = "ERROR";
 
     @Autowired
