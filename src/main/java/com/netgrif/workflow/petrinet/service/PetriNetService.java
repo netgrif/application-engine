@@ -71,6 +71,11 @@ public abstract class PetriNetService implements IPetriNetService {
     private Map<ObjectId, PetriNet> cache = new HashMap<>();
 
     @Override
+    public void evictCache() {
+        cache = new HashMap<>();
+    }
+
+    @Override
     public PetriNet clone(ObjectId petriNetId) {
         PetriNet net = cache.get(petriNetId);
         if (net == null) {

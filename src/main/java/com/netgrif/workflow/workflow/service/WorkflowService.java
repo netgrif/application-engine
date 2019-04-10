@@ -15,8 +15,6 @@ import com.netgrif.workflow.utils.FullPageRequest;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.DataField;
 import com.netgrif.workflow.workflow.domain.Task;
-import com.netgrif.workflow.workflow.domain.elastic.ElastiCase;
-import com.netgrif.workflow.workflow.domain.elastic.ElastiCaseRepository;
 import com.netgrif.workflow.workflow.domain.repositories.CaseRepository;
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
@@ -73,9 +71,6 @@ public class WorkflowService implements IWorkflowService {
     @Autowired
     private FieldFactory fieldFactory;
 
-    @Autowired
-    private ElastiCaseRepository elastiCaseRepository;
-
     @Override
     public Case save(Case useCase) {
         encryptDataSet(useCase);
@@ -83,7 +78,6 @@ public class WorkflowService implements IWorkflowService {
         if (useCase.getPetriNet() == null) {
             setPetriNet(useCase);
         }
-        elastiCaseRepository.save(new ElastiCase(useCase));
         return useCase;
     }
 
