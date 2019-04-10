@@ -29,6 +29,9 @@ import javax.xml.bind.annotation.XmlType;
  *         &lt;element ref="{}valid" maxOccurs="unbounded" minOccurs="0"/&gt;
  *         &lt;element ref="{}init" minOccurs="0"/&gt;
  *         &lt;element ref="{}format" minOccurs="0"/&gt;
+ *         &lt;choice&gt;
+ *           &lt;element name="view" type="{}fieldView" minOccurs="0"/&gt;
+ *         &lt;/choice&gt;
  *         &lt;element ref="{}encryption" minOccurs="0"/&gt;
  *         &lt;element ref="{}action" maxOccurs="unbounded" minOccurs="0"/&gt;
  *         &lt;element ref="{}actionRef" maxOccurs="unbounded" minOccurs="0"/&gt;
@@ -54,6 +57,7 @@ import javax.xml.bind.annotation.XmlType;
     "valid",
     "init",
     "format",
+    "view",
     "encryption",
     "action",
     "actionRef",
@@ -73,6 +77,7 @@ public class Data {
     protected List<String> valid;
     protected String init;
     protected Format format;
+    protected FieldView view;
     protected EncryptionType encryption;
     protected List<ActionType> action;
     protected List<ActionRefType> actionRef;
@@ -283,6 +288,30 @@ public class Data {
      */
     public void setFormat(Format value) {
         this.format = value;
+    }
+
+    /**
+     * Gets the value of the view property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link FieldView }
+     *     
+     */
+    public FieldView getView() {
+        return view;
+    }
+
+    /**
+     * Sets the value of the view property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link FieldView }
+     *     
+     */
+    public void setView(FieldView value) {
+        this.view = value;
     }
 
     /**
