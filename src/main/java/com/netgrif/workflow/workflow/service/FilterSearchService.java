@@ -1,8 +1,6 @@
 package com.netgrif.workflow.workflow.service;
 
 import com.netgrif.workflow.workflow.domain.Filter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -13,8 +11,6 @@ import java.util.function.Function;
 
 @Service
 public class FilterSearchService extends MongoSearchService<Filter> {
-
-    private static final Logger log = LoggerFactory.getLogger(FilterSearchService.class.getName());
 
     public String titleQuery(Object obj) {
         Map<Class, Function<Object, String>> builder = new HashMap<>();

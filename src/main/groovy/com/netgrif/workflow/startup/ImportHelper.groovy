@@ -16,9 +16,9 @@ import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.workflow.petrinet.web.requestbodies.UploadedFileMeta
 import com.netgrif.workflow.workflow.domain.Case
+import com.netgrif.workflow.workflow.domain.EventOutcome
 import com.netgrif.workflow.workflow.domain.Filter
 import com.netgrif.workflow.workflow.domain.repositories.CaseRepository
-import com.netgrif.workflow.workflow.service.EventOutcome
 import com.netgrif.workflow.workflow.service.interfaces.IDataService
 import com.netgrif.workflow.workflow.service.interfaces.IFilterService
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService
