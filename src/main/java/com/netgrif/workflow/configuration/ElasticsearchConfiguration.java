@@ -1,5 +1,6 @@
 package com.netgrif.workflow.configuration;
 
+import com.netgrif.workflow.workflow.domain.elastic.CaseEventHandler;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.settings.Settings;
@@ -39,5 +40,10 @@ public class ElasticsearchConfiguration {
     @Bean
     public ElasticsearchOperations elasticsearchTemplate() throws UnknownHostException {
         return new ElasticsearchTemplate(client());
+    }
+
+    @Bean
+    public CaseEventHandler caseEventHandler() {
+        return new CaseEventHandler();
     }
 }
