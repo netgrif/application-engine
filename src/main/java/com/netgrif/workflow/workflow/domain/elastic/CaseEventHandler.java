@@ -8,7 +8,13 @@ import org.springframework.data.elasticsearch.repository.ElasticsearchRepository
 import org.springframework.data.rest.core.annotation.HandleAfterCreate;
 import org.springframework.data.rest.core.annotation.HandleAfterSave;
 import org.springframework.data.rest.core.annotation.RepositoryEventHandler;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.stereotype.Component;
 
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
+
+@Component
 @RepositoryEventHandler
 public class CaseEventHandler {
 
@@ -17,17 +23,12 @@ public class CaseEventHandler {
     @Autowired
     private ElasticsearchRepository repository;
 
+    @Async
     @HandleAfterCreate
-    public void afterCreate(Case useCase) {
-        save(useCase);
-    }
-
     @HandleAfterSave
-    public void afterSave(Case useCase) {
-        save(useCase);
-    }
-
-    private void save(Case useCase) {
+    @PrePersist
+    @PreUpdate
+    public void afterCreate(Case useCase) {
         ElasticCase elasticCase = new ElasticCase(useCase);
 
         repository.save(elasticCase);
