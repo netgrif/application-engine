@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component
 class RunnerController {
 
     private List order = [
+            ElasticsearchRunner,
             MongoDbRunner,
             Neo4jRunner,
             StorageRunner,
@@ -18,6 +19,7 @@ class RunnerController {
             MailRunner,
             PostalCodeImporter,
             DummyUserRunner,
+            DemoRunner,
             FinisherRunner
     ]
 
