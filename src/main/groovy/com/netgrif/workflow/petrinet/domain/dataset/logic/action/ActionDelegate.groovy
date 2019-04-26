@@ -30,6 +30,7 @@ import org.apache.log4j.Logger
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.i18n.LocaleContextHolder
 import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Component
 
 @Component
@@ -321,6 +322,12 @@ class ActionDelegate {
         return result.content
     }
 
+    List<Case> findCases(Closure<Predicate> predicate, Pageable pageable) {
+        QCase qCase = new QCase("case")
+        Page<Case> result = workflowService.search(predicate(qCase), pageable)
+        return result.content
+    }
+
     Case findCase(Closure<Predicate> predicate) {
         QCase qCase = new QCase("case")
         return workflowService.searchOne(predicate(qCase))
@@ -381,6 +388,12 @@ class ActionDelegate {
     List<Task> findTasks(Closure<Predicate> predicate) {
         QTask qTask = new QTask("task")
         Page<Task> result = taskService.searchAll(predicate(qTask))
+        return result.content
+    }
+
+    List<Task> findTasks(Closure<Predicate> predicate, Pageable pageable) {
+        QTask qTask = new QTask("task")
+        Page<Task> result = taskService.search(predicate(qTask), pageable)
         return result.content
     }
 
