@@ -1,5 +1,7 @@
-package com.netgrif.workflow.workflow.domain.elastic;
+package com.netgrif.workflow.elastic.service;
 
+import com.netgrif.workflow.elastic.domain.ElasticCase;
+import com.netgrif.workflow.elastic.domain.ElasticCaseRepository;
 import com.netgrif.workflow.workflow.domain.Case;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,6 +24,15 @@ public class ElasticCaseService implements IElasticCaseService {
 
         repository.save(elasticCase);
 
-        log.info("[" + useCase.getStringId() + "]: Case " + useCase.getTitle() + " indexed");
+        log.info("[" + useCase.getStringId() + "]: Case \"" + useCase.getTitle() + "\" indexed");
+    }
+
+    @Override
+    public void indexNow(Case useCase) {
+        ElasticCase elasticCase = new ElasticCase(useCase);
+
+        repository.save(elasticCase);
+
+        log.info("[" + useCase.getStringId() + "]: Case \"" + useCase.getTitle() + "\" indexed");
     }
 }
