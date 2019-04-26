@@ -24,7 +24,7 @@
         <java.version>1.8</java.version>
         <jasypt.version>1.9.2</jasypt.version>
         <querydsl.version>4.2.1</querydsl.version>
-        <version.jsonOutputPath>${project.basedir}/src/main/resources/static/scripts</version.jsonOutputPath>
+        <version.jsonOutputPath>${project.basedir}/src/main/resources/static</version.jsonOutputPath>
     </properties>
 
     <dependencies>
@@ -173,7 +173,7 @@
             <version>1.10.3</version>
         </dependency>
 
-         <!--SWAGGER -->
+        <!--SWAGGER -->
         <dependency>
             <groupId>io.springfox</groupId>
             <artifactId>springfox-swagger2</artifactId>
@@ -317,7 +317,9 @@
                             <outputDirectory>target/generated-sources/java</outputDirectory>
                             <processors>
                                 <processor>com.querydsl.apt.jpa.JPAAnnotationProcessor</processor>
-                                <processor>org.springframework.data.mongodb.repository.support.MongoAnnotationProcessor</processor>
+                                <processor>
+                                    org.springframework.data.mongodb.repository.support.MongoAnnotationProcessor
+                                </processor>
                             </processors>
                             <options>
                                 <querydsl.excludedClasses>groovy.lang.MetaClass</querydsl.excludedClasses>
@@ -383,6 +385,10 @@
                 </executions>
             </plugin>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+            </plugin>
+            <plugin>
                 <groupId>com.netgrif.maven</groupId>
                 <artifactId>version-plugin</artifactId>
                 <version>1.0.0</version>
@@ -406,12 +412,6 @@
             <id>dev</id>
             <properties>
                 <activatedProperties>dev</activatedProperties>
-            </properties>
-        </profile>
-        <profile>
-            <id>update</id>
-            <properties>
-                <activatedProperties>update</activatedProperties>
             </properties>
         </profile>
     </profiles>
