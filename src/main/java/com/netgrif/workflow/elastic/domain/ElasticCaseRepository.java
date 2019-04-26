@@ -1,4 +1,4 @@
-package com.netgrif.workflow.workflow.domain.elastic;
+package com.netgrif.workflow.elastic.domain;
 
 import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;
 import org.springframework.stereotype.Repository;

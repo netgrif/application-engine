@@ -1,5 +1,9 @@
-package com.netgrif.workflow.workflow.domain.elastic;
+package com.netgrif.workflow.elastic.domain;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.TaskPair;
 import lombok.AllArgsConstructor;
@@ -10,6 +14,7 @@ import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -19,7 +24,7 @@ import static org.springframework.data.elasticsearch.annotations.FieldType.Keywo
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Document(indexName = "nae", type = "case")
+@Document(indexName = "case", type = "case")
 public class ElasticCase {
 
     @Id
@@ -33,6 +38,8 @@ public class ElasticCase {
 
     private String title;
 
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     private LocalDateTime creationDate;
 
     private Long author;
@@ -62,9 +69,13 @@ public class ElasticCase {
         author = useCase.getAuthor().getId();
         authorName = useCase.getAuthor().getFullName();
         authorEmail = useCase.getAuthor().getEmail();
-        dataSet = useCase.getDataSet().entrySet().stream().limit(1000).collect(Collectors.toMap(Map.Entry::getKey, f -> "" + f.getValue().getValue()));
         taskIds = useCase.getTasks().stream().map(TaskPair::getTransition).collect(Collectors.toSet());
         taskMongoIds = useCase.getTasks().stream().map(TaskPair::getTask).collect(Collectors.toSet());
         enabledRoles = useCase.getEnabledRoles();
+
+        dataSet = new HashMap<>();
+        for (String id : useCase.getImmediateDataFields()) {
+            dataSet.put(id, String.valueOf(useCase.getFieldValue(id)));
+        }
     }
 }

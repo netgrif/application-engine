@@ -1,6 +1,6 @@
 package com.netgrif.workflow.configuration;
 
-import com.netgrif.workflow.workflow.domain.elastic.CaseEventHandler;
+import com.netgrif.workflow.workflow.service.CaseEventHandler;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.settings.Settings;
