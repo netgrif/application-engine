@@ -566,6 +566,12 @@ public class TaskService implements ITaskService {
     }
 
     @Override
+    public Page<Task> search(com.querydsl.core.types.Predicate predicate, Pageable pageable) {
+        Page<Task> tasks = taskRepository.findAll(predicate, pageable);
+        return loadUsers(tasks);
+    }
+
+    @Override
     public Task searchOne(com.querydsl.core.types.Predicate predicate) {
         Page<Task> tasks = taskRepository.findAll(predicate, new PageRequest(0, 1));
         if (tasks.getTotalElements() > 0)
