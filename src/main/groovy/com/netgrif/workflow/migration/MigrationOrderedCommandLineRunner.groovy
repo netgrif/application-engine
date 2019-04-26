@@ -1,5 +1,7 @@
 package com.netgrif.workflow.migration
 
+
+import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.workflow.startup.AbstractOrderedCommandLineRunner
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -16,6 +18,9 @@ abstract class MigrationOrderedCommandLineRunner extends AbstractOrderedCommandL
     @Autowired
     private MigrationRepository repository
 
+    @Autowired
+    private IPetriNetService service
+
     @Override
     void run(String... strings) throws Exception {
         if (repository.existsByTitle(title)) {
@@ -23,9 +28,10 @@ abstract class MigrationOrderedCommandLineRunner extends AbstractOrderedCommandL
             return
         }
 
-        log.info("Applying migration ${ title}")
+        log.info("Applying migration ${title}")
         migrate()
         repository.save(new Migration(title))
+        service.evictCache()
         log.info("Migration ${title} applied")
     }
 
