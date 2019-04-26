@@ -1,6 +1,9 @@
 package com.netgrif.workflow.workflow.web;
 
 import com.netgrif.workflow.auth.domain.LoggedUser;
+import com.netgrif.workflow.elastic.domain.ElasticCase;
+import com.netgrif.workflow.elastic.service.IElasticCaseService;
+import com.netgrif.workflow.elastic.web.ElasticSearchRequest;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.service.FileFieldInputStream;
 import com.netgrif.workflow.workflow.service.interfaces.IDataService;
@@ -43,6 +46,9 @@ public class WorkflowController {
     private IWorkflowService workflowService;
 
     @Autowired
+    private IElasticCaseService elasticCaseService;
+
+    @Autowired
     private IDataService dataService;
 
     @RequestMapping(value = "/case", method = RequestMethod.POST)
@@ -78,12 +84,14 @@ public class WorkflowController {
     }
 
     @PostMapping(value = "/case/search", produces = MediaTypes.HAL_JSON_VALUE)
-    public PagedResources<CaseResource> search(@RequestBody Map<String, Object> searchBody, Pageable pageable, PagedResourcesAssembler<Case> assembler, Authentication auth, Locale locale) {
-        Page<Case> cases = workflowService.search(searchBody, pageable, (LoggedUser) auth.getPrincipal(), locale);
+    public PagedResources<ElasticCaseResource> search(@RequestBody ElasticSearchRequest searchBody, Pageable pageable, PagedResourcesAssembler<ElasticCase> assembler, Authentication auth, Locale locale) {
+        Page<ElasticCase> cases = elasticCaseService.search(searchBody, (LoggedUser) auth.getPrincipal(), pageable);
+
         Link selfLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(WorkflowController.class)
                 .search(searchBody, pageable, assembler, auth, locale)).withRel("search");
-        PagedResources<CaseResource> resources = assembler.toResource(cases, new CaseResourceAssembler(), selfLink);
-        ResourceLinkAssembler.addLinks(resources, Case.class, selfLink.getRel());
+
+        PagedResources<ElasticCaseResource> resources = assembler.toResource(cases, new ElasticCaseResourceAssembler(), selfLink);
+        ResourceLinkAssembler.addLinks(resources, ElasticCase.class, selfLink.getRel());
         return resources;
     }
 
