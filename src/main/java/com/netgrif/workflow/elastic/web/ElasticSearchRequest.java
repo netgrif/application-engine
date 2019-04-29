@@ -1,5 +1,6 @@
 package com.netgrif.workflow.elastic.web;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,25 +13,36 @@ import java.util.Map;
 @AllArgsConstructor
 public class ElasticSearchRequest {
 
-    private List<String> id;
+    @JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
+    private List<PetriNet> petriNet;
 
-    private List<String> visualId;
-
+    @JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
     private List<String> processIdentifier;
 
+    @JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
     private List<String> title;
 
+    @JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
     private List<Author> author;
 
     private Map<String, String> data;
 
-    private String fulltext;
+    private String fullText;
 
+    @JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
     private List<String> task;
 
+    @JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
     private List<String> role;
 
-    class Author {
+    @Data
+    public class PetriNet {
+
+        String identifier;
+    }
+
+    @Data
+    public class Author {
 
         Long id;
 
