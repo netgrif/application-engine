@@ -8,6 +8,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Async;
 
+import java.util.Map;
+
 public interface IElasticCaseService {
 
     @Async
@@ -18,4 +20,6 @@ public interface IElasticCaseService {
     Page<ElasticCase> search(ElasticSearchRequest request, LoggedUser user, Pageable pageable);
 
     long count(ElasticSearchRequest request, LoggedUser user);
+
+    Map<String, Float> fullTextFields();
 }
