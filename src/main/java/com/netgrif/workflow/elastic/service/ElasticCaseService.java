@@ -43,6 +43,7 @@ public class ElasticCaseService implements IElasticCaseService {
 
     /**
      * See {@link QueryStringQueryBuilder#fields(Map)}
+     *
      * @return map where keys are ElasticCase field names and values are boosts of these fields
      */
     @Override
@@ -112,13 +113,13 @@ public class ElasticCaseService implements IElasticCaseService {
 
     /**
      * Cases with processIdentifier "id" <br>
-     *     <pre>
+     * <pre>
      * {
      *     "petriNet": {
      *         "identifier": "id"
      *     }
      * }</pre><br>
-     *
+     * <p>
      * Cases with processIdentifiers "1" or "2" <br>
      * <pre>
      * {
@@ -197,7 +198,7 @@ public class ElasticCaseService implements IElasticCaseService {
      *     "task": "nova_uloha"
      * }
      * </pre>
-     *
+     * <p>
      * Cases with tasks with import Id "nova_uloha" or "kontrola"
      * <pre>
      * {
@@ -268,7 +269,7 @@ public class ElasticCaseService implements IElasticCaseService {
 
         BoolQueryBuilder dataQuery = QueryBuilders.boolQuery();
         for (Map.Entry<String, String> field : request.getData().entrySet()) {
-            dataQuery.must(QueryBuilders.matchQuery(field.getKey(), field.getValue()));
+            dataQuery.must(QueryBuilders.matchQuery("dataSet." + field.getKey(), field.getValue()));
         }
 
         query.filter(dataQuery);
@@ -282,7 +283,7 @@ public class ElasticCaseService implements IElasticCaseService {
             return;
         }
 
-        QueryBuilder fullTextQuery = QueryBuilders.queryStringQuery("*"+request.getFullText()+"*").fields(fullTextFields());
+        QueryBuilder fullTextQuery = QueryBuilders.queryStringQuery("*" + request.getFullText() + "*").fields(fullTextFields());
         query.must(fullTextQuery);
     }
 
@@ -290,7 +291,7 @@ public class ElasticCaseService implements IElasticCaseService {
      * See <a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-query-string-query.html">Query String Query</a>
      */
     private void buildStringQuery(ElasticSearchRequest request, BoolQueryBuilder query) {
-        if (request.getQuery() == null  || request.getQuery().isEmpty()) {
+        if (request.getQuery() == null || request.getQuery().isEmpty()) {
             return;
         }
 
