@@ -35,6 +35,8 @@ public class ElasticSearchRequest {
     @JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
     private List<String> role;
 
+    private String query;
+
     @Data
     public class PetriNet {
 
