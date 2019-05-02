@@ -102,6 +102,7 @@ public class ElasticCaseService implements IElasticCaseService {
         buildRoleQuery(request, query);
         buildDataQuery(request, query);
         buildFullTextQuery(request, query);
+        buildStringQuery(request, query);
 
         return builder
                 .withQuery(query)
@@ -109,10 +110,65 @@ public class ElasticCaseService implements IElasticCaseService {
                 .build();
     }
 
+    /**
+     * Cases with processIdentifier "id" <br>
+     *     <pre>
+     * {
+     *     "petriNet": {
+     *         "identifier": "id"
+     *     }
+     * }</pre><br>
+     *
+     * Cases with processIdentifiers "1" or "2" <br>
+     * <pre>
+     * {
+     *     "petriNet": [
+     *         {
+     *             "identifier": "1"
+     *         },
+     *         {
+     *             "identifier": "2"
+     *         }
+     *     ]
+     * }
+     * </pre>
+     */
     private void buildPetriNetQuery(ElasticSearchRequest request, LoggedUser user, BoolQueryBuilder query) {
-        // TODO
+        if (request.getPetriNet() == null || request.getPetriNet().isEmpty()) {
+            return;
+        }
+
+        BoolQueryBuilder petriNetQuery = QueryBuilders.boolQuery();
+
+        for (ElasticSearchRequest.PetriNet petriNet : request.getPetriNet()) {
+            if (petriNet.getIdentifier() != null) {
+                petriNetQuery.must(QueryBuilders.termQuery("processIdentifier", petriNet.getIdentifier()));
+            }
+        }
+
+        query.filter(petriNetQuery);
     }
 
+    /**
+     * <pre>
+     * {
+     *     "author": {
+     *         "email": "user@customer.com"
+     *     }
+     * }
+     * </pre><br>
+     *
+     * <pre>
+     * {
+     *     "author": [{
+     *         "id": 1
+     *     }, {
+     *         "id": 2
+     *     }
+     *     ]
+     * }
+     * </pre><br>
+     */
     private void buildAuthorQuery(ElasticSearchRequest request, BoolQueryBuilder query) {
         if (request.getAuthor() == null || request.getAuthor().isEmpty()) {
             return;
@@ -120,24 +176,67 @@ public class ElasticCaseService implements IElasticCaseService {
 
         BoolQueryBuilder authorQuery = QueryBuilders.boolQuery();
         for (ElasticSearchRequest.Author author : request.getAuthor()) {
-            if (author.getEmail() != null && author.getEmail().isEmpty()) {
+            if (author.getEmail() != null) {
                 authorQuery.must(QueryBuilders.termQuery("authorEmail", author.getEmail()));
             }
             if (author.getId() != null) {
                 authorQuery.must(QueryBuilders.matchQuery("authorName", author.getId()));
             }
             if (author.getName() != null) {
-                authorQuery.must(QueryBuilders.matchQuery("author", author.getName()));
+                authorQuery.must(QueryBuilders.termQuery("author", author.getName()));
             }
         }
 
         query.filter(authorQuery);
     }
 
+    /**
+     * Cases with tasks with import Id "nova_uloha"
+     * <pre>
+     * {
+     *     "task": "nova_uloha"
+     * }
+     * </pre>
+     *
+     * Cases with tasks with import Id "nova_uloha" or "kontrola"
+     * <pre>
+     * {
+     *     "task": [
+     *         "nova_uloha",
+     *         "kontrola"
+     *     ]
+     * }
+     * </pre>
+     */
     private void buildTaskQuery(ElasticSearchRequest request, BoolQueryBuilder query) {
-        // TODO
+        if (request.getTask() == null || request.getTask().isEmpty()) {
+            return;
+        }
+
+        BoolQueryBuilder taskQuery = QueryBuilders.boolQuery();
+        for (String taskImportId : request.getTask()) {
+            taskQuery.must(QueryBuilders.termQuery("taskIds", taskImportId));
+        }
+
+        query.filter(taskQuery);
     }
 
+    /**
+     * <pre>
+     * {
+     *     "role": "5cb07b6ff05be15f0b972c36"
+     * }
+     * </pre>
+     *
+     * <pre>
+     * {
+     *     "role" [
+     *         "5cb07b6ff05be15f0b972c36",
+     *         "5cb07b6ff05be15f0b972c31"
+     *     ]
+     * }
+     * </pre>
+     */
     private void buildRoleQuery(ElasticSearchRequest request, BoolQueryBuilder query) {
         if (request.getRole() == null || request.getRole().isEmpty()) {
             return;
@@ -151,10 +250,33 @@ public class ElasticCaseService implements IElasticCaseService {
         query.filter(roleQuery);
     }
 
+    /**
+     * Cases where "text_field" has value "text" and "number_field" has value 125.<br>
+     * <pre>
+     * {
+     *     "data": {
+     *         "text_field": "text",
+     *         "number_field": "125"
+     *     }
+     * }
+     * </pre>
+     */
     private void buildDataQuery(ElasticSearchRequest request, BoolQueryBuilder query) {
-        // TODO
+        if (request.getData() == null || request.getData().isEmpty()) {
+            return;
+        }
+
+        BoolQueryBuilder dataQuery = QueryBuilders.boolQuery();
+        for (Map.Entry<String, String> field : request.getData().entrySet()) {
+            dataQuery.must(QueryBuilders.matchQuery(field.getKey(), field.getValue()));
+        }
+
+        query.filter(dataQuery);
     }
 
+    /**
+     * Full text search on fields defined by {@link #fullTextFields()}.
+     */
     private void buildFullTextQuery(ElasticSearchRequest request, BoolQueryBuilder query) {
         if (request.getFullText() == null || request.getFullText().isEmpty()) {
             return;
@@ -162,5 +284,16 @@ public class ElasticCaseService implements IElasticCaseService {
 
         QueryBuilder fullTextQuery = QueryBuilders.queryStringQuery("*"+request.getFullText()+"*").fields(fullTextFields());
         query.must(fullTextQuery);
+    }
+
+    /**
+     * See <a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-query-string-query.html">Query String Query</a>
+     */
+    private void buildStringQuery(ElasticSearchRequest request, BoolQueryBuilder query) {
+        if (request.getQuery() == null  || request.getQuery().isEmpty()) {
+            return;
+        }
+
+        query.must(QueryBuilders.queryStringQuery(request.getQuery()));
     }
 }
