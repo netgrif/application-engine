@@ -38,13 +38,17 @@ public class ElasticSearchRequest {
     private String query;
 
     @Data
-    public class PetriNet {
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class PetriNet {
 
         String identifier;
     }
 
     @Data
-    public class Author {
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Author {
 
         Long id;
 
