@@ -120,7 +120,7 @@ public class ElasticCaseService implements IElasticCaseService {
      *     }
      * }</pre><br>
      * <p>
-     * Cases with processIdentifiers "1" or "2" <br>
+     * Cases with processIdentifiers "1" OR "2" <br>
      * <pre>
      * {
      *     "petriNet": [
@@ -143,7 +143,7 @@ public class ElasticCaseService implements IElasticCaseService {
 
         for (ElasticSearchRequest.PetriNet petriNet : request.getPetriNet()) {
             if (petriNet.getIdentifier() != null) {
-                petriNetQuery.must(QueryBuilders.termQuery("processIdentifier", petriNet.getIdentifier()));
+                petriNetQuery.should(QueryBuilders.termQuery("processIdentifier", petriNet.getIdentifier()));
             }
         }
 
@@ -159,10 +159,12 @@ public class ElasticCaseService implements IElasticCaseService {
      * }
      * </pre><br>
      *
+     * Cases with author with id 1 AND email "user@customer.com", OR with id 2
      * <pre>
      * {
      *     "author": [{
      *         "id": 1
+     *         "email": "user@customer.com"
      *     }, {
      *         "id": 2
      *     }
@@ -175,8 +177,9 @@ public class ElasticCaseService implements IElasticCaseService {
             return;
         }
 
-        BoolQueryBuilder authorQuery = QueryBuilders.boolQuery();
+        BoolQueryBuilder authorsQuery = QueryBuilders.boolQuery();
         for (ElasticSearchRequest.Author author : request.getAuthor()) {
+            BoolQueryBuilder authorQuery = QueryBuilders.boolQuery();
             if (author.getEmail() != null) {
                 authorQuery.must(QueryBuilders.termQuery("authorEmail", author.getEmail()));
             }
@@ -186,9 +189,10 @@ public class ElasticCaseService implements IElasticCaseService {
             if (author.getName() != null) {
                 authorQuery.must(QueryBuilders.termQuery("author", author.getName()));
             }
+            authorsQuery.should(authorQuery);
         }
 
-        query.filter(authorQuery);
+        query.filter(authorsQuery);
     }
 
     /**
@@ -199,7 +203,7 @@ public class ElasticCaseService implements IElasticCaseService {
      * }
      * </pre>
      * <p>
-     * Cases with tasks with import Id "nova_uloha" or "kontrola"
+     * Cases with tasks with import Id "nova_uloha" OR "kontrola"
      * <pre>
      * {
      *     "task": [
@@ -216,19 +220,21 @@ public class ElasticCaseService implements IElasticCaseService {
 
         BoolQueryBuilder taskQuery = QueryBuilders.boolQuery();
         for (String taskImportId : request.getTask()) {
-            taskQuery.must(QueryBuilders.termQuery("taskIds", taskImportId));
+            taskQuery.should(QueryBuilders.termQuery("taskIds", taskImportId));
         }
 
         query.filter(taskQuery);
     }
 
     /**
+     * Cases with active role "5cb07b6ff05be15f0b972c36"
      * <pre>
      * {
      *     "role": "5cb07b6ff05be15f0b972c36"
      * }
      * </pre>
      *
+     * Cases with active role "5cb07b6ff05be15f0b972c36" OR "5cb07b6ff05be15f0b972c31"
      * <pre>
      * {
      *     "role" [
@@ -245,14 +251,14 @@ public class ElasticCaseService implements IElasticCaseService {
 
         BoolQueryBuilder roleQuery = QueryBuilders.boolQuery();
         for (String roleId : request.getRole()) {
-            roleQuery.must(QueryBuilders.termQuery("enabledRoles", roleId));
+            roleQuery.should(QueryBuilders.termQuery("enabledRoles", roleId));
         }
 
         query.filter(roleQuery);
     }
 
     /**
-     * Cases where "text_field" has value "text" and "number_field" has value 125.<br>
+     * Cases where "text_field" has value "text" AND "number_field" has value 125.<br>
      * <pre>
      * {
      *     "data": {
