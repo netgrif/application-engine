@@ -4,12 +4,11 @@ import com.google.common.collect.ImmutableMap;
 import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.elastic.domain.ElasticCase;
 import com.netgrif.workflow.elastic.domain.ElasticCaseRepository;
-import com.netgrif.workflow.elastic.web.ElasticSearchRequest;
+import com.netgrif.workflow.elastic.web.CaseSearchRequest;
 import com.netgrif.workflow.utils.FullPageRequest;
 import com.netgrif.workflow.workflow.domain.Case;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.QueryStringQueryBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,6 +22,8 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
+
+import static org.elasticsearch.index.query.QueryBuilders.*;
 
 @Service
 public class ElasticCaseService implements IElasticCaseService {
@@ -72,7 +73,7 @@ public class ElasticCaseService implements IElasticCaseService {
     }
 
     @Override
-    public Page<ElasticCase> search(ElasticSearchRequest request, LoggedUser user, Pageable pageable) {
+    public Page<ElasticCase> search(CaseSearchRequest request, LoggedUser user, Pageable pageable) {
         if (request == null) {
             throw new IllegalArgumentException("Request can not be null!");
         }
@@ -83,7 +84,7 @@ public class ElasticCaseService implements IElasticCaseService {
     }
 
     @Override
-    public long count(ElasticSearchRequest request, LoggedUser user) {
+    public long count(CaseSearchRequest request, LoggedUser user) {
         if (request == null) {
             throw new IllegalArgumentException("Request can not be null!");
         }
@@ -93,9 +94,9 @@ public class ElasticCaseService implements IElasticCaseService {
         return template.count(query);
     }
 
-    private SearchQuery buildQuery(ElasticSearchRequest request, LoggedUser user, Pageable pageable) {
+    private SearchQuery buildQuery(CaseSearchRequest request, LoggedUser user, Pageable pageable) {
         NativeSearchQueryBuilder builder = new NativeSearchQueryBuilder();
-        BoolQueryBuilder query = QueryBuilders.boolQuery();
+        BoolQueryBuilder query = boolQuery();
 
         buildPetriNetQuery(request, user, query);
         buildAuthorQuery(request, query);
@@ -134,16 +135,16 @@ public class ElasticCaseService implements IElasticCaseService {
      * }
      * </pre>
      */
-    private void buildPetriNetQuery(ElasticSearchRequest request, LoggedUser user, BoolQueryBuilder query) {
-        if (request.getPetriNet() == null || request.getPetriNet().isEmpty()) {
+    private void buildPetriNetQuery(CaseSearchRequest request, LoggedUser user, BoolQueryBuilder query) {
+        if (request.petriNet == null || request.petriNet.isEmpty()) {
             return;
         }
 
-        BoolQueryBuilder petriNetQuery = QueryBuilders.boolQuery();
+        BoolQueryBuilder petriNetQuery = boolQuery();
 
-        for (ElasticSearchRequest.PetriNet petriNet : request.getPetriNet()) {
-            if (petriNet.getIdentifier() != null) {
-                petriNetQuery.should(QueryBuilders.termQuery("processIdentifier", petriNet.getIdentifier()));
+        for (CaseSearchRequest.PetriNet petriNet : request.petriNet) {
+            if (petriNet.identifier != null) {
+                petriNetQuery.should(termQuery("processIdentifier", petriNet.identifier));
             }
         }
 
@@ -159,7 +160,7 @@ public class ElasticCaseService implements IElasticCaseService {
      * }
      * </pre><br>
      *
-     * Cases with author with id 1 AND email "user@customer.com", OR with id 2
+     * Cases with author with (id 1 AND email "user@customer.com") OR (id 2)
      * <pre>
      * {
      *     "author": [{
@@ -172,22 +173,22 @@ public class ElasticCaseService implements IElasticCaseService {
      * }
      * </pre><br>
      */
-    private void buildAuthorQuery(ElasticSearchRequest request, BoolQueryBuilder query) {
-        if (request.getAuthor() == null || request.getAuthor().isEmpty()) {
+    private void buildAuthorQuery(CaseSearchRequest request, BoolQueryBuilder query) {
+        if (request.author == null || request.author.isEmpty()) {
             return;
         }
 
-        BoolQueryBuilder authorsQuery = QueryBuilders.boolQuery();
-        for (ElasticSearchRequest.Author author : request.getAuthor()) {
-            BoolQueryBuilder authorQuery = QueryBuilders.boolQuery();
-            if (author.getEmail() != null) {
-                authorQuery.must(QueryBuilders.termQuery("authorEmail", author.getEmail()));
+        BoolQueryBuilder authorsQuery = boolQuery();
+        for (CaseSearchRequest.Author author : request.author) {
+            BoolQueryBuilder authorQuery = boolQuery();
+            if (author.email != null) {
+                authorQuery.must(termQuery("authorEmail", author.email));
             }
-            if (author.getId() != null) {
-                authorQuery.must(QueryBuilders.matchQuery("authorName", author.getId()));
+            if (author.id != null) {
+                authorQuery.must(matchQuery("authorName", author.id));
             }
-            if (author.getName() != null) {
-                authorQuery.must(QueryBuilders.termQuery("author", author.getName()));
+            if (author.name != null) {
+                authorQuery.must(termQuery("author", author.name));
             }
             authorsQuery.should(authorQuery);
         }
@@ -213,14 +214,14 @@ public class ElasticCaseService implements IElasticCaseService {
      * }
      * </pre>
      */
-    private void buildTaskQuery(ElasticSearchRequest request, BoolQueryBuilder query) {
-        if (request.getTask() == null || request.getTask().isEmpty()) {
+    private void buildTaskQuery(CaseSearchRequest request, BoolQueryBuilder query) {
+        if (request.task == null || request.task.isEmpty()) {
             return;
         }
 
-        BoolQueryBuilder taskQuery = QueryBuilders.boolQuery();
-        for (String taskImportId : request.getTask()) {
-            taskQuery.should(QueryBuilders.termQuery("taskIds", taskImportId));
+        BoolQueryBuilder taskQuery = boolQuery();
+        for (String taskImportId : request.task) {
+            taskQuery.should(termQuery("taskIds", taskImportId));
         }
 
         query.filter(taskQuery);
@@ -244,14 +245,14 @@ public class ElasticCaseService implements IElasticCaseService {
      * }
      * </pre>
      */
-    private void buildRoleQuery(ElasticSearchRequest request, BoolQueryBuilder query) {
-        if (request.getRole() == null || request.getRole().isEmpty()) {
+    private void buildRoleQuery(CaseSearchRequest request, BoolQueryBuilder query) {
+        if (request.role == null || request.role.isEmpty()) {
             return;
         }
 
-        BoolQueryBuilder roleQuery = QueryBuilders.boolQuery();
-        for (String roleId : request.getRole()) {
-            roleQuery.should(QueryBuilders.termQuery("enabledRoles", roleId));
+        BoolQueryBuilder roleQuery = boolQuery();
+        for (String roleId : request.role) {
+            roleQuery.should(termQuery("enabledRoles", roleId));
         }
 
         query.filter(roleQuery);
@@ -268,14 +269,14 @@ public class ElasticCaseService implements IElasticCaseService {
      * }
      * </pre>
      */
-    private void buildDataQuery(ElasticSearchRequest request, BoolQueryBuilder query) {
-        if (request.getData() == null || request.getData().isEmpty()) {
+    private void buildDataQuery(CaseSearchRequest request, BoolQueryBuilder query) {
+        if (request.data == null || request.data.isEmpty()) {
             return;
         }
 
-        BoolQueryBuilder dataQuery = QueryBuilders.boolQuery();
-        for (Map.Entry<String, String> field : request.getData().entrySet()) {
-            dataQuery.must(QueryBuilders.matchQuery("dataSet." + field.getKey(), field.getValue()));
+        BoolQueryBuilder dataQuery = boolQuery();
+        for (Map.Entry<String, String> field : request.data.entrySet()) {
+            dataQuery.must(matchQuery("dataSet." + field.getKey(), field.getValue()))
         }
 
         query.filter(dataQuery);
@@ -284,23 +285,23 @@ public class ElasticCaseService implements IElasticCaseService {
     /**
      * Full text search on fields defined by {@link #fullTextFields()}.
      */
-    private void buildFullTextQuery(ElasticSearchRequest request, BoolQueryBuilder query) {
-        if (request.getFullText() == null || request.getFullText().isEmpty()) {
+    private void buildFullTextQuery(CaseSearchRequest request, BoolQueryBuilder query) {
+        if (request.fullText == null || request.fullText.isEmpty()) {
             return;
         }
 
-        QueryBuilder fullTextQuery = QueryBuilders.queryStringQuery("*" + request.getFullText() + "*").fields(fullTextFields());
+        QueryBuilder fullTextQuery = queryStringQuery("*" + request.fullText + "*").fields(fullTextFields());
         query.must(fullTextQuery);
     }
 
     /**
      * See <a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-query-string-query.html">Query String Query</a>
      */
-    private void buildStringQuery(ElasticSearchRequest request, BoolQueryBuilder query) {
-        if (request.getQuery() == null || request.getQuery().isEmpty()) {
+    private void buildStringQuery(CaseSearchRequest request, BoolQueryBuilder query) {
+        if (request.query == null || request.query.isEmpty()) {
             return;
         }
 
-        query.must(QueryBuilders.queryStringQuery(request.getQuery()));
+        query.must(queryStringQuery(request.query));
     }
 }
