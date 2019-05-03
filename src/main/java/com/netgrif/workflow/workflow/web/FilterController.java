@@ -1,6 +1,8 @@
 package com.netgrif.workflow.workflow.web;
 
+import com.netgrif.workflow.auth.domain.Author;
 import com.netgrif.workflow.auth.domain.LoggedUser;
+import com.netgrif.workflow.auth.domain.throwable.UnauthorisedRequestException;
 import com.netgrif.workflow.workflow.domain.Filter;
 import com.netgrif.workflow.workflow.service.interfaces.IFilterService;
 import com.netgrif.workflow.workflow.web.requestbodies.CreateFilterBody;
@@ -37,7 +39,12 @@ public class FilterController {
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
-    public MessageResource deleteFilter(@PathVariable("id") String filterId, Authentication auth) {
+    public MessageResource deleteFilter(@PathVariable("id") String filterId, Authentication auth) throws UnauthorisedRequestException {
+        LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
+        Author author = filterService.findOne(filterId).getAuthor();
+        if( !loggedUser.isAdmin() && !loggedUser.getId().equals(author.getId()))
+            throw new UnauthorisedRequestException("delete filter");
+
         boolean success = filterService.deleteFilter(filterId, (LoggedUser) auth.getPrincipal());
         if (success)
             return MessageResource.successMessage("Filter " + filterId + " successfully deleted");
