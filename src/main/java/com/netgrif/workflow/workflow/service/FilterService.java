@@ -25,9 +25,7 @@ public class FilterService implements IFilterService {
 
     @Override
     public boolean deleteFilter(String filterId, LoggedUser user) {
-        Filter filter = repository.findOne(filterId);
-        if (filter == null)
-            throw new IllegalArgumentException("Filter not found");
+        Filter filter = this.findOne(filterId);
 
         if (filter.getAuthor().getId().equals(user.getId()))
             throw new IllegalArgumentException("User " + user.getUsername() + " doesn't have permission to delete filter " + filter.getStringId());
@@ -57,5 +55,13 @@ public class FilterService implements IFilterService {
         }
 
         return searchService.search(request, pageable, Filter.class);
+    }
+
+    @Override
+    public Filter findOne(String filterId) {
+        Filter filter = repository.findOne(filterId);
+        if (filter == null)
+            throw new IllegalArgumentException("Filter not found");
+        return filter;
     }
 }

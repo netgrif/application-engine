@@ -18,4 +18,5 @@ public interface IFilterService {
 
     Page<Filter> search(Map<String, Object> request, Pageable pageable, LoggedUser user);
 
+	Filter findOne(String filterId);
 }
