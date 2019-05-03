@@ -1,6 +1,10 @@
 package com.netgrif.workflow.workflow.web;
 
+import com.netgrif.workflow.auth.domain.Author;
 import com.netgrif.workflow.auth.domain.LoggedUser;
+import com.netgrif.workflow.auth.domain.User;
+import com.netgrif.workflow.auth.domain.throwable.UnauthorisedRequestException;
+import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.service.FileFieldInputStream;
 import com.netgrif.workflow.workflow.service.interfaces.IDataService;
@@ -43,6 +47,9 @@ public class WorkflowController {
 
     @Autowired
     private IDataService dataService;
+
+    @Autowired
+    private IUserService userService;
 
     @RequestMapping(value = "/case", method = RequestMethod.POST)
     public CaseResource createCase(@RequestBody CreateCaseBody body, Authentication auth) {
@@ -113,7 +120,12 @@ public class WorkflowController {
     }
 
     @RequestMapping(value = "/case/{id}", method = RequestMethod.DELETE)
-    public MessageResource deleteCase(@PathVariable("id") String caseId) {
+    public MessageResource deleteCase(@PathVariable("id") String caseId) throws UnauthorisedRequestException {
+        User logged = userService.getLoggedUser();
+        Author author = workflowService.findOne(caseId).getAuthor();
+        if( !logged.transformToLoggedUser().isAdmin() && !logged.getId().equals(author.getId()))
+            throw new UnauthorisedRequestException("delete case");
+
         try {
             caseId = URLDecoder.decode(caseId, StandardCharsets.UTF_8.name());
             workflowService.deleteCase(caseId);
