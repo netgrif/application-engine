@@ -276,7 +276,7 @@ public class ElasticCaseService implements IElasticCaseService {
 
         BoolQueryBuilder dataQuery = boolQuery();
         for (Map.Entry<String, String> field : request.data.entrySet()) {
-            dataQuery.must(matchQuery("dataSet." + field.getKey(), field.getValue()))
+            dataQuery.must(matchQuery("dataSet." + field.getKey(), field.getValue()));
         }
 
         query.filter(dataQuery);
