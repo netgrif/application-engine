@@ -21,10 +21,12 @@ public class TaskAuthenticationService implements ITaskAuthenticationService {
 	@Autowired
 	ITaskService taskService;
 
+	@Override
 	public boolean userHasAtLeastOneRolePermission(LoggedUser loggedUser, String taskId, RolePermission... permissions) {
 		return userHasAtLeastOneRolePermission(loggedUser.transformToUser(), taskService.findById(taskId), permissions);
 	}
 
+	@Override
 	public boolean userHasAtLeastOneRolePermission(User user, Task task, RolePermission... permissions) {
 		Map<String, Boolean> aggregatePermissions = getAggregatePermissions(user, task);
 
@@ -36,6 +38,21 @@ public class TaskAuthenticationService implements ITaskAuthenticationService {
 		}
 
 		return false;
+	}
+
+	@Override
+	public boolean isAssignee(LoggedUser loggedUser, String taskId) {
+		return isAssignee(loggedUser.transformToUser(), taskService.findById(taskId));
+	}
+
+	@Override
+	public boolean isAssignee(User user, String taskId) {
+		return isAssignee(user, taskService.findById(taskId));
+	}
+
+	@Override
+	public boolean isAssignee(User user, Task task) {
+		return task.getUserId().equals(user.getId());
 	}
 
 	private Map<String, Boolean> getAggregatePermissions(User user, Task task) {
