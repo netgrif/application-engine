@@ -91,7 +91,7 @@ public class ElasticCaseService implements IElasticCaseService {
 
         SearchQuery query = buildQuery(request, user, new FullPageRequest());
 
-        return template.count(query);
+        return template.count(query, ElasticCase.class);
     }
 
     private SearchQuery buildQuery(CaseSearchRequest request, LoggedUser user, Pageable pageable) {
