@@ -89,7 +89,7 @@ public class ElasticTaskService implements IElasticTaskService {
 
         SearchQuery query = buildQuery(request, user, new FullPageRequest());
 
-        return template.count(query);
+        return template.count(query, ElasticTask.class);
     }
 
     private SearchQuery buildQuery(TaskSearchRequest request, LoggedUser user, Pageable pageable) {

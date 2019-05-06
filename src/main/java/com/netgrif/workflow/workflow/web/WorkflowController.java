@@ -96,8 +96,8 @@ public class WorkflowController {
     }
 
     @PostMapping(value = "/case/count", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public CountResponse count(@RequestBody Map<String, Object> query, Authentication auth, Locale locale) {
-        long count = workflowService.count(query, (LoggedUser) auth.getPrincipal(), locale);
+    public CountResponse count(@RequestBody CaseSearchRequest query, Authentication auth) {
+        long count = elasticCaseService.count(query, (LoggedUser) auth.getPrincipal());
         return CountResponse.caseCount(count);
     }
 
