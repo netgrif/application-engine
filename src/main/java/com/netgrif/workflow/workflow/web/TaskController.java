@@ -2,7 +2,9 @@ package com.netgrif.workflow.workflow.web;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.netgrif.workflow.auth.domain.LoggedUser;
+import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.auth.domain.throwable.UnauthorisedRequestException;
+import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.petrinet.domain.DataGroup;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldContainer;
@@ -50,6 +52,9 @@ public class TaskController {
 
     @Autowired
     private IDataService dataService;
+
+    @Autowired
+	private IUserService userService;
 
     @Autowired
     private ITaskAuthenticationService taskAuthenticationService;
@@ -126,7 +131,12 @@ public class TaskController {
     public MessageResource finish(Authentication auth, @PathVariable("id") String taskId) throws UnauthorisedRequestException {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
 
-        if( !loggedUser.isAdmin() && !taskAuthenticationService.userHasAtLeastOneRolePermission(loggedUser, taskId, RolePermission.PERFORM))
+        if(	!loggedUser.isAdmin()
+			&& !(
+				taskAuthenticationService.userHasAtLeastOneRolePermission(loggedUser, taskId, RolePermission.PERFORM)
+				&& taskAuthenticationService.isAssignee(loggedUser, taskId)
+			)
+		)
             throw new UnauthorisedRequestException("finish task");
 
         try {
@@ -142,7 +152,12 @@ public class TaskController {
     public MessageResource cancel(Authentication auth, @PathVariable("id") String taskId) throws UnauthorisedRequestException {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
 
-        if( !loggedUser.isAdmin() && !taskAuthenticationService.userHasAtLeastOneRolePermission(loggedUser, taskId, RolePermission.PERFORM, RolePermission.CANCEL))
+		if(	!loggedUser.isAdmin()
+			&& !(
+				taskAuthenticationService.userHasAtLeastOneRolePermission(loggedUser, taskId, RolePermission.PERFORM, RolePermission.CANCEL)
+				&& taskAuthenticationService.isAssignee(loggedUser, taskId)
+			)
+		)
             throw new UnauthorisedRequestException("cancel task");
 
         try {
@@ -217,13 +232,23 @@ public class TaskController {
     }
 
     @RequestMapping(value = "/{id}/data", method = RequestMethod.POST)
-    public ChangedFieldContainer saveData(@PathVariable("id") String taskId, @RequestBody ObjectNode dataBody) {
+    public ChangedFieldContainer saveData(@PathVariable("id") String taskId, @RequestBody ObjectNode dataBody) throws UnauthorisedRequestException {
+
+    	User logged = userService.getLoggedUser();
+    	if( !logged.transformToLoggedUser().isAdmin() && !taskAuthenticationService.isAssignee(logged, taskId))
+    		throw new UnauthorisedRequestException("save task data");
+
         return dataService.setData(taskId, dataBody);
     }
 
     @RequestMapping(value = "/{id}/file/{field}", method = RequestMethod.POST)
     public MessageResource saveFile(@PathVariable("id") String taskId, @PathVariable("field") String fieldId,
-                                    @RequestParam(value = "file") MultipartFile multipartFile) {
+                                    @RequestParam(value = "file") MultipartFile multipartFile) throws UnauthorisedRequestException {
+
+		User logged = userService.getLoggedUser();
+		if( !logged.transformToLoggedUser().isAdmin() && !taskAuthenticationService.isAssignee(logged, taskId))
+			throw new UnauthorisedRequestException("save task file");
+
         if (dataService.saveFile(taskId, fieldId, multipartFile))
             return MessageResource.successMessage("File " + multipartFile.getOriginalFilename() + " successfully uploaded");
         else
