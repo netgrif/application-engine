@@ -9,4 +9,10 @@ public interface ITaskAuthenticationService {
 	boolean userHasAtLeastOneRolePermission(LoggedUser loggedUser, String taskId, RolePermission... permissions);
 
 	boolean userHasAtLeastOneRolePermission(User user, Task task, RolePermission... permissions);
+
+	boolean isAssignee(LoggedUser loggedUser, String taskId);
+
+	boolean isAssignee(User user, String taskId);
+
+	boolean isAssignee(User user, Task task);
 }
