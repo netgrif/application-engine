@@ -2,6 +2,8 @@ package com.netgrif.workflow.workflow.web;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.netgrif.workflow.auth.domain.LoggedUser;
+import com.netgrif.workflow.elastic.service.IElasticTaskService;
+import com.netgrif.workflow.elastic.web.TaskSearchRequest;
 import com.netgrif.workflow.petrinet.domain.DataGroup;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldContainer;
@@ -47,6 +49,9 @@ public class TaskController {
 
     @Autowired
     private IDataService dataService;
+
+    @Autowired
+    private IElasticTaskService searchService;
 
     @RequestMapping(method = RequestMethod.GET)
     public PagedResources<LocalisedTaskResource> getAll(Authentication auth, Pageable pageable, PagedResourcesAssembler<com.netgrif.workflow.workflow.domain.Task> assembler, Locale locale) {
@@ -178,8 +183,8 @@ public class TaskController {
     }
 
     @PostMapping(value = "/count", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public CountResponse count(@RequestBody Map<String, Object> query, Authentication auth, Locale locale){
-        long count = taskService.count(query, (LoggedUser)auth.getPrincipal(), locale);
+    public CountResponse count(@RequestBody TaskSearchRequest query, Authentication auth, Locale locale){
+        long count = searchService.count(query, (LoggedUser)auth.getPrincipal());
         return CountResponse.taskCount(count);
     }
 
