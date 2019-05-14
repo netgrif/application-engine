@@ -122,9 +122,9 @@ public class WorkflowController {
     @RequestMapping(value = "/case/{id}", method = RequestMethod.DELETE)
     public MessageResource deleteCase(@PathVariable("id") String caseId) throws UnauthorisedRequestException {
         User logged = userService.getLoggedUser();
-        Author author = workflowService.findOne(caseId).getAuthor();
-        if( !logged.transformToLoggedUser().isAdmin() && !logged.getId().equals(author.getId()))
-            throw new UnauthorisedRequestException("delete case");
+        Case requestedCase = workflowService.findOne(caseId);
+        if( !logged.transformToLoggedUser().isAdmin() && !logged.getId().equals(requestedCase.getAuthor().getId()))
+            throw new UnauthorisedRequestException("User " + logged.transformToLoggedUser().getUsername() + " doesn't have permission to delete case " + requestedCase.getStringId());
 
         try {
             caseId = URLDecoder.decode(caseId, StandardCharsets.UTF_8.name());
