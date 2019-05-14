@@ -52,7 +52,10 @@ public class TaskAuthenticationService implements ITaskAuthenticationService {
 
 	@Override
 	public boolean isAssignee(User user, Task task) {
-		return task.getUserId().equals(user.getId());
+		if (task.getUserId() == null)
+			return false;
+		else
+			return task.getUserId().equals(user.getId());
 	}
 
 	private Map<String, Boolean> getAggregatePermissions(User user, Task task) {
