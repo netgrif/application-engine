@@ -25,12 +25,7 @@ public class FilterService implements IFilterService {
 
     @Override
     public boolean deleteFilter(String filterId, LoggedUser user) {
-        Filter filter = this.findOne(filterId);
-
-        if (filter.getAuthor().getId().equals(user.getId()))
-            throw new IllegalArgumentException("User " + user.getUsername() + " doesn't have permission to delete filter " + filter.getStringId());
-
-        repository.delete(filter);
+        repository.delete(this.findOne(filterId));
         return true;
     }
 

@@ -41,11 +41,11 @@ public class FilterController {
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
     public MessageResource deleteFilter(@PathVariable("id") String filterId, Authentication auth) throws UnauthorisedRequestException {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
-        Author author = filterService.findOne(filterId).getAuthor();
-        if( !loggedUser.isAdmin() && !loggedUser.getId().equals(author.getId()))
-            throw new UnauthorisedRequestException("delete filter");
+        Filter filter = filterService.findOne(filterId);
+        if( !loggedUser.isAdmin() && !loggedUser.getId().equals(filter.getAuthor().getId()))
+            throw new UnauthorisedRequestException("User " + loggedUser.getUsername() + " doesn't have permission to delete filter " + filter.getStringId());
 
-        boolean success = filterService.deleteFilter(filterId, (LoggedUser) auth.getPrincipal());
+        boolean success = filterService.deleteFilter(filterId, loggedUser);
         if (success)
             return MessageResource.successMessage("Filter " + filterId + " successfully deleted");
         return MessageResource.errorMessage("Filter " + filterId + " has failed to delete");
