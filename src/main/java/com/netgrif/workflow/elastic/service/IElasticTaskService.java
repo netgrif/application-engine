@@ -22,4 +22,6 @@ public interface IElasticTaskService {
     Page<ElasticTask> search(TaskSearchRequest request, LoggedUser user, Pageable pageable);
 
     long count(TaskSearchRequest request, LoggedUser user);
+
+    void remove(String taskId);
 }

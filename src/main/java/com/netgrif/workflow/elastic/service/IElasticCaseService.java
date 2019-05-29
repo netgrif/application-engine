@@ -21,4 +21,6 @@ public interface IElasticCaseService {
     long count(CaseSearchRequest request, LoggedUser user);
 
     Map<String, Float> fullTextFields();
+
+    void remove(String caseId);
 }
