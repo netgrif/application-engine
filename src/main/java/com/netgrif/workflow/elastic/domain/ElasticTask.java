@@ -1,5 +1,9 @@
 package com.netgrif.workflow.elastic.domain;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.netgrif.workflow.workflow.domain.Task;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -34,29 +38,45 @@ public class ElasticTask {
     @Field(type = Keyword)
     private String transitionId;
 
-    private String title;
+    private String title; //TODO: i18n
+
+    @Field(type = Keyword)
+    private String caseColor;
 
     private String caseTitle;
 
-    private Integer priority;
+    private int priority;
 
     private Long userId;
 
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     private LocalDateTime startDate;
 
+    @Field(type = Keyword)
+    private String transactionId;
+
+    @Field(type = Keyword)
     private Set<String> roles;
+
+    @Field(type = Keyword)
+    private String icon;
+
+    @Field(type = Keyword)
+    private String assignPolicy;
+
+    @Field(type = Keyword)
+    private String dataFocusPolicy;
+
+    @Field(type = Keyword)
+    private String finishPolicy;
 
     public ElasticTask(Task task) {
         this.stringId = task.getStringId();
         this.processId = task.getProcessId();
         this.caseId = task.getCaseId();
         this.transitionId = task.getTransitionId();
-        this.title = task.getTitle().getDefaultValue();
-        this.caseTitle = task.getCaseTitle();
-        this.priority = task.getPriority();
-        this.userId = task.getUserId();
-        this.startDate = task.getStartDate();
-        this.roles = task.getRoles().keySet();
+        update(task);
     }
 
     public void update(Task task) {

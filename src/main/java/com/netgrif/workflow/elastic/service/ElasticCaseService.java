@@ -55,6 +55,13 @@ public class ElasticCaseService implements IElasticCaseService {
         return fullTextFieldMap;
     }
 
+    @Override
+    public void remove(String caseId) {
+        executor.execute(() -> {
+            repository.deleteById(caseId);
+            log.info("[" + caseId + "]: Case \"" + caseId + "\" deleted");
+        });
+    }
 
     @Async
     @Override
@@ -84,7 +91,7 @@ public class ElasticCaseService implements IElasticCaseService {
 
         SearchQuery query = buildQuery(request, user, pageable);
 
-        return template.queryForPage(query, ElasticCase.class);
+        return repository.search(query);
     }
 
     @Override
