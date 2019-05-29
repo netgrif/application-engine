@@ -23,6 +23,9 @@ public class ElasticTask {
     private String id;
 
     @Field(type = Keyword)
+    private String stringId;
+
+    @Field(type = Keyword)
     private String processId;
 
     @Field(type = Keyword)
@@ -44,13 +47,23 @@ public class ElasticTask {
     private Set<String> roles;
 
     public ElasticTask(Task task) {
-        this.id = task.getStringId();
+        this.stringId = task.getStringId();
         this.processId = task.getProcessId();
         this.caseId = task.getCaseId();
         this.transitionId = task.getTransitionId();
         this.title = task.getTitle().getDefaultValue();
         this.caseTitle = task.getCaseTitle();
         this.priority = task.getPriority();
+        this.userId = task.getUserId();
+        this.startDate = task.getStartDate();
+        this.roles = task.getRoles().keySet();
+    }
+
+    public void update(Task task) {
+        this.title = task.getTitle().getDefaultValue();
+        this.caseTitle = task.getCaseTitle();
+        if (task.getPriority() != null)
+            this.priority = task.getPriority();
         this.userId = task.getUserId();
         this.startDate = task.getStartDate();
         this.roles = task.getRoles().keySet();

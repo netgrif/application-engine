@@ -85,7 +85,10 @@ public class WorkflowController {
 
     @PostMapping(value = "/case/search", produces = MediaTypes.HAL_JSON_VALUE)
     public PagedResources<ElasticCaseResource> search(@RequestBody CaseSearchRequest searchBody, Pageable pageable, PagedResourcesAssembler<ElasticCase> assembler, Authentication auth, Locale locale) {
-        Page<ElasticCase> cases = elasticCaseService.search(searchBody, (LoggedUser) auth.getPrincipal(), pageable);
+        LoggedUser user =(LoggedUser) auth.getPrincipal();
+        long start = System.currentTimeMillis();
+        Page<ElasticCase> cases = elasticCaseService.search(searchBody, user, pageable);
+        log.error(""+(System.currentTimeMillis() - start));
 
         Link selfLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(WorkflowController.class)
                 .search(searchBody, pageable, assembler, auth, locale)).withRel("search");
