@@ -22,6 +22,8 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import static org.elasticsearch.index.query.QueryBuilders.*;
 
@@ -35,6 +37,8 @@ public class ElasticTaskService implements IElasticTaskService {
 
     @Autowired
     private ElasticsearchTemplate template;
+
+    private ExecutorService executor = Executors.newSingleThreadExecutor();
 
     private Map<String, Float> fullTextFieldMap = ImmutableMap.of(
             "title", 1f,
@@ -51,23 +55,35 @@ public class ElasticTaskService implements IElasticTaskService {
         return fullTextFieldMap;
     }
 
+    @Override
+    public void remove(String taskId) {
+        executor.submit(() -> {
+            repository.deleteById(taskId);
+            log.info("[?]: Task \"" + taskId + "\" deleted");
+        });
+    }
+
     @Async
     @Override
     public void index(Task task) {
-        ElasticTask elasticCase = new ElasticTask(task);
+        executor.submit(() -> {
+            ElasticTask elasticTask = repository.findByStringId(task.getStringId());
 
-        repository.save(elasticCase);
+            if (elasticTask == null ) {
+                elasticTask = new ElasticTask(task);
+            } else {
+                elasticTask.update(task);
+            }
 
-        log.info("[" + task.getCaseId() + "]: Task \"" + task.getTitle() + "\" ["+task.getStringId()+"] indexed");
+            repository.save(elasticTask);
+
+            log.info("[" + task.getCaseId() + "]: Task \"" + task.getTitle() + "\" [" + task.getStringId() + "] indexed");
+        });
     }
 
     @Override
     public void indexNow(Task task) {
-        ElasticTask elasticCase = new ElasticTask(task);
-
-        repository.save(elasticCase);
-
-        log.info("[" + task.getCaseId() + "]: Task \"" + task.getTitle() + "\" ["+task.getStringId()+"] indexed");
+        index(task);
     }
 
     @Override
@@ -140,18 +156,15 @@ public class ElasticTaskService implements IElasticTaskService {
     /**
      * Tasks of case with id "5cb07b6ff05be15f0b972c4d"
      * {
-     *     "case": {
-     *         "id": "5cb07b6ff05be15f0b972c4d"
-     *     }
+     *     "case": "5cb07b6ff05be15f0b972c4d"
      * }
      *
      * Tasks of cases with id "5cb07b6ff05be15f0b972c4d" OR "5cb07b6ff05be15f0b972c4e"
      * {
-     *     "case": [{
-     *         "id": "5cb07b6ff05be15f0b972c4d"
-     *     }, {
-     *         "id": "5cb07b6ff05be15f0b972c4e"
-     *     }]
+     *     "case": [
+     *          "id": "5cb07b6ff05be15f0b972c4d",
+     *          "id": "5cb07b6ff05be15f0b972c4e"
+     *     ]
      * }
      */
     private void buildCaseQuery(TaskSearchRequest request, BoolQueryBuilder query) {
@@ -160,15 +173,8 @@ public class ElasticTaskService implements IElasticTaskService {
         }
 
         BoolQueryBuilder casesQuery = boolQuery();
-        for (TaskSearchRequest.Case useCase : request.useCase) {
-            BoolQueryBuilder caseQuery = boolQuery();
-            if (useCase.id != null) {
-                caseQuery.must(termQuery("caseId", useCase.id));
-            }
-            if (useCase.title != null) {
-                caseQuery.must(matchQuery("caseTitle", useCase.title));
-            }
-            casesQuery.should(caseQuery);
+        for (String caseId : request.useCase) {
+            casesQuery.should(termQuery("caseId", caseId));
         }
 
         query.filter(casesQuery);

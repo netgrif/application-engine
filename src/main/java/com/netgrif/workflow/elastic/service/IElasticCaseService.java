@@ -3,7 +3,6 @@ package com.netgrif.workflow.elastic.service;
 import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.elastic.domain.ElasticCase;
 import com.netgrif.workflow.elastic.web.CaseSearchRequest;
-import com.netgrif.workflow.workflow.domain.Case;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Async;
@@ -13,9 +12,9 @@ import java.util.Map;
 public interface IElasticCaseService {
 
     @Async
-    void index(Case useCase);
+    void index(ElasticCase useCase);
 
-    void indexNow(Case useCase);
+    void indexNow(ElasticCase useCase);
 
     Page<ElasticCase> search(CaseSearchRequest request, LoggedUser user, Pageable pageable);
 
