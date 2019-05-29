@@ -32,6 +32,9 @@ public class ElasticCase {
     private String id;
 
     @Field(type = Keyword)
+    private String stringId;
+
+    @Field(type = Keyword)
     private String visualId;
 
     @Field(type = Keyword)
@@ -62,9 +65,9 @@ public class ElasticCase {
     private Set<String> enabledRoles;
 
     public ElasticCase(Case useCase) {
-        id = useCase.getStringId();
-        visualId = useCase.getVisualId();
+        stringId = useCase.getStringId();
         processIdentifier = useCase.getProcessIdentifier();
+        visualId = useCase.getVisualId();
         title = useCase.getTitle();
         creationDate = useCase.getCreationDate();
         author = useCase.getAuthor().getId();
@@ -72,11 +75,14 @@ public class ElasticCase {
         authorEmail = useCase.getAuthor().getEmail();
         taskIds = useCase.getTasks().stream().map(TaskPair::getTransition).collect(Collectors.toSet());
         taskMongoIds = useCase.getTasks().stream().map(TaskPair::getTask).collect(Collectors.toSet());
-        enabledRoles = useCase.getEnabledRoles();
+        enabledRoles = new HashSet<>(useCase.getEnabledRoles());
 
         dataSet = new HashMap<>();
         for (String id : useCase.getImmediateDataFields()) {
-            dataSet.put(id, String.valueOf(useCase.getFieldValue(id)));
+            Object object = useCase.getFieldValue(id);
+            if (object != null) {
+                dataSet.put(id, String.valueOf(object));
+            }
         }
     }
 
