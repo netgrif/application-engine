@@ -15,6 +15,7 @@ import org.springframework.data.elasticsearch.annotations.Field;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -77,5 +78,13 @@ public class ElasticCase {
         for (String id : useCase.getImmediateDataFields()) {
             dataSet.put(id, String.valueOf(useCase.getFieldValue(id)));
         }
+    }
+
+    public void update(ElasticCase useCase) {
+        title = useCase.getTitle();
+        taskIds = useCase.getTaskIds();
+        taskMongoIds = useCase.getTaskMongoIds();
+        enabledRoles = useCase.getEnabledRoles();
+        dataSet = useCase.getDataSet();
     }
 }

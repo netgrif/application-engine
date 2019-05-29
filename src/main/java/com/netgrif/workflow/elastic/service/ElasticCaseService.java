@@ -6,7 +6,6 @@ import com.netgrif.workflow.elastic.domain.ElasticCase;
 import com.netgrif.workflow.elastic.domain.ElasticCaseRepository;
 import com.netgrif.workflow.elastic.web.CaseSearchRequest;
 import com.netgrif.workflow.utils.FullPageRequest;
-import com.netgrif.workflow.workflow.domain.Case;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryStringQueryBuilder;
@@ -22,6 +21,8 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import static org.elasticsearch.index.query.QueryBuilders.*;
 
@@ -35,6 +36,8 @@ public class ElasticCaseService implements IElasticCaseService {
 
     @Autowired
     private ElasticsearchTemplate template;
+
+    private ExecutorService executor = Executors.newSingleThreadExecutor();
 
     private Map<String, Float> fullTextFieldMap = ImmutableMap.of(
             "title", 2f,
@@ -55,21 +58,22 @@ public class ElasticCaseService implements IElasticCaseService {
 
     @Async
     @Override
-    public void index(Case useCase) {
-        ElasticCase elasticCase = new ElasticCase(useCase);
-
-        repository.save(elasticCase);
-
-        log.info("[" + useCase.getStringId() + "]: Case \"" + useCase.getTitle() + "\" indexed");
+    public void index(ElasticCase useCase) {
+        executor.execute(() -> {
+            ElasticCase elasticCase = repository.findByStringId(useCase.getStringId());
+            if (elasticCase == null) {
+                repository.save(useCase);
+            } else {
+                elasticCase.update(useCase);
+                repository.save(elasticCase);
+            }
+            log.info("[" + useCase.getStringId() + "]: Case \"" + useCase.getTitle() + "\" indexed");
+        });
     }
 
     @Override
-    public void indexNow(Case useCase) {
-        ElasticCase elasticCase = new ElasticCase(useCase);
-
-        repository.save(elasticCase);
-
-        log.info("[" + useCase.getStringId() + "]: Case \"" + useCase.getTitle() + "\" indexed");
+    public void indexNow(ElasticCase useCase) {
+        index(useCase);
     }
 
     @Override
@@ -105,6 +109,8 @@ public class ElasticCaseService implements IElasticCaseService {
         buildDataQuery(request, query);
         buildFullTextQuery(request, query);
         buildStringQuery(request, query);
+
+        // TODO: filtered query https://stackoverflow.com/questions/28116404/filtered-query-using-nativesearchquerybuilder-in-spring-data-elasticsearch
 
         return builder
                 .withQuery(query)
@@ -159,7 +165,7 @@ public class ElasticCaseService implements IElasticCaseService {
      *     }
      * }
      * </pre><br>
-     *
+     * <p>
      * Cases with author with (id 1 AND email "user@customer.com") OR (id 2)
      * <pre>
      * {
@@ -234,7 +240,7 @@ public class ElasticCaseService implements IElasticCaseService {
      *     "role": "5cb07b6ff05be15f0b972c36"
      * }
      * </pre>
-     *
+     * <p>
      * Cases with active role "5cb07b6ff05be15f0b972c36" OR "5cb07b6ff05be15f0b972c31"
      * <pre>
      * {
