@@ -19,6 +19,9 @@ import com.netgrif.workflow.workflow.web.responsebodies.*;
 import com.querydsl.core.types.Predicate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.Authorization;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.io.InputStreamResource;
@@ -28,7 +31,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.querydsl.binding.QuerydslPredicate;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.Link;
-import org.springframework.hateoas.MediaTypes;
 import org.springframework.hateoas.PagedResources;
 import org.springframework.hateoas.mvc.ControllerLinkBuilder;
 import org.springframework.http.HttpHeaders;
@@ -53,6 +55,7 @@ import java.util.Map;
         havingValue = "true",
         matchIfMissing = true
 )
+@Api(tags = {"Workflow"})
 public class WorkflowController {
 
     private static final Logger log = LoggerFactory.getLogger(WorkflowController.class.getName());
@@ -75,7 +78,8 @@ public class WorkflowController {
     @Autowired
     private IWorkflowAuthorizationService authenticationService;
 
-    @RequestMapping(value = "/case", method = RequestMethod.POST)
+    @ApiOperation(value = "Create new case", authorizations = @Authorization("BasicAuth"))
+    @RequestMapping(value = "/case", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public CaseResource createCase(@RequestBody CreateCaseBody body, Authentication auth) {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
         try {
@@ -87,7 +91,8 @@ public class WorkflowController {
         }
     }
 
-    @RequestMapping(value = "/all", method = RequestMethod.GET)
+    @ApiOperation(value = "Get all cases of the system", authorizations = @Authorization("BasicAuth"))
+    @RequestMapping(value = "/all", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public PagedResources<CaseResource> getAll(Pageable pageable, PagedResourcesAssembler<Case> assembler) {
         Page<Case> cases = workflowService.getAll(pageable);
         Link selfLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(WorkflowController.class)
@@ -97,7 +102,8 @@ public class WorkflowController {
         return resources;
     }
 
-    @PostMapping("/case/search2")
+    @ApiOperation(value = "Generic case search with QueryDSL predicate", authorizations = @Authorization("BasicAuth"))
+    @PostMapping(value = "/case/search2", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public PagedResources<CaseResource> search2(@QuerydslPredicate(root = Case.class) Predicate predicate, Pageable pageable, PagedResourcesAssembler<Case> assembler) {
         Page<Case> cases = workflowService.search(predicate, pageable);
         Link selfLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(WorkflowController.class)
@@ -107,7 +113,8 @@ public class WorkflowController {
         return resources;
     }
 
-    @PostMapping(value = "/case/search", produces = MediaTypes.HAL_JSON_VALUE)
+    @ApiOperation(value = "Generic case search", authorizations = @Authorization("BasicAuth"))
+    @PostMapping(value = "/case/search", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public PagedResources<CaseResource> search(@RequestBody SingleCaseSearchRequestAsList searchBody, @RequestParam(defaultValue = "OR") MergeFilterOperation operation, Pageable pageable, PagedResourcesAssembler<Case> assembler, Authentication auth, Locale locale) {
         LoggedUser user =(LoggedUser) auth.getPrincipal();
         Page<Case> cases = elasticCaseService.search(searchBody.getList(), user, pageable, operation == MergeFilterOperation.AND);
@@ -130,7 +137,9 @@ public class WorkflowController {
         return resources;
     }
 
-    @PostMapping(value = "/case/count", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+
+    @ApiOperation(value = "Get count of the cases", authorizations = @Authorization("BasicAuth"))
+    @PostMapping(value = "/case/count", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public CountResponse count(@RequestBody SingleCaseSearchRequestAsList searchBody, @RequestParam(defaultValue = "OR") MergeFilterOperation operation, Authentication auth) {
         long count = elasticCaseService.count(searchBody.getList(), (LoggedUser) auth.getPrincipal(), operation == MergeFilterOperation.AND);
         return CountResponse.caseCount(count);
@@ -154,7 +163,8 @@ public class WorkflowController {
         return new CaseResource(aCase);
     }
 
-    @RequestMapping(value = "/case/author/{id}", method = RequestMethod.POST)
+    @ApiOperation(value = "Get all cases by user that created them", authorizations = @Authorization("BasicAuth"))
+    @RequestMapping(value = "/case/author/{id}", method = RequestMethod.POST, consumes = MediaType.TEXT_PLAIN_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public PagedResources<CaseResource> findAllByAuthor(@PathVariable("id") Long authorId, @RequestBody String petriNet, Pageable pageable, PagedResourcesAssembler<Case> assembler) {
         Page<Case> cases = workflowService.findAllByAuthor(authorId, petriNet, pageable);
         Link selfLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(WorkflowController.class)
@@ -179,7 +189,8 @@ public class WorkflowController {
         }
     }
 
-    @RequestMapping(value = "/case/{id}", method = RequestMethod.DELETE)
+    @ApiOperation(value = "Delete case", authorizations = @Authorization("BasicAuth"))
+    @RequestMapping(value = "/case/{id}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public MessageResource deleteCase(@PathVariable("id") String caseId, @RequestParam(defaultValue = "false") boolean deleteSubtree) throws UnauthorisedRequestException {
         User logged = userService.getLoggedUser();
         Case requestedCase = workflowService.findOne(caseId);
@@ -200,7 +211,8 @@ public class WorkflowController {
         }
     }
 
-    @RequestMapping(value = "/case/{id}/data", method = RequestMethod.GET)
+    @ApiOperation(value = "Get all case data", authorizations = @Authorization("BasicAuth"))
+    @RequestMapping(value = "/case/{id}/data", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public DataFieldsResource getAllCaseData(@PathVariable("id") String caseId, Locale locale) {
         try {
             caseId = URLDecoder.decode(caseId, StandardCharsets.UTF_8.name());
@@ -211,7 +223,8 @@ public class WorkflowController {
         }
     }
 
-//    @RequestMapping(value = "/case/{caseId}/field/{fieldId}", method = RequestMethod.GET)
+//    @ApiOperation(value = "Get options for enumeration or multiple-choice data field", authorizations = @Authorization("BasicAuth"))
+//    @RequestMapping(value = "/case/{caseId}/field/{fieldId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 //    public List<Case> getCaseFieldChoices(@PathVariable("caseId") String caseId, @PathVariable("fieldId") String fieldId, Pageable pageable) {
 //        try {
 //            caseId = URLDecoder.decode(caseId, StandardCharsets.UTF_8.name());
@@ -223,6 +236,7 @@ public class WorkflowController {
 //        }
 //    }
 
+    @ApiOperation(value = "Download case file field value", authorizations = @Authorization("BasicAuth"))
     @RequestMapping(value = "/case/{id}/file/{field}", method = RequestMethod.GET, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public ResponseEntity<Resource> getFile(@PathVariable("id") String caseId, @PathVariable("field") String fieldId) throws FileNotFoundException {
         FileFieldInputStream fileFieldInputStream = dataService.getFileByCase(caseId, fieldId);

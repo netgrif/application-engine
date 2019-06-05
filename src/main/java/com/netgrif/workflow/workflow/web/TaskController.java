@@ -17,6 +17,9 @@ import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
 import com.netgrif.workflow.workflow.web.responsebodies.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.Authorization;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.io.InputStreamResource;
@@ -47,6 +50,7 @@ import java.util.Locale;
         havingValue = "true",
         matchIfMissing = true
 )
+@Api(tags = {"Task"})
 public class TaskController {
 
     public static final Logger log = LoggerFactory.getLogger(TaskController.class);
@@ -60,7 +64,8 @@ public class TaskController {
     @Autowired
     private IElasticTaskService searchService;
 
-    @RequestMapping(method = RequestMethod.GET)
+    @ApiOperation(value = "Get all tasks", authorizations = @Authorization("BasicAuth"))
+    @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public PagedResources<LocalisedTaskResource> getAll(Authentication auth, Pageable pageable, PagedResourcesAssembler<Task> assembler, Locale locale) {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
         Page<Task> page = taskService.getAll(loggedUser, pageable, locale);
@@ -72,7 +77,8 @@ public class TaskController {
         return resources;
     }
 
-    @RequestMapping(value = "/case", method = RequestMethod.POST)
+    @ApiOperation(value = "Get all tasks by cases", authorizations = @Authorization("BasicAuth"))
+    @RequestMapping(value = "/case", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public PagedResources<LocalisedTaskResource> getAllByCases(@RequestBody List<String> cases, Pageable pageable, PagedResourcesAssembler<Task> assembler, Locale locale) {
         Page<Task> page = taskService.findByCases(pageable, cases);
 
@@ -83,12 +89,14 @@ public class TaskController {
         return resources;
     }
 
-    @RequestMapping(value = "/case/{id}", method = RequestMethod.GET)
+    @ApiOperation(value = "Get tasks of the case", authorizations = @Authorization("BasicAuth"))
+    @RequestMapping(value = "/case/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public List<TaskReference> getTasksOfCase(@PathVariable("id") String caseId, Locale locale) {
         return taskService.findAllByCase(caseId, locale);
     }
 
-    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
+    @ApiOperation(value = "Get task by id", authorizations = @Authorization("BasicAuth"))
+    @RequestMapping(value = "/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public LocalisedTaskResource getOne(@PathVariable("id") String taskId, Locale locale) {
         Task task = taskService.findById(taskId);
         if (task == null)
@@ -96,7 +104,8 @@ public class TaskController {
         return new LocalisedTaskResource(new com.netgrif.workflow.workflow.web.responsebodies.Task(task, locale));
     }
 
-    @RequestMapping(value = "/assign/{id}", method = RequestMethod.GET)
+    @ApiOperation(value = "Get all tasks by cases", authorizations = @Authorization("BasicAuth"))
+    @RequestMapping(value = "/case", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @PreAuthorize("@taskAuthorizationService.canCallAssign(#auth.getPrincipal(), #taskId)")
     public LocalisedEventOutcomeResource assign(Authentication auth, @PathVariable("id") String taskId, Locale locale) {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
@@ -110,7 +119,8 @@ public class TaskController {
         }
     }
 
-    @RequestMapping(value = "/delegate/{id}", method = RequestMethod.POST)
+    @ApiOperation(value = "Get all tasks by cases", authorizations = @Authorization("BasicAuth"))
+    @RequestMapping(value = "/case", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @PreAuthorize("@taskAuthorizationService.canCallDelegate(#auth.getPrincipal(), #taskId)")
     public LocalisedEventOutcomeResource delegate(Authentication auth, @PathVariable("id") String taskId, @RequestBody Long delegatedId, Locale locale) {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
@@ -124,7 +134,8 @@ public class TaskController {
         }
     }
 
-    @RequestMapping(value = "/finish/{id}", method = RequestMethod.GET)
+    @ApiOperation(value = "Get all tasks by cases", authorizations = @Authorization("BasicAuth"))
+    @RequestMapping(value = "/case", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @PreAuthorize("@taskAuthorizationService.canCallFinish(#auth.getPrincipal(), #taskId)")
     public LocalisedEventOutcomeResource finish(Authentication auth, @PathVariable("id") String taskId, Locale locale) {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
@@ -138,7 +149,8 @@ public class TaskController {
         }
     }
 
-    @RequestMapping(value = "/cancel/{id}", method = RequestMethod.GET)
+    @ApiOperation(value = "Get all tasks by cases", authorizations = @Authorization("BasicAuth"))
+    @RequestMapping(value = "/case", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @PreAuthorize("@taskAuthorizationService.canCallCancel(#auth.getPrincipal(), #taskId)")
     public LocalisedEventOutcomeResource cancel(Authentication auth, @PathVariable("id") String taskId, Locale locale) {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
@@ -152,7 +164,8 @@ public class TaskController {
         }
     }
 
-    @RequestMapping(value = "/my", method = RequestMethod.GET)
+    @ApiOperation(value = "Get all tasks by cases", authorizations = @Authorization("BasicAuth"))
+    @RequestMapping(value = "/case", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public PagedResources<LocalisedTaskResource> getMy(Authentication auth, Pageable pageable, PagedResourcesAssembler<Task> assembler, Locale locale) {
         Page<Task> page = taskService.findByUser(pageable, ((LoggedUser) auth.getPrincipal()).transformToUser());
 
@@ -163,7 +176,8 @@ public class TaskController {
         return resources;
     }
 
-    @RequestMapping(value = "/my/finished", method = RequestMethod.GET)
+    @ApiOperation(value = "Get all finished tasks by logged user", authorizations = @Authorization("BasicAuth"))
+    @RequestMapping(value = "/my/finished", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public PagedResources<LocalisedTaskResource> getMyFinished(Pageable pageable, Authentication auth, PagedResourcesAssembler<Task> assembler, Locale locale) {
         Page<Task> page = taskService.findByUser(pageable, ((LoggedUser) auth.getPrincipal()).transformToUser());
 
@@ -174,7 +188,8 @@ public class TaskController {
         return resources;
     }
 
-    @RequestMapping(value = "/search", method = RequestMethod.POST)
+    @ApiOperation(value = "Generic task search", authorizations = @Authorization("BasicAuth"))
+    @RequestMapping(value = "/search", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public PagedResources<LocalisedTaskResource> search(Authentication auth, Pageable pageable, @RequestBody SingleTaskSearchRequestAsList searchBody, @RequestParam(defaultValue = "OR") MergeFilterOperation operation, PagedResourcesAssembler<Task> assembler, Locale locale) {
         Page<Task> tasks = taskService.search(searchBody.getList(), pageable, (LoggedUser) auth.getPrincipal(), operation == MergeFilterOperation.AND);
         Link selfLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
@@ -194,36 +209,38 @@ public class TaskController {
         return resources;
     }
 
-    @PostMapping(value = "/count", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ApiOperation(value = "Count tasks by provided criteria", authorizations = @Authorization("BasicAuth"))
+    @PostMapping(value = "/count", produces = MediaType.APPLICATION_JSON_UTF8_VALUE, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public CountResponse count(@RequestBody SingleElasticTaskSearchRequestAsList query, @RequestParam(defaultValue = "OR") MergeFilterOperation operation, Authentication auth, Locale locale) {
         long count = searchService.count(query.getList(), (LoggedUser)auth.getPrincipal(), operation == MergeFilterOperation.AND);
         return CountResponse.taskCount(count);
     }
 
-    @RequestMapping(value = "/{id}/data", method = RequestMethod.GET)
+    @ApiOperation(value = "Get all task data", authorizations = @Authorization("BasicAuth"))
+    @RequestMapping(value = "/{id}/data", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public DataGroupsResource getData(@PathVariable("id") String taskId, Locale locale) {
         List<DataGroup> dataGroups = dataService.getDataGroups(taskId, locale);
-
         return new DataGroupsResource(dataGroups, locale);
     }
 
-    @RequestMapping(value = "/{id}/data", method = RequestMethod.POST)
+    @ApiOperation(value = "Set task data", authorizations = @Authorization("BasicAuth"))
+    @RequestMapping(value = "/{id}/data", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @PreAuthorize("@taskAuthorizationService.canCallSaveData(#auth.getPrincipal(), #taskId)")
     public ChangedFieldContainer setData(Authentication auth, @PathVariable("id") String taskId, @RequestBody ObjectNode dataBody) {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
-
         return dataService.setData(taskId, dataBody);
     }
 
-    @RequestMapping(value = "/{id}/file/{field}", method = RequestMethod.POST)
+    @ApiOperation(value = "Upload file into the task", authorizations = @Authorization("BasicAuth"))
+    @RequestMapping(value = "/{id}/file/{field}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @PreAuthorize("@taskAuthorizationService.canCallSaveFile(#auth.getPrincipal(), #taskId)")
     public ChangedFieldByFileFieldContainer saveFile(Authentication auth, @PathVariable("id") String taskId, @PathVariable("field") String fieldId, @RequestParam(value = "file") MultipartFile multipartFile) {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
-
         return dataService.saveFile(taskId, fieldId, multipartFile);
     }
 
-    @RequestMapping(value = "/{id}/file/{field}", method = RequestMethod.GET, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    @ApiOperation(value = "Download task file field value", authorizations = @Authorization("BasicAuth"))
+    @RequestMapping(value = "/{id}/file/{field}", method = RequestMethod.GET, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<Resource> getFile(@PathVariable("id") String taskId, @PathVariable("field") String fieldId, HttpServletResponse response) throws FileNotFoundException {
         FileFieldInputStream fileFieldInputStream = dataService.getFileByTask(taskId, fieldId);
 
