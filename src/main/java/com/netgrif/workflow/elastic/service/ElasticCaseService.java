@@ -6,6 +6,7 @@ import com.netgrif.workflow.elastic.domain.ElasticCase;
 import com.netgrif.workflow.elastic.domain.ElasticCaseRepository;
 import com.netgrif.workflow.elastic.web.CaseSearchRequest;
 import com.netgrif.workflow.utils.FullPageRequest;
+import com.netgrif.workflow.workflow.domain.repositories.CaseRepository;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryStringQueryBuilder;
@@ -33,6 +34,9 @@ public class ElasticCaseService implements IElasticCaseService {
 
     @Autowired
     private ElasticCaseRepository repository;
+
+    @Autowired
+    private CaseRepository caseRepository;
 
     @Autowired
     private ElasticsearchTemplate template;
@@ -213,14 +217,14 @@ public class ElasticCaseService implements IElasticCaseService {
      * Cases with tasks with import Id "nova_uloha"
      * <pre>
      * {
-     *     "task": "nova_uloha"
+     *     "transition": "nova_uloha"
      * }
      * </pre>
      * <p>
      * Cases with tasks with import Id "nova_uloha" OR "kontrola"
      * <pre>
      * {
-     *     "task": [
+     *     "transition": [
      *         "nova_uloha",
      *         "kontrola"
      *     ]
@@ -228,12 +232,12 @@ public class ElasticCaseService implements IElasticCaseService {
      * </pre>
      */
     private void buildTaskQuery(CaseSearchRequest request, BoolQueryBuilder query) {
-        if (request.task == null || request.task.isEmpty()) {
+        if (request.transition == null || request.transition.isEmpty()) {
             return;
         }
 
         BoolQueryBuilder taskQuery = boolQuery();
-        for (String taskImportId : request.task) {
+        for (String taskImportId : request.transition) {
             taskQuery.should(termQuery("taskIds", taskImportId));
         }
 
@@ -289,7 +293,7 @@ public class ElasticCaseService implements IElasticCaseService {
 
         BoolQueryBuilder dataQuery = boolQuery();
         for (Map.Entry<String, String> field : request.data.entrySet()) {
-            dataQuery.must(matchQuery("dataSet." + field.getKey(), field.getValue()));
+            dataQuery.must(matchQuery("dataSet." + field.getKey()+".value", field.getValue()));
         }
 
         query.filter(dataQuery);

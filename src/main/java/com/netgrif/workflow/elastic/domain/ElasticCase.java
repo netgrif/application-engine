@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
+import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.TaskPair;
 import lombok.AllArgsConstructor;
@@ -53,7 +54,7 @@ public class ElasticCase {
     @Field(type = Keyword)
     private String authorEmail;
 
-    private Map<String, String> dataSet;
+    private Map<String, DataField> dataSet;
 
     @Field(type = Keyword)
     private Set<String> taskIds;
@@ -79,10 +80,7 @@ public class ElasticCase {
 
         dataSet = new HashMap<>();
         for (String id : useCase.getImmediateDataFields()) {
-            Object object = useCase.getFieldValue(id);
-            if (object != null) {
-                dataSet.put(id, String.valueOf(object));
-            }
+            dataSet.put(id, new DataField(useCase.getDataField(id).toString()));
         }
     }
 
@@ -92,5 +90,17 @@ public class ElasticCase {
         taskMongoIds = useCase.getTaskMongoIds();
         enabledRoles = useCase.getEnabledRoles();
         dataSet = useCase.getDataSet();
+    }
+
+    private String parseValue(com.netgrif.workflow.workflow.domain.DataField dataField) {
+        // Set<I18nString>
+        if (dataField.getValue() instanceof User) {
+            User user = (User) dataField.getValue();
+            return String.valueOf(user.getId());
+        } else {
+            if (dataField.getValue() == null)
+                return "";
+            return dataField.getValue().toString();
+        }
     }
 }
