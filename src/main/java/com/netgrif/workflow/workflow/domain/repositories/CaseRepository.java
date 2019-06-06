@@ -2,6 +2,8 @@ package com.netgrif.workflow.workflow.domain.repositories;
 
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.QCase;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import org.springframework.data.querydsl.binding.QuerydslBinderCustomizer;
@@ -14,6 +16,8 @@ import java.util.List;
 public interface CaseRepository extends MongoRepository<Case, String>, QuerydslPredicateExecutor<Case>, QuerydslBinderCustomizer<QCase> {
 
     List<Case> findAllByProcessIdentifier(String identifier);
+
+    Page<Case> findAllBy_idIn(Iterable<String> id, Pageable pageable);
 
     @Override
     default void customize(QuerydslBindings bindings, QCase qCase) {
