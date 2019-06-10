@@ -6,7 +6,8 @@ import com.netgrif.workflow.elastic.domain.ElasticCase;
 import com.netgrif.workflow.elastic.domain.ElasticCaseRepository;
 import com.netgrif.workflow.elastic.web.CaseSearchRequest;
 import com.netgrif.workflow.utils.FullPageRequest;
-import com.netgrif.workflow.workflow.domain.repositories.CaseRepository;
+import com.netgrif.workflow.workflow.domain.Case;
+import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryStringQueryBuilder;
@@ -24,6 +25,7 @@ import org.springframework.stereotype.Service;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 
 import static org.elasticsearch.index.query.QueryBuilders.*;
 
@@ -36,7 +38,7 @@ public class ElasticCaseService implements IElasticCaseService {
     private ElasticCaseRepository repository;
 
     @Autowired
-    private CaseRepository caseRepository;
+    private IWorkflowService workflowService;
 
     @Autowired
     private ElasticsearchTemplate template;
@@ -88,14 +90,15 @@ public class ElasticCaseService implements IElasticCaseService {
     }
 
     @Override
-    public Page<ElasticCase> search(CaseSearchRequest request, LoggedUser user, Pageable pageable) {
+    public Page<Case> search(CaseSearchRequest request, LoggedUser user, Pageable pageable) {
         if (request == null) {
             throw new IllegalArgumentException("Request can not be null!");
         }
 
         SearchQuery query = buildQuery(request, user, pageable);
+        Page<ElasticCase> search = repository.search(query);
 
-        return repository.search(query);
+        return workflowService.findAllById(search.get().map(ElasticCase::getStringId).collect(Collectors.toList()), pageable);
     }
 
     @Override
