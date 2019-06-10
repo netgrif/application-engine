@@ -18,6 +18,8 @@ public interface IWorkflowService {
 
     Case findOne(String caseId);
 
+    Page<Case> findAllById(List<String> ids, Pageable pageable);
+
     Page<Case> getAll(Pageable pageable);
 
     Case createCase(String netId, String title, String color, LoggedUser user);
