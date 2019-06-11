@@ -1,6 +1,5 @@
 package com.netgrif.workflow.startup
 
-
 import com.netgrif.workflow.elastic.domain.ElasticCaseRepository
 import com.netgrif.workflow.elastic.domain.ElasticTaskRepository
 import com.netgrif.workflow.elastic.service.IElasticCaseService
@@ -39,6 +38,21 @@ class DemoRunner extends AbstractOrderedCommandLineRunner {
     @Override
     void run(String... args) throws Exception {
         log.info("Elastic")
+
+//        Optional<PetriNet> netOptional = helper.createNet("posudky.xml", "elk", "elastic", "ELK", "major")
+//        assert netOptional.isPresent()
+//        PetriNet net = netOptional.get()
+//
+//        1000.times { i ->
+//            log.info "Processing page ${i+1}/1000"
+//
+//            def cases = []
+//            50.times { j ->
+//                cases << helper.createCase("Case_${i}_${j}", net)
+//            }
+//            caseRepository.saveAll cases
+//        }
+
 
 //        Predicate filter = QCase.case$.title.isNotNull()
 //        long caseCount = caseRepository.count(filter)
