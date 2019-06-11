@@ -15,6 +15,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
@@ -96,9 +98,10 @@ public class ElasticCaseService implements IElasticCaseService {
         }
 
         SearchQuery query = buildQuery(request, user, pageable);
-        Page<ElasticCase> search = repository.search(query);
+        Page<ElasticCase> indexedCases = repository.search(query);
+        Page<Case> casePage = workflowService.findAllById(indexedCases.get().map(ElasticCase::getStringId).collect(Collectors.toList()), PageRequest.of(0, pageable.getPageSize()));
 
-        return workflowService.findAllById(search.get().map(ElasticCase::getStringId).collect(Collectors.toList()), pageable);
+        return new PageImpl<>(casePage.getContent(), pageable, indexedCases.getTotalElements());
     }
 
     @Override
