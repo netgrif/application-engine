@@ -10,6 +10,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.Authorization;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -38,14 +39,14 @@ public class GroupController {
 
     @ApiOperation(value = "Get all groups in the system", authorizations = @Authorization("BasicAuth"))
     @PreAuthorize("hasRole('ADMIN')")
-    @RequestMapping(value = "/all", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = "/all", method = RequestMethod.GET, produces = MediaTypes.HAL_JSON_VALUE)
     public GroupsResource getAllGroups() {
         Set<Group> groups = service.findAll();
         return new GroupsMinimalResource(groups);
     }
 
     @ApiOperation(value = "Get all the user's groups", authorizations = @Authorization("BasicAuth"))
-    @GetMapping(value = "/my", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @GetMapping(value = "/my", produces = MediaTypes.HAL_JSON_VALUE)
     public GroupsResource getGroupsOfUser(Authentication auth) {
         User loggedUser = ((LoggedUser) auth.getPrincipal()).transformToUser();
         List<Long> groupIds = loggedUser.getGroups().stream()
