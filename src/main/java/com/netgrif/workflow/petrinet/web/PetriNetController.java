@@ -22,6 +22,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.Link;
+import org.springframework.hateoas.MediaTypes;
 import org.springframework.hateoas.PagedResources;
 import org.springframework.hateoas.mvc.ControllerLinkBuilder;
 import org.springframework.http.MediaType;
@@ -66,7 +67,7 @@ public class PetriNetController {
 
     @ApiOperation(value = "", authorizations = @Authorization("BasicAuth"))
     @PreAuthorize("hasRole('ADMIN')")
-    @RequestMapping(value = "/import", method = POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = "/import", method = POST, produces = MediaTypes.HAL_JSON_VALUE)
     public
     @ResponseBody
     PetriNetReferenceWithMessageResource importPetriNet(
@@ -90,7 +91,7 @@ public class PetriNetController {
     }
 
     @ApiOperation(value = "", authorizations = @Authorization("BasicAuth"))
-    @RequestMapping(method = GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(method = GET, produces = MediaTypes.HAL_JSON_VALUE)
     public @ResponseBody
     PetriNetReferenceResources getAll(@RequestParam(value = "indentifier", required = false) String identifier, @RequestParam(value = "version", required = false) String version, Authentication auth, Locale locale) {
         LoggedUser user = (LoggedUser) auth.getPrincipal();
@@ -106,21 +107,21 @@ public class PetriNetController {
     }
 
     @ApiOperation(value = "", authorizations = @Authorization("BasicAuth"))
-    @RequestMapping(value = "/{id}", method = GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = "/{id}", method = GET, produces = MediaTypes.HAL_JSON_VALUE)
     public @ResponseBody
     PetriNetReferenceResource getOne(@PathVariable("id") String id, Authentication auth, Locale locale) {
         return new PetriNetReferenceResource(IPetriNetService.transformToReference(service.getPetriNet(decodeUrl(id)), locale));
     }
 
     @ApiOperation(value = "", authorizations = @Authorization("BasicAuth"))
-    @RequestMapping(value = "/{identifier}/{version}", method = GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = "/{identifier}/{version}", method = GET, produces = MediaTypes.HAL_JSON_VALUE)
     public @ResponseBody
     PetriNetReferenceResource getOne(@PathVariable("identifier") String identifier, @PathVariable("version") String version, Authentication auth, Locale locale) {
         return new PetriNetReferenceResource(service.getReference(identifier, converter.convert(version), (LoggedUser) auth.getPrincipal(), locale));
     }
 
     @ApiOperation(value = "", authorizations = @Authorization("BasicAuth"))
-    @RequestMapping(value = "/transitions", method = GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = "/transitions", method = GET, produces = MediaTypes.HAL_JSON_VALUE)
     public
     @ResponseBody
     TransitionReferencesResource getTransitionReferences(@RequestParam List<String> ids, Authentication auth, Locale locale) {
@@ -129,7 +130,7 @@ public class PetriNetController {
     }
 
     @ApiOperation(value = "", authorizations = @Authorization("BasicAuth"))
-    @RequestMapping(value = "/data", method = POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = "/data", method = POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public
     @ResponseBody
     DataFieldReferencesResource getDataFieldReferences(@RequestBody List<TransitionReference> referenceBody, Locale locale) {
@@ -137,7 +138,7 @@ public class PetriNetController {
     }
 
     @ApiOperation(value = "", authorizations = @Authorization("BasicAuth"))
-    @RequestMapping(value = "/{netId}/roles", method = GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = "/{netId}/roles", method = GET, produces = MediaTypes.HAL_JSON_VALUE)
     public @ResponseBody
     ProcessRolesResource getRoles(@PathVariable("netId") String netId, Locale locale) {
         netId = decodeUrl(netId);
@@ -145,7 +146,7 @@ public class PetriNetController {
     }
 
     @ApiOperation(value = "", authorizations = @Authorization("BasicAuth"))
-    @RequestMapping(value = "/{netId}/transactions", method = GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = "/{netId}/transactions", method = GET, produces = MediaTypes.HAL_JSON_VALUE)
     public @ResponseBody
     TransactionsResource getTransactions(@PathVariable("netId") String netId, Locale locale) {
         PetriNet net = service.getPetriNet(decodeUrl(netId));
@@ -153,7 +154,7 @@ public class PetriNetController {
     }
 
     @ApiOperation(value = "", authorizations = @Authorization("BasicAuth"))
-    @RequestMapping(value = "/{netId}/file", method = GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = "/{netId}/file", method = GET, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public FileSystemResource getNetFile(@PathVariable("netId") String netId, @RequestParam(value = "title", required = false) String title, Authentication auth, HttpServletResponse response) {
         FileSystemResource fileResource = service.getFile(decodeUrl(netId), decodeUrl(title));
         response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
@@ -164,7 +165,7 @@ public class PetriNetController {
     }
 
     @ApiOperation(value = "", authorizations = @Authorization("BasicAuth"))
-    @RequestMapping(value = "/search", method = POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = "/search", method = POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public @ResponseBody
     PagedResources<PetriNetReferenceResource> searchPetriNets(@RequestBody Map<String, Object> criteria, Authentication auth, Pageable pageable, PagedResourcesAssembler<PetriNetReference> assembler, Locale locale) {
         LoggedUser user = (LoggedUser) auth.getPrincipal();
