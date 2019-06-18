@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -64,7 +65,7 @@ public class AuthenticationController {
     private boolean openRegistration;
 
     @ApiOperation(value = "New user registration")
-    @PostMapping(value = "/signup", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @PostMapping(value = "/signup", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public MessageResource signup(@RequestBody RegistrationRequest regRequest) {
         if (!registrationService.verifyToken(regRequest.token))
             return MessageResource.errorMessage("Registration of " + regRequest.email + " has failed! Invalid token!");
@@ -78,7 +79,7 @@ public class AuthenticationController {
     }
 
     @ApiOperation(value = "Send invitation to a new user", authorizations = @Authorization("BasicAuth"))
-    @PostMapping(value = "/invite", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @PostMapping(value = "/invite", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public MessageResource invite(@RequestBody NewUserRequest newUserRequest, Authentication auth) {
         try {
             if (!openRegistration && (auth == null || !((LoggedUser) auth.getPrincipal()).isAdmin())) {
@@ -104,7 +105,7 @@ public class AuthenticationController {
     }
 
     @ApiOperation(value = "Verify validity of a registration token")
-    @PostMapping(value = "/token/verify", consumes = MediaType.TEXT_PLAIN_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @PostMapping(value = "/token/verify", consumes = MediaType.TEXT_PLAIN_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public MessageResource verifyToken(@RequestBody String token) {
         try {
             if (registrationService.verifyToken(token))
@@ -124,13 +125,13 @@ public class AuthenticationController {
     }
 
     @ApiOperation(value = "Login to the system", authorizations = @Authorization("BasicAuth"))
-    @GetMapping(value = "/login", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @GetMapping(value = "/login", produces = MediaTypes.HAL_JSON_VALUE)
     public UserResource login(Authentication auth, Locale locale) {
         return new UserResource(userService.findByAuth(auth), "profile", locale);
     }
 
     @ApiOperation(value = "Reset password")
-    @PostMapping(value = "/reset", consumes = MediaType.TEXT_PLAIN_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @PostMapping(value = "/reset", consumes = MediaType.TEXT_PLAIN_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public MessageResource resetPassword(@RequestBody String recoveryEmail) {
         if (mailAttemptService.isBlocked(recoveryEmail)) {
             return MessageResource.successMessage("Done");
@@ -151,7 +152,7 @@ public class AuthenticationController {
     }
 
     @ApiOperation(value = "Account recovery")
-    @PostMapping(value = "/recover", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @PostMapping(value = "/recover", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public MessageResource recoverAccount(@RequestBody RegistrationRequest request) {
         try {
             if (!registrationService.verifyToken(request.token))
@@ -167,7 +168,7 @@ public class AuthenticationController {
     }
 
     @ApiOperation(value = "Set a new password", authorizations = @Authorization("BasicAuth"))
-    @PostMapping(value = "/changePassword", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @PostMapping(value = "/changePassword", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public MessageResource changePassword(Authentication auth, @RequestBody ChangePasswordRequest request) {
         try {
             User user = userService.findByEmail(request.login, false);
