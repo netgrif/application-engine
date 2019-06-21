@@ -10,15 +10,8 @@ import static org.springframework.data.elasticsearch.annotations.FieldType.Keywo
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class DataField {
-
-    public String value;
+public class KeywordDataField {
 
     @Field(type = Keyword)
-    public String sortable;
-
-    public DataField(String value) {
-        this.value = value;
-        this.sortable = value;
-    }
+    public String value;
 }

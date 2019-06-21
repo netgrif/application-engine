@@ -24,6 +24,7 @@
         <java.version>1.8</java.version>
         <jasypt.version>1.9.2</jasypt.version>
         <querydsl.version>4.2.1</querydsl.version>
+        <elasticsearch.version>6.8.0</elasticsearch.version>
         <version.jsonOutputPath>${project.basedir}/src/main/resources/static</version.jsonOutputPath>
     </properties>
 

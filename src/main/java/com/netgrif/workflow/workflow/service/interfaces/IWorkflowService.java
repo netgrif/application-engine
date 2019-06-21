@@ -18,7 +18,7 @@ public interface IWorkflowService {
 
     Case findOne(String caseId);
 
-    Page<Case> findAllById(List<String> ids, Pageable pageable);
+    List<Case> findAllById(List<String> ids);
 
     Page<Case> getAll(Pageable pageable);
 
