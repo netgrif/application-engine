@@ -3,7 +3,9 @@ package com.netgrif.workflow.workflow.service;
 import com.netgrif.workflow.elastic.domain.ElasticCase;
 import com.netgrif.workflow.elastic.service.IElasticCaseService;
 import com.netgrif.workflow.importer.service.FieldFactory;
+import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
+import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.workflow.workflow.domain.Case;
 import org.bson.Document;
 import org.bson.types.ObjectId;
@@ -30,6 +32,9 @@ public class CaseEventHandler extends AbstractMongoEventListener<Case> {
     @Autowired
     private FieldFactory fieldFactory;
 
+    @Autowired
+    private IPetriNetService petriNetService;
+
     @Override
     public void onAfterSave(AfterSaveEvent<Case> event) {
         Case useCase = event.getSource();
@@ -49,6 +54,9 @@ public class CaseEventHandler extends AbstractMongoEventListener<Case> {
     }
 
     private void setImmediateData(Case useCase) {
+        if (useCase.getPetriNet() == null) {
+            setPetriNet(useCase);
+        }
         List<Field> immediateData = new ArrayList<>();
 
         useCase.getImmediateDataFields().forEach(fieldId ->
@@ -57,5 +65,12 @@ public class CaseEventHandler extends AbstractMongoEventListener<Case> {
         LongStream.range(0L, immediateData.size()).forEach(index -> immediateData.get((int) index).setOrder(index));
 
         useCase.setImmediateData(immediateData);
+    }
+
+    private void setPetriNet(Case useCase) {
+        PetriNet model = petriNetService.clone(useCase.getPetriNetObjectId());
+        model.initializeTokens(useCase.getActivePlaces());
+        model.initializeVarArcs(useCase.getDataSet());
+        useCase.setPetriNet(model);
     }
 }

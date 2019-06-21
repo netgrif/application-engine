@@ -16,7 +16,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
@@ -24,6 +23,7 @@ import org.springframework.data.elasticsearch.core.query.SearchQuery;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -99,9 +99,9 @@ public class ElasticCaseService implements IElasticCaseService {
 
         SearchQuery query = buildQuery(request, user, pageable);
         Page<ElasticCase> indexedCases = repository.search(query);
-        Page<Case> casePage = workflowService.findAllById(indexedCases.get().map(ElasticCase::getStringId).collect(Collectors.toList()), PageRequest.of(0, pageable.getPageSize()));
+        List<Case> casePage = workflowService.findAllById(indexedCases.get().map(ElasticCase::getStringId).collect(Collectors.toList()));
 
-        return new PageImpl<>(casePage.getContent(), pageable, indexedCases.getTotalElements());
+        return new PageImpl<>(casePage, pageable, indexedCases.getTotalElements());
     }
 
     @Override
