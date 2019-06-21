@@ -15,14 +15,12 @@ import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.springframework.data.elasticsearch.annotations.FieldType.Keyword;
 
+@SuppressWarnings("OptionalIsPresent")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -80,7 +78,10 @@ public class ElasticCase {
 
         dataSet = new HashMap<>();
         for (String id : useCase.getImmediateDataFields()) {
-            dataSet.put(id, new DataField(useCase.getDataField(id).toString()));
+            Optional<String> parseValue = parseValue(useCase.getDataField(id));
+            if (parseValue.isPresent()) {
+                dataSet.put(id, new DataField(parseValue.get()));
+            }
         }
     }
 
@@ -92,15 +93,15 @@ public class ElasticCase {
         dataSet = useCase.getDataSet();
     }
 
-    private String parseValue(com.netgrif.workflow.workflow.domain.DataField dataField) {
+    private Optional<String> parseValue(com.netgrif.workflow.workflow.domain.DataField dataField) {
         // Set<I18nString>
         if (dataField.getValue() instanceof User) {
             User user = (User) dataField.getValue();
-            return String.valueOf(user.getId());
+            return Optional.ofNullable(String.valueOf(user.getId()));
         } else {
             if (dataField.getValue() == null)
-                return "";
-            return dataField.getValue().toString();
+                return Optional.empty();
+            return Optional.ofNullable(dataField.getValue().toString());
         }
     }
 }
