@@ -14,7 +14,10 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 
+import java.sql.Timestamp;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -45,6 +48,8 @@ public class ElasticCase {
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     private LocalDateTime creationDate;
 
+    private Long creationDateSortable;
+
     private Long author;
 
     private String authorName;
@@ -69,6 +74,7 @@ public class ElasticCase {
         visualId = useCase.getVisualId();
         title = useCase.getTitle();
         creationDate = useCase.getCreationDate();
+        creationDateSortable = Timestamp.valueOf(useCase.getCreationDate()).getTime();
         author = useCase.getAuthor().getId();
         authorName = useCase.getAuthor().getFullName();
         authorEmail = useCase.getAuthor().getEmail();
@@ -78,9 +84,9 @@ public class ElasticCase {
 
         dataSet = new HashMap<>();
         for (String id : useCase.getImmediateDataFields()) {
-            Optional<String> parseValue = parseValue(useCase.getDataField(id));
+            Optional<DataField> parseValue = parseValue(useCase.getDataField(id));
             if (parseValue.isPresent()) {
-                dataSet.put(id, new DataField(parseValue.get()));
+                dataSet.put(id, parseValue.get());
             }
         }
     }
@@ -93,15 +99,38 @@ public class ElasticCase {
         dataSet = useCase.getDataSet();
     }
 
-    private Optional<String> parseValue(com.netgrif.workflow.workflow.domain.DataField dataField) {
+    private Optional<DataField> parseValue(com.netgrif.workflow.workflow.domain.DataField dataField) {
         // Set<I18nString>
         if (dataField.getValue() instanceof User) {
             User user = (User) dataField.getValue();
-            return Optional.ofNullable(String.valueOf(user.getId()));
+            if (user == null)
+                return Optional.of(new DataField(""," "));
+            StringBuilder fullname = new StringBuilder("");
+            if (user.getSurname() != null) {
+                fullname.append(user.getSurname());
+                fullname.append(" ");
+            }
+            if (user.getName() != null) {
+                fullname.append(user.getName());
+            }
+            return Optional.of(new DataField(String.valueOf(user.getId()), fullname.toString()));
+        } else if (dataField.getValue() instanceof LocalDate) {
+            LocalDate date = (LocalDate) dataField.getValue();
+            if (date == null)
+                return Optional.empty();
+            return Optional.of(new DataField(String.valueOf(date), date.format(DateTimeFormatter.BASIC_ISO_DATE)));
+        } else if (dataField.getValue() instanceof LocalDateTime) {
+            LocalDateTime date = (LocalDateTime) dataField.getValue();
+            if (date == null)
+                return Optional.empty();
+            return Optional.of(new DataField(String.valueOf(date), date.format(DateTimeFormatter.BASIC_ISO_DATE)));
         } else {
             if (dataField.getValue() == null)
                 return Optional.empty();
-            return Optional.ofNullable(dataField.getValue().toString());
+            String string = dataField.getValue().toString();
+            if (string == null)
+                return Optional.empty();
+            return Optional.of(new DataField(string));
         }
     }
 }
