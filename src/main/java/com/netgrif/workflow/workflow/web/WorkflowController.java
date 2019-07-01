@@ -91,7 +91,6 @@ public class WorkflowController {
         LoggedUser user =(LoggedUser) auth.getPrincipal();
         long start = System.currentTimeMillis();
         Page<Case> cases = elasticCaseService.search(searchBody, user, pageable);
-        log.error(""+(System.currentTimeMillis() - start));
 
         Link selfLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(WorkflowController.class)
                 .search(searchBody, pageable, assembler, auth, locale)).withRel("search");
