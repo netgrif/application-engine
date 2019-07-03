@@ -27,7 +27,7 @@ import static org.springframework.data.elasticsearch.annotations.FieldType.Keywo
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Document(indexName = "case", type = "case")
+@Document(indexName = "#{@elasticCaseIndex}", type = "case")
 public class ElasticCase {
 
     @Id
