@@ -20,7 +20,7 @@ import static org.springframework.data.elasticsearch.annotations.FieldType.Keywo
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Document(indexName = "task", type = "task")
+@Document(indexName = "#{@elasticTaskIndex}", type = "task")
 public class ElasticTask {
 
     @Id
