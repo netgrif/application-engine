@@ -98,10 +98,12 @@ public class DataService implements IDataService {
                 }
             }
         });
+
+        workflowService.save(useCase);
+
         LongStream.range(0L, dataSetFields.size())
                 .forEach(index -> dataSetFields.get((int) index).setOrder(index));
 
-        workflowService.save(useCase);
         return dataSetFields;
     }
 
