@@ -22,8 +22,6 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import static org.elasticsearch.index.query.QueryBuilders.*;
 
@@ -38,7 +36,8 @@ public class ElasticTaskService implements IElasticTaskService {
     @Autowired
     private ElasticsearchTemplate template;
 
-    private ExecutorService executor = Executors.newSingleThreadExecutor();
+    @Autowired
+    private Executors executors;
 
     private Map<String, Float> fullTextFieldMap = ImmutableMap.of(
             "title", 1f,
@@ -57,7 +56,7 @@ public class ElasticTaskService implements IElasticTaskService {
 
     @Override
     public void remove(String taskId) {
-        executor.submit(() -> {
+        executors.execute(taskId, () -> {
             repository.deleteById(taskId);
             log.info("[?]: Task \"" + taskId + "\" deleted");
         });
@@ -66,7 +65,7 @@ public class ElasticTaskService implements IElasticTaskService {
     @Async
     @Override
     public void index(Task task) {
-        executor.submit(() -> {
+        executors.execute(task.getStringId(), () -> {
             ElasticTask elasticTask = repository.findByStringId(task.getStringId());
 
             if (elasticTask == null ) {
@@ -77,7 +76,7 @@ public class ElasticTaskService implements IElasticTaskService {
 
             repository.save(elasticTask);
 
-            log.info("[" + task.getCaseId() + "]: Task \"" + task.getTitle() + "\" [" + task.getStringId() + "] indexed");
+            log.debug("[" + task.getCaseId() + "]: Task \"" + task.getTitle() + "\" [" + task.getStringId() + "] indexed");
         });
     }
 
