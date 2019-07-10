@@ -180,7 +180,7 @@ public class TaskController {
 //    }
 
     @PostMapping(value = "/count", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public CountResponse count(@RequestBody TaskSearchRequest query, Authentication auth, Locale locale){
+    public CountResponse count(@RequestBody TaskSearchRequest query, Authentication auth, Locale locale) {
         long count = searchService.count(query, (LoggedUser)auth.getPrincipal());
         return CountResponse.taskCount(count);
     }

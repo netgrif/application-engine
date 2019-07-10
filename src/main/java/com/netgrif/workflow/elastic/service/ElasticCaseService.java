@@ -20,13 +20,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
 import org.springframework.data.elasticsearch.core.query.SearchQuery;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 import static org.elasticsearch.index.query.QueryBuilders.*;
@@ -45,7 +42,8 @@ public class ElasticCaseService implements IElasticCaseService {
     @Autowired
     private ElasticsearchTemplate template;
 
-    private ExecutorService executor = Executors.newSingleThreadExecutor();
+    @Autowired
+    private Executors executors;
 
     private Map<String, Float> fullTextFieldMap = ImmutableMap.of(
             "title", 2f,
@@ -65,16 +63,15 @@ public class ElasticCaseService implements IElasticCaseService {
 
     @Override
     public void remove(String caseId) {
-        executor.execute(() -> {
+        executors.execute(caseId, () -> {
             repository.deleteById(caseId);
             log.info("[" + caseId + "]: Case \"" + caseId + "\" deleted");
         });
     }
 
-    @Async
     @Override
     public void index(ElasticCase useCase) {
-        executor.execute(() -> {
+        executors.execute(useCase.getStringId(), () -> {
             ElasticCase elasticCase = repository.findByStringId(useCase.getStringId());
             if (elasticCase == null) {
                 repository.save(useCase);
@@ -82,7 +79,7 @@ public class ElasticCaseService implements IElasticCaseService {
                 elasticCase.update(useCase);
                 repository.save(elasticCase);
             }
-            log.info("[" + useCase.getStringId() + "]: Case \"" + useCase.getTitle() + "\" indexed");
+            log.debug("[" + useCase.getStringId() + "]: Case \"" + useCase.getTitle() + "\" indexed");
         });
     }
 
