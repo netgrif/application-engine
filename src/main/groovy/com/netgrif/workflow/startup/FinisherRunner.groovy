@@ -1,5 +1,6 @@
 package com.netgrif.workflow.startup
 
+
 import com.netgrif.workflow.petrinet.service.PetriNetService
 import com.netgrif.workflow.workflow.domain.repositories.CaseRepository
 import org.slf4j.Logger
@@ -28,6 +29,6 @@ class FinisherRunner extends AbstractOrderedCommandLineRunner {
 
     @Override
     void run(String... strings) throws Exception {
-//        superCreator.setAllToSuperUser()
+        superCreator.setAllToSuperUser()
     }
 }
