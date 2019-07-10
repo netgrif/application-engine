@@ -39,13 +39,18 @@ public class ElasticController {
         try {
             LoggedUser user = (LoggedUser) auth.getPrincipal();
             long count = workflowService.count(searchBody, user, locale);
-            long numOfPages = (long) ((count / 100.0) + 1);
-            log.info("Processing cases: " + numOfPages + " pages");
 
-            for (int page = 0; page < numOfPages; page++) {
-                log.info("Indexing page " + (page + 1));
-                Page<Case> cases = workflowService.search(searchBody, PageRequest.of(page, 100), user, locale);
-                cases.forEach(aCase -> elasticCaseService.index(new ElasticCase(aCase)));
+            if (count == 0) {
+                log.info("No cases to reindex");
+            } else {
+                long numOfPages = (long) ((count / 100.0) + 1);
+                log.info("Reindexing cases: " + numOfPages + " pages");
+
+                for (int page = 0; page < numOfPages; page++) {
+                    log.info("Indexing page " + (page + 1));
+                    Page<Case> cases = workflowService.search(searchBody, PageRequest.of(page, 100), user, locale);
+                    cases.forEach(aCase -> elasticCaseService.index(new ElasticCase(aCase)));
+                }
             }
 
             return MessageResource.successMessage("Success");
