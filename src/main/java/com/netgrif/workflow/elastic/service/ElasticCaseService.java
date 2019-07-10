@@ -24,6 +24,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 import static org.elasticsearch.index.query.QueryBuilders.*;
@@ -42,8 +44,10 @@ public class ElasticCaseService implements IElasticCaseService {
     @Autowired
     private ElasticsearchTemplate template;
 
-    @Autowired
-    private Executors executors;
+//    @Autowired
+//    private Executors executors;
+
+    private ExecutorService executor = Executors.newSingleThreadExecutor();
 
     private Map<String, Float> fullTextFieldMap = ImmutableMap.of(
             "title", 2f,
@@ -63,7 +67,7 @@ public class ElasticCaseService implements IElasticCaseService {
 
     @Override
     public void remove(String caseId) {
-        executors.execute(caseId, () -> {
+        executor.execute(() -> {
             repository.deleteById(caseId);
             log.info("[" + caseId + "]: Case \"" + caseId + "\" deleted");
         });
@@ -71,7 +75,7 @@ public class ElasticCaseService implements IElasticCaseService {
 
     @Override
     public void index(ElasticCase useCase) {
-        executors.execute(useCase.getStringId(), () -> {
+        executor.execute(() -> {
             ElasticCase elasticCase = repository.findByStringId(useCase.getStringId());
             if (elasticCase == null) {
                 repository.save(useCase);
