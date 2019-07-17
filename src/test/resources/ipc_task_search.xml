@@ -13,6 +13,11 @@
         <title>one task</title>
         <init>0</init>
     </data>
+    <data type="number">
+        <id>paged</id>
+        <title>Paged</title>
+        <init>0</init>
+    </data>
     <transition>
         <id>task</id>
         <x>0</x>
@@ -32,6 +37,12 @@
                     def taskId = "work_task";
                     def task = findTask( { it.transitionId.eq(taskId) } );
                     change field about { return task.processId; };
+                </action>
+                <action>
+                    field: f.paged;
+                    def taskId = "work_task";
+                    def tasks = findTasks( { it.transitionId.eq(taskId) }, new org.springframework.data.domain.PageRequest(1, 4));
+                    change field value { return tasks.size(); };
                 </action>
             </actions>
         </event>

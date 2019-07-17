@@ -53,7 +53,7 @@ class TransitionRoleTest {
 
     @Test
     void testTaskExecution() {
-        template.db.dropDatabase()
+        template.db.drop()
         userRepository.deleteAll()
         roleRepository.deleteAll()
         roleRunner.run()

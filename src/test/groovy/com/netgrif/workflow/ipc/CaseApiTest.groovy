@@ -84,5 +84,7 @@ class CaseApiTest {
         cases = caseRepository.findAll()
         assert cases.find { it.title == "Case 1" }.dataSet["field"].value != 0
         assert cases.findAll { it.title != "Case 1" }.every { it.dataSet["field"].value == 0 }
+        assert cases.find {it.title == "Case 0"}.dataSet["count"].value == 5
+        assert cases.find {it.title == "Case 0"}.dataSet["paged"].value == 1
     }
 }
