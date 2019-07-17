@@ -71,5 +71,7 @@ public interface IPetriNetService {
         return new DataFieldReference(field.getStringId(), field.getName().getTranslation(locale), net.getStringId(), transition.getStringId());
     }
 
+    void evictCache();
+
     PetriNet clone(ObjectId petriNetId);
 }
