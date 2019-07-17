@@ -16,10 +16,7 @@
     <data type="text" immediate="true">
         <id>text_field</id>
         <title>Text</title>
-        <init>Example text</init>
-        <view>
-            <editor/>
-        </view>
+        <valid>email</valid>
     </data>
     <data type="text" immediate="true">
         <id>text_area_field</id>
