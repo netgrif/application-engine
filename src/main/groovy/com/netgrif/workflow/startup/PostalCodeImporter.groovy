@@ -3,7 +3,8 @@ package com.netgrif.workflow.startup
 import com.netgrif.workflow.business.IPostalCodeService
 import com.netgrif.workflow.business.PostalCode
 import com.netgrif.workflow.business.PostalCodeRepository
-import org.apache.log4j.Logger
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Profile
@@ -14,7 +15,7 @@ import org.springframework.stereotype.Component
 @Profile("!update")
 class PostalCodeImporter extends AbstractOrderedCommandLineRunner {
 
-    private static final Logger log = Logger.getLogger(PostalCodeImporter.class.name)
+    private static final Logger log = LoggerFactory.getLogger(PostalCodeImporter.class.name)
 
     @Value("\${postal.codes.csv}")
     String postalCodesPath
