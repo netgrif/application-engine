@@ -8,46 +8,51 @@ import lombok.NoArgsConstructor;
 import java.util.List;
 import java.util.Map;
 
-@Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ElasticSearchRequest {
+public class CaseSearchRequest {
 
     @JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
-    private List<PetriNet> petriNet;
+    public List<PetriNet> petriNet;
 
     @JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
-    private List<String> processIdentifier;
+    public List<String> processIdentifier;
 
     @JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
-    private List<String> title;
+    public List<String> title;
 
     @JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
-    private List<Author> author;
+    public List<Author> author;
 
-    private Map<String, String> data;
+    public Map<String, String> data;
 
-    private String fullText;
-
-    @JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
-    private List<String> task;
+    public String fullText;
 
     @JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
-    private List<String> role;
+    public List<String> transition;
+
+    @JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
+    public List<String> role;
+
+    public String query;
 
     @Data
-    public class PetriNet {
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class PetriNet {
 
-        String identifier;
+        public String identifier;
     }
 
     @Data
-    public class Author {
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Author {
 
-        Long id;
+        public Long id;
 
-        String name;
+        public String name;
 
-        String email;
+        public String email;
     }
 }

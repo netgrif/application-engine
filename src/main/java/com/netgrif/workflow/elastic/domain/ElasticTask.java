@@ -1,5 +1,9 @@
 package com.netgrif.workflow.elastic.domain;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.netgrif.workflow.workflow.domain.Task;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -16,11 +20,14 @@ import static org.springframework.data.elasticsearch.annotations.FieldType.Keywo
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Document(indexName = "task", type = "task")
+@Document(indexName = "#{@elasticTaskIndex}", type = "task")
 public class ElasticTask {
 
     @Id
     private String id;
+
+    @Field(type = Keyword)
+    private String stringId;
 
     @Field(type = Keyword)
     private String processId;
@@ -31,26 +38,52 @@ public class ElasticTask {
     @Field(type = Keyword)
     private String transitionId;
 
-    private String title;
+    private String title; //TODO: i18n
+
+    @Field(type = Keyword)
+    private String caseColor;
 
     private String caseTitle;
 
-    private Integer priority;
+    private int priority;
 
     private Long userId;
 
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     private LocalDateTime startDate;
 
+    @Field(type = Keyword)
+    private String transactionId;
+
+    @Field(type = Keyword)
     private Set<String> roles;
 
+    @Field(type = Keyword)
+    private String icon;
+
+    @Field(type = Keyword)
+    private String assignPolicy;
+
+    @Field(type = Keyword)
+    private String dataFocusPolicy;
+
+    @Field(type = Keyword)
+    private String finishPolicy;
+
     public ElasticTask(Task task) {
-        this.id = task.getStringId();
+        this.stringId = task.getStringId();
         this.processId = task.getProcessId();
         this.caseId = task.getCaseId();
         this.transitionId = task.getTransitionId();
+        update(task);
+    }
+
+    public void update(Task task) {
         this.title = task.getTitle().getDefaultValue();
         this.caseTitle = task.getCaseTitle();
-        this.priority = task.getPriority();
+        if (task.getPriority() != null)
+            this.priority = task.getPriority();
         this.userId = task.getUserId();
         this.startDate = task.getStartDate();
         this.roles = task.getRoles().keySet();
