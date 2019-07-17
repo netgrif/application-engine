@@ -55,8 +55,11 @@ class EncryptionTest {
         DataField field = useCase.dataSet.get(nameField.stringId)
         assert field.value == FIELD_VALUE
 
-        def rawCase = caseRepository.findOne(useCase.stringId)
-        DataField rawField = rawCase.dataSet.get(nameField.stringId)
+        def rawCaseOpt = caseRepository.findById(useCase.stringId)
+
+        assert rawCaseOpt.isPresent()
+
+        DataField rawField = rawCaseOpt.get().dataSet.get(nameField.stringId)
         assert rawField.value != FIELD_VALUE
     }
 
