@@ -2,7 +2,7 @@
 <document
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="petriflow_schema.xsd">
-    <id>1</id>
+    <id>insurance</id>
     <defaultRole>false</defaultRole>
     <caseName name="case_name">Nové poistenie</caseName>
     <!-- ========== GLOBAL ================ -->
