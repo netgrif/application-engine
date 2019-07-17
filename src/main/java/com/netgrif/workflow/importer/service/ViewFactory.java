@@ -18,6 +18,8 @@ public class ViewFactory {
             return buildListView(data);
         } else if (data.getView().getEditor() != null) {
             return new EditorView();
+        } else if (data.getView().getAutocomplete() != null) {
+            return new View("autocomplete");
         } else {
             throw new UnsupportedViewException();
         }

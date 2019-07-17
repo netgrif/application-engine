@@ -15,7 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 @ControllerAdvice
 public class ForwardConfiguration {
 
-    private static final Logger log = LoggerFactory.getLogger(SecurityConfiguration.class);
+    private static final Logger log = LoggerFactory.getLogger(SecurityConfigurationStaticEnabled.class);
 
     @RequestMapping(value = "/{path:[^api]*}")
     public String redirect(HttpServletRequest request) {
@@ -39,5 +39,4 @@ public class ForwardConfiguration {
         log.info("No requested mapping found. Forwarding to index");
         return "forward:/";
     }
-
 }
