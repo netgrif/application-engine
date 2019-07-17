@@ -9,7 +9,8 @@ import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.auth.web.requestbodies.NewUserRequest;
 import com.netgrif.workflow.auth.web.requestbodies.RegistrationRequest;
 import com.netgrif.workflow.orgstructure.service.IGroupService;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -27,7 +28,7 @@ import java.util.Objects;
 @Service
 public class RegistrationService implements IRegistrationService {
 
-    private static final Logger log = Logger.getLogger(RegistrationService.class.getName());
+    private static final Logger log = LoggerFactory.getLogger(RegistrationService.class.getName());
 
     @Autowired
     private UserRepository userRepository;
@@ -71,7 +72,7 @@ public class RegistrationService implements IRegistrationService {
             user.setToken(null);
             user.setExpirationDate(null);
         });
-        users = userRepository.save(users);
+        users = userRepository.saveAll(users);
         log.info("Reset " + users.size() + " expired user tokens");
     }
 

@@ -17,6 +17,7 @@ import javax.xml.bind.annotation.XmlType;
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
  *       &lt;choice&gt;
  *         &lt;element name="area" type="{http://www.w3.org/2001/XMLSchema}string"/&gt;
+ *         &lt;element name="autocomplete" type="{http://www.w3.org/2001/XMLSchema}string"/&gt;
  *         &lt;element name="image" type="{}booleanImageView"/&gt;
  *         &lt;element name="editor" type="{http://www.w3.org/2001/XMLSchema}anyType"/&gt;
  *         &lt;element name="list"&gt;
@@ -45,6 +46,7 @@ import javax.xml.bind.annotation.XmlType;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "fieldView", propOrder = {
     "area",
+    "autocomplete",
     "image",
     "editor",
     "list"
@@ -52,6 +54,7 @@ import javax.xml.bind.annotation.XmlType;
 public class FieldView {
 
     protected String area;
+    protected String autocomplete;
     protected BooleanImageView image;
     protected Object editor;
     protected String list;
@@ -78,6 +81,30 @@ public class FieldView {
      */
     public void setArea(String value) {
         this.area = value;
+    }
+
+    /**
+     * Gets the value of the autocomplete property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getAutocomplete() {
+        return autocomplete;
+    }
+
+    /**
+     * Sets the value of the autocomplete property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setAutocomplete(String value) {
+        this.autocomplete = value;
     }
 
     /**

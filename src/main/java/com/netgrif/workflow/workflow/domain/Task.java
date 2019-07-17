@@ -89,9 +89,15 @@ public class Task {
     @Getter @Setter
     private String transactionId;
 
+    /**
+     * transient
+     */
     @Getter @Setter
     private Boolean requiredFilled;
 
+    /**
+     * ???
+     */
     @Getter @Setter
     @JsonIgnore
     @Builder.Default
