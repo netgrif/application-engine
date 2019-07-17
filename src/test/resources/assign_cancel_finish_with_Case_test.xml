@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="../../main/resources/petriNets/petriflow_schema.xsd">
+    <id>assign_cancel_finish_with_Case_net</id>
+    <defaultRole>false</defaultRole>
+    <data type="number">
+        <id>field</id>
+        <title>Field</title>
+        <init>0</init>
+    </data>
+    <transition>
+        <id>task</id>
+        <x>0</x>
+        <y>0</y>
+        <label>Task</label>
+        <event type="assign">
+            <id>1</id>
+            <actions phase="post">
+                <action>
+                    def c = createCase("assign_cancel_finish_with_Case_net","Case 2");
+
+                    assignTask("task2", c);
+                    cancelTask("task2", c);
+                    assignTask("task2", c);
+                    finishTask("task2", c);
+                </action>
+            </actions>
+        </event>
+    </transition>
+    <transition>
+        <id>task2</id>
+        <x>0</x>
+        <y>0</y>
+        <label>Task2</label>
+        <event type="finish">
+            <id>1</id>
+            <actions phase="post">
+                <action>
+                    <!-- @formatter:off -->
+                    field: f.field;
+                    change field value {return 1}
+                    <!-- @formatter:on -->
+                </action>
+            </actions>
+        </event>
+    </transition>
+</document>

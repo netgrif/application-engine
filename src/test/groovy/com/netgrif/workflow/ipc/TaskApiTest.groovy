@@ -86,6 +86,7 @@ class TaskApiTest {
 
         assert useCase.dataSet["field"].value == 6
         assert useCase.dataSet["task_one"].value == net.stringId
+        assert useCase.dataSet["paged"].value == 2
     }
 
     public static final String TASK_EVENTS_NET_FILE = "task_events.xml"

@@ -41,7 +41,9 @@ public interface ITaskService {
 
     Page<Task> searchAll(com.querydsl.core.types.Predicate predicate);
 
-    Task searchOne(com.querydsl.core.types.Predicate predicate);
+	Page<Task> search(com.querydsl.core.types.Predicate predicate, Pageable pageable);
+
+	Task searchOne(com.querydsl.core.types.Predicate predicate);
 
     @Transactional(rollbackFor = Exception.class)
     void finishTasks(List<Task> tasks, User user) throws TransitionNotExecutableException;
