@@ -15,6 +15,6 @@ public class TaskResourceAssembler implements ResourceAssembler<Task, LocalisedT
 
     @Override
     public LocalisedTaskResource toResource(com.netgrif.workflow.workflow.domain.Task task) {
-        return new LocalisedTaskResource(new LocalisedTask(task, locale));
+        return new LocalisedTaskResource(new com.netgrif.workflow.workflow.web.responsebodies.Task(task, locale));
     }
 }
