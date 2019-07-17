@@ -1,15 +1,13 @@
 package com.netgrif.workflow.business.qr;
 
 import com.google.zxing.BarcodeFormat;
-import com.google.zxing.EncodeHintType;
 import com.google.zxing.WriterException;
 import com.google.zxing.client.j2se.MatrixToImageConfig;
 import com.google.zxing.client.j2se.MatrixToImageWriter;
 import com.google.zxing.common.BitMatrix;
-import com.google.zxing.qrcode.QRCodeWriter;
-import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
 import net.glxn.qrgen.javase.QRCode;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.imageio.ImageIO;
@@ -19,15 +17,12 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
-import java.util.Random;
 
 @Service
 public class QrService implements IQrService {
 
-    private static Logger log = Logger.getLogger(QrService.class);
+    private static Logger log = LoggerFactory.getLogger(QrService.class);
 
     @Override
     public Optional<InputStream> generateToStream(QrCode code) {
@@ -76,7 +71,7 @@ public class QrService implements IQrService {
             g.drawImage(overly, Math.round(deltaWidth / 2), Math.round(deltaHeight / 2), null);
 
             ImageIO.write(combined, "png", os);
-            Files.copy( new ByteArrayInputStream(os.toByteArray()), Paths.get(code.getFileName()), StandardCopyOption.REPLACE_EXISTING);
+            Files.copy(new ByteArrayInputStream(os.toByteArray()), Paths.get(code.getFileName()), StandardCopyOption.REPLACE_EXISTING);
 
             return Optional.of(new File(code.getFileName()));
         } catch (WriterException | IOException e) {
