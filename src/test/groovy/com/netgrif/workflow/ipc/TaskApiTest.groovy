@@ -79,7 +79,10 @@ class TaskApiTest {
         helper.assignTaskToSuper(TASK_EVENTS_TASK, useCase.stringId)
         helper.finishTaskAsSuper(TASK_EVENTS_TASK, useCase.stringId)
 
-        useCase = caseRepository.findOne(useCase.stringId)
+        def caseOpt = caseRepository.findById(useCase.stringId)
+
+        assert caseOpt.isPresent()
+        useCase = caseOpt.get()
 
         assert useCase.dataSet["field"].value == 6
         assert useCase.dataSet["task_one"].value == net.stringId
@@ -146,9 +149,16 @@ class TaskApiTest {
         ])
         helper.finishTaskAsSuper(LEASING_NET_TASK_EDIT_COST, leasing1.stringId)
 
-        limits = caseRepository.findOne(limits.stringId)
-        leasing1 = caseRepository.findOne(leasing1.stringId)
-        leasing2 = caseRepository.findOne(leasing2.stringId)
+        def limitsOpt = caseRepository.findById(limits.stringId)
+        def leasing1Opt = caseRepository.findById(leasing1.stringId)
+        def leasing2Opt = caseRepository.findById(leasing2.stringId)
+
+        assert limitsOpt.isPresent()
+        assert leasing1Opt.isPresent()
+        assert leasing2Opt.isPresent()
+        limits = limitsOpt.get()
+        leasing1 = leasing1Opt.get()
+        leasing2 = leasing2Opt.get()
 
 //@formatter:off
         assert limits.dataSet["limit"].value as Double  == 970_000 as Double
@@ -167,9 +177,16 @@ class TaskApiTest {
         ])
         helper.finishTaskAsSuper(LEASING_NET_TASK_EDIT_COST, leasing2.stringId)
 
-        limits = caseRepository.findOne(limits.stringId)
-        leasing1 = caseRepository.findOne(leasing1.stringId)
-        leasing2 = caseRepository.findOne(leasing2.stringId)
+        limitsOpt = caseRepository.findById(limits.stringId)
+        leasing1Opt = caseRepository.findById(leasing1.stringId)
+        leasing2Opt = caseRepository.findById(leasing2.stringId)
+
+        assert limitsOpt.isPresent()
+        assert leasing1Opt.isPresent()
+        assert leasing2Opt.isPresent()
+        limits = limitsOpt.get()
+        leasing1 = leasing1Opt.get()
+        leasing2 = leasing2Opt.get()
 
 //@formatter:off
         assert limits.dataSet["limit"].value as Double  == 950_000 as Double
@@ -232,7 +249,10 @@ class TaskApiTest {
         Case control = helper.createCase("Control case", net)
         helper.assignTaskToSuper(TASK_GETTER_TASK, control.stringId)
 
-        control = caseRepository.findOne(control.stringId)
+        def controlOpt = caseRepository.findById(control.stringId)
+
+        assert controlOpt.isPresent()
+        control = controlOpt.get()
         assert control.dataSet[DATA_TEXT].value == "text"
         assert control.dataSet[DATA_NUMBER].value == 13
     }
@@ -253,7 +273,10 @@ class TaskApiTest {
         def case1 = helper.createCase("Case 1", net)
 
         helper.assignTaskToSuper(TASK_SETTER_TASK, control.stringId)
-        case1 = caseRepository.findOne(case1.stringId)
+        def case1Opt = caseRepository.findById(case1.stringId)
+
+        assert case1Opt.isPresent()
+        case1 = case1Opt.get()
         assert case1.dataSet[DATA_TEXT].value == "some text"
         assert case1.dataSet[DATA_NUMBER].value == 10
     }

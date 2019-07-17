@@ -75,6 +75,9 @@ public class Case {
     @JsonIgnore
     private LinkedHashMap<String, DataField> dataSet;
 
+    /**
+     * List of data fields importIds
+     */
     @Getter
     @Setter
     @JsonIgnore
@@ -90,15 +93,24 @@ public class Case {
     @Indexed
     private Author author;
 
+    /**
+     * TODO: reset = variable
+     */
     @Getter
     @Setter
     private Map<String, Integer> resetArcTokens;
 
+    /**
+     * TODO: Indexed?
+     */
     @Getter
     @Setter
     @JsonIgnore
     private Set<TaskPair> tasks;
 
+    /**
+     * TODO: Indexed?
+     */
     @Getter
     @Setter
     @JsonIgnore
