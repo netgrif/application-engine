@@ -3,7 +3,7 @@ package com.netgrif.workflow.workflow.web;
 import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.elastic.domain.ElasticCase;
 import com.netgrif.workflow.elastic.service.IElasticCaseService;
-import com.netgrif.workflow.elastic.web.ElasticSearchRequest;
+import com.netgrif.workflow.elastic.web.CaseSearchRequest;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.service.FileFieldInputStream;
 import com.netgrif.workflow.workflow.service.interfaces.IDataService;
@@ -34,7 +34,10 @@ import java.io.FileNotFoundException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
 
 @RestController()
 @RequestMapping("/api/workflow")
@@ -84,20 +87,22 @@ public class WorkflowController {
     }
 
     @PostMapping(value = "/case/search", produces = MediaTypes.HAL_JSON_VALUE)
-    public PagedResources<ElasticCaseResource> search(@RequestBody ElasticSearchRequest searchBody, Pageable pageable, PagedResourcesAssembler<ElasticCase> assembler, Authentication auth, Locale locale) {
-        Page<ElasticCase> cases = elasticCaseService.search(searchBody, (LoggedUser) auth.getPrincipal(), pageable);
+    public PagedResources<CaseResource> search(@RequestBody CaseSearchRequest searchBody, Pageable pageable, PagedResourcesAssembler<Case> assembler, Authentication auth, Locale locale) {
+        LoggedUser user =(LoggedUser) auth.getPrincipal();
+        long start = System.currentTimeMillis();
+        Page<Case> cases = elasticCaseService.search(searchBody, user, pageable);
 
         Link selfLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(WorkflowController.class)
                 .search(searchBody, pageable, assembler, auth, locale)).withRel("search");
 
-        PagedResources<ElasticCaseResource> resources = assembler.toResource(cases, new ElasticCaseResourceAssembler(), selfLink);
+        PagedResources<CaseResource> resources = assembler.toResource(cases, new CaseResourceAssembler(), selfLink);
         ResourceLinkAssembler.addLinks(resources, ElasticCase.class, selfLink.getRel());
         return resources;
     }
 
     @PostMapping(value = "/case/count", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public CountResponse count(@RequestBody Map<String, Object> query, Authentication auth, Locale locale) {
-        long count = workflowService.count(query, (LoggedUser) auth.getPrincipal(), locale);
+    public CountResponse count(@RequestBody CaseSearchRequest query, Authentication auth) {
+        long count = elasticCaseService.count(query, (LoggedUser) auth.getPrincipal());
         return CountResponse.caseCount(count);
     }
 
