@@ -32,6 +32,8 @@ public class LocalisedField {
 
     private View view;
 
+    private Integer length;
+
     public LocalisedField() {
     }
 
@@ -46,5 +48,6 @@ public class LocalisedField {
         order = field.getOrder();
         formatFilter = field.getFormat();
         view = field.getView();
+        length = field.getLength();
     }
 }

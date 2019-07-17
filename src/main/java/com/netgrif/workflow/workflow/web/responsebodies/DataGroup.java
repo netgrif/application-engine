@@ -1,11 +1,9 @@
 package com.netgrif.workflow.workflow.web.responsebodies;
 
-import com.fasterxml.jackson.annotation.JsonRootName;
 import lombok.Data;
 
 @Data
-@JsonRootName("dataGroup")
-public class LocalisedDataGroup {
+public class DataGroup {
 
     private DataFieldsResource fields;
 
@@ -15,10 +13,10 @@ public class LocalisedDataGroup {
 
     private Boolean stretch;
 
-    private LocalisedDataGroup() {
+    private DataGroup() {
     }
 
-    public LocalisedDataGroup(DataFieldsResource fields, String title, String alignment, Boolean stretch) {
+    public DataGroup(DataFieldsResource fields, String title, String alignment, Boolean stretch) {
         this();
         this.fields = fields;
         this.title = title;

@@ -1,7 +1,6 @@
 package com.netgrif.workflow.auth.web.responsebodies;
 
 
-import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.auth.web.UserController;
 import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.mvc.ControllerLinkBuilder;
@@ -9,14 +8,14 @@ import org.springframework.hateoas.mvc.ControllerLinkBuilder;
 import java.util.ArrayList;
 import java.util.Locale;
 
-public class UserResource extends Resource<LocalisedUser> {
+public class UserResource extends Resource<User> {
 
-    public UserResource(User content, String selfRel, Locale locale) {
-        super(new LocalisedUser(content, locale), new ArrayList<>());
+    public UserResource(com.netgrif.workflow.auth.domain.User content, String selfRel, Locale locale) {
+        super(new User(content, locale), new ArrayList<>());
         buildLinks(selfRel);
     }
 
-    public UserResource(User content, String selfRel, Locale locale, boolean small) {
+    public UserResource(com.netgrif.workflow.auth.domain.User content, String selfRel, Locale locale, boolean small) {
         this(content, selfRel, locale);
         getContent().setPassword(null);
         if (small) {

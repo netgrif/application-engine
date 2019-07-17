@@ -47,6 +47,8 @@ abstract class Field<T> extends Imported {
 
     private View view
 
+    private Integer length
+
     Field() {
         _id = new ObjectId()
     }
@@ -200,6 +202,14 @@ abstract class Field<T> extends Imported {
         this.view = view
     }
 
+    Integer getLength() {
+        return length
+    }
+
+    void setLength(Integer length) {
+        this.length = length
+    }
+
     @Override
     String toString() {
         return name.defaultValue
@@ -223,6 +233,7 @@ abstract class Field<T> extends Imported {
         clone.encryption = this.encryption
         clone.view = this.view
         clone.format = this.format
+        clone.length = this.length
     }
 
     abstract Field clone()
