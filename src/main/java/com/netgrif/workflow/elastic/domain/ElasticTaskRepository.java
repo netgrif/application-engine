@@ -5,4 +5,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ElasticTaskRepository extends ElasticsearchRepository<ElasticTask, String> {
+
+    ElasticTask findByStringId(String stringId);
 }

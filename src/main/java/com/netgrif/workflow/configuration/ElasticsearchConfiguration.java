@@ -27,6 +27,22 @@ public class ElasticsearchConfiguration {
     @Value("${spring.data.elasticsearch.port:9300}")
     private int port;
 
+    @Value("${spring.data.elasticsearch.index.case}")
+    private String caseIndex;
+
+    @Value("${spring.data.elasticsearch.index.task}")
+    private String taskIndex;
+
+    @Bean
+    public String elasticCaseIndex() {
+        return caseIndex;
+    }
+
+    @Bean
+    public String elasticTaskIndex() {
+        return taskIndex;
+    }
+
     @Bean
     public Client client() throws UnknownHostException {
         Settings elasticsearchSettings = Settings.builder()
