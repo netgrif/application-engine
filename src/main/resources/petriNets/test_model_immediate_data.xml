@@ -17,8 +17,7 @@
     <data type="text" immediate="true">
         <id>text_field</id>
         <title>Text</title>
-        <init>Example text</init>
-        <length>5</length>
+        <valid>email</valid>
     </data>
     <data type="text" immediate="true">
         <id>text_area_field</id>
@@ -58,14 +57,6 @@
     <data type="enumeration" immediate="true">
         <id>enumeration_field</id>
         <title>Enumeration</title>
-        <values>Value 1</values>
-        <values>Value 2</values>
-        <values>Value 3</values>
-        <init>Value 1</init>
-    </data>
-    <data type="enumeration" immediate="true">
-        <id>enumeration_field_old</id>
-        <title>Enumeration</title>
         <placeholder>WTF</placeholder>
         <values>Alfa</values>
         <values>Bravo</values>
@@ -93,6 +84,9 @@
         <values>X-ray</values>
         <values>Yankee</values>
         <values>Zulu</values>
+        <view>
+            <autocomplete/>
+        </view>
     </data>
     <data type="multichoice" immediate="true">
         <id>multichoice_field</id>
