@@ -343,8 +343,8 @@ class ActionDelegate {
         return workflowService.createCase(net.stringId, title, color, author.transformToLoggedUser())
     }
 
-    Task assignTask(String transitionId, User user = userService.loggedOrSystem) {
-        String taskId = getTaskId(transitionId)
+    Task assignTask(String transitionId, Case aCase = useCase, User user = userService.loggedOrSystem) {
+        String taskId = getTaskId(transitionId, aCase)
         taskService.assignTask(user.transformToLoggedUser(), taskId)
         return taskService.findOne(taskId)
     }
@@ -358,8 +358,8 @@ class ActionDelegate {
         taskService.assignTasks(tasks, assignee)
     }
 
-    void cancelTask(String transitionId, User user = userService.loggedOrSystem) {
-        String taskId = getTaskId(transitionId)
+    void cancelTask(String transitionId, Case aCase = useCase, User user = userService.loggedOrSystem) {
+        String taskId = getTaskId(transitionId, aCase)
         taskService.cancelTask(user.transformToLoggedUser(), taskId)
     }
 
@@ -371,8 +371,8 @@ class ActionDelegate {
         taskService.cancelTasks(tasks, user)
     }
 
-    void finishTask(String transitionId, User user = userService.loggedOrSystem) {
-        String taskId = getTaskId(transitionId)
+    void finishTask(String transitionId, Case aCase = useCase, User user = userService.loggedOrSystem) {
+        String taskId = getTaskId(transitionId, aCase)
         taskService.finishTask(user.transformToLoggedUser(), taskId)
     }
 
@@ -401,8 +401,8 @@ class ActionDelegate {
         return taskService.searchOne(predicate(qTask))
     }
 
-    String getTaskId(String transitionId) {
-        List<TaskReference> refs = taskService.findAllByCase(useCase.stringId, null)
+    String getTaskId(String transitionId, Case aCase = useCase) {
+        List<TaskReference> refs = taskService.findAllByCase(aCase.stringId, null)
         refs.find { it.transitionId == transitionId }.stringId
     }
 
