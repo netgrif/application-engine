@@ -31,6 +31,7 @@
                 <xs:element ref="actionRef" minOccurs="0" maxOccurs="unbounded"/>
                 <xs:element ref="documentRef" minOccurs="0"/>
                 <xs:element ref="remote" minOccurs="0"/>
+                <xs:element ref="length" minOccurs="0"/>
             </xs:sequence>
             <xs:attribute type="data_type" name="type" use="required"/>
             <xs:attribute type="xs:boolean" name="immediate"/>
@@ -457,7 +458,9 @@
         <xs:choice>
             <xs:element name="area" type="xs:string"/>
             <xs:element name="autocomplete" type="xs:string"/>
+            <xs:element name="tree" type="xs:string"/>
             <xs:element name="image" type="booleanImageView"/>
+            <xs:element name="editor"/>
             <xs:element name="list">
                 <xs:simpleType>
                     <xs:union>
@@ -496,6 +499,7 @@
             </xs:sequence>
         </xs:complexType>
     </xs:element>
+    <xs:element name="length" type="xs:int"/>
     <!-- ISO 4217 currency code -->
     <xs:element name="code" type="xs:string" default="EUR"/>
     <xs:element name="fractionSize" type="xs:int" default="2"/>

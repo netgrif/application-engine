@@ -26,8 +26,10 @@ import com.netgrif.workflow.workflow.service.interfaces.IDataService;
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
 import com.netgrif.workflow.workflow.web.responsebodies.TaskReference;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -49,7 +51,7 @@ import java.util.stream.Stream;
 @Service
 public class TaskService implements ITaskService {
 
-    private static final Logger log = Logger.getLogger(TaskService.class);
+    private static final Logger log = LoggerFactory.getLogger(TaskService.class);
 
     @Autowired
     private ApplicationEventPublisher publisher;
@@ -67,6 +69,7 @@ public class TaskService implements ITaskService {
     private TaskSearchService searchService;
 
     @Autowired
+    @Qualifier("taskScheduler")
     private TaskScheduler scheduler;
 
     @Autowired
@@ -89,9 +92,12 @@ public class TaskService implements ITaskService {
     @Override
     @Transactional
     public EventOutcome assignTask(LoggedUser loggedUser, String taskId) throws TransitionNotExecutableException {
-        Task task = taskRepository.findOne(taskId);
+        Optional<Task> taskOptional = taskRepository.findById(taskId);
+        if (!taskOptional.isPresent())
+            throw new IllegalArgumentException("Could not find task with id ["+taskId+"]");
+
         User user = userService.findById(loggedUser.getId(), true);
-        return assignTask(task, user);
+        return assignTask(taskOptional.get(), user);
     }
 
     @Override
@@ -150,11 +156,13 @@ public class TaskService implements ITaskService {
     @Override
     @Transactional
     public EventOutcome finishTask(LoggedUser loggedUser, String taskId) throws IllegalArgumentException, TransitionNotExecutableException {
-        Task task = taskRepository.findOne(taskId);
+        Optional<Task> taskOptional = taskRepository.findById(taskId);
+        if (!taskOptional.isPresent())
+            throw new IllegalArgumentException("Could not find task with id ["+taskId+"]");
+        Task task = taskOptional.get();
         User user = userService.findById(loggedUser.getId(), true);
-        if (task == null) {
-            throw new IllegalArgumentException("Could not find task with id=" + taskId);
-        } else if (task.getUserId() == null) {
+
+        if (task.getUserId() == null) {
             throw new IllegalArgumentException("Task with id=" + taskId + " is not assigned to any user.");
         }
         // TODO: 14. 4. 2017 replace with @PreAuthorize
@@ -203,9 +211,12 @@ public class TaskService implements ITaskService {
     @Override
     @Transactional
     public EventOutcome cancelTask(LoggedUser loggedUser, String taskId) {
-        Task task = taskRepository.findOne(taskId);
+        Optional<Task> taskOptional = taskRepository.findById(taskId);
+        if (!taskOptional.isPresent())
+            throw new IllegalArgumentException("Could not find task with id ["+taskId+"]");
+
         User user = userService.findById(loggedUser.getId(), true);
-        return cancelTask(task, user);
+        return cancelTask(taskOptional.get(), user);
     }
 
     @Override
@@ -274,7 +285,11 @@ public class TaskService implements ITaskService {
     public EventOutcome delegateTask(LoggedUser loggedUser, Long delegatedId, String taskId) throws TransitionNotExecutableException {
         User delegatedUser = userService.findById(delegatedId, true);
         User delegateUser = userService.findById(loggedUser.getId(), true);
-        Task task = taskRepository.findOne(taskId);
+        Optional<Task> taskOptional = taskRepository.findById(taskId);
+        if (!taskOptional.isPresent())
+            throw new IllegalArgumentException("Could not find task with id ["+taskId+"]");
+        Task task = taskOptional.get();
+
         Case useCase = workflowService.findOne(task.getCaseId());
         Transition transition = useCase.getPetriNet().getTransition(task.getTransitionId());
         EventOutcome outcome = new EventOutcome(transition.getDelegateMessage());
@@ -458,7 +473,10 @@ public class TaskService implements ITaskService {
 
     @Override
     public Task findOne(String taskId) {
-        return taskRepository.findOne(taskId);
+        Optional<Task> optionalTask = taskRepository.findById(taskId);
+        if (!optionalTask.isPresent())
+            throw new IllegalArgumentException("Could not find task with id ["+taskId+"]");
+        return optionalTask.get();
     }
 
     @Override
@@ -524,7 +542,10 @@ public class TaskService implements ITaskService {
 
     @Override
     public Task findById(String id) {
-        Task task = taskRepository.findOne(id);
+        Optional<Task> taskOptional = taskRepository.findById(id);
+        if (!taskOptional.isPresent())
+            throw new IllegalArgumentException("Could not find task with id ["+id+"]");
+        Task task = taskOptional.get();
         if (task.getUserId() != null)
             task.setUser(userService.findById(task.getUserId(), true));
         return task;
@@ -653,13 +674,13 @@ public class TaskService implements ITaskService {
     @Override
     public void delete(Iterable<? extends Task> tasks, Case useCase) {
         workflowService.removeTasksFromCase(tasks, useCase);
-        taskRepository.delete(tasks);
+        taskRepository.deleteAll(tasks);
     }
 
     @Override
     public void delete(Iterable<? extends Task> tasks, String caseId) {
         workflowService.removeTasksFromCase(tasks, caseId);
-        taskRepository.delete(tasks);
+        taskRepository.deleteAll(tasks);
     }
 
     @Override
