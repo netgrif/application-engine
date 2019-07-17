@@ -8,6 +8,16 @@
         <title>Field</title>
         <init>0</init>
     </data>
+    <data type="number">
+        <id>count</id>
+        <title>Count</title>
+        <init>0</init>
+    </data>
+    <data type="number">
+        <id>paged</id>
+        <title>Paged</title>
+        <init>0</init>
+    </data>
     <transition>
         <id>task</id>
         <x>0</x>
@@ -33,9 +43,27 @@
                     <!-- @formatter:off -->
                     field: f.field;
                     change field about {
-                        findCase({it.title.eq("Case 1")});
-                        return 0 as Double;
+                    findCase({it.title.eq("Case 1")});
+                    return 0 as Double;
                     }
+                    <!-- @formatter:on -->
+                </action>
+                <action>
+                    <!-- @formatter:off -->
+                    field: f.count;
+
+                    def cases = findCases({it.title.startsWith("Case ")});
+
+                    change field value { return cases.size(); }
+                    <!-- @formatter:on -->
+                </action>
+                <action>
+                    <!-- @formatter:off -->
+                    field: f.paged;
+
+                    def cases = findCases({it.title.startsWith("Case ")}, new org.springframework.data.domain.PageRequest(1, 4));
+
+                    change field value { return cases.size(); }
                     <!-- @formatter:on -->
                 </action>
             </actions>
