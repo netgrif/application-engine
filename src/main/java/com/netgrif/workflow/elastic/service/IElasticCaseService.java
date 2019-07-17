@@ -2,7 +2,7 @@ package com.netgrif.workflow.elastic.service;
 
 import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.elastic.domain.ElasticCase;
-import com.netgrif.workflow.elastic.web.ElasticSearchRequest;
+import com.netgrif.workflow.elastic.web.CaseSearchRequest;
 import com.netgrif.workflow.workflow.domain.Case;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -13,13 +13,15 @@ import java.util.Map;
 public interface IElasticCaseService {
 
     @Async
-    void index(Case useCase);
+    void index(ElasticCase useCase);
 
-    void indexNow(Case useCase);
+    void indexNow(ElasticCase useCase);
 
-    Page<ElasticCase> search(ElasticSearchRequest request, LoggedUser user, Pageable pageable);
+    Page<Case> search(CaseSearchRequest request, LoggedUser user, Pageable pageable);
 
-    long count(ElasticSearchRequest request, LoggedUser user);
+    long count(CaseSearchRequest request, LoggedUser user);
 
     Map<String, Float> fullTextFields();
+
+    void remove(String caseId);
 }

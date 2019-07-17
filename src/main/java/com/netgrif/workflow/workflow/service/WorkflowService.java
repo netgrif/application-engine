@@ -94,6 +94,15 @@ public class WorkflowService implements IWorkflowService {
     }
 
     @Override
+    public List<Case> findAllById(List<String> ids) {
+        List<Case> page = repository.findAllBy_idIn(ids);
+        page.forEach(this::setPetriNet);
+        decryptDataSets(page);
+        page.forEach(this::setImmediateDataFields);
+        return page;
+    }
+
+    @Override
     public Page<Case> getAll(Pageable pageable) {
         Page<Case> page = repository.findAll(pageable);
         page.getContent().forEach(this::setPetriNet);
