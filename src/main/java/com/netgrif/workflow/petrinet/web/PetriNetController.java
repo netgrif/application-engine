@@ -9,7 +9,8 @@ import com.netgrif.workflow.petrinet.service.interfaces.IProcessRoleService;
 import com.netgrif.workflow.petrinet.web.requestbodies.UploadedFileMeta;
 import com.netgrif.workflow.petrinet.web.responsebodies.*;
 import com.netgrif.workflow.workflow.web.responsebodies.MessageResource;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.data.domain.Page;
@@ -44,7 +45,7 @@ import static org.springframework.web.bind.annotation.RequestMethod.POST;
 @RequestMapping("/api/petrinet")
 public class PetriNetController {
 
-    private static final Logger log = Logger.getLogger(PetriNetController.class);
+    private static final Logger log = LoggerFactory.getLogger(PetriNetController.class);
 
     @Autowired
     private IPetriNetService service;
@@ -123,9 +124,9 @@ public class PetriNetController {
 
     @RequestMapping(value = "/{netId}/roles", method = GET)
     public @ResponseBody
-    LocalisedRolesResource getRoles(@PathVariable("netId") String netId, Locale locale) {
+    ProcessRolesResource getRoles(@PathVariable("netId") String netId, Locale locale) {
         netId = decodeUrl(netId);
-        return new LocalisedRolesResource(roleService.findAll(netId), netId, locale);
+        return new ProcessRolesResource(roleService.findAll(netId), netId, locale);
     }
 
     @RequestMapping(value = "/{netId}/transactions", method = GET)

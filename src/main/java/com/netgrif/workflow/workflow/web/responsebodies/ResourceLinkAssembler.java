@@ -47,7 +47,7 @@ public class ResourceLinkAssembler {
                     .search(null, null, null, null, null)).withRel("search"));
         if (!selfRel.equalsIgnoreCase("count"))
             pagedResources.add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(WorkflowController.class)
-                    .count(null, null, null)).withRel("count"));
+                    .count(null, null)).withRel("count"));
         if (!selfRel.equalsIgnoreCase("author"))
             pagedResources.add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(WorkflowController.class)
                     .findAllByAuthor(0L, "", null, null)).withRel("author"));
