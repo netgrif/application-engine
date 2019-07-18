@@ -209,10 +209,10 @@ public class ElasticCaseService implements IElasticCaseService {
                 authorQuery.must(termQuery("authorEmail", author.email));
             }
             if (author.id != null) {
-                authorQuery.must(matchQuery("authorName", author.id));
+                authorQuery.must(matchQuery("author", author.id));
             }
             if (author.name != null) {
-                authorQuery.must(termQuery("author", author.name));
+                authorQuery.must(termQuery("authorName", author.name));
             }
             authorsQuery.should(authorQuery);
         }
