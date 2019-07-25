@@ -135,5 +135,11 @@
                 <behavior>editable</behavior>
             </logic>
         </dataRef>
+        <dataRef>
+            <id>dateTime</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
     </transition>
 </document>
