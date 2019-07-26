@@ -7,10 +7,8 @@ import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Predicate;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class TaskSearchService extends MongoSearchService<Task> {
@@ -52,11 +50,9 @@ public class TaskSearchService extends MongoSearchService<Task> {
     }
 
     public Predicate role(Object query) {
-        if (query instanceof ArrayList) {
-            BooleanBuilder builder = new BooleanBuilder();
-            ((ArrayList<String>) query).stream().map(this::roleString).forEach(builder::or);
-            return builder;
-        } else if (query instanceof String)
+        if (query instanceof ArrayList)
+            return constructOrPredicateTree(((ArrayList<String>) query).stream().map(this::roleString).collect(Collectors.toList()));
+        else if (query instanceof String)
             return roleString((String) query);
 
         return null;
@@ -89,14 +85,12 @@ public class TaskSearchService extends MongoSearchService<Task> {
     }
 
     private Predicate caseArray(ArrayList<String> query, String key) {
-        BooleanBuilder builder = new BooleanBuilder();
-        query.stream().map(q -> {
+        return constructOrPredicateTree(query.stream().map(q -> {
             if (key.equalsIgnoreCase(TITLE))
                 return caseTitle(q);
             else
                 return caseId(q);
-        }).forEach(builder::or);
-        return builder;
+        }).collect(Collectors.toList()));
     }
 
     private Predicate caseId(String caseId) {
@@ -108,11 +102,9 @@ public class TaskSearchService extends MongoSearchService<Task> {
     }
 
     public Predicate title(Object query) {
-        if (query instanceof ArrayList) {
-            BooleanBuilder builder = new BooleanBuilder();
-            ((ArrayList<String>) query).stream().map(this::titleString).forEach(builder::or);
-            return builder;
-        } else if (query instanceof String)
+        if (query instanceof ArrayList)
+            constructOrPredicateTree(((ArrayList<String>) query).stream().map(this::titleString).collect(Collectors.toList()));
+        else if (query instanceof String)
             return titleString((String) query);
 
         return null;
@@ -123,11 +115,9 @@ public class TaskSearchService extends MongoSearchService<Task> {
     }
 
     public Predicate user(Object query) {
-        if (query instanceof ArrayList) {
-            BooleanBuilder builder = new BooleanBuilder();
-            ((ArrayList<Number>) query).stream().map(this::userLong).forEach(builder::or);
-            return builder;
-        } else if (query instanceof Integer)
+        if (query instanceof ArrayList)
+            constructOrPredicateTree(((ArrayList<Number>) query).stream().map(this::userLong).collect(Collectors.toList()));
+        else if (query instanceof Integer)
             return userLong(Long.valueOf(((Integer) query).longValue()));
         else if (query instanceof Long)
             return userLong((Long) query);
@@ -158,11 +148,9 @@ public class TaskSearchService extends MongoSearchService<Task> {
     }
 
     public Predicate transition(Object query) {
-        if (query instanceof ArrayList) {
-            BooleanBuilder builder = new BooleanBuilder();
-            ((ArrayList<String>) query).stream().map(this::transitionString).forEach(builder::or);
-            return builder;
-        } else if (query instanceof String)
+        if (query instanceof ArrayList)
+            constructOrPredicateTree(((ArrayList<String>) query).stream().map(this::transitionString).collect(Collectors.toList()));
+        else if (query instanceof String)
             return transitionString((String) query);
 
         return null;
@@ -173,11 +161,9 @@ public class TaskSearchService extends MongoSearchService<Task> {
     }
 
     public Predicate process(Object query) {
-        if (query instanceof ArrayList) {
-            BooleanBuilder builder = new BooleanBuilder();
-            ((ArrayList<String>) query).stream().map(this::processString).forEach(builder::or);
-            return builder;
-        } else if (query instanceof String)
+        if (query instanceof ArrayList)
+            constructOrPredicateTree(((ArrayList<String>) query).stream().map(this::processString).collect(Collectors.toList()));
+        else if (query instanceof String)
             return processString((String) query);
 
         return null;
@@ -192,5 +178,15 @@ public class TaskSearchService extends MongoSearchService<Task> {
         builder.or(QTask.task.title.defaultValue.containsIgnoreCase(query));
         builder.or(QTask.task.caseTitle.containsIgnoreCase(query));
         return builder;
+    }
+
+    private Predicate constructOrPredicateTree(List<Predicate> elementaryPredicates) {
+        if(elementaryPredicates.size() == 1)
+            return elementaryPredicates.get(0);
+
+        BooleanBuilder treeNode = new BooleanBuilder(constructOrPredicateTree(elementaryPredicates.subList(0, elementaryPredicates.size()/2)));
+        treeNode.or(constructOrPredicateTree(elementaryPredicates.subList(elementaryPredicates.size()/2, elementaryPredicates.size())));
+
+        return treeNode;
     }
 }
