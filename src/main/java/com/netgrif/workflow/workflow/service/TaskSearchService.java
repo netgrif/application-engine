@@ -8,6 +8,7 @@ import com.querydsl.core.types.Predicate;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
 @Service
@@ -51,7 +52,7 @@ public class TaskSearchService extends MongoSearchService<Task> {
 
     public Predicate role(Object query) {
         if (query instanceof ArrayList)
-            return constructOrPredicateTree(((ArrayList<String>) query).stream().map(this::roleString).collect(Collectors.toList()));
+            return constructPredicateTree(((ArrayList<String>) query).stream().map(this::roleString).collect(Collectors.toList()), TaskSearchService::or);
         else if (query instanceof String)
             return roleString((String) query);
 
@@ -85,12 +86,12 @@ public class TaskSearchService extends MongoSearchService<Task> {
     }
 
     private Predicate caseArray(ArrayList<String> query, String key) {
-        return constructOrPredicateTree(query.stream().map(q -> {
+        return constructPredicateTree(query.stream().map(q -> {
             if (key.equalsIgnoreCase(TITLE))
                 return caseTitle(q);
             else
                 return caseId(q);
-        }).collect(Collectors.toList()));
+        }).collect(Collectors.toList()), TaskSearchService::or);
     }
 
     private Predicate caseId(String caseId) {
@@ -103,7 +104,7 @@ public class TaskSearchService extends MongoSearchService<Task> {
 
     public Predicate title(Object query) {
         if (query instanceof ArrayList)
-            constructOrPredicateTree(((ArrayList<String>) query).stream().map(this::titleString).collect(Collectors.toList()));
+            constructPredicateTree(((ArrayList<String>) query).stream().map(this::titleString).collect(Collectors.toList()), TaskSearchService::or);
         else if (query instanceof String)
             return titleString((String) query);
 
@@ -116,7 +117,7 @@ public class TaskSearchService extends MongoSearchService<Task> {
 
     public Predicate user(Object query) {
         if (query instanceof ArrayList)
-            constructOrPredicateTree(((ArrayList<Number>) query).stream().map(this::userLong).collect(Collectors.toList()));
+            constructPredicateTree(((ArrayList<Number>) query).stream().map(this::userLong).collect(Collectors.toList()), TaskSearchService::or);
         else if (query instanceof Integer)
             return userLong(Long.valueOf(((Integer) query).longValue()));
         else if (query instanceof Long)
@@ -149,7 +150,7 @@ public class TaskSearchService extends MongoSearchService<Task> {
 
     public Predicate transition(Object query) {
         if (query instanceof ArrayList)
-            constructOrPredicateTree(((ArrayList<String>) query).stream().map(this::transitionString).collect(Collectors.toList()));
+            constructPredicateTree(((ArrayList<String>) query).stream().map(this::transitionString).collect(Collectors.toList()), TaskSearchService::or);
         else if (query instanceof String)
             return transitionString((String) query);
 
@@ -162,7 +163,7 @@ public class TaskSearchService extends MongoSearchService<Task> {
 
     public Predicate process(Object query) {
         if (query instanceof ArrayList)
-            constructOrPredicateTree(((ArrayList<String>) query).stream().map(this::processString).collect(Collectors.toList()));
+            constructPredicateTree(((ArrayList<String>) query).stream().map(this::processString).collect(Collectors.toList()), TaskSearchService::or);
         else if (query instanceof String)
             return processString((String) query);
 
@@ -180,13 +181,20 @@ public class TaskSearchService extends MongoSearchService<Task> {
         return builder;
     }
 
-    private Predicate constructOrPredicateTree(List<Predicate> elementaryPredicates) {
+    private BooleanBuilder constructPredicateTree(List<Predicate> elementaryPredicates, BiFunction<BooleanBuilder, Predicate, BooleanBuilder> nodeOperation) {
         if(elementaryPredicates.size() == 1)
-            return elementaryPredicates.get(0);
+            return new BooleanBuilder(elementaryPredicates.get(0));
+        if(elementaryPredicates.size() == 2) {
+            BooleanBuilder treeNode = new BooleanBuilder(elementaryPredicates.get(0));
+            return nodeOperation.apply(treeNode, elementaryPredicates.get(1));
+        }
 
-        BooleanBuilder treeNode = new BooleanBuilder(constructOrPredicateTree(elementaryPredicates.subList(0, elementaryPredicates.size()/2)));
-        treeNode.or(constructOrPredicateTree(elementaryPredicates.subList(elementaryPredicates.size()/2, elementaryPredicates.size())));
+        return nodeOperation.apply(
+                constructPredicateTree(elementaryPredicates.subList(0, elementaryPredicates.size()/2), nodeOperation),
+                constructPredicateTree(elementaryPredicates.subList(elementaryPredicates.size()/2, elementaryPredicates.size()), nodeOperation));
+    }
 
-        return treeNode;
+    private static BooleanBuilder or(BooleanBuilder leftSubtree, Predicate rightSubtree) {
+        return leftSubtree.or(rightSubtree);
     }
 }
