@@ -182,16 +182,19 @@ public class TaskSearchService extends MongoSearchService<Task> {
     }
 
     private BooleanBuilder constructPredicateTree(List<Predicate> elementaryPredicates, BiFunction<BooleanBuilder, Predicate, BooleanBuilder> nodeOperation) {
-        if(elementaryPredicates.size() == 1)
-            return new BooleanBuilder(elementaryPredicates.get(0));
-        if(elementaryPredicates.size() == 2) {
-            BooleanBuilder treeNode = new BooleanBuilder(elementaryPredicates.get(0));
-            return nodeOperation.apply(treeNode, elementaryPredicates.get(1));
+        ArrayDeque<BooleanBuilder> subtrees = new ArrayDeque<>(elementaryPredicates.size()/2 + elementaryPredicates.size()%2);
+
+        for(Iterator<Predicate> predicateIterator = elementaryPredicates.iterator(); predicateIterator.hasNext();) {
+            BooleanBuilder subtree = new BooleanBuilder(predicateIterator.next());
+            if(predicateIterator.hasNext())
+                nodeOperation.apply(subtree, predicateIterator.next());
+            subtrees.addFirst(subtree);
         }
 
-        return nodeOperation.apply(
-                constructPredicateTree(elementaryPredicates.subList(0, elementaryPredicates.size()/2), nodeOperation),
-                constructPredicateTree(elementaryPredicates.subList(elementaryPredicates.size()/2, elementaryPredicates.size()), nodeOperation));
+        while(subtrees.size()!=1)
+            subtrees.addLast(nodeOperation.apply(subtrees.pollFirst(), subtrees.pollFirst()));
+
+        return subtrees.peekFirst();
     }
 
     private static BooleanBuilder or(BooleanBuilder leftSubtree, Predicate rightSubtree) {
