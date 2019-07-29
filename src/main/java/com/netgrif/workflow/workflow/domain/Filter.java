@@ -37,13 +37,12 @@ public class Filter {
 
     private String query;
 
-    private String readableQuery;
 
     public Filter() {
         this.created = LocalDateTime.now();
     }
 
-    public Filter(I18nString title, I18nString description, Integer visibility, Author author, String type, String query, String readableQuery) {
+    public Filter(I18nString title, I18nString description, Integer visibility, Author author, String type, String query) {
         this();
         this.title = title;
         this.description = description;
@@ -51,7 +50,6 @@ public class Filter {
         this.author = author;
         this.type = type;
         this.query = query;
-        this.readableQuery = readableQuery;
     }
 
     public String getStringId() {
