@@ -38,7 +38,6 @@ public class Filter {
         this.created = filter.getCreated();
         this.type = filter.getType();
         this.query = filter.getQuery();
-        this.readableQuery = filter.getReadableQuery();
     }
 
 

@@ -47,7 +47,6 @@ public class FilterService implements IFilterService {
         filter.setType(newFilterBody.getType());
         filter.setVisibility(newFilterBody.getVisibility());
         filter.setQuery(newFilterBody.getQuery());
-        filter.setReadableQuery(newFilterBody.getReadableQuery());
 
         return repository.save(filter);
     }
