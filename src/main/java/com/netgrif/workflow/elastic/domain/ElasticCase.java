@@ -44,6 +44,9 @@ public class ElasticCase {
 
     private String title;
 
+    @Field(type = Keyword)
+    private String titleSortable;
+
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     private LocalDateTime creationDate;
@@ -73,6 +76,7 @@ public class ElasticCase {
         processIdentifier = useCase.getProcessIdentifier();
         visualId = useCase.getVisualId();
         title = useCase.getTitle();
+        titleSortable = useCase.getTitle();
         creationDate = useCase.getCreationDate();
         creationDateSortable = Timestamp.valueOf(useCase.getCreationDate()).getTime();
         author = useCase.getAuthor().getId();
@@ -93,6 +97,7 @@ public class ElasticCase {
 
     public void update(ElasticCase useCase) {
         title = useCase.getTitle();
+        titleSortable = useCase.getTitle();
         taskIds = useCase.getTaskIds();
         taskMongoIds = useCase.getTaskMongoIds();
         enabledRoles = useCase.getEnabledRoles();
