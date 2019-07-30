@@ -41,9 +41,15 @@ public class ElasticTask {
     private String title; //TODO: i18n
 
     @Field(type = Keyword)
+    private String titleSortable;
+
+    @Field(type = Keyword)
     private String caseColor;
 
     private String caseTitle;
+
+    @Field(type = Keyword)
+    private String caseTitleSortable;
 
     private int priority;
 
@@ -81,7 +87,9 @@ public class ElasticTask {
 
     public void update(Task task) {
         this.title = task.getTitle().getDefaultValue();
+        this.titleSortable = title;
         this.caseTitle = task.getCaseTitle();
+        this.caseTitleSortable = this.caseTitle;
         if (task.getPriority() != null)
             this.priority = task.getPriority();
         this.userId = task.getUserId();
