@@ -104,7 +104,7 @@ public class TaskSearchService extends MongoSearchService<Task> {
 
     public Predicate title(Object query) {
         if (query instanceof ArrayList)
-            constructPredicateTree(((ArrayList<String>) query).stream().map(this::titleString).collect(Collectors.toList()), TaskSearchService::or);
+            return constructPredicateTree(((ArrayList<String>) query).stream().map(this::titleString).collect(Collectors.toList()), TaskSearchService::or);
         else if (query instanceof String)
             return titleString((String) query);
 
@@ -117,7 +117,7 @@ public class TaskSearchService extends MongoSearchService<Task> {
 
     public Predicate user(Object query) {
         if (query instanceof ArrayList)
-            constructPredicateTree(((ArrayList<Number>) query).stream().map(this::userLong).collect(Collectors.toList()), TaskSearchService::or);
+            return constructPredicateTree(((ArrayList<Number>) query).stream().map(this::userLong).collect(Collectors.toList()), TaskSearchService::or);
         else if (query instanceof Integer)
             return userLong(Long.valueOf(((Integer) query).longValue()));
         else if (query instanceof Long)
@@ -150,7 +150,7 @@ public class TaskSearchService extends MongoSearchService<Task> {
 
     public Predicate transition(Object query) {
         if (query instanceof ArrayList)
-            constructPredicateTree(((ArrayList<String>) query).stream().map(this::transitionString).collect(Collectors.toList()), TaskSearchService::or);
+            return constructPredicateTree(((ArrayList<String>) query).stream().map(this::transitionString).collect(Collectors.toList()), TaskSearchService::or);
         else if (query instanceof String)
             return transitionString((String) query);
 
@@ -163,7 +163,7 @@ public class TaskSearchService extends MongoSearchService<Task> {
 
     public Predicate process(Object query) {
         if (query instanceof ArrayList)
-            constructPredicateTree(((ArrayList<String>) query).stream().map(this::processString).collect(Collectors.toList()), TaskSearchService::or);
+            return constructPredicateTree(((ArrayList<String>) query).stream().map(this::processString).collect(Collectors.toList()), TaskSearchService::or);
         else if (query instanceof String)
             return processString((String) query);
 
