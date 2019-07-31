@@ -127,7 +127,7 @@ class ImportHelper {
     }
 
     Optional<PetriNet> createNet(String fileName, String identifier, String name, String initials, String release, LoggedUser loggedUser) {
-        return petriNetService.importPetriNet(ResourceUtils.getFile("classpath:petriNets/$fileName"),
+        return petriNetService.importPetriNet(ResourceUtils.getFile("src/main/resources/petriNets/$fileName"),
                 new UploadedFileMeta(name, initials, identifier, release), loggedUser)
     }
 

@@ -20,7 +20,10 @@
                 <xs:element ref="placeholder" minOccurs="0"/>
                 <xs:element ref="desc" minOccurs="0"/>
                 <xs:element ref="values" minOccurs="0" maxOccurs="unbounded"/>
-                <xs:element ref="valid" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:choice>
+                    <xs:element ref="valid" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element ref="validations" minOccurs="0" />
+                </xs:choice>
                 <xs:element ref="init" minOccurs="0"/>
                 <xs:element ref="format" minOccurs="0"/>
                 <xs:choice>
@@ -362,6 +365,21 @@
     </xs:complexType>
     <xs:element name="placeholder" type="i18nStringType"/>
     <xs:element name="valid" type="validation"/>
+    <xs:element name="validations" >
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="validation" maxOccurs="unbounded" minOccurs="0"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="validation" >
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="expression" type="validation"/>
+                <xs:element name="message" type="i18nStringType"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
     <xs:element name="init" type="xs:string"/>
     <xs:simpleType name="remoteType">
         <xs:restriction base="xs:string">

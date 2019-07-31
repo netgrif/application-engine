@@ -49,7 +49,7 @@ class NumberField extends ValidableField<Double> {
         NumberField clone = new NumberField()
         super.clone(clone)
 
-        clone.validationRules = this.validationRules
+        clone.validations = this.validations
         clone.defaultValue = this.defaultValue
 
         return clone
