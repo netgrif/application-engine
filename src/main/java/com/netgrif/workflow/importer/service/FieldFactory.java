@@ -81,6 +81,9 @@ public final class FieldFactory {
         field.setName(importer.toI18NString(data.getTitle()));
         field.setImportId(data.getId());
         field.setImmediate(data.isImmediate());
+        if (data.getLength() != null) {
+            field.setLength(data.getLength());
+        }
         if (data.getDesc() != null)
             field.setDescription(importer.toI18NString(data.getDesc()));
         if (data.getPlaceholder() != null)

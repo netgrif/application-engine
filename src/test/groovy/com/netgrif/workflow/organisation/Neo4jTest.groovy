@@ -44,9 +44,17 @@ class Neo4jTest {
         groupRepository.save(child1)
         groupRepository.save(child2)
 
-        parent = groupRepository.findOne(parent.getId())
-        child1 = groupRepository.findOne(child1.getId())
-        child2 = groupRepository.findOne(child2.getId())
+        def parentOpt = groupRepository.findById(parent.getId())
+        def child1Opt = groupRepository.findById(child1.getId())
+        def child2Opt = groupRepository.findById(child2.getId())
+
+        assert parentOpt.isPresent()
+        assert child1Opt.isPresent()
+        assert child2Opt.isPresent()
+
+        parent = parentOpt.get()
+        child1 = child1Opt.get()
+        child2 = child2Opt.get()
 
         assert parent.childGroups.size() == 2
         assert child1.parentGroup
@@ -89,10 +97,20 @@ class Neo4jTest {
         groupRepository.save(child2)
         groupRepository.save(child3)
 
-        parent = groupRepository.findOne(parent.getId())
-        child1 = groupRepository.findOne(child1.getId())
-        child2 = groupRepository.findOne(child2.getId())
-        child3 = groupRepository.findOne(child3.getId())
+        def parentOpt = groupRepository.findById(parent.getId())
+        def child1Opt = groupRepository.findById(child1.getId())
+        def child2Opt = groupRepository.findById(child2.getId())
+        def child3Opt = groupRepository.findById(child3.getId())
+
+        assert parentOpt.isPresent()
+        assert child1Opt.isPresent()
+        assert child2Opt.isPresent()
+        assert child3Opt.isPresent()
+
+        parent = parentOpt.get()
+        child1 = child1Opt.get()
+        child2 = child2Opt.get()
+        child3 = child3Opt.get()
 
         Member member1 = memberRepository.save(new Member(userId: 1L, email: "1@parent.com"))
         Member member2 = memberRepository.save(new Member(userId: 2L, email: "2@parent.com"))
@@ -149,9 +167,12 @@ class Neo4jTest {
         groupRepository.save(parent)
 
         helper.assignTaskToSuper("Task", acase.stringId)
-        acase = caseRepository.findOne(acase.stringId)
+        def caseOpt = caseRepository.findById(acase.stringId)
+
+        assert caseOpt.isPresent()
+        acase = caseOpt.get()
 
         assert acase.dataSet["orgs"].choices.find {it.defaultValue == PARENT}
-        assert acase.dataSet["orgs"].choices.find {it.defaultValue == "Test organization"}
+        assert acase.dataSet["orgs"].choices.find {it.defaultValue == "Test organisation"}
     }
 }

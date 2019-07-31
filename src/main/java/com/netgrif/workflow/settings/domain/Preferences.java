@@ -39,6 +39,9 @@ public class Preferences implements Serializable {
     @Field
     private Map<String, List<String>> caseViewHeaders = new HashMap<>();
 
+    public Preferences() {
+    }
+
     public Preferences(Long userId) {
         this.userId = userId;
     }
