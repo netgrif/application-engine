@@ -24,19 +24,19 @@ import com.netgrif.workflow.workflow.service.TaskService
 import com.netgrif.workflow.workflow.service.interfaces.IDataService
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService
 import com.netgrif.workflow.workflow.web.responsebodies.TaskReference
-import com.querydsl.core.types.ExpressionUtils
 import com.querydsl.core.types.Predicate
-import org.apache.log4j.Logger
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.i18n.LocaleContextHolder
 import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Component
 
-@Component
 @SuppressWarnings(["GrMethodMayBeStatic", "GroovyUnusedDeclaration"])
 class ActionDelegate {
 
-    static final Logger log = Logger.getLogger(ActionDelegate)
+    static final Logger log = LoggerFactory.getLogger(ActionDelegate)
 
     static final String UNCHANGED_VALUE = "unchangedooo"
     static final String ALWAYS_GENERATE = "always"
@@ -168,7 +168,7 @@ class ActionDelegate {
 
     def execute(String taskId) {
         [with : { Map dataSet ->
-            executeTasks(dataSet, taskId, { ExpressionUtils.anyOf([]) })
+            executeTasks(dataSet, taskId, { it._id.isNotNull() })
         },
          where: { Closure<Predicate> closure ->
              [with: { Map dataSet ->
@@ -321,6 +321,12 @@ class ActionDelegate {
         return result.content
     }
 
+    List<Case> findCases(Closure<Predicate> predicate, Pageable pageable) {
+        QCase qCase = new QCase("case")
+        Page<Case> result = workflowService.search(predicate(qCase), pageable)
+        return result.content
+    }
+
     Case findCase(Closure<Predicate> predicate) {
         QCase qCase = new QCase("case")
         return workflowService.searchOne(predicate(qCase))
@@ -337,8 +343,8 @@ class ActionDelegate {
         return workflowService.createCase(net.stringId, title, color, author.transformToLoggedUser())
     }
 
-    Task assignTask(String transitionId, User user = userService.loggedOrSystem) {
-        String taskId = getTaskId(transitionId)
+    Task assignTask(String transitionId, Case aCase = useCase, User user = userService.loggedOrSystem) {
+        String taskId = getTaskId(transitionId, aCase)
         taskService.assignTask(user.transformToLoggedUser(), taskId)
         return taskService.findOne(taskId)
     }
@@ -352,8 +358,8 @@ class ActionDelegate {
         taskService.assignTasks(tasks, assignee)
     }
 
-    void cancelTask(String transitionId, User user = userService.loggedOrSystem) {
-        String taskId = getTaskId(transitionId)
+    void cancelTask(String transitionId, Case aCase = useCase, User user = userService.loggedOrSystem) {
+        String taskId = getTaskId(transitionId, aCase)
         taskService.cancelTask(user.transformToLoggedUser(), taskId)
     }
 
@@ -365,8 +371,8 @@ class ActionDelegate {
         taskService.cancelTasks(tasks, user)
     }
 
-    void finishTask(String transitionId, User user = userService.loggedOrSystem) {
-        String taskId = getTaskId(transitionId)
+    void finishTask(String transitionId, Case aCase = useCase, User user = userService.loggedOrSystem) {
+        String taskId = getTaskId(transitionId, aCase)
         taskService.finishTask(user.transformToLoggedUser(), taskId)
     }
 
@@ -384,13 +390,19 @@ class ActionDelegate {
         return result.content
     }
 
+    List<Task> findTasks(Closure<Predicate> predicate, Pageable pageable) {
+        QTask qTask = new QTask("task")
+        Page<Task> result = taskService.search(predicate(qTask), pageable)
+        return result.content
+    }
+
     Task findTask(Closure<Predicate> predicate) {
         QTask qTask = new QTask("task")
         return taskService.searchOne(predicate(qTask))
     }
 
-    String getTaskId(String transitionId) {
-        List<TaskReference> refs = taskService.findAllByCase(useCase.stringId, null)
+    String getTaskId(String transitionId, Case aCase = useCase) {
+        List<TaskReference> refs = taskService.findAllByCase(aCase.stringId, null)
         refs.find { it.transitionId == transitionId }.stringId
     }
 

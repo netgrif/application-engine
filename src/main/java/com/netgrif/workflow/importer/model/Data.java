@@ -37,6 +37,7 @@ import javax.xml.bind.annotation.XmlType;
  *         &lt;element ref="{}actionRef" maxOccurs="unbounded" minOccurs="0"/&gt;
  *         &lt;element ref="{}documentRef" minOccurs="0"/&gt;
  *         &lt;element ref="{}remote" minOccurs="0"/&gt;
+ *         &lt;element ref="{}length" minOccurs="0"/&gt;
  *       &lt;/sequence&gt;
  *       &lt;attribute name="type" use="required" type="{}data_type" /&gt;
  *       &lt;attribute name="immediate" type="{http://www.w3.org/2001/XMLSchema}boolean" /&gt;
@@ -62,7 +63,8 @@ import javax.xml.bind.annotation.XmlType;
     "action",
     "actionRef",
     "documentRef",
-    "remote"
+    "remote",
+    "length"
 })
 @XmlRootElement(name = "data")
 public class Data {
@@ -83,6 +85,7 @@ public class Data {
     protected List<ActionRefType> actionRef;
     protected DocumentRef documentRef;
     protected String remote;
+    protected Integer length;
     @XmlAttribute(name = "type", required = true)
     protected DataType type;
     @XmlAttribute(name = "immediate")
@@ -442,6 +445,30 @@ public class Data {
      */
     public void setRemote(String value) {
         this.remote = value;
+    }
+
+    /**
+     * Gets the value of the length property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link Integer }
+     *     
+     */
+    public Integer getLength() {
+        return length;
+    }
+
+    /**
+     * Sets the value of the length property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link Integer }
+     *     
+     */
+    public void setLength(Integer value) {
+        this.length = value;
     }
 
     /**
