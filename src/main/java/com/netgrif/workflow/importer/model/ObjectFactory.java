@@ -102,6 +102,22 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link Validations }
+     * 
+     */
+    public Validations createValidations() {
+        return new Validations();
+    }
+
+    /**
+     * Create an instance of {@link Validation }
+     * 
+     */
+    public Validation createValidation() {
+        return new Validation();
+    }
+
+    /**
      * Create an instance of {@link Format }
      * 
      */
