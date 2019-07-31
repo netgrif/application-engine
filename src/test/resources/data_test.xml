@@ -11,6 +11,12 @@
         <desc>Number field description</desc>
         <placeholder>Number field placeholder</placeholder>
         <valid>inrange 0,inf</valid>
+        <validations>
+            <validation>
+                <expression>inrange 0,inf</expression>
+                <message>Number field validation message</message>
+            </validation>
+        </validations>
     </data>
     <!-- TEXT -->
     <data type="text">
@@ -20,6 +26,12 @@
         <desc>Text field description</desc>
         <placeholder>Text field placeholder</placeholder>
         <valid>email</valid>
+        <validations>
+            <validation>
+                <expression>email</expression>
+                <message>Mail validation message</message>
+            </validation>
+        </validations>
     </data>
     <!-- ENUMERATION -->
     <data type="enumeration">
@@ -58,6 +70,16 @@
         <desc>Date field description</desc>
         <placeholder>Date field placeholder</placeholder>
         <valid>between today,future</valid>
+        <validations>
+            <validation>
+                <expression>between today,future</expression>
+                <message>Date field validation message</message>
+            </validation>
+            <validation>
+                <expression>between today,tommorow</expression>
+                <message>Date field validation message 2</message>
+            </validation>
+        </validations>
     </data>
     <!-- FILE -->
     <data type="file">

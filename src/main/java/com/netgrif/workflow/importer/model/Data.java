@@ -26,7 +26,10 @@ import javax.xml.bind.annotation.XmlType;
  *         &lt;element ref="{}placeholder" minOccurs="0"/&gt;
  *         &lt;element ref="{}desc" minOccurs="0"/&gt;
  *         &lt;element ref="{}values" maxOccurs="unbounded" minOccurs="0"/&gt;
- *         &lt;element ref="{}valid" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *         &lt;choice&gt;
+ *           &lt;element ref="{}valid" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *           &lt;element ref="{}validations" minOccurs="0"/&gt;
+ *         &lt;/choice&gt;
  *         &lt;element ref="{}init" minOccurs="0"/&gt;
  *         &lt;element ref="{}format" minOccurs="0"/&gt;
  *         &lt;choice&gt;
@@ -56,6 +59,7 @@ import javax.xml.bind.annotation.XmlType;
     "desc",
     "values",
     "valid",
+    "validations",
     "init",
     "format",
     "view",
@@ -77,6 +81,7 @@ public class Data {
     protected I18NStringType desc;
     protected List<I18NStringType> values;
     protected List<String> valid;
+    protected Validations validations;
     protected String init;
     protected Format format;
     protected FieldView view;
@@ -243,6 +248,30 @@ public class Data {
             valid = new ArrayList<String>();
         }
         return this.valid;
+    }
+
+    /**
+     * Gets the value of the validations property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link Validations }
+     *     
+     */
+    public Validations getValidations() {
+        return validations;
+    }
+
+    /**
+     * Sets the value of the validations property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link Validations }
+     *     
+     */
+    public void setValidations(Validations value) {
+        this.validations = value;
     }
 
     /**
