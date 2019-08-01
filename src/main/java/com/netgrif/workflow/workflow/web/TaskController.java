@@ -2,6 +2,8 @@ package com.netgrif.workflow.workflow.web;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.netgrif.workflow.auth.domain.LoggedUser;
+import com.netgrif.workflow.elastic.service.IElasticTaskService;
+import com.netgrif.workflow.elastic.web.TaskSearchRequest;
 import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.auth.domain.throwable.UnauthorisedRequestException;
 import com.netgrif.workflow.auth.service.interfaces.IUserService;
@@ -54,6 +56,9 @@ public class TaskController {
     private IDataService dataService;
 
     @Autowired
+    private IElasticTaskService searchService;
+
+    @Autowired
 	private IUserService userService;
 
     @Autowired
@@ -92,7 +97,7 @@ public class TaskController {
         Task task = taskService.findById(taskId);
         if (task == null)
             return null;
-        return new LocalisedTaskResource(new LocalisedTask(task, locale));
+        return new LocalisedTaskResource(new com.netgrif.workflow.workflow.web.responsebodies.Task(task, locale));
     }
 
     @RequestMapping(value = "/assign/{id}", method = RequestMethod.GET)
@@ -191,19 +196,6 @@ public class TaskController {
 
     @RequestMapping(value = "/search", method = RequestMethod.POST)
     public PagedResources<LocalisedTaskResource> search(Authentication auth, Pageable pageable, @RequestBody Map<String, Object> searchBody, PagedResourcesAssembler<com.netgrif.workflow.workflow.domain.Task> assembler, Locale locale) {
-//        Page<LocalisedTask> page = null;
-//        if (searchBody.searchTier == TaskSearchBody.SEARCH_TIER_1) {
-//            page = taskService.findByPetriNets(pageable, searchBody.petriNets
-//                    .stream()
-//                    .map(net -> net.petriNet)
-//                    .collect(Collectors.toList()));
-//        } else if (searchBody.searchTier == TaskSearchBody.SEARCH_TIER_2) {
-//            List<String> transitions = new ArrayList<>();
-//            searchBody.petriNets.forEach(net -> transitions.addAll(net.transitions));
-//            page = taskService.findByTransitions(pageable, transitions);
-//        } else if (searchBody.searchTier == TaskSearchBody.SEARCH_TIER_3) {
-//            //TODO: 4.6.2017 vyhľadanie na základe dát
-//        }
         Page<com.netgrif.workflow.workflow.domain.Task> tasks = taskService.search(searchBody, pageable, (LoggedUser) auth.getPrincipal());
         Link selfLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
                 .search(auth, pageable, searchBody, assembler, locale)).withRel("search");
@@ -212,9 +204,19 @@ public class TaskController {
         return resources;
     }
 
+//    @RequestMapping(value = "/search", method = RequestMethod.POST)
+//    public PagedResources<LocalisedTaskResource> search(Authentication auth, Pageable pageable, @RequestBody TaskSearchRequest searchBody, PagedResourcesAssembler<ElasticTask> assembler, Locale locale) {
+//        Page<ElasticTask> tasks = searchService.search(searchBody, (LoggedUser) auth.getPrincipal(), pageable);
+//        Link selfLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
+//                .search(auth, pageable, searchBody, assembler, locale)).withRel("search");
+//        PagedResources<LocalisedTaskResource> resources = assembler.toResource(tasks, new ElasticTaskResourceAssembler(), selfLink);
+//        ResourceLinkAssembler.addLinks(resources, com.netgrif.workflow.workflow.domain.Task.class, selfLink.getRel());
+//        return resources;
+//    }
+
     @PostMapping(value = "/count", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public CountResponse count(@RequestBody Map<String, Object> query, Authentication auth, Locale locale){
-        long count = taskService.count(query, (LoggedUser)auth.getPrincipal(), locale);
+    public CountResponse count(@RequestBody TaskSearchRequest query, Authentication auth, Locale locale) {
+        long count = searchService.count(query, (LoggedUser)auth.getPrincipal());
         return CountResponse.taskCount(count);
     }
 

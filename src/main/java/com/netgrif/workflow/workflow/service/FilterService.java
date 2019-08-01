@@ -13,6 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 public class FilterService implements IFilterService {
@@ -25,7 +26,15 @@ public class FilterService implements IFilterService {
 
     @Override
     public boolean deleteFilter(String filterId, LoggedUser user) {
-        repository.delete(this.findOne(filterId));
+        Optional<Filter> result = repository.findById(filterId);
+        if (!result.isPresent())
+            throw new IllegalArgumentException("Filter not found");
+
+        Filter filter = result.get();
+        if (filter.getAuthor().getId().equals(user.getId()))
+            throw new IllegalArgumentException("User " + user.getUsername() + " doesn't have permission to delete filter " + filter.getStringId());
+
+        repository.delete(filter);
         return true;
     }
 
@@ -50,13 +59,5 @@ public class FilterService implements IFilterService {
         }
 
         return searchService.search(request, pageable, Filter.class);
-    }
-
-    @Override
-    public Filter findOne(String filterId) {
-        Filter filter = repository.findOne(filterId);
-        if (filter == null)
-            throw new IllegalArgumentException("Filter not found");
-        return filter;
     }
 }
