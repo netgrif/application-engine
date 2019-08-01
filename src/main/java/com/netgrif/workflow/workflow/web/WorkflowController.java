@@ -5,6 +5,9 @@ import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.auth.domain.throwable.UnauthorisedRequestException;
 import com.netgrif.workflow.auth.service.interfaces.IUserService;
+import com.netgrif.workflow.elastic.domain.ElasticCase;
+import com.netgrif.workflow.elastic.service.IElasticCaseService;
+import com.netgrif.workflow.elastic.web.CaseSearchRequest;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.service.FileFieldInputStream;
 import com.netgrif.workflow.workflow.service.interfaces.IDataService;
@@ -12,7 +15,8 @@ import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
 import com.netgrif.workflow.workflow.web.requestbodies.CreateCaseBody;
 import com.netgrif.workflow.workflow.web.responsebodies.*;
 import com.querydsl.core.types.Predicate;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
@@ -34,16 +38,22 @@ import java.io.FileNotFoundException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
 
 @RestController()
 @RequestMapping("/api/workflow")
 public class WorkflowController {
 
-    private static final Logger log = Logger.getLogger(WorkflowController.class.getName());
+    private static final Logger log = LoggerFactory.getLogger(WorkflowController.class.getName());
 
     @Autowired
     private IWorkflowService workflowService;
+
+    @Autowired
+    private IElasticCaseService elasticCaseService;
 
     @Autowired
     private IDataService dataService;
@@ -84,18 +94,22 @@ public class WorkflowController {
     }
 
     @PostMapping(value = "/case/search", produces = MediaTypes.HAL_JSON_VALUE)
-    public PagedResources<CaseResource> search(@RequestBody Map<String, Object> searchBody, Pageable pageable, PagedResourcesAssembler<Case> assembler, Authentication auth, Locale locale) {
-        Page<Case> cases = workflowService.search(searchBody, pageable, (LoggedUser) auth.getPrincipal(), locale);
+    public PagedResources<CaseResource> search(@RequestBody CaseSearchRequest searchBody, Pageable pageable, PagedResourcesAssembler<Case> assembler, Authentication auth, Locale locale) {
+        LoggedUser user =(LoggedUser) auth.getPrincipal();
+        long start = System.currentTimeMillis();
+        Page<Case> cases = elasticCaseService.search(searchBody, user, pageable);
+
         Link selfLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(WorkflowController.class)
                 .search(searchBody, pageable, assembler, auth, locale)).withRel("search");
+
         PagedResources<CaseResource> resources = assembler.toResource(cases, new CaseResourceAssembler(), selfLink);
-        ResourceLinkAssembler.addLinks(resources, Case.class, selfLink.getRel());
+        ResourceLinkAssembler.addLinks(resources, ElasticCase.class, selfLink.getRel());
         return resources;
     }
 
     @PostMapping(value = "/case/count", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public CountResponse count(@RequestBody Map<String, Object> query, Authentication auth, Locale locale) {
-        long count = workflowService.count(query, (LoggedUser) auth.getPrincipal(), locale);
+    public CountResponse count(@RequestBody CaseSearchRequest query, Authentication auth) {
+        long count = elasticCaseService.count(query, (LoggedUser) auth.getPrincipal());
         return CountResponse.caseCount(count);
     }
 

@@ -9,9 +9,9 @@ import org.springframework.hateoas.mvc.ControllerLinkBuilder;
 import java.util.ArrayList;
 
 
-public class LocalisedFilterResource extends Resource<LocalisedFilter> {
+public class LocalisedFilterResource extends Resource<Filter> {
 
-    public LocalisedFilterResource(LocalisedFilter content) {
+    public LocalisedFilterResource(Filter content) {
         super(content, new ArrayList<Link>());
         buildLinks();
     }
