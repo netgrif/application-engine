@@ -6,7 +6,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface PostalCodeRepository extends JpaRepository<PostalCode, String> {
+public interface PostalCodeRepository extends JpaRepository<PostalCode, Long> {
 
     List<PostalCode> findAllByCode(String code);
 
