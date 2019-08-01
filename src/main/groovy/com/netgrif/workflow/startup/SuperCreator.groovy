@@ -7,7 +7,8 @@ import com.netgrif.workflow.auth.service.interfaces.IUserService
 import com.netgrif.workflow.orgstructure.domain.Member
 import com.netgrif.workflow.orgstructure.service.IGroupService
 import com.netgrif.workflow.orgstructure.service.IMemberService
-import org.apache.log4j.Logger
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
@@ -17,7 +18,7 @@ import org.springframework.stereotype.Component
 @Component
 class SuperCreator extends AbstractOrderedCommandLineRunner {
 
-    private static final Logger log = Logger.getLogger(SuperCreator.class.name)
+    private static final Logger log = LoggerFactory.getLogger(SuperCreator.class.name)
 
     @Autowired
     private IAuthorityService authorityService
