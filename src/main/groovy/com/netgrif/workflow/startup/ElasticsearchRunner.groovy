@@ -1,10 +1,12 @@
 package com.netgrif.workflow.startup
 
+import com.netgrif.workflow.elastic.domain.ElasticCase
 import com.netgrif.workflow.elastic.domain.ElasticCaseRepository
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.data.elasticsearch.core.ElasticsearchTemplate
 import org.springframework.stereotype.Component
 
 @Component
@@ -25,13 +27,19 @@ class ElasticsearchRunner extends AbstractOrderedCommandLineRunner {
     private int port
 
     @Autowired
-    private ElasticCaseRepository repository
+    private ElasticsearchTemplate template
 
     @Override
     void run(String... args) throws Exception {
         if (drop) {
             log.info("Dropping Elasticsearch database ${url}:${port}/${clusterName}")
-            repository.deleteAll()
+            template.deleteIndex(ElasticCase.class)
+            template.createIndex(ElasticCase.class)
+            template.putMapping(ElasticCase.class)
+
+            template.deleteIndex(ElasticCase.class)
+            template.createIndex(ElasticCase.class)
+            template.putMapping(ElasticCase.class)
         }
     }
 }
