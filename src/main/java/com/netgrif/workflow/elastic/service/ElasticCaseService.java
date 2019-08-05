@@ -8,6 +8,7 @@ import com.netgrif.workflow.elastic.web.CaseSearchRequest;
 import com.netgrif.workflow.utils.FullPageRequest;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
+import org.apache.lucene.search.join.ScoreMode;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryStringQueryBuilder;
@@ -300,7 +301,14 @@ public class ElasticCaseService implements IElasticCaseService {
 
         BoolQueryBuilder dataQuery = boolQuery();
         for (Map.Entry<String, String> field : request.data.entrySet()) {
-            dataQuery.must(matchQuery("dataSet." + field.getKey()+".value", field.getValue()));
+            dataQuery.must(nestedQuery("dataSet",
+                    boolQuery().must(
+                            termQuery("dataSet.id", field.getKey())
+                    ).must(
+                            termQuery("dataSet.value", field.getValue())
+                    ),
+                    ScoreMode.Total
+            ));
         }
 
         query.filter(dataQuery);

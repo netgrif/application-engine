@@ -10,17 +10,20 @@ import static org.springframework.data.elasticsearch.annotations.FieldType.Keywo
 @NoArgsConstructor
 public class DataField {
 
+    @Field(type = Keyword)
+    public String id;
+
     public String value;
 
     @Field(type = Keyword)
     public String sortable;
 
-    public DataField(String value) {
-        this.value = value;
-        this.sortable = value;
+    public DataField(String id, String value) {
+        this(id, value, value);
     }
 
-    public DataField(String value, String sortable) {
+    public DataField(String id, String value, String sortable) {
+        this.id = id;
         this.value = value;
         this.sortable = sortable;
     }

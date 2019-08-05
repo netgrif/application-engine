@@ -170,12 +170,6 @@
                 </logic>
             </dataRef>
             <dataRef>
-                <id>enumeration_field_old</id>
-                <logic>
-                    <behavior>editable</behavior>
-                </logic>
-            </dataRef>
-            <dataRef>
                 <id>multichoice_field</id>
                 <logic>
                     <behavior>editable</behavior>
