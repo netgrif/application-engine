@@ -322,6 +322,7 @@ public class ElasticCaseService implements IElasticCaseService {
             return;
         }
 
+        // TODO: improvement? wildcard does not scale good
         QueryBuilder fullTextQuery = queryStringQuery("*" + request.fullText + "*").fields(fullTextFields());
         query.must(fullTextQuery);
     }
