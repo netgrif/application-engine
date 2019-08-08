@@ -1,0 +1,266 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="../../main/resources/petriNets/petriflow_schema.xsd">
+    <id>1</id>
+    <defaultRole>true</defaultRole>
+    <!-- NUMBER -->
+    <data type="number">
+        <id>numberOdd</id>
+        <title>Number</title>
+        <init>10</init>
+        <desc>Number field description</desc>
+        <placeholder>Number field placeholder</placeholder>
+        <validations>
+            <validation>
+                <expression>odd</expression>
+                <message>Number field validation message odd</message>
+            </validation>
+
+        </validations>
+    </data>
+    <data type="number">
+        <id>numberEven</id>
+        <title>Number</title>
+        <init>1</init>
+        <desc>Number field description</desc>
+        <placeholder>Number field placeholder</placeholder>
+        <validations>
+            <validation>
+                <expression>even</expression>
+                <message>Number field validation message even</message>
+            </validation>
+        </validations>
+    </data>
+    <data type="number">
+        <id>numberPos</id>
+        <title>Number</title>
+        <init>-10</init>
+        <desc>Number field description</desc>
+        <placeholder>Number field placeholder</placeholder>
+        <validations>
+            <validation>
+                <expression>positive</expression>
+                <message>Number field validation message positive</message>
+            </validation>
+        </validations>
+    </data>
+    <data type="number">
+        <id>numberNeg</id>
+        <title>Number</title>
+        <init>10</init>
+        <desc>Number field description</desc>
+        <placeholder>Number field placeholder</placeholder>
+        <validations>
+            <validation>
+                <expression>negative</expression>
+                <message>Number field validation message negative</message>
+            </validation>
+        </validations>
+    </data>
+    <data type="number">
+        <id>numberDec</id>
+        <title>Number</title>
+        <init>10.1</init>
+        <desc>Number field description</desc>
+        <placeholder>Number field placeholder</placeholder>
+        <validations>
+            <validation>
+                <expression>decimal</expression>
+                <message>Number field validation message decimal</message>
+            </validation>
+        </validations>
+    </data>
+    <data type="number">
+        <id>number0Inf</id>
+        <title>Number</title>
+        <init>-10</init>
+        <desc>Number field description</desc>
+        <placeholder>Number field placeholder</placeholder>
+        <validations>
+            <validation>
+                <expression>inrange 0,inf</expression>
+                <message>Number field validation message 0-inf</message>
+            </validation>
+        </validations>
+    </data>
+    <data type="number">
+        <id>numberInf0</id>
+        <title>Number</title>
+        <init>10</init>
+        <desc>Number field description</desc>
+        <placeholder>Number field placeholder</placeholder>
+        <validations>
+            <validation>
+                <expression>inrange inf,0</expression>
+                <message>Number field validation message inf-0</message>
+            </validation>
+        </validations>
+    </data>
+    <data type="number">
+        <id>numberTest</id>
+        <title>Number</title>
+        <init>-1</init>
+        <desc>Number field description</desc>
+        <placeholder>Number field placeholder</placeholder>
+        <validations>
+            <validation>
+                <expression>even</expression>
+                <message>Number field validation message even</message>
+            </validation>
+            <validation>
+                <expression>inrange inf,0</expression>
+                <message>Number field validation message inf-0</message>
+            </validation>
+        </validations>
+    </data>
+    <!-- TEXT -->
+    <data type="text">
+        <id>text</id>
+        <title>Text</title>
+        <init>text</init>
+        <desc>Text field description</desc>
+        <placeholder>Text field placeholder</placeholder>
+        <validations>
+            <validation>
+                <expression>email</expression>
+                <message>Mail validation message</message>
+            </validation>
+        </validations>
+    </data>
+    <data type="text">
+        <id>length5</id>
+        <title>Text</title>
+        <init>texttext</init>
+        <desc>Text field description</desc>
+        <placeholder>Text field placeholder</placeholder>
+        <validations>
+            <validation>
+                <expression>length 5</expression>
+                <message>length validation message</message>
+            </validation>
+        </validations>
+    </data>
+    <data type="text">
+        <id>telnum</id>
+        <title>Text</title>
+        <init>text</init>
+        <desc>Text field description</desc>
+        <placeholder>Text field placeholder</placeholder>
+        <validations>
+            <validation>
+                <expression>telNumber</expression>
+                <message>telNumber validation message</message>
+            </validation>
+        </validations>
+    </data>
+    <!-- DATE -->
+    <data type="date">
+        <id>date</id>
+        <title>Date</title>
+        <desc>Date field description</desc>
+        <placeholder>Date field placeholder</placeholder>
+        <validations>
+            <validation>
+                <expression>between today,future</expression>
+                <message>Date field validation message</message>
+            </validation>
+        </validations>
+    </data>
+    <data type="date">
+        <id>datepast</id>
+        <title>Date</title>
+        <desc>Date field description</desc>
+        <placeholder>Date field placeholder</placeholder>
+        <validations>
+            <validation>
+                <expression>between past,today</expression>
+                <message>Date field validation message</message>
+            </validation>
+        </validations>
+    </data>
+
+    <transition>
+        <id>1</id>
+        <x>1</x>
+        <y>1</y>
+        <label>Transition</label>
+        <dataRef>
+            <id>numberOdd</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>numberEven</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>numberPos</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>numberNeg</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>numberDec</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>numberInf0</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>number0Inf</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>numberTest</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>length5</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>telnum</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>date</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>datepast</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>text</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+    </transition>
+</document>
