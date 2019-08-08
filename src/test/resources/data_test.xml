@@ -76,7 +76,7 @@
                 <message>Date field validation message</message>
             </validation>
             <validation>
-                <expression>between today,tommorow</expression>
+                <expression>between today,future</expression>
                 <message>Date field validation message 2</message>
             </validation>
         </validations>
