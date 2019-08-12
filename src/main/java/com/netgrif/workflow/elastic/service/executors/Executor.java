@@ -15,10 +15,17 @@ public class Executor {
 
     public void execute(String id, Runnable task) {
         ExecutorService executorService = map.get(id);
+
         if (executorService == null) {
             executorService = Executors.newSingleThreadExecutor();
-            map.put(id, executorService);
+            ExecutorService absent = map.putIfAbsent(id, executorService);
+
+            if (absent != null) {
+                absent.execute(task);
+                return;
+            }
         }
+
         executorService.execute(task);
     }
 }
