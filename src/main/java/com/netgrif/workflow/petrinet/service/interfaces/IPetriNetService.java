@@ -22,6 +22,8 @@ import java.util.Optional;
 
 public interface IPetriNetService {
 
+    PetriNet get(ObjectId petriNetId);
+
     Optional<PetriNet> importPetriNetAndDeleteFile(File xmlFile, UploadedFileMeta netMetaData, LoggedUser user) throws IOException;
 
     Optional<PetriNet> importPetriNet(File xmlFile, UploadedFileMeta metaData, LoggedUser user) throws IOException;
