@@ -1,9 +1,8 @@
-package com.netgrif.workflow.elastic.service;
+package com.netgrif.workflow.elastic.service.executors;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 public class MaxSizeHashMap extends LinkedHashMap<String, ExecutorService> {
 
@@ -17,15 +16,5 @@ public class MaxSizeHashMap extends LinkedHashMap<String, ExecutorService> {
     @Override
     protected boolean removeEldestEntry(Map.Entry<String, ExecutorService> eldest) {
         return size() > maxSize;
-    }
-
-    @Override
-    public ExecutorService get(Object o) {
-        ExecutorService executor = super.get(o);
-        if (executor == null) {
-            executor = Executors.newSingleThreadExecutor();
-            put((String) o, executor);
-        }
-        return executor;
     }
 }
