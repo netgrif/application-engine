@@ -4,11 +4,12 @@ import com.google.common.collect.ImmutableMap;
 import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.elastic.domain.ElasticCase;
 import com.netgrif.workflow.elastic.domain.ElasticCaseRepository;
+import com.netgrif.workflow.elastic.service.executors.Executor;
+import com.netgrif.workflow.elastic.service.interfaces.IElasticCaseService;
 import com.netgrif.workflow.elastic.web.CaseSearchRequest;
 import com.netgrif.workflow.utils.FullPageRequest;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
-import org.apache.lucene.search.join.ScoreMode;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryStringQueryBuilder;
@@ -26,8 +27,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 import static org.elasticsearch.index.query.QueryBuilders.*;
@@ -49,7 +48,7 @@ public class ElasticCaseService implements IElasticCaseService {
     @Value("${spring.data.elasticsearch.executors}")
     private long executorsLimit;
 
-    private MaxSizeHashMap executors = new MaxSizeHashMap(executorsLimit);
+    private Executor executors = new Executor(executorsLimit);
 
     private Map<String, Float> fullTextFieldMap = ImmutableMap.of(
             "title", 2f,
@@ -69,7 +68,7 @@ public class ElasticCaseService implements IElasticCaseService {
 
     @Override
     public void remove(String caseId) {
-        executors.get(caseId).execute(() -> {
+        executors.execute(caseId, () -> {
             repository.deleteById(caseId);
             log.info("[" + caseId + "]: Case \"" + caseId + "\" deleted");
         });
@@ -77,7 +76,7 @@ public class ElasticCaseService implements IElasticCaseService {
 
     @Override
     public void index(ElasticCase useCase) {
-        executors.get(useCase.getStringId()).execute(() -> {
+        executors.execute(useCase.getStringId(), () -> {
             ElasticCase elasticCase = repository.findByStringId(useCase.getStringId());
             if (elasticCase == null) {
                 repository.save(useCase);
@@ -302,7 +301,7 @@ public class ElasticCaseService implements IElasticCaseService {
 
         BoolQueryBuilder dataQuery = boolQuery();
         for (Map.Entry<String, String> field : request.data.entrySet()) {
-            dataQuery.must(matchQuery("dataSet." + field.getKey()+".value", field.getValue()));
+            dataQuery.must(matchQuery("dataSet." + field.getKey() + ".value", field.getValue()));
         }
 
         query.filter(dataQuery);
