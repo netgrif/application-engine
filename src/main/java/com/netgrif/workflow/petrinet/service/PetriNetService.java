@@ -91,6 +91,11 @@ public abstract class PetriNetService implements IPetriNetService {
     }
 
     @Override
+    public PetriNet get(ObjectId petriNetId) {
+        return cache.get(petriNetId);
+    }
+
+    @Override
     public Optional<PetriNet> importPetriNetAndDeleteFile(File xmlFile, UploadedFileMeta netMetaData, LoggedUser user) throws IOException {
         Optional<PetriNet> imported = importPetriNet(xmlFile, netMetaData, user);
         if (!xmlFile.delete())
@@ -259,19 +264,6 @@ public abstract class PetriNetService implements IPetriNetService {
         }
         return new FileSystemResource(Importer.ARCHIVED_FILES_PATH + netId + "-" + title + Importer.FILE_EXTENSION);
     }
-
-
-//    public static PetriNetReference transformToReference(PetriNet net, Locale locale) {
-//        return new PetriNetReference(net.getStringId(), net.getIdentifier(), net.getVersion(), net.getTitle().getTranslation(locale), net.getInitials());
-//    }
-//
-//    public static TransitionReference transformToReference(PetriNet net, Transition transition, Locale locale) {
-//        return new TransitionReference(transition.getStringId(), transition.getTitle().getTranslation(locale), net.getStringId());
-//    }
-//
-//    public static DataFieldReference transformToReference(PetriNet net, Transition transition, Field field, Locale locale) {
-//        return new DataFieldReference(field.getStringId(), field.getName().getTranslation(locale), net.getStringId(), transition.getStringId());
-//    }
 
     @Override
     public List<PetriNetReference> getReferences(LoggedUser user, Locale locale) {
