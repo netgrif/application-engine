@@ -1,7 +1,7 @@
 package com.netgrif.workflow.workflow.service;
 
 import com.netgrif.workflow.elastic.domain.ElasticCase;
-import com.netgrif.workflow.elastic.service.IElasticCaseService;
+import com.netgrif.workflow.elastic.service.interfaces.IElasticCaseService;
 import com.netgrif.workflow.importer.service.FieldFactory;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
