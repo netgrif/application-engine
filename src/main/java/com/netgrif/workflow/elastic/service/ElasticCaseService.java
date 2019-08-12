@@ -45,10 +45,8 @@ public class ElasticCaseService implements IElasticCaseService {
     @Autowired
     private ElasticsearchTemplate template;
 
-    @Value("${spring.data.elasticsearch.executors}")
-    private long executorsLimit;
-
-    private Executor executors = new Executor(executorsLimit);
+    @Autowired
+    private Executor executors;
 
     private Map<String, Float> fullTextFieldMap = ImmutableMap.of(
             "title", 2f,
