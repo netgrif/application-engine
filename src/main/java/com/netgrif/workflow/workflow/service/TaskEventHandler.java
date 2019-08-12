@@ -1,6 +1,6 @@
 package com.netgrif.workflow.workflow.service;
 
-import com.netgrif.workflow.elastic.service.IElasticTaskService;
+import com.netgrif.workflow.elastic.service.interfaces.IElasticTaskService;
 import com.netgrif.workflow.workflow.domain.Task;
 import org.bson.Document;
 import org.bson.types.ObjectId;
