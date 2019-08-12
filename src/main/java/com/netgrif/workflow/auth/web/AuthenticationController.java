@@ -158,5 +158,4 @@ public class AuthenticationController {
             return MessageResource.errorMessage("There has been a problem!");
         }
     }
-
 }

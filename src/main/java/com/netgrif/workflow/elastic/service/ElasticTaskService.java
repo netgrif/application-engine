@@ -30,7 +30,7 @@ import static org.elasticsearch.index.query.QueryBuilders.*;
 @Service
 public class ElasticTaskService implements IElasticTaskService {
 
-    private static final Logger log = LoggerFactory.getLogger(ElasticCaseService.class);
+    private static final Logger log = LoggerFactory.getLogger(ElasticTaskService.class);
 
     @Autowired
     private ElasticTaskRepository repository;
@@ -38,8 +38,6 @@ public class ElasticTaskService implements IElasticTaskService {
     @Autowired
     private ElasticsearchTemplate template;
 
-//    @Autowired
-//    private Executors executors;
     private ExecutorService executor = Executors.newSingleThreadExecutor();
 
     private Map<String, Float> fullTextFieldMap = ImmutableMap.of(
