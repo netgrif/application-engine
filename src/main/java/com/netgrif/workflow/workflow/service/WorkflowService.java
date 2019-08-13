@@ -88,6 +88,7 @@ public class WorkflowService implements IWorkflowService {
             setPetriNet(useCase);
         }
         try {
+            setImmediateDataFields(useCase);
             elasticCaseService.indexNow(new ElasticCase(useCase));
         } catch (Exception e) {
             log.error("Indexing failed ["+useCase.getStringId()+"]", e);
