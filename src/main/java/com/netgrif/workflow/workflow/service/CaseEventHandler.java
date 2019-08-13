@@ -35,12 +35,12 @@ public class CaseEventHandler extends AbstractMongoEventListener<Case> {
     @Autowired
     private IPetriNetService petriNetService;
 
-    @Override
-    public void onAfterSave(AfterSaveEvent<Case> event) {
-        Case useCase = event.getSource();
-        setImmediateData(useCase);
-        service.indexNow(new ElasticCase(useCase));
-    }
+//    @Override
+//    public void onAfterSave(AfterSaveEvent<Case> event) {
+//        Case useCase = event.getSource();
+//        setImmediateData(useCase);
+//        service.indexNow(new ElasticCase(useCase));
+//    }
 
     @Override
     public void onAfterDelete(AfterDeleteEvent<Case> event) {
