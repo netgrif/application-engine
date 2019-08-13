@@ -1,7 +1,7 @@
 package com.netgrif.workflow.workflow.service;
 
 import com.netgrif.workflow.elastic.domain.ElasticCase;
-import com.netgrif.workflow.elastic.service.IElasticCaseService;
+import com.netgrif.workflow.elastic.service.interfaces.IElasticCaseService;
 import com.netgrif.workflow.importer.service.FieldFactory;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
@@ -36,13 +36,6 @@ public class CaseEventHandler extends AbstractMongoEventListener<Case> {
     private IPetriNetService petriNetService;
 
     @Override
-    public void onAfterSave(AfterSaveEvent<Case> event) {
-        Case useCase = event.getSource();
-        setImmediateData(useCase);
-        service.indexNow(new ElasticCase(useCase));
-    }
-
-    @Override
     public void onAfterDelete(AfterDeleteEvent<Case> event) {
         Document document = event.getDocument();
         if (document == null) {
@@ -51,20 +44,6 @@ public class CaseEventHandler extends AbstractMongoEventListener<Case> {
         }
         ObjectId objectId = document.getObjectId("_id");
         service.remove(objectId.toString());
-    }
-
-    private void setImmediateData(Case useCase) {
-        if (useCase.getPetriNet() == null) {
-            setPetriNet(useCase);
-        }
-        List<Field> immediateData = new ArrayList<>();
-
-        useCase.getImmediateDataFields().forEach(fieldId ->
-                immediateData.add(fieldFactory.buildImmediateField(useCase, fieldId))
-        );
-        LongStream.range(0L, immediateData.size()).forEach(index -> immediateData.get((int) index).setOrder(index));
-
-        useCase.setImmediateData(immediateData);
     }
 
     private void setPetriNet(Case useCase) {
