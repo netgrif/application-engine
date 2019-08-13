@@ -4,6 +4,8 @@ import com.google.common.collect.ImmutableMap;
 import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.elastic.domain.ElasticCase;
 import com.netgrif.workflow.elastic.domain.ElasticCaseRepository;
+import com.netgrif.workflow.elastic.service.executors.Executor;
+import com.netgrif.workflow.elastic.service.interfaces.IElasticCaseService;
 import com.netgrif.workflow.elastic.web.CaseSearchRequest;
 import com.netgrif.workflow.utils.FullPageRequest;
 import com.netgrif.workflow.workflow.domain.Case;
@@ -26,8 +28,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 import static org.elasticsearch.index.query.QueryBuilders.*;
@@ -46,10 +46,8 @@ public class ElasticCaseService implements IElasticCaseService {
     @Autowired
     private ElasticsearchTemplate template;
 
-    @Value("${spring.data.elasticsearch.executors}")
-    private long executorsLimit;
-
-    private MaxSizeHashMap executors = new MaxSizeHashMap(executorsLimit);
+    @Autowired
+    private Executor executors;
 
     private Map<String, Float> fullTextFieldMap = ImmutableMap.of(
             "title", 2f,
@@ -69,7 +67,7 @@ public class ElasticCaseService implements IElasticCaseService {
 
     @Override
     public void remove(String caseId) {
-        executors.get(caseId).execute(() -> {
+        executors.execute(caseId, () -> {
             repository.deleteById(caseId);
             log.info("[" + caseId + "]: Case \"" + caseId + "\" deleted");
         });
@@ -77,7 +75,7 @@ public class ElasticCaseService implements IElasticCaseService {
 
     @Override
     public void index(ElasticCase useCase) {
-        executors.get(useCase.getStringId()).execute(() -> {
+        executors.execute(useCase.getStringId(), () -> {
             ElasticCase elasticCase = repository.findByStringId(useCase.getStringId());
             if (elasticCase == null) {
                 repository.save(useCase);
