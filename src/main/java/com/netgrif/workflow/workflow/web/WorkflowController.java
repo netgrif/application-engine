@@ -76,20 +76,9 @@ public class WorkflowController {
         return resources;
     }
 
-    @PostMapping("/case/search2")
-    public PagedResources<CaseResource> search2(@QuerydslPredicate(root = Case.class) Predicate predicate, Pageable pageable, PagedResourcesAssembler<Case> assembler) {
-        Page<Case> cases = workflowService.search(predicate, pageable);
-        Link selfLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(WorkflowController.class)
-                .search2(predicate, pageable, assembler)).withRel("search2");
-        PagedResources<CaseResource> resources = assembler.toResource(cases, new CaseResourceAssembler(), selfLink);
-        ResourceLinkAssembler.addLinks(resources, Case.class, selfLink.getRel());
-        return resources;
-    }
-
     @PostMapping(value = "/case/search", produces = MediaTypes.HAL_JSON_VALUE)
     public PagedResources<CaseResource> search(@RequestBody CaseSearchRequest searchBody, Pageable pageable, PagedResourcesAssembler<Case> assembler, Authentication auth, Locale locale) {
         LoggedUser user =(LoggedUser) auth.getPrincipal();
-        long start = System.currentTimeMillis();
         Page<Case> cases = elasticCaseService.search(searchBody, user, pageable);
 
         Link selfLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(WorkflowController.class)
