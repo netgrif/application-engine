@@ -38,6 +38,8 @@ public class ElasticCase {
     @Version
     private Long version;
 
+    private LocalDateTime lastModified;
+
     @Field(type = Keyword)
     private String stringId;
 
@@ -79,6 +81,7 @@ public class ElasticCase {
 
     public ElasticCase(Case useCase) {
         stringId = useCase.getStringId();
+        lastModified = useCase.getLastModified();
         processIdentifier = useCase.getProcessIdentifier();
         visualId = useCase.getVisualId();
         title = useCase.getTitle();
@@ -103,6 +106,7 @@ public class ElasticCase {
 
     public void update(ElasticCase useCase) {
         version++;
+        lastModified = useCase.getLastModified();
         title = useCase.getTitle();
         titleSortable = useCase.getTitle();
         taskIds = useCase.getTaskIds();
