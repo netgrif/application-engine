@@ -23,7 +23,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.springframework.data.elasticsearch.annotations.FieldType.Keyword;
-import static org.springframework.data.elasticsearch.annotations.FieldType.Nested;
 
 @SuppressWarnings("OptionalIsPresent")
 @Data
@@ -38,7 +37,7 @@ public class ElasticCase {
     @Version
     private Long version;
 
-    private LocalDateTime lastModified;
+    private Long lastModified;
 
     @Field(type = Keyword)
     private String stringId;
@@ -67,8 +66,7 @@ public class ElasticCase {
     @Field(type = Keyword)
     private String authorEmail;
 
-    @Field(type = Nested)
-    private List<DataField> dataSet;
+    private Map<String, DataField> dataSet;
 
     @Field(type = Keyword)
     private Set<String> taskIds;
@@ -81,7 +79,7 @@ public class ElasticCase {
 
     public ElasticCase(Case useCase) {
         stringId = useCase.getStringId();
-        lastModified = useCase.getLastModified();
+        lastModified = Timestamp.valueOf(useCase.getLastModified()).getTime();
         processIdentifier = useCase.getProcessIdentifier();
         visualId = useCase.getVisualId();
         title = useCase.getTitle();
@@ -95,11 +93,11 @@ public class ElasticCase {
         taskMongoIds = useCase.getTasks().stream().map(TaskPair::getTask).collect(Collectors.toSet());
         enabledRoles = new HashSet<>(useCase.getEnabledRoles());
 
-        dataSet = new LinkedList<>();
+        dataSet = new HashMap<>();
         for (String id : useCase.getImmediateDataFields()) {
-            Optional<DataField> parseValue = parseValue(id, useCase.getDataField(id));
+            Optional<DataField> parseValue = parseValue(useCase.getDataField(id));
             if (parseValue.isPresent()) {
-                dataSet.add(parseValue.get());
+                dataSet.put(id, parseValue.get());
             }
         }
     }
@@ -115,7 +113,7 @@ public class ElasticCase {
         dataSet = useCase.getDataSet();
     }
 
-    private Optional<DataField> parseValue(String id, com.netgrif.workflow.workflow.domain.DataField dataField) {
+    private Optional<DataField> parseValue(com.netgrif.workflow.workflow.domain.DataField dataField) {
         // Set<I18nString>
         if (dataField.getValue() instanceof User) {
             User user = (User) dataField.getValue();
@@ -129,24 +127,24 @@ public class ElasticCase {
             if (user.getName() != null) {
                 fullname.append(user.getName());
             }
-            return Optional.of(new DataField(id, String.valueOf(user.getId()), fullname.toString()));
+            return Optional.of(new DataField(String.valueOf(user.getId()), fullname.toString()));
         } else if (dataField.getValue() instanceof LocalDate) {
             LocalDate date = (LocalDate) dataField.getValue();
             if (date == null)
                 return Optional.empty();
-            return Optional.of(new DataField(id, String.valueOf(date), date.format(DateTimeFormatter.BASIC_ISO_DATE)));
+            return Optional.of(new DataField(String.valueOf(date), date.format(DateTimeFormatter.BASIC_ISO_DATE)));
         } else if (dataField.getValue() instanceof LocalDateTime) {
             LocalDateTime date = (LocalDateTime) dataField.getValue();
             if (date == null)
                 return Optional.empty();
-            return Optional.of(new DataField(id, String.valueOf(date), date.format(DateTimeFormatter.BASIC_ISO_DATE)));
+            return Optional.of(new DataField(String.valueOf(date), date.format(DateTimeFormatter.BASIC_ISO_DATE)));
         } else {
             if (dataField.getValue() == null)
                 return Optional.empty();
             String string = dataField.getValue().toString();
             if (string == null)
                 return Optional.empty();
-            return Optional.of(new DataField(id, string));
+            return Optional.of(new DataField(string));
         }
     }
 }
