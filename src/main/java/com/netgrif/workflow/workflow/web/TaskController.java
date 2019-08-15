@@ -34,7 +34,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.FileNotFoundException;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
@@ -159,25 +158,26 @@ public class TaskController {
         return resources;
     }
 
-    @RequestMapping(value = "/search", method = RequestMethod.POST)
-    public PagedResources<LocalisedTaskResource> search(Authentication auth, Pageable pageable, @RequestBody Map<String, Object> searchBody, PagedResourcesAssembler<com.netgrif.workflow.workflow.domain.Task> assembler, Locale locale) {
-        Page<com.netgrif.workflow.workflow.domain.Task> tasks = taskService.search(searchBody, pageable, (LoggedUser) auth.getPrincipal());
-        Link selfLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
-                .search(auth, pageable, searchBody, assembler, locale)).withRel("search");
-        PagedResources<LocalisedTaskResource> resources = assembler.toResource(tasks, new TaskResourceAssembler(locale), selfLink);
-        ResourceLinkAssembler.addLinks(resources, com.netgrif.workflow.workflow.domain.Task.class, selfLink.getRel());
-        return resources;
-    }
-
+//    TODO remove this
 //    @RequestMapping(value = "/search", method = RequestMethod.POST)
-//    public PagedResources<LocalisedTaskResource> search(Authentication auth, Pageable pageable, @RequestBody TaskSearchRequest searchBody, PagedResourcesAssembler<ElasticTask> assembler, Locale locale) {
-//        Page<ElasticTask> tasks = searchService.search(searchBody, (LoggedUser) auth.getPrincipal(), pageable);
+//    public PagedResources<LocalisedTaskResource> search(Authentication auth, Pageable pageable, @RequestBody Map<String, Object> searchBody, PagedResourcesAssembler<com.netgrif.workflow.workflow.domain.Task> assembler, Locale locale) {
+//        Page<com.netgrif.workflow.workflow.domain.Task> tasks = taskService.search(searchBody, pageable, (LoggedUser) auth.getPrincipal());
 //        Link selfLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
 //                .search(auth, pageable, searchBody, assembler, locale)).withRel("search");
-//        PagedResources<LocalisedTaskResource> resources = assembler.toResource(tasks, new ElasticTaskResourceAssembler(), selfLink);
+//        PagedResources<LocalisedTaskResource> resources = assembler.toResource(tasks, new TaskResourceAssembler(locale), selfLink);
 //        ResourceLinkAssembler.addLinks(resources, com.netgrif.workflow.workflow.domain.Task.class, selfLink.getRel());
 //        return resources;
 //    }
+
+    @RequestMapping(value = "/search", method = RequestMethod.POST)
+    public PagedResources<LocalisedTaskResource> search(Authentication auth, Pageable pageable, @RequestBody TaskSearchRequest searchBody, PagedResourcesAssembler<ElasticTask> assembler, Locale locale) {
+        Page<ElasticTask> tasks = searchService.search(searchBody, (LoggedUser) auth.getPrincipal(), pageable);
+        Link selfLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
+                .search(auth, pageable, searchBody, assembler, locale)).withRel("search");
+        PagedResources<LocalisedTaskResource> resources = assembler.toResource(tasks, new ElasticTaskResourceAssembler(), selfLink);
+        ResourceLinkAssembler.addLinks(resources, com.netgrif.workflow.workflow.domain.Task.class, selfLink.getRel());
+        return resources;
+    }
 
     @PostMapping(value = "/count", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public CountResponse count(@RequestBody TaskSearchRequest query, Authentication auth, Locale locale) {
