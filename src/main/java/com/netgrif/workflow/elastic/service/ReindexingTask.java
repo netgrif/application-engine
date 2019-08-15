@@ -20,6 +20,7 @@ import org.springframework.stereotype.Component;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.time.Month;
 
 @Component
 @ConditionalOnProperty(value = "spring.data.elasticsearch.reindex")
@@ -44,7 +45,7 @@ public class ReindexingTask {
     @Autowired
     private IElasticCaseService elasticCaseService;
 
-    private LocalDateTime lastRun = LocalDateTime.MIN;
+    private LocalDateTime lastRun = LocalDateTime.of(2000, Month.JANUARY,1,0,0,0,0);
 
     @Scheduled(cron = "#{springElasticsearchReindex}")
     public void reindex() {
