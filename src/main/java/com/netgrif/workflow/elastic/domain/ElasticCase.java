@@ -5,11 +5,13 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.netgrif.workflow.auth.domain.User;
+import com.netgrif.workflow.petrinet.domain.I18nString;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.TaskPair;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.bouncycastle.util.Times;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Version;
 import org.springframework.data.elasticsearch.annotations.Document;
@@ -18,6 +20,7 @@ import org.springframework.data.elasticsearch.annotations.Field;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -115,29 +118,34 @@ public class ElasticCase {
 
     private Optional<DataField> parseValue(com.netgrif.workflow.workflow.domain.DataField dataField) {
         // Set<I18nString>
-        if (dataField.getValue() instanceof User) {
+        if (dataField.getValue() instanceof Set) {
+            if (dataField.getValue() == null)
+                return Optional.empty();
+            Set values = (Set) dataField.getValue();
+            return Optional.of(new DataField((String) values.stream().map(Object::toString).collect(Collectors.joining(" "))));
+        } else if (dataField.getValue() instanceof User) {
             User user = (User) dataField.getValue();
             if (user == null)
-                return Optional.of(new DataField(""," "));
-            StringBuilder fullname = new StringBuilder("");
+                return Optional.empty();
+            StringBuilder fullName = new StringBuilder("");
             if (user.getSurname() != null) {
-                fullname.append(user.getSurname());
-                fullname.append(" ");
+                fullName.append(user.getSurname());
+                fullName.append(" ");
             }
             if (user.getName() != null) {
-                fullname.append(user.getName());
+                fullName.append(user.getName());
             }
-            return Optional.of(new DataField(String.valueOf(user.getId()), fullname.toString()));
+            return Optional.of(new UserField(String.valueOf(user.getId()), user.getEmail(), fullName.toString()));
         } else if (dataField.getValue() instanceof LocalDate) {
             LocalDate date = (LocalDate) dataField.getValue();
             if (date == null)
                 return Optional.empty();
-            return Optional.of(new DataField(String.valueOf(date), date.format(DateTimeFormatter.BASIC_ISO_DATE)));
+            return Optional.of(new DateField(date.format(DateTimeFormatter.BASIC_ISO_DATE), Timestamp.valueOf(LocalDateTime.of(date, LocalTime.NOON)).getTime()));
         } else if (dataField.getValue() instanceof LocalDateTime) {
             LocalDateTime date = (LocalDateTime) dataField.getValue();
             if (date == null)
                 return Optional.empty();
-            return Optional.of(new DataField(String.valueOf(date), date.format(DateTimeFormatter.BASIC_ISO_DATE)));
+            return Optional.of(new DateField(date.format(DateTimeFormatter.BASIC_ISO_DATE), Timestamp.valueOf(date).getTime()));
         } else {
             if (dataField.getValue() == null)
                 return Optional.empty();
