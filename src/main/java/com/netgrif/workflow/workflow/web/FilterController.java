@@ -1,6 +1,7 @@
 package com.netgrif.workflow.workflow.web;
 
 import com.netgrif.workflow.auth.domain.LoggedUser;
+import com.netgrif.workflow.auth.domain.throwable.UnauthorisedRequestException;
 import com.netgrif.workflow.workflow.domain.Filter;
 import com.netgrif.workflow.workflow.service.interfaces.IFilterService;
 import com.netgrif.workflow.workflow.web.requestbodies.CreateFilterBody;
@@ -16,7 +17,6 @@ import org.springframework.hateoas.PagedResources;
 import org.springframework.hateoas.mvc.ControllerLinkBuilder;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-
 
 import java.util.Locale;
 import java.util.Map;
@@ -37,8 +37,9 @@ public class FilterController {
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
-    public MessageResource deleteFilter(@PathVariable("id") String filterId, Authentication auth) {
-        boolean success = filterService.deleteFilter(filterId, (LoggedUser) auth.getPrincipal());
+    public MessageResource deleteFilter(@PathVariable("id") String filterId, Authentication auth) throws UnauthorisedRequestException {
+        LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
+        boolean success = filterService.deleteFilter(filterId, loggedUser);
         if (success)
             return MessageResource.successMessage("Filter " + filterId + " successfully deleted");
         return MessageResource.errorMessage("Filter " + filterId + " has failed to delete");
