@@ -109,9 +109,16 @@ public class WorkflowService implements IWorkflowService {
 
     @Override
     public List<Case> findAllById(List<String> ids) {
-        List<Case> page = repository.findAllBy_idIn(ids);
-        page.forEach(this::setPetriNet);
-        decryptDataSets(page);
+        List<Case> page = new LinkedList<>();
+        ids.forEach(id -> {
+            Optional<Case> useCase = repository.findById(id);
+            useCase.ifPresent(page::add);
+        });
+        if (page.size() > 0) {
+            PetriNet net = petriNetService.clone(page.get(0).getPetriNetObjectId());
+            page.forEach(c -> c.setPetriNet(net));
+            decryptDataSets(page);
+        }
         page.forEach(this::setImmediateDataFields);
         return page;
     }
