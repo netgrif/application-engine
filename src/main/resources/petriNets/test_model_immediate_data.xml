@@ -105,6 +105,10 @@
         <id>file_field</id>
         <title>File</title>
     </data>
+    <data type="dateTime" immediate="true">
+        <id>datetime_field</id>
+        <title>Date Time</title>
+    </data>
 
     <i18n locale="en">
         <i18nString name="case_name">New case</i18nString>
@@ -152,12 +156,6 @@
                     <behavior>editable</behavior>
                 </logic>
             </dataRef>
-            <dataRef>
-                <id>date_field</id>
-                <logic>
-                    <behavior>editable</behavior>
-                </logic>
-            </dataRef>
         </dataGroup>
         <dataGroup>
             <id>2</id>
@@ -165,12 +163,6 @@
             <alignment>start</alignment>
             <dataRef>
                 <id>enumeration_field</id>
-                <logic>
-                    <behavior>editable</behavior>
-                </logic>
-            </dataRef>
-            <dataRef>
-                <id>enumeration_field_old</id>
                 <logic>
                     <behavior>editable</behavior>
                 </logic>
@@ -194,6 +186,23 @@
             </dataRef>
             <dataRef>
                 <id>file_field</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>4</id>
+            <title>Date fields</title>
+            <alignment>start</alignment>
+            <dataRef>
+                <id>datetime_field</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>date_field</id>
                 <logic>
                     <behavior>editable</behavior>
                 </logic>
