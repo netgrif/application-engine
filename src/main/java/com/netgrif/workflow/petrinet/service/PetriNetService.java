@@ -17,10 +17,11 @@ import com.netgrif.workflow.petrinet.web.requestbodies.UploadedFileMeta;
 import com.netgrif.workflow.petrinet.web.responsebodies.DataFieldReference;
 import com.netgrif.workflow.petrinet.web.responsebodies.PetriNetReference;
 import com.netgrif.workflow.petrinet.web.responsebodies.TransitionReference;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.bson.Document;
 import org.bson.types.ObjectId;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Lookup;
 import org.springframework.context.ApplicationEventPublisher;
@@ -39,8 +40,8 @@ import org.springframework.data.repository.support.PageableExecutionUtils;
 import org.springframework.stereotype.Service;
 
 import javax.validation.constraints.NotNull;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -92,14 +93,14 @@ public abstract class PetriNetService implements IPetriNetService {
 
     @Override
     public Optional<PetriNet> importPetriNetAndDeleteFile(File xmlFile, UploadedFileMeta netMetaData, LoggedUser user) throws IOException {
-        Optional<PetriNet> imported = importPetriNet(xmlFile, netMetaData, user);
+        Optional<PetriNet> imported = importPetriNet(new FileInputStream(xmlFile), netMetaData, user);
         if (!xmlFile.delete())
             throw new IOException("File of process was not deleted");
         return imported;
     }
 
     @Override
-    public Optional<PetriNet> importPetriNet(File xmlFile, UploadedFileMeta metaData, LoggedUser user) throws IOException {
+    public Optional<PetriNet> importPetriNet(InputStream xmlFile, UploadedFileMeta metaData, LoggedUser user) throws IOException {
         PetriNet existingNet = getNewestVersionByIdentifier(metaData.identifier);
         Optional<PetriNet> newPetriNet;
         if (existingNet == null) {
@@ -117,13 +118,17 @@ public abstract class PetriNetService implements IPetriNetService {
         return newPetriNet;
     }
 
-    private Optional<PetriNet> importNewPetriNet(File xmlFile, UploadedFileMeta metaData, LoggedUser user) {
-        Optional<PetriNet> imported = getImporter().importPetriNet(xmlFile, metaData.name, metaData.initials, new Config());
+    private Optional<PetriNet> importNewPetriNet(InputStream xmlFile, UploadedFileMeta metaData, LoggedUser user) throws IOException {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        IOUtils.copy(xmlFile, baos);
+        byte[] bytes = baos.toByteArray();
+
+        Optional<PetriNet> imported = getImporter().importPetriNet(new ByteArrayInputStream(bytes), metaData.name, metaData.initials, new Config());
         imported.ifPresent(petriNet -> {
             userProcessRoleService.saveRoles(imported.get().getRoles().values(), imported.get().getStringId());
 
             try {
-                setupImportedPetriNet(imported.get(), xmlFile, metaData, user);
+                setupImportedPetriNet(imported.get(), new ByteArrayInputStream(bytes), metaData, user);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -132,19 +137,23 @@ public abstract class PetriNetService implements IPetriNetService {
         return imported;
     }
 
-    private Optional<PetriNet> importNewVersion(File xmlFile, UploadedFileMeta meta, @NotNull PetriNet previousVersion, LoggedUser user) {
+    private Optional<PetriNet> importNewVersion(InputStream xmlFile, UploadedFileMeta meta, @NotNull PetriNet previousVersion, LoggedUser user) throws IOException {
         Config config = Config.builder()
                 .notSaveObjects(true)
                 .build();
 
-        Optional<PetriNet> imported = getImporter().importPetriNet(xmlFile, meta.name, meta.initials, config);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        IOUtils.copy(xmlFile, baos);
+        byte[] bytes = baos.toByteArray();
+
+        Optional<PetriNet> imported = getImporter().importPetriNet(new ByteArrayInputStream(bytes), meta.name, meta.initials, config);
         imported.ifPresent(petriNet -> {
             petriNet.setVersion(previousVersion.getVersion());
             petriNet.incrementVersion(PetriNet.VersionType.valueOf(meta.releaseType.trim().toUpperCase()));
             List<ProcessRole> newRoles = migrateProcessRoles(petriNet, previousVersion);
 
             try {
-                setupImportedPetriNet(petriNet, xmlFile, meta, user);
+                setupImportedPetriNet(petriNet, new ByteArrayInputStream(bytes), meta, user);
                 userProcessRoleService.saveRoles(newRoles, petriNet.getStringId());
             } catch (IOException e) {
                 e.printStackTrace();
@@ -185,19 +194,18 @@ public abstract class PetriNetService implements IPetriNetService {
         return processRoleRepository.saveAll(newRoles);
     }
 
-    private void setupImportedPetriNet(PetriNet net, File xmlFile, UploadedFileMeta meta, LoggedUser user) throws IOException {
+    private void setupImportedPetriNet(PetriNet net, InputStream xmlFile, UploadedFileMeta meta, LoggedUser user) throws IOException {
         net.setAuthor(user.transformToAuthor());
         if (meta.identifier != null && !meta.identifier.isEmpty()) {
             net.setIdentifier(meta.identifier);
         }
 
         net = repository.save(net);
+        Path savedPath = getImporter().saveNetFile(net, xmlFile);
         log.info("Petri net " + meta.name + " (" + meta.initials + " v" + net.getVersion() + ") imported successfully");
-        publisher.publishEvent(new UserImportModelEvent(user, xmlFile, meta.name, meta.initials));
 
-        getImporter().saveNetFile(net, xmlFile);
+        publisher.publishEvent(new UserImportModelEvent(user, new File(savedPath.toString()), meta.name, meta.initials));
     }
-
 
     @Override
     public Optional<PetriNet> saveNew(PetriNet petriNet) {
