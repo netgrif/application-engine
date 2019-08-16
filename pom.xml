@@ -355,7 +355,7 @@
                         <configuration>
                             <!-- The package of your generated sources -->
                             <packageName>com.netgrif.workflow.importer.model</packageName>
-                            <outputDirectory>src/main/java</outputDirectory>
+                            <outputDirectory>${project.build.directory}/generated-sources/java</outputDirectory>
                             <sources>
                                 <source>src/main/resources/petriNets/petriflow_schema.xsd</source>
                             </sources>
@@ -383,6 +383,21 @@
                         <goals>
                             <goal>clean</goal>
                         </goals>
+                    </execution>
+                    <execution>
+                        <id>target</id>
+                        <phase>clean</phase>
+                        <goals>
+                            <goal>clean</goal>
+                        </goals>
+                        <configuration>
+                            <excludeDefaultDirectories>true</excludeDefaultDirectories>
+                            <filesets>
+                                <fileset>
+                                    <directory>target</directory>
+                                </fileset>
+                            </filesets>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
