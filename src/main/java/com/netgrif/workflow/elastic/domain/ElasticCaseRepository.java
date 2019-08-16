@@ -7,4 +7,6 @@ import org.springframework.stereotype.Repository;
 public interface ElasticCaseRepository extends ElasticsearchRepository<ElasticCase, String> {
 
     ElasticCase findByStringId(String stringId);
+
+    long countByStringIdAndLastModified(String stringId, long lastUpdated);
 }
