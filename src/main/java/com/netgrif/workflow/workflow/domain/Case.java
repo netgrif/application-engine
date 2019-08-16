@@ -190,14 +190,10 @@ public class Case {
     }
 
     public boolean removeTask(Task task) {
-//        return this.tasks.remove(new TaskPair(task.getStringId(), task.getTransitionId()));
         return this.removeTasks(Collections.singletonList(task));
     }
 
     public boolean removeTasks(List<Task> tasks) {
-//        List<TaskPair> taskPairsToRemove = tasks.stream().map(task -> new TaskPair(task.getStringId(), task.getTransitionId()))
-//                .collect(Collectors.toList());
-//        return this.tasks.removeAll(taskPairsToRemove);
         int sizeBeforeChange = this.tasks.size();
         Set<String> tasksTransitions = tasks.stream().map(Task::getTransitionId).collect(Collectors.toSet());
         this.tasks = this.tasks.stream().filter(pair -> !tasksTransitions.contains(pair.getTransition())).collect(Collectors.toSet());
