@@ -1,4 +1,4 @@
-package com.netgrif.workflow.elastic.service;
+package com.netgrif.workflow.elastic.service.interfaces;
 
 import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.elastic.domain.ElasticTask;
