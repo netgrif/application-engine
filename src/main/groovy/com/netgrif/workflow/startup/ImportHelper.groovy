@@ -31,7 +31,6 @@ import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.io.ResourceLoader
 import org.springframework.stereotype.Component
-import org.springframework.util.ResourceUtils
 
 @Component
 class ImportHelper {
@@ -127,7 +126,7 @@ class ImportHelper {
     }
 
     Optional<PetriNet> createNet(String fileName, String identifier, String name, String initials, String release, LoggedUser loggedUser) {
-        return petriNetService.importPetriNet(ResourceUtils.getFile("classpath:petriNets/$fileName"),
+        return petriNetService.importPetriNet(new File("src/main/resources/petriNets/$fileName"),
                 new UploadedFileMeta(name, initials, identifier, release), loggedUser)
     }
 
