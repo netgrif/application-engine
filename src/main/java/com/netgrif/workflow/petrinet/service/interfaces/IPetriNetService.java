@@ -15,6 +15,7 @@ import org.springframework.data.domain.Pageable;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -26,7 +27,7 @@ public interface IPetriNetService {
 
     Optional<PetriNet> importPetriNetAndDeleteFile(File xmlFile, UploadedFileMeta netMetaData, LoggedUser user) throws IOException;
 
-    Optional<PetriNet> importPetriNet(File xmlFile, UploadedFileMeta metaData, LoggedUser user) throws IOException;
+    Optional<PetriNet> importPetriNet(InputStream xmlFile, UploadedFileMeta metaData, LoggedUser user) throws IOException;
 
     Optional<PetriNet> saveNew(PetriNet petriNet);
 
