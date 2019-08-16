@@ -1,0 +1,345 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://modeler.netgrif.com/petriflow_schema.xsd">
+    <!-- TRANSACTIONS -->
+    <!-- ROLES -->
+    <role>
+        <id>role1</id>
+        <name>role1</name>
+    <!-- DATA -->
+    <data type="date">
+        <id>datum</id>
+        <title>Datum</title>
+    </data>
+    <data type="text">
+        <id>student_meno</id>
+        <title>Meno študenta</title>
+    </data>
+    <data type="text">
+        <id>student_priezvisko</id>
+        <title>Priezvisko študenta</title>
+    </data>
+    <data type="text">
+        <id>student_titul</id>
+        <title>Titul študenta</title>
+    </data>
+    <data type="text">
+        <id>praca_nazov</id>
+        <title>Názov práce</title>
+    </data>
+    <data type="enumeration">
+        <id>praca_program</id>
+        <title>Študijný program</title>
+        <values>Aplikovaná informatika</values>
+        <values>Mechatronika</values>
+        <init>Aplikovaná informatika</init>
+    </data>
+    <data type="text">
+        <id>praca_veduci</id>
+        <title>Meno vedúceho</title>
+    </data>
+    <data type="text">
+        <id>praca_oponent</id>
+        <title>Meno oponenta</title>
+    </data>
+    <!-- TRANSITIONS -->
+    <transition>
+        <id>2</id>
+        <x>300</x>
+        <y>260</y>
+        <label>Info o praci</label>
+        <assignPolicy>auto</assignPolicy>
+        <dataGroup>
+            <id>student</id>
+            <title>Študent</title>
+            <dataRef>
+                <id>datum</id>
+                <logic>
+                    <behavior>required</behavior>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>student_meno</id>
+                <logic>
+                    <behavior>required</behavior>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>student_priezvisko</id>
+                <logic>
+                    <behavior>required</behavior>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>student_titul</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>praca</id>
+            <title>Práca</title>
+            <dataRef>
+                <id>praca_nazov</id>
+                <logic>
+                    <behavior>required</behavior>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>praca_program</id>
+                <logic>
+                    <behavior>required</behavior>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>praca_veduci</id>
+                <logic>
+                    <behavior>required</behavior>
+                    <behavior>editable</behavior>
+                    <action trigger="get">
+                        veduci: f.praca_veduci;
+
+                        change veduci value {
+                            useCase.author.fullName
+                        }
+                    </action>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>praca_oponent</id>
+                <logic>
+                    <behavior>required</behavior>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+    </transition>
+    <transition>
+        <id>7</id>
+        <x>580</x>
+        <y>140</y>
+        <label>Postup a dokumentácia riešenia</label>
+    </transition>
+    <transition>
+        <id>8</id>
+        <x>580</x>
+        <y>220</y>
+        <label>Odborná úroveň</label>
+    </transition>
+    <transition>
+        <id>9</id>
+        <x>580</x>
+        <y>300</y>
+        <label>Formálna úroveň</label>
+    </transition>
+    <transition>
+        <id>10</id>
+        <x>580</x>
+        <y>380</y>
+        <label>Celkové zhodnotenie</label>
+    </transition>
+    <transition>
+        <id>19</id>
+        <x>860</x>
+        <y>260</y>
+        <label>Vytvoriť posudok</label>
+    </transition>
+    <!-- PLACES -->
+    <place>
+        <id>1</id>
+        <x>180</x>
+        <y>260</y>
+        <label></label>
+        <tokens>1</tokens>
+        <static>false</static>
+    </place>
+    <place>
+        <id>3</id>
+        <x>460</x>
+        <y>140</y>
+        <label></label>
+        <tokens>0</tokens>
+        <static>false</static>
+    </place>
+    <place>
+        <id>4</id>
+        <x>460</x>
+        <y>220</y>
+        <label></label>
+        <tokens>0</tokens>
+        <static>false</static>
+    </place>
+    <place>
+        <id>5</id>
+        <x>460</x>
+        <y>300</y>
+        <label></label>
+        <tokens>0</tokens>
+        <static>false</static>
+    </place>
+    <place>
+        <id>6</id>
+        <x>460</x>
+        <y>380</y>
+        <label></label>
+        <tokens>0</tokens>
+        <static>false</static>
+    </place>
+    <place>
+        <id>15</id>
+        <x>700</x>
+        <y>140</y>
+        <label></label>
+        <tokens>0</tokens>
+        <static>false</static>
+    </place>
+    <place>
+        <id>16</id>
+        <x>700</x>
+        <y>220</y>
+        <label></label>
+        <tokens>0</tokens>
+        <static>false</static>
+    </place>
+    <place>
+        <id>17</id>
+        <x>700</x>
+        <y>300</y>
+        <label></label>
+        <tokens>0</tokens>
+        <static>false</static>
+    </place>
+    <place>
+        <id>18</id>
+        <x>700</x>
+        <y>380</y>
+        <label></label>
+        <tokens>0</tokens>
+        <static>false</static>
+    </place>
+    <!-- ARCS -->
+    <arc>
+        <id>11</id>
+        <type>read</type>
+        <sourceId>3</sourceId>
+        <destinationId>7</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>12</id>
+        <type>read</type>
+        <sourceId>4</sourceId>
+        <destinationId>8</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>13</id>
+        <type>read</type>
+        <sourceId>5</sourceId>
+        <destinationId>9</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>14</id>
+        <type>read</type>
+        <sourceId>6</sourceId>
+        <destinationId>10</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>22</id>
+        <type>regular</type>
+        <sourceId>1</sourceId>
+        <destinationId>2</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>23</id>
+        <type>regular</type>
+        <sourceId>2</sourceId>
+        <destinationId>3</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>24</id>
+        <type>regular</type>
+        <sourceId>2</sourceId>
+        <destinationId>4</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>25</id>
+        <type>regular</type>
+        <sourceId>2</sourceId>
+        <destinationId>5</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>26</id>
+        <type>regular</type>
+        <sourceId>2</sourceId>
+        <destinationId>6</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>27</id>
+        <type>regular</type>
+        <sourceId>10</sourceId>
+        <destinationId>18</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>28</id>
+        <type>regular</type>
+        <sourceId>9</sourceId>
+        <destinationId>17</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>29</id>
+        <type>regular</type>
+        <sourceId>8</sourceId>
+        <destinationId>16</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>30</id>
+        <type>regular</type>
+        <sourceId>7</sourceId>
+        <destinationId>15</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>44</id>
+        <type>read</type>
+        <sourceId>15</sourceId>
+        <destinationId>19</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>45</id>
+        <type>read</type>
+        <sourceId>17</sourceId>
+        <destinationId>19</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>46</id>
+        <type>read</type>
+        <sourceId>16</sourceId>
+        <destinationId>19</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>47</id>
+        <type>read</type>
+        <sourceId>18</sourceId>
+        <destinationId>19</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+</document>

@@ -1,5 +1,6 @@
 package com.netgrif.workflow.elastic.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
@@ -11,6 +12,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Version;
 import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 
@@ -32,6 +34,11 @@ public class ElasticCase {
 
     @Id
     private String id;
+
+    @Version
+    private Long version;
+
+    private Long lastModified;
 
     @Field(type = Keyword)
     private String stringId;
@@ -73,6 +80,7 @@ public class ElasticCase {
 
     public ElasticCase(Case useCase) {
         stringId = useCase.getStringId();
+        lastModified = Timestamp.valueOf(useCase.getLastModified()).getTime();
         processIdentifier = useCase.getProcessIdentifier();
         visualId = useCase.getVisualId();
         title = useCase.getTitle();
@@ -96,6 +104,8 @@ public class ElasticCase {
     }
 
     public void update(ElasticCase useCase) {
+        version++;
+        lastModified = useCase.getLastModified();
         title = useCase.getTitle();
         titleSortable = useCase.getTitle();
         taskIds = useCase.getTaskIds();
