@@ -2,6 +2,7 @@ package com.netgrif.workflow.workflow.service;
 
 
 import com.netgrif.workflow.auth.domain.LoggedUser;
+import com.netgrif.workflow.auth.domain.throwable.UnauthorisedRequestException;
 import com.netgrif.workflow.petrinet.domain.I18nString;
 import com.netgrif.workflow.workflow.domain.Filter;
 import com.netgrif.workflow.workflow.domain.repositories.FilterRepository;
@@ -25,14 +26,14 @@ public class FilterService implements IFilterService {
     private FilterSearchService searchService;
 
     @Override
-    public boolean deleteFilter(String filterId, LoggedUser user) {
+    public boolean deleteFilter(String filterId, LoggedUser user) throws UnauthorisedRequestException {
         Optional<Filter> result = repository.findById(filterId);
         if (!result.isPresent())
             throw new IllegalArgumentException("Filter not found");
 
         Filter filter = result.get();
-        if (filter.getAuthor().getId().equals(user.getId()))
-            throw new IllegalArgumentException("User " + user.getUsername() + " doesn't have permission to delete filter " + filter.getStringId());
+        if (!user.isAdmin() && !user.getId().equals(filter.getAuthor().getId()))
+            throw new UnauthorisedRequestException("User " + user.getUsername() + " doesn't have permission to delete filter " + filter.getStringId());
 
         repository.delete(filter);
         return true;
