@@ -1,5 +1,6 @@
 package com.netgrif.workflow.elastic.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
@@ -11,6 +12,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Version;
 import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 
@@ -33,6 +35,11 @@ public class ElasticCase {
     @Id
     private String id;
 
+    @Version
+    private Long version;
+
+    private Long lastModified;
+
     @Field(type = Keyword)
     private String stringId;
 
@@ -43,6 +50,9 @@ public class ElasticCase {
     private String processIdentifier;
 
     private String title;
+
+    @Field(type = Keyword)
+    private String titleSortable;
 
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
@@ -70,9 +80,11 @@ public class ElasticCase {
 
     public ElasticCase(Case useCase) {
         stringId = useCase.getStringId();
+        lastModified = Timestamp.valueOf(useCase.getLastModified()).getTime();
         processIdentifier = useCase.getProcessIdentifier();
         visualId = useCase.getVisualId();
         title = useCase.getTitle();
+        titleSortable = useCase.getTitle();
         creationDate = useCase.getCreationDate();
         creationDateSortable = Timestamp.valueOf(useCase.getCreationDate()).getTime();
         author = useCase.getAuthor().getId();
@@ -92,7 +104,10 @@ public class ElasticCase {
     }
 
     public void update(ElasticCase useCase) {
+        version++;
+        lastModified = useCase.getLastModified();
         title = useCase.getTitle();
+        titleSortable = useCase.getTitle();
         taskIds = useCase.getTaskIds();
         taskMongoIds = useCase.getTaskMongoIds();
         enabledRoles = useCase.getEnabledRoles();
