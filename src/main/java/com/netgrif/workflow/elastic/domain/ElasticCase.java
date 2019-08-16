@@ -21,6 +21,7 @@ import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -143,6 +144,13 @@ public class ElasticCase {
             return Optional.of(new DateField(date.format(DateTimeFormatter.BASIC_ISO_DATE), Timestamp.valueOf(LocalDateTime.of(date, LocalTime.NOON)).getTime()));
         } else if (dataField.getValue() instanceof LocalDateTime) {
             LocalDateTime date = (LocalDateTime) dataField.getValue();
+            if (date == null)
+                return Optional.empty();
+            return Optional.of(new DataField(String.valueOf(date), date.format(DateTimeFormatter.BASIC_ISO_DATE)));
+        } else if (dataField.getValue() instanceof Date) {
+            LocalDateTime date = ((Date)dataField.getValue()).toInstant()
+                    .atZone(ZoneId.systemDefault())
+                    .toLocalDateTime();
             if (date == null)
                 return Optional.empty();
             return Optional.of(new DateField(date.format(DateTimeFormatter.BASIC_ISO_DATE), Timestamp.valueOf(date).getTime()));
