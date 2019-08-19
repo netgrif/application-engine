@@ -10,10 +10,7 @@ import static org.springframework.data.elasticsearch.annotations.FieldType.Keywo
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class DataField {
+public class DataField<T> {
 
-    @Field(type = Keyword)
-    public String id;
-
-    public String value;
+    public T value;
 }
