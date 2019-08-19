@@ -77,8 +77,11 @@ public abstract class PetriNetService implements IPetriNetService {
         cache = new HashMap<>();
     }
 
+    /**
+     * Get read only Petri net.
+     */
     @Override
-    public PetriNet clone(ObjectId petriNetId) {
+    public PetriNet get(ObjectId petriNetId) {
         PetriNet net = cache.get(petriNetId);
         if (net == null) {
             Optional<PetriNet> optional = repository.findById(petriNetId.toString());
@@ -88,7 +91,12 @@ public abstract class PetriNetService implements IPetriNetService {
             net = optional.get();
             cache.put(petriNetId, net);
         }
-        return net.clone();
+        return net;
+    }
+
+    @Override
+    public PetriNet clone(ObjectId petriNetId) {
+        return get(petriNetId).clone();
     }
 
     @Override
