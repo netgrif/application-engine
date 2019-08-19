@@ -30,7 +30,7 @@ public class ElasticTask {
     private String stringId;
 
     @Field(type = Keyword)
-    private String processIdentifier;
+    private String processId;
 
     @Field(type = Keyword)
     private String caseId;
@@ -79,7 +79,7 @@ public class ElasticTask {
 
     public ElasticTask(Task task) {
         this.stringId = task.getStringId();
-        this.processIdentifier = task.getProcessId();
+        this.processId = task.getProcessId();
         this.caseId = task.getCaseId();
         this.transitionId = task.getTransitionId();
         update(task);
