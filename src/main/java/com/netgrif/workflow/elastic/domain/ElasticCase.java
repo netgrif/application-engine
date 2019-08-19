@@ -54,9 +54,6 @@ public class ElasticCase {
 
     private String title;
 
-    @Field(type = Keyword)
-    private String titleSortable;
-
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     private LocalDateTime creationDate;
@@ -67,7 +64,6 @@ public class ElasticCase {
 
     private String authorName;
 
-    @Field(type = Keyword)
     private String authorEmail;
 
     private Map<String, DataField> dataSet;
@@ -87,7 +83,6 @@ public class ElasticCase {
         processIdentifier = useCase.getProcessIdentifier();
         visualId = useCase.getVisualId();
         title = useCase.getTitle();
-        titleSortable = useCase.getTitle();
         creationDate = useCase.getCreationDate();
         creationDateSortable = Timestamp.valueOf(useCase.getCreationDate()).getTime();
         author = useCase.getAuthor().getId();
@@ -110,7 +105,6 @@ public class ElasticCase {
         version++;
         lastModified = useCase.getLastModified();
         title = useCase.getTitle();
-        titleSortable = useCase.getTitle();
         taskIds = useCase.getTaskIds();
         taskMongoIds = useCase.getTaskMongoIds();
         enabledRoles = useCase.getEnabledRoles();
@@ -123,7 +117,9 @@ public class ElasticCase {
             if (dataField.getValue() == null)
                 return Optional.empty();
             Set values = (Set) dataField.getValue();
-            return Optional.of(new DataField((String) values.stream().map(Object::toString).collect(Collectors.joining(" "))));
+            return Optional.of(new TextField((String) values.stream().map(Object::toString).collect(Collectors.joining(" "))));
+        } else if (dataField.getValue() instanceof Number) {
+            return Optional.of(new NumberField((Double) dataField.getValue()));
         } else if (dataField.getValue() instanceof User) {
             User user = (User) dataField.getValue();
             if (user == null)
@@ -136,31 +132,30 @@ public class ElasticCase {
             if (user.getName() != null) {
                 fullName.append(user.getName());
             }
-            return Optional.of(new UserField(String.valueOf(user.getId()), user.getEmail(), fullName.toString()));
+            return Optional.of(new UserField(user.getId(), user.getEmail(), fullName.toString()));
         } else if (dataField.getValue() instanceof LocalDate) {
             LocalDate date = (LocalDate) dataField.getValue();
-            if (date == null)
-                return Optional.empty();
-            return Optional.of(new DateField(date.format(DateTimeFormatter.BASIC_ISO_DATE), Timestamp.valueOf(LocalDateTime.of(date, LocalTime.NOON)).getTime()));
+            return parseDateField(LocalDateTime.of(date, LocalTime.NOON));
         } else if (dataField.getValue() instanceof LocalDateTime) {
-            LocalDateTime date = (LocalDateTime) dataField.getValue();
-            if (date == null)
-                return Optional.empty();
-            return Optional.of(new DataField(String.valueOf(date), date.format(DateTimeFormatter.BASIC_ISO_DATE)));
+            return parseDateField((LocalDateTime) dataField.getValue());
         } else if (dataField.getValue() instanceof Date) {
             LocalDateTime date = ((Date)dataField.getValue()).toInstant()
                     .atZone(ZoneId.systemDefault())
                     .toLocalDateTime();
-            if (date == null)
-                return Optional.empty();
-            return Optional.of(new DateField(date.format(DateTimeFormatter.BASIC_ISO_DATE), Timestamp.valueOf(date).getTime()));
+            return parseDateField(date);
         } else {
             if (dataField.getValue() == null)
                 return Optional.empty();
             String string = dataField.getValue().toString();
             if (string == null)
                 return Optional.empty();
-            return Optional.of(new DataField(string));
+            return Optional.of(new TextField(string));
         }
+    }
+
+    private Optional<DataField> parseDateField(LocalDateTime date) {
+        if (date == null)
+            return Optional.empty();
+        return Optional.of(new DateField(date.format(DateTimeFormatter.BASIC_ISO_DATE), Timestamp.valueOf(date).getTime()));
     }
 }
