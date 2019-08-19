@@ -115,11 +115,10 @@ public class WorkflowService implements IWorkflowService {
             useCase.ifPresent(page::add);
         });
         if (page.size() > 0) {
-            PetriNet net = petriNetService.clone(page.get(0).getPetriNetObjectId());
-            page.forEach(c -> c.setPetriNet(net));
+            page.forEach(c -> c.setPetriNet(petriNetService.get(c.getPetriNetObjectId())));
             decryptDataSets(page);
+            page.forEach(this::setImmediateDataFieldsReadOnly);
         }
-        page.forEach(this::setImmediateDataFields);
         return page;
     }
 
@@ -280,6 +279,24 @@ public class WorkflowService implements IWorkflowService {
 
         LongStream.range(0L, fields.size()).forEach(l -> fields.get((int) l).setOrder(l));
         return fields;
+    }
+
+    private void setImmediateDataFieldsReadOnly(Case useCase) {
+        List<Field> immediateData = new ArrayList<>();
+
+        useCase.getImmediateDataFields().forEach(fieldId -> {
+            try {
+                Field field = fieldFactory.buildImmediateField(useCase, fieldId);
+                Field clone = field.clone();
+                clone.setValue(field.getValue());
+                immediateData.add(clone);
+            } catch (Exception e) {
+                log.error("Could not built immediate field [" + fieldId + "]");
+            }
+        });
+        LongStream.range(0L, immediateData.size()).forEach(index -> immediateData.get((int) index).setOrder(index));
+
+        useCase.setImmediateData(immediateData);
     }
 
     private Page<Case> setImmediateDataFields(Page<Case> cases) {
