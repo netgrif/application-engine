@@ -10,13 +10,13 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class UserField extends DataField {
+public class UserField extends DataField<Long> {
 
     private String email;
 
     private String fullName;
 
-    public UserField(String value, String email, String fullName) {
+    public UserField(long value, String email, String fullName) {
         super(value);
         this.email = email;
         this.fullName = fullName;
