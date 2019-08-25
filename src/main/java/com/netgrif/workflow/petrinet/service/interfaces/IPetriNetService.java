@@ -73,5 +73,7 @@ public interface IPetriNetService {
 
     void evictCache();
 
+    PetriNet get(ObjectId petriNetId);
+
     PetriNet clone(ObjectId petriNetId);
 }
