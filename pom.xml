@@ -5,7 +5,7 @@
 
     <groupId>com.netgrif</groupId>
     <artifactId>application-engine</artifactId>
-    <version>3.0.4</version>
+    <version>3.0.5</version>
     <packaging>jar</packaging>
 
     <name>NETGRIF Application Engine</name>
