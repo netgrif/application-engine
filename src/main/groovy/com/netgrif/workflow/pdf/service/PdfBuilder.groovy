@@ -28,7 +28,7 @@ class PdfBuilder {
         return this
     }
 
-    PdfBuilder load(String ... paths) {
+    PdfBuilder load(String... paths) {
         PDFMergerUtility pdfMerger = new PDFMergerUtility()
 
         document = new PDDocument()
@@ -43,7 +43,9 @@ class PdfBuilder {
     File save(String path) {
         if (document == null || path == null)
             throw new IllegalArgumentException("Document=[$document] and path=[$path]")
-        return document.save(path)
+        document.save(path)
+        document.close()
+        return new File(path)
     }
 
     PDDocument build() {
@@ -97,7 +99,7 @@ class PdfBuilder {
         }
     }
 
-    PdfBuilder merge(PDDocument ... documents) {
+    PdfBuilder merge(PDDocument... documents) {
         PDFMergerUtility pdfMerger = new PDFMergerUtility()
 
         documents.each { toMerge ->
