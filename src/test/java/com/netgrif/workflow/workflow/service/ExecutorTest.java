@@ -30,7 +30,7 @@ public class ExecutorTest {
 
     @Test
     public void runMoreThanCapacityExecutors() throws InterruptedException {
-        for (int i = 0; i < 50; i++) {
+        for (int i = 0; i < 500; i++) {
             final String id = "EXE" + i;
             executors.execute(id, () -> {
                 log.info("[" + id + "]Running task in executor");
