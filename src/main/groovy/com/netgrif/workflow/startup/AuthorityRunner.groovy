@@ -15,5 +15,6 @@ class AuthorityRunner extends AbstractOrderedCommandLineRunner {
     void run(String... strings) throws Exception {
         service.getOrCreate(Authority.user)
         service.getOrCreate(Authority.admin)
+        service.getOrCreate(Authority.system)
     }
 }
