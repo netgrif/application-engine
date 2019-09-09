@@ -19,6 +19,7 @@ public class Authority implements GrantedAuthority {
     public static final String ROLE = "ROLE_";
 
     public static final String admin = ROLE + "ADMIN";
+    public static final String system = ROLE + "SYSTEM";
     public static final String user = ROLE + "USER";
 
     @Id
