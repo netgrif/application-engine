@@ -5,6 +5,7 @@ public class ResponseMessage {
 
     private String success;
     private String error;
+    private Object data;
 
     public static ResponseMessage createSuccessMessage(String msg){
         ResponseMessage resMsg = new ResponseMessage();
@@ -12,9 +13,24 @@ public class ResponseMessage {
         return resMsg;
     }
 
+    public static ResponseMessage createSuccessMessageWithData(String msg, Object data){
+        ResponseMessage resMsg = new ResponseMessage();
+        resMsg.setSuccess(msg);
+        resMsg.setData(data);
+        return resMsg;
+    }
+
     public static ResponseMessage createErrorMessage(String msg){
         ResponseMessage resMsg = new ResponseMessage();
         resMsg.setError(msg);
+        return resMsg;
+    }
+
+
+    public static ResponseMessage createErrorMessageWithData(String msg, Object data){
+        ResponseMessage resMsg = new ResponseMessage();
+        resMsg.setError(msg);
+        resMsg.setData(data);
         return resMsg;
     }
 
@@ -32,5 +48,13 @@ public class ResponseMessage {
 
     public void setError(String error) {
         this.error = error;
+    }
+
+    public Object getData() {
+        return data;
+    }
+
+    public void setData(Object data) {
+        this.data = data;
     }
 }
