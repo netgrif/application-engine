@@ -55,4 +55,8 @@ class AdminConslole {
         }
     }
 
+    def test(){
+        println("TEST")
+    }
+
 }
