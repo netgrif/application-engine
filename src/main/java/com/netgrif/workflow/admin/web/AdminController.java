@@ -1,6 +1,5 @@
 package com.netgrif.workflow.admin.web;
 
-import com.netgrif.workflow.admin.AdminConsoleRunner;
 import com.netgrif.workflow.admin.service.interfaces.IAdminService;
 import com.netgrif.workflow.workflow.web.responsebodies.MessageResource;
 import io.swagger.annotations.ApiOperation;
@@ -18,7 +17,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
 
 import java.util.Collections;
 import java.util.HashSet;
