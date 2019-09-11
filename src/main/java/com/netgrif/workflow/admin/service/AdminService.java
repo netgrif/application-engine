@@ -16,7 +16,7 @@ public class AdminService implements IAdminService {
 
     @Override
     public MessageResource runCode(String code) {
-        actionsRunner.run(code);
-        return successMessage("OK");
+        Object result = actionsRunner.run(code);
+        return successMessage("OK", result);
     }
 }
