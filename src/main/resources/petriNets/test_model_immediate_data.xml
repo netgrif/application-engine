@@ -33,7 +33,7 @@
     <data type="number" immediate="true">
         <id>number_field</id>
         <title>Number</title>
-        <init>38</init>
+        <init>38.579</init>
         <format>
             <currency>
                 <code>EUR</code>
@@ -165,12 +165,6 @@
             <alignment>start</alignment>
             <dataRef>
                 <id>enumeration_field</id>
-                <logic>
-                    <behavior>editable</behavior>
-                </logic>
-            </dataRef>
-            <dataRef>
-                <id>enumeration_field_old</id>
                 <logic>
                     <behavior>editable</behavior>
                 </logic>
