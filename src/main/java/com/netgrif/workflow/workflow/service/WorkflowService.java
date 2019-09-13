@@ -1,6 +1,9 @@
 package com.netgrif.workflow.workflow.service;
 
 import com.netgrif.workflow.auth.domain.LoggedUser;
+import com.netgrif.workflow.elastic.domain.ElasticCase;
+import com.netgrif.workflow.elastic.service.ElasticCaseService;
+import com.netgrif.workflow.elastic.service.interfaces.IElasticCaseService;
 import com.netgrif.workflow.event.events.usecase.CreateCaseEvent;
 import com.netgrif.workflow.event.events.usecase.DeleteCaseEvent;
 import com.netgrif.workflow.event.events.usecase.UpdateMarkingEvent;
@@ -24,6 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -72,12 +76,22 @@ public class WorkflowService implements IWorkflowService {
     @Autowired
     private FieldFactory fieldFactory;
 
+    @Autowired
+    @Lazy
+    private IElasticCaseService elasticCaseService;
+
     @Override
     public Case save(Case useCase) {
         encryptDataSet(useCase);
         useCase = repository.save(useCase);
         if (useCase.getPetriNet() == null) {
             setPetriNet(useCase);
+        }
+        try {
+            setImmediateDataFields(useCase);
+            elasticCaseService.indexNow(new ElasticCase(useCase));
+        } catch (Exception e) {
+            log.error("Indexing failed ["+useCase.getStringId()+"]", e);
         }
         return useCase;
     }
@@ -95,10 +109,16 @@ public class WorkflowService implements IWorkflowService {
 
     @Override
     public List<Case> findAllById(List<String> ids) {
-        List<Case> page = repository.findAllBy_idIn(ids);
-        page.forEach(this::setPetriNet);
-        decryptDataSets(page);
-        page.forEach(this::setImmediateDataFields);
+        List<Case> page = new LinkedList<>();
+        ids.forEach(id -> {
+            Optional<Case> useCase = repository.findById(id);
+            useCase.ifPresent(page::add);
+        });
+        if (page.size() > 0) {
+            page.forEach(c -> c.setPetriNet(petriNetService.get(c.getPetriNetObjectId())));
+            decryptDataSets(page);
+            page.forEach(this::setImmediateDataFieldsReadOnly);
+        }
         return page;
     }
 
@@ -259,6 +279,24 @@ public class WorkflowService implements IWorkflowService {
 
         LongStream.range(0L, fields.size()).forEach(l -> fields.get((int) l).setOrder(l));
         return fields;
+    }
+
+    private void setImmediateDataFieldsReadOnly(Case useCase) {
+        List<Field> immediateData = new ArrayList<>();
+
+        useCase.getImmediateDataFields().forEach(fieldId -> {
+            try {
+                Field field = fieldFactory.buildImmediateField(useCase, fieldId);
+                Field clone = field.clone();
+                clone.setValue(field.getValue());
+                immediateData.add(clone);
+            } catch (Exception e) {
+                log.error("Could not built immediate field [" + fieldId + "]");
+            }
+        });
+        LongStream.range(0L, immediateData.size()).forEach(index -> immediateData.get((int) index).setOrder(index));
+
+        useCase.setImmediateData(immediateData);
     }
 
     private Page<Case> setImmediateDataFields(Page<Case> cases) {
