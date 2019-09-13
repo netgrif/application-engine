@@ -4,6 +4,8 @@ import com.google.common.collect.ImmutableMap;
 import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.elastic.domain.ElasticCase;
 import com.netgrif.workflow.elastic.domain.ElasticCaseRepository;
+import com.netgrif.workflow.elastic.service.executors.Executor;
+import com.netgrif.workflow.elastic.service.interfaces.IElasticCaseService;
 import com.netgrif.workflow.elastic.web.CaseSearchRequest;
 import com.netgrif.workflow.utils.FullPageRequest;
 import com.netgrif.workflow.workflow.domain.Case;
@@ -24,8 +26,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 import static org.elasticsearch.index.query.QueryBuilders.*;
@@ -44,10 +44,8 @@ public class ElasticCaseService implements IElasticCaseService {
     @Autowired
     private ElasticsearchTemplate template;
 
-//    @Autowired
-//    private Executors executors;
-
-    private ExecutorService executor = Executors.newSingleThreadExecutor();
+    @Autowired
+    private Executor executors;
 
     private Map<String, Float> fullTextFieldMap = ImmutableMap.of(
             "title", 2f,
@@ -67,7 +65,7 @@ public class ElasticCaseService implements IElasticCaseService {
 
     @Override
     public void remove(String caseId) {
-        executor.execute(() -> {
+        executors.execute(caseId, () -> {
             repository.deleteById(caseId);
             log.info("[" + caseId + "]: Case \"" + caseId + "\" deleted");
         });
@@ -75,7 +73,7 @@ public class ElasticCaseService implements IElasticCaseService {
 
     @Override
     public void index(ElasticCase useCase) {
-        executor.execute(() -> {
+        executors.execute(useCase.getStringId(), () -> {
             ElasticCase elasticCase = repository.findByStringId(useCase.getStringId());
             if (elasticCase == null) {
                 repository.save(useCase);
@@ -300,7 +298,7 @@ public class ElasticCaseService implements IElasticCaseService {
 
         BoolQueryBuilder dataQuery = boolQuery();
         for (Map.Entry<String, String> field : request.data.entrySet()) {
-            dataQuery.must(matchQuery("dataSet." + field.getKey()+".value", field.getValue()));
+            dataQuery.must(matchQuery("dataSet." + field.getKey() + ".value", field.getValue()));
         }
 
         query.filter(dataQuery);
@@ -314,6 +312,7 @@ public class ElasticCaseService implements IElasticCaseService {
             return;
         }
 
+        // TODO: improvement? wildcard does not scale good
         QueryBuilder fullTextQuery = queryStringQuery("*" + request.fullText + "*").fields(fullTextFields());
         query.must(fullTextQuery);
     }
