@@ -5,7 +5,7 @@
 
     <groupId>com.netgrif</groupId>
     <artifactId>application-engine</artifactId>
-    <version>3.1.0-SNAPSHOT</version>
+    <version>3.2.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>NETGRIF Application Engine</name>
@@ -14,7 +14,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.1.4.RELEASE</version>
+        <version>2.1.7.RELEASE</version>
         <relativePath/>
     </parent>
 
@@ -252,6 +252,12 @@
             <artifactId>spring-session</artifactId>
             <version>2.0.0.M2</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
+            <optional>true</optional>
+        </dependency>
     </dependencies>
 
     <repositories>
@@ -349,7 +355,7 @@
                         <configuration>
                             <!-- The package of your generated sources -->
                             <packageName>com.netgrif.workflow.importer.model</packageName>
-                            <outputDirectory>src/main/java</outputDirectory>
+                            <outputDirectory>${project.build.directory}/generated-sources/java</outputDirectory>
                             <sources>
                                 <source>src/main/resources/petriNets/petriflow_schema.xsd</source>
                             </sources>
@@ -377,6 +383,21 @@
                         <goals>
                             <goal>clean</goal>
                         </goals>
+                    </execution>
+                    <execution>
+                        <id>target</id>
+                        <phase>clean</phase>
+                        <goals>
+                            <goal>clean</goal>
+                        </goals>
+                        <configuration>
+                            <excludeDefaultDirectories>true</excludeDefaultDirectories>
+                            <filesets>
+                                <fileset>
+                                    <directory>target</directory>
+                                </fileset>
+                            </filesets>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
