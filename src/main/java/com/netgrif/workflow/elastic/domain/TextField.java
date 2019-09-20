@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class TextField extends DataField<String> {
+public class TextField extends DataField {
 
     public TextField(String value) {
         super(value);

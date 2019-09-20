@@ -205,13 +205,13 @@ public class ElasticCaseService implements IElasticCaseService {
         for (CaseSearchRequest.Author author : request.author) {
             BoolQueryBuilder authorQuery = boolQuery();
             if (author.email != null) {
-                authorQuery.must(termQuery("authorEmail", author.email));
+                authorQuery.must(termQuery("authorEmail.keyword", author.email));
             }
             if (author.id != null) {
                 authorQuery.must(matchQuery("author", author.id));
             }
             if (author.name != null) {
-                authorQuery.must(termQuery("authorName", author.name));
+                authorQuery.must(termQuery("authorName.keyword", author.name));
             }
             authorsQuery.should(authorQuery);
         }
@@ -282,7 +282,7 @@ public class ElasticCaseService implements IElasticCaseService {
     }
 
     /**
-     * Cases where "text_field" has value "text" AND "number_field" has value 125.<br>
+     * Cases where "text_field" has value EXACTLY "text" AND "number_field" has value EXACTLY "125".<br>
      * <pre>
      * {
      *     "data": {
@@ -301,9 +301,7 @@ public class ElasticCaseService implements IElasticCaseService {
         for (Map.Entry<String, String> field : request.data.entrySet()) {
             dataQuery.must(nestedQuery("dataSet",
                     boolQuery().must(
-                            termQuery("dataSet.id", field.getKey())
-                    ).must(
-                            termQuery("dataSet.value", field.getValue())
+                            termQuery("dataSet." + field.getKey() + ".value.keyword", field.getValue())
                     ),
                     ScoreMode.Total
             ));
