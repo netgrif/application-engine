@@ -27,6 +27,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.springframework.data.elasticsearch.annotations.FieldType.Keyword;
+import static org.springframework.data.elasticsearch.annotations.FieldType.Nested;
 
 @SuppressWarnings("OptionalIsPresent")
 @Data
@@ -46,7 +47,6 @@ public class ElasticCase {
     @Field(type = Keyword)
     private String stringId;
 
-    @Field(type = Keyword)
     private String visualId;
 
     @Field(type = Keyword)
@@ -66,6 +66,7 @@ public class ElasticCase {
 
     private String authorEmail;
 
+    @Field(type = Nested)
     private Map<String, DataField> dataSet;
 
     @Field(type = Keyword)
@@ -124,7 +125,7 @@ public class ElasticCase {
             User user = (User) dataField.getValue();
             if (user == null)
                 return Optional.empty();
-            StringBuilder fullName = new StringBuilder("");
+            StringBuilder fullName = new StringBuilder();
             if (user.getSurname() != null) {
                 fullName.append(user.getSurname());
                 fullName.append(" ");
