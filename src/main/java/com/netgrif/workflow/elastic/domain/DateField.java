@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class DateField extends DataField<String> {
+public class DateField extends DataField {
 
     private long timestamp;
 
