@@ -33,6 +33,7 @@
     <data type="text" immediate="true">
         <id>text_area</id>
         <title>Text area</title>
+        <values>area</values>
         <init>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque vitae magna in libero semper
             vulputate ut eu sapien. Phasellus vel.
         </init>

@@ -19,6 +19,8 @@ import groovy.json.JsonSlurper
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
@@ -52,6 +54,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 )
 class ElasticSearchTest {
 
+    private static final Logger log = LoggerFactory.getLogger(ElasticSearchTest)
+
     private static final String LOCALE_SK = "sk"
     private static final String USER_EMAIL = "test@test.com"
     private static final String USER_PASSW = "password"
@@ -83,7 +87,7 @@ class ElasticSearchTest {
 
     private Authentication auth
     private MockMvc mvc
-    private String netId
+    private String netId, netId2
     private Map testCases
 
     @Before
@@ -103,9 +107,12 @@ class ElasticSearchTest {
         repository.deleteAll()
 
         def net = importer.importPetriNet(new File("src/test/resources/all_data.xml"), PROCESS_TITLE, PROCESS_INITIALS, new Config())
+        def net2 = importer.importPetriNet(new File("src/test/resources/all_data.xml"), PROCESS_TITLE, PROCESS_INITIALS, new Config())
         assert net.isPresent()
+        assert net2.isPresent()
 
         netId = net.get().getStringId()
+        netId2 = net.get().getStringId()
 
         def org = importHelper.createGroup("Test")
         def auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])
@@ -116,11 +123,7 @@ class ElasticSearchTest {
                 [processRoles.get("process_role")] as UserProcessRole[])
 
         10.times {
-            def _case = importHelper.createCase("$it" as String, net.get())
-            if (it % 2 == 0) {
-                _case.processIdentifier = "test"
-                _case.author = testUser.transformToAuthor()
-            }
+            def _case = importHelper.createCase("$it" as String, it % 2 == 0 ? net.get() : net2.get())
             _case.dataSet["number"].value = it * 100.0 as Double
             _case.dataSet["enumeration"].value = _case.petriNet.dataSet["enumeration"].choices[it % 3]
             workflowService.save(_case)
@@ -187,11 +190,12 @@ class ElasticSearchTest {
     @Test
     void testSearch() {
         testCases.entrySet().each { value ->
-            def content = value["json"] as String
+            log.info "Testing $value.key"
+            def content = value.value["json"] as String
             def result = search(content)
             def response = parseResult(result)
 
-            assert response?."_embedded"?."cases"?.size == value["size"]
+            assert response?."_embedded"?."cases"?.size == value.value["size"]
         }
     }
 
