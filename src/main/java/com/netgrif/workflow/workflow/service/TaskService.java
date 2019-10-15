@@ -432,8 +432,7 @@ public class TaskService implements ITaskService {
 
             outcome.setMessage(new I18nString("Task " + task.getTitle() + " executed"));
         } catch (TransitionNotExecutableException e) {
-            log.error("execution of task [" + task.getTitle() + "] in case [" + useCase.getTitle() + "] failed");
-            e.printStackTrace();
+            log.error("execution of task [" + task.getTitle() + "] in case [" + useCase.getTitle() + "] failed: ", e);
         }
         return outcome;
     }

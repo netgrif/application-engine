@@ -1,6 +1,8 @@
 package com.netgrif.workflow.workflow.web.responsebodies;
 
 import com.netgrif.workflow.workflow.web.TaskController;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.mvc.ControllerLinkBuilder;
@@ -10,6 +12,8 @@ import java.util.ArrayList;
 
 
 public class LocalisedTaskResource extends Resource<Task> {
+
+    public static final Logger log = LoggerFactory.getLogger(LocalisedTaskResource.class);
 
     public LocalisedTaskResource(Task content) {
         super(content, new ArrayList<Link>());
@@ -36,7 +40,7 @@ public class LocalisedTaskResource extends Resource<Task> {
             add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
                     .getFile(task.getStringId(), "", null)).withRel("file"));
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            log.error("Building links failed: ", e);
         }
     }
 }
