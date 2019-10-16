@@ -83,7 +83,8 @@ public class SecurityConfiguration extends AbstractSecurityConfiguration {
                 .logoutUrl("/api/auth/logout")
             .and()
             .headers()
-                .frameOptions().sameOrigin();
+                .frameOptions().sameOrigin()
+                .httpStrictTransportSecurity().includeSubDomains(true).maxAgeInSeconds(31536000);
 //        @formatter:on
         setCsrf(http);
     }
