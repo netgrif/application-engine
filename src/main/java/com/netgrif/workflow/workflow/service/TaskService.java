@@ -230,9 +230,9 @@ public class TaskService implements ITaskService {
 
         outcome.add(dataService.runActions(transition.getPreCancelActions(), useCase.getStringId(), transition));
         task = returnTokens(task, useCase.getStringId());
-        outcome.add(dataService.runActions(transition.getPostCancelActions(), useCase.getStringId(), transition));
         useCase = workflowService.findOne(useCase.getStringId());
         reloadTasks(useCase);
+        outcome.add(dataService.runActions(transition.getPostCancelActions(), useCase.getStringId(), transition));
 
         publisher.publishEvent(new UserCancelTaskEvent(user, task, useCase));
         log.info("["+useCase.getStringId()+"]: Task [" + task.getTitle() + "] in case [" + useCase.getTitle() + "] assigned to [" + user.getEmail() + "] was cancelled");
