@@ -33,6 +33,14 @@ public class ElasticsearchConfiguration {
     @Value("${spring.data.elasticsearch.index.task}")
     private String taskIndex;
 
+    @Value("${spring.data.elasticsearch.reindex}")
+    private String cron;
+
+    @Bean
+    public String springElasticsearchReindex() {
+        return cron;
+    }
+
     @Bean
     public String elasticCaseIndex() {
         return caseIndex;
