@@ -24,6 +24,8 @@ import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.workflow.workflow.domain.triggers.Trigger;
 import lombok.Getter;
 import org.bson.types.ObjectId;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,6 +41,8 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class Importer {
+
+    public static final Logger log = LoggerFactory.getLogger(Importer.class);
 
     public static final String ARCHIVED_FILES_PATH = "storage/uploadedModels/";
     public static final String FILE_EXTENSION = ".xml";
@@ -91,7 +95,7 @@ public class Importer {
             unmarshallXml(xml);
             return createPetriNet(title, initials);
         } catch (JAXBException e) {
-            e.printStackTrace();
+            log.error("Importing Petri net failed: ", e);
         }
         return Optional.empty();
     }
@@ -101,7 +105,7 @@ public class Importer {
         try {
             return importPetriNet(new FileInputStream(xml), title, initials, config);
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            log.error("Importing Petri net failed: ", e);
         }
         return Optional.empty();
     }
