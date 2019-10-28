@@ -5,10 +5,14 @@ import com.netgrif.workflow.workflow.domain.Filter;
 import com.netgrif.workflow.workflow.domain.QFilter;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Predicate;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class FilterSearchService extends MongoSearchService<Filter> {
@@ -17,6 +21,7 @@ public class FilterSearchService extends MongoSearchService<Filter> {
     public static final String VISIBILITY = "visibility";
     public static final String AUTHOR = "author";
     public static final String TYPE = "type";
+    public static final String FILTER_ID = "id";
 
     public Predicate buildQuery(Map<String, Object> request, LoggedUser user, Locale locale) {
         BooleanBuilder builder = new BooleanBuilder();
@@ -29,6 +34,8 @@ public class FilterSearchService extends MongoSearchService<Filter> {
             builder.and(author(request.get(AUTHOR)));
         if (request.containsKey(TYPE))
             builder.and(type(request.get(TYPE)));
+        if (request.containsKey(FILTER_ID))
+            builder.and(id(request.get(FILTER_ID)));
 
         return builder;
     }
@@ -71,5 +78,20 @@ public class FilterSearchService extends MongoSearchService<Filter> {
 
     private Predicate typeString(String query) {
         return QFilter.filter.type.eq(query);
+    }
+
+    public Predicate id(Object query) {
+        if (query instanceof ArrayList) {
+            BooleanBuilder builder = new BooleanBuilder();
+            List<BooleanExpression> expressions = (List<BooleanExpression>) ((ArrayList) query).stream().filter(q -> q instanceof String).map(q -> idString((String) q)).collect(Collectors.toList());
+            expressions.forEach(builder::or);
+            return builder;
+        } else if (query instanceof String)
+            return idString((String) query);
+        return null;
+    }
+
+    private Predicate idString(String query) {
+        return QFilter.filter.stringId.eq(query);
     }
 }
