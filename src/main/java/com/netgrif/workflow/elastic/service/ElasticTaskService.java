@@ -8,6 +8,7 @@ import com.netgrif.workflow.elastic.service.interfaces.IElasticTaskService;
 import com.netgrif.workflow.elastic.web.TaskSearchRequest;
 import com.netgrif.workflow.utils.FullPageRequest;
 import com.netgrif.workflow.workflow.domain.Task;
+import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryStringQueryBuilder;
@@ -15,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
@@ -22,9 +24,11 @@ import org.springframework.data.elasticsearch.core.query.SearchQuery;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 
 import static org.elasticsearch.index.query.QueryBuilders.*;
 
@@ -35,6 +39,9 @@ public class ElasticTaskService implements IElasticTaskService {
 
     @Autowired
     private ElasticTaskRepository repository;
+
+    @Autowired
+    private ITaskService taskService;
 
     @Autowired
     private ElasticsearchTemplate template;
@@ -90,14 +97,16 @@ public class ElasticTaskService implements IElasticTaskService {
     }
 
     @Override
-    public Page<ElasticTask> search(TaskSearchRequest request, LoggedUser user, Pageable pageable) {
+    public Page<Task> search(TaskSearchRequest request, LoggedUser user, Pageable pageable) {
         if (request == null) {
             throw new IllegalArgumentException("Request can not be null!");
         }
 
         SearchQuery query = buildQuery(request, user, pageable);
+        Page<ElasticTask> indexedTasks = repository.search(query);
+        List<Task> taskPage = taskService.findAllById(indexedTasks.get().map(ElasticTask::getStringId).collect(Collectors.toList()));
 
-        return template.queryForPage(query, ElasticTask.class);
+        return new PageImpl<>(taskPage, pageable, indexedTasks.getTotalElements());
     }
 
     @Override
