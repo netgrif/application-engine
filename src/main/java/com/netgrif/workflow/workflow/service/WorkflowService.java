@@ -241,7 +241,7 @@ public class WorkflowService implements IWorkflowService {
             return true;
         }
         boolean deleteSuccess = useCase.removeTasks(StreamSupport.stream(tasks.spliterator(), false).collect(Collectors.toList()));
-        useCase = repository.save(useCase);
+        save(useCase);
         return deleteSuccess;
     }
 
