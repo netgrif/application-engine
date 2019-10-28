@@ -546,9 +546,15 @@ public class TaskService implements ITaskService {
         if (!taskOptional.isPresent())
             throw new IllegalArgumentException("Could not find task with id ["+id+"]");
         Task task = taskOptional.get();
-        if (task.getUserId() != null)
-            task.setUser(userService.findById(task.getUserId(), true));
+        this.setUser(task);
         return task;
+    }
+
+    @Override
+    public List<Task> findAllById(List<String> ids) {
+        List<Task> page = taskRepository.findAllBy_idIn(ids);
+        page.forEach(this::setUser);
+        return page;
     }
 
     @Override
@@ -686,5 +692,10 @@ public class TaskService implements ITaskService {
     @Override
     public void deleteTasksByCase(String caseId) {
         delete(taskRepository.findAllByCaseId(caseId), caseId);
+    }
+
+    private void setUser(Task task) {
+        if (task.getUserId() != null)
+            task.setUser(userService.findById(task.getUserId(), true));
     }
 }

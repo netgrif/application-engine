@@ -4,8 +4,8 @@ import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.workflow.workflow.domain.Case;
-import com.netgrif.workflow.workflow.domain.Task;
 import com.netgrif.workflow.workflow.domain.EventOutcome;
+import com.netgrif.workflow.workflow.domain.Task;
 import com.netgrif.workflow.workflow.web.responsebodies.TaskReference;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -30,6 +30,8 @@ public interface ITaskService {
     long count(Map<String, Object> request, LoggedUser user, Locale locale);
 
     Page<Task> findByCases(Pageable pageable, List<String> cases);
+
+    List<Task> findAllById(List<String> ids);
 
     void createTasks(Case useCase);
 

@@ -30,6 +30,8 @@ public interface TaskRepository extends MongoRepository<Task, String>, QuerydslP
 
     List<Task> findAllByTransitionIdInAndCaseId(Collection<String> transitionIds, String caseId);
 
+    List<Task> findAllBy_idIn(Iterable<String> id);
+
     void deleteAllByCaseIdAndUserIdIsNull(String caseId);
 
     void deleteAllByCaseIdAndFinishDateIsNotNull(String caseId);
