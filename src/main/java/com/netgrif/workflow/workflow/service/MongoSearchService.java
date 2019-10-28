@@ -39,7 +39,7 @@ public class MongoSearchService<T> {
             this.tClass = clazz;
             return executeQuery(buildQuery(resolveRequest(searchRequest)), pageable);
         } catch (IllegalQueryException e) {
-            e.printStackTrace();
+            log.error("Searching failed: ", e);
             return new PageImpl<>(new ArrayList<>(), pageable, 0);
         }
     }
@@ -55,7 +55,7 @@ public class MongoSearchService<T> {
                     queryParts.put(entry.getKey(), part);
                 return true;
             } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-                e.printStackTrace();
+                log.error("Resolving request failed: ", e);
                 queryParts.put(ERROR_KEY, "Parameter " + entry.getKey() + " is not supported in " + tClass.getSimpleName() + " search!");
                 return false;
             }

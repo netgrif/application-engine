@@ -19,6 +19,8 @@ import com.netgrif.workflow.workflow.service.interfaces.IFilterService;
 import com.netgrif.workflow.workflow.service.interfaces.ITaskAuthenticationService;
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
 import com.netgrif.workflow.workflow.web.responsebodies.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
@@ -39,12 +41,13 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.FileNotFoundException;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/task")
 public class TaskController {
+
+    public static final Logger log = LoggerFactory.getLogger(TaskController.class);
 
     @Autowired
     private ITaskService taskService;
@@ -111,7 +114,7 @@ public class TaskController {
             taskService.assignTask(loggedUser, taskId);
             return MessageResource.successMessage("LocalisedTask " + taskId + " assigned to " + loggedUser.getFullName());
         } catch (TransitionNotExecutableException e) {
-            e.printStackTrace();
+            log.error("Assigning task ["+taskId+"] failed: ", e);
             return MessageResource.errorMessage("LocalisedTask " + taskId + " cannot be assigned");
         }
     }
@@ -126,8 +129,8 @@ public class TaskController {
         try {
             taskService.delegateTask(loggedUser, delegatedId, taskId);
             return MessageResource.successMessage("LocalisedTask " + taskId + " assigned to [" + delegatedId + "]");
-        } catch (Exception ignored) {
-            ignored.printStackTrace();
+        } catch (Exception e) {
+            log.error("Delegating task ["+taskId+"] failed: ", e);
             return MessageResource.errorMessage("LocalisedTask " + taskId + " cannot be assigned");
         }
     }
@@ -147,7 +150,7 @@ public class TaskController {
             taskService.finishTask(loggedUser, taskId);
             return MessageResource.successMessage("LocalisedTask " + taskId + " finished");
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("Finishing task ["+taskId+"] failed: ", e);
             return MessageResource.errorMessage(e.getMessage());
         }
     }
@@ -167,7 +170,7 @@ public class TaskController {
             taskService.cancelTask(loggedUser, taskId);
             return MessageResource.successMessage("LocalisedTask " + taskId + " canceled");
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("Canceling task ["+taskId+"] failed: ", e);
             return MessageResource.errorMessage(e.getMessage());
         }
     }
@@ -195,8 +198,8 @@ public class TaskController {
     }
 
     @RequestMapping(value = "/search", method = RequestMethod.POST)
-    public PagedResources<LocalisedTaskResource> search(Authentication auth, Pageable pageable, @RequestBody Map<String, Object> searchBody, PagedResourcesAssembler<com.netgrif.workflow.workflow.domain.Task> assembler, Locale locale) {
-        Page<com.netgrif.workflow.workflow.domain.Task> tasks = taskService.search(searchBody, pageable, (LoggedUser) auth.getPrincipal());
+    public PagedResources<LocalisedTaskResource> search(Authentication auth, Pageable pageable, @RequestBody TaskSearchRequest searchBody, PagedResourcesAssembler<com.netgrif.workflow.workflow.domain.Task> assembler, Locale locale) {
+        Page<com.netgrif.workflow.workflow.domain.Task> tasks = searchService.search(searchBody, (LoggedUser) auth.getPrincipal(), pageable);
         Link selfLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
                 .search(auth, pageable, searchBody, assembler, locale)).withRel("search");
         PagedResources<LocalisedTaskResource> resources = assembler.toResource(tasks, new TaskResourceAssembler(locale), selfLink);
