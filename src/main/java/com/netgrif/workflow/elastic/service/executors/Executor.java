@@ -32,8 +32,7 @@ public class Executor {
                 executor.awaitTermination(EXECUTOR_TIMEOUT, TimeUnit.SECONDS);
                 executor.shutdown();
             } catch (InterruptedException e) {
-                e.printStackTrace();
-                log.error("Thread was interrupted while waiting for termination");
+                log.error("Thread was interrupted while waiting for termination: ", e);
             }
         });
     }

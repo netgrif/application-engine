@@ -8,10 +8,14 @@ import org.apache.pdfbox.pdmodel.encryption.StandardProtectionPolicy
 import org.apache.pdfbox.pdmodel.font.PDType0Font
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject
 import org.apache.pdfbox.pdmodel.interactive.form.PDAcroForm
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 import static com.netgrif.workflow.pdf.service.PdfUtils.mmToPoint
 
 class PdfBuilder {
+
+    public static final Logger log = LoggerFactory.getLogger(PdfBuilder)
 
     protected PDDocument document
 
@@ -94,7 +98,7 @@ class PdfBuilder {
 
             return this
         } catch (IOException e) {
-            e.printStackTrace()
+            log.error("Filling PDF failed: ", e)
             throw new IllegalArgumentException(e);
         }
     }
