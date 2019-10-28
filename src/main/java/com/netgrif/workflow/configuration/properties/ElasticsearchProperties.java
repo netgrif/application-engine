@@ -4,6 +4,7 @@ import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
+import java.time.Duration;
 import java.util.Map;
 
 @ConfigurationProperties(prefix = "spring.data.elasticsearch")
@@ -12,6 +13,10 @@ import java.util.Map;
 public class ElasticsearchProperties {
 
     private String reindex;
+
+    private int reindexSize;
+
+    private Duration reindexFrom;
 
     private int executors;
 
