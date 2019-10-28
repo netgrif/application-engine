@@ -50,6 +50,9 @@ public class ElasticCase {
     @Field(type = Keyword)
     private String processIdentifier;
 
+    @Field(type = Keyword)
+    private String processId;
+
     private String title;
 
     @Field(type = Keyword)
@@ -83,6 +86,7 @@ public class ElasticCase {
         stringId = useCase.getStringId();
         lastModified = Timestamp.valueOf(useCase.getLastModified()).getTime();
         processIdentifier = useCase.getProcessIdentifier();
+        processId = useCase.getPetriNetId();
         visualId = useCase.getVisualId();
         title = useCase.getTitle();
         titleSortable = useCase.getTitle();
