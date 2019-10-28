@@ -37,7 +37,7 @@ public class ExecutorTest {
                 try {
                     Thread.sleep(new Random().nextInt(500));
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    log.error("ExecutorTest failed: ", e);
                 }
                 log.info("[" + id + "]Ending task in executor");
             });
