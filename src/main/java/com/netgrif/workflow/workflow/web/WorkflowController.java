@@ -7,6 +7,7 @@ import com.netgrif.workflow.elastic.web.CaseSearchRequest;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.service.FileFieldInputStream;
 import com.netgrif.workflow.workflow.service.interfaces.IDataService;
+import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
 import com.netgrif.workflow.workflow.web.requestbodies.CreateCaseBody;
 import com.netgrif.workflow.workflow.web.responsebodies.*;
@@ -27,6 +28,7 @@ import org.springframework.hateoas.mvc.ControllerLinkBuilder;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
@@ -47,6 +49,9 @@ public class WorkflowController {
 
     @Autowired
     private IWorkflowService workflowService;
+
+    @Autowired
+    private ITaskService taskService;
 
     @Autowired
     private IElasticCaseService elasticCaseService;
@@ -124,6 +129,21 @@ public class WorkflowController {
         PagedResources<CaseResource> resources = assembler.toResource(cases, new CaseResourceAssembler(), selfLink);
         ResourceLinkAssembler.addLinks(resources, Case.class, selfLink.getRel());
         return resources;
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping(value = "/case/reload/{id}")
+    public MessageResource reloadTasks(@PathVariable("id") String caseId) {
+        try {
+            caseId = URLDecoder.decode(caseId, StandardCharsets.UTF_8.name());
+            Case aCase = workflowService.findOne(caseId);
+            taskService.reloadTasks(aCase);
+
+            return MessageResource.successMessage("Task reloaded in case ["+caseId+"]");
+        } catch (Exception e) {
+            log.error("Reloading tasks of case ["+caseId+"] failed:", e);
+            return MessageResource.errorMessage("Reloading tasks in case "+caseId+" has failed!");
+        }
     }
 
     @RequestMapping(value = "/case/{id}", method = RequestMethod.DELETE)
