@@ -98,6 +98,7 @@ class PdfUtils {
 
     static File fillPdfForm(String outPdfName, InputStream pdfFile, InputStream xmlFile) throws IllegalArgumentException {
         fillPdfForm(outPdfName, pdfFile, xmlFile.getText())
+        xmlFile.close()
     }
 
     static File fillPdfForm(String outPdfName, InputStream pdfFile, String xml) throws IllegalArgumentException {
@@ -111,6 +112,8 @@ class PdfUtils {
         } catch (IOException e) {
             e.printStackTrace()
             throw new IllegalArgumentException(e)
+        } finally {
+            pdfFile.close()
         }
     }
 
@@ -183,6 +186,8 @@ class PdfUtils {
         fields.forEach({
             addAllFieldsAndChildFields(it, result)
         })
+        document.close()
+        inputStream.close()
 
         return result
     }
