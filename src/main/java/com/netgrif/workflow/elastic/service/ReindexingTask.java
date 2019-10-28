@@ -3,6 +3,7 @@ package com.netgrif.workflow.elastic.service;
 import com.netgrif.workflow.elastic.domain.ElasticCase;
 import com.netgrif.workflow.elastic.domain.ElasticCaseRepository;
 import com.netgrif.workflow.elastic.service.interfaces.IElasticCaseService;
+import com.netgrif.workflow.elastic.service.interfaces.IElasticTaskService;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.QCase;
 import com.netgrif.workflow.workflow.domain.repositories.CaseRepository;
@@ -31,14 +32,16 @@ public class ReindexingTask {
     private CaseRepository caseRepository;
     private ElasticCaseRepository elasticCaseRepository;
     private IElasticCaseService elasticCaseService;
+    private IElasticTaskService elasticTaskService;
 
     private LocalDateTime lastRun;
 
     @Autowired
-    public ReindexingTask(CaseRepository caseRepository, ElasticCaseRepository elasticCaseRepository, IElasticCaseService elasticCaseService, @Value("${spring.data.elasticsearch.reindex-size:20}") int pageSize, @Value("${spring.data.elasticsearch.reindex-from:#{null}}") Duration from) {
+    public ReindexingTask(CaseRepository caseRepository, ElasticCaseRepository elasticCaseRepository, IElasticCaseService elasticCaseService, IElasticTaskService elasticTaskService, @Value("${spring.data.elasticsearch.reindex-size:20}") int pageSize, @Value("${spring.data.elasticsearch.reindex-from:#{null}}") Duration from) {
         this.caseRepository = caseRepository;
         this.elasticCaseRepository = elasticCaseRepository;
         this.elasticCaseService = elasticCaseService;
+        this.elasticTaskService = elasticTaskService;
         this.pageSize = pageSize;
 
         lastRun = LocalDateTime.now();
@@ -78,6 +81,7 @@ public class ReindexingTask {
         for (Case aCase : cases) {
             if (elasticCaseRepository.countByStringIdAndLastModified(aCase.getStringId(), Timestamp.valueOf(aCase.getLastModified()).getTime()) == 0) {
                 elasticCaseService.indexNow(new ElasticCase(aCase));
+
             }
         }
     }
