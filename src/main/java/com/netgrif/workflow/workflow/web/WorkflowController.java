@@ -66,7 +66,7 @@ public class WorkflowController {
             Case useCase = workflowService.createCase(body.netId, body.title, body.color, loggedUser);
             return new CaseResource(useCase);
         } catch (Exception e) { // TODO: 5. 2. 2017 change to custom exception
-            e.printStackTrace();
+            log.error("Creating case failed:",e);
             return null;
         }
     }
@@ -153,7 +153,7 @@ public class WorkflowController {
             workflowService.deleteCase(caseId);
             return MessageResource.successMessage("Case " + caseId + " was deleted");
         } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
+            log.error("Deleting case ["+caseId+"] failed:",e);
             return MessageResource.errorMessage("Deleting case " + caseId + " has failed!");
         }
     }
@@ -164,7 +164,7 @@ public class WorkflowController {
             caseId = URLDecoder.decode(caseId, StandardCharsets.UTF_8.name());
             return new DataFieldsResource(workflowService.getData(caseId), locale);
         } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
+            log.error("Getting all case data of ["+caseId+"] failed:", e);
             return new DataFieldsResource(new ArrayList<>(), locale);
         }
     }
@@ -176,7 +176,7 @@ public class WorkflowController {
             fieldId = URLDecoder.decode(fieldId, StandardCharsets.UTF_8.name());
             return workflowService.getCaseFieldChoices(pageable, caseId, fieldId);
         } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
+            log.error("Getting case field choices of ["+caseId+"] failed:", e);
             return new LinkedList<>();
         }
     }
