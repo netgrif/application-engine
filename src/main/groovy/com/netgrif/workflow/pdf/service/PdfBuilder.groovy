@@ -8,10 +8,14 @@ import org.apache.pdfbox.pdmodel.encryption.StandardProtectionPolicy
 import org.apache.pdfbox.pdmodel.font.PDType0Font
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject
 import org.apache.pdfbox.pdmodel.interactive.form.PDAcroForm
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 import static com.netgrif.workflow.pdf.service.PdfUtils.mmToPoint
 
 class PdfBuilder {
+
+    public static final Logger log = LoggerFactory.getLogger(PdfBuilder)
 
     protected PDDocument document
 
@@ -28,7 +32,7 @@ class PdfBuilder {
         return this
     }
 
-    PdfBuilder load(String ... paths) {
+    PdfBuilder load(String... paths) {
         PDFMergerUtility pdfMerger = new PDFMergerUtility()
 
         document = new PDDocument()
@@ -43,7 +47,9 @@ class PdfBuilder {
     File save(String path) {
         if (document == null || path == null)
             throw new IllegalArgumentException("Document=[$document] and path=[$path]")
-        return document.save(path)
+        document.save(path)
+        document.close()
+        return new File(path)
     }
 
     PDDocument build() {
@@ -92,12 +98,12 @@ class PdfBuilder {
 
             return this
         } catch (IOException e) {
-            e.printStackTrace()
+            log.error("Filling PDF failed: ", e)
             throw new IllegalArgumentException(e);
         }
     }
 
-    PdfBuilder merge(PDDocument ... documents) {
+    PdfBuilder merge(PDDocument... documents) {
         PDFMergerUtility pdfMerger = new PDFMergerUtility()
 
         documents.each { toMerge ->
