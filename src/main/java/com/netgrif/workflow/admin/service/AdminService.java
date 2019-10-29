@@ -25,7 +25,7 @@ public class AdminService implements IAdminService {
             String result = actionsRunner.run(code);
             return successMessage("OK", result);
         } catch (Exception e) {
-            log.error("", e);
+            log.error("Admin console ERROR: ", e);
             return errorMessage("ERROR", e.toString());
         }
     }
