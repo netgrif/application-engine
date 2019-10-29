@@ -147,6 +147,25 @@ public class User {
         return loggedUser;
     }
 
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", email='" + email + '\'' +
+                ", telNumber='" + telNumber + '\'' +
+                ", avatar='" + avatar + '\'' +
+                ", name='" + name + '\'' +
+                ", surname='" + surname + '\'' +
+                ", state=" + state +
+                ", token='" + token + '\'' +
+                ", expirationDate=" + expirationDate +
+                ", authorities=" + authorities +
+                ", userProcessRoles=" + userProcessRoles +
+                ", processRoles=" + processRoles +
+                ", groups=" + groups +
+                '}';
+    }
+
     public Author transformToAuthor() {
         Author author = new Author();
         author.setId(this.getId());
