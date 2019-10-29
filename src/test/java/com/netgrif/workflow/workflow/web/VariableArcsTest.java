@@ -26,6 +26,8 @@ import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
@@ -44,6 +46,8 @@ import java.util.stream.Collectors;
 @ActiveProfiles({"test"})
 @RunWith(SpringRunner.class)
 public class VariableArcsTest {
+
+    public static final Logger log = LoggerFactory.getLogger(VariableArcsTest.class);
 
     private static final String NET_TITLE = "Variable Arc Test";
     private static final String NET_PATH = "src/test/resources/variable_arc_test.xml";
@@ -90,7 +94,7 @@ public class VariableArcsTest {
             try {
                 defaultRoleRunner.run();
             } catch (Exception e) {
-                e.printStackTrace();
+                log.error("VariableArcsTest failed: ", e);
             }
         }
     }

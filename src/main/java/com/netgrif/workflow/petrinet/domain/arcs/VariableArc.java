@@ -48,6 +48,10 @@ public class VariableArc extends Arc {
 
     @Override
     public void rollbackExecution() {
+        if (removedTokens == null) {
+            double multiplicity = Double.parseDouble(field.getValue().toString());
+            removedTokens = (int) multiplicity;
+        }
         ((Place) source).addTokens(removedTokens);
     }
 
