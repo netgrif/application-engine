@@ -12,6 +12,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.web.header.writers.StaticHeadersWriter;
 import org.springframework.session.web.http.HeaderHttpSessionIdResolver;
 import org.springframework.session.web.http.HttpSessionIdResolver;
 import org.springframework.stereotype.Controller;
@@ -83,8 +84,10 @@ public class SecurityConfiguration extends AbstractSecurityConfiguration {
                 .logoutUrl("/api/auth/logout")
             .and()
             .headers()
-                .frameOptions().sameOrigin()
-                .httpStrictTransportSecurity().includeSubDomains(true).maxAgeInSeconds(31536000);
+                .frameOptions().disable()
+                .httpStrictTransportSecurity().includeSubDomains(true).maxAgeInSeconds(31536000)
+                .and()
+                .addHeaderWriter(new StaticHeadersWriter("X-Content-Security-Policy","frame-src: 'none'"));
 //        @formatter:on
         setCsrf(http);
     }
