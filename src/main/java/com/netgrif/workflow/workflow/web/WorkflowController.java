@@ -1,12 +1,17 @@
 package com.netgrif.workflow.workflow.web;
 
+import com.netgrif.workflow.auth.domain.Author;
 import com.netgrif.workflow.auth.domain.LoggedUser;
+import com.netgrif.workflow.auth.domain.User;
+import com.netgrif.workflow.auth.domain.throwable.UnauthorisedRequestException;
+import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.elastic.domain.ElasticCase;
 import com.netgrif.workflow.elastic.service.interfaces.IElasticCaseService;
 import com.netgrif.workflow.elastic.web.CaseSearchRequest;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.service.FileFieldInputStream;
 import com.netgrif.workflow.workflow.service.interfaces.IDataService;
+import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
 import com.netgrif.workflow.workflow.web.requestbodies.CreateCaseBody;
 import com.netgrif.workflow.workflow.web.responsebodies.*;
@@ -27,6 +32,7 @@ import org.springframework.hateoas.mvc.ControllerLinkBuilder;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
@@ -49,10 +55,16 @@ public class WorkflowController {
     private IWorkflowService workflowService;
 
     @Autowired
+    private ITaskService taskService;
+
+    @Autowired
     private IElasticCaseService elasticCaseService;
 
     @Autowired
     private IDataService dataService;
+
+    @Autowired
+    private IUserService userService;
 
     @RequestMapping(value = "/case", method = RequestMethod.POST)
     public CaseResource createCase(@RequestBody CreateCaseBody body, Authentication auth) {
@@ -61,7 +73,7 @@ public class WorkflowController {
             Case useCase = workflowService.createCase(body.netId, body.title, body.color, loggedUser);
             return new CaseResource(useCase);
         } catch (Exception e) { // TODO: 5. 2. 2017 change to custom exception
-            e.printStackTrace();
+            log.error("Creating case failed:",e);
             return null;
         }
     }
@@ -126,14 +138,34 @@ public class WorkflowController {
         return resources;
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping(value = "/case/reload/{id}")
+    public MessageResource reloadTasks(@PathVariable("id") String caseId) {
+        try {
+            caseId = URLDecoder.decode(caseId, StandardCharsets.UTF_8.name());
+            Case aCase = workflowService.findOne(caseId);
+            taskService.reloadTasks(aCase);
+
+            return MessageResource.successMessage("Task reloaded in case ["+caseId+"]");
+        } catch (Exception e) {
+            log.error("Reloading tasks of case ["+caseId+"] failed:", e);
+            return MessageResource.errorMessage("Reloading tasks in case "+caseId+" has failed!");
+        }
+    }
+
     @RequestMapping(value = "/case/{id}", method = RequestMethod.DELETE)
-    public MessageResource deleteCase(@PathVariable("id") String caseId) {
+    public MessageResource deleteCase(@PathVariable("id") String caseId) throws UnauthorisedRequestException {
+        User logged = userService.getLoggedUser();
+        Case requestedCase = workflowService.findOne(caseId);
+        if( !logged.transformToLoggedUser().isAdmin() && !logged.getId().equals(requestedCase.getAuthor().getId()))
+            throw new UnauthorisedRequestException("User " + logged.transformToLoggedUser().getUsername() + " doesn't have permission to delete case " + requestedCase.getStringId());
+
         try {
             caseId = URLDecoder.decode(caseId, StandardCharsets.UTF_8.name());
             workflowService.deleteCase(caseId);
             return MessageResource.successMessage("Case " + caseId + " was deleted");
         } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
+            log.error("Deleting case ["+caseId+"] failed:",e);
             return MessageResource.errorMessage("Deleting case " + caseId + " has failed!");
         }
     }
@@ -144,7 +176,7 @@ public class WorkflowController {
             caseId = URLDecoder.decode(caseId, StandardCharsets.UTF_8.name());
             return new DataFieldsResource(workflowService.getData(caseId), locale);
         } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
+            log.error("Getting all case data of ["+caseId+"] failed:", e);
             return new DataFieldsResource(new ArrayList<>(), locale);
         }
     }
@@ -156,7 +188,7 @@ public class WorkflowController {
             fieldId = URLDecoder.decode(fieldId, StandardCharsets.UTF_8.name());
             return workflowService.getCaseFieldChoices(pageable, caseId, fieldId);
         } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
+            log.error("Getting case field choices of ["+caseId+"] failed:", e);
             return new LinkedList<>();
         }
     }
