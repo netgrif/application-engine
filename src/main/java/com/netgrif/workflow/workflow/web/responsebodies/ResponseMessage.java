@@ -5,7 +5,7 @@ public class ResponseMessage {
 
     private String success;
     private String error;
-    private Object data;
+    private String data;
 
     public static ResponseMessage createSuccessMessage(String msg){
         ResponseMessage resMsg = new ResponseMessage();
@@ -13,7 +13,7 @@ public class ResponseMessage {
         return resMsg;
     }
 
-    public static ResponseMessage createSuccessMessageWithData(String msg, Object data){
+    public static ResponseMessage createSuccessMessageWithData(String msg, String data){
         ResponseMessage resMsg = new ResponseMessage();
         resMsg.setSuccess(msg);
         resMsg.setData(data);
@@ -27,7 +27,7 @@ public class ResponseMessage {
     }
 
 
-    public static ResponseMessage createErrorMessageWithData(String msg, Object data){
+    public static ResponseMessage createErrorMessageWithData(String msg, String data){
         ResponseMessage resMsg = new ResponseMessage();
         resMsg.setError(msg);
         resMsg.setData(data);
@@ -54,7 +54,7 @@ public class ResponseMessage {
         return data;
     }
 
-    public void setData(Object data) {
+    public void setData(String data) {
         this.data = data;
     }
 }
