@@ -6,6 +6,7 @@ import com.netgrif.workflow.workflow.domain.QFilter;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -92,6 +93,6 @@ public class FilterSearchService extends MongoSearchService<Filter> {
     }
 
     private Predicate idString(String query) {
-        return QFilter.filter.stringId.eq(query);
+        return QFilter.filter._id.eq(new ObjectId(query));
     }
 }
