@@ -50,7 +50,7 @@ public class ResponseMessage {
         this.error = error;
     }
 
-    public Object getData() {
+    public String getData() {
         return data;
     }
 
