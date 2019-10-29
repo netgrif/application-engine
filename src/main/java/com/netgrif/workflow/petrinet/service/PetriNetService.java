@@ -138,7 +138,7 @@ public abstract class PetriNetService implements IPetriNetService {
             try {
                 setupImportedPetriNet(imported.get(), new ByteArrayInputStream(bytes), metaData, user);
             } catch (IOException e) {
-                e.printStackTrace();
+                log.error("Importing new Petri net failed: ", e);
             }
         });
 
@@ -164,7 +164,7 @@ public abstract class PetriNetService implements IPetriNetService {
                 setupImportedPetriNet(petriNet, new ByteArrayInputStream(bytes), meta, user);
                 userProcessRoleService.saveRoles(newRoles, petriNet.getStringId());
             } catch (IOException e) {
-                e.printStackTrace();
+                log.error("Importing new version failed: ", e);
             }
         });
 

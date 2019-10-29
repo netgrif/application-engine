@@ -3,6 +3,7 @@ package com.netgrif.workflow.workflow.service;
 import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.auth.service.interfaces.IUserService;
+import com.netgrif.workflow.elastic.service.interfaces.IElasticTaskService;
 import com.netgrif.workflow.event.events.task.*;
 import com.netgrif.workflow.petrinet.domain.*;
 import com.netgrif.workflow.petrinet.domain.arcs.Arc;
@@ -81,6 +82,9 @@ public class TaskService implements ITaskService {
     @Autowired
     private IProcessRoleService processRoleService;
 
+    @Autowired
+    private IElasticTaskService elasticTaskService;
+
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void assignTasks(List<Task> tasks, User user) throws TransitionNotExecutableException {
@@ -135,7 +139,7 @@ public class TaskService implements ITaskService {
         task.setStartDate(LocalDateTime.now());
 
         useCase = workflowService.save(useCase);
-        taskRepository.save(task);
+        save(task);
         reloadTasks(useCase);
     }
 
@@ -190,7 +194,7 @@ public class TaskService implements ITaskService {
         task.setUserId(null);
 
         useCase = workflowService.findOne(useCase.getStringId());
-        taskRepository.save(task);
+        save(task);
         reloadTasks(useCase);
         outcome.add(dataService.runActions(transition.getPostFinishActions(), useCase.getStringId(), transition));
 
@@ -274,7 +278,7 @@ public class TaskService implements ITaskService {
 
         task.setUserId(null);
         task.setStartDate(null);
-        task = taskRepository.save(task);
+        task = save(task);
         workflowService.save(useCase);
 
         return task;
@@ -310,7 +314,7 @@ public class TaskService implements ITaskService {
     protected void delegate(User delegated, Task task, Case useCase) throws TransitionNotExecutableException {
         if (task.getUserId() != null) {
             task.setUserId(delegated.getId());
-            taskRepository.save(task);
+            save(task);
         } else {
             assignTaskToUser(delegated, task, useCase.getStringId());
         }
@@ -432,8 +436,7 @@ public class TaskService implements ITaskService {
 
             outcome.setMessage(new I18nString("Task " + task.getTitle() + " executed"));
         } catch (TransitionNotExecutableException e) {
-            log.error("execution of task [" + task.getTitle() + "] in case [" + useCase.getTitle() + "] failed");
-            e.printStackTrace();
+            log.error("execution of task [" + task.getTitle() + "] in case [" + useCase.getTitle() + "] failed: ", e);
         }
         return outcome;
     }
@@ -546,9 +549,15 @@ public class TaskService implements ITaskService {
         if (!taskOptional.isPresent())
             throw new IllegalArgumentException("Could not find task with id ["+id+"]");
         Task task = taskOptional.get();
-        if (task.getUserId() != null)
-            task.setUser(userService.findById(task.getUserId(), true));
+        this.setUser(task);
         return task;
+    }
+
+    @Override
+    public List<Task> findAllById(List<String> ids) {
+        List<Task> page = taskRepository.findAllBy_idIn(ids);
+        page.forEach(this::setUser);
+        return page;
     }
 
     @Override
@@ -565,7 +574,7 @@ public class TaskService implements ITaskService {
                 //figureOutProcessRoles(task, transition);
                 if (task == null)
                     break;
-                taskRepository.save(task);
+                save(task);
             }
         }
     }
@@ -607,6 +616,13 @@ public class TaskService implements ITaskService {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public Task save(Task task) {
+        task = taskRepository.save(task);
+        elasticTaskService.index(task);
+        return task;
+    }
+
     private Task createFromTransition(Transition transition, Case useCase) {
         final Task task = Task.with()
                 .title(transition.getTitle())
@@ -645,7 +661,7 @@ public class TaskService implements ITaskService {
         if (transaction != null) {
             task.setTransactionId(transaction.getStringId());
         }
-        Task savedTask = taskRepository.save(task);
+        Task savedTask = save(task);
 
         useCase.addTask(savedTask);
         useCase = workflowService.save(useCase);
@@ -675,16 +691,23 @@ public class TaskService implements ITaskService {
     public void delete(Iterable<? extends Task> tasks, Case useCase) {
         workflowService.removeTasksFromCase(tasks, useCase);
         taskRepository.deleteAll(tasks);
+        tasks.forEach(t -> elasticTaskService.remove(t.getStringId()));
     }
 
     @Override
     public void delete(Iterable<? extends Task> tasks, String caseId) {
         workflowService.removeTasksFromCase(tasks, caseId);
         taskRepository.deleteAll(tasks);
+        tasks.forEach(t -> elasticTaskService.remove(t.getStringId()));
     }
 
     @Override
     public void deleteTasksByCase(String caseId) {
         delete(taskRepository.findAllByCaseId(caseId), caseId);
+    }
+
+    private void setUser(Task task) {
+        if (task.getUserId() != null)
+            task.setUser(userService.findById(task.getUserId(), true));
     }
 }
