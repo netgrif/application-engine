@@ -4,6 +4,6 @@ import com.netgrif.workflow.workflow.web.responsebodies.MessageResource;
 
 public interface IAdminService {
 
-   MessageResource runCode(String code);
+   MessageResource run(String code);
 
 }
