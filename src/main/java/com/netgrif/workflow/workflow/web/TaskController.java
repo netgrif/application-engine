@@ -4,16 +4,23 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.elastic.service.interfaces.IElasticTaskService;
 import com.netgrif.workflow.elastic.web.TaskSearchRequest;
+import com.netgrif.workflow.auth.domain.User;
+import com.netgrif.workflow.auth.domain.throwable.UnauthorisedRequestException;
+import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.petrinet.domain.DataGroup;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldContainer;
+import com.netgrif.workflow.petrinet.domain.roles.RolePermission;
 import com.netgrif.workflow.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.workflow.workflow.domain.Task;
 import com.netgrif.workflow.workflow.service.FileFieldInputStream;
 import com.netgrif.workflow.workflow.service.interfaces.IDataService;
 import com.netgrif.workflow.workflow.service.interfaces.IFilterService;
+import com.netgrif.workflow.workflow.service.interfaces.ITaskAuthenticationService;
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
 import com.netgrif.workflow.workflow.web.responsebodies.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
@@ -34,12 +41,13 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.FileNotFoundException;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/task")
 public class TaskController {
+
+    public static final Logger log = LoggerFactory.getLogger(TaskController.class);
 
     @Autowired
     private ITaskService taskService;
@@ -52,6 +60,12 @@ public class TaskController {
 
     @Autowired
     private IElasticTaskService searchService;
+
+    @Autowired
+	private IUserService userService;
+
+    @Autowired
+    private ITaskAuthenticationService taskAuthenticationService;
 
     @RequestMapping(method = RequestMethod.GET)
     public PagedResources<LocalisedTaskResource> getAll(Authentication auth, Pageable pageable, PagedResourcesAssembler<com.netgrif.workflow.workflow.domain.Task> assembler, Locale locale) {
@@ -90,49 +104,73 @@ public class TaskController {
     }
 
     @RequestMapping(value = "/assign/{id}", method = RequestMethod.GET)
-    public MessageResource assign(Authentication auth, @PathVariable("id") String taskId) {
+    public MessageResource assign(Authentication auth, @PathVariable("id") String taskId) throws UnauthorisedRequestException {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
+
+        if( !loggedUser.isAdmin() && !taskAuthenticationService.userHasAtLeastOneRolePermission(loggedUser, taskId, RolePermission.PERFORM))
+            throw new UnauthorisedRequestException("User " + loggedUser.getUsername() + " doesn't have permission to assign task " + taskId);
+
         try {
             taskService.assignTask(loggedUser, taskId);
             return MessageResource.successMessage("LocalisedTask " + taskId + " assigned to " + loggedUser.getFullName());
         } catch (TransitionNotExecutableException e) {
-            e.printStackTrace();
+            log.error("Assigning task ["+taskId+"] failed: ", e);
             return MessageResource.errorMessage("LocalisedTask " + taskId + " cannot be assigned");
         }
     }
 
     @RequestMapping(value = "/delegate/{id}", method = RequestMethod.POST)
-    public MessageResource delegate(Authentication auth, @PathVariable("id") String taskId, @RequestBody Long delegatedId) {
+    public MessageResource delegate(Authentication auth, @PathVariable("id") String taskId, @RequestBody Long delegatedId) throws UnauthorisedRequestException {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
+
+        if( !loggedUser.isAdmin() && !taskAuthenticationService.userHasAtLeastOneRolePermission(loggedUser, taskId, RolePermission.PERFORM, RolePermission.DELEGATE))
+            throw new UnauthorisedRequestException("User " + loggedUser.getUsername() + " doesn't have permission to delegate task " + taskId);
+
         try {
             taskService.delegateTask(loggedUser, delegatedId, taskId);
             return MessageResource.successMessage("LocalisedTask " + taskId + " assigned to [" + delegatedId + "]");
-        } catch (Exception ignored) {
-            ignored.printStackTrace();
+        } catch (Exception e) {
+            log.error("Delegating task ["+taskId+"] failed: ", e);
             return MessageResource.errorMessage("LocalisedTask " + taskId + " cannot be assigned");
         }
     }
 
     @RequestMapping(value = "/finish/{id}", method = RequestMethod.GET)
-    public MessageResource finish(Authentication auth, @PathVariable("id") String taskId) {
+    public MessageResource finish(Authentication auth, @PathVariable("id") String taskId) throws UnauthorisedRequestException {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
+
+        if(	!loggedUser.isAdmin()
+			&& !(
+				taskAuthenticationService.userHasAtLeastOneRolePermission(loggedUser, taskId, RolePermission.PERFORM)
+				&& taskAuthenticationService.isAssignee(loggedUser, taskId)
+			))
+            throw new UnauthorisedRequestException("User " + loggedUser.getUsername() + " doesn't have permission to finish task " + taskId);
+
         try {
             taskService.finishTask(loggedUser, taskId);
             return MessageResource.successMessage("LocalisedTask " + taskId + " finished");
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("Finishing task ["+taskId+"] failed: ", e);
             return MessageResource.errorMessage(e.getMessage());
         }
     }
 
     @RequestMapping(value = "/cancel/{id}", method = RequestMethod.GET)
-    public MessageResource cancel(Authentication auth, @PathVariable("id") String taskId) {
+    public MessageResource cancel(Authentication auth, @PathVariable("id") String taskId) throws UnauthorisedRequestException {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
+
+		if(	!loggedUser.isAdmin()
+			&& !(
+				taskAuthenticationService.userHasAtLeastOneRolePermission(loggedUser, taskId, RolePermission.PERFORM, RolePermission.CANCEL)
+				&& taskAuthenticationService.isAssignee(loggedUser, taskId)
+			))
+            throw new UnauthorisedRequestException("User " + loggedUser.getUsername() + " doesn't have permission to cancel task " + taskId);
+
         try {
             taskService.cancelTask(loggedUser, taskId);
             return MessageResource.successMessage("LocalisedTask " + taskId + " canceled");
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("Canceling task ["+taskId+"] failed: ", e);
             return MessageResource.errorMessage(e.getMessage());
         }
     }
@@ -160,8 +198,8 @@ public class TaskController {
     }
 
     @RequestMapping(value = "/search", method = RequestMethod.POST)
-    public PagedResources<LocalisedTaskResource> search(Authentication auth, Pageable pageable, @RequestBody Map<String, Object> searchBody, PagedResourcesAssembler<com.netgrif.workflow.workflow.domain.Task> assembler, Locale locale) {
-        Page<com.netgrif.workflow.workflow.domain.Task> tasks = taskService.search(searchBody, pageable, (LoggedUser) auth.getPrincipal());
+    public PagedResources<LocalisedTaskResource> search(Authentication auth, Pageable pageable, @RequestBody TaskSearchRequest searchBody, PagedResourcesAssembler<com.netgrif.workflow.workflow.domain.Task> assembler, Locale locale) {
+        Page<com.netgrif.workflow.workflow.domain.Task> tasks = searchService.search(searchBody, (LoggedUser) auth.getPrincipal(), pageable);
         Link selfLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
                 .search(auth, pageable, searchBody, assembler, locale)).withRel("search");
         PagedResources<LocalisedTaskResource> resources = assembler.toResource(tasks, new TaskResourceAssembler(locale), selfLink);
@@ -197,13 +235,21 @@ public class TaskController {
     }
 
     @RequestMapping(value = "/{id}/data", method = RequestMethod.POST)
-    public ChangedFieldContainer saveData(@PathVariable("id") String taskId, @RequestBody ObjectNode dataBody) {
+    public ChangedFieldContainer saveData(@PathVariable("id") String taskId, @RequestBody ObjectNode dataBody) throws UnauthorisedRequestException {
+    	User logged = userService.getLoggedUser();
+    	if( !logged.transformToLoggedUser().isAdmin() && !taskAuthenticationService.isAssignee(logged, taskId))
+    		throw new UnauthorisedRequestException("User " + logged.transformToLoggedUser().getUsername() + " doesn't have permission to save data in task " + taskId);
+
         return dataService.setData(taskId, dataBody);
     }
 
     @RequestMapping(value = "/{id}/file/{field}", method = RequestMethod.POST)
     public MessageResource saveFile(@PathVariable("id") String taskId, @PathVariable("field") String fieldId,
-                                    @RequestParam(value = "file") MultipartFile multipartFile) {
+                                    @RequestParam(value = "file") MultipartFile multipartFile) throws UnauthorisedRequestException {
+		User logged = userService.getLoggedUser();
+		if( !logged.transformToLoggedUser().isAdmin() && !taskAuthenticationService.isAssignee(logged, taskId))
+			throw new UnauthorisedRequestException("User " + logged.transformToLoggedUser().getUsername() + " doesn't have permission to save file in task " + taskId);
+
         if (dataService.saveFile(taskId, fieldId, multipartFile))
             return MessageResource.successMessage("File " + multipartFile.getOriginalFilename() + " successfully uploaded");
         else

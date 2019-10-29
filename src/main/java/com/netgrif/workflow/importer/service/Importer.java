@@ -24,6 +24,8 @@ import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.workflow.workflow.domain.triggers.Trigger;
 import lombok.Getter;
 import org.bson.types.ObjectId;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,14 +33,14 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import java.io.*;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class Importer {
+
+    public static final Logger log = LoggerFactory.getLogger(Importer.class);
 
     public static final String ARCHIVED_FILES_PATH = "storage/uploadedModels/";
     public static final String FILE_EXTENSION = ".xml";
@@ -91,7 +93,7 @@ public class Importer {
             unmarshallXml(xml);
             return createPetriNet(title, initials);
         } catch (JAXBException e) {
-            e.printStackTrace();
+            log.error("Importing Petri net failed: ", e);
         }
         return Optional.empty();
     }
@@ -101,7 +103,7 @@ public class Importer {
         try {
             return importPetriNet(new FileInputStream(xml), title, initials, config);
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            log.error("Importing Petri net failed: ", e);
         }
         return Optional.empty();
     }
@@ -138,11 +140,12 @@ public class Importer {
     }
 
     @Transactional
-    public Path saveNetFile(PetriNet net, File xmlFile) throws IOException {
+    public Path saveNetFile(PetriNet net, InputStream xmlFile) throws IOException {
         File savedFile = new File(ARCHIVED_FILES_PATH + net.getStringId() + "-" + net.getTitle() + FILE_EXTENSION);
         savedFile.getParentFile().mkdirs();
         net.setImportXmlPath(savedFile.getPath());
-        return Files.copy(xmlFile.toPath(), savedFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+        copyInputStreamToFile(xmlFile, savedFile);
+        return savedFile.toPath();
     }
 
     @Transactional
@@ -758,5 +761,15 @@ public class Importer {
 
     private boolean isTransitionRoleAllowed() {
         return document.isTransitionRole() == null || document.isTransitionRole();
+    }
+
+    private static void copyInputStreamToFile(InputStream inputStream, File file) throws IOException {
+        try (FileOutputStream outputStream = new FileOutputStream(file)) {
+            int read;
+            byte[] bytes = new byte[1024];
+            while ((read = inputStream.read(bytes)) != -1) {
+                outputStream.write(bytes, 0, read);
+            }
+        }
     }
 }

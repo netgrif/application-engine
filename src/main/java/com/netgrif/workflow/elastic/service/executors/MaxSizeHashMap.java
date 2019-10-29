@@ -29,8 +29,7 @@ public class MaxSizeHashMap extends LinkedHashMap<String, ExecutorService> {
                 eldest.getValue().shutdown();
                 eldest.getValue().awaitTermination(threadShutdownTimeout, TimeUnit.SECONDS);
             } catch (InterruptedException e) {
-                e.printStackTrace();
-                log.error("Thread was interrupted while waiting for termination");
+                log.error("Thread was interrupted while waiting for termination: ", e);
             }
         }
         return removeEntry;
