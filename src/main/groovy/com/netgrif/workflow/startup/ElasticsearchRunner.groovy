@@ -61,6 +61,9 @@ class ElasticsearchRunner extends AbstractOrderedCommandLineRunner {
           "processIdentifier":{
              "type":"keyword"
           },
+          "processId":{
+             "type":"keyword"
+          },
           "stringId":{
              "type":"keyword"
           },
