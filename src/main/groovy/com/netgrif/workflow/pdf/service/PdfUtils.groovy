@@ -110,7 +110,7 @@ class PdfUtils {
             addFieldValues(acroForm, xml, [:])
             return saveToFile(document, outPdfName)
         } catch (IOException e) {
-            e.printStackTrace()
+            log.error("Filling PDF form failed: ", e)
             throw new IllegalArgumentException(e)
         } finally {
             pdfFile.close()

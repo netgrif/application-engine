@@ -52,7 +52,7 @@ public class SecurityConfiguration extends AbstractSecurityConfiguration {
         CorsConfiguration config = new CorsConfiguration().applyPermitDefaultValues();
         config.addAllowedMethod("*");
         config.addAllowedHeader("*");
-        config.addExposedHeader("x-auth-token");
+        config.addExposedHeader("X-Auth-Token");
         config.addAllowedOrigin("*");
         config.setAllowCredentials(true);
 
