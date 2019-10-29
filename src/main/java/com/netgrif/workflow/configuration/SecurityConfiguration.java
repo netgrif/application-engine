@@ -85,6 +85,8 @@ public class SecurityConfiguration extends AbstractSecurityConfiguration {
             .and()
             .headers()
                 .frameOptions().disable()
+                .httpStrictTransportSecurity().includeSubDomains(true).maxAgeInSeconds(31536000)
+                .and()
                 .addHeaderWriter(new StaticHeadersWriter("X-Content-Security-Policy","frame-src: 'none'"));
 //        @formatter:on
         setCsrf(http);
