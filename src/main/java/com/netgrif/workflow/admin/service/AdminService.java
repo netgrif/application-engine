@@ -20,7 +20,7 @@ public class AdminService implements IAdminService {
     private AdminConsoleRunner actionsRunner;
 
     @Override
-    public MessageResource runCode(String code) {
+    public MessageResource run(String code) {
         try {
             String result = actionsRunner.run(code);
             return successMessage("OK", result);

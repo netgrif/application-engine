@@ -42,7 +42,6 @@ public class AdminController {
         whitelist.add("127.0.0.1");
         whitelist.add("0:0:0:0:0:0:0:1");
         whitelist.add("localhost");
-        whitelist.add("87.197.180.58");
         if (ipList != null) {
             Collections.addAll(whitelist, ipList);
         }
@@ -69,7 +68,7 @@ public class AdminController {
                 return errorMessage("Invalid IP Address");
             }
             if (code != null) {
-                return adminService.runCode(code);
+                return adminService.run(code);
             }
             return errorMessage("Code is null");
         } else {
