@@ -49,7 +49,7 @@ public class AdminController {
     }
 
 
-    @PreAuthorize("hasRole('SYSTEM')")
+    @PreAuthorize("hasRole('SYSTEMADMIN')")
     @PostMapping(value = "/run", consumes = MediaType.TEXT_PLAIN_VALUE)
     @ApiOperation(value = "Admin console running code",
             notes = "End-point",
@@ -60,7 +60,7 @@ public class AdminController {
     })
     public MessageResource adminCode(@RequestBody String code, Authentication auth) {
         if (activateRun) {
-            log.warn(auth.getName() + " loggin to Admin bash console");
+            log.warn(auth.getName() + " login to Admin console");
             WebAuthenticationDetails details = (WebAuthenticationDetails) auth.getDetails();
             String userIp = details.getRemoteAddress();
             log.warn("Connecting IP " + userIp);
@@ -73,7 +73,7 @@ public class AdminController {
             }
             return errorMessage("Code is null");
         } else {
-            return errorMessage("Admin bash console is disabled");
+            return errorMessage("Admin console is disabled");
         }
     }
 
