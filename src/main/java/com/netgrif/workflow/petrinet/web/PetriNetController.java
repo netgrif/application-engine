@@ -75,7 +75,7 @@ public class PetriNetController {
             service.importPetriNetAndDeleteFile(file, fileMeta, (LoggedUser) auth.getPrincipal());
             return MessageResource.successMessage("Petri net " + fileMeta.name + " imported successfully");
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("Importing Petri net failed: ", e);
             return MessageResource.errorMessage("IO error");
         }
     }
@@ -164,7 +164,7 @@ public class PetriNetController {
                 return null;
             return URLDecoder.decode(s1, StandardCharsets.UTF_8.name());
         } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
+            log.error("Decoding URL failed: ",e);
             return "";
         }
     }
