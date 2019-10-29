@@ -16,6 +16,7 @@ import org.elasticsearch.index.query.QueryStringQueryBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -66,7 +67,7 @@ public class ElasticCaseService implements IElasticCaseService {
     @Override
     public void remove(String caseId) {
         executors.execute(caseId, () -> {
-            repository.deleteById(caseId);
+            repository.deleteAllByStringId(caseId);
             log.info("[" + caseId + "]: Case \"" + caseId + "\" deleted");
         });
     }
@@ -74,14 +75,21 @@ public class ElasticCaseService implements IElasticCaseService {
     @Override
     public void index(ElasticCase useCase) {
         executors.execute(useCase.getStringId(), () -> {
-            ElasticCase elasticCase = repository.findByStringId(useCase.getStringId());
-            if (elasticCase == null) {
+            try {
+                ElasticCase elasticCase = repository.findByStringId(useCase.getStringId());
+                if (elasticCase == null) {
+                    repository.save(useCase);
+                } else {
+                    elasticCase.update(useCase);
+                    repository.save(elasticCase);
+                }
+                log.debug("[" + useCase.getStringId() + "]: Case \"" + useCase.getTitle() + "\" indexed");
+            } catch (InvalidDataAccessApiUsageException ignored) {
+                log.debug("[" + useCase.getStringId() + "]: Case \"" + useCase.getTitle() + "\" has duplicates, will be reindexed");
+                repository.deleteAllByStringId(useCase.getStringId());
                 repository.save(useCase);
-            } else {
-                elasticCase.update(useCase);
-                repository.save(elasticCase);
+                log.debug("[" + useCase.getStringId() + "]: Case \"" + useCase.getTitle() + "\" indexed");
             }
-            log.debug("[" + useCase.getStringId() + "]: Case \"" + useCase.getTitle() + "\" indexed");
         });
     }
 

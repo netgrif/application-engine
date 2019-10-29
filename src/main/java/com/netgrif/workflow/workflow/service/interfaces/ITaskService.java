@@ -90,4 +90,6 @@ public interface ITaskService {
     void deleteTasksByCase(String caseId);
 
     List<TaskReference> findAllByCase(String caseId, Locale locale);
+
+    Task save(Task task);
 }
