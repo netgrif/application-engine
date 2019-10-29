@@ -11,6 +11,7 @@ import com.netgrif.workflow.importer.service.FieldFactory;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.dataset.CaseField;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
+import com.netgrif.workflow.petrinet.domain.dataset.FieldType;
 import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository;
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.workflow.security.service.EncryptionService;
@@ -240,7 +241,7 @@ public class WorkflowService implements IWorkflowService {
             return true;
         }
         boolean deleteSuccess = useCase.removeTasks(StreamSupport.stream(tasks.spliterator(), false).collect(Collectors.toList()));
-        useCase = repository.save(useCase);
+        save(useCase);
         return deleteSuccess;
     }
 
@@ -288,7 +289,15 @@ public class WorkflowService implements IWorkflowService {
             try {
                 Field field = fieldFactory.buildImmediateField(useCase, fieldId);
                 Field clone = field.clone();
-                clone.setValue(field.getValue());
+                if (field.getValue() != null) {
+                    if (field.getType() == FieldType.TEXT) {
+                        clone.setValue(field.getValue().toString());
+                    } else {
+                        clone.setValue(field.getValue());
+                    }
+                } else {
+                    clone.setValue(null);
+                }
                 immediateData.add(clone);
             } catch (Exception e) {
                 log.error("Could not built immediate field [" + fieldId + "]");
