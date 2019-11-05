@@ -12,23 +12,19 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * User application preferences. Contains:
+ * Role application preferences. Contains:
  * <ul>
- *     <li>locale</li>
  *     <li>task filters for each task view</li>
  *     <li>case filters for each case view</li>
- *     <li>case view flex fields</li>
  * </ul>
  */
 @Document
 @Data
 @NoArgsConstructor
-public class Preferences implements Serializable {
+public class RolePreferences implements Serializable {
 
     @Id
-    private Long userId;
-
-    private String locale;
+    private Long processRoleId;
 
     /**
      * taskViewId: [filterIds]
@@ -42,13 +38,7 @@ public class Preferences implements Serializable {
     @Field
     private Map<String, List<String>> caseFilters = new HashMap<>();
 
-    /**
-     * caseViewId: [headersIds]
-     */
-    @Field
-    private Map<String, List<String>> caseViewHeaders = new HashMap<>();
-
-    public Preferences(Long userId) {
-        this.userId = userId;
+    public RolePreferences(Long processRoleId) {
+        this.processRoleId = processRoleId;
     }
 }
