@@ -1,6 +1,7 @@
 package com.netgrif.workflow.admin.web;
 
 import com.netgrif.workflow.admin.service.interfaces.IAdminService;
+import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.workflow.web.responsebodies.MessageResource;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -68,7 +69,7 @@ public class AdminController {
                 return errorMessage("Invalid IP Address");
             }
             if (code != null) {
-                return adminService.run(code);
+                return adminService.run(code, (LoggedUser) auth.getPrincipal());
             }
             return errorMessage("Code is null");
         } else {
