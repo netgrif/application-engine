@@ -13,7 +13,7 @@ abstract class AdminConsoleRunner {
     private static final Logger log = LoggerFactory.getLogger(AdminConsoleRunner.class)
 
     @Lookup("actionDelegate")
-    abstract ActionDelegate getActionDeleget()
+    abstract ActionDelegate getActionDelegate()
 
     String run(String action) {
         log.debug("Action: $action")
@@ -23,7 +23,7 @@ abstract class AdminConsoleRunner {
 
     private Closure getActionCode(String action) {
         def code = (Closure) new GroovyShell(this.class.getClassLoader()).evaluate("{-> ${action}}")
-        code.delegate = getActionDeleget()
+        code.delegate = getActionDelegate()
         return code
     }
 
