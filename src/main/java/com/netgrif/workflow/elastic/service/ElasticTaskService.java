@@ -24,8 +24,7 @@ import org.springframework.data.elasticsearch.core.query.SearchQuery;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
@@ -99,6 +98,7 @@ public class ElasticTaskService implements IElasticTaskService {
         if (request == null) {
             throw new IllegalArgumentException("Request can not be null!");
         }
+        addRolesQueryConstraint(request, user);
 
         SearchQuery query = buildQuery(request, user, pageable);
         Page<ElasticTask> indexedTasks = repository.search(query);
@@ -112,10 +112,21 @@ public class ElasticTaskService implements IElasticTaskService {
         if (request == null) {
             throw new IllegalArgumentException("Request can not be null!");
         }
+        addRolesQueryConstraint(request, user);
 
         SearchQuery query = buildQuery(request, user, new FullPageRequest());
 
         return template.count(query, ElasticTask.class);
+    }
+
+    private void addRolesQueryConstraint(TaskSearchRequest request, LoggedUser user) {
+        if (request.role != null && !request.role.isEmpty()) {
+            Set<String> roles = new HashSet<>(request.role);
+            roles.addAll(user.getProcessRoles());
+            request.role = new ArrayList<>(roles);
+        } else {
+            request.role = new ArrayList<>(user.getProcessRoles());
+        }
     }
 
     private SearchQuery buildQuery(TaskSearchRequest request, LoggedUser user, Pageable pageable) {
