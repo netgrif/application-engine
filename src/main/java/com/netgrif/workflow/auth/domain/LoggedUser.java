@@ -74,6 +74,16 @@ public class LoggedUser extends org.springframework.security.core.userdetails.Us
         return user;
     }
 
+    @Override
+    public String toString() {
+        return "LoggedUser{" +
+                "id=" + id +
+                ", fullName='" + fullName + '\'' +
+                ", groups=" + groups +
+                ", processRoles=" + processRoles +
+                '}';
+    }
+
     public Author transformToAuthor() {
         Author author = new Author();
         author.setId(this.id);
