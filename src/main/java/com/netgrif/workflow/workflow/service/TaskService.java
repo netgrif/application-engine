@@ -511,7 +511,7 @@ public class TaskService implements ITaskService {
 
     @Override
     public Page<Task> search(Map<String, Object> request, Pageable pageable, LoggedUser user) {
-        request = addRolesQueryContraint(request, user);
+        request = addRolesQueryConstraint(request, user);
         com.querydsl.core.types.Predicate searchPredicate = searchService.buildQuery(request, user, null);
         Page<Task> page = taskRepository.findAll(searchPredicate, pageable);
         page = loadUsers(page);
@@ -521,12 +521,12 @@ public class TaskService implements ITaskService {
 
     @Override
     public long count(Map<String, Object> request, LoggedUser user, Locale locale) {
-        request = addRolesQueryContraint(request, user);
+        request = addRolesQueryConstraint(request, user);
         com.querydsl.core.types.Predicate searchPredicate = searchService.buildQuery(request, user, locale);
         return taskRepository.count(searchPredicate);
     }
 
-    protected Map<String, Object> addRolesQueryContraint(Map<String, Object> request, LoggedUser user) {
+    protected Map<String, Object> addRolesQueryConstraint(Map<String, Object> request, LoggedUser user) {
         if (request.containsKey("role")) {
             Set<String> roles = new HashSet<>((List) request.get("role"));
             roles.addAll(user.getProcessRoles());
