@@ -1,5 +1,6 @@
 package com.netgrif.workflow.admin.web;
 
+import com.netgrif.workflow.admin.service.AdminActionException;
 import com.netgrif.workflow.admin.service.interfaces.IAdminService;
 import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.workflow.web.responsebodies.MessageResource;
@@ -33,19 +34,20 @@ public class AdminController {
 
     private static Set<String> whitelist = new HashSet<>();
 
-    @Value("${admin.console.activation:true}")
     private boolean activateRun;
 
-    @Autowired
     private IAdminService adminService;
 
-    public AdminController(@Value("${admin.console.ip-list:null}") String[] ipList) {
+    @Autowired
+    public AdminController(@Value("${admin.console.ip-list:null}") String[] ipList, @Value("${admin.console.activation:true}") boolean activateRun, IAdminService adminService) {
         whitelist.add("127.0.0.1");
         whitelist.add("0:0:0:0:0:0:0:1");
         whitelist.add("localhost");
         if (ipList != null) {
             Collections.addAll(whitelist, ipList);
         }
+        this.adminService = adminService;
+        this.activateRun = activateRun;
     }
 
 
@@ -69,7 +71,12 @@ public class AdminController {
                 return errorMessage("Invalid IP Address");
             }
             if (code != null) {
-                return adminService.run(code, (LoggedUser) auth.getPrincipal());
+                try {
+                    String result = adminService.run(code, (LoggedUser) auth.getPrincipal());
+                    return successMessage("OK", result);
+                } catch (AdminActionException e) {
+                    return errorMessage("ERROR", e.toString());
+                }
             }
             return errorMessage("Code is null");
         } else {
