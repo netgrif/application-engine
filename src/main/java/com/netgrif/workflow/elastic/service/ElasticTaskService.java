@@ -119,7 +119,7 @@ public class ElasticTaskService implements IElasticTaskService {
         return template.count(query, ElasticTask.class);
     }
 
-    private void addRolesQueryConstraint(TaskSearchRequest request, LoggedUser user) {
+    protected void addRolesQueryConstraint(TaskSearchRequest request, LoggedUser user) {
         if (request.role != null && !request.role.isEmpty()) {
             Set<String> roles = new HashSet<>(request.role);
             roles.addAll(user.getProcessRoles());
