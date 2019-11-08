@@ -58,6 +58,6 @@ public class FilterService implements IFilterService {
             request.put("author", user.getId());
         }
 
-        return searchService.search(request, pageable, Filter.class);
+        return repository.findAll(searchService.buildQuery(request, user, null), pageable);
     }
 }
