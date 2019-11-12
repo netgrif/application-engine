@@ -17,8 +17,8 @@ public class Filter {
     public static final int VISIBILITY_GROUP = 1;
     public static final int VISIBILITY_PRIVATE = 0;
 
-    public static final String TYPE_TASK = "task";
-    public static final String TYPE_CASE = "case";
+    public static final String TYPE_TASK = "Task";
+    public static final String TYPE_CASE = "Case";
 
     @Id
     private ObjectId _id;
