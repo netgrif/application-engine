@@ -285,6 +285,12 @@ public class Importer {
         arc.setMultiplicity(importArc.getMultiplicity());
         arc.setSource(getNode(importArc.getSourceId()));
         arc.setDestination(getNode(importArc.getDestinationId()));
+        if (importArc.getReference() != null) {
+            if (!places.containsKey(importArc.getReference()) && !fields.containsKey(importArc.getReference())) {
+                throw new IllegalArgumentException("Place of Data variable with id [" + importArc.getReference() + "] referenced by Arc [" + importArc.getId() + "] could not be found.");
+            }
+            arc.setReference(importArc.getReference());
+        }
 
         net.addArc(arc);
     }
