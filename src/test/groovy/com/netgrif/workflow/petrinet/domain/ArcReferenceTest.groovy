@@ -15,12 +15,12 @@ import org.springframework.test.context.junit4.SpringRunner
 @SpringBootTest
 class ArcReferenceTest {
 
-    public static final String NET_FILE = "arc_order_test.xml"
-    public static final String NET_TITLE = "ArcOrder"
-    public static final String NET_INITS = "ACR"
+    public static final String NET_FILE = "arc_reference_test.xml"
+    public static final String NET_TITLE = "arc_reference_test"
+    public static final String NET_INITS = "a01"
     public static final String NET_INVALID_FILE = "arc_reference_invalid_test.xml"
-    public static final String NET_INVALID_TITLE = "ArcOrder"
-    public static final String NET_INVALID_INITS = "ACR"
+    public static final String NET_INVALID_TITLE = "arc_reference_invalid_test"
+    public static final String NET_INVALID_INITS = "a02"
 
     @Autowired
     private Importer importer
