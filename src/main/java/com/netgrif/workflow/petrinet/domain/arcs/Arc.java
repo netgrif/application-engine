@@ -26,6 +26,9 @@ public class Arc extends PetriNetObject {
     @Getter @Setter
     protected Integer multiplicity;
 
+    @Getter @Setter
+    protected String reference;
+
     public Arc() {
         this.setObjectId(new ObjectId());
     }

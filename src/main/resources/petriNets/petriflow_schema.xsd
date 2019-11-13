@@ -109,6 +109,7 @@
                 <xs:element ref="sourceId"/>
                 <xs:element ref="destinationId"/>
                 <xs:element ref="multiplicity"/>
+                <xs:element ref="reference" minOccurs="0"/>
                 <xs:element ref="breakPoint" minOccurs="0" maxOccurs="unbounded"/>
             </xs:sequence>
         </xs:complexType>
@@ -268,6 +269,7 @@
     <xs:element name="sourceId" type="xs:string"/>
     <xs:element name="destinationId" type="xs:string"/>
     <xs:element name="multiplicity" type="nonNegativeInteger"/>
+    <xs:element name="reference" type="xs:string"/>
     <xs:element name="breakPoint">
         <xs:complexType>
             <xs:sequence>

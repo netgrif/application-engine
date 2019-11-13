@@ -122,7 +122,7 @@ class ImportHelper {
         return authorityService.getOrCreate(name)
     }
 
-    Optional<PetriNet> createNet(String fileName, String identifier, String name, String initials, String release) {
+    Optional<PetriNet> createNet(String fileName, String identifier, String name, String initials, String release = "major") {
         createNet(fileName, identifier, name, initials, release, superCreator.loggedSuper)
     }
 
