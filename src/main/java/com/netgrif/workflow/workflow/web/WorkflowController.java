@@ -1,6 +1,5 @@
 package com.netgrif.workflow.workflow.web;
 
-import com.netgrif.workflow.auth.domain.Author;
 import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.auth.domain.throwable.UnauthorisedRequestException;
@@ -8,6 +7,7 @@ import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.elastic.domain.ElasticCase;
 import com.netgrif.workflow.elastic.service.interfaces.IElasticCaseService;
 import com.netgrif.workflow.elastic.web.CaseSearchRequest;
+import com.netgrif.workflow.elastic.web.CaseSearchRequestWrapper;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.service.FileFieldInputStream;
 import com.netgrif.workflow.workflow.service.interfaces.IDataService;
@@ -99,10 +99,10 @@ public class WorkflowController {
     }
 
     @PostMapping(value = "/case/search", produces = MediaTypes.HAL_JSON_VALUE)
-    public PagedResources<CaseResource> search(@RequestBody CaseSearchRequest searchBody, Pageable pageable, PagedResourcesAssembler<Case> assembler, Authentication auth, Locale locale) {
+    public PagedResources<CaseResource> search(@RequestBody CaseSearchRequestWrapper searchBody, Pageable pageable, PagedResourcesAssembler<Case> assembler, Authentication auth, Locale locale) {
         LoggedUser user =(LoggedUser) auth.getPrincipal();
         long start = System.currentTimeMillis();
-        Page<Case> cases = elasticCaseService.search(searchBody, user, pageable);
+        Page<Case> cases = elasticCaseService.search(searchBody.list.get(0), user, pageable);
 
         Link selfLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(WorkflowController.class)
                 .search(searchBody, pageable, assembler, auth, locale)).withRel("search");
