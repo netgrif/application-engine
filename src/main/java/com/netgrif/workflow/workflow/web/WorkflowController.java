@@ -102,7 +102,7 @@ public class WorkflowController {
     public PagedResources<CaseResource> search(@RequestBody CaseSearchRequestWrapper searchBody, Pageable pageable, PagedResourcesAssembler<Case> assembler, Authentication auth, Locale locale) {
         LoggedUser user =(LoggedUser) auth.getPrincipal();
         long start = System.currentTimeMillis();
-        Page<Case> cases = elasticCaseService.search(searchBody.list.get(0), user, pageable);
+        Page<Case> cases = elasticCaseService.search(searchBody.getList().get(0), user, pageable);
 
         Link selfLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(WorkflowController.class)
                 .search(searchBody, pageable, assembler, auth, locale)).withRel("search");
