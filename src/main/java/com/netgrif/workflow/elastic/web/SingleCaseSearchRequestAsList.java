@@ -9,18 +9,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import lombok.Getter;
-import lombok.Setter;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 @Getter
-@Setter
 @JsonDeserialize(using = SingleCaseSearchRequestAsList.SingleItemAsListDeserializer.class)
 public class SingleCaseSearchRequestAsList {
 
-    public List<CaseSearchRequest> list;
+    private List<CaseSearchRequest> list;
 
     public SingleCaseSearchRequestAsList() {
         list = new ArrayList<>();
