@@ -8,6 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Async;
 
+import java.util.List;
 import java.util.Map;
 
 public interface IElasticCaseService {
@@ -17,9 +18,9 @@ public interface IElasticCaseService {
 
     void indexNow(ElasticCase useCase);
 
-    Page<Case> search(CaseSearchRequest request, LoggedUser user, Pageable pageable);
+    Page<Case> search(List<CaseSearchRequest> requests, LoggedUser user, Pageable pageable, Boolean isIntersection);
 
-    long count(CaseSearchRequest request, LoggedUser user);
+    long count(List<CaseSearchRequest> requests, LoggedUser user, Boolean isIntersection);
 
     Map<String, Float> fullTextFields();
 
