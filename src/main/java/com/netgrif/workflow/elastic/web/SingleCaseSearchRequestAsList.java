@@ -17,21 +17,26 @@ import java.util.List;
 
 @Getter
 @Setter
-@JsonDeserialize(using = CaseSearchRequestWrapper.SingleItemAsListDeserializer.class)
-public class CaseSearchRequestWrapper {
+@JsonDeserialize(using = SingleCaseSearchRequestAsList.SingleItemAsListDeserializer.class)
+public class SingleCaseSearchRequestAsList {
 
     public List<CaseSearchRequest> list;
 
-    public CaseSearchRequestWrapper() {
+    public SingleCaseSearchRequestAsList() {
         list = new ArrayList<>();
     }
 
-    public CaseSearchRequestWrapper(List<CaseSearchRequest> requests) {
+    public SingleCaseSearchRequestAsList(CaseSearchRequest item) {
+        this();
+        this.list.add(item);
+    }
+
+    public SingleCaseSearchRequestAsList(List<CaseSearchRequest> requests) {
         list = requests;
     }
 
 
-    public static class SingleItemAsListDeserializer extends StdDeserializer<CaseSearchRequestWrapper> {
+    public static class SingleItemAsListDeserializer extends StdDeserializer<SingleCaseSearchRequestAsList> {
 
         protected SingleItemAsListDeserializer() {
             this(null);
@@ -42,21 +47,19 @@ public class CaseSearchRequestWrapper {
         }
 
         @Override
-        public CaseSearchRequestWrapper deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException, JsonProcessingException {
-            CaseSearchRequestWrapper wrapper;
+        public SingleCaseSearchRequestAsList deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException, JsonProcessingException {
+            SingleCaseSearchRequestAsList wrapper;
 
             ObjectMapper innerDeserializer = new ObjectMapper();
             JsonNode node = innerDeserializer.readTree(jsonParser);
             try {
-                CaseSearchRequest request = innerDeserializer.convertValue(node, new TypeReference<CaseSearchRequest>() {
-                });
-                wrapper = new CaseSearchRequestWrapper();
-                wrapper.getList().add(request);
+                CaseSearchRequest request = innerDeserializer.convertValue(node, new TypeReference<CaseSearchRequest>() {});
+                wrapper = new SingleCaseSearchRequestAsList(request);
             } catch (IllegalArgumentException e) {
                 // parsing of single item failed
-                List<CaseSearchRequest> requests = innerDeserializer.convertValue(node, new TypeReference<List<CaseSearchRequest>>() {
-                });
-                wrapper = new CaseSearchRequestWrapper(requests);
+                List<CaseSearchRequest> requests = innerDeserializer.convertValue(node, new TypeReference<List<CaseSearchRequest>>() {});
+                wrapper = new SingleCaseSearchRequestAsList(requests);
+                // TODO throw some informative exception when both parsing attempts fail
             }
 
             return wrapper;
