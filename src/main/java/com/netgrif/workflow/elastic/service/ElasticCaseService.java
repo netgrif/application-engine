@@ -27,6 +27,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.BinaryOperator;
 import java.util.stream.Collectors;
 
 import static org.elasticsearch.index.query.QueryBuilders.*;
@@ -99,12 +100,12 @@ public class ElasticCaseService implements IElasticCaseService {
     }
 
     @Override
-    public Page<Case> search(CaseSearchRequest request, LoggedUser user, Pageable pageable) {
-        if (request == null) {
+    public Page<Case> search(List<CaseSearchRequest> requests, LoggedUser user, Pageable pageable, Boolean isIntersection) {
+        if (requests == null) {
             throw new IllegalArgumentException("Request can not be null!");
         }
 
-        SearchQuery query = buildQuery(request, user, pageable);
+        SearchQuery query = buildQuery(requests, user, pageable, isIntersection);
         Page<ElasticCase> indexedCases = repository.search(query);
         List<Case> casePage = workflowService.findAllById(indexedCases.get().map(ElasticCase::getStringId).collect(Collectors.toList()));
 
@@ -112,18 +113,35 @@ public class ElasticCaseService implements IElasticCaseService {
     }
 
     @Override
-    public long count(CaseSearchRequest request, LoggedUser user) {
-        if (request == null) {
+    public long count(List<CaseSearchRequest> requests, LoggedUser user, Boolean isIntersection) {
+        if (requests == null) {
             throw new IllegalArgumentException("Request can not be null!");
         }
 
-        SearchQuery query = buildQuery(request, user, new FullPageRequest());
+        SearchQuery query = buildQuery(requests, user, new FullPageRequest(), isIntersection);
 
         return template.count(query, ElasticCase.class);
     }
 
-    private SearchQuery buildQuery(CaseSearchRequest request, LoggedUser user, Pageable pageable) {
+    private SearchQuery buildQuery(List<CaseSearchRequest> requests, LoggedUser user, Pageable pageable, Boolean isIntersection) {
+        BinaryOperator<BoolQueryBuilder> reductionOperator;
+        if(isIntersection)
+            reductionOperator = ElasticCaseService::intersection;
+        else
+            reductionOperator = ElasticCaseService::union;
+
+        BoolQueryBuilder query = requests.parallelStream()
+                                            .map(request -> buildSingleQuery(request, user))
+                                            .reduce(new BoolQueryBuilder(), reductionOperator);
+
         NativeSearchQueryBuilder builder = new NativeSearchQueryBuilder();
+        return builder
+                .withQuery(query)
+                .withPageable(pageable)
+                .build();
+    }
+
+    private BoolQueryBuilder buildSingleQuery(CaseSearchRequest request, LoggedUser user) {
         BoolQueryBuilder query = boolQuery();
 
         buildPetriNetQuery(request, user, query);
@@ -136,10 +154,15 @@ public class ElasticCaseService implements IElasticCaseService {
 
         // TODO: filtered query https://stackoverflow.com/questions/28116404/filtered-query-using-nativesearchquerybuilder-in-spring-data-elasticsearch
 
-        return builder
-                .withQuery(query)
-                .withPageable(pageable)
-                .build();
+        return query;
+    }
+
+    private static BoolQueryBuilder intersection(BoolQueryBuilder left, BoolQueryBuilder right) {
+        return left.must(right);
+    }
+
+    private static BoolQueryBuilder union(BoolQueryBuilder left, BoolQueryBuilder right) {
+        return left.should(right);
     }
 
     /**

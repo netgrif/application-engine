@@ -6,7 +6,6 @@ import com.netgrif.workflow.auth.domain.throwable.UnauthorisedRequestException;
 import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.elastic.domain.ElasticCase;
 import com.netgrif.workflow.elastic.service.interfaces.IElasticCaseService;
-import com.netgrif.workflow.elastic.web.CaseSearchRequest;
 import com.netgrif.workflow.elastic.web.SingleCaseSearchRequestAsList;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.service.FileFieldInputStream;
@@ -101,8 +100,7 @@ public class WorkflowController {
     @PostMapping(value = "/case/search", produces = MediaTypes.HAL_JSON_VALUE)
     public PagedResources<CaseResource> search(@RequestBody SingleCaseSearchRequestAsList searchBody, Pageable pageable, PagedResourcesAssembler<Case> assembler, Authentication auth, Locale locale) {
         LoggedUser user =(LoggedUser) auth.getPrincipal();
-        long start = System.currentTimeMillis();
-        Page<Case> cases = elasticCaseService.search(searchBody.getList().get(0), user, pageable);
+        Page<Case> cases = elasticCaseService.search(searchBody.getList(), user, pageable, true);
 
         Link selfLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(WorkflowController.class)
                 .search(searchBody, pageable, assembler, auth, locale)).withRel("search");
@@ -113,8 +111,8 @@ public class WorkflowController {
     }
 
     @PostMapping(value = "/case/count", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public CountResponse count(@RequestBody CaseSearchRequest query, Authentication auth) {
-        long count = elasticCaseService.count(query, (LoggedUser) auth.getPrincipal());
+    public CountResponse count(@RequestBody SingleCaseSearchRequestAsList searchBody, Authentication auth) {
+        long count = elasticCaseService.count(searchBody.getList(), (LoggedUser) auth.getPrincipal(), true);
         return CountResponse.caseCount(count);
     }
 
