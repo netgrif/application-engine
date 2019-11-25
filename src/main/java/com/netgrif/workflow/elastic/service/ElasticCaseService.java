@@ -126,9 +126,9 @@ public class ElasticCaseService implements IElasticCaseService {
     private SearchQuery buildQuery(List<CaseSearchRequest> requests, LoggedUser user, Pageable pageable, Boolean isIntersection) {
         BinaryOperator<BoolQueryBuilder> reductionOperator;
         if(isIntersection)
-            reductionOperator = ElasticCaseService::intersection;
+            reductionOperator = BoolQueryBuilder::must;
         else
-            reductionOperator = ElasticCaseService::union;
+            reductionOperator = BoolQueryBuilder::should;
 
         BoolQueryBuilder query = requests.parallelStream()
                                             .map(request -> buildSingleQuery(request, user))
@@ -155,14 +155,6 @@ public class ElasticCaseService implements IElasticCaseService {
         // TODO: filtered query https://stackoverflow.com/questions/28116404/filtered-query-using-nativesearchquerybuilder-in-spring-data-elasticsearch
 
         return query;
-    }
-
-    private static BoolQueryBuilder intersection(BoolQueryBuilder left, BoolQueryBuilder right) {
-        return left.must(right);
-    }
-
-    private static BoolQueryBuilder union(BoolQueryBuilder left, BoolQueryBuilder right) {
-        return left.should(right);
     }
 
     /**
