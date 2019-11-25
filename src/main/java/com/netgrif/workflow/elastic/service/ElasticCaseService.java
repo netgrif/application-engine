@@ -130,7 +130,7 @@ public class ElasticCaseService implements IElasticCaseService {
         else
             reductionOperator = BoolQueryBuilder::should;
 
-        BoolQueryBuilder query = requests.parallelStream()
+        BoolQueryBuilder query = requests.stream()
                                             .map(request -> buildSingleQuery(request, user))
                                             .reduce(new BoolQueryBuilder(), reductionOperator);
 
