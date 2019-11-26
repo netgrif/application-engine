@@ -71,13 +71,13 @@ public class AuthenticationController {
             newUserRequest.email = URLDecoder.decode(newUserRequest.email, StandardCharsets.UTF_8.name());
             User user = registrationService.createNewUser(newUserRequest);
             if (user == null)
-                return MessageResource.errorMessage("User with email " + newUserRequest.email + " has been already registered.");
+                return MessageResource.successMessage("An Email has been sent to the user,if is not registered. If you dont received one, please contact the Administrator");
             mailService.sendRegistrationEmail(user);
 
-            return MessageResource.successMessage("Mail was sent to " + user.getEmail());
+            return MessageResource.successMessage("An Email has been sent to the user,if is not registered. If you dont received one, please contact the Administrator");
         } catch (IOException | TemplateException | MessagingException e) {
             log.error(e.toString());
-            return MessageResource.errorMessage("Sending mail to " + newUserRequest.email + " failed!");
+            return MessageResource.successMessage("An Email has been sent to the user,if is not registered. If you dont received one, please contact the Administrator");
         }
     }
 
@@ -105,13 +105,13 @@ public class AuthenticationController {
             User user = registrationService.resetPassword(recoveryEmail);
             if (user != null) {
                 mailService.sendPasswordResetEmail(user);
-                return MessageResource.successMessage("Email with reset link was sent to address " + recoveryEmail);
+                return MessageResource.successMessage("An Email with reset link has been sent to the user. If you dont received one, please contact the Administrator");
             } else {
-                return MessageResource.errorMessage("User with email " + recoveryEmail + " has not yet registered");
+                return MessageResource.successMessage("An Email with reset link has been sent to the user. If you dont received one, please contact the Administrator");
             }
         } catch (MessagingException | IOException | TemplateException e) {
             log.error(e.toString());
-            return MessageResource.errorMessage("Reset email has failed to be sent to address " + recoveryEmail);
+            return MessageResource.successMessage("An Email with reset link has been sent to the user. If you dont received one, please contact the Administrator");
         }
     }
 
