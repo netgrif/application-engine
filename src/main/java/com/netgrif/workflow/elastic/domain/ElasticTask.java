@@ -82,10 +82,6 @@ public class ElasticTask {
         this.processId = task.getProcessId();
         this.caseId = task.getCaseId();
         this.transitionId = task.getTransitionId();
-        update(task);
-    }
-
-    public void update(Task task) {
         this.title = task.getTitle().getDefaultValue();
         this.titleSortable = title;
         this.caseTitle = task.getCaseTitle();
@@ -95,5 +91,16 @@ public class ElasticTask {
         this.userId = task.getUserId();
         this.startDate = task.getStartDate();
         this.roles = task.getRoles().keySet();
+    }
+
+    public void update(ElasticTask task) {
+        this.title = task.getTitle();
+        this.titleSortable = title;
+        this.caseTitle = task.getCaseTitle();
+        this.caseTitleSortable = this.caseTitle;
+        this.priority = task.getPriority();
+        this.userId = task.getUserId();
+        this.startDate = task.getStartDate();
+        this.roles = task.getRoles();
     }
 }
