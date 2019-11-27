@@ -2,7 +2,6 @@ package com.netgrif.workflow.workflow.service;
 
 import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.elastic.domain.ElasticCase;
-import com.netgrif.workflow.elastic.service.ElasticCaseService;
 import com.netgrif.workflow.elastic.service.interfaces.IElasticCaseService;
 import com.netgrif.workflow.event.events.usecase.CreateCaseEvent;
 import com.netgrif.workflow.event.events.usecase.DeleteCaseEvent;
@@ -187,7 +186,7 @@ public class WorkflowService implements IWorkflowService {
         publisher.publishEvent(new CreateCaseEvent(useCase));
         log.info("["+useCase.getStringId()+"]: Case " + title + " created");
 
-        useCase.getPetriNet().initializeVarArcs(useCase.getDataSet());
+        useCase.getPetriNet().initializeArcs(useCase.getDataSet());
         taskService.reloadTasks(useCase);
 
         useCase = findOne(useCase.getStringId());
@@ -371,7 +370,7 @@ public class WorkflowService implements IWorkflowService {
     private void setPetriNet(Case useCase) {
         PetriNet model = petriNetService.clone(useCase.getPetriNetObjectId());
         model.initializeTokens(useCase.getActivePlaces());
-        model.initializeVarArcs(useCase.getDataSet());
+        model.initializeArcs(useCase.getDataSet());
         useCase.setPetriNet(model);
     }
 }
