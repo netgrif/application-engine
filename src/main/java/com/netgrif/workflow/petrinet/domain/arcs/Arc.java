@@ -4,6 +4,7 @@ import com.netgrif.workflow.petrinet.domain.Node;
 import com.netgrif.workflow.petrinet.domain.PetriNetObject;
 import com.netgrif.workflow.petrinet.domain.Place;
 import com.netgrif.workflow.petrinet.domain.Transition;
+import com.netgrif.workflow.petrinet.domain.arcs.reference.Reference;
 import lombok.Getter;
 import lombok.Setter;
 import org.bson.types.ObjectId;
@@ -27,7 +28,7 @@ public class Arc extends PetriNetObject {
     protected Integer multiplicity;
 
     @Getter @Setter
-    protected String reference;
+    protected Reference reference;
 
     public Arc() {
         this.setObjectId(new ObjectId());
