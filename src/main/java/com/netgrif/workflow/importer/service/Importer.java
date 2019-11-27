@@ -9,6 +9,8 @@ import com.netgrif.workflow.petrinet.domain.Transaction;
 import com.netgrif.workflow.petrinet.domain.Transition;
 import com.netgrif.workflow.petrinet.domain.*;
 import com.netgrif.workflow.petrinet.domain.arcs.Arc;
+import com.netgrif.workflow.petrinet.domain.arcs.reference.Reference;
+import com.netgrif.workflow.petrinet.domain.arcs.reference.Type;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.FieldBehavior;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action;
@@ -289,7 +291,10 @@ public class Importer {
             if (!places.containsKey(importArc.getReference()) && !fields.containsKey(importArc.getReference())) {
                 throw new IllegalArgumentException("Place of Data variable with id [" + importArc.getReference() + "] referenced by Arc [" + importArc.getId() + "] could not be found.");
             }
-            arc.setReference(importArc.getReference());
+            Reference reference = new Reference();
+            reference.setReference(importArc.getReference());
+            reference.setType((places.containsKey(importArc.getReference())) ? Type.PLACE : Type.DATA);
+            arc.setReference(reference);
         }
 
         net.addArc(arc);

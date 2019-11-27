@@ -2,7 +2,6 @@ package com.netgrif.workflow.petrinet.domain;
 
 import com.netgrif.workflow.auth.domain.Author;
 import com.netgrif.workflow.petrinet.domain.arcs.Arc;
-import com.netgrif.workflow.petrinet.domain.arcs.VariableArc;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRole;
 import com.netgrif.workflow.workflow.domain.DataField;
@@ -188,16 +187,16 @@ public class PetriNet extends PetriNetObject {
         places.values().forEach(place -> place.setTokens(activePlaces.getOrDefault(place.getStringId(), 0)));
     }
 
-    public void initializeVarArcs(Map<String, DataField> dataSet) {
+    public void initializeArcs(Map<String, DataField> dataSet) {
         arcs.values()
                 .stream()
                 .flatMap(List::stream)
-                .filter(arc -> arc instanceof VariableArc)
                 .forEach(arc -> {
-                    VariableArc varc = (VariableArc) arc;
-                    String fieldId = varc.getFieldId();
-                    DataField field = dataSet.get(fieldId);
-                    varc.setField(field);
+                    if (arc.getReference() != null) {
+                        String fieldId = varc.getFieldId();
+                        DataField field = dataSet.get(fieldId);
+                        varc.setField(field);
+                    }
                 });
     }
 
