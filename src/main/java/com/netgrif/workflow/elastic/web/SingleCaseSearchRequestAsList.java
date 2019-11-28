@@ -2,10 +2,9 @@ package com.netgrif.workflow.elastic.web;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.deser.ContextualDeserializer;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import lombok.Getter;
 
@@ -14,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Getter
-@JsonDeserialize(using = SingleCaseSearchRequestAsList.SingleItemAsListDeserializer.class)
+@JsonDeserialize(using = SingleCaseSearchRequestAsList.SingleItemAsListDeserializer.class, contentAs = CaseSearchRequest.class)
 public class SingleCaseSearchRequestAsList {
 
     private List<CaseSearchRequest> list;
@@ -33,7 +32,7 @@ public class SingleCaseSearchRequestAsList {
     }
 
 
-    public static class SingleItemAsListDeserializer extends StdDeserializer<SingleCaseSearchRequestAsList> {
+    public static class SingleItemAsListDeserializer extends StdDeserializer<SingleCaseSearchRequestAsList> implements ContextualDeserializer {
 
         protected SingleItemAsListDeserializer() {
             this(null);
@@ -65,6 +64,11 @@ public class SingleCaseSearchRequestAsList {
             }
 
             return wrapper;
+        }
+
+        @Override
+        public JsonDeserializer<?> createContextual(DeserializationContext deserializationContext, BeanProperty beanProperty) throws JsonMappingException {
+            return null;
         }
     }
 }
