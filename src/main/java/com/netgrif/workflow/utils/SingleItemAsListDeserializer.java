@@ -40,7 +40,7 @@ public class SingleItemAsListDeserializer extends StdDeserializer<Object> implem
         try {
             wrapper = (SingleItemAsList<Object>) this._valueClass.newInstance();
         } catch (InstantiationException | IllegalAccessException e) {
-            throw new IllegalArgumentException("", e);
+            throw new IllegalArgumentException("SingleItemAsList object could not be instantiated", e);
         }
 
         ObjectMapper innerDeserializer = new ObjectMapper();
