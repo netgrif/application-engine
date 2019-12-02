@@ -36,10 +36,10 @@ public class ResourceLinkAssembler {
                     .search(null, null, null, null, null)).withRel("search"));
         if (!selfRel.equalsIgnoreCase("search_es"))
             pagedResources.add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
-                    .searchElastic(null, null, null, null, null)).withRel("search_es"));
+                    .searchElastic(null, null, null, null, null, null)).withRel("search_es"));
         if (!selfRel.equalsIgnoreCase("count"))
             pagedResources.add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
-                    .count(null, null, null)).withRel("count"));
+                    .count(null, null, null, null)).withRel("count"));
     }
 
     private static void addCasesLinks(PagedResources pagedResources, String selfRel) {
