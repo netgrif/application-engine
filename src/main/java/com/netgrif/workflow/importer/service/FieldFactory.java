@@ -142,7 +142,7 @@ public final class FieldFactory {
         Map<String, LinkedHashSet<String>> netIds = new HashMap<>();
         DocumentRef documentRef = data.getDocumentRef();
 
-        PetriNet net = importer.getNetByImportId(documentRef.getId());
+        PetriNet net = importer.getNetByImportId(String.valueOf(documentRef.getId()));
         LinkedHashSet<String> fieldIds = new LinkedHashSet<>();
 
         net.getDataSet().values().forEach(field -> {
