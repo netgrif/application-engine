@@ -27,6 +27,7 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.function.BinaryOperator;
 import java.util.stream.Collectors;
 
 import static org.elasticsearch.index.query.QueryBuilders.*;
@@ -94,13 +95,8 @@ public class ElasticTaskService implements IElasticTaskService {
     }
 
     @Override
-    public Page<Task> search(TaskSearchRequest request, LoggedUser user, Pageable pageable) {
-        if (request == null) {
-            throw new IllegalArgumentException("Request can not be null!");
-        }
-        addRolesQueryConstraint(request, user);
-
-        SearchQuery query = buildQuery(request, user, pageable);
+    public Page<Task> search(List<TaskSearchRequest> requests, LoggedUser user, Pageable pageable, Boolean isIntersection) {
+        SearchQuery query = buildQuery(requests, user, pageable, isIntersection);
         Page<ElasticTask> indexedTasks = repository.search(query);
         List<Task> taskPage = taskService.findAllById(indexedTasks.get().map(ElasticTask::getStringId).collect(Collectors.toList()));
 
@@ -108,13 +104,8 @@ public class ElasticTaskService implements IElasticTaskService {
     }
 
     @Override
-    public long count(TaskSearchRequest request, LoggedUser user) {
-        if (request == null) {
-            throw new IllegalArgumentException("Request can not be null!");
-        }
-        addRolesQueryConstraint(request, user);
-
-        SearchQuery query = buildQuery(request, user, new FullPageRequest());
+    public long count(List<TaskSearchRequest> requests, LoggedUser user, Boolean isIntersection) {
+        SearchQuery query = buildQuery(requests, user, new FullPageRequest(), isIntersection);
 
         return template.count(query, ElasticTask.class);
     }
@@ -129,8 +120,30 @@ public class ElasticTaskService implements IElasticTaskService {
         }
     }
 
-    private SearchQuery buildQuery(TaskSearchRequest request, LoggedUser user, Pageable pageable) {
+    private SearchQuery buildQuery(List<TaskSearchRequest> requests, LoggedUser user, Pageable pageable, Boolean isIntersection) {
+        BinaryOperator<BoolQueryBuilder> reductionOperator;
+        if(isIntersection)
+            reductionOperator = BoolQueryBuilder::must;
+        else
+            reductionOperator = BoolQueryBuilder::should;
+
+        BoolQueryBuilder query = requests.stream()
+                                            .map(request -> buildSingleQuery(request, user))
+                                            .reduce(new BoolQueryBuilder(), reductionOperator);
+
         NativeSearchQueryBuilder builder = new NativeSearchQueryBuilder();
+        return builder
+                .withQuery(query)
+                .withPageable(pageable)
+                .build();
+    }
+
+    private BoolQueryBuilder buildSingleQuery(TaskSearchRequest request, LoggedUser user) {
+        if (request == null) {
+            throw new IllegalArgumentException("Request can not be null!");
+        }
+        addRolesQueryConstraint(request, user);
+
         BoolQueryBuilder query = boolQuery();
 
         buildRoleQuery(request, query);
@@ -141,10 +154,7 @@ public class ElasticTaskService implements IElasticTaskService {
         buildFullTextQuery(request, query);
         buildStringQuery(request, query);
 
-        return builder
-                .withQuery(query)
-                .withPageable(pageable)
-                .build();
+        return query;
     }
 
     /**
