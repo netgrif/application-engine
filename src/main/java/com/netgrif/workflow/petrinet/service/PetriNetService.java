@@ -12,6 +12,7 @@ import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository;
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRole;
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRoleRepository;
+import com.netgrif.workflow.petrinet.domain.version.Version;
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.workflow.petrinet.web.requestbodies.UploadedFileMeta;
 import com.netgrif.workflow.petrinet.web.responsebodies.DataFieldReference;
@@ -233,7 +234,7 @@ public abstract class PetriNetService implements IPetriNetService {
     }
 
     @Override
-    public PetriNet getPetriNet(String identifier, String version) {
+    public PetriNet getPetriNet(String identifier, Version version) {
         PetriNet net = repository.findByIdentifierAndVersion(identifier, version);
         if (net == null)
             return null;
@@ -300,15 +301,15 @@ public abstract class PetriNetService implements IPetriNetService {
     }
 
     @Override
-    public List<PetriNetReference> getReferencesByVersion(String version, LoggedUser user, Locale locale) {
+    public List<PetriNetReference> getReferencesByVersion(Version version, LoggedUser user, Locale locale) {
         List<PetriNetReference> references;
 
-        if (version.contains("^")) {
+        if (version == null) {
             GroupOperation groupByIdentifier = Aggregation.group("identifier").max("version").as("version");
             Aggregation aggregation = Aggregation.newAggregation(groupByIdentifier);
             AggregationResults<Document> results = mongoTemplate.aggregate(aggregation, "petriNet", Document.class);
             references = results.getMappedResults().stream()
-                    .map(doc -> getReference(doc.getString("_id"), doc.getString("version"), user, locale))
+                    .map(doc -> getReference(doc.getString("_id"), doc.get("version", Version.class), user, locale))
                     .collect(Collectors.toList());
         } else {
             references = repository.findAllByVersion(version).stream()
@@ -325,8 +326,8 @@ public abstract class PetriNetService implements IPetriNetService {
     }
 
     @Override
-    public PetriNetReference getReference(String identifier, String version, LoggedUser user, Locale locale) {
-        PetriNet net = version.contains("^") ? getNewestVersionByIdentifier(identifier) : getPetriNet(identifier, version);
+    public PetriNetReference getReference(String identifier, Version version, LoggedUser user, Locale locale) {
+        PetriNet net =  version == null ? getNewestVersionByIdentifier(identifier) : getPetriNet(identifier, version);
         return net != null ? transformToReference(net, locale) : new PetriNetReference();
     }
 
@@ -362,7 +363,7 @@ public abstract class PetriNetService implements IPetriNetService {
     }
 
     @Override
-    public Optional<PetriNet> findByImportId(long id) {
+    public Optional<PetriNet> findByImportId(String id) {
         return Optional.of(repository.findByImportId(id));
     }
 
