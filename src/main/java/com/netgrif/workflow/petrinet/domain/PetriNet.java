@@ -2,6 +2,9 @@ package com.netgrif.workflow.petrinet.domain;
 
 import com.netgrif.workflow.auth.domain.Author;
 import com.netgrif.workflow.petrinet.domain.arcs.Arc;
+import com.netgrif.workflow.petrinet.domain.arcs.reference.Referencable;
+import com.netgrif.workflow.petrinet.domain.arcs.reference.Reference;
+import com.netgrif.workflow.petrinet.domain.arcs.reference.Type;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRole;
 import com.netgrif.workflow.workflow.domain.DataField;
@@ -193,9 +196,12 @@ public class PetriNet extends PetriNetObject {
                 .flatMap(List::stream)
                 .forEach(arc -> {
                     if (arc.getReference() != null) {
-                        String fieldId = varc.getFieldId();
-                        DataField field = dataSet.get(fieldId);
-                        varc.setField(field);
+                        String referenceId = arc.getReference().getReference();
+                        if (arc.getReference().getType() == Type.PLACE) {
+                            arc.getReference().setReferencable(places.get(referenceId));
+                        } else {
+                            arc.getReference().setReferencable(dataSet.get(referenceId));
+                        }
                     }
                 });
     }
