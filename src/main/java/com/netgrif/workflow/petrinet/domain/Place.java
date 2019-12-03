@@ -1,11 +1,12 @@
 package com.netgrif.workflow.petrinet.domain;
 
+import com.netgrif.workflow.petrinet.domain.arcs.reference.Referencable;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document
-public class Place extends Node {
+public class Place extends Node implements Referencable {
 
     @Getter @Setter
     private Integer tokens;
@@ -44,5 +45,10 @@ public class Place extends Node {
         clone.setObjectId(this.getObjectId());
         clone.setImportId(this.getImportId());
         return clone;
+    }
+
+    @Override
+    public int getMultiplicity() {
+        return tokens;
     }
 }
