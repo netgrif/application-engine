@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.netgrif.workflow.petrinet.domain.I18nString;
+import com.netgrif.workflow.petrinet.domain.arcs.reference.Referencable;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.FieldBehavior;
 import com.querydsl.core.annotations.PropertyType;
 import com.querydsl.core.annotations.QueryType;
@@ -13,7 +14,7 @@ import lombok.Setter;
 
 import java.util.*;
 
-public class DataField {
+public class DataField implements Referencable {
 
     @Getter
     private Map<String, Set<FieldBehavior>> behavior;
@@ -156,5 +157,10 @@ public class DataField {
         if (value == null)
             return "null";
         return value.toString();
+    }
+
+    @Override
+    public int getMultiplicity() {
+        return Integer.parseInt(String.valueOf(value));
     }
 }
