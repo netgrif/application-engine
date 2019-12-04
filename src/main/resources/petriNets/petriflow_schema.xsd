@@ -19,6 +19,7 @@
                 <xs:element ref="title"/>
                 <xs:element ref="placeholder" minOccurs="0"/>
                 <xs:element ref="desc" minOccurs="0"/>
+                <xs:element ref="options" minOccurs="0"/>
                 <xs:element ref="values" minOccurs="0" maxOccurs="unbounded"/>
                 <xs:element ref="valid" minOccurs="0" maxOccurs="unbounded"/>
                 <xs:element ref="init" minOccurs="0"/>
@@ -287,6 +288,21 @@
         </xs:restriction>
     </xs:simpleType>
     <xs:element name="values" type="i18nStringType"/>
+    <xs:element name="options">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="entry" minOccurs="0" maxOccurs="unbounded">
+                    <xs:complexType>
+                        <xs:simpleContent>
+                            <xs:extension base="xs:string">
+                                <xs:attribute name="key" type="xs:string" use="required"/>
+                            </xs:extension>
+                        </xs:simpleContent>
+                    </xs:complexType>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
     <xs:element name="perform" type="xs:boolean"/>
     <xs:element name="view" type="xs:boolean"/>
     <xs:element name="delegate" type="xs:boolean"/>
@@ -470,7 +486,7 @@
                             </xs:restriction>
                         </xs:simpleType>
                         <xs:simpleType>
-                            <xs:restriction base='xs:int' />
+                            <xs:restriction base='xs:int'/>
                         </xs:simpleType>
                     </xs:union>
                 </xs:simpleType>
