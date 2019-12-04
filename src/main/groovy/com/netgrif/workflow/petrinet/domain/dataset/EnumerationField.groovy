@@ -10,7 +10,7 @@ class EnumerationField extends ChoiceField<I18nString> {
         super()
     }
 
-    EnumerationField(List<I18nString> values) {
+    EnumerationField(Map values) {
         super(values)
     }
 
@@ -45,7 +45,7 @@ class EnumerationField extends ChoiceField<I18nString> {
     }
 
     void setDefaultValue(String defaultValue) {
-        I18nString value = choices.find { it.contains(defaultValue) }
+        I18nString value = choices.find { it -> it.value.contains(defaultValue)}
         if (!value && defaultValue)
             value = new I18nString(defaultValue)
         //TODO: case save choices
