@@ -11,6 +11,7 @@ import com.netgrif.workflow.auth.web.requestbodies.NewUserRequest;
 import com.netgrif.workflow.auth.web.requestbodies.RegistrationRequest;
 import com.netgrif.workflow.auth.web.responsebodies.UserResource;
 import com.netgrif.workflow.mail.IMailService;
+import com.netgrif.workflow.mail.MailAttemptService;
 import com.netgrif.workflow.workflow.web.responsebodies.MessageResource;
 import freemarker.template.TemplateException;
 import org.slf4j.Logger;
@@ -44,6 +45,9 @@ public class AuthenticationController {
 
     @Autowired
     private IUserService userService;
+
+    @Autowired
+    private MailAttemptService mailAttemptService;
 
     @Value("${server.auth.open-registration}")
     private boolean openRegistration;
@@ -101,10 +105,14 @@ public class AuthenticationController {
 
     @PostMapping(value = "/reset")
     public MessageResource resetPassword(@RequestBody String recoveryEmail) {
+        if (mailAttemptService.isBlocked(recoveryEmail)) {
+            return MessageResource.successMessage("An Email with reset link has been sent to the user. If you dont received one, please contact the Administrator");
+        }
         try {
             User user = registrationService.resetPassword(recoveryEmail);
             if (user != null) {
                 mailService.sendPasswordResetEmail(user);
+                mailAttemptService.MailAttempt(user.getEmail());
                 return MessageResource.successMessage("Email with reset link was sent to address " + recoveryEmail);
             } else {
                 return MessageResource.errorMessage("User with email " + recoveryEmail + " has not yet registered");
