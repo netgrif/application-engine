@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../petriflow_schema.xsd">
+    <data type="number">
+        <id>income</id>
+        <title>Monthly Income in EUR</title>
+        <desc>Your average monthly income</desc>
+        <valid>inrange 300,100000</valid>
+    </data>
+    <data type="number">
+        <id>loan_amount</id>
+        <title>Loan amount in EUR</title>
+        <valid>inrange 10000,1000000</valid>
+        <init>100000</init>
+        <action trigger="set">
+            calc: f.calc;
+            change calc value {
+            return !calc.value;
+            }
+        </action>
+    </data>
+    <data type="number">
+        <id>period</id>
+        <title>Repayment period in years</title>
+        <valid>inrange 1,30</valid>
+        <init>30</init>
+        <action trigger="set">
+            calc: f.calc;
+            change calc about {
+            return !calc.value;
+            }
+        </action>
+    </data>
+    <data type="number">
+        <id>monthly_payment</id>
+        <title>Monthly payment in EUR</title>
+        <init>444.44</init>
+    </data>
+    <data type="boolean">
+        <id>calc</id>
+        <title>Recalculate the monthly payment</title>
+        <action trigger="set">
+            loan: f.loan_amount,
+            period: f.period,
+            monthly: f.monthly_payment;
+            change monthly value {
+            return (loan.value+loan.value*0.02*period.value)/(period.value*12);
+            }
+        </action>
+    </data>
+    <transition>
+        <id>financial_data</id>
+        <x>50</x>
+        <y>50</y>
+        <label>Financial data</label>
+        <dataRef>
+            <id>income</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>loan_amount</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>period</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>monthly_payment</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+    </transition>
+</document>

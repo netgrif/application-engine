@@ -29,6 +29,21 @@ class FinisherRunner extends AbstractOrderedCommandLineRunner {
 
     @Override
     void run(String... strings) throws Exception {
+        def address = helper.createNet("mortgage/address.xml", "address", "Address", "ADD", "major")
+        def financial = helper.createNet("mortgage/financial_data.xml", "financial_data", "Financial data", "FIN", "major")
+        def personal = helper.createNet("mortgage/personal_information.xml", "personal_information", "Personal information", "PER", "major")
+        def mortgage = helper.createNet("mortgage/mortgage.xml", "mortgage", "Mortgage", "MOR", "major")
+
+        assert address.isPresent()
+        assert financial.isPresent()
+        assert personal.isPresent()
+        assert mortgage.isPresent()
+
+        helper.createCase("Address", address.get())
+        helper.createCase("Financial Data", financial.get())
+        helper.createCase("Personal Information", personal.get())
+        helper.createCase("Mortgage", mortgage.get())
+
         superCreator.setAllToSuperUser()
     }
 }
