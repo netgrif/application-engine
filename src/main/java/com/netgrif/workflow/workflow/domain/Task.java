@@ -127,6 +127,8 @@ public class Task {
     @Builder.Default
     private Map<EventType, I18nString> eventTitles = new HashMap<>();
 
+    private Map<String, Integer> consumedTokens = new HashMap<>();
+
     public Task() {
     }
 
