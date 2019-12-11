@@ -1,17 +1,16 @@
 package com.netgrif.workflow.workflow.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.event.events.usecase.SaveCaseDataEvent;
 import com.netgrif.workflow.importer.service.FieldFactory;
-import com.netgrif.workflow.petrinet.domain.DataFieldLogic;
-import com.netgrif.workflow.petrinet.domain.DataGroup;
-import com.netgrif.workflow.petrinet.domain.I18nString;
-import com.netgrif.workflow.petrinet.domain.Transition;
+import com.netgrif.workflow.petrinet.domain.*;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
+import com.netgrif.workflow.petrinet.domain.dataset.FieldType;
 import com.netgrif.workflow.petrinet.domain.dataset.FileField;
 import com.netgrif.workflow.petrinet.domain.dataset.FileFieldValue;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedField;
@@ -24,6 +23,9 @@ import com.netgrif.workflow.workflow.domain.Task;
 import com.netgrif.workflow.workflow.service.interfaces.IDataService;
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
+import com.netgrif.workflow.workflow.web.responsebodies.DataFieldsResource;
+import com.netgrif.workflow.workflow.web.responsebodies.LocalisedField;
+import com.netgrif.workflow.workflow.web.responsebodies.LocalisedFieldFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -119,32 +121,70 @@ public class DataService implements IDataService {
     public ChangedFieldContainer setData(String taskId, ObjectNode values) {
         Task task = taskService.findOne(taskId);
         Case useCase = workflowService.findOne(task.getCaseId());
+        ChangedFieldContainer container = new ChangedFieldContainer();
 
         log.info("[" + useCase.getStringId() + "]: Setting data of task " + task.getTransitionId() + " [" + task.getStringId() + "]");
 
         Map<String, ChangedField> changedFields = new HashMap<>();
         values.fields().forEachRemaining(entry -> {
-            useCase.getDataSet().get(entry.getKey()).setValue(parseFieldsValues(entry.getValue()));
-            Map<String, ChangedField> changedFieldMap = resolveActions(useCase.getPetriNet().getField(entry.getKey()).get(),
-                    Action.ActionTrigger.SET, useCase, useCase.getPetriNet().getTransition(task.getTransitionId()));
-            mergeChanges(changedFields, changedFieldMap);
+            DataField dataField = useCase.getDataSet().get(entry.getKey());
+            String fieldId = entry.getKey();
+            if (entry.getKey().startsWith(taskId)) {
+                fieldId = fieldId.replace(taskId + "-", "");
+                dataField = useCase.getDataField(fieldId);
+            }
+            if (dataField != null) {
+                dataField.setValue(parseFieldsValues(entry.getValue()));
+                Map<String, ChangedField> changedFieldMap = resolveActions(useCase.getPetriNet().getField(fieldId).get(),
+                        Action.ActionTrigger.SET, useCase, useCase.getPetriNet().getTransition(task.getTransitionId()));
+                mergeChanges(changedFields, changedFieldMap);
+            } else try {
+                if (entry.getKey().contains("-")) {
+                    String[] parts = entry.getKey().split("-");
+                    ChangedFieldContainer changedFieldContainer = setData(parts[0], values);
+                    for (Map.Entry<String, Map<String, Object>> stringMapEntry : changedFieldContainer.getChangedFields().entrySet()) {
+                        container.getChangedFields().put(parts[0] + "-" + stringMapEntry.getKey(), stringMapEntry.getValue());
+                    }
+                }
+            } catch (Exception e) {
+                log.error("Faile", e);
+            }
         });
         updateDataset(useCase);
         workflowService.save(useCase);
         publisher.publishEvent(new SaveCaseDataEvent(useCase, values, changedFields.values()));
 
-        ChangedFieldContainer container = new ChangedFieldContainer();
         container.putAll(changedFields);
         return container;
     }
 
     @Override
-    public List<DataGroup> getDataGroups(String taskId) {
+    public List<DataGroup> getDataGroups(String taskId, Locale locale) {
         Task task = taskService.findOne(taskId);
         Case useCase = workflowService.findOne(task.getCaseId());
-        Transition transition = useCase.getPetriNet().getTransition(task.getTransitionId());
+        PetriNet net = useCase.getPetriNet();
+        Transition transition = net.getTransition(task.getTransitionId());
 
-        return new ArrayList<>(transition.getDataGroups().values());
+        List<Field> data1 = getData(taskId);
+        Map<String, Field> dataFieldMap = data1.stream().collect(Collectors.toMap(Field::getImportId, field -> field));
+        ArrayList<DataGroup> dataGroups = new ArrayList<>(transition.getDataGroups().values());
+        for (DataGroup dataGroup : dataGroups) {
+            List<Field> resources = new LinkedList<>();
+            for (String datum : dataGroup.getData()) {
+                Field field = net.getDataSet().get(datum);
+                if (field.getType() == FieldType.TASK_REF) {
+                    String taskId2 = (String) useCase.getFieldValue(datum);
+                    List<Field> data = getData(taskId2);
+                    data.forEach(d -> d.setImportId(taskId2 + "-" + d.getImportId()));
+                    resources.addAll(data);
+                } else {
+                    resources.add(dataFieldMap.get(datum));
+                }
+            }
+            dataGroup.setFields(new DataFieldsResource(resources, locale));
+        }
+
+        return dataGroups;
     }
 
     @Override
