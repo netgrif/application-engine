@@ -1,12 +1,11 @@
 package com.netgrif.workflow.petrinet.web;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.importer.service.Importer;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
+import com.netgrif.workflow.petrinet.domain.throwable.MissingPetriNetMetaDataException;
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.workflow.petrinet.service.interfaces.IProcessRoleService;
-import com.netgrif.workflow.petrinet.web.requestbodies.UploadedFileMeta;
 import com.netgrif.workflow.petrinet.web.responsebodies.*;
 import com.netgrif.workflow.workflow.web.responsebodies.MessageResource;
 import org.slf4j.Logger;
@@ -59,21 +58,18 @@ public class PetriNetController {
     @ResponseBody
     MessageResource importPetriNet(
             @RequestParam(value = "file", required = true) MultipartFile multipartFile,
-            @RequestParam(value = "meta", required = false) String fileMetaJSON,
-            Authentication auth) {
+            @RequestParam(value = "meta", required = false) String releaseType,
+            Authentication auth) throws MissingPetriNetMetaDataException {
         try {
             File file = new File(multipartFile.getOriginalFilename());
             file.createNewFile();
             FileOutputStream fout = new FileOutputStream(file);
             fout.write(multipartFile.getBytes());
             fout.close();
+            String release = releaseType == null ? "major" : releaseType;
 
-            ObjectMapper mapper = new ObjectMapper();
-            UploadedFileMeta fileMeta = mapper.readValue(fileMetaJSON, UploadedFileMeta.class);
-            fileMeta.releaseType = fileMeta.releaseType == null ? "patch" : fileMeta.releaseType;
-
-            service.importPetriNetAndDeleteFile(file, fileMeta, (LoggedUser) auth.getPrincipal());
-            return MessageResource.successMessage("Petri net " + fileMeta.name + " imported successfully");
+            service.importPetriNetAndDeleteFile(file, release, (LoggedUser) auth.getPrincipal());
+            return MessageResource.successMessage("Petri net imported successfully");
         } catch (IOException e) {
             log.error("Importing Petri net failed: ", e);
             return MessageResource.errorMessage("IO error");

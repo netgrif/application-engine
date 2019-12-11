@@ -19,6 +19,7 @@ import com.netgrif.workflow.petrinet.domain.policies.FinishPolicy;
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRole;
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRoleRepository;
 import com.netgrif.workflow.petrinet.domain.roles.RolePermission;
+import com.netgrif.workflow.petrinet.domain.throwable.MissingPetriNetMetaDataException;
 import com.netgrif.workflow.petrinet.service.ArcFactory;
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.workflow.workflow.domain.triggers.Trigger;
@@ -87,11 +88,11 @@ public class Importer {
     private FieldActionsRunner actionsRunner;
 
     @Transactional
-    public Optional<PetriNet> importPetriNet(InputStream xml, String title, String initials, Config config) {
+    public Optional<PetriNet> importPetriNet(InputStream xml, Config config) throws MissingPetriNetMetaDataException {
         try {
             initialize(config);
             unmarshallXml(xml);
-            return createPetriNet(title, initials);
+            return createPetriNet();
         } catch (JAXBException e) {
             log.error("Importing Petri net failed: ", e);
         }
@@ -99,9 +100,9 @@ public class Importer {
     }
 
     @Transactional
-    public Optional<PetriNet> importPetriNet(File xml, String title, String initials, Config config) {
+    public Optional<PetriNet> importPetriNet(File xml, Config config) throws MissingPetriNetMetaDataException {
         try {
-            return importPetriNet(new FileInputStream(xml), title, initials, config);
+            return importPetriNet(new FileInputStream(xml), config);
         } catch (FileNotFoundException e) {
             log.error("Importing Petri net failed: ", e);
         }
@@ -109,13 +110,13 @@ public class Importer {
     }
 
     @Transactional
-    public Optional<PetriNet> importPetriNet(InputStream xml, String title, String initials) {
-        return importPetriNet(xml, title, initials, new Config());
+    public Optional<PetriNet> importPetriNet(InputStream xml) throws MissingPetriNetMetaDataException {
+        return importPetriNet(xml, new Config());
     }
 
     @Transactional
-    public Optional<PetriNet> importPetriNet(File xml, String title, String initials) {
-        return importPetriNet(xml, title, initials, new Config());
+    public Optional<PetriNet> importPetriNet(File xml) throws MissingPetriNetMetaDataException {
+        return importPetriNet(xml, new Config());
     }
 
     private void initialize(Config config) {
@@ -149,9 +150,10 @@ public class Importer {
     }
 
     @Transactional
-    protected Optional<PetriNet> createPetriNet(String title, String initials) {
+    protected Optional<PetriNet> createPetriNet() throws MissingPetriNetMetaDataException {
         net = new PetriNet();
-        net.setImportId(document.getId() != null ? document.getId() : new ObjectId().toString());
+
+        setMetaData();
         net.setIcon(document.getIcon());
 
         document.getI18N().forEach(this::addI18N);
@@ -167,10 +169,7 @@ public class Importer {
         actionRefs.forEach(this::resolveActionRefs);
         actions.forEach(this::evaluateActions);
 
-        net.setTitle(title != null ? new I18nString(title) : toI18NString(document.getTitle()));
-        net.setInitials(initials != null ? initials : document.getInitials());
         net.setDefaultCaseName(toI18NString(document.getCaseName()));
-        net.setIdentifier(document.getId());
 
         if (config.isNotSaveObjects()) {
             return service.saveNew(net);
@@ -460,6 +459,8 @@ public class Importer {
             if (logic.getBehavior() != null) {
                 logic.getBehavior().forEach(b -> behavior.add(FieldBehavior.fromString(b)));
             }
+            if(getField(dataRef.getId()).isImmediate())
+                behavior.add(FieldBehavior.IMMEDIATE);
 
             transition.addDataSet(fieldId, behavior, null);
         } catch (NullPointerException e) {
@@ -771,5 +772,26 @@ public class Importer {
                 outputStream.write(bytes, 0, read);
             }
         }
+    }
+
+    private void setMetaData() throws MissingPetriNetMetaDataException{
+        List<String> missingMetaData = new ArrayList<>();
+        if (document.getId() != null) {
+            net.setImportId(document.getId());
+        } else {
+            missingMetaData.add("id");
+        }
+        if (document.getTitle() != null) {
+            net.setTitle(toI18NString(document.getTitle()));
+        } else {
+            missingMetaData.add("title");
+        }
+        if (document.getInitials() != null) {
+            net.setInitials(document.getInitials());
+        } else {
+            missingMetaData.add("initials");
+        }
+        if (!missingMetaData.isEmpty())
+            throw new MissingPetriNetMetaDataException("Petri net must contains : " + String.join(",", missingMetaData));
     }
 }

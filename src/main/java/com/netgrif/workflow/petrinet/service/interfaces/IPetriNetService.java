@@ -4,6 +4,7 @@ import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.Transition;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
+import com.netgrif.workflow.petrinet.domain.throwable.MissingPetriNetMetaDataException;
 import com.netgrif.workflow.petrinet.web.requestbodies.UploadedFileMeta;
 import com.netgrif.workflow.petrinet.web.responsebodies.DataFieldReference;
 import com.netgrif.workflow.petrinet.web.responsebodies.PetriNetReference;
@@ -23,9 +24,9 @@ import java.util.Optional;
 
 public interface IPetriNetService {
 
-    Optional<PetriNet> importPetriNetAndDeleteFile(File xmlFile, UploadedFileMeta netMetaData, LoggedUser user) throws IOException;
+    Optional<PetriNet> importPetriNetAndDeleteFile(File xmlFile, String releaseType, LoggedUser user) throws IOException, MissingPetriNetMetaDataException;
 
-    Optional<PetriNet> importPetriNet(InputStream xmlFile, UploadedFileMeta metaData, LoggedUser user) throws IOException;
+    Optional<PetriNet> importPetriNet(InputStream xmlFile, String releaseType, LoggedUser user) throws IOException, MissingPetriNetMetaDataException;
 
     Optional<PetriNet> saveNew(PetriNet petriNet);
 
