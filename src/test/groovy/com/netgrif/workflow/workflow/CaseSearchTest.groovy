@@ -117,7 +117,7 @@ class CaseSearchTest {
     PetriNet getNet() {
         def netOptional = petriNetService.importPetriNet(
                 new File("src/test/resources/case_search_test.xml"),
-                new UploadedFileMeta("Case search test", "CST", "net", "major"),
+                "major" as String,
                 new LoggedUser(1, "super@netgrif.com", "password", new ArrayList<GrantedAuthority>()))
         assert netOptional.isPresent()
         return netOptional.get()

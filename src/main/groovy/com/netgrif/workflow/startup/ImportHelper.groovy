@@ -122,13 +122,13 @@ class ImportHelper {
         return authorityService.getOrCreate(name)
     }
 
-    Optional<PetriNet> createNet(String fileName, String identifier, String name, String initials, String release) {
-        createNet(fileName, identifier, name, initials, release, superCreator.loggedSuper)
+    Optional<PetriNet> createNet(String fileName, String release) {
+        createNet(fileName, release, superCreator.loggedSuper)
     }
 
-    Optional<PetriNet> createNet(String fileName, String identifier, String name, String initials, String release, LoggedUser loggedUser) {
+    Optional<PetriNet> createNet(String fileName, String release, LoggedUser loggedUser) {
         InputStream netStream = new ClassPathResource("petriNets/$fileName" as String).inputStream
-        return petriNetService.importPetriNet(netStream, new UploadedFileMeta(name, initials, identifier, release), loggedUser)
+        return petriNetService.importPetriNet(netStream, release, loggedUser)
     }
 
     UserProcessRole createUserProcessRole(PetriNet net, String name) {
