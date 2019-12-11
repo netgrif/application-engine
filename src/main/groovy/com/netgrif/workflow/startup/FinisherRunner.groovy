@@ -39,9 +39,6 @@ class FinisherRunner extends AbstractOrderedCommandLineRunner {
         assert personal.isPresent()
         assert mortgage.isPresent()
 
-        helper.createCase("Address", address.get())
-        helper.createCase("Financial Data", financial.get())
-        helper.createCase("Personal Information", personal.get())
         helper.createCase("Mortgage", mortgage.get())
 
         superCreator.setAllToSuperUser()

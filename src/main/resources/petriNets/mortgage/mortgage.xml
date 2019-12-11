@@ -518,8 +518,35 @@
 		<id>288</id>
 		<x>20</x>
 		<y>100</y>
-		<label></label>
+        <label/>
         <trigger type="auto"/>
+        <event type="finish">
+            <id>288_finish</id>
+            <actions phase="pre">
+                <action>
+                    <!-- @formatter:off -->
+                    task_personal_information: f.personal_information,
+                    task_address_and_mortgage: f.address_and_mortgage,
+                    task_financial_data: f.financial_data;
+
+                    def personal = createCase("personal_information", "${useCase.title} - Personal information" as String)
+                    change task_personal_information value {
+                        personal.tasks.first().task
+                    }
+
+                    def address = createCase("address", "${useCase.title} - Address" as String)
+                    change task_address_and_mortgage value {
+                        address.tasks.first().task
+                    }
+
+                    def financial_data = createCase("financial_data", "${useCase.title} - Financial data" as String)
+                    change task_financial_data value {
+                        financial_data.tasks.first().task
+                    }
+                    <!-- @formatter:on -->
+                </action>
+            </actions>
+        </event>
 	</transition>
 	<!-- PLACES -->
 	<place>
