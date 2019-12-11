@@ -6,6 +6,7 @@ import com.netgrif.workflow.importer.service.Importer;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository;
+import com.netgrif.workflow.petrinet.domain.throwable.MissingPetriNetMetaDataException;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
 import org.junit.Before;
@@ -55,15 +56,15 @@ public class ImporterTest {
     }
 
     @Test
-    public void importPetriNet() {
-        importer.importPetriNet(new File("src/test/resources/prikladFM_test.xml"), NET_TITLE, NET_INITIALS, new Config());
+    public void importPetriNet() throws MissingPetriNetMetaDataException {
+        importer.importPetriNet(new File("src/test/resources/prikladFM_test.xml"), new Config());
 
         assertNetProperlyImported();
     }
 
     @Test
-    public void priorityTest() {
-        Optional<PetriNet> net = importer.importPetriNet(new File("src/test/resources/priority_test.xml"), "Priority test", "PT", new Config());
+    public void priorityTest() throws MissingPetriNetMetaDataException {
+        Optional<PetriNet> net = importer.importPetriNet(new File("src/test/resources/priority_test.xml"), new Config());
 
         assert net.isPresent();
 
@@ -73,17 +74,17 @@ public class ImporterTest {
     }
 
     @Test
-    public void dataGroupTest() {
-        Optional<PetriNet> net = importer.importPetriNet(new File("src/test/resources/datagroup_test.xml"), "DataGroup test", "DGT", new Config());
+    public void dataGroupTest() throws MissingPetriNetMetaDataException {
+        Optional<PetriNet> net = importer.importPetriNet(new File("src/test/resources/datagroup_test.xml"), new Config());
 
         assert net.isPresent();
     }
 
     @Test
     @Ignore
-    public void caseRefTest() {
-        importer.importPetriNet(new File("src/test/resources/datagroup_test.xml"), "DataGroup test", "DGT", new Config());
-        Optional<PetriNet> net = importer.importPetriNet(new File("src/test/resources/caseref_test.xml"), "Caseref test", "CRT", new Config());
+    public void caseRefTest() throws MissingPetriNetMetaDataException {
+        importer.importPetriNet(new File("src/test/resources/datagroup_test.xml"), new Config());
+        Optional<PetriNet> net = importer.importPetriNet(new File("src/test/resources/caseref_test.xml"),  new Config());
         assert net.isPresent();
 
         Case useCase = workflowService.createCase(net.get().getStringId(), net.get().getTitle().getDefaultValue(), "color", mock.mockLoggedUser());
@@ -99,13 +100,13 @@ public class ImporterTest {
     }
 
     @Test
-    public void readArcImportTest() {
-        importer.importPetriNet(new File("src/test/resources/read_test.xml"), "R", "R", new Config());
+    public void readArcImportTest() throws MissingPetriNetMetaDataException {
+        importer.importPetriNet(new File("src/test/resources/read_test.xml"), new Config());
     }
 
     @Test
-    public void externalMappingTest() {
-        Optional<PetriNet> net = importer.importPetriNet(new File("src/test/resources/mapping_test.xml"), "External mapping", "EXT", new Config());
+    public void externalMappingTest() throws MissingPetriNetMetaDataException {
+        Optional<PetriNet> net = importer.importPetriNet(new File("src/test/resources/mapping_test.xml"), new Config());
 
         assertExternalMappingImport(net);
     }
