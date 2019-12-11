@@ -69,7 +69,7 @@ public class PetriNetController {
             String release = releaseType == null ? "major" : releaseType;
 
             service.importPetriNetAndDeleteFile(file, release, (LoggedUser) auth.getPrincipal());
-            return MessageResource.successMessage("Petri net imported successfully");
+            return MessageResource.successMessage("Petri net " + multipartFile.getOriginalFilename() + " imported successfully");
         } catch (IOException e) {
             log.error("Importing Petri net failed: ", e);
             return MessageResource.errorMessage("IO error");
