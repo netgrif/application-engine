@@ -459,8 +459,6 @@ public class Importer {
             if (logic.getBehavior() != null) {
                 logic.getBehavior().forEach(b -> behavior.add(FieldBehavior.fromString(b)));
             }
-            if(getField(dataRef.getId()).isImmediate())
-                behavior.add(FieldBehavior.IMMEDIATE);
 
             transition.addDataSet(fieldId, behavior, null);
         } catch (NullPointerException e) {
