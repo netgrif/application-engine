@@ -792,6 +792,6 @@ public class Importer {
             missingMetaData.add("initials");
         }
         if (!missingMetaData.isEmpty())
-            throw new MissingPetriNetMetaDataException("Petri net must contains : " + String.join(",", missingMetaData));
+            throw new MissingPetriNetMetaDataException("missing " + String.join(", ", missingMetaData));
     }
 }
