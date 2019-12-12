@@ -177,10 +177,12 @@
             <id>9_finish</id>
             <actions phase="pre">
                 <action>
+                    <!-- @formatter:off -->
                     decision: f.status;
                     change decision value {
-                    return "Mortgage Pre-approved";
+                        return "Mortgage Pre-approved";
                     }
+                    <!-- @formatter:on -->
                 </action>
             </actions>
         </event>
@@ -201,10 +203,12 @@
             <id>14_finish</id>
             <actions phase="pre">
                 <action>
+                    <!-- @formatter:off -->
                     decision: f.status;
                     change decision value {
-                    return "Mortgage Rejected";
+                        return "Mortgage Rejected";
                     }
+                    <!-- @formatter:on -->
                 </action>
             </actions>
         </event>
@@ -237,26 +241,26 @@
         <event type="finish">
             <id>39_finish</id>
             <actions phase="pre">
-<!--                <action>-->
-<!--                    asked: f.loan_amount,-->
-<!--                    valued: f.appraised_value,-->
-<!--                    decision: f.status,-->
-<!--                    approveArc: f.1,-->
-<!--                    rejectArc: f.2;-->
-<!--                    def approvement = (valued.value >= asked.value);-->
-<!--                    change decision value {-->
-<!--                    if (approvement)-->
-<!--                    return "Mortgage Accepted";-->
-<!--                    else-->
-<!--                    return "Mortgage Rejected";-->
-<!--                    }-->
-<!--                    change approveArc value {-->
-<!--                    return approvement ? 1 : 0;-->
-<!--                    }-->
-<!--                    change rejectArc value {-->
-<!--                    return approvement ? 0 : 1;-->
-<!--                    }-->
-<!--                </action>-->
+                <action>
+                    <!-- @formatter:off -->
+                    financial_data_section: f.financial_data,
+                    valued: f.appraised_value,
+                    decision: f.status;
+
+                    def financial_data_section_task = findTask(financial_data_section.value)
+                    def financial_data = getData(financial_data_section_task)
+
+                    def asked = financial_data["loan_amount"]
+                    def approvement = (valued.value >= asked.value);
+                    if (approvement) {
+                        change decision value { "Mortgage Accepted" }
+                    } else {
+                        change decision value { "Mortgage Rejected" }
+                    }
+                    <!-- TODO: decision -->
+
+                    <!-- @formatter:on -->
+                </action>
             </actions>
         </event>
     </transition>
@@ -330,10 +334,12 @@
             <id>59_finish</id>
             <actions phase="pre">
                 <action>
+                    <!-- @formatter:off -->
                     decision: f.status;
                     change decision value {
-                    return decision.value + " and Inscription Confirmed";
+                        return decision.value + " and Inscription Confirmed";
                     }
+                    <!-- @formatter:on -->
                 </action>
             </actions>
         </event>
@@ -367,10 +373,12 @@
             <id>61_finish</id>
             <actions phase="pre">
                 <action>
+                    <!-- @formatter:off -->
                     decision: f.status;
                     change decision value {
-                    return "Mortgage signed";
+                        return "Mortgage signed";
                     }
+                    <!-- @formatter:on -->
                 </action>
             </actions>
         </event>
@@ -398,11 +406,13 @@
             <id>72_finish</id>
             <actions phase="pre">
                 <action>
+                    <!-- @formatter:off -->
                     decision: f.status,
                     insurance: f.insurance;
                     change decision value {
-                    return decision.value + " and Insurance Signed in " + insurance.value;
+                        return decision.value + " and Insurance Signed in " + insurance.value;
                     }
+                    <!-- @formatter:on -->
                 </action>
             </actions>
         </event>
@@ -425,6 +435,7 @@
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
+<!--        TODO:-->
 <!--        <dataRef>-->
 <!--            <id></id>-->
 <!--            <logic>-->
@@ -435,10 +446,12 @@
             <id>78_finish</id>
             <actions phase="pre">
                 <action>
+                    <!-- @formatter:off -->
                     decision: f.status;
                     change decision value {
-                    return decision.value + " and Money sended";
+                        return decision.value + " and Money sended";
                     }
+                    <!-- @formatter:on -->
                 </action>
             </actions>
         </event>
@@ -506,10 +519,12 @@
 			<id>263_finish</id>
             <actions phase="pre">
                 <action>
+                    <!-- @formatter:off -->
                     decision: f.status;
                     change decision value {
-                    return "Application deleted by client";
+                        return "Application deleted by client";
                     }
+                    <!-- @formatter:on -->
                 </action>
             </actions>
         </event>
@@ -638,10 +653,10 @@
 		<static>false</static>
 	</place>
 	<place>
-		<id>IN</id>
+		<id>289</id>
 		<x>20</x>
 		<y>60</y>
-		<label></label>
+		<label>IN</label>
 		<tokens>1</tokens>
 		<static>false</static>
 	</place>
@@ -817,7 +832,7 @@
 	<arc>
 		<id>290</id>
 		<type>regular</type>
-		<sourceId>IN</sourceId>
+		<sourceId>289</sourceId>
 		<destinationId>288</destinationId>
 		<multiplicity>1</multiplicity>
 	</arc>
