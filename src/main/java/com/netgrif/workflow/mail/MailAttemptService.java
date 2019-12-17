@@ -9,6 +9,8 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 
+import javax.annotation.Nonnull;
+
 @Service
 public class MailAttemptService {
 
@@ -17,17 +19,17 @@ public class MailAttemptService {
 
     private LoadingCache<String, Integer> attemptsCache;
 
-    public MailAttemptService() {
+    public MailAttemptService(@Value("${spring.max.email.block.duration}") final int BLOCK_DURATION, @Value("${spring.max.email.block.time.type}") @Nonnull final TimeUnit BLOCK_TIME_TYPE) {
           super();
           attemptsCache = CacheBuilder.newBuilder().
-                expireAfterWrite(1, TimeUnit.DAYS).build(new CacheLoader<String, Integer>() {
+                expireAfterWrite(BLOCK_DURATION, BLOCK_TIME_TYPE).build(new CacheLoader<String, Integer>() {
                 public Integer load(String key) {
                     return 0;
                 }
           });
     }
 
-    public void MailAttempt(String key) {
+    public void mailAttempt(String key) {
         int attempts = 0;
         try {
             attempts = attemptsCache.get(key);
