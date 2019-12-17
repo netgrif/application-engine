@@ -73,11 +73,15 @@ public class AuthenticationController {
             }
 
             newUserRequest.email = URLDecoder.decode(newUserRequest.email, StandardCharsets.UTF_8.name());
+            if (mailAttemptService.isBlocked(newUserRequest.email)) {
+                return MessageResource.successMessage("An email has been sent to the user.");
+            }
+
             User user = registrationService.createNewUser(newUserRequest);
             if (user == null)
                 return MessageResource.errorMessage("User with email " + newUserRequest.email + " has been already registered.");
             mailService.sendRegistrationEmail(user);
-
+            mailAttemptService.mailAttempt(newUserRequest.email);
             return MessageResource.successMessage("Mail was sent to " + user.getEmail());
         } catch (IOException | TemplateException | MessagingException e) {
             log.error(e.toString());
@@ -106,13 +110,13 @@ public class AuthenticationController {
     @PostMapping(value = "/reset")
     public MessageResource resetPassword(@RequestBody String recoveryEmail) {
         if (mailAttemptService.isBlocked(recoveryEmail)) {
-            return MessageResource.successMessage("An Email with reset link has been sent to the user. If you dont received one, please contact the Administrator");
+            return MessageResource.successMessage("An email with the reset link has been sent to the user.");
         }
         try {
             User user = registrationService.resetPassword(recoveryEmail);
             if (user != null) {
                 mailService.sendPasswordResetEmail(user);
-                mailAttemptService.MailAttempt(user.getEmail());
+                mailAttemptService.mailAttempt(user.getEmail());
                 return MessageResource.successMessage("Email with reset link was sent to address " + recoveryEmail);
             } else {
                 return MessageResource.errorMessage("User with email " + recoveryEmail + " has not yet registered");
