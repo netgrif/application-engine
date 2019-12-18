@@ -111,7 +111,10 @@ public abstract class PetriNetService implements IPetriNetService {
         PetriNet existingNet = getNewestVersionByIdentifier(imported.get().getIdentifier());
         InputStream xmlStream = new FileInputStream(xmlFile);
         Optional<PetriNet> newPetriNet = existingNet == null ? importNewPetriNet(xmlStream, user) : importNewVersion(xmlStream, releaseType, existingNet, user);
-        newPetriNet.ifPresent(petriNet -> cache.put(petriNet.getObjectId(), petriNet));
+        newPetriNet.ifPresent(petriNet -> {
+            cache.put(petriNet.getObjectId(), petriNet);
+            saveNew(petriNet);
+        });
 
         xmlStream.close();
         if (!xmlFile.delete())
