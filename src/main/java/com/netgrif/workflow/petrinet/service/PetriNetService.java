@@ -39,6 +39,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.repository.support.PageableExecutionUtils;
 import org.springframework.stereotype.Service;
+import sun.nio.ch.Net;
 
 import javax.validation.constraints.NotNull;
 import java.io.*;
@@ -101,28 +102,20 @@ public abstract class PetriNetService implements IPetriNetService {
     }
 
     @Override
-    public Optional<PetriNet> importPetriNetAndDeleteFile(File xmlFile, String releaseType, LoggedUser user) throws IOException, MissingPetriNetMetaDataException {
-        Optional<PetriNet> imported = importPetriNet(new FileInputStream(xmlFile), releaseType, user);
+    public Optional<PetriNet> importPetriNet(File xmlFile, String releaseType, LoggedUser user) throws IOException, MissingPetriNetMetaDataException {
+        Optional<PetriNet> imported = getImporter().importPetriNet(new FileInputStream(xmlFile), new Config());
+        if (!imported.isPresent()) {
+            return imported;
+        }
+
+        PetriNet existingNet = getNewestVersionByIdentifier(imported.get().getIdentifier());
+        InputStream xmlStream = new FileInputStream(xmlFile);
+        Optional<PetriNet> newPetriNet = existingNet == null ? importNewPetriNet(xmlStream, user) : importNewVersion(xmlStream, releaseType, existingNet, user);
+        newPetriNet.ifPresent(petriNet -> cache.put(petriNet.getObjectId(), petriNet));
+
+        xmlStream.close();
         if (!xmlFile.delete())
             throw new IOException("File of process was not deleted");
-        return imported;
-    }
-
-    @Override
-    public Optional<PetriNet> importPetriNet(InputStream xmlFile, String releaseType, LoggedUser user) throws IOException, MissingPetriNetMetaDataException {
-        PetriNet existingNet = getNewestVersionByIdentifier(metaData.identifier);
-        Optional<PetriNet> newPetriNet;
-        if (existingNet == null) {
-            newPetriNet = importNewPetriNet(xmlFile, user);
-        } else {
-            //TODO 3.4.2018 compare net hash with found net hash -> if equal do not save network => possible duplicate
-            newPetriNet = importNewVersion(xmlFile, releaseType, existingNet, user);
-        }
-
-        if (newPetriNet.isPresent()) {
-            PetriNet net = newPetriNet.get();
-            cache.put(net.getObjectId(), net);
-        }
 
         return newPetriNet;
     }

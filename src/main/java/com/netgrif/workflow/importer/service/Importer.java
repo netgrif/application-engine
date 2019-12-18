@@ -171,11 +171,7 @@ public class Importer {
 
         net.setDefaultCaseName(toI18NString(document.getCaseName()));
 
-        if (config.isNotSaveObjects()) {
-            return service.saveNew(net);
-        } else {
-            return Optional.of(net);
-        }
+        return Optional.of(net);
     }
 
     @Transactional
@@ -776,6 +772,7 @@ public class Importer {
         List<String> missingMetaData = new ArrayList<>();
         if (document.getId() != null) {
             net.setImportId(document.getId());
+            net.setIdentifier(document.getId());
         } else {
             missingMetaData.add("id");
         }
