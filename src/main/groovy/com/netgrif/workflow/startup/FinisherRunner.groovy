@@ -34,12 +34,12 @@ class FinisherRunner extends AbstractOrderedCommandLineRunner {
         def personal = helper.createNet("mortgage/personal_information.xml", "personal_information", "Personal information", "PER", "major")
         def mortgage = helper.createNet("mortgage/mortgage.xml", "mortgage", "Mortgage", "MOR", "major")
 
-        assert address.isPresent()
-        assert financial.isPresent()
-        assert personal.isPresent()
-        assert mortgage.isPresent()
+//        assert address.isPresent()
+//        assert financial.isPresent()
+//        assert personal.isPresent()
+//        assert mortgage.isPresent()
 
-        helper.createCase("Mortgage", mortgage.get())
+//        helper.createCase("Mortgage", mortgage.get())
 
         superCreator.setAllToSuperUser()
     }

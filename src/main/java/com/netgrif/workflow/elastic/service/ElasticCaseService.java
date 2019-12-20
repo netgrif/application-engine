@@ -39,7 +39,15 @@ public class ElasticCaseService implements IElasticCaseService {
     @Autowired
     private ElasticCaseRepository repository;
 
+    public IWorkflowService getWorkflowService() {
+        return workflowService;
+    }
+
     @Autowired
+    public void setWorkflowService(IWorkflowService workflowService) {
+        this.workflowService = workflowService;
+    }
+
     private IWorkflowService workflowService;
 
     @Autowired
