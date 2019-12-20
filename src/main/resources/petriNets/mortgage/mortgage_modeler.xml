@@ -247,14 +247,14 @@
                     if (approvement) {
                         change decision value { "Mortgage Accepted" }
                         async.run {
-                            assignTask("ok")
-                            finishTask("ok")
+                            assignTask("400")
+                            finishTask("400")
                         }
                     } else {
                         change decision value { "Mortgage Rejected" }
                         async.run {
-                            assignTask("ko")
-                            finishTask("ko")
+                            assignTask("500")
+                            finishTask("500")
                         }
                     }
                     <!-- @formatter:on -->
@@ -448,7 +448,7 @@
                     <!-- @formatter:off -->
                     decision: f.status;
                     change decision value {
-                        return decision.value + " and Money sended";
+                        return decision.value + " and Money sent";
                     }
                     <!-- @formatter:on -->
                 </action>
@@ -544,17 +544,17 @@
                     task_address_and_mortgage: f.address_and_mortgage,
                     task_financial_data: f.financial_data;
 
-                    def personal = createCase("personal_information", "${useCase.title} - Personal information" as String, "color-fg-amber-500")
+                    def personal = createCase("personal_information", "${useCase.title} - Personal information" as String)
                     change task_personal_information value {
                         personal.tasks.first().task
                     }
 
-                    def address = createCase("address", "${useCase.title} - Address" as String, "color-fg-green-500")
+                    def address = createCase("address", "${useCase.title} - Address" as String)
                     change task_address_and_mortgage value {
                         address.tasks.first().task
                     }
 
-                    def financial_data = createCase("financial_data", "${useCase.title} - Financial data" as String, "color-fg-red-500")
+                    def financial_data = createCase("financial_data", "${useCase.title} - Financial data" as String)
                     change task_financial_data value {
                         financial_data.tasks.first().task
                     }
@@ -564,13 +564,13 @@
         </event>
 	</transition>
 	<transition>
-		<id>ko</id>
+		<id>500</id>
 		<x>780</x>
 		<y>220</y>
 		<label>Reject / System</label>
 	</transition>
 	<transition>
-		<id>ok</id>
+		<id>400</id>
 		<x>780</x>
 		<y>140</y>
 		<label>Approve / System</label>
@@ -860,13 +860,13 @@
 		<id>320</id>
 		<type>regular</type>
 		<sourceId>316</sourceId>
-		<destinationId>ok</destinationId>
+		<destinationId>400</destinationId>
 		<multiplicity>1</multiplicity>
 	</arc>
 	<arc>
 		<id>321</id>
 		<type>regular</type>
-		<sourceId>ok</sourceId>
+		<sourceId>400</sourceId>
 		<destinationId>41</destinationId>
 		<multiplicity>1</multiplicity>
 	</arc>
@@ -874,13 +874,13 @@
 		<id>322</id>
 		<type>regular</type>
 		<sourceId>316</sourceId>
-		<destinationId>ko</destinationId>
+		<destinationId>500</destinationId>
 		<multiplicity>1</multiplicity>
 	</arc>
 	<arc>
 		<id>323</id>
 		<type>regular</type>
-		<sourceId>ko</sourceId>
+		<sourceId>500</sourceId>
 		<destinationId>16</destinationId>
         <multiplicity>1</multiplicity>
     </arc>

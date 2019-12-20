@@ -39,7 +39,15 @@ public class ElasticTaskService implements IElasticTaskService {
     @Autowired
     private ElasticTaskRepository repository;
 
+    public ITaskService getTaskService() {
+        return taskService;
+    }
+
     @Autowired
+    public void setTaskService(ITaskService taskService) {
+        this.taskService = taskService;
+    }
+
     private ITaskService taskService;
 
     @Autowired
