@@ -30,7 +30,7 @@ public class FilterController {
     private IFilterService filterService;
 
     @RequestMapping(method = RequestMethod.POST)
-    public MessageResource createFilter(@RequestBody CreateFilterBody newFilter, @RequestParam(defaultValue = "AND") MergeFilterOperation operation, Authentication auth, Locale locale) {
+    public MessageResource createFilter(@RequestBody CreateFilterBody newFilter, @RequestParam(required = false) MergeFilterOperation operation, Authentication auth, Locale locale) {
         Filter filter = filterService.saveFilter(newFilter, operation, (LoggedUser) auth.getPrincipal());
         if (filter != null)
             return MessageResource.successMessage("Filter " + newFilter.getTitle() + " successfully created");
