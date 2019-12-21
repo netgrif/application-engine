@@ -6,6 +6,7 @@ import com.netgrif.workflow.auth.domain.*
 import com.netgrif.workflow.auth.domain.repositories.UserProcessRoleRepository
 import com.netgrif.workflow.auth.service.interfaces.IAuthorityService
 import com.netgrif.workflow.auth.service.interfaces.IUserService
+import com.netgrif.workflow.elastic.web.requestbodies.singleaslist.SingleCaseSearchRequestAsList
 import com.netgrif.workflow.orgstructure.domain.Group
 import com.netgrif.workflow.orgstructure.service.IGroupService
 import com.netgrif.workflow.orgstructure.service.IMemberService
@@ -18,12 +19,13 @@ import com.netgrif.workflow.petrinet.web.requestbodies.UploadedFileMeta
 import com.netgrif.workflow.workflow.domain.Case
 import com.netgrif.workflow.workflow.domain.EventOutcome
 import com.netgrif.workflow.workflow.domain.Filter
+import com.netgrif.workflow.workflow.domain.MergeFilterOperation
 import com.netgrif.workflow.workflow.domain.repositories.CaseRepository
 import com.netgrif.workflow.workflow.service.interfaces.IDataService
 import com.netgrif.workflow.workflow.service.interfaces.IFilterService
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService
-import com.netgrif.workflow.workflow.web.requestbodies.CreateFilterBody
+import com.netgrif.workflow.workflow.web.requestbodies.CreateCaseFilterBody
 import com.netgrif.workflow.workflow.web.responsebodies.TaskReference
 import groovy.json.JsonOutput
 import org.slf4j.Logger
@@ -175,8 +177,8 @@ class ImportHelper {
         return createCase(title, net, superCreator.loggedSuper)
     }
 
-    boolean createFilter(String title, String query, String readable, LoggedUser user) {
-        return filterService.saveFilter(new CreateFilterBody(title, Filter.VISIBILITY_PUBLIC, "This filter was created automatically for testing purpose only.", Filter.TYPE_TASK, query, readable), user)
+    boolean createCaseFilter(String title, SingleCaseSearchRequestAsList query, LoggedUser user) {
+        return filterService.saveFilter(new CreateCaseFilterBody(title, Filter.VISIBILITY_PUBLIC, "This filter was created automatically for testing purpose only.", Filter.TYPE_TASK, query), MergeFilterOperation.AND, user)
     }
 
     EventOutcome assignTask(String taskTitle, String caseId, LoggedUser author) {
