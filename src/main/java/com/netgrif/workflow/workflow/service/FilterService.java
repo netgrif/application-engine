@@ -5,6 +5,7 @@ import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.auth.domain.throwable.UnauthorisedRequestException;
 import com.netgrif.workflow.petrinet.domain.I18nString;
 import com.netgrif.workflow.workflow.domain.Filter;
+import com.netgrif.workflow.workflow.domain.MergeFilterOperation;
 import com.netgrif.workflow.workflow.domain.repositories.FilterRepository;
 import com.netgrif.workflow.workflow.service.interfaces.IFilterService;
 import com.netgrif.workflow.workflow.web.requestbodies.CreateFilterBody;
@@ -40,14 +41,14 @@ public class FilterService implements IFilterService {
     }
 
     @Override
-    public Filter saveFilter(CreateFilterBody newFilterBody, LoggedUser user) {
+    public Filter saveFilter(CreateFilterBody<?> newFilterBody, MergeFilterOperation operation, LoggedUser user) {
         Filter filter = new Filter();
         filter.setAuthor(user.transformToAuthor());
         filter.setTitle(new I18nString(newFilterBody.getTitle()));
         filter.setDescription(new I18nString(newFilterBody.getDescription()));
         filter.setType(newFilterBody.getType());
         filter.setVisibility(newFilterBody.getVisibility());
-        filter.setQuery(newFilterBody.getQuery());
+//        filter.setQuery(newFilterBody.getQuery());
 
         return repository.save(filter);
     }
