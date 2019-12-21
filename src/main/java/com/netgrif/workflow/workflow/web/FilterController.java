@@ -5,7 +5,7 @@ import com.netgrif.workflow.auth.domain.throwable.UnauthorisedRequestException;
 import com.netgrif.workflow.workflow.domain.Filter;
 import com.netgrif.workflow.workflow.domain.MergeFilterOperation;
 import com.netgrif.workflow.workflow.service.interfaces.IFilterService;
-import com.netgrif.workflow.workflow.web.requestbodies.CreateCaseFilterBody;
+import com.netgrif.workflow.workflow.web.requestbodies.CreateFilterBody;
 import com.netgrif.workflow.workflow.web.responsebodies.FilterResourceAssembler;
 import com.netgrif.workflow.workflow.web.responsebodies.LocalisedFilterResource;
 import com.netgrif.workflow.workflow.web.responsebodies.MessageResource;
@@ -29,8 +29,8 @@ public class FilterController {
     @Autowired
     private IFilterService filterService;
 
-    @RequestMapping(value = "/case", method = RequestMethod.POST)
-    public MessageResource createCaseFilter(@RequestBody CreateCaseFilterBody newFilter, @RequestParam(defaultValue = "AND") MergeFilterOperation operation, Authentication auth, Locale locale) {
+    @RequestMapping(method = RequestMethod.POST)
+    public MessageResource createFilter(@RequestBody CreateFilterBody newFilter, @RequestParam(defaultValue = "AND") MergeFilterOperation operation, Authentication auth, Locale locale) {
         Filter filter = filterService.saveFilter(newFilter, operation, (LoggedUser) auth.getPrincipal());
         if (filter != null)
             return MessageResource.successMessage("Filter " + newFilter.getTitle() + " successfully created");
@@ -54,6 +54,5 @@ public class FilterController {
         PagedResources<LocalisedFilterResource> resources = assembler.toResource(page,new FilterResourceAssembler(locale),selfLink);
         return resources;
     }
-
 
 }
