@@ -6,7 +6,7 @@ import com.netgrif.workflow.elastic.domain.ElasticCase;
 import com.netgrif.workflow.elastic.domain.ElasticCaseRepository;
 import com.netgrif.workflow.elastic.service.executors.Executor;
 import com.netgrif.workflow.elastic.service.interfaces.IElasticCaseService;
-import com.netgrif.workflow.elastic.web.CaseSearchRequest;
+import com.netgrif.workflow.elastic.web.requestbodies.CaseSearchRequest;
 import com.netgrif.workflow.utils.FullPageRequest;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
