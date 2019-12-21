@@ -15,7 +15,7 @@ public interface IFilterService {
 
     boolean deleteFilter(String filterId, LoggedUser user) throws UnauthorisedRequestException;
 
-    Filter saveFilter(CreateFilterBody<?> newFilterBody, MergeFilterOperation operation, LoggedUser user);
+    Filter saveFilter(CreateFilterBody newFilterBody, MergeFilterOperation operation, LoggedUser user);
 
     Page<Filter> search(Map<String, Object> request, Pageable pageable, LoggedUser user);
 }
