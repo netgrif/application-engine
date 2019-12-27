@@ -3,6 +3,8 @@ package com.netgrif.workflow
 import com.netgrif.workflow.importer.model.Document
 import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository
 import com.netgrif.workflow.workflow.domain.repositories.CaseRepository
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Profile
 import org.springframework.web.bind.annotation.PathVariable
@@ -21,6 +23,8 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET
 @RequestMapping("/dev/")
 @Profile("dev")
 class DevConsole {
+
+    private static final Logger log = LoggerFactory.getLogger(DevConsole)
 
     @Autowired
     private CaseRepository caseRepository
@@ -70,7 +74,7 @@ class DevConsole {
 
             return stringWriter.toString()
         } catch (Exception ignored) {
-            ignored.printStackTrace()
+            log.error("Getting snapshot of net failed: ", ignored)
             return null
         }
     }

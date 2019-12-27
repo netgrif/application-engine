@@ -1,7 +1,6 @@
 package com.netgrif.workflow.elastic.service.interfaces;
 
 import com.netgrif.workflow.auth.domain.LoggedUser;
-import com.netgrif.workflow.elastic.domain.ElasticTask;
 import com.netgrif.workflow.elastic.web.TaskSearchRequest;
 import com.netgrif.workflow.workflow.domain.Task;
 import org.springframework.data.domain.Page;
@@ -19,7 +18,7 @@ public interface IElasticTaskService {
 
     void indexNow(Task task);
 
-    Page<ElasticTask> search(TaskSearchRequest request, LoggedUser user, Pageable pageable);
+    Page<Task> search(TaskSearchRequest request, LoggedUser user, Pageable pageable);
 
     long count(TaskSearchRequest request, LoggedUser user);
 
