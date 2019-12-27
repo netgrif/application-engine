@@ -19,6 +19,7 @@ public class Authority implements GrantedAuthority {
     public static final String ROLE = "ROLE_";
 
     public static final String admin = ROLE + "ADMIN";
+    public static final String systemAdmin = ROLE + "SYSTEMADMIN";
     public static final String user = ROLE + "USER";
 
     @Id
@@ -71,6 +72,14 @@ public class Authority implements GrantedAuthority {
         Authority authority = (Authority) o;
 
         return name.equals(authority.name);
+    }
+
+    @Override
+    public String toString() {
+        return "Authority{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                '}';
     }
 
     @Override

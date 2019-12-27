@@ -77,8 +77,11 @@ public abstract class PetriNetService implements IPetriNetService {
         cache = new HashMap<>();
     }
 
+    /**
+     * Get read only Petri net.
+     */
     @Override
-    public PetriNet clone(ObjectId petriNetId) {
+    public PetriNet get(ObjectId petriNetId) {
         PetriNet net = cache.get(petriNetId);
         if (net == null) {
             Optional<PetriNet> optional = repository.findById(petriNetId.toString());
@@ -88,7 +91,12 @@ public abstract class PetriNetService implements IPetriNetService {
             net = optional.get();
             cache.put(petriNetId, net);
         }
-        return net.clone();
+        return net;
+    }
+
+    @Override
+    public PetriNet clone(ObjectId petriNetId) {
+        return get(petriNetId).clone();
     }
 
     @Override
@@ -135,7 +143,7 @@ public abstract class PetriNetService implements IPetriNetService {
             try {
                 setupImportedPetriNet(imported.get(), new ByteArrayInputStream(bytes), metaData, user);
             } catch (IOException e) {
-                e.printStackTrace();
+                log.error("Importing new Petri net failed: ", e);
             }
         });
 
@@ -161,7 +169,7 @@ public abstract class PetriNetService implements IPetriNetService {
                 setupImportedPetriNet(petriNet, new ByteArrayInputStream(bytes), meta, user);
                 userProcessRoleService.saveRoles(newRoles, petriNet.getStringId());
             } catch (IOException e) {
-                e.printStackTrace();
+                log.error("Importing new version failed: ", e);
             }
         });
 

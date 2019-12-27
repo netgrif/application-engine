@@ -93,7 +93,7 @@ public class Task {
     }
 
     public Task(ElasticTask entity) {
-        _id = new ObjectId(entity.getCaseId());
+        _id = new ObjectId(entity.getStringId());
         caseId = entity.getCaseId();
         transitionId = entity.getTransitionId();
         title = entity.getTitle();
