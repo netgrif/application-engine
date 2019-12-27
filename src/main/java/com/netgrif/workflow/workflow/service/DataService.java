@@ -173,14 +173,14 @@ public class DataService implements IDataService {
             try {
                 return new FileFieldInputStream(field, download(field.getValue().getPath()));
             } catch (IOException e) {
-                e.printStackTrace();
+                log.error("Getting file failed: ", e);
                 return null;
             }
         } else {
             try {
                 return new FileFieldInputStream(field, new FileInputStream(field.getFilePath(useCase.getStringId())));
             } catch (FileNotFoundException e) {
-                e.printStackTrace();
+                log.error("Getting file failed: ", e);
                 return null;
             }
         }
@@ -212,7 +212,7 @@ public class DataService implements IDataService {
 
             return true;
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("Saving file failed: ", e);
             return false;
         }
     }

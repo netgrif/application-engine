@@ -48,7 +48,6 @@ public class FilterService implements IFilterService {
         filter.setType(newFilterBody.getType());
         filter.setVisibility(newFilterBody.getVisibility());
         filter.setQuery(newFilterBody.getQuery());
-        filter.setReadableQuery(newFilterBody.getReadableQuery());
 
         return repository.save(filter);
     }
@@ -59,6 +58,6 @@ public class FilterService implements IFilterService {
             request.put("author", user.getId());
         }
 
-        return searchService.search(request, pageable, Filter.class);
+        return repository.findAll(searchService.buildQuery(request, user, null), pageable);
     }
 }

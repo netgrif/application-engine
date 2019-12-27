@@ -103,8 +103,7 @@ public class MailService implements IMailService {
 //            ((JavaMailSenderImpl) mailSender).testConnection();
 //            log.info("MAIL: Connection to mail server is stable");
 //        } catch (MessagingException e) {
-//            e.printStackTrace();
-//            log.error("MAIL: Connection failed!");
+//            log.error("MAIL: Connection failed!", e);
 //        }
     }
 
@@ -120,7 +119,7 @@ public class MailService implements IMailService {
             try {
                 helper.addAttachment(s, inputStream);
             } catch (MessagingException e) {
-                e.printStackTrace();
+                log.error("Building email failed: ", e);
             }
         });
         return message;
