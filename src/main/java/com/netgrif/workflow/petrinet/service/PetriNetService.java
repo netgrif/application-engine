@@ -100,11 +100,6 @@ public abstract class PetriNetService implements IPetriNetService {
     }
 
     @Override
-    public PetriNet get(ObjectId petriNetId) {
-        return cache.get(petriNetId);
-    }
-
-    @Override
     public Optional<PetriNet> importPetriNetAndDeleteFile(File xmlFile, UploadedFileMeta netMetaData, LoggedUser user) throws IOException {
         Optional<PetriNet> imported = importPetriNet(new FileInputStream(xmlFile), netMetaData, user);
         if (!xmlFile.delete())
