@@ -11,6 +11,7 @@ import com.netgrif.workflow.importer.service.FieldFactory;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.dataset.CaseField;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
+import com.netgrif.workflow.petrinet.domain.dataset.FieldType;
 import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository;
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.workflow.security.service.EncryptionService;
@@ -115,11 +116,10 @@ public class WorkflowService implements IWorkflowService {
             useCase.ifPresent(page::add);
         });
         if (page.size() > 0) {
-            PetriNet net = petriNetService.clone(page.get(0).getPetriNetObjectId());
-            page.forEach(c -> c.setPetriNet(net));
+            page.forEach(c -> c.setPetriNet(petriNetService.get(c.getPetriNetObjectId())));
             decryptDataSets(page);
+            page.forEach(this::setImmediateDataFieldsReadOnly);
         }
-        page.forEach(this::setImmediateDataFields);
         return page;
     }
 
@@ -241,7 +241,7 @@ public class WorkflowService implements IWorkflowService {
             return true;
         }
         boolean deleteSuccess = useCase.removeTasks(StreamSupport.stream(tasks.spliterator(), false).collect(Collectors.toList()));
-        useCase = repository.save(useCase);
+        save(useCase);
         return deleteSuccess;
     }
 
@@ -280,6 +280,32 @@ public class WorkflowService implements IWorkflowService {
 
         LongStream.range(0L, fields.size()).forEach(l -> fields.get((int) l).setOrder(l));
         return fields;
+    }
+
+    private void setImmediateDataFieldsReadOnly(Case useCase) {
+        List<Field> immediateData = new ArrayList<>();
+
+        useCase.getImmediateDataFields().forEach(fieldId -> {
+            try {
+                Field field = fieldFactory.buildImmediateField(useCase, fieldId);
+                Field clone = field.clone();
+                if (field.getValue() != null) {
+                    if (field.getType() == FieldType.TEXT) {
+                        clone.setValue(field.getValue().toString());
+                    } else {
+                        clone.setValue(field.getValue());
+                    }
+                } else {
+                    clone.setValue(null);
+                }
+                immediateData.add(clone);
+            } catch (Exception e) {
+                log.error("Could not built immediate field [" + fieldId + "]");
+            }
+        });
+        LongStream.range(0L, immediateData.size()).forEach(index -> immediateData.get((int) index).setOrder(index));
+
+        useCase.setImmediateData(immediateData);
     }
 
     private Page<Case> setImmediateDataFields(Page<Case> cases) {

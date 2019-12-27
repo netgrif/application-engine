@@ -17,8 +17,8 @@ public class Filter {
     public static final int VISIBILITY_GROUP = 1;
     public static final int VISIBILITY_PRIVATE = 0;
 
-    public static final String TYPE_TASK = "task";
-    public static final String TYPE_CASE = "case";
+    public static final String TYPE_TASK = "Task";
+    public static final String TYPE_CASE = "Case";
 
     @Id
     private ObjectId _id;
@@ -37,13 +37,12 @@ public class Filter {
 
     private String query;
 
-    private String readableQuery;
 
     public Filter() {
         this.created = LocalDateTime.now();
     }
 
-    public Filter(I18nString title, I18nString description, Integer visibility, Author author, String type, String query, String readableQuery) {
+    public Filter(I18nString title, I18nString description, Integer visibility, Author author, String type, String query) {
         this();
         this.title = title;
         this.description = description;
@@ -51,7 +50,6 @@ public class Filter {
         this.author = author;
         this.type = type;
         this.query = query;
-        this.readableQuery = readableQuery;
     }
 
     public String getStringId() {

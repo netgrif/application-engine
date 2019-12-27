@@ -2,11 +2,11 @@ package com.netgrif.workflow.workflow.web;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.netgrif.workflow.auth.domain.LoggedUser;
-import com.netgrif.workflow.elastic.service.interfaces.IElasticTaskService;
-import com.netgrif.workflow.elastic.web.TaskSearchRequest;
 import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.auth.domain.throwable.UnauthorisedRequestException;
 import com.netgrif.workflow.auth.service.interfaces.IUserService;
+import com.netgrif.workflow.elastic.service.interfaces.IElasticTaskService;
+import com.netgrif.workflow.elastic.web.TaskSearchRequest;
 import com.netgrif.workflow.petrinet.domain.DataGroup;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldContainer;
@@ -19,6 +19,8 @@ import com.netgrif.workflow.workflow.service.interfaces.IFilterService;
 import com.netgrif.workflow.workflow.service.interfaces.ITaskAuthenticationService;
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
 import com.netgrif.workflow.workflow.web.responsebodies.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
@@ -45,6 +47,8 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/task")
 public class TaskController {
+
+    public static final Logger log = LoggerFactory.getLogger(TaskController.class);
 
     @Autowired
     private ITaskService taskService;
@@ -111,7 +115,7 @@ public class TaskController {
             taskService.assignTask(loggedUser, taskId);
             return MessageResource.successMessage("LocalisedTask " + taskId + " assigned to " + loggedUser.getFullName());
         } catch (TransitionNotExecutableException e) {
-            e.printStackTrace();
+            log.error("Assigning task ["+taskId+"] failed: ", e);
             return MessageResource.errorMessage("LocalisedTask " + taskId + " cannot be assigned");
         }
     }
@@ -126,8 +130,8 @@ public class TaskController {
         try {
             taskService.delegateTask(loggedUser, delegatedId, taskId);
             return MessageResource.successMessage("LocalisedTask " + taskId + " assigned to [" + delegatedId + "]");
-        } catch (Exception ignored) {
-            ignored.printStackTrace();
+        } catch (Exception e) {
+            log.error("Delegating task ["+taskId+"] failed: ", e);
             return MessageResource.errorMessage("LocalisedTask " + taskId + " cannot be assigned");
         }
     }
@@ -147,7 +151,7 @@ public class TaskController {
             taskService.finishTask(loggedUser, taskId);
             return MessageResource.successMessage("LocalisedTask " + taskId + " finished");
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("Finishing task ["+taskId+"] failed: ", e);
             return MessageResource.errorMessage(e.getMessage());
         }
     }
@@ -167,7 +171,7 @@ public class TaskController {
             taskService.cancelTask(loggedUser, taskId);
             return MessageResource.successMessage("LocalisedTask " + taskId + " canceled");
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("Canceling task ["+taskId+"] failed: ", e);
             return MessageResource.errorMessage(e.getMessage());
         }
     }
@@ -199,6 +203,16 @@ public class TaskController {
         Page<com.netgrif.workflow.workflow.domain.Task> tasks = taskService.search(searchBody, pageable, (LoggedUser) auth.getPrincipal());
         Link selfLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
                 .search(auth, pageable, searchBody, assembler, locale)).withRel("search");
+        PagedResources<LocalisedTaskResource> resources = assembler.toResource(tasks, new TaskResourceAssembler(locale), selfLink);
+        ResourceLinkAssembler.addLinks(resources, com.netgrif.workflow.workflow.domain.Task.class, selfLink.getRel());
+        return resources;
+    }
+
+    @RequestMapping(value = "/search_es", method = RequestMethod.POST)
+    public PagedResources<LocalisedTaskResource> searchElastic(Authentication auth, Pageable pageable, @RequestBody TaskSearchRequest searchBody, PagedResourcesAssembler<com.netgrif.workflow.workflow.domain.Task> assembler, Locale locale) {
+        Page<com.netgrif.workflow.workflow.domain.Task> tasks = searchService.search(searchBody, (LoggedUser) auth.getPrincipal(), pageable);
+        Link selfLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
+                .searchElastic(auth, pageable, searchBody, assembler, locale)).withRel("search_es");
         PagedResources<LocalisedTaskResource> resources = assembler.toResource(tasks, new TaskResourceAssembler(locale), selfLink);
         ResourceLinkAssembler.addLinks(resources, com.netgrif.workflow.workflow.domain.Task.class, selfLink.getRel());
         return resources;
