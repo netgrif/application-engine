@@ -2,12 +2,18 @@ package com.netgrif.workflow.elastic.domain.mapping;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.springframework.data.elasticsearch.annotations.Field;
+
+import static org.springframework.data.elasticsearch.annotations.FieldType.Text;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode
 public class DataField {
 
-    public String value;
+    @Field(type = Text)
+    public String fulltext;
 }
