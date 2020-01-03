@@ -15,6 +15,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.annotation.Version;
 import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
@@ -69,6 +70,7 @@ public class ElasticCase {
 
     private String authorEmail;
 
+    @Transient
     private Map<String, DataField> dataSet;
 
     @Field(type = Keyword)
@@ -135,17 +137,21 @@ public class ElasticCase {
             if (user.getName() != null) {
                 fullName.append(user.getName());
             }
-            return Optional.of(new UserField(user.getId(), user.getEmail(), fullName.toString()));
+            //return Optional.of(new UserField(user.getId(), user.getEmail(), fullName.toString()));
+            return Optional.empty();
         } else if (dataField.getValue() instanceof LocalDate) {
             LocalDate date = (LocalDate) dataField.getValue();
-            return parseDateField(LocalDateTime.of(date, LocalTime.NOON));
+//            return parseDateField(LocalDateTime.of(date, LocalTime.NOON));
+            return Optional.empty();
         } else if (dataField.getValue() instanceof LocalDateTime) {
-            return parseDateField((LocalDateTime) dataField.getValue());
+//            return parseDateField((LocalDateTime) dataField.getValue());
+            return Optional.empty();
         } else if (dataField.getValue() instanceof Date) {
             LocalDateTime date = ((Date)dataField.getValue()).toInstant()
                     .atZone(ZoneId.systemDefault())
                     .toLocalDateTime();
-            return parseDateField(date);
+//            return parseDateField(date);
+            return Optional.empty();
         } else {
             if (dataField.getValue() == null)
                 return Optional.empty();
