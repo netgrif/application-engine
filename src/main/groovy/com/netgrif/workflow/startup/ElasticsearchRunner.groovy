@@ -119,17 +119,97 @@ class ElasticsearchRunner extends AbstractOrderedCommandLineRunner {
     @Value('${spring.data.elasticsearch.index.task}')
     private String taskIndex
 
+    @Value('${spring.data.elasticsearch.index.data.prefix}')
+    private String dataIndexPrefix
     private static final String DATA_TYPE = "data"
+
+    @Value('${spring.data.elasticsearch.index.data.text-suffix}')
+    private String textDataIndexSuffix
+    private static final String TEXT_DATA_MAPPING = """
+    {
+        "properties": {
+            "id":{
+             "type":"text",
+             "fields":{
+                "keyword":{
+                   "type":"keyword",
+                   "ignore_above":256
+                }
+             }
+          },
+          "version": {
+            "type":"long"
+          },
+          "fulltext": {
+            "type":"text"
+          },
+          "searchable": {
+            "type":"text"
+          },
+          "sortable": {
+            "type":"keyword"
+          },
+          "dataSet":{
+            "type":"join",
+            "relations": {
+                "${CASE_TYPE}": "${DATA_TYPE}"
+            }
+          }
+        }
+    }
+    """
+
+    @Value('${spring.data.elasticsearch.index.data.number-suffix}')
+    private String numberDataIndexSuffix
+    private static final String NUMBER_DATA_MAPPING = """
+    {
+        "properties": {
+            "id":{
+             "type":"text",
+             "fields":{
+                "keyword":{
+                   "type":"keyword",
+                   "ignore_above":256
+                }
+             }
+          },
+          "version": {
+            "type":"long"
+          },
+          "fulltext": {
+            "type":"text"
+          },
+          "searchable": {
+            "type":"double"
+          },
+          "sortable": {
+            "type":"double"
+          },
+          "dataSet":{
+            "type":"join",
+            "relations": {
+                "${CASE_TYPE}": "${DATA_TYPE}"
+            }
+          }
+        }
+    }
+    """
 
     @Autowired
     private ElasticsearchTemplate template
 
     @Override
     void run(String... args) throws Exception {
+        Map<String, String> suffixes = ["${textDataIndexSuffix}":TEXT_DATA_MAPPING, "${numberDataIndexSuffix}":NUMBER_DATA_MAPPING]
+
         if (drop) {
             log.info("Dropping Elasticsearch database [${url}:${port}/${clusterName}]")
             template.deleteIndex(caseIndex)
             template.createIndex(caseIndex)
+            for(String suffix in suffixes.keySet()) {
+                template.deleteIndex(dataIndexPrefix+suffix)
+                template.createIndex(dataIndexPrefix+suffix)
+            }
             template.deleteIndex(ElasticTask.class)
             template.createIndex(ElasticTask.class)
         }
@@ -137,5 +217,9 @@ class ElasticsearchRunner extends AbstractOrderedCommandLineRunner {
         template.putMapping(caseIndex, CASE_TYPE, CASE_MAPPING)
         log.info("Updating Elasticsearch task mapping [${taskIndex}]")
         template.putMapping(ElasticTask.class)
+        for(Map.Entry<String, String> entry in suffixes.entrySet()) {
+            log.info("Updating Elasticsearch data mapping [${dataIndexPrefix+entry.getKey()}]")
+            template.putMapping(dataIndexPrefix+entry.getKey(), DATA_TYPE, entry.getValue())
+        }
     }
 }
