@@ -1,5 +1,6 @@
 package com.netgrif.workflow.elastic.domain.mapping;
 
+import com.netgrif.workflow.elastic.domain.ElasticCase;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -14,7 +15,7 @@ import static org.springframework.data.elasticsearch.annotations.FieldType.Text;
 @NoArgsConstructor
 @EqualsAndHashCode
 @AllArgsConstructor
-public class DataField {
+public abstract class DataField {
 
     @Id
     private String id;
@@ -30,4 +31,10 @@ public class DataField {
     public DataField(String fulltextValue) {
         this.fulltext = fulltextValue;
     }
+
+    public void createParentLink(ElasticCase parent) {
+        this.dataSetJoin = new JoinField("data", parent.getId());
+    }
+
+    public abstract String getIndex();
 }

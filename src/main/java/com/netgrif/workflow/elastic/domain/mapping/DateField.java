@@ -17,4 +17,9 @@ public class DateField extends DataField {
         super(value);
         this.timestamp = timestamp;
     }
+
+    @Override
+    public String getIndex() {
+        return "TODO";
+    }
 }

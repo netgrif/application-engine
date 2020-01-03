@@ -3,6 +3,7 @@ package com.netgrif.workflow.elastic.service;
 import com.google.common.collect.ImmutableMap;
 import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.elastic.domain.ElasticCase;
+import com.netgrif.workflow.elastic.domain.mapping.DataField;
 import com.netgrif.workflow.elastic.domain.repository.ElasticCaseRepository;
 import com.netgrif.workflow.elastic.service.executors.Executor;
 import com.netgrif.workflow.elastic.service.interfaces.IElasticCaseService;
@@ -11,6 +12,8 @@ import com.netgrif.workflow.utils.FullPageRequest;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
 import org.apache.lucene.search.join.ScoreMode;
+import org.elasticsearch.action.index.IndexRequestBuilder;
+import org.elasticsearch.client.Client;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryStringQueryBuilder;
@@ -126,7 +129,16 @@ public class ElasticCaseService implements IElasticCaseService {
     }
 
     private void indexDataSet(ElasticCase useCase) {
+        Client client = template.getClient();
 
+        for (DataField field : useCase.getDataSet().values()) {
+            field.createParentLink(useCase);
+
+            // routing is not supported by spring data => we need to set it at a lower level
+            IndexRequestBuilder builder = client.prepareIndex(field.getIndex(), "data", field.getId());
+            builder.setRouting(useCase.getId());
+            builder.execute().actionGet();
+        }
     }
 
     private SearchQuery buildQuery(CaseSearchRequest request, LoggedUser user, Pageable pageable) {
