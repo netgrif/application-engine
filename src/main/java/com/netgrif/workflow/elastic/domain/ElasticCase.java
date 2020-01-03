@@ -5,10 +5,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.netgrif.workflow.auth.domain.User;
-import com.netgrif.workflow.elastic.domain.mapping.DataField;
-import com.netgrif.workflow.elastic.domain.mapping.DateField;
-import com.netgrif.workflow.elastic.domain.mapping.NumberField;
-import com.netgrif.workflow.elastic.domain.mapping.TextField;
+import com.netgrif.workflow.elastic.domain.mapping.*;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.TaskPair;
 import lombok.AllArgsConstructor;
@@ -73,6 +70,8 @@ public class ElasticCase {
     @Transient
     private Map<String, DataField> dataSet;
 
+    private JoinField dataSetJoin;
+
     @Field(type = Keyword)
     private Set<String> taskIds;
 
@@ -96,6 +95,7 @@ public class ElasticCase {
         taskIds = useCase.getTasks().stream().map(TaskPair::getTransition).collect(Collectors.toSet());
         taskMongoIds = useCase.getTasks().stream().map(TaskPair::getTask).collect(Collectors.toSet());
         enabledRoles = new HashSet<>(useCase.getEnabledRoles());
+        dataSetJoin = new JoinField("case", null);
 
         dataSet = new HashMap<>();
         for (String id : useCase.getImmediateDataFields()) {
