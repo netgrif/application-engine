@@ -3,12 +3,14 @@ package com.netgrif.workflow.elastic.domain.mapping;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
 
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
+@Document(indexName = "#{@elasticDataIndexPrefix}"+"#{@elasticNumberDataIndexSuffix}", type = "data")
 public class NumberField extends DataField {
 
     @Field(type = FieldType.Double)
