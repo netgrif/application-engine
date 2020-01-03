@@ -1,7 +1,7 @@
 package com.netgrif.workflow.startup
 
-import com.netgrif.workflow.elastic.domain.ElasticCaseRepository
-import com.netgrif.workflow.elastic.domain.ElasticTaskRepository
+import com.netgrif.workflow.elastic.domain.repository.ElasticCaseRepository
+import com.netgrif.workflow.elastic.domain.repository.ElasticTaskRepository
 import com.netgrif.workflow.elastic.service.interfaces.IElasticCaseService
 import com.netgrif.workflow.workflow.domain.repositories.CaseRepository
 import com.netgrif.workflow.workflow.domain.repositories.TaskRepository

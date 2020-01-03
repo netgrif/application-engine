@@ -97,7 +97,7 @@ class ElasticsearchRunner extends AbstractOrderedCommandLineRunner {
                 }
              }
           },
-          "dataSet":{
+          "dataSetJoin":{
             "type":"join",
             "relations": {
                 "${CASE_TYPE}": "${DATA_TYPE}"
@@ -149,7 +149,7 @@ class ElasticsearchRunner extends AbstractOrderedCommandLineRunner {
           "sortable": {
             "type":"keyword"
           },
-          "dataSet":{
+          "dataSetJoin":{
             "type":"join",
             "relations": {
                 "${CASE_TYPE}": "${DATA_TYPE}"
@@ -185,7 +185,7 @@ class ElasticsearchRunner extends AbstractOrderedCommandLineRunner {
           "sortable": {
             "type":"double"
           },
-          "dataSet":{
+          "dataSetJoin":{
             "type":"join",
             "relations": {
                 "${CASE_TYPE}": "${DATA_TYPE}"
