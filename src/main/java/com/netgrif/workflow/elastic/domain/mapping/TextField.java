@@ -26,4 +26,9 @@ public class TextField extends DataField {
         this.searchable = value;
         this.sortable = value;
     }
+
+    @Override
+    public String getIndex() {
+        return "#{@elasticDataIndexPrefix}"+"#{@elasticTextDataIndexSuffix}";
+    }
 }
