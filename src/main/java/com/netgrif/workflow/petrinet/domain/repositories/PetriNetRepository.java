@@ -21,4 +21,6 @@ public interface PetriNetRepository extends MongoRepository<PetriNet, String> {
     Page<PetriNet> findByIdentifier(String identifier, Pageable pageable);
 
     List<PetriNet> findAllByVersion(String version);
+
+    void deleteByIdentifierAndVersion(String identifier, String version);
 }
