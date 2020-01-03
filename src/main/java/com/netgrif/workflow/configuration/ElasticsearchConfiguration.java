@@ -33,6 +33,15 @@ public class ElasticsearchConfiguration {
     @Value("${spring.data.elasticsearch.index.task}")
     private String taskIndex;
 
+    @Value("${spring.data.elasticsearch.index.data.prefix}")
+    private String dataIndexPrefix;
+
+    @Value("${spring.data.elasticsearch.index.data.text-suffix}")
+    private String textDataIndexSuffix;
+
+    @Value("${spring.data.elasticsearch.index.data.number-suffix}")
+    private String numberDataIndexSuffix;
+
     @Value("${spring.data.elasticsearch.reindex}")
     private String cron;
 
@@ -50,6 +59,15 @@ public class ElasticsearchConfiguration {
     public String elasticTaskIndex() {
         return taskIndex;
     }
+
+    @Bean
+    public String elasticDataIndexPrefix() {return dataIndexPrefix;};
+
+    @Bean
+    public String elasticTextDataIndexSuffix() {return textDataIndexSuffix;}
+
+    @Bean
+    public String elasticNumberDataIndexSuffix() {return numberDataIndexSuffix;}
 
     @Bean
     public Client client() throws UnknownHostException {
