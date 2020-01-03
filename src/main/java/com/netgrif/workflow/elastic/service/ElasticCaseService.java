@@ -3,7 +3,7 @@ package com.netgrif.workflow.elastic.service;
 import com.google.common.collect.ImmutableMap;
 import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.elastic.domain.ElasticCase;
-import com.netgrif.workflow.elastic.domain.ElasticCaseRepository;
+import com.netgrif.workflow.elastic.domain.repository.ElasticCaseRepository;
 import com.netgrif.workflow.elastic.service.executors.Executor;
 import com.netgrif.workflow.elastic.service.interfaces.IElasticCaseService;
 import com.netgrif.workflow.elastic.web.CaseSearchRequest;
@@ -38,7 +38,7 @@ public class ElasticCaseService implements IElasticCaseService {
     private static final Logger log = LoggerFactory.getLogger(ElasticCaseService.class);
 
     @Autowired
-    private ElasticCaseRepository repository;
+    private ElasticCaseRepository caseRepository;
 
     @Autowired
     private IWorkflowService workflowService;
@@ -68,7 +68,7 @@ public class ElasticCaseService implements IElasticCaseService {
     @Override
     public void remove(String caseId) {
         executors.execute(caseId, () -> {
-            repository.deleteAllByStringId(caseId);
+            caseRepository.deleteAllByStringId(caseId);
             log.info("[" + caseId + "]: Case \"" + caseId + "\" deleted");
         });
     }
@@ -77,18 +77,20 @@ public class ElasticCaseService implements IElasticCaseService {
     public void index(ElasticCase useCase) {
         executors.execute(useCase.getStringId(), () -> {
             try {
-                ElasticCase elasticCase = repository.findByStringId(useCase.getStringId());
+                ElasticCase elasticCase = caseRepository.findByStringId(useCase.getStringId());
                 if (elasticCase == null) {
-                    repository.save(useCase);
+                    caseRepository.save(useCase);
+                    indexDataSet(useCase);
                 } else {
                     elasticCase.update(useCase);
-                    repository.save(elasticCase);
+                    caseRepository.save(elasticCase);
+                    indexDataSet(elasticCase);
                 }
                 log.debug("[" + useCase.getStringId() + "]: Case \"" + useCase.getTitle() + "\" indexed");
             } catch (InvalidDataAccessApiUsageException ignored) {
                 log.debug("[" + useCase.getStringId() + "]: Case \"" + useCase.getTitle() + "\" has duplicates, will be reindexed");
-                repository.deleteAllByStringId(useCase.getStringId());
-                repository.save(useCase);
+                caseRepository.deleteAllByStringId(useCase.getStringId());
+                caseRepository.save(useCase);
                 log.debug("[" + useCase.getStringId() + "]: Case \"" + useCase.getTitle() + "\" indexed");
             }
         });
@@ -106,7 +108,7 @@ public class ElasticCaseService implements IElasticCaseService {
         }
 
         SearchQuery query = buildQuery(request, user, pageable);
-        Page<ElasticCase> indexedCases = repository.search(query);
+        Page<ElasticCase> indexedCases = caseRepository.search(query);
         List<Case> casePage = workflowService.findAllById(indexedCases.get().map(ElasticCase::getStringId).collect(Collectors.toList()));
 
         return new PageImpl<>(casePage, pageable, indexedCases.getTotalElements());
@@ -121,6 +123,10 @@ public class ElasticCaseService implements IElasticCaseService {
         SearchQuery query = buildQuery(request, user, new FullPageRequest());
 
         return template.count(query, ElasticCase.class);
+    }
+
+    private void indexDataSet(ElasticCase useCase) {
+
     }
 
     private SearchQuery buildQuery(CaseSearchRequest request, LoggedUser user, Pageable pageable) {
