@@ -33,6 +33,8 @@ public interface IPetriNetService {
 
     PetriNet getPetriNet(String identifier, String version);
 
+    void deletePetriNet(String identifier, String version);
+
     List<PetriNet> getByIdentifier(String identifier);
 
     PetriNet getNewestVersionByIdentifier(String identifier);
