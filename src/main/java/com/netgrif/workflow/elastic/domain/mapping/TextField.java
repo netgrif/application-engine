@@ -3,7 +3,6 @@ package com.netgrif.workflow.elastic.domain.mapping;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 
 import static org.springframework.data.elasticsearch.annotations.FieldType.Keyword;
@@ -12,7 +11,6 @@ import static org.springframework.data.elasticsearch.annotations.FieldType.Text;
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-@Document(indexName = "#{@elasticCaseIndex}", type = "data_text")
 public class TextField extends DataField {
 
     @Field(type = Text)
