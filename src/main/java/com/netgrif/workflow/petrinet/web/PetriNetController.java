@@ -4,11 +4,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.importer.service.Importer;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
+import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository;
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.workflow.petrinet.service.interfaces.IProcessRoleService;
 import com.netgrif.workflow.petrinet.web.requestbodies.UploadedFileMeta;
 import com.netgrif.workflow.petrinet.web.responsebodies.*;
+import com.netgrif.workflow.workflow.domain.Case;
+import com.netgrif.workflow.workflow.domain.repositories.CaseRepository;
+import com.netgrif.workflow.workflow.domain.repositories.TaskRepository;
 import com.netgrif.workflow.workflow.web.responsebodies.MessageResource;
+import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,8 +43,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import static org.springframework.web.bind.annotation.RequestMethod.GET;
-import static org.springframework.web.bind.annotation.RequestMethod.POST;
+import static org.springframework.web.bind.annotation.RequestMethod.*;
 
 @Controller
 @RequestMapping("/api/petrinet")
@@ -105,6 +109,17 @@ public class PetriNetController {
     public @ResponseBody
     PetriNetReferenceResource getOne(@PathVariable("identifier") String identifier, @PathVariable("version") String version, Authentication auth, Locale locale) {
         return new PetriNetReferenceResource(service.getReference(identifier, version, (LoggedUser) auth.getPrincipal(), locale));
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @RequestMapping(value = "/{identifier}/{version}", method = DELETE)
+    public @ResponseBody MessageResource deleteOne(@PathVariable("identifier") String identifier, @PathVariable("version") String version, Authentication auth, Locale locale) {
+        try {
+            service.deletePetriNet(identifier, version);
+            return MessageResource.successMessage("Petri net " + identifier + " deleted successfully");
+        } catch (IllegalArgumentException e){
+            return MessageResource.errorMessage("Petri net " + identifier + " deletion failed!");
+        }
     }
 
     @RequestMapping(value = "/transitions", method = GET)
