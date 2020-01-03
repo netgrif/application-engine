@@ -2,8 +2,6 @@ package com.netgrif.workflow.startup
 
 import com.netgrif.workflow.elastic.domain.ElasticCase
 import com.netgrif.workflow.elastic.domain.ElasticTask
-import com.netgrif.workflow.elastic.domain.mapping.NumberField
-import com.netgrif.workflow.elastic.domain.mapping.TextField
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -43,15 +41,11 @@ class ElasticsearchRunner extends AbstractOrderedCommandLineRunner {
             log.info("Dropping Elasticsearch database [${url}:${port}/${clusterName}]")
             template.deleteIndex(ElasticCase.class)
             template.createIndex(ElasticCase.class)
-            template.createIndex(TextField.class)
-            template.createIndex(NumberField.class)
             template.deleteIndex(ElasticTask.class)
             template.createIndex(ElasticTask.class)
         }
         log.info("Updating Elasticsearch case mapping [${caseIndex}]")
         template.putMapping(ElasticCase.class)
-        template.putMapping(TextField.class)
-        template.putMapping(NumberField.class)
         log.info("Updating Elasticsearch task mapping [${taskIndex}]")
         template.putMapping(ElasticTask.class)
     }
