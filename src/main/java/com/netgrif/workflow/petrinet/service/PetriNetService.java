@@ -17,6 +17,9 @@ import com.netgrif.workflow.petrinet.web.requestbodies.UploadedFileMeta;
 import com.netgrif.workflow.petrinet.web.responsebodies.DataFieldReference;
 import com.netgrif.workflow.petrinet.web.responsebodies.PetriNetReference;
 import com.netgrif.workflow.petrinet.web.responsebodies.TransitionReference;
+import com.netgrif.workflow.workflow.domain.Case;
+import com.netgrif.workflow.workflow.domain.repositories.CaseRepository;
+import com.netgrif.workflow.workflow.domain.repositories.TaskRepository;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.bson.Document;
 import org.bson.types.ObjectId;
@@ -69,6 +72,12 @@ public abstract class PetriNetService implements IPetriNetService {
 
     @Autowired
     private ApplicationEventPublisher publisher;
+
+    @Autowired
+    private CaseRepository caseRepository;
+
+    @Autowired
+    private TaskRepository taskRepository;
 
     private Map<ObjectId, PetriNet> cache = new HashMap<>();
 
@@ -239,6 +248,19 @@ public abstract class PetriNetService implements IPetriNetService {
             return null;
         net.initializeArcs();
         return net;
+    }
+
+    @Override
+    public void deletePetriNet(String identifier, String version) {
+        PetriNet net = repository.findByIdentifierAndVersion(identifier, version);
+        if (net == null)
+            throw new IllegalArgumentException("Petri net was not found.");
+        List<Case> cases = caseRepository.findAllByPetriNetObjectId(new ObjectId(net.getStringId()));
+        for(Case tmp : cases){
+            taskRepository.deleteAllByCaseId(tmp.getStringId());
+        }
+        caseRepository.deleteAllByPetriNetObjectId(new ObjectId(net.getStringId()));
+        repository.deleteByIdentifierAndVersion(identifier, version);
     }
 
     @Override
