@@ -1,6 +1,6 @@
 package com.netgrif.workflow.startup
 
-
+import com.netgrif.workflow.elastic.domain.ElasticTask
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -28,16 +28,10 @@ class ElasticsearchRunner extends AbstractOrderedCommandLineRunner {
     @Value('${spring.data.elasticsearch.index.case}')
     private String caseIndex
     private static final String CASE_TYPE = "case"
-    private static final String CASE_MAPPING = '''
+    private static final String CASE_MAPPING = """
     {
        "properties":{
-          "author":{
-             "type":"long"
-          },
-          "authorEmail":{
-             "type":"keyword"
-          },
-          "authorName":{
+          "id":{
              "type":"text",
              "fields":{
                 "keyword":{
@@ -46,16 +40,16 @@ class ElasticsearchRunner extends AbstractOrderedCommandLineRunner {
                 }
              }
           },
-          "creationDate":{
-             "type":"long"
+          "version": {
+            "type":"long"
           },
-          "creationDateSortable": {
-              "type": "long"
+          "lastModified": {
+            "type":"long"
           },
-          "enabledRoles":{
+          "stringId":{
              "type":"keyword"
           },
-          "id":{
+          "visualId":{
              "type":"text",
              "fields":{
                 "keyword":{
@@ -70,15 +64,6 @@ class ElasticsearchRunner extends AbstractOrderedCommandLineRunner {
           "processId":{
              "type":"keyword"
           },
-          "stringId":{
-             "type":"keyword"
-          },
-          "taskIds":{
-             "type":"keyword"
-          },
-          "taskMongoIds":{
-             "type":"keyword"
-          },
           "title":{
              "type":"text",
              "fields":{
@@ -88,85 +73,53 @@ class ElasticsearchRunner extends AbstractOrderedCommandLineRunner {
                 }
              }
           },
-          "titleSortable":{
+          "creationDate":{
+             "type":"date"
+          },
+          "author":{
+             "type":"long"
+          },
+          "authorName":{
+             "type":"text",
+             "fields":{
+                "keyword":{
+                   "type":"keyword",
+                   "ignore_above":256
+                }
+             }
+          },
+          "authorEmail":{
+             "type":"text",
+             "fields":{
+                "keyword":{
+                   "type":"keyword",
+                   "ignore_above":256
+                }
+             }
+          },
+          "dataSet":{
+            "type":"join",
+            "relations": {
+                "${CASE_TYPE}": "${DATA_TYPE}"
+            }
+          },
+          "taskIds":{
              "type":"keyword"
           },
-          "visualId":{
+          "taskMongoIds":{
+             "type":"keyword"
+          },
+          "enabledRoles":{
              "type":"keyword"
           }
        }
     }
-    '''
+    """
 
     @Value('${spring.data.elasticsearch.index.task}')
     private String taskIndex
-    private static final String TASK_TYPE = "task"
-    private static final String TASK_MAPPING = '''
-    {
-        "properties": {
-            "assignPolicy": {
-                "type": "keyword"
-            },
-            "caseColor": {
-                "type": "keyword"
-            },
-            "caseId": {
-                "type": "keyword"
-            },
-            "caseTitle": {
-                "type": "text",
-                "fields": {
-                    "keyword": {
-                        "type": "keyword",
-                        "ignore_above": 256
-                    }
-                }
-            },
-            "caseTitleSortable": {
-                "type": "keyword"
-            },
-            "dataFocusPolicy": {
-                "type": "keyword"
-            },
-            "finishPolicy": {
-                "type": "keyword"
-            },
-            "icon": {
-                "type": "keyword"
-            },
-            "priority": {
-                "type": "long"
-            },
-            "processId": {
-                "type": "keyword"
-            },
-            "roles": {
-                "type": "keyword"
-            },
-            "stringId": {
-                "type": "keyword"
-            },
-            "title": {
-                "type": "text",
-                "fields": {
-                    "keyword": {
-                        "type": "keyword",
-                        "ignore_above": 256
-                    }
-                }
-            },
-            "titleSortable": {
-                "type": "keyword"
-            },
-            "transactionId": {
-                "type": "keyword"
-            },
-            "transitionId": {
-                "type": "keyword"
-            }
-        }
-    }
-    '''
+
+    private static final String DATA_TYPE = "data"
 
     @Autowired
     private ElasticsearchTemplate template
@@ -177,12 +130,12 @@ class ElasticsearchRunner extends AbstractOrderedCommandLineRunner {
             log.info("Dropping Elasticsearch database [${url}:${port}/${clusterName}]")
             template.deleteIndex(caseIndex)
             template.createIndex(caseIndex)
-            template.deleteIndex(taskIndex)
-            template.createIndex(taskIndex)
+            template.deleteIndex(ElasticTask.class)
+            template.createIndex(ElasticTask.class)
         }
         log.info("Updating Elasticsearch case mapping [${caseIndex}]")
         template.putMapping(caseIndex, CASE_TYPE, CASE_MAPPING)
         log.info("Updating Elasticsearch task mapping [${taskIndex}]")
-        template.putMapping(taskIndex, TASK_TYPE, TASK_MAPPING)
+        template.putMapping(ElasticTask.class)
     }
 }

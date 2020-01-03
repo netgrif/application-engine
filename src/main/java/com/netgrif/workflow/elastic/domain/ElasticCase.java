@@ -5,7 +5,10 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.netgrif.workflow.auth.domain.User;
-import com.netgrif.workflow.elastic.domain.mapping.*;
+import com.netgrif.workflow.elastic.domain.mapping.DataField;
+import com.netgrif.workflow.elastic.domain.mapping.DateField;
+import com.netgrif.workflow.elastic.domain.mapping.NumberField;
+import com.netgrif.workflow.elastic.domain.mapping.TextField;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.TaskPair;
 import lombok.AllArgsConstructor;
@@ -19,14 +22,13 @@ import org.springframework.data.elasticsearch.annotations.Field;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static org.springframework.data.elasticsearch.annotations.FieldType.Date;
 import static org.springframework.data.elasticsearch.annotations.FieldType.Keyword;
-import static org.springframework.data.elasticsearch.annotations.FieldType.Nested;
 
 @SuppressWarnings("OptionalIsPresent")
 @Data
@@ -56,11 +58,10 @@ public class ElasticCase {
 
     private String title;
 
+    @Field(type = Date)
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     private LocalDateTime creationDate;
-
-    private Long creationDateSortable;
 
     private Long author;
 
@@ -68,7 +69,6 @@ public class ElasticCase {
 
     private String authorEmail;
 
-    @Field(type = Nested)
     private Map<String, DataField> dataSet;
 
     @Field(type = Keyword)
@@ -88,7 +88,6 @@ public class ElasticCase {
         visualId = useCase.getVisualId();
         title = useCase.getTitle();
         creationDate = useCase.getCreationDate();
-        creationDateSortable = Timestamp.valueOf(useCase.getCreationDate()).getTime();
         author = useCase.getAuthor().getId();
         authorName = useCase.getAuthor().getFullName();
         authorEmail = useCase.getAuthor().getEmail();
