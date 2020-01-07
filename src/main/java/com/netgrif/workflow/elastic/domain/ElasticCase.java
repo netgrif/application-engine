@@ -12,7 +12,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.annotation.Transient;
 import org.springframework.data.annotation.Version;
 import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
@@ -20,13 +19,14 @@ import org.springframework.data.elasticsearch.annotations.Field;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static org.springframework.data.elasticsearch.annotations.FieldType.Date;
 import static org.springframework.data.elasticsearch.annotations.FieldType.Keyword;
+import static org.springframework.data.elasticsearch.annotations.FieldType.Nested;
 
 @SuppressWarnings("OptionalIsPresent")
 @Data
@@ -56,10 +56,11 @@ public class ElasticCase {
 
     private String title;
 
-    @Field(type = Date)
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     private LocalDateTime creationDate;
+
+    private Long creationDateSortable;
 
     private Long author;
 
@@ -67,10 +68,8 @@ public class ElasticCase {
 
     private String authorEmail;
 
-    @Transient
+    @Field(type = Nested)
     private Map<String, DataField> dataSet;
-
-    private JoinField dataSetJoin;
 
     @Field(type = Keyword)
     private Set<String> taskIds;
@@ -89,13 +88,13 @@ public class ElasticCase {
         visualId = useCase.getVisualId();
         title = useCase.getTitle();
         creationDate = useCase.getCreationDate();
+        creationDateSortable = Timestamp.valueOf(useCase.getCreationDate()).getTime();
         author = useCase.getAuthor().getId();
         authorName = useCase.getAuthor().getFullName();
         authorEmail = useCase.getAuthor().getEmail();
         taskIds = useCase.getTasks().stream().map(TaskPair::getTransition).collect(Collectors.toSet());
         taskMongoIds = useCase.getTasks().stream().map(TaskPair::getTask).collect(Collectors.toSet());
         enabledRoles = new HashSet<>(useCase.getEnabledRoles());
-        dataSetJoin = new JoinField("case", null);
 
         dataSet = new HashMap<>();
         for (String id : useCase.getImmediateDataFields()) {
@@ -137,21 +136,17 @@ public class ElasticCase {
             if (user.getName() != null) {
                 fullName.append(user.getName());
             }
-            //return Optional.of(new UserField(user.getId(), user.getEmail(), fullName.toString()));
-            return Optional.empty();
+            return Optional.of(new UserField(user.getId(), user.getEmail(), fullName.toString()));
         } else if (dataField.getValue() instanceof LocalDate) {
             LocalDate date = (LocalDate) dataField.getValue();
-//            return parseDateField(LocalDateTime.of(date, LocalTime.NOON));
-            return Optional.empty();
+            return parseDateField(LocalDateTime.of(date, LocalTime.NOON));
         } else if (dataField.getValue() instanceof LocalDateTime) {
-//            return parseDateField((LocalDateTime) dataField.getValue());
-            return Optional.empty();
+            return parseDateField((LocalDateTime) dataField.getValue());
         } else if (dataField.getValue() instanceof Date) {
             LocalDateTime date = ((Date)dataField.getValue()).toInstant()
                     .atZone(ZoneId.systemDefault())
                     .toLocalDateTime();
-//            return parseDateField(date);
-            return Optional.empty();
+            return parseDateField(date);
         } else {
             if (dataField.getValue() == null)
                 return Optional.empty();
