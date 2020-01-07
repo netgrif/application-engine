@@ -12,14 +12,10 @@ import org.springframework.data.elasticsearch.annotations.FieldType;
 public class NumberField extends DataField {
 
     @Field(type = FieldType.Double)
-    public Double searchable;
-
-    @Field(type = FieldType.Double)
-    public Double sortable;
+    public Double numberValue;
 
     public NumberField(Double value) {
         super(value.toString());
-        this.searchable = value;
-        this.sortable = value;
+        this.numberValue = value;
     }
 }
