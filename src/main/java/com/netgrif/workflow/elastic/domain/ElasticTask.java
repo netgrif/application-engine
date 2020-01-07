@@ -15,7 +15,6 @@ import org.springframework.data.elasticsearch.annotations.Field;
 import java.time.LocalDateTime;
 import java.util.Set;
 
-import static org.springframework.data.elasticsearch.annotations.FieldType.Date;
 import static org.springframework.data.elasticsearch.annotations.FieldType.Keyword;
 
 @Data
@@ -56,7 +55,6 @@ public class ElasticTask {
 
     private Long userId;
 
-    @Field(type = Date)
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     private LocalDateTime startDate;

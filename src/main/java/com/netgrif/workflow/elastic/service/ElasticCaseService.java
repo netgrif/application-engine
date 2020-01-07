@@ -3,8 +3,7 @@ package com.netgrif.workflow.elastic.service;
 import com.google.common.collect.ImmutableMap;
 import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.elastic.domain.ElasticCase;
-import com.netgrif.workflow.elastic.domain.mapping.DataField;
-import com.netgrif.workflow.elastic.domain.repository.ElasticCaseRepository;
+import com.netgrif.workflow.elastic.domain.ElasticCaseRepository;
 import com.netgrif.workflow.elastic.service.executors.Executor;
 import com.netgrif.workflow.elastic.service.interfaces.IElasticCaseService;
 import com.netgrif.workflow.elastic.web.CaseSearchRequest;
@@ -12,8 +11,6 @@ import com.netgrif.workflow.utils.FullPageRequest;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
 import org.apache.lucene.search.join.ScoreMode;
-import org.elasticsearch.action.index.IndexRequestBuilder;
-import org.elasticsearch.client.Client;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryStringQueryBuilder;
@@ -41,7 +38,7 @@ public class ElasticCaseService implements IElasticCaseService {
     private static final Logger log = LoggerFactory.getLogger(ElasticCaseService.class);
 
     @Autowired
-    private ElasticCaseRepository caseRepository;
+    private ElasticCaseRepository repository;
 
     @Autowired
     private IWorkflowService workflowService;
@@ -71,7 +68,7 @@ public class ElasticCaseService implements IElasticCaseService {
     @Override
     public void remove(String caseId) {
         executors.execute(caseId, () -> {
-            caseRepository.deleteAllByStringId(caseId);
+            repository.deleteAllByStringId(caseId);
             log.info("[" + caseId + "]: Case \"" + caseId + "\" deleted");
         });
     }
@@ -80,20 +77,18 @@ public class ElasticCaseService implements IElasticCaseService {
     public void index(ElasticCase useCase) {
         executors.execute(useCase.getStringId(), () -> {
             try {
-                ElasticCase elasticCase = caseRepository.findByStringId(useCase.getStringId());
+                ElasticCase elasticCase = repository.findByStringId(useCase.getStringId());
                 if (elasticCase == null) {
-                    caseRepository.save(useCase);
-                    indexDataSet(useCase);
+                    repository.save(useCase);
                 } else {
                     elasticCase.update(useCase);
-                    caseRepository.save(elasticCase);
-                    indexDataSet(elasticCase);
+                    repository.save(elasticCase);
                 }
                 log.debug("[" + useCase.getStringId() + "]: Case \"" + useCase.getTitle() + "\" indexed");
             } catch (InvalidDataAccessApiUsageException ignored) {
                 log.debug("[" + useCase.getStringId() + "]: Case \"" + useCase.getTitle() + "\" has duplicates, will be reindexed");
-                caseRepository.deleteAllByStringId(useCase.getStringId());
-                caseRepository.save(useCase);
+                repository.deleteAllByStringId(useCase.getStringId());
+                repository.save(useCase);
                 log.debug("[" + useCase.getStringId() + "]: Case \"" + useCase.getTitle() + "\" indexed");
             }
         });
@@ -111,7 +106,7 @@ public class ElasticCaseService implements IElasticCaseService {
         }
 
         SearchQuery query = buildQuery(request, user, pageable);
-        Page<ElasticCase> indexedCases = caseRepository.search(query);
+        Page<ElasticCase> indexedCases = repository.search(query);
         List<Case> casePage = workflowService.findAllById(indexedCases.get().map(ElasticCase::getStringId).collect(Collectors.toList()));
 
         return new PageImpl<>(casePage, pageable, indexedCases.getTotalElements());
@@ -126,19 +121,6 @@ public class ElasticCaseService implements IElasticCaseService {
         SearchQuery query = buildQuery(request, user, new FullPageRequest());
 
         return template.count(query, ElasticCase.class);
-    }
-
-    private void indexDataSet(ElasticCase useCase) {
-        Client client = template.getClient();
-
-        for (DataField field : useCase.getDataSet().values()) {
-            field.createParentLink(useCase);
-
-            // routing is not supported by spring data => we need to set it at a lower level
-            IndexRequestBuilder builder = client.prepareIndex(field.getIndex(), "data", field.getId());
-            builder.setRouting(useCase.getId());
-            builder.execute().actionGet();
-        }
     }
 
     private SearchQuery buildQuery(CaseSearchRequest request, LoggedUser user, Pageable pageable) {
