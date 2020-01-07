@@ -5,7 +5,9 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.springframework.data.elasticsearch.annotations.Field;
+import org.springframework.data.elasticsearch.annotations.FieldType;
 
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
 import static org.springframework.data.elasticsearch.annotations.FieldType.Date;
@@ -17,14 +19,14 @@ import static org.springframework.data.elasticsearch.annotations.FieldType.Date;
 public class DateField extends DataField {
 
     @Field(type = Date)
-    private LocalDateTime searchable;
+    private LocalDateTime dateValue;
 
-    @Field(type = Date)
-    private LocalDateTime sortable;
+    @Field(type = FieldType.Long)
+    private Long timestampValue;
 
     public DateField(String value, LocalDateTime dateTime) {
         super(value);
-        this.searchable = dateTime;
-        this.sortable = dateTime;
+        this.dateValue = dateTime;
+        this.timestampValue = Timestamp.valueOf(dateTime).getTime();
     }
 }
