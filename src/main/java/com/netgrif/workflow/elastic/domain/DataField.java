@@ -1,4 +1,4 @@
-package com.netgrif.workflow.elastic.domain.mapping;
+package com.netgrif.workflow.elastic.domain;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
