@@ -26,7 +26,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.springframework.data.elasticsearch.annotations.FieldType.Keyword;
-import static org.springframework.data.elasticsearch.annotations.FieldType.Nested;
 
 @SuppressWarnings("OptionalIsPresent")
 @Data
@@ -68,7 +67,6 @@ public class ElasticCase {
 
     private String authorEmail;
 
-    @Field(type = Nested)
     private Map<String, DataField> dataSet;
 
     @Field(type = Keyword)
@@ -160,6 +158,6 @@ public class ElasticCase {
     private Optional<DataField> parseDateField(LocalDateTime date) {
         if (date == null)
             return Optional.empty();
-        return Optional.of(new DateField(date.format(DateTimeFormatter.BASIC_ISO_DATE), Timestamp.valueOf(date).getTime()));
+        return Optional.of(new DateField(date.format(DateTimeFormatter.BASIC_ISO_DATE), date));
     }
 }
