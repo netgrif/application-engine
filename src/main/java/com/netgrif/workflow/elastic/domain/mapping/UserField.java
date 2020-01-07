@@ -21,11 +21,6 @@ public class UserField extends DataField {
         this.email = email;
         this.fullName = fullName;
     }
-
-    @Override
-    public String getIndex() {
-        return "TODO";
-    }
 }
 
 
