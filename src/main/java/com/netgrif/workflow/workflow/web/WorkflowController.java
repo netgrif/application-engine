@@ -1,14 +1,14 @@
 package com.netgrif.workflow.workflow.web;
 
-import com.netgrif.workflow.auth.domain.Author;
 import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.auth.domain.throwable.UnauthorisedRequestException;
 import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.elastic.domain.ElasticCase;
 import com.netgrif.workflow.elastic.service.interfaces.IElasticCaseService;
-import com.netgrif.workflow.elastic.web.CaseSearchRequest;
+import com.netgrif.workflow.elastic.web.requestbodies.singleaslist.SingleCaseSearchRequestAsList;
 import com.netgrif.workflow.workflow.domain.Case;
+import com.netgrif.workflow.workflow.domain.MergeFilterOperation;
 import com.netgrif.workflow.workflow.service.FileFieldInputStream;
 import com.netgrif.workflow.workflow.service.interfaces.IDataService;
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
@@ -88,13 +88,23 @@ public class WorkflowController {
         return resources;
     }
 
+    @PostMapping("/case/search2")
+    public PagedResources<CaseResource> search2(@QuerydslPredicate(root = Case.class) Predicate predicate, Pageable pageable, PagedResourcesAssembler<Case> assembler) {
+        Page<Case> cases = workflowService.search(predicate, pageable);
+        Link selfLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(WorkflowController.class)
+                .search2(predicate, pageable, assembler)).withRel("search2");
+        PagedResources<CaseResource> resources = assembler.toResource(cases, new CaseResourceAssembler(), selfLink);
+        ResourceLinkAssembler.addLinks(resources, Case.class, selfLink.getRel());
+        return resources;
+    }
+
     @PostMapping(value = "/case/search", produces = MediaTypes.HAL_JSON_VALUE)
-    public PagedResources<CaseResource> search(@RequestBody CaseSearchRequest searchBody, Pageable pageable, PagedResourcesAssembler<Case> assembler, Authentication auth, Locale locale) {
+    public PagedResources<CaseResource> search(@RequestBody SingleCaseSearchRequestAsList searchBody, @RequestParam(defaultValue = "OR") MergeFilterOperation operation, Pageable pageable, PagedResourcesAssembler<Case> assembler, Authentication auth, Locale locale) {
         LoggedUser user =(LoggedUser) auth.getPrincipal();
-        Page<Case> cases = elasticCaseService.search(searchBody, user, pageable);
+        Page<Case> cases = elasticCaseService.search(searchBody.getList(), user, pageable, operation == MergeFilterOperation.AND);
 
         Link selfLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(WorkflowController.class)
-                .search(searchBody, pageable, assembler, auth, locale)).withRel("search");
+                .search(searchBody, operation, pageable, assembler, auth, locale)).withRel("search");
 
         PagedResources<CaseResource> resources = assembler.toResource(cases, new CaseResourceAssembler(), selfLink);
         ResourceLinkAssembler.addLinks(resources, ElasticCase.class, selfLink.getRel());
@@ -102,8 +112,8 @@ public class WorkflowController {
     }
 
     @PostMapping(value = "/case/count", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public CountResponse count(@RequestBody CaseSearchRequest query, Authentication auth) {
-        long count = elasticCaseService.count(query, (LoggedUser) auth.getPrincipal());
+    public CountResponse count(@RequestBody SingleCaseSearchRequestAsList searchBody, @RequestParam(defaultValue = "OR") MergeFilterOperation operation, Authentication auth) {
+        long count = elasticCaseService.count(searchBody.getList(), (LoggedUser) auth.getPrincipal(), operation == MergeFilterOperation.AND);
         return CountResponse.caseCount(count);
     }
 
