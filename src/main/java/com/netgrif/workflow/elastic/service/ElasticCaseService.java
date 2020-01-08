@@ -306,8 +306,10 @@ public class ElasticCaseService implements IElasticCaseService {
 
         BoolQueryBuilder dataQuery = boolQuery();
         for (Map.Entry<String, String> field : request.data.entrySet()) {
-            // TODO query generation with fulltext fallback
-            dataQuery.must(termQuery("dataSet." + field.getKey() + ".value.keyword", field.getValue()));
+            if(field.getKey().contains("."))
+                dataQuery.must(termQuery("dataSet." + field.getKey(), field.getValue()));
+            else
+                dataQuery.must(termQuery("dataSet." + field.getKey() + ".fulltextValue.keyword", field.getValue()));
         }
 
         query.filter(dataQuery);
