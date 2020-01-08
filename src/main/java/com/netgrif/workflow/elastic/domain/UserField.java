@@ -17,19 +17,19 @@ import static org.springframework.data.elasticsearch.annotations.FieldType.Text;
 public class UserField extends DataField {
 
     @Field(type = Text)
-    private String email;
+    private String emailValue;
 
     @Field(type = Text)
-    private String fullName;
+    private String fullNameValue;
 
     @Field(type = FieldType.Long)
-    private Long userId;
+    private Long userIdValue;
 
     public UserField(long userId, String email, String fullName) {
         super(String.format("%s %s", fullName, email));
-        this.email = email;
-        this.fullName = fullName;
-        this.userId = userId;
+        this.emailValue = email;
+        this.fullNameValue = fullName;
+        this.userIdValue = userId;
     }
 }
 
