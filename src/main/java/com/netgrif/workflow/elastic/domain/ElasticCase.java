@@ -140,10 +140,12 @@ public class ElasticCase {
         } else if (dataField.getValue() instanceof LocalDateTime) {
             return parseDateField((LocalDateTime) dataField.getValue());
         } else if (dataField.getValue() instanceof Date) {
-            LocalDateTime date = ((Date)dataField.getValue()).toInstant()
+            LocalDateTime date = ((Date) dataField.getValue()).toInstant()
                     .atZone(ZoneId.systemDefault())
                     .toLocalDateTime();
             return parseDateField(date);
+        } else if (dataField.getValue() instanceof Boolean) {
+            return Optional.of(new BooleanField((Boolean) dataField.getValue()));
         } else {
             if (dataField.getValue() == null)
                 return Optional.empty();
