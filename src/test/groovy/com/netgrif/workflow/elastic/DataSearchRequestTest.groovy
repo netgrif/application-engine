@@ -6,7 +6,7 @@ import com.netgrif.workflow.elastic.domain.ElasticCase
 import com.netgrif.workflow.elastic.domain.ElasticCaseRepository
 import com.netgrif.workflow.elastic.domain.ElasticTask
 import com.netgrif.workflow.elastic.service.interfaces.IElasticCaseService
-import com.netgrif.workflow.elastic.web.CaseSearchRequest
+import com.netgrif.workflow.elastic.web.requestbodies.CaseSearchRequest
 import com.netgrif.workflow.importer.service.Config
 import com.netgrif.workflow.importer.service.Importer
 import com.netgrif.workflow.startup.ImportHelper
@@ -129,7 +129,7 @@ class DataSearchRequestTest {
 
             log.info(String.format("Testing %s", searchRequest.getKey()))
 
-            Page<Case> result = searchService.search(request, mockService.mockLoggedUser(), PageRequest.of(0, 100))
+            Page<Case> result = searchService.search([request] as List, mockService.mockLoggedUser(), PageRequest.of(0, 100), false)
             assert result.size() == 1
         }
     }
