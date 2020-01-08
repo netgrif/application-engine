@@ -1,4 +1,4 @@
-package com.netgrif.workflow.elastic.web;
+package com.netgrif.workflow.elastic.web.requestbodies;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
