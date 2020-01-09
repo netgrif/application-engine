@@ -28,13 +28,6 @@ class FinisherRunner extends AbstractOrderedCommandLineRunner {
 
     @Override
     void run(String... strings) throws Exception {
-        def net = helper.createNet("all_data.xml", "All", "All data", "All", "major")
-        assert net.isPresent()
-
-        10.times { index ->
-            helper.createCase("Case $index" as String, net.get())
-        }
-
         log.info("+----------------------------+")
         log.info("| Netgrif Application Engine |")
         log.info("+----------------------------+")
