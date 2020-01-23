@@ -55,11 +55,18 @@ public final class FieldFactory {
                 field = buildFileField(data, importer);
                 break;
             case ENUMERATION:
-                field = buildEnumerationFieldTest(data.getOptions(),data.getInit(), importer);
-//                field = buildEnumerationField(data.getValues(), data.getInit(), importer);
+                if (data.getOptions() != null) {
+                    field = buildEnumerationField(data.getOptions(), data.getInit(), importer);
+                } else {
+                    field = buildEnumerationField(data.getValues(), data.getInit(), importer);
+                }
                 break;
             case MULTICHOICE:
-                field = buildMultichoiceField(data.getValues(), data.getInit(), importer);
+                if (data.getOptions() != null) {
+                    field = buildMultichoiceField(data.getOptions(), data.getInit(), importer);
+                } else {
+                    field = buildMultichoiceField(data.getValues(), data.getInit(), importer);
+                }
                 break;
             case NUMBER:
                 field = new NumberField();
@@ -111,30 +118,40 @@ public final class FieldFactory {
         return field;
     }
 
-    private MultichoiceField buildMultichoiceField(List<I18NStringType> values, String init, Importer importer) {
-        List<I18nString> choices = values.stream()
-                .map(importer::toI18NString)
-                .collect(Collectors.toList());
+    private MultichoiceField buildMultichoiceField(Options options, String init, Importer importer) {
+        Map<String, I18nString> choices = options.getOption().stream()
+                .collect(Collectors.toMap(Options.Option::getKey, value -> new I18nString(value.getValue())));
+
         MultichoiceField field = new MultichoiceField(choices);
         field.setDefaultValue(init);
 
         return field;
     }
 
-//    private EnumerationField buildEnumerationField(List<I18NStringType> values, String init, Importer importer) {
-//        List<I18nString> choices = values.stream()
-//                .map(importer::toI18NString)
-//                .collect(Collectors.toList());
-//
-//        EnumerationField field = new EnumerationField(choices);
-//        field.setDefaultValue(init);
-//
-//        return field;
-//    }
+    private MultichoiceField buildMultichoiceField(List<I18NStringType> values, String init, Importer importer) {
+        Map<String, I18nString> choices = values.stream()
+                .map(importer::toI18NString)
+                .collect(Collectors.toMap(I18nString::toString, it -> it));
+        MultichoiceField field = new MultichoiceField(choices);
+        field.setDefaultValue(init);
 
-    private EnumerationField buildEnumerationFieldTest(Options options, String init, Importer importer) {
-        Map<String, I18nString> choices = options.getEntry().stream()
-                .collect(Collectors.toMap(Options.Entry::getKey, value -> new I18nString(value.getValue())));
+        return field;
+    }
+
+    private EnumerationField buildEnumerationField(Options options, String init, Importer importer) {
+        Map<String, I18nString> choices = options.getOption().stream()
+                .collect(Collectors.toMap(Options.Option::getKey, value -> new I18nString(value.getValue())));
+
+        EnumerationField field = new EnumerationField(choices);
+        field.setDefaultValue(init);
+
+        return field;
+    }
+
+    private EnumerationField buildEnumerationField(List<I18NStringType> values, String init, Importer importer) {
+        Map<String, I18nString> choices = values.stream()
+                .map(importer::toI18NString)
+                .collect(Collectors.toMap(I18nString::toString, it -> it));
 
         EnumerationField field = new EnumerationField(choices);
         field.setDefaultValue(init);
