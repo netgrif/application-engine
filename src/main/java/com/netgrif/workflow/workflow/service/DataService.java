@@ -360,7 +360,7 @@ public class DataService implements IDataService {
                     value = null;
                     break;
                 }
-                value = new I18nString(val);
+                value = val;
                 break;
             case "user":
                 if (node.get("value") == null) {

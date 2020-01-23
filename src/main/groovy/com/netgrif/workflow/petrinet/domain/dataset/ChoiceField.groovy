@@ -25,10 +25,18 @@ abstract class ChoiceField<T> extends FieldWithDefault<T> {
         this.choices = choices
     }
 
+    void setChoices(Collection<I18nString> choices) {
+        this.choices.clear()
+        choices.each { this.choices.put(it.defaultValue, it) }
+    }
+
+    void setChoicesFromStrings(Map<String, String> choices) {
+        choices.each { it.value = new I18nString(it.value) }
+        this.choices = choices
+    }
+
     void setChoicesFromStrings(Collection<String> choices) {
-        this.choices = new LinkedHashSet<>()
-        choices.each {
-            this.choices.add(new I18nString(it))
-        }
+        this.choices.clear()
+        choices.each { this.choices.put(it, new I18nString(it)) }
     }
 }
