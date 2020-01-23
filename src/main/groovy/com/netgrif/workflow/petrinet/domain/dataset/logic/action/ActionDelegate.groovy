@@ -1,6 +1,6 @@
 package com.netgrif.workflow.petrinet.domain.dataset.logic.action
 
-import  com.netgrif.workflow.*
+import com.netgrif.workflow.*
 import com.netgrif.workflow.AsyncRunner
 import com.netgrif.workflow.auth.domain.User
 import com.netgrif.workflow.auth.service.interfaces.IUserService
@@ -141,8 +141,7 @@ class ActionDelegate {
      *     text: f.textId,
      *     transition: t.transitionId;
      *
-     *     make text,visible on transition when { condition.value == true }
-     * </pre>
+     *     make text,visible on transition when { condition.value == true }* </pre>
      * This code will change the field <i>text</i> behaviour to <i>visible</i> when fields <i>condition</i> value is equal to <i>true</i>
      * @param field which behaviour will be changed
      * @param behavior one of visible, editable, required, optional, hidden, forbidden
@@ -174,7 +173,9 @@ class ActionDelegate {
         if (!changedFields.containsKey(field.stringId)) {
             changedFields[field.stringId] = new ChangedField(field.stringId)
         }
-        changedFields[field.stringId].addAttribute("choices", field.choices.collect { it.getTranslation(LocaleContextHolder.locale) })
+        changedFields[field.stringId].addAttribute("choices", field.choices.collect {
+            it.value.getTranslation(LocaleContextHolder.locale)
+        })
     }
 
     def close = { Transition[] transitions ->
@@ -214,7 +215,7 @@ class ActionDelegate {
         QTask qTask = new QTask("task")
         Task task = taskService.searchOne(qTask.transitionId.eq(transitionId).and(qTask.caseId.eq(useCase.stringId)))
         taskService.assignTask(task.stringId)
-        dataService.setData(task.stringId, ImportHelper.populateDataset(dataSet as Map<String, Map<String,String>>))
+        dataService.setData(task.stringId, ImportHelper.populateDataset(dataSet as Map<String, Map<String, String>>))
         taskService.finishTask(task.stringId)
     }
 
@@ -231,7 +232,7 @@ class ActionDelegate {
             changeFieldValue(field, cl)
         },
          value  : { cl ->
-            changeFieldValue(field, cl)
+             changeFieldValue(field, cl)
          },
          choices: { cl ->
              if (!(field instanceof MultichoiceField || field instanceof EnumerationField))
@@ -240,13 +241,21 @@ class ActionDelegate {
              def values = cl()
              if (values == null || (values instanceof Closure && values() == UNCHANGED_VALUE))
                  return
-             if (!(values instanceof Collection))
+             if (!(values instanceof Collection) && !(values instanceof Map))
                  values = [values]
              field = (ChoiceField) field
-             if (values.every { it instanceof I18nString }) {
-                 field.setChoices(values as Set<I18nString>)
+             if (values instanceof Map) {
+                 if (values.every { it.value instanceof I18nString }) {
+                     field.setChoices(values as Map<String, I18nString>)
+                 } else {
+                     field.setChoicesFromStrings(values as Map<String, String>)
+                 }
              } else {
-                 field.setChoicesFromStrings(values as Set<String>)
+                 if (values.every { it instanceof I18nString }) {
+                     field.setChoices(values as Set<I18nString>)
+                 } else {
+                     field.setChoicesFromStrings(values as Set<String>)
+                 }
              }
              saveChangedChoices(field)
          }]
@@ -511,5 +520,17 @@ class ActionDelegate {
 
     User loggedUser() {
         return userService.loggedUser
+    }
+
+    void test(def enu) {
+        List<I18nString> testCollection = [new I18nString("str1"), new I18nString("str1")]
+        change useCase.getField("test_enum") choices {
+            return testCollection
+        }
+        Map<String, I18nString> testMap = ["id1": new I18nString("value1"), "id2": new I18nString("value2")]
+        change useCase.getField("test_enum") choices {
+            return testMap
+        }
+        print("weq")
     }
 }
