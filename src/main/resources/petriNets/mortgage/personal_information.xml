@@ -13,18 +13,30 @@
     <data type="text">
         <id>surname</id>
         <title name="surname">Surname</title>
-        <placeholder>Your surname</placeholder>
-        <desc>Your second name</desc>
+        <placeholder name="surname_placeholder">Your surname</placeholder>
+        <desc name="surname_desc">Your second name</desc>
     </data>
     <data type="date">
         <id>date_of_birth</id>
-        <title>Date of Birth</title>
+        <title name="date_of_birth">Date of Birth</title>
     </data>
+
+    <i18n locale="sk">
+        <i18nString name="first_name">Meno</i18nString>
+        <i18nString name="fn_placeholder">Vaše meno</i18nString>
+        <i18nString name="fn_desc">Napíšte krstné meno</i18nString>
+        <i18nString name="surname">Priezvisko</i18nString>
+        <i18nString name="surname_placeholder">Vaše priezvisko</i18nString>
+        <i18nString name="surname_desc">Napíšte priezvisko</i18nString>
+        <i18nString name="date_of_birth">Dátum narodenia</i18nString>
+        <i18nString name="personal_information">Osobné údaje</i18nString>
+    </i18n>
+
     <transition>
         <id>personal_information</id>
         <x>50</x>
         <y>50</y>
-        <label>Personal information</label>
+        <label name="personal_information">Personal information</label>
         <dataRef>
             <id>first_name</id>
             <logic>

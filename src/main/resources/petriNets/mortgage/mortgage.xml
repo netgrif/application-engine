@@ -84,6 +84,10 @@
 		<i18nString name="fn_placeholder">Vaše meno</i18nString>
 		<i18nString name="fn_desc">Napíšte krstné meno</i18nString>
 		<i18nString name="surname">Priezvisko</i18nString>
+        <i18nString name="dg_personal_information">Osobné údaje</i18nString>
+        <i18nString name="dg_address">Adresa a typ nehnuteľnosti</i18nString>
+        <i18nString name="dg_financial_data">Finančné údaje</i18nString>
+        <i18nString name="task_apply_for_mortgage">Požiadať o hypotéku / Klient</i18nString>
 	</i18n>
 	<i18n locale="en">
 		<i18nString name="first_name">Name</i18nString>
@@ -96,7 +100,7 @@
         <id>1</id>
         <x>140</x>
         <y>140</y>
-        <label>Apply for mortgage / Client</label>
+        <label name="task_apply_for_mortgage">Apply for mortgage / Client</label>
         <assignPolicy>auto</assignPolicy>
         <roleRef>
             <id>client</id>
@@ -106,7 +110,7 @@
         </roleRef>
         <dataGroup>
             <id>1</id>
-            <title>Personal information</title>
+            <title name="dg_personal_information">Personal information</title>
             <dataRef>
                 <id>personal_information</id>
                 <logic>
@@ -117,7 +121,7 @@
         </dataGroup>
         <dataGroup>
             <id>2</id>
-            <title>Address and type of mortgage</title>
+            <title name="dg_address">Address and type of mortgage</title>
             <dataRef>
                 <id>address_and_mortgage</id>
                 <logic>
@@ -128,7 +132,7 @@
         </dataGroup>
         <dataGroup>
             <id>Finance data</id>
-            <title>Financial data</title>
+            <title name="dg_financial_data">Financial data</title>
             <dataRef>
                 <id>financial_data</id>
                 <logic>

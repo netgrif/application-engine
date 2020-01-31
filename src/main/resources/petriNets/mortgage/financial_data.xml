@@ -2,13 +2,13 @@
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../petriflow_schema.xsd">
     <data type="number">
         <id>income</id>
-        <title>Monthly Income in EUR</title>
-        <desc>Your average monthly income</desc>
+        <title name="income_title">Monthly Income in EUR</title>
+        <desc name="income_desc">Your average monthly income</desc>
         <valid>inrange 300,100000</valid>
     </data>
     <data type="number">
         <id>loan_amount</id>
-        <title>Loan amount in EUR</title>
+        <title name="loan_amount_tite">Loan amount in EUR</title>
         <valid>inrange 10000,1000000</valid>
         <init>100000</init>
         <action trigger="set">
@@ -20,7 +20,7 @@
     </data>
     <data type="number">
         <id>period</id>
-        <title>Repayment period in years</title>
+        <title name="period_title">Repayment period in years</title>
         <valid>inrange 1,30</valid>
         <init>30</init>
         <action trigger="set">
@@ -32,7 +32,7 @@
     </data>
     <data type="number">
         <id>monthly_payment</id>
-        <title>Monthly payment in EUR</title>
+        <title name="monthly_payment_title">Monthly payment in EUR</title>
         <init>444.44</init>
     </data>
     <data type="boolean">
@@ -47,11 +47,21 @@
             }
         </action>
     </data>
+
+    <i18n locale="sk">
+        <i18nString name="income_title">Mesačný príjem v EUR</i18nString>
+        <i18nString name="income_desc">Zadajte priemerný mesačný príjem</i18nString>
+        <i18nString name="loan_amount_tite">Výška hypotéky v EUR</i18nString>
+        <i18nString name="period_title">Doba splácania v rokoch</i18nString>
+        <i18nString name="monthly_payment_title">Výška mesačnej splátky v EUR </i18nString>
+        <i18nString name="financial_data">Finančné údaje</i18nString>
+    </i18n>
+
     <transition>
         <id>financial_data</id>
         <x>50</x>
         <y>50</y>
-        <label>Financial data</label>
+        <label name="financial_data">Financial data</label>
         <dataRef>
             <id>income</id>
             <logic>
