@@ -2,34 +2,48 @@
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../petriflow_schema.xsd">
     <data type="text">
         <id>street</id>
-        <title>Street</title>
+        <title name="street_title">Street</title>
     </data>
     <data type="text">
         <id>streetnumber</id>
-        <title>Street Number</title>
+        <title name="streetnumber_title">Street Number</title>
     </data>
     <data type="text">
         <id>postal</id>
-        <title>Postal code</title>
+        <title name="postal_title">Postal code</title>
     </data>
     <data type="enumeration">
         <id>city</id>
-        <title>City</title>
+        <title name="city_title">City</title>
     </data>
     <data type="enumeration">
         <id>type</id>
-        <title>Property</title>
-        <values>House</values>
-        <values>Flat</values>
-        <values>Apartment</values>
-        <values>Cottage</values>
+        <title name="type_title">Property</title>
+        <values name="type_value_house">House</values>
+        <values name="type_value_flat">Flat</values>
+        <values name="type_value_apartment">Apartment</values>
+        <values name="type_value_cottage">Cottage</values>
         <init>House</init>
     </data>
+
+    <i18n locale="sk">
+        <i18nString name="street_title">Ulica</i18nString>
+        <i18nString name="streetnumber_title">Číslo domu</i18nString>
+        <i18nString name="postal_title">PSČ</i18nString>
+        <i18nString name="city_title">Obec</i18nString>
+        <i18nString name="type_title">Typ nehnuteľnosti</i18nString>
+        <i18nString name="type_value_house">Dom</i18nString>
+        <i18nString name="type_value_flat">Byt</i18nString>
+        <i18nString name="type_value_apartment">Apartmán</i18nString>
+        <i18nString name="type_value_cottage">Chata</i18nString>
+        <i18nString name="address_and_mortgage">Adresa a typ nehnuteľnosti</i18nString>
+    </i18n>
+
     <transition>
         <id>address_and_mortgage</id>
         <x>50</x>
         <y>50</y>
-        <label>Address and type of mortgage</label>
+        <label name="address_and_mortgage">Address and type of mortgage</label>
         <dataRef>
             <id>street</id>
             <logic>
