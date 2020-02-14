@@ -23,6 +23,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
 import org.springframework.data.elasticsearch.core.query.SearchQuery;
+import org.springframework.data.rest.core.mapping.RepositoryResourceMappings;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -36,25 +37,18 @@ public class ElasticCaseService implements IElasticCaseService {
 
     private static final Logger log = LoggerFactory.getLogger(ElasticCaseService.class);
 
-    @Autowired
     private ElasticCaseRepository repository;
-
-    public IWorkflowService getWorkflowService() {
-        return workflowService;
-    }
-
-    @Autowired
-    public void setWorkflowService(IWorkflowService workflowService) {
-        this.workflowService = workflowService;
-    }
-
     private IWorkflowService workflowService;
-
-    @Autowired
     private ElasticsearchTemplate template;
+    private Executor executors;
 
     @Autowired
-    private Executor executors;
+    public ElasticCaseService(ElasticCaseRepository repository, IWorkflowService workflowService, ElasticsearchTemplate template, Executor executors) {
+        this.repository = repository;
+        this.workflowService = workflowService;
+        this.template = template;
+        this.executors = executors;
+    }
 
     private Map<String, Float> fullTextFieldMap = ImmutableMap.of(
             "title", 2f,
