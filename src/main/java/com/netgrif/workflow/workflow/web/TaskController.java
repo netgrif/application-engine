@@ -64,7 +64,7 @@ public class TaskController {
     private IElasticTaskService searchService;
 
     @Autowired
-	private IUserService userService;
+    private IUserService userService;
 
     @Autowired
     private ITaskAuthenticationService taskAuthenticationService;
@@ -109,14 +109,13 @@ public class TaskController {
     public MessageResource assign(Authentication auth, @PathVariable("id") String taskId) throws UnauthorisedRequestException {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
 
-        if( !loggedUser.isAdmin() && !taskAuthenticationService.userHasAtLeastOneRolePermission(loggedUser, taskId, RolePermission.PERFORM))
-            throw new UnauthorisedRequestException("User " + loggedUser.getUsername() + " doesn't have permission to assign task " + taskId);
+        taskAuthenticationService.checkAssign(loggedUser, taskId);
 
         try {
             taskService.assignTask(loggedUser, taskId);
             return MessageResource.successMessage("LocalisedTask " + taskId + " assigned to " + loggedUser.getFullName());
         } catch (TransitionNotExecutableException e) {
-            log.error("Assigning task ["+taskId+"] failed: ", e);
+            log.error("Assigning task [" + taskId + "] failed: ", e);
             return MessageResource.errorMessage("LocalisedTask " + taskId + " cannot be assigned");
         }
     }
@@ -125,14 +124,13 @@ public class TaskController {
     public MessageResource delegate(Authentication auth, @PathVariable("id") String taskId, @RequestBody Long delegatedId) throws UnauthorisedRequestException {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
 
-        if( !loggedUser.isAdmin() && !taskAuthenticationService.userHasAtLeastOneRolePermission(loggedUser, taskId, RolePermission.PERFORM, RolePermission.DELEGATE))
-            throw new UnauthorisedRequestException("User " + loggedUser.getUsername() + " doesn't have permission to delegate task " + taskId);
+        taskAuthenticationService.checkDelegate(loggedUser, taskId);
 
         try {
             taskService.delegateTask(loggedUser, delegatedId, taskId);
             return MessageResource.successMessage("LocalisedTask " + taskId + " assigned to [" + delegatedId + "]");
         } catch (Exception e) {
-            log.error("Delegating task ["+taskId+"] failed: ", e);
+            log.error("Delegating task [" + taskId + "] failed: ", e);
             return MessageResource.errorMessage("LocalisedTask " + taskId + " cannot be assigned");
         }
     }
@@ -141,18 +139,13 @@ public class TaskController {
     public MessageResource finish(Authentication auth, @PathVariable("id") String taskId) throws UnauthorisedRequestException {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
 
-        if(	!loggedUser.isAdmin()
-			&& !(
-				taskAuthenticationService.userHasAtLeastOneRolePermission(loggedUser, taskId, RolePermission.PERFORM)
-				&& taskAuthenticationService.isAssignee(loggedUser, taskId)
-			))
-            throw new UnauthorisedRequestException("User " + loggedUser.getUsername() + " doesn't have permission to finish task " + taskId);
+        taskAuthenticationService.checkFinish(loggedUser, taskId);
 
         try {
             taskService.finishTask(loggedUser, taskId);
             return MessageResource.successMessage("LocalisedTask " + taskId + " finished");
         } catch (Exception e) {
-            log.error("Finishing task ["+taskId+"] failed: ", e);
+            log.error("Finishing task [" + taskId + "] failed: ", e);
             return MessageResource.errorMessage(e.getMessage());
         }
     }
@@ -161,18 +154,13 @@ public class TaskController {
     public MessageResource cancel(Authentication auth, @PathVariable("id") String taskId) throws UnauthorisedRequestException {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
 
-		if(	!loggedUser.isAdmin()
-			&& !(
-				taskAuthenticationService.userHasAtLeastOneRolePermission(loggedUser, taskId, RolePermission.PERFORM, RolePermission.CANCEL)
-				&& taskAuthenticationService.isAssignee(loggedUser, taskId)
-			))
-            throw new UnauthorisedRequestException("User " + loggedUser.getUsername() + " doesn't have permission to cancel task " + taskId);
+        taskAuthenticationService.checkCancel(loggedUser, taskId);
 
         try {
             taskService.cancelTask(loggedUser, taskId);
             return MessageResource.successMessage("LocalisedTask " + taskId + " canceled");
         } catch (Exception e) {
-            log.error("Canceling task ["+taskId+"] failed: ", e);
+            log.error("Canceling task [" + taskId + "] failed: ", e);
             return MessageResource.errorMessage(e.getMessage());
         }
     }
@@ -231,7 +219,7 @@ public class TaskController {
 
     @PostMapping(value = "/count", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public CountResponse count(@RequestBody TaskSearchRequest query, Authentication auth, Locale locale) {
-        long count = searchService.count(query, (LoggedUser)auth.getPrincipal());
+        long count = searchService.count(query, (LoggedUser) auth.getPrincipal());
         return CountResponse.taskCount(count);
     }
 
@@ -247,22 +235,21 @@ public class TaskController {
     }
 
     @RequestMapping(value = "/{id}/data", method = RequestMethod.POST)
-    public ChangedFieldContainer saveData(@PathVariable("id") String taskId, @RequestBody ObjectNode dataBody) throws UnauthorisedRequestException {
-    	User logged = userService.getLoggedUser();
-    	if( !logged.transformToLoggedUser().isAdmin() && !taskAuthenticationService.isAssignee(logged, taskId))
-    		throw new UnauthorisedRequestException("User " + logged.transformToLoggedUser().getUsername() + " doesn't have permission to save data in task " + taskId);
+    public ChangedFieldContainer saveData(Authentication auth, @PathVariable("id") String taskId, @RequestBody ObjectNode dataBody) throws UnauthorisedRequestException {
+        LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
+
+        taskAuthenticationService.checkSaveData(loggedUser, taskId);
 
         return dataService.setData(taskId, dataBody);
     }
 
     @RequestMapping(value = "/{id}/file/{field}", method = RequestMethod.POST)
-    public ChangedFieldByFileFieldContainer saveFile(@PathVariable("id") String taskId, @PathVariable("field") String fieldId,
-                                                     @RequestParam(value = "file") MultipartFile multipartFile) throws UnauthorisedRequestException {
-		User logged = userService.getLoggedUser();
-		if( !logged.transformToLoggedUser().isAdmin() && !taskAuthenticationService.isAssignee(logged, taskId))
-			throw new UnauthorisedRequestException("User " + logged.transformToLoggedUser().getUsername() + " doesn't have permission to save file in task " + taskId);
+    public ChangedFieldByFileFieldContainer saveFile(Authentication auth, @PathVariable("id") String taskId, @PathVariable("field") String fieldId, @RequestParam(value = "file") MultipartFile multipartFile) throws UnauthorisedRequestException {
+        LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
 
-		return dataService.saveFile(taskId, fieldId, multipartFile);
+		taskAuthenticationService.checkSaveFile(loggedUser, taskId);
+
+        return dataService.saveFile(taskId, fieldId, multipartFile);
     }
 
     @RequestMapping(value = "/{id}/file/{field}", method = RequestMethod.GET, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
