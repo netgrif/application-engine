@@ -459,6 +459,7 @@
             <xs:element name="area" type="xs:string"/>
             <xs:element name="autocomplete" type="xs:string"/>
             <xs:element name="tree" type="xs:string"/>
+            <xs:element name="table" type="xs:string"/>
             <xs:element name="image" type="booleanImageView"/>
             <xs:element name="editor"/>
             <xs:element name="list">
