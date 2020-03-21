@@ -1,10 +1,19 @@
 package com.netgrif.workflow.petrinet.domain.dataset.logic
 
+import com.querydsl.core.annotations.PropertyType
+import com.querydsl.core.annotations.QueryType
+
 class FieldLayout {
     private Integer x
     private Integer y
     private Integer rows
     private Integer cols
+
+    @Override
+    @QueryType(PropertyType.NONE)
+    MetaClass getMetaClass() {
+        return this.metaClass
+    }
 
     FieldLayout() {
     }
