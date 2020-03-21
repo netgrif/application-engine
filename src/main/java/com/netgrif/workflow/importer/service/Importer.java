@@ -406,6 +406,9 @@ public class Importer {
     protected void addDataWithDefaultGroup(Transition transition, DataRef dataRef) {
         DataGroup dataGroup = new DataGroup();
         dataGroup.setImportId(transition.getImportId() + "_" + dataRef.getId() + "_" + System.currentTimeMillis());
+        if (transition.getCols() != null) {
+            dataGroup.setCols(transition.getCols());
+        }
         dataGroup.setAlignment("start");
         dataGroup.setStretch(true);
         dataGroup.addData(getField(dataRef.getId()).getStringId());
@@ -420,6 +423,11 @@ public class Importer {
         String alignment = importDataGroup.getAlignment() != null ? importDataGroup.getAlignment().value() : "";
         DataGroup dataGroup = new DataGroup();
         dataGroup.setImportId(importDataGroup.getId());
+        if (importDataGroup.getCols() != null) {
+            dataGroup.setCols((int) importDataGroup.getCols());
+        } else if (transition.getCols() != null) {
+            dataGroup.setCols(transition.getCols());
+        }
         dataGroup.setTitle(toI18NString(importDataGroup.getTitle()));
         dataGroup.setAlignment(alignment);
         dataGroup.setStretch(importDataGroup.isStretch());

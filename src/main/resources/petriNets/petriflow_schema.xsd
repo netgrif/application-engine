@@ -357,6 +357,7 @@
         <xs:complexType>
             <xs:sequence>
                 <xs:element ref="id"/>
+                <xs:element ref="cols" minOccurs="0"/>
                 <xs:element ref="title" minOccurs="0"/>
                 <xs:element ref="alignment" minOccurs="0"/>
                 <xs:element ref="stretch" minOccurs="0"/>
