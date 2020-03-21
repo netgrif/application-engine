@@ -11,6 +11,7 @@ import com.netgrif.workflow.petrinet.domain.*;
 import com.netgrif.workflow.petrinet.domain.arcs.Arc;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.FieldBehavior;
+import com.netgrif.workflow.petrinet.domain.dataset.logic.FieldLayout;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.FieldActionsRunner;
 import com.netgrif.workflow.petrinet.domain.policies.AssignPolicy;
@@ -303,6 +304,9 @@ public class Importer {
         transition.setImportId(importTransition.getId());
         transition.setTitle(toI18NString(importTransition.getLabel()));
         transition.setPosition(importTransition.getX(), importTransition.getY());
+        if (importTransition.getCols() != null) {
+            transition.setCols((int) importTransition.getCols());
+        }
         transition.setPriority(importTransition.getPriority());
         transition.setIcon(importTransition.getIcon());
         transition.setAssignPolicy(toAssignPolicy(importTransition.getAssignPolicy()));
@@ -408,6 +412,7 @@ public class Importer {
         transition.addDataGroup(dataGroup);
 
         addDataLogic(transition, dataRef);
+        addDataLayout(transition, dataRef);
     }
 
     @Transactional
@@ -423,6 +428,7 @@ public class Importer {
 
         for (DataRef dataRef : importDataGroup.getDataRef()) {
             addDataLogic(transition, dataRef);
+            addDataLayout(transition, dataRef);
         }
     }
 
@@ -461,7 +467,23 @@ public class Importer {
                 logic.getBehavior().forEach(b -> behavior.add(FieldBehavior.fromString(b)));
             }
 
-            transition.addDataSet(fieldId, behavior, null);
+            transition.addDataSet(fieldId, behavior, null, null);
+        } catch (NullPointerException e) {
+            throw new IllegalArgumentException("Wrong dataRef id [" + dataRef.getId() + "] on transition [" + transition.getTitle() + "]", e);
+        }
+    }
+
+    @Transactional
+    protected void addDataLayout(Transition transition, DataRef dataRef) {
+        Layout layout = dataRef.getLayout();
+        try {
+            String fieldId = getField(dataRef.getId()).getStringId();
+            if (layout == null || fieldId == null) {
+                return;
+            }
+
+            FieldLayout fieldLayout = new FieldLayout((int) layout.getX(), (int) layout.getY(), (int) layout.getRows(), (int) layout.getCols());
+            transition.addDataSet(fieldId, null, null, fieldLayout);
         } catch (NullPointerException e) {
             throw new IllegalArgumentException("Wrong dataRef id [" + dataRef.getId() + "] on transition [" + transition.getTitle() + "]", e);
         }
