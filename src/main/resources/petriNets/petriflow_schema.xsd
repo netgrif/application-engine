@@ -68,6 +68,7 @@
                 <xs:element ref="x"/>
                 <xs:element ref="y"/>
                 <xs:element ref="label"/>
+                <xs:element ref="cols" minOccurs="0"/>
                 <xs:element ref="icon" minOccurs="0"/>
                 <xs:element ref="priority" minOccurs="0"/>
                 <xs:element ref="assignPolicy" minOccurs="0"/>
@@ -260,6 +261,8 @@
     <!-- ===== INNER ELEMENTS ===== -->
     <xs:element name="x" type="xs:short"/>
     <xs:element name="y" type="xs:short"/>
+    <xs:element name="cols" type="xs:short"/>
+    <xs:element name="rows" type="xs:short"/>
     <xs:element name="label" type="i18nStringType"/>
     <xs:element name="tokens" type="nonNegativeInteger"/>
     <xs:element name="isStatic" type="xs:boolean"/>
@@ -336,6 +339,17 @@
             <xs:sequence>
                 <xs:element ref="id"/>
                 <xs:element ref="logic"/>
+                <xs:element ref="layout" minOccurs="0"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="layout">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="x"/>
+                <xs:element ref="y"/>
+                <xs:element ref="rows"/>
+                <xs:element ref="cols"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>

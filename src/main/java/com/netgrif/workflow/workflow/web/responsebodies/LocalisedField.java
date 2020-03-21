@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.netgrif.workflow.petrinet.domain.Format;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.petrinet.domain.dataset.FieldType;
+import com.netgrif.workflow.petrinet.domain.dataset.logic.FieldLayout;
 import com.netgrif.workflow.petrinet.domain.views.View;
 import lombok.Data;
 
@@ -23,6 +24,8 @@ public class LocalisedField {
     private String placeholder;
 
     private ObjectNode behavior;
+
+    private FieldLayout layout;
 
     private Object value;
 
@@ -44,6 +47,7 @@ public class LocalisedField {
         description = field.getTranslatedDescription(locale);
         placeholder = field.getTranslatedPlaceholder(locale);
         behavior = field.getBehavior();
+        layout = field.getLayout();
         value = field.getValue();
         order = field.getOrder();
         formatFilter = field.getFormat();
