@@ -85,7 +85,7 @@ public class DataFieldLogic {
         return behavior.contains(FieldBehavior.FORBIDDEN);
     }
 
-    public boolean isLayoutExist() {
+    public boolean layoutExist() {
         return this.layout.getX() != null && this.layout.getY() != null && this.layout.getRows() != null && this.layout.getCols() != null;
     }
 }
