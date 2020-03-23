@@ -86,6 +86,6 @@ public class DataFieldLogic {
     }
 
     public boolean layoutExist() {
-        return this.layout.getX() != null && this.layout.getY() != null && this.layout.getRows() != null && this.layout.getCols() != null;
+        return this.layout != null;
     }
 }
