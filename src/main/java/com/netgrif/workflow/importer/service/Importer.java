@@ -305,7 +305,7 @@ public class Importer {
         transition.setTitle(toI18NString(importTransition.getLabel()));
         transition.setPosition(importTransition.getX(), importTransition.getY());
         if (importTransition.getCols() != null) {
-            transition.setCols((int) importTransition.getCols());
+            transition.setCols(importTransition.getCols());
         }
         transition.setPriority(importTransition.getPriority());
         transition.setIcon(importTransition.getIcon());
@@ -424,7 +424,7 @@ public class Importer {
         DataGroup dataGroup = new DataGroup();
         dataGroup.setImportId(importDataGroup.getId());
         if (importDataGroup.getCols() != null) {
-            dataGroup.setCols((int) importDataGroup.getCols());
+            dataGroup.setCols(importDataGroup.getCols());
         } else if (transition.getCols() != null) {
             dataGroup.setCols(transition.getCols());
         }
@@ -490,7 +490,7 @@ public class Importer {
                 return;
             }
 
-            FieldLayout fieldLayout = new FieldLayout((int) layout.getX(), (int) layout.getY(), (int) layout.getRows(), (int) layout.getCols());
+            FieldLayout fieldLayout = new FieldLayout(layout.getX(),layout.getY(),layout.getRows(),layout.getCols());
             transition.addDataSet(fieldId, null, null, fieldLayout);
         } catch (NullPointerException e) {
             throw new IllegalArgumentException("Wrong dataRef id [" + dataRef.getId() + "] on transition [" + transition.getTitle() + "]", e);

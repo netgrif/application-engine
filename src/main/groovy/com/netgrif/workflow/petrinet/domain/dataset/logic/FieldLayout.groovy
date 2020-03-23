@@ -4,10 +4,10 @@ import com.querydsl.core.annotations.PropertyType
 import com.querydsl.core.annotations.QueryType
 
 class FieldLayout {
-    private Integer x
-    private Integer y
-    private Integer rows
-    private Integer cols
+    private int x
+    private int y
+    private int rows
+    private int cols
 
     @Override
     @QueryType(PropertyType.NONE)
@@ -18,42 +18,46 @@ class FieldLayout {
     FieldLayout() {
     }
 
-    FieldLayout(Integer x, Integer y, Integer rows, Integer cols) {
+    FieldLayout(int x, int y, int rows, int cols) {
         this.x = x
         this.y = y
         this.rows = rows
         this.cols = cols
     }
 
-    Integer getX() {
+    int getX() {
         return x
     }
 
-    void setX(Integer x) {
+    void setX(int x) {
         this.x = x
     }
 
-    Integer getY() {
+    int getY() {
         return y
     }
 
-    void setY(Integer y) {
+    void setY(int y) {
         this.y = y
     }
 
-    Integer getRows() {
+    int getRows() {
         return rows
     }
 
-    void setRows(Integer rows) {
+    void setRows(int rows) {
         this.rows = rows
     }
 
-    Integer getCols() {
+    int getCols() {
         return cols
     }
 
-    void setCols(Integer cols) {
+    void setCols(int cols) {
         this.cols = cols
+    }
+
+    boolean layoutFilled() {
+        return this.rows != 0 && this.cols != 0
     }
 }
