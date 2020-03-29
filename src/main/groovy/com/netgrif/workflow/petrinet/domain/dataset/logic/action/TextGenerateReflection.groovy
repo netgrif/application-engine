@@ -2,10 +2,14 @@ package com.netgrif.workflow.petrinet.domain.dataset.logic.action
 
 import com.netgrif.workflow.petrinet.domain.dataset.TextField
 import com.netgrif.workflow.workflow.domain.Case
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 import java.lang.reflect.Method
 
 class TextGenerateReflection {
+
+    public static final Logger log = LoggerFactory.getLogger(TextGenerateReflection)
 
     private static final String GENERATION_METHODS_PACKAGE = "com.netgrif.workflow.petrinet.domain.dataset.logic.action."
 
@@ -49,7 +53,7 @@ class TextGenerateReflection {
             return m.invoke(t)
 
         } catch (Exception e) {
-            e.printStackTrace()
+            log.error("Calling method failed: ", e)
             return null
         }
     }

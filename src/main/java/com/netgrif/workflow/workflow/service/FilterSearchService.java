@@ -1,44 +1,98 @@
 package com.netgrif.workflow.workflow.service;
 
+import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.workflow.domain.Filter;
+import com.netgrif.workflow.workflow.domain.QFilter;
+import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.Predicate;
+import com.querydsl.core.types.dsl.BooleanExpression;
+import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
-import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 public class FilterSearchService extends MongoSearchService<Filter> {
 
-    public String titleQuery(Object obj) {
-        Map<Class, Function<Object, String>> builder = new HashMap<>();
+    public static final String TITLE = "title";
+    public static final String VISIBILITY = "visibility";
+    public static final String AUTHOR = "author";
+    public static final String TYPE = "type";
+    public static final String FILTER_ID = "id";
 
-        builder.put(ArrayList.class, o -> in(((List<Object>) obj), ob -> "\"" + ob + "\"", null));
-        builder.put(String.class, o -> "\"" + o + "\"");
+    public Predicate buildQuery(Map<String, Object> request, LoggedUser user, Locale locale) {
+        BooleanBuilder builder = new BooleanBuilder();
 
-        return buildQueryPart("title.defaultValue", obj, builder);
+        if (request.containsKey(TITLE))
+            builder.and(title(request.get(TITLE)));
+        if (request.containsKey(VISIBILITY))
+            builder.and(visibility(request.get(VISIBILITY)));
+        if (request.containsKey(AUTHOR))
+            builder.and(author(request.get(AUTHOR)));
+        if (request.containsKey(TYPE))
+            builder.and(type(request.get(TYPE)));
+        if (request.containsKey(FILTER_ID))
+            builder.and(id(request.get(FILTER_ID)));
+
+        return builder;
     }
 
-    public String visibilityQuery(Object obj) {
-        Map<Class, Function<Object, String>> builder = new HashMap<>();
-
-        builder.put(Integer.class, MongoSearchService::lessThenOrEqual);
-        builder.put(Long.class, MongoSearchService::lessThenOrEqual);
-
-        return buildQueryPart("visibility", obj, builder);
+    public Predicate title(Object query) {
+        if (query instanceof String)
+            return titleString((String) query);
+        return null;
     }
 
-    public String authorQuery(Object obj) {
-        Map<Class, Function<Object, String>> builder = new HashMap<>();
+    private Predicate titleString(String query) {
+        return QFilter.filter.title.defaultValue.containsIgnoreCase(query);
+    }
 
-        builder.put(String.class, o -> "\"" + o + "\"");
-        builder.put(Long.class, Object::toString);
-        builder.put(Integer.class, Object::toString);
+    public Predicate visibility(Object query) {
+        if (query instanceof Integer)
+            return visibilityInteger((Integer) query);
+        return null;
+    }
 
-        if (obj instanceof String)
-            return buildQueryPart("author.email", obj, builder);
-        return buildQueryPart("author.id", obj, builder);
+    private Predicate visibilityInteger(Integer query) {
+        return QFilter.filter.visibility.eq(query);
+    }
+
+    public Predicate author(Object query) {
+        if (query instanceof Long)
+            return authorLong((Long) query);
+        return null;
+    }
+
+    private Predicate authorLong(Long query) {
+        return QFilter.filter.author.id.eq(query);
+    }
+
+    public Predicate type(Object query) {
+        if (query instanceof String)
+            return typeString((String) query);
+        return null;
+    }
+
+    private Predicate typeString(String query) {
+        return QFilter.filter.type.eq(query);
+    }
+
+    public Predicate id(Object query) {
+        if (query instanceof ArrayList) {
+            BooleanBuilder builder = new BooleanBuilder();
+            List<BooleanExpression> expressions = (List<BooleanExpression>) ((ArrayList) query).stream().filter(q -> q instanceof String).map(q -> idString((String) q)).collect(Collectors.toList());
+            expressions.forEach(builder::or);
+            return builder;
+        } else if (query instanceof String)
+            return idString((String) query);
+        return null;
+    }
+
+    private Predicate idString(String query) {
+        return QFilter.filter._id.eq(new ObjectId(query));
     }
 }

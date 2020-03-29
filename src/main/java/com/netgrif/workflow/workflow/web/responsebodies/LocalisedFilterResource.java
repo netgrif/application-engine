@@ -1,5 +1,6 @@
 package com.netgrif.workflow.workflow.web.responsebodies;
 
+import com.netgrif.workflow.auth.domain.throwable.UnauthorisedRequestException;
 import com.netgrif.workflow.workflow.web.FilterController;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.Resource;
@@ -16,7 +17,12 @@ public class LocalisedFilterResource extends Resource<Filter> {
     }
 
     private void buildLinks() {
-        add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(FilterController.class)
-                .deleteFilter(getContent().getStringId(),null)).withRel("delete"));
+        try {
+            add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(FilterController.class)
+                    .deleteFilter(getContent().getStringId(), null)).withRel("delete"));
+        }
+        catch (UnauthorisedRequestException e) {
+            e.printStackTrace();
+        }
     }
 }
