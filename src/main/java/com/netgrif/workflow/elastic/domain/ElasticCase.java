@@ -1,5 +1,6 @@
 package com.netgrif.workflow.elastic.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
@@ -11,12 +12,14 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Version;
 import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -33,6 +36,11 @@ public class ElasticCase {
     @Id
     private String id;
 
+    @Version
+    private Long version;
+
+    private Long lastModified;
+
     @Field(type = Keyword)
     private String stringId;
 
@@ -41,6 +49,9 @@ public class ElasticCase {
 
     @Field(type = Keyword)
     private String processIdentifier;
+
+    @Field(type = Keyword)
+    private String processId;
 
     private String title;
 
@@ -73,7 +84,9 @@ public class ElasticCase {
 
     public ElasticCase(Case useCase) {
         stringId = useCase.getStringId();
+        lastModified = Timestamp.valueOf(useCase.getLastModified()).getTime();
         processIdentifier = useCase.getProcessIdentifier();
+        processId = useCase.getPetriNetId();
         visualId = useCase.getVisualId();
         title = useCase.getTitle();
         titleSortable = useCase.getTitle();
@@ -96,6 +109,8 @@ public class ElasticCase {
     }
 
     public void update(ElasticCase useCase) {
+        version++;
+        lastModified = useCase.getLastModified();
         title = useCase.getTitle();
         titleSortable = useCase.getTitle();
         taskIds = useCase.getTaskIds();
@@ -126,6 +141,13 @@ public class ElasticCase {
             return Optional.of(new DataField(String.valueOf(date), date.format(DateTimeFormatter.BASIC_ISO_DATE)));
         } else if (dataField.getValue() instanceof LocalDateTime) {
             LocalDateTime date = (LocalDateTime) dataField.getValue();
+            if (date == null)
+                return Optional.empty();
+            return Optional.of(new DataField(String.valueOf(date), date.format(DateTimeFormatter.BASIC_ISO_DATE)));
+        } else if (dataField.getValue() instanceof Date) {
+            LocalDateTime date = ((Date)dataField.getValue()).toInstant()
+                    .atZone(ZoneId.systemDefault())
+                    .toLocalDateTime();
             if (date == null)
                 return Optional.empty();
             return Optional.of(new DataField(String.valueOf(date), date.format(DateTimeFormatter.BASIC_ISO_DATE)));
