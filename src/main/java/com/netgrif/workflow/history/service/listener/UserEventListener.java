@@ -1,9 +1,7 @@
 package com.netgrif.workflow.history.service.listener;
 
-import com.netgrif.workflow.event.events.user.UserLoginEvent;
-import com.netgrif.workflow.event.events.user.UserLogoutEvent;
-import com.netgrif.workflow.event.events.user.UserRegistrationEvent;
-import com.netgrif.workflow.event.events.user.UserRoleChangeEvent;
+import com.netgrif.workflow.event.events.user.*;
+import com.netgrif.workflow.history.domain.AdminActionEventLog;
 import com.netgrif.workflow.history.domain.UserEventLog;
 import com.netgrif.workflow.history.domain.UserRoleEventLog;
 import com.netgrif.workflow.history.domain.repository.EventLogRepository;
@@ -42,6 +40,12 @@ public class UserEventListener {
     public void onUserRoleChangeEvent(UserRoleChangeEvent event) {
         UserRoleEventLog log = new UserRoleEventLog(event.getUser().getUsername(), event.getRoles());
         log.setMessage(event.getMessage());
+        repository.save(log);
+    }
+
+    @EventListener
+    public void onAdminActionEvent(AdminActionEvent event) {
+        AdminActionEventLog log = new AdminActionEventLog(event);
         repository.save(log);
     }
 }
