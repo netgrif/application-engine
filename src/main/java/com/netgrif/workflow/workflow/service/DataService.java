@@ -15,6 +15,7 @@ import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.petrinet.domain.dataset.FileField;
 import com.netgrif.workflow.petrinet.domain.dataset.FileFieldValue;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedField;
+import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldByFileFieldContainer;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldContainer;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.FieldActionsRunner;
@@ -173,14 +174,14 @@ public class DataService implements IDataService {
             try {
                 return new FileFieldInputStream(field, download(field.getValue().getPath()));
             } catch (IOException e) {
-                e.printStackTrace();
+                log.error("Getting file failed: ", e);
                 return null;
             }
         } else {
             try {
                 return new FileFieldInputStream(field, new FileInputStream(field.getFilePath(useCase.getStringId())));
             } catch (FileNotFoundException e) {
-                e.printStackTrace();
+                log.error("Getting file failed: ", e);
                 return null;
             }
         }
@@ -193,27 +194,34 @@ public class DataService implements IDataService {
     }
 
     @Override
-    public boolean saveFile(String taskId, String fieldId, MultipartFile multipartFile) {
+    public ChangedFieldByFileFieldContainer saveFile(String taskId, String fieldId, MultipartFile multipartFile) {
         try {
             Task task = taskService.findOne(taskId);
             Case useCase = workflowService.findOne(task.getCaseId());
             FileField field = (FileField) useCase.getPetriNet().getDataSet().get(fieldId);
             field.setValue((FileFieldValue) useCase.getDataField(field.getStringId()).getValue());
+            ChangedFieldByFileFieldContainer container = new ChangedFieldByFileFieldContainer(false);
 
             if (field.isRemote()) {
                 upload(useCase, field, multipartFile);
             } else {
                 if (!saveLocalFile(useCase, field, multipartFile))
-                    return false;
+                    return container;
             }
 
             field.getActions().forEach(action -> actionsRunner.run(action, useCase));
+            updateDataset(useCase);
             workflowService.save(useCase);
 
-            return true;
+            Map<String, ChangedField> changedFields = resolveActions(useCase.getPetriNet().getField(fieldId).get(),
+                    Action.ActionTrigger.SET, useCase, useCase.getPetriNet().getTransition(task.getTransitionId()));
+            container.putAll(changedFields);
+            container.setIsSave(true);
+            return container;
+
         } catch (IOException e) {
-            e.printStackTrace();
-            return false;
+            log.error("Saving file failed: ", e);
+            return new ChangedFieldByFileFieldContainer(false);
         }
     }
 

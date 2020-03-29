@@ -2,6 +2,7 @@ package com.netgrif.workflow.auth.web;
 
 import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.auth.domain.User;
+import com.netgrif.workflow.auth.domain.throwable.UnauthorisedRequestException;
 import com.netgrif.workflow.auth.service.UserDetailsServiceImpl;
 import com.netgrif.workflow.auth.service.interfaces.IAuthorityService;
 import com.netgrif.workflow.auth.service.interfaces.IUserService;
@@ -96,18 +97,18 @@ public class UserController {
     }
 
     @PostMapping("/{id}")
-    public UserResource updateUser(@PathVariable("id") Long userId, @RequestBody UpdateUserRequest updates, Authentication auth, Locale locale) {
+    public UserResource updateUser(@PathVariable("id") Long userId, @RequestBody UpdateUserRequest updates, Authentication auth, Locale locale) throws UnauthorisedRequestException {
         if (!enableProfileEdit) return null;
 
-        LoggedUser logged = (LoggedUser) auth.getPrincipal();
+        LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
         User user = userService.findById(userId, false);
-        if (user == null || (!logged.isAdmin() && !Objects.equals(logged.getId(), userId)))
-            return null;
+        if (user == null || (!loggedUser.isAdmin() && !Objects.equals(loggedUser.getId(), userId)))
+            throw new UnauthorisedRequestException("User " + loggedUser.getUsername() + " doesn't have permission to modify profile of " + user.transformToLoggedUser().getUsername());
 
         user = userService.update(user, updates);
-        if (Objects.equals(logged.getId(), userId)) {
-            logged.setFullName(user.getFullName());
-            userDetailsService.reloadSecurityContext(logged);
+        if (Objects.equals(loggedUser.getId(), userId)) {
+            loggedUser.setFullName(user.getFullName());
+            userDetailsService.reloadSecurityContext(loggedUser);
         }
         log.info("Updating user " + user.getEmail() + " with data " + updates.toString());
         return new UserResource(user, "profile", locale);
@@ -124,6 +125,7 @@ public class UserController {
         return resources;
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/{id}/role/assign")
     public MessageResource assignRolesToUser(@PathVariable("id") Long userId, @RequestBody Set<String> roleIds, Authentication auth) {
         try {
