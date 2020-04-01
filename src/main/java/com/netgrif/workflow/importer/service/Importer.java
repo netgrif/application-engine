@@ -185,7 +185,7 @@ public class Importer {
         try {
             actionsRunner.getActionCode(action);
         } catch (Exception e) {
-            throw new IllegalArgumentException("Could not evaluate action[" + action.getImportId() + "]: \n " + action.getDefinition());
+            throw new IllegalArgumentException("Could not evaluate action[" + action.getImportId() + "]: \n " + action.getDefinition(), e);
         }
     }
 
