@@ -10,22 +10,19 @@
 	<data type='text'>
 		<id>text_0</id>
 		<title>Pozámka</title>
-		<values>undefined</values>
+		<values>area</values>
 	</data>
 	<data type='text'>
 		<id>text_1</id>
 		<title>Kód lekára</title>
-		<init>value</init>
 	</data>
 	<data type='text'>
 		<id>text_2</id>
 		<title>Meno lekára</title>
-		<init>value</init>
 	</data>
 	<data type='text'>
 		<id>text_3</id>
 		<title>Priezvisko lekára</title>
-		<init>value</init>
 	</data>
 	<data type='text'>
 		<id>text_4</id>
@@ -57,10 +54,8 @@
 	</data>
 	<data type='text'>
 		<id>text_11</id>
-		<title>set label</title>
-		<placeholder>placeholder</placeholder>
+		<title>Email</title>
 		<desc>V prípade vyplnenia emailu bude poskytovateľ notifikovaný o stavoch spracovania žiadosti</desc>
-		<init>value</init>
 	</data>
 	<data type='enumeration'>
 		<id>enumeration_0</id>
