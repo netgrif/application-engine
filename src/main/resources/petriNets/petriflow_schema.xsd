@@ -259,10 +259,10 @@
         </xs:restriction>
     </xs:simpleType>
     <!-- ===== INNER ELEMENTS ===== -->
-    <xs:element name="x" type="xs:short"/>
-    <xs:element name="y" type="xs:short"/>
-    <xs:element name="cols" type="xs:short"/>
-    <xs:element name="rows" type="xs:short"/>
+    <xs:element name="x" type="nonNegativeInteger"/>
+    <xs:element name="y" type="nonNegativeInteger"/>
+    <xs:element name="cols" type="nonNegativeInteger"/>
+    <xs:element name="rows" type="nonNegativeInteger"/>
     <xs:element name="label" type="i18nStringType"/>
     <xs:element name="tokens" type="nonNegativeInteger"/>
     <xs:element name="isStatic" type="xs:boolean"/>
