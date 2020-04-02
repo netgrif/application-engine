@@ -1,9 +1,9 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <document xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:noNamespaceSchemaLocation='petriflow_schema.xsd'>
     <version>1.0.0</version>
-    <initials>NEW</initials>
-    <title>New Model</title>
-    <icon>home</icon>
+    <initials>LEU</initials>
+    <title>Protokol o liečbe leukémie</title>
+    <icon>local_hospital</icon>
     <defaultRole>true</defaultRole>
     <transitionRole>false</transitionRole>
     <!-- TRANSACTIONS -->
@@ -11,64 +11,56 @@
     <!-- DATA -->
     <data type='text'>
         <id>text_0</id>
-        <title>set label</title>
-        <placeholder>placeholder</placeholder>
-        <desc>description</desc>
-        <init>value</init>
-    </data>
-    <data type='text'>
-        <id>text_1</id>
-        <title>set label</title>
-        <placeholder>placeholder</placeholder>
-        <desc>description</desc>
-        <init>value</init>
-    </data>
-    <data type='text'>
-        <id>text_2</id>
-        <title>set label</title>
-        <placeholder>placeholder</placeholder>
-        <desc>description</desc>
-        <init>value</init>
+        <title>Interné poznámky</title>
+        <values>undefined</values>
     </data>
     <data type='enumeration'>
         <id>enumeration_0</id>
-        <title>set label</title>
-        <placeholder>placeholder</placeholder>
-        <desc>description</desc>
-        <values>option1</values>
-        <values>option2</values>
-        <values>option3</values>
+        <title>Liečba</title>
+        <values>Začatie liečby</values>
+        <values>Pokračovanie liečby</values>
+        <values>Ukončenie liečby</values>
         <init>option1</init>
     </data>
-    <data type='multichoice'>
-        <id>multichoice_0</id>
-        <title>set label</title>
-        <placeholder>placeholder</placeholder>
-        <desc>description</desc>
-        <values>option1</values>
-        <values>option2</values>
-        <values>option3</values>
-        <init>option1, option2</init>
+    <data type='text'>
+        <id>text_1</id>
+        <title>Kód</title>
     </data>
-    <data type='boolean'>
-        <id>slide_0</id>
-        <title>set label</title>
-        <init>false</init>
+    <data type='text'>
+        <id>text_2</id>
+        <title>Meno</title>
     </data>
-    <data type='number'>
-        <id>number_0</id>
-        <title>set label</title>
-        <placeholder>placeholder</placeholder>
-        <desc>description</desc>
-        <init>0</init>
+    <data type='text'>
+        <id>text_3</id>
+        <title>Priezvisko</title>
+    </data>
+    <data type='text'>
+        <id>text_4</id>
+        <title>Kód PZS</title>
+    </data>
+    <data type='text'>
+        <id>text_5</id>
+        <title>Názov</title>
+    </data>
+    <data type='text'>
+        <id>text_6</id>
+        <title>Ulica</title>
+    </data>
+    <data type='text'>
+        <id>text_7</id>
+        <title>Mesto</title>
+    </data>
+    <data type='text'>
+        <id>text_8</id>
+        <title>PSČ</title>
     </data>
     <!-- TRANSITIONS -->
     <transition>
         <id>1</id>
-        <x>368</x>
-        <y>133</y>
-        <label></label>
-        <cols>4</cols>
+        <x>96</x>
+        <y>88</y>
+        <label>Protokol o liečbe leukémie</label>
+        <cols>3</cols>
         <dataGroup>
             <id>1</id>
             <dataRef>
@@ -79,32 +71,8 @@
                 <layout>
                     <x>0</x>
                     <y>0</y>
-                    <rows>1</rows>
-                    <cols>2</cols>
-                </layout>
-            </dataRef>
-            <dataRef>
-                <id>text_1</id>
-                <logic>
-                    <behavior>editable</behavior>
-                </logic>
-                <layout>
-                    <x>2</x>
-                    <y>0</y>
-                    <rows>1</rows>
-                    <cols>2</cols>
-                </layout>
-            </dataRef>
-            <dataRef>
-                <id>text_2</id>
-                <logic>
-                    <behavior>editable</behavior>
-                </logic>
-                <layout>
-                    <x>0</x>
-                    <y>1</y>
-                    <rows>1</rows>
-                    <cols>4</cols>
+                    <rows>2</rows>
+                    <cols>3</cols>
                 </layout>
             </dataRef>
             <dataRef>
@@ -116,41 +84,101 @@
                     <x>0</x>
                     <y>2</y>
                     <rows>1</rows>
-                    <cols>1</cols>
+                    <cols>3</cols>
                 </layout>
             </dataRef>
             <dataRef>
-                <id>multichoice_0</id>
+                <id>text_1</id>
                 <logic>
                     <behavior>editable</behavior>
                 </logic>
                 <layout>
-                    <x>2</x>
-                    <y>2</y>
+                    <x>0</x>
+                    <y>3</y>
                     <rows>1</rows>
                     <cols>1</cols>
                 </layout>
             </dataRef>
             <dataRef>
-                <id>slide_0</id>
+                <id>text_2</id>
                 <logic>
                     <behavior>editable</behavior>
                 </logic>
                 <layout>
                     <x>1</x>
-                    <y>2</y>
+                    <y>3</y>
                     <rows>1</rows>
                     <cols>1</cols>
                 </layout>
             </dataRef>
             <dataRef>
-                <id>number_0</id>
+                <id>text_3</id>
                 <logic>
                     <behavior>editable</behavior>
                 </logic>
                 <layout>
-                    <x>3</x>
-                    <y>2</y>
+                    <x>2</x>
+                    <y>3</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>text_4</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>4</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>text_5</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>1</x>
+                    <y>4</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>text_6</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>5</y>
+                    <rows>1</rows>
+                    <cols>3</cols>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>text_7</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>6</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>text_8</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>2</x>
+                    <y>6</y>
                     <rows>1</rows>
                     <cols>1</cols>
                 </layout>
