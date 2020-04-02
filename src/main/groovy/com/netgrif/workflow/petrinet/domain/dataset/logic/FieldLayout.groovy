@@ -8,6 +8,8 @@ class FieldLayout {
     private int y
     private int rows
     private int cols
+    private String template
+    private String appearance
 
     @Override
     @QueryType(PropertyType.NONE)
@@ -18,11 +20,13 @@ class FieldLayout {
     FieldLayout() {
     }
 
-    FieldLayout(int x, int y, int rows, int cols) {
+    FieldLayout(int x, int y, int rows, int cols, String template, String appearance) {
         this.x = x
         this.y = y
         this.rows = rows
         this.cols = cols
+        this.template = template?.toLowerCase()
+        this.appearance = appearance?.toLowerCase()
     }
 
     int getX() {
@@ -55,6 +59,22 @@ class FieldLayout {
 
     void setCols(int cols) {
         this.cols = cols
+    }
+
+    String getTemplate() {
+        return template
+    }
+
+    void setTemplate(String template) {
+        this.template = template
+    }
+
+    String getAppearance() {
+        return appearance
+    }
+
+    void setAppearance(String appearance) {
+        this.appearance = appearance
     }
 
     boolean layoutFilled() {
