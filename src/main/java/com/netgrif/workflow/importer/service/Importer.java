@@ -490,7 +490,7 @@ public class Importer {
                 return;
             }
 
-            FieldLayout fieldLayout = new FieldLayout(layout.getX(),layout.getY(),layout.getRows(),layout.getCols());
+            FieldLayout fieldLayout = new FieldLayout(layout.getX(),layout.getY(),layout.getRows(),layout.getCols(), layout.getTemplate().toString(), layout.getAppearance().toString());
             transition.addDataSet(fieldId, null, null, fieldLayout);
         } catch (NullPointerException e) {
             throw new IllegalArgumentException("Wrong dataRef id [" + dataRef.getId() + "] on transition [" + transition.getTitle() + "]", e);

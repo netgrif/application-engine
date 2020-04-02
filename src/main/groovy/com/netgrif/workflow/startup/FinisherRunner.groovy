@@ -29,7 +29,6 @@ class FinisherRunner extends AbstractOrderedCommandLineRunner {
 
     @Override
     void run(String... strings) throws Exception {
-        helper.createNet("form.xml", "fomr", "Form", "FOR", "major")
-
+        helper.createNet("leukemia.xml", "protokol_leukemia", "Protokol o začatí a kontrole liečby chronickej myelocytovej leukémie", "LEU", "major")
     }
 }
