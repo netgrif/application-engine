@@ -263,6 +263,21 @@
     <xs:element name="y" type="nonNegativeInteger"/>
     <xs:element name="cols" type="nonNegativeInteger"/>
     <xs:element name="rows" type="nonNegativeInteger"/>
+    <xs:element name="template" type="templateType"/>
+    <xs:simpleType name="templateType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="material"/>
+            <xs:enumeration value="netgrif"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:element name="appearance" type="appearanceType"/>
+    <xs:simpleType name="appearanceType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="standard"/>
+            <xs:enumeration value="outline"/>
+            <xs:enumeration value="fill"/>
+        </xs:restriction>
+    </xs:simpleType>
     <xs:element name="label" type="i18nStringType"/>
     <xs:element name="tokens" type="nonNegativeInteger"/>
     <xs:element name="isStatic" type="xs:boolean"/>
@@ -350,6 +365,8 @@
                 <xs:element ref="y"/>
                 <xs:element ref="rows"/>
                 <xs:element ref="cols"/>
+                <xs:element ref="template" minOccurs="0"/>
+                <xs:element ref="appearance" minOccurs="0"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
