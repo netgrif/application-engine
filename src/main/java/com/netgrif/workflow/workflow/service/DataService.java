@@ -173,10 +173,7 @@ public class DataService implements IDataService {
             for (String datum : dataGroup.getData()) {
                 Field field = net.getDataSet().get(datum);
                 if (field.getType() == FieldType.TASK_REF) {
-                    String taskId2 = (String) useCase.getFieldValue(datum);
-                    List<Field> data = getData(taskId2);
-                    data.forEach(d -> d.setImportId(taskId2 + "-" + d.getImportId()));
-                    resources.addAll(data);
+                    collectTaskRefDataGroups(useCase, datum, resources);
                 } else {
                     resources.add(dataFieldMap.get(datum));
                 }
@@ -185,6 +182,30 @@ public class DataService implements IDataService {
         }
 
         return dataGroups;
+    }
+
+    private void collectTaskRefDataGroups(Case useCase, String datum, List<Field> resources) {
+        collectTaskRefDataGroups(useCase, datum, resources, new HashSet<>());
+    }
+
+    private void collectTaskRefDataGroups(Case useCase, String datum, List<Field> resources, Set<String> collectedTasks) {
+        List<String> taskIds = (List<String>) useCase.getFieldValue(datum);
+        taskIds = taskIds.stream().filter(it -> !collectedTasks.contains(it)).collect(Collectors.toList());
+        taskIds.forEach(taskId -> {
+            List<Field> data = getData(taskId);
+            Task task = taskService.findOne(taskId);
+            Case caze = workflowService.findOne(task.getCaseId());
+
+            collectedTasks.add(taskId);
+            data.forEach(field -> {
+                if (field.getType() == FieldType.TASK_REF) {
+                    collectTaskRefDataGroups(caze, field.getImportId(), resources, collectedTasks);
+                } else {
+                    field.setImportId(taskId + "-" + field.getImportId());
+                    resources.add(field);
+                }
+            });
+        });
     }
 
     @Override

@@ -550,17 +550,17 @@
 
                     def personal = createCase("personal_information", "${useCase.title} - Personal information" as String, "color-fg-amber-500")
                     change task_personal_information value {
-                        personal.tasks.first().task
+                        [personal.tasks.first().task]
                     }
 
                     def address = createCase("address", "${useCase.title} - Address" as String, "color-fg-green-500")
                     change task_address_and_mortgage value {
-                        address.tasks.first().task
+                        [address.tasks.first().task]
                     }
 
                     def financial_data = createCase("financial_data", "${useCase.title} - Financial data" as String, "color-fg-red-500")
                     change task_financial_data value {
-                        financial_data.tasks.first().task
+                        [financial_data.tasks.first().task]
                     }
                     <!-- @formatter:on -->
                 </action>

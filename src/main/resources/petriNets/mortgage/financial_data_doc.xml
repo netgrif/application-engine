@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../petriflow_schema.xsd">
+
+    <data type="text">
+        <id>doc_info</id>
+        <title>Document info</title>
+    </data>
+
+    <transition>
+        <id>doc</id>
+        <x>50</x>
+        <y>50</y>
+        <label name="financial_data">Document</label>
+        <dataRef>
+            <id>doc_info</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+            </logic>
+        </dataRef>
+    </transition>
+</document>
