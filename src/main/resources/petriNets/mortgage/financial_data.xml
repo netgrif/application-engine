@@ -47,6 +47,10 @@
             }
         </action>
     </data>
+    <data type="taskRef">
+        <id>task_doc</id>
+        <title>task_doc</title>
+    </data>
 
     <i18n locale="sk">
         <i18nString name="income_title">Mesačný príjem v EUR</i18nString>
@@ -58,9 +62,49 @@
     </i18n>
 
     <transition>
+        <id>constructor</id>
+        <x>180</x>
+        <y>60</y>
+        <label>Constructor / System</label>
+        <trigger type="auto"/>
+        <event type="finish">
+            <id>288_finish</id>
+            <actions phase="pre">
+                <action>
+                    <!-- @formatter:off -->
+                    taskDoc: f.task_doc;
+
+                    def document = createCase("financial_data_doc", "${useCase.title} - Doc" as String, "color-fg-amber-500")
+                    def document2 = createCase("financial_data_doc", "${useCase.title} - Doc 2" as String, "color-fg-amber-500")
+
+                    change taskDoc value {
+                        [document.tasks.first().task, document2.tasks.first().task]
+                    }
+
+                    <!-- @formatter:on -->
+                </action>
+            </actions>
+
+            <actions phase="post">
+                <action>
+                    taskDoc: f.task_doc;
+
+                    def taskList = taskDoc.value
+                    taskList.add(useCase.tasks.first().task)
+
+                    change taskDoc value {
+                        taskList as List
+                    }
+
+                </action>
+            </actions>
+        </event>
+    </transition>
+
+    <transition>
         <id>financial_data</id>
-        <x>50</x>
-        <y>50</y>
+        <x>500</x>
+        <y>60</y>
         <label name="financial_data">Financial data</label>
         <dataRef>
             <id>income</id>
@@ -84,10 +128,55 @@
             </logic>
         </dataRef>
         <dataRef>
+            <id>task_doc</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
             <id>monthly_payment</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
         </dataRef>
     </transition>
+	<!-- PLACES -->
+	<place>
+		<id>1</id>
+		<x>60</x>
+		<y>60</y>
+		<label></label>
+		<tokens>1</tokens>
+		<static>false</static>
+	</place>
+	<place>
+		<id>2</id>
+		<x>340</x>
+		<y>60</y>
+		<label></label>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
+	<!-- ARCS -->
+	<arc>
+		<id>3</id>
+		<type>regular</type>
+		<sourceId>1</sourceId>
+		<destinationId>constructor</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>4</id>
+		<type>regular</type>
+		<sourceId>constructor</sourceId>
+		<destinationId>2</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>5</id>
+		<type>read</type>
+		<sourceId>2</sourceId>
+		<destinationId>financial_data</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
 </document>
