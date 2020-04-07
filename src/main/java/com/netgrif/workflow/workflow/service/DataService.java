@@ -1,7 +1,6 @@
 package com.netgrif.workflow.workflow.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.netgrif.workflow.auth.domain.User;
@@ -24,8 +23,8 @@ import com.netgrif.workflow.workflow.service.interfaces.IDataService;
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
 import com.netgrif.workflow.workflow.web.responsebodies.DataFieldsResource;
-import com.netgrif.workflow.workflow.web.responsebodies.LocalisedField;
-import com.netgrif.workflow.workflow.web.responsebodies.LocalisedFieldFactory;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,6 +43,8 @@ import java.util.stream.LongStream;
 public class DataService implements IDataService {
 
     private static final Logger log = LoggerFactory.getLogger(DataService.class);
+
+    public static final int MONGO_ID_LENGTH = 24;
 
     @Autowired
     private ApplicationEventPublisher publisher;
@@ -211,8 +212,11 @@ public class DataService implements IDataService {
 
     @Override
     public FileFieldInputStream getFileByTask(String taskId, String fieldId) {
-        Task task = taskService.findOne(taskId);
-        return getFileByCase(task.getCaseId(), fieldId);
+        TaskRefFieldWrapper wrapper = decodeTaskRefFieldId(taskId, fieldId);
+        Task task = wrapper.getTask();
+        String parsedFieldId = wrapper.getParsedFieldId();
+
+        return getFileByCase(task.getCaseId(), parsedFieldId);
     }
 
     @Override
@@ -257,9 +261,12 @@ public class DataService implements IDataService {
     @Override
     public boolean saveFile(String taskId, String fieldId, MultipartFile multipartFile) {
         try {
-            Task task = taskService.findOne(taskId);
+            TaskRefFieldWrapper wrapper = decodeTaskRefFieldId(taskId, fieldId);
+            Task task = wrapper.getTask();
+            String parsedFieldId = wrapper.getParsedFieldId();
+
             Case useCase = workflowService.findOne(task.getCaseId());
-            FileField field = (FileField) useCase.getPetriNet().getDataSet().get(fieldId);
+            FileField field = (FileField) useCase.getPetriNet().getDataSet().get(parsedFieldId);
             field.setValue((FileFieldValue) useCase.getDataField(field.getStringId()).getValue());
 
             if (field.isRemote()) {
@@ -278,6 +285,33 @@ public class DataService implements IDataService {
             return false;
         }
     }
+
+    private TaskRefFieldWrapper decodeTaskRefFieldId(String taskId, String fieldId) {
+        Task task;
+        String parsedFieldId;
+        try {
+            String[] parts = decodeTaskRefFieldId(fieldId);
+            task = taskService.findOne(parts[0]);
+            parsedFieldId = parts[1];
+
+        } catch (IllegalArgumentException e) {
+            task = taskService.findOne(taskId);
+            parsedFieldId = fieldId;
+        }
+
+        return new TaskRefFieldWrapper(task, parsedFieldId);
+    }
+
+
+    private String[] decodeTaskRefFieldId(String fieldId) {
+        String[] split = fieldId.split("-", 2);
+        if (split[0].length() == MONGO_ID_LENGTH && split.length == 2) {
+            return split;
+        }
+
+        throw new IllegalArgumentException("fieldId is not referenced through taskRef");
+    }
+
 
     public boolean saveLocalFile(Case useCase, FileField field, MultipartFile multipartFile) throws IOException {
         if (useCase.getDataSet().get(field.getStringId()).getValue() != null) {
@@ -460,5 +494,12 @@ public class DataService implements IDataService {
         }
         if (value instanceof String && ((String) value).equalsIgnoreCase("null")) return null;
         else return value;
+    }
+
+    @Data
+    @AllArgsConstructor
+    private class TaskRefFieldWrapper {
+        private Task task;
+        private String parsedFieldId;
     }
 }
