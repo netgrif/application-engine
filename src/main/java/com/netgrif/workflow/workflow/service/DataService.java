@@ -202,6 +202,7 @@ public class DataService implements IDataService {
                     collectTaskRefDataGroups(caze, field.getImportId(), resources, collectedTasks);
                 } else {
                     field.setImportId(taskId + "-" + field.getImportId());
+                    field.setOrder((long) (resources.size() - 1));
                     resources.add(field);
                 }
             });
