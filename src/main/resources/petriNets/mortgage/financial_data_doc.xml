@@ -6,6 +6,16 @@
         <title>Document info</title>
     </data>
 
+    <data type="number">
+        <id>num</id>
+        <title>Document number</title>
+    </data>
+
+    <data type="file">
+        <id>doc</id>
+        <title>Document</title>
+    </data>
+
     <transition>
         <id>doc</id>
         <x>50</x>
@@ -13,6 +23,20 @@
         <label name="financial_data">Document</label>
         <dataRef>
             <id>doc_info</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>num</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>doc</id>
             <logic>
                 <behavior>editable</behavior>
                 <behavior>required</behavior>
