@@ -192,6 +192,10 @@ public class DataService implements IDataService {
 
     private void collectTaskRefDataGroups(Case useCase, String datum, List<Field> resources, Set<String> collectedTasks) {
         List<String> taskIds = (List<String>) useCase.getFieldValue(datum);
+        if (taskIds == null) {
+            return;
+        }
+
         taskIds = taskIds.stream().filter(it -> !collectedTasks.contains(it)).collect(Collectors.toList());
         taskIds.forEach(taskId -> {
             List<Field> data = getData(taskId);
