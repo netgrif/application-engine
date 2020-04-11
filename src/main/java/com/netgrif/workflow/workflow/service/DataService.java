@@ -8,10 +8,7 @@ import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.event.events.usecase.SaveCaseDataEvent;
 import com.netgrif.workflow.importer.service.FieldFactory;
 import com.netgrif.workflow.petrinet.domain.*;
-import com.netgrif.workflow.petrinet.domain.dataset.Field;
-import com.netgrif.workflow.petrinet.domain.dataset.FieldType;
-import com.netgrif.workflow.petrinet.domain.dataset.FileField;
-import com.netgrif.workflow.petrinet.domain.dataset.FileFieldValue;
+import com.netgrif.workflow.petrinet.domain.dataset.*;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedField;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldContainer;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action;
@@ -174,7 +171,7 @@ public class DataService implements IDataService {
             for (String datum : dataGroup.getData()) {
                 Field field = net.getDataSet().get(datum);
                 if (field.getType() == FieldType.TASK_REF) {
-                    collectTaskRefDataGroups(useCase, datum, resources);
+                    collectTaskRefDataGroups((TaskField) dataFieldMap.get(datum), resources);
                 } else {
                     resources.add(dataFieldMap.get(datum));
                 }
@@ -185,12 +182,12 @@ public class DataService implements IDataService {
         return dataGroups;
     }
 
-    private void collectTaskRefDataGroups(Case useCase, String datum, List<Field> resources) {
-        collectTaskRefDataGroups(useCase, datum, resources, new HashSet<>());
+    private void collectTaskRefDataGroups(TaskField taskRefField, List<Field> resources) {
+        collectTaskRefDataGroups(taskRefField, resources, new HashSet<>());
     }
 
-    private void collectTaskRefDataGroups(Case useCase, String datum, List<Field> resources, Set<String> collectedTasks) {
-        List<String> taskIds = (List<String>) useCase.getFieldValue(datum);
+    private void collectTaskRefDataGroups(TaskField taskRefField, List<Field> resources, Set<String> collectedTasks) {
+        List<String> taskIds = taskRefField.getValue();
         if (taskIds == null) {
             return;
         }
@@ -198,13 +195,12 @@ public class DataService implements IDataService {
         taskIds = taskIds.stream().filter(it -> !collectedTasks.contains(it)).collect(Collectors.toList());
         taskIds.forEach(taskId -> {
             List<Field> data = getData(taskId);
-            Task task = taskService.findOne(taskId);
-            Case caze = workflowService.findOne(task.getCaseId());
+            Map<String, Field> dataFieldMap = data.stream().collect(Collectors.toMap(Field::getImportId, field -> field));
 
             collectedTasks.add(taskId);
             data.forEach(field -> {
                 if (field.getType() == FieldType.TASK_REF) {
-                    collectTaskRefDataGroups(caze, field.getImportId(), resources, collectedTasks);
+                    collectTaskRefDataGroups((TaskField) dataFieldMap.get(field.getImportId()), resources, collectedTasks);
                 } else {
                     field.setImportId(taskId + "-" + field.getImportId());
                     field.setOrder((long) (resources.size() - 1));
