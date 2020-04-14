@@ -29,9 +29,9 @@ import groovy.json.JsonOutput
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.core.io.ClassPathResource
 import org.springframework.core.io.ResourceLoader
 import org.springframework.stereotype.Component
-import org.springframework.util.ResourceUtils
 
 @Component
 class ImportHelper {
@@ -127,8 +127,8 @@ class ImportHelper {
     }
 
     Optional<PetriNet> createNet(String fileName, String identifier, String name, String initials, String release, LoggedUser loggedUser) {
-        return petriNetService.importPetriNet(ResourceUtils.getFile("src/main/resources/petriNets/$fileName"),
-                new UploadedFileMeta(name, initials, identifier, release), loggedUser)
+        InputStream netStream = new ClassPathResource("petriNets/$fileName" as String).inputStream
+        return petriNetService.importPetriNet(netStream, new UploadedFileMeta(name, initials, identifier, release), loggedUser)
     }
 
     UserProcessRole createUserProcessRole(PetriNet net, String name) {
