@@ -111,9 +111,9 @@ class FieldTest {
         assert field.name.defaultValue == "Enumeration"
         assert field.placeholder.defaultValue == "Enumeration field placeholder"
         assert field.choices.size() == 3
-        assert field.choices.find { it.defaultValue == "enumeration" }
-        assert field.choices.find { it.defaultValue == "enumeration2" }
-        assert field.choices.find { it.defaultValue == "enumeration3" }
+        assert field.choices.values().find { it.defaultValue == "enumeration" }
+        assert field.choices.values().find { it.defaultValue == "enumeration2" }
+        assert field.choices.values().find { it.defaultValue == "enumeration3" }
     }
 
     private void assertMultichoiceField() {
@@ -125,9 +125,9 @@ class FieldTest {
         assert field.name.defaultValue == "Multichoice"
         assert field.placeholder.defaultValue == "Multichoice field placeholder"
         assert field.choices.size() == 3
-        assert field.choices.find { it.defaultValue == "multichoice" }
-        assert field.choices.find { it.defaultValue == "multichoice2" }
-        assert field.choices.find { it.defaultValue == "multichoice3" }
+        assert field.choices.values().find { it.defaultValue == "multichoice" }
+        assert field.choices.values().find { it.defaultValue == "multichoice2" }
+        assert field.choices.values().find { it.defaultValue == "multichoice3" }
     }
 
     private void assertBooleanField() {
