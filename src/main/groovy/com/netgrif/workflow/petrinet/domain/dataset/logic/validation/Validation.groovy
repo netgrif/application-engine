@@ -1,10 +1,16 @@
 package com.netgrif.workflow.petrinet.domain.dataset.logic.validation
 
-import com.fasterxml.jackson.annotation.JsonIgnore
 import com.netgrif.workflow.petrinet.domain.I18nString
-import org.springframework.data.annotation.Transient
+import com.querydsl.core.annotations.PropertyType
+import com.querydsl.core.annotations.QueryType
 
 class Validation {
+
+    @Override
+    @QueryType(PropertyType.NONE)
+    MetaClass getMetaClass() {
+        return this.metaClass
+    }
 
     private String validationRule
 
