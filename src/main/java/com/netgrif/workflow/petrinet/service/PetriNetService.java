@@ -14,7 +14,6 @@ import com.netgrif.workflow.petrinet.domain.roles.ProcessRole;
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRoleRepository;
 import com.netgrif.workflow.petrinet.domain.throwable.MissingPetriNetMetaDataException;
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
-import com.netgrif.workflow.petrinet.web.requestbodies.UploadedFileMeta;
 import com.netgrif.workflow.petrinet.web.responsebodies.DataFieldReference;
 import com.netgrif.workflow.petrinet.web.responsebodies.PetriNetReference;
 import com.netgrif.workflow.petrinet.web.responsebodies.TransitionReference;
@@ -39,7 +38,6 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.repository.support.PageableExecutionUtils;
 import org.springframework.stereotype.Service;
-import sun.nio.ch.Net;
 
 import javax.validation.constraints.NotNull;
 import java.io.*;
