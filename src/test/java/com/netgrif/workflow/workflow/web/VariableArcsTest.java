@@ -14,6 +14,7 @@ import com.netgrif.workflow.petrinet.domain.arcs.VariableArc;
 import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository;
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRole;
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRoleRepository;
+import com.netgrif.workflow.petrinet.domain.throwable.MissingPetriNetMetaDataException;
 import com.netgrif.workflow.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.workflow.startup.DefaultRoleRunner;
@@ -100,8 +101,8 @@ public class VariableArcsTest {
     }
 
     @Test
-    public void importTest() throws TransitionNotExecutableException {
-        Optional<PetriNet> optionalNet = importer.importPetriNet(new File(NET_PATH), NET_TITLE, NET_INITIALS, new Config());
+    public void importTest() throws TransitionNotExecutableException, MissingPetriNetMetaDataException {
+        Optional<PetriNet> optionalNet = importer.importPetriNet(new File(NET_PATH), new Config());
 
         assert optionalNet.isPresent();
         PetriNet net = optionalNet.get();
