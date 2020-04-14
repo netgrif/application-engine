@@ -2,7 +2,7 @@
 <document xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:noNamespaceSchemaLocation='petriflow_schema.xsd'>
 	<version>1.0.0</version>
 	<initials>LEU</initials>
-	<title>Protokol o začatí a kontrole liečby chronickej myelocytovej leukémie</title>
+	<title>Protocol on treatment of chronic myelocytic leukemia</title>
 	<icon>local_hospital</icon>
 	<defaultRole>true</defaultRole>
 	<transitionRole>false</transitionRole>
@@ -11,67 +11,67 @@
 	<!-- DATA -->
 	<data type='text'>
 		<id>text_0</id>
-		<title>Poznámka</title>
+		<title>Notes</title>
 		<values>area</values>
 	</data>
 	<data type='text'>
 		<id>text_1</id>
-		<title>Kód lekára</title>
+		<title>Doctor code</title>
 	</data>
 	<data type='text'>
 		<id>text_2</id>
-		<title>Meno lekára</title>
+		<title>Doctor name</title>
 	</data>
 	<data type='text'>
 		<id>text_3</id>
-		<title>Priezvisko lekára</title>
+		<title>Doctor surname</title>
 	</data>
 	<data type='text'>
 		<id>text_4</id>
-		<title>Kód PZS</title>
+		<title>Health care provider code</title>
 	</data>
 	<data type='text'>
 		<id>text_5</id>
-		<title>Názov zdrav. zariadenia</title>
+		<title>Provider name</title>
 	</data>
 	<data type='text'>
 		<id>text_6</id>
-		<title>Adresa - ulica</title>
+		<title>Adress - street</title>
 	</data>
 	<data type='text'>
 		<id>text_7</id>
-		<title>Adresa - mesto</title>
+		<title>Adress - city</title>
 	</data>
 	<data type='text'>
 		<id>text_8</id>
-		<title>Adresa - PSČ</title>
+		<title>Adress - ZIP code</title>
 	</data>
 	<data type='text'>
 		<id>text_9</id>
-		<title>IČO</title>
+		<title>Company ID</title>
 	</data>
 	<data type='text'>
 		<id>text_10</id>
-		<title>Tel. kontakt</title>
+		<title>Tel. number</title>
 	</data>
 	<data type='text'>
 		<id>text_11</id>
 		<title>Email</title>
-		<desc>V prípade vyplnenia emailu bude poskytovateľ notifikovaný o stavoch spracovania žiadosti</desc>
+		<desc>If the email is filled in, the provider will be notified of the processing status of the application</desc>
 	</data>
 	<data type='enumeration'>
 		<id>enumeration_0</id>
-		<title>Liečba</title>
-		<values>Začatie liečby</values>
-		<values>Pokračovanie liečby</values>
-		<values>Ukončenie liečby</values>
+		<title>Treatment</title>
+		<values>New treatment</values>
+		<values>Continuing treatment</values>
+		<values>End of treatment</values>
 	</data>
 	<!-- TRANSITIONS -->
 	<transition>
 		<id>1</id>
 		<x>190</x>
 		<y>118</y>
-		<label>Protokol o liečbe leukémie</label>
+		<label>Protocol on treatment of leukemia</label>
 		<cols>3</cols>
 		<dataRef>
 			<id>text_0</id>
