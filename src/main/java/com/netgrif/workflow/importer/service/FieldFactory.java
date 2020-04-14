@@ -126,7 +126,7 @@ public final class FieldFactory {
 
     private MultichoiceField buildMultichoiceField(Options options, String init, Importer importer) {
         Map<String, I18nString> choices = options.getOption().stream()
-                .collect(Collectors.toMap(Options.Option::getKey, value -> new I18nString(value.getValue())));
+                .collect(Collectors.toMap(Option::getKey, value -> new I18nString(value.getValue())));
 
         MultichoiceField field = new MultichoiceField(choices);
         field.setDefaultValue(init);
@@ -146,7 +146,7 @@ public final class FieldFactory {
 
     private EnumerationField buildEnumerationField(Options options, String init, Importer importer) {
         Map<String, I18nString> choices = options.getOption().stream()
-                .collect(Collectors.toMap(Options.Option::getKey, value -> new I18nString(value.getValue())));
+                .collect(Collectors.toMap(Option::getKey, value -> new I18nString(value.getValue())));
 
         EnumerationField field = new EnumerationField(choices);
         field.setDefaultValue(init);
