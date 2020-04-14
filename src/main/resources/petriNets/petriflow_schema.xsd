@@ -294,16 +294,17 @@
     <xs:element name="options">
         <xs:complexType>
             <xs:sequence>
-                <xs:element name="option" minOccurs="0" maxOccurs="unbounded">
-                    <xs:complexType>
-                        <xs:simpleContent>
-                            <xs:extension base="xs:string">
-                                <xs:attribute name="key" type="xs:string" use="required"/>
-                            </xs:extension>
-                        </xs:simpleContent>
-                    </xs:complexType>
-                </xs:element>
+                <xs:element ref="option" minOccurs="0" maxOccurs="unbounded" />
             </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="option">
+        <xs:complexType>
+            <xs:simpleContent>
+                <xs:extension base="i18nStringType">
+                    <xs:attribute name="key" type="xs:string" use="required"/>
+                </xs:extension>
+            </xs:simpleContent>
         </xs:complexType>
     </xs:element>
     <xs:element name="perform" type="xs:boolean"/>
