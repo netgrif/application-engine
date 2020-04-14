@@ -1,6 +1,7 @@
 package com.netgrif.workflow.settings.domain;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
@@ -15,11 +16,13 @@ import java.util.Map;
  * <ul>
  *     <li>locale</li>
  *     <li>task filters for each task view</li>
+ *     <li>case filters for each case view</li>
  *     <li>case view flex fields</li>
  * </ul>
  */
 @Document
 @Data
+@NoArgsConstructor
 public class Preferences implements Serializable {
 
     @Id
@@ -32,6 +35,12 @@ public class Preferences implements Serializable {
      */
     @Field
     private Map<String, List<String>> taskFilters = new HashMap<>();
+
+    /**
+     * caseViewId: [filterIds]
+     */
+    @Field
+    private Map<String, List<String>> caseFilters = new HashMap<>();
 
     /**
      * caseViewId: [headersIds]
