@@ -2,6 +2,8 @@
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xsi:noNamespaceSchemaLocation="../../main/resources/petriNets/petriflow_schema.xsd">
     <id>1</id>
+    <initials>TES</initials>
+    <title>Data test</title>
     <defaultRole>true</defaultRole>
     <!-- NUMBER -->
     <data type="number">
