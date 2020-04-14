@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="../../main/resources/petriNets/petriflow_schema.xsd">
+    <id>2</id>
+    <defaultRole>true</defaultRole>
+
+    <data type="enumeration">
+        <id>deprecated_enum</id>
+        <title>Deprecated enum</title>
+        <values>Choice 1</values>
+        <values>Choice 2</values>
+        <values>Choice 3</values>
+    </data>
+    <data type="enumeration">
+        <id>enum</id>
+        <title>Enum</title>
+        <options>
+            <option key="key_1">Choice 1</option>
+            <option key="key_2">Choice 2</option>
+            <option key="key_3">Choice 3</option>
+        </options>
+    </data>
+    <data type="boolean">
+        <id>bool_1</id>
+        <title>Switch</title>
+        <action trigger="set">
+            <!-- @formatter:off -->
+            enume: f.deprecated_enum,
+            check: f.this;
+
+            change enume choices {
+                if (check.value)
+                    return ["Choice 1","Choice 2","Choice 3"]
+                return ["Choice A","Choice B","Choice C"]
+            }
+            <!-- @formatter:on -->
+        </action>
+    </data>
+    <data type="boolean">
+        <id>bool_2</id>
+        <title>Switch</title>
+        <action trigger="set">
+            enume: f.enum,
+            check: f.this;
+
+            change enume choices {
+                if (check.value)
+                    return ["key_1":"Choice 1", "key_2":"Choice 2", "key_3":"Choice 3"]
+                return ["key_a":"Choice A", "key_b":"Choice B", "key_c":"Choice C"]
+            }
+        </action>
+    </data>
+    <data type="boolean">
+        <id>bool_3</id>
+        <title>Switch</title>
+        <action trigger="set">
+            enume: f.enum;
+
+            change enume value { "key_1" }
+        </action>
+    </data>
+
+    <transition>
+        <id>1</id>
+        <x>1</x>
+        <y>1</y>
+        <label>Tran</label>
+        <dataGroup>
+            <id>1</id>
+            <dataRef>
+                <id>bool_1</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>bool_2</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>bool_3</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>deprecated_enum</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>enum</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+    </transition>
+</document>
