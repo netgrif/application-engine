@@ -33,6 +33,15 @@ public class UserProcessRole {
         this.roleId = roleId;
     }
 
+    @Override
+    public String toString() {
+        return "UserProcessRole{" +
+                "id=" + id +
+                ", roleId='" + roleId + '\'' +
+                ", netId='" + netId + '\'' +
+                '}';
+    }
+
     public UserProcessRole(String roleId, String netId) {
         this.roleId = roleId;
         this.netId = netId;
