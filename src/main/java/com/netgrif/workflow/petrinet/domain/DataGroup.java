@@ -24,6 +24,9 @@ public class DataGroup extends PetriNetObject {
     @Getter @Setter
     private DataFieldsResource fields;
 
+    @Getter @Setter
+    private Integer cols;
+
     @Getter @Setter(AccessLevel.NONE)
     private I18nString title;
 

@@ -72,6 +72,7 @@
                 <xs:element ref="x"/>
                 <xs:element ref="y"/>
                 <xs:element ref="label"/>
+                <xs:element ref="cols" minOccurs="0"/>
                 <xs:element ref="icon" minOccurs="0"/>
                 <xs:element ref="priority" minOccurs="0"/>
                 <xs:element ref="assignPolicy" minOccurs="0"/>
@@ -262,8 +263,25 @@
         </xs:restriction>
     </xs:simpleType>
     <!-- ===== INNER ELEMENTS ===== -->
-    <xs:element name="x" type="xs:short"/>
-    <xs:element name="y" type="xs:short"/>
+    <xs:element name="x" type="nonNegativeInteger"/>
+    <xs:element name="y" type="nonNegativeInteger"/>
+    <xs:element name="cols" type="nonNegativeInteger"/>
+    <xs:element name="rows" type="nonNegativeInteger"/>
+    <xs:element name="template" type="templateType"/>
+    <xs:simpleType name="templateType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="material"/>
+            <xs:enumeration value="netgrif"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:element name="appearance" type="appearanceType"/>
+    <xs:simpleType name="appearanceType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="standard"/>
+            <xs:enumeration value="outline"/>
+            <xs:enumeration value="fill"/>
+        </xs:restriction>
+    </xs:simpleType>
     <xs:element name="label" type="i18nStringType"/>
     <xs:element name="tokens" type="nonNegativeInteger"/>
     <xs:element name="isStatic" type="xs:boolean"/>
@@ -356,6 +374,19 @@
             <xs:sequence>
                 <xs:element ref="id"/>
                 <xs:element ref="logic"/>
+                <xs:element ref="layout" minOccurs="0"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="layout">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="x"/>
+                <xs:element ref="y"/>
+                <xs:element ref="rows"/>
+                <xs:element ref="cols"/>
+                <xs:element ref="template" minOccurs="0"/>
+                <xs:element ref="appearance" minOccurs="0"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
@@ -363,6 +394,7 @@
         <xs:complexType>
             <xs:sequence>
                 <xs:element ref="id"/>
+                <xs:element ref="cols" minOccurs="0"/>
                 <xs:element ref="title" minOccurs="0"/>
                 <xs:element ref="alignment" minOccurs="0"/>
                 <xs:element ref="stretch" minOccurs="0"/>
