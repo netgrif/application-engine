@@ -11,6 +11,7 @@ import com.netgrif.workflow.auth.web.requestbodies.NewUserRequest;
 import com.netgrif.workflow.auth.web.requestbodies.RegistrationRequest;
 import com.netgrif.workflow.auth.web.responsebodies.UserResource;
 import com.netgrif.workflow.mail.IMailService;
+import com.netgrif.workflow.mail.MailAttemptService;
 import com.netgrif.workflow.workflow.web.responsebodies.MessageResource;
 import freemarker.template.TemplateException;
 import org.slf4j.Logger;
@@ -45,6 +46,9 @@ public class AuthenticationController {
     @Autowired
     private IUserService userService;
 
+    @Autowired
+    private MailAttemptService mailAttemptService;
+
     @Value("${server.auth.open-registration}")
     private boolean openRegistration;
 
@@ -69,11 +73,16 @@ public class AuthenticationController {
             }
 
             newUserRequest.email = URLDecoder.decode(newUserRequest.email, StandardCharsets.UTF_8.name());
+            if (mailAttemptService.isBlocked(newUserRequest.email)) {
+                return MessageResource.successMessage("Done");
+            }
+
             User user = registrationService.createNewUser(newUserRequest);
             if (user == null)
                 return MessageResource.successMessage("Done");
             mailService.sendRegistrationEmail(user);
 
+            mailAttemptService.mailAttempt(newUserRequest.email);
             return MessageResource.successMessage("Done");
         } catch (IOException | TemplateException | MessagingException e) {
             log.error(e.toString());
@@ -101,10 +110,14 @@ public class AuthenticationController {
 
     @PostMapping(value = "/reset")
     public MessageResource resetPassword(@RequestBody String recoveryEmail) {
+        if (mailAttemptService.isBlocked(recoveryEmail)) {
+            return MessageResource.successMessage("Done");
+        }
         try {
             User user = registrationService.resetPassword(recoveryEmail);
             if (user != null) {
                 mailService.sendPasswordResetEmail(user);
+                mailAttemptService.mailAttempt(user.getEmail());
                 return MessageResource.successMessage("Done");
             } else {
                 return MessageResource.successMessage("Done");
