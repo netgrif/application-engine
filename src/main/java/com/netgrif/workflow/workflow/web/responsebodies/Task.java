@@ -26,6 +26,8 @@ public class Task {
 
     private String transitionId;
 
+    private Integer cols;
+
     private String title;
 
     private String caseColor;
@@ -70,6 +72,7 @@ public class Task {
         this._id = task.getObjectId();
         this.caseId = task.getCaseId();
         this.transitionId = task.getTransitionId();
+        this.cols = task.getCols();
         this.title = task.getTitle().getTranslation(locale);
         this.caseColor = task.getCaseColor();
         this.caseTitle = task.getCaseTitle();

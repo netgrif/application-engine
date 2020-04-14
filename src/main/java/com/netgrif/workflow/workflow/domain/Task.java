@@ -46,6 +46,9 @@ public class Task {
     private String transitionId;
 
     @Getter @Setter
+    private Integer cols;
+
+    @Getter @Setter
     private I18nString title;
 
     @Getter @Setter
