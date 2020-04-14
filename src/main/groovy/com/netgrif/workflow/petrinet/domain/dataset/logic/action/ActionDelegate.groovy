@@ -1,5 +1,6 @@
 package com.netgrif.workflow.petrinet.domain.dataset.logic.action
 
+import  com.netgrif.workflow.*
 import com.netgrif.workflow.AsyncRunner
 import com.netgrif.workflow.auth.domain.User
 import com.netgrif.workflow.auth.service.interfaces.IUserService
@@ -33,6 +34,9 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Component
 
+/**
+ * ActionDelegate class contains Actions API methods.
+ */
 @SuppressWarnings(["GrMethodMayBeStatic", "GroovyUnusedDeclaration"])
 class ActionDelegate {
 
@@ -69,9 +73,12 @@ class ActionDelegate {
     @Autowired
     MemberService memberService
 
+    /**
+     * Reference of case in which current action is taking place.
+     */
+    Case useCase
     def map = [:]
     Action action
-    Case useCase
     FieldActionsRunner actionsRunner
     Map<String, ChangedField> changedFields = new HashMap<>()
 
@@ -125,6 +132,21 @@ class ActionDelegate {
 
     def unchanged = { return UNCHANGED_VALUE }
 
+    /**
+     * Changes behavior of a given field on given transition if certain condition is being met.
+     * <br>
+     * Example:
+     * <pre>
+     *     condition: f.conditionId,
+     *     text: f.textId,
+     *     transition: t.transitionId;
+     *
+     *     make text,visible on transition when { condition.value == true }
+     * </pre>
+     * This code will change the field <i>text</i> behaviour to <i>visible</i> when fields <i>condition</i> value is equal to <i>true</i>
+     * @param field which behaviour will be changed
+     * @param behavior one of visible, editable, required, optional, hidden, forbidden
+     */
     def make(Field field, Closure behavior) {
         [on: { Transition trans ->
             [when: { Closure condition ->
