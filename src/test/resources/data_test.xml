@@ -7,9 +7,9 @@
     <data type="number">
         <id>number</id>
         <title>Number</title>
-        <init>10</init>
-        <desc>Number field description</desc>
         <placeholder>Number field placeholder</placeholder>
+        <desc>Number field description</desc>
+        <init>10</init>
         <valid>inrange 0,inf</valid>
         <validations>
             <validation>
@@ -103,6 +103,17 @@
         <title>DateTime</title>
         <desc>DateTime field description</desc>
         <placeholder>DateTime field placeholder</placeholder>
+        <valid>between today,future</valid>
+        <validations>
+            <validation>
+                <expression>between today,future</expression>
+                <message>Date field validation message</message>
+            </validation>
+            <validation>
+                <expression>between today,future</expression>
+                <message>Date field validation message 2</message>
+            </validation>
+        </validations>
     </data>
     <transition>
         <id>1</id>
