@@ -209,14 +209,13 @@ public class DataService implements IDataService {
                     return container;
             }
 
-            field.getActions().forEach(action -> actionsRunner.run(action, useCase));
-            updateDataset(useCase);
-            workflowService.save(useCase);
 
             Map<String, ChangedField> changedFields = resolveActions(useCase.getPetriNet().getField(fieldId).get(),
                     Action.ActionTrigger.SET, useCase, useCase.getPetriNet().getTransition(task.getTransitionId()));
             container.putAll(changedFields);
             container.setIsSave(true);
+            updateDataset(useCase);
+            workflowService.save(useCase);
             return container;
 
         } catch (IOException e) {
