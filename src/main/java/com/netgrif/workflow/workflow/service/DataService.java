@@ -172,7 +172,7 @@ public class DataService implements IDataService {
                 Field field = net.getDataSet().get(datum);
                 if (field.getType() == FieldType.TASK_REF) {
                     collectTaskRefDataGroups((TaskField) dataFieldMap.get(datum), resources);
-                } else {
+                } else if (dataFieldMap.containsKey(datum)) {
                     resources.add(dataFieldMap.get(datum));
                 }
             }
