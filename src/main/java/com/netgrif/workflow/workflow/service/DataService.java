@@ -171,10 +171,12 @@ public class DataService implements IDataService {
             List<Field> resources = new LinkedList<>();
             for (String datum : dataGroup.getData()) {
                 Field field = net.getDataSet().get(datum);
-                if (field.getType() == FieldType.TASK_REF) {
-                    collectTaskRefDataGroups((TaskField) dataFieldMap.get(datum), resources);
-                } else {
-                    resources.add(dataFieldMap.get(datum));
+                if (dataFieldMap.containsKey(datum)) {
+                    if (field.getType() == FieldType.TASK_REF) {
+                        collectTaskRefDataGroups((TaskField) dataFieldMap.get(datum), resources);
+                    } else {
+                        resources.add(dataFieldMap.get(datum));
+                    }
                 }
             }
             dataGroup.setFields(new DataFieldsResource(resources, locale));
