@@ -119,6 +119,10 @@ public class DataService implements IDataService {
     @Override
     public ChangedFieldContainer setData(String taskId, ObjectNode values) {
         Task task = taskService.findOne(taskId);
+        return setData(task, values);
+    }
+
+    private ChangedFieldContainer setData(Task task, ObjectNode values) {
         Case useCase = workflowService.findOne(task.getCaseId());
         ChangedFieldContainer container = new ChangedFieldContainer();
 
@@ -128,8 +132,8 @@ public class DataService implements IDataService {
         values.fields().forEachRemaining(entry -> {
             DataField dataField = useCase.getDataSet().get(entry.getKey());
             String fieldId = entry.getKey();
-            if (entry.getKey().startsWith(taskId)) {
-                fieldId = fieldId.replace(taskId + "-", "");
+            if (entry.getKey().startsWith(task.getStringId())) {
+                fieldId = fieldId.replace(task.getStringId() + "-", "");
                 dataField = useCase.getDataField(fieldId);
             }
             if (dataField != null) {
@@ -140,13 +144,15 @@ public class DataService implements IDataService {
             } else try {
                 if (entry.getKey().contains("-")) {
                     String[] parts = entry.getKey().split("-");
-                    ChangedFieldContainer changedFieldContainer = setData(parts[0], values);
+                    Task referencedTask = taskService.findOne(parts[0]);
+                    ChangedFieldContainer changedFieldContainer = setData(referencedTask, values);
                     for (Map.Entry<String, Map<String, Object>> stringMapEntry : changedFieldContainer.getChangedFields().entrySet()) {
-                        container.getChangedFields().put(parts[0] + "-" + stringMapEntry.getKey(), stringMapEntry.getValue());
+                        Map<String, Object> entryValue = substituteTaskRefFieldBehavior(stringMapEntry.getValue(), referencedTask, task.getTransitionId());
+                        container.getChangedFields().put(parts[0] + "-" + stringMapEntry.getKey(), entryValue);
                     }
                 }
             } catch (Exception e) {
-                log.error("Faile", e);
+                log.error("Failed to set taskRef references fields", e);
             }
         });
         updateDataset(useCase);
@@ -155,6 +161,23 @@ public class DataService implements IDataService {
 
         container.putAll(changedFields);
         return container;
+    }
+
+    private Map<String, Object> substituteTaskRefFieldBehavior(Map<String, Object> entryValue, Task referencedTask, String refereeTransId) {
+        if (entryValue.containsKey("behavior")) {
+            Map<String, Object> newBehavior = new HashMap<>();
+            ((Map<String, Object>) entryValue.get("behavior")).entrySet().forEach(behaviorEntry -> {
+                String behaviorChangedOnTrans;
+                if (behaviorEntry.getKey().equals(referencedTask.getTransitionId())) {
+                    behaviorChangedOnTrans = refereeTransId;
+                } else {
+                    behaviorChangedOnTrans = referencedTask.getTransitionId() + "-" + behaviorEntry.getKey();
+                }
+                newBehavior.put(behaviorChangedOnTrans, behaviorEntry.getValue());
+            });
+            entryValue.put("behavior", newBehavior);
+        }
+        return entryValue;
     }
 
     @Override
