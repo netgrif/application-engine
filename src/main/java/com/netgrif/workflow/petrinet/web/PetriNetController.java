@@ -26,10 +26,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
@@ -61,14 +58,14 @@ public class PetriNetController {
             @RequestParam(value = "meta", required = false) String releaseType,
             Authentication auth) throws MissingPetriNetMetaDataException {
         try {
-            File file = new File(multipartFile.getOriginalFilename());
+            File file = new File("storage/uploadedModels/" + multipartFile.getOriginalFilename());
             file.createNewFile();
             FileOutputStream fout = new FileOutputStream(file);
             fout.write(multipartFile.getBytes());
-            fout.close();
             String release = releaseType == null ? "major" : releaseType;
 
-            service.importPetriNet(file, release, (LoggedUser) auth.getPrincipal());
+            service.importPetriNet(new FileInputStream(file), release, (LoggedUser) auth.getPrincipal());
+            fout.close();
             return MessageResource.successMessage("Petri net " + multipartFile.getOriginalFilename() + " imported successfully");
         } catch (IOException e) {
             log.error("Importing Petri net failed: ", e);
