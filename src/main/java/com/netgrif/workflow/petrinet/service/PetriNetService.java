@@ -17,7 +17,7 @@ import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.workflow.petrinet.web.responsebodies.DataFieldReference;
 import com.netgrif.workflow.petrinet.web.responsebodies.PetriNetReference;
 import com.netgrif.workflow.petrinet.web.responsebodies.TransitionReference;
-import org.apache.tomcat.util.http.fileupload.IOUtils;
+import org.apache.commons.io.IOUtils;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
@@ -100,23 +100,22 @@ public abstract class PetriNetService implements IPetriNetService {
     }
 
     @Override
-    public Optional<PetriNet> importPetriNet(File xmlFile, String releaseType, LoggedUser user) throws IOException, MissingPetriNetMetaDataException {
-        Optional<PetriNet> imported = getImporter().importPetriNet(new FileInputStream(xmlFile), new Config());
+    public Optional<PetriNet> importPetriNet(InputStream xmlFile, String releaseType, LoggedUser user) throws IOException, MissingPetriNetMetaDataException {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        IOUtils.copy(xmlFile, baos);
+        byte[] bytes = baos.toByteArray();
+
+        Optional<PetriNet> imported = getImporter().importPetriNet(new ByteArrayInputStream(bytes), new Config());
         if (!imported.isPresent()) {
             return imported;
         }
 
         PetriNet existingNet = getNewestVersionByIdentifier(imported.get().getIdentifier());
-        InputStream xmlStream = new FileInputStream(xmlFile);
-        Optional<PetriNet> newPetriNet = existingNet == null ? importNewPetriNet(xmlStream, user) : importNewVersion(xmlStream, releaseType, existingNet, user);
+        Optional<PetriNet> newPetriNet = existingNet == null ? importNewPetriNet(new ByteArrayInputStream(bytes), user) : importNewVersion(new ByteArrayInputStream(bytes), releaseType, existingNet, user);
         newPetriNet.ifPresent(petriNet -> {
             cache.put(petriNet.getObjectId(), petriNet);
             saveNew(petriNet);
         });
-
-        xmlStream.close();
-        if (!xmlFile.delete())
-            throw new IOException("File of process was not deleted");
 
         return newPetriNet;
     }
