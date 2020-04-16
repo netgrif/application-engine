@@ -167,12 +167,8 @@ public class DataService implements IDataService {
         if (entryValue.containsKey("behavior")) {
             Map<String, Object> newBehavior = new HashMap<>();
             ((Map<String, Object>) entryValue.get("behavior")).entrySet().forEach(behaviorEntry -> {
-                String behaviorChangedOnTrans;
-                if (behaviorEntry.getKey().equals(referencedTask.getTransitionId())) {
-                    behaviorChangedOnTrans = refereeTransId;
-                } else {
-                    behaviorChangedOnTrans = referencedTask.getTransitionId() + "-" + behaviorEntry.getKey();
-                }
+                String behaviorChangedOnTrans = behaviorEntry.getKey().equals(referencedTask.getTransitionId()) ?
+                    refereeTransId : referencedTask.getStringId() + "-" + behaviorEntry.getKey();
                 newBehavior.put(behaviorChangedOnTrans, behaviorEntry.getValue());
             });
             entryValue.put("behavior", newBehavior);
