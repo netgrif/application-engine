@@ -127,7 +127,8 @@ class ImportHelper {
     }
 
     Optional<PetriNet> createNet(String fileName, String release, LoggedUser loggedUser) {
-        return petriNetService.importPetriNet(new File("petriNets/$fileName" as String), release, loggedUser)
+        InputStream netStream = new ClassPathResource("petriNets/$fileName" as String).inputStream
+        return petriNetService.importPetriNet(netStream, release, loggedUser)
     }
 
     UserProcessRole createUserProcessRole(PetriNet net, String name) {

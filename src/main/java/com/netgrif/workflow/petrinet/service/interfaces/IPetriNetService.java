@@ -24,7 +24,7 @@ import java.util.Optional;
 
 public interface IPetriNetService {
 
-    Optional<PetriNet> importPetriNet(File xmlFile, String releaseType, LoggedUser user) throws IOException, MissingPetriNetMetaDataException;
+    Optional<PetriNet> importPetriNet(InputStream xmlFile, String releaseType, LoggedUser user) throws IOException, MissingPetriNetMetaDataException;
 
     Optional<PetriNet> saveNew(PetriNet petriNet);
 
