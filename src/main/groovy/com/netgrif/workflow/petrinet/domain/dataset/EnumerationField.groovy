@@ -10,7 +10,7 @@ class EnumerationField extends ChoiceField<I18nString> {
         super()
     }
 
-    EnumerationField(Map values) {
+    EnumerationField(Map<String, I18nString> values) {
         super(values)
     }
 

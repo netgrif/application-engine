@@ -10,8 +10,8 @@ import com.netgrif.workflow.auth.web.requestbodies.ChangePasswordRequest;
 import com.netgrif.workflow.auth.web.requestbodies.NewUserRequest;
 import com.netgrif.workflow.auth.web.requestbodies.RegistrationRequest;
 import com.netgrif.workflow.auth.web.responsebodies.UserResource;
-import com.netgrif.workflow.mail.IMailService;
-import com.netgrif.workflow.mail.MailAttemptService;
+import com.netgrif.workflow.mail.interfaces.IMailAttemptService;
+import com.netgrif.workflow.mail.interfaces.IMailService;
 import com.netgrif.workflow.workflow.web.responsebodies.MessageResource;
 import freemarker.template.TemplateException;
 import org.slf4j.Logger;
@@ -47,7 +47,7 @@ public class AuthenticationController {
     private IUserService userService;
 
     @Autowired
-    private MailAttemptService mailAttemptService;
+    private IMailAttemptService mailAttemptService;
 
     @Value("${server.auth.open-registration}")
     private boolean openRegistration;
