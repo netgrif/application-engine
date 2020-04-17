@@ -28,8 +28,10 @@ public class LocalisedDateField extends LocalisedField {
         this.minDate = field.getMinDate();
         this.maxDate = field.getMaxDate();
         List<LocalizedValidation> locVal = new ArrayList<LocalizedValidation>();
-        for(Validation val:field.getValidations()){
-            locVal.add(val.getLocalizedValidation(locale));
+        if (field.getValidations() != null) {
+            for(Validation val:field.getValidations()){
+                locVal.add(val.getLocalizedValidation(locale));
+            }
         }
         this.validations = locVal;
         this.defaultValue = field.getDefaultValue();

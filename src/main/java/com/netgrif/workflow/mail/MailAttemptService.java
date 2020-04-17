@@ -19,12 +19,12 @@ public class MailAttemptService implements IMailAttemptService {
 
     static final Logger log = LoggerFactory.getLogger(MailAttemptService.class);
 
-    @Value("${spring.max.email.sends.attempts}")
+    @Value("${spring.max.emailSendsAttempts}")
     private int MAX_ATTEMPT;
 
     private LoadingCache<String, Integer> attemptsCache;
 
-    public MailAttemptService(@Value("${spring.max.email.block.duration}") final int BLOCK_DURATION, @Value("${spring.max.email.block.time.type}") @Nonnull final TimeUnit BLOCK_TIME_TYPE) {
+    public MailAttemptService(@Value("${spring.max.emailBlockDuration}") final int BLOCK_DURATION, @Value("${spring.max.emailBlockTimeType}") @Nonnull final TimeUnit BLOCK_TIME_TYPE) {
           super();
           attemptsCache = CacheBuilder.newBuilder().
                 expireAfterWrite(BLOCK_DURATION, BLOCK_TIME_TYPE).build(new CacheLoader<String, Integer>() {

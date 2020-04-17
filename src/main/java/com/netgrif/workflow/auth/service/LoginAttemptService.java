@@ -19,7 +19,7 @@ public class LoginAttemptService implements ILoginAttemptService {
 
     static final Logger log = LoggerFactory.getLogger(LoginAttemptService.class);
 
-    @Value("${spring.max.login.attempts}")
+    @Value("${spring.max.loginAttempts}")
     private int MAX_ATTEMPT;
 
     private LoadingCache<String, Integer> attemptsCache;
