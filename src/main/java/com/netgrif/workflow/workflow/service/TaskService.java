@@ -629,7 +629,7 @@ public class TaskService implements ITaskService {
                 .processId(useCase.getPetriNetId())
                 .caseId(useCase.get_id().toString())
                 .transitionId(transition.getImportId())
-                .cols(transition.getCols())
+                .layout(transition.getLayout())
                 .caseColor(useCase.getColor())
                 .caseTitle(useCase.getTitle())
                 .priority(transition.getPriority())

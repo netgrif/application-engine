@@ -5,6 +5,7 @@ import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.elastic.domain.ElasticTask;
 import com.netgrif.workflow.petrinet.domain.EventType;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
+import com.netgrif.workflow.petrinet.domain.layout.TaskLayout;
 import lombok.Data;
 import org.bson.types.ObjectId;
 
@@ -26,7 +27,7 @@ public class Task {
 
     private String transitionId;
 
-    private Integer cols;
+    private TaskLayout layout;
 
     private String title;
 
@@ -72,7 +73,7 @@ public class Task {
         this._id = task.getObjectId();
         this.caseId = task.getCaseId();
         this.transitionId = task.getTransitionId();
-        this.cols = task.getCols();
+        this.layout = task.getLayout();
         this.title = task.getTitle().getTranslation(locale);
         this.caseColor = task.getCaseColor();
         this.caseTitle = task.getCaseTitle();
