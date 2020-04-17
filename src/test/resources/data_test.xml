@@ -64,6 +64,13 @@
         <init>true</init>
         <desc>Boolean field description</desc>
         <placeholder>Boolean field placeholder</placeholder>
+        <valid>requiredTrue</valid>
+        <validations>
+            <validation>
+                <expression>requiredTrue</expression>
+                <message>Boolean field validation message</message>
+            </validation>
+        </validations>
     </data>
     <!-- DATE -->
     <data type="date">

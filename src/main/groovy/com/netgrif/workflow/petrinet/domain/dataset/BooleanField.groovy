@@ -3,7 +3,7 @@ package com.netgrif.workflow.petrinet.domain.dataset
 import org.springframework.data.mongodb.core.mapping.Document
 
 @Document
-class BooleanField extends FieldWithDefault<Boolean> {
+class BooleanField extends ValidableField<Boolean> {
 
     BooleanField() {
         super()
@@ -34,6 +34,7 @@ class BooleanField extends FieldWithDefault<Boolean> {
         BooleanField clone = new BooleanField()
         super.clone(clone)
         clone.defaultValue = this.defaultValue
+        clone.validations = this.validations
         return clone
     }
 }
