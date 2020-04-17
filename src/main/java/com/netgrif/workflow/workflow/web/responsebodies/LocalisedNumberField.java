@@ -27,8 +27,10 @@ public class LocalisedNumberField extends LocalisedField {
         this.minValue = field.getMinValue();
         this.maxValue = field.getMaxValue();
         List<LocalizedValidation> locVal = new ArrayList<LocalizedValidation>();
-        for(Validation val:field.getValidations()){
-            locVal.add(val.getLocalizedValidation(locale));
+        if (field.getValidations() != null) {
+            for(Validation val:field.getValidations()){
+                locVal.add(val.getLocalizedValidation(locale));
+            }
         }
         this.validations = locVal;
         this.defaultValue = field.getDefaultValue();

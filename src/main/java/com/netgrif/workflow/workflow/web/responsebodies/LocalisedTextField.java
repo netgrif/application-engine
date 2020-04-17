@@ -30,8 +30,10 @@ public class LocalisedTextField extends LocalisedField {
         this.maxLength = field.getMaxLength();
         this.formatting = field.getFormatting();
         List<LocalizedValidation> locVal = new ArrayList<LocalizedValidation>();
-        for(Validation val:field.getValidations()){
-            locVal.add(val.getLocalizedValidation(locale));
+        if (field.getValidations() != null) {
+            for(Validation val:field.getValidations()){
+                locVal.add(val.getLocalizedValidation(locale));
+            }
         }
         this.validations = locVal;
         this.defaultValue = field.getDefaultValue();
