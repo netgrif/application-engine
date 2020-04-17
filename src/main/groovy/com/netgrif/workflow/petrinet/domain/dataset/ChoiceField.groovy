@@ -31,8 +31,8 @@ abstract class ChoiceField<T> extends FieldWithDefault<T> {
     }
 
     void setChoicesFromStrings(Map<String, String> choices) {
-        choices.each { it.value = new I18nString(it.value) }
-        this.choices = choices
+        this.choices.clear()
+        choices.each { this.choices.put(it.key, new I18nString(it.value)) }
     }
 
     void setChoicesFromStrings(Collection<String> choices) {
