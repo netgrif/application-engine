@@ -14,6 +14,8 @@ import com.netgrif.workflow.petrinet.domain.dataset.logic.FieldBehavior;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.FieldLayout;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.FieldActionsRunner;
+import com.netgrif.workflow.petrinet.domain.layout.DataGroupLayout;
+import com.netgrif.workflow.petrinet.domain.layout.TaskLayout;
 import com.netgrif.workflow.petrinet.domain.policies.AssignPolicy;
 import com.netgrif.workflow.petrinet.domain.policies.DataFocusPolicy;
 import com.netgrif.workflow.petrinet.domain.policies.FinishPolicy;
@@ -299,8 +301,14 @@ public class Importer {
         transition.setImportId(importTransition.getId());
         transition.setTitle(toI18NString(importTransition.getLabel()));
         transition.setPosition(importTransition.getX(), importTransition.getY());
-        if (importTransition.getCols() != null) {
-            transition.setCols(importTransition.getCols());
+        if (importTransition.getCols() != null || importTransition.getRows() != null) {
+            if (importTransition.getRows() != null && importTransition.getCols() != null) {
+                transition.setLayout(new TaskLayout(importTransition.getRows(), importTransition.getCols()));
+            } else if (importTransition.getRows() != null) {
+                transition.setLayout(new TaskLayout(importTransition.getRows(), null));
+            } else {
+                transition.setLayout(new TaskLayout(null, importTransition.getCols()));
+            }
         }
         transition.setPriority(importTransition.getPriority());
         transition.setIcon(importTransition.getIcon());
@@ -401,8 +409,8 @@ public class Importer {
     protected void addDataWithDefaultGroup(Transition transition, DataRef dataRef) {
         DataGroup dataGroup = new DataGroup();
         dataGroup.setImportId(transition.getImportId() + "_" + dataRef.getId() + "_" + System.currentTimeMillis());
-        if (transition.getCols() != null) {
-            dataGroup.setCols(transition.getCols());
+        if (transition.getLayout() != null && transition.getLayout().getCols() != null) {
+            dataGroup.setLayout(new DataGroupLayout(null, transition.getLayout().getCols()));
         }
         dataGroup.setAlignment("start");
         dataGroup.setStretch(true);
@@ -418,10 +426,15 @@ public class Importer {
         String alignment = importDataGroup.getAlignment() != null ? importDataGroup.getAlignment().value() : "";
         DataGroup dataGroup = new DataGroup();
         dataGroup.setImportId(importDataGroup.getId());
-        if (importDataGroup.getCols() != null) {
-            dataGroup.setCols(importDataGroup.getCols());
-        } else if (transition.getCols() != null) {
-            dataGroup.setCols(transition.getCols());
+        if (importDataGroup.getCols() != null || importDataGroup.getRows() != null) {
+            if (importDataGroup.getCols() != null && importDataGroup.getRows() != null) {
+                dataGroup.setLayout(new DataGroupLayout(importDataGroup.getRows(), importDataGroup.getCols()));
+            } else if (importDataGroup.getCols() != null) {
+                dataGroup.setLayout(new DataGroupLayout(null, importDataGroup.getCols()));
+            }
+
+        } else if (transition.getLayout() != null && transition.getLayout().getCols() != null) {
+            dataGroup.setLayout(new DataGroupLayout(null, transition.getLayout().getCols()));
         }
         dataGroup.setTitle(toI18NString(importDataGroup.getTitle()));
         dataGroup.setAlignment(alignment);
