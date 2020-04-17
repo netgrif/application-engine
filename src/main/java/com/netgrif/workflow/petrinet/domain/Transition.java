@@ -3,6 +3,7 @@ package com.netgrif.workflow.petrinet.domain;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.FieldBehavior;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.FieldLayout;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action;
+import com.netgrif.workflow.petrinet.domain.layout.TaskLayout;
 import com.netgrif.workflow.petrinet.domain.policies.AssignPolicy;
 import com.netgrif.workflow.petrinet.domain.policies.DataFocusPolicy;
 import com.netgrif.workflow.petrinet.domain.policies.FinishPolicy;
@@ -36,7 +37,7 @@ public class Transition extends Node {
     private List<Trigger> triggers;
 
     @Getter @Setter
-    private Integer cols;
+    private TaskLayout layout;
 
     @Getter @Setter
     private Integer priority;

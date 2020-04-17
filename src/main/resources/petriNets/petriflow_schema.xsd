@@ -73,6 +73,7 @@
                 <xs:element ref="y"/>
                 <xs:element ref="label"/>
                 <xs:element ref="cols" minOccurs="0"/>
+                <xs:element ref="rows" minOccurs="0"/>
                 <xs:element ref="icon" minOccurs="0"/>
                 <xs:element ref="priority" minOccurs="0"/>
                 <xs:element ref="assignPolicy" minOccurs="0"/>
@@ -395,6 +396,7 @@
             <xs:sequence>
                 <xs:element ref="id"/>
                 <xs:element ref="cols" minOccurs="0"/>
+                <xs:element ref="rows" minOccurs="0"/>
                 <xs:element ref="title" minOccurs="0"/>
                 <xs:element ref="alignment" minOccurs="0"/>
                 <xs:element ref="stretch" minOccurs="0"/>
