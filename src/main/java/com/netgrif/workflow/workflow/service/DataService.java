@@ -89,12 +89,18 @@ public class DataService implements IDataService {
                 if (useCase.getDataSet().get(fieldId).isDisplayable(transition.getStringId())) {
                     Field field = fieldFactory.buildFieldWithValidation(useCase, fieldId);
                     field.setBehavior(useCase.getDataSet().get(fieldId).applyBehavior(transition.getStringId()));
+                    if (transition.getDataSet().get(fieldId).layoutExist() && transition.getDataSet().get(fieldId).getLayout().layoutFilled()) {
+                        field.setLayout(transition.getDataSet().get(fieldId).getLayout());
+                    }
                     dataSetFields.add(field);
                 }
             } else {
                 if (transition.getDataSet().get(fieldId).isDisplayable()) {
                     Field field = fieldFactory.buildFieldWithValidation(useCase, fieldId);
                     field.setBehavior(transition.getDataSet().get(fieldId).applyBehavior());
+                    if (transition.getDataSet().get(fieldId).layoutExist() && transition.getDataSet().get(fieldId).getLayout().layoutFilled()) {
+                        field.setLayout(transition.getDataSet().get(fieldId).getLayout());
+                    }
                     dataSetFields.add(field);
                 }
             }
