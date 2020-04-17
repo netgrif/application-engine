@@ -804,19 +804,19 @@ public class Importer {
             net.setImportId(document.getId());
             net.setIdentifier(document.getId());
         } else {
-            missingMetaData.add("id");
+            missingMetaData.add("<id>");
         }
         if (document.getTitle() != null) {
             net.setTitle(toI18NString(document.getTitle()));
         } else {
-            missingMetaData.add("title");
+            missingMetaData.add("<title>");
         }
         if (document.getInitials() != null) {
             net.setInitials(document.getInitials());
         } else {
-            missingMetaData.add("initials");
+            missingMetaData.add("<initials>");
         }
         if (!missingMetaData.isEmpty())
-            throw new MissingPetriNetMetaDataException("missing " + String.join(", ", missingMetaData));
+            throw new MissingPetriNetMetaDataException(missingMetaData);
     }
 }
