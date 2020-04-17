@@ -1,6 +1,6 @@
 package com.netgrif.workflow.event.listeners;
 
-import com.netgrif.workflow.auth.service.LoginAttemptService;
+import com.netgrif.workflow.auth.service.interfaces.ILoginAttemptService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.context.event.EventListener;
@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 public class AuthEventListener {
 
     @Autowired
-    private LoginAttemptService loginAttemptService;
+    private ILoginAttemptService loginAttemptService;
 
     @EventListener
     public void onAuthenticationFailureBadCredentialsEvent(final AuthenticationFailureBadCredentialsEvent e) {

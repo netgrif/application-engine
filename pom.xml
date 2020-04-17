@@ -159,13 +159,6 @@
             <version>2.0.6</version>
         </dependency>
 
-        <!-- Apache Common IO -->
-        <dependency>
-            <groupId>commons-io</groupId>
-            <artifactId>commons-io</artifactId>
-            <version>2.4</version>
-        </dependency>
-
         <!-- Jsoup -->
         <dependency>
             <groupId>org.jsoup</groupId>
@@ -264,6 +257,13 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-configuration-processor</artifactId>
             <optional>true</optional>
+        </dependency>
+
+        <!-- For Coniguration Properties -->
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-validator</artifactId>
+            <version>6.0.16.Final</version>
         </dependency>
     </dependencies>
 

@@ -11,12 +11,6 @@ class FieldLayout {
     private String template
     private String appearance
 
-    @Override
-    @QueryType(PropertyType.NONE)
-    MetaClass getMetaClass() {
-        return this.metaClass
-    }
-
     FieldLayout() {
     }
 
@@ -79,5 +73,11 @@ class FieldLayout {
 
     boolean layoutFilled() {
         return this.rows != 0 && this.cols != 0
+    }
+
+    @Override
+    @QueryType(PropertyType.NONE)
+    MetaClass getMetaClass() {
+        return this.metaClass
     }
 }

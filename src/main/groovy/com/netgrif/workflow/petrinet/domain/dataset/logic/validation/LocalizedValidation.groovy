@@ -11,9 +11,6 @@ class LocalizedValidation {
         this.validationMessage = validationMessage
     }
 
-    LocalizedValidation() {
-    }
-
     String getValidationMessage() {
         return validationMessage
     }
