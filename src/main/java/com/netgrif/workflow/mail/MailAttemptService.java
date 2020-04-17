@@ -2,6 +2,9 @@ package com.netgrif.workflow.mail;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
+import com.netgrif.workflow.mail.interfaces.IMailAttemptService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -12,7 +15,9 @@ import com.google.common.cache.LoadingCache;
 import javax.annotation.Nonnull;
 
 @Service
-public class MailAttemptService {
+public class MailAttemptService implements IMailAttemptService {
+
+    static final Logger log = LoggerFactory.getLogger(MailAttemptService.class);
 
     @Value("${spring.max.email.sends.attempts}")
     private int MAX_ATTEMPT;
@@ -34,6 +39,7 @@ public class MailAttemptService {
         try {
             attempts = attemptsCache.get(key);
         } catch (ExecutionException e) {
+            log.error(e.toString());
             attempts = 0;
         }
         attempts++;
@@ -44,6 +50,7 @@ public class MailAttemptService {
         try {
             return attemptsCache.get(key) >= MAX_ATTEMPT;
         } catch (ExecutionException e) {
+            log.error(e.toString());
             return false;
         }
     }

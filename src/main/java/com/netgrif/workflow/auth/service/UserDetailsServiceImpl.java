@@ -4,6 +4,7 @@ import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.auth.domain.UserState;
 import com.netgrif.workflow.auth.domain.repositories.UserRepository;
+import com.netgrif.workflow.auth.service.interfaces.ILoginAttemptService;
 import com.netgrif.workflow.event.events.user.UserLoginEvent;
 import com.netgrif.workflow.orgstructure.domain.Group;
 import com.netgrif.workflow.orgstructure.domain.Member;
@@ -19,7 +20,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import com.netgrif.workflow.auth.service.LoginAttemptService;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.stream.Collectors;
@@ -39,7 +39,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     private ApplicationEventPublisher publisher;
 
     @Autowired
-    private LoginAttemptService loginAttemptService;
+    private ILoginAttemptService loginAttemptService;
 
     @Autowired
     private HttpServletRequest request;

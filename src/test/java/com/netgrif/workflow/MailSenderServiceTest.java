@@ -4,7 +4,7 @@ import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.ServerSetup;
 import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.mail.EmailType;
-import com.netgrif.workflow.mail.IMailService;
+import com.netgrif.workflow.mail.interfaces.IMailService;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
