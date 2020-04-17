@@ -20,6 +20,7 @@ import javax.validation.constraints.NotNull;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Document
@@ -170,7 +171,7 @@ public class Case {
                 this.dataSet.put(key, new DataField());
             }
             if (field instanceof UserField) {
-                this.dataSet.get(key).setChoices(((UserField) field).getRoles().stream().collect(Collectors.toMap(o -> o, I18nString::new)));
+                this.dataSet.get(key).setChoices(((UserField) field).getRoles().stream().collect(Collectors.toMap(Function.identity(), I18nString::new)));
             }
         });
     }

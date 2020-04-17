@@ -6,12 +6,6 @@ import com.querydsl.core.annotations.QueryType
 
 class Validation {
 
-    @Override
-    @QueryType(PropertyType.NONE)
-    MetaClass getMetaClass() {
-        return this.metaClass
-    }
-
     private String validationRule
 
     private I18nString validationMessage
@@ -29,9 +23,7 @@ class Validation {
     }
 
     LocalizedValidation getLocalizedValidation(Locale locale){
-        LocalizedValidation ret = new LocalizedValidation()
-        ret.setValidationRule(this.validationRule)
-        ret.setValidationMessage(getTranslatedValidationMessage(locale))
+        LocalizedValidation ret = new LocalizedValidation(this.validationRule, getTranslatedValidationMessage(locale))
         return ret
     }
 
@@ -53,5 +45,11 @@ class Validation {
 
     void setValidationRule(String validationRule) {
         this.validationRule = validationRule
+    }
+
+    @Override
+    @QueryType(PropertyType.NONE)
+    MetaClass getMetaClass() {
+        return this.metaClass
     }
 }

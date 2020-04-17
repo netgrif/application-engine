@@ -21,6 +21,7 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Component
@@ -137,7 +138,7 @@ public final class FieldFactory {
     private MultichoiceField buildMultichoiceField(List<I18NStringType> values, String init, Importer importer) {
         Map<String, I18nString> choices = values.stream()
                 .map(importer::toI18NString)
-                .collect(Collectors.toMap(I18nString::toString, it -> it));
+                .collect(Collectors.toMap(I18nString::toString, Function.identity()));
         MultichoiceField field = new MultichoiceField(choices);
         field.setDefaultValue(init);
 
@@ -157,7 +158,7 @@ public final class FieldFactory {
     private EnumerationField buildEnumerationField(List<I18NStringType> values, String init, Importer importer) {
         Map<String, I18nString> choices = values.stream()
                 .map(importer::toI18NString)
-                .collect(Collectors.toMap(I18nString::toString, it -> it));
+                .collect(Collectors.toMap(I18nString::toString, Function.identity()));
 
         EnumerationField field = new EnumerationField(choices);
         field.setDefaultValue(init);
@@ -255,10 +256,7 @@ public final class FieldFactory {
 
     private Field buildField(Case useCase, String fieldId, boolean withValidation) {
         Field field = useCase.getPetriNet().getDataSet().get(fieldId);
-        if (field instanceof ValidableField) {
-            if (withValidation) {
-            }
-        }
+
         resolveDataValues(field, useCase, fieldId);
         if (field instanceof ChoiceField)
             resolveChoices((ChoiceField) field, useCase);

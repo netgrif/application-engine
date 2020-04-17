@@ -11,7 +11,7 @@ abstract class ChoiceField<T> extends FieldWithDefault<T> {
         choices = new LinkedHashMap<>()
     }
 
-    ChoiceField(Map values) {
+    ChoiceField(Map<String, I18nString> values) {
         this()
         if (values != null)
             this.choices = values

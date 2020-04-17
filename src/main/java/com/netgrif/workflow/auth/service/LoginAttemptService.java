@@ -3,6 +3,9 @@ package com.netgrif.workflow.auth.service;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
+import com.netgrif.workflow.auth.service.interfaces.ILoginAttemptService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -12,7 +15,9 @@ import com.google.common.cache.LoadingCache;
 
 
 @Service
-public class LoginAttemptService {
+public class LoginAttemptService implements ILoginAttemptService {
+
+    static final Logger log = LoggerFactory.getLogger(LoginAttemptService.class);
 
     @Value("${spring.max.login.attempts}")
     private int MAX_ATTEMPT;
@@ -38,6 +43,7 @@ public class LoginAttemptService {
         try {
             attempts = attemptsCache.get(key);
         } catch (ExecutionException e) {
+            log.error(e.toString());
             attempts = 0;
         }
         attempts++;
@@ -48,6 +54,7 @@ public class LoginAttemptService {
         try {
             return attemptsCache.get(key) >= MAX_ATTEMPT;
         } catch (ExecutionException e) {
+            log.error(e.toString());
             return false;
         }
     }
