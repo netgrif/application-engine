@@ -80,6 +80,9 @@ public final class FieldFactory {
             case BUTTON:
                 field = new ButtonField();
                 break;
+            case TASK_REF:
+                field = new TaskField();
+                break;
             default:
                 throw new IllegalArgumentException(data.getType() + " is not a valid Field type");
         }

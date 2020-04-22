@@ -15,7 +15,8 @@ enum FieldType {
     TABULAR("tabular"),
     CASEREF("caseref"),
     DATETIME("dateTime"),
-    BUTTON("button")
+    BUTTON("button"),
+    TASK_REF("taskRef")
 
     String name
 
