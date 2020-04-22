@@ -110,8 +110,8 @@ public class TaskController {
     public MessageResource assign(Authentication auth, @PathVariable("id") String taskId) throws UnauthorisedRequestException {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
 
-//        if( !loggedUser.isAdmin() && !taskAuthenticationService.userHasAtLeastOneRolePermission(loggedUser, taskId, RolePermission.PERFORM))
-//            throw new UnauthorisedRequestException("User " + loggedUser.getUsername() + " doesn't have permission to assign task " + taskId);
+        if( !loggedUser.isAdmin() && !taskAuthenticationService.userHasAtLeastOneRolePermission(loggedUser, taskId, RolePermission.PERFORM))
+            throw new UnauthorisedRequestException("User " + loggedUser.getUsername() + " doesn't have permission to assign task " + taskId);
 
         try {
             taskService.assignTask(loggedUser, taskId);
@@ -126,8 +126,8 @@ public class TaskController {
     public MessageResource delegate(Authentication auth, @PathVariable("id") String taskId, @RequestBody Long delegatedId) throws UnauthorisedRequestException {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
 
-//        if( !loggedUser.isAdmin() && !taskAuthenticationService.userHasAtLeastOneRolePermission(loggedUser, taskId, RolePermission.PERFORM, RolePermission.DELEGATE))
-//            throw new UnauthorisedRequestException("User " + loggedUser.getUsername() + " doesn't have permission to delegate task " + taskId);
+        if( !loggedUser.isAdmin() && !taskAuthenticationService.userHasAtLeastOneRolePermission(loggedUser, taskId, RolePermission.PERFORM, RolePermission.DELEGATE))
+            throw new UnauthorisedRequestException("User " + loggedUser.getUsername() + " doesn't have permission to delegate task " + taskId);
 
         try {
             taskService.delegateTask(loggedUser, delegatedId, taskId);
@@ -142,12 +142,11 @@ public class TaskController {
     public MessageResource finish(Authentication auth, @PathVariable("id") String taskId) throws UnauthorisedRequestException {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
 
-        if(
-//                !loggedUser.isAdmin()
-//			&& !(
-//				taskAuthenticationService.userHasAtLeastOneRolePermission(loggedUser, taskId, RolePermission.PERFORM)
-				!taskAuthenticationService.isAssignee(loggedUser, taskId)
-			)
+        if(	!loggedUser.isAdmin()
+			&& !(
+				taskAuthenticationService.userHasAtLeastOneRolePermission(loggedUser, taskId, RolePermission.PERFORM)
+				&& taskAuthenticationService.isAssignee(loggedUser, taskId)
+			))
             throw new UnauthorisedRequestException("User " + loggedUser.getUsername() + " doesn't have permission to finish task " + taskId);
 
         try {
@@ -163,12 +162,11 @@ public class TaskController {
     public MessageResource cancel(Authentication auth, @PathVariable("id") String taskId) throws UnauthorisedRequestException {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
 
-		if(
-//		!loggedUser.isAdmin()
-//			&& !(
-//				taskAuthenticationService.userHasAtLeastOneRolePermission(loggedUser, taskId, RolePermission.PERFORM, RolePermission.CANCEL)
-				!taskAuthenticationService.isAssignee(loggedUser, taskId)
-			)
+		if(	!loggedUser.isAdmin()
+			&& !(
+				taskAuthenticationService.userHasAtLeastOneRolePermission(loggedUser, taskId, RolePermission.PERFORM, RolePermission.CANCEL)
+				&& taskAuthenticationService.isAssignee(loggedUser, taskId)
+			))
             throw new UnauthorisedRequestException("User " + loggedUser.getUsername() + " doesn't have permission to cancel task " + taskId);
 
         try {
