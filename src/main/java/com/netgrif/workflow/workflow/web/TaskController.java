@@ -164,7 +164,7 @@ public class TaskController {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
 
 		if(
-		!loggedUser.isAdmin() &&
+//		!loggedUser.isAdmin()
 //			&& !(
 //				taskAuthenticationService.userHasAtLeastOneRolePermission(loggedUser, taskId, RolePermission.PERFORM, RolePermission.CANCEL)
 				!taskAuthenticationService.isAssignee(loggedUser, taskId)
