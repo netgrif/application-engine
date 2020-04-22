@@ -2,6 +2,7 @@ package com.netgrif.workflow.workflow.web.responsebodies;
 
 import com.fasterxml.jackson.annotation.JsonRootName;
 import com.netgrif.workflow.auth.domain.Author;
+import com.netgrif.workflow.workflow.domain.MergeFilterOperation;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -27,7 +28,7 @@ public class Filter {
 
     private String query;
 
-    private String readableQuery;
+    private MergeFilterOperation mergeOperation;
 
     public Filter(com.netgrif.workflow.workflow.domain.Filter filter, Locale locale) {
         this.stringId = filter.getStringId();
@@ -38,6 +39,7 @@ public class Filter {
         this.created = filter.getCreated();
         this.type = filter.getType();
         this.query = filter.getQuery();
+        this.mergeOperation = filter.getMergeOperation();
     }
 
 
