@@ -39,7 +39,7 @@ public class MailAttemptService implements IMailAttemptService {
         try {
             attempts = attemptsCache.get(key);
         } catch (ExecutionException e) {
-            log.error(e.toString());
+            log.error("Error reading mail attempts cache for key " + key , e);
             attempts = 0;
         }
         attempts++;
@@ -50,7 +50,7 @@ public class MailAttemptService implements IMailAttemptService {
         try {
             return attemptsCache.get(key) >= MAX_ATTEMPT;
         } catch (ExecutionException e) {
-            log.error(e.toString());
+            log.error("Error reading mail attempts cache for key " + key , e);
             return false;
         }
     }

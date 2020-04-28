@@ -43,7 +43,7 @@ public class LoginAttemptService implements ILoginAttemptService {
         try {
             attempts = attemptsCache.get(key);
         } catch (ExecutionException e) {
-            log.error(e.toString());
+            log.error("Error reading login attempts cache for key " + key , e);
             attempts = 0;
         }
         attempts++;
@@ -54,7 +54,7 @@ public class LoginAttemptService implements ILoginAttemptService {
         try {
             return attemptsCache.get(key) >= MAX_ATTEMPT;
         } catch (ExecutionException e) {
-            log.error(e.toString());
+            log.error("Error reading login attempts cache for key " + key , e);
             return false;
         }
     }
