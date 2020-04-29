@@ -1,0 +1,28 @@
+import com.netgrif.workflow.auth.service.interfaces.IUserService;
+import com.netgrif.workflow.elastic.service.interfaces.IElasticCaseService;
+import com.netgrif.workflow.elastic.service.interfaces.IElasticTaskService;
+import com.netgrif.workflow.mail.IMailService;
+import com.netgrif.workflow.workflow.service.interfaces.IDataService;
+import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
+import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
+import org.slf4j.Logger;
+
+import com.netgrif.workflow.workflow.domain.Case
+
+dialect "mvel"
+
+global IWorkflowService workflowService;
+global ITaskService taskService;
+global IElasticCaseService elasticCaseService;
+global IElasticTaskService elasticTaskService;
+global IDataService dataService;
+global IMailService mailService;
+global IUserService userService;
+global Logger log;
+
+rule "case save rule"
+when
+    $case:Case()
+then
+    log.info("New case [" + $case.getTitle() +"] created");
+end
