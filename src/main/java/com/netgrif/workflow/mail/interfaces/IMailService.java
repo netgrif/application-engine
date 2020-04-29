@@ -1,4 +1,4 @@
-package com.netgrif.workflow.mail;
+package com.netgrif.workflow.mail.interfaces;
 
 import com.netgrif.workflow.auth.domain.User;
 import freemarker.template.TemplateException;

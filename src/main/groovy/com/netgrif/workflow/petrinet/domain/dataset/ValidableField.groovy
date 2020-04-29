@@ -1,70 +1,36 @@
 package com.netgrif.workflow.petrinet.domain.dataset
 
 import com.fasterxml.jackson.annotation.JsonIgnore
+import com.netgrif.workflow.petrinet.domain.I18nString
+import com.netgrif.workflow.petrinet.domain.dataset.logic.validation.Validation
 import org.springframework.data.annotation.Transient
 import org.springframework.data.mongodb.core.mapping.Document
 
 @Document
 abstract class ValidableField<T> extends FieldWithDefault<T> {
 
-    @JsonIgnore
-    private String validationRules
-
-    @Transient
-    private String validationJS
-
-    @Transient
-    private Map<String, Boolean> validationErrors
+    private List<Validation> validations
 
     ValidableField() {
         super()
     }
 
-    String getValidationRules() {
-        return validationRules
-    }
-
-    void setValidationRules(String rules) {
-        this.validationRules = rules
-    }
-
-    void setValidationRules(List<String> rules) {
-        if (rules == null || rules.empty)
-            return
-
-        StringBuilder builder = new StringBuilder()
-        rules.each { rule ->
-            rule = rule.trim()
-            if (rule.contains(" ") || rule.contains("(")) builder.append("{${rule}},")
-            else builder.append(rule + ",")
+    void addValidation(String validationRule,I18nString validationMessage){
+        Validation add = new Validation()
+        if(validationMessage == null) add = new Validation(validationRule)
+        else add = new Validation(validationRule,validationMessage)
+        if(validations == null){
+            this.validations = new ArrayList<Validation>()
         }
-        builder.deleteCharAt(builder.length() - 1)
-        this.validationRules = builder.toString()
+        this.validations.add(add)
     }
 
-    String getValidationJS() {
-        return validationJS
+    List<Validation> getValidations() {
+        return validations
     }
 
-    void setValidationJS(String validationJS) {
-        this.validationJS = validationJS
-    }
-
-    Map<String, Boolean> getValidationErrors() {
-        return validationErrors
-    }
-
-    void setValidationErrors(Map<String, Boolean> validationErrors) {
-        this.validationErrors = validationErrors
-    }
-
-    void addValidationError(String key, Boolean value) {
-        if (this.validationErrors == null) this.validationErrors = new HashMap<>()
-        this.validationErrors.put(key, value)
-    }
-
-    void addValidationError(String key) {
-        this.addValidationError(key, false)
+    void setValidations(List<Validation> validations) {
+        this.validations = validations
     }
 
     @JsonIgnore

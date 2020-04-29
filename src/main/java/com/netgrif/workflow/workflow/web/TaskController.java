@@ -6,13 +6,14 @@ import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.auth.domain.throwable.UnauthorisedRequestException;
 import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.elastic.service.interfaces.IElasticTaskService;
-import com.netgrif.workflow.elastic.web.TaskSearchRequest;
+import com.netgrif.workflow.elastic.web.requestbodies.singleaslist.SingleTaskSearchRequestAsList;
 import com.netgrif.workflow.petrinet.domain.DataGroup;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldByFileFieldContainer;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldContainer;
 import com.netgrif.workflow.petrinet.domain.roles.RolePermission;
 import com.netgrif.workflow.petrinet.domain.throwable.TransitionNotExecutableException;
+import com.netgrif.workflow.workflow.domain.MergeFilterOperation;
 import com.netgrif.workflow.workflow.domain.Task;
 import com.netgrif.workflow.workflow.service.FileFieldInputStream;
 import com.netgrif.workflow.workflow.service.interfaces.IDataService;
@@ -210,10 +211,10 @@ public class TaskController {
     }
 
     @RequestMapping(value = "/search_es", method = RequestMethod.POST)
-    public PagedResources<LocalisedTaskResource> searchElastic(Authentication auth, Pageable pageable, @RequestBody TaskSearchRequest searchBody, PagedResourcesAssembler<com.netgrif.workflow.workflow.domain.Task> assembler, Locale locale) {
-        Page<com.netgrif.workflow.workflow.domain.Task> tasks = searchService.search(searchBody, (LoggedUser) auth.getPrincipal(), pageable);
+    public PagedResources<LocalisedTaskResource> searchElastic(Authentication auth, Pageable pageable, @RequestBody SingleTaskSearchRequestAsList searchBody, @RequestParam(defaultValue = "OR") MergeFilterOperation operation, PagedResourcesAssembler<com.netgrif.workflow.workflow.domain.Task> assembler, Locale locale) {
+        Page<com.netgrif.workflow.workflow.domain.Task> tasks = searchService.search(searchBody.getList(), (LoggedUser) auth.getPrincipal(), pageable, operation == MergeFilterOperation.AND);
         Link selfLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
-                .searchElastic(auth, pageable, searchBody, assembler, locale)).withRel("search_es");
+                .searchElastic(auth, pageable, searchBody, operation, assembler, locale)).withRel("search_es");
         PagedResources<LocalisedTaskResource> resources = assembler.toResource(tasks, new TaskResourceAssembler(locale), selfLink);
         ResourceLinkAssembler.addLinks(resources, com.netgrif.workflow.workflow.domain.Task.class, selfLink.getRel());
         return resources;
@@ -230,18 +231,14 @@ public class TaskController {
 //    }
 
     @PostMapping(value = "/count", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public CountResponse count(@RequestBody TaskSearchRequest query, Authentication auth, Locale locale) {
-        long count = searchService.count(query, (LoggedUser)auth.getPrincipal());
+    public CountResponse count(@RequestBody SingleTaskSearchRequestAsList query, @RequestParam(defaultValue = "OR") MergeFilterOperation operation, Authentication auth, Locale locale) {
+        long count = searchService.count(query.getList(), (LoggedUser)auth.getPrincipal(), operation == MergeFilterOperation.AND);
         return CountResponse.taskCount(count);
     }
 
     @RequestMapping(value = "/{id}/data", method = RequestMethod.GET)
     public DataGroupsResource getData(@PathVariable("id") String taskId, Locale locale) {
-        List<Field> dataFields = dataService.getData(taskId);
-        List<DataGroup> dataGroups = dataService.getDataGroups(taskId);
-
-        dataGroups.forEach(group -> group.setFields(new DataFieldsResource(dataFields.stream().filter(field ->
-                group.getData().contains(field.getStringId())).collect(Collectors.toList()), locale)));
+        List<DataGroup> dataGroups = dataService.getDataGroups(taskId, locale);
 
         return new DataGroupsResource(dataGroups, locale);
     }
