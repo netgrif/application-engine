@@ -12,6 +12,7 @@ import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.dataset.CaseField;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.petrinet.domain.dataset.FieldType;
+import com.netgrif.workflow.petrinet.domain.dataset.logic.action.ActionDelegate;
 import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository;
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.workflow.security.service.EncryptionService;
@@ -24,9 +25,12 @@ import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
 import com.querydsl.core.types.Predicate;
 import org.bson.types.ObjectId;
+import org.kie.api.runtime.KieRuntime;
+import org.kie.api.runtime.KieSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Lookup;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
@@ -46,7 +50,7 @@ import java.util.stream.LongStream;
 import java.util.stream.StreamSupport;
 
 @Service
-public class WorkflowService implements IWorkflowService {
+public abstract class WorkflowService implements IWorkflowService {
 
     private static final Logger log = LoggerFactory.getLogger(WorkflowService.class);
 
@@ -81,6 +85,9 @@ public class WorkflowService implements IWorkflowService {
     @Lazy
     private IElasticCaseService elasticCaseService;
 
+    @Lookup
+    abstract KieSession ruleEngine();
+
     @Override
     public Case save(Case useCase) {
         encryptDataSet(useCase);
@@ -88,6 +95,12 @@ public class WorkflowService implements IWorkflowService {
         if (useCase.getPetriNet() == null) {
             setPetriNet(useCase);
         }
+
+        KieSession ruleEngine = ruleEngine();
+        ruleEngine.insert(useCase);
+        ruleEngine.fireAllRules();
+        ruleEngine.dispose();
+
         try {
             setImmediateDataFields(useCase);
             elasticCaseService.indexNow(new ElasticCase(useCase));
