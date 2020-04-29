@@ -10,6 +10,7 @@ import com.netgrif.workflow.importer.service.Config;
 import com.netgrif.workflow.importer.service.Importer;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository;
+import com.netgrif.workflow.petrinet.domain.throwable.MissingPetriNetMetaDataException;
 import com.netgrif.workflow.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.workflow.startup.SystemUserRunner;
 import com.netgrif.workflow.utils.FullPageRequest;
@@ -75,7 +76,7 @@ public class TaskServiceTest {
         taskRepository.deleteAll();
         userRunner.run("");
 
-        importer.importPetriNet(new File("src/test/resources/prikladFM.xml"), "fm net", "fm", new Config());
+        importer.importPetriNet(new File("src/test/resources/prikladFM.xml"), new Config());
         PetriNet net = petriNetRepository.findAll().get(0);
         workflowService.createCase(net.getStringId(), "Storage Unit", "color", mockLoggedUser());
     }
@@ -90,8 +91,8 @@ public class TaskServiceTest {
     }
 
     @Test
-    public void resetArcTest() throws TransitionNotExecutableException {
-        PetriNet net = importer.importPetriNet(new File("src/test/resources/reset_inhibitor_test.xml"), "reset", "rst", new Config()).get();
+    public void resetArcTest() throws TransitionNotExecutableException, MissingPetriNetMetaDataException {
+        PetriNet net = importer.importPetriNet(new File("src/test/resources/reset_inhibitor_test.xml"), new Config()).get();
         LoggedUser loggedUser = mockLoggedUser();
         Case useCase = workflowService.createCase(net.getStringId(), "Reset test", "color", loggedUser);
         User user = new User();

@@ -1,14 +1,11 @@
 package com.netgrif.workflow.importer.service;
 
 import com.netgrif.workflow.auth.domain.User;
-import com.netgrif.workflow.importer.model.Data;
-import com.netgrif.workflow.importer.model.DocumentRef;
-import com.netgrif.workflow.importer.model.I18NStringType;
+import com.netgrif.workflow.importer.model.*;
 import com.netgrif.workflow.petrinet.domain.Format;
 import com.netgrif.workflow.petrinet.domain.I18nString;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.dataset.*;
-import com.netgrif.workflow.petrinet.domain.dataset.logic.validation.FieldValidationRunner;
 import com.netgrif.workflow.petrinet.domain.views.View;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.DataField;
@@ -24,6 +21,7 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Component
@@ -54,10 +52,18 @@ public final class FieldFactory {
                 field = buildFileField(data, importer);
                 break;
             case ENUMERATION:
-                field = buildEnumerationField(data.getValues(), data.getInit(), importer);
+                if (data.getOptions() != null) {
+                    field = buildEnumerationField(data.getOptions(), data.getInit(), importer);
+                } else {
+                    field = buildEnumerationField(data.getValues(), data.getInit(), importer);
+                }
                 break;
             case MULTICHOICE:
-                field = buildMultichoiceField(data.getValues(), data.getInit(), importer);
+                if (data.getOptions() != null) {
+                    field = buildMultichoiceField(data.getOptions(), data.getInit(), importer);
+                } else {
+                    field = buildMultichoiceField(data.getValues(), data.getInit(), importer);
+                }
                 break;
             case NUMBER:
                 field = new NumberField();
@@ -74,6 +80,9 @@ public final class FieldFactory {
             case BUTTON:
                 field = new ButtonField();
                 break;
+            case TASK_REF:
+                field = new TaskField();
+                break;
             default:
                 throw new IllegalArgumentException(data.getType() + " is not a valid Field type");
         }
@@ -86,15 +95,25 @@ public final class FieldFactory {
         }
         if (data.getDesc() != null)
             field.setDescription(importer.toI18NString(data.getDesc()));
+
         if (data.getPlaceholder() != null)
             field.setPlaceholder(importer.toI18NString(data.getPlaceholder()));
-        if (data.getValid() != null && field instanceof ValidableField)
-            ((ValidableField) field).setValidationRules(data.getValid());
+
+        if (data.getValid() != null && field instanceof ValidableField){
+            List<String> list = data.getValid();
+            for (String item : list) {
+                ((ValidableField) field).addValidation(item,null);
+            }
+        }
+        if (data.getValidations() != null && field instanceof ValidableField) {
+            List<com.netgrif.workflow.importer.model.Validation> list = data.getValidations().getValidation();
+            for (com.netgrif.workflow.importer.model.Validation item : list) {
+                ((ValidableField) field).addValidation(item.getExpression(), importer.toI18NString(item.getMessage()));
+            }
+        }
         if (data.getInit() != null && field instanceof FieldWithDefault)
             setFieldDefaultValue((FieldWithDefault) field, data.getInit());
-        if (field instanceof ValidableField) {
-            resolveValidation(field);
-        }
+
         if (data.getFormat() != null) {
             Format format = formatFactory.buildFormat(data.getFormat());
             field.setFormat(format);
@@ -109,20 +128,40 @@ public final class FieldFactory {
         return field;
     }
 
-    private MultichoiceField buildMultichoiceField(List<I18NStringType> values, String init, Importer importer) {
-        List<I18nString> choices = values.stream()
-                .map(importer::toI18NString)
-                .collect(Collectors.toList());
+    private MultichoiceField buildMultichoiceField(Options options, String init, Importer importer) {
+        Map<String, I18nString> choices = options.getOption().stream()
+                .collect(Collectors.toMap(Option::getKey, value -> new I18nString(value.getValue())));
+
         MultichoiceField field = new MultichoiceField(choices);
         field.setDefaultValue(init);
 
         return field;
     }
 
-    private EnumerationField buildEnumerationField(List<I18NStringType> values, String init, Importer importer) {
-        List<I18nString> choices = values.stream()
+    private MultichoiceField buildMultichoiceField(List<I18NStringType> values, String init, Importer importer) {
+        Map<String, I18nString> choices = values.stream()
                 .map(importer::toI18NString)
-                .collect(Collectors.toList());
+                .collect(Collectors.toMap(I18nString::toString, Function.identity()));
+        MultichoiceField field = new MultichoiceField(choices);
+        field.setDefaultValue(init);
+
+        return field;
+    }
+
+    private EnumerationField buildEnumerationField(Options options, String init, Importer importer) {
+        Map<String, I18nString> choices = options.getOption().stream()
+                .collect(Collectors.toMap(Option::getKey, value -> new I18nString(value.getValue())));
+
+        EnumerationField field = new EnumerationField(choices);
+        field.setDefaultValue(init);
+
+        return field;
+    }
+
+    private EnumerationField buildEnumerationField(List<I18NStringType> values, String init, Importer importer) {
+        Map<String, I18nString> choices = values.stream()
+                .map(importer::toI18NString)
+                .collect(Collectors.toMap(I18nString::toString, Function.identity()));
 
         EnumerationField field = new EnumerationField(choices);
         field.setDefaultValue(init);
@@ -220,13 +259,7 @@ public final class FieldFactory {
 
     private Field buildField(Case useCase, String fieldId, boolean withValidation) {
         Field field = useCase.getPetriNet().getDataSet().get(fieldId);
-        if (field instanceof ValidableField) {
-            if (!withValidation) {
-                ((ValidableField) field).setValidationJS(null);
-            } else {
-                resolveValidation(field);
-            }
-        }
+
         resolveDataValues(field, useCase, fieldId);
         if (field instanceof ChoiceField)
             resolveChoices((ChoiceField) field, useCase);
@@ -234,16 +267,10 @@ public final class FieldFactory {
     }
 
     private void resolveChoices(ChoiceField field, Case useCase) {
-        Set<I18nString> choices = useCase.getDataField(field.getImportId()).getChoices();
+        Map<String, I18nString> choices = useCase.getDataField(field.getImportId()).getChoices();
         if (choices == null)
             return;
         field.setChoices(choices);
-    }
-
-    private void resolveValidation(Field field) {
-        if (((ValidableField) field).getValidationRules() != null)
-            ((ValidableField) field).setValidationJS(FieldValidationRunner
-                    .toJavascript(field, ((ValidableField) field).getValidationRules()));
     }
 
     public Field buildImmediateField(Case useCase, String fieldId) {
@@ -288,7 +315,7 @@ public final class FieldFactory {
     private void parseUserValues(UserField field, Case useCase, String fieldId) {
         DataField userField = useCase.getDataField(fieldId);
         if (userField.getChoices() != null) {
-            Set<String> roles = userField.getChoices().stream().map(I18nString::getDefaultValue).collect(Collectors.toSet());
+            Set<String> roles = userField.getChoices().values().stream().map(I18nString::getDefaultValue).collect(Collectors.toSet());
             field.setRoles(roles);
         }
         field.setValue((User) useCase.getFieldValue(fieldId));
@@ -417,7 +444,7 @@ public final class FieldFactory {
     public static I18nString parseEnumValue(Case useCase, String fieldId, EnumerationField field) {
         Object value = useCase.getFieldValue(fieldId);
         if (value instanceof String) {
-            for (I18nString i18nString : field.getChoices()) {
+            for (I18nString i18nString : field.getChoices().values()) {
                 if (i18nString.contains((String) value)) {
                     return i18nString;
                 }
