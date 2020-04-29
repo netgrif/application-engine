@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../petriflow_schema.xsd">
+    <id>address</id>
+    <initials>ADD</initials>
+    <title>Address</title>
+    
+    <data type="text">
+        <id>street</id>
+        <title name="street_title">Street</title>
+    </data>
+    <data type="text">
+        <id>streetnumber</id>
+        <title name="streetnumber_title">Street Number</title>
+    </data>
+    <data type="text">
+        <id>postal</id>
+        <title name="postal_title">Postal code</title>
+    </data>
+    <data type="enumeration">
+        <id>city</id>
+        <title name="city_title">City</title>
+    </data>
+    <data type="enumeration">
+        <id>type</id>
+        <title name="type_title">Property</title>
+        <values name="type_value_house">House</values>
+        <values name="type_value_flat">Flat</values>
+        <values name="type_value_apartment">Apartment</values>
+        <values name="type_value_cottage">Cottage</values>
+        <init>House</init>
+    </data>
+
+    <i18n locale="sk">
+        <i18nString name="street_title">Ulica</i18nString>
+        <i18nString name="streetnumber_title">Číslo domu</i18nString>
+        <i18nString name="postal_title">PSČ</i18nString>
+        <i18nString name="city_title">Obec</i18nString>
+        <i18nString name="type_title">Typ nehnuteľnosti</i18nString>
+        <i18nString name="type_value_house">Dom</i18nString>
+        <i18nString name="type_value_flat">Byt</i18nString>
+        <i18nString name="type_value_apartment">Apartmán</i18nString>
+        <i18nString name="type_value_cottage">Chata</i18nString>
+        <i18nString name="address_and_mortgage">Adresa a typ nehnuteľnosti</i18nString>
+    </i18n>
+
+    <transition>
+        <id>address_and_mortgage</id>
+        <x>150</x>
+        <y>150</y>
+        <label name="address_and_mortgage">Address and type of mortgage</label>
+        <dataRef>
+            <id>street</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>streetnumber</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>postal</id>
+            <logic>
+                <behavior>editable</behavior>
+                <action trigger="set">
+                    field: f.this,
+                    city: f.city;
+                    change city choices {
+                    def postals = psc byCode,field.value;
+                    return postals.collect({it.city}).unique();
+                    }
+                </action>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>city</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>type</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+            </logic>
+        </dataRef>
+    </transition>
+</document>

@@ -29,6 +29,12 @@ class FinisherRunner extends AbstractOrderedCommandLineRunner {
 
     @Override
     void run(String... strings) throws Exception {
+//        helper.createNet("mortgage/address.xml","address","Address","ADD","major")
+        def insuranceNet = helper.createNet("insurance_portal_demo.xml","insurance","Insurance","INS","major")
         helper.createNet("leukemia.xml", "protokol_leukemia", "Protokol o začatí a kontrole liečby chronickej myelocytovej leukémie", "LEU", "major")
+
+        helper.createCase("Insurance Case", insuranceNet.get())
+
+        superCreator.setAllToSuperUser()
     }
 }
