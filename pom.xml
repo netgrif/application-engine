@@ -224,6 +224,18 @@
             <scope>runtime</scope>
         </dependency>
 
+        <!-- Drools -->
+        <dependency>
+            <groupId>org.drools</groupId>
+            <artifactId>drools-core</artifactId>
+            <version>7.36.1.Final</version>
+        </dependency>
+        <dependency>
+            <groupId>org.kie</groupId>
+            <artifactId>kie-spring</artifactId>
+            <version>7.36.1.Final</version>
+        </dependency>
+
         <!-- Dev tools -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
