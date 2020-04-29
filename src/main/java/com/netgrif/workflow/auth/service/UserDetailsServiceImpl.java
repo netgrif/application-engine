@@ -4,6 +4,7 @@ import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.auth.domain.UserState;
 import com.netgrif.workflow.auth.domain.repositories.UserRepository;
+import com.netgrif.workflow.auth.service.interfaces.ILoginAttemptService;
 import com.netgrif.workflow.event.events.user.UserLoginEvent;
 import com.netgrif.workflow.orgstructure.domain.Group;
 import com.netgrif.workflow.orgstructure.domain.Member;
@@ -20,6 +21,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.stream.Collectors;
 
 @Service
@@ -36,9 +38,21 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Autowired
     private ApplicationEventPublisher publisher;
 
+    @Autowired
+    private ILoginAttemptService loginAttemptService;
+
+    @Autowired
+    private HttpServletRequest request;
+
     @Override
     @Transactional(readOnly = true)
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        String ip = getClientIP();
+        if (loginAttemptService.isBlocked(ip)) {
+            logger.info("User "+email+" with IP Address "+ip+" is blocked.");
+            throw new RuntimeException("blocked");
+        }
+
         LoggedUser loggedUser = getLoggedUser(email);
         setGroups(loggedUser);
 
@@ -67,5 +81,13 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         if (member != null) {
             loggedUser.setGroups(member.getGroups().stream().map(Group::getId).collect(Collectors.toSet()));
         }
+    }
+
+    private String getClientIP() {
+        String xfHeader = request.getHeader("X-Forwarded-For");
+        if (xfHeader == null){
+            return request.getRemoteAddr();
+        }
+        return xfHeader.split(",")[0];
     }
 }

@@ -1,7 +1,9 @@
 package com.netgrif.workflow.petrinet.domain;
 
 import com.netgrif.workflow.petrinet.domain.dataset.logic.FieldBehavior;
+import com.netgrif.workflow.petrinet.domain.dataset.logic.FieldLayout;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action;
+import com.netgrif.workflow.petrinet.domain.layout.TaskLayout;
 import com.netgrif.workflow.petrinet.domain.policies.AssignPolicy;
 import com.netgrif.workflow.petrinet.domain.policies.DataFocusPolicy;
 import com.netgrif.workflow.petrinet.domain.policies.FinishPolicy;
@@ -33,6 +35,9 @@ public class Transition extends Node {
     @Field("triggers")
     @Getter @Setter
     private List<Trigger> triggers;
+
+    @Getter @Setter
+    private TaskLayout layout;
 
     @Getter @Setter
     private Integer priority;
@@ -67,12 +72,13 @@ public class Transition extends Node {
         events = new HashMap<>();
     }
 
-    public void addDataSet(String field, Set<FieldBehavior> behavior, Set<Action> actions){
+    public void addDataSet(String field, Set<FieldBehavior> behavior, Set<Action> actions, FieldLayout layout){
         if(dataSet.containsKey(field) && dataSet.get(field) != null){
             if(behavior != null) dataSet.get(field).getBehavior().addAll(behavior);
             if(actions != null) dataSet.get(field).getActions().addAll(actions);
+            if(layout != null) dataSet.get(field).setLayout(layout);
         } else {
-            dataSet.put(field,new DataFieldLogic(behavior, actions));
+            dataSet.put(field,new DataFieldLogic(behavior, actions, layout));
         }
     }
 
