@@ -88,7 +88,9 @@ class FieldTest {
         assert field.description.defaultValue == "Number field description"
         assert field.name.defaultValue == "Number"
         assert field.placeholder.defaultValue == "Number field placeholder"
-        assert field.validationRules == "{inrange 0,inf}"
+        assert field.validations.get(0).validationRule == "inrange 0,inf"
+        assert field.validations.get(1).validationMessage.defaultValue == "Number field validation message"
+        assert field.validations.get(1).validationRule == "inrange 0,inf"
     }
 
     private void assertTextField() {
@@ -97,7 +99,9 @@ class FieldTest {
         assert field.description.defaultValue == "Text field description"
         assert field.name.defaultValue == "Text"
         assert field.placeholder.defaultValue == "Text field placeholder"
-        assert field.validationRules == "email"
+        assert field.validations.get(0).validationRule == "email"
+        assert field.validations.get(1).validationMessage.defaultValue == "Mail validation message"
+        assert field.validations.get(1).validationRule == "email"
     }
 
     private void assertEnumerationField() {
@@ -107,9 +111,9 @@ class FieldTest {
         assert field.name.defaultValue == "Enumeration"
         assert field.placeholder.defaultValue == "Enumeration field placeholder"
         assert field.choices.size() == 3
-        assert field.choices.find { it.defaultValue == "enumeration" }
-        assert field.choices.find { it.defaultValue == "enumeration2" }
-        assert field.choices.find { it.defaultValue == "enumeration3" }
+        assert field.choices.values().find { it.defaultValue == "enumeration" }
+        assert field.choices.values().find { it.defaultValue == "enumeration2" }
+        assert field.choices.values().find { it.defaultValue == "enumeration3" }
     }
 
     private void assertMultichoiceField() {
@@ -121,9 +125,9 @@ class FieldTest {
         assert field.name.defaultValue == "Multichoice"
         assert field.placeholder.defaultValue == "Multichoice field placeholder"
         assert field.choices.size() == 3
-        assert field.choices.find { it.defaultValue == "multichoice" }
-        assert field.choices.find { it.defaultValue == "multichoice2" }
-        assert field.choices.find { it.defaultValue == "multichoice3" }
+        assert field.choices.values().find { it.defaultValue == "multichoice" }
+        assert field.choices.values().find { it.defaultValue == "multichoice2" }
+        assert field.choices.values().find { it.defaultValue == "multichoice3" }
     }
 
     private void assertBooleanField() {
@@ -139,6 +143,11 @@ class FieldTest {
         assert field.description.defaultValue == "Date field description"
         assert field.name.defaultValue == "Date"
         assert field.placeholder.defaultValue == "Date field placeholder"
+        assert field.validations.get(0).validationRule == "between today,future"
+        assert field.validations.get(1).validationMessage.defaultValue == "Date field validation message"
+        assert field.validations.get(1).validationRule == "between today,future"
+        assert field.validations.get(2).validationMessage.defaultValue == "Date field validation message 2"
+        assert field.validations.get(2).validationRule == "between today,tommorow"
     }
 
     private void assertFileField() {

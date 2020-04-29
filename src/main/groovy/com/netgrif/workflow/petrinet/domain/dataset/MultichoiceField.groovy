@@ -8,14 +8,14 @@ class MultichoiceField extends ChoiceField<Set<I18nString>> {
 
     MultichoiceField() {
         super()
-        super.setValue(new HashSet<I18nString>())
-        super.setDefaultValue(new HashSet<I18nString>())
+        super.setValue(new HashSet<String>())
+        super.setDefaultValue(new HashSet<String>())
     }
 
-    MultichoiceField(List<I18nString> values) {
+    MultichoiceField(Map<String, I18nString> values) {
         super(values)
-        super.setValue(new HashSet<I18nString>())
-        super.setDefaultValue(new HashSet<I18nString>())
+        super.setValue(new HashSet<String>())
+        super.setDefaultValue(new HashSet<String>())
     }
 
     @Override
@@ -30,7 +30,7 @@ class MultichoiceField extends ChoiceField<Set<I18nString>> {
             String[] vls = value.split(",")
             def defaults = new HashSet()
             vls.each { s ->
-                defaults << choices.find { it ->
+                defaults << choices.values().find { it ->
                     it.defaultValue == s.trim()
                 }
             }

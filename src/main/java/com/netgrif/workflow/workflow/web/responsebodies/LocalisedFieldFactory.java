@@ -19,6 +19,8 @@ public class LocalisedFieldFactory {
             return fromText((TextField) field, locale);
         } else if (field instanceof DateField) {
             return fromDate((DateField) field, locale);
+        } else if (field instanceof DateTimeField) {
+            return fromDateTime((DateTimeField) field, locale);
         } else if (field instanceof BooleanField) {
             return fromBoolean((BooleanField) field, locale);
         } else if (field instanceof UserField) {
@@ -38,6 +40,10 @@ public class LocalisedFieldFactory {
 
     private static LocalisedField fromDate(DateField field, Locale locale) {
         return new LocalisedDateField(field, locale);
+    }
+
+    private static LocalisedField fromDateTime(DateTimeField field, Locale locale) {
+        return new LocalisedDateTimeField(field, locale);
     }
 
     private static LocalisedField fromBoolean(BooleanField field, Locale locale) {

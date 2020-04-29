@@ -83,11 +83,11 @@ public class WorkflowService implements IWorkflowService {
 
     @Override
     public Case save(Case useCase) {
-        encryptDataSet(useCase);
-        useCase = repository.save(useCase);
         if (useCase.getPetriNet() == null) {
             setPetriNet(useCase);
         }
+        encryptDataSet(useCase);
+        useCase = repository.save(useCase);
         try {
             setImmediateDataFields(useCase);
             elasticCaseService.indexNow(new ElasticCase(useCase));
