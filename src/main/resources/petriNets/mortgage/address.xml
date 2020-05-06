@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../petriflow_schema.xsd">
+    <id>address</id>
+    <initials>ADD</initials>
+    <title>Address</title>
+
     <data type="text">
         <id>street</id>
         <title name="street_title">Street</title>

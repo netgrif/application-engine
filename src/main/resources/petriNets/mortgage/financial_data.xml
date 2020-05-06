@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../petriflow_schema.xsd">
+    <id>financial_data</id>
+    <initials>FIN</initials>
+    <title>Financial Data</title>
+
     <data type="number">
         <id>income</id>
         <title name="income_title">Monthly Income in EUR</title>
@@ -67,38 +71,6 @@
         <y>60</y>
         <label>Constructor / System</label>
         <trigger type="auto"/>
-        <event type="finish">
-            <id>288_finish</id>
-            <actions phase="pre">
-                <action>
-                    <!-- @formatter:off -->
-                    taskDoc: f.task_doc;
-
-                    def document = createCase("financial_data_doc", "${useCase.title} - Doc" as String, "color-fg-amber-500")
-                    def document2 = createCase("financial_data_doc", "${useCase.title} - Doc 2" as String, "color-fg-amber-500")
-
-                    change taskDoc value {
-                        [document.tasks.first().task, document2.tasks.first().task]
-                    }
-
-                    <!-- @formatter:on -->
-                </action>
-            </actions>
-
-            <actions phase="post">
-                <action>
-                    taskDoc: f.task_doc;
-
-                    def taskList = taskDoc.value
-                    taskList.add(useCase.tasks.first().task)
-
-                    change taskDoc value {
-                        taskList as List
-                    }
-
-                </action>
-            </actions>
-        </event>
     </transition>
 
     <transition>
