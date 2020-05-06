@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../petriflow_schema.xsd">
+    <id>mortgage</id>
+    <initials>MOR</initials>
+    <title>Mortgage</title>
     <!-- ROLES -->
     <role>
         <id>client</id>
