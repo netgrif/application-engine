@@ -30,14 +30,14 @@ class FinisherRunner extends AbstractOrderedCommandLineRunner {
 
     @Override
     void run(String... strings) throws Exception {
-        helper.createNet("mortgage/address.xml", "major")
-        helper.createNet("mortgage/financial_data.xml", "major")
-        helper.createNet("mortgage/personal_information.xml", "major")
-        def mortgage = helper.createNet("mortgage/mortgage.xml", "major")
-        def leukemia = helper.createNet("leukemia.xml", "major")
-        superCreator.setAllToSuperUser()
-
-        helper.createCase("Mortgage", mortgage.get())
-        helper.createCase("Protocol", leukemia.get())
+//        helper.createNet("mortgage/address.xml", "major")
+//        helper.createNet("mortgage/financial_data.xml", "major")
+//        helper.createNet("mortgage/personal_information.xml", "major")
+//        def mortgage = helper.createNet("mortgage/mortgage.xml", "major")
+//        def leukemia = helper.createNet("leukemia.xml", "major")
+//        superCreator.setAllToSuperUser()
+//
+//        helper.createCase("Mortgage", mortgage.get())
+//        helper.createCase("Protocol", leukemia.get())
     }
 }
