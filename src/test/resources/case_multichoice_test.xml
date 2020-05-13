@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xsi:noNamespaceSchemaLocation="../../main/resources/petriNets/petriflow_schema.xsd">
-    <id>2</id>
+    <id>case_multichoice_test.xml</id>
+    <initials>TST</initials>
+    <title>Test</title>
     <defaultRole>true</defaultRole>
 
     <data type="multichoice">
