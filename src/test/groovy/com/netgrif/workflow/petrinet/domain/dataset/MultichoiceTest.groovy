@@ -3,7 +3,9 @@ package com.netgrif.workflow.petrinet.domain.dataset
 import com.netgrif.workflow.TestHelper
 import com.netgrif.workflow.importer.service.Importer
 import com.netgrif.workflow.ipc.TaskApiTest
+import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.workflow.startup.ImportHelper
+import com.netgrif.workflow.startup.SuperCreator
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -18,9 +20,6 @@ import org.springframework.test.context.junit4.SpringRunner
 class MultichoiceTest {
 
     public static final String MULTICHOICE_NET_FILE = "case_multichoice_test.xml"
-    public static final String NET_TITLE = "CMT"
-    public static final String NET_INITIALS = "CMT"
-    public static final String NET_TASK_EDIT_COST = "Tran"
 
     @Autowired
     private Importer importer
@@ -30,6 +29,12 @@ class MultichoiceTest {
 
     @Autowired
     private TestHelper testHelper
+
+    @Autowired
+    private IPetriNetService petriNetService
+
+    @Autowired
+    private SuperCreator superCreator
 
     private def stream = { String name ->
         return TaskApiTest.getClassLoader().getResourceAsStream(name)
@@ -42,9 +47,7 @@ class MultichoiceTest {
 
     @Test
     void testMultichoiceField() {
-        def netOptional = importer.importPetriNet(stream(MULTICHOICE_NET_FILE), NET_TITLE, NET_INITIALS)
+        def netOptional = petriNetService.importPetriNet(stream(MULTICHOICE_NET_FILE), "major", superCreator.getLoggedSuper())
         assert netOptional.isPresent()
-        def net = netOptional.get()
     }
-
 }
