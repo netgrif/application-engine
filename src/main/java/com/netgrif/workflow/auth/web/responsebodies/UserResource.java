@@ -12,6 +12,7 @@ public class UserResource extends Resource<User> {
 
     public UserResource(com.netgrif.workflow.auth.domain.User content, String selfRel, Locale locale) {
         super(new User(content, locale), new ArrayList<>());
+        getContent().setPassword(null);
         buildLinks(selfRel);
     }
 
