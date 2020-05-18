@@ -1,3 +1,8 @@
+template header
+ruleId
+whenCondition
+thenAction
+
 import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.elastic.service.interfaces.IElasticCaseService;
 import com.netgrif.workflow.elastic.service.interfaces.IElasticTaskService;
@@ -14,9 +19,10 @@ import com.netgrif.workflow.utils.DateUtils;
 import com.netgrif.workflow.rules.domain.facts.CaseRuleEvaluation;
 import java.util.concurrent.atomic.AtomicInteger
 
-import com.netgrif.workflow.workflow.domain.Case
-
-dialect "mvel"
+import com.netgrif.workflow.workflow.domain.*
+import com.netgrif.workflow.rules.domain.facts.*
+import com.netgrif.workflow.petrinet.domain.*
+import com.netgrif.workflow.rules.domain.facts.TransitionEvent
 
 global IWorkflowService workflowService;
 global ITaskService taskService;
@@ -27,27 +33,13 @@ global IMailService mailService;
 global IUserService userService;
 global Logger log;
 
-rule "case save rule"
-when
-    $case:Case( processIdentifier == "protokol_leukemia", ["TEST1", "TEST"] contains dataSet["text_1"].value, dataSet["date_1"].value != null, DateUtils.objectToLocalDate(dataSet["date_1"].value).compareTo(LocalDate.now()) == 0) // TODO figure out casting
-    $dataSet: HashMap() from $case.dataSet
-then
-    log.info("New case [" + $case.getTitle() +"] created");
-    log.info($dataSet.toString());
-    log.info($case.getStringId());
-end
+template "standard_template"
 
-rule "rule event trigger rule"
-when
-    $event: CaseRuleEvaluation()
-then
-    log.info("New rule event fact inserted " + $event.getCaseId());
+rule "@{ruleId}"
+  dialect "mvel"
+  when
+    @{whenCondition}
+  then
+    @{thenAction}
 end
-
-rule "rule event insert"
-when
-    $event: CaseRuleEvaluation()
-then
-    insert(new AtomicInteger(1))
-end
-
+end template
