@@ -14,6 +14,9 @@ import com.netgrif.workflow.petrinet.domain.roles.ProcessRole;
 import com.netgrif.workflow.petrinet.domain.roles.RolePermission;
 import com.netgrif.workflow.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.workflow.petrinet.service.interfaces.IProcessRoleService;
+import com.netgrif.workflow.rules.domain.facts.TransitionEvent;
+import com.netgrif.workflow.rules.service.CaseSessionService;
+import com.netgrif.workflow.rules.service.interfaces.IRuleEngineSessionService;
 import com.netgrif.workflow.utils.DateUtils;
 import com.netgrif.workflow.utils.FullPageRequest;
 import com.netgrif.workflow.workflow.domain.Case;
@@ -27,6 +30,7 @@ import com.netgrif.workflow.workflow.service.interfaces.IDataService;
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
 import com.netgrif.workflow.workflow.web.responsebodies.TaskReference;
+import org.kie.api.runtime.KieSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -84,6 +88,9 @@ public class TaskService implements ITaskService {
 
     @Autowired
     private IElasticTaskService elasticTaskService;
+
+    @Autowired
+    private CaseSessionService caseSessionService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -200,6 +207,8 @@ public class TaskService implements ITaskService {
 
         publisher.publishEvent(new UserFinishTaskEvent(user, task, useCase));
         log.info("["+useCase.getStringId()+"]: Task [" + task.getTitle() + "] in case [" + useCase.getTitle() + "] assigned to [" + user.getEmail() + "] was finished");
+
+        evaluateRules(useCase, TransitionEvent.finish(task));
 
         return outcome;
     }
@@ -705,6 +714,17 @@ public class TaskService implements ITaskService {
     @Override
     public void deleteTasksByCase(String caseId) {
         delete(taskRepository.findAllByCaseId(caseId), caseId);
+    }
+
+    @Transactional
+    void evaluateRules(Case useCase, TransitionEvent transitionEvent) {
+        KieSession ruleEngine = caseSessionService.getSessionForCase(useCase);
+
+        ruleEngine.insert(useCase);
+        ruleEngine.insert(transitionEvent);
+        ruleEngine.fireAllRules();
+
+        ruleEngine.destroy();
     }
 
     private void setUser(Task task) {

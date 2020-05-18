@@ -2,7 +2,6 @@ package com.netgrif.workflow.workflow.service;
 
 import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.elastic.domain.ElasticCase;
-import com.netgrif.workflow.elastic.service.ElasticCaseService;
 import com.netgrif.workflow.elastic.service.interfaces.IElasticCaseService;
 import com.netgrif.workflow.event.events.usecase.CreateCaseEvent;
 import com.netgrif.workflow.event.events.usecase.DeleteCaseEvent;
@@ -12,9 +11,9 @@ import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.dataset.CaseField;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.petrinet.domain.dataset.FieldType;
-import com.netgrif.workflow.petrinet.domain.dataset.logic.action.ActionDelegate;
 import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository;
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
+import com.netgrif.workflow.rules.service.CaseSessionService;
 import com.netgrif.workflow.security.service.EncryptionService;
 import com.netgrif.workflow.utils.FullPageRequest;
 import com.netgrif.workflow.workflow.domain.Case;
@@ -25,12 +24,10 @@ import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
 import com.querydsl.core.types.Predicate;
 import org.bson.types.ObjectId;
-import org.kie.api.runtime.KieRuntime;
 import org.kie.api.runtime.KieSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Lookup;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
@@ -41,6 +38,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.BasicQuery;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -50,7 +48,7 @@ import java.util.stream.LongStream;
 import java.util.stream.StreamSupport;
 
 @Service
-public abstract class WorkflowService implements IWorkflowService {
+public class WorkflowService implements IWorkflowService {
 
     private static final Logger log = LoggerFactory.getLogger(WorkflowService.class);
 
@@ -82,11 +80,11 @@ public abstract class WorkflowService implements IWorkflowService {
     private FieldFactory fieldFactory;
 
     @Autowired
+    private CaseSessionService caseSessionService;
+
+    @Autowired
     @Lazy
     private IElasticCaseService elasticCaseService;
-
-    @Lookup
-    abstract KieSession ruleEngine();
 
     @Override
     public Case save(Case useCase) {
@@ -96,10 +94,11 @@ public abstract class WorkflowService implements IWorkflowService {
             setPetriNet(useCase);
         }
 
-        KieSession ruleEngine = ruleEngine();
-        ruleEngine.insert(useCase);
-        ruleEngine.fireAllRules();
-        ruleEngine.dispose();
+        try {
+            evaluateRules(useCase);
+        } catch (Exception e) {
+            log.error("Failed to eval rules for " + useCase.getStringId(), e);
+        }
 
         try {
             setImmediateDataFields(useCase);
@@ -108,6 +107,16 @@ public abstract class WorkflowService implements IWorkflowService {
             log.error("Indexing failed ["+useCase.getStringId()+"]", e);
         }
         return useCase;
+    }
+
+    @Transactional
+    void evaluateRules(Case useCase) {
+        KieSession ruleEngine = caseSessionService.getSessionForCase(useCase);
+
+        ruleEngine.insert(useCase);
+        ruleEngine.fireAllRules();
+
+        ruleEngine.destroy();
     }
 
     @Override
@@ -387,4 +396,6 @@ public abstract class WorkflowService implements IWorkflowService {
         model.initializeVarArcs(useCase.getDataSet());
         useCase.setPetriNet(model);
     }
+
+
 }
