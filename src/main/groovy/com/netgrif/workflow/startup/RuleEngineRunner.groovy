@@ -29,8 +29,13 @@ class RuleEngineRunner extends AbstractOrderedCommandLineRunner {
 
         StoredRule rule3 = new StoredRule()
         rule3.when = "\$case: Case()\n    \$event: TransitionEvent(type == EventType.FINISH)"
-        rule3.then = "log.info(\$case.stringId + ' was evaluated in rule 3, finished task ' + \$event.transitionId)"
+        rule3.then = "log.info(\$case.stringId + ' was evaluated in rule 3, finished task ' + \$event.transitionId) \n factRepository.save(\$event)"
         repository.save(rule3)
+
+        StoredRule rule4 = new StoredRule()
+        rule4.when = "\$net: PetriNet()"
+        rule4.then = "log.info(\$net.stringId + ' ' + \$net.identifier + ' was imported ')"
+        repository.save(rule4)
     }
 
 }
