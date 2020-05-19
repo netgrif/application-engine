@@ -7,7 +7,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document
 @Data
-public abstract class RuleFact {
+public abstract class Fact {
 
     @Id
     private ObjectId _id;

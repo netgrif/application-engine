@@ -15,8 +15,7 @@ import com.netgrif.workflow.petrinet.domain.roles.RolePermission;
 import com.netgrif.workflow.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.workflow.petrinet.service.interfaces.IProcessRoleService;
 import com.netgrif.workflow.rules.domain.facts.TransitionEvent;
-import com.netgrif.workflow.rules.service.CaseSessionService;
-import com.netgrif.workflow.rules.service.interfaces.IRuleEngineSessionService;
+import com.netgrif.workflow.rules.service.RuleEngine;
 import com.netgrif.workflow.utils.DateUtils;
 import com.netgrif.workflow.utils.FullPageRequest;
 import com.netgrif.workflow.workflow.domain.Case;
@@ -90,7 +89,7 @@ public class TaskService implements ITaskService {
     private IElasticTaskService elasticTaskService;
 
     @Autowired
-    private CaseSessionService caseSessionService;
+    private RuleEngine ruleEngine;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -130,6 +129,9 @@ public class TaskService implements ITaskService {
 
         publisher.publishEvent(new UserAssignTaskEvent(user, task, useCase));
         log.info("["+useCase.getStringId()+"]: Task [" + task.getTitle() + "] in case [" + useCase.getTitle() + "] assigned to [" + user.getEmail() + "]");
+
+        ruleEngine.evaluateRules(useCase, TransitionEvent.assign(task));
+
         return outcome;
     }
 
@@ -208,7 +210,7 @@ public class TaskService implements ITaskService {
         publisher.publishEvent(new UserFinishTaskEvent(user, task, useCase));
         log.info("["+useCase.getStringId()+"]: Task [" + task.getTitle() + "] in case [" + useCase.getTitle() + "] assigned to [" + user.getEmail() + "] was finished");
 
-        evaluateRules(useCase, TransitionEvent.finish(task));
+        ruleEngine.evaluateRules(useCase, TransitionEvent.finish(task));
 
         return outcome;
     }
@@ -249,6 +251,9 @@ public class TaskService implements ITaskService {
 
         publisher.publishEvent(new UserCancelTaskEvent(user, task, useCase));
         log.info("["+useCase.getStringId()+"]: Task [" + task.getTitle() + "] in case [" + useCase.getTitle() + "] assigned to [" + user.getEmail() + "] was cancelled");
+
+        ruleEngine.evaluateRules(useCase, TransitionEvent.cancel(task));
+
         return outcome;
     }
 
@@ -714,17 +719,6 @@ public class TaskService implements ITaskService {
     @Override
     public void deleteTasksByCase(String caseId) {
         delete(taskRepository.findAllByCaseId(caseId), caseId);
-    }
-
-    @Transactional
-    void evaluateRules(Case useCase, TransitionEvent transitionEvent) {
-        KieSession ruleEngine = caseSessionService.getSessionForCase(useCase);
-
-        ruleEngine.insert(useCase);
-        ruleEngine.insert(transitionEvent);
-        ruleEngine.fireAllRules();
-
-        ruleEngine.destroy();
     }
 
     private void setUser(Task task) {

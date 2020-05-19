@@ -1,6 +1,5 @@
 package com.netgrif.workflow.rules.domain.facts;
 
-import com.netgrif.workflow.rules.domain.facts.RuleFact;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -12,7 +11,7 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class CaseRuleEvaluation extends RuleFact {
+public class CaseEvaluation extends Fact {
 
     private String caseId;
 
