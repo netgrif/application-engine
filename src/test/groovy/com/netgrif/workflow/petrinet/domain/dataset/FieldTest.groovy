@@ -62,7 +62,7 @@ class FieldTest {
         superCreator.run()
         systemUserRunner.run()
 
-        limitsNetOptional = importer.importPetriNet(stream(LIMITS_NET_FILE), LIMITS_NET_TITLE, LIMITS_NET_INITIALS)
+        limitsNetOptional = importer.importPetriNet(stream(LIMITS_NET_FILE))
 
         assertNet()
         assertNumberField()
