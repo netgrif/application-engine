@@ -11,7 +11,9 @@ import com.netgrif.workflow.importer.service.Importer
 import com.netgrif.workflow.orgstructure.domain.Group
 import com.netgrif.workflow.petrinet.domain.PetriNet
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRoleRepository
+import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.workflow.startup.ImportHelper
+import com.netgrif.workflow.startup.SuperCreator
 import groovy.json.JsonOutput
 import org.junit.Assert
 import org.junit.Before
@@ -69,6 +71,11 @@ class RemoveActionTest {
     @Autowired
     private ImportHelper importHelper
 
+    @Autowired
+    private IPetriNetService petriNetService;
+
+    @Autowired
+    private SuperCreator superCreator;
 
     private MockMvc mvc
     private PetriNet petriNet
@@ -83,7 +90,7 @@ class RemoveActionTest {
                 .apply(springSecurity())
                 .build()
 
-        def net = importer.importPetriNet(new File("src/test/resources/removeRole_test.xml"), NET_NAME, NET_INITIALS, new Config())
+        def net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/removeRole_test.xml"), "major", superCreator.getLoggedSuper())
         assert net.isPresent()
 
         this.petriNet = net.get()
