@@ -17,7 +17,9 @@ import com.netgrif.workflow.orgstructure.domain.Group
 import com.netgrif.workflow.orgstructure.domain.GroupRepository
 import com.netgrif.workflow.orgstructure.domain.Member
 import com.netgrif.workflow.orgstructure.domain.MemberRepository
+import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.workflow.startup.ImportHelper
+import com.netgrif.workflow.startup.SuperCreator
 import org.jsoup.Jsoup
 import org.junit.After
 import org.junit.Before
@@ -68,6 +70,12 @@ class AuthenticationControllerTest {
     @Autowired
     private AuthorityRepository authorityRepository
 
+    @Autowired
+    private IPetriNetService petriNetService;
+
+    @Autowired
+    private SuperCreator superCreator;
+
     private GreenMail smtpServer
 
     private Group group
@@ -78,7 +86,7 @@ class AuthenticationControllerTest {
         smtpServer = new GreenMail(new ServerSetup(2525, null, "smtp"))
         smtpServer.start()
 
-        def net = importer.importPetriNet(new File("src/test/resources/insurance_portal_demo_test.xml"), CASE_NAME, CASE_INITIALS, new Config())
+        def net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/insurance_portal_demo_test.xml"), "major", superCreator.getLoggedSuper())
         assert net.isPresent()
         if (authorityRepository.count() == 0)
             importHelper.createAuthority(Authority.user)
