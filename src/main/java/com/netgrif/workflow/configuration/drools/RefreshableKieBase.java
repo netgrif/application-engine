@@ -1,5 +1,6 @@
 package com.netgrif.workflow.configuration.drools;
 
+import com.netgrif.workflow.configuration.drools.interfaces.IKnowledgeBaseInitializer;
 import com.netgrif.workflow.rules.domain.RuleRepository;
 import org.kie.api.KieBase;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,10 +15,10 @@ public class RefreshableKieBase {
     private KieBase kieBase;
 
     private RuleRepository ruleRepository;
-    private KnowledgeBaseInitializer knowledgeBaseInitializer;
+    private IKnowledgeBaseInitializer knowledgeBaseInitializer;
 
 
-    public RefreshableKieBase(@Autowired RuleRepository ruleRepository, @Autowired KnowledgeBaseInitializer knowledgeBaseInitializer) {
+    public RefreshableKieBase(@Autowired RuleRepository ruleRepository, @Autowired IKnowledgeBaseInitializer knowledgeBaseInitializer) {
         this.ruleRepository = ruleRepository;
         this.knowledgeBaseInitializer = knowledgeBaseInitializer;
         refresh();

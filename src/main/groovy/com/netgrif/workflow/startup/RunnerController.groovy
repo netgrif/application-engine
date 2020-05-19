@@ -21,6 +21,7 @@ class RunnerController {
             PostalCodeImporter,
             DummyUserRunner,
             DemoRunner,
+            QuartzSchedulerRunner,
             FinisherRunner
     ]
 
