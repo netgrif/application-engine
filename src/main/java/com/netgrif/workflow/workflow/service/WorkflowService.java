@@ -13,7 +13,7 @@ import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.petrinet.domain.dataset.FieldType;
 import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository;
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
-import com.netgrif.workflow.rules.service.CaseSessionService;
+import com.netgrif.workflow.rules.service.RuleEngine;
 import com.netgrif.workflow.security.service.EncryptionService;
 import com.netgrif.workflow.utils.FullPageRequest;
 import com.netgrif.workflow.workflow.domain.Case;
@@ -80,7 +80,7 @@ public class WorkflowService implements IWorkflowService {
     private FieldFactory fieldFactory;
 
     @Autowired
-    private CaseSessionService caseSessionService;
+    private RuleEngine ruleEngine;
 
     @Autowired
     @Lazy
@@ -95,28 +95,12 @@ public class WorkflowService implements IWorkflowService {
         }
 
         try {
-            evaluateRules(useCase);
-        } catch (Exception e) {
-            log.error("Failed to eval rules for " + useCase.getStringId(), e);
-        }
-
-        try {
             setImmediateDataFields(useCase);
             elasticCaseService.indexNow(new ElasticCase(useCase));
         } catch (Exception e) {
             log.error("Indexing failed ["+useCase.getStringId()+"]", e);
         }
         return useCase;
-    }
-
-    @Transactional
-    void evaluateRules(Case useCase) {
-        KieSession ruleEngine = caseSessionService.getSessionForCase(useCase);
-
-        ruleEngine.insert(useCase);
-        ruleEngine.fireAllRules();
-
-        ruleEngine.destroy();
     }
 
     @Override
@@ -213,6 +197,9 @@ public class WorkflowService implements IWorkflowService {
         taskService.reloadTasks(useCase);
 
         useCase = findOne(useCase.getStringId());
+
+        ruleEngine.evaluateRules(useCase);
+
         return setImmediateDataFields(useCase);
     }
 

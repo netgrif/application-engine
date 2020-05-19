@@ -5,12 +5,12 @@ import lombok.EqualsAndHashCode;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
-public abstract class CaseSpecificRuleFact extends RuleFact {
+public abstract class PetriNetFact extends Fact {
 
-    private String caseId;
+    private String netId;
 
-    public CaseSpecificRuleFact(String caseId) {
+    public PetriNetFact(String netId) {
         super();
-        this.caseId = caseId;
+        this.netId = netId;
     }
 }

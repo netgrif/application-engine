@@ -2,13 +2,19 @@ package com.netgrif.workflow.configuration.quartz;
 
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.autoconfigure.quartz.QuartzDataSource;
 import org.springframework.boot.autoconfigure.quartz.QuartzProperties;
+import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.datasource.init.DataSourceInitializer;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
@@ -21,6 +27,17 @@ import java.util.Properties;
 @Configuration
 public class QuartzConfiguration {
 
+    private static final Logger log = LoggerFactory.getLogger(QuartzConfiguration.class);
+
+    @Value("${quartz.jdbc-url}")
+    private String jdbcUrl;
+
+    @Value("${spring.datasource.username}")
+    private String jdbcUser;
+
+    @Value("${spring.datasource.password}")
+    private String jdbcPass;
+
     @Autowired
     private ApplicationContext applicationContext;
 
@@ -30,13 +47,14 @@ public class QuartzConfiguration {
     @Autowired
     private DataSource dataSource;
 
-    /*
-    @Bean
     @QuartzDataSource
     public DataSource quartzDataSource() {
-        return null;
+        DataSourceBuilder dataSourceBuilder = DataSourceBuilder.create();
+        dataSourceBuilder.url(jdbcUrl);
+        dataSourceBuilder.username(jdbcUser);
+        dataSourceBuilder.password(jdbcPass);
+        return dataSourceBuilder.build();
     }
-    */
 
     @Bean
     @ConditionalOnProperty(value = "quartz.import-schema")
@@ -44,30 +62,28 @@ public class QuartzConfiguration {
         ResourceDatabasePopulator resourceDatabasePopulator = new ResourceDatabasePopulator();
         resourceDatabasePopulator.addScript(new ClassPathResource("quartz/schema.sql"));
         DataSourceInitializer dataSourceInitializer = new DataSourceInitializer();
-        dataSourceInitializer.setDataSource(dataSource);
+        dataSourceInitializer.setDataSource(quartzDataSource());
         dataSourceInitializer.setDatabasePopulator(resourceDatabasePopulator);
         return dataSourceInitializer;
     }
 
     @Bean
-    public Scheduler scheduler() throws SchedulerException {
-        Scheduler scheduler = schedulerFactoryBean().getScheduler();
-        scheduler.start();
-        return scheduler;
+    public Scheduler scheduler() {
+        return schedulerFactoryBean().getScheduler();
     }
 
     @Bean
     public SchedulerFactoryBean schedulerFactoryBean() {
         SchedulerFactoryBean schedulerFactory = new SchedulerFactoryBean();
         schedulerFactory.setApplicationContext(applicationContext);
+        schedulerFactory.setAutoStartup(false);
 
         Properties properties = new Properties();
         properties.putAll(quartzProperties.getProperties());
         schedulerFactory.setQuartzProperties(properties);
 
         schedulerFactory.setJobFactory(new SpringBeanJobFactory());
-        schedulerFactory.setDataSource(dataSource);
-
+        schedulerFactory.setDataSource(quartzDataSource());
 
         return schedulerFactory;
     }

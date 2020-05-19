@@ -1,5 +1,6 @@
 package com.netgrif.workflow.configuration.drools;
 
+import com.netgrif.workflow.configuration.drools.interfaces.IKnowledgeBaseInitializer;
 import com.netgrif.workflow.rules.domain.RuleRepository;
 import com.netgrif.workflow.rules.domain.StoredRule;
 import org.drools.template.ObjectDataCompiler;
@@ -11,7 +12,7 @@ import org.kie.internal.utils.KieHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -20,14 +21,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@Component
-public class KnowledgeBaseInitializer {
+@Service
+public class KnowledgeBaseInitializer implements IKnowledgeBaseInitializer {
 
     private static final Logger log = LoggerFactory.getLogger(KnowledgeBaseInitializer.class);
 
     @Autowired
     private RuleRepository ruleRepository;
 
+    @Override
     public KieBase constructKieBase() {
         List<StoredRule> rules = ruleRepository.findAll();
         KieHelper kieHelper = new KieHelper();

@@ -4,10 +4,12 @@ import com.netgrif.workflow.petrinet.domain.EventType;
 import com.netgrif.workflow.workflow.domain.Task;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 @Data
+@Document
 @EqualsAndHashCode(callSuper = true)
-public class TransitionEvent extends CaseSpecificRuleFact {
+public class TransitionEvent extends CaseFact {
 
     private String transitionId;
 
