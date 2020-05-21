@@ -1,5 +1,8 @@
 template header
 ruleId
+ruleEnabled
+dateEffective
+dateExpires
 whenCondition
 thenAction
 
@@ -16,16 +19,16 @@ import org.slf4j.Logger;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import com.netgrif.workflow.utils.DateUtils;
-import com.netgrif.workflow.rules.domain.facts.CaseEvaluation;
 import java.util.concurrent.atomic.AtomicInteger
 
 import com.netgrif.workflow.workflow.domain.*
-import com.netgrif.workflow.rules.domain.facts.*
 import com.netgrif.workflow.petrinet.domain.*
+import com.netgrif.workflow.rules.domain.facts.*
+import com.netgrif.workflow.rules.service.interfaces.IRuleEvaluationScheduleService
 import com.netgrif.workflow.rules.domain.FactRepository
-import com.netgrif.workflow.rules.domain.facts.TransitionEvent
 
 global IWorkflowService workflowService;
+global IRuleEvaluationScheduleService ruleEvaluationScheduleService;
 global ITaskService taskService;
 global IElasticCaseService elasticCaseService;
 global IElasticTaskService elasticTaskService;
@@ -39,6 +42,9 @@ template "standard_template"
 
 rule "@{ruleId}"
   dialect "mvel"
+  enabled @{ruleEnabled}
+  @{dateEffective}
+  @{dateExpires}
   when
     @{whenCondition}
   then
