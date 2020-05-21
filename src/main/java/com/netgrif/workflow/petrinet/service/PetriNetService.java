@@ -17,7 +17,10 @@ import com.netgrif.workflow.petrinet.web.requestbodies.UploadedFileMeta;
 import com.netgrif.workflow.petrinet.web.responsebodies.DataFieldReference;
 import com.netgrif.workflow.petrinet.web.responsebodies.PetriNetReference;
 import com.netgrif.workflow.petrinet.web.responsebodies.TransitionReference;
+import com.netgrif.workflow.rules.domain.facts.EventPhase;
+import com.netgrif.workflow.rules.domain.facts.NetImportedFact;
 import com.netgrif.workflow.rules.service.RuleEngine;
+import com.netgrif.workflow.rules.service.interfaces.IRuleEngine;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.bson.Document;
 import org.bson.types.ObjectId;
@@ -71,9 +74,6 @@ public abstract class PetriNetService implements IPetriNetService {
     @Autowired
     private ApplicationEventPublisher publisher;
 
-    @Autowired
-    private RuleEngine ruleEngine;
-
     private Map<ObjectId, PetriNet> cache = new HashMap<>();
 
     @Override
@@ -125,8 +125,6 @@ public abstract class PetriNetService implements IPetriNetService {
         if (newPetriNet.isPresent()) {
             PetriNet net = newPetriNet.get();
             cache.put(net.getObjectId(), net);
-
-            ruleEngine.evaluateRules(net);
         }
 
         return newPetriNet;

@@ -22,6 +22,10 @@ import com.netgrif.workflow.petrinet.domain.roles.ProcessRoleRepository;
 import com.netgrif.workflow.petrinet.domain.roles.RolePermission;
 import com.netgrif.workflow.petrinet.service.ArcFactory;
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
+import com.netgrif.workflow.rules.domain.facts.EventPhase;
+import com.netgrif.workflow.rules.domain.facts.NetImportedFact;
+import com.netgrif.workflow.rules.service.RuleEngine;
+import com.netgrif.workflow.rules.service.interfaces.IRuleEngine;
 import com.netgrif.workflow.workflow.domain.triggers.Trigger;
 import lombok.Getter;
 import org.bson.types.ObjectId;
@@ -86,6 +90,9 @@ public class Importer {
 
     @Autowired
     private FieldActionsRunner actionsRunner;
+
+    @Autowired
+    private IRuleEngine ruleEngine;
 
     @Transactional
     public Optional<PetriNet> importPetriNet(InputStream xml, String title, String initials, Config config) {
@@ -173,11 +180,26 @@ public class Importer {
         net.setDefaultCaseName(toI18NString(document.getCaseName()));
         net.setIdentifier(document.getId());
 
+        evaluateRules(net, EventPhase.PRE);
+
+        Optional<PetriNet> toReturn;
         if (config.isNotSaveObjects()) {
-            return service.saveNew(net);
+            toReturn = service.saveNew(net);
+            if (toReturn.isPresent()) {
+                evaluateRules(toReturn.get(), EventPhase.POST);
+                toReturn = service.saveNew(toReturn.get());
+            }
+
         } else {
-            return Optional.of(net);
+            toReturn = Optional.of(net);
+            evaluateRules(net, EventPhase.POST);
         }
+
+        return toReturn;
+    }
+
+    protected void evaluateRules(PetriNet net, EventPhase phase) {
+        ruleEngine.evaluateRules(net, new NetImportedFact(net.getStringId(), phase));
     }
 
     @Transactional

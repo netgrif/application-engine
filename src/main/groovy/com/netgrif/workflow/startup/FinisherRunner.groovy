@@ -1,15 +1,12 @@
 package com.netgrif.workflow.startup
 
-import com.netgrif.workflow.RulesHelper
 import com.netgrif.workflow.petrinet.service.PetriNetService
-import com.netgrif.workflow.rules.domain.scheduled.RuleEvaluationJob
 import com.netgrif.workflow.workflow.domain.repositories.CaseRepository
 import org.quartz.*
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
-import org.springframework.scheduling.quartz.SimpleTriggerFactoryBean
 import org.springframework.stereotype.Component
 
 @ConditionalOnProperty(value = "admin.create-super", matchIfMissing = true)
