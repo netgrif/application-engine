@@ -3,7 +3,7 @@
     <id>address</id>
     <initials>ADD</initials>
     <title>Address</title>
-    
+
     <data type="text">
         <id>street</id>
         <title name="street_title">Street</title>
@@ -45,8 +45,8 @@
 
     <transition>
         <id>address_and_mortgage</id>
-        <x>150</x>
-        <y>150</y>
+        <x>50</x>
+        <y>50</y>
         <label name="address_and_mortgage">Address and type of mortgage</label>
         <dataRef>
             <id>street</id>

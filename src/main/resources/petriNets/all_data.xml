@@ -104,6 +104,14 @@
     <data type="file">
         <id>file</id>
         <title>File</title>
+        <action trigger="set">
+            <!-- @formatter:off -->
+            textfield: f.text;
+            change textfield value {
+                "funguje to"
+            }
+            <!-- @formatter:on -->
+        </action>
     </data>
 
     <data type="user">

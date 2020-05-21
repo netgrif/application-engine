@@ -2,7 +2,9 @@ package com.netgrif.workflow.ipc
 
 import com.netgrif.workflow.TestHelper
 import com.netgrif.workflow.importer.service.Importer
+import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.workflow.startup.ImportHelper
+import com.netgrif.workflow.startup.SuperCreator
 import com.netgrif.workflow.workflow.domain.Case
 import com.netgrif.workflow.workflow.domain.repositories.CaseRepository
 import org.junit.Before
@@ -30,6 +32,12 @@ class AssignCancelFinishWithCaseTest {
     @Autowired
     private TestHelper testHelper
 
+    @Autowired
+    private IPetriNetService petriNetService;
+
+    @Autowired
+    private SuperCreator superCreator;
+
     private boolean initialised = false
 
     private def stream = { String name ->
@@ -45,12 +53,10 @@ class AssignCancelFinishWithCaseTest {
     }
 
     public static final String ASSIGN_CANCEL_FINISH_NET_FILE = "assign_cancel_finish_with_Case_test.xml"
-    public static final String ASSIGN_CANCEL_FINISH_NET_NAME = "AssignCancelFinish"
-    public static final String ASSIGN_CANCEL_FINISH_NET_INITIALS = "ACF"
 
     @Test
     void testAssignCancelFinish() {
-        def testNet = importer.importPetriNet(stream(ASSIGN_CANCEL_FINISH_NET_FILE), ASSIGN_CANCEL_FINISH_NET_NAME, ASSIGN_CANCEL_FINISH_NET_INITIALS)
+        def testNet = petriNetService.importPetriNet(stream(ASSIGN_CANCEL_FINISH_NET_FILE), "major", superCreator.getLoggedSuper())
 
         assert testNet.isPresent()
 
