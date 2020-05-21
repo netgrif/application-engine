@@ -15,7 +15,6 @@ import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository;
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.workflow.rules.domain.facts.CaseCreatedFact;
 import com.netgrif.workflow.rules.domain.facts.EventPhase;
-import com.netgrif.workflow.rules.service.RuleEngine;
 import com.netgrif.workflow.rules.service.interfaces.IRuleEngine;
 import com.netgrif.workflow.security.service.EncryptionService;
 import com.netgrif.workflow.utils.FullPageRequest;
@@ -27,7 +26,6 @@ import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
 import com.querydsl.core.types.Predicate;
 import org.bson.types.ObjectId;
-import org.kie.api.runtime.KieSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,7 +39,6 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.BasicQuery;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -91,11 +88,11 @@ public class WorkflowService implements IWorkflowService {
 
     @Override
     public Case save(Case useCase) {
-        encryptDataSet(useCase);
-        useCase = repository.save(useCase);
         if (useCase.getPetriNet() == null) {
             setPetriNet(useCase);
         }
+        encryptDataSet(useCase);
+        useCase = repository.save(useCase);
 
         try {
             setImmediateDataFields(useCase);

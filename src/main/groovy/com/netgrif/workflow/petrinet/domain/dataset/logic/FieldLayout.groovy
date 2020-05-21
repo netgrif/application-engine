@@ -1,30 +1,23 @@
 package com.netgrif.workflow.petrinet.domain.dataset.logic
 
+import com.netgrif.workflow.petrinet.domain.layout.Layout
 import com.querydsl.core.annotations.PropertyType
 import com.querydsl.core.annotations.QueryType
 
-class FieldLayout {
+class FieldLayout extends Layout{
     private int x
     private int y
-    private int rows
-    private int cols
     private String template
     private String appearance
 
-    @Override
-    @QueryType(PropertyType.NONE)
-    MetaClass getMetaClass() {
-        return this.metaClass
-    }
-
     FieldLayout() {
+        super()
     }
 
     FieldLayout(int x, int y, int rows, int cols, String template, String appearance) {
+        super(rows, cols)
         this.x = x
         this.y = y
-        this.rows = rows
-        this.cols = cols
         this.template = template?.toLowerCase()
         this.appearance = appearance?.toLowerCase()
     }
@@ -45,22 +38,6 @@ class FieldLayout {
         this.y = y
     }
 
-    int getRows() {
-        return rows
-    }
-
-    void setRows(int rows) {
-        this.rows = rows
-    }
-
-    int getCols() {
-        return cols
-    }
-
-    void setCols(int cols) {
-        this.cols = cols
-    }
-
     String getTemplate() {
         return template
     }
@@ -78,6 +55,12 @@ class FieldLayout {
     }
 
     boolean layoutFilled() {
-        return this.rows != 0 && this.cols != 0
+        return (this.rows != null && this.rows != 0) && (this.cols != null && this.cols != 0)
+    }
+
+    @Override
+    @QueryType(PropertyType.NONE)
+    MetaClass getMetaClass() {
+        return this.metaClass
     }
 }

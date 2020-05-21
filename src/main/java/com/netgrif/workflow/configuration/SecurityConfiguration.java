@@ -115,14 +115,14 @@ public class SecurityConfiguration extends AbstractSecurityConfiguration {
 
     @Override
     String[] getStaticPatterns() {
-        return new String[] {
+        return new String[]{
                 "/**/favicon.ico", "/favicon.ico", "/**/manifest.json", "/manifest.json", "/configuration/**", "/swagger-resources/**", "/swagger-ui.html", "/webjars/**"
         };
     }
 
     @Override
     String[] getServerPatterns() {
-        return new String[] {
+        return new String[]{
                 "/api/auth/signup", "/api/auth/token/verify", "/api/auth/reset", "/api/auth/recover", "/v2/api-docs", "/swagger-ui.html"
         };
     }
