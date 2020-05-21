@@ -7,6 +7,7 @@ import com.netgrif.workflow.elastic.service.interfaces.IElasticTaskService;
 import com.netgrif.workflow.mail.IMailService;
 import com.netgrif.workflow.rules.domain.FactRepository;
 import com.netgrif.workflow.rules.domain.RuleRepository;
+import com.netgrif.workflow.rules.service.interfaces.IRuleEvaluationScheduleService;
 import com.netgrif.workflow.workflow.service.interfaces.IDataService;
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
@@ -24,31 +25,40 @@ import org.springframework.context.annotation.Scope;
 public class DroolsConfiguration {
 
     private static final Logger log = LoggerFactory.getLogger("RuleEngine");
-    private final IKnowledgeBaseInitializer baseInitializer;
-    private final FactRepository factRepository;
-    private final RuleRepository ruleRepository;
-    private final IWorkflowService workflowService;
-    private final ITaskService taskService;
-    private final IElasticCaseService elasticCaseService;
-    private final IElasticTaskService elasticTaskService;
-    private final IDataService dataService;
-    private final IMailService mailService;
-    private final IUserService userService;
 
     @Autowired
-    public DroolsConfiguration(@Qualifier("knowledgeBaseInitializer") IKnowledgeBaseInitializer baseInitializer, FactRepository factRepository, RuleRepository ruleRepository, IWorkflowService workflowService, ITaskService taskService, IElasticCaseService elasticCaseService, IElasticTaskService elasticTaskService, IDataService dataService, IMailService mailService, IUserService userService) {
-        this.baseInitializer = baseInitializer;
-        this.factRepository = factRepository;
-        this.ruleRepository = ruleRepository;
-        this.workflowService = workflowService;
-        this.taskService = taskService;
-        this.elasticCaseService = elasticCaseService;
-        this.elasticTaskService = elasticTaskService;
-        this.dataService = dataService;
-        this.mailService = mailService;
-        this.userService = userService;
-    }
+    private IRuleEvaluationScheduleService ruleEvaluationScheduleService;
 
+    @Autowired
+    @Qualifier("knowledgeBaseInitializer")
+    private IKnowledgeBaseInitializer baseInitializer;
+
+    @Autowired
+    private FactRepository factRepository;
+
+    @Autowired
+    private RuleRepository ruleRepository;
+
+    @Autowired
+    private IWorkflowService workflowService;
+
+    @Autowired
+    private ITaskService taskService;
+
+    @Autowired
+    private IElasticCaseService elasticCaseService;
+
+    @Autowired
+    private IElasticTaskService elasticTaskService;
+
+    @Autowired
+    private IDataService dataService;
+
+    @Autowired
+    private IMailService mailService;
+
+    @Autowired
+    private IUserService userService;
 
     @Bean(name = "kieRuntime")
     @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
@@ -77,6 +87,7 @@ public class DroolsConfiguration {
         runtime.setGlobal("mailService", mailService);
         runtime.setGlobal("userService", userService);
         runtime.setGlobal("factRepository", factRepository);
+        runtime.setGlobal("ruleEvaluationScheduleService", ruleEvaluationScheduleService);
         runtime.setGlobal("log", log);
     }
 

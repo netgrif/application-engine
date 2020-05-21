@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class CaseEvaluation extends Fact {
+public class RuleEvaluation extends Fact {
 
     private String caseId;
 
