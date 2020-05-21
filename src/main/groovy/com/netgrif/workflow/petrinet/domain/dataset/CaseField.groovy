@@ -3,16 +3,16 @@ package com.netgrif.workflow.petrinet.domain.dataset
 import org.springframework.data.mongodb.core.mapping.Document
 
 @Document
-class CaseField extends Field<Set<String>> {
+class CaseField extends Field<List<String>> {
 
-    private Set<String> allowedNets
+    private List<String> allowedNets
 
     CaseField() {
         super()
-        allowedNets = new LinkedHashSet<>()
+        allowedNets = new ArrayList<>()
     }
 
-    CaseField(Set<String> allowedNets) {
+    CaseField(List<String> allowedNets) {
         this()
         this.setAllowedNets(allowedNets)
     }
@@ -24,7 +24,7 @@ class CaseField extends Field<Set<String>> {
 
     @Override
     void clearValue() {
-        this.setValue(new LinkedHashSet<String>())
+        this.setValue(new ArrayList<String>())
     }
 
     @Override
@@ -36,11 +36,11 @@ class CaseField extends Field<Set<String>> {
         return clone
     }
 
-    Set<String> getAllowedNets() {
+    List<String> getAllowedNets() {
         return allowedNets
     }
 
-    void setAllowedNets(Set<String> allowedNets) {
+    void setAllowedNets(List<String> allowedNets) {
         this.allowedNets.clear()
         allowedNets.each {this.allowedNets.add(it)}
     }
