@@ -194,13 +194,13 @@ public class DataService implements IDataService {
         ArrayList<DataGroup> dataGroups = new ArrayList<>(transition.getDataGroups().values());
         for (DataGroup dataGroup : dataGroups) {
             List<Field> resources = new LinkedList<>();
-            for (String datum : dataGroup.getData()) {
-                Field field = net.getDataSet().get(datum);
-                if (dataFieldMap.containsKey(datum)) {
+            for (String dataFieldId : dataGroup.getData()) {
+                Field field = net.getDataSet().get(dataFieldId);
+                if (dataFieldMap.containsKey(dataFieldId)) {
                     if (field.getType() == FieldType.TASK_REF) {
-                        collectTaskRefDataGroups((TaskField) dataFieldMap.get(datum), resources);
+                        collectTaskRefDataGroups((TaskField) dataFieldMap.get(dataFieldId), resources);
                     } else {
-                        resources.add(dataFieldMap.get(datum));
+                        resources.add(dataFieldMap.get(dataFieldId));
                     }
                 }
             }
