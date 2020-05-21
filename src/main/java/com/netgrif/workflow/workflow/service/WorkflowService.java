@@ -2,14 +2,12 @@ package com.netgrif.workflow.workflow.service;
 
 import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.elastic.domain.ElasticCase;
-import com.netgrif.workflow.elastic.service.ElasticCaseService;
 import com.netgrif.workflow.elastic.service.interfaces.IElasticCaseService;
 import com.netgrif.workflow.event.events.usecase.CreateCaseEvent;
 import com.netgrif.workflow.event.events.usecase.DeleteCaseEvent;
 import com.netgrif.workflow.event.events.usecase.UpdateMarkingEvent;
 import com.netgrif.workflow.importer.service.FieldFactory;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
-import com.netgrif.workflow.petrinet.domain.dataset.CaseField;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.petrinet.domain.dataset.FieldType;
 import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository;
@@ -153,25 +151,25 @@ public class WorkflowService implements IWorkflowService {
         return repository.count(searchPredicate);
     }
 
-    @Override
-    public List<Case> getCaseFieldChoices(Pageable pageable, String caseId, String fieldId) {
-        Optional<Case> caseOptional = repository.findById(caseId);
-        if (!caseOptional.isPresent())
-            throw new IllegalArgumentException("Could not find case with id ["+caseId+"]");
-        Case useCase = caseOptional.get();
-
-        CaseField field = (CaseField) useCase.getPetriNet().getDataSet().get(fieldId);
-
-        List<Case> list = new LinkedList<>();
-        field.getConstraintNetIds().forEach((netImportId, fieldImportIds) -> {
-            Optional<PetriNet> netOptional = petriNetRepository.findById(netImportId);
-            if (!netOptional.isPresent())
-                throw new IllegalArgumentException("Could not find model with id ["+netImportId+"]");
-            list.addAll(repository.findAllByProcessIdentifier(netOptional.get().getIdentifier()));
-        });
-
-        return list;
-    }
+//    @Override
+//    public List<Case> getCaseFieldChoices(Pageable pageable, String caseId, String fieldId) {
+//        Optional<Case> caseOptional = repository.findById(caseId);
+//        if (!caseOptional.isPresent())
+//            throw new IllegalArgumentException("Could not find case with id ["+caseId+"]");
+//        Case useCase = caseOptional.get();
+//
+//        CaseField field = (CaseField) useCase.getPetriNet().getDataSet().get(fieldId);
+//
+//        List<Case> list = new LinkedList<>();
+//        field.getConstraintNetIds().forEach((netImportId, fieldImportIds) -> {
+//            Optional<PetriNet> netOptional = petriNetRepository.findById(netImportId);
+//            if (!netOptional.isPresent())
+//                throw new IllegalArgumentException("Could not find model with id ["+netImportId+"]");
+//            list.addAll(repository.findAllByProcessIdentifier(netOptional.get().getIdentifier()));
+//        });
+//
+//        return list;
+//    }
 
     @Override
     public Case createCase(String netId, String title, String color, LoggedUser user) {
