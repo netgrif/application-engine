@@ -1,7 +1,9 @@
 package com.netgrif.workflow.rules.service;
 
 import com.netgrif.workflow.petrinet.domain.PetriNet;
-import com.netgrif.workflow.rules.domain.facts.TransitionEvent;
+import com.netgrif.workflow.rules.domain.facts.CaseCreatedFact;
+import com.netgrif.workflow.rules.domain.facts.NetImportedFact;
+import com.netgrif.workflow.rules.domain.facts.TransitionEventFact;
 import com.netgrif.workflow.rules.service.interfaces.IRuleEngine;
 import com.netgrif.workflow.workflow.domain.Case;
 import org.kie.api.runtime.KieSession;
@@ -11,7 +13,6 @@ import org.springframework.beans.factory.annotation.Lookup;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -23,21 +24,27 @@ public abstract class RuleEngine implements IRuleEngine {
     protected abstract KieSession ruleEngine();
 
     @Override
-    public void evaluateRules(Case useCase) {
+    public void evaluateRules(List<Object> facts) {
         KieSession ruleEngine = createSession();
-        evaluateWithFacts(ruleEngine, Collections.singletonList(useCase));
+        evaluateWithFacts(ruleEngine, facts);
     }
 
     @Override
-    public void evaluateRules(Case useCase, TransitionEvent transitionEvent) {
+    public void evaluateRules(Case useCase, CaseCreatedFact caseCreatedFact) {
         KieSession ruleEngine = createSession();
-        evaluateWithFacts(ruleEngine, Arrays.asList(useCase, transitionEvent));
+        evaluateWithFacts(ruleEngine, Arrays.asList(useCase, caseCreatedFact));
     }
 
     @Override
-    public void evaluateRules(PetriNet petriNet) {
+    public void evaluateRules(Case useCase, TransitionEventFact transitionEventFact) {
         KieSession ruleEngine = createSession();
-        evaluateWithFacts(ruleEngine, Collections.singletonList(petriNet));
+        evaluateWithFacts(ruleEngine, Arrays.asList(useCase, transitionEventFact));
+    }
+
+    @Override
+    public void evaluateRules(PetriNet petriNet, NetImportedFact fact) {
+        KieSession ruleEngine = createSession();
+        evaluateWithFacts(ruleEngine, Arrays.asList(petriNet, fact));
     }
 
     protected KieSession createSession() {

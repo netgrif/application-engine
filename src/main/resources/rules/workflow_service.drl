@@ -11,7 +11,7 @@ import org.slf4j.Logger;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import com.netgrif.workflow.utils.DateUtils;
-import com.netgrif.workflow.rules.domain.facts.CaseEvaluation;
+import com.netgrif.workflow.rules.domain.facts.RuleEvaluation;
 import java.util.concurrent.atomic.AtomicInteger
 
 import com.netgrif.workflow.workflow.domain.Case
@@ -39,14 +39,14 @@ end
 
 rule "rule event trigger rule"
 when
-    $event: CaseEvaluation()
+    $event: RuleEvaluation()
 then
     log.info("New rule event fact inserted " + $event.getCaseId());
 end
 
 rule "rule event insert"
 when
-    $event: CaseEvaluation()
+    $event: RuleEvaluation()
 then
     insert(new AtomicInteger(1))
 end
