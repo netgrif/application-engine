@@ -16,7 +16,6 @@ import com.netgrif.workflow.petrinet.domain.throwable.TransitionNotExecutableExc
 import com.netgrif.workflow.petrinet.service.interfaces.IProcessRoleService;
 import com.netgrif.workflow.rules.domain.facts.EventPhase;
 import com.netgrif.workflow.rules.domain.facts.TransitionEventFact;
-import com.netgrif.workflow.rules.service.RuleEngine;
 import com.netgrif.workflow.rules.service.interfaces.IRuleEngine;
 import com.netgrif.workflow.utils.DateUtils;
 import com.netgrif.workflow.utils.FullPageRequest;
@@ -31,12 +30,12 @@ import com.netgrif.workflow.workflow.service.interfaces.IDataService;
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
 import com.netgrif.workflow.workflow.web.responsebodies.TaskReference;
-import org.kie.api.runtime.KieSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -88,6 +87,7 @@ public class TaskService implements ITaskService {
     private IProcessRoleService processRoleService;
 
     @Autowired
+    @Lazy
     private IElasticTaskService elasticTaskService;
 
     @Autowired
@@ -251,11 +251,11 @@ public class TaskService implements ITaskService {
         useCase = evaluateRules(useCase.getStringId(), task, EventType.CANCEL, EventPhase.PRE);
 
         task = returnTokens(task, useCase.getStringId());
-        outcome.add(dataService.runActions(transition.getPostCancelActions(), useCase.getStringId(), transition));
-        evaluateRules(useCase.getStringId(), task, EventType.CANCEL, EventPhase.POST);
 
         useCase = workflowService.findOne(useCase.getStringId());
         reloadTasks(useCase);
+        outcome.add(dataService.runActions(transition.getPostCancelActions(), useCase.getStringId(), transition));
+        evaluateRules(useCase.getStringId(), task, EventType.CANCEL, EventPhase.POST);
 
         publisher.publishEvent(new UserCancelTaskEvent(user, task, useCase));
         log.info("["+useCase.getStringId()+"]: Task [" + task.getTitle() + "] in case [" + useCase.getTitle() + "] assigned to [" + user.getEmail() + "] was cancelled");
@@ -587,8 +587,14 @@ public class TaskService implements ITaskService {
 
     @Override
     public List<Task> findAllById(List<String> ids) {
-        List<Task> page = taskRepository.findAllBy_idIn(ids);
-        page.forEach(this::setUser);
+        List<Task> page = new LinkedList<>();
+        ids.forEach(id -> {
+            Optional<Task> task = taskRepository.findById(id);
+            task.ifPresent(page::add);
+        });
+        if (page.size() > 0) {
+            page.forEach(this::setUser);
+        }
         return page;
     }
 
@@ -661,7 +667,7 @@ public class TaskService implements ITaskService {
                 .processId(useCase.getPetriNetId())
                 .caseId(useCase.get_id().toString())
                 .transitionId(transition.getImportId())
-                .cols(transition.getCols())
+                .layout(transition.getLayout())
                 .caseColor(useCase.getColor())
                 .caseTitle(useCase.getTitle())
                 .priority(transition.getPriority())

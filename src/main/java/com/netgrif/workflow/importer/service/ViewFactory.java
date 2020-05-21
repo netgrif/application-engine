@@ -2,11 +2,7 @@ package com.netgrif.workflow.importer.service;
 
 import com.netgrif.workflow.importer.model.Data;
 import com.netgrif.workflow.importer.model.DataType;
-import com.netgrif.workflow.petrinet.domain.views.BooleanImageView;
-import com.netgrif.workflow.petrinet.domain.views.EditorView;
-import com.netgrif.workflow.petrinet.domain.views.ListView;
-import com.netgrif.workflow.petrinet.domain.views.TreeView;
-import com.netgrif.workflow.petrinet.domain.views.View;
+import com.netgrif.workflow.petrinet.domain.views.*;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -23,6 +19,8 @@ public class ViewFactory {
             return new View("autocomplete");
         } else if (data.getView().getTree() != null) {
             return new TreeView();
+        } else if (data.getView().getTable() != null) {
+            return new TableView();
         } else {
             throw new UnsupportedViewException();
         }

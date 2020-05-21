@@ -20,6 +20,10 @@ class SuperCreator extends AbstractOrderedCommandLineRunner {
 
     private static final Logger log = LoggerFactory.getLogger(SuperCreator.class.name)
 
+    public static final String TEST_USER_EMAIL = "user@netgrif.com"
+    public static final String TEST_USER_NAME = "Test"
+    public static final String TEST_USER_SURNAME = "User"
+
     @Autowired
     private IAuthorityService authorityService
 
@@ -69,6 +73,24 @@ class SuperCreator extends AbstractOrderedCommandLineRunner {
             this.superUser = superUser
             this.superMember = memberService.findByEmail(this.superUser.email)
         }
+
+        Authority userAuthority = authorityService.getOrCreate(Authority.user)
+        adminAuthority = authorityService.getOrCreate(Authority.admin)
+        User testUser = userService.findByEmail(TEST_USER_EMAIL, false)
+        if (testUser == null) {
+            userService.saveNew(new User(
+                    name: TEST_USER_NAME,
+                    surname: TEST_USER_SURNAME,
+                    email: TEST_USER_EMAIL,
+                    password: "password",
+                    state: UserState.ACTIVE,
+                    authorities: [userAuthority, adminAuthority] as Set<Authority>,
+                    userProcessRoles: new HashSet<UserProcessRole>()))
+            log.info("Test user created")
+        } else {
+            log.info("Test user detected")
+        }
+
         return this.superUser
     }
 

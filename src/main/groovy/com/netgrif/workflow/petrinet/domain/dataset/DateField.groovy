@@ -62,9 +62,8 @@ class DateField extends ValidableField<LocalDate> {
     Field clone() {
         DateField clone = new DateField()
         super.clone(clone)
-        clone.validationRules = this.validationRules
+        clone.validations = this.validations
         clone.defaultValue = this.defaultValue
-
         return clone
     }
 }
