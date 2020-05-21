@@ -490,7 +490,7 @@ public class DataService implements IDataService {
                     value = null;
                     break;
                 }
-                value = val;
+                value = new I18nString(val);
                 break;
             case "user":
                 if (node.get("value") == null) {

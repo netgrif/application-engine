@@ -171,7 +171,7 @@ public class Case {
                 this.dataSet.put(key, new DataField());
             }
             if (field instanceof UserField) {
-                this.dataSet.get(key).setChoices(((UserField) field).getRoles().stream().collect(Collectors.toMap(Function.identity(), I18nString::new)));
+                this.dataSet.get(key).setChoices(((UserField) field).getRoles().stream().map(I18nString::new).collect(Collectors.toSet()));
             }
         });
     }

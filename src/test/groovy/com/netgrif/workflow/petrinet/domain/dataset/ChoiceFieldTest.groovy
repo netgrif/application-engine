@@ -56,11 +56,11 @@ class ChoiceFieldTest {
         assert netOptional.isPresent()
         def net = netOptional.get()
 
-        Map<String, I18nString> choices = ((ChoiceField) net.dataSet["enum"]).choices
+        Set<I18nString> choices = ((ChoiceField) net.dataSet["enum"]).choices
         assert choices.size() == 3
-        assert choices.values().find { it.defaultValue == "Choice 1" }
-        assert choices.values().find { it.defaultValue == "Choice 2" }
-        assert choices.values().find { it.defaultValue == "Choice 3" }
+        assert choices.find { it.defaultValue == "Choice 1" }
+        assert choices.find { it.defaultValue == "Choice 2" }
+        assert choices.find { it.defaultValue == "Choice 3" }
 
         Case choiceCase = helper.createCase("Choices", net)
         helper.assignTaskToSuper(LEASING_NET_TASK_EDIT_COST, choiceCase.stringId)
@@ -74,9 +74,9 @@ class ChoiceFieldTest {
         choices = ((EnumerationField) fields.find { it.name.defaultValue == "Enum" }).choices
 
         assert choices.size() == 3
-        assert choices.values().find { it.defaultValue == "Choice 1" }
-        assert choices.values().find { it.defaultValue == "Choice 2" }
-        assert choices.values().find { it.defaultValue == "Choice 3" }
+        assert choices.find { it.defaultValue == "Choice 1" }
+        assert choices.find { it.defaultValue == "Choice 2" }
+        assert choices.find { it.defaultValue == "Choice 3" }
 
         helper.setTaskData(LEASING_NET_TASK_EDIT_COST, choiceCase.stringId, [
                 "bool": [
@@ -89,9 +89,9 @@ class ChoiceFieldTest {
         choices = ((EnumerationField) fields.find { it.name.defaultValue == "Enum" }).choices
 
         assert choices.size() == 3
-        assert choices.values().find { it.defaultValue == "Choice A" }
-        assert choices.values().find { it.defaultValue == "Choice B" }
-        assert choices.values().find { it.defaultValue == "Choice C" }
+        assert choices.find { it.defaultValue == "Choice A" }
+        assert choices.find { it.defaultValue == "Choice B" }
+        assert choices.find { it.defaultValue == "Choice C" }
 
         helper.setTaskData(LEASING_NET_TASK_EDIT_COST, choiceCase.stringId, [
                 "bool": [
@@ -104,8 +104,8 @@ class ChoiceFieldTest {
         choices = ((EnumerationField) fields.find { it.name.defaultValue == "Enum" }).choices
 
         assert choices.size() == 3
-        assert choices.values().find { it.defaultValue == "Choice 1" }
-        assert choices.values().find { it.defaultValue == "Choice 2" }
-        assert choices.values().find { it.defaultValue == "Choice 3" }
+        assert choices.find { it.defaultValue == "Choice 1" }
+        assert choices.find { it.defaultValue == "Choice 2" }
+        assert choices.find { it.defaultValue == "Choice 3" }
     }
 }
