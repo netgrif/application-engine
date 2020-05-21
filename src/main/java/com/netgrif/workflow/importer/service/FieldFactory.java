@@ -176,7 +176,7 @@ public final class FieldFactory {
         if (nets == null) {
             return new CaseField();
         } else {
-            return new CaseField(new LinkedHashSet<>(nets.getAllowedNet()));
+            return new CaseField(new ArrayList<>(nets.getAllowedNet()));
         }
     }
 
