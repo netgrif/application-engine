@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xsi:noNamespaceSchemaLocation="../../main/resources/petriNets/petriflow_schema.xsd">
-    <id>1</id>
+    <id>test_inter_data_actions_static.xml</id>
+    <initials>TST</initials>
+    <title>Test</title>
     <defaultRole>true</defaultRole>
     <data type="number">
         <id>limit</id>

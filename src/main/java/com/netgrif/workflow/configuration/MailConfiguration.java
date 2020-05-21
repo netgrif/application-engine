@@ -1,6 +1,6 @@
 package com.netgrif.workflow.configuration;
 
-import com.netgrif.workflow.mail.IMailService;
+import com.netgrif.workflow.mail.interfaces.IMailService;
 import com.netgrif.workflow.mail.MailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;

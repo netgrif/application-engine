@@ -10,7 +10,8 @@ import com.netgrif.workflow.auth.web.requestbodies.ChangePasswordRequest;
 import com.netgrif.workflow.auth.web.requestbodies.NewUserRequest;
 import com.netgrif.workflow.auth.web.requestbodies.RegistrationRequest;
 import com.netgrif.workflow.auth.web.responsebodies.UserResource;
-import com.netgrif.workflow.mail.IMailService;
+import com.netgrif.workflow.mail.interfaces.IMailAttemptService;
+import com.netgrif.workflow.mail.interfaces.IMailService;
 import com.netgrif.workflow.workflow.web.responsebodies.MessageResource;
 import freemarker.template.TemplateException;
 import org.slf4j.Logger;
@@ -45,6 +46,9 @@ public class AuthenticationController {
     @Autowired
     private IUserService userService;
 
+    @Autowired
+    private IMailAttemptService mailAttemptService;
+
     @Value("${server.auth.open-registration}")
     private boolean openRegistration;
 
@@ -69,15 +73,20 @@ public class AuthenticationController {
             }
 
             newUserRequest.email = URLDecoder.decode(newUserRequest.email, StandardCharsets.UTF_8.name());
+            if (mailAttemptService.isBlocked(newUserRequest.email)) {
+                return MessageResource.successMessage("Done");
+            }
+
             User user = registrationService.createNewUser(newUserRequest);
             if (user == null)
-                return MessageResource.errorMessage("User with email " + newUserRequest.email + " has been already registered.");
+                return MessageResource.successMessage("Done");
             mailService.sendRegistrationEmail(user);
 
-            return MessageResource.successMessage("Mail was sent to " + user.getEmail());
+            mailAttemptService.mailAttempt(newUserRequest.email);
+            return MessageResource.successMessage("Done");
         } catch (IOException | TemplateException | MessagingException e) {
             log.error(e.toString());
-            return MessageResource.errorMessage("Sending mail to " + newUserRequest.email + " failed!");
+            return MessageResource.errorMessage("Failed");
         }
     }
 
@@ -101,17 +110,21 @@ public class AuthenticationController {
 
     @PostMapping(value = "/reset")
     public MessageResource resetPassword(@RequestBody String recoveryEmail) {
+        if (mailAttemptService.isBlocked(recoveryEmail)) {
+            return MessageResource.successMessage("Done");
+        }
         try {
             User user = registrationService.resetPassword(recoveryEmail);
             if (user != null) {
                 mailService.sendPasswordResetEmail(user);
-                return MessageResource.successMessage("Email with reset link was sent to address " + recoveryEmail);
+                mailAttemptService.mailAttempt(user.getEmail());
+                return MessageResource.successMessage("Done");
             } else {
-                return MessageResource.errorMessage("User with email " + recoveryEmail + " has not yet registered");
+                return MessageResource.successMessage("Done");
             }
         } catch (MessagingException | IOException | TemplateException e) {
             log.error(e.toString());
-            return MessageResource.errorMessage("Reset email has failed to be sent to address " + recoveryEmail);
+            return MessageResource.errorMessage("Failed");
         }
     }
 

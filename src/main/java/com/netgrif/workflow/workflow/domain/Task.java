@@ -5,6 +5,7 @@ import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.petrinet.domain.EventType;
 import com.netgrif.workflow.petrinet.domain.I18nString;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
+import com.netgrif.workflow.petrinet.domain.layout.TaskLayout;
 import com.netgrif.workflow.petrinet.domain.policies.AssignPolicy;
 import com.netgrif.workflow.petrinet.domain.policies.DataFocusPolicy;
 import com.netgrif.workflow.petrinet.domain.policies.FinishPolicy;
@@ -46,7 +47,7 @@ public class Task {
     private String transitionId;
 
     @Getter @Setter
-    private Integer cols;
+    private TaskLayout layout;
 
     @Getter @Setter
     private I18nString title;
@@ -129,6 +130,8 @@ public class Task {
     @Getter @Setter
     @Builder.Default
     private Map<EventType, I18nString> eventTitles = new HashMap<>();
+
+    private Map<String, Integer> consumedTokens = new HashMap<>();
 
     public Task() {
     }
