@@ -10,6 +10,7 @@ class CaseField extends Field<List<String>> {
     CaseField() {
         super()
         allowedNets = new ArrayList<>()
+        this.value = new ArrayList<>()
     }
 
     CaseField(List<String> allowedNets) {

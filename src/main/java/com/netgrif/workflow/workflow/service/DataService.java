@@ -14,6 +14,7 @@ import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldByFileFiel
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldContainer;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.FieldActionsRunner;
+import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.DataField;
 import com.netgrif.workflow.workflow.domain.Task;
@@ -61,6 +62,9 @@ public class DataService implements IDataService {
 
     @Autowired
     private FieldActionsRunner actionsRunner;
+
+    @Autowired
+    private IPetriNetService petriNetService;
 
     @Override
     public List<Field> getData(String taskId) {
@@ -143,7 +147,14 @@ public class DataService implements IDataService {
                 dataField = useCase.getDataField(fieldId);
             }
             if (dataField != null) {
-                dataField.setValue(parseFieldsValues(entry.getValue()));
+                dataField.setValue(parseFieldsValues(entry.getValue(), dataField));
+                if (entry.getValue().get("type") != null && entry.getValue().get("type").asText().equals("caseRef")) {
+                    Map<String, ChangedField> newCaseRefValue = new HashMap<>();
+                    ChangedField value = new ChangedField(entry.getKey());
+                    value.addAttribute("value", dataField.getValue());
+                    newCaseRefValue.put(entry.getKey(), value);
+                    mergeChanges(changedFields, newCaseRefValue);
+                }
                 Map<String, ChangedField> changedFieldMap = resolveActions(useCase.getPetriNet().getField(fieldId).get(),
                         Action.ActionTrigger.SET, useCase, useCase.getPetriNet().getTransition(task.getTransitionId()));
                 mergeChanges(changedFields, changedFieldMap);
@@ -465,7 +476,7 @@ public class DataService implements IDataService {
         });
     }
 
-    private Object parseFieldsValues(JsonNode jsonNode) {
+    private Object parseFieldsValues(JsonNode jsonNode, DataField dataField) {
         ObjectNode node = (ObjectNode) jsonNode;
         Object value;
         switch (node.get("type").asText()) {
@@ -517,6 +528,34 @@ public class DataService implements IDataService {
                     break;
                 }
                 value = FileFieldValue.fromString(node.get("value").asText());
+                break;
+            case "caseRef":
+                value = dataField.getValue();
+                if (node.get("value") == null) break;
+                Map<String, JsonNode> setRequest = new HashMap<>();
+                node.get("value").fields().forEachRemaining(entry -> {
+                    setRequest.put(entry.getKey(), entry.getValue());
+                });
+                if (setRequest.get("operation") == null) break;
+                switch (setRequest.get("operation").asText()) {
+                    case "add":
+                        if (setRequest.get("title") == null
+                                || !setRequest.get("title").isTextual()
+                                || setRequest.get("processId") == null
+                                || !setRequest.get("processId").isTextual()) break;
+                        if (dataField.getAllowedNets() == null) break;
+                        if (!dataField.getAllowedNets().contains(setRequest.get("processId").asText())) break;
+                        PetriNet net = petriNetService.getNewestVersionByIdentifier(setRequest.get("processId").asText());
+                        Case newCase = workflowService.createCase(net.getStringId(),
+                                setRequest.get("title").asText(),
+                                "panel-primary-icon",
+                                userService.getLoggedUser().transformToLoggedUser());
+                        ((List<String>) value).add(newCase.getStringId());
+                        break;
+                    case "remove":
+
+                        break;
+                }
                 break;
             default:
                 if (node.get("value") == null) {
