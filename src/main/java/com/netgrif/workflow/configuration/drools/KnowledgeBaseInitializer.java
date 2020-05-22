@@ -1,6 +1,7 @@
 package com.netgrif.workflow.configuration.drools;
 
 import com.netgrif.workflow.configuration.drools.interfaces.IKnowledgeBaseInitializer;
+import com.netgrif.workflow.configuration.drools.throwable.RuleValidationException;
 import com.netgrif.workflow.rules.domain.RuleRepository;
 import com.netgrif.workflow.rules.domain.StoredRule;
 import org.drools.template.ObjectDataCompiler;
@@ -8,6 +9,7 @@ import org.kie.api.KieBase;
 import org.kie.api.KieServices;
 import org.kie.api.io.Resource;
 import org.kie.api.io.ResourceType;
+import org.kie.api.runtime.KieSession;
 import org.kie.internal.utils.KieHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,10 +22,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class KnowledgeBaseInitializer implements IKnowledgeBaseInitializer {
@@ -50,6 +49,7 @@ public class KnowledgeBaseInitializer implements IKnowledgeBaseInitializer {
             log.error("Failed to construct rule engine knowledge base", e);
             throw new IllegalStateException("Rules not successfully loaded");
         }
+
         return kieHelper.build();
     }
 
@@ -86,6 +86,25 @@ public class KnowledgeBaseInitializer implements IKnowledgeBaseInitializer {
         kieHelper.addResource(resource1, ResourceType.DRL);
 
         System.out.println("drl:\n" + generatedDRL);
+    }
+
+    @Override
+    public void validate(List<StoredRule> storedRules) throws RuleValidationException {
+        KieSession testSession = null;
+        try {
+            KieHelper kieHelper = new KieHelper();
+            buildRules(storedRules, kieHelper);
+            KieBase base = kieHelper.build();;
+            testSession = base.newKieSession();
+            testSession.fireAllRules();
+        } catch (Exception e) {
+            log.error("Validation unsuccessful", e);
+            throw new RuleValidationException(e);
+        } finally {
+            if (testSession != null) {
+                testSession.destroy();
+            }
+        }
     }
 
     private String formatDate(LocalDate date) {
