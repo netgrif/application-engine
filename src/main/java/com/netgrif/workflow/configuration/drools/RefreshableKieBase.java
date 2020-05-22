@@ -21,7 +21,6 @@ public class RefreshableKieBase {
     public RefreshableKieBase(@Autowired RuleRepository ruleRepository, @Autowired IKnowledgeBaseInitializer knowledgeBaseInitializer) {
         this.ruleRepository = ruleRepository;
         this.knowledgeBaseInitializer = knowledgeBaseInitializer;
-        refresh();
     }
 
     public KieBase kieBase() {

@@ -41,6 +41,7 @@ public class StoredRule {
     private LocalDateTime lastUpdate;
 
     public StoredRule() {
+        _id = new ObjectId();
         lastUpdate = LocalDateTime.now();
     }
 
