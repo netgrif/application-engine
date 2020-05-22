@@ -53,7 +53,13 @@ public abstract class RuleEngine implements IRuleEngine {
 
     private void evaluateWithFacts(KieSession session, List<Object> facts) {
         facts.forEach(session::insert);
-        session.fireAllRules();
-        session.destroy();
+        try {
+            session.fireAllRules();
+        } catch (Exception e) {
+            log.error("Rule engine failure", e);
+            throw e;
+        } finally {
+            session.destroy();
+        }
     }
 }
