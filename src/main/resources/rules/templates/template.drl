@@ -9,7 +9,7 @@ thenAction
 import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.elastic.service.interfaces.IElasticCaseService;
 import com.netgrif.workflow.elastic.service.interfaces.IElasticTaskService;
-import com.netgrif.workflow.mail.IMailService;
+import com.netgrif.workflow.mail.interfaces.IMailService;
 import com.netgrif.workflow.workflow.service.interfaces.IDataService;
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;

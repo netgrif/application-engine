@@ -74,6 +74,9 @@ public abstract class PetriNetService implements IPetriNetService {
     @Autowired
     private ApplicationEventPublisher publisher;
 
+    @Autowired
+    private IRuleEngine ruleEngine;
+
     private Map<ObjectId, PetriNet> cache = new HashMap<>();
 
     @Override
@@ -117,11 +120,18 @@ public abstract class PetriNetService implements IPetriNetService {
         PetriNet existingNet = getNewestVersionByIdentifier(imported.get().getIdentifier());
         Optional<PetriNet> newPetriNet = existingNet == null ? importNewPetriNet(new ByteArrayInputStream(bytes), user) : importNewVersion(new ByteArrayInputStream(bytes), releaseType, existingNet, user);
         newPetriNet.ifPresent(petriNet -> {
+            evaluateRules(petriNet, EventPhase.PRE);
             cache.put(petriNet.getObjectId(), petriNet);
+            saveNew(petriNet);
+            evaluateRules(petriNet, EventPhase.POST);
             saveNew(petriNet);
         });
 
         return newPetriNet;
+    }
+
+    protected void evaluateRules(PetriNet net, EventPhase phase) {
+        ruleEngine.evaluateRules(net, new NetImportedFact(net.getStringId(), phase));
     }
 
     private Optional<PetriNet> importNewPetriNet(InputStream xmlFile, LoggedUser user) throws IOException, MissingPetriNetMetaDataException {

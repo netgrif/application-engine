@@ -1,18 +1,13 @@
 package com.netgrif.workflow.startup
 
-import com.netgrif.workflow.emailtool.domain.EmailRule
-import com.netgrif.workflow.emailtool.domain.EmailRuleRepository
-import com.netgrif.workflow.emailtool.service.EmailRuleService
-import com.netgrif.workflow.emailtool.service.interfaces.IEmailRuleService
-import com.netgrif.workflow.rules.domain.StoredRule
+import com.netgrif.workflow.configuration.drools.RefreshableKieBase
+import com.netgrif.workflow.configuration.drools.interfaces.IKnowledgeBaseInitializer
 import com.netgrif.workflow.rules.domain.RuleRepository
+import com.netgrif.workflow.rules.domain.StoredRule
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
-
-import java.time.LocalDate
-import java.time.LocalDateTime
 
 @Component
 class RuleEngineRunner extends AbstractOrderedCommandLineRunner {
@@ -23,16 +18,20 @@ class RuleEngineRunner extends AbstractOrderedCommandLineRunner {
     private RuleRepository repository
 
     @Autowired
-    private EmailRuleRepository emailRuleRepository
+    private RefreshableKieBase refreshableKieBase
 
     @Autowired
-    private IEmailRuleService emailRuleService
+    private IKnowledgeBaseInitializer knowledgeBaseInitializer
 
     @Override
     void run(String... strings) throws Exception {
+        refreshableKieBase.refresh()
+
         StoredRule rule = new StoredRule()
         rule.when = "\$case: Case()"
-        rule.then = "log.info(\$case.stringId + ' was evaluated in rule 1')"
+        rule.then = "log.info(\$case.stringId + ' was evaluated in rule 1')    " +
+                "\n log.info(\"\" + factRepository.findAll(QCaseCreatedFact.caseCreatedFact.caseId.eq(\$case.stringId)))"
+
         repository.save(rule)
 
         StoredRule rule2 = new StoredRule()
@@ -51,8 +50,8 @@ class RuleEngineRunner extends AbstractOrderedCommandLineRunner {
         repository.save(rule4)
 
         StoredRule rule5 = new StoredRule()
-        rule5.when = "\$net: PetriNet()\n    \$event: NetImportedFact(netId == \$net.stringId)\n    \$facts: ArrayList() from collect (Fact() from factRepository.findAll())\n"
-        rule5.then = "log.info(\$net.stringId + ' ' + \$net.identifier + ' was imported  ' + \$event.eventPhase)     \n factRepository.save(\$event)     \n log.info(\"Count = \" + \$facts)"
+        rule5.when = "\$net: PetriNet()\n    \$event: NetImportedFact(netId == \$net.stringId, eventPhase == EventPhase.PRE)\n    \$facts: ArrayList() from collect (Fact() from factRepository.findAll())\n"
+        rule5.then = "log.info(\$net.stringId + ' ' + \$net.identifier + ' was imported  ' + \$event.eventPhase)     \n factRepository.save(\$event)     \n log.info(\"Count = \" + \$facts)    \n \$net.title.defaultValue = 'NEW TITLE ' + \$event.eventPhase"
         repository.save(rule5)
 
     }
