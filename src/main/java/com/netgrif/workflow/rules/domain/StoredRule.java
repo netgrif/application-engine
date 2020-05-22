@@ -38,10 +38,12 @@ public class StoredRule {
 
     private LocalDate dateExpires;
 
+    @Indexed
     private LocalDateTime lastUpdate;
 
     public StoredRule() {
         _id = new ObjectId();
+        identifier = _id.toString();
         lastUpdate = LocalDateTime.now();
     }
 
