@@ -553,7 +553,10 @@ public class DataService implements IDataService {
                         ((List<String>) value).add(newCase.getStringId());
                         break;
                     case "remove":
-
+                        if (setRequest.get("caseId") == null
+                                || !setRequest.get("caseId").isTextual()) break;
+                        String idToRemove = setRequest.get("caseId").asText();
+                        value = ((List<String>) value).stream().filter(caseId -> !caseId.equals(idToRemove)).collect(Collectors.toList());
                         break;
                 }
                 break;
