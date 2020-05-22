@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.netgrif.workflow.auth.domain.Author;
 import com.netgrif.workflow.petrinet.domain.I18nString;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
+import com.netgrif.workflow.petrinet.domain.dataset.CaseField;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.petrinet.domain.dataset.FieldWithDefault;
 import com.netgrif.workflow.petrinet.domain.dataset.UserField;
@@ -172,6 +173,10 @@ public class Case {
             }
             if (field instanceof UserField) {
                 this.dataSet.get(key).setChoices(((UserField) field).getRoles().stream().collect(Collectors.toMap(Function.identity(), I18nString::new)));
+            }
+            if (field instanceof CaseField) {
+                this.dataSet.get(key).setValue(new ArrayList<>());
+                this.dataSet.get(key).setAllowedNets(((CaseField) field).getAllowedNets());
             }
         });
     }
