@@ -25,10 +25,6 @@ import com.netgrif.workflow.petrinet.domain.roles.RolePermission;
 import com.netgrif.workflow.petrinet.domain.throwable.MissingPetriNetMetaDataException;
 import com.netgrif.workflow.petrinet.service.ArcFactory;
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
-import com.netgrif.workflow.rules.domain.facts.EventPhase;
-import com.netgrif.workflow.rules.domain.facts.NetImportedFact;
-import com.netgrif.workflow.rules.service.RuleEngine;
-import com.netgrif.workflow.rules.service.interfaces.IRuleEngine;
 import com.netgrif.workflow.workflow.domain.triggers.Trigger;
 import lombok.Getter;
 import org.bson.types.ObjectId;
@@ -93,9 +89,6 @@ public class Importer {
 
     @Autowired
     private FieldActionsRunner actionsRunner;
-
-    @Autowired
-    private IRuleEngine ruleEngine;
 
     @Transactional
     public Optional<PetriNet> importPetriNet(InputStream xml, Config config) throws MissingPetriNetMetaDataException {
