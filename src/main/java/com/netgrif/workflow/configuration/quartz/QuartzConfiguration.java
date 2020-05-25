@@ -60,20 +60,6 @@ public class QuartzConfiguration {
     }
 
     @Bean
-    @ConditionalOnProperty(value = "quartz.import-schema")
-    public DataSourceInitializer dataSourceInitializer() {
-        ResourceDatabasePopulator resourceDatabasePopulator = new ResourceDatabasePopulator();
-        if (ddlAuto.equals("create-drop")) {
-            resourceDatabasePopulator.addScript(new ClassPathResource("quartz/drop.sql"));
-        }
-        resourceDatabasePopulator.addScript(new ClassPathResource("quartz/schema.sql"));
-        DataSourceInitializer dataSourceInitializer = new DataSourceInitializer();
-        dataSourceInitializer.setDataSource(quartzDataSource());
-        dataSourceInitializer.setDatabasePopulator(resourceDatabasePopulator);
-        return dataSourceInitializer;
-    }
-
-    @Bean
     public Scheduler scheduler() {
         return schedulerFactoryBean().getScheduler();
     }
