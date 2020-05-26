@@ -17,6 +17,7 @@ public abstract class Fact {
     private LocalDateTime creationDate;
 
     public Fact() {
+        _id = new ObjectId();
         creationDate = LocalDateTime.now();
     }
 }

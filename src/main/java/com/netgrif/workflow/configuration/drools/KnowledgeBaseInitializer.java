@@ -4,6 +4,7 @@ import com.netgrif.workflow.configuration.drools.interfaces.IKnowledgeBaseInitia
 import com.netgrif.workflow.configuration.drools.throwable.RuleValidationException;
 import com.netgrif.workflow.rules.domain.RuleRepository;
 import com.netgrif.workflow.rules.domain.StoredRule;
+import org.drools.core.io.impl.ClassPathResource;
 import org.drools.template.ObjectDataCompiler;
 import org.kie.api.KieBase;
 import org.kie.api.KieServices;
@@ -17,12 +18,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Service
 public class KnowledgeBaseInitializer implements IKnowledgeBaseInitializer {
@@ -74,7 +77,7 @@ public class KnowledgeBaseInitializer implements IKnowledgeBaseInitializer {
         });
 
         String generatedDRL;
-        try (FileInputStream template = new FileInputStream(templatePath)) {
+        try (InputStream template = new ClassPathResource(templatePath).getInputStream()) {
             generatedDRL = compiler.compile(ruleAttributes, template);
         } catch (IOException e) {
             log.error("Failed to compile rules", e);
