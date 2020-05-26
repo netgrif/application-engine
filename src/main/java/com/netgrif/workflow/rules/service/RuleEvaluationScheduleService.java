@@ -30,18 +30,19 @@ public class RuleEvaluationScheduleService implements IRuleEvaluationScheduleSer
     private RuleRepository ruleRepository;
 
     @Override
-    public void scheduleRuleEvaluationForCase(Case useCase, String ruleIdentifier, Trigger trigger) throws RuleEvaluationScheduleException {
-        scheduleRuleEvaluationForCase(useCase, Collections.singletonList(ruleIdentifier), trigger);
+    public void scheduleRuleEvaluationForCase(Case useCase, String ruleIdentifier, ScheduleBuilder<Trigger> scheduleBuilder) throws RuleEvaluationScheduleException {
+        scheduleRuleEvaluationForCase(useCase, Collections.singletonList(ruleIdentifier), scheduleBuilder);
     }
 
     @Override
-    public void scheduleRuleEvaluationForCase(Case useCase, List<String> ruleIdentifiers, Trigger trigger) throws RuleEvaluationScheduleException {
+    public void scheduleRuleEvaluationForCase(Case useCase, List<String> ruleIdentifiers, ScheduleBuilder<Trigger> scheduleBuilder) throws RuleEvaluationScheduleException {
         List<StoredRule> storedRules = ruleRepository.findByIdentifierIn(ruleIdentifiers);
 
         for (StoredRule rule : storedRules) {
             log.info("Scheduling rule eval job for " + useCase.getStringId() + " " + rule.getIdentifier());
 
-            JobDetail jobDetail = jobDetailBuilder(useCase.getStringId(), rule, CaseRuleEvaluationJob.class);
+            JobDetail jobDetail = buildJobDetail(useCase.getStringId(), rule, CaseRuleEvaluationJob.class);
+            Trigger trigger = buildTrigger(useCase.getStringId(), scheduleBuilder, jobDetail);
             jobDetail.getJobDataMap().put("caseId", useCase.getStringId());
 
             try {
@@ -54,18 +55,19 @@ public class RuleEvaluationScheduleService implements IRuleEvaluationScheduleSer
     }
 
     @Override
-    public void scheduleRuleEvaluationForNet(PetriNet petriNet, String ruleIdentifier, Trigger trigger) throws RuleEvaluationScheduleException {
-        scheduleRuleEvaluationForNet(petriNet, Collections.singletonList(ruleIdentifier), trigger);
+    public void scheduleRuleEvaluationForNet(PetriNet petriNet, String ruleIdentifier, ScheduleBuilder<Trigger> scheduleBuilder) throws RuleEvaluationScheduleException {
+        scheduleRuleEvaluationForNet(petriNet, Collections.singletonList(ruleIdentifier), scheduleBuilder);
     }
 
     @Override
-    public void scheduleRuleEvaluationForNet(PetriNet petriNet, List<String> ruleIdentifiers, Trigger trigger) throws RuleEvaluationScheduleException {
+    public void scheduleRuleEvaluationForNet(PetriNet petriNet, List<String> ruleIdentifiers, ScheduleBuilder<Trigger> scheduleBuilder) throws RuleEvaluationScheduleException {
         List<StoredRule> storedRules = ruleRepository.findByIdentifierIn(ruleIdentifiers);
 
         for (StoredRule rule : storedRules) {
             log.info("Scheduling rule eval job for " + petriNet.getStringId() + " " + rule.getIdentifier());
 
-            JobDetail jobDetail = jobDetailBuilder(petriNet.getStringId(), rule, PetriNetRuleEvaluationJob.class);
+            JobDetail jobDetail = buildJobDetail(petriNet.getStringId(), rule, PetriNetRuleEvaluationJob.class);
+            Trigger trigger = buildTrigger(petriNet.getStringId(), scheduleBuilder, jobDetail);
             jobDetail.getJobDataMap().put("netId", petriNet.getStringId());
 
             try {
@@ -78,13 +80,21 @@ public class RuleEvaluationScheduleService implements IRuleEvaluationScheduleSer
 
     }
 
-    private <T extends Job> JobDetail jobDetailBuilder(String instanceStringId, StoredRule rule, Class<T> type) {
+    protected  <T extends Job> JobDetail buildJobDetail(String instanceStringId, StoredRule rule, Class<T> type) {
         JobDetail jobDetail = JobBuilder.newJob().ofType(type)
                 .storeDurably(false)
                 .withIdentity(instanceStringId + "-" + rule.getStringId() + "-" + UUID.randomUUID().toString())
                 .withDescription("Scheduled eval for " + instanceStringId + " of rule " + rule.getStringId()).build();
         jobDetail.getJobDataMap().put("ruleIdentifier", rule.getIdentifier());
         return jobDetail;
+    }
+
+    protected Trigger buildTrigger(String instanceStringId, ScheduleBuilder<Trigger> scheduleBuilder, JobDetail jobDetail) {
+        return TriggerBuilder.newTrigger().forJob(jobDetail)
+                .withIdentity("trigger" + instanceStringId + "-" + jobDetail.getKey().toString() + "-" + UUID.randomUUID().toString())
+                .withDescription("Trigger for " + instanceStringId + " for job " + jobDetail.getKey().toString())
+                .withSchedule(scheduleBuilder)
+                .build();
     }
 
 }
