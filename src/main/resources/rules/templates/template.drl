@@ -27,6 +27,8 @@ import com.netgrif.workflow.rules.domain.facts.*
 import com.netgrif.workflow.rules.service.interfaces.IRuleEvaluationScheduleService
 import com.netgrif.workflow.rules.domain.FactRepository
 
+import org.quartz.*
+
 global IWorkflowService workflowService;
 global IRuleEvaluationScheduleService ruleEvaluationScheduleService;
 global ITaskService taskService;
