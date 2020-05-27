@@ -38,13 +38,19 @@ public class StoredRule {
 
     private LocalDate dateExpires;
 
+    private int salience = 1;
+
     @Indexed
     private LocalDateTime lastUpdate;
+
+    @Indexed
+    private LocalDateTime creationDate;
 
     public StoredRule() {
         _id = new ObjectId();
         identifier = _id.toString();
         lastUpdate = LocalDateTime.now();
+        creationDate = LocalDateTime.now();
     }
 
     public String getStringId() {

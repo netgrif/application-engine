@@ -2,6 +2,7 @@ package com.netgrif.workflow.configuration.drools;
 
 import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.configuration.drools.interfaces.IKnowledgeBaseInitializer;
+import com.netgrif.workflow.configuration.drools.interfaces.IRefreshableKieBase;
 import com.netgrif.workflow.elastic.service.interfaces.IElasticCaseService;
 import com.netgrif.workflow.elastic.service.interfaces.IElasticTaskService;
 import com.netgrif.workflow.mail.interfaces.IMailService;
@@ -64,7 +65,7 @@ public class DroolsConfiguration {
     @Bean(name = "kieRuntime")
     @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
     public KieSession kieRuntime() {
-        RefreshableKieBase baseWrapper = refreshableKieBase();
+        IRefreshableKieBase baseWrapper = refreshableKieBase();
         if (baseWrapper.shouldRefresh()) {
             baseWrapper.refresh();
         }
@@ -75,7 +76,7 @@ public class DroolsConfiguration {
     }
 
     @Bean
-    public RefreshableKieBase refreshableKieBase() {
+    public IRefreshableKieBase refreshableKieBase() {
         return new RefreshableKieBase(ruleRepository, baseInitializer);
     }
 

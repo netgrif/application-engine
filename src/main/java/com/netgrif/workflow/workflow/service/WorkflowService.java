@@ -199,8 +199,8 @@ public class WorkflowService implements IWorkflowService {
         taskService.reloadTasks(useCase);
 
         useCase = findOne(useCase.getStringId());
-        useCase = save(useCase);
         ruleEngine.evaluateRules(useCase, new CaseCreatedFact(useCase.getStringId(), EventPhase.POST));
+        useCase = save(useCase);
 
         return setImmediateDataFields(useCase);
     }
