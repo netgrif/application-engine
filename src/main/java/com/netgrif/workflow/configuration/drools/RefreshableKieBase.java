@@ -1,6 +1,7 @@
 package com.netgrif.workflow.configuration.drools;
 
 import com.netgrif.workflow.configuration.drools.interfaces.IKnowledgeBaseInitializer;
+import com.netgrif.workflow.configuration.drools.interfaces.IRefreshableKieBase;
 import com.netgrif.workflow.rules.domain.RuleRepository;
 import org.kie.api.KieBase;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,7 +10,7 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDateTime;
 
 @Component
-public class RefreshableKieBase {
+public class RefreshableKieBase implements IRefreshableKieBase {
 
     private LocalDateTime lastRefresh;
     private KieBase kieBase;
