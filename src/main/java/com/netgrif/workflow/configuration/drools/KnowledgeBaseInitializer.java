@@ -70,6 +70,7 @@ public class KnowledgeBaseInitializer implements IKnowledgeBaseInitializer {
             String dateEffective = (persistedRule.getDateEffective() == null) ? "" : "date-effective \"" + formatDate(persistedRule.getDateEffective()) + "\"";
             String dateExpires = (persistedRule.getDateExpires() == null) ? "" : "date-expires \"" + formatDate(persistedRule.getDateExpires()) + "\"";
 
+            templateRule.put("salienceVal", Integer.toString(persistedRule.getSalience()));
             templateRule.put("dateEffective", dateEffective);
             templateRule.put("dateExpires", dateExpires);
 
