@@ -1,5 +1,6 @@
 template header
 ruleId
+salienceVal
 ruleEnabled
 dateEffective
 dateExpires
@@ -42,7 +43,7 @@ global Logger log;
 
 template "standard_template"
 
-rule "@{ruleId}"
+rule "@{ruleId}" salience @{salienceVal}
   dialect "mvel"
   enabled @{ruleEnabled}
   @{dateEffective}
