@@ -32,12 +32,12 @@ public class RuleEvaluationScheduleService implements IRuleEvaluationScheduleSer
     private RuleRepository ruleRepository;
 
     @Override
-    public void scheduleRuleEvaluationForCase(Case useCase, String ruleIdentifier, ScheduleBuilder<Trigger> scheduleBuilder) throws RuleEvaluationScheduleException {
+    public void scheduleRuleEvaluationForCase(Case useCase, String ruleIdentifier, ScheduleBuilder<? extends Trigger> scheduleBuilder) throws RuleEvaluationScheduleException {
         scheduleRuleEvaluationForCase(useCase, Collections.singletonList(ruleIdentifier), scheduleBuilder);
     }
 
     @Override
-    public void scheduleRuleEvaluationForCase(Case useCase, List<String> ruleIdentifiers, ScheduleBuilder<Trigger> scheduleBuilder) throws RuleEvaluationScheduleException {
+    public void scheduleRuleEvaluationForCase(Case useCase, List<String> ruleIdentifiers, ScheduleBuilder<? extends Trigger> scheduleBuilder) throws RuleEvaluationScheduleException {
         List<StoredRule> storedRules = ruleRepository.findByIdentifierIn(ruleIdentifiers);
 
         for (StoredRule rule : storedRules) {
@@ -52,12 +52,12 @@ public class RuleEvaluationScheduleService implements IRuleEvaluationScheduleSer
     }
 
     @Override
-    public void scheduleRuleEvaluationForNet(PetriNet petriNet, String ruleIdentifier, ScheduleBuilder<Trigger> scheduleBuilder) throws RuleEvaluationScheduleException {
+    public void scheduleRuleEvaluationForNet(PetriNet petriNet, String ruleIdentifier, ScheduleBuilder<? extends Trigger> scheduleBuilder) throws RuleEvaluationScheduleException {
         scheduleRuleEvaluationForNet(petriNet, Collections.singletonList(ruleIdentifier), scheduleBuilder);
     }
 
     @Override
-    public void scheduleRuleEvaluationForNet(PetriNet petriNet, List<String> ruleIdentifiers, ScheduleBuilder<Trigger> scheduleBuilder) throws RuleEvaluationScheduleException {
+    public void scheduleRuleEvaluationForNet(PetriNet petriNet, List<String> ruleIdentifiers, ScheduleBuilder<? extends Trigger> scheduleBuilder) throws RuleEvaluationScheduleException {
         List<StoredRule> storedRules = ruleRepository.findByIdentifierIn(ruleIdentifiers);
 
         for (StoredRule rule : storedRules) {
@@ -90,7 +90,7 @@ public class RuleEvaluationScheduleService implements IRuleEvaluationScheduleSer
         return jobDetail;
     }
 
-    protected Trigger buildTrigger(String instanceStringId, ScheduleBuilder<Trigger> scheduleBuilder, JobDetail jobDetail) {
+    protected Trigger buildTrigger(String instanceStringId, ScheduleBuilder<? extends Trigger> scheduleBuilder, JobDetail jobDetail) {
         return TriggerBuilder.newTrigger().forJob(jobDetail)
                 .withIdentity("trigger" + instanceStringId + "-" + jobDetail.getKey().toString() + "-" + UUID.randomUUID().toString())
                 .withDescription("Trigger for " + instanceStringId + " for job " + jobDetail.getKey().toString())

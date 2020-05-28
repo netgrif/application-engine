@@ -5,12 +5,14 @@ import lombok.EqualsAndHashCode;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
-public class ScheduledRuleFact extends CaseFact {
+public class ScheduledRuleFact extends Fact {
 
+    private String instanceId;
     private String ruleIdentifier;
 
-    public ScheduledRuleFact(String caseId, String ruleIdentifier) {
-        super(caseId);
+    public ScheduledRuleFact(String instanceId, String ruleIdentifier) {
+        super();
+        this.instanceId = instanceId;
         this.ruleIdentifier = ruleIdentifier;
     }
 }
