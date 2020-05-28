@@ -17,6 +17,8 @@ import java.util.Arrays;
 @Component
 public class CaseRuleEvaluationJob extends RuleJob {
 
+    public static final String CASE_ID = "caseId";
+
     private static final Logger log = LoggerFactory.getLogger(CaseRuleEvaluationJob.class);
 
     @Autowired
@@ -47,6 +49,6 @@ public class CaseRuleEvaluationJob extends RuleJob {
 
     @Override
     public String getInstanceId(JobExecutionContext context) {
-        return (String) context.getJobDetail().getJobDataMap().get("caseId");
+        return (String) context.getJobDetail().getJobDataMap().get(CASE_ID);
     }
 }

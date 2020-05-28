@@ -2,8 +2,8 @@ package com.netgrif.workflow.rules.service;
 
 import com.netgrif.workflow.TestHelper;
 import com.netgrif.workflow.WorkflowManagementSystemApplication;
+import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.configuration.drools.RefreshableKieBase;
-import com.netgrif.workflow.configuration.drools.interfaces.IKnowledgeBaseInitializer;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.throwable.MissingPetriNetMetaDataException;
 import com.netgrif.workflow.petrinet.domain.throwable.TransitionNotExecutableException;
@@ -12,15 +12,11 @@ import com.netgrif.workflow.rules.domain.FactRepository;
 import com.netgrif.workflow.rules.domain.RuleRepository;
 import com.netgrif.workflow.rules.domain.StoredRule;
 import com.netgrif.workflow.rules.domain.facts.*;
-import com.netgrif.workflow.rules.service.interfaces.IRuleEngine;
 import com.netgrif.workflow.startup.SuperCreator;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.Task;
-import com.netgrif.workflow.workflow.service.interfaces.IDataService;
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
 import org.bson.types.ObjectId;
 import org.junit.After;
 import org.junit.Before;
@@ -54,9 +50,6 @@ public class RuleEngineTest {
     private TestHelper testHelper;
 
     @Autowired
-    private IRuleEngine ruleEngine;
-    
-    @Autowired
     private RuleRepository ruleRepository;
     
     @Autowired
@@ -69,9 +62,6 @@ public class RuleEngineTest {
     private ITaskService taskService;
 
     @Autowired
-    private IDataService dataService;
-
-    @Autowired
     private IPetriNetService petriNetService;
 
     @Autowired
@@ -79,9 +69,6 @@ public class RuleEngineTest {
 
     @Autowired
     private SuperCreator superCreator;
-
-    @Autowired
-    private IKnowledgeBaseInitializer knowledgeBaseInitializer;
 
     @Before
     public void before() {
@@ -201,7 +188,7 @@ public class RuleEngineTest {
         Case newCase = workflowService.createCase(petriNetOptional.get().getStringId(), "Original title", "original color", superCreator.getLoggedSuper());
         assert newCase.getTitle().equals(NEW_CASE_TITLE);
 
-        Task task = taskService.findOne(newCase.getTasks().stream().filter(it -> it.getTransition().equals(TRANS_1)).findFirst().get().getTask());
+        Task task = findTask(newCase, TRANS_1);
         taskService.assignTask(task, superCreator.getLoggedSuper().transformToUser());
         taskService.finishTask(task, superCreator.getLoggedSuper().transformToUser());
         newCase = workflowService.findOne(newCase.getStringId());
@@ -212,12 +199,127 @@ public class RuleEngineTest {
 
         assert facts.size() == 1 && facts.get(0) instanceof TestFact && ((TestFact) facts.get(0)).number == 1;
 
-        Task task2 = taskService.findOne(newCase.getTasks().stream().filter(it -> it.getTransition().equals(TRANS_2)).findFirst().get().getTask());
+        Task task2 = findTask(newCase, TRANS_2);
         taskService.assignTask(task2, superCreator.getLoggedSuper().transformToUser());
         taskService.finishTask(task2, superCreator.getLoggedSuper().transformToUser());
         newCase = workflowService.findOne(newCase.getStringId());
 
         assert newCase.getTitle().equals(NEW_CASE_TITLE_2);
+    }
+
+
+    public static final String TEXT_VALUE = "new text value";
+    public static final Double NUM_VALUE = 99.0;
+    public static final String TRANS_1 = "2";
+
+    @Test
+    public void testAssign() throws IOException, MissingPetriNetMetaDataException, TransitionNotExecutableException {
+        StoredRule rule = transitionRulePre(TRANS_1, "EventType.ASSIGN");
+        StoredRule rule2 = transitionRulePost(TRANS_1, "EventType.ASSIGN");
+
+        ruleRepository.save(rule);
+        ruleRepository.save(rule2);
+
+        Case caze = newCase();
+        Task task = findTask(caze, TRANS_1);
+        taskService.assignTask(task, superCreator.getLoggedSuper().transformToUser());
+        caze = workflowService.findOne(caze.getStringId());
+
+        assert caze.getDataSet().get("text_data").getValue().equals(TEXT_VALUE);
+        assert caze.getDataSet().get("number_data").getValue().equals(NUM_VALUE);
+    }
+
+    @Test
+    public void testDelegate() throws IOException, MissingPetriNetMetaDataException, TransitionNotExecutableException {
+        StoredRule rule = transitionRulePre(TRANS_1, "EventType.DELEGATE");
+        StoredRule rule2 = transitionRulePost(TRANS_1, "EventType.DELEGATE");
+
+        ruleRepository.save(rule);
+        ruleRepository.save(rule2);
+
+        Case caze = newCase();
+        Task task = findTask(caze, TRANS_1);
+        User user = superCreator.getLoggedSuper().transformToUser();
+        taskService.assignTask(task, user);
+        taskService.delegateTask(user.transformToLoggedUser(), user.getId(), task.getStringId());
+        caze = workflowService.findOne(caze.getStringId());
+
+        assert caze.getDataSet().get("text_data").getValue().equals(TEXT_VALUE);
+        assert caze.getDataSet().get("number_data").getValue().equals(NUM_VALUE);
+    }
+
+    @Test
+    public void testFinish() throws IOException, MissingPetriNetMetaDataException, TransitionNotExecutableException {
+        StoredRule rule = transitionRulePre(TRANS_1, "EventType.FINISH");
+        StoredRule rule2 = transitionRulePost(TRANS_1, "EventType.FINISH");
+
+        ruleRepository.save(rule);
+        ruleRepository.save(rule2);
+
+        Case caze = newCase();
+        Task task = findTask(caze, TRANS_1);
+        User user = superCreator.getLoggedSuper().transformToUser();
+        taskService.assignTask(task, user);
+        taskService.finishTask(task, user);
+        caze = workflowService.findOne(caze.getStringId());
+
+        assert caze.getDataSet().get("text_data").getValue().equals(TEXT_VALUE);
+        assert caze.getDataSet().get("number_data").getValue().equals(NUM_VALUE);
+    }
+
+    @Test
+    public void testCancel() throws IOException, MissingPetriNetMetaDataException, TransitionNotExecutableException {
+        StoredRule rule = transitionRulePre(TRANS_1, "EventType.CANCEL");
+        StoredRule rule2 = transitionRulePost(TRANS_1, "EventType.CANCEL");
+
+        ruleRepository.save(rule);
+        ruleRepository.save(rule2);
+
+        Case caze = newCase();
+        Task task = findTask(caze, TRANS_1);
+        User user = superCreator.getLoggedSuper().transformToUser();
+
+        taskService.assignTask(task, user);
+        taskService.cancelTask(task, user);
+        caze = workflowService.findOne(caze.getStringId());
+
+        assert caze.getDataSet().get("text_data").getValue().equals(TEXT_VALUE);
+        assert caze.getDataSet().get("number_data").getValue().equals(NUM_VALUE);
+    }
+
+    private StoredRule transitionRulePre(String trans, String type) {
+        String when = "$case: Case() $event: TransitionEventFact(caseId == $case.stringId, transitionId == \"" + trans + "\", type == " + type + ", phase == EventPhase.PRE)";
+        String then = "$case.dataSet[\"text_data\"].value = \"" + TEXT_VALUE + "\";";
+
+        return rule(when, then);
+    }
+
+    private StoredRule transitionRulePost(String trans, String type) {
+        String when = "$case: Case() $event: TransitionEventFact(caseId == $case.stringId, transitionId == \"" + trans + "\", type == " + type + ", phase == EventPhase.POST)";
+        String then = "$case.dataSet[\"number_data\"].value = " + NUM_VALUE + ";";
+
+        return rule(when, then);
+    }
+
+    private StoredRule rule(String when, String then) {
+        ObjectId id = new ObjectId();
+        return StoredRule.builder()
+                ._id(id)
+                .when(when)
+                .then(then)
+                .identifier(id.toString())
+                .lastUpdate(LocalDateTime.now())
+                .enabled(true)
+                .build();
+    }
+
+    private Case newCase() throws IOException, MissingPetriNetMetaDataException {
+        Optional<PetriNet> petriNetOptional = petriNetService.importPetriNet(new FileInputStream("src/test/resources/rule_engine_test.xml"), "major", superCreator.getLoggedSuper());
+        return workflowService.createCase(petriNetOptional.get().getStringId(), "Original title", "original color", superCreator.getLoggedSuper());
+    }
+
+    private Task findTask(Case caze, String trans) {
+        return taskService.findOne(caze.getTasks().stream().filter(it -> it.getTransition().equals(trans)).findFirst().get().getTask());
     }
 
     @After
