@@ -21,6 +21,8 @@ import java.util.Arrays;
 @Component
 public class PetriNetRuleEvaluationJob extends RuleJob {
 
+    public static final String NET_ID = "netId";
+
     private static final Logger log = LoggerFactory.getLogger(PetriNetRuleEvaluationJob.class);
 
     @Autowired
@@ -52,7 +54,7 @@ public class PetriNetRuleEvaluationJob extends RuleJob {
 
     @Override
     public String getInstanceId(JobExecutionContext context) {
-        return (String) context.getJobDetail().getJobDataMap().get("netId");
+        return (String) context.getJobDetail().getJobDataMap().get(NET_ID);
     }
 
 }

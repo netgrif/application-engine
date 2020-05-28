@@ -5,9 +5,11 @@ import com.netgrif.workflow.rules.domain.RuleRepository;
 import com.netgrif.workflow.rules.domain.StoredRule;
 import com.netgrif.workflow.rules.domain.scheduled.CaseRuleEvaluationJob;
 import com.netgrif.workflow.rules.domain.scheduled.PetriNetRuleEvaluationJob;
+import com.netgrif.workflow.rules.domain.scheduled.RuleJob;
 import com.netgrif.workflow.rules.service.interfaces.IRuleEvaluationScheduleService;
 import com.netgrif.workflow.rules.service.throwable.RuleEvaluationScheduleException;
 import com.netgrif.workflow.workflow.domain.Case;
+import com.netgrif.workflow.workflow.domain.QCase;
 import org.quartz.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,14 +45,9 @@ public class RuleEvaluationScheduleService implements IRuleEvaluationScheduleSer
 
             JobDetail jobDetail = buildJobDetail(useCase.getStringId(), rule, CaseRuleEvaluationJob.class);
             Trigger trigger = buildTrigger(useCase.getStringId(), scheduleBuilder, jobDetail);
-            jobDetail.getJobDataMap().put("caseId", useCase.getStringId());
+            jobDetail.getJobDataMap().put(CaseRuleEvaluationJob.CASE_ID, useCase.getStringId());
 
-            try {
-                scheduler.scheduleJob(jobDetail, trigger);
-            } catch (SchedulerException e) {
-                log.error("Failed to schedule Rule evaluation for " + useCase.getStringId() + " of rule " + rule.getStringId(), e);
-                throw new RuleEvaluationScheduleException(e);
-            }
+            schedule(useCase.getStringId(), rule.getStringId(), jobDetail, trigger);
         }
     }
 
@@ -68,16 +65,20 @@ public class RuleEvaluationScheduleService implements IRuleEvaluationScheduleSer
 
             JobDetail jobDetail = buildJobDetail(petriNet.getStringId(), rule, PetriNetRuleEvaluationJob.class);
             Trigger trigger = buildTrigger(petriNet.getStringId(), scheduleBuilder, jobDetail);
-            jobDetail.getJobDataMap().put("netId", petriNet.getStringId());
+            jobDetail.getJobDataMap().put(PetriNetRuleEvaluationJob.NET_ID, petriNet.getStringId());
 
-            try {
-                scheduler.scheduleJob(jobDetail, trigger);
-            } catch (SchedulerException e) {
-                log.error("Failed to schedule Rule evaluation for " + petriNet.getStringId() + " of rule " + rule.getStringId(), e);
-                throw new RuleEvaluationScheduleException(e);
-            }
+            schedule(petriNet.getStringId(), rule.getStringId(), jobDetail, trigger);
         }
 
+    }
+
+    private void schedule(String stringId, String ruleId, JobDetail jobDetail, Trigger trigger) throws RuleEvaluationScheduleException {
+        try {
+            scheduler.scheduleJob(jobDetail, trigger);
+        } catch (SchedulerException e) {
+            log.error("Failed to schedule Rule evaluation for " + stringId + " of rule " + ruleId, e);
+            throw new RuleEvaluationScheduleException(e);
+        }
     }
 
     protected  <T extends Job> JobDetail buildJobDetail(String instanceStringId, StoredRule rule, Class<T> type) {
@@ -85,7 +86,7 @@ public class RuleEvaluationScheduleService implements IRuleEvaluationScheduleSer
                 .storeDurably(false)
                 .withIdentity(instanceStringId + "-" + rule.getStringId() + "-" + UUID.randomUUID().toString())
                 .withDescription("Scheduled eval for " + instanceStringId + " of rule " + rule.getStringId()).build();
-        jobDetail.getJobDataMap().put("ruleIdentifier", rule.getIdentifier());
+        jobDetail.getJobDataMap().put(RuleJob.RULE_IDENTIFIER, rule.getIdentifier());
         return jobDetail;
     }
 
