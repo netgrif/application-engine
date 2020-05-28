@@ -12,11 +12,11 @@ import java.util.List;
 @Service
 public interface IRuleEvaluationScheduleService {
 
-    void scheduleRuleEvaluationForCase(Case useCase, String ruleIdentifier, ScheduleBuilder<Trigger> trigger) throws RuleEvaluationScheduleException;
+    void scheduleRuleEvaluationForCase(Case useCase, String ruleIdentifier, ScheduleBuilder<? extends Trigger> trigger) throws RuleEvaluationScheduleException;
 
-    void scheduleRuleEvaluationForCase(Case useCase, List<String> ruleIdentifiers, ScheduleBuilder<Trigger> trigger) throws RuleEvaluationScheduleException;
+    void scheduleRuleEvaluationForCase(Case useCase, List<String> ruleIdentifiers, ScheduleBuilder<? extends Trigger> trigger) throws RuleEvaluationScheduleException;
 
-    void scheduleRuleEvaluationForNet(PetriNet petriNet, String ruleIdentifier, ScheduleBuilder<Trigger> trigger) throws RuleEvaluationScheduleException;
+    void scheduleRuleEvaluationForNet(PetriNet petriNet, String ruleIdentifier, ScheduleBuilder<? extends Trigger> trigger) throws RuleEvaluationScheduleException;
 
-    void scheduleRuleEvaluationForNet(PetriNet petriNet, List<String> ruleIdentifiers, ScheduleBuilder<Trigger> trigger) throws RuleEvaluationScheduleException;
+    void scheduleRuleEvaluationForNet(PetriNet petriNet, List<String> ruleIdentifiers, ScheduleBuilder<? extends Trigger> trigger) throws RuleEvaluationScheduleException;
 }
