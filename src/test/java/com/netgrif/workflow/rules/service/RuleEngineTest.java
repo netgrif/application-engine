@@ -287,6 +287,29 @@ public class RuleEngineTest {
         assert caze.getDataSet().get("number_data").getValue().equals(NUM_VALUE);
     }
 
+    @Test
+    public void testQueries() throws IOException, MissingPetriNetMetaDataException {
+        String predicate = "$event: CaseCreatedFact(eventPhase == EventPhase.POST)";
+        String then = "factRepository.save(com.netgrif.workflow.rules.service.RuleEngineTest.TestFact.instance($case.stringId, %d));";
+        StoredRule rule0 = rule(predicate + " $case: Case(processIdentifier == \"rule_engine_test\", title == \"FAKE_TITLE\")", String.format(then, -2));
+        StoredRule rule1 = rule(predicate + " $case: Case(processIdentifier == \"FAKE_NET\")", String.format(then, -1));
+        StoredRule rule2 = rule(predicate + " $case: Case(processIdentifier == \"rule_engine_test\")", String.format(then, 1));
+        StoredRule rule3 = rule(predicate + " $case: Case(processIdentifier == \"rule_engine_test\", dataSet[\"text_data\"].value == \"VALUE\")", String.format(then, 2));
+
+        ruleRepository.save(rule0);
+        ruleRepository.save(rule1);
+        ruleRepository.save(rule2);
+        ruleRepository.save(rule3);
+
+        Case caze = newCase();
+        List<Fact> facts = factRepository.findAll(QCaseFact.caseFact.caseId.eq(caze.getStringId()), PageRequest.of(0, 100)).getContent();
+        assert facts.stream().noneMatch(it -> ((TestFact) it).number == -2);
+        assert facts.stream().noneMatch(it -> ((TestFact) it).number == -1);
+        assert facts.stream().filter(it -> ((TestFact) it).number == 1).count() == 1;
+        assert facts.stream().filter(it -> ((TestFact) it).number == 2).count() == 1;
+
+    }
+
     private StoredRule transitionRulePre(String trans, String type) {
         String when = "$case: Case() $event: TransitionEventFact(caseId == $case.stringId, transitionId == \"" + trans + "\", type == " + type + ", phase == EventPhase.PRE)";
         String then = "$case.dataSet[\"text_data\"].value = \"" + TEXT_VALUE + "\";";
