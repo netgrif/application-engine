@@ -8,6 +8,8 @@ import org.slf4j.LoggerFactory;
 
 public abstract class RuleJob implements Job {
 
+    public static final String RULE_IDENTIFIER = "ruleIdentifier";
+
     private static final Logger log = LoggerFactory.getLogger(RuleJob.class);
 
     public boolean validate(JobExecutionContext context) {
@@ -17,6 +19,6 @@ public abstract class RuleJob implements Job {
     public abstract String getInstanceId(JobExecutionContext context);
 
     public String getRuleIdentifier(JobExecutionContext context) {
-        return (String) context.getJobDetail().getJobDataMap().get("ruleIdentifier");
+        return (String) context.getJobDetail().getJobDataMap().get(RULE_IDENTIFIER);
     }
 }
