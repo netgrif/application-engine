@@ -5,7 +5,6 @@ import com.netgrif.workflow.WorkflowManagementSystemApplication;
 import com.netgrif.workflow.configuration.drools.RefreshableKieBase;
 import com.netgrif.workflow.rules.domain.RuleRepository;
 import com.netgrif.workflow.rules.domain.StoredRule;
-import org.apache.tomcat.jni.Local;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
