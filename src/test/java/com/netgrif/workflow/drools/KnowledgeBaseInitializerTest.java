@@ -37,9 +37,6 @@ public class KnowledgeBaseInitializerTest {
     @Autowired
     private IKnowledgeBaseInitializer knowledgeBaseInitializer;
 
-    @Autowired
-    private RuleRepository ruleRepository;
-
     @Before
     public void before() {
         testHelper.truncateDbs();
