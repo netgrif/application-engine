@@ -78,7 +78,7 @@ public class KnowledgeBaseInitializer implements IKnowledgeBaseInitializer {
         });
 
         String generatedDRL;
-        try (InputStream template = new ClassPathResource(templatePath).getInputStream()) {
+        try (InputStream template = templateInputStream()) {
             generatedDRL = compiler.compile(ruleAttributes, template);
         } catch (IOException e) {
             log.error("Failed to compile rules", e);
@@ -109,6 +109,10 @@ public class KnowledgeBaseInitializer implements IKnowledgeBaseInitializer {
                 testSession.destroy();
             }
         }
+    }
+
+    protected InputStream templateInputStream() throws IOException {
+        return new ClassPathResource(templatePath).getInputStream();
     }
 
     private String formatDate(LocalDate date) {
