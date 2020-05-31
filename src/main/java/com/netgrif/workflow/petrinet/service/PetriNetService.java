@@ -105,9 +105,9 @@ public abstract class PetriNetService implements IPetriNetService {
         IOUtils.copy(xmlFile, baos);
         byte[] bytes = baos.toByteArray();
 
-        Optional<PetriNet> imported = getImporter().importPetriNet(new ByteArrayInputStream(bytes), new Config());
+        Optional<PetriNet> imported = getImporter().importPetriNet(new ByteArrayInputStream(bytes), Config.unsaved());
         if (!imported.isPresent()) {
-            return imported;
+            return Optional.empty();
         }
 
         PetriNet existingNet = getNewestVersionByIdentifier(imported.get().getIdentifier());
@@ -140,15 +140,11 @@ public abstract class PetriNetService implements IPetriNetService {
     }
 
     private Optional<PetriNet> importNewVersion(InputStream xmlFile, String releaseType, @NotNull PetriNet previousVersion, LoggedUser user) throws IOException, MissingPetriNetMetaDataException {
-        Config config = Config.builder()
-                .notSaveObjects(true)
-                .build();
-
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         IOUtils.copy(xmlFile, baos);
         byte[] bytes = baos.toByteArray();
 
-        Optional<PetriNet> imported = getImporter().importPetriNet(new ByteArrayInputStream(bytes), config);
+        Optional<PetriNet> imported = getImporter().importPetriNet(new ByteArrayInputStream(bytes), Config.unsaved());
         imported.ifPresent(petriNet -> {
             petriNet.setVersion(previousVersion.getVersion());
             petriNet.incrementVersion(PetriNet.VersionType.valueOf(releaseType.trim().toUpperCase()));
