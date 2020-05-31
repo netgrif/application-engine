@@ -342,7 +342,7 @@ public class Importer {
         if (isDefaultRoleAllowedFor(importTransition, document)) {
             addDefaultRole(transition);
         }
-        if (isTransitionRoleAllowed()) {
+        if (isTransitionRoleAllowed() && config.isSaveObjects()) {
             addTransitionRole(transition);
         }
         if (importTransition.getEvent() != null) {
@@ -661,7 +661,7 @@ public class Importer {
         } else {
             role.setName(toI18NString(importRole.getName()));
         }
-        if (config.isNotSaveObjects()) {
+        if (config.isSaveObjects()) {
             role = roleRepository.save(role);
         } else {
             role.set_id(new ObjectId());
