@@ -7,12 +7,19 @@ import lombok.Data;
 @Builder
 public class Config {
 
-    private boolean notSaveObjects = true;
+    private boolean saveObjects = true;
 
     public Config() {
     }
 
-    public Config(boolean notSaveObjects) {
-        this.notSaveObjects = notSaveObjects;
+    public Config(boolean saveObjects) {
+        this.saveObjects = saveObjects;
+    }
+
+    public static Config unsaved() {
+        return Config.builder()
+                .saveObjects(false)
+                .build();
+
     }
 }
