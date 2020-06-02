@@ -46,7 +46,7 @@ public class Preferences implements Serializable {
      * caseViewId: [headersIds]
      */
     @Field
-    private Map<String, List<String>> caseViewHeaders = new HashMap<>();
+    private Map<String, List<String>> headers = new HashMap<>();
 
     /**
      * temporary field that allows for a more flexible development of user preferences
