@@ -71,6 +71,24 @@
         <y>60</y>
         <label>Constructor / System</label>
         <trigger type="auto"/>
+        <event type="finish">
+            <id>288_finish</id>
+            <actions phase="pre">
+                <action>
+                    <!-- @formatter:off -->
+                    taskDoc: f.task_doc;
+
+                    def document = createCase("financial_data_doc", "${useCase.title} - Doc" as String, "color-fg-amber-500")
+                    def document2 = createCase("financial_data_doc", "${useCase.title} - Doc 2" as String, "color-fg-amber-500")
+
+                    change taskDoc value {
+                        [document.tasks.first().task, document2.tasks.first().task]
+                    }
+
+                    <!-- @formatter:on -->
+                </action>
+            </actions>
+        </event>
     </transition>
 
     <transition>
@@ -78,39 +96,56 @@
         <x>500</x>
         <y>60</y>
         <label name="financial_data">Financial data</label>
-        <dataRef>
-            <id>income</id>
-            <logic>
-                <behavior>editable</behavior>
-                <behavior>required</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>loan_amount</id>
-            <logic>
-                <behavior>editable</behavior>
-                <behavior>required</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>period</id>
-            <logic>
-                <behavior>editable</behavior>
-                <behavior>required</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>task_doc</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>monthly_payment</id>
-            <logic>
-                <behavior>visible</behavior>
-            </logic>
-        </dataRef>
+
+        <dataGroup>
+            <id>0</id>
+            <title>Financial data 0</title>
+            <dataRef>
+                <id>income</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>loan_amount</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>period</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+
+        <dataGroup>
+            <id>task_ref</id>
+            <dataRef>
+                <id>task_doc</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+
+        <dataGroup>
+            <id>1</id>
+            <title>Financial data 1</title>
+
+            <dataRef>
+                <id>monthly_payment</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+
+
     </transition>
 	<!-- PLACES -->
 	<place>
