@@ -172,10 +172,10 @@ public class DataService implements IDataService {
     private Map<String, Object> substituteTaskRefFieldBehavior(Map<String, Object> entryValue, Task referencedTask, String refereeTransId) {
         if (entryValue.containsKey("behavior")) {
             Map<String, Object> newBehavior = new HashMap<>();
-            ((Map<String, Object>) entryValue.get("behavior")).entrySet().forEach(behaviorEntry -> {
-                String behaviorChangedOnTrans = behaviorEntry.getKey().equals(referencedTask.getTransitionId()) ?
-                    refereeTransId : referencedTask.getStringId() + "-" + behaviorEntry.getKey();
-                newBehavior.put(behaviorChangedOnTrans, behaviorEntry.getValue());
+            ((Map<String, Object>) entryValue.get("behavior")).forEach((key, value) -> {
+                String behaviorChangedOnTrans = key.equals(referencedTask.getTransitionId()) ?
+                        refereeTransId : referencedTask.getStringId() + "-" + key;
+                newBehavior.put(behaviorChangedOnTrans, value);
             });
             entryValue.put("behavior", newBehavior);
         }
@@ -184,58 +184,60 @@ public class DataService implements IDataService {
 
     @Override
     public List<DataGroup> getDataGroups(String taskId, Locale locale) {
+        return getDataGroups(taskId, locale, new HashSet<>(), 0);
+    }
+
+    public List<DataGroup> getDataGroups(String taskId, Locale locale, Set<String> collectedTaskIds, int level) {
         Task task = taskService.findOne(taskId);
         Case useCase = workflowService.findOne(task.getCaseId());
         PetriNet net = useCase.getPetriNet();
         Transition transition = net.getTransition(task.getTransitionId());
 
-        List<Field> data1 = getData(taskId);
-        Map<String, Field> dataFieldMap = data1.stream().collect(Collectors.toMap(Field::getImportId, field -> field));
-        ArrayList<DataGroup> dataGroups = new ArrayList<>(transition.getDataGroups().values());
+        log.info("Getting groups of task " + taskId + " in case " + useCase.getTitle() + " level: " + level);
+        List<DataGroup> resultDataGroups = new ArrayList<>();
+
+        List<Field> data = getData(taskId);
+        Map<String, Field> dataFieldMap = data.stream().collect(Collectors.toMap(Field::getImportId, field -> field));
+        List<DataGroup> dataGroups = transition.getDataGroups().values().stream().map(DataGroup::clone).collect(Collectors.toList());
         for (DataGroup dataGroup : dataGroups) {
+            resultDataGroups.add(dataGroup);
+            log.info("Setting groups of task " + taskId + " in case " + useCase.getTitle() + " level: " + level + " " + dataGroup.getImportId());
+            if (level != 0) dataGroup.setImportId(taskId + "-" + dataGroup.getStringId());
+
             List<Field> resources = new LinkedList<>();
             for (String datum : dataGroup.getData()) {
                 Field field = net.getDataSet().get(datum);
                 if (dataFieldMap.containsKey(datum)) {
                     if (field.getType() == FieldType.TASK_REF) {
-                        collectTaskRefDataGroups((TaskField) dataFieldMap.get(datum), resources);
+                        resultDataGroups.addAll(collectTaskRefDataGroups((TaskField) dataFieldMap.get(datum), locale, collectedTaskIds, level));
                     } else {
-                        resources.add(dataFieldMap.get(datum));
+                        Field resource = dataFieldMap.get(datum);
+                        if (level != 0) resource.setImportId(taskId + "-" + resource.getImportId());
+                        resources.add(resource);
                     }
                 }
             }
             dataGroup.setFields(new DataFieldsResource(resources, locale));
         }
 
-        return dataGroups;
+        return resultDataGroups;
     }
 
-    private void collectTaskRefDataGroups(TaskField taskRefField, List<Field> resources) {
-        collectTaskRefDataGroups(taskRefField, resources, new HashSet<>());
-    }
-
-    private void collectTaskRefDataGroups(TaskField taskRefField, List<Field> resources, Set<String> collectedTasks) {
+    private List<DataGroup> collectTaskRefDataGroups(TaskField taskRefField, Locale locale, Set<String> collectedTaskIds, int level) {
         List<String> taskIds = taskRefField.getValue();
-        if (taskIds == null) {
-            return;
+        List<DataGroup> groups = new ArrayList<>();
+
+        if (taskIds != null) {
+            taskIds = taskIds.stream().filter(id -> !collectedTaskIds.contains(id)).collect(Collectors.toList());
+
+            taskIds.forEach(id -> {
+                collectedTaskIds.add(id);
+                List<DataGroup> taskRefDataGroups = getDataGroups(id, locale, collectedTaskIds, level + 1);
+                groups.addAll(taskRefDataGroups);
+            });
         }
 
-        taskIds = taskIds.stream().filter(it -> !collectedTasks.contains(it)).collect(Collectors.toList());
-        taskIds.forEach(taskId -> {
-            List<Field> data = getData(taskId);
-            Map<String, Field> dataFieldMap = data.stream().collect(Collectors.toMap(Field::getImportId, field -> field));
-
-            collectedTasks.add(taskId);
-            data.forEach(field -> {
-                if (field.getType() == FieldType.TASK_REF) {
-                    collectTaskRefDataGroups((TaskField) dataFieldMap.get(field.getImportId()), resources, collectedTasks);
-                } else {
-                    field.setImportId(taskId + "-" + field.getImportId());
-                    field.setOrder((long) (resources.size() - 1));
-                    resources.add(field);
-                }
-            });
-        });
+        return groups;
     }
 
     @Override
@@ -304,7 +306,6 @@ public class DataService implements IDataService {
                 if (!saveLocalFile(useCase, field, multipartFile))
                     return container;
             }
-
 
             Map<String, ChangedField> changedFields = resolveActions(useCase.getPetriNet().getField(fieldId).get(),
                     Action.ActionTrigger.SET, useCase, useCase.getPetriNet().getTransition(task.getTransitionId()));
