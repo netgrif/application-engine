@@ -31,6 +31,7 @@ import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.xml.bind.JAXBContext;
@@ -46,7 +47,8 @@ public class Importer {
 
     public static final Logger log = LoggerFactory.getLogger(Importer.class);
 
-    public static final String ARCHIVED_FILES_PATH = "storage/uploadedModels/";
+    @Value("${storage.archived}")
+    private String storageArchived;
     public static final String FILE_EXTENSION = ".xml";
 
     public static final String FIELD_KEYWORD = "f";
@@ -145,7 +147,7 @@ public class Importer {
 
     @Transactional
     public Path saveNetFile(PetriNet net, InputStream xmlFile) throws IOException {
-        File savedFile = new File(ARCHIVED_FILES_PATH + net.getStringId() + "-" + net.getTitle() + FILE_EXTENSION);
+        File savedFile = new File(storageArchived + net.getStringId() + "-" + net.getTitle() + FILE_EXTENSION);
         savedFile.getParentFile().mkdirs();
         net.setImportXmlPath(savedFile.getPath());
         copyInputStreamToFile(xmlFile, savedFile);
@@ -816,7 +818,7 @@ public class Importer {
         }
     }
 
-    private void setMetaData() throws MissingPetriNetMetaDataException{
+    private void setMetaData() throws MissingPetriNetMetaDataException {
         List<String> missingMetaData = new ArrayList<>();
         if (document.getId() != null) {
             net.setImportId(document.getId());
