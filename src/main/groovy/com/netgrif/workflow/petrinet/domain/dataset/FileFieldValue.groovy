@@ -1,10 +1,15 @@
 package com.netgrif.workflow.petrinet.domain.dataset
 
+import org.springframework.beans.factory.annotation.Value
+
 class FileFieldValue {
 
     private String name
 
     private String path
+
+    @Value('${storage.path}')
+    private String storagePath
 
     FileFieldValue() {
     }
@@ -35,7 +40,7 @@ class FileFieldValue {
     }
 
     String getPath(String caseId, String fieldId) {
-        return "storage/${caseId}-${fieldId}-${name}"
+        return "${storagePath}/${caseId}-${fieldId}-${name}"
     }
 
     void setPath(String path) {
