@@ -24,6 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Lookup;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.data.domain.Page;
@@ -51,6 +52,9 @@ import static com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService.
 public abstract class PetriNetService implements IPetriNetService {
 
     private static final Logger log = LoggerFactory.getLogger(PetriNetService.class);
+
+    @Value("storage.archived")
+    private String storageArchived;
 
     @Lookup("importer")
     abstract Importer getImporter();
@@ -263,7 +267,7 @@ public abstract class PetriNetService implements IPetriNetService {
                 return null;
             title = nets.get(0).getTitle().getDefaultValue();
         }
-        return new FileSystemResource(Importer.ARCHIVED_FILES_PATH + netId + "-" + title + Importer.FILE_EXTENSION);
+        return new FileSystemResource(storageArchived + netId + "-" + title + Importer.FILE_EXTENSION);
     }
 
 

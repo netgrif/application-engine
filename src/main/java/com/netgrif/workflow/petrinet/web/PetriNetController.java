@@ -11,6 +11,7 @@ import com.netgrif.workflow.workflow.web.responsebodies.MessageResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -43,6 +44,9 @@ public class PetriNetController {
 
     private static final Logger log = LoggerFactory.getLogger(PetriNetController.class);
 
+    @Value("${storage.archived}")
+    private String storageArchived;
+
     @Autowired
     private IPetriNetService service;
 
@@ -58,7 +62,7 @@ public class PetriNetController {
             @RequestParam(value = "meta", required = false) String releaseType,
             Authentication auth) throws MissingPetriNetMetaDataException {
         try {
-            File file = new File("storage/uploadedModels/" + multipartFile.getOriginalFilename());
+            File file = new File(storageArchived + multipartFile.getOriginalFilename());
             file.createNewFile();
             FileOutputStream fout = new FileOutputStream(file);
             fout.write(multipartFile.getBytes());

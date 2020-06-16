@@ -15,15 +15,18 @@ class StorageRunner extends AbstractOrderedCommandLineRunner {
     @Value('${storage.clean}')
     private boolean cleanStorage
 
+    @Value('${storage.path}')
+    private String storagePath
+
     @Override
     void run(String... strings) throws Exception {
         log.info("Creating storage folder")
-        File storage = new File("storage/uploadedModels/model.txt")
+        File storage = new File("${storagePath}/uploadedModels/model.txt")
         storage.getParentFile().mkdirs()
 
         if (cleanStorage) {
             log.info("Removing files from storage folder and it's sub-folders")
-            purgeDirectory(new File("storage"))
+            purgeDirectory(new File(storagePath))
         }
 
         log.info("Creating log folder")
