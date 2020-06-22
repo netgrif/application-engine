@@ -17,6 +17,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.quartz.SimpleScheduleBuilder;
+import org.quartz.TriggerBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -77,7 +78,7 @@ public class RuleEvaluationScheduleServiceTest {
         ruleRepository.save(rule);
 
         Case caze = workflowService.createCase(petriNetOptional.get().getStringId(), "Original title", "original color", user);
-        ruleEvaluationScheduleService.scheduleRuleEvaluationForCase(caze, "rule2", SimpleScheduleBuilder.simpleSchedule().withIntervalInSeconds(1).withRepeatCount(5));
+        ruleEvaluationScheduleService.scheduleRuleEvaluationForCase(caze, "rule2", TriggerBuilder.newTrigger().withSchedule(SimpleScheduleBuilder.simpleSchedule().withIntervalInSeconds(1).withRepeatCount(5)));
 
         Thread.sleep(10000);
         caze = workflowService.findOne(caze.getStringId());
