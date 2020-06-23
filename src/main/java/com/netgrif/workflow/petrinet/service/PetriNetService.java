@@ -17,6 +17,7 @@ import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.workflow.petrinet.web.responsebodies.DataFieldReference;
 import com.netgrif.workflow.petrinet.web.responsebodies.PetriNetReference;
 import com.netgrif.workflow.petrinet.web.responsebodies.TransitionReference;
+import com.netgrif.workflow.workflow.domain.FileStorageConfiguration;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.bson.Document;
 import org.bson.types.ObjectId;
@@ -24,7 +25,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Lookup;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.data.domain.Page;
@@ -53,9 +53,6 @@ public abstract class PetriNetService implements IPetriNetService {
 
     private static final Logger log = LoggerFactory.getLogger(PetriNetService.class);
 
-    @Value("storage.archived")
-    private String storageArchived;
-
     @Lookup("importer")
     abstract Importer getImporter();
 
@@ -73,6 +70,9 @@ public abstract class PetriNetService implements IPetriNetService {
 
     @Autowired
     private ApplicationEventPublisher publisher;
+
+    @Autowired
+    private FileStorageConfiguration fileStorageConfiguration;
 
     private Map<ObjectId, PetriNet> cache = new HashMap<>();
 
@@ -267,7 +267,7 @@ public abstract class PetriNetService implements IPetriNetService {
                 return null;
             title = nets.get(0).getTitle().getDefaultValue();
         }
-        return new FileSystemResource(storageArchived + netId + "-" + title + Importer.FILE_EXTENSION);
+        return new FileSystemResource(fileStorageConfiguration.getStorageArchived() + netId + "-" + title + Importer.FILE_EXTENSION);
     }
 
 

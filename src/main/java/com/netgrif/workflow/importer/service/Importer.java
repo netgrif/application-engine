@@ -25,13 +25,13 @@ import com.netgrif.workflow.petrinet.domain.roles.RolePermission;
 import com.netgrif.workflow.petrinet.domain.throwable.MissingPetriNetMetaDataException;
 import com.netgrif.workflow.petrinet.service.ArcFactory;
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
+import com.netgrif.workflow.workflow.domain.FileStorageConfiguration;
 import com.netgrif.workflow.workflow.domain.triggers.Trigger;
 import lombok.Getter;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.xml.bind.JAXBContext;
@@ -47,8 +47,6 @@ public class Importer {
 
     public static final Logger log = LoggerFactory.getLogger(Importer.class);
 
-    @Value("${storage.archived}")
-    private String storageArchived;
     public static final String FILE_EXTENSION = ".xml";
 
     public static final String FIELD_KEYWORD = "f";
@@ -91,6 +89,9 @@ public class Importer {
 
     @Autowired
     private FieldActionsRunner actionsRunner;
+
+    @Autowired
+    private FileStorageConfiguration fileStorageConfiguration;
 
     @Transactional
     public Optional<PetriNet> importPetriNet(InputStream xml, Config config) throws MissingPetriNetMetaDataException {
@@ -147,7 +148,7 @@ public class Importer {
 
     @Transactional
     public Path saveNetFile(PetriNet net, InputStream xmlFile) throws IOException {
-        File savedFile = new File(storageArchived + net.getStringId() + "-" + net.getTitle() + FILE_EXTENSION);
+        File savedFile = new File(fileStorageConfiguration.getStorageArchived() + net.getStringId() + "-" + net.getTitle() + FILE_EXTENSION);
         savedFile.getParentFile().mkdirs();
         net.setImportXmlPath(savedFile.getPath());
         copyInputStreamToFile(xmlFile, savedFile);
