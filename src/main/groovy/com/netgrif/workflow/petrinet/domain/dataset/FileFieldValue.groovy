@@ -1,6 +1,7 @@
 package com.netgrif.workflow.petrinet.domain.dataset
 
-import org.springframework.beans.factory.annotation.Value
+
+import org.springframework.beans.factory.annotation.Autowired
 
 class FileFieldValue {
 
@@ -8,8 +9,8 @@ class FileFieldValue {
 
     private String path
 
-    @Value('${storage.path}')
-    private String storagePath
+    @Autowired
+    private FileStorageConfiguration
 
     FileFieldValue() {
     }
