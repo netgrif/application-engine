@@ -4,6 +4,7 @@ import com.netgrif.workflow.workflow.domain.FileStorageConfiguration
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Component
 
@@ -12,6 +13,9 @@ import org.springframework.stereotype.Component
 class StorageRunner extends AbstractOrderedCommandLineRunner {
 
     private static final Logger log = LoggerFactory.getLogger(StorageRunner)
+
+    @Value('${storage.clean}')
+    private boolean cleanStorage
 
     @Autowired
     private FileStorageConfiguration fileStorageConfiguration

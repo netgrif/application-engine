@@ -1,16 +1,13 @@
 package com.netgrif.workflow.petrinet.domain.dataset
 
-
-import org.springframework.beans.factory.annotation.Autowired
+import com.netgrif.workflow.configuration.ApplicationContextProvider
+import com.netgrif.workflow.workflow.domain.FileStorageConfiguration
 
 class FileFieldValue {
 
     private String name
 
     private String path
-
-    @Autowired
-    private FileStorageConfiguration
 
     FileFieldValue() {
     }
@@ -41,7 +38,8 @@ class FileFieldValue {
     }
 
     String getPath(String caseId, String fieldId) {
-        return "${storagePath}/${caseId}-${fieldId}-${name}"
+        FileStorageConfiguration fileStorageConfiguration = ApplicationContextProvider.getBean("fileStorageConfiguration")
+        return "${fileStorageConfiguration.getStoragePath()}/${caseId}-${fieldId}-${name}"
     }
 
     void setPath(String path) {
