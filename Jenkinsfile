@@ -70,61 +70,69 @@ pipeline {
     stage('Documentation') {
         parallel {
             stage('JavaDoc') {
-                echo 'Uploading JavaDoc to developer.netgrif.com'
-                sshPublisher(
-                    publishers: [
-                        sshPublisherDesc(
-                            configName: 'developer.netgrif.com',
-                            transfers: [
-                                sshTransfer(
-                                    cleanRemote: true,
-                                    excludes: '',
-                                    execCommand: '',
-                                    execTimeout: 120000,
-                                    flatten: false,
-                                    makeEmptyDirs: false,
-                                    noDefaultExcludes: false,
-                                    patternSeparator: '[, ]+',
-                                    remoteDirectory: "/var/www/html/developer/projects/engine-backend/${pom.getVersion()}/javadoc",
-                                    remoteDirectorySDF: false,
-                                    removePrefix: 'target/apidocs',
-                                    sourceFiles: 'target/apidocs/**')],
-                            usePromotionTimestamp: false,
-                            useWorkspaceInPromotion: false,
-                            verbose: true)])
+                steps {
+                    echo 'Uploading JavaDoc to developer.netgrif.com'
+                    sshPublisher(
+                        publishers: [
+                            sshPublisherDesc(
+                                configName: 'developer.netgrif.com',
+                                transfers: [
+                                    sshTransfer(
+                                        cleanRemote: true,
+                                        excludes: '',
+                                        execCommand: '',
+                                        execTimeout: 120000,
+                                        flatten: false,
+                                        makeEmptyDirs: false,
+                                        noDefaultExcludes: false,
+                                        patternSeparator: '[, ]+',
+                                        remoteDirectory: "/var/www/html/developer/projects/engine-backend/${pom.getVersion()}/javadoc",
+                                        remoteDirectorySDF: false,
+                                        removePrefix: 'target/apidocs',
+                                        sourceFiles: 'target/apidocs/**')],
+                                usePromotionTimestamp: false,
+                                useWorkspaceInPromotion: false,
+                                verbose: true)])
+                }
             }
 
             stage('GroovyDoc') {
-                echo 'Building GroovyDoc'
+                steps {
+                    echo 'Building GroovyDoc'
+                }
             }
 
             stage('Swagger') {
-                echo 'Building OpenApi 3 documentation'
+                steps {
+                    echo 'Building OpenApi 3 documentation'
+                }
             }
 
             stage('XSD Schema') {
-                echo 'Publishing Petriflow XSD schema'
-                sshPublisher(
-                    publishers: [
-                        sshPublisherDesc(
-                            configName: 'developer.netgrif.com',
-                            transfers: [
-                                sshTransfer(
-                                    cleanRemote: true,
-                                    excludes: '',
-                                    execCommand: '',
-                                    execTimeout: 120000,
-                                    flatten: false,
-                                    makeEmptyDirs: false,
-                                    noDefaultExcludes: false,
-                                    patternSeparator: '[, ]+',
-                                    remoteDirectory: "/var/www/html/developer/projects/engine-backend/${pom.getVersion()}/schema",
-                                    remoteDirectorySDF: false,
-                                    removePrefix: 'src/main/resources/petriNets',
-                                    sourceFiles: 'src/main/resources/petriNets/petriflow_schema.xsd')],
-                            usePromotionTimestamp: false,
-                            useWorkspaceInPromotion: false,
-                            verbose: true)])
+                steps {
+                    echo 'Publishing Petriflow XSD schema'
+                    sshPublisher(
+                        publishers: [
+                            sshPublisherDesc(
+                                configName: 'developer.netgrif.com',
+                                transfers: [
+                                    sshTransfer(
+                                        cleanRemote: true,
+                                        excludes: '',
+                                        execCommand: '',
+                                        execTimeout: 120000,
+                                        flatten: false,
+                                        makeEmptyDirs: false,
+                                        noDefaultExcludes: false,
+                                        patternSeparator: '[, ]+',
+                                        remoteDirectory: "/var/www/html/developer/projects/engine-backend/${pom.getVersion()}/schema",
+                                        remoteDirectorySDF: false,
+                                        removePrefix: 'src/main/resources/petriNets',
+                                        sourceFiles: 'src/main/resources/petriNets/petriflow_schema.xsd')],
+                                usePromotionTimestamp: false,
+                                useWorkspaceInPromotion: false,
+                                verbose: true)])
+                }
             }
         }
     }
