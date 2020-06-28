@@ -25,6 +25,7 @@ import com.netgrif.workflow.petrinet.domain.roles.RolePermission;
 import com.netgrif.workflow.petrinet.domain.throwable.MissingPetriNetMetaDataException;
 import com.netgrif.workflow.petrinet.service.ArcFactory;
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
+import com.netgrif.workflow.workflow.domain.FileStorageConfiguration;
 import com.netgrif.workflow.workflow.domain.triggers.Trigger;
 import lombok.Getter;
 import org.bson.types.ObjectId;
@@ -46,7 +47,6 @@ public class Importer {
 
     public static final Logger log = LoggerFactory.getLogger(Importer.class);
 
-    public static final String ARCHIVED_FILES_PATH = "storage/uploadedModels/";
     public static final String FILE_EXTENSION = ".xml";
 
     public static final String FIELD_KEYWORD = "f";
@@ -89,6 +89,9 @@ public class Importer {
 
     @Autowired
     private FieldActionsRunner actionsRunner;
+
+    @Autowired
+    private FileStorageConfiguration fileStorageConfiguration;
 
     @Transactional
     public Optional<PetriNet> importPetriNet(InputStream xml, Config config) throws MissingPetriNetMetaDataException {
@@ -145,7 +148,7 @@ public class Importer {
 
     @Transactional
     public Path saveNetFile(PetriNet net, InputStream xmlFile) throws IOException {
-        File savedFile = new File(ARCHIVED_FILES_PATH + net.getStringId() + "-" + net.getTitle() + FILE_EXTENSION);
+        File savedFile = new File(fileStorageConfiguration.getStorageArchived() + net.getStringId() + "-" + net.getTitle() + FILE_EXTENSION);
         savedFile.getParentFile().mkdirs();
         net.setImportXmlPath(savedFile.getPath());
         copyInputStreamToFile(xmlFile, savedFile);
@@ -816,7 +819,7 @@ public class Importer {
         }
     }
 
-    private void setMetaData() throws MissingPetriNetMetaDataException{
+    private void setMetaData() throws MissingPetriNetMetaDataException {
         List<String> missingMetaData = new ArrayList<>();
         if (document.getId() != null) {
             net.setImportId(document.getId());
