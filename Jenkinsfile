@@ -8,7 +8,11 @@ pipeline {
     copyArtifactPermission('*');
   }
   environment {
-        NEXUS_CRED = credentials('1986c778-eba7-44d7-b6f6-71e73906d894')
+        NEXUS_CRED = '1986c778-eba7-44d7-b6f6-71e73906d894'
+        NEXUS_VERSION = 'nexus3'
+        NEXUS_PROTOCOL = 'https'
+        NEXUS_URL = 'nexus.netgrif.com'
+        NEXUS_REPO = 'maven-releases'
   }
 
   stages {
@@ -150,11 +154,11 @@ pipeline {
         script {
             DATETIME_TAG = java.time.LocalDateTime.now()
             pom = readMavenPom()
-            ZIP_FILE = "NETGRIF-${pom.getName().replace(' ','_')}-${pom.getVersion()}-Backend-${DATETIME_TAG}.zip"
+            ZIP_FILE = "${pom.getName().replace(' ','_')}-${pom.getVersion()}-Backend-${DATETIME_TAG}.zip"
         }
         sh '''
             mkdir dist
-            cp target/*.jar dist/
+            cp target/*.${pom.getPackaging()} dist/
         '''
         zip zipFile: ZIP_FILE, archive: false, dir: 'dist'
         archiveArtifacts artifacts:ZIP_FILE, fingerprint: true
@@ -165,7 +169,46 @@ pipeline {
         parallel {
             stage('Nexus') {
                 steps {
-                    echo 'Publishing to Nexus Maven repository'
+                    script {
+                        pom = readMavenPom()
+                        if(pom.getVersion().contains('SNAPSHOT')){
+                            NEXUS_REPO = 'maven-snapshots'
+                        }
+                    }
+                    echo "Publishing to Nexus Maven repository ${NEXUS_REPO}"
+                    nexusArtifactUploader(
+                        nexusVersion: NEXUS_VERSION,
+                        protocol: NEXUS_PROTOCOL,
+                        nexusUrl: NEXUS_URL,
+                        groupId: pom.getGroupId(),
+                        version: pom.getVersion(),
+                        repository: NEXUS_REPO
+                        credentialsId: NEXUS_CRED,
+                        artifacts: [
+                            [
+                                artifactId: pom.getArtifactId(),
+                                classifier: '',
+                                file: "${pom.getArtifactId()}-${pom.getVersion()}.${pom.getPackaging()}",
+                                type: pom.getPackaging()
+                            ],[
+                                artifactId: pom.getArtifactId(),
+                                classifier: '',
+                                file: "${pom.getArtifactId()}-${pom.getVersion()}-javadoc.${pom.getPackaging()}",
+                                type: pom.getPackaging()
+                            ],[
+                                artifactId: pom.getArtifactId(),
+                                classifier: '',
+                                file: 'pom.xml',
+                                type: 'pom'
+                            ],
+                        ]
+                    )
+                }
+            }
+
+            stage('Upload to FTP') {
+                steps {
+                    echo 'Uploading to FTP server'
                 }
             }
         }
