@@ -137,12 +137,6 @@ pipeline {
         }
     }
 
-    stage('Nexus') {
-        steps {
-
-        }
-    }
-
     stage('ZIP file') {
       steps {
         script {
@@ -176,6 +170,7 @@ pipeline {
           //          message: "The pipeline ${currentBuild.fullDisplayName} completed successfully."
 
           //junit 'coverage/netgrif-application-engine/JUNITX-test-report.xml'
+          echo 'Future TODO: archive junit results'
       }
 
       success {
