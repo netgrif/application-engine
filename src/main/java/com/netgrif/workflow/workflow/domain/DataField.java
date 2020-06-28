@@ -22,7 +22,7 @@ public class DataField {
     private Object value;
 
     @Getter @Setter
-    private Map<String, I18nString> choices;
+    private Set<I18nString> choices;
 
     @Getter
     @Setter

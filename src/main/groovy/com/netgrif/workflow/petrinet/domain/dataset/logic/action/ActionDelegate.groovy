@@ -174,9 +174,7 @@ class ActionDelegate {
         if (!changedFields.containsKey(field.stringId)) {
             changedFields[field.stringId] = new ChangedField(field.stringId)
         }
-        changedFields[field.stringId].addAttribute("choices", field.choices.collect {
-            it.value.getTranslation(LocaleContextHolder.locale)
-        })
+        changedFields[field.stringId].addAttribute("choices", field.choices.collect { it.getTranslation(LocaleContextHolder.locale) })
     }
 
     def close = { Transition[] transitions ->
@@ -242,22 +240,14 @@ class ActionDelegate {
              def values = cl()
              if (values == null || (values instanceof Closure && values() == UNCHANGED_VALUE))
                  return
-             if (!(values instanceof Collection) && !(values instanceof Map))
+             if (!(values instanceof Collection))
                  values = [values]
              field = (ChoiceField) field
-             if (values instanceof Map) {
-                 if (values.every { it.value instanceof I18nString }) {
-                     field.setChoices(values as Map<String, I18nString>)
-                 } else {
-                     field.setChoicesFromStrings(values as Map<String, String>)
-                 }
-             } else {
                  if (values.every { it instanceof I18nString }) {
                      field.setChoices(values as Set<I18nString>)
                  } else {
                      field.setChoicesFromStrings(values as Set<String>)
                  }
-             }
              saveChangedChoices(field)
          }]
     }
@@ -525,17 +515,5 @@ class ActionDelegate {
 
     User loggedUser() {
         return userService.loggedUser
-    }
-
-    void test(def enu) {
-        List<I18nString> testCollection = [new I18nString("str1"), new I18nString("str1")]
-        change useCase.getField("test_enum") choices {
-            return testCollection
-        }
-        Map<String, I18nString> testMap = ["id1": new I18nString("value1"), "id2": new I18nString("value2")]
-        change useCase.getField("test_enum") choices {
-            return testMap
-        }
-        print("weq")
     }
 }
