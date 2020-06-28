@@ -9,7 +9,6 @@ pipeline {
   }
   environment {
         NEXUS_CRED = credentials('1986c778-eba7-44d7-b6f6-71e73906d894')
-        pom = readMavenPom()
   }
 
   stages {
@@ -18,6 +17,9 @@ pipeline {
         steps {
             bitbucketStatusNotify(buildState: 'INPROGRESS')
             echo "‎ _   _        _                 _   __ \n| \\ | |  ___ | |_   __ _  _ __ (_) / _|\n|  \\| | / _ \\| __| / _` || '__|| || |_	\n| |\\  ||  __/| |_ | (_| || |   | ||  _|\n|_| \\_| \\___| \\__| \\__, ||_|   |_||_|	\n                   |___/				\n\n\n"
+            script {
+                pom = readMavenPom()
+            }
             echo pom.getName()
             echo pom.getVersion()
             echo pom.getDescription()
@@ -71,6 +73,9 @@ pipeline {
         parallel {
             stage('JavaDoc') {
                 steps {
+                    script {
+                        pom = readMavenPom()
+                    }
                     echo 'Uploading JavaDoc to developer.netgrif.com'
                     sshPublisher(
                         publishers: [
@@ -110,6 +115,9 @@ pipeline {
 
             stage('XSD Schema') {
                 steps {
+                    script {
+                        pom = readMavenPom()
+                    }
                     echo 'Publishing Petriflow XSD schema'
                     sshPublisher(
                         publishers: [
@@ -141,6 +149,7 @@ pipeline {
       steps {
         script {
             DATETIME_TAG = java.time.LocalDateTime.now()
+            pom = readMavenPom()
             ZIP_FILE = "NETGRIF-${pom.getName().replace(' ','_')}-${pom.getVersion()}-Backend-${DATETIME_TAG}.zip"
         }
         sh '''
