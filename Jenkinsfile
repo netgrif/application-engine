@@ -158,7 +158,7 @@ pipeline {
         }
         sh '''
             mkdir dist
-            cp target/*.${pom.getPackaging()} dist/
+            cp target/*.jar pom.xml dist/
         '''
         zip zipFile: ZIP_FILE, archive: false, dir: 'dist'
         archiveArtifacts artifacts:ZIP_FILE, fingerprint: true
