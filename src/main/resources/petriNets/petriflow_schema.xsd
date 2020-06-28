@@ -19,7 +19,6 @@
                 <xs:element ref="title"/>
                 <xs:element ref="placeholder" minOccurs="0"/>
                 <xs:element ref="desc" minOccurs="0"/>
-                <xs:element ref="options" minOccurs="0"/>
                 <xs:element ref="values" minOccurs="0" maxOccurs="unbounded"/>
                 <xs:choice>
                     <xs:element ref="valid" minOccurs="0" maxOccurs="unbounded"/>
