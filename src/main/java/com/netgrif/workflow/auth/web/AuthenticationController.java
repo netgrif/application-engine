@@ -103,6 +103,12 @@ public class AuthenticationController {
         }
     }
 
+    @GetMapping("/verify")
+    public MessageResource verifyAuthToken(Authentication auth) {
+        LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
+        return MessageResource.successMessage("Auth Token successfully verified, for user [" + loggedUser.getId() + "] " + loggedUser.getFullName());
+    }
+
     @GetMapping(value = "/login")
     public UserResource login(Authentication auth, Locale locale) {
         return new UserResource(userService.findByAuth(auth), "profile", locale);
