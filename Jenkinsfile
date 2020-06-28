@@ -182,7 +182,7 @@ pipeline {
                         nexusUrl: NEXUS_URL,
                         groupId: pom.getGroupId(),
                         version: pom.getVersion(),
-                        repository: NEXUS_REPO
+                        repository: NEXUS_REPO,
                         credentialsId: NEXUS_CRED,
                         artifacts: [
                             [
