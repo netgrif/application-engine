@@ -188,12 +188,12 @@ pipeline {
                             [
                                 artifactId: pom.getArtifactId(),
                                 classifier: '',
-                                file: "${pom.getArtifactId()}-${pom.getVersion()}.${pom.getPackaging()}",
+                                file: "target/${pom.getArtifactId()}-${pom.getVersion()}.${pom.getPackaging()}",
                                 type: pom.getPackaging()
                             ],[
                                 artifactId: pom.getArtifactId(),
                                 classifier: '',
-                                file: "${pom.getArtifactId()}-${pom.getVersion()}-javadoc.${pom.getPackaging()}",
+                                file: "target/${pom.getArtifactId()}-${pom.getVersion()}-javadoc.${pom.getPackaging()}",
                                 type: pom.getPackaging()
                             ],[
                                 artifactId: pom.getArtifactId(),
