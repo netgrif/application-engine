@@ -4,39 +4,31 @@ import com.netgrif.workflow.petrinet.domain.I18nString
 
 abstract class ChoiceField<T> extends FieldWithDefault<T> {
 
-    protected Map<String, I18nString> choices
+    protected Set<I18nString> choices
 
     ChoiceField() {
         super()
-        choices = new LinkedHashMap<>()
+        choices = new LinkedHashSet<I18nString>()
     }
 
-    ChoiceField(Map<String, I18nString> values) {
+    ChoiceField(List<I18nString> values) {
         this()
         if (values != null)
-            this.choices = values
+            this.choices.addAll(values)
     }
 
-    Map<String, I18nString> getChoices() {
+    Set<I18nString> getChoices() {
         return choices
     }
 
-    void setChoices(Map<String, I18nString> choices) {
+    void setChoices(Set<I18nString> choices) {
         this.choices = choices
     }
 
-    void setChoices(Collection<I18nString> choices) {
-        this.choices.clear()
-        choices.each { this.choices.put(it.defaultValue, it) }
-    }
-
-    void setChoicesFromStrings(Map<String, String> choices) {
-        this.choices.clear()
-        choices.each { this.choices.put(it.key, new I18nString(it.value)) }
-    }
-
     void setChoicesFromStrings(Collection<String> choices) {
-        this.choices.clear()
-        choices.each { this.choices.put(it, new I18nString(it)) }
+        this.choices = new LinkedHashSet<>()
+        choices.each {
+            this.choices.add(new I18nString(it))
+        }
     }
 }
