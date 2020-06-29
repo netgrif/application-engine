@@ -99,7 +99,7 @@
 
         <dataGroup>
             <id>0</id>
-            <title>Financial data 0</title>
+            <title name="financial_data">Financial data</title>
             <dataRef>
                 <id>income</id>
                 <logic>
@@ -135,7 +135,7 @@
 
         <dataGroup>
             <id>1</id>
-            <title>Financial data 1</title>
+            <title>Financial data - calculated payment</title>
 
             <dataRef>
                 <id>monthly_payment</id>
