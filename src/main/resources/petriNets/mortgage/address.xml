@@ -48,46 +48,52 @@
         <x>50</x>
         <y>50</y>
         <label name="address_and_mortgage">Address and type of mortgage</label>
-        <dataRef>
-            <id>street</id>
-            <logic>
-                <behavior>editable</behavior>
-                <behavior>required</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>streetnumber</id>
-            <logic>
-                <behavior>editable</behavior>
-                <behavior>required</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>postal</id>
-            <logic>
-                <behavior>editable</behavior>
-                <action trigger="set">
-                    field: f.this,
-                    city: f.city;
-                    change city choices {
-                    def postals = psc byCode,field.value;
-                    return postals.collect({it.city}).unique();
-                    }
-                </action>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>city</id>
-            <logic>
-                <behavior>editable</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>type</id>
-            <logic>
-                <behavior>editable</behavior>
-                <behavior>required</behavior>
-            </logic>
-        </dataRef>
+
+        <dataGroup>
+            <id>0</id>
+            <title name="address_and_mortgage">Address and type of mortgage</title>
+            <dataRef>
+                <id>street</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>streetnumber</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>postal</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <action trigger="set">
+                        field: f.this,
+                        city: f.city;
+                        change city choices {
+                        def postals = psc byCode,field.value;
+                        return postals.collect({it.city}).unique();
+                        }
+                    </action>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>city</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>type</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+
     </transition>
 </document>

@@ -37,26 +37,31 @@
         <x>50</x>
         <y>50</y>
         <label name="personal_information">Personal information</label>
-        <dataRef>
-            <id>first_name</id>
-            <logic>
-                <behavior>editable</behavior>
-                <behavior>required</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>surname</id>
-            <logic>
-                <behavior>editable</behavior>
-                <behavior>required</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>date_of_birth</id>
-            <logic>
-                <behavior>editable</behavior>
-                <behavior>required</behavior>
-            </logic>
-        </dataRef>
+        <dataGroup>
+            <id>0</id>
+            <title name="personal_information">Personal information</title>
+            <dataRef>
+                <id>first_name</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>surname</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>date_of_birth</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+
     </transition>
 </document>
