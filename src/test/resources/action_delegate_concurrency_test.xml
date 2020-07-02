@@ -11,6 +11,10 @@
     <!-- TRANSACTIONS -->
     <!-- ROLES -->
     <!-- DATA -->
+    <data type="text">
+        <id>text</id>
+        <title>title</title>
+    </data>
     <!-- TRANSITIONS -->
     <transition>
         <id>1</id>
@@ -21,8 +25,11 @@
             <id>1</id>
             <actions phase="post">
                 <action>
-                    Thread.sleep(10000)
-                    println(useCase.stringId)
+                    text: f.text;
+                    Thread.sleep(1000)
+                    change text value {
+                        return useCase.stringId
+                    }
                 </action>
             </actions>
         </event>
