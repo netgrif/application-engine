@@ -42,17 +42,12 @@ abstract class FieldActionsRunner {
 
         log.debug("Action: $action")
         def code = getActionCode(action)
-
-        // the code object is shared between threads and the delegate context gets replaced if two (or more) threads run the same action at the same time
-        synchronized (code) {
-            code.delegate = getActionDeleget()
-            try {
-                code.init(action, useCase, this)
-                code()
-            } catch (Exception e) {
-                log.error("Action: $action.definition")
-                throw e
-            }
+        try {
+            code.init(action, useCase, this)
+            code()
+        } catch (Exception e) {
+            log.error("Action: $action.definition")
+            throw e
         }
         return ((ActionDelegate) code.delegate).changedFields
     }
@@ -65,7 +60,7 @@ abstract class FieldActionsRunner {
             code = (Closure) new GroovyShell().evaluate("{-> ${action.definition}}")
             actions.put(action.importId, code)
         }
-        return code
+        return code.rehydrate(getActionDeleget(), code.owner, code.thisObject)
     }
 
     void addToCache(String key, Object value) {
