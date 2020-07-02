@@ -57,8 +57,6 @@ class ConcurrencyTest {
             it.join()
         }
 
-        Thread.sleep(5000)
-
         cases.each {
             Optional<Case> caseOptional = caseRepository.findById(it.stringId)
             assert caseOptional.isPresent()
