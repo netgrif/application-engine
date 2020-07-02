@@ -557,6 +557,7 @@ public class DataService implements IDataService {
                                 || !setRequest.get("caseId").isTextual()) break;
                         String idToRemove = setRequest.get("caseId").asText();
                         value = ((List<String>) value).stream().filter(caseId -> !caseId.equals(idToRemove)).collect(Collectors.toList());
+                        this.workflowService.deleteCase(idToRemove);
                         break;
                 }
                 break;
