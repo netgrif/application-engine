@@ -557,7 +557,7 @@ public class DataService implements IDataService {
                                 || !setRequest.get("caseId").isTextual()) break;
                         String idToRemove = setRequest.get("caseId").asText();
                         value = ((List<String>) value).stream().filter(caseId -> !caseId.equals(idToRemove)).collect(Collectors.toList());
-                        this.workflowService.deleteCase(idToRemove);
+                        deleteSubtreeRootedAt(idToRemove);
                         break;
                 }
                 break;
@@ -571,6 +571,17 @@ public class DataService implements IDataService {
         }
         if (value instanceof String && ((String) value).equalsIgnoreCase("null")) return null;
         else return value;
+    }
+
+    private void deleteSubtreeRootedAt(String subtreeRootId) {
+        Case subtreeRoot = workflowService.findOne(subtreeRootId);
+        if (subtreeRoot.getImmediateDataFields().contains("treeChildCases")) {
+            subtreeRoot.getDataSet().entrySet().stream()
+                    .filter(entry -> entry.getKey().equals("treeChildCases"))
+                    .findFirst()
+                    .ifPresent(treeChildrenEntry -> ((List<String>) treeChildrenEntry.getValue().getValue()).forEach(this::deleteSubtreeRootedAt));
+        }
+        workflowService.deleteCase(subtreeRootId);
     }
 
     @Data
