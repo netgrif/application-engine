@@ -4,6 +4,7 @@ import com.netgrif.workflow.importer.service.Config
 import com.netgrif.workflow.importer.service.Importer
 import com.netgrif.workflow.startup.ImportHelper
 import com.netgrif.workflow.workflow.domain.Case
+import com.netgrif.workflow.workflow.domain.repositories.CaseRepository
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.slf4j.Logger
@@ -26,6 +27,9 @@ class ConcurrencyTest {
     @Autowired
     private ImportHelper importHelper
 
+    @Autowired
+    private CaseRepository caseRepository
+
     @Test
     void test() {
         def mainNet = importer.importPetriNet(new File("src/test/resources/action_delegate_concurrency_test.xml"), "action_delegate_concurrency_test", "TST", new Config())
@@ -47,6 +51,18 @@ class ConcurrencyTest {
 
         threads.each {
             it.start()
+        }
+
+        threads.each {
+            it.join()
+        }
+
+        Thread.sleep(5000)
+
+        cases.each {
+            Optional<Case> caseOptional = caseRepository.findById(it.stringId)
+            assert caseOptional.isPresent()
+            assert caseOptional.get().stringId == (caseOptional.get().getFieldValue("text") as String)
         }
     }
 }
