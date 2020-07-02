@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="https://modeler.netgrif.com/petriflow_schema.xsd">
+    <id>action_delegate_concurrency_test</id>
+    <version>1.0.0</version>
+    <initials>TRE</initials>
+    <title>Tree Node</title>
+    <icon>nature</icon>
+    <defaultRole>true</defaultRole>
+    <transitionRole>false</transitionRole>
+    <!-- TRANSACTIONS -->
+    <!-- ROLES -->
+    <!-- DATA -->
+    <!-- TRANSITIONS -->
+    <transition>
+        <id>1</id>
+        <x>546</x>
+        <y>177</y>
+        <label>task</label>
+        <event type="assign">
+            <id>1</id>
+            <actions phase="post">
+                <action>
+                    Thread.sleep(10000)
+                    println(useCase.stringId)
+                </action>
+            </actions>
+        </event>
+    </transition>
+    <!-- PLACES -->
+    <!-- ARCS -->
+</document>
