@@ -24,34 +24,22 @@ public abstract class RuleEngine implements IRuleEngine {
     protected abstract KieSession ruleEngine();
 
     @Override
-    public void evaluateRules(List<Object> facts) {
-        KieSession ruleEngine = createSession();
-        evaluateWithFacts(ruleEngine, facts);
-    }
-
-    @Override
     public void evaluateRules(Case useCase, CaseCreatedFact caseCreatedFact) {
-        KieSession ruleEngine = createSession();
-        evaluateWithFacts(ruleEngine, Arrays.asList(useCase, caseCreatedFact));
+        evaluateWithFacts(Arrays.asList(useCase, caseCreatedFact));
     }
 
     @Override
     public void evaluateRules(Case useCase, TransitionEventFact transitionEventFact) {
-        KieSession ruleEngine = createSession();
-        evaluateWithFacts(ruleEngine, Arrays.asList(useCase, transitionEventFact));
+        evaluateWithFacts(Arrays.asList(useCase, transitionEventFact));
     }
 
     @Override
     public void evaluateRules(PetriNet petriNet, NetImportedFact fact) {
-        KieSession ruleEngine = createSession();
-        evaluateWithFacts(ruleEngine, Arrays.asList(petriNet, fact));
+        evaluateWithFacts(Arrays.asList(petriNet, fact));
     }
 
-    protected KieSession createSession() {
-        return ruleEngine();
-    }
-
-    private void evaluateWithFacts(KieSession session, List<Object> facts) {
+    private void evaluateWithFacts(List<Object> facts) {
+        KieSession session = createSession();
         facts.forEach(session::insert);
         try {
             session.fireAllRules();
@@ -61,5 +49,9 @@ public abstract class RuleEngine implements IRuleEngine {
         } finally {
             session.destroy();
         }
+    }
+
+    protected KieSession createSession() {
+        return ruleEngine();
     }
 }
