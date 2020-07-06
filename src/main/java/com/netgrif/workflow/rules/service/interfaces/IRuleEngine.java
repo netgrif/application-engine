@@ -12,8 +12,6 @@ import java.util.List;
 @Service
 public interface IRuleEngine {
 
-    void evaluateRules(List<Object> facts);
-
     void evaluateRules(Case useCase, CaseCreatedFact caseCreatedFact);
 
     void evaluateRules(Case useCase, TransitionEventFact transitionEventFact);
