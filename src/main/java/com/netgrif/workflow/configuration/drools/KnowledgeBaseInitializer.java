@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -26,6 +27,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.IntStream;
 
 @Service
 public class KnowledgeBaseInitializer implements IKnowledgeBaseInitializer {
@@ -37,59 +39,26 @@ public class KnowledgeBaseInitializer implements IKnowledgeBaseInitializer {
     @Value("${drools.template.path}")
     private String templatePath;
 
+    @Value("${drools.compile.page-size}")
+    private Integer pageSize;
 
     @Autowired
     private RuleRepository ruleRepository;
 
+    @Autowired
+    private ObjectDataCompiler compiler;
 
     @Override
     public KieBase constructKieBase() {
-        List<StoredRule> rules = ruleRepository.findAll();
         KieHelper kieHelper = new KieHelper();
         try {
-            buildRules(rules, kieHelper);
+            kieHelper = buildAllRules(kieHelper);
         } catch (Exception e) {
             log.error("Failed to construct rule engine knowledge base", e);
             throw new IllegalStateException("Rules not successfully loaded");
         }
 
         return kieHelper.build();
-    }
-
-    protected void buildRules(List<StoredRule> rules, KieHelper kieHelper) throws IOException {
-        ObjectDataCompiler compiler = new ObjectDataCompiler();
-        List<Map<String, String>> ruleAttributes = new ArrayList<>();
-
-        rules.forEach(persistedRule -> {
-            Map<String, String> templateRule = new HashMap<>();
-            templateRule.put("ruleId", persistedRule.getStringId());
-            templateRule.put("ruleEnabled", Boolean.toString(persistedRule.isEnabled()));
-            templateRule.put("whenCondition", persistedRule.getWhen());
-            templateRule.put("thenAction", persistedRule.getThen());
-
-            String dateEffective = (persistedRule.getDateEffective() == null) ? "" : "date-effective \"" + formatDate(persistedRule.getDateEffective()) + "\"";
-            String dateExpires = (persistedRule.getDateExpires() == null) ? "" : "date-expires \"" + formatDate(persistedRule.getDateExpires()) + "\"";
-
-            templateRule.put("salienceVal", Integer.toString(persistedRule.getSalience()));
-            templateRule.put("dateEffective", dateEffective);
-            templateRule.put("dateExpires", dateExpires);
-
-            ruleAttributes.add(templateRule);
-        });
-
-        String generatedDRL;
-        try (InputStream template = templateInputStream()) {
-            generatedDRL = compiler.compile(ruleAttributes, template);
-        } catch (IOException e) {
-            log.error("Failed to compile rules", e);
-            throw e;
-        }
-
-        KieServices kieServices = KieServices.Factory.get();
-        Resource resource1 = kieServices.getResources().newByteArrayResource(generatedDRL.getBytes());
-        kieHelper.addResource(resource1, ResourceType.DRL);
-
-        System.out.println("drl:\n" + generatedDRL);
     }
 
     @Override
@@ -109,6 +78,62 @@ public class KnowledgeBaseInitializer implements IKnowledgeBaseInitializer {
                 testSession.destroy();
             }
         }
+    }
+
+    protected KieHelper buildAllRules(KieHelper kieHelper) throws IOException {
+        Long count = ruleRepository.count();
+        long numOfPages = ((count/pageSize) + 1);
+
+        log.debug("Compiling rules, count=" + count + ", pages=" + numOfPages);
+        for (int page = 0; page < numOfPages; page++) {
+            List<StoredRule> rules = ruleRepository.findAll(PageRequest.of(page, pageSize)).getContent();
+            buildRules(rules, kieHelper);
+        }
+
+        return kieHelper;
+    }
+
+    protected KieHelper buildRules(List<StoredRule> rules, KieHelper kieHelper) throws IOException {
+        String generatedDRL = compileRules(rules);
+        kieHelper = addRulesResource(generatedDRL, kieHelper);
+        log.debug("drl:\n" + generatedDRL);
+
+        return kieHelper;
+    }
+
+    protected String compileRules(List<StoredRule> rules) throws IOException {
+        List<Map<String, String>> ruleAttributes = new ArrayList<>();
+
+        rules.forEach(persistedRule -> {
+            Map<String, String> templateRule = new HashMap<>();
+            templateRule.put("ruleId", persistedRule.getStringId());
+            templateRule.put("ruleEnabled", Boolean.toString(persistedRule.isEnabled()));
+            templateRule.put("whenCondition", persistedRule.getWhen());
+            templateRule.put("thenAction", persistedRule.getThen());
+
+            String dateEffective = (persistedRule.getDateEffective() == null) ? "" : "date-effective \"" + formatDate(persistedRule.getDateEffective()) + "\"";
+            String dateExpires = (persistedRule.getDateExpires() == null) ? "" : "date-expires \"" + formatDate(persistedRule.getDateExpires()) + "\"";
+
+            templateRule.put("salienceVal", Integer.toString(persistedRule.getSalience()));
+            templateRule.put("dateEffective", dateEffective);
+            templateRule.put("dateExpires", dateExpires);
+
+            ruleAttributes.add(templateRule);
+        });
+
+        try (InputStream template = templateInputStream()) {
+            return compiler.compile(ruleAttributes, template);
+        } catch (IOException e) {
+            log.error("Failed to compile rules", e);
+            throw e;
+        }
+    }
+
+    protected KieHelper addRulesResource(String generatedDRL, KieHelper kieHelper) {
+        KieServices kieServices = KieServices.Factory.get();
+        Resource resource = kieServices.getResources().newByteArrayResource(generatedDRL.getBytes());
+        kieHelper.addResource(resource, ResourceType.DRL);
+        return kieHelper;
     }
 
     protected InputStream templateInputStream() throws IOException {
