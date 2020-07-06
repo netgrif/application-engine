@@ -2,8 +2,9 @@ package com.netgrif.workflow.configuration.drools;
 
 import com.netgrif.workflow.configuration.drools.interfaces.IKnowledgeBaseInitializer;
 import com.netgrif.workflow.configuration.drools.interfaces.IRefreshableKieBase;
-import com.netgrif.workflow.configuration.drools.interfaces.ISessionInitializer;
+import com.netgrif.workflow.configuration.drools.interfaces.IRuleEngineGlobalsProvider;
 import com.netgrif.workflow.rules.domain.RuleRepository;
+import org.drools.template.ObjectDataCompiler;
 import org.kie.api.runtime.KieSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
@@ -18,7 +19,7 @@ public class DroolsConfiguration {
     private IKnowledgeBaseInitializer baseInitializer;
 
     @Autowired
-    private ISessionInitializer sessionInitializer;
+    private IRuleEngineGlobalsProvider sessionInitializer;
 
     @Autowired
     private RuleRepository ruleRepository;
@@ -41,4 +42,8 @@ public class DroolsConfiguration {
         return new RefreshableKieBase(ruleRepository, baseInitializer);
     }
 
+    @Bean
+    public ObjectDataCompiler objectDataCompiler() {
+        return new ObjectDataCompiler();
+    }
 }
