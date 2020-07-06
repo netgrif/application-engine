@@ -34,6 +34,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.IntStream;
 
 @SpringBootTest(
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
@@ -308,6 +309,20 @@ public class RuleEngineTest {
         assert facts.stream().filter(it -> ((TestFact) it).number == 1).count() == 1;
         assert facts.stream().filter(it -> ((TestFact) it).number == 2).count() == 1;
 
+    }
+
+    @Test
+    public void stressTest() throws IOException, MissingPetriNetMetaDataException {
+        StoredRule rule = rule("$case: Case() \n $event: CaseCreatedFact(caseId == $case.stringId, eventPhase == EventPhase.POST)", "log.info($case.stringId)");
+        IntStream.range(0, 10000).forEach(number -> {
+            rule.set_id(new ObjectId());
+            ruleRepository.save(rule);
+        });
+        StoredRule rule2 = rule("$case: Case() \n $event: CaseCreatedFact(caseId == $case.stringId, eventPhase == EventPhase.POST)", "$case.title = \"NEW_TITLE\"");
+        ruleRepository.save(rule2);
+
+        Case caze = newCase();
+        assert caze.getTitle().equals("NEW_TITLE");
     }
 
     private StoredRule transitionRulePre(String trans, String type) {
