@@ -3,6 +3,7 @@ package com.netgrif.workflow.rules.service;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.rules.domain.facts.CaseCreatedFact;
 import com.netgrif.workflow.rules.domain.facts.NetImportedFact;
+import com.netgrif.workflow.rules.domain.facts.ScheduledRuleFact;
 import com.netgrif.workflow.rules.domain.facts.TransitionEventFact;
 import com.netgrif.workflow.rules.service.interfaces.IRuleEngine;
 import com.netgrif.workflow.workflow.domain.Case;
@@ -34,8 +35,18 @@ public abstract class RuleEngine implements IRuleEngine {
     }
 
     @Override
+    public void evaluateRules(Case useCase, ScheduledRuleFact scheduledRuleFact) {
+        evaluateWithFacts(Arrays.asList(useCase, scheduledRuleFact));
+    }
+
+    @Override
     public void evaluateRules(PetriNet petriNet, NetImportedFact fact) {
         evaluateWithFacts(Arrays.asList(petriNet, fact));
+    }
+
+    @Override
+    public void evaluateRules(PetriNet petriNet, ScheduledRuleFact scheduledRuleFact) {
+        evaluateWithFacts(Arrays.asList(petriNet, scheduledRuleFact));
     }
 
     private void evaluateWithFacts(List<Object> facts) {
