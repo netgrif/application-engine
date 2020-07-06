@@ -1,17 +1,15 @@
 package com.netgrif.workflow.rules.domain.scheduled;
 
 import com.netgrif.workflow.rules.domain.facts.ScheduledRuleFact;
-import com.netgrif.workflow.rules.service.RuleEngine;
 import com.netgrif.workflow.rules.service.interfaces.IRuleEngine;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
-import org.quartz.*;
+import org.quartz.JobExecutionContext;
+import org.quartz.JobExecutionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.util.Arrays;
 
 
 @Component
@@ -39,7 +37,7 @@ public class CaseRuleEvaluationJob extends RuleJob {
         log.info("Executing CaseRuleEvaluationJob for case " + caseId + " of rule " + ruleIdentifier);
         try {
             Case useCase = workflowService.findOne(caseId);
-            ruleEngine.evaluateRules(Arrays.asList(useCase, new ScheduledRuleFact(caseId, ruleIdentifier)));
+            ruleEngine.evaluateRules(useCase, new ScheduledRuleFact(caseId, ruleIdentifier));
             workflowService.save(useCase);
         } catch (Exception e) {
             log.error("Failed scheduled rule evaluation", e);
