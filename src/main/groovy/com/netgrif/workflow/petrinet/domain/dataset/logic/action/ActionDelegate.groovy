@@ -10,6 +10,7 @@ import com.netgrif.workflow.orgstructure.domain.Group
 import com.netgrif.workflow.orgstructure.domain.Member
 import com.netgrif.workflow.orgstructure.service.GroupService
 import com.netgrif.workflow.orgstructure.service.MemberService
+import com.netgrif.workflow.pdf.generator.service.IPDFGenerator
 import com.netgrif.workflow.petrinet.domain.I18nString
 import com.netgrif.workflow.petrinet.domain.PetriNet
 import com.netgrif.workflow.petrinet.domain.Transition
@@ -73,6 +74,9 @@ class ActionDelegate {
 
     @Autowired
     MemberService memberService
+
+    @Autowired
+    IPDFGenerator pdfGenerator
 
     /**
      * Reference of case in which current action is taking place.
@@ -516,4 +520,9 @@ class ActionDelegate {
     User loggedUser() {
         return userService.loggedUser
     }
+
+    void generatePDF(String transitionId){
+        pdfGenerator.convertCaseForm(useCase, transitionId)
+    }
+
 }
