@@ -21,10 +21,10 @@ public class QuartzConfiguration {
     @Value("${quartz.jdbc-url}")
     private String jdbcUrl;
 
-    @Value("${spring.datasource.username}")
+    @Value("${quartz.jdbc-user}")
     private String jdbcUser;
 
-    @Value("${spring.datasource.password}")
+    @Value("${quartz.jdbc-password}")
     private String jdbcPass;
 
     @Autowired

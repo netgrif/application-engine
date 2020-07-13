@@ -14,7 +14,7 @@ import com.netgrif.workflow.petrinet.domain.roles.ProcessRole;
 import com.netgrif.workflow.petrinet.domain.roles.RolePermission;
 import com.netgrif.workflow.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.workflow.petrinet.service.interfaces.IProcessRoleService;
-import com.netgrif.workflow.rules.domain.facts.EventPhase;
+import com.netgrif.workflow.petrinet.domain.EventPhase;
 import com.netgrif.workflow.rules.domain.facts.TransitionEventFact;
 import com.netgrif.workflow.rules.service.interfaces.IRuleEngine;
 import com.netgrif.workflow.utils.DateUtils;
@@ -348,7 +348,7 @@ public class TaskService implements ITaskService {
     protected Case evaluateRules(String caseId, Task task, EventType eventType, EventPhase eventPhase) {
         Case useCase = workflowService.findOne(caseId);
         log.info("["+useCase.getStringId()+"]: Task [" + task.getTitle() + "] in case [" + useCase.getTitle() + "] evaluating rules of event " + eventType.name() + " of phase " + eventPhase.name());
-        ruleEngine.evaluateRules(useCase, TransitionEventFact.of(task, eventType, eventPhase));
+        ruleEngine.evaluateRules(useCase, task, TransitionEventFact.of(task, eventType, eventPhase));
         return workflowService.save(useCase);
     }
 
