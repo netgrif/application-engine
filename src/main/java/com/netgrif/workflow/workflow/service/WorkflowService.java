@@ -14,7 +14,7 @@ import com.netgrif.workflow.petrinet.domain.dataset.FieldType;
 import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository;
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.workflow.rules.domain.facts.CaseCreatedFact;
-import com.netgrif.workflow.rules.domain.facts.EventPhase;
+import com.netgrif.workflow.petrinet.domain.EventPhase;
 import com.netgrif.workflow.rules.service.interfaces.IRuleEngine;
 import com.netgrif.workflow.security.service.EncryptionService;
 import com.netgrif.workflow.utils.FullPageRequest;

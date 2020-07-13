@@ -87,7 +87,6 @@ public class RuleEngineGlobalsProvider implements IRuleEngineGlobalsProvider {
         return imports;
     }
 
-
     @Override
     public List<RuleEngineGlobal> globals() {
         return globals;
@@ -106,6 +105,5 @@ public class RuleEngineGlobalsProvider implements IRuleEngineGlobalsProvider {
     protected String asImport(String name) {
         return "import " + name + ";\n";
     }
-
 
 }
