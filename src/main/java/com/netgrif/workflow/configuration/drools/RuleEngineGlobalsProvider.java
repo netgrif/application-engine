@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -57,7 +58,10 @@ public class RuleEngineGlobalsProvider implements IRuleEngineGlobalsProvider {
         this.mailService = mailService;
         this.userService = userService;
         this.factRepository = factRepository;
+    }
 
+    @PostConstruct
+    void postConstruct() {
         this.globals = initializeGlobals();
         this.imports = initializeImports();
     }
@@ -99,7 +103,7 @@ public class RuleEngineGlobalsProvider implements IRuleEngineGlobalsProvider {
         globals.forEach(global -> runtime.setGlobal(global.getGlobalName(), global.getInjected()));
     }
 
-    private String asImport(String name) {
+    protected String asImport(String name) {
         return "import " + name + ";\n";
     }
 
