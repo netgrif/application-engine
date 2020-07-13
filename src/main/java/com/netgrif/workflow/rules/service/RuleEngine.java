@@ -7,6 +7,7 @@ import com.netgrif.workflow.rules.domain.facts.ScheduledRuleFact;
 import com.netgrif.workflow.rules.domain.facts.TransitionEventFact;
 import com.netgrif.workflow.rules.service.interfaces.IRuleEngine;
 import com.netgrif.workflow.workflow.domain.Case;
+import com.netgrif.workflow.workflow.domain.Task;
 import org.kie.api.runtime.KieSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,7 +31,7 @@ public abstract class RuleEngine implements IRuleEngine {
     }
 
     @Override
-    public void evaluateRules(Case useCase, TransitionEventFact transitionEventFact) {
+    public void evaluateRules(Case useCase, Task task, TransitionEventFact transitionEventFact) {
         evaluateWithFacts(Arrays.asList(useCase, transitionEventFact));
     }
 
@@ -48,6 +49,7 @@ public abstract class RuleEngine implements IRuleEngine {
     public void evaluateRules(PetriNet petriNet, ScheduledRuleFact scheduledRuleFact) {
         evaluateWithFacts(Arrays.asList(petriNet, scheduledRuleFact));
     }
+
 
     private void evaluateWithFacts(List<Object> facts) {
         KieSession session = createSession();
