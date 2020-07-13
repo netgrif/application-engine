@@ -3,13 +3,18 @@ package com.netgrif.workflow.configuration;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.boot.model.naming.Identifier;
 import org.hibernate.engine.jdbc.env.spi.JdbcEnvironment;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.orm.jpa.hibernate.SpringPhysicalNamingStrategy;
+import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.Locale;
 
+@Component
 public class HibernateNamingStrategy extends SpringPhysicalNamingStrategy {
 
-    public static final String HIBERNATE_SPECIAL_COLUMN = "DTYPE";
+    @Value("${hibernate.naming-strategy.ignored-values}")
+    private List<String> ignored;
 
     @Override
     protected Identifier getIdentifier(String name, boolean quoted, JdbcEnvironment jdbcEnvironment) {
@@ -23,7 +28,7 @@ public class HibernateNamingStrategy extends SpringPhysicalNamingStrategy {
     protected boolean shouldSetLowercase(String name, JdbcEnvironment jdbcEnvironment) {
         return isCaseInsensitive(jdbcEnvironment) && (
                 !StringUtils.isAllUpperCase(name.replaceAll("[\\_\\s\\.\\d]+", "")) ||
-                HIBERNATE_SPECIAL_COLUMN.equals(name));
+                ignored.contains(name));
     }
 
 }

@@ -25,24 +25,13 @@ public class CaseRuleEvaluationJob extends RuleJob {
     @Autowired
     private IWorkflowService workflowService;
 
-    public void execute(JobExecutionContext context) throws JobExecutionException {
+    @Override
+    public void doExecute(JobExecutionContext context) {
         String caseId = getInstanceId(context);
-        String ruleIdentifier = getRuleIdentifier(context);
-
-        if (!validate(context)) {
-            log.warn("Job does not have caseId or ruleIdentifier! " + caseId + ", " + ruleIdentifier);
-            return;
-        }
-
-        log.info("Executing CaseRuleEvaluationJob for case " + caseId + " of rule " + ruleIdentifier);
-        try {
-            Case useCase = workflowService.findOne(caseId);
-            ruleEngine.evaluateRules(useCase, new ScheduledRuleFact(caseId, ruleIdentifier));
-            workflowService.save(useCase);
-        } catch (Exception e) {
-            log.error("Failed scheduled rule evaluation", e);
-            throw new JobExecutionException(e);
-        }
+        log.info("Executing CaseRuleEvaluationJob for case " + caseId + " of rule " + getRuleIdentifier(context));
+        Case useCase = workflowService.findOne(caseId);
+        ruleEngine.evaluateRules(useCase, new ScheduledRuleFact(caseId, getRuleIdentifier(context)));
+        workflowService.save(useCase);
     }
 
     @Override

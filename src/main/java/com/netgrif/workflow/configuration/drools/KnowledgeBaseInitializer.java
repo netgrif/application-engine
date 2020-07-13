@@ -4,6 +4,7 @@ import com.netgrif.workflow.configuration.drools.interfaces.IKnowledgeBaseInitia
 import com.netgrif.workflow.configuration.drools.throwable.RuleValidationException;
 import com.netgrif.workflow.rules.domain.RuleRepository;
 import com.netgrif.workflow.rules.domain.StoredRule;
+import com.netgrif.workflow.utils.DateUtils;
 import org.drools.core.io.impl.ClassPathResource;
 import org.drools.template.ObjectDataCompiler;
 import org.kie.api.KieBase;
@@ -33,8 +34,6 @@ import java.util.stream.IntStream;
 public class KnowledgeBaseInitializer implements IKnowledgeBaseInitializer {
 
     private static final Logger log = LoggerFactory.getLogger(KnowledgeBaseInitializer.class);
-
-    private static final DateTimeFormatter formatter =  DateTimeFormatter.ofPattern("dd-MMM-yyyy");
 
     @Value("${drools.template.path}")
     private String templatePath;
@@ -141,6 +140,6 @@ public class KnowledgeBaseInitializer implements IKnowledgeBaseInitializer {
     }
 
     private String formatDate(LocalDate date) {
-        return date.format(formatter);
+        return date.format(DateUtils.dd_MMM_yyyy);
     }
 }

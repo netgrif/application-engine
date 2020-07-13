@@ -9,16 +9,13 @@ import com.netgrif.workflow.rules.domain.scheduled.RuleJob;
 import com.netgrif.workflow.rules.service.interfaces.IRuleEvaluationScheduleService;
 import com.netgrif.workflow.rules.service.throwable.RuleEvaluationScheduleException;
 import com.netgrif.workflow.workflow.domain.Case;
-import com.netgrif.workflow.workflow.domain.QCase;
 import org.quartz.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 public class RuleEvaluationScheduleService implements IRuleEvaluationScheduleService {
@@ -38,17 +35,9 @@ public class RuleEvaluationScheduleService implements IRuleEvaluationScheduleSer
 
     @Override
     public void scheduleRuleEvaluationForCase(Case useCase, List<String> ruleIdentifiers, TriggerBuilder<? extends Trigger> triggerBuilder) throws RuleEvaluationScheduleException {
-        List<StoredRule> storedRules = ruleRepository.findByIdentifierIn(ruleIdentifiers);
-
-        for (StoredRule rule : storedRules) {
-            log.info("Scheduling rule eval job for " + useCase.getStringId() + " " + rule.getIdentifier());
-
-            JobDetail jobDetail = buildJobDetail(useCase.getStringId(), rule, CaseRuleEvaluationJob.class);
-            Trigger trigger = buildTrigger(useCase.getStringId(), triggerBuilder, jobDetail);
-            jobDetail.getJobDataMap().put(CaseRuleEvaluationJob.CASE_ID, useCase.getStringId());
-
-            schedule(useCase.getStringId(), rule.getStringId(), jobDetail, trigger);
-        }
+        Map<String, String> data = new HashMap<>();
+        data.put(CaseRuleEvaluationJob.CASE_ID, useCase.getStringId());
+        scheduleRuleEvaluation(useCase.getStringId(), data, ruleIdentifiers, triggerBuilder);
     }
 
     @Override
@@ -58,18 +47,9 @@ public class RuleEvaluationScheduleService implements IRuleEvaluationScheduleSer
 
     @Override
     public void scheduleRuleEvaluationForNet(PetriNet petriNet, List<String> ruleIdentifiers, TriggerBuilder<? extends Trigger> triggerBuilder) throws RuleEvaluationScheduleException {
-        List<StoredRule> storedRules = ruleRepository.findByIdentifierIn(ruleIdentifiers);
-
-        for (StoredRule rule : storedRules) {
-            log.info("Scheduling rule eval job for " + petriNet.getStringId() + " " + rule.getIdentifier());
-
-            JobDetail jobDetail = buildJobDetail(petriNet.getStringId(), rule, PetriNetRuleEvaluationJob.class);
-            Trigger trigger = buildTrigger(petriNet.getStringId(), triggerBuilder, jobDetail);
-            jobDetail.getJobDataMap().put(PetriNetRuleEvaluationJob.NET_ID, petriNet.getStringId());
-
-            schedule(petriNet.getStringId(), rule.getStringId(), jobDetail, trigger);
-        }
-
+        Map<String, String> data = new HashMap<>();
+        data.put(PetriNetRuleEvaluationJob.NET_ID, petriNet.getStringId());
+        scheduleRuleEvaluation(petriNet.getStringId(), data, ruleIdentifiers, triggerBuilder);
     }
 
     private void schedule(String stringId, String ruleId, JobDetail jobDetail, Trigger trigger) throws RuleEvaluationScheduleException {
@@ -78,6 +58,20 @@ public class RuleEvaluationScheduleService implements IRuleEvaluationScheduleSer
         } catch (SchedulerException e) {
             log.error("Failed to schedule Rule evaluation for " + stringId + " of rule " + ruleId, e);
             throw new RuleEvaluationScheduleException(e);
+        }
+    }
+
+    public void scheduleRuleEvaluation(String instanceId, Map<String, String> jobData, List<String> ruleIdentifiers, TriggerBuilder<? extends Trigger> triggerBuilder) throws RuleEvaluationScheduleException {
+        List<StoredRule> storedRules = ruleRepository.findByIdentifierIn(ruleIdentifiers);
+
+        for (StoredRule rule : storedRules) {
+            log.info("Scheduling rule eval job for " + instanceId + " " + rule.getIdentifier());
+
+            JobDetail jobDetail = buildJobDetail(instanceId, rule, CaseRuleEvaluationJob.class);
+            Trigger trigger = buildTrigger(instanceId, triggerBuilder, jobDetail);
+            jobDetail.getJobDataMap().putAll(jobData);
+
+            schedule(instanceId, rule.getStringId(), jobDetail, trigger);
         }
     }
 
