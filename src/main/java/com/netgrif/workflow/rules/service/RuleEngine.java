@@ -32,7 +32,7 @@ public abstract class RuleEngine implements IRuleEngine {
 
     @Override
     public void evaluateRules(Case useCase, Task task, TransitionEventFact transitionEventFact) {
-        evaluateWithFacts(Arrays.asList(useCase, transitionEventFact));
+        evaluateWithFacts(Arrays.asList(useCase, task, transitionEventFact));
     }
 
     @Override
