@@ -8,6 +8,7 @@ import com.netgrif.workflow.petrinet.domain.throwable.MissingPetriNetMetaDataExc
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.workflow.rules.domain.RuleRepository;
 import com.netgrif.workflow.rules.domain.StoredRule;
+import com.netgrif.workflow.rules.domain.scheduled.ScheduleOutcome;
 import com.netgrif.workflow.rules.service.interfaces.IRuleEvaluationScheduleService;
 import com.netgrif.workflow.rules.service.throwable.RuleEvaluationScheduleException;
 import com.netgrif.workflow.startup.SuperCreator;
@@ -78,7 +79,10 @@ public class RuleEvaluationScheduleServiceTest {
         ruleRepository.save(rule);
 
         Case caze = workflowService.createCase(petriNetOptional.get().getStringId(), "Original title", "original color", user);
-        ruleEvaluationScheduleService.scheduleRuleEvaluationForCase(caze, "rule2", TriggerBuilder.newTrigger().withSchedule(SimpleScheduleBuilder.simpleSchedule().withIntervalInSeconds(1).withRepeatCount(5)));
+        ScheduleOutcome outcome = ruleEvaluationScheduleService.scheduleRuleEvaluationForCase(caze, "rule2", TriggerBuilder.newTrigger().withSchedule(SimpleScheduleBuilder.simpleSchedule().withIntervalInSeconds(1).withRepeatCount(5)));
+
+        assert outcome.getJobDetail() != null;
+        assert outcome.getTrigger() != null;
 
         Thread.sleep(10000);
         caze = workflowService.findOne(caze.getStringId());
