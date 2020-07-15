@@ -1,6 +1,5 @@
 package com.netgrif.workflow.petrinet.domain.dataset.logic.action
 
-import com.netgrif.workflow.*
 import com.netgrif.workflow.AsyncRunner
 import com.netgrif.workflow.auth.domain.User
 import com.netgrif.workflow.auth.service.interfaces.IUserService
@@ -33,8 +32,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.i18n.LocaleContextHolder
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
-import org.springframework.stereotype.Component
-
 /**
  * ActionDelegate class contains Actions API methods.
  */
@@ -156,6 +153,7 @@ class ActionDelegate {
                         changedFields[field.stringId] = new ChangedField(field.stringId)
                     }
                     changedFields[field.stringId].addBehavior(useCase.dataSet.get(field.stringId).behavior)
+                    changedFields[field.stringId].addAttribute("type", field.type.name)
                 }
             }]
         }]
@@ -167,6 +165,7 @@ class ActionDelegate {
             changedFields[field.stringId] = new ChangedField(field.stringId)
         }
         changedFields[field.stringId].addAttribute("value", field.value)
+        changedFields[field.stringId].addAttribute("type", field.type.name)
     }
 
     def saveChangedChoices(ChoiceField field) {
