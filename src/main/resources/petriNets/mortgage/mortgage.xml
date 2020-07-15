@@ -3,6 +3,8 @@
     <id>mortgage</id>
     <initials>MOR</initials>
     <title>Mortgage</title>
+    <defaultRole>false</defaultRole>
+    <transitionRole>false</transitionRole>
     <!-- ROLES -->
     <role>
         <id>client</id>
@@ -21,6 +23,18 @@
         <name>Account Clerk</name>
     </role>
     <!-- DATA -->
+    <data type="button">
+        <id>add_personal_information</id>
+        <title>Add</title>
+        <placeholder>Add</placeholder>
+        <action trigger="set">
+            task_personal_information: f.personal_information;
+            def personal = createCase("personal_information", "${useCase.title} - Personal information" as String, "color-fg-amber-500")
+            change task_personal_information value {
+                [personal.tasks.first().task]
+            }
+        </action>
+    </data>
 	<data type="taskRef">
 		<id>personal_information</id>
 		<title>personal_information</title>
@@ -111,6 +125,17 @@
                 <perform>true</perform>
             </logic>
         </roleRef>
+        <dataGroup>
+            <id>00000</id>
+            <title name="dg_personal_information">Personal information</title>
+            <dataRef>
+                <id>add_personal_information</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>optional</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
         <dataGroup>
             <id>1</id>
             <title name="dg_personal_information">Personal information</title>
