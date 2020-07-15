@@ -6,6 +6,7 @@ import com.netgrif.workflow.rules.domain.StoredRule;
 import com.netgrif.workflow.rules.domain.scheduled.CaseRuleEvaluationJob;
 import com.netgrif.workflow.rules.domain.scheduled.PetriNetRuleEvaluationJob;
 import com.netgrif.workflow.rules.domain.scheduled.RuleJob;
+import com.netgrif.workflow.rules.domain.scheduled.ScheduleOutcome;
 import com.netgrif.workflow.rules.service.interfaces.IRuleEvaluationScheduleService;
 import com.netgrif.workflow.rules.service.throwable.RuleEvaluationScheduleException;
 import com.netgrif.workflow.workflow.domain.Case;
@@ -29,27 +30,27 @@ public class RuleEvaluationScheduleService implements IRuleEvaluationScheduleSer
     private RuleRepository ruleRepository;
 
     @Override
-    public void scheduleRuleEvaluationForCase(Case useCase, String ruleIdentifier, TriggerBuilder<? extends Trigger> triggerBuilder) throws RuleEvaluationScheduleException {
-        scheduleRuleEvaluationForCase(useCase, Collections.singletonList(ruleIdentifier), triggerBuilder);
+    public ScheduleOutcome scheduleRuleEvaluationForCase(Case useCase, String ruleIdentifier, TriggerBuilder<? extends Trigger> triggerBuilder) throws RuleEvaluationScheduleException {
+        return scheduleRuleEvaluationForCase(useCase, Collections.singletonList(ruleIdentifier), triggerBuilder).values().iterator().next();
     }
 
     @Override
-    public void scheduleRuleEvaluationForCase(Case useCase, List<String> ruleIdentifiers, TriggerBuilder<? extends Trigger> triggerBuilder) throws RuleEvaluationScheduleException {
+    public Map<String, ScheduleOutcome> scheduleRuleEvaluationForCase(Case useCase, List<String> ruleIdentifiers, TriggerBuilder<? extends Trigger> triggerBuilder) throws RuleEvaluationScheduleException {
         Map<String, String> data = new HashMap<>();
         data.put(CaseRuleEvaluationJob.CASE_ID, useCase.getStringId());
-        scheduleRuleEvaluation(useCase.getStringId(), data, ruleIdentifiers, triggerBuilder);
+        return scheduleRuleEvaluation(useCase.getStringId(), data, ruleIdentifiers, triggerBuilder);
     }
 
     @Override
-    public void scheduleRuleEvaluationForNet(PetriNet petriNet, String ruleIdentifier, TriggerBuilder<? extends Trigger> triggerBuilder) throws RuleEvaluationScheduleException {
-        scheduleRuleEvaluationForNet(petriNet, Collections.singletonList(ruleIdentifier), triggerBuilder);
+    public ScheduleOutcome scheduleRuleEvaluationForNet(PetriNet petriNet, String ruleIdentifier, TriggerBuilder<? extends Trigger> triggerBuilder) throws RuleEvaluationScheduleException {
+        return scheduleRuleEvaluationForNet(petriNet, Collections.singletonList(ruleIdentifier), triggerBuilder).values().iterator().next();
     }
 
     @Override
-    public void scheduleRuleEvaluationForNet(PetriNet petriNet, List<String> ruleIdentifiers, TriggerBuilder<? extends Trigger> triggerBuilder) throws RuleEvaluationScheduleException {
+    public Map<String, ScheduleOutcome> scheduleRuleEvaluationForNet(PetriNet petriNet, List<String> ruleIdentifiers, TriggerBuilder<? extends Trigger> triggerBuilder) throws RuleEvaluationScheduleException {
         Map<String, String> data = new HashMap<>();
         data.put(PetriNetRuleEvaluationJob.NET_ID, petriNet.getStringId());
-        scheduleRuleEvaluation(petriNet.getStringId(), data, ruleIdentifiers, triggerBuilder);
+        return scheduleRuleEvaluation(petriNet.getStringId(), data, ruleIdentifiers, triggerBuilder);
     }
 
     private void schedule(String stringId, String ruleId, JobDetail jobDetail, Trigger trigger) throws RuleEvaluationScheduleException {
@@ -61,9 +62,10 @@ public class RuleEvaluationScheduleService implements IRuleEvaluationScheduleSer
         }
     }
 
-    public void scheduleRuleEvaluation(String instanceId, Map<String, String> jobData, List<String> ruleIdentifiers, TriggerBuilder<? extends Trigger> triggerBuilder) throws RuleEvaluationScheduleException {
+    public Map<String, ScheduleOutcome> scheduleRuleEvaluation(String instanceId, Map<String, String> jobData, List<String> ruleIdentifiers, TriggerBuilder<? extends Trigger> triggerBuilder) throws RuleEvaluationScheduleException {
         List<StoredRule> storedRules = ruleRepository.findByIdentifierIn(ruleIdentifiers);
 
+        Map<String, ScheduleOutcome> outcomes = new HashMap<>();
         for (StoredRule rule : storedRules) {
             log.info("Scheduling rule eval job for " + instanceId + " " + rule.getIdentifier());
 
@@ -72,7 +74,10 @@ public class RuleEvaluationScheduleService implements IRuleEvaluationScheduleSer
             jobDetail.getJobDataMap().putAll(jobData);
 
             schedule(instanceId, rule.getStringId(), jobDetail, trigger);
+            outcomes.put(rule.getIdentifier(), new ScheduleOutcome(jobDetail, trigger));
         }
+
+        return outcomes;
     }
 
     protected  <T extends Job> JobDetail buildJobDetail(String instanceStringId, StoredRule rule, Class<T> type) {
