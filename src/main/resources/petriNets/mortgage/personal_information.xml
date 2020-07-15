@@ -3,7 +3,8 @@
     <id>personal_information</id>
     <initials>PER</initials>
     <title>Personal Information</title>
-
+    <defaultRole>false</defaultRole>
+    <transitionRole>false</transitionRole>
     <data type="text">
         <id>first_name</id>
         <title name="first_name">Name</title>
