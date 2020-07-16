@@ -1,6 +1,5 @@
 package com.netgrif.workflow.petrinet.domain.dataset.logic.action
 
-import com.netgrif.workflow.*
 import com.netgrif.workflow.AsyncRunner
 import com.netgrif.workflow.auth.domain.User
 import com.netgrif.workflow.auth.service.interfaces.IUserService
@@ -10,7 +9,7 @@ import com.netgrif.workflow.orgstructure.domain.Group
 import com.netgrif.workflow.orgstructure.domain.Member
 import com.netgrif.workflow.orgstructure.service.GroupService
 import com.netgrif.workflow.orgstructure.service.MemberService
-import com.netgrif.workflow.pdf.generator.service.IPDFGenerator
+import com.netgrif.workflow.pdf.generator.service.interfaces.IPdfGenerator
 import com.netgrif.workflow.petrinet.domain.I18nString
 import com.netgrif.workflow.petrinet.domain.PetriNet
 import com.netgrif.workflow.petrinet.domain.Transition
@@ -34,7 +33,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.i18n.LocaleContextHolder
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
-import org.springframework.stereotype.Component
 
 /**
  * ActionDelegate class contains Actions API methods.
@@ -76,7 +74,7 @@ class ActionDelegate {
     MemberService memberService
 
     @Autowired
-    IPDFGenerator pdfGenerator
+    IPdfGenerator pdfGenerator
 
     /**
      * Reference of case in which current action is taking place.
