@@ -43,36 +43,38 @@ public class PdfDrawer extends PdfResources implements IPdfDrawer {
         contentStream = new PDPageContentStream(pdf, actualPage, PDPageContentStream.AppendMode.APPEND, true, true);
     }
 
-    /**
-     * Replacing the corresponding characters with whitespace or with empty character
-     * */
-    String escape(String text) {
-        return text.replaceAll("[\r\n\t]", "").replaceAll(" +", " ");
-    }
-
     @Override
-    public void drawDataGroup(String label, int dgX, int dgY) throws IOException {
-        sendStringToContentStream(titleFont, FONT_GROUP_SIZE, dgX + PADDING, dgY + PADDING, escape(label));
+    public void drawTitle(String title, int fieldWidth) throws IOException {
+        float textWidth = getTextWidth(title, titleFont, FONT_TITLE_SIZE);
+        String[] multiLineText = new String[]{title};
+        int lineCounter = 1, x = (int) (BASE_X + ((PAGE_DRAWABLE_WIDTH - textWidth) / 2 )), y;
+        int maxLineSize = getMaxLabelLineSize(fieldWidth, FONT_TITLE_SIZE);
+
+        if(textWidth > fieldWidth - 2 * PADDING){
+            x = BASE_X;
+            multiLineText = DataConverter.generateMultiLineText(title, maxLineSize);
+        }
+
+        for(String line : multiLineText){
+            y = BASE_Y - LINE_HEIGHT * lineCounter;
+            sendStringToContentStream(titleFont, FONT_TITLE_SIZE, x, y, line);
+            lineCounter++;
+        }
     }
 
     @Override
     public void drawTextField(String label, String value, int fieldX, int fieldY, int fieldWidth, int fieldHeight) throws IOException {
         //To test
-        contentStream.setStrokingColor(Color.GRAY);
-        contentStream.setLineWidth(0.5f);
-        contentStream.addRect(fieldX, fieldY, fieldWidth, fieldHeight);
-        contentStream.stroke();
-
-        int lineCounter = drawDataFieldLabel(label, fieldX, fieldY, fieldWidth, fieldHeight);
+        int lineCounter = drawFieldLabel(label, fieldX, fieldY, fieldWidth, fieldHeight, labelFont, FONT_LABEL_SIZE);
         drawTextValue(value, fieldX, fieldY, fieldWidth, fieldHeight, lineCounter);
     }
 
     @Override
-    public int drawDataFieldLabel(String text, int fieldX, int fieldY, int fieldWidth, int fieldHeight) throws IOException {
-        float textWidth = labelFont.getStringWidth(text) / 1000 * FONT_LABEL_SIZE;
+    public int drawFieldLabel(String text, int fieldX, int fieldY, int fieldWidth, int fieldHeight, PDType0Font font, int fontSize) throws IOException {
+        float textWidth = getTextWidth(text, font, fontSize);
         String[] multiLineText = new String[]{text};
         int lineCounter = 1, x, y;
-        int maxLineSize = getMaxLabelLineSize(fieldWidth);
+        int maxLineSize = getMaxLabelLineSize(fieldWidth, fontSize);
 
         if(textWidth > fieldWidth - PADDING){
             multiLineText = DataConverter.generateMultiLineText(text, maxLineSize);
@@ -81,7 +83,7 @@ public class PdfDrawer extends PdfResources implements IPdfDrawer {
         for(String line : multiLineText){
             x = fieldX + PADDING;
             y = fieldY + fieldHeight - LINE_HEIGHT * lineCounter;
-            sendStringToContentStream(labelFont, FONT_LABEL_SIZE, x, y, line);
+            sendStringToContentStream(font, fontSize, x, y, line);
             lineCounter++;
         }
         return lineCounter;
@@ -89,7 +91,7 @@ public class PdfDrawer extends PdfResources implements IPdfDrawer {
 
     @Override
     public void drawTextValue(String text, int fieldX, int fieldY, int fieldWidth, int fieldHeight, int lineCounter) throws IOException {
-        float textWidth = valueFont.getStringWidth(text) / 1000 * FONT_VALUE_SIZE;
+        float textWidth = getTextWidth(text, valueFont, FONT_VALUE_SIZE);
         String[] multiLineText = new String[]{text};
         int x, y;
         int maxLineSize = getMaxValueLineSize(fieldWidth);
@@ -97,6 +99,8 @@ public class PdfDrawer extends PdfResources implements IPdfDrawer {
         if(textWidth > fieldWidth - 2 * PADDING){
             multiLineText = DataConverter.generateMultiLineText(text, maxLineSize);
         }
+
+        drawStroke(fieldX, fieldY, fieldWidth, fieldHeight - LINE_HEIGHT * (lineCounter - 1) - PADDING);
 
         for(String line : multiLineText){
             x = fieldX + 2 * PADDING;
@@ -114,11 +118,22 @@ public class PdfDrawer extends PdfResources implements IPdfDrawer {
         contentStream.endText();
     }
 
-    public static int getMaxLabelLineSize(int fieldWidth){
-        return (fieldWidth - PADDING) / FONT_LABEL_SIZE;
+    private void drawStroke(int x, int y, int width, int height) throws IOException {
+        contentStream.setStrokingColor(Color.GRAY);
+        contentStream.setLineWidth(0.5f);
+        contentStream.addRect(x, y, width, height);
+        contentStream.stroke();
+    }
+
+    public static int getMaxLabelLineSize(int fieldWidth, int fontSize){
+        return (int) ((fieldWidth - PADDING) * 1.5 / fontSize);
     }
 
     public static int getMaxValueLineSize(int fieldWidth){
         return (int) ((fieldWidth - PADDING) * 1.5 / FONT_VALUE_SIZE);
+    }
+
+    public static int getTextWidth(String text, PDType0Font font, int fontSize) throws IOException {
+        return (int) (font.getStringWidth(text) / 1000 * fontSize);
     }
 }

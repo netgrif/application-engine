@@ -109,8 +109,8 @@ public class PdfField extends PdfProperties implements Comparable<PdfField>{
     /**
      * Counts and changes fields default height in case there are multiple lines and text will not fit into default size
      */
-    public void countMultiLineHeight(){
-        int maxLabelLineLength = PdfDrawer.getMaxLabelLineSize(this.width);
+    public void countMultiLineHeight(int fontSize){
+        int maxLabelLineLength = PdfDrawer.getMaxLabelLineSize(this.width, fontSize);
         int maxValueLineLength = PdfDrawer.getMaxValueLineSize(this.width);
         int multiLineHeight = 0;
 
