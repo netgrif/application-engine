@@ -8,8 +8,6 @@ import com.netgrif.workflow.pdf.generator.service.interfaces.IPdfGenerator;
 import com.netgrif.workflow.workflow.domain.Case;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.font.PDType0Font;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,8 +21,6 @@ import java.util.List;
  * */
 @Service
 public class PdfGenerator extends PdfResources implements IPdfGenerator {
-
-    static final Logger log = LoggerFactory.getLogger(PdfGenerator.class.getName());
 
     private PDDocument pdf;
 
@@ -56,6 +52,7 @@ public class PdfGenerator extends PdfResources implements IPdfGenerator {
     public void convertCaseForm(Case formCase, String transitionId) throws IOException {
         dataConverter.setDataGroups(formCase.getPetriNet().getTransitions().get(transitionId).getDataGroups());
         dataConverter.setDataSet(formCase.getDataSet());
+        dataConverter.generateTitleField(formCase.getPetriNet().getTransitions().get(transitionId).getTitle().toString());
         dataConverter.generatePdfFields();
         dataConverter.generatePdfDataGroups();
         dataConverter.correctCoveringFields();
@@ -77,8 +74,6 @@ public class PdfGenerator extends PdfResources implements IPdfGenerator {
         pdfDrawer.closeContentStream();
         if (pdf == null)
             throw new IllegalArgumentException("[$pdf] is null  ");
-        if (!out.exists())
-            out.createNewFile();
         pdf.save(out);
         pdf.close();
         return out;
@@ -90,28 +85,30 @@ public class PdfGenerator extends PdfResources implements IPdfGenerator {
      * */
     void drawTransitionForm(IDataConverter dataHelper) throws IOException {
         int fieldX, fieldY, fieldWidth, fieldHeight;
-        String currentDgTitle = "";
+        String label, value;
         List<PdfField> pdfFields = dataHelper.getPdfFields();
-
-        //pdfDrawer.drawTitle();
 
         for(PdfField pdfField : pdfFields){
             fieldX = pdfField.getX();
             fieldY = pdfField.getBottomY();
             fieldWidth = pdfField.getWidth();
             fieldHeight = pdfField.getHeight();
+            label = pdfField.getLabel();
+            value = pdfField.getValue();
 
-            if(!pdfField.isDgField()) {
+            if(pdfField.getFieldId().equals("titleField")){
+                pdfDrawer.drawTitle(label, fieldWidth);
+            }else if(!pdfField.isDgField()) {
                 switch (pdfField.getType()) {
                     case TEXT:
-                        pdfDrawer.drawTextField(pdfField.getLabel(), pdfField.getValue(), fieldX, fieldY, fieldWidth, fieldHeight);
+                        pdfDrawer.drawTextField(label, value, fieldX, fieldY, fieldWidth, fieldHeight);
                         break;
                     case NUMBER:
-                        pdfDrawer.drawTextField(pdfField.getLabel(), pdfField.getValue(), fieldX, fieldY, fieldWidth, fieldHeight);
+                        pdfDrawer.drawTextField(label, value, fieldX, fieldY, fieldWidth, fieldHeight);
                         break;
                 }
             }else{
-                pdfDrawer.drawDataGroup(pdfField.getLabel(), fieldX, fieldY);
+                pdfDrawer.drawFieldLabel(label, fieldX, fieldY, fieldWidth, fieldHeight, titleFont, FONT_GROUP_SIZE);
             }
         }
     }
