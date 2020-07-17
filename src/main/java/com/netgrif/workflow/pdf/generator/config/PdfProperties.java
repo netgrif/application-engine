@@ -30,9 +30,9 @@ public abstract class PdfProperties {
 
    public static int PAGE_DRAWABLE_WIDTH = PAGE_WIDTH - MARGIN_LEFT - MARGIN_RIGHT;
 
-   public static int FONT_TITLE_SIZE = 10;
+   public static int FONT_TITLE_SIZE = 13;
 
-   public static int FONT_GROUP_SIZE = 12;
+   public static int FONT_GROUP_SIZE = 13;
 
    public static int FONT_LABEL_SIZE = 10;
 
@@ -48,5 +48,5 @@ public abstract class PdfProperties {
 
    public static int BASE_X = MARGIN_LEFT;
 
-   public static int BASE_Y = PAGE_HEIGHT - MARGIN_TOP;
+   public static int BASE_Y;
 }

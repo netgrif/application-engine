@@ -34,8 +34,21 @@ public class DataConverter extends PdfProperties implements IDataConverter {
 
     private int lastX, lastY;
 
-    public void countSpaceForTitle(String title){
+    @Override
+    public void generateTitleField(String title){
+        BASE_Y = PAGE_HEIGHT - MARGIN_TOP;
+        pdfFields = new ArrayList<>();
+        changedPdfFields = new Stack<>();
 
+        PdfField titleField = new PdfField("titleField", null, 0, 0, PAGE_DRAWABLE_WIDTH,
+                FORM_GRID_ROW_HEIGHT, null, title, null);
+
+        titleField.setOriginalBottomY(countBottomPosY(titleField));
+        titleField.countMultiLineHeight(FONT_TITLE_SIZE);
+        titleField.setBottomY(countBottomPosY(titleField));
+
+        pdfFields.add(titleField);
+        BASE_Y = titleField.getBottomY();
     }
 
     /**
@@ -43,8 +56,6 @@ public class DataConverter extends PdfProperties implements IDataConverter {
      * order in PDF
      */
     public void generatePdfFields(){
-        pdfFields = new ArrayList<>();
-        changedPdfFields = new Stack<>();
         lastX = Integer.MAX_VALUE;
         lastY = 0;
 
@@ -60,7 +71,7 @@ public class DataConverter extends PdfProperties implements IDataConverter {
         DataGroup currentDg = null;
         List<PdfField> dgFields = new ArrayList<>();
         for(PdfField pdfField : pdfFields){
-            if(pdfField.getDataGroup().getTitle() != null && pdfField.getDataGroup() != currentDg){
+            if(pdfField.getDataGroup() != null && pdfField.getDataGroup().getTitle() != null && pdfField.getDataGroup() != currentDg){
                 currentDg = pdfField.getDataGroup();
                 PdfField dgField = createPdfDgField(currentDg, pdfField);
                 dgFields.add(dgField);
@@ -68,6 +79,39 @@ public class DataConverter extends PdfProperties implements IDataConverter {
         }
         pdfFields.addAll(dgFields);
         pdfFields.sort(Collections.reverseOrder());
+    }
+
+    private PdfField createPdfField(DataGroup dataGroup, LocalisedField field){
+        int fieldWidth, fieldHeight, fieldLayoutX, fieldLayoutY;
+        String value;
+
+        fieldLayoutX = countFieldLayoutX(dataGroup, field);
+        fieldLayoutY = countFieldLayoutY(dataGroup, field);
+        fieldWidth = countFieldWidth(field, dataGroup);
+        fieldHeight = countFieldHeight(field);
+        value = dataSet.get(field.getStringId()).getValue().toString();
+
+        PdfField dataPdfField = new PdfField(field.getStringId(), dataGroup, fieldLayoutX,
+                fieldLayoutY, fieldWidth, fieldHeight, field.getType(), field.getName(), value);
+        setFieldPositions(dataPdfField, FONT_LABEL_SIZE);
+        return dataPdfField;
+    }
+
+    private PdfField createPdfDgField(DataGroup dataGroup, PdfField pdfField){
+        PdfField dgField = new PdfField(dataGroup.getImportId(), pdfField.getLayoutX(), pdfField.getLayoutY(),
+                pdfField.getWidth(), LINE_HEIGHT, dataGroup.getTitle().toString());
+        setFieldPositions(dgField, FONT_GROUP_SIZE);
+        return dgField;
+
+    }
+
+    private void setFieldPositions(PdfField pdfField, int fontSize){
+        pdfField.setX(countPosX(pdfField));
+        pdfField.setOriginalTopY(countTopPosY(pdfField));
+        pdfField.setTopY(countTopPosY(pdfField));
+        pdfField.setOriginalBottomY(countBottomPosY(pdfField));
+        pdfField.setBottomY(countBottomPosY(pdfField));
+        pdfField.countMultiLineHeight(fontSize);
     }
 
     /**
@@ -133,39 +177,6 @@ public class DataConverter extends PdfProperties implements IDataConverter {
             changedPdfFields.push(fieldBelow);
         }
         return maxDiff;
-    }
-
-    private PdfField createPdfField(DataGroup dataGroup, LocalisedField field){
-        int fieldWidth, fieldHeight, fieldLayoutX, fieldLayoutY;
-        String value;
-
-        fieldLayoutX = countFieldLayoutX(dataGroup, field);
-        fieldLayoutY = countFieldLayoutY(dataGroup, field);
-        fieldWidth = countFieldWidth(field, dataGroup);
-        fieldHeight = countFieldHeight(field);
-        value = dataSet.get(field.getStringId()).getValue().toString();
-
-        PdfField dataPdfField = new PdfField(field.getStringId(), dataGroup, fieldLayoutX,
-                fieldLayoutY, fieldWidth, fieldHeight, field.getType(), field.getName(), value);
-        setFieldPositions(dataPdfField);
-        return dataPdfField;
-    }
-
-    private PdfField createPdfDgField(DataGroup dataGroup, PdfField pdfField){
-        PdfField dgField = new PdfField(dataGroup.getImportId(), pdfField.getLayoutX(), pdfField.getLayoutY(),
-                pdfField.getWidth(), LINE_HEIGHT, dataGroup.getTitle().toString());
-        setFieldPositions(dgField);
-        return dgField;
-
-    }
-
-    private void setFieldPositions(PdfField pdfField){
-        pdfField.setX(countPosX(pdfField));
-        pdfField.setOriginalTopY(countTopPosY(pdfField));
-        pdfField.setTopY(countTopPosY(pdfField));
-        pdfField.setOriginalBottomY(countBottomPosY(pdfField));
-        pdfField.setBottomY(countBottomPosY(pdfField));
-        pdfField.countMultiLineHeight();
     }
 
     /**
