@@ -42,7 +42,6 @@ abstract class FieldActionsRunner {
 
         log.debug("Action: $action")
         def code = getActionCode(action)
-
         try {
             code.init(action, useCase, this)
             code()
@@ -61,8 +60,7 @@ abstract class FieldActionsRunner {
             code = (Closure) new GroovyShell().evaluate("{-> ${action.definition}}")
             actions.put(action.importId, code)
         }
-        code.delegate = getActionDeleget()
-        return code
+        return code.rehydrate(getActionDeleget(), code.owner, code.thisObject)
     }
 
     void addToCache(String key, Object value) {
