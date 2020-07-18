@@ -5,7 +5,6 @@ import com.netgrif.workflow.configuration.drools.throwable.RuleValidationExcepti
 import com.netgrif.workflow.rules.domain.RuleRepository;
 import com.netgrif.workflow.rules.domain.StoredRule;
 import com.netgrif.workflow.utils.DateUtils;
-import org.drools.core.io.impl.ClassPathResource;
 import org.drools.template.ObjectDataCompiler;
 import org.kie.api.KieBase;
 import org.kie.api.KieServices;
@@ -20,15 +19,14 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.IntStream;
 
 @Service
 public class KnowledgeBaseInitializer implements IKnowledgeBaseInitializer {
@@ -136,7 +134,7 @@ public class KnowledgeBaseInitializer implements IKnowledgeBaseInitializer {
     }
 
     protected InputStream templateInputStream() throws IOException {
-        return new ClassPathResource(templatePath).getInputStream();
+        return new FileInputStream(templatePath);
     }
 
     private String formatDate(LocalDate date) {
