@@ -31,7 +31,6 @@ public class CaseRuleEvaluationJob extends RuleJob {
         log.info("Executing CaseRuleEvaluationJob for case " + caseId + " of rule " + getRuleIdentifier(context));
         Case useCase = workflowService.findOne(caseId);
         ruleEngine.evaluateRules(useCase, new ScheduledRuleFact(caseId, getRuleIdentifier(context)));
-        workflowService.save(useCase);
     }
 
     @Override
