@@ -10,8 +10,6 @@ public abstract class PdfProperties {
 
    public PDRectangle pageSize = PDRectangle.A4;
 
-   public static int GRID_WIDTH = 4;
-
    public static int PAGE_WIDTH = 595;
 
    public static int PAGE_HEIGHT = 850;
@@ -40,7 +38,7 @@ public abstract class PdfProperties {
 
    public static final int FORM_GRID_COLS = 4;
 
-   public static final int FORM_GRID_ROWS = 25;
+   public static final int FORM_GRID_ROWS = 30;
 
    public static final int FORM_GRID_COL_WIDTH = (PAGE_DRAWABLE_WIDTH / FORM_GRID_COLS);
 
