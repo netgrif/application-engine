@@ -28,5 +28,5 @@ public interface IDataConverter {
     /**
      * Checks whether there are any fields that needs to be shifted due to changed height
      */
-    void correctCoveringFields();
+    void correctFieldsPosition();
 }

@@ -55,7 +55,7 @@ public class PdfGenerator extends PdfResources implements IPdfGenerator {
         dataConverter.generateTitleField(formCase.getPetriNet().getTransitions().get(transitionId).getTitle().toString());
         dataConverter.generatePdfFields();
         dataConverter.generatePdfDataGroups();
-        dataConverter.correctCoveringFields();
+        dataConverter.correctFieldsPosition();
 
         constructPdfGenerator();
         pdfDrawer.setupDrawer(pdf);
@@ -89,15 +89,15 @@ public class PdfGenerator extends PdfResources implements IPdfGenerator {
         List<PdfField> pdfFields = dataHelper.getPdfFields();
 
         for(PdfField pdfField : pdfFields){
-            fieldX = pdfField.getX();
-            fieldY = pdfField.getBottomY();
+            fieldX = BASE_X + pdfField.getX();
+            fieldY = BASE_Y - pdfField.getBottomY();
             fieldWidth = pdfField.getWidth();
             fieldHeight = pdfField.getHeight();
             label = pdfField.getLabel();
             value = pdfField.getValue();
 
             if(pdfField.getFieldId().equals("titleField")){
-                pdfDrawer.drawTitle(label, fieldWidth);
+                pdfDrawer.drawTitle(label, pdfField.getX(), pdfField.getBottomY(),fieldWidth);
             }else if(!pdfField.isDgField()) {
                 switch (pdfField.getType()) {
                     case TEXT:
