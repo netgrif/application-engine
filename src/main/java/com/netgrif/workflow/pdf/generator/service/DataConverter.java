@@ -48,7 +48,7 @@ public class DataConverter extends PdfProperties implements IDataConverter {
         titleField.setBottomY(countBottomPosY(titleField));
 
         pdfFields.add(titleField);
-        BASE_Y = titleField.getBottomY();
+        BASE_Y = BASE_Y - titleField.getBottomY();
     }
 
     /**
@@ -58,13 +58,14 @@ public class DataConverter extends PdfProperties implements IDataConverter {
     public void generatePdfFields(){
         lastX = Integer.MAX_VALUE;
         lastY = 0;
-
         for(Map.Entry<String,DataGroup> entry : dataGroups.entrySet()) {
             for(LocalisedField field : entry.getValue().getFields().getContent()) {
-                pdfFields.add(createPdfField(entry.getValue(), field));
+                if(field.getBehavior().get("hidden") == null) {
+                    pdfFields.add(createPdfField(entry.getValue(), field));
+                }
             }
         }
-        pdfFields.sort(Collections.reverseOrder());
+        Collections.sort(pdfFields);
     }
 
     public void generatePdfDataGroups(){
@@ -78,7 +79,7 @@ public class DataConverter extends PdfProperties implements IDataConverter {
             }
         }
         pdfFields.addAll(dgFields);
-        pdfFields.sort(Collections.reverseOrder());
+        Collections.sort(pdfFields);
     }
 
     private PdfField createPdfField(DataGroup dataGroup, LocalisedField field){
@@ -89,7 +90,7 @@ public class DataConverter extends PdfProperties implements IDataConverter {
         fieldLayoutY = countFieldLayoutY(dataGroup, field);
         fieldWidth = countFieldWidth(field, dataGroup);
         fieldHeight = countFieldHeight(field);
-        value = dataSet.get(field.getStringId()).getValue().toString();
+        value = dataSet.get(field.getStringId()).getValue() != null ? dataSet.get(field.getStringId()).getValue().toString() : "";
 
         PdfField dataPdfField = new PdfField(field.getStringId(), dataGroup, fieldLayoutX,
                 fieldLayoutY, fieldWidth, fieldHeight, field.getType(), field.getName(), value);
@@ -118,7 +119,7 @@ public class DataConverter extends PdfProperties implements IDataConverter {
      * Check parameters of FieldParam objects and calls correction functions, when a field's cannot be drawn into PDF
      * correctly
      */
-    public void correctCoveringFields(){
+    public void correctFieldsPosition(){
         for(PdfField pdfField : pdfFields){
             if(pdfField.isChangedSize()) {
                 pdfField.setBottomY(countBottomPosY(pdfField));
@@ -143,40 +144,36 @@ public class DataConverter extends PdfProperties implements IDataConverter {
      * @param currentField FieldParam object
      */
     private void shiftFieldsBelow(PdfField currentField){
-        int maxDiff = 0, belowTopY, cFieldBottomY;
+        int belowTopY, cFieldBottomY;
 
         for(PdfField fieldBelow : pdfFields){
             if(!currentField.equals(fieldBelow)) {
                 belowTopY = fieldBelow.getTopY();
                 cFieldBottomY = currentField.getBottomY();
-                if ((isCoveredByDataField(currentField, fieldBelow) || isCoveredByDataGroup(currentField, fieldBelow)) && (cFieldBottomY < belowTopY)) {
-                    maxDiff = setNewPositions(maxDiff, belowTopY, cFieldBottomY, fieldBelow);
+                if ((isCoveredByDataField(currentField, fieldBelow) || isCoveredByDataGroup(currentField, fieldBelow)) && (cFieldBottomY > belowTopY)) {
+                    setNewPositions(belowTopY, cFieldBottomY, fieldBelow);
                 }
             }
         }
     }
 
     private boolean isCoveredByDataGroup(PdfField currentField, PdfField fieldBelow){
-        return currentField.isDgField() && currentField.getOriginalTopY() >= fieldBelow.getOriginalTopY();
+        return currentField.isDgField() && currentField.getOriginalTopY() <= fieldBelow.getOriginalTopY();
     }
 
     private boolean isCoveredByDataField(PdfField currentField, PdfField fieldBelow){
-        return currentField.getOriginalBottomY() > fieldBelow.getOriginalTopY();
+        return currentField.getOriginalBottomY() < fieldBelow.getOriginalTopY();
     }
 
-    private int setNewPositions(int maxDiff, int belowTopY, int cFieldBottomY, PdfField fieldBelow) {
+    private void setNewPositions( int belowTopY, int cFieldBottomY, PdfField fieldBelow) {
         int currentDiff;
-        currentDiff = belowTopY - cFieldBottomY + PADDING;
-        if(maxDiff < currentDiff){
-            maxDiff = currentDiff;
-        }
-        fieldBelow.setTopY(belowTopY - maxDiff);
-        fieldBelow.setBottomY(fieldBelow.getBottomY() - maxDiff);
+        currentDiff = cFieldBottomY - belowTopY + PADDING;
+        fieldBelow.setTopY(belowTopY + currentDiff);
+        fieldBelow.setBottomY(fieldBelow.getBottomY() + currentDiff);
         fieldBelow.setChangedPosition(true);
         if(!changedPdfFields.contains(fieldBelow)){
             changedPdfFields.push(fieldBelow);
         }
-        return maxDiff;
     }
 
     /**
@@ -222,7 +219,7 @@ public class DataConverter extends PdfProperties implements IDataConverter {
      * @return
      */
     public int countPosX(PdfField field){
-        return BASE_X + (field.getLayoutX() * FORM_GRID_COL_WIDTH);
+        return (field.getLayoutX() * FORM_GRID_COL_WIDTH);
     }
 
     /**
@@ -230,7 +227,7 @@ public class DataConverter extends PdfProperties implements IDataConverter {
      * @return
      */
     public int countTopPosY(PdfField field){
-        return BASE_Y - (field.getLayoutY() * FORM_GRID_ROW_HEIGHT) - PADDING;
+        return (field.getLayoutY() * FORM_GRID_ROW_HEIGHT) + PADDING;
     }
 
     /**
@@ -238,7 +235,7 @@ public class DataConverter extends PdfProperties implements IDataConverter {
      * @return
      */
     public int countBottomPosY(PdfField field){
-        return BASE_Y - (field.getLayoutY() * FORM_GRID_ROW_HEIGHT) - field.getHeight() - PADDING;
+        return (field.getLayoutY() * FORM_GRID_ROW_HEIGHT) + field.getHeight() + PADDING;
     }
 
     /**
