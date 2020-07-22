@@ -1,11 +1,11 @@
 package com.netgrif.workflow.petrinet.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.netgrif.workflow.auth.domain.Author;
 import com.netgrif.workflow.petrinet.domain.arcs.Arc;
 import com.netgrif.workflow.petrinet.domain.arcs.VariableArc;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRole;
+import com.netgrif.workflow.petrinet.domain.version.Version;
 import com.netgrif.workflow.workflow.domain.DataField;
 import lombok.Getter;
 import lombok.Setter;
@@ -47,12 +47,7 @@ public class PetriNet extends PetriNetObject {
 
     @Getter
     @Setter
-    private String version; //in format 1.1.1 - MAJOR.MINOR.PATCH
-
-    @Getter
-    @Setter
-    @JsonIgnore
-    private String paddedVersion; //in format 0001.0001.0001 - MAJOR.MINOR.PATCH
+    private Version version;
 
     @Getter
     @Setter
@@ -99,11 +94,10 @@ public class PetriNet extends PetriNetObject {
     public PetriNet() {
         this._id = new ObjectId();
         this.identifier = "Default";
-        this.version = "1.0.0";
-        this.paddedVersion = "0001.0000.0000";
         this.initials = "";
         this.title = new I18nString("");
         this.importId = "";
+        this.version = new Version();
         defaultCaseName = new I18nString("");
         initialized = false;
         creationDate = LocalDateTime.now();
@@ -234,24 +228,7 @@ public class PetriNet extends PetriNetObject {
     }
 
     public void incrementVersion(VersionType type) {
-        List<Integer> versionParts = Arrays.stream(this.version.split("\\."))
-                .map(Integer::parseInt).collect(Collectors.toList());
-
-        if (type == VersionType.MAJOR) {
-            versionParts.set(0, versionParts.get(0) + 1);
-            versionParts.set(1, 0);
-            versionParts.set(2, 0);
-        } else if (type == VersionType.MINOR) {
-            versionParts.set(1, versionParts.get(1) + 1);
-            versionParts.set(2, 0);
-        } else if (type == VersionType.PATCH) {
-            versionParts.set(2, versionParts.get(2) + 1);
-        }
-
-        this.version = versionParts.get(0) + "." + versionParts.get(1) + "." + versionParts.get(2);
-        this.paddedVersion = String.format("%04d", versionParts.get(0)) + "." +
-                String.format("%04d", versionParts.get(1)) + "." +
-                String.format("%04d", versionParts.get(2));
+        this.version.increment(type);
     }
 
     @Override
@@ -301,7 +278,6 @@ public class PetriNet extends PetriNetObject {
         clone.setIcon(this.icon);
         clone.setCreationDate(this.creationDate);
         clone.setVersion(this.version);
-        clone.setPaddedVersion(this.paddedVersion);
         clone.setAuthor(this.author);
         clone.setTransitions(this.transitions);
         clone.setRoles(this.roles);

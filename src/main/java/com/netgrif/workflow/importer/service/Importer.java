@@ -40,6 +40,9 @@ import javax.xml.bind.Unmarshaller;
 import java.io.*;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -729,7 +732,7 @@ public class Importer {
         return (transition.getRoleRef() == null || transition.getRoleRef().isEmpty()) && (transition.getTrigger() == null || transition.getTrigger().isEmpty());
     }
 
-    PetriNet getNetByImportId(Long id) {
+    PetriNet getNetByImportId(String id) {
         Optional<PetriNet> net = service.findByImportId(id);
         if (!net.isPresent()) {
             throw new IllegalArgumentException();
