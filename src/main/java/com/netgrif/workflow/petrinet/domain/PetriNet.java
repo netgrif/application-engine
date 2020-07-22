@@ -1,5 +1,6 @@
 package com.netgrif.workflow.petrinet.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.netgrif.workflow.auth.domain.Author;
 import com.netgrif.workflow.petrinet.domain.arcs.Arc;
 import com.netgrif.workflow.petrinet.domain.arcs.VariableArc;
@@ -50,6 +51,11 @@ public class PetriNet extends PetriNetObject {
 
     @Getter
     @Setter
+    @JsonIgnore
+    private String paddedVersion; //in format 0001.0001.0001 - MAJOR.MINOR.PATCH
+
+    @Getter
+    @Setter
     private Author author;
 
     @org.springframework.data.mongodb.core.mapping.Field("places")
@@ -94,6 +100,7 @@ public class PetriNet extends PetriNetObject {
         this._id = new ObjectId();
         this.identifier = "Default";
         this.version = "1.0.0";
+        this.paddedVersion = "0001.0000.0000";
         this.initials = "";
         this.title = new I18nString("");
         this.importId = "";
@@ -242,6 +249,9 @@ public class PetriNet extends PetriNetObject {
         }
 
         this.version = versionParts.get(0) + "." + versionParts.get(1) + "." + versionParts.get(2);
+        this.paddedVersion = String.format("%04d", versionParts.get(0)) + "." +
+                String.format("%04d", versionParts.get(1)) + "." +
+                String.format("%04d", versionParts.get(2));
     }
 
     @Override
@@ -291,6 +301,7 @@ public class PetriNet extends PetriNetObject {
         clone.setIcon(this.icon);
         clone.setCreationDate(this.creationDate);
         clone.setVersion(this.version);
+        clone.setPaddedVersion(this.paddedVersion);
         clone.setAuthor(this.author);
         clone.setTransitions(this.transitions);
         clone.setRoles(this.roles);
