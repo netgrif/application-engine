@@ -155,6 +155,7 @@ public abstract class PetriNetService implements IPetriNetService {
         Optional<PetriNet> imported = getImporter().importPetriNet(new ByteArrayInputStream(bytes), config);
         imported.ifPresent(petriNet -> {
             petriNet.setVersion(previousVersion.getVersion());
+            petriNet.setPaddedVersion(previousVersion.getPaddedVersion());
             petriNet.incrementVersion(PetriNet.VersionType.valueOf(releaseType.trim().toUpperCase()));
             List<ProcessRole> newRoles = migrateProcessRoles(petriNet, previousVersion);
 
@@ -244,7 +245,7 @@ public abstract class PetriNetService implements IPetriNetService {
 
     @Override
     public PetriNet getNewestVersionByIdentifier(String identifier) {
-        List<PetriNet> nets = repository.findByIdentifier(identifier, new PageRequest(0, 1, Sort.Direction.DESC, "version")).getContent();
+        List<PetriNet> nets = repository.findByIdentifier(identifier, PageRequest.of(0, 1, Sort.Direction.DESC, "paddedVersion")).getContent();
         if (nets.isEmpty())
             return null;
         return nets.get(0);
@@ -298,7 +299,7 @@ public abstract class PetriNetService implements IPetriNetService {
         List<PetriNetReference> references;
 
         if (version.contains("^")) {
-            GroupOperation groupByIdentifier = Aggregation.group("identifier").max("version").as("version");
+            GroupOperation groupByIdentifier = Aggregation.group("identifier").max("paddedVersion").as("paddedVersion");
             Aggregation aggregation = Aggregation.newAggregation(groupByIdentifier);
             AggregationResults<Document> results = mongoTemplate.aggregate(aggregation, "petriNet", Document.class);
             references = results.getMappedResults().stream()

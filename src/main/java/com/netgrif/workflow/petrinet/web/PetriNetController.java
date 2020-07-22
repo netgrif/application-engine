@@ -30,10 +30,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
-import java.util.Collections;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
@@ -57,10 +54,10 @@ public class PetriNetController {
     @RequestMapping(value = "/import", method = POST)
     public
     @ResponseBody
-    MessageResource importPetriNet(
+    PetriNetReferenceWithMessageResource importPetriNet(
             @RequestParam(value = "file", required = true) MultipartFile multipartFile,
             @RequestParam(value = "meta", required = false) String releaseType,
-            Authentication auth) throws MissingPetriNetMetaDataException {
+            Authentication auth, Locale locale) throws MissingPetriNetMetaDataException {
         try {
             File file = new File(fileStorageConfiguration.getStorageArchived() + multipartFile.getOriginalFilename());
             file.createNewFile();
@@ -68,12 +65,12 @@ public class PetriNetController {
             fout.write(multipartFile.getBytes());
             String release = releaseType == null ? "major" : releaseType;
 
-            service.importPetriNet(new FileInputStream(file), release, (LoggedUser) auth.getPrincipal());
+            Optional<PetriNet> newPetriNet = service.importPetriNet(new FileInputStream(file), release, (LoggedUser) auth.getPrincipal());
             fout.close();
-            return MessageResource.successMessage("Petri net " + multipartFile.getOriginalFilename() + " imported successfully");
+            return PetriNetReferenceWithMessageResource.successMessage("Petri net " + multipartFile.getOriginalFilename() + " imported successfully", newPetriNet.get(), locale);
         } catch (IOException e) {
             log.error("Importing Petri net failed: ", e);
-            return MessageResource.errorMessage("IO error");
+            return PetriNetReferenceWithMessageResource.errorMessage("IO error");
         }
     }
 
