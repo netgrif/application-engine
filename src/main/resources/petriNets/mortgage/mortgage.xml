@@ -25,14 +25,14 @@
     <!-- DATA -->
     <data type="button">
         <id>add_personal_information</id>
-        <title>Add</title>
-        <placeholder>Add</placeholder>
+        <title></title>
+        <placeholder>Pridaj</placeholder>
         <action trigger="set">
             task_personal_information: f.personal_information;
             def personal = createCase("personal_information", "${useCase.title} - Personal information" as String, "color-fg-amber-500")
-            change task_personal_information value {
-                [personal.tasks.first().task]
-            }
+            def list = (task_personal_information.value as List)
+            list.addAll([personal.tasks.first().task])
+            change task_personal_information value { list }
         </action>
     </data>
 	<data type="taskRef">
