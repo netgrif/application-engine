@@ -4,8 +4,12 @@ import com.netgrif.workflow.pdf.generator.domain.PdfField;
 import com.netgrif.workflow.pdf.generator.config.PdfProperties;
 import com.netgrif.workflow.pdf.generator.service.interfaces.IDataConverter;
 import com.netgrif.workflow.petrinet.domain.DataGroup;
+import com.netgrif.workflow.petrinet.domain.I18nString;
+import com.netgrif.workflow.petrinet.domain.dataset.FieldType;
 import com.netgrif.workflow.workflow.domain.DataField;
+import com.netgrif.workflow.workflow.web.responsebodies.LocalisedEnumerationField;
 import com.netgrif.workflow.workflow.web.responsebodies.LocalisedField;
+import com.netgrif.workflow.workflow.web.responsebodies.LocalisedMultichoiceField;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.stereotype.Service;
@@ -34,14 +38,18 @@ public class DataConverter extends PdfProperties implements IDataConverter {
 
     private int lastX, lastY;
 
+    /**
+     * Generates title field for PDF
+     * @param title text of title
+     */
     @Override
     public void generateTitleField(String title){
         BASE_Y = PAGE_HEIGHT - MARGIN_TOP;
         pdfFields = new ArrayList<>();
         changedPdfFields = new Stack<>();
 
-        PdfField titleField = new PdfField("titleField", null, 0, 0, PAGE_DRAWABLE_WIDTH,
-                FORM_GRID_ROW_HEIGHT, null, title, null);
+        PdfField titleField = new PdfField("titleField", 0, 0, PAGE_DRAWABLE_WIDTH,
+                FORM_GRID_ROW_HEIGHT,  title, false);
 
         titleField.setOriginalBottomY(countBottomPosY(titleField));
         titleField.countMultiLineHeight(FONT_TITLE_SIZE);
@@ -55,19 +63,30 @@ public class DataConverter extends PdfProperties implements IDataConverter {
      * Creates list of FieldParam objects that allows to manipulate easier with data and sorts by their vertical
      * order in PDF
      */
+    @Override
     public void generatePdfFields(){
         lastX = Integer.MAX_VALUE;
         lastY = 0;
         for(Map.Entry<String,DataGroup> entry : dataGroups.entrySet()) {
             for(LocalisedField field : entry.getValue().getFields().getContent()) {
                 if(field.getBehavior().get("hidden") == null) {
-                    pdfFields.add(createPdfField(entry.getValue(), field));
+                    if(field.getType().equals(FieldType.ENUMERATION)){
+                        pdfFields.add(createEnumField(entry.getValue(), (LocalisedEnumerationField) field));
+                    }else if(field.getType().equals(FieldType.MULTICHOICE)){
+                        pdfFields.add(createMultiChoiceField(entry.getValue(), (LocalisedMultichoiceField) field));
+                    }else{
+                        pdfFields.add(createPdfField(entry.getValue(), field));
+                    }
                 }
             }
         }
         Collections.sort(pdfFields);
     }
 
+    /**
+     * Generates data group field for PDF
+     */
+    @Override
     public void generatePdfDataGroups(){
         DataGroup currentDg = null;
         List<PdfField> dgFields = new ArrayList<>();
@@ -82,28 +101,79 @@ public class DataConverter extends PdfProperties implements IDataConverter {
         Collections.sort(pdfFields);
     }
 
+    /**
+     * Creates PdfField object from input field
+     * @param dataGroup data group that contains current field
+     * @param field field that is currently converted to PdfField
+     * @return newly created PdfField object
+     */
     private PdfField createPdfField(DataGroup dataGroup, LocalisedField field){
-        int fieldWidth, fieldHeight, fieldLayoutX, fieldLayoutY;
-        String value;
-
-        fieldLayoutX = countFieldLayoutX(dataGroup, field);
-        fieldLayoutY = countFieldLayoutY(dataGroup, field);
-        fieldWidth = countFieldWidth(field, dataGroup);
-        fieldHeight = countFieldHeight(field);
-        value = dataSet.get(field.getStringId()).getValue() != null ? dataSet.get(field.getStringId()).getValue().toString() : "";
-
-        PdfField dataPdfField = new PdfField(field.getStringId(), dataGroup, fieldLayoutX,
-                fieldLayoutY, fieldWidth, fieldHeight, field.getType(), field.getName(), value);
-        setFieldPositions(dataPdfField, FONT_LABEL_SIZE);
-        return dataPdfField;
+        List<String> value = new ArrayList<>();
+        value.add(dataSet.get(field.getStringId()).getValue() != null ? dataSet.get(field.getStringId()).getValue().toString() : "");
+        PdfField pdfField = new PdfField(field.getStringId(), dataGroup, field.getType(), field.getName(), value, null);
+        setFieldParams(dataGroup, field, pdfField);
+        setFieldPositions(pdfField, FONT_LABEL_SIZE);
+        return pdfField;
     }
 
+    /**
+     * Creates PdfField object from input enumeration field
+     * @param dataGroup data group that contains current field
+     * @param field field that is currently converted to PdfField
+     * @return newly created PdfField object
+     */
+    private PdfField createEnumField(DataGroup dataGroup, LocalisedEnumerationField field){
+        List<String> choices;
+        List<String> values = new ArrayList<>();
+        choices = field.getChoices();
+        if(dataSet.get(field.getStringId()).getValue() != null){
+            values.add(dataSet.get(field.getStringId()).getValue().toString());
+        }
+        PdfField pdfField = new PdfField(field.getStringId(), dataGroup, field.getType(), field.getName(), values, choices);
+        setFieldParams(dataGroup, field, pdfField);
+        setFieldPositions(pdfField, FONT_LABEL_SIZE);
+        return pdfField;
+    }
+
+    /**
+     * Creates PdfField object from input multi choice field
+     * @param dataGroup data group that contains current field
+     * @param field field that is currently converted to PdfField
+     * @return newly created PdfField object
+     */
+    private PdfField createMultiChoiceField(DataGroup dataGroup, LocalisedMultichoiceField field){
+        List<String> choices;
+        List<String> values = new ArrayList<>();
+        choices = field.getChoices();
+        if(dataSet.get(field.getStringId()).getValue() != null){
+            for(I18nString value : (List<I18nString>) dataSet.get(field.getStringId()).getValue()){
+                values.add(value.toString());
+            }
+        }
+        PdfField pdfField = new PdfField(field.getStringId(), dataGroup, field.getType(), field.getName(), values, choices);
+        setFieldParams(dataGroup, field, pdfField);
+        setFieldPositions(pdfField, FONT_LABEL_SIZE);
+        return pdfField;
+    }
+
+    /**
+     * Creates PdfField object from input data group
+     * @param dataGroup data group that is currently converted to PdfField
+     * @param pdfField PDF field that contains data about data group
+     * @return newly created PdfField object
+     */
     private PdfField createPdfDgField(DataGroup dataGroup, PdfField pdfField){
         PdfField dgField = new PdfField(dataGroup.getImportId(), pdfField.getLayoutX(), pdfField.getLayoutY(),
-                pdfField.getWidth(), LINE_HEIGHT, dataGroup.getTitle().toString());
+                pdfField.getWidth(), LINE_HEIGHT, dataGroup.getTitle().toString(), true);
         setFieldPositions(dgField, FONT_GROUP_SIZE);
         return dgField;
+    }
 
+    private void setFieldParams(DataGroup dg, LocalisedField field, PdfField pdfField){
+        pdfField.setLayoutX(countFieldLayoutX(dg, field));
+        pdfField.setLayoutY(countFieldLayoutY(dg, field));
+        pdfField.setWidth(countFieldWidth(dg, field));
+        pdfField.setHeight(countFieldHeight(field));
     }
 
     private void setFieldPositions(PdfField pdfField, int fontSize){
@@ -126,7 +196,6 @@ public class DataConverter extends PdfProperties implements IDataConverter {
                 changedPdfFields.push(pdfField);
             }
         }
-
         while(!changedPdfFields.empty()){
             PdfField pdfField = changedPdfFields.pop();
             if(pdfField.isChangedSize()){
@@ -157,14 +226,6 @@ public class DataConverter extends PdfProperties implements IDataConverter {
         }
     }
 
-    private boolean isCoveredByDataGroup(PdfField currentField, PdfField fieldBelow){
-        return currentField.isDgField() && currentField.getOriginalTopY() <= fieldBelow.getOriginalTopY();
-    }
-
-    private boolean isCoveredByDataField(PdfField currentField, PdfField fieldBelow){
-        return currentField.getOriginalBottomY() < fieldBelow.getOriginalTopY();
-    }
-
     private void setNewPositions( int belowTopY, int cFieldBottomY, PdfField fieldBelow) {
         int currentDiff;
         currentDiff = cFieldBottomY - belowTopY + PADDING;
@@ -174,6 +235,14 @@ public class DataConverter extends PdfProperties implements IDataConverter {
         if(!changedPdfFields.contains(fieldBelow)){
             changedPdfFields.push(fieldBelow);
         }
+    }
+
+    private boolean isCoveredByDataGroup(PdfField currentField, PdfField fieldBelow){
+        return currentField.isDgField() && currentField.getOriginalTopY() <= fieldBelow.getOriginalTopY();
+    }
+
+    private boolean isCoveredByDataField(PdfField currentField, PdfField fieldBelow){
+        return currentField.getOriginalBottomY() < fieldBelow.getOriginalTopY();
     }
 
     /**
@@ -219,7 +288,7 @@ public class DataConverter extends PdfProperties implements IDataConverter {
      * @return
      */
     public int countPosX(PdfField field){
-        return (field.getLayoutX() * FORM_GRID_COL_WIDTH);
+        return (field.getLayoutX() * FORM_GRID_COL_WIDTH + PADDING);
     }
 
     /**
@@ -241,37 +310,41 @@ public class DataConverter extends PdfProperties implements IDataConverter {
     /**
      * Generates array of strings in case the text is too long to fit into one line in PDF.
      * Each element represents a single line in final PDF
-     * @param text
+     * @param values
      * @param maxLineLength
      * @return result
      */
-    public static String[] generateMultiLineText(String text, float maxLineLength){
-        StringTokenizer tokenizer = new StringTokenizer(text, " ");
-        StringBuilder output = new StringBuilder(text.length());
-        String[] result;
+    public static List<String> generateMultiLineText(List<String> values, float maxLineLength){
+        StringTokenizer tokenizer;
+        StringBuilder output;
+        List<String> result = new ArrayList<>();
         int lineLen = 1;
 
-        while (tokenizer.hasMoreTokens()) {
-            String word = tokenizer.nextToken();
+        for(String value : values) {
+            tokenizer = new StringTokenizer(value, " ");
+            output = new StringBuilder(value.length());
+            while (tokenizer.hasMoreTokens()) {
+                String word = tokenizer.nextToken();
 
-            if (lineLen + word.length() > maxLineLength) {
-                output.append("\n");
-                lineLen = 0;
+                if (lineLen + word.length() > maxLineLength) {
+                    output.append("\n");
+                    lineLen = 0;
+                }
+                output.append(word + " ");
+                lineLen += word.length() + 1;
             }
-            output.append(word + " ");
-            lineLen += word.length() + 1;
+            result.addAll(Arrays.asList(output.toString().split("\n")));
         }
-        result = output.toString().split("\n");
         return result;
     }
 
     /**
      * Counts field width for drawing the data field to PDF
-     * @param field that is the width counted for
      * @param dataGroup that the field is part of
+     * @param field that is the width counted for
      * @return width of rectangle that will be drawn to PDF
      */
-    private int countFieldWidth(LocalisedField field, DataGroup dataGroup){
+    private int countFieldWidth(DataGroup dataGroup, LocalisedField field){
         if(field.getLayout() != null) {
             return field.getLayout().getCols() * FORM_GRID_COL_WIDTH - PADDING;
         }else{

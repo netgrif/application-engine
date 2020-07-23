@@ -1,13 +1,16 @@
 package com.netgrif.workflow.pdf.generator.service;
 
 import com.netgrif.workflow.pdf.generator.config.PdfResources;
+import com.netgrif.workflow.pdf.generator.domain.DrawableElement;
 import com.netgrif.workflow.pdf.generator.domain.PdfField;
 import com.netgrif.workflow.pdf.generator.service.interfaces.IDataConverter;
 import com.netgrif.workflow.pdf.generator.service.interfaces.IPdfDrawer;
 import com.netgrif.workflow.pdf.generator.service.interfaces.IPdfGenerator;
+import com.netgrif.workflow.petrinet.domain.dataset.FieldType;
 import com.netgrif.workflow.workflow.domain.Case;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.font.PDType0Font;
+import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -30,7 +33,10 @@ public class PdfGenerator extends PdfResources implements IPdfGenerator {
     @Autowired
     private IPdfDrawer pdfDrawer;
 
-
+    /**
+     * Creates new PD document, sets resources files for fonts and images
+     * @throws IOException I/O exception handling for operations with files
+     */
     private void constructPdfGenerator() throws IOException {
         this.pdf = new PDDocument();
 
@@ -42,10 +48,10 @@ public class PdfGenerator extends PdfResources implements IPdfGenerator {
         setLabelFont(PDType0Font.load(this.pdf, new FileInputStream(fontLabelFile), true));
         setValueFont(PDType0Font.load(this.pdf, new FileInputStream(fontValueFile), true));
 
-//        this.setCheckboxChecked(PDImageXObject.createFromFile(checkBoxCheckedPath, this.getPdf()))
-//        this.setCheckboxUnchecked(PDImageXObject.createFromFile(checkBoxUnCheckedPath, this.getPdf()))
-//        this.setRadioChecked(PDImageXObject.createFromFile(radioCheckedPath, this.getPdf()))
-//        this.setRadioUnchecked(PDImageXObject.createFromFile(radioUnCheckedPath, this.getPdf()))
+        setCheckboxChecked(PDImageXObject.createFromFileByContent(checkBoxCheckedResource.getFile(), this.pdf));
+        setCheckboxUnchecked(PDImageXObject.createFromFileByContent(checkBoxUnCheckedResource.getFile(), this.pdf));
+        setRadioChecked(PDImageXObject.createFromFileByContent(radioCheckedResource.getFile(), this.pdf));
+        setRadioUnchecked(PDImageXObject.createFromFileByContent(radioUnCheckedResource.getFile(), this.pdf));
     }
 
     @Override
@@ -67,6 +73,12 @@ public class PdfGenerator extends PdfResources implements IPdfGenerator {
         }
     }
 
+    /**
+     * Creates output files and execute export of elements to PDF
+     * @param dataHelper holds the data to be exported
+     * @return PDF file generated from form
+     * @throws IOException I/O exception handling for operations with files
+     */
     private File transformRequestToPdf(IDataConverter dataHelper) throws IOException {
         File out = new File("src/main/resources/out.pdf");
         pdfDrawer.newPage();
@@ -85,7 +97,10 @@ public class PdfGenerator extends PdfResources implements IPdfGenerator {
      * */
     void drawTransitionForm(IDataConverter dataHelper) throws IOException {
         int fieldX, fieldY, fieldWidth, fieldHeight;
-        String label, value;
+        String label;
+        FieldType type;
+        List<String> values;
+        List<String> choices;
         List<PdfField> pdfFields = dataHelper.getPdfFields();
 
         for(PdfField pdfField : pdfFields){
@@ -94,21 +109,27 @@ public class PdfGenerator extends PdfResources implements IPdfGenerator {
             fieldWidth = pdfField.getWidth();
             fieldHeight = pdfField.getHeight();
             label = pdfField.getLabel();
-            value = pdfField.getValue();
+            values = pdfField.getValues();
+            choices = pdfField.getChoices();
+            type = pdfField.getType();
 
             if(pdfField.getFieldId().equals("titleField")){
                 pdfDrawer.drawTitle(label, pdfField.getX(), pdfField.getBottomY(),fieldWidth);
             }else if(!pdfField.isDgField()) {
                 switch (pdfField.getType()) {
                     case TEXT:
-                        pdfDrawer.drawTextField(label, value, fieldX, fieldY, fieldWidth, fieldHeight);
-                        break;
                     case NUMBER:
-                        pdfDrawer.drawTextField(label, value, fieldX, fieldY, fieldWidth, fieldHeight);
+                    case DATE:
+                    case DATETIME:
+                        pdfDrawer.drawTextField(label, values, fieldX, fieldY, fieldWidth, fieldHeight);
+                        break;
+                    case MULTICHOICE:
+                    case ENUMERATION:
+                        pdfDrawer.drawSelectionField(label, choices, values, fieldX, fieldY, fieldWidth, fieldHeight, type);
                         break;
                 }
             }else{
-                pdfDrawer.drawFieldLabel(label, fieldX, fieldY, fieldWidth, fieldHeight, titleFont, FONT_GROUP_SIZE);
+                pdfDrawer.drawLabel(label, fieldX, fieldY, fieldWidth, fieldHeight, titleFont, FONT_GROUP_SIZE);
             }
         }
     }
