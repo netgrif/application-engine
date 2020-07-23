@@ -262,6 +262,7 @@ public final class FieldFactory {
     public Field buildImmediateField(Case useCase, String fieldId) {
         Field field = useCase.getPetriNet().getDataSet().get(fieldId);
         resolveDataValues(field, useCase, fieldId);
+        resolveAttributeValues(field, useCase, fieldId);
         return field;
     }
 
@@ -450,5 +451,11 @@ public final class FieldFactory {
             field.setValue((FileFieldValue) value);
         } else
             throw new IllegalArgumentException("Object " + value.toString() + " cannot be set as value to the File field [" + fieldId + "] !");
+    }
+
+    private void resolveAttributeValues(Field field, Case useCase, String fieldId) {
+        if (field.getType().equals(FieldType.CASE_REF)) {
+            ((CaseField) field).setAllowedNets(useCase.getDataSet().get(fieldId).getAllowedNets());
+        }
     }
 }
