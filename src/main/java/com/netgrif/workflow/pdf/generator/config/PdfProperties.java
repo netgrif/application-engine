@@ -24,7 +24,9 @@ public abstract class PdfProperties {
 
    public static int MARGIN_RIGHT = (int) (0.5 * PPI);
 
-   public static int PADDING = 5;
+   public static int PADDING = 4;
+
+   public static int SELECTION_BOX_PADDING = 1;
 
    public static int PAGE_DRAWABLE_WIDTH = PAGE_WIDTH - MARGIN_LEFT - MARGIN_RIGHT;
 

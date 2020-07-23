@@ -9,6 +9,8 @@ import org.springframework.core.io.Resource;
 
 import java.awt.*;
 import java.io.File;
+import java.io.IOException;
+import java.util.List;
 
 public abstract class PdfResources extends PdfProperties {
     @Getter
@@ -68,15 +70,15 @@ public abstract class PdfResources extends PdfProperties {
     @Value("file:src/main/resources/pdfGenerator/fonts/SpaceMono-Regular.ttf")
     public Resource fontValueResource;
 
-   /*@Value('${pdf.generator.choice.checked.path}')
-   String checkBoxCheckedPath
+    @Value("file:src/main/resources/pdfGenerator/img/checkbox_checked.png")
+    public Resource checkBoxCheckedResource;
 
-   @Value('${pdf.generator.choice.unchecked.path}')
-   String checkBoxUnCheckedPath
+    @Value("file:src/main/resources/pdfGenerator/img/checkbox_unchecked.png")
+    public Resource checkBoxUnCheckedResource;
 
-   @Value('${pdf.generator.radio.checked.path}')
-   String radioCheckedPath
+    @Value("file:src/main/resources/pdfGenerator/img/radio_checked.png")
+    public Resource radioCheckedResource;
 
-   @Value('${pdf.generator.radio.unchecked.path}')
-   String radioUnCheckedPath*/
+    @Value("file:src/main/resources/pdfGenerator/img/radio_unchecked.png")
+    public Resource radioUnCheckedResource;
 }
