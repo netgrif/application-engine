@@ -455,7 +455,8 @@ public final class FieldFactory {
 
     private void resolveAttributeValues(Field field, Case useCase, String fieldId) {
         if (field.getType().equals(FieldType.CASE_REF)) {
-            ((CaseField) field).setAllowedNets(useCase.getDataSet().get(fieldId).getAllowedNets());
+            List<String> allowedNets = new ArrayList<>(useCase.getDataSet().get(fieldId).getAllowedNets());
+            ((CaseField) field).setAllowedNets(allowedNets);
         }
     }
 }
