@@ -214,7 +214,7 @@ public class DataService implements IDataService {
                     } else {
                         Field resource = dataFieldMap.get(datum);
                         if (resource.getLayout() != null && !dataGroup.getImportId().contains("-")) {
-                            resource.getLayout().setY(resource.getLayout().getY() + wrapping );
+                            resource.getLayout().setY(resource.getLayout().getY() + wrapping);
                         }
                         if (level != 0) resource.setImportId(taskId + "-" + resource.getImportId());
                         resources.add(resource);
@@ -251,6 +251,9 @@ public class DataService implements IDataService {
         int maxRows = 0;
         for (DataGroup dataGroup : taskRefDataGroups) {
             for (LocalisedField localisedField : dataGroup.getFields().getContent()) {
+                if (localisedField.getLayout() == null) {
+                    return;
+                }
                 localisedField.getLayout().setY(taskRefField.getLayout().getY() + localisedField.getLayout().getY() + maxWrapping);
                 if (localisedField.getLayout().getRows() > maxRows) {
                     maxRows = localisedField.getLayout().getRows();
