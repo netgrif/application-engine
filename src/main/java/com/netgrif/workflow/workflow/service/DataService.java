@@ -43,7 +43,7 @@ public class DataService implements IDataService {
 
     public static final int MONGO_ID_LENGTH = 24;
 
-    private int nabalenie = 0;
+    private int wrapping = 0;
 
     @Autowired
     private ApplicationEventPublisher publisher;
@@ -213,8 +213,8 @@ public class DataService implements IDataService {
                         resultDataGroups.addAll(collectTaskRefDataGroups((TaskField) dataFieldMap.get(datum), locale, collectedTaskIds, level));
                     } else {
                         Field resource = dataFieldMap.get(datum);
-                        if (resource.getLayout() != null) {
-                            resource.getLayout().setY(resource.getLayout().getY() + nabalenie);
+                        if (resource.getLayout() != null && !dataGroup.getImportId().contains("-")) {
+                            resource.getLayout().setY(resource.getLayout().getY() + wrapping );
                         }
                         if (level != 0) resource.setImportId(taskId + "-" + resource.getImportId());
                         resources.add(resource);
@@ -237,7 +237,7 @@ public class DataService implements IDataService {
             taskIds.forEach(id -> {
                 collectedTaskIds.add(id);
                 List<DataGroup> taskRefDataGroups = getDataGroups(id, locale, collectedTaskIds, level + 1);
-                iterateTaskRefDataGroups(taskRefDataGroups);
+                iterateTaskRefDataGroups(taskRefDataGroups, taskRefField);
                 groups.addAll(taskRefDataGroups);
             });
         }
@@ -246,20 +246,20 @@ public class DataService implements IDataService {
     }
 
 
-    private void iterateTaskRefDataGroups(List<DataGroup> taskRefDataGroups) {
-        int maxNabalenie = nabalenie;
+    private void iterateTaskRefDataGroups(List<DataGroup> taskRefDataGroups, TaskField taskRefField) {
+        int maxWrapping = wrapping;
         int maxRows = 0;
         for (DataGroup dataGroup : taskRefDataGroups) {
             for (LocalisedField localisedField : dataGroup.getFields().getContent()) {
+                localisedField.getLayout().setY(taskRefField.getLayout().getY() + localisedField.getLayout().getY() + maxWrapping);
                 if (localisedField.getLayout().getRows() > maxRows) {
                     maxRows = localisedField.getLayout().getRows();
                 }
             }
         }
-        if (maxNabalenie + maxRows > nabalenie) {
-            nabalenie = maxNabalenie + maxRows;
+        if (maxWrapping + maxRows > wrapping) {
+            wrapping = maxWrapping + maxRows;
         }
-
     }
 
     @Override
@@ -433,8 +433,8 @@ public class DataService implements IDataService {
     }
 
     @Override
-    public void setNabalenie(int nabalenie) {
-        this.nabalenie = nabalenie;
+    public void setWrapping(int wrapping) {
+        this.wrapping = wrapping;
     }
 
     private void updateDataset(Case useCase) {
