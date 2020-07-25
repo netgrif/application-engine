@@ -46,4 +46,6 @@ public interface IDataService {
     List<Field> getImmediateFields(Task task);
 
     Map<String, ChangedField> runActions(List<Action> actions, String useCaseId, Transition transition);
+
+    void setNabalenie(int nabalenie);
 }

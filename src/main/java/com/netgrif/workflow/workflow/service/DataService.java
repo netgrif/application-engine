@@ -21,10 +21,10 @@ import com.netgrif.workflow.workflow.service.interfaces.IDataService;
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
 import com.netgrif.workflow.workflow.web.responsebodies.DataFieldsResource;
+import com.netgrif.workflow.workflow.web.responsebodies.LocalisedField;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
@@ -37,12 +37,13 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.LongStream;
 
+@Slf4j
 @Service
 public class DataService implements IDataService {
 
-    private static final Logger log = LoggerFactory.getLogger(DataService.class);
-
     public static final int MONGO_ID_LENGTH = 24;
+
+    private int nabalenie = 0;
 
     @Autowired
     private ApplicationEventPublisher publisher;
@@ -90,7 +91,7 @@ public class DataService implements IDataService {
                     Field field = fieldFactory.buildFieldWithValidation(useCase, fieldId);
                     field.setBehavior(useCase.getDataSet().get(fieldId).applyBehavior(transition.getStringId()));
                     if (transition.getDataSet().get(fieldId).layoutExist() && transition.getDataSet().get(fieldId).getLayout().layoutFilled()) {
-                        field.setLayout(transition.getDataSet().get(fieldId).getLayout());
+                        field.setLayout(transition.getDataSet().get(fieldId).getLayout().of());
                     }
                     dataSetFields.add(field);
                 }
@@ -99,7 +100,7 @@ public class DataService implements IDataService {
                     Field field = fieldFactory.buildFieldWithValidation(useCase, fieldId);
                     field.setBehavior(transition.getDataSet().get(fieldId).applyBehavior());
                     if (transition.getDataSet().get(fieldId).layoutExist() && transition.getDataSet().get(fieldId).getLayout().layoutFilled()) {
-                        field.setLayout(transition.getDataSet().get(fieldId).getLayout());
+                        field.setLayout(transition.getDataSet().get(fieldId).getLayout().of());
                     }
                     dataSetFields.add(field);
                 }
@@ -212,6 +213,9 @@ public class DataService implements IDataService {
                         resultDataGroups.addAll(collectTaskRefDataGroups((TaskField) dataFieldMap.get(datum), locale, collectedTaskIds, level));
                     } else {
                         Field resource = dataFieldMap.get(datum);
+                        if (resource.getLayout() != null) {
+                            resource.getLayout().setY(resource.getLayout().getY() + nabalenie);
+                        }
                         if (level != 0) resource.setImportId(taskId + "-" + resource.getImportId());
                         resources.add(resource);
                     }
@@ -233,11 +237,29 @@ public class DataService implements IDataService {
             taskIds.forEach(id -> {
                 collectedTaskIds.add(id);
                 List<DataGroup> taskRefDataGroups = getDataGroups(id, locale, collectedTaskIds, level + 1);
+                iterateTaskRefDataGroups(taskRefDataGroups);
                 groups.addAll(taskRefDataGroups);
             });
         }
 
         return groups;
+    }
+
+
+    private void iterateTaskRefDataGroups(List<DataGroup> taskRefDataGroups) {
+        int maxNabalenie = nabalenie;
+        int maxRows = 0;
+        for (DataGroup dataGroup : taskRefDataGroups) {
+            for (LocalisedField localisedField : dataGroup.getFields().getContent()) {
+                if (localisedField.getLayout().getRows() > maxRows) {
+                    maxRows = localisedField.getLayout().getRows();
+                }
+            }
+        }
+        if (maxNabalenie + maxRows > nabalenie) {
+            nabalenie = maxNabalenie + maxRows;
+        }
+
     }
 
     @Override
@@ -408,6 +430,11 @@ public class DataService implements IDataService {
         });
         workflowService.save(case$);
         return changedFields;
+    }
+
+    @Override
+    public void setNabalenie(int nabalenie) {
+        this.nabalenie = nabalenie;
     }
 
     private void updateDataset(Case useCase) {
