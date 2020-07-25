@@ -8,7 +8,6 @@ import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.elastic.service.interfaces.IElasticTaskService;
 import com.netgrif.workflow.elastic.web.requestbodies.singleaslist.SingleTaskSearchRequestAsList;
 import com.netgrif.workflow.petrinet.domain.DataGroup;
-import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldByFileFieldContainer;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldContainer;
 import com.netgrif.workflow.petrinet.domain.roles.RolePermission;
@@ -44,7 +43,6 @@ import java.io.FileNotFoundException;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/task")
@@ -238,6 +236,7 @@ public class TaskController {
 
     @RequestMapping(value = "/{id}/data", method = RequestMethod.GET)
     public DataGroupsResource getData(@PathVariable("id") String taskId, Locale locale) {
+        dataService.setNabalenie(0);
         List<DataGroup> dataGroups = dataService.getDataGroups(taskId, locale);
 
         return new DataGroupsResource(dataGroups, locale);
