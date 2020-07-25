@@ -47,5 +47,5 @@ public interface IDataService {
 
     Map<String, ChangedField> runActions(List<Action> actions, String useCaseId, Transition transition);
 
-    void setNabalenie(int nabalenie);
+    void setWrapping(int wrapping);
 }
