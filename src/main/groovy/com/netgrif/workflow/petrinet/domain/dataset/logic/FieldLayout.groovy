@@ -4,7 +4,7 @@ import com.netgrif.workflow.petrinet.domain.layout.Layout
 import com.querydsl.core.annotations.PropertyType
 import com.querydsl.core.annotations.QueryType
 
-class FieldLayout extends Layout{
+class FieldLayout extends Layout {
     private int x
     private int y
     private String template
@@ -20,6 +20,10 @@ class FieldLayout extends Layout{
         this.y = y
         this.template = template?.toLowerCase()
         this.appearance = appearance?.toLowerCase()
+    }
+
+    FieldLayout of() {
+        return new FieldLayout(this.getX(), this.getY(), this.getRows(), this.getCols(), this.getTemplate(), this.getAppearance())
     }
 
     int getX() {
