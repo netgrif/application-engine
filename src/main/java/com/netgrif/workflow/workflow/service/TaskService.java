@@ -27,6 +27,7 @@ import com.netgrif.workflow.workflow.service.interfaces.IDataService;
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
 import com.netgrif.workflow.workflow.web.responsebodies.TaskReference;
+import groovy.lang.Lazy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -83,6 +84,7 @@ public class TaskService implements ITaskService {
     private IProcessRoleService processRoleService;
 
     @Autowired
+    @Lazy
     private IElasticTaskService elasticTaskService;
 
     @Override
@@ -234,9 +236,9 @@ public class TaskService implements ITaskService {
 
         outcome.add(dataService.runActions(transition.getPreCancelActions(), useCase.getStringId(), transition));
         task = returnTokens(task, useCase.getStringId());
-        outcome.add(dataService.runActions(transition.getPostCancelActions(), useCase.getStringId(), transition));
         useCase = workflowService.findOne(useCase.getStringId());
         reloadTasks(useCase);
+        outcome.add(dataService.runActions(transition.getPostCancelActions(), useCase.getStringId(), transition));
 
         publisher.publishEvent(new UserCancelTaskEvent(user, task, useCase));
         log.info("["+useCase.getStringId()+"]: Task [" + task.getTitle() + "] in case [" + useCase.getTitle() + "] assigned to [" + user.getEmail() + "] was cancelled");
@@ -555,8 +557,14 @@ public class TaskService implements ITaskService {
 
     @Override
     public List<Task> findAllById(List<String> ids) {
-        List<Task> page = taskRepository.findAllBy_idIn(ids);
-        page.forEach(this::setUser);
+        List<Task> page = new LinkedList<>();
+        ids.forEach(id -> {
+            Optional<Task> task = taskRepository.findById(id);
+            task.ifPresent(page::add);
+        });
+        if (page.size() > 0) {
+            page.forEach(this::setUser);
+        }
         return page;
     }
 
@@ -629,6 +637,7 @@ public class TaskService implements ITaskService {
                 .processId(useCase.getPetriNetId())
                 .caseId(useCase.get_id().toString())
                 .transitionId(transition.getImportId())
+                .layout(transition.getLayout())
                 .caseColor(useCase.getColor())
                 .caseTitle(useCase.getTitle())
                 .priority(transition.getPriority())

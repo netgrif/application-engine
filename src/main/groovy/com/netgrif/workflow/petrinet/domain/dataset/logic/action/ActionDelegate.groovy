@@ -1,6 +1,6 @@
 package com.netgrif.workflow.petrinet.domain.dataset.logic.action
 
-import  com.netgrif.workflow.*
+import com.netgrif.workflow.*
 import com.netgrif.workflow.AsyncRunner
 import com.netgrif.workflow.auth.domain.User
 import com.netgrif.workflow.auth.service.interfaces.IUserService
@@ -26,6 +26,7 @@ import com.netgrif.workflow.workflow.service.interfaces.IDataService
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService
 import com.netgrif.workflow.workflow.web.responsebodies.TaskReference
 import com.querydsl.core.types.Predicate
+import org.bson.types.ObjectId
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -141,8 +142,7 @@ class ActionDelegate {
      *     text: f.textId,
      *     transition: t.transitionId;
      *
-     *     make text,visible on transition when { condition.value == true }
-     * </pre>
+     *     make text,visible on transition when { condition.value == true }* </pre>
      * This code will change the field <i>text</i> behaviour to <i>visible</i> when fields <i>condition</i> value is equal to <i>true</i>
      * @param field which behaviour will be changed
      * @param behavior one of visible, editable, required, optional, hidden, forbidden
@@ -214,7 +214,7 @@ class ActionDelegate {
         QTask qTask = new QTask("task")
         Task task = taskService.searchOne(qTask.transitionId.eq(transitionId).and(qTask.caseId.eq(useCase.stringId)))
         taskService.assignTask(task.stringId)
-        dataService.setData(task.stringId, ImportHelper.populateDataset(dataSet as Map<String, Map<String,String>>))
+        dataService.setData(task.stringId, ImportHelper.populateDataset(dataSet as Map<String, Map<String, String>>))
         taskService.finishTask(task.stringId)
     }
 
@@ -231,7 +231,7 @@ class ActionDelegate {
             changeFieldValue(field, cl)
         },
          value  : { cl ->
-            changeFieldValue(field, cl)
+             changeFieldValue(field, cl)
          },
          choices: { cl ->
              if (!(field instanceof MultichoiceField || field instanceof EnumerationField))
@@ -243,11 +243,11 @@ class ActionDelegate {
              if (!(values instanceof Collection))
                  values = [values]
              field = (ChoiceField) field
-             if (values.every { it instanceof I18nString }) {
-                 field.setChoices(values as Set<I18nString>)
-             } else {
-                 field.setChoicesFromStrings(values as Set<String>)
-             }
+                 if (values.every { it instanceof I18nString }) {
+                     field.setChoices(values as Set<I18nString>)
+                 } else {
+                     field.setChoicesFromStrings(values as Set<String>)
+                 }
              saveChangedChoices(field)
          }]
     }
@@ -421,6 +421,10 @@ class ActionDelegate {
     Task findTask(Closure<Predicate> predicate) {
         QTask qTask = new QTask("task")
         return taskService.searchOne(predicate(qTask))
+    }
+
+    Task findTask(String mongoId) {
+        return taskService.searchOne(QTask.task._id.eq(new ObjectId(mongoId)))
     }
 
     String getTaskId(String transitionId, Case aCase = useCase) {

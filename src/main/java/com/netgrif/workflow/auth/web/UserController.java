@@ -29,6 +29,7 @@ import org.springframework.hateoas.PagedResources;
 import org.springframework.hateoas.mvc.ControllerLinkBuilder;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Locale;
@@ -84,6 +85,11 @@ public class UserController {
     @GetMapping("/{id}")
     public UserResource getUser(@PathVariable("id") Long userId, @RequestParam(value = "small", required = false) Boolean small, Locale locale) {
         small = small == null ? false : small;
+        LoggedUser loggedUser = (LoggedUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (!loggedUser.isAdmin() && !Objects.equals(loggedUser.getId(), userId)){
+            log.info("User " + loggedUser.getUsername() + " trying to get another user with ID "+userId);
+            throw new IllegalArgumentException("Could not find user with id ["+userId+"]");
+        }
         return new UserResource(userService.findById(userId, small), "profile", locale, small);
     }
 

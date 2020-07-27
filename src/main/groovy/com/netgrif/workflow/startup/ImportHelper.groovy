@@ -18,6 +18,7 @@ import com.netgrif.workflow.petrinet.web.requestbodies.UploadedFileMeta
 import com.netgrif.workflow.workflow.domain.Case
 import com.netgrif.workflow.workflow.domain.EventOutcome
 import com.netgrif.workflow.workflow.domain.Filter
+import com.netgrif.workflow.workflow.domain.MergeFilterOperation
 import com.netgrif.workflow.workflow.domain.repositories.CaseRepository
 import com.netgrif.workflow.workflow.service.interfaces.IDataService
 import com.netgrif.workflow.workflow.service.interfaces.IFilterService
@@ -122,13 +123,13 @@ class ImportHelper {
         return authorityService.getOrCreate(name)
     }
 
-    Optional<PetriNet> createNet(String fileName, String identifier, String name, String initials, String release) {
-        createNet(fileName, identifier, name, initials, release, superCreator.loggedSuper)
+    Optional<PetriNet> createNet(String fileName, String release) {
+        createNet(fileName, release, superCreator.loggedSuper)
     }
 
-    Optional<PetriNet> createNet(String fileName, String identifier, String name, String initials, String release, LoggedUser loggedUser) {
+    Optional<PetriNet> createNet(String fileName, String release, LoggedUser loggedUser) {
         InputStream netStream = new ClassPathResource("petriNets/$fileName" as String).inputStream
-        return petriNetService.importPetriNet(netStream, new UploadedFileMeta(name, initials, identifier, release), loggedUser)
+        return petriNetService.importPetriNet(netStream, release, loggedUser)
     }
 
     UserProcessRole createUserProcessRole(PetriNet net, String name) {
@@ -175,8 +176,8 @@ class ImportHelper {
         return createCase(title, net, superCreator.loggedSuper)
     }
 
-    boolean createFilter(String title, String query, String readable, LoggedUser user) {
-        return filterService.saveFilter(new CreateFilterBody(title, Filter.VISIBILITY_PUBLIC, "This filter was created automatically for testing purpose only.", Filter.TYPE_TASK, query, readable), user)
+    boolean createCaseFilter(String title, String query, MergeFilterOperation operation, LoggedUser user) {
+        return filterService.saveFilter(new CreateFilterBody(title, Filter.VISIBILITY_PUBLIC, "This filter was created automatically for testing purpose only.", Filter.TYPE_TASK, query), operation, user)
     }
 
     EventOutcome assignTask(String taskTitle, String caseId, LoggedUser author) {
