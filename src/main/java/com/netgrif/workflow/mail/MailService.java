@@ -2,6 +2,7 @@ package com.netgrif.workflow.mail;
 
 import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.auth.service.interfaces.IRegistrationService;
+import com.netgrif.workflow.mail.interfaces.IMailService;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;

@@ -1,6 +1,8 @@
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xsi:noNamespaceSchemaLocation="../../main/resources/petriNets/petriflow_schema.xsd">
-    <id>net</id>
+    <id>case_search_test.xml</id>
+    <initials>TST</initials>
+    <title>Test</title>
     <defaultRole>true</defaultRole>
     <role>
         <id>99</id>

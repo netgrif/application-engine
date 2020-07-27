@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode
 import com.netgrif.workflow.petrinet.domain.Format
 import com.netgrif.workflow.petrinet.domain.I18nString
 import com.netgrif.workflow.petrinet.domain.Imported
+import com.netgrif.workflow.petrinet.domain.dataset.logic.FieldLayout
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action
 import com.netgrif.workflow.petrinet.domain.views.View
 import com.querydsl.core.annotations.PropertyType
@@ -28,6 +29,9 @@ abstract class Field<T> extends Imported {
 
     @Transient
     private ObjectNode behavior
+
+    @Transient
+    private FieldLayout layout
 
     @Transient
     private T value
@@ -106,6 +110,14 @@ abstract class Field<T> extends Imported {
 
     void setBehavior(ObjectNode behavior) {
         this.behavior = behavior
+    }
+
+    FieldLayout getLayout() {
+        return layout
+    }
+
+    void setLayout(FieldLayout layout) {
+        this.layout = layout
     }
 
     T getValue() {

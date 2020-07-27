@@ -1,6 +1,5 @@
 package com.netgrif.workflow.startup
 
-
 import com.netgrif.workflow.petrinet.service.PetriNetService
 import com.netgrif.workflow.workflow.domain.repositories.CaseRepository
 import org.slf4j.Logger
