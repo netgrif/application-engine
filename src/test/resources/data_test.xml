@@ -2,15 +2,23 @@
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xsi:noNamespaceSchemaLocation="../../main/resources/petriNets/petriflow_schema.xsd">
     <id>1</id>
+    <initials>TES</initials>
+    <title>Data test</title>
     <defaultRole>true</defaultRole>
     <!-- NUMBER -->
     <data type="number">
         <id>number</id>
         <title>Number</title>
-        <init>10</init>
-        <desc>Number field description</desc>
         <placeholder>Number field placeholder</placeholder>
+        <desc>Number field description</desc>
+        <init>10</init>
         <valid>inrange 0,inf</valid>
+        <validations>
+            <validation>
+                <expression>inrange 0,inf</expression>
+                <message>Number field validation message</message>
+            </validation>
+        </validations>
     </data>
     <!-- TEXT -->
     <data type="text">
@@ -20,6 +28,12 @@
         <desc>Text field description</desc>
         <placeholder>Text field placeholder</placeholder>
         <valid>email</valid>
+        <validations>
+            <validation>
+                <expression>email</expression>
+                <message>Mail validation message</message>
+            </validation>
+        </validations>
     </data>
     <!-- ENUMERATION -->
     <data type="enumeration">
@@ -50,6 +64,13 @@
         <init>true</init>
         <desc>Boolean field description</desc>
         <placeholder>Boolean field placeholder</placeholder>
+        <valid>requiredTrue</valid>
+        <validations>
+            <validation>
+                <expression>requiredTrue</expression>
+                <message>Boolean field validation message</message>
+            </validation>
+        </validations>
     </data>
     <!-- DATE -->
     <data type="date">
@@ -58,6 +79,16 @@
         <desc>Date field description</desc>
         <placeholder>Date field placeholder</placeholder>
         <valid>between today,future</valid>
+        <validations>
+            <validation>
+                <expression>between today,future</expression>
+                <message>Date field validation message</message>
+            </validation>
+            <validation>
+                <expression>between today,future</expression>
+                <message>Date field validation message 2</message>
+            </validation>
+        </validations>
     </data>
     <!-- FILE -->
     <data type="file">
@@ -81,6 +112,17 @@
         <title>DateTime</title>
         <desc>DateTime field description</desc>
         <placeholder>DateTime field placeholder</placeholder>
+        <valid>between today,future</valid>
+        <validations>
+            <validation>
+                <expression>between today,future</expression>
+                <message>Date field validation message</message>
+            </validation>
+            <validation>
+                <expression>between today,future</expression>
+                <message>Date field validation message 2</message>
+            </validation>
+        </validations>
     </data>
     <transition>
         <id>1</id>
