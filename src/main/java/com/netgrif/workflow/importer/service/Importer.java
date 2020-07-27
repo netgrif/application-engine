@@ -99,10 +99,6 @@ public class Importer {
     @Autowired
     private FileStorageConfiguration fileStorageConfiguration;
 
-    @Qualifier("webApplicationContext")
-    @Autowired
-    private ResourceLoader resourceLoader;
-
     @Transactional
     public Optional<PetriNet> importPetriNet(InputStream xml, Config config) throws MissingPetriNetMetaDataException {
         try {
@@ -154,14 +150,6 @@ public class Importer {
 
         Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
         document = (Document) jaxbUnmarshaller.unmarshal(xml);
-    }
-
-    @Transactional
-    protected Unmarshaller schemaValidation(Unmarshaller unmarshaller) throws IOException, SAXException {
-        SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-        Schema petriflowSchema = sf.newSchema(resourceLoader.getResource("classpath:petriNets/petriflow_schema.xsd").getFile());
-        unmarshaller.setSchema(petriflowSchema);
-        return unmarshaller;
     }
 
     @Transactional
