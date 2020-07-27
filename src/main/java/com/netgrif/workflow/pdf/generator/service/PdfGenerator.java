@@ -1,7 +1,6 @@
 package com.netgrif.workflow.pdf.generator.service;
 
 import com.netgrif.workflow.pdf.generator.config.PdfResources;
-import com.netgrif.workflow.pdf.generator.domain.DrawableElement;
 import com.netgrif.workflow.pdf.generator.domain.PdfField;
 import com.netgrif.workflow.pdf.generator.service.interfaces.IDataConverter;
 import com.netgrif.workflow.pdf.generator.service.interfaces.IPdfDrawer;
@@ -11,8 +10,11 @@ import com.netgrif.workflow.workflow.domain.Case;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.font.PDType0Font;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ResourceUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -24,6 +26,8 @@ import java.util.List;
  * */
 @Service
 public class PdfGenerator extends PdfResources implements IPdfGenerator {
+
+    public static Logger log = LoggerFactory.getLogger(PdfGenerator.class);
 
     private PDDocument pdf;
 
@@ -38,6 +42,8 @@ public class PdfGenerator extends PdfResources implements IPdfGenerator {
      * @throws IOException I/O exception handling for operations with files
      */
     private void constructPdfGenerator() throws IOException {
+        log.info("Setting up PDF generator.");
+
         this.pdf = new PDDocument();
 
         File fontTitleFile = fontTitleResource.getFile();
@@ -84,10 +90,10 @@ public class PdfGenerator extends PdfResources implements IPdfGenerator {
         pdfDrawer.newPage();
         drawTransitionForm(dataHelper);
         pdfDrawer.closeContentStream();
-        if (pdf == null)
-            throw new IllegalArgumentException("[$pdf] is null  ");
         pdf.save(out);
         pdf.close();
+
+        log.info("PDF is generated from transition.");
         return out;
     }
 
@@ -96,6 +102,8 @@ public class PdfGenerator extends PdfResources implements IPdfGenerator {
      * functions
      * */
     void drawTransitionForm(IDataConverter dataHelper) throws IOException {
+        log.info("Drawing form to PDF.");
+
         int fieldX, fieldY, fieldWidth, fieldHeight;
         String label;
         FieldType type;
@@ -117,15 +125,15 @@ public class PdfGenerator extends PdfResources implements IPdfGenerator {
                 pdfDrawer.drawTitle(label, pdfField.getX(), pdfField.getBottomY(),fieldWidth);
             }else if(!pdfField.isDgField()) {
                 switch (pdfField.getType()) {
-                    case TEXT:
-                    case NUMBER:
-                    case DATE:
-                    case DATETIME:
-                        pdfDrawer.drawTextField(label, values, fieldX, fieldY, fieldWidth, fieldHeight);
-                        break;
                     case MULTICHOICE:
                     case ENUMERATION:
                         pdfDrawer.drawSelectionField(label, choices, values, fieldX, fieldY, fieldWidth, fieldHeight, type);
+                        break;
+                    case BOOLEAN:
+                        pdfDrawer.drawBooleanField(label, values, fieldX, fieldY, fieldWidth, fieldHeight);
+                        break;
+                    default:
+                        pdfDrawer.drawTextField(label, values, fieldX, fieldY, fieldWidth, fieldHeight);
                         break;
                 }
             }else{

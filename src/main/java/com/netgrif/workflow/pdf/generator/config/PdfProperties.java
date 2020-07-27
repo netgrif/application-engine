@@ -26,8 +26,6 @@ public abstract class PdfProperties {
 
    public static int PADDING = 4;
 
-   public static int SELECTION_BOX_PADDING = 1;
-
    public static int PAGE_DRAWABLE_WIDTH = PAGE_WIDTH - MARGIN_LEFT - MARGIN_RIGHT;
 
    public static int FONT_TITLE_SIZE = 13;
