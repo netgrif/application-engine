@@ -10,10 +10,14 @@ import com.netgrif.workflow.workflow.domain.DataField;
 import com.netgrif.workflow.workflow.web.responsebodies.LocalisedEnumerationField;
 import com.netgrif.workflow.workflow.web.responsebodies.LocalisedField;
 import com.netgrif.workflow.workflow.web.responsebodies.LocalisedMultichoiceField;
+import groovy.util.logging.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.stereotype.Service;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -21,6 +25,8 @@ import java.util.*;
  */
 @Service
 public class DataConverter extends PdfProperties implements IDataConverter {
+
+    public static final Logger log = LoggerFactory.getLogger(DataConverter.class);
 
     @Getter
     @Setter
@@ -44,6 +50,8 @@ public class DataConverter extends PdfProperties implements IDataConverter {
      */
     @Override
     public void generateTitleField(String title){
+        log.info("Setting title field for PDF");
+
         BASE_Y = PAGE_HEIGHT - MARGIN_TOP;
         pdfFields = new ArrayList<>();
         changedPdfFields = new Stack<>();
@@ -65,21 +73,27 @@ public class DataConverter extends PdfProperties implements IDataConverter {
      */
     @Override
     public void generatePdfFields(){
+        log.info("Generating PDF fields from data fields.");
+
         lastX = Integer.MAX_VALUE;
         lastY = 0;
-        for(Map.Entry<String,DataGroup> entry : dataGroups.entrySet()) {
-            for(LocalisedField field : entry.getValue().getFields().getContent()) {
+        dataGroups.forEach((dataGroupId, dataGroup) ->
+            dataGroup.getFields().getContent().forEach(field -> {
                 if(field.getBehavior().get("hidden") == null) {
-                    if(field.getType().equals(FieldType.ENUMERATION)){
-                        pdfFields.add(createEnumField(entry.getValue(), (LocalisedEnumerationField) field));
-                    }else if(field.getType().equals(FieldType.MULTICHOICE)){
-                        pdfFields.add(createMultiChoiceField(entry.getValue(), (LocalisedMultichoiceField) field));
-                    }else{
-                        pdfFields.add(createPdfField(entry.getValue(), field));
+                    switch (field.getType()){
+                        case ENUMERATION:
+                            pdfFields.add(createEnumField(dataGroup, (LocalisedEnumerationField) field));
+                            break;
+                        case MULTICHOICE:
+                            pdfFields.add(createMultiChoiceField(dataGroup, (LocalisedMultichoiceField) field));
+                            break;
+                        default:
+                            pdfFields.add(createPdfTextField(dataGroup, field));
+                            break;
                     }
                 }
             }
-        }
+        ));
         Collections.sort(pdfFields);
     }
 
@@ -88,15 +102,17 @@ public class DataConverter extends PdfProperties implements IDataConverter {
      */
     @Override
     public void generatePdfDataGroups(){
-        DataGroup currentDg = null;
+        log.info("Generating PDF field from data group titles.");
+
         List<PdfField> dgFields = new ArrayList<>();
-        for(PdfField pdfField : pdfFields){
-            if(pdfField.getDataGroup() != null && pdfField.getDataGroup().getTitle() != null && pdfField.getDataGroup() != currentDg){
+        pdfFields.forEach(pdfField -> {
+            DataGroup currentDg = null;
+            if (pdfField.getDataGroup() != null && pdfField.getDataGroup().getTitle() != null && pdfField.getDataGroup() != currentDg) {
                 currentDg = pdfField.getDataGroup();
                 PdfField dgField = createPdfDgField(currentDg, pdfField);
                 dgFields.add(dgField);
             }
-        }
+        });
         pdfFields.addAll(dgFields);
         Collections.sort(pdfFields);
     }
@@ -107,9 +123,19 @@ public class DataConverter extends PdfProperties implements IDataConverter {
      * @param field field that is currently converted to PdfField
      * @return newly created PdfField object
      */
-    private PdfField createPdfField(DataGroup dataGroup, LocalisedField field){
+    private PdfField createPdfTextField(DataGroup dataGroup, LocalisedField field){
         List<String> value = new ArrayList<>();
-        value.add(dataSet.get(field.getStringId()).getValue() != null ? dataSet.get(field.getStringId()).getValue().toString() : "");
+
+        switch (field.getType()){
+            case DATE:
+            case DATETIME:
+                value.add(formatDateTime(field));
+                break;
+            default:
+                value.add(dataSet.get(field.getStringId()).getValue() != null ? dataSet.get(field.getStringId()).getValue().toString() : "");
+                break;
+        }
+
         PdfField pdfField = new PdfField(field.getStringId(), dataGroup, field.getType(), field.getName(), value, null);
         setFieldParams(dataGroup, field, pdfField);
         setFieldPositions(pdfField, FONT_LABEL_SIZE);
@@ -190,12 +216,13 @@ public class DataConverter extends PdfProperties implements IDataConverter {
      * correctly
      */
     public void correctFieldsPosition(){
-        for(PdfField pdfField : pdfFields){
+        pdfFields.forEach(pdfField -> {
             if(pdfField.isChangedSize()) {
                 pdfField.setBottomY(countBottomPosY(pdfField));
                 changedPdfFields.push(pdfField);
             }
-        }
+        });
+
         while(!changedPdfFields.empty()){
             PdfField pdfField = changedPdfFields.pop();
             if(pdfField.isChangedSize()){
@@ -213,9 +240,8 @@ public class DataConverter extends PdfProperties implements IDataConverter {
      * @param currentField FieldParam object
      */
     private void shiftFieldsBelow(PdfField currentField){
-        int belowTopY, cFieldBottomY;
-
-        for(PdfField fieldBelow : pdfFields){
+        pdfFields.forEach(fieldBelow -> {
+            int belowTopY, cFieldBottomY;
             if(!currentField.equals(fieldBelow)) {
                 belowTopY = fieldBelow.getTopY();
                 cFieldBottomY = currentField.getBottomY();
@@ -223,7 +249,7 @@ public class DataConverter extends PdfProperties implements IDataConverter {
                     setNewPositions(belowTopY, cFieldBottomY, fieldBelow);
                 }
             }
-        }
+        });
     }
 
     private void setNewPositions( int belowTopY, int cFieldBottomY, PdfField fieldBelow) {
@@ -362,6 +388,14 @@ public class DataConverter extends PdfProperties implements IDataConverter {
             return field.getLayout().getRows() * FORM_GRID_ROW_HEIGHT - PADDING;
         }else{
             return FORM_GRID_ROW_HEIGHT - PADDING;
+        }
+    }
+
+    private String formatDateTime(LocalisedField field){
+        if(dataSet.get(field.getStringId()).getValue() != null) {
+            return new SimpleDateFormat("dd-MM-yyyy").format(dataSet.get(field.getStringId()).getValue());
+        }else{
+            return "";
         }
     }
 }
