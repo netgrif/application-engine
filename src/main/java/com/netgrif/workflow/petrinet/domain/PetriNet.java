@@ -94,6 +94,9 @@ public class PetriNet extends PetriNetObject {
         this._id = new ObjectId();
         this.identifier = "Default";
         this.version = "1.0.0";
+        this.initials = "";
+        this.title = new I18nString("");
+        this.importId = "";
         defaultCaseName = new I18nString("");
         initialized = false;
         creationDate = LocalDateTime.now();
@@ -103,13 +106,6 @@ public class PetriNet extends PetriNetObject {
         dataSet = new LinkedHashMap<>();
         roles = new HashMap<>();
         transactions = new LinkedHashMap<>();
-    }
-
-    public PetriNet(String identifier, String title, String initials) {
-        this();
-        this.identifier = identifier;
-        setTitle(title);
-        this.initials = initials;
     }
 
     public void addPlace(Place place) {

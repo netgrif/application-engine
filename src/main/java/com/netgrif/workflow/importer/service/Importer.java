@@ -11,27 +11,38 @@ import com.netgrif.workflow.petrinet.domain.*;
 import com.netgrif.workflow.petrinet.domain.arcs.Arc;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.FieldBehavior;
+import com.netgrif.workflow.petrinet.domain.dataset.logic.FieldLayout;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.FieldActionsRunner;
+import com.netgrif.workflow.petrinet.domain.layout.DataGroupLayout;
+import com.netgrif.workflow.petrinet.domain.layout.TaskLayout;
 import com.netgrif.workflow.petrinet.domain.policies.AssignPolicy;
 import com.netgrif.workflow.petrinet.domain.policies.DataFocusPolicy;
 import com.netgrif.workflow.petrinet.domain.policies.FinishPolicy;
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRole;
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRoleRepository;
 import com.netgrif.workflow.petrinet.domain.roles.RolePermission;
+import com.netgrif.workflow.petrinet.domain.throwable.MissingPetriNetMetaDataException;
 import com.netgrif.workflow.petrinet.service.ArcFactory;
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
+import com.netgrif.workflow.workflow.domain.FileStorageConfiguration;
 import com.netgrif.workflow.workflow.domain.triggers.Trigger;
 import lombok.Getter;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.transaction.annotation.Transactional;
+import org.xml.sax.SAXException;
 
+import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
 import java.io.*;
 import java.nio.file.Path;
 import java.util.*;
@@ -42,7 +53,6 @@ public class Importer {
 
     public static final Logger log = LoggerFactory.getLogger(Importer.class);
 
-    public static final String ARCHIVED_FILES_PATH = "storage/uploadedModels/";
     public static final String FILE_EXTENSION = ".xml";
 
     public static final String FIELD_KEYWORD = "f";
@@ -86,12 +96,15 @@ public class Importer {
     @Autowired
     private FieldActionsRunner actionsRunner;
 
+    @Autowired
+    private FileStorageConfiguration fileStorageConfiguration;
+
     @Transactional
-    public Optional<PetriNet> importPetriNet(InputStream xml, String title, String initials, Config config) {
+    public Optional<PetriNet> importPetriNet(InputStream xml, Config config) throws MissingPetriNetMetaDataException {
         try {
             initialize(config);
             unmarshallXml(xml);
-            return createPetriNet(title, initials);
+            return createPetriNet();
         } catch (JAXBException e) {
             log.error("Importing Petri net failed: ", e);
         }
@@ -99,9 +112,9 @@ public class Importer {
     }
 
     @Transactional
-    public Optional<PetriNet> importPetriNet(File xml, String title, String initials, Config config) {
+    public Optional<PetriNet> importPetriNet(File xml, Config config) throws MissingPetriNetMetaDataException {
         try {
-            return importPetriNet(new FileInputStream(xml), title, initials, config);
+            return importPetriNet(new FileInputStream(xml), config);
         } catch (FileNotFoundException e) {
             log.error("Importing Petri net failed: ", e);
         }
@@ -109,13 +122,13 @@ public class Importer {
     }
 
     @Transactional
-    public Optional<PetriNet> importPetriNet(InputStream xml, String title, String initials) {
-        return importPetriNet(xml, title, initials, new Config());
+    public Optional<PetriNet> importPetriNet(InputStream xml) throws MissingPetriNetMetaDataException {
+        return importPetriNet(xml, new Config());
     }
 
     @Transactional
-    public Optional<PetriNet> importPetriNet(File xml, String title, String initials) {
-        return importPetriNet(xml, title, initials, new Config());
+    public Optional<PetriNet> importPetriNet(File xml) throws MissingPetriNetMetaDataException {
+        return importPetriNet(xml, new Config());
     }
 
     private void initialize(Config config) {
@@ -141,7 +154,7 @@ public class Importer {
 
     @Transactional
     public Path saveNetFile(PetriNet net, InputStream xmlFile) throws IOException {
-        File savedFile = new File(ARCHIVED_FILES_PATH + net.getStringId() + "-" + net.getTitle() + FILE_EXTENSION);
+        File savedFile = new File(fileStorageConfiguration.getStorageArchived() + net.getStringId() + "-" + net.getTitle() + FILE_EXTENSION);
         savedFile.getParentFile().mkdirs();
         net.setImportXmlPath(savedFile.getPath());
         copyInputStreamToFile(xmlFile, savedFile);
@@ -149,9 +162,10 @@ public class Importer {
     }
 
     @Transactional
-    protected Optional<PetriNet> createPetriNet(String title, String initials) {
+    protected Optional<PetriNet> createPetriNet() throws MissingPetriNetMetaDataException {
         net = new PetriNet();
-        net.setImportId(document.getId() != null ? document.getId() : new ObjectId().toString());
+
+        setMetaData();
         net.setIcon(document.getIcon());
 
         document.getI18N().forEach(this::addI18N);
@@ -167,16 +181,9 @@ public class Importer {
         actionRefs.forEach(this::resolveActionRefs);
         actions.forEach(this::evaluateActions);
 
-        net.setTitle(title != null ? new I18nString(title) : toI18NString(document.getTitle()));
-        net.setInitials(initials != null ? initials : document.getInitials());
         net.setDefaultCaseName(toI18NString(document.getCaseName()));
-        net.setIdentifier(document.getId());
 
-        if (config.isNotSaveObjects()) {
-            return service.saveNew(net);
-        } else {
-            return Optional.of(net);
-        }
+        return Optional.of(net);
     }
 
     @Transactional
@@ -184,7 +191,7 @@ public class Importer {
         try {
             actionsRunner.getActionCode(action);
         } catch (Exception e) {
-            throw new IllegalArgumentException("Could not evaluate action[" + action.getImportId() + "]: \n " + action.getDefinition());
+            throw new IllegalArgumentException("Could not evaluate action[" + action.getImportId() + "]: \n " + action.getDefinition(), e);
         }
     }
 
@@ -303,6 +310,11 @@ public class Importer {
         transition.setImportId(importTransition.getId());
         transition.setTitle(toI18NString(importTransition.getLabel()));
         transition.setPosition(importTransition.getX(), importTransition.getY());
+
+        if (importTransition.getCols() != null || importTransition.getRows() != null) {
+            transition.setLayout(new TaskLayout(importTransition.getRows(), importTransition.getCols()));
+        }
+
         transition.setPriority(importTransition.getPriority());
         transition.setIcon(importTransition.getIcon());
         transition.setAssignPolicy(toAssignPolicy(importTransition.getAssignPolicy()));
@@ -402,12 +414,16 @@ public class Importer {
     protected void addDataWithDefaultGroup(Transition transition, DataRef dataRef) {
         DataGroup dataGroup = new DataGroup();
         dataGroup.setImportId(transition.getImportId() + "_" + dataRef.getId() + "_" + System.currentTimeMillis());
+        if (transition.getLayout() != null && transition.getLayout().getCols() != null) {
+            dataGroup.setLayout(new DataGroupLayout(null, transition.getLayout().getCols()));
+        }
         dataGroup.setAlignment("start");
         dataGroup.setStretch(true);
         dataGroup.addData(getField(dataRef.getId()).getStringId());
         transition.addDataGroup(dataGroup);
 
         addDataLogic(transition, dataRef);
+        addDataLayout(transition, dataRef);
     }
 
     @Transactional
@@ -415,6 +431,16 @@ public class Importer {
         String alignment = importDataGroup.getAlignment() != null ? importDataGroup.getAlignment().value() : "";
         DataGroup dataGroup = new DataGroup();
         dataGroup.setImportId(importDataGroup.getId());
+
+        if (importDataGroup.getCols() != null || importDataGroup.getRows() != null) {
+            dataGroup.setLayout(new DataGroupLayout(importDataGroup.getRows(), importDataGroup.getCols()));
+        }
+        if (importDataGroup.getCols() == null && (transition.getLayout() != null && transition.getLayout().getCols() != null)) {
+            dataGroup.setLayout(dataGroup.getLayout() != null ?
+                    new DataGroupLayout(dataGroup.getLayout().getRows(),transition.getLayout().getCols()) :
+                    new DataGroupLayout(null, transition.getLayout().getCols()));
+        }
+
         dataGroup.setTitle(toI18NString(importDataGroup.getTitle()));
         dataGroup.setAlignment(alignment);
         dataGroup.setStretch(importDataGroup.isStretch());
@@ -423,6 +449,7 @@ public class Importer {
 
         for (DataRef dataRef : importDataGroup.getDataRef()) {
             addDataLogic(transition, dataRef);
+            addDataLayout(transition, dataRef);
         }
     }
 
@@ -461,7 +488,28 @@ public class Importer {
                 logic.getBehavior().forEach(b -> behavior.add(FieldBehavior.fromString(b)));
             }
 
-            transition.addDataSet(fieldId, behavior, null);
+            transition.addDataSet(fieldId, behavior, null, null);
+        } catch (NullPointerException e) {
+            throw new IllegalArgumentException("Wrong dataRef id [" + dataRef.getId() + "] on transition [" + transition.getTitle() + "]", e);
+        }
+    }
+
+    @Transactional
+    protected void addDataLayout(Transition transition, DataRef dataRef) {
+        Layout layout = dataRef.getLayout();
+        try {
+            String fieldId = getField(dataRef.getId()).getStringId();
+            if (layout == null || fieldId == null) {
+                return;
+            }
+
+            String appearance = "standard";
+            if (layout.getAppearance() != null) {
+                appearance = layout.getAppearance().toString();
+            }
+
+            FieldLayout fieldLayout = new FieldLayout(layout.getX(), layout.getY(), layout.getRows(), layout.getCols(), layout.getTemplate().toString(), appearance);
+            transition.addDataSet(fieldId, null, null, fieldLayout);
         } catch (NullPointerException e) {
             throw new IllegalArgumentException("Wrong dataRef id [" + dataRef.getId() + "] on transition [" + transition.getTitle() + "]", e);
         }
@@ -771,5 +819,27 @@ public class Importer {
                 outputStream.write(bytes, 0, read);
             }
         }
+    }
+
+    private void setMetaData() throws MissingPetriNetMetaDataException {
+        List<String> missingMetaData = new ArrayList<>();
+        if (document.getId() != null) {
+            net.setImportId(document.getId());
+            net.setIdentifier(document.getId());
+        } else {
+            missingMetaData.add("<id>");
+        }
+        if (document.getTitle() != null) {
+            net.setTitle(toI18NString(document.getTitle()));
+        } else {
+            missingMetaData.add("<title>");
+        }
+        if (document.getInitials() != null) {
+            net.setInitials(document.getInitials());
+        } else {
+            missingMetaData.add("<initials>");
+        }
+        if (!missingMetaData.isEmpty())
+            throw new MissingPetriNetMetaDataException(missingMetaData);
     }
 }
