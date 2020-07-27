@@ -123,7 +123,7 @@ public class PdfDrawer extends PdfResources implements IPdfDrawer {
     /**
      * Draws a text, text area, number, date and datetime fields
      * @param label label of field
-     * @param value list of values of field
+     * @param values list of values of field
      * @param fieldX X position of field
      * @param fieldY Y position of field
      * @param fieldWidth width of field in PDF
@@ -131,9 +131,25 @@ public class PdfDrawer extends PdfResources implements IPdfDrawer {
      * @throws IOException I/O exception handling for operations with files
      */
     @Override
-    public void drawTextField(String label, List<String> value, int fieldX, int fieldY, int fieldWidth, int fieldHeight) throws IOException {
+    public void drawTextField(String label, List<String> values, int fieldX, int fieldY, int fieldWidth, int fieldHeight) throws IOException {
         int lineCounter = drawLabel(label, fieldX, fieldY, fieldWidth, fieldHeight, labelFont, FONT_LABEL_SIZE);
-        drawTextValue(value, fieldX, fieldY, fieldWidth, fieldHeight, lineCounter);
+        drawTextValue(values, fieldX, fieldY, fieldWidth, fieldHeight, lineCounter);
+    }
+
+    /**
+     * Draws a boolean field
+     * @param label label of field
+     * @param values list of values of field
+     * @param fieldX X position of field
+     * @param fieldY Y position of field
+     * @param fieldWidth width of field in PDF
+     * @param fieldHeight height of field in PDF
+     * @throws IOException I/O exception handling for operations with files
+     */
+    @Override
+    public void drawBooleanField(String label, List<String> values, int fieldX, int fieldY, int fieldWidth, int fieldHeight) throws IOException {
+        int lineCounter = drawLabel(label, fieldX, fieldY, fieldWidth, fieldHeight, labelFont, FONT_LABEL_SIZE);
+        drawBooleanValue(values, fieldX, fieldY, fieldWidth, fieldHeight, lineCounter);
     }
 
     /**
@@ -173,14 +189,13 @@ public class PdfDrawer extends PdfResources implements IPdfDrawer {
         int maxLineSize = getMaxLabelLineSize(fieldWidth, fontSize);
         List<String> multiLineText = new ArrayList<String>(){{add(text);}};
         int lineCounter = 1;
-        int x, y;
+        int x = fieldX + PADDING, y;
 
         if(textWidth > fieldWidth - PADDING){
             multiLineText = DataConverter.generateMultiLineText(Collections.singletonList(text), maxLineSize);
         }
 
         for(String line : multiLineText){
-            x = fieldX + PADDING;
             y = fieldY + fieldHeight - LINE_HEIGHT * lineCounter;
             if(y < MARGIN_BOTTOM + LINE_HEIGHT) {
                 fieldHeight -= LINE_HEIGHT * (lineCounter - 1);
@@ -213,7 +228,7 @@ public class PdfDrawer extends PdfResources implements IPdfDrawer {
         float textWidth = getTextWidth(values, valueFont, FONT_VALUE_SIZE);
         int maxLineSize = getMaxValueLineSize(fieldWidth - 3 * PADDING);
         List<String> multiLineText = values;
-        int x, y = fieldY + fieldHeight - LINE_HEIGHT * lineCounter;
+        int x = fieldX + PADDING, y = fieldY + fieldHeight - LINE_HEIGHT * lineCounter;
         int strokeLineCounter = 0;
         lineCounter--;
 
@@ -234,13 +249,34 @@ public class PdfDrawer extends PdfResources implements IPdfDrawer {
                     y = fieldY + fieldHeight - LINE_HEIGHT * lineCounter;
                 }
             }
-            x = fieldX + 3 * PADDING;
             y = fieldY + fieldHeight - LINE_HEIGHT * lineCounter;
             strokeLineCounter++;
             sendStringToContentStream(valueFont, FONT_VALUE_SIZE, x, y, line);
         }
         drawStroke(fieldX, y, fieldY, fieldWidth, strokeLineCounter);
         checkOpenPages();
+    }
+
+    private void drawBooleanValue(List<String> values, int fieldX, int fieldY, int fieldWidth, int fieldHeight, int lineCounter) throws IOException {
+        int x = fieldX + PADDING, y = fieldY + fieldHeight - LINE_HEIGHT * lineCounter;
+        lineCounter--;
+
+        if(y < MARGIN_BOTTOM){
+            fieldHeight -= LINE_HEIGHT * (lineCounter);
+            lineCounter = 1;
+            while (y < MARGIN_BOTTOM) {
+                newPage();
+                fieldY = fieldY + PAGE_HEIGHT - MARGIN_TOP - MARGIN_BOTTOM - LINE_HEIGHT;
+                y = fieldY + fieldHeight - LINE_HEIGHT * lineCounter;
+            }
+        }
+        drawStroke(fieldX, y, fieldY, fieldWidth, 1);
+
+        if(values.get(0).equals("true")){
+            contentStream.drawImage(checkboxChecked, x, y, FONT_LABEL_SIZE, FONT_LABEL_SIZE);
+        }else{
+            contentStream.drawImage(checkboxUnchecked, x, y, FONT_LABEL_SIZE, FONT_LABEL_SIZE);
+        }
     }
 
     /**
@@ -259,8 +295,7 @@ public class PdfDrawer extends PdfResources implements IPdfDrawer {
     private void drawChoiceValue(List<String> choices, List<String> values, int fieldX, int fieldY, int fieldWidth, int fieldHeight, FieldType type, int lineCounter) throws IOException {
         int maxLineSize = getMaxValueLineSize(fieldWidth - 3 * PADDING);
         List<String> multiLineText;
-        int x, y = fieldY + fieldHeight - LINE_HEIGHT * (lineCounter);
-        int strokeLineCounter = 0;
+        int x = fieldX + 4 * PADDING, y = fieldY + fieldHeight - LINE_HEIGHT * (lineCounter);
         lineCounter--;
 
         for(String choice : choices) {
@@ -268,33 +303,28 @@ public class PdfDrawer extends PdfResources implements IPdfDrawer {
             float textWidth = getTextWidth(Collections.singletonList(choice), valueFont, FONT_VALUE_SIZE);
             multiLineText = new ArrayList<String>(){{add(choice);}};
 
-            if (textWidth > fieldWidth - 3 * PADDING) {
+            if (textWidth > fieldWidth - 4 * PADDING) {
                 multiLineText = DataConverter.generateMultiLineText(Collections.singletonList(choice), maxLineSize);
             }
 
             for (String line : multiLineText) {
                 lineCounter++;
                 if (y < MARGIN_BOTTOM) {
-                    drawStroke(fieldX, y, fieldY, fieldWidth, strokeLineCounter);
                     fieldHeight -= LINE_HEIGHT * (lineCounter - 1);
                     lineCounter = 1;
-                    strokeLineCounter = 0;
                     while (y < MARGIN_BOTTOM) {
                         newPage();
                         fieldY = fieldY + PAGE_HEIGHT - MARGIN_TOP - MARGIN_BOTTOM - LINE_HEIGHT;
                         y = fieldY + fieldHeight - LINE_HEIGHT * lineCounter;
                     }
                 }
-                x = fieldX + 3 * PADDING;
                 y = fieldY + fieldHeight - LINE_HEIGHT * (lineCounter);
-                strokeLineCounter++;
                 sendStringToContentStream(valueFont, FONT_VALUE_SIZE, x, y, line);
                 if(!buttonDrawn) {
-                    buttonDrawn = drawSelectionButtons(values, choice, fieldX - SELECTION_BOX_PADDING, y, type);
+                    buttonDrawn = drawSelectionButtons(values, choice, fieldX + PADDING, y, type);
                 }
             }
         }
-        drawStroke(fieldX, y, fieldY, fieldWidth, strokeLineCounter);
         checkOpenPages();
     }
 
