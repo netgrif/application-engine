@@ -6,8 +6,6 @@ import com.netgrif.workflow.pdf.generator.service.PdfDrawer;
 import com.netgrif.workflow.petrinet.domain.DataGroup;
 import com.netgrif.workflow.petrinet.domain.dataset.FieldType;
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
 
 import java.util.Collections;
 import java.util.List;
@@ -22,19 +20,19 @@ public class PdfField extends PdfProperties implements Comparable<PdfField>{
 
     private DataGroup dataGroup = null;
 
-    public FieldType type = null;
+    private FieldType type = null;
 
-    public String label;
+    private String label;
 
-    public List<String> values = null;
+    private List<String> values = null;
 
-    public List<String> choices = null;
+    private List<String> choices = null;
 
     private int layoutX;
 
     private int layoutY;
 
-    public int x;
+    private int x;
 
     private int originalTopY;
 
@@ -42,11 +40,11 @@ public class PdfField extends PdfProperties implements Comparable<PdfField>{
 
     private Integer originalBottomY;
 
-    public int bottomY;
+    private int bottomY;
 
-    public int width;
+    private int width;
 
-    public int height;
+    private int height;
 
     private boolean changedSize = false;
 
