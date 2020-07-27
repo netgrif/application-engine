@@ -5,6 +5,7 @@ import com.netgrif.workflow.pdf.generator.service.DataConverter;
 import com.netgrif.workflow.pdf.generator.service.PdfDrawer;
 import com.netgrif.workflow.petrinet.domain.DataGroup;
 import com.netgrif.workflow.petrinet.domain.dataset.FieldType;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -14,78 +15,43 @@ import java.util.List;
 /**
  * Class that holds information about fields that will be exported to PDF
  * */
+@Data
 public class PdfField extends PdfProperties implements Comparable<PdfField>{
 
-    @Getter
-    @Setter
     private String fieldId;
 
-    @Getter
-    @Setter
     private DataGroup dataGroup = null;
 
-    @Getter
-    @Setter
-    private FieldType type = null;
+    public FieldType type = null;
 
-    @Getter
-    @Setter
-    private String label;
+    public String label;
 
-    @Getter
-    @Setter
-    private List<String> values = null;
+    public List<String> values = null;
 
-    @Getter
-    @Setter
-    private List<String> choices = null;
+    public List<String> choices = null;
 
-    @Getter
-    @Setter
     private int layoutX;
 
-    @Getter
-    @Setter
     private int layoutY;
 
-    @Getter
-    @Setter
-    int x;
+    public int x;
 
-    @Getter
-    @Setter
-    int originalTopY;
+    private int originalTopY;
 
-    @Getter
-    @Setter
-    int topY;
+    private int topY;
 
-    @Getter
-    @Setter
-    Integer originalBottomY;
+    private Integer originalBottomY;
 
-    @Getter
-    @Setter
-    int bottomY;
+    public int bottomY;
 
-    @Getter
-    @Setter
-    private int width;
+    public int width;
 
-    @Getter
-    @Setter
-    private int height;
+    public int height;
 
-    @Getter
-    @Setter
     private boolean changedSize = false;
 
-    @Getter
-    @Setter
     private boolean changedPosition = false;
 
-    @Getter
-    @Setter
     private boolean dgField;
 
     public PdfField(String fieldId, DataGroup dataGroup, FieldType type, String label, List<String> values, List<String> choices){
