@@ -251,7 +251,7 @@ public class DataService implements IDataService {
         int maxRows = 0;
         for (DataGroup dataGroup : taskRefDataGroups) {
             for (LocalisedField localisedField : dataGroup.getFields().getContent()) {
-                if (localisedField.getLayout() == null) {
+                if (localisedField.getLayout() == null || taskRefField.getLayout() == null) {
                     return;
                 }
                 localisedField.getLayout().setY(taskRefField.getLayout().getY() + localisedField.getLayout().getY() + maxWrapping);
