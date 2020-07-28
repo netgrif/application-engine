@@ -3,7 +3,10 @@
     <id>address</id>
     <initials>ADD</initials>
     <title>Address</title>
-
+    <data type="text">
+        <id>requestID</id>
+        <title></title>
+    </data>
     <data type="text">
         <id>street</id>
         <title name="street_title">Street</title>
@@ -48,16 +51,20 @@
         <x>50</x>
         <y>50</y>
         <label name="address_and_mortgage">Address and type of mortgage</label>
-
-        <dataGroup>
-            <id>0</id>
-            <title name="address_and_mortgage">Address and type of mortgage</title>
             <dataRef>
                 <id>street</id>
                 <logic>
                     <behavior>editable</behavior>
                     <behavior>required</behavior>
                 </logic>
+                <layout>
+                    <x>0</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
             </dataRef>
             <dataRef>
                 <id>streetnumber</id>
@@ -65,6 +72,14 @@
                     <behavior>editable</behavior>
                     <behavior>required</behavior>
                 </logic>
+                <layout>
+                    <x>2</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
             </dataRef>
             <dataRef>
                 <id>postal</id>
@@ -79,12 +94,28 @@
                         }
                     </action>
                 </logic>
+                <layout>
+                    <x>0</x>
+                    <y>1</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
             </dataRef>
             <dataRef>
                 <id>city</id>
                 <logic>
                     <behavior>editable</behavior>
                 </logic>
+                <layout>
+                    <x>2</x>
+                    <y>1</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
             </dataRef>
             <dataRef>
                 <id>type</id>
@@ -92,8 +123,15 @@
                     <behavior>editable</behavior>
                     <behavior>required</behavior>
                 </logic>
+                <layout>
+                    <x>0</x>
+                    <y>2</y>
+                    <rows>1</rows>
+                    <cols>2</cols>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
             </dataRef>
-        </dataGroup>
 
     </transition>
 </document>
