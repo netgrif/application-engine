@@ -81,9 +81,7 @@ public class PdfGenerator implements IPdfGenerator {
         pdfDrawer.setupDrawer(pdf);
 
         try {
-            File output = new ClassPathResource(outputPath).getFile();
-            transformRequestToPdf(dataConverter, output);
-            return output;
+            return transformRequestToPdf(dataConverter);
         } catch (IOException e) {
             log.error("Error occured while converting form data to PDF", e);
         }
@@ -97,14 +95,17 @@ public class PdfGenerator implements IPdfGenerator {
      * @return PDF file generated from form
      * @throws IOException I/O exception handling for operations with files
      */
-    private void transformRequestToPdf(IDataConverter dataHelper, File output) throws IOException {
-        FileOutputStream stream = new FileOutputStream(output);
+    private File transformRequestToPdf(IDataConverter dataHelper) throws IOException {
         pdfDrawer.newPage();
         drawTransitionForm(dataHelper);
         pdfDrawer.closeContentStream();
+        File output = new ClassPathResource(outputPath).getFile();
+        FileOutputStream stream = new FileOutputStream(output);
         pdf.save(stream);
         pdf.close();
         log.info("PDF is generated from transition.");
+
+        return output;
     }
 
     /**
