@@ -13,6 +13,7 @@ import org.apache.pdfbox.pdmodel.font.PDType0Font;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -97,7 +98,7 @@ public class PdfGenerator implements IPdfGenerator {
      * @throws IOException I/O exception handling for operations with files
      */
     private File transformRequestToPdf(IDataConverter dataHelper) throws IOException {
-        File output = new File("src/main/resources/out.pdf");
+        File output = new ClassPathResource(outputPath).getFile();
         pdfDrawer.newPage();
         drawTransitionForm(dataHelper);
         pdfDrawer.closeContentStream();
