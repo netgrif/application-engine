@@ -11,7 +11,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.font.PDType0Font;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
-import org.jsoup.select.Evaluator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
@@ -91,21 +90,17 @@ public class PdfGenerator implements IPdfGenerator {
      * @param formCase     case that contains current transition
      * @param transitionId transition that form will be exported from
      * @param stream       output stream that the file is written to
-     * @return output PDF file
      * @throws IOException I/O exception handling for operations with files
      */
     @Override
-    public File convertCaseForm(Case formCase, String transitionId, OutputStream stream) throws IOException {
+    public void convertCaseForm(Case formCase, String transitionId, OutputStream stream) throws IOException {
         generateData(formCase, transitionId);
 
         try {
-            File output = new ClassPathResource(outputPath).getFile();
-            transformRequestToPdf(dataConverter, new FileOutputStream(output));
-            return output;
+            transformRequestToPdf(dataConverter, new FileOutputStream(outputPath));
         } catch (IOException e) {
             log.error("Error occured while converting form data to PDF", e);
         }
-        return null;
     }
 
     /**
