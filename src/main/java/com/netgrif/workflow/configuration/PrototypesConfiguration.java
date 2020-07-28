@@ -1,6 +1,12 @@
 package com.netgrif.workflow.configuration;
 
 import com.netgrif.workflow.importer.service.Importer;
+import com.netgrif.workflow.pdf.generator.service.DataConverter;
+import com.netgrif.workflow.pdf.generator.service.PdfDrawer;
+import com.netgrif.workflow.pdf.generator.service.PdfGenerator;
+import com.netgrif.workflow.pdf.generator.service.interfaces.IDataConverter;
+import com.netgrif.workflow.pdf.generator.service.interfaces.IPdfDrawer;
+import com.netgrif.workflow.pdf.generator.service.interfaces.IPdfGenerator;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.ActionDelegate;
 import com.netgrif.workflow.workflow.domain.FileStorageConfiguration;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
@@ -30,4 +36,16 @@ public class PrototypesConfiguration {
     public FileStorageConfiguration fileStorageConfiguration() {
         return new FileStorageConfiguration();
     }
+
+    @Bean("dataConverter")
+    @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
+    public IDataConverter dataConverter(){return new DataConverter();}
+
+    @Bean("pdfGenerator")
+    @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
+    public IPdfGenerator pdfGenerator(){return new PdfGenerator();}
+
+    @Bean("pdfDrawer")
+    @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
+    public IPdfDrawer pdfDrawer(){return new PdfDrawer();}
 }
