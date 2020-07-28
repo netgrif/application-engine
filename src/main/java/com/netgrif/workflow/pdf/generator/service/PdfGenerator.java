@@ -97,7 +97,7 @@ public class PdfGenerator implements IPdfGenerator {
         generateData(formCase, transitionId);
 
         try {
-            transformRequestToPdf(dataConverter, new FileOutputStream(outputPath));
+            transformRequestToPdf(dataConverter, stream);
         } catch (IOException e) {
             log.error("Error occured while converting form data to PDF", e);
         }
