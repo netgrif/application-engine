@@ -1,50 +1,54 @@
 package com.netgrif.workflow.pdf.generator.config;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.stereotype.Component;
 
-public abstract class PdfProperties {
+@ConfigurationProperties(prefix = "nae.pdf.properties")
+@Component
+@Data
+public class PdfProperties {
 
-   public static int PPI = 72;
+   protected int ppi = 72;
 
-   public PDRectangle pageSize = PDRectangle.A4;
+   protected PDRectangle pageSize = PDRectangle.A4;
 
-   public static int PAGE_WIDTH = 595;
+   protected int pageWidth = 595;
 
-   public static int PAGE_HEIGHT = 850;
+   protected int pageHeight = 850;
 
-   public static int LINE_HEIGHT = 18;
+   protected int lineHeight = 18;
 
-   public static int MARGIN_TOP = PPI;
+   protected int marginTop = ppi;
 
-   public static int MARGIN_BOTTOM = PPI;
+   protected int marginBottom = ppi;
 
-   public static int MARGIN_LEFT = (int) (0.5 * PPI);
+   protected int marginLeft = (int) (0.5 * ppi);
 
-   public static int MARGIN_RIGHT = (int) (0.5 * PPI);
+   protected int marginRight = (int) (0.5 * ppi);
 
-   public static int PADDING = 4;
+   protected int padding = 4;
 
-   public static int PAGE_DRAWABLE_WIDTH = PAGE_WIDTH - MARGIN_LEFT - MARGIN_RIGHT;
+   protected int pageDrawableWidth = pageWidth - marginLeft - marginRight;
 
-   public static int FONT_TITLE_SIZE = 13;
+   protected int fontTitleSize = 13;
 
-   public static int FONT_GROUP_SIZE = 13;
+   protected int fontGroupSize = 13;
 
-   public static int FONT_LABEL_SIZE = 10;
+   protected int fontLabelSize = 10;
 
-   public static int FONT_VALUE_SIZE = 10;
+   protected int fontValueSize = 10;
 
-   public static final int FORM_GRID_COLS = 4;
+   protected int formGridCols = 4;
 
-   public static final int FORM_GRID_ROWS = 30;
+   protected int formGridRows = 30;
 
-   public static final int FORM_GRID_COL_WIDTH = (PAGE_DRAWABLE_WIDTH / FORM_GRID_COLS);
+   protected int formGridColWidth = (pageDrawableWidth / formGridCols);
 
-   public static final int FORM_GRID_ROW_HEIGHT = ((PAGE_HEIGHT - MARGIN_BOTTOM - MARGIN_TOP) / FORM_GRID_ROWS);
+   protected int formGridRowHeight = ((pageHeight - marginBottom - marginTop) / formGridRows);
 
-   public static int BASE_X = MARGIN_LEFT;
+   protected int baseX = marginLeft;
 
-   public static int BASE_Y;
+   protected int baseY;
 }

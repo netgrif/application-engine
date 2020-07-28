@@ -1,8 +1,7 @@
 package com.netgrif.workflow.pdf.generator.domain;
 
-import com.netgrif.workflow.pdf.generator.config.PdfProperties;
+import com.netgrif.workflow.pdf.generator.config.PdfResource;
 import com.netgrif.workflow.pdf.generator.service.DataConverter;
-import com.netgrif.workflow.pdf.generator.service.PdfDrawer;
 import com.netgrif.workflow.petrinet.domain.DataGroup;
 import com.netgrif.workflow.petrinet.domain.dataset.FieldType;
 import lombok.Data;
@@ -12,9 +11,9 @@ import java.util.List;
 
 /**
  * Class that holds information about fields that will be exported to PDF
- * */
+ */
 @Data
-public class PdfField extends PdfProperties implements Comparable<PdfField>{
+public class PdfField implements Comparable<PdfField> {
 
     private String fieldId;
 
@@ -52,7 +51,7 @@ public class PdfField extends PdfProperties implements Comparable<PdfField>{
 
     private boolean dgField;
 
-    public PdfField(String fieldId, DataGroup dataGroup, FieldType type, String label, List<String> values, List<String> choices){
+    public PdfField(String fieldId, DataGroup dataGroup, FieldType type, String label, List<String> values, List<String> choices) {
         this.fieldId = fieldId;
         this.dataGroup = dataGroup;
         this.type = type;
@@ -63,7 +62,7 @@ public class PdfField extends PdfProperties implements Comparable<PdfField>{
     }
 
     public PdfField(String fieldId, int layoutX, int layoutY, int width, int originalHeight,
-                    String label, boolean dgField){
+                    String label, boolean dgField) {
         this.fieldId = fieldId;
         this.layoutX = layoutX;
         this.layoutY = layoutY;
@@ -75,22 +74,25 @@ public class PdfField extends PdfProperties implements Comparable<PdfField>{
 
     /**
      * Counts and changes fields default height in case there are multiple lines and text will not fit into default size
+     *
      * @param fontSize size of font
      */
-    public void countMultiLineHeight(int fontSize){
-        int maxLabelLineLength = PdfDrawer.getMaxLabelLineSize(this.width, fontSize);
-        int maxValueLineLength = PdfDrawer.getMaxValueLineSize(this.width - 3 * PADDING);
+    public void countMultiLineHeight(int fontSize, PdfResource resource) {
+        int padding = resource.getPadding();
+        int lineHeight = resource.getLineHeight();
+        int maxLabelLineLength = getMaxLabelLineSize(this.width, fontSize, padding);
+        int maxValueLineLength = getMaxValueLineSize(this.width - 3 * padding, resource.getFontValueSize(), padding);
         int multiLineHeight = 0;
 
         List<String> splitLabel = DataConverter.generateMultiLineText(Collections.singletonList(this.label), maxLabelLineLength);
-        multiLineHeight += splitLabel.size() * LINE_HEIGHT + PADDING;
+        multiLineHeight += splitLabel.size() * lineHeight + padding;
 
-        if(this.choices != null){
+        if (this.choices != null) {
             List<String> splitText = DataConverter.generateMultiLineText(this.choices, maxValueLineLength);
-            multiLineHeight += splitText.size() * LINE_HEIGHT + PADDING;
-        }else if(this.values != null){
+            multiLineHeight += splitText.size() * lineHeight + padding;
+        } else if (this.values != null) {
             List<String> splitText = DataConverter.generateMultiLineText(this.values, maxValueLineLength);
-            multiLineHeight += splitText.size() * LINE_HEIGHT + PADDING;
+            multiLineHeight += splitText.size() * lineHeight + padding;
         }
 
         this.changedSize = changeHeight(multiLineHeight);
@@ -98,20 +100,28 @@ public class PdfField extends PdfProperties implements Comparable<PdfField>{
 
     /**
      * Changes the field's height for new multiLineHeight when the too long text requires more space
+     *
      * @param multiLineHeight the new height of field
      * @return boolean value, whether the change was executed or not
      */
-    private boolean changeHeight(int multiLineHeight){
-        if(multiLineHeight > this.height){
-            this.height = multiLineHeight;
-            return true;
-        }else{
+    private boolean changeHeight(int multiLineHeight) {
+        if (multiLineHeight <= this.height) {
             return false;
         }
+        this.height = multiLineHeight;
+        return true;
     }
 
     @Override
     public int compareTo(PdfField pdfField) {
         return this.getOriginalBottomY().compareTo(pdfField.getOriginalBottomY());
+    }
+
+    private int getMaxLabelLineSize(int fieldWidth, int fontSize, int padding) {
+        return (int) ((fieldWidth - padding) * 1.5 / fontSize);
+    }
+
+    private int getMaxValueLineSize(int fieldWidth, int fontSize, int padding) {
+        return (int) ((fieldWidth - padding) * 1.5 / fontSize);
     }
 }
