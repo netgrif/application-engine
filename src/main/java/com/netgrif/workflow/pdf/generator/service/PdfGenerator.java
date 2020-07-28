@@ -16,9 +16,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
+import java.io.*;
 import java.util.List;
 
 /**
@@ -83,7 +81,9 @@ public class PdfGenerator implements IPdfGenerator {
         pdfDrawer.setupDrawer(pdf);
 
         try {
-            return transformRequestToPdf(dataConverter);
+            File output = new ClassPathResource(outputPath).getFile();
+            transformRequestToPdf(dataConverter, output);
+            return output;
         } catch (IOException e) {
             log.error("Error occured while converting form data to PDF", e);
         }
@@ -97,16 +97,14 @@ public class PdfGenerator implements IPdfGenerator {
      * @return PDF file generated from form
      * @throws IOException I/O exception handling for operations with files
      */
-    private File transformRequestToPdf(IDataConverter dataHelper) throws IOException {
-        File output = new ClassPathResource(outputPath).getFile();
+    private void transformRequestToPdf(IDataConverter dataHelper, File output) throws IOException {
+        FileOutputStream stream = new FileOutputStream(output);
         pdfDrawer.newPage();
         drawTransitionForm(dataHelper);
         pdfDrawer.closeContentStream();
-        pdf.save(output);
+        pdf.save(stream);
         pdf.close();
-
         log.info("PDF is generated from transition.");
-        return output;
     }
 
     /**
