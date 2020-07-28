@@ -24,6 +24,7 @@ import com.netgrif.workflow.workflow.web.responsebodies.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
@@ -48,15 +49,17 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/task")
+@ConditionalOnProperty(
+        value = "nae.task.web.enabled",
+        havingValue = "true",
+        matchIfMissing = true
+)
 public class TaskController {
 
     public static final Logger log = LoggerFactory.getLogger(TaskController.class);
 
     @Autowired
     private ITaskService taskService;
-
-    @Autowired
-    private IFilterService filterService;
 
     @Autowired
     private IDataService dataService;
