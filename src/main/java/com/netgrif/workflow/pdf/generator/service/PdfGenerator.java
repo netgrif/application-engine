@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.font.PDType0Font;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
+import org.jsoup.select.Evaluator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
@@ -62,6 +63,7 @@ public class PdfGenerator implements IPdfGenerator {
 
     /**
      * Function is called when a PDF needs to be generated from the transition. This generate PDF from transition
+     *
      * data by calling corresponding functions.
      * @param formCase case that contains current transition
      * @param transitionId transition that form will be exported from
@@ -92,20 +94,22 @@ public class PdfGenerator implements IPdfGenerator {
      * Creates output files and execute export of elements to PDF
      *
      * @param dataHelper holds the data to be exported
-     * @return PDF file generated from form
      * @throws IOException I/O exception handling for operations with files
+     * @return PDF file generated from form
      */
-    private File transformRequestToPdf(IDataConverter dataHelper) throws IOException {
+    protected File transformRequestToPdf(IDataConverter dataHelper) throws IOException {
+        File output = new ClassPathResource(outputPath).getFile();
+        transformRequestToPdf(dataHelper, new FileOutputStream(output));
+        return output;
+    }
+
+    protected void transformRequestToPdf(IDataConverter dataHelper, OutputStream stream) throws IOException {
         pdfDrawer.newPage();
         drawTransitionForm(dataHelper);
         pdfDrawer.closeContentStream();
-        File output = new ClassPathResource(outputPath).getFile();
-        FileOutputStream stream = new FileOutputStream(output);
         pdf.save(stream);
         pdf.close();
         log.info("PDF is generated from transition.");
-
-        return output;
     }
 
     /**
