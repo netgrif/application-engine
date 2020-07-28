@@ -1,20 +1,19 @@
 package com.netgrif.workflow.pdf.generator.service;
 
-import com.netgrif.workflow.pdf.generator.config.PdfResources;
+import com.netgrif.workflow.pdf.generator.config.PdfResource;
 import com.netgrif.workflow.pdf.generator.domain.PdfField;
 import com.netgrif.workflow.pdf.generator.service.interfaces.IDataConverter;
 import com.netgrif.workflow.pdf.generator.service.interfaces.IPdfDrawer;
 import com.netgrif.workflow.pdf.generator.service.interfaces.IPdfGenerator;
 import com.netgrif.workflow.petrinet.domain.dataset.FieldType;
 import com.netgrif.workflow.workflow.domain.Case;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.font.PDType0Font;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.util.ResourceUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -23,11 +22,10 @@ import java.util.List;
 
 /**
  * Generates PDF from the given transition form
- * */
+ */
+@Slf4j
 @Service
-public class PdfGenerator extends PdfResources implements IPdfGenerator {
-
-    public static Logger log = LoggerFactory.getLogger(PdfGenerator.class);
+public class PdfGenerator implements IPdfGenerator {
 
     private PDDocument pdf;
 
@@ -37,8 +35,15 @@ public class PdfGenerator extends PdfResources implements IPdfGenerator {
     @Autowired
     private IPdfDrawer pdfDrawer;
 
+    @Autowired
+    private PdfResource pdfResource;
+
+    @Value("${nae.pdf.output.path}")
+    private String outputPath;
+
     /**
      * Creates new PD document, sets resources files for fonts and images
+     *
      * @throws IOException I/O exception handling for operations with files
      */
     private void constructPdfGenerator() throws IOException {
@@ -46,22 +51,26 @@ public class PdfGenerator extends PdfResources implements IPdfGenerator {
 
         this.pdf = new PDDocument();
 
-        File fontTitleFile = fontTitleResource.getFile();
-        File fontLabelFile = fontLabelResource.getFile();
-        File fontValueFile = fontValueResource.getFile();
+        pdfResource.setTitleFont(PDType0Font.load(this.pdf, new FileInputStream(pdfResource.getFontTitleResource().getFile()), true));
+        pdfResource.setLabelFont(PDType0Font.load(this.pdf, new FileInputStream(pdfResource.getFontLabelResource().getFile()), true));
+        pdfResource.setValueFont(PDType0Font.load(this.pdf, new FileInputStream(pdfResource.getFontValueResource().getFile()), true));
 
-        setTitleFont(PDType0Font.load(this.pdf, new FileInputStream(fontTitleFile), true));
-        setLabelFont(PDType0Font.load(this.pdf, new FileInputStream(fontLabelFile), true));
-        setValueFont(PDType0Font.load(this.pdf, new FileInputStream(fontValueFile), true));
-
-        setCheckboxChecked(PDImageXObject.createFromFileByContent(checkBoxCheckedResource.getFile(), this.pdf));
-        setCheckboxUnchecked(PDImageXObject.createFromFileByContent(checkBoxUnCheckedResource.getFile(), this.pdf));
-        setRadioChecked(PDImageXObject.createFromFileByContent(radioCheckedResource.getFile(), this.pdf));
-        setRadioUnchecked(PDImageXObject.createFromFileByContent(radioUnCheckedResource.getFile(), this.pdf));
+        pdfResource.setCheckboxChecked(PDImageXObject.createFromFileByContent(pdfResource.getCheckBoxCheckedResource().getFile(), this.pdf));
+        pdfResource.setCheckboxUnchecked(PDImageXObject.createFromFileByContent(pdfResource.getCheckBoxUnCheckedResource().getFile(), this.pdf));
+        pdfResource.setRadioChecked(PDImageXObject.createFromFileByContent(pdfResource.getRadioCheckedResource().getFile(), this.pdf));
+        pdfResource.setRadioUnchecked(PDImageXObject.createFromFileByContent(pdfResource.getRadioUnCheckedResource().getFile(), this.pdf));
     }
 
+    /**
+     * Function is called when a PDF needs to be generated from the transition. This generate PDF from transition
+     * data by calling corresponding functions.
+     * @param formCase case that contains current transition
+     * @param transitionId transition that form will be exported from
+     * @throws IOException I/O exception handling for operations with files
+     * @return output PDF file
+     */
     @Override
-    public void convertCaseForm(Case formCase, String transitionId) throws IOException {
+    public File convertCaseForm(Case formCase, String transitionId) throws IOException {
         dataConverter.setDataGroups(formCase.getPetriNet().getTransitions().get(transitionId).getDataGroups());
         dataConverter.setDataSet(formCase.getDataSet());
         dataConverter.generateTitleField(formCase.getPetriNet().getTransitions().get(transitionId).getTitle().toString());
@@ -73,34 +82,36 @@ public class PdfGenerator extends PdfResources implements IPdfGenerator {
         pdfDrawer.setupDrawer(pdf);
 
         try {
-            File result = transformRequestToPdf(dataConverter);
+            return transformRequestToPdf(dataConverter);
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("Error occured while converting form data to PDF", e);
         }
+        return null;
     }
 
     /**
      * Creates output files and execute export of elements to PDF
+     *
      * @param dataHelper holds the data to be exported
      * @return PDF file generated from form
      * @throws IOException I/O exception handling for operations with files
      */
     private File transformRequestToPdf(IDataConverter dataHelper) throws IOException {
-        File out = new File("src/main/resources/out.pdf");
+        File output = new File("src/main/resources/out.pdf");
         pdfDrawer.newPage();
         drawTransitionForm(dataHelper);
         pdfDrawer.closeContentStream();
-        pdf.save(out);
+        pdf.save(output);
         pdf.close();
 
         log.info("PDF is generated from transition.");
-        return out;
+        return output;
     }
 
     /**
      * Parses the input data groups and data field to a PDF file and draws to a PDF file using corresponding
      * functions
-     * */
+     */
     void drawTransitionForm(IDataConverter dataHelper) throws IOException {
         log.info("Drawing form to PDF.");
 
@@ -111,9 +122,9 @@ public class PdfGenerator extends PdfResources implements IPdfGenerator {
         List<String> choices;
         List<PdfField> pdfFields = dataHelper.getPdfFields();
 
-        for(PdfField pdfField : pdfFields){
-            fieldX = BASE_X + pdfField.getX();
-            fieldY = BASE_Y - pdfField.getBottomY();
+        for (PdfField pdfField : pdfFields) {
+            fieldX = pdfResource.getBaseX() + pdfField.getX();
+            fieldY = pdfResource.getBaseY() - pdfField.getBottomY();
             fieldWidth = pdfField.getWidth();
             fieldHeight = pdfField.getHeight();
             label = pdfField.getLabel();
@@ -121,9 +132,9 @@ public class PdfGenerator extends PdfResources implements IPdfGenerator {
             choices = pdfField.getChoices();
             type = pdfField.getType();
 
-            if(pdfField.getFieldId().equals("titleField")){
-                pdfDrawer.drawTitle(label, pdfField.getX(), pdfField.getBottomY(),fieldWidth);
-            }else if(!pdfField.isDgField()) {
+            if (pdfField.getFieldId().equals("titleField")) {
+                pdfDrawer.drawTitle(label, pdfField.getX(), pdfField.getBottomY(), fieldWidth);
+            } else if (!pdfField.isDgField()) {
                 switch (pdfField.getType()) {
                     case MULTICHOICE:
                     case ENUMERATION:
@@ -136,8 +147,8 @@ public class PdfGenerator extends PdfResources implements IPdfGenerator {
                         pdfDrawer.drawTextField(label, values, fieldX, fieldY, fieldWidth, fieldHeight);
                         break;
                 }
-            }else{
-                pdfDrawer.drawLabel(label, fieldX, fieldY, fieldWidth, fieldHeight, titleFont, FONT_GROUP_SIZE);
+            } else {
+                pdfDrawer.drawLabel(label, fieldX, fieldY, fieldWidth, fieldHeight, pdfResource.getTitleFont(), pdfResource.getFontGroupSize());
             }
         }
     }
