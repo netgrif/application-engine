@@ -519,8 +519,8 @@ class ActionDelegate {
         return userService.loggedUser
     }
 
-    void generatePDF(String transitionId){
-        pdfGenerator.convertCaseForm(useCase, transitionId)
+    File generatePDF(String transitionId){
+        return pdfGenerator.convertCaseForm(useCase, transitionId)
     }
 
 }
