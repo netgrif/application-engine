@@ -6,6 +6,7 @@ import com.netgrif.workflow.orgstructure.service.IGroupService;
 import com.netgrif.workflow.orgstructure.web.responsebodies.GroupsMinimalResource;
 import com.netgrif.workflow.orgstructure.web.responsebodies.GroupsResource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +18,11 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/group")
+@ConditionalOnProperty(
+        value = "nae.group.web.enabled",
+        havingValue = "true",
+        matchIfMissing = true
+)
 public class GroupController {
 
     @Autowired
