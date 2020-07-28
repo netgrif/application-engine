@@ -62,25 +62,18 @@ public class PdfGenerator implements IPdfGenerator {
     }
 
     /**
-     * Function is called when a PDF needs to be generated from the transition. This generate PDF from transition
-     *
+     * Function is called when a PDF needs to be generated from the transition. This generates PDF from transition
+     * <p>
      * data by calling corresponding functions.
-     * @param formCase case that contains current transition
+     *
+     * @param formCase     case that contains current transition
      * @param transitionId transition that form will be exported from
-     * @throws IOException I/O exception handling for operations with files
      * @return output PDF file
+     * @throws IOException I/O exception handling for operations with files
      */
     @Override
     public File convertCaseForm(Case formCase, String transitionId) throws IOException {
-        dataConverter.setDataGroups(formCase.getPetriNet().getTransitions().get(transitionId).getDataGroups());
-        dataConverter.setDataSet(formCase.getDataSet());
-        dataConverter.generateTitleField(formCase.getPetriNet().getTransitions().get(transitionId).getTitle().toString());
-        dataConverter.generatePdfFields();
-        dataConverter.generatePdfDataGroups();
-        dataConverter.correctFieldsPosition();
-
-        constructPdfGenerator();
-        pdfDrawer.setupDrawer(pdf);
+        generateData(formCase, transitionId);
 
         try {
             return transformRequestToPdf(dataConverter);
@@ -91,11 +84,55 @@ public class PdfGenerator implements IPdfGenerator {
     }
 
     /**
+     * Function is called when a PDF needs to be generated from the transition. This generates PDF from transition
+     * <p>
+     * data by calling corresponding functions and writes the data to the output stream.
+     *
+     * @param formCase     case that contains current transition
+     * @param transitionId transition that form will be exported from
+     * @param stream       output stream that the file is written to
+     * @return output PDF file
+     * @throws IOException I/O exception handling for operations with files
+     */
+    @Override
+    public File convertCaseForm(Case formCase, String transitionId, OutputStream stream) throws IOException {
+        generateData(formCase, transitionId);
+
+        try {
+            File output = new ClassPathResource(outputPath).getFile();
+            transformRequestToPdf(dataConverter, new FileOutputStream(output));
+            return output;
+        } catch (IOException e) {
+            log.error("Error occured while converting form data to PDF", e);
+        }
+        return null;
+    }
+
+    /**
+     * Generates data to be exported using DataConverter service
+     *
+     * @param formCase     case that contains current transition
+     * @param transitionId transition that form will be exported from
+     * @throws IOException I/O exception handling for operations with files
+     */
+    private void generateData(Case formCase, String transitionId) throws IOException {
+        dataConverter.setDataGroups(formCase.getPetriNet().getTransitions().get(transitionId).getDataGroups());
+        dataConverter.setDataSet(formCase.getDataSet());
+        dataConverter.generateTitleField(formCase.getPetriNet().getTransitions().get(transitionId).getTitle().toString());
+        dataConverter.generatePdfFields();
+        dataConverter.generatePdfDataGroups();
+        dataConverter.correctFieldsPosition();
+
+        constructPdfGenerator();
+        pdfDrawer.setupDrawer(pdf);
+    }
+
+    /**
      * Creates output files and execute export of elements to PDF
      *
      * @param dataHelper holds the data to be exported
-     * @throws IOException I/O exception handling for operations with files
      * @return PDF file generated from form
+     * @throws IOException I/O exception handling for operations with files
      */
     protected File transformRequestToPdf(IDataConverter dataHelper) throws IOException {
         File output = new ClassPathResource(outputPath).getFile();
@@ -103,6 +140,13 @@ public class PdfGenerator implements IPdfGenerator {
         return output;
     }
 
+    /**
+     * Exports the data to PDF file using outputStream
+     *
+     * @param dataHelper holds the data to be exported
+     * @param stream     stream that the data is written to
+     * @throws IOException I/O exception handling for operations with files
+     */
     protected void transformRequestToPdf(IDataConverter dataHelper, OutputStream stream) throws IOException {
         pdfDrawer.newPage();
         drawTransitionForm(dataHelper);
