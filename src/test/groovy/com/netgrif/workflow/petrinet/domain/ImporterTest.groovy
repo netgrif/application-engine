@@ -3,10 +3,6 @@ package com.netgrif.workflow.petrinet.domain
 import com.netgrif.workflow.TestHelper
 import com.netgrif.workflow.auth.domain.repositories.UserProcessRoleRepository
 import com.netgrif.workflow.importer.service.Importer
-import com.netgrif.workflow.petrinet.domain.arcs.Arc
-import com.netgrif.workflow.petrinet.domain.arcs.InhibitorArc
-import com.netgrif.workflow.petrinet.domain.arcs.ReadArc
-import com.netgrif.workflow.petrinet.domain.arcs.ResetArc
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRoleRepository
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.workflow.startup.SuperCreator
@@ -23,9 +19,7 @@ import org.springframework.test.context.junit4.SpringRunner
 @RunWith(SpringRunner.class)
 @ActiveProfiles(["test"])
 @SpringBootTest
-class PetriNetTest {
-
-    public static final String CLONE_NET_TASK = "2"
+class ImporterTest {
 
     @Autowired
     private Importer importer
@@ -40,8 +34,10 @@ class PetriNetTest {
     @Autowired
     private TestHelper testHelper
 
-    @Value("classpath:net_clone.xml")
-    private Resource netResource
+    @Value("classpath:net_import_1.xml")
+    private Resource firstVersionResource
+    @Value("classpath:net_import_2.xml")
+    private Resource secondVersionResource
 
     @Before
     void before() {
@@ -49,24 +45,29 @@ class PetriNetTest {
     }
 
     @Test
-    void testClone() {
-        def netOptional = petriNetService.importPetriNet(netResource.inputStream, "major", superCreator.loggedSuper)
-
-        assert netOptional.isPresent()
-
-        def net = netOptional.get()
-        def clone = net.clone()
-
-        def arcs = clone.getArcsOfTransition(CLONE_NET_TASK)
-
-        assert arcs.size() == 4
-        assert arcs.any { it instanceof Arc }
-        assert arcs.any { it instanceof InhibitorArc }
-        assert arcs.any { it instanceof ResetArc }
-        assert arcs.any { it instanceof ReadArc }
-
-        assert net.roles.size() == 2
+    void importTest() {
+        importAndAssert(firstVersionResource.inputStream, "1.0.0", 2, 5, 2, 0)
         assert processRoleRepository.count() == 3
         assert userProcessRoleRepository.count() == 3
+
+        importAndAssert(secondVersionResource.inputStream, "2.0.0",1, 3, 1, 0)
+        assert processRoleRepository.count() == 4
+        assert userProcessRoleRepository.count() == 4
+    }
+
+    private void importAndAssert(InputStream netStream, String version, int roles, int data, int transitions, int places) {
+        def netOptional = petriNetService.importPetriNet(
+                netStream,
+                "major",
+                superCreator.loggedSuper
+        )
+        assert netOptional.isPresent()
+        def net = netOptional.get()
+
+        assert net.roles.size() == roles
+        assert net.dataSet.size() == data
+        assert net.transitions.size() == transitions
+        assert net.places.size() == places
+        assert net.version == version
     }
 }
