@@ -11,32 +11,32 @@
     <!-- ROLES -->
     <role>
         <id>newRole_1</id>
-        <title></title>
+        <title>newRole_1</title>
     </role>
     <role>
         <id>newRole_2</id>
-        <title></title>
+        <title>newRole_2</title>
     </role>
     <!-- DATA -->
     <data type="text">
         <id>newVariable_1</id>
-        <title></title>
+        <title>newVariable_1</title>
     </data>
     <data type="text">
         <id>newVariable_2</id>
-        <title></title>
+        <title>newVariable_2</title>
     </data>
     <data type="text">
         <id>newVariable_3</id>
-        <title></title>
+        <title>newVariable_3</title>
     </data>
     <data type="text">
         <id>newVariable_4</id>
-        <title></title>
+        <title>newVariable_4</title>
     </data>
     <data type="text">
         <id>newVariable_5</id>
-        <title></title>
+        <title>newVariable_5</title>
     </data>
     <!-- I18NS -->
     <!-- TRANSITIONS -->
@@ -44,13 +44,13 @@
         <id>1</id>
         <x>481</x>
         <y>186</y>
-        <label>task</label>
+        <label>task1</label>
     </transition>
     <transition>
         <id>2</id>
         <x>481</x>
         <y>186</y>
-        <label>task</label>
+        <label>task2</label>
     </transition>
     <!-- PLACES -->
     <!-- ARCS -->
