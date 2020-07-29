@@ -3,28 +3,24 @@
     <id>new_model</id>
     <version>1.0.0</version>
     <initials>NEW</initials>
-    <title>New Model</title>
-    <icon>home</icon>
+    <title>New Model2</title>
+    <icon>home2</icon>
     <defaultRole>true</defaultRole>
     <transitionRole>false</transitionRole>
     <!-- TRANSACTIONS -->
     <!-- ROLES -->
     <role>
         <id>newRole_3</id>
-        <title></title>
+        <title>newRole_3</title>
     </role>
     <!-- DATA -->
     <data type="text">
-        <id>newVariable_1</id>
-        <title></title>
-    </data>
-    <data type="text">
         <id>newVariable_7</id>
-        <title></title>
+        <title>newVariable_7</title>
     </data>
     <data type="text">
         <id>newVariable_6</id>
-        <title></title>
+        <title>newVariable_6</title>
     </data>
     <!-- I18NS -->
     <!-- TRANSITIONS -->
@@ -32,7 +28,7 @@
         <id>3</id>
         <x>481</x>
         <y>186</y>
-        <label>task</label>
+        <label>task3</label>
     </transition>
     <!-- PLACES -->
     <!-- ARCS -->
