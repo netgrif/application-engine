@@ -46,28 +46,181 @@ class ImporterTest {
 
     @Test
     void importTest() {
-        importAndAssert(firstVersionResource.inputStream, "1.0.0", 2, 5, 2, 0)
-        assert processRoleRepository.count() == 3
-        assert userProcessRoleRepository.count() == 3
-
-        importAndAssert(secondVersionResource.inputStream, "2.0.0",1, 3, 1, 0)
-        assert processRoleRepository.count() == 4
-        assert userProcessRoleRepository.count() == 4
-    }
-
-    private void importAndAssert(InputStream netStream, String version, int roles, int data, int transitions, int places) {
         def netOptional = petriNetService.importPetriNet(
-                netStream,
+                firstVersionResource.inputStream,
                 "major",
                 superCreator.loggedSuper
         )
+        assert processRoleRepository.count() == 3
+        assert userProcessRoleRepository.count() == 3
         assert netOptional.isPresent()
         def net = netOptional.get()
 
-        assert net.roles.size() == roles
-        assert net.dataSet.size() == data
-        assert net.transitions.size() == transitions
-        assert net.places.size() == places
-        assert net.version == version
+        // ASSERT IMPORTED NET
+        assert net.importId == "new_model"
+        assert net.version == "1.0.0"
+        assert net.initials == "NEW"
+        assert net.title.defaultValue == "New Model"
+        assert net.icon == "home"
+        assert net.roles.size() == 2
+        2.times {
+            assert net.roles.values().toSorted({ a, b ->
+                return a.importId <=> b.importId
+            })[it].importId == ("newRole_${it + 1}" as String)
+            assert net.roles.values().toSorted({ a, b ->
+                return a.importId <=> b.importId
+            })[it].name.defaultValue == ("newRole_${it + 1}" as String)
+        }
+        assert net.dataSet.size() == 5
+        5.times {
+            assert net.dataSet.values().toSorted({ a, b ->
+                return a.importId <=> b.importId
+            })[it].importId == ("newVariable_${it + 1}" as String)
+            assert net.dataSet.values().toSorted({ a, b ->
+                return a.importId <=> b.importId
+            })[it].name.defaultValue == ("newVariable_${it + 1}" as String)
+        }
+        assert net.transitions.size() == 2
+        2.times {
+            net.transitions.values().toSorted({ a, b ->
+                return a.importId <=> b.importId
+            })[it].importId == ("task${it + 1}" as String)
+            net.transitions.values().toSorted({ a, b ->
+                return a.importId <=> b.importId
+            })[it].title.defaultValue == ("task${it + 1}" as String)
+        }
+        assert net.places.size() == 0
+
+        // ASSERT IMPORTED NET FROM REPO
+        net = petriNetService.getNewestVersionByIdentifier("new_model")
+        assert net != null
+        assert net.importId == "new_model"
+        assert net.version == "1.0.0"
+        assert net.initials == "NEW"
+        assert net.title.defaultValue == "New Model"
+        assert net.icon == "home"
+        assert net.roles.size() == 2
+        2.times {
+            assert net.roles.values().toSorted({ a, b ->
+                return a.importId <=> b.importId
+            })[it].importId == ("newRole_${it + 1}" as String)
+            assert net.roles.values().toSorted({ a, b ->
+                return a.importId <=> b.importId
+            })[it].name.defaultValue == ("newRole_${it + 1}" as String)
+        }
+        assert net.dataSet.size() == 5
+        5.times {
+            assert net.dataSet.values().toSorted({ a, b ->
+                return a.importId <=> b.importId
+            })[it].importId == ("newVariable_${it + 1}" as String)
+            assert net.dataSet.values().toSorted({ a, b ->
+                return a.importId <=> b.importId
+            })[it].name.defaultValue == ("newVariable_${it + 1}" as String)
+        }
+        assert net.transitions.size() == 2
+        2.times {
+            net.transitions.values().toSorted({ a, b ->
+                return a.importId <=> b.importId
+            })[it].importId == ("task${it + 1}" as String)
+            net.transitions.values().toSorted({ a, b ->
+                return a.importId <=> b.importId
+            })[it].title.defaultValue == ("task${it + 1}" as String)
+        }
+        assert net.places.size() == 0
+
+        def netOptional2 = petriNetService.importPetriNet(
+                secondVersionResource.inputStream,
+                "major",
+                superCreator.loggedSuper
+        )
+        assert processRoleRepository.count() == 4
+        assert userProcessRoleRepository.count() == 4
+        assert netOptional2.isPresent()
+        def net2 = netOptional2.get()
+
+        // ASSERT NEW IMPORTED NET
+        assert net2.importId == "new_modelyoutu"
+        assert net2.version == "2.0.0"
+        assert net2.initials == "NEW"
+        assert net2.title.defaultValue == "New Model2"
+        assert net2.icon == "home2"
+        assert net2.roles.size() == 1
+        assert net2.roles.values()[0].importId == "newRole_3"
+        assert net2.roles.values()[0].name.defaultValue == "newRole_3"
+        assert net2.dataSet.size() == 2
+        2.times {
+            assert net2.dataSet.values().toSorted({ a, b ->
+                return a.importId <=> b.importId
+            })[it].importId == ("newVariable_${it + 6}" as String)
+            assert net2.dataSet.values().toSorted({ a, b ->
+                return a.importId <=> b.importId
+            })[it].name.defaultValue == ("newVariable_${it + 6}" as String)
+        }
+        assert net2.transitions.size() == 1
+        net2.transitions.values()[0].importId == "task3"
+        net2.transitions.values()[0].title.defaultValue == "task3"
+        assert net2.places.size() == 0
+
+        // ASSERT NEW NET FROM REPO
+        net2 = petriNetService.getNewestVersionByIdentifier("new_model")
+        assert net2 != null
+        assert net2.importId == "new_model"
+        assert net2.version == "2.0.0"
+        assert net2.initials == "NEW"
+        assert net2.title.defaultValue == "New Model2"
+        assert net2.icon == "home2"
+        assert net2.roles.size() == 1
+        assert net2.roles.values()[0].importId == "newRole_3"
+        assert net2.roles.values()[0].name.defaultValue == "newRole_3"
+        assert net2.dataSet.size() == 2
+        2.times {
+            assert net2.dataSet.values().toSorted({ a, b ->
+                return a.importId <=> b.importId
+            })[it].importId == ("newVariable_${it + 6}" as String)
+            assert net2.dataSet.values().toSorted({ a, b ->
+                return a.importId <=> b.importId
+            })[it].name.defaultValue == ("newVariable_${it + 6}" as String)
+        }
+        assert net2.transitions.size() == 1
+        net2.transitions.values()[0].importId == "task3"
+        net2.transitions.values()[0].title.defaultValue == "task3"
+        assert net2.places.size() == 0
+
+        // ASSERT OLD NET FROM REPO
+        net = petriNetService.getPetriNet(net.stringId)
+        assert net != null
+        assert net.importId == "new_model"
+        assert net.version == "1.0.0"
+        assert net.initials == "NEW"
+        assert net.title.defaultValue == "New Model"
+        assert net.icon == "home"
+        assert net.roles.size() == 2
+        2.times {
+            assert net.roles.values().toSorted({ a, b ->
+                return a.importId <=> b.importId
+            })[it].importId == ("newRole_${it + 1}" as String)
+            assert net.roles.values().toSorted({ a, b ->
+                return a.importId <=> b.importId
+            })[it].name.defaultValue == ("newRole_${it + 1}" as String)
+        }
+        assert net.dataSet.size() == 5
+        5.times {
+            assert net.dataSet.values().toSorted({ a, b ->
+                return a.importId <=> b.importId
+            })[it].importId == ("newVariable_${it + 1}" as String)
+            assert net.dataSet.values().toSorted({ a, b ->
+                return a.importId <=> b.importId
+            })[it].name.defaultValue == ("newVariable_${it + 1}" as String)
+        }
+        assert net.transitions.size() == 2
+        2.times {
+            net.transitions.values().toSorted({ a, b ->
+                return a.importId <=> b.importId
+            })[it].importId == ("task${it + 1}" as String)
+            net.transitions.values().toSorted({ a, b ->
+                return a.importId <=> b.importId
+            })[it].title.defaultValue == ("task${it + 1}" as String)
+        }
+        assert net.places.size() == 0
     }
 }
