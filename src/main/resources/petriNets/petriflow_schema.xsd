@@ -27,7 +27,7 @@
                     <xs:element ref="valid" minOccurs="0" maxOccurs="unbounded"/>
                     <xs:element ref="validations" minOccurs="0" />
                 </xs:choice>
-                <xs:element ref="init" minOccurs="0"/>
+                <xs:element ref="init" minOccurs="0" maxOccurs="unbounded"/>
                 <xs:element ref="format" minOccurs="0"/>
                 <xs:choice>
                     <xs:element name="view" minOccurs="0" type="fieldView"/>

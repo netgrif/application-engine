@@ -49,4 +49,25 @@ class MapFieldTest {
         assert field.choices["third"].defaultValue == "Third option"
         assert field.defaultValue == "second"
     }
+
+    @Value("classpath:data_map_2.xml")
+    private Resource netResource2
+
+    @Test
+    void testImportMultichoice() {
+        def netOptional = petriNetService.importPetriNet(netResource2.inputStream, "major", superCreator.loggedSuper)
+        assert netOptional.isPresent()
+
+        def net = netOptional.get()
+        assert net.dataSet.size() == 1
+
+        MultichoiceMapField field = net.dataSet["multichoice"] as MultichoiceMapField
+        assert field.name.defaultValue == "Multichoice map"
+        assert field.choices.size() == 3
+        assert field.choices["first"].defaultValue == "First option"
+        assert field.choices["second"].defaultValue == "Second option"
+        assert field.choices["third"].defaultValue == "Third option"
+        assert field.defaultValue.contains("second")
+        assert field.defaultValue.contains("first")
+    }
 }
