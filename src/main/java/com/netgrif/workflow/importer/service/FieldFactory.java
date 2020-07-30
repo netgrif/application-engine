@@ -78,6 +78,11 @@ public final class FieldFactory {
             case TASK_REF:
                 field = new TaskField();
                 break;
+            case ENUMERATION_MAP:
+                field = buildEnumerationMapField(data.getOptions(), data.getInit(), importer);
+                break;
+//            case MULTICHOICE_MAP:
+//                field = new MultichoiceMapField();
             default:
                 throw new IllegalArgumentException(data.getType() + " is not a valid Field type");
         }
@@ -142,6 +147,12 @@ public final class FieldFactory {
         field.setDefaultValue(init);
 
         return field;
+    }
+
+    private EnumerationMapField buildEnumerationMapField(Options options, String init, Importer importer) {
+        Map<String, I18nString> choices = options.getOption().stream()
+                .collect(Collectors.toMap(Option::getKey, importer::toI18NString));
+        return new EnumerationMapField(choices, init);
     }
 
     private TextField buildTextField(List<I18NStringType> values) {
