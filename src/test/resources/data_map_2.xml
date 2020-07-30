@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="../../main/resources/petriNets/petriflow_schema.xsd">
+    <id>test</id>
+    <initials>TST</initials>
+    <title>Test</title>
+    <defaultRole>true</defaultRole>
+    <!-- DATA -->
+    <data type="multichoice_map">
+        <id>multichoice</id>
+        <title>Multichoice map</title>
+        <options>
+            <option key="first">First option</option>
+            <option key="second">Second option</option>
+            <option key="third">Third option</option>
+        </options>
+        <init>second</init>
+        <init>first</init>
+    </data>
+</document>

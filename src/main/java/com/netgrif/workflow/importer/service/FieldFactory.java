@@ -24,7 +24,6 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Component
@@ -81,8 +80,9 @@ public final class FieldFactory {
             case ENUMERATION_MAP:
                 field = buildEnumerationMapField(data.getOptions(), data.getInit(), importer);
                 break;
-//            case MULTICHOICE_MAP:
-//                field = new MultichoiceMapField();
+            case MULTICHOICE_MAP:
+                field = buildMultichoiceMapField(data.getOptions(), data.getInit(), importer);
+                break;
             default:
                 throw new IllegalArgumentException(data.getType() + " is not a valid Field type");
         }
@@ -111,8 +111,9 @@ public final class FieldFactory {
                 ((ValidableField) field).addValidation(item.getExpression(), importer.toI18NString(item.getMessage()));
             }
         }
-        if (data.getInit() != null && field instanceof FieldWithDefault)
-            setFieldDefaultValue((FieldWithDefault) field, data.getInit());
+        if (data.getInit() != null && !data.getInit().isEmpty() && field instanceof FieldWithDefault) {
+            setFieldDefaultValue((FieldWithDefault) field, data.getInit().get(0));
+        }
 
         if (data.getFormat() != null) {
             Format format = formatFactory.buildFormat(data.getFormat());
@@ -128,31 +129,45 @@ public final class FieldFactory {
         return field;
     }
 
-    private MultichoiceField buildMultichoiceField(List<I18NStringType> values, String init, Importer importer) {
+    private MultichoiceMapField buildMultichoiceMapField(Options options, List<String> init, Importer importer) {
+        Map<String, I18nString> choices = options.getOption().stream()
+                .collect(Collectors.toMap(Option::getKey, importer::toI18NString));
+        return new MultichoiceMapField(choices, new HashSet<>(init));
+    }
+
+    private MultichoiceField buildMultichoiceField(List<I18NStringType> values, List<String> init, Importer importer) {
         List<I18nString> choices = values.stream()
                 .map(importer::toI18NString)
                 .collect(Collectors.toList());
         MultichoiceField field = new MultichoiceField(choices);
-        field.setDefaultValue(init);
+        if (init!= null && !init.isEmpty()) {
+            field.setDefaultValue(init.get(0));
+        }
 
         return field;
     }
 
-    private EnumerationField buildEnumerationField(List<I18NStringType> values, String init, Importer importer) {
+    private EnumerationField buildEnumerationField(List<I18NStringType> values, List<String> init, Importer importer) {
         List<I18nString> choices = values.stream()
                 .map(importer::toI18NString)
                 .collect(Collectors.toList());
 
         EnumerationField field = new EnumerationField(choices);
-        field.setDefaultValue(init);
+        if (init != null && !init.isEmpty()) {
+            field.setDefaultValue(init.get(0));
+        }
 
         return field;
     }
 
-    private EnumerationMapField buildEnumerationMapField(Options options, String init, Importer importer) {
+    private EnumerationMapField buildEnumerationMapField(Options options, List<String> init, Importer importer) {
         Map<String, I18nString> choices = options.getOption().stream()
                 .collect(Collectors.toMap(Option::getKey, importer::toI18NString));
-        return new EnumerationMapField(choices, init);
+        EnumerationMapField field = new EnumerationMapField(choices);
+        if (init!= null && !init.isEmpty()) {
+            field.setDefaultValue(init.get(0));
+        }
+        return field;
     }
 
     private TextField buildTextField(List<I18NStringType> values) {
@@ -229,6 +244,8 @@ public final class FieldFactory {
                 break;
             case FILE:
                 ((FileField) field).setDefaultValue(defaultValue);
+                break;
+            case MULTICHOICE_MAP:
                 break;
             default:
                 field.setDefaultValue(defaultValue);
