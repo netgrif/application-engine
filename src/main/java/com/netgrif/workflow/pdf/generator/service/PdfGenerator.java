@@ -11,7 +11,6 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.font.PDType0Font;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
@@ -50,6 +49,8 @@ public class PdfGenerator implements IPdfGenerator {
         pdfResource.setCheckboxUnchecked(PDImageXObject.createFromFileByContent(pdfResource.getCheckBoxUnCheckedResource().getFile(), this.pdf));
         pdfResource.setRadioChecked(PDImageXObject.createFromFileByContent(pdfResource.getRadioCheckedResource().getFile(), this.pdf));
         pdfResource.setRadioUnchecked(PDImageXObject.createFromFileByContent(pdfResource.getRadioUnCheckedResource().getFile(), this.pdf));
+        pdfResource.setBooleanChecked(PDImageXObject.createFromFileByContent(pdfResource.getBooleanCheckedResource().getFile(), this.pdf));
+        pdfResource.setBooleanUnchecked(PDImageXObject.createFromFileByContent(pdfResource.getBooleanUncheckedResource().getFile(), this.pdf));
     }
 
     @Override
@@ -77,7 +78,7 @@ public class PdfGenerator implements IPdfGenerator {
         dataConverter.setPetriNet(formCase.getPetriNet());
         dataConverter.setDataGroups(formCase.getPetriNet().getTransitions().get(transitionId).getDataGroups());
         dataConverter.setDataSet(formCase.getDataSet());
-        dataConverter.generateTitleField(formCase.getPetriNet().getTransitions().get(transitionId).getTitle().toString());
+        dataConverter.generateTitleField();
         dataConverter.generatePdfFields();
         dataConverter.generatePdfDataGroups();
         dataConverter.correctFieldsPosition();
@@ -93,6 +94,10 @@ public class PdfGenerator implements IPdfGenerator {
     }
 
     protected void transformRequestToPdf(IDataConverter dataHelper, OutputStream stream) throws IOException {
+        File template = new File(((ClassPathResource) pdfResource.getTemplateResource()).getPath());
+        if(template.exists()){
+            pdfDrawer.setTemplatePdf(PDDocument.load(template));
+        }
         pdfDrawer.newPage();
         drawTransitionForm(dataHelper);
         pdfDrawer.closeContentStream();
@@ -126,5 +131,6 @@ public class PdfGenerator implements IPdfGenerator {
                 pdfDrawer.drawDataGroupField(pdfField);
             }
         }
+        pdfDrawer.drawPageNumber();
     }
 }

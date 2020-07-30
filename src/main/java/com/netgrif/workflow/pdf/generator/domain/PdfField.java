@@ -131,10 +131,10 @@ public class PdfField extends PdfProperties implements Comparable<PdfField> {
     }
 
     private int getMaxLabelLineSize(int fieldWidth, int fontSize, int padding) {
-        return (int) ((fieldWidth - padding) * marginMultiplier / fontSize);
+        return (int) ((fieldWidth - padding) * sizeMultiplier / fontSize);
     }
 
     private int getMaxValueLineSize(int fieldWidth, int fontSize, int padding) {
-        return (int) ((fieldWidth - padding) * marginMultiplier / fontSize);
+        return (int) ((fieldWidth - padding) * sizeMultiplier / fontSize);
     }
 }

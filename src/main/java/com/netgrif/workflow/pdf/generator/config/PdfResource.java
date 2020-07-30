@@ -28,6 +28,10 @@ public class PdfResource extends PdfProperties {
 
     private PDImageXObject radioUnchecked;
 
+    private PDImageXObject booleanChecked;
+
+    private PDImageXObject booleanUnchecked;
+
     private Resource fontTitleResource;
 
     private Resource fontLabelResource;
@@ -36,6 +40,8 @@ public class PdfResource extends PdfProperties {
 
     private Resource outputResource;
 
+    private Resource templateResource;
+
     private Resource checkBoxCheckedResource;
 
     private Resource checkBoxUnCheckedResource;
@@ -43,4 +49,8 @@ public class PdfResource extends PdfProperties {
     private Resource radioCheckedResource;
 
     private Resource radioUnCheckedResource;
+
+    private Resource booleanCheckedResource;
+
+    private Resource booleanUncheckedResource;
 }

@@ -1,6 +1,8 @@
 package com.netgrif.workflow.pdf.generator.config;
 
+import com.netgrif.workflow.pdf.generator.config.types.PdfBooleanFormat;
 import com.netgrif.workflow.pdf.generator.config.types.PdfDateFormat;
+import com.netgrif.workflow.pdf.generator.config.types.PdfPageNumberFormat;
 import lombok.Data;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -23,6 +25,8 @@ public class PdfProperties {
 
    protected int lineHeight = 20;
 
+   protected int marginTitle = (int) (0.5 * unit);
+
    protected int marginTop = unit;
 
    protected int marginBottom = unit;
@@ -32,6 +36,12 @@ public class PdfProperties {
    protected int marginRight = (int) (0.5 * unit);
 
    protected int padding = 4;
+
+   protected int boxPadding = 2;
+
+   protected int baseX = marginLeft;
+
+   protected int baseY;
 
    protected int pageDrawableWidth = pageWidth - marginLeft - marginRight;
 
@@ -53,11 +63,13 @@ public class PdfProperties {
 
    protected float strokeWidth = 0.5f;
 
+   protected int boxSize = 10;
+
+   protected float sizeMultiplier = 1.65f;
+
    protected boolean textFieldStroke = true;
 
    protected boolean booleanFieldStroke = false;
-
-   protected float marginMultiplier = 1.65f;
 
    protected PdfDateFormat dateFormat = PdfDateFormat.SLOVAK1;
 
@@ -65,7 +77,30 @@ public class PdfProperties {
 
    protected Locale textLocale = new Locale("sk", "SK");
 
-   protected int baseX = marginLeft;
+   protected String documentTitle;
 
-   protected int baseY;
+   protected PdfBooleanFormat booleanFormat = PdfBooleanFormat.DOUBLE_BOX_WITH_TEXT_SK;
+
+   protected PdfPageNumberFormat pageNumberFormat = PdfPageNumberFormat.SLASH;
+
+   protected int pageNumberPosition = (int) (0.5 * pageWidth);
+
+   public void resetProperties(){
+      pageDrawableWidth = pageWidth - marginLeft - marginRight;
+      formGridColWidth = (pageDrawableWidth / formGridCols);
+      formGridRowHeight = ((pageHeight - marginBottom - marginTop) / formGridRows);
+      baseX = marginLeft;
+   }
+
+   public void resetProperties(int unit){
+      marginTop = unit;
+      marginBottom = unit;
+      marginLeft = (int) (0.5 * unit);
+      marginRight = (int) (0.5 * unit);
+      marginTitle = (int) (0.5 * unit);
+      pageDrawableWidth = pageWidth - marginLeft - marginRight;
+      formGridColWidth = (pageDrawableWidth / formGridCols);
+      formGridRowHeight = ((pageHeight - marginBottom - marginTop) / formGridRows);
+      baseX = marginLeft;
+   }
 }
