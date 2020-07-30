@@ -6,10 +6,10 @@ import org.springframework.stereotype.Component;
 @Component
 public class FileStorageConfiguration {
 
-    @Value("${storage.path}")
+    @Value("${storage.path:storage}")
     private String storagePath;
 
-    @Value("${storage.archived}")
+    @Value("${storage.archived:storage/uploadedModels/}")
     private String storageArchived;
 
     public String getStoragePath() {
