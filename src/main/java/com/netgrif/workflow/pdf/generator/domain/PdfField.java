@@ -1,5 +1,6 @@
 package com.netgrif.workflow.pdf.generator.domain;
 
+import com.netgrif.workflow.pdf.generator.config.PdfProperties;
 import com.netgrif.workflow.pdf.generator.config.PdfResource;
 import com.netgrif.workflow.pdf.generator.service.DataConverter;
 import com.netgrif.workflow.petrinet.domain.DataGroup;
@@ -13,7 +14,7 @@ import java.util.List;
  * Class that holds information about fields that will be exported to PDF
  */
 @Data
-public class PdfField implements Comparable<PdfField> {
+public class PdfField extends PdfProperties implements Comparable<PdfField> {
 
     private String fieldId;
 
@@ -72,6 +73,18 @@ public class PdfField implements Comparable<PdfField> {
         this.dgField = dgField;
     }
 
+    public PdfField(String fieldId, String label, List<String> values, List<String> choices, FieldType type, int x, int bottomY, int width, int height) {
+        this.fieldId = fieldId;
+        this.label = label;
+        this.values = values;
+        this.choices = choices;
+        this.type = type;
+        this.x = x;
+        this.bottomY = bottomY;
+        this.width = width;
+        this.height = height;
+    }
+
     /**
      * Counts and changes fields default height in case there are multiple lines and text will not fit into default size
      *
@@ -118,10 +131,10 @@ public class PdfField implements Comparable<PdfField> {
     }
 
     private int getMaxLabelLineSize(int fieldWidth, int fontSize, int padding) {
-        return (int) ((fieldWidth - padding) * 1.5 / fontSize);
+        return (int) ((fieldWidth - padding) * marginMultiplier / fontSize);
     }
 
     private int getMaxValueLineSize(int fieldWidth, int fontSize, int padding) {
-        return (int) ((fieldWidth - padding) * 1.5 / fontSize);
+        return (int) ((fieldWidth - padding) * marginMultiplier / fontSize);
     }
 }
