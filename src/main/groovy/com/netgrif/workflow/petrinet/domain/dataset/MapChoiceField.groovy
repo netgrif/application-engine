@@ -1,6 +1,6 @@
 package com.netgrif.workflow.petrinet.domain.dataset
 
-abstract class MapChoiceField<T> extends FieldWithDefault<String> {
+abstract class MapChoiceField<T, U> extends FieldWithDefault<U> {
 
     protected Map<String, T> choices
 

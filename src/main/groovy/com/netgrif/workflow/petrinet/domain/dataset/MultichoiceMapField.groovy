@@ -1,28 +1,27 @@
 package com.netgrif.workflow.petrinet.domain.dataset
 
-
 import com.netgrif.workflow.petrinet.domain.I18nString
 import org.springframework.data.mongodb.core.mapping.Document
 
 @Document
-class EnumerationMapField extends MapChoiceField<I18nString, String> {
+class MultichoiceMapField extends MapChoiceField<I18nString, Set<String>> {
 
-    EnumerationMapField() {
+    MultichoiceMapField() {
         super()
     }
 
-    EnumerationMapField(Map<String, I18nString> choices) {
+    MultichoiceMapField(Map<String, I18nString> choices) {
         super(choices)
     }
 
-    EnumerationMapField(Map<String, I18nString> choices, String defaultValue) {
+    MultichoiceMapField(Map<String, I18nString> choices, Set<String> defaultValues) {
         super(choices)
-        this.defaultValue = defaultValue
+        this.defaultValue = defaultValues
     }
 
     @Override
     FieldType getType() {
-        return FieldType.ENUMERATION_MAP
+        return FieldType.MULTICHOICE_MAP
     }
 
     @Override
@@ -36,18 +35,18 @@ class EnumerationMapField extends MapChoiceField<I18nString, String> {
     }
 
     @Override
-    String getDefaultValue() {
-        return super.getDefaultValue()
+    Set<String> getDefaultValue() {
+        return super.getDefaultValue() as Set<String>
     }
 
     @Override
-    void setDefaultValue(String defaultValue) {
+    void setDefaultValue(Set<String> defaultValue) {
         super.setDefaultValue(defaultValue)
     }
 
     @Override
     Field clone() {
-        EnumerationMapField clone = new EnumerationMapField()
+        MultichoiceMapField clone = new MultichoiceMapField()
         super.clone(clone)
 
         clone.choices = choices
