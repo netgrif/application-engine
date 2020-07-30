@@ -83,6 +83,6 @@ public abstract class FieldRenderer<T> extends Renderer{
     }
 
     protected int getMaxValueLineSize(int fieldWidth) {
-        return (int) ((fieldWidth - padding) * resource.getMarginMultiplier() / fontValueSize);
+        return (int) ((fieldWidth - padding) * resource.getSizeMultiplier() / fontValueSize);
     }
 }
