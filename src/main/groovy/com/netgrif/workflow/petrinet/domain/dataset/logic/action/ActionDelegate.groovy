@@ -9,6 +9,7 @@ import com.netgrif.workflow.orgstructure.domain.Group
 import com.netgrif.workflow.orgstructure.domain.Member
 import com.netgrif.workflow.orgstructure.service.GroupService
 import com.netgrif.workflow.orgstructure.service.MemberService
+import com.netgrif.workflow.pdf.generator.config.PdfResource
 import com.netgrif.workflow.pdf.generator.service.interfaces.IPdfGenerator
 import com.netgrif.workflow.petrinet.domain.I18nString
 import com.netgrif.workflow.petrinet.domain.PetriNet
@@ -31,6 +32,8 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.i18n.LocaleContextHolder
+import org.springframework.core.io.ClassPathResource
+import org.springframework.core.io.Resource
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 
@@ -75,6 +78,9 @@ class ActionDelegate {
 
     @Autowired
     IPdfGenerator pdfGenerator
+
+    @Autowired
+    PdfResource pdfResource;
 
     /**
      * Reference of case in which current action is taking place.
@@ -520,6 +526,12 @@ class ActionDelegate {
     }
 
     File generatePDF(String transitionId){
+        pdfResource.setTemplateResource(new ClassPathResource("src/main/resources/pdfGenerator/existing.pdf"))
+        pdfResource.setDocumentTitle("")
+        pdfResource.setMarginTitle(100)
+        pdfResource.setMarginLeft(75)
+        pdfResource.setMarginRight(75)
+        pdfResource.resetProperties()
         return pdfGenerator.convertCaseForm(useCase, transitionId)
     }
 

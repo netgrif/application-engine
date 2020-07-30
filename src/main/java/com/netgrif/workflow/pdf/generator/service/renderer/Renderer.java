@@ -55,6 +55,6 @@ public abstract class Renderer {
     }
 
     protected int getMaxLabelLineSize(int fieldWidth, int fontSize) {
-        return (int) ((fieldWidth - padding) * resource.getMarginMultiplier() / fontSize);
+        return (int) ((fieldWidth - padding) * resource.getSizeMultiplier() / fontSize);
     }
 }
