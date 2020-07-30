@@ -1,5 +1,6 @@
 package com.netgrif.workflow.pdf.generator.service.interfaces;
 
+import com.netgrif.workflow.pdf.generator.domain.PdfField;
 import com.netgrif.workflow.petrinet.domain.dataset.FieldType;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.font.PDType0Font;
@@ -10,10 +11,19 @@ import java.util.List;
 public interface IPdfDrawer {
     void setupDrawer(PDDocument pdf);
     void newPage() throws IOException;
-    void drawTitle(String title, int fieldX, int fieldY, int fieldWidth) throws IOException;
+    void checkOpenPages() throws IOException;
     void closeContentStream() throws IOException;
-    void drawTextField(String label, List<String> value, int fieldX, int fieldY, int fieldWidth, int fieldHeight) throws IOException;
-    void drawBooleanField(String label, List<String> value, int fieldX, int fieldY, int fieldWidth, int fieldHeight) throws IOException;
-    void drawSelectionField(String label, List<String> choices, List<String> values, int fieldX, int fieldY, int fieldWidth, int fieldHeight, FieldType type) throws IOException;
-    int drawLabel(String text, int fieldX, int fieldY, int fieldWidth, int fieldHeight, PDType0Font font, int fontSize) throws IOException;
+    void drawTitleField(PdfField field) throws IOException;
+    void drawDataGroupField(PdfField field) throws IOException;
+    void drawTextField(PdfField field) throws IOException;
+    void drawBooleanField(PdfField field) throws IOException;
+    void drawEnumerationField(PdfField field) throws IOException;
+
+    void drawMultiChoiceField(PdfField field) throws IOException;
+
+    void drawBooleanBox(List<String> values, int x, int y) throws IOException;
+    boolean drawSelectionButtons(List<String> values, String choice, int x, int y, FieldType fieldType) throws IOException;
+    void writeString(PDType0Font font, int fontSize, int x, int y, String text) throws IOException;
+    void drawStroke(int x, int y, int fieldPosY, int width, int lineCounter, float strokeWidth) throws IOException;
+
 }

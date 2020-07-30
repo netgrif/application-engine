@@ -14,12 +14,6 @@ import java.io.File;
 @Data
 public class PdfResource extends PdfProperties {
 
-    private File fontTitleFile;
-
-    private File fontLabelFile;
-
-    private File fontValueFile;
-
     private PDType0Font labelFont;
 
     private PDType0Font titleFont;
@@ -34,24 +28,19 @@ public class PdfResource extends PdfProperties {
 
     private PDImageXObject radioUnchecked;
 
-    @Value("file:src/main/resources/pdfGenerator/fonts/SpaceMono-Bold.ttf")
     private Resource fontTitleResource;
 
-    @Value("file:src/main/resources/pdfGenerator/fonts/SpaceMono-Bold.ttf")
     private Resource fontLabelResource;
 
-    @Value("file:src/main/resources/pdfGenerator/fonts/SpaceMono-Regular.ttf")
     private Resource fontValueResource;
 
-    @Value("file:src/main/resources/pdfGenerator/img/checkbox_checked.png")
+    private Resource outputResource;
+
     private Resource checkBoxCheckedResource;
 
-    @Value("file:src/main/resources/pdfGenerator/img/checkbox_unchecked.png")
     private Resource checkBoxUnCheckedResource;
 
-    @Value("file:src/main/resources/pdfGenerator/img/radio_checked.png")
     private Resource radioCheckedResource;
 
-    @Value("file:src/main/resources/pdfGenerator/img/radio_unchecked.png")
     private Resource radioUnCheckedResource;
 }
