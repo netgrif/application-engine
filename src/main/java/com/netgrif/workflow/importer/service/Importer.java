@@ -28,9 +28,8 @@ import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.workflow.workflow.domain.FileStorageConfiguration;
 import com.netgrif.workflow.workflow.domain.triggers.Trigger;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -46,16 +45,14 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+@Slf4j
 public class Importer {
-
-    public static final Logger log = LoggerFactory.getLogger(Importer.class);
 
     public static final String FILE_EXTENSION = ".xml";
 
     public static final String FIELD_KEYWORD = "f";
     public static final String TRANSITION_KEYWORD = "t";
 
-    private Config config;
     private Document document;
     private PetriNet net;
     private ProcessRole defaultRole;
@@ -97,9 +94,9 @@ public class Importer {
     private FileStorageConfiguration fileStorageConfiguration;
 
     @Transactional
-    public Optional<PetriNet> importPetriNet(InputStream xml, Config config) throws MissingPetriNetMetaDataException {
+    public Optional<PetriNet> importPetriNet(InputStream xml) throws MissingPetriNetMetaDataException {
         try {
-            initialize(config);
+            initialize();
             unmarshallXml(xml);
             return createPetriNet();
         } catch (JAXBException e) {
@@ -109,27 +106,16 @@ public class Importer {
     }
 
     @Transactional
-    public Optional<PetriNet> importPetriNet(File xml, Config config) throws MissingPetriNetMetaDataException {
+    public Optional<PetriNet> importPetriNet(File xml) throws MissingPetriNetMetaDataException {
         try {
-            return importPetriNet(new FileInputStream(xml), config);
+            return importPetriNet(new FileInputStream(xml));
         } catch (FileNotFoundException e) {
             log.error("Importing Petri net failed: ", e);
         }
         return Optional.empty();
     }
 
-    @Transactional
-    public Optional<PetriNet> importPetriNet(InputStream xml) throws MissingPetriNetMetaDataException {
-        return importPetriNet(xml, new Config());
-    }
-
-    @Transactional
-    public Optional<PetriNet> importPetriNet(File xml) throws MissingPetriNetMetaDataException {
-        return importPetriNet(xml, new Config());
-    }
-
-    private void initialize(Config config) {
-        this.config = config;
+    private void initialize() {
         this.roles = new HashMap<>();
         this.transitions = new HashMap<>();
         this.places = new HashMap<>();
@@ -307,15 +293,11 @@ public class Importer {
         transition.setImportId(importTransition.getId());
         transition.setTitle(toI18NString(importTransition.getLabel()));
         transition.setPosition(importTransition.getX(), importTransition.getY());
+
         if (importTransition.getCols() != null || importTransition.getRows() != null) {
-            if (importTransition.getRows() != null && importTransition.getCols() != null) {
-                transition.setLayout(new TaskLayout(importTransition.getRows(), importTransition.getCols()));
-            } else if (importTransition.getRows() != null) {
-                transition.setLayout(new TaskLayout(importTransition.getRows(), null));
-            } else {
-                transition.setLayout(new TaskLayout(null, importTransition.getCols()));
-            }
+            transition.setLayout(new TaskLayout(importTransition.getRows(), importTransition.getCols()));
         }
+
         transition.setPriority(importTransition.getPriority());
         transition.setIcon(importTransition.getIcon());
         transition.setAssignPolicy(toAssignPolicy(importTransition.getAssignPolicy()));
@@ -348,9 +330,6 @@ public class Importer {
         if (isDefaultRoleAllowedFor(importTransition, document)) {
             addDefaultRole(transition);
         }
-        if (isTransitionRoleAllowed()) {
-            addTransitionRole(transition);
-        }
         if (importTransition.getEvent() != null) {
             importTransition.getEvent().forEach(event ->
                     transition.addEvent(addEvent(transition.getImportId(), event))
@@ -359,12 +338,6 @@ public class Importer {
 
         net.addTransition(transition);
         transitions.put(importTransition.getId(), transition);
-    }
-
-    private void addTransitionRole(Transition transition) {
-        ProcessRole role = roleFactory.transitionRole(net, transition);
-        transition.addRole(role.getStringId(), Collections.singleton(RolePermission.PERFORM));
-        transition.setDefaultRoleId(role.getStringId());
     }
 
     @Transactional
@@ -432,16 +405,16 @@ public class Importer {
         String alignment = importDataGroup.getAlignment() != null ? importDataGroup.getAlignment().value() : "";
         DataGroup dataGroup = new DataGroup();
         dataGroup.setImportId(importDataGroup.getId());
-        if (importDataGroup.getCols() != null || importDataGroup.getRows() != null) {
-            if (importDataGroup.getCols() != null && importDataGroup.getRows() != null) {
-                dataGroup.setLayout(new DataGroupLayout(importDataGroup.getRows(), importDataGroup.getCols()));
-            } else if (importDataGroup.getCols() != null) {
-                dataGroup.setLayout(new DataGroupLayout(null, importDataGroup.getCols()));
-            }
 
-        } else if (transition.getLayout() != null && transition.getLayout().getCols() != null) {
-            dataGroup.setLayout(new DataGroupLayout(null, transition.getLayout().getCols()));
+        if (importDataGroup.getCols() != null || importDataGroup.getRows() != null) {
+            dataGroup.setLayout(new DataGroupLayout(importDataGroup.getRows(), importDataGroup.getCols()));
         }
+        if (importDataGroup.getCols() == null && (transition.getLayout() != null && transition.getLayout().getCols() != null)) {
+            dataGroup.setLayout(dataGroup.getLayout() != null ?
+                    new DataGroupLayout(dataGroup.getLayout().getRows(), transition.getLayout().getCols()) :
+                    new DataGroupLayout(null, transition.getLayout().getCols()));
+        }
+
         dataGroup.setTitle(toI18NString(importDataGroup.getTitle()));
         dataGroup.setAlignment(alignment);
         dataGroup.setStretch(importDataGroup.isStretch());
@@ -509,7 +482,7 @@ public class Importer {
                 appearance = layout.getAppearance().toString();
             }
 
-            FieldLayout fieldLayout = new FieldLayout(layout.getX(),layout.getY(),layout.getRows(),layout.getCols(), layout.getTemplate().toString(), appearance);
+            FieldLayout fieldLayout = new FieldLayout(layout.getX(), layout.getY(), layout.getRows(), layout.getCols(), layout.getTemplate().toString(), appearance);
             transition.addDataSet(fieldId, null, null, fieldLayout);
         } catch (NullPointerException e) {
             throw new IllegalArgumentException("Wrong dataRef id [" + dataRef.getId() + "] on transition [" + transition.getTitle() + "]", e);
@@ -667,11 +640,7 @@ public class Importer {
         } else {
             role.setName(toI18NString(importRole.getName()));
         }
-        if (config.isNotSaveObjects()) {
-            role = roleRepository.save(role);
-        } else {
-            role.set_id(new ObjectId());
-        }
+        role.set_id(new ObjectId());
 
         net.addRole(role);
         roles.put(importRole.getId(), role);

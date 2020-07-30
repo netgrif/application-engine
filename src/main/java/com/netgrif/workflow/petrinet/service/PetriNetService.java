@@ -2,8 +2,8 @@ package com.netgrif.workflow.petrinet.service;
 
 import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.auth.service.UserProcessRoleService;
+import com.netgrif.workflow.auth.service.interfaces.IUserProcessRoleService;
 import com.netgrif.workflow.event.events.model.UserImportModelEvent;
-import com.netgrif.workflow.importer.service.Config;
 import com.netgrif.workflow.importer.service.Importer;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.Transition;
@@ -15,6 +15,7 @@ import com.netgrif.workflow.petrinet.domain.roles.ProcessRoleRepository;
 import com.netgrif.workflow.petrinet.domain.version.Version;
 import com.netgrif.workflow.petrinet.domain.throwable.MissingPetriNetMetaDataException;
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
+import com.netgrif.workflow.petrinet.service.interfaces.IProcessRoleService;
 import com.netgrif.workflow.petrinet.web.responsebodies.DataFieldReference;
 import com.netgrif.workflow.petrinet.web.responsebodies.PetriNetReference;
 import com.netgrif.workflow.petrinet.web.responsebodies.TransitionReference;
@@ -58,10 +59,10 @@ public abstract class PetriNetService implements IPetriNetService {
     abstract Importer getImporter();
 
     @Autowired
-    private UserProcessRoleService userProcessRoleService;
+    private IUserProcessRoleService userProcessRoleService;
 
     @Autowired
-    private ProcessRoleRepository processRoleRepository;
+    private IProcessRoleService processRoleService;
 
     @Autowired
     private PetriNetRepository repository;
@@ -106,108 +107,34 @@ public abstract class PetriNetService implements IPetriNetService {
 
     @Override
     public Optional<PetriNet> importPetriNet(InputStream xmlFile, String releaseType, LoggedUser user) throws IOException, MissingPetriNetMetaDataException {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        IOUtils.copy(xmlFile, baos);
-        byte[] bytes = baos.toByteArray();
-
-        Optional<PetriNet> imported = getImporter().importPetriNet(new ByteArrayInputStream(bytes), new Config());
+        Optional<PetriNet> imported = getImporter().importPetriNet(copy(xmlFile));
         if (!imported.isPresent()) {
             return imported;
         }
+        PetriNet net = imported.get();
 
-        PetriNet existingNet = getNewestVersionByIdentifier(imported.get().getIdentifier());
-        Optional<PetriNet> newPetriNet = existingNet == null ? importNewPetriNet(new ByteArrayInputStream(bytes), user) : importNewVersion(new ByteArrayInputStream(bytes), releaseType, existingNet, user);
-        newPetriNet.ifPresent(petriNet -> {
-            cache.put(petriNet.getObjectId(), petriNet);
-            saveNew(petriNet);
-        });
-
-        return newPetriNet;
-    }
-
-    private Optional<PetriNet> importNewPetriNet(InputStream xmlFile, LoggedUser user) throws IOException, MissingPetriNetMetaDataException {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        IOUtils.copy(xmlFile, baos);
-        byte[] bytes = baos.toByteArray();
-
-        Optional<PetriNet> imported = getImporter().importPetriNet(new ByteArrayInputStream(bytes), new Config());
-        imported.ifPresent(petriNet -> {
-            userProcessRoleService.saveRoles(imported.get().getRoles().values(), imported.get().getStringId());
-
-            try {
-                setupImportedPetriNet(imported.get(), new ByteArrayInputStream(bytes), user);
-            } catch (IOException e) {
-                log.error("Importing new Petri net failed: ", e);
-            }
-        });
-
-        return imported;
-    }
-
-    private Optional<PetriNet> importNewVersion(InputStream xmlFile, String releaseType, @NotNull PetriNet previousVersion, LoggedUser user) throws IOException, MissingPetriNetMetaDataException {
-        Config config = Config.builder()
-                .notSaveObjects(true)
-                .build();
-
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        IOUtils.copy(xmlFile, baos);
-        byte[] bytes = baos.toByteArray();
-
-        Optional<PetriNet> imported = getImporter().importPetriNet(new ByteArrayInputStream(bytes), config);
-        imported.ifPresent(petriNet -> {
-            petriNet.setVersion(previousVersion.getVersion());
-            petriNet.incrementVersion(PetriNet.VersionType.valueOf(releaseType.trim().toUpperCase()));
-            List<ProcessRole> newRoles = migrateProcessRoles(petriNet, previousVersion);
-
-            try {
-                setupImportedPetriNet(petriNet, new ByteArrayInputStream(bytes), user);
-                userProcessRoleService.saveRoles(newRoles, petriNet.getStringId());
-            } catch (IOException e) {
-                log.error("Importing new version failed: ", e);
-            }
-        });
-
-        return imported;
-    }
-
-    private List<ProcessRole> migrateProcessRoles(PetriNet newVersion, PetriNet previousVersion) {
-        Map<String, String> twins = new HashMap<>(); //key is new roles, value is old role => key is which role should be replaced and value by what
-        List<ProcessRole> newRoles = new ArrayList<>();
-        Map<String, ProcessRole> oldRolesByName = new HashMap<>();
-        previousVersion.getRoles().forEach((id, role) -> oldRolesByName.put(role.getName().getDefaultValue(), role));
-
-        newVersion.getRoles().forEach((id, role) -> {
-            if (oldRolesByName.containsKey(role.getName().getDefaultValue())) {
-                twins.put(role.getStringId(), oldRolesByName.get(role.getName().getDefaultValue()).getStringId());
-            } else {
-                newRoles.add(role);
-            }
-        });
-
-        //replace new role with old
-        twins.forEach((newId, oldId) -> {
-            //replace in Petri Net
-            newVersion.getRoles().remove(newId);
-            newVersion.addRole(previousVersion.getRoles().get(oldId));
-
-            //replace in transitions
-            newVersion.getTransitions().forEach((transId, transition) -> {
-                if (transition.getRoles().containsKey(newId)) {
-                    transition.addRole(oldId, transition.getRoles().remove(newId));
-                }
-            });
-        });
-
-        return processRoleRepository.saveAll(newRoles);
-    }
-
-    private void setupImportedPetriNet(PetriNet net, InputStream xmlFile, LoggedUser user) throws IOException {
+        PetriNet existingNet = getNewestVersionByIdentifier(net.getIdentifier());
+        if (existingNet != null) {
+            net.setVersion(existingNet.getVersion());
+            net.incrementVersion(PetriNet.VersionType.valueOf(releaseType.trim().toUpperCase()));
+        }
+        processRoleService.saveAll(net.getRoles().values());
+        userProcessRoleService.saveRoles(net.getRoles().values(), net.getStringId());
         net.setAuthor(user.transformToAuthor());
-        net = repository.save(net);
         Path savedPath = getImporter().saveNetFile(net, xmlFile);
         log.info("Petri net " + net.getTitle() + " (" + net.getInitials() + " v" + net.getVersion() + ") imported successfully");
-
         publisher.publishEvent(new UserImportModelEvent(user, new File(savedPath.toString()), net.getTitle().getDefaultValue(), net.getInitials()));
+        saveNew(net);
+        cache.put(net.getObjectId(), net);
+
+        return imported;
+    }
+
+    private InputStream copy(InputStream xmlFile) throws IOException {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        IOUtils.copy(xmlFile, baos);
+        byte[] bytes = baos.toByteArray();
+        return new ByteArrayInputStream(bytes);
     }
 
     @Override
@@ -270,19 +197,6 @@ public abstract class PetriNetService implements IPetriNetService {
         }
         return new FileSystemResource(fileStorageConfiguration.getStorageArchived() + netId + "-" + title + Importer.FILE_EXTENSION);
     }
-
-
-//    public static PetriNetReference transformToReference(PetriNet net, Locale locale) {
-//        return new PetriNetReference(net.getStringId(), net.getIdentifier(), net.getVersion(), net.getTitle().getTranslation(locale), net.getInitials());
-//    }
-//
-//    public static TransitionReference transformToReference(PetriNet net, Transition transition, Locale locale) {
-//        return new TransitionReference(transition.getStringId(), transition.getTitle().getTranslation(locale), net.getStringId());
-//    }
-//
-//    public static DataFieldReference transformToReference(PetriNet net, Transition transition, Field field, Locale locale) {
-//        return new DataFieldReference(field.getStringId(), field.getName().getTranslation(locale), net.getStringId(), transition.getStringId());
-//    }
 
     @Override
     public List<PetriNetReference> getReferences(LoggedUser user, Locale locale) {
