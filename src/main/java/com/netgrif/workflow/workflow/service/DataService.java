@@ -213,8 +213,8 @@ public class DataService implements IDataService {
                         resultDataGroups.addAll(collectTaskRefDataGroups((TaskField) dataFieldMap.get(datum), locale, collectedTaskIds, level));
                     } else {
                         Field resource = dataFieldMap.get(datum);
-                        if (resource.getLayout() != null && !dataGroup.getImportId().contains("-")) {
-                            resource.getLayout().setY(resource.getLayout().getY() + wrapping);
+                        if (resource.getLayout() != null && !dataGroup.getImportId().contains("-") && wrapping != 0) {
+                            resource.getLayout().setY(resource.getLayout().getY() + wrapping - 1);
                         }
                         if (level != 0) resource.setImportId(taskId + "-" + resource.getImportId());
                         resources.add(resource);
