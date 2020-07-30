@@ -52,24 +52,20 @@ public class DataConverter implements IDataConverter {
 
     private int lastX, lastY;
 
-    /**
-     * Generates title field for PDF
-     *
-     * @param title text of title
-     */
     @Override
-    public void generateTitleField(String title) {
+    public void generateTitleField() {
         log.info("Setting title field for PDF");
 
-        resource.setBaseY(resource.getPageHeight() - resource.getMarginTop());
+        resource.setBaseY(resource.getPageHeight() - resource.getMarginTitle());
         pdfFields = new ArrayList<>();
         changedPdfFields = new Stack<>();
 
         PdfField titleField = new PdfField("titleField", 0, 0, resource.getPageDrawableWidth(),
-                resource.getFormGridRowHeight(), title, false);
+                resource.getFormGridRowHeight(), resource.getDocumentTitle(), false);
 
         titleField.setOriginalBottomY(countBottomPosY(titleField));
         titleField.countMultiLineHeight(resource.getFontTitleSize(), resource);
+        titleField.setHeight(titleField.getHeight() + 2 * resource.getLineHeight());
         titleField.setBottomY(countBottomPosY(titleField));
 
         pdfFields.add(titleField);

@@ -1,10 +1,12 @@
 package com.netgrif.workflow.pdf.generator.service;
 
 import com.netgrif.workflow.pdf.generator.config.PdfResource;
+import com.netgrif.workflow.pdf.generator.config.types.PdfBooleanFormat;
 import com.netgrif.workflow.pdf.generator.domain.PdfField;
 import com.netgrif.workflow.pdf.generator.service.interfaces.IPdfDrawer;
 import com.netgrif.workflow.pdf.generator.service.renderer.*;
 import com.netgrif.workflow.petrinet.domain.dataset.FieldType;
+import lombok.Setter;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
@@ -25,29 +27,29 @@ public class PdfDrawer implements IPdfDrawer {
 
     private PDDocument pdf;
 
+    @Setter
+    private PDDocument templatePdf;
+
     private PDPageContentStream contentStream;
 
     private List<PDPage> pageList;
 
-    private PDPage currentPage;
+    private PDPage currentPage = null;
 
     @Autowired
     private PdfResource resource;
 
-    private int marginLeft, marginBottom;
-    private int lineHeight, pageDrawableWidth, padding;
-    private int fontValueSize, fontLabelSize;
+    private int marginBottom;
+    private int lineHeight, padding;
+    private int boxSize;
 
     public void setupDrawer(PDDocument pdf) {
         this.pdf = pdf;
         this.pageList = new ArrayList<>();
-        this.marginLeft = resource.getMarginLeft();
         this.marginBottom = resource.getMarginBottom();
         this.lineHeight = resource.getLineHeight();
-        this.pageDrawableWidth = resource.getPageDrawableWidth();
         this.padding = resource.getPadding();
-        this.fontValueSize = resource.getFontValueSize();
-        this.fontLabelSize = resource.getFontLabelSize();
+        this.boxSize = resource.getBoxSize();
     }
 
     @Override
@@ -61,17 +63,27 @@ public class PdfDrawer implements IPdfDrawer {
         if (contentStream != null) {
             contentStream.close();
         }
-        if (pageList.indexOf(currentPage) < pageList.size() - 1) {
+        PDPage emptyPage;
+        if (!isOnLastPage()) {
             currentPage = pageList.get(pageList.indexOf(currentPage) + 1);
             contentStream = new PDPageContentStream(pdf, currentPage, PDPageContentStream.AppendMode.APPEND, true, true);
-        } else {
-            PDPage emptyPage = new PDPage(resource.getPageSize());
+        } else if (templatePdf != null || isOnLastPage()) {
+            if (templatePdf != null && pageList.size() == 0) {
+                emptyPage = templatePdf.getPage(0);
+            } else if(templatePdf != null && templatePdf.getPages().getCount() > 1) {
+                emptyPage = templatePdf.getPage(1);
+            } else{
+                emptyPage = new PDPage(resource.getPageSize());
+            }
             pageList.add(emptyPage);
             pdf.addPage(emptyPage);
             currentPage = emptyPage;
             contentStream = new PDPageContentStream(pdf, currentPage, PDPageContentStream.AppendMode.APPEND, true, true);
-            drawPageNumber(pageList.indexOf(emptyPage) + 1);
         }
+    }
+
+    private boolean isOnLastPage(){
+        return pageList.indexOf(currentPage) == pageList.size() - 1;
     }
 
     @Override
@@ -83,8 +95,17 @@ public class PdfDrawer implements IPdfDrawer {
         }
     }
 
-    private void drawPageNumber(int number) throws IOException {
-        writeString(resource.getValueFont(), fontValueSize, marginLeft + (pageDrawableWidth / 2), marginBottom - 2 * lineHeight, String.valueOf(number));
+    @Override
+    public void drawPageNumber() throws IOException {
+        PageNumberRenderer pageNumberRenderer = new PageNumberRenderer();
+        pageNumberRenderer.setupRenderer(this, resource);
+        pageNumberRenderer.setFormat(resource.getPageNumberFormat());
+
+        for(PDPage page : pageList){
+            contentStream.close();
+            contentStream = new PDPageContentStream(pdf, page, PDPageContentStream.AppendMode.APPEND, true, true);
+            pageNumberRenderer.renderPageNumber(pageList.indexOf(page) + 1, pageList.size());
+        }
     }
 
     @Override
@@ -134,27 +155,41 @@ public class PdfDrawer implements IPdfDrawer {
     }
 
     @Override
-    public void drawBooleanBox(List<String> values, int x, int y) throws IOException {
-        if (values.get(0).equals("true")) {
-            contentStream.drawImage(resource.getCheckboxChecked(), x, y, fontLabelSize, fontLabelSize);
+    public void drawBooleanBox(List<String> values, String text, int x, int y) throws IOException {
+        if (checkBooleanValue(values, text)) {
+            contentStream.drawImage(resource.getBooleanChecked(), x, y - resource.getBoxPadding(), boxSize, boxSize);
         } else {
-            contentStream.drawImage(resource.getCheckboxUnchecked(), x, y, fontLabelSize, fontLabelSize);
+            contentStream.drawImage(resource.getBooleanUnchecked(), x, y - resource.getBoxPadding(), boxSize, boxSize);
         }
     }
 
+    private boolean checkBooleanValue(List<String> values, String text){
+        PdfBooleanFormat format = resource.getBooleanFormat();
+        if (values.get(0).equals("true")) {
+            if(!format.equals(PdfBooleanFormat.SINGLE_BOX_EN) && !format.equals(PdfBooleanFormat.SINGLE_BOX_SK)){
+                return format.getValue().get(0).equals(text);
+            }else{
+                return true;
+            }
+        }else if(format.equals(PdfBooleanFormat.DOUBLE_BOX_WITH_TEXT_EN) || format.equals(PdfBooleanFormat.DOUBLE_BOX_WITH_TEXT_SK)){
+                return format.getValue().get(1).equals(text);
+        }
+        return false;
+    }
+
     @Override
-    public boolean drawSelectionButtons(List<String> values, String choice, int x, int y, FieldType fieldType) throws IOException {
+    public boolean drawSelectionButton(List<String> values, String choice, int x, int y, FieldType fieldType) throws IOException {
         if (values.contains(choice)) {
             if (fieldType == FieldType.MULTICHOICE) {
-                contentStream.drawImage(resource.getCheckboxChecked(), x, y - 2, fontLabelSize, fontLabelSize);
+                contentStream.drawImage(resource.getCheckboxChecked(), x, y - resource.getBoxPadding(), boxSize, boxSize);
             } else if (fieldType == FieldType.ENUMERATION) {
-                contentStream.drawImage(resource.getRadioChecked(), x, y - 2, fontLabelSize, fontLabelSize);
+                contentStream.drawImage(resource.getRadioChecked(), x, y - resource.getBoxPadding(), boxSize, boxSize);
             }
         } else {
             if (fieldType == FieldType.MULTICHOICE) {
-                contentStream.drawImage(resource.getCheckboxUnchecked(), x, y - 2, fontLabelSize, fontLabelSize);
+                contentStream.drawImage(resource.getCheckboxUnchecked(), x, y - resource.getBoxPadding(), boxSize, boxSize);
             } else if (fieldType == FieldType.ENUMERATION) {
-                contentStream.drawImage(resource.getRadioUnchecked(), x, y - 2, fontLabelSize, fontLabelSize);
+                contentStream.drawImage(resource.getRadioUnchecked(), x, y - resource.getBoxPadding(), boxSize, boxSize);
             }
         }
         return true;

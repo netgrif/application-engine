@@ -15,7 +15,7 @@ public interface IDataConverter {
     void setDataSet(Map<String, DataField> dataSet);
     List<PdfField> getPdfFields();
 
-    void generateTitleField(String title);
+    void generateTitleField();
 
     /**
      * Creates PdfField list that will be used for drawing elements to PDF
