@@ -58,7 +58,9 @@ class ImporterTest {
 
         // ASSERT IMPORTED NET
         assert net.importId == "new_model"
-        assert net.version == "1.0.0"
+        assert net.version.major == 1
+        assert net.version.minor == 0
+        assert net.version.patch == 0
         assert net.initials == "NEW"
         assert net.title.defaultValue == "New Model"
         assert net.icon == "home"
@@ -95,7 +97,9 @@ class ImporterTest {
         net = petriNetService.getNewestVersionByIdentifier("new_model")
         assert net != null
         assert net.importId == "new_model"
-        assert net.version == "1.0.0"
+        assert net.version.major == 1
+        assert net.version.minor == 0
+        assert net.version.patch == 0
         assert net.initials == "NEW"
         assert net.title.defaultValue == "New Model"
         assert net.icon == "home"
@@ -139,8 +143,10 @@ class ImporterTest {
         def net2 = netOptional2.get()
 
         // ASSERT NEW IMPORTED NET
-        assert net2.importId == "new_modelyoutu"
-        assert net2.version == "2.0.0"
+        assert net2.importId == "new_model"
+        assert net2.version.major == 2
+        assert net2.version.minor == 0
+        assert net2.version.patch == 0
         assert net2.initials == "NEW"
         assert net2.title.defaultValue == "New Model2"
         assert net2.icon == "home2"
@@ -165,7 +171,9 @@ class ImporterTest {
         net2 = petriNetService.getNewestVersionByIdentifier("new_model")
         assert net2 != null
         assert net2.importId == "new_model"
-        assert net2.version == "2.0.0"
+        assert net2.version.major == 2
+        assert net2.version.minor == 0
+        assert net2.version.patch == 0
         assert net2.initials == "NEW"
         assert net2.title.defaultValue == "New Model2"
         assert net2.icon == "home2"
@@ -190,7 +198,9 @@ class ImporterTest {
         net = petriNetService.getPetriNet(net.stringId)
         assert net != null
         assert net.importId == "new_model"
-        assert net.version == "1.0.0"
+        assert net.version.major == 1
+        assert net.version.minor == 0
+        assert net.version.patch == 0
         assert net.initials == "NEW"
         assert net.title.defaultValue == "New Model"
         assert net.icon == "home"
