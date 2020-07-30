@@ -38,6 +38,7 @@ public final class FieldFactory {
     @Autowired
     private ViewFactory viewFactory;
 
+    // TODO: refactor this shit
     Field getField(Data data, Importer importer) throws IllegalArgumentException {
         Field field;
         switch (data.getType()) {
