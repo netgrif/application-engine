@@ -1,10 +1,12 @@
 package com.netgrif.workflow.pdf.generator.service;
 
 import com.netgrif.workflow.pdf.generator.config.PdfResource;
+import com.netgrif.workflow.pdf.generator.config.types.PdfDateFormat;
 import com.netgrif.workflow.pdf.generator.domain.PdfField;
 import com.netgrif.workflow.pdf.generator.service.interfaces.IDataConverter;
 import com.netgrif.workflow.petrinet.domain.DataGroup;
 import com.netgrif.workflow.petrinet.domain.I18nString;
+import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.workflow.domain.DataField;
 import com.netgrif.workflow.workflow.web.responsebodies.LocalisedEnumerationField;
 import com.netgrif.workflow.workflow.web.responsebodies.LocalisedField;
@@ -13,8 +15,10 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.elasticsearch.annotations.DateFormat;
 import org.springframework.stereotype.Service;
 
+import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -27,6 +31,10 @@ public class DataConverter implements IDataConverter {
 
     @Autowired
     private PdfResource resource;
+
+    @Getter
+    @Setter
+    private PetriNet petriNet;
 
     @Getter
     @Setter
@@ -137,12 +145,18 @@ public class DataConverter implements IDataConverter {
             case DATETIME:
                 value.add(formatDateTime(field));
                 break;
+            case NUMBER:
+                double number = (double) dataSet.get(field.getStringId()).getValue();
+                NumberFormat nf2 = NumberFormat.getInstance(resource.getNumberFormat());
+                String numberString = nf2.format(number);
+                value.add(numberString);
+                break;
             default:
                 value.add(dataSet.get(field.getStringId()).getValue() != null ? dataSet.get(field.getStringId()).getValue().toString() : "");
                 break;
         }
-
-        PdfField pdfField = new PdfField(field.getStringId(), dataGroup, field.getType(), field.getName(), value, null);
+        String translatedTitle = getTranslatedLabel(field.getStringId());
+        PdfField pdfField = new PdfField(field.getStringId(), dataGroup, field.getType(), translatedTitle, value, null);
         setFieldParams(dataGroup, field, pdfField);
         setFieldPositions(pdfField, resource.getFontLabelSize());
         return pdfField;
@@ -162,7 +176,8 @@ public class DataConverter implements IDataConverter {
         if (dataSet.get(field.getStringId()).getValue() != null) {
             values.add(dataSet.get(field.getStringId()).getValue().toString());
         }
-        PdfField pdfField = new PdfField(field.getStringId(), dataGroup, field.getType(), field.getName(), values, choices);
+        String translatedTitle = getTranslatedLabel(field.getStringId());
+        PdfField pdfField = new PdfField(field.getStringId(), dataGroup, field.getType(), translatedTitle, values, choices);
         setFieldParams(dataGroup, field, pdfField);
         setFieldPositions(pdfField, resource.getFontLabelSize());
         return pdfField;
@@ -181,13 +196,18 @@ public class DataConverter implements IDataConverter {
         choices = field.getChoices();
         if (dataSet.get(field.getStringId()).getValue() != null) {
             for (I18nString value : (List<I18nString>) dataSet.get(field.getStringId()).getValue()) {
-                values.add(value.toString());
+                values.add(value.getTranslation(resource.getTextLocale()));
             }
         }
-        PdfField pdfField = new PdfField(field.getStringId(), dataGroup, field.getType(), field.getName(), values, choices);
+        String translatedTitle = getTranslatedLabel(field.getStringId());
+        PdfField pdfField = new PdfField(field.getStringId(), dataGroup, field.getType(), translatedTitle, values, choices);
         setFieldParams(dataGroup, field, pdfField);
         setFieldPositions(pdfField, resource.getFontLabelSize());
         return pdfField;
+    }
+
+    private String getTranslatedLabel(String fieldStringId){
+        return petriNet.getDataSet().get(fieldStringId).getName().getTranslation(resource.getTextLocale());
     }
 
     /**
@@ -415,7 +435,7 @@ public class DataConverter implements IDataConverter {
 
     private String formatDateTime(LocalisedField field) {
         if (dataSet.get(field.getStringId()).getValue() != null) {
-            return new SimpleDateFormat("dd-MM-yyyy").format(dataSet.get(field.getStringId()).getValue());
+            return new SimpleDateFormat(resource.getDateFormat().getValue()).format(dataSet.get(field.getStringId()).getValue());
         } else {
             return "";
         }
