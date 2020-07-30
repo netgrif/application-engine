@@ -19,7 +19,10 @@
                 <xs:element ref="title"/>
                 <xs:element ref="placeholder" minOccurs="0"/>
                 <xs:element ref="desc" minOccurs="0"/>
-                <xs:element ref="values" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:choice>
+                    <xs:element ref="values" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element ref="options" minOccurs="0"/>
+                </xs:choice>
                 <xs:choice>
                     <xs:element ref="valid" minOccurs="0" maxOccurs="unbounded"/>
                     <xs:element ref="validations" minOccurs="0" />
@@ -195,7 +198,9 @@
             <xs:enumeration value="number"/>
             <xs:enumeration value="text"/>
             <xs:enumeration value="enumeration"/>
+            <xs:enumeration value="enumeration_map"/>
             <xs:enumeration value="multichoice"/>
+            <xs:enumeration value="multichoice_map"/>
             <xs:enumeration value="boolean"/>
             <xs:enumeration value="date"/>
             <xs:enumeration value="file"/>
