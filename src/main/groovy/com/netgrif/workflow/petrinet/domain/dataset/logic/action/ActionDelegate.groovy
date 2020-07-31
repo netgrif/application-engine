@@ -526,12 +526,6 @@ class ActionDelegate {
     }
 
     File generatePDF(String transitionId){
-        pdfResource.setTemplateResource(new ClassPathResource("src/main/resources/pdfGenerator/existing.pdf"))
-        pdfResource.setDocumentTitle("")
-        pdfResource.setMarginTitle(100)
-        pdfResource.setMarginLeft(75)
-        pdfResource.setMarginRight(75)
-        pdfResource.resetProperties()
         return pdfGenerator.convertCaseForm(useCase, transitionId, pdfResource)
     }
 

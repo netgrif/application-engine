@@ -10,8 +10,6 @@ import java.util.List;
 @Data
 public class PdfEnumerationField extends PdfSelectionField {
 
-    private List<String> choices = null;
-
     public PdfEnumerationField(String fieldId, DataGroup dataGroup, FieldType type, String label, List<String> values, List<String> choices, PdfResource resource) {
         super(resource);
         this.fieldId = fieldId;
