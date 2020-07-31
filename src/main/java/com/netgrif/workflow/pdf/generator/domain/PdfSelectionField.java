@@ -1,7 +1,6 @@
 package com.netgrif.workflow.pdf.generator.domain;
 
 import com.netgrif.workflow.pdf.generator.config.PdfResource;
-import com.netgrif.workflow.pdf.generator.service.DataConverter;
 import com.netgrif.workflow.pdf.generator.service.fieldbuilder.FieldBuilder;
 import lombok.Data;
 
