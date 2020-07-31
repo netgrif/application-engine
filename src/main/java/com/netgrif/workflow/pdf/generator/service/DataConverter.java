@@ -162,7 +162,7 @@ public class DataConverter implements IDataConverter {
 
     private void shiftFieldsBelow(PdfField currentField) {
         pdfFields.forEach(fieldBelow -> {
-            if (!currentField.equals(fieldBelow)) {
+            if (currentField != fieldBelow) {
                 shiftField(currentField, fieldBelow);
             }
         });

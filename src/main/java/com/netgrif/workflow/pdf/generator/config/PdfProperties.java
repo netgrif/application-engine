@@ -69,13 +69,15 @@ public class PdfProperties {
 
    protected int pageNumberPosition = (int) (0.5 * pageWidth);
 
-   protected String documentTitle;
+   protected String documentTitle = "";
 
    protected boolean textFieldStroke = true;
 
    protected boolean booleanFieldStroke = false;
 
    protected PdfDateFormat dateFormat = PdfDateFormat.SLOVAK1;
+
+   protected PdfDateFormat dateTimeFormat = PdfDateFormat.SLOVAK1_DATETIME;
 
    protected Locale numberFormat = new Locale("sk", "SK");
 
