@@ -5,7 +5,10 @@ import com.netgrif.workflow.pdf.generator.domain.PdfField;
 import com.netgrif.workflow.pdf.generator.service.interfaces.IDataConverter;
 import com.netgrif.workflow.pdf.generator.service.interfaces.IPdfDrawer;
 import com.netgrif.workflow.pdf.generator.service.interfaces.IPdfGenerator;
+import com.netgrif.workflow.petrinet.domain.DataGroup;
+import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.workflow.domain.Case;
+import com.netgrif.workflow.workflow.domain.DataField;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.font.PDType0Font;
@@ -16,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.*;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Generates PDF from the given transition form
@@ -32,11 +36,8 @@ public class PdfGenerator implements IPdfGenerator {
     @Autowired
     private IPdfDrawer pdfDrawer;
 
-    @Autowired
-    private PdfResource pdfResource;
 
-
-    private void constructPdfGenerator() throws IOException {
+    private void constructPdfGenerator(PdfResource pdfResource) throws IOException {
         log.info("Setting up PDF generator.");
 
         this.pdf = new PDDocument();
@@ -54,10 +55,10 @@ public class PdfGenerator implements IPdfGenerator {
     }
 
     @Override
-    public File convertCaseForm(Case formCase, String transitionId) throws IOException {
-        generateData(formCase, transitionId);
+    public File convertCustomField(List<PdfField> pdfFields, PdfResource pdfResource){
         try {
-            return transformRequestToPdf(dataConverter);
+            generateData(pdfFields, pdfResource);
+            return transformRequestToPdf(dataConverter.getPdfFields(), pdfResource);
         } catch (IOException e) {
             log.error("Error occurred while converting form data to PDF", e);
         }
@@ -65,50 +66,81 @@ public class PdfGenerator implements IPdfGenerator {
     }
 
     @Override
-    public void convertCaseForm(Case formCase, String transitionId, OutputStream stream) throws IOException {
-        generateData(formCase, transitionId);
+    public File convertCaseForm(Case formCase, String transitionId, PdfResource pdfResource) throws IOException {
+        return convertCaseForm(formCase, formCase.getPetriNet().getTransition(transitionId).getDataGroups(), pdfResource);
+    }
+
+    @Override
+    public File convertCaseForm(Case formCase, Map<String, DataGroup> dataGroupMap, PdfResource pdfResource) throws IOException {
+        generateData(formCase.getPetriNet(), dataGroupMap, formCase.getDataSet(), pdfResource);
         try {
-            transformRequestToPdf(dataConverter, stream);
+            return transformRequestToPdf(dataConverter.getPdfFields(), pdfResource);
+        } catch (IOException e) {
+            log.error("Error occurred while converting form data to PDF", e);
+        }
+        return null;
+    }
+
+    @Override
+    public void convertCaseForm(Case formCase, String transitionId, PdfResource pdfResource, OutputStream stream) throws IOException {
+        convertCaseForm(formCase, formCase.getPetriNet().getTransition(transitionId).getDataGroups(), pdfResource, stream);
+    }
+
+    @Override
+    public void convertCaseForm(Case formCase, Map<String, DataGroup> dataGroupMap, PdfResource pdfResource, OutputStream stream) throws IOException {
+        generateData(formCase.getPetriNet(), dataGroupMap, formCase.getDataSet(), pdfResource);
+        try {
+            transformRequestToPdf(dataConverter.getPdfFields(), pdfResource, stream);
         } catch (IOException e) {
             log.error("Error occurred while converting form data to PDF", e);
         }
     }
 
-    private void generateData(Case formCase, String transitionId) throws IOException {
-        dataConverter.setPetriNet(formCase.getPetriNet());
-        dataConverter.setDataGroups(formCase.getPetriNet().getTransitions().get(transitionId).getDataGroups());
-        dataConverter.setDataSet(formCase.getDataSet());
+    @Override
+    public void generateData(PetriNet petriNet, Map<String, DataGroup> dataGroupMap, Map<String, DataField> dataSet, PdfResource pdfResource) throws IOException {
+        dataConverter.setupDataConverter(pdfResource);
+        dataConverter.setPetriNet(petriNet);
+        dataConverter.setDataGroups(dataGroupMap);
+        dataConverter.setDataSet(dataSet);
         dataConverter.generateTitleField();
         dataConverter.generatePdfFields();
         dataConverter.generatePdfDataGroups();
         dataConverter.correctFieldsPosition();
 
-        constructPdfGenerator();
-        pdfDrawer.setupDrawer(pdf);
+        constructPdfGenerator(pdfResource);
+        pdfDrawer.setupDrawer(pdf, pdfResource);
     }
 
-    protected File transformRequestToPdf(IDataConverter dataHelper) throws IOException {
+    @Override
+    public void generateData(List<PdfField> pdfFields, PdfResource pdfResource) throws IOException {
+        dataConverter.setPdfFields(pdfFields);
+        dataConverter.correctFieldsPosition();
+
+        constructPdfGenerator(pdfResource);
+        pdfDrawer.setupDrawer(pdf, pdfResource);
+    }
+
+    protected File transformRequestToPdf(List<PdfField> pdfFields, PdfResource pdfResource) throws IOException {
         File output = new File(((ClassPathResource) pdfResource.getOutputResource()).getPath());
-        transformRequestToPdf(dataHelper, new FileOutputStream(output));
+        transformRequestToPdf(pdfFields, pdfResource, new FileOutputStream(output));
         return output;
     }
 
-    protected void transformRequestToPdf(IDataConverter dataHelper, OutputStream stream) throws IOException {
+    protected void transformRequestToPdf(List<PdfField> pdfFields, PdfResource pdfResource, OutputStream stream) throws IOException {
         File template = new File(((ClassPathResource) pdfResource.getTemplateResource()).getPath());
         if(template.exists()){
             pdfDrawer.setTemplatePdf(PDDocument.load(template));
         }
         pdfDrawer.newPage();
-        drawTransitionForm(dataHelper);
+        drawTransitionForm(pdfFields);
         pdfDrawer.closeContentStream();
         pdf.save(stream);
         pdf.close();
         log.info("PDF is generated from transition.");
     }
 
-    void drawTransitionForm(IDataConverter dataHelper) throws IOException {
+    void drawTransitionForm(List<PdfField> pdfFields) throws IOException {
         log.info("Drawing form to PDF.");
-        List<PdfField> pdfFields = dataHelper.getPdfFields();
 
         for (PdfField pdfField : pdfFields) {
 
@@ -117,6 +149,8 @@ public class PdfGenerator implements IPdfGenerator {
             } else if (!pdfField.isDgField()) {
                 switch (pdfField.getType()) {
                     case MULTICHOICE:
+                        pdfDrawer.drawMultiChoiceField(pdfField);
+                        break;
                     case ENUMERATION:
                         pdfDrawer.drawEnumerationField(pdfField);
                         break;

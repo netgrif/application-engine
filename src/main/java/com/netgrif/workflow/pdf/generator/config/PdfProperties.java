@@ -67,6 +67,10 @@ public class PdfProperties {
 
    protected float sizeMultiplier = 1.65f;
 
+   protected int pageNumberPosition = (int) (0.5 * pageWidth);
+
+   protected String documentTitle;
+
    protected boolean textFieldStroke = true;
 
    protected boolean booleanFieldStroke = false;
@@ -77,13 +81,9 @@ public class PdfProperties {
 
    protected Locale textLocale = new Locale("sk", "SK");
 
-   protected String documentTitle;
-
    protected PdfBooleanFormat booleanFormat = PdfBooleanFormat.DOUBLE_BOX_WITH_TEXT_SK;
 
    protected PdfPageNumberFormat pageNumberFormat = PdfPageNumberFormat.SLASH;
-
-   protected int pageNumberPosition = (int) (0.5 * pageWidth);
 
    public void resetProperties(){
       pageDrawableWidth = pageWidth - marginLeft - marginRight;

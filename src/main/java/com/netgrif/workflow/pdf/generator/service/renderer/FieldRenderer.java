@@ -1,7 +1,7 @@
 package com.netgrif.workflow.pdf.generator.service.renderer;
 
 import com.netgrif.workflow.pdf.generator.domain.PdfField;
-import com.netgrif.workflow.pdf.generator.service.DataConverter;
+import com.netgrif.workflow.pdf.generator.service.fieldbuilder.FieldBuilder;
 import lombok.Data;
 import org.apache.pdfbox.pdmodel.font.PDType0Font;
 
@@ -28,7 +28,7 @@ public abstract class FieldRenderer<T> extends Renderer{
         int x = field.getX() + padding, y = renderLinePosY(field, 1);
 
         if (textWidth > field.getWidth() - padding) {
-            multiLineText = DataConverter.generateMultiLineText(Collections.singletonList(field.getLabel()), maxLineSize);
+            multiLineText = FieldBuilder.generateMultiLineText(Collections.singletonList(field.getLabel()), maxLineSize);
         }
 
         for (String line : multiLineText) {
