@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class MultiChoiceFieldBuilder extends FieldBuilder {
+public class MultiChoiceFieldBuilder extends SelectionFieldBuilder {
 
     public MultiChoiceFieldBuilder(PdfResource resource) {
         super(resource);
@@ -32,7 +32,7 @@ public class MultiChoiceFieldBuilder extends FieldBuilder {
             }
         }
         String translatedTitle = getTranslatedLabel(field.getStringId(), petriNet);
-        PdfField pdfField = new PdfMultiChoiceField(field.getStringId(), dataGroup, field.getType(), translatedTitle, values, choices, resource);
+        PdfMultiChoiceField pdfField = new PdfMultiChoiceField(field.getStringId(), dataGroup, field.getType(), translatedTitle, values, choices, resource);
         setFieldParams(dataGroup, field, pdfField);
         setFieldPositions(pdfField, resource.getFontLabelSize());
         return pdfField;

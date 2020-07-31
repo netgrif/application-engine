@@ -16,7 +16,6 @@ import java.util.Map;
 public interface IPdfGenerator {
     File convertCustomField(List<PdfField> pdfFields, PdfResource pdfResource);
 
-
     File convertCaseForm(Case formCase, String transitionId, PdfResource pdfResource) throws IOException;
 
     File convertCaseForm(Case formCase, Map<String, DataGroup> dataGroupMap, PdfResource pdfResource) throws IOException;

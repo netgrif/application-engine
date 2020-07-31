@@ -20,7 +20,6 @@ public class EnumerationRenderer extends SelectionFieldRenderer<EnumerationField
         return renderLabel(helperField, resource.getLabelFont(), fontLabelSize);
     }
 
-    @Override
     public void renderValue(PdfField field, int lineCounter) throws IOException {
         setFieldParams((PdfEnumerationField) field);
         renderValue((PdfSelectionField) helperField, lineCounter);

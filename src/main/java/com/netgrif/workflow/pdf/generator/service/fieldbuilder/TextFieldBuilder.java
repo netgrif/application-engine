@@ -25,6 +25,8 @@ public class TextFieldBuilder extends FieldBuilder{
         String value;
         switch (field.getType()) {
             case DATE:
+                value = formatDate(field, dataSet);
+                break;
             case DATETIME:
                 value = formatDateTime(field, dataSet);
                 break;
@@ -44,9 +46,17 @@ public class TextFieldBuilder extends FieldBuilder{
         return pdfField;
     }
 
-    private String formatDateTime(LocalisedField field, Map<String, DataField> dataSet) {
+    private String formatDate(LocalisedField field, Map<String, DataField> dataSet) {
         if (dataSet.get(field.getStringId()).getValue() != null) {
             return new SimpleDateFormat(resource.getDateFormat().getValue()).format(dataSet.get(field.getStringId()).getValue());
+        } else {
+            return "";
+        }
+    }
+
+    private String formatDateTime(LocalisedField field, Map<String, DataField> dataSet) {
+        if (dataSet.get(field.getStringId()).getValue() != null) {
+            return new SimpleDateFormat(resource.getDateTimeFormat().getValue()).format(dataSet.get(field.getStringId()).getValue());
         } else {
             return "";
         }
