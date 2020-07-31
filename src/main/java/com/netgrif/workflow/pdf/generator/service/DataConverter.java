@@ -1,11 +1,10 @@
 package com.netgrif.workflow.pdf.generator.service;
 
 import com.netgrif.workflow.pdf.generator.config.PdfResource;
-import com.netgrif.workflow.pdf.generator.config.types.PdfDateFormat;
 import com.netgrif.workflow.pdf.generator.domain.PdfField;
+import com.netgrif.workflow.pdf.generator.service.fieldbuilder.*;
 import com.netgrif.workflow.pdf.generator.service.interfaces.IDataConverter;
 import com.netgrif.workflow.petrinet.domain.DataGroup;
-import com.netgrif.workflow.petrinet.domain.I18nString;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.workflow.domain.DataField;
 import com.netgrif.workflow.workflow.web.responsebodies.LocalisedEnumerationField;
@@ -14,12 +13,8 @@ import com.netgrif.workflow.workflow.web.responsebodies.LocalisedMultichoiceFiel
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.elasticsearch.annotations.DateFormat;
 import org.springframework.stereotype.Service;
 
-import java.text.NumberFormat;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -29,7 +24,6 @@ import java.util.*;
 @Service
 public class DataConverter implements IDataConverter {
 
-    @Autowired
     private PdfResource resource;
 
     @Getter
@@ -53,29 +47,22 @@ public class DataConverter implements IDataConverter {
     private int lastX, lastY;
 
     @Override
+    public void setupDataConverter(PdfResource resource){
+        this.resource = resource;
+    }
+
+    @Override
     public void generateTitleField() {
         log.info("Setting title field for PDF");
 
         resource.setBaseY(resource.getPageHeight() - resource.getMarginTitle());
         pdfFields = new ArrayList<>();
         changedPdfFields = new Stack<>();
-
-        PdfField titleField = new PdfField("titleField", 0, 0, resource.getPageDrawableWidth(),
-                resource.getFormGridRowHeight(), resource.getDocumentTitle(), false);
-
-        titleField.setOriginalBottomY(countBottomPosY(titleField));
-        titleField.countMultiLineHeight(resource.getFontTitleSize(), resource);
-        titleField.setHeight(titleField.getHeight() + 2 * resource.getLineHeight());
-        titleField.setBottomY(countBottomPosY(titleField));
-
+        PdfField titleField = new TitleFieldBuilder(resource).createTitleField();
         pdfFields.add(titleField);
         resource.setBaseY(resource.getBaseY() - titleField.getBottomY());
     }
 
-    /**
-     * Creates list of FieldParam objects that allows to manipulate easier with data and sorts by their vertical
-     * order in PDF
-     */
     @Override
     public void generatePdfFields() {
         log.info("Generating PDF fields from data fields.");
@@ -88,6 +75,43 @@ public class DataConverter implements IDataConverter {
                         }
                 ));
         Collections.sort(pdfFields);
+    }
+
+    @Override
+    public void generatePdfDataGroups() {
+        log.info("Generating PDF field from data group titles.");
+
+        List<PdfField> dgFields = new ArrayList<>();
+        DataGroup currentDg = null;
+        for (PdfField pdfField : pdfFields) {
+            if (pdfField.getDataGroup() != null && pdfField.getDataGroup().getTitle() != null && pdfField.getDataGroup() != currentDg) {
+                currentDg = pdfField.getDataGroup();
+                PdfField dgField = new DataGroupFieldBuilder(resource).buildField(pdfField.getDataGroup(), pdfField);
+                dgFields.add(dgField);
+            }
+        }
+        pdfFields.addAll(dgFields);
+        Collections.sort(pdfFields);
+    }
+
+    @Override
+    public void correctFieldsPosition() {
+        pdfFields.forEach(pdfField -> {
+            if (pdfField.isChangedSize()) {
+                pdfField.setBottomY(updateBottomY(pdfField));
+                changedPdfFields.push(pdfField);
+            }
+        });
+
+        while (!changedPdfFields.empty()) {
+            PdfField pdfField = changedPdfFields.pop();
+            if (pdfField.isChangedSize()) {
+                shiftFieldsBelow(pdfField);
+            }
+            if (pdfField.isChangedPosition()) {
+                shiftFieldsBelow(pdfField);
+            }
+        }
     }
 
     protected void generateField(DataGroup dataGroup, LocalisedField field) {
@@ -106,165 +130,36 @@ public class DataConverter implements IDataConverter {
         }
     }
 
-    /**
-     * Generates data group field for PDF
-     */
-    @Override
-    public void generatePdfDataGroups() {
-        log.info("Generating PDF field from data group titles.");
-
-        List<PdfField> dgFields = new ArrayList<>();
-        DataGroup currentDg = null;
-        for (PdfField pdfField : pdfFields) {
-            if (pdfField.getDataGroup() != null && pdfField.getDataGroup().getTitle() != null && pdfField.getDataGroup() != currentDg) {
-                currentDg = pdfField.getDataGroup();
-                PdfField dgField = createPdfDgField(currentDg, pdfField);
-                dgFields.add(dgField);
-            }
-        }
-        pdfFields.addAll(dgFields);
-        Collections.sort(pdfFields);
-    }
-
-    /**
-     * Creates PdfField object from input field
-     *
-     * @param dataGroup data group that contains current field
-     * @param field     field that is currently converted to PdfField
-     * @return newly created PdfField object
-     */
     protected PdfField createPdfTextField(DataGroup dataGroup, LocalisedField field) {
-        List<String> value = new ArrayList<>();
-
-        switch (field.getType()) {
-            case DATE:
-            case DATETIME:
-                value.add(formatDateTime(field));
-                break;
-            case NUMBER:
-                double number = (double) dataSet.get(field.getStringId()).getValue();
-                NumberFormat nf2 = NumberFormat.getInstance(resource.getNumberFormat());
-                String numberString = nf2.format(number);
-                value.add(numberString);
-                break;
-            default:
-                value.add(dataSet.get(field.getStringId()).getValue() != null ? dataSet.get(field.getStringId()).getValue().toString() : "");
-                break;
-        }
-        String translatedTitle = getTranslatedLabel(field.getStringId());
-        PdfField pdfField = new PdfField(field.getStringId(), dataGroup, field.getType(), translatedTitle, value, null);
-        setFieldParams(dataGroup, field, pdfField);
-        setFieldPositions(pdfField, resource.getFontLabelSize());
+        TextFieldBuilder builder = new TextFieldBuilder(resource);
+        PdfField pdfField = builder.buildField(dataGroup, field, dataSet, petriNet, lastX, lastY);
+        updateLastCoordinates(builder.getLastX(), builder.getLastY());
         return pdfField;
     }
 
-    /**
-     * Creates PdfField object from input enumeration field
-     *
-     * @param dataGroup data group that contains current field
-     * @param field     field that is currently converted to PdfField
-     * @return newly created PdfField object
-     */
     protected PdfField createEnumField(DataGroup dataGroup, LocalisedEnumerationField field) {
-        List<String> choices;
-        List<String> values = new ArrayList<>();
-        choices = field.getChoices();
-        if (dataSet.get(field.getStringId()).getValue() != null) {
-            values.add(dataSet.get(field.getStringId()).getValue().toString());
-        }
-        String translatedTitle = getTranslatedLabel(field.getStringId());
-        PdfField pdfField = new PdfField(field.getStringId(), dataGroup, field.getType(), translatedTitle, values, choices);
-        setFieldParams(dataGroup, field, pdfField);
-        setFieldPositions(pdfField, resource.getFontLabelSize());
+        EnumerationFieldBuilder builder = new EnumerationFieldBuilder(resource);
+        PdfField pdfField = builder.buildField(dataGroup, field, dataSet, petriNet, lastX, lastY);
+        updateLastCoordinates(builder.getLastX(), builder.getLastY());
         return pdfField;
     }
 
-    /**
-     * Creates PdfField object from input multi choice field
-     *
-     * @param dataGroup data group that contains current field
-     * @param field     field that is currently converted to PdfField
-     * @return newly created PdfField object
-     */
     protected PdfField createMultiChoiceField(DataGroup dataGroup, LocalisedMultichoiceField field) {
-        List<String> choices;
-        List<String> values = new ArrayList<>();
-        choices = field.getChoices();
-        if (dataSet.get(field.getStringId()).getValue() != null) {
-            for (I18nString value : (List<I18nString>) dataSet.get(field.getStringId()).getValue()) {
-                values.add(value.getTranslation(resource.getTextLocale()));
-            }
-        }
-        String translatedTitle = getTranslatedLabel(field.getStringId());
-        PdfField pdfField = new PdfField(field.getStringId(), dataGroup, field.getType(), translatedTitle, values, choices);
-        setFieldParams(dataGroup, field, pdfField);
-        setFieldPositions(pdfField, resource.getFontLabelSize());
+        MultiChoiceFieldBuilder builder = new MultiChoiceFieldBuilder(resource);
+        PdfField pdfField = builder.buildField(dataGroup, field, dataSet, petriNet, lastX, lastY);
+        updateLastCoordinates(builder.getLastX(), builder.getLastY());
         return pdfField;
     }
 
-    private String getTranslatedLabel(String fieldStringId){
-        return petriNet.getDataSet().get(fieldStringId).getName().getTranslation(resource.getTextLocale());
+    protected void updateLastCoordinates(int lastX, int lastY){
+        this.lastX = lastX;
+        this.lastY = lastY;
     }
 
-    /**
-     * Creates PdfField object from input data group
-     *
-     * @param dataGroup data group that is currently converted to PdfField
-     * @param pdfField  PDF field that contains data about data group
-     * @return newly created PdfField object
-     */
-    protected PdfField createPdfDgField(DataGroup dataGroup, PdfField pdfField) {
-        PdfField dgField = new PdfField(dataGroup.getImportId(), pdfField.getLayoutX(), pdfField.getLayoutY(),
-                pdfField.getWidth(), resource.getLineHeight(), dataGroup.getTitle().toString(), true);
-        setFieldPositions(dgField, resource.getFontGroupSize());
-        return dgField;
+    protected int updateBottomY(PdfField pdfField){
+        return FieldBuilder.countBottomPosY(pdfField, pdfField.getResource());
     }
 
-    private void setFieldParams(DataGroup dg, LocalisedField field, PdfField pdfField) {
-        pdfField.setLayoutX(countFieldLayoutX(dg, field));
-        pdfField.setLayoutY(countFieldLayoutY(dg, field));
-        pdfField.setWidth(countFieldWidth(dg, field));
-        pdfField.setHeight(countFieldHeight(field));
-    }
-
-    private void setFieldPositions(PdfField pdfField, int fontSize) {
-        pdfField.setX(countPosX(pdfField));
-        pdfField.setOriginalTopY(countTopPosY(pdfField));
-        pdfField.setTopY(countTopPosY(pdfField));
-        pdfField.setOriginalBottomY(countBottomPosY(pdfField));
-        pdfField.setBottomY(countBottomPosY(pdfField));
-        pdfField.countMultiLineHeight(fontSize, resource);
-    }
-
-    /**
-     * Check parameters of FieldParam objects and calls correction functions, when a field's cannot be drawn into PDF
-     * correctly
-     */
-    public void correctFieldsPosition() {
-        pdfFields.forEach(pdfField -> {
-            if (pdfField.isChangedSize()) {
-                pdfField.setBottomY(countBottomPosY(pdfField));
-                changedPdfFields.push(pdfField);
-            }
-        });
-
-        while (!changedPdfFields.empty()) {
-            PdfField pdfField = changedPdfFields.pop();
-            if (pdfField.isChangedSize()) {
-                shiftFieldsBelow(pdfField);
-            }
-            if (pdfField.isChangedPosition()) {
-                shiftFieldsBelow(pdfField);
-            }
-        }
-    }
-
-    /**
-     * Counts height difference of currentField when too large text is needed to be converted to pdf and
-     * shifts fields below by that difference
-     *
-     * @param currentField FieldParam object
-     */
     private void shiftFieldsBelow(PdfField currentField) {
         pdfFields.forEach(fieldBelow -> {
             if (!currentField.equals(fieldBelow)) {
@@ -278,11 +173,11 @@ public class DataConverter implements IDataConverter {
         belowTopY = fieldBelow.getTopY();
         cFieldBottomY = currentField.getBottomY();
         if ((isCoveredByDataField(currentField, fieldBelow) || isCoveredByDataGroup(currentField, fieldBelow)) && (cFieldBottomY > belowTopY)) {
-            setNewPositions(belowTopY, cFieldBottomY, fieldBelow);
+            setNewPositions(belowTopY, cFieldBottomY, fieldBelow, currentField.getResource());
         }
     }
 
-    private void setNewPositions(int belowTopY, int cFieldBottomY, PdfField fieldBelow) {
+    private void setNewPositions(int belowTopY, int cFieldBottomY, PdfField fieldBelow, PdfResource resource) {
         int currentDiff;
         currentDiff = cFieldBottomY - belowTopY + resource.getPadding();
         fieldBelow.setTopY(belowTopY + currentDiff);
@@ -299,141 +194,5 @@ public class DataConverter implements IDataConverter {
 
     private boolean isCoveredByDataField(PdfField currentField, PdfField fieldBelow) {
         return currentField.getOriginalBottomY() < fieldBelow.getOriginalTopY();
-    }
-
-    /**
-     * Counts X position of a field on the grid from XML
-     *
-     * @param dataGroup a dataGroup that contains field
-     * @param field     a field that is being converted to FieldParam
-     * @return X position of a field in an abstract grid
-     */
-    private int countFieldLayoutX(DataGroup dataGroup, LocalisedField field) {
-        int x = 0;
-        if (field.getLayout() != null) {
-            x = field.getLayout().getX();
-        } else if (dataGroup.getStretch() == null || !dataGroup.getStretch()) {
-            lastX = (lastX == 0 ? 2 : 0);
-            x = lastX;
-        }
-        return x;
-    }
-
-    /**
-     * Counts Y position of field on the grid from XML
-     *
-     * @param dataGroup a dataGroup that contains field
-     * @param field     a field that is being converted to FieldParam
-     * @return Y position of a field in an abstract grid
-     */
-    private int countFieldLayoutY(DataGroup dataGroup, LocalisedField field) {
-        int y;
-        if (field.getLayout() != null) {
-            y = field.getLayout().getY();
-        } else if (dataGroup.getStretch() != null && dataGroup.getStretch()) {
-            y = ++lastY;
-        } else {
-            lastY = (lastX == 0 ? ++lastY : lastY);
-            y = lastY;
-        }
-        return y;
-    }
-
-    /**
-     * Counts the X coordinate of the most upper part of the field in the PDF document
-     *
-     * @return
-     */
-    public int countPosX(PdfField field) {
-        return (field.getLayoutX() * resource.getFormGridColWidth() + resource.getPadding());
-    }
-
-    /**
-     * Counts the Y coordinate of the most upper part of the field in the PDF document
-     *
-     * @return
-     */
-    public int countTopPosY(PdfField field) {
-        return (field.getLayoutY() * resource.getFormGridRowHeight()) + resource.getPadding();
-    }
-
-    /**
-     * Counts the Y coordinate of the most lower part of the field in the PDF document
-     *
-     * @return
-     */
-    public int countBottomPosY(PdfField field) {
-        return (field.getLayoutY() * resource.getFormGridRowHeight()) + field.getHeight() + resource.getPadding();
-    }
-
-    /**
-     * Generates array of strings in case the text is too long to fit into one line in PDF.
-     * Each element represents a single line in final PDF
-     *
-     * @param values
-     * @param maxLineLength
-     * @return result
-     */
-    public static List<String> generateMultiLineText(List<String> values, float maxLineLength) {
-        StringTokenizer tokenizer;
-        StringBuilder output;
-        List<String> result = new ArrayList<>();
-        int lineLen = 1;
-
-        for (String value : values) {
-            tokenizer = new StringTokenizer(value, " ");
-            output = new StringBuilder(value.length());
-            while (tokenizer.hasMoreTokens()) {
-                String word = tokenizer.nextToken();
-
-                if (lineLen + word.length() > maxLineLength) {
-                    output.append("\n");
-                    lineLen = 0;
-                }
-                output.append(word + " ");
-                lineLen += word.length() + 1;
-            }
-            result.addAll(Arrays.asList(output.toString().split("\n")));
-        }
-        return result;
-    }
-
-    /**
-     * Counts field width for drawing the data field to PDF
-     *
-     * @param dataGroup that the field is part of
-     * @param field     that is the width counted for
-     * @return width of rectangle that will be drawn to PDF
-     */
-    private int countFieldWidth(DataGroup dataGroup, LocalisedField field) {
-        if (field.getLayout() != null) {
-            return field.getLayout().getCols() * resource.getFormGridColWidth() - resource.getPadding();
-        } else {
-            return (dataGroup.getStretch() != null && dataGroup.getStretch() ?
-                    (resource.getFormGridColWidth() * resource.getFormGridCols())
-                    : (resource.getFormGridColWidth() * resource.getFormGridCols() / 2)) - resource.getPadding();
-        }
-    }
-
-    /**
-     * Counts field width for drawing the data field to PDF
-     *
-     * @param field that is the width counted for
-     * @return height of rectangle that will be drawn to PDF
-     */
-    private int countFieldHeight(LocalisedField field) {
-        if (field.getLayout() != null) {
-            return field.getLayout().getRows() * resource.getFormGridRowHeight() - resource.getPadding();
-        } else {
-            return resource.getFormGridRowHeight() - resource.getPadding();
-        }
-    }
-
-    private String formatDateTime(LocalisedField field) {
-        if (dataSet.get(field.getStringId()).getValue() != null) {
-            return new SimpleDateFormat(resource.getDateFormat().getValue()).format(dataSet.get(field.getStringId()).getValue());
-        } else {
-            return "";
-        }
     }
 }

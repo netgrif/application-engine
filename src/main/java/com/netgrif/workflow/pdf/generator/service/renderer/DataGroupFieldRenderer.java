@@ -1,14 +1,14 @@
 package com.netgrif.workflow.pdf.generator.service.renderer;
 
+import com.netgrif.workflow.pdf.generator.domain.PdfDataGroupField;
 import com.netgrif.workflow.pdf.generator.domain.PdfField;
 import java.io.IOException;
 
 public class DataGroupFieldRenderer extends FieldRenderer<TextFieldRenderer> {
 
-    @Override
     public void setFieldParams(PdfField field) {
-        helperField = new PdfField(field.getFieldId(),field.getLabel(), field.getValues(), field.getChoices(), field.getType(), resource.getBaseX() + field.getX(),
-                resource.getBaseY() - field.getBottomY(), field.getWidth(), field.getHeight());
+        helperField = new PdfDataGroupField(field.getFieldId(),field.getLabel(), field.getValues(), field.getType(), resource.getBaseX() + field.getX(),
+                resource.getBaseY() - field.getBottomY(), field.getWidth(), field.getHeight(), resource);
     }
 
     @Override

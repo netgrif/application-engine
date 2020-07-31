@@ -23,6 +23,4 @@ public class PageNumberRenderer extends Renderer {
     @Override
     public int renderLabel(PdfField field) throws IOException {return 0;}
 
-    @Override
-    public void setFieldParams(PdfField field) {}
 }
