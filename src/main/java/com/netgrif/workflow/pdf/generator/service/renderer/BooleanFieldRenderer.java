@@ -2,21 +2,20 @@ package com.netgrif.workflow.pdf.generator.service.renderer;
 
 import com.netgrif.workflow.pdf.generator.config.types.PdfBooleanFormat;
 import com.netgrif.workflow.pdf.generator.domain.PdfField;
+import com.netgrif.workflow.pdf.generator.domain.PdfTextField;
 import com.netgrif.workflow.petrinet.domain.dataset.BooleanField;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 
 public class BooleanFieldRenderer extends FieldRenderer<BooleanField>{
 
     private PdfBooleanFormat booleanFormat;
 
-    @Override
     public void setFieldParams(PdfField field) {
-        helperField = new PdfField(field.getFieldId(),field.getLabel(), field.getValues(), field.getChoices(), field.getType(),
+        helperField = new PdfTextField(field.getFieldId(),field.getLabel(), field.getValues(), field.getType(),
                 resource.getBaseX() + field.getX(), resource.getBaseY() - field.getBottomY(), field.getWidth(),
-                field.getHeight());
+                field.getHeight(), resource);
         booleanFormat = resource.getBooleanFormat();
     }
 
@@ -42,7 +41,7 @@ public class BooleanFieldRenderer extends FieldRenderer<BooleanField>{
 
         List<String> booleanValues = booleanFormat.getValue();
         for(String value : booleanValues){
-            x += booleanValues.indexOf(value) * (padding * 8);
+            x += booleanValues.indexOf(value) * (padding * 9);
             pdfDrawer.drawBooleanBox(field.getValues(), value, x, y);
             pdfDrawer.writeString(resource.getValueFont(), resource.getFontValueSize(), x + fontLabelSize + padding, y, value);
         }

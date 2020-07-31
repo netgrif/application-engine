@@ -1,7 +1,7 @@
 package com.netgrif.workflow.pdf.generator.service.renderer;
 
-import com.netgrif.workflow.pdf.generator.domain.PdfField;
-import com.netgrif.workflow.pdf.generator.service.DataConverter;
+import com.netgrif.workflow.pdf.generator.domain.PdfSelectionField;
+import com.netgrif.workflow.pdf.generator.service.fieldbuilder.FieldBuilder;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -11,7 +11,7 @@ import java.util.List;
 public abstract class SelectionFieldRenderer<T> extends FieldRenderer<T>{
 
 
-    public void renderValue(PdfField field, int lineCounter) throws IOException {
+    public void renderValue(PdfSelectionField field, int lineCounter) throws IOException {
         int maxLineSize = getMaxValueLineSize(field.getWidth() - 3 * padding);
         List<String> multiLineText;
         int x = field.getX() + 4 * padding, y = renderLinePosY(field, lineCounter);
@@ -24,7 +24,7 @@ public abstract class SelectionFieldRenderer<T> extends FieldRenderer<T>{
             }};
 
             if (textWidth > field.getWidth() - 4 * padding) {
-                multiLineText = DataConverter.generateMultiLineText(Collections.singletonList(choice), maxLineSize);
+                multiLineText = FieldBuilder.generateMultiLineText(Collections.singletonList(choice), maxLineSize);
             }
 
             for (String line : multiLineText) {

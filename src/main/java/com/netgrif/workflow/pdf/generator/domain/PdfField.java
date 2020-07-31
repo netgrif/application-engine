@@ -1,8 +1,8 @@
 package com.netgrif.workflow.pdf.generator.domain;
 
-import com.netgrif.workflow.pdf.generator.config.PdfProperties;
 import com.netgrif.workflow.pdf.generator.config.PdfResource;
-import com.netgrif.workflow.pdf.generator.service.DataConverter;
+import com.netgrif.workflow.pdf.generator.service.fieldbuilder.FieldBuilder;
+import com.netgrif.workflow.pdf.generator.service.renderer.Renderer;
 import com.netgrif.workflow.petrinet.domain.DataGroup;
 import com.netgrif.workflow.petrinet.domain.dataset.FieldType;
 import lombok.Data;
@@ -14,82 +14,50 @@ import java.util.List;
  * Class that holds information about fields that will be exported to PDF
  */
 @Data
-public class PdfField extends PdfProperties implements Comparable<PdfField> {
+public abstract class PdfField implements Comparable<PdfField> {
 
-    private String fieldId;
+    protected String fieldId;
 
-    private DataGroup dataGroup = null;
+    protected DataGroup dataGroup = null;
 
-    private FieldType type = null;
+    protected FieldType type = null;
 
-    private String label;
+    protected String label;
 
-    private List<String> values = null;
+    protected List<String> values = null;
 
-    private List<String> choices = null;
+    protected int layoutX;
 
-    private int layoutX;
+    protected int layoutY;
 
-    private int layoutY;
+    protected int x;
 
-    private int x;
+    protected int originalTopY;
 
-    private int originalTopY;
+    protected int topY;
 
-    private int topY;
+    protected Integer originalBottomY;
 
-    private Integer originalBottomY;
+    protected int bottomY;
 
-    private int bottomY;
+    protected int width;
 
-    private int width;
+    protected int height;
 
-    private int height;
+    protected boolean changedSize = false;
 
-    private boolean changedSize = false;
+    protected boolean changedPosition = false;
 
-    private boolean changedPosition = false;
+    protected boolean dgField = false;
 
-    private boolean dgField;
+    protected PdfResource resource;
 
-    public PdfField(String fieldId, DataGroup dataGroup, FieldType type, String label, List<String> values, List<String> choices) {
-        this.fieldId = fieldId;
-        this.dataGroup = dataGroup;
-        this.type = type;
-        this.label = label;
-        this.values = values;
-        this.choices = choices;
-        this.dgField = false;
+    protected Renderer renderer;
+
+    public PdfField(PdfResource resource){
+        this.resource = resource;
     }
 
-    public PdfField(String fieldId, int layoutX, int layoutY, int width, int originalHeight,
-                    String label, boolean dgField) {
-        this.fieldId = fieldId;
-        this.layoutX = layoutX;
-        this.layoutY = layoutY;
-        this.width = width;
-        this.height = originalHeight;
-        this.label = label;
-        this.dgField = dgField;
-    }
-
-    public PdfField(String fieldId, String label, List<String> values, List<String> choices, FieldType type, int x, int bottomY, int width, int height) {
-        this.fieldId = fieldId;
-        this.label = label;
-        this.values = values;
-        this.choices = choices;
-        this.type = type;
-        this.x = x;
-        this.bottomY = bottomY;
-        this.width = width;
-        this.height = height;
-    }
-
-    /**
-     * Counts and changes fields default height in case there are multiple lines and text will not fit into default size
-     *
-     * @param fontSize size of font
-     */
     public void countMultiLineHeight(int fontSize, PdfResource resource) {
         int padding = resource.getPadding();
         int lineHeight = resource.getLineHeight();
@@ -97,27 +65,17 @@ public class PdfField extends PdfProperties implements Comparable<PdfField> {
         int maxValueLineLength = getMaxValueLineSize(this.width - 3 * padding, resource.getFontValueSize(), padding);
         int multiLineHeight = 0;
 
-        List<String> splitLabel = DataConverter.generateMultiLineText(Collections.singletonList(this.label), maxLabelLineLength);
+        List<String> splitLabel = FieldBuilder.generateMultiLineText(Collections.singletonList(this.label), maxLabelLineLength);
         multiLineHeight += splitLabel.size() * lineHeight + padding;
 
-        if (this.choices != null) {
-            List<String> splitText = DataConverter.generateMultiLineText(this.choices, maxValueLineLength);
-            multiLineHeight += splitText.size() * lineHeight + padding;
-        } else if (this.values != null) {
-            List<String> splitText = DataConverter.generateMultiLineText(this.values, maxValueLineLength);
+        if (this.values != null) {
+            List<String> splitText = FieldBuilder.generateMultiLineText(this.values, maxValueLineLength);
             multiLineHeight += splitText.size() * lineHeight + padding;
         }
-
         this.changedSize = changeHeight(multiLineHeight);
     }
 
-    /**
-     * Changes the field's height for new multiLineHeight when the too long text requires more space
-     *
-     * @param multiLineHeight the new height of field
-     * @return boolean value, whether the change was executed or not
-     */
-    private boolean changeHeight(int multiLineHeight) {
+    protected boolean changeHeight(int multiLineHeight) {
         if (multiLineHeight <= this.height) {
             return false;
         }
@@ -130,11 +88,11 @@ public class PdfField extends PdfProperties implements Comparable<PdfField> {
         return this.getOriginalBottomY().compareTo(pdfField.getOriginalBottomY());
     }
 
-    private int getMaxLabelLineSize(int fieldWidth, int fontSize, int padding) {
-        return (int) ((fieldWidth - padding) * sizeMultiplier / fontSize);
+    protected int getMaxLabelLineSize(int fieldWidth, int fontSize, int padding) {
+        return (int) ((fieldWidth - padding) * resource.getSizeMultiplier() / fontSize);
     }
 
-    private int getMaxValueLineSize(int fieldWidth, int fontSize, int padding) {
-        return (int) ((fieldWidth - padding) * sizeMultiplier / fontSize);
+    protected int getMaxValueLineSize(int fieldWidth, int fontSize, int padding) {
+        return (int) ((fieldWidth - padding) * resource.getSizeMultiplier() / fontSize);
     }
 }

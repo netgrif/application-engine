@@ -80,7 +80,7 @@ class ActionDelegate {
     IPdfGenerator pdfGenerator
 
     @Autowired
-    PdfResource pdfResource;
+    PdfResource pdfResource
 
     /**
      * Reference of case in which current action is taking place.
@@ -532,7 +532,7 @@ class ActionDelegate {
         pdfResource.setMarginLeft(75)
         pdfResource.setMarginRight(75)
         pdfResource.resetProperties()
-        return pdfGenerator.convertCaseForm(useCase, transitionId)
+        return pdfGenerator.convertCaseForm(useCase, transitionId, pdfResource)
     }
 
 }
