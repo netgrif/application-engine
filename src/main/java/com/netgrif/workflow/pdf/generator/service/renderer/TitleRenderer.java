@@ -1,7 +1,8 @@
 package com.netgrif.workflow.pdf.generator.service.renderer;
 
 import com.netgrif.workflow.pdf.generator.domain.PdfField;
-import com.netgrif.workflow.pdf.generator.service.DataConverter;
+import com.netgrif.workflow.pdf.generator.domain.PdfTitleField;
+import com.netgrif.workflow.pdf.generator.service.fieldbuilder.FieldBuilder;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -13,8 +14,7 @@ public class TitleRenderer extends Renderer{
     private int fieldY, fieldWidth;
     private String label;
 
-    @Override
-    public void setFieldParams(PdfField field) {
+    public void setFieldParams(PdfTitleField field) {
         fieldY = field.getBottomY();
         fieldWidth = field.getWidth();
         label = field.getLabel();
@@ -22,7 +22,7 @@ public class TitleRenderer extends Renderer{
 
     @Override
     public int renderLabel(PdfField field) throws IOException {
-        setFieldParams(field);
+        setFieldParams((PdfTitleField) field);
         renderTitle(label, fieldY, fieldWidth);
         return 0;
     }
@@ -37,7 +37,7 @@ public class TitleRenderer extends Renderer{
 
         if (textWidth > fieldWidth - 2 * padding) {
             x = baseX;
-            multiLineText = DataConverter.generateMultiLineText(Collections.singletonList(title), maxLineSize);
+            multiLineText = FieldBuilder.generateMultiLineText(Collections.singletonList(title), maxLineSize);
         }
 
         for (String line : multiLineText) {

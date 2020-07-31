@@ -23,8 +23,6 @@ public abstract class Renderer {
 
     float strokeWidth;
 
-    public abstract void setFieldParams(PdfField field);
-
     public abstract int renderLabel(PdfField field) throws IOException;
 
     public void setupRenderer(IPdfDrawer pdfDrawer, PdfResource resource) {

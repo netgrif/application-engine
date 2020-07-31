@@ -1,5 +1,6 @@
 package com.netgrif.workflow.pdf.generator.service.interfaces;
 
+import com.netgrif.workflow.pdf.generator.config.PdfResource;
 import com.netgrif.workflow.pdf.generator.domain.PdfField;
 import com.netgrif.workflow.petrinet.domain.dataset.FieldType;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -9,7 +10,7 @@ import java.io.IOException;
 import java.util.List;
 
 public interface IPdfDrawer {
-    void setupDrawer(PDDocument pdf);
+    void setupDrawer(PDDocument pdf, PdfResource pdfResource);
     void setTemplatePdf(PDDocument pdf);
     void newPage() throws IOException;
     void checkOpenPages() throws IOException;

@@ -1,18 +1,18 @@
 package com.netgrif.workflow.pdf.generator.service.renderer;
 
-import com.netgrif.workflow.pdf.generator.config.PdfResource;
 import com.netgrif.workflow.pdf.generator.domain.PdfField;
+import com.netgrif.workflow.pdf.generator.domain.PdfTextField;
 import com.netgrif.workflow.pdf.generator.service.DataConverter;
+import com.netgrif.workflow.pdf.generator.service.fieldbuilder.FieldBuilder;
 
 import java.io.IOException;
 import java.util.List;
 
 public class TextFieldRenderer extends FieldRenderer<TextFieldRenderer> {
 
-    @Override
     public void setFieldParams(PdfField field) {
-        helperField = new PdfField(field.getFieldId(),field.getLabel(), field.getValues(), field.getChoices(), field.getType(),
-                resource.getBaseX() + field.getX(), resource.getBaseY() - field.getBottomY(), field.getWidth(), field.getHeight());
+        helperField = new PdfTextField(field.getFieldId(),field.getLabel(), field.getValues(), field.getType(),
+                resource.getBaseX() + field.getX(), resource.getBaseY() - field.getBottomY(), field.getWidth(), field.getHeight(), resource);
     }
 
     @Override
@@ -35,7 +35,7 @@ public class TextFieldRenderer extends FieldRenderer<TextFieldRenderer> {
         int strokeLineCounter = 0;
 
         if (textWidth > field.getWidth() - 3 * padding) {
-            multiLineText = DataConverter.generateMultiLineText(field.getValues(), maxLineSize);
+            multiLineText = FieldBuilder.generateMultiLineText(field.getValues(), maxLineSize);
         }
 
         for (String line : multiLineText) {
