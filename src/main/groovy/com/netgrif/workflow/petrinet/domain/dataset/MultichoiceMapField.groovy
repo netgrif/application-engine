@@ -4,7 +4,7 @@ import com.netgrif.workflow.petrinet.domain.I18nString
 import org.springframework.data.mongodb.core.mapping.Document
 
 @Document
-class MultichoiceMapField extends MapChoiceField<I18nString, Set<String>> {
+class MultichoiceMapField extends MapOptionsField<I18nString, Set<String>> {
 
     MultichoiceMapField() {
         super()
@@ -25,13 +25,13 @@ class MultichoiceMapField extends MapChoiceField<I18nString, Set<String>> {
     }
 
     @Override
-    Map<String, I18nString> getChoices() {
-        return super.getChoices()
+    Map<String, I18nString> getOptions() {
+        return super.getOptions()
     }
 
     @Override
-    void setChoices(Map<String, I18nString> choices) {
-        super.setChoices(choices)
+    void setOptions(Map<String, I18nString> choices) {
+        super.setOptions(choices)
     }
 
     @Override
@@ -49,7 +49,7 @@ class MultichoiceMapField extends MapChoiceField<I18nString, Set<String>> {
         MultichoiceMapField clone = new MultichoiceMapField()
         super.clone(clone)
 
-        clone.choices = choices
+        clone.options = options
         clone.defaultValue = defaultValue
 
         return clone
