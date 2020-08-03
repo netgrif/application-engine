@@ -4,6 +4,7 @@ import com.netgrif.workflow.petrinet.domain.I18nString;
 import com.netgrif.workflow.petrinet.domain.dataset.MapChoiceField;
 import lombok.Data;
 
+import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -18,6 +19,6 @@ public class LocalisedMapOptionsField<DV> extends LocalisedField {
         this.options = field.getChoices()
                 .entrySet()
                 .stream()
-                .collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue().getTranslation(locale)));
+                .collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue().getTranslation(locale), (o1, o2) -> o1, LinkedHashMap::new));
     }
 }

@@ -2,9 +2,6 @@ package com.netgrif.workflow.importer.service;
 
 import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.importer.model.*;
-import com.netgrif.workflow.importer.model.Data;
-import com.netgrif.workflow.importer.model.DocumentRef;
-import com.netgrif.workflow.importer.model.I18NStringType;
 import com.netgrif.workflow.petrinet.domain.Format;
 import com.netgrif.workflow.petrinet.domain.I18nString;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
@@ -162,8 +159,13 @@ public final class FieldFactory {
     }
 
     private EnumerationMapField buildEnumerationMapField(Options options, List<String> init, Importer importer) {
-        Map<String, I18nString> choices = options.getOption().stream()
-                .collect(Collectors.toMap(Option::getKey, importer::toI18NString));
+        Map<String, I18nString> choices;
+        if (options == null) {
+            choices = new LinkedHashMap<>();
+        } else {
+            choices = options.getOption().stream()
+                    .collect(Collectors.toMap(Option::getKey, importer::toI18NString, (o1, o2) -> o1, LinkedHashMap::new));
+        }
         EnumerationMapField field = new EnumerationMapField(choices);
         if (init!= null && !init.isEmpty()) {
             field.setDefaultValue(init.get(0));
