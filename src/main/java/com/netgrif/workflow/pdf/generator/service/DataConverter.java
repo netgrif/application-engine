@@ -17,9 +17,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 
-/**
- * Class that represents data that needs to be exported to PDF
- */
 @Slf4j
 @Service
 public class DataConverter implements IDataConverter {
