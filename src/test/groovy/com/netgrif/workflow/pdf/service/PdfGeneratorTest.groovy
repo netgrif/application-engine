@@ -45,7 +45,7 @@ class PdfGeneratorTest {
     @Autowired
     private PdfResource pdfResource;
 
-    public static final String[] TESTING_DATA = [""]
+    public static final String[] TESTING_DATA = ["pdf_test_1.xml", "pdf_test_2.xml", "pdf_test_3.xml"]
 
     private def stream = { String name ->
         return TaskApiTest.getClassLoader().getResourceAsStream(name)
