@@ -5,7 +5,7 @@ import com.netgrif.workflow.petrinet.domain.I18nString
 import org.springframework.data.mongodb.core.mapping.Document
 
 @Document
-class EnumerationMapField extends MapChoiceField<I18nString, String> {
+class EnumerationMapField extends MapOptionsField<I18nString, String> {
 
     EnumerationMapField() {
         super()
@@ -26,13 +26,13 @@ class EnumerationMapField extends MapChoiceField<I18nString, String> {
     }
 
     @Override
-    Map<String, I18nString> getChoices() {
-        return super.getChoices()
+    Map<String, I18nString> getOptions() {
+        return super.getOptions()
     }
 
     @Override
-    void setChoices(Map<String, I18nString> choices) {
-        super.setChoices(choices)
+    void setOptions(Map<String, I18nString> choices) {
+        super.setOptions(choices)
     }
 
     @Override
@@ -50,7 +50,7 @@ class EnumerationMapField extends MapChoiceField<I18nString, String> {
         EnumerationMapField clone = new EnumerationMapField()
         super.clone(clone)
 
-        clone.choices = choices
+        clone.options = options
         clone.defaultValue = defaultValue
 
         return clone

@@ -1,7 +1,6 @@
 package com.netgrif.workflow.petrinet.domain.dataset.logic.action
 
-import com.netgrif.workflow.*
-import com.netgrif.workflow.AsyncRunner
+
 import com.netgrif.workflow.auth.domain.User
 import com.netgrif.workflow.auth.service.interfaces.IUserService
 import com.netgrif.workflow.configuration.ApplicationContextProvider
@@ -33,7 +32,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.i18n.LocaleContextHolder
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
-import org.springframework.stereotype.Component
 
 /**
  * ActionDelegate class contains Actions API methods.
@@ -177,6 +175,14 @@ class ActionDelegate {
         changedFields[field.stringId].addAttribute("choices", field.choices.collect { it.getTranslation(LocaleContextHolder.locale) })
     }
 
+    def saveChangedOptions(MapOptionsField field) {
+        useCase.dataSet.get(field.stringId).options = field.options
+        if (!changedFields.containsKey(field.stringId)) {
+            changedFields[field.stringId] = new ChangedField(field.stringId)
+        }
+        changedFields[field.stringId].addAttribute("options", field.options.collectEntries {key, value -> [key, (value as I18nString).getTranslation(LocaleContextHolder.locale)]} )
+    }
+
     def close = { Transition[] transitions ->
         def service = ApplicationContextProvider.getBean("taskService")
         if (!service) {
@@ -249,7 +255,26 @@ class ActionDelegate {
                      field.setChoicesFromStrings(values as Set<String>)
                  }
              saveChangedChoices(field)
-         }]
+         },
+        options: { cl ->
+            if (!(field instanceof MultichoiceMapField || field instanceof EnumerationMapField))
+                return
+
+            def options = cl()
+            if (options == null || (options instanceof Closure && options() == UNCHANGED_VALUE))
+                return
+            if (!(options instanceof Map && options.every {it.getKey() instanceof String}))
+                return
+            field = (MapOptionsField) field
+            if (options.every {it.getValue() instanceof I18nString}) {
+                field.setOptions(options)
+            } else {
+                Map<String, I18nString> newOptions = new LinkedHashMap<>();
+                options.each {it -> newOptions.put(it.getKey() as String, new I18nString(it.getValue() as String))}
+                field.setOptions(newOptions)
+            }
+            saveChangedOptions(field)
+        }]
     }
 
     void changeFieldValue(Field field, def cl) {

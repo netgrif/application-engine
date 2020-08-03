@@ -43,10 +43,10 @@ class MapFieldTest {
 
         EnumerationMapField field = net.dataSet["enumeration"] as EnumerationMapField
         assert field.name.defaultValue == "Enumeration map"
-        assert field.choices.size() == 3
-        assert field.choices["first"].defaultValue == "First option"
-        assert field.choices["second"].defaultValue == "Second option"
-        assert field.choices["third"].defaultValue == "Third option"
+        assert field.options.size() == 3
+        assert field.options["first"].defaultValue == "First option"
+        assert field.options["second"].defaultValue == "Second option"
+        assert field.options["third"].defaultValue == "Third option"
         assert field.defaultValue == "second"
     }
 
@@ -63,10 +63,10 @@ class MapFieldTest {
 
         MultichoiceMapField field = net.dataSet["multichoice"] as MultichoiceMapField
         assert field.name.defaultValue == "Multichoice map"
-        assert field.choices.size() == 3
-        assert field.choices["first"].defaultValue == "First option"
-        assert field.choices["second"].defaultValue == "Second option"
-        assert field.choices["third"].defaultValue == "Third option"
+        assert field.options.size() == 3
+        assert field.options["first"].defaultValue == "First option"
+        assert field.options["second"].defaultValue == "Second option"
+        assert field.options["third"].defaultValue == "Third option"
         assert field.defaultValue.contains("second")
         assert field.defaultValue.contains("first")
     }
