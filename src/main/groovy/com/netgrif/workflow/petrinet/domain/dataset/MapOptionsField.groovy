@@ -17,7 +17,7 @@ abstract class MapOptionsField<T, U> extends FieldWithDefault<U> {
         return options
     }
 
-    void setOptions(Map<String, T> choices) {
-        this.options = choices
+    void setOptions(Map<String, T> options) {
+        this.options = options
     }
 }
