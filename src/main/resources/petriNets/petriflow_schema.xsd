@@ -133,10 +133,10 @@
     <xs:element name="document">
         <xs:complexType>
             <xs:sequence>
-                <xs:element ref="id" minOccurs="0"/>
+                <xs:element ref="id" minOccurs="1"/>
                 <xs:element ref="version" minOccurs="0"/>
-                <xs:element ref="initials" minOccurs="0"/>
-                <xs:element name="title" minOccurs="0" type="i18nStringType"/>
+                <xs:element ref="initials" minOccurs="1"/>
+                <xs:element name="title" minOccurs="1" type="i18nStringType"/>
                 <xs:element ref="icon" minOccurs="0"/>
                 <xs:element ref="defaultRole" minOccurs="0"/>
                 <xs:element ref="transitionRole" minOccurs="0"/>
