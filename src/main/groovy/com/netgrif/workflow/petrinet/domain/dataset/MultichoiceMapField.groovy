@@ -30,8 +30,8 @@ class MultichoiceMapField extends MapOptionsField<I18nString, Set<String>> {
     }
 
     @Override
-    void setOptions(Map<String, I18nString> choices) {
-        super.setOptions(choices)
+    void setOptions(Map<String, I18nString> options) {
+        super.setOptions(options)
     }
 
     @Override

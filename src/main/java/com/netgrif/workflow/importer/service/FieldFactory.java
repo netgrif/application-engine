@@ -269,6 +269,8 @@ public final class FieldFactory {
         resolveDataValues(field, useCase, fieldId);
         if (field instanceof ChoiceField)
             resolveChoices((ChoiceField) field, useCase);
+        if (field instanceof MapOptionsField)
+            resolveMapOptions((MapOptionsField) field, useCase);
         return field;
     }
 
@@ -277,6 +279,13 @@ public final class FieldFactory {
         if (choices == null)
             return;
         field.setChoices(choices);
+    }
+
+    private void resolveMapOptions(MapOptionsField field, Case useCase) {
+        Map options = useCase.getDataField(field.getImportId()).getOptions();
+        if (options == null)
+            return;
+        field.setOptions(options);
     }
 
     public Field buildImmediateField(Case useCase, String fieldId) {
