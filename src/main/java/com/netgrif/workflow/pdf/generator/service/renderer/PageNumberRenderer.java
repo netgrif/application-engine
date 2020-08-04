@@ -13,7 +13,7 @@ public class PageNumberRenderer extends Renderer {
 
     public void renderPageNumber(int counter, int pageCount) throws IOException {
         String numberText = generateNumberText(counter, pageCount);
-        pdfDrawer.writeString(resource.getValueFont(), fontValueSize, marginLeft + (pageDrawableWidth / 2), marginBottom - 2 * lineHeight, numberText);
+        pdfDrawer.writeString(resource.getValueFont(), fontValueSize, resource.getPageNumberPosition(), marginBottom - 2 * lineHeight, numberText);
     }
 
     private String generateNumberText(int counter, int pageCount){

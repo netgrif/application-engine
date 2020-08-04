@@ -59,6 +59,14 @@ public class PdfDrawer implements IPdfDrawer {
     }
 
     @Override
+    public void closeTemplate() throws IOException {
+        if(templatePdf != null){
+            templatePdf.close();
+            templatePdf = null;
+        }
+    }
+
+    @Override
     public void newPage() throws IOException {
         if (contentStream != null) {
             contentStream.close();

@@ -135,7 +135,9 @@ public class PdfGenerator implements IPdfGenerator {
         drawTransitionForm(pdfFields);
         pdfDrawer.closeContentStream();
         pdf.save(stream);
+        pdfDrawer.closeTemplate();
         pdf.close();
+        stream.close();
         log.info("PDF is generated from transition.");
     }
 
