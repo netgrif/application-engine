@@ -479,10 +479,10 @@ public class DataService implements IDataService {
                 value = node.get("value") != null && node.get("value").asBoolean();
                 break;
             case "multichoice":
-                ArrayNode arrayNode = (ArrayNode) node.get("value");
-                HashSet<I18nString> set = new HashSet<>();
-                arrayNode.forEach(item -> set.add(new I18nString(item.asText())));
-                value = set;
+                value = parseMultichoiceFieldValues(node).stream().map(I18nString::new).collect(Collectors.toSet());
+                break;
+            case "multichoice_map":
+                value = parseMultichoiceFieldValues(node);
                 break;
             case "enumeration":
                 String val = node.get("value").asText();
@@ -528,6 +528,13 @@ public class DataService implements IDataService {
         }
         if (value instanceof String && ((String) value).equalsIgnoreCase("null")) return null;
         else return value;
+    }
+
+    private Set<String> parseMultichoiceFieldValues(ObjectNode node) {
+        ArrayNode arrayNode = (ArrayNode) node.get("value");
+        HashSet<String> set = new HashSet<>();
+        arrayNode.forEach(item -> set.add(item.asText()));
+        return set;
     }
 
     @Data
