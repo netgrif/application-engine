@@ -87,14 +87,14 @@ public class PdfProperties {
 
    protected PdfPageNumberFormat pageNumberFormat = PdfPageNumberFormat.SLASH;
 
-   public void resetProperties(){
+   public void updateProperties(){
       pageDrawableWidth = pageWidth - marginLeft - marginRight;
       formGridColWidth = (pageDrawableWidth / formGridCols);
       formGridRowHeight = ((pageHeight - marginBottom - marginTop) / formGridRows);
       baseX = marginLeft;
    }
 
-   public void resetProperties(int unit){
+   public void updateProperties(int unit){
       marginTop = unit;
       marginBottom = unit;
       marginLeft = (int) (0.5 * unit);
