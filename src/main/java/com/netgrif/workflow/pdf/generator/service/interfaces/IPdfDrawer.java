@@ -12,6 +12,9 @@ import java.util.List;
 public interface IPdfDrawer {
     void setupDrawer(PDDocument pdf, PdfResource pdfResource);
     void setTemplatePdf(PDDocument pdf);
+
+    void closeTemplate() throws IOException;
+
     void newPage() throws IOException;
     void checkOpenPages() throws IOException;
     void closeContentStream() throws IOException;
