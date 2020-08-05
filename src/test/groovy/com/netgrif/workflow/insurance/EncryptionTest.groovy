@@ -6,6 +6,8 @@ import com.netgrif.workflow.auth.service.interfaces.IAuthorityService
 import com.netgrif.workflow.importer.service.Config
 import com.netgrif.workflow.importer.service.Importer
 import com.netgrif.workflow.petrinet.domain.PetriNet
+import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
+import com.netgrif.workflow.startup.SuperCreator
 import com.netgrif.workflow.workflow.domain.Case
 import com.netgrif.workflow.workflow.domain.DataField
 import com.netgrif.workflow.workflow.domain.repositories.CaseRepository
@@ -37,6 +39,12 @@ class EncryptionTest {
 
     @Autowired
     private IAuthorityService authorityService
+
+    @Autowired
+    private IPetriNetService petriNetService
+
+    @Autowired
+    private SuperCreator superCreator
 
     private final String FIELD_NAME = "City"
     private final String FIELD_VALUE = "Bratislava"
@@ -70,7 +78,7 @@ class EncryptionTest {
     }
 
     private String createCase() {
-        Optional<PetriNet> net = importer.importPetriNet(new File("src/test/resources/mapping_test.xml"), "Encryption test", "ENC", new Config())
+        Optional<PetriNet> net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/mapping_test.xml"), "major", superCreator.getLoggedSuper())
         assert net.isPresent()
         def useCase = workflowService.createCase(net.get().stringId, "Encryption test", "color", mockLoggedUser())
         def nameField = useCase.petriNet.dataSet.values().find { v -> v.name.defaultValue == FIELD_NAME}
