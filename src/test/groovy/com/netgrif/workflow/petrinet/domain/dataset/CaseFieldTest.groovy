@@ -24,6 +24,9 @@ class CaseFieldTest {
     public static final String ALLOWED_NETS_NET_FILE = "change_allowed_nets_action_test.xml"
     public static final String ALLOWED_NETS_TASK_TITLE = "Tran"
 
+    public static final String CHANGE_VALUE_NET_FILE = "change_caseref_value_action_test.xml"
+    public static final String CHANGE_VALUE_TASK_TITLE = "Tran"
+
     @Autowired
     private ImportHelper importHelper
 
@@ -100,5 +103,64 @@ class CaseFieldTest {
         aCase = caseOpt.get()
         assert aCase.getDataSet().get("caseref").allowedNets.size() == 0
 
+    }
+
+    @Test
+    void testChangeValueAction() {
+        def notAllowedNet = petriNetService.importPetriNet(stream(ALLOWED_NETS_NET_FILE), "major", superCreator.getLoggedSuper())
+        assert notAllowedNet.isPresent()
+
+        def testNet = petriNetService.importPetriNet(stream(CHANGE_VALUE_NET_FILE), "major", superCreator.getLoggedSuper())
+        assert testNet.isPresent()
+
+        Case aCase = importHelper.createCase("Case 1", testNet.get())
+
+        assert aCase.getDataSet().get("caseref").value.size() == 0
+
+        importHelper.assignTaskToSuper(CHANGE_VALUE_TASK_TITLE, aCase.stringId)
+
+        importHelper.setTaskData(CHANGE_VALUE_TASK_TITLE, aCase.stringId, [
+                "addExisting": [
+                        "value": true,
+                        "type": importHelper.FIELD_BOOLEAN
+                ]
+        ])
+
+        def caseOpt = caseRepository.findById(aCase.stringId)
+        assert caseOpt.isPresent()
+        aCase = caseOpt.get()
+        assert aCase.getDataSet().get("caseref").value.size() == 1
+        assert aCase.getDataSet().get("caseref").value.get(0).equals(aCase.getStringId())
+
+        importHelper.setTaskData(CHANGE_VALUE_TASK_TITLE, aCase.stringId, [
+                "addNew": [
+                        "value": true,
+                        "type": importHelper.FIELD_BOOLEAN
+                ]
+        ])
+
+        caseOpt = caseRepository.findById(aCase.stringId)
+        assert caseOpt.isPresent()
+        aCase = caseOpt.get()
+        assert aCase.getDataSet().get("caseref").value.size() == 2
+        assert aCase.getDataSet().get("caseref").value.get(0).equals(aCase.getStringId())
+        String secondCaseId = aCase.getDataSet().get("caseref").value.get(1)
+
+        caseOpt = caseRepository.findById(secondCaseId)
+        assert caseOpt.isPresent()
+
+        importHelper.setTaskData(CHANGE_VALUE_TASK_TITLE, aCase.stringId, [
+                "addInvalidNet": [
+                        "value": true,
+                        "type": importHelper.FIELD_BOOLEAN
+                ]
+        ])
+
+        caseOpt = caseRepository.findById(aCase.stringId)
+        assert caseOpt.isPresent()
+        aCase = caseOpt.get()
+        assert aCase.getDataSet().get("caseref").value.size() == 2
+        assert aCase.getDataSet().get("caseref").value.get(0).equals(aCase.getStringId())
+        assert aCase.getDataSet().get("caseref").value.get(1).equals(secondCaseId)
     }
 }
