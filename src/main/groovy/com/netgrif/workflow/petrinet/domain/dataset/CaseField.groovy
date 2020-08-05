@@ -32,7 +32,7 @@ class CaseField extends Field<List<String>> {
     Field clone() {
         CaseField clone = new CaseField()
         super.clone(clone)
-        clone.allowedNets = this.allowedNets
+        clone.allowedNets = new ArrayList<>(this.allowedNets)
 
         return clone
     }
