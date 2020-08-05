@@ -3,7 +3,9 @@ package com.netgrif.workflow.ipc
 import com.netgrif.workflow.TestHelper
 import com.netgrif.workflow.importer.service.Importer
 import com.netgrif.workflow.petrinet.domain.PetriNet
+import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.workflow.startup.ImportHelper
+import com.netgrif.workflow.startup.SuperCreator
 import com.netgrif.workflow.workflow.domain.Case
 import com.netgrif.workflow.workflow.domain.repositories.CaseRepository
 import org.junit.Before
@@ -31,6 +33,12 @@ class CaseApiTest {
     @Autowired
     private TestHelper testHelper
 
+    @Autowired
+    private IPetriNetService petriNetService
+
+    @Autowired
+    private SuperCreator superCreator
+
     private boolean initialised = false
     private Optional<PetriNet> testNet
 
@@ -47,12 +55,10 @@ class CaseApiTest {
     }
 
     public static final String CREATE_NET_FILE = "ipc_createCase.xml"
-    public static final String CREATE_NET_NAME = "Create case"
-    public static final String CREATE_NET_INITIALS = "CC"
 
     @Test
     void testCreate() {
-        testNet = importer.importPetriNet(stream(CREATE_NET_FILE), CREATE_NET_NAME, CREATE_NET_INITIALS)
+        testNet = petriNetService.importPetriNet(stream(CREATE_NET_FILE), "major", superCreator.getLoggedSuper())
 
         assert testNet.isPresent()
 
@@ -64,12 +70,10 @@ class CaseApiTest {
     }
 
     public static final String SEARCH_NET_FILE = "ipc_where.xml"
-    public static final String SEARCH_NET_NAME = "Insurance"
-    public static final String SEARCH_NET_INITIALS = "INS"
 
     @Test
     void testSearch() {
-        testNet = importer.importPetriNet(stream(SEARCH_NET_FILE), SEARCH_NET_NAME, SEARCH_NET_INITIALS)
+        testNet = petriNetService.importPetriNet(stream(SEARCH_NET_FILE), "major", superCreator.getLoggedSuper())
 
         assert testNet.isPresent()
 

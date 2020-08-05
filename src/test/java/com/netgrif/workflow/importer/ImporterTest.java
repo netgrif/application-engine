@@ -1,11 +1,14 @@
 package com.netgrif.workflow.importer;
 
-import com.netgrif.workflow.MockService;
-import com.netgrif.workflow.importer.service.Config;
+import com.netgrif.workflow.TestHelper;
 import com.netgrif.workflow.importer.service.Importer;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository;
+import com.netgrif.workflow.petrinet.domain.throwable.MissingPetriNetMetaDataException;
+import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
+import com.netgrif.workflow.startup.SuperCreator;
+import com.netgrif.workflow.utils.FullPageRequest;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
 import org.junit.Before;
@@ -14,12 +17,13 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -30,7 +34,7 @@ import java.util.stream.Collectors;
 public class ImporterTest {
 
     @Autowired
-    private Importer importer;
+    private TestHelper testHelper;
 
     @Autowired
     private PetriNetRepository repository;
@@ -39,9 +43,13 @@ public class ImporterTest {
     private IWorkflowService workflowService;
 
     @Autowired
-    private MockService mock;
+    private IPetriNetService petriNetService;
 
-    private static final String NET_TITLE = "jaxb_test";
+    @Autowired
+    private SuperCreator superCreator;
+
+    private static final String NET_ID = "prikladFM_test.xml";
+    private static final String NET_TITLE = "Test";
     private static final String NET_INITIALS = "TST";
     private static final Integer NET_PLACES = 17;
     private static final Integer NET_TRANSITIONS = 22;
@@ -51,42 +59,40 @@ public class ImporterTest {
 
     @Before
     public void before() {
-        repository.deleteAll();
+        testHelper.truncateDbs();
     }
 
     @Test
-    public void importPetriNet() {
-        importer.importPetriNet(new File("src/test/resources/prikladFM_test.xml"), NET_TITLE, NET_INITIALS, new Config());
-
+    public void importPetriNet() throws MissingPetriNetMetaDataException, IOException {
+        petriNetService.importPetriNet(new FileInputStream("src/test/resources/prikladFM_test.xml"), "major", superCreator.getLoggedSuper());
         assertNetProperlyImported();
     }
 
     @Test
-    public void priorityTest() {
-        Optional<PetriNet> net = importer.importPetriNet(new File("src/test/resources/priority_test.xml"), "Priority test", "PT", new Config());
-
+    public void priorityTest() throws MissingPetriNetMetaDataException, IOException {
+        Optional<PetriNet> net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/priority_test.xml"), "major", superCreator.getLoggedSuper());
         assert net.isPresent();
 
-        Case useCase = workflowService.createCase(net.get().getStringId(), net.get().getTitle().getDefaultValue(), "color", mock.mockLoggedUser());
+        Case useCase = workflowService.createCase(net.get().getStringId(), net.get().getTitle().getDefaultValue(), "color", superCreator.getLoggedSuper());
 
         assert useCase != null;
     }
 
     @Test
-    public void dataGroupTest() {
-        Optional<PetriNet> net = importer.importPetriNet(new File("src/test/resources/datagroup_test.xml"), "DataGroup test", "DGT", new Config());
+    public void dataGroupTest() throws MissingPetriNetMetaDataException, IOException {
+        Optional<PetriNet> net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/datagroup_test.xml"), "major", superCreator.getLoggedSuper());
 
         assert net.isPresent();
     }
 
     @Test
     @Ignore
-    public void caseRefTest() {
-        importer.importPetriNet(new File("src/test/resources/datagroup_test.xml"), "DataGroup test", "DGT", new Config());
-        Optional<PetriNet> net = importer.importPetriNet(new File("src/test/resources/caseref_test.xml"), "Caseref test", "CRT", new Config());
+    public void caseRefTest() throws MissingPetriNetMetaDataException, IOException {
+        petriNetService.importPetriNet(new FileInputStream("src/test/resources/datagroup_test.xml"), "major", superCreator.getLoggedSuper());
+        Optional<PetriNet> net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/caseref_test.xml"), "major", superCreator.getLoggedSuper());
         assert net.isPresent();
 
-        Case useCase = workflowService.createCase(net.get().getStringId(), net.get().getTitle().getDefaultValue(), "color", mock.mockLoggedUser());
+        Case useCase = workflowService.createCase(net.get().getStringId(), net.get().getTitle().getDefaultValue(), "color", superCreator.getLoggedSuper());
         assert useCase != null;
 
         List<Field> data = workflowService.getData(useCase.getStringId());
@@ -99,13 +105,13 @@ public class ImporterTest {
     }
 
     @Test
-    public void readArcImportTest() {
-        importer.importPetriNet(new File("src/test/resources/read_test.xml"), "R", "R", new Config());
+    public void readArcImportTest() throws MissingPetriNetMetaDataException, IOException {
+        petriNetService.importPetriNet(new FileInputStream("src/test/resources/read_test.xml"), "major", superCreator.getLoggedSuper());
     }
 
     @Test
-    public void externalMappingTest() {
-        Optional<PetriNet> net = importer.importPetriNet(new File("src/test/resources/mapping_test.xml"), "External mapping", "EXT", new Config());
+    public void externalMappingTest() throws MissingPetriNetMetaDataException, IOException {
+        Optional<PetriNet> net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/mapping_test.xml"), "major", superCreator.getLoggedSuper());
 
         assertExternalMappingImport(net);
     }
@@ -136,9 +142,10 @@ public class ImporterTest {
     }
 
     private void assertNetProperlyImported() {
-        assert repository.count() == 1;
-        PetriNet net = repository.findAll().get(0);
-        assert net.getTitle().equals(NET_TITLE);
+        assert repository.count() > 0;
+        Page<PetriNet> nets = repository.findByIdentifier(NET_ID, new FullPageRequest());
+        PetriNet net = nets.getContent().get(0);
+        assert net.getTitle().getDefaultValue().equals(NET_TITLE);
         assert net.getInitials().equals(NET_INITIALS);
         assert net.getPlaces().size() == NET_PLACES;
         assert net.getTransitions().size() == NET_TRANSITIONS;
