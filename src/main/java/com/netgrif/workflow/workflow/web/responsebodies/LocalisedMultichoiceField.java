@@ -9,18 +9,18 @@ import java.util.*;
 @Data
 public class LocalisedMultichoiceField extends LocalisedField {
 
-    private Map<String, String> choices;
+    private List<String> choices;
 
     private Object defaultValue;
 
     public LocalisedMultichoiceField(MultichoiceField field, Locale locale) {
         super(field, locale);
-        this.choices = new LinkedHashMap<>();
-        Map<String, I18nString> choices = field.getChoices();
-
-        for (Map.Entry<String, I18nString> choice : choices.entrySet()) {
-            this.choices.put(choice.getKey(), choice.getValue().getTranslation(locale));
+        this.choices = new LinkedList<>();
+        Set<I18nString> choices = field.getChoices();
+        for (I18nString choice : choices) {
+            this.choices.add(choice.getTranslation(locale));
         }
+
         this.defaultValue = new LinkedList<String>();
         Collection<I18nString> fieldDefaults = field.getDefaultValue();
         if (fieldDefaults != null) {
