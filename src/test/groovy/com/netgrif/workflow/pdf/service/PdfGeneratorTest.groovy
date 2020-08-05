@@ -6,8 +6,12 @@ import com.netgrif.workflow.importer.service.Importer
 import com.netgrif.workflow.ipc.TaskApiTest
 import com.netgrif.workflow.pdf.generator.config.PdfResource
 import com.netgrif.workflow.pdf.generator.config.types.PdfPageNumberFormat
+import com.netgrif.workflow.pdf.generator.domain.PdfField
+import com.netgrif.workflow.pdf.generator.domain.PdfTextField
+import com.netgrif.workflow.pdf.generator.service.interfaces.IPdfDataHelper
 import com.netgrif.workflow.pdf.generator.service.interfaces.IPdfGenerator
 import com.netgrif.workflow.petrinet.domain.PetriNet
+import com.netgrif.workflow.petrinet.domain.dataset.FieldType
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.workflow.workflow.domain.Case
 import com.netgrif.workflow.workflow.service.interfaces.IDataService
@@ -59,6 +63,7 @@ class PdfGeneratorTest {
         testingWithTemplate()
         testingLongDocument()
         testingPageNumber()
+        testingCustomField()
     }
 
     private void testingNormal(){
@@ -67,7 +72,8 @@ class PdfGeneratorTest {
         Case testCase = workflowService.createCase(net.get().getStringId(), "Test PDF", "", userService.getSystem().transformToLoggedUser())
         dataService.getDataGroups(testCase.getTasks()[0].getTask(), Locale.ENGLISH)
         pdfResource.setOutputResource(new ClassPathResource("src/main/resources/out_" + TESTING_DATA[0] + "_.pdf"))
-        pdfGenerator.convertCaseForm(testCase, "1", pdfResource)
+        pdfGenerator.setupPdfGenerator(pdfResource)
+        pdfGenerator.generatePdf(testCase, "1", pdfResource)
     }
 
     private void testingWithTemplate(){
@@ -81,7 +87,8 @@ class PdfGeneratorTest {
         pdfResource.setMarginTitle(100)
         pdfResource.updateProperties()
         pdfResource.setTemplateResource(new ClassPathResource("src/main/resources/pdfGenerator/existing.pdf"))
-        pdfGenerator.convertCaseForm(testCase, "1", pdfResource)
+        pdfGenerator.setupPdfGenerator(pdfResource)
+        pdfGenerator.generatePdf(testCase, "1", pdfResource)
     }
 
     private void testingLongDocument(){
@@ -90,7 +97,8 @@ class PdfGeneratorTest {
         Case testCase = workflowService.createCase(net.get().getStringId(), "Test PDF", "", userService.getSystem().transformToLoggedUser())
         dataService.getDataGroups(testCase.getTasks()[0].getTask(), Locale.ENGLISH)
         pdfResource.setOutputResource(new ClassPathResource("src/main/resources/out_" + TESTING_DATA[2] + "_.pdf"))
-        pdfGenerator.convertCaseForm(testCase, "1", pdfResource)
+        pdfGenerator.setupPdfGenerator(pdfResource)
+        pdfGenerator.generatePdf(testCase, "1", pdfResource)
     }
 
     private void testingPageNumber(){
@@ -102,7 +110,30 @@ class PdfGeneratorTest {
         pdfResource.setPageNumberPosition(pdfResource.getMarginLeft())
         pdfResource.setPageNumberFormat(PdfPageNumberFormat.SIMPLE)
         pdfResource.setOutputResource(new ClassPathResource("src/main/resources/out_page_number_.pdf"))
-        pdfGenerator.convertCaseForm(testCase, "1", pdfResource)
+        pdfGenerator.setupPdfGenerator(pdfResource)
+        pdfGenerator.generatePdf(testCase, "1", pdfResource)
     }
+
+    private void testingCustomField(){
+        PdfResource pdfResource = applicationContext.getBean(PdfResource.class)
+        PdfField pdf = new PdfTextField("footer_company_title",
+                null,
+                "Netgrif Application Engine",
+                FieldType.TEXT,
+                pdfResource.getMarginLeft(),
+                pdfResource.getPageHeight() - pdfResource.getMarginBottom(),
+                (int) (pdfResource.getPageDrawableWidth() / pdfResource.getFormGridCols()),
+                pdfResource.getLineHeight(),
+                pdfResource)
+
+        Optional<PetriNet> net = petriNetService.importPetriNet(stream(TESTING_DATA[2]), "major", userService.getSystem().transformToLoggedUser())
+        Case testCase = workflowService.createCase(net.get().getStringId(), "Test PDF", "", userService.getSystem().transformToLoggedUser())
+        dataService.getDataGroups(testCase.getTasks()[0].getTask(), Locale.ENGLISH)
+        pdfResource.setOutputResource(new ClassPathResource("src/main/resources/out_custom_field.pdf"))
+        pdfGenerator.setupPdfGenerator(pdfResource)
+        pdfGenerator.addCustomField(pdf, pdfResource)
+        pdfGenerator.generatePdf(testCase, "1", pdfResource)
+    }
+
 
 }

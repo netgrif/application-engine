@@ -19,6 +19,23 @@ public class PdfTextField extends PdfField{
         this.values.add(value);
     }
 
+    public PdfTextField(String fieldId, DataGroup dataGroup, String label, FieldType type,
+                        int x, int bottomY, int width, int height, PdfResource resource) {
+        super(resource);
+        this.fieldId = fieldId;
+        this.dataGroup = dataGroup;
+        this.label = label;
+        this.values = new ArrayList<>();
+        this.type = type;
+        this.x = x;
+        this.originalTopY = bottomY - height;
+        this.topY = bottomY - height;
+        this.originalBottomY = bottomY;
+        this.bottomY = bottomY;
+        this.width = width;
+        this.height = height;
+    }
+
     public PdfTextField(String fieldId, String label, List<String> values, FieldType type,
                         int x, int bottomY, int width, int height, PdfResource resource) {
         super(resource);

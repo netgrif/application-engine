@@ -3,7 +3,7 @@ package com.netgrif.workflow.pdf.generator.service;
 import com.netgrif.workflow.pdf.generator.config.PdfResource;
 import com.netgrif.workflow.pdf.generator.domain.PdfField;
 import com.netgrif.workflow.pdf.generator.service.fieldbuilder.*;
-import com.netgrif.workflow.pdf.generator.service.interfaces.IDataConverter;
+import com.netgrif.workflow.pdf.generator.service.interfaces.IPdfDataHelper;
 import com.netgrif.workflow.petrinet.domain.DataGroup;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.workflow.domain.DataField;
@@ -19,7 +19,7 @@ import java.util.*;
 
 @Slf4j
 @Service
-public class DataConverter implements IDataConverter {
+public class PdfDataHelper implements IPdfDataHelper {
 
     private PdfResource resource;
 
@@ -44,17 +44,16 @@ public class DataConverter implements IDataConverter {
     private int lastX, lastY;
 
     @Override
-    public void setupDataConverter(PdfResource resource){
+    public void setupDataHelper(PdfResource resource){
         this.resource = resource;
+        this.pdfFields = new ArrayList<>();
+        this.changedPdfFields = new Stack<>();
     }
 
     @Override
     public void generateTitleField() {
         log.info("Setting title field for PDF");
-
         resource.setBaseY(resource.getPageHeight() - resource.getMarginTitle());
-        pdfFields = new ArrayList<>();
-        changedPdfFields = new Stack<>();
         PdfField titleField = new TitleFieldBuilder(resource).createTitleField();
         pdfFields.add(titleField);
         resource.setBaseY(resource.getBaseY() - titleField.getBottomY());
@@ -66,11 +65,12 @@ public class DataConverter implements IDataConverter {
 
         lastX = Integer.MAX_VALUE;
         lastY = 0;
-        dataGroups.forEach((dataGroupId, dataGroup) ->
+        dataGroups.forEach((dataGroupId, dataGroup) ->{
+                refreshGrid(dataGroup);
                 dataGroup.getFields().getContent().forEach(field -> {
                             generateField(dataGroup, field);
                         }
-                ));
+                );});
         Collections.sort(pdfFields);
     }
 
@@ -114,6 +114,9 @@ public class DataConverter implements IDataConverter {
     protected void generateField(DataGroup dataGroup, LocalisedField field) {
         if (field.getBehavior().get("hidden") == null) {
             switch (field.getType()) {
+                case BUTTON:
+                case FILE:
+                    break;
                 case ENUMERATION:
                     pdfFields.add(createEnumField(dataGroup, (LocalisedEnumerationField) field));
                     break;
@@ -191,5 +194,12 @@ public class DataConverter implements IDataConverter {
 
     private boolean isCoveredByDataField(PdfField currentField, PdfField fieldBelow) {
         return currentField.getOriginalBottomY() < fieldBelow.getOriginalTopY();
+    }
+
+    protected void refreshGrid(DataGroup dataGroup){
+        if(dataGroup.getLayout() != null){
+            resource.setFormGridCols(dataGroup.getLayout().getCols());
+            resource.updateProperties();
+        }
     }
 }
