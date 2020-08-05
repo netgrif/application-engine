@@ -5,6 +5,8 @@ import com.netgrif.workflow.petrinet.domain.arcs.Arc
 import com.netgrif.workflow.petrinet.domain.arcs.InhibitorArc
 import com.netgrif.workflow.petrinet.domain.arcs.ReadArc
 import com.netgrif.workflow.petrinet.domain.arcs.ResetArc
+import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
+import com.netgrif.workflow.startup.SuperCreator
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -18,12 +20,16 @@ import org.springframework.test.context.junit4.SpringRunner
 class PetriNetTest {
 
     public static final String CLONE_NET_FILE = "net_clone.xml"
-    public static final String CLONE_NET_TITLE = "Clone"
-    public static final String CLONE_NET_INITS = "CLN"
     public static final String CLONE_NET_TASK = "2"
 
     @Autowired
     private Importer importer
+
+    @Autowired
+    private IPetriNetService petriNetService;
+
+    @Autowired
+    private SuperCreator superCreator;
 
     private def stream = { String name ->
         return PetriNetTest.getClassLoader().getResourceAsStream(name)
@@ -31,7 +37,7 @@ class PetriNetTest {
 
     @Test
     void testCloen() {
-        def net = importer.importPetriNet(stream(CLONE_NET_FILE), CLONE_NET_TITLE, CLONE_NET_INITS).get()
+        def net = petriNetService.importPetriNet(stream(CLONE_NET_FILE), "major", superCreator.getLoggedSuper()).get()
 
         def clone = net.clone()
 

@@ -3,6 +3,7 @@ package com.netgrif.workflow.petrinet.domain.roles
 import com.netgrif.workflow.auth.domain.repositories.UserProcessRoleRepository
 import com.netgrif.workflow.auth.domain.repositories.UserRepository
 import com.netgrif.workflow.importer.service.Importer
+import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.workflow.startup.DefaultRoleRunner
 import com.netgrif.workflow.startup.SuperCreator
 import com.netgrif.workflow.startup.SystemUserRunner
@@ -47,6 +48,9 @@ class TransitionRoleTest {
     @Autowired
     private ProcessRoleRepository processRoleRepository
 
+    @Autowired
+    private IPetriNetService petriNetService;
+
     private def stream = { String name ->
         return TransitionRoleTest.getClassLoader().getResourceAsStream(name)
     }
@@ -60,7 +64,7 @@ class TransitionRoleTest {
         superCreator.run()
         systemUserRunner.run()
 
-        def netOptional = importer.importPetriNet(stream(LIMITS_NET_FILE), LIMITS_NET_TITLE, LIMITS_NET_INITIALS)
+        def netOptional = petriNetService.importPetriNet(stream(LIMITS_NET_FILE), "major", superCreator.getLoggedSuper())
         assert netOptional.isPresent()
 
         def net = netOptional.get()

@@ -1,0 +1,271 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<document xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:noNamespaceSchemaLocation='petriflow_schema.xsd'>
+	<version>1.0.0</version>
+	<initials>LEU</initials>
+	<title>Protocol on treatment of chronic myelocytic leukemia</title>
+	<icon>local_hospital</icon>
+	<defaultRole>true</defaultRole>
+	<transitionRole>false</transitionRole>
+	<!-- TRANSACTIONS -->
+	<!-- ROLES -->
+	<!-- DATA -->
+	<data type='text'>
+		<id>text_0</id>
+		<title>Notes</title>
+		<values>area</values>
+	</data>
+	<data type='text'>
+		<id>text_1</id>
+		<title>Doctor code</title>
+	</data>
+	<data type='text'>
+		<id>text_2</id>
+		<title>Doctor name</title>
+	</data>
+	<data type='text'>
+		<id>text_3</id>
+		<title>Doctor surname</title>
+	</data>
+	<data type='text'>
+		<id>text_4</id>
+		<title>Health care provider code</title>
+	</data>
+	<data type='text'>
+		<id>text_5</id>
+		<title>Provider name</title>
+	</data>
+	<data type='text'>
+		<id>text_6</id>
+		<title>Adress - street</title>
+	</data>
+	<data type='text'>
+		<id>text_7</id>
+		<title>Adress - city</title>
+	</data>
+	<data type='text'>
+		<id>text_8</id>
+		<title>Adress - ZIP code</title>
+	</data>
+	<data type='text'>
+		<id>text_9</id>
+		<title>Company ID</title>
+	</data>
+	<data type='text'>
+		<id>text_10</id>
+		<title>Tel. number</title>
+	</data>
+	<data type='text'>
+		<id>text_11</id>
+		<title>Email</title>
+		<desc>If the email is filled in, the provider will be notified of the processing status of the application</desc>
+	</data>
+	<data type='enumeration'>
+		<id>enumeration_0</id>
+		<title>Treatment</title>
+		<values>New treatment</values>
+		<values>Continuing treatment</values>
+		<values>End of treatment</values>
+	</data>
+	<!-- TRANSITIONS -->
+	<transition>
+		<id>1</id>
+		<x>190</x>
+		<y>118</y>
+		<label>Protocol on treatment of leukemia</label>
+		<cols>3</cols>
+		<dataRef>
+			<id>text_0</id>
+			<logic>
+				<behavior>editable</behavior>
+			</logic>
+			<layout>
+				<x>0</x>
+				<y>0</y>
+				<rows>2</rows>
+				<cols>3</cols>
+				<template>material</template>
+				<appearance>outline</appearance>
+			</layout>
+		</dataRef>
+		<dataRef>
+			<id>text_1</id>
+			<logic>
+				<behavior>editable</behavior>
+				<behavior>required</behavior>
+			</logic>
+			<layout>
+				<x>0</x>
+				<y>3</y>
+				<rows>1</rows>
+				<cols>1</cols>
+				<template>material</template>
+				<appearance>outline</appearance>
+			</layout>
+		</dataRef>
+		<dataRef>
+			<id>text_2</id>
+			<logic>
+				<behavior>editable</behavior>
+				<behavior>required</behavior>
+			</logic>
+			<layout>
+				<x>1</x>
+				<y>3</y>
+				<rows>1</rows>
+				<cols>1</cols>
+				<template>material</template>
+				<appearance>outline</appearance>
+			</layout>
+		</dataRef>
+		<dataRef>
+			<id>text_3</id>
+			<logic>
+				<behavior>editable</behavior>
+				<behavior>required</behavior>
+			</logic>
+			<layout>
+				<x>2</x>
+				<y>3</y>
+				<rows>1</rows>
+				<cols>1</cols>
+				<template>material</template>
+				<appearance>outline</appearance>
+			</layout>
+		</dataRef>
+		<dataRef>
+			<id>text_4</id>
+			<logic>
+				<behavior>editable</behavior>
+				<behavior>required</behavior>
+			</logic>
+			<layout>
+				<x>0</x>
+				<y>4</y>
+				<rows>1</rows>
+				<cols>1</cols>
+				<template>material</template>
+				<appearance>outline</appearance>
+			</layout>
+		</dataRef>
+		<dataRef>
+			<id>text_5</id>
+			<logic>
+				<behavior>editable</behavior>
+				<behavior>required</behavior>
+			</logic>
+			<layout>
+				<x>1</x>
+				<y>4</y>
+				<rows>1</rows>
+				<cols>2</cols>
+				<template>material</template>
+				<appearance>outline</appearance>
+			</layout>
+		</dataRef>
+		<dataRef>
+			<id>text_6</id>
+			<logic>
+				<behavior>editable</behavior>
+				<behavior>required</behavior>
+			</logic>
+			<layout>
+				<x>0</x>
+				<y>5</y>
+				<rows>1</rows>
+				<cols>3</cols>
+				<template>material</template>
+				<appearance>outline</appearance>
+			</layout>
+		</dataRef>
+		<dataRef>
+			<id>text_7</id>
+			<logic>
+				<behavior>editable</behavior>
+				<behavior>required</behavior>
+			</logic>
+			<layout>
+				<x>0</x>
+				<y>6</y>
+				<rows>1</rows>
+				<cols>2</cols>
+				<template>material</template>
+				<appearance>outline</appearance>
+			</layout>
+		</dataRef>
+		<dataRef>
+			<id>text_8</id>
+			<logic>
+				<behavior>editable</behavior>
+				<behavior>required</behavior>
+			</logic>
+			<layout>
+				<x>2</x>
+				<y>6</y>
+				<rows>1</rows>
+				<cols>1</cols>
+				<template>material</template>
+				<appearance>outline</appearance>
+			</layout>
+		</dataRef>
+		<dataRef>
+			<id>text_9</id>
+			<logic>
+				<behavior>editable</behavior>
+			</logic>
+			<layout>
+				<x>0</x>
+				<y>7</y>
+				<rows>1</rows>
+				<cols>1</cols>
+				<template>material</template>
+				<appearance>outline</appearance>
+			</layout>
+		</dataRef>
+		<dataRef>
+			<id>text_10</id>
+			<logic>
+				<behavior>editable</behavior>
+				<behavior>required</behavior>
+			</logic>
+			<layout>
+				<x>1</x>
+				<y>7</y>
+				<rows>1</rows>
+				<cols>1</cols>
+				<template>material</template>
+				<appearance>outline</appearance>
+			</layout>
+		</dataRef>
+		<dataRef>
+			<id>text_11</id>
+			<logic>
+				<behavior>editable</behavior>
+			</logic>
+			<layout>
+				<x>2</x>
+				<y>7</y>
+				<rows>1</rows>
+				<cols>1</cols>
+				<template>material</template>
+				<appearance>outline</appearance>
+			</layout>
+		</dataRef>
+		<dataRef>
+			<id>enumeration_0</id>
+			<logic>
+				<behavior>editable</behavior>
+				<behavior>required</behavior>
+			</logic>
+			<layout>
+				<x>0</x>
+				<y>2</y>
+				<rows>1</rows>
+				<cols>3</cols>
+				<template>material</template>
+				<appearance>outline</appearance>
+			</layout>
+		</dataRef>
+	</transition>
+	<!-- PLACES -->
+	<!-- ARCS -->
+</document>
