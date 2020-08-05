@@ -2,13 +2,16 @@ package com.netgrif.workflow.workflow.web;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.netgrif.workflow.auth.domain.LoggedUser;
+import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.auth.domain.throwable.UnauthorisedRequestException;
 import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.elastic.service.interfaces.IElasticTaskService;
 import com.netgrif.workflow.elastic.web.requestbodies.singleaslist.SingleTaskSearchRequestAsList;
 import com.netgrif.workflow.petrinet.domain.DataGroup;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
+import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldByFileFieldContainer;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldContainer;
+import com.netgrif.workflow.petrinet.domain.roles.RolePermission;
 import com.netgrif.workflow.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.workflow.workflow.domain.MergeFilterOperation;
 import com.netgrif.workflow.workflow.domain.Task;
@@ -242,17 +245,29 @@ public class TaskController {
     }
 
 
-    @RequestMapping(value = "/{id}/file/{field}", method = RequestMethod.POST)
-    public MessageResource saveFile(Authentication auth, @PathVariable("id") String taskId, @PathVariable("field") String fieldId,
-                                                     @RequestParam(value = "file") MultipartFile multipartFile) throws UnauthorisedRequestException {
-        LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
 
-		taskAuthenticationService.checkSaveFile(loggedUser, taskId);
+    /*
+    @RequestMapping(value = "/{id}/file/{field}", method = RequestMethod.POST)
+    public MessageResource saveFile(@PathVariable("id") String taskId, @PathVariable("field") String fieldId,
+                                    @RequestParam(value = "file") MultipartFile multipartFile) throws UnauthorisedRequestException {
+		User logged = userService.getLoggedUser();
+		if( !logged.transformToLoggedUser().isAdmin() && !taskAuthenticationService.isAssignee(logged, taskId))
+			throw new UnauthorisedRequestException("User " + logged.transformToLoggedUser().getUsername() + " doesn't have permission to save file in task " + taskId);
 
         if (dataService.saveFile(taskId, fieldId, multipartFile))
             return MessageResource.successMessage("File " + multipartFile.getOriginalFilename() + " successfully uploaded");
         else
             return MessageResource.errorMessage("File " + multipartFile.getOriginalFilename() + " failed to upload");
+    }
+     */
+
+    @RequestMapping(value = "/{id}/file/{field}", method = RequestMethod.POST)
+    public ChangedFieldByFileFieldContainer saveFile(Authentication auth, @PathVariable("id") String taskId, @PathVariable("field") String fieldId, @RequestParam(value = "file") MultipartFile multipartFile) throws UnauthorisedRequestException {
+        LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
+
+		taskAuthenticationService.checkSaveFile(loggedUser, taskId);
+
+        return dataService.saveFile(taskId, fieldId, multipartFile);
     }
 
     @RequestMapping(value = "/{id}/file/{field}", method = RequestMethod.GET, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)

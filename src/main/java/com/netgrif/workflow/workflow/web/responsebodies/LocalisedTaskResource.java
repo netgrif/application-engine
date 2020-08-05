@@ -37,7 +37,7 @@ public class LocalisedTaskResource extends Resource<Task> {
             add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
                     .getData(task.getStringId(), null)).withRel("data"));
             add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
-                    .saveData(null, task.getStringId(), null)).withRel("data-edit"));
+                    .saveData(task.getStringId(), null)).withRel("data-edit"));
         } catch (UnauthorisedRequestException e) {
             e.printStackTrace();
         }
