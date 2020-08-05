@@ -1,10 +1,10 @@
 package com.netgrif.workflow.configuration;
 
 import com.netgrif.workflow.importer.service.Importer;
-import com.netgrif.workflow.pdf.generator.service.DataConverter;
+import com.netgrif.workflow.pdf.generator.service.PdfDataHelper;
 import com.netgrif.workflow.pdf.generator.service.PdfDrawer;
 import com.netgrif.workflow.pdf.generator.service.PdfGenerator;
-import com.netgrif.workflow.pdf.generator.service.interfaces.IDataConverter;
+import com.netgrif.workflow.pdf.generator.service.interfaces.IPdfDataHelper;
 import com.netgrif.workflow.pdf.generator.service.interfaces.IPdfDrawer;
 import com.netgrif.workflow.pdf.generator.service.interfaces.IPdfGenerator;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.ActionDelegate;
@@ -39,7 +39,7 @@ public class PrototypesConfiguration {
 
     @Bean("dataConverter")
     @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-    public IDataConverter dataConverter(){return new DataConverter();}
+    public IPdfDataHelper dataConverter(){return new PdfDataHelper();}
 
     @Bean("pdfGenerator")
     @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)

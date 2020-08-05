@@ -2,7 +2,6 @@ package com.netgrif.workflow.pdf.generator.service.renderer;
 
 import com.netgrif.workflow.pdf.generator.domain.PdfField;
 import com.netgrif.workflow.pdf.generator.domain.PdfTextField;
-import com.netgrif.workflow.pdf.generator.service.DataConverter;
 import com.netgrif.workflow.pdf.generator.service.fieldbuilder.FieldBuilder;
 
 import java.io.IOException;

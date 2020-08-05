@@ -33,7 +33,6 @@ import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.i18n.LocaleContextHolder
 import org.springframework.core.io.ClassPathResource
-import org.springframework.core.io.Resource
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 
@@ -78,9 +77,6 @@ class ActionDelegate {
 
     @Autowired
     IPdfGenerator pdfGenerator
-
-    @Autowired
-    PdfResource pdfResource
 
     /**
      * Reference of case in which current action is taking place.
@@ -525,8 +521,15 @@ class ActionDelegate {
         return userService.loggedUser
     }
 
-    File generatePDF(String transitionId){
-        return pdfGenerator.convertCaseForm(useCase, transitionId, pdfResource)
+    void generatePDF(String transitionId, String fileFieldId){
+        PdfResource pdfResource = ApplicationContextProvider.getBean(PdfResource.class) as PdfResource
+        String filename = pdfResource.getOutputResource().getFilename()
+        String storagePath = new FileFieldValue(pdfResource.getOutputResource().getFilename(), ((ClassPathResource)pdfResource.getOutputResource()).getPath()).getPath(useCase.stringId, "pdf_file")
+
+        pdfResource.setOutputResource(new ClassPathResource(storagePath))
+        pdfGenerator.setupPdfGenerator(pdfResource)
+        pdfGenerator.generatePdf(useCase, transitionId, pdfResource)
+        change useCase.getField(fileFieldId) value {new FileFieldValue(filename, storagePath)}
     }
 
 }

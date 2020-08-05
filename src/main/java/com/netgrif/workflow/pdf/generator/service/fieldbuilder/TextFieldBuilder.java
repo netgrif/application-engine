@@ -5,6 +5,7 @@ import com.netgrif.workflow.pdf.generator.domain.PdfField;
 import com.netgrif.workflow.pdf.generator.domain.PdfTextField;
 import com.netgrif.workflow.petrinet.domain.DataGroup;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
+import com.netgrif.workflow.petrinet.domain.dataset.FileFieldValue;
 import com.netgrif.workflow.workflow.domain.DataField;
 import com.netgrif.workflow.workflow.web.responsebodies.LocalisedField;
 
@@ -34,6 +35,9 @@ public class TextFieldBuilder extends FieldBuilder{
                 double number = (double) dataSet.get(field.getStringId()).getValue();
                 NumberFormat nf2 = NumberFormat.getInstance(resource.getNumberFormat());
                 value = nf2.format(number);
+                break;
+            case FILE:
+                value = dataSet.get(field.getStringId()).getValue() != null ? ((FileFieldValue)dataSet.get(field.getStringId()).getValue()).getName().toString() : "";
                 break;
             default:
                 value = dataSet.get(field.getStringId()).getValue() != null ? dataSet.get(field.getStringId()).getValue().toString() : "";
