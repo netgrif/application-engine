@@ -14,17 +14,19 @@ import java.util.List;
 import java.util.Map;
 
 public interface IPdfGenerator {
-    File convertCustomField(List<PdfField> pdfFields, PdfResource pdfResource);
+    void setupPdfGenerator(PdfResource pdfResource) throws IOException;
 
-    File convertCaseForm(Case formCase, String transitionId, PdfResource pdfResource) throws IOException;
+    void addCustomField(PdfField field, PdfResource pdfResource) throws IOException;
 
-    File convertCaseForm(Case formCase, Map<String, DataGroup> dataGroupMap, PdfResource pdfResource) throws IOException;
+    File generatePdf(Case formCase, String transitionId, PdfResource pdfResource) throws IOException;
 
-    void convertCaseForm(Case formCase, String transitionId, PdfResource pdfResource, OutputStream stream) throws IOException;
+    File generatePdf(PdfResource pdfResource) throws IOException;
 
-    void convertCaseForm(Case formCase, Map<String, DataGroup> dataGroupMap, PdfResource pdfResource, OutputStream stream) throws IOException;
+    void generatePdf(Case formCase, String transitionId, PdfResource pdfResource, OutputStream stream) throws IOException;
+
+    void generatePdf(Case formCase, Map<String, DataGroup> dataGroupMap, PdfResource pdfResource, OutputStream stream) throws IOException;
 
     void generateData(PetriNet petriNet, Map<String, DataGroup> dataGroupMap, Map<String, DataField> dataSet, PdfResource pdfResource) throws IOException;
 
-    void generateData(List<PdfField> pdfFields, PdfResource pdfResource) throws IOException;
+    void generateData(PdfField pdfField, PdfResource pdfResource) throws IOException;
 }

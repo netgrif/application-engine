@@ -9,30 +9,16 @@ import com.netgrif.workflow.workflow.domain.DataField;
 import java.util.List;
 import java.util.Map;
 
-public interface IDataConverter {
+public interface IPdfDataHelper {
 
     void setPetriNet(PetriNet petriNet);
     void setDataGroups(Map<String, DataGroup> dataGroups);
     void setDataSet(Map<String, DataField> dataSet);
     void setPdfFields(List<PdfField> fields);
     List<PdfField> getPdfFields();
-
-    void setupDataConverter(PdfResource resource);
-
+    void setupDataHelper(PdfResource resource);
     void generateTitleField();
-
-    /**
-     * Creates PdfField list that will be used for drawing elements to PDF
-     */
     void generatePdfFields();
-
-    /**
-     * Adds data groups to PdfField list
-     */
     void generatePdfDataGroups();
-
-    /**
-     * Checks whether there are any fields that needs to be shifted due to changed height
-     */
     void correctFieldsPosition();
 }
