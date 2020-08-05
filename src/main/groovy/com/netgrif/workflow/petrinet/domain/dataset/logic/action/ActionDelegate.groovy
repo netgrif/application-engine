@@ -551,7 +551,7 @@ class ActionDelegate {
     void generatePdfWithLocale(String transitionId, String fileFieldId, Locale locale){
         PdfResource pdfResource = ApplicationContextProvider.getBean(PdfResource.class) as PdfResource
         String filename = pdfResource.getOutputResource().getFilename()
-        String storagePath = new FileFieldValue(pdfResource.getOutputResource().getFilename(), ((ClassPathResource)pdfResource.getOutputResource()).getPath()).getPath(useCase.stringId, "pdf_file")
+        String storagePath = new FileFieldValue(pdfResource.getOutputResource().getFilename(), ((ClassPathResource)pdfResource.getOutputResource()).getPath()).getPath(useCase.stringId, fileFieldId)
 
         pdfResource.setOutputResource(new ClassPathResource(storagePath))
         pdfResource.setTextLocale(locale)
