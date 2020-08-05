@@ -34,6 +34,8 @@ import org.springframework.context.i18n.LocaleContextHolder
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 
+import java.util.stream.Collectors
+
 /**
  * ActionDelegate class contains Actions API methods.
  */
@@ -293,6 +295,10 @@ class ActionDelegate {
             return
         }
         if (value != null) {
+            if (field instanceof CaseField) {
+                value = ((List) value).stream().map({ entry -> entry instanceof Case ? entry.getStringId() : entry }).collect(Collectors.toList())
+                dataService.validateCaseRefValue((List<String>) value, ((CaseField) field).getAllowedNets())
+            }
             field.value = value
             saveChangedValue(field)
         }
