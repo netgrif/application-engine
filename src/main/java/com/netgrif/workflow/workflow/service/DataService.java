@@ -148,13 +148,6 @@ public class DataService implements IDataService {
             }
             if (dataField != null) {
                 dataField.setValue(parseFieldsValues(entry.getValue(), dataField));
-                if (entry.getValue().get("type") != null && entry.getValue().get("type").asText().equals("caseRef")) {
-                    Map<String, ChangedField> newCaseRefValue = new HashMap<>();
-                    ChangedField value = new ChangedField(entry.getKey());
-                    value.addAttribute("value", dataField.getValue());
-                    newCaseRefValue.put(entry.getKey(), value);
-                    mergeChanges(changedFields, newCaseRefValue);
-                }
                 Map<String, ChangedField> changedFieldMap = resolveActions(useCase.getPetriNet().getField(fieldId).get(),
                         Action.ActionTrigger.SET, useCase, useCase.getPetriNet().getTransition(task.getTransitionId()));
                 mergeChanges(changedFields, changedFieldMap);
@@ -530,35 +523,11 @@ public class DataService implements IDataService {
                 value = FileFieldValue.fromString(node.get("value").asText());
                 break;
             case "caseRef":
-                value = dataField.getValue();
-                if (node.get("value") == null) break;
-                Map<String, JsonNode> setRequest = new HashMap<>();
-                node.get("value").fields().forEachRemaining(entry -> {
-                    setRequest.put(entry.getKey(), entry.getValue());
-                });
-                if (setRequest.get("operation") == null) break;
-                switch (setRequest.get("operation").asText()) {
-                    case "add":
-                        if (setRequest.get("title") == null
-                                || !setRequest.get("title").isTextual()
-                                || setRequest.get("processId") == null
-                                || !setRequest.get("processId").isTextual()) break;
-                        if (dataField.getAllowedNets() == null) break;
-                        if (!dataField.getAllowedNets().contains(setRequest.get("processId").asText())) break;
-                        PetriNet net = petriNetService.getNewestVersionByIdentifier(setRequest.get("processId").asText());
-                        Case newCase = workflowService.createCase(net.getStringId(),
-                                setRequest.get("title").asText(),
-                                "panel-primary-icon",
-                                userService.getLoggedUser().transformToLoggedUser());
-                        ((List<String>) value).add(newCase.getStringId());
-                        break;
-                    case "remove":
-                        if (setRequest.get("caseId") == null
-                                || !setRequest.get("caseId").isTextual()) break;
-                        String idToRemove = setRequest.get("caseId").asText();
-                        value = ((List<String>) value).stream().filter(caseId -> !caseId.equals(idToRemove)).collect(Collectors.toList());
-                        break;
-                }
+                ArrayNode valueArrayNode = (ArrayNode) node.get("value");
+                ArrayList<String> list = new ArrayList<>();
+                valueArrayNode.forEach(caseId -> list.add(caseId.asText()));
+                value = list;
+                validateCaseRefValue(list, dataField.getAllowedNets());
                 break;
             default:
                 if (node.get("value") == null) {
@@ -570,6 +539,16 @@ public class DataService implements IDataService {
         }
         if (value instanceof String && ((String) value).equalsIgnoreCase("null")) return null;
         else return value;
+    }
+
+    public void validateCaseRefValue(List<String> value, List<String> allowedNets) throws IllegalArgumentException {
+        List<Case> cases = workflowService.findAllById(value);
+        Set<String> nets = new HashSet<>(allowedNets);
+        cases.forEach(_case -> {
+            if (!nets.contains(_case.getProcessIdentifier())) {
+                throw new IllegalArgumentException(String.format("Case '%s' with id '%s' cannot be added to case ref, since it is an instance of process with identifier '%s', which is not one of the allowed nets", _case.getTitle(), _case.getStringId(), _case.getProcessIdentifier()));
+            }
+        });
     }
 
     @Data
