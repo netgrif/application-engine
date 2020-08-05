@@ -7,6 +7,7 @@ import com.netgrif.workflow.petrinet.domain.throwable.MissingPetriNetMetaDataExc
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.workflow.petrinet.service.interfaces.IProcessRoleService;
 import com.netgrif.workflow.petrinet.web.responsebodies.*;
+import com.netgrif.workflow.workflow.domain.FileStorageConfiguration;
 import com.netgrif.workflow.workflow.web.responsebodies.MessageResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,6 +45,9 @@ public class PetriNetController {
     private static final Logger log = LoggerFactory.getLogger(PetriNetController.class);
 
     @Autowired
+    private FileStorageConfiguration fileStorageConfiguration;
+
+    @Autowired
     private IPetriNetService service;
 
     @Autowired
@@ -58,7 +62,7 @@ public class PetriNetController {
             @RequestParam(value = "meta", required = false) String releaseType,
             Authentication auth) throws MissingPetriNetMetaDataException {
         try {
-            File file = new File("storage/uploadedModels/" + multipartFile.getOriginalFilename());
+            File file = new File(fileStorageConfiguration.getStorageArchived() + multipartFile.getOriginalFilename());
             file.createNewFile();
             FileOutputStream fout = new FileOutputStream(file);
             fout.write(multipartFile.getBytes());
