@@ -45,5 +45,6 @@ public class BooleanFieldRenderer extends FieldRenderer<BooleanField>{
             pdfDrawer.drawBooleanBox(field.getValues(), value, x, y);
             pdfDrawer.writeString(resource.getValueFont(), resource.getFontValueSize(), x + fontLabelSize + padding, y, value);
         }
+        pdfDrawer.checkOpenPages();
     }
 }
