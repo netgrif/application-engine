@@ -3,6 +3,7 @@
           xsi:noNamespaceSchemaLocation="https://modeler.netgrif.com/petriflow_schema.xsd">
     <id>secondary</id>
     <initials>ORG</initials>
+    <title>secondary</title>
     <icon>business</icon>
     <defaultRole>false</defaultRole>
 

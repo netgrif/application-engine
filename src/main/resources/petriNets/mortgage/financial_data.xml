@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../petriflow_schema.xsd">
+    <id>financial_data</id>
+    <initials>FIN</initials>
+    <title>Financial Data</title>
+
+    <data type="number">
+        <id>income</id>
+        <title name="income_title">Monthly Income in EUR</title>
+        <desc name="income_desc">Your average monthly income</desc>
+        <valid>inrange 300,100000</valid>
+    </data>
+    <data type="number">
+        <id>loan_amount</id>
+        <title name="loan_amount_tite">Loan amount in EUR</title>
+        <valid>inrange 10000,1000000</valid>
+        <init>100000</init>
+        <action trigger="set">
+            calc: f.calc;
+            change calc value {
+            return !calc.value;
+            }
+        </action>
+    </data>
+    <data type="number">
+        <id>period</id>
+        <title name="period_title">Repayment period in years</title>
+        <valid>inrange 1,30</valid>
+        <init>30</init>
+        <action trigger="set">
+            calc: f.calc;
+            change calc about {
+            return !calc.value;
+            }
+        </action>
+    </data>
+    <data type="number">
+        <id>monthly_payment</id>
+        <title name="monthly_payment_title">Monthly payment in EUR</title>
+        <init>444.44</init>
+    </data>
+    <data type="boolean">
+        <id>calc</id>
+        <title>Recalculate the monthly payment</title>
+        <action trigger="set">
+            loan: f.loan_amount,
+            period: f.period,
+            monthly: f.monthly_payment;
+            change monthly value {
+            return (loan.value+loan.value*0.02*period.value)/(period.value*12);
+            }
+        </action>
+    </data>
+    <data type="taskRef">
+        <id>task_doc</id>
+        <title>task_doc</title>
+    </data>
+
+    <i18n locale="sk">
+        <i18nString name="income_title">Mesačný príjem v EUR</i18nString>
+        <i18nString name="income_desc">Zadajte priemerný mesačný príjem</i18nString>
+        <i18nString name="loan_amount_tite">Výška hypotéky v EUR</i18nString>
+        <i18nString name="period_title">Doba splácania v rokoch</i18nString>
+        <i18nString name="monthly_payment_title">Výška mesačnej splátky v EUR </i18nString>
+        <i18nString name="financial_data">Finančné údaje</i18nString>
+    </i18n>
+
+    <transition>
+        <id>constructor</id>
+        <x>180</x>
+        <y>60</y>
+        <label>Constructor / System</label>
+        <trigger type="auto"/>
+    </transition>
+
+    <transition>
+        <id>financial_data</id>
+        <x>500</x>
+        <y>60</y>
+        <label name="financial_data">Financial data</label>
+        <dataRef>
+            <id>income</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>loan_amount</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>period</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>task_doc</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>monthly_payment</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+    </transition>
+	<!-- PLACES -->
+	<place>
+		<id>1</id>
+		<x>60</x>
+		<y>60</y>
+		<label></label>
+		<tokens>1</tokens>
+		<static>false</static>
+	</place>
+	<place>
+		<id>2</id>
+		<x>340</x>
+		<y>60</y>
+		<label></label>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
+	<!-- ARCS -->
+	<arc>
+		<id>3</id>
+		<type>regular</type>
+		<sourceId>1</sourceId>
+		<destinationId>constructor</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>4</id>
+		<type>regular</type>
+		<sourceId>constructor</sourceId>
+		<destinationId>2</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>5</id>
+		<type>read</type>
+		<sourceId>2</sourceId>
+		<destinationId>financial_data</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+</document>

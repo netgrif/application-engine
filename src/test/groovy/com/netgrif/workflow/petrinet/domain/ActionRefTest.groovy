@@ -4,6 +4,7 @@ import com.netgrif.workflow.auth.domain.repositories.UserProcessRoleRepository
 import com.netgrif.workflow.auth.domain.repositories.UserRepository
 import com.netgrif.workflow.importer.service.Importer
 import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository
+import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.workflow.startup.DefaultRoleRunner
 import com.netgrif.workflow.startup.ImportHelper
 import com.netgrif.workflow.startup.SuperCreator
@@ -26,8 +27,6 @@ import org.springframework.test.context.junit4.SpringRunner
 class ActionRefTest {
 
     public static final String NET_FILE = "actionref_test.xml"
-    public static final String NET_TITLE = "ActionRef"
-    public static final String NET_INITS = "ACR"
 
     @Autowired
     private Importer importer
@@ -62,12 +61,12 @@ class ActionRefTest {
     @Autowired
     private UserProcessRoleRepository roleRepository
 
+    @Autowired
+    private IPetriNetService petriNetService;
+
     private def stream = { String name ->
         return ActionRefTest.getClassLoader().getResourceAsStream(name)
     }
-
-    Case instance
-    EventOutcome outcome
 
     @Test
     void testEventImport() {
@@ -77,7 +76,7 @@ class ActionRefTest {
         roleRunner.run()
         superCreator.run()
 
-        def net = importer.importPetriNet(stream(NET_FILE), NET_TITLE, NET_INITS).get()
+        def net = petriNetService.importPetriNet(stream(NET_FILE), "major", superCreator.getLoggedSuper()).get()
 
         assert net.dataSet.get("text_1").actions.size() == 8
         assert net.transitions.get("task").dataSet.get("text_1").actions.size() == 8

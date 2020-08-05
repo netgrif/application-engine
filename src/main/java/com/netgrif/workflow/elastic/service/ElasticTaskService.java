@@ -37,16 +37,17 @@ public class ElasticTaskService implements IElasticTaskService {
 
     private static final Logger log = LoggerFactory.getLogger(ElasticTaskService.class);
 
-    @Autowired
     private ElasticTaskRepository repository;
-
-    @Autowired
     private ITaskService taskService;
+    private ElasticsearchTemplate template;
+    private ExecutorService executor = Executors.newSingleThreadExecutor();
 
     @Autowired
-    private ElasticsearchTemplate template;
-
-    private ExecutorService executor = Executors.newSingleThreadExecutor();
+    public ElasticTaskService(ElasticTaskRepository repository, ITaskService taskService, ElasticsearchTemplate template) {
+        this.repository = repository;
+        this.taskService = taskService;
+        this.template = template;
+    }
 
     private Map<String, Float> fullTextFieldMap = ImmutableMap.of(
             "title", 1f,
