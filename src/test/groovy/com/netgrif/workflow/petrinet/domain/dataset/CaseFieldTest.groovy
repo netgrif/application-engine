@@ -8,6 +8,7 @@ import com.netgrif.workflow.startup.ImportHelper
 import com.netgrif.workflow.startup.SuperCreator
 import com.netgrif.workflow.workflow.domain.Case
 import com.netgrif.workflow.workflow.domain.repositories.CaseRepository
+import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -41,6 +42,9 @@ class CaseFieldTest {
 
     @Autowired
     private CaseRepository caseRepository
+
+    @Autowired
+    private IWorkflowService workflowService
 
     private def stream = { String name ->
         return TaskApiTest.getClassLoader().getResourceAsStream(name)
@@ -102,6 +106,59 @@ class CaseFieldTest {
         assert caseOpt.isPresent()
         aCase = caseOpt.get()
         assert aCase.getDataSet().get("caseref").allowedNets.size() == 0
+
+    }
+
+    @Test
+    void testImmediateAllowedNets() {
+        def testNet = petriNetService.importPetriNet(stream(ALLOWED_NETS_NET_FILE), "major", superCreator.getLoggedSuper())
+        assert testNet.isPresent()
+
+        Case aCase = importHelper.createCase("Case 1", testNet.get())
+
+        assert aCase.getImmediateData().size() == 1
+        CaseField caseRef = (CaseField) aCase.getImmediateData().get(0)
+        assert caseRef.allowedNets.size() == 1
+        assert caseRef.allowedNets.get(0).equals("lorem")
+
+        aCase = workflowService.findAllById([aCase.stringId]).get(0)
+
+        assert aCase.getImmediateData() != null
+        assert aCase.getImmediateData().size() == 1
+        caseRef = (CaseField) aCase.getImmediateData().get(0)
+        assert caseRef.allowedNets.size() == 1
+        assert caseRef.allowedNets.get(0).equals("lorem")
+
+        importHelper.assignTaskToSuper(ALLOWED_NETS_TASK_TITLE, aCase.stringId)
+        importHelper.setTaskData(ALLOWED_NETS_TASK_TITLE, aCase.stringId, [
+                "setVal": [
+                        "value": true,
+                        "type": importHelper.FIELD_BOOLEAN
+                ]
+        ])
+
+        aCase = workflowService.findAllById([aCase.stringId]).get(0)
+
+        assert aCase.getImmediateData() != null
+        assert aCase.getImmediateData().size() == 1
+        caseRef = (CaseField) aCase.getImmediateData().get(0)
+        assert caseRef.allowedNets.size() == 2
+        assert caseRef.allowedNets.get(0).equals("hello")
+        assert caseRef.allowedNets.get(1).equals("world")
+
+        ChangedFieldContainer changed2 = importHelper.setTaskData(ALLOWED_NETS_TASK_TITLE, aCase.stringId, [
+                "setNull": [
+                        "value": true,
+                        "type": importHelper.FIELD_BOOLEAN
+                ]
+        ])
+
+        aCase = workflowService.findAllById([aCase.stringId]).get(0)
+
+        assert aCase.getImmediateData() != null
+        assert aCase.getImmediateData().size() == 1
+        caseRef = (CaseField) aCase.getImmediateData().get(0)
+        assert caseRef.allowedNets.size() == 0
 
     }
 
