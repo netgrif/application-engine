@@ -49,4 +49,6 @@ public interface IWorkflowService {
     Case decrypt(Case useCase);
 
     Page<Case> search(Predicate predicate, Pageable pageable);
+
+    void deleteSubtreeRootedAt(String subtreeRootCaseId);
 }

@@ -551,17 +551,6 @@ public class DataService implements IDataService {
         });
     }
 
-    private void deleteSubtreeRootedAt(String subtreeRootId) {
-        Case subtreeRoot = workflowService.findOne(subtreeRootId);
-        if (subtreeRoot.getImmediateDataFields().contains("treeChildCases")) {
-            subtreeRoot.getDataSet().entrySet().stream()
-                    .filter(entry -> entry.getKey().equals("treeChildCases"))
-                    .findFirst()
-                    .ifPresent(treeChildrenEntry -> ((List<String>) treeChildrenEntry.getValue().getValue()).forEach(this::deleteSubtreeRootedAt));
-        }
-        workflowService.deleteCase(subtreeRootId);
-    }
-
     @Data
     @AllArgsConstructor
     private class TaskRefFieldWrapper {
