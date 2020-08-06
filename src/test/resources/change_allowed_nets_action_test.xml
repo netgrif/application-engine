@@ -6,7 +6,7 @@
     <title>Test</title>
     <defaultRole>true</defaultRole>
 
-    <data type="caseRef">
+    <data type="caseRef" immediate="true">
         <id>caseref</id>
         <title>Caseref</title>
         <allowedNets>
