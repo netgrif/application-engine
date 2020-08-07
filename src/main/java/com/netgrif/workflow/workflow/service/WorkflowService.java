@@ -104,6 +104,7 @@ public class WorkflowService implements IWorkflowService {
         Case useCase = caseOptional.get();
         setPetriNet(useCase);
         decryptDataSet(useCase);
+        this.setImmediateDataFieldsReadOnly(useCase);
         return useCase;
     }
 

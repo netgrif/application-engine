@@ -42,6 +42,7 @@ import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Locale;
+import java.util.Map;
 
 @RestController()
 @RequestMapping("/api/workflow")
@@ -109,6 +110,16 @@ public class WorkflowController {
         return resources;
     }
 
+    @PostMapping(value = "/case/search_mongo", produces = MediaTypes.HAL_JSON_VALUE)
+    public PagedResources<CaseResource> searchMongo(@RequestBody Map<String, Object> searchBody, Pageable pageable, PagedResourcesAssembler<Case> assembler, Authentication auth, Locale locale) {
+        Page<Case> cases = workflowService.search(searchBody, pageable, (LoggedUser) auth.getPrincipal(), locale);
+        Link selfLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(WorkflowController.class)
+                .searchMongo(searchBody, pageable, assembler, auth, locale)).withRel("search");
+        PagedResources<CaseResource> resources = assembler.toResource(cases, new CaseResourceAssembler(), selfLink);
+        ResourceLinkAssembler.addLinks(resources, Case.class, selfLink.getRel());
+        return resources;
+    }
+
     @PostMapping(value = "/case/count", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public CountResponse count(@RequestBody SingleCaseSearchRequestAsList searchBody, @RequestParam(defaultValue = "OR") MergeFilterOperation operation, Authentication auth) {
         long count = elasticCaseService.count(searchBody.getList(), (LoggedUser) auth.getPrincipal(), operation == MergeFilterOperation.AND);
@@ -124,6 +135,14 @@ public class WorkflowController {
 //        ResourceLinkAssembler.addLinks(resources, Case.class, selfLink.getRel());
 //        return resources;
 //    }
+
+    @GetMapping(value = "/case/{id}")
+    public CaseResource getOne(@PathVariable("id") String caseId) {
+        Case aCase = workflowService.findOne(caseId);
+        if (aCase == null)
+            return null;
+        return new CaseResource(aCase);
+    }
 
     @RequestMapping(value = "/case/author/{id}", method = RequestMethod.POST)
     public PagedResources<CaseResource> findAllByAuthor(@PathVariable("id") Long authorId, @RequestBody String petriNet, Pageable pageable, PagedResourcesAssembler<Case> assembler) {
