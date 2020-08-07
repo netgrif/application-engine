@@ -43,6 +43,7 @@ public class CaseSearchService extends MongoSearchService<Case> {
     public static final String AUTHOR_NAME = "name";
     public static final String TRANSITION = "transition";
     public static final String FULLTEXT = "fullText";
+    public static final String CASE_ID = "stringId";
 
     @Autowired
     private IPetriNetService petriNetService;
@@ -67,6 +68,9 @@ public class CaseSearchService extends MongoSearchService<Case> {
         }
         if (requestQuery.containsKey(DATA)) {
             builder.and(data(requestQuery.get(DATA)));
+        }
+        if (requestQuery.containsKey(CASE_ID)) {
+            builder.and(caseId(requestQuery.get(CASE_ID)));
         }
 
         return builder;
@@ -253,5 +257,21 @@ public class CaseSearchService extends MongoSearchService<Case> {
         if (petriNet.containsKey(PETRINET_IDENTIFIER))
             return petriNet.get(PETRINET_IDENTIFIER);
         return "";
+    }
+
+    public Predicate caseId(Object query) {
+        if (query instanceof ArrayList) {
+            BooleanBuilder builder = new BooleanBuilder();
+            List<BooleanExpression> expressions = (List<BooleanExpression>) ((ArrayList) query).stream().filter(q -> q instanceof String).map(q -> caseIdString((String) q)).collect(Collectors.toList());
+            expressions.forEach(builder::or);
+            return builder;
+        } else if (query instanceof String) {
+            return caseIdString((String) query);
+        }
+        return null;
+    }
+
+    private static BooleanExpression caseIdString(String caseId) {
+        return QCase.case$.stringId.eq(caseId);
     }
 }
