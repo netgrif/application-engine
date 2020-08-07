@@ -91,7 +91,7 @@ public class WorkflowService implements IWorkflowService {
             setImmediateDataFields(useCase);
             elasticCaseService.indexNow(new ElasticCase(useCase));
         } catch (Exception e) {
-            log.error("Indexing failed ["+useCase.getStringId()+"]", e);
+            log.error("Indexing failed [" + useCase.getStringId() + "]", e);
         }
         return useCase;
     }
@@ -100,7 +100,7 @@ public class WorkflowService implements IWorkflowService {
     public Case findOne(String caseId) {
         Optional<Case> caseOptional = repository.findById(caseId);
         if (!caseOptional.isPresent())
-            throw new IllegalArgumentException("Could not find Case with id ["+caseId+"]");
+            throw new IllegalArgumentException("Could not find Case with id [" + caseId + "]");
         Case useCase = caseOptional.get();
         setPetriNet(useCase);
         decryptDataSet(useCase);
@@ -184,7 +184,7 @@ public class WorkflowService implements IWorkflowService {
         useCase = save(useCase);
 
         publisher.publishEvent(new CreateCaseEvent(useCase));
-        log.info("["+useCase.getStringId()+"]: Case " + title + " created");
+        log.info("[" + useCase.getStringId() + "]: Case " + title + " created");
 
         useCase.getPetriNet().initializeVarArcs(useCase.getDataSet());
         taskService.reloadTasks(useCase);
@@ -207,14 +207,23 @@ public class WorkflowService implements IWorkflowService {
     public void deleteCase(String caseId) {
         Optional<Case> caseOptional = repository.findById(caseId);
         if (!caseOptional.isPresent())
-            throw new IllegalArgumentException("Could not find case with id ["+caseId+"]");
+            throw new IllegalArgumentException("Could not find case with id [" + caseId + "]");
         Case useCase = caseOptional.get();
-        log.info("["+caseId+"]: Deleting case " + useCase.getTitle());
+        log.info("[" + caseId + "]: Deleting case " + useCase.getTitle());
 
         taskService.deleteTasksByCase(caseId);
         repository.delete(useCase);
 
         publisher.publishEvent(new DeleteCaseEvent(useCase));
+    }
+
+    @Override
+    public void deleteCase(String caseId, boolean deleteSubtree) {
+        if (deleteSubtree) {
+            deleteSubtreeRootedAt(caseId);
+        } else {
+            deleteCase(caseId);
+        }
     }
 
     @Override
@@ -229,7 +238,7 @@ public class WorkflowService implements IWorkflowService {
     public boolean removeTasksFromCase(Iterable<? extends Task> tasks, String caseId) {
         Optional<Case> caseOptional = repository.findById(caseId);
         if (!caseOptional.isPresent())
-            throw new IllegalArgumentException("Could not find case with id ["+caseId+"]");
+            throw new IllegalArgumentException("Could not find case with id [" + caseId + "]");
         Case useCase = caseOptional.get();
         return removeTasksFromCase(tasks, useCase);
     }
@@ -257,7 +266,7 @@ public class WorkflowService implements IWorkflowService {
 
     @Override
     public Case searchOne(Predicate predicate) {
-        Page<Case> page = search(predicate, new PageRequest(0,1));
+        Page<Case> page = search(predicate, new PageRequest(0, 1));
         if (page.getContent().isEmpty())
             return null;
         return page.getContent().get(0);
@@ -266,7 +275,7 @@ public class WorkflowService implements IWorkflowService {
     public List<Field> getData(String caseId) {
         Optional<Case> optionalUseCase = repository.findById(caseId);
         if (!optionalUseCase.isPresent())
-            throw new IllegalArgumentException("Could not find case with id ["+caseId+"]");
+            throw new IllegalArgumentException("Could not find case with id [" + caseId + "]");
         Case useCase = optionalUseCase.get();
         List<Field> fields = new ArrayList<>();
         useCase.getDataSet().forEach((id, dataField) -> {
@@ -374,10 +383,10 @@ public class WorkflowService implements IWorkflowService {
         useCase.setPetriNet(model);
     }
 
-    public void deleteSubtreeRootedAt(String subtreeRootCaseId) {
+    protected void deleteSubtreeRootedAt(String subtreeRootCaseId) {
         Case subtreeRoot = findOne(subtreeRootCaseId);
         if (subtreeRoot.getImmediateDataFields().contains("treeChildCases")) {
-            ((CaseField) subtreeRoot.getDataSet().get("treeChildCases")).getValue().forEach(this::deleteSubtreeRootedAt);
+            ((List<String>) subtreeRoot.getDataSet().get("treeChildCases").getValue()).forEach(this::deleteSubtreeRootedAt);
         }
         deleteCase(subtreeRootCaseId);
     }

@@ -28,6 +28,8 @@ public interface IWorkflowService {
 
     void deleteCase(String caseId);
 
+    void deleteCase(String caseId, boolean deleteSubtree);
+
     void updateMarking(Case useCase);
 
     Page<Case> searchAll(Predicate predicate);
@@ -49,6 +51,4 @@ public interface IWorkflowService {
     Case decrypt(Case useCase);
 
     Page<Case> search(Predicate predicate, Pageable pageable);
-
-    void deleteSubtreeRootedAt(String subtreeRootCaseId);
 }
