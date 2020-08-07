@@ -531,6 +531,11 @@
             <xs:element name="table" type="xs:string"/>
             <xs:element name="image" type="booleanImageView"/>
             <xs:element name="editor"/>
+            <xs:element name="buttonType">
+                <xs:simpleType>
+                    <xs:restriction base='xs:string'/>
+                </xs:simpleType>
+            </xs:element>
             <xs:element name="list">
                 <xs:simpleType>
                     <xs:union>
