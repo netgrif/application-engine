@@ -14,6 +14,7 @@ import com.netgrif.workflow.workflow.service.interfaces.IDataService;
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
 import com.netgrif.workflow.workflow.web.requestbodies.CreateCaseBody;
+import com.netgrif.workflow.workflow.web.requestbodies.DeleteCaseBody;
 import com.netgrif.workflow.workflow.web.responsebodies.*;
 import com.querydsl.core.types.Predicate;
 import org.slf4j.Logger;
@@ -151,7 +152,7 @@ public class WorkflowController {
     }
 
     @RequestMapping(value = "/case/{id}", method = RequestMethod.DELETE)
-    public MessageResource deleteCase(@PathVariable("id") String caseId) throws UnauthorisedRequestException {
+    public MessageResource deleteCase(@PathVariable("id") String caseId, @RequestBody DeleteCaseBody deleteParams) throws UnauthorisedRequestException {
         User logged = userService.getLoggedUser();
         Case requestedCase = workflowService.findOne(caseId);
         if( !logged.transformToLoggedUser().isAdmin() && !logged.getId().equals(requestedCase.getAuthor().getId()))
@@ -159,7 +160,7 @@ public class WorkflowController {
 
         try {
             caseId = URLDecoder.decode(caseId, StandardCharsets.UTF_8.name());
-            workflowService.deleteCase(caseId);
+            workflowService.deleteCase(caseId, deleteParams.deleteSubtree);
             return MessageResource.successMessage("Case " + caseId + " was deleted");
         } catch (UnsupportedEncodingException e) {
             log.error("Deleting case ["+caseId+"] failed:",e);
