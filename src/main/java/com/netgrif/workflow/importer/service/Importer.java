@@ -25,17 +25,24 @@ import com.netgrif.workflow.petrinet.domain.roles.RolePermission;
 import com.netgrif.workflow.petrinet.domain.throwable.MissingPetriNetMetaDataException;
 import com.netgrif.workflow.petrinet.service.ArcFactory;
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
+import com.netgrif.workflow.workflow.domain.FileStorageConfiguration;
 import com.netgrif.workflow.workflow.domain.triggers.Trigger;
 import lombok.Getter;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.transaction.annotation.Transactional;
+import org.xml.sax.SAXException;
 
+import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
 import java.io.*;
 import java.nio.file.Path;
 import java.util.*;
@@ -46,7 +53,6 @@ public class Importer {
 
     public static final Logger log = LoggerFactory.getLogger(Importer.class);
 
-    public static final String ARCHIVED_FILES_PATH = "storage/uploadedModels/";
     public static final String FILE_EXTENSION = ".xml";
 
     public static final String FIELD_KEYWORD = "f";
@@ -89,6 +95,9 @@ public class Importer {
 
     @Autowired
     private FieldActionsRunner actionsRunner;
+
+    @Autowired
+    private FileStorageConfiguration fileStorageConfiguration;
 
     @Transactional
     public Optional<PetriNet> importPetriNet(InputStream xml, Config config) throws MissingPetriNetMetaDataException {
@@ -145,7 +154,7 @@ public class Importer {
 
     @Transactional
     public Path saveNetFile(PetriNet net, InputStream xmlFile) throws IOException {
-        File savedFile = new File(ARCHIVED_FILES_PATH + net.getStringId() + "-" + net.getTitle() + FILE_EXTENSION);
+        File savedFile = new File(fileStorageConfiguration.getStorageArchived() + net.getStringId() + "-" + net.getTitle() + FILE_EXTENSION);
         savedFile.getParentFile().mkdirs();
         net.setImportXmlPath(savedFile.getPath());
         copyInputStreamToFile(xmlFile, savedFile);
@@ -301,15 +310,11 @@ public class Importer {
         transition.setImportId(importTransition.getId());
         transition.setTitle(toI18NString(importTransition.getLabel()));
         transition.setPosition(importTransition.getX(), importTransition.getY());
+
         if (importTransition.getCols() != null || importTransition.getRows() != null) {
-            if (importTransition.getRows() != null && importTransition.getCols() != null) {
-                transition.setLayout(new TaskLayout(importTransition.getRows(), importTransition.getCols()));
-            } else if (importTransition.getRows() != null) {
-                transition.setLayout(new TaskLayout(importTransition.getRows(), null));
-            } else {
-                transition.setLayout(new TaskLayout(null, importTransition.getCols()));
-            }
+            transition.setLayout(new TaskLayout(importTransition.getRows(), importTransition.getCols()));
         }
+
         transition.setPriority(importTransition.getPriority());
         transition.setIcon(importTransition.getIcon());
         transition.setAssignPolicy(toAssignPolicy(importTransition.getAssignPolicy()));
@@ -426,16 +431,16 @@ public class Importer {
         String alignment = importDataGroup.getAlignment() != null ? importDataGroup.getAlignment().value() : "";
         DataGroup dataGroup = new DataGroup();
         dataGroup.setImportId(importDataGroup.getId());
-        if (importDataGroup.getCols() != null || importDataGroup.getRows() != null) {
-            if (importDataGroup.getCols() != null && importDataGroup.getRows() != null) {
-                dataGroup.setLayout(new DataGroupLayout(importDataGroup.getRows(), importDataGroup.getCols()));
-            } else if (importDataGroup.getCols() != null) {
-                dataGroup.setLayout(new DataGroupLayout(null, importDataGroup.getCols()));
-            }
 
-        } else if (transition.getLayout() != null && transition.getLayout().getCols() != null) {
-            dataGroup.setLayout(new DataGroupLayout(null, transition.getLayout().getCols()));
+        if (importDataGroup.getCols() != null || importDataGroup.getRows() != null) {
+            dataGroup.setLayout(new DataGroupLayout(importDataGroup.getRows(), importDataGroup.getCols()));
         }
+        if (importDataGroup.getCols() == null && (transition.getLayout() != null && transition.getLayout().getCols() != null)) {
+            dataGroup.setLayout(dataGroup.getLayout() != null ?
+                    new DataGroupLayout(dataGroup.getLayout().getRows(),transition.getLayout().getCols()) :
+                    new DataGroupLayout(null, transition.getLayout().getCols()));
+        }
+
         dataGroup.setTitle(toI18NString(importDataGroup.getTitle()));
         dataGroup.setAlignment(alignment);
         dataGroup.setStretch(importDataGroup.isStretch());
@@ -503,7 +508,7 @@ public class Importer {
                 appearance = layout.getAppearance().toString();
             }
 
-            FieldLayout fieldLayout = new FieldLayout(layout.getX(),layout.getY(),layout.getRows(),layout.getCols(), layout.getTemplate().toString(), appearance);
+            FieldLayout fieldLayout = new FieldLayout(layout.getX(), layout.getY(), layout.getRows(), layout.getCols(), layout.getTemplate().toString(), appearance);
             transition.addDataSet(fieldId, null, null, fieldLayout);
         } catch (NullPointerException e) {
             throw new IllegalArgumentException("Wrong dataRef id [" + dataRef.getId() + "] on transition [" + transition.getTitle() + "]", e);
@@ -816,7 +821,7 @@ public class Importer {
         }
     }
 
-    private void setMetaData() throws MissingPetriNetMetaDataException{
+    private void setMetaData() throws MissingPetriNetMetaDataException {
         List<String> missingMetaData = new ArrayList<>();
         if (document.getId() != null) {
             net.setImportId(document.getId());

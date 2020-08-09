@@ -5,7 +5,7 @@
 
     <groupId>com.netgrif</groupId>
     <artifactId>application-engine</artifactId>
-    <version>4.0.0-SNAPSHOT</version>
+    <version>4.0.0</version>
     <packaging>jar</packaging>
 
     <name>NETGRIF Application Engine</name>
@@ -25,6 +25,12 @@
         <jasypt.version>1.9.2</jasypt.version>
         <querydsl.version>4.2.1</querydsl.version>
         <version.jsonOutputPath>${project.basedir}/src/main/resources/static</version.jsonOutputPath>
+        <sonar.projectName>NETGRIF Application Engine - Backend</sonar.projectName>
+        <sonar.projectKey>Engine-backend</sonar.projectKey>
+        <sonar.host.url>https://sonar.netgrif.com</sonar.host.url>
+        <sonar.login>a77040433bc2c05b8139a35fcf696b362cefa908</sonar.login>
+        <sonar.sources>src/main</sonar.sources>
+        <sonar.exclusions>src/test/**/*</sonar.exclusions>
     </properties>
 
     <dependencies>
@@ -338,11 +344,15 @@
                             <goal>compile</goal>
                             <goal>generateTestStubs</goal>
                             <goal>compileTests</goal>
+                            <goal>groovydoc</goal>
                             <goal>removeStubs</goal>
                             <goal>removeTestStubs</goal>
                         </goals>
                     </execution>
                 </executions>
+                <configuration>
+                    <groovyDocJavaSources>false</groovyDocJavaSources>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>com.mysema.maven</groupId>
@@ -379,6 +389,21 @@
                         </goals>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <doclint>none</doclint>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
@@ -442,6 +467,37 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.sonarsource.scanner.maven</groupId>
+                <artifactId>sonar-maven-plugin</artifactId>
+                <version>3.6.0.1398</version>
+            </plugin>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.8.5</version>
+                <executions>
+                    <execution>
+                        <id>default-prepare-agent</id>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>default-report</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <excludes>
+                        <exclude>**/config/*.*</exclude>
+                        <exclude>**/domain/*.*</exclude>
+                    </excludes>
+                </configuration>
             </plugin>
         </plugins>
     </build>
