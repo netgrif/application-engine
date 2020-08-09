@@ -52,7 +52,6 @@ class FileField extends FieldWithDefault<FileFieldValue> {
      * Path is generated as follow:
      * - if file is remote, path is field value / remote URI
      * - if file is local
-     *    - always starts with directory storage/
      *    - saved file name consists of Case id, field import id and original file name separated by dash
      * @param caseId
      * @return path to the saved file

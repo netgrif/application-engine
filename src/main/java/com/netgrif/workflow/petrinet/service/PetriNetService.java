@@ -20,6 +20,7 @@ import com.netgrif.workflow.petrinet.web.responsebodies.TransitionReference;
 import com.netgrif.workflow.petrinet.domain.EventPhase;
 import com.netgrif.workflow.rules.domain.facts.NetImportedFact;
 import com.netgrif.workflow.rules.service.interfaces.IRuleEngine;
+import com.netgrif.workflow.workflow.domain.FileStorageConfiguration;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.bson.Document;
 import org.bson.types.ObjectId;
@@ -72,6 +73,9 @@ public abstract class PetriNetService implements IPetriNetService {
 
     @Autowired
     private ApplicationEventPublisher publisher;
+
+    @Autowired
+    private FileStorageConfiguration fileStorageConfiguration;
 
     @Autowired
     private IRuleEngine ruleEngine;
@@ -272,7 +276,7 @@ public abstract class PetriNetService implements IPetriNetService {
                 return null;
             title = nets.get(0).getTitle().getDefaultValue();
         }
-        return new FileSystemResource(Importer.ARCHIVED_FILES_PATH + netId + "-" + title + Importer.FILE_EXTENSION);
+        return new FileSystemResource(fileStorageConfiguration.getStorageArchived() + netId + "-" + title + Importer.FILE_EXTENSION);
     }
 
 
