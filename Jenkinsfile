@@ -5,7 +5,7 @@ pipeline {
     jdk 'localJava8'
   }
   options {
-    copyArtifactPermission('*');
+    copyArtifactPermission('*')
   }
   environment {
         NEXUS_CRED = '1986c778-eba7-44d7-b6f6-71e73906d894'
@@ -108,6 +108,32 @@ pipeline {
             stage('GroovyDoc') {
                 steps {
                     echo 'Building GroovyDoc'
+                    sh 'mvn gplus:generateStubs gplus:groovydoc'
+                    script {
+                        pom = readMavenPom()
+                    }
+                    echo 'Uploading GroovyDoc to developer.netgrif.com'
+                    sshPublisher(
+                        publishers: [
+                            sshPublisherDesc(
+                                configName: 'developer.netgrif.com',
+                                transfers: [
+                                    sshTransfer(
+                                        cleanRemote: true,
+                                        excludes: '',
+                                        execCommand: '',
+                                        execTimeout: 120000,
+                                        flatten: false,
+                                        makeEmptyDirs: false,
+                                        noDefaultExcludes: false,
+                                        patternSeparator: '[, ]+',
+                                        remoteDirectory: "/var/www/html/developer/projects/engine-backend/${pom.getVersion()}/groovydoc",
+                                        remoteDirectorySDF: false,
+                                        removePrefix: 'target/gapidocs',
+                                        sourceFiles: 'target/gapidocs/**')],
+                                usePromotionTimestamp: false,
+                                useWorkspaceInPromotion: false,
+                                verbose: true)])
                 }
             }
 
@@ -192,8 +218,13 @@ pipeline {
                                 type: pom.getPackaging()
                             ],[
                                 artifactId: pom.getArtifactId(),
-                                classifier: '',
+                                classifier: 'javadoc',
                                 file: "target/${pom.getArtifactId()}-${pom.getVersion()}-javadoc.${pom.getPackaging()}",
+                                type: pom.getPackaging()
+                            ],[
+                                artifactId: pom.getArtifactId(),
+                                classifier: 'sources',
+                                file: "target/${pom.getArtifactId()}-${pom.getVersion()}-sources.${pom.getPackaging()}",
                                 type: pom.getPackaging()
                             ],[
                                 artifactId: pom.getArtifactId(),
