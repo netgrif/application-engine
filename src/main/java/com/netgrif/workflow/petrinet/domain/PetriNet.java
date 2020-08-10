@@ -5,6 +5,7 @@ import com.netgrif.workflow.petrinet.domain.arcs.Arc;
 import com.netgrif.workflow.petrinet.domain.arcs.VariableArc;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRole;
+import com.netgrif.workflow.petrinet.domain.version.Version;
 import com.netgrif.workflow.workflow.domain.DataField;
 import lombok.Getter;
 import lombok.Setter;
@@ -46,7 +47,7 @@ public class PetriNet extends PetriNetObject {
 
     @Getter
     @Setter
-    private String version; //in format 1.1.1 - MAJOR.MINOR.PATCH
+    private Version version;
 
     @Getter
     @Setter
@@ -93,10 +94,10 @@ public class PetriNet extends PetriNetObject {
     public PetriNet() {
         this._id = new ObjectId();
         this.identifier = "Default";
-        this.version = "1.0.0";
         this.initials = "";
         this.title = new I18nString("");
         this.importId = "";
+        this.version = new Version();
         defaultCaseName = new I18nString("");
         initialized = false;
         creationDate = LocalDateTime.now();
@@ -227,21 +228,7 @@ public class PetriNet extends PetriNetObject {
     }
 
     public void incrementVersion(VersionType type) {
-        List<Integer> versionParts = Arrays.stream(this.version.split("\\."))
-                .map(Integer::parseInt).collect(Collectors.toList());
-
-        if (type == VersionType.MAJOR) {
-            versionParts.set(0, versionParts.get(0) + 1);
-            versionParts.set(1, 0);
-            versionParts.set(2, 0);
-        } else if (type == VersionType.MINOR) {
-            versionParts.set(1, versionParts.get(1) + 1);
-            versionParts.set(2, 0);
-        } else if (type == VersionType.PATCH) {
-            versionParts.set(2, versionParts.get(2) + 1);
-        }
-
-        this.version = versionParts.get(0) + "." + versionParts.get(1) + "." + versionParts.get(2);
+        this.version.increment(type);
     }
 
     @Override
