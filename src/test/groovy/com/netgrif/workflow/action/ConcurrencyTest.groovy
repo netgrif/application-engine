@@ -1,6 +1,6 @@
 package com.netgrif.workflow.action
 
-import com.netgrif.workflow.importer.service.Config
+
 import com.netgrif.workflow.importer.service.Importer
 import com.netgrif.workflow.startup.ImportHelper
 import com.netgrif.workflow.workflow.domain.Case
@@ -32,7 +32,7 @@ class ConcurrencyTest {
 
     @Test
     void test() {
-        def mainNet = importer.importPetriNet(new File("src/test/resources/action_delegate_concurrency_test.xml"), "action_delegate_concurrency_test", "TST", new Config())
+        def mainNet = importer.importPetriNet(new File("src/test/resources/action_delegate_concurrency_test.xml"), "action_delegate_concurrency_test", "TST")
         assert mainNet.isPresent()
 
         List<Case> cases = []
