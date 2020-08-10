@@ -1,5 +1,6 @@
 package com.netgrif.workflow.configuration.security;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.www.BasicAuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
@@ -12,6 +13,9 @@ import java.io.IOException;
 @Component
 public class RestAuthenticationEntryPoint extends BasicAuthenticationEntryPoint {
 
+    @Value("${server.security.realm-name:NAE-Realm}")
+    private String realmName;
+
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
         if (authException != null) {
@@ -22,7 +26,7 @@ public class RestAuthenticationEntryPoint extends BasicAuthenticationEntryPoint 
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        setRealmName("NAE-Realm");
+        setRealmName(realmName);
         super.afterPropertiesSet();
     }
 }
