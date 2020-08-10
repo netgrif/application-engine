@@ -50,7 +50,7 @@ class RuleEngineRunner extends AbstractOrderedCommandLineRunner {
                 globals : sessionInitializer.globals().collect { "${it.toString()}" }.join(""),
         ]
 
-        String template = engine.createTemplate(new ClassPathResource(templateResource).getFile().getText()).make(binding)
+        String template = engine.createTemplate(new ClassPathResource(templateResource).inputStream.getText()).make(binding)
 
         File templateFile = new File(generatedTemplatePath)
         templateFile.getParentFile().mkdirs()
