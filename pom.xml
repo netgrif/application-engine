@@ -24,6 +24,7 @@
         <java.version>1.8</java.version>
         <jasypt.version>1.9.2</jasypt.version>
         <querydsl.version>4.2.1</querydsl.version>
+        <drools.version>7.36.1.Final</drools.version>
         <version.jsonOutputPath>${project.basedir}/src/main/resources/static</version.jsonOutputPath>
         <sonar.projectName>NETGRIF Application Engine - Backend</sonar.projectName>
         <sonar.projectKey>Engine-backend</sonar.projectKey>
@@ -234,22 +235,22 @@
         <dependency>
             <groupId>org.drools</groupId>
             <artifactId>drools-core</artifactId>
-            <version>7.36.1.Final</version>
+            <version>${drools.version}</version>
         </dependency>
         <dependency>
             <groupId>org.kie</groupId>
             <artifactId>kie-spring</artifactId>
-            <version>7.36.1.Final</version>
+            <version>${drools.version}</version>
         </dependency>
         <dependency>
             <groupId>org.drools</groupId>
             <artifactId>drools-model-compiler</artifactId>
-            <version>7.36.1.Final</version>
+            <version>${drools.version}</version>
         </dependency>
         <dependency>
             <groupId>org.drools</groupId>
             <artifactId>drools-canonical-model</artifactId>
-            <version>7.36.1.Final</version>
+            <version>${drools.version}</version>
         </dependency>
 
 
