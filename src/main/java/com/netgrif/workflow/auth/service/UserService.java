@@ -3,6 +3,7 @@ package com.netgrif.workflow.auth.service;
 import com.netgrif.workflow.auth.domain.*;
 import com.netgrif.workflow.auth.domain.repositories.AuthorityRepository;
 import com.netgrif.workflow.auth.domain.repositories.UserRepository;
+import com.netgrif.workflow.auth.domain.throwable.UnauthorisedRequestException;
 import com.netgrif.workflow.auth.service.interfaces.IUserProcessRoleService;
 import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.auth.web.requestbodies.UpdateUserRequest;
@@ -11,6 +12,7 @@ import com.netgrif.workflow.orgstructure.domain.Member;
 import com.netgrif.workflow.orgstructure.service.IMemberService;
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRoleRepository;
 import com.netgrif.workflow.startup.SystemUserRunner;
+import com.netgrif.workflow.workflow.service.interfaces.ITaskAuthenticationService;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
@@ -246,6 +248,15 @@ public class UserService implements IUserService {
     public User getLoggedUser() {
         LoggedUser loggedUser = (LoggedUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         return findByEmail(loggedUser.getEmail(), false);
+    }
+
+    @Override
+    public void checkUsersPermissions(String taskId, ITaskAuthenticationService taskAuthenticationService) throws UnauthorisedRequestException {
+        User logged = this.getLoggedUser();
+        if (!logged.transformToLoggedUser().isAdmin() && !taskAuthenticationService.isAssignee(logged, taskId))
+            throw new UnauthorisedRequestException(
+                    "User " + logged.transformToLoggedUser().getUsername() + " doesn't have permission to modify file in task " + taskId
+            );
     }
 
     @Override
