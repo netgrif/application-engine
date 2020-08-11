@@ -2,8 +2,10 @@ package com.netgrif.workflow.auth.service.interfaces;
 
 import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.auth.domain.User;
+import com.netgrif.workflow.auth.domain.throwable.UnauthorisedRequestException;
 import com.netgrif.workflow.auth.web.requestbodies.UpdateUserRequest;
 import com.netgrif.workflow.orgstructure.domain.Member;
+import com.netgrif.workflow.workflow.service.interfaces.ITaskAuthenticationService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
@@ -48,6 +50,8 @@ public interface IUserService {
     User getLoggedOrSystem();
 
     User getLoggedUser();
+
+    void checkUsersPermissions(String taskId, ITaskAuthenticationService taskAuthenticationService) throws UnauthorisedRequestException;
 
     User getSystem();
 
