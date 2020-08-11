@@ -5,6 +5,7 @@ import com.netgrif.workflow.petrinet.domain.DataGroup;
 import com.netgrif.workflow.petrinet.domain.Transition;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.petrinet.domain.dataset.FileField;
+import com.netgrif.workflow.petrinet.domain.dataset.FileListField;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedField;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldByFileFieldContainer;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldContainer;
@@ -12,6 +13,7 @@ import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.Task;
 import com.netgrif.workflow.workflow.service.FileFieldInputStream;
+import com.netgrif.workflow.workflow.web.responsebodies.MessageResource;
 import org.springframework.data.domain.Page;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -29,15 +31,23 @@ public interface IDataService {
 
     ChangedFieldContainer setData(String taskId, ObjectNode values);
 
-    FileFieldInputStream getFileByTask(String taskId, String fieldId);
+    FileFieldInputStream getFileByTask(String taskId, String fieldId, String name);
 
-    FileFieldInputStream getFileByCase(String caseId, String fieldId);
+    FileFieldInputStream getFileByCase(String caseId, String fieldId, String name);
 
     FileFieldInputStream getFile(Case useCase, FileField field);
+
+    FileFieldInputStream getFileByName(Case useCase, FileListField field, String name);
 
     InputStream download(String url) throws IOException;
 
     ChangedFieldByFileFieldContainer saveFile(String taskId, String fieldId, MultipartFile multipartFile);
+
+    ChangedFieldByFileFieldContainer saveFiles(String taskId, String fieldId, MultipartFile[] multipartFile);
+
+    boolean deleteFile(String taskId, String fieldId);
+
+    boolean deleteFileByName(String taskId, String fieldId, String name);
 
     List<DataGroup> getDataGroups(String taskId, Locale locale);
 

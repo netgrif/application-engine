@@ -25,7 +25,10 @@ public class LocalisedFieldFactory {
             return fromBoolean((BooleanField) field, locale);
         } else if (field instanceof UserField) {
             return fromUser((UserField) field, locale);
-        } else {
+        } else if (field instanceof FileListField) {
+            return fromFileList((FileListField) field, locale);
+        }
+        else {
             return fromGeneral(field, locale);
         }
     }
@@ -64,5 +67,9 @@ public class LocalisedFieldFactory {
 
     public static LocalisedField fromEnumeration(EnumerationField field, Locale locale) {
         return new LocalisedEnumerationField(field, locale);
+    }
+
+    public static LocalisedField fromFileList(FileListField field, Locale locale) {
+        return new LocalisedFileListField(field, locale);
     }
 }
