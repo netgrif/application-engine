@@ -6,11 +6,12 @@ import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.auth.domain.UserState;
 import com.netgrif.workflow.auth.domain.repositories.UserRepository;
 import com.netgrif.workflow.auth.service.interfaces.IAuthorityService;
-import com.netgrif.workflow.importer.service.Config;
-import com.netgrif.workflow.importer.service.Importer;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository;
+import com.netgrif.workflow.petrinet.domain.throwable.MissingPetriNetMetaDataException;
 import com.netgrif.workflow.petrinet.domain.throwable.TransitionNotExecutableException;
+import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
+import com.netgrif.workflow.startup.SuperCreator;
 import com.netgrif.workflow.startup.SystemUserRunner;
 import com.netgrif.workflow.utils.FullPageRequest;
 import com.netgrif.workflow.workflow.domain.Case;
@@ -28,7 +29,8 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.Collections;
 
 @SpringBootTest
@@ -38,12 +40,6 @@ public class TaskServiceTest {
 
     @Autowired
     private ITaskService service;
-
-    @Autowired
-    private TaskRepository repository;
-
-    @Autowired
-    private Importer importer;
 
     @Autowired
     private IWorkflowService workflowService;
@@ -69,29 +65,35 @@ public class TaskServiceTest {
     @Autowired
     private SystemUserRunner userRunner;
 
+    @Autowired
+    private IPetriNetService petriNetService;
+
+    @Autowired
+    private SuperCreator superCreator;
+
     @Before
     public void setUp() throws Exception {
         mongoTemplate.getDb().drop();
         taskRepository.deleteAll();
         userRunner.run("");
 
-        importer.importPetriNet(new File("src/test/resources/prikladFM.xml"), "fm net", "fm", new Config());
+        petriNetService.importPetriNet(new FileInputStream("src/test/resources/prikladFM.xml"), "major", superCreator.getLoggedSuper());
         PetriNet net = petriNetRepository.findAll().get(0);
         workflowService.createCase(net.getStringId(), "Storage Unit", "color", mockLoggedUser());
     }
 
     @Test
-    public void createTasks() throws Exception {
+    public void createTasks() {
         Case useCase = workflowService.getAll(new FullPageRequest()).getContent().get(0);
 
         service.createTasks(useCase);
 
-        assert repository.findAll().size() > 0;
+        assert taskRepository.findAll().size() > 0;
     }
 
     @Test
-    public void resetArcTest() throws TransitionNotExecutableException {
-        PetriNet net = importer.importPetriNet(new File("src/test/resources/reset_inhibitor_test.xml"), "reset", "rst", new Config()).get();
+    public void resetArcTest() throws TransitionNotExecutableException, MissingPetriNetMetaDataException, IOException {
+        PetriNet net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/reset_inhibitor_test.xml"), "major", superCreator.getLoggedSuper()).get();
         LoggedUser loggedUser = mockLoggedUser();
         Case useCase = workflowService.createCase(net.getStringId(), "Reset test", "color", loggedUser);
         User user = new User();

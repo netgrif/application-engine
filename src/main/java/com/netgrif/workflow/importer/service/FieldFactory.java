@@ -1,6 +1,7 @@
 package com.netgrif.workflow.importer.service;
 
 import com.netgrif.workflow.auth.domain.User;
+import com.netgrif.workflow.importer.model.*;
 import com.netgrif.workflow.importer.model.Data;
 import com.netgrif.workflow.importer.model.DocumentRef;
 import com.netgrif.workflow.importer.model.I18NStringType;
@@ -8,7 +9,6 @@ import com.netgrif.workflow.petrinet.domain.Format;
 import com.netgrif.workflow.petrinet.domain.I18nString;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.dataset.*;
-import com.netgrif.workflow.petrinet.domain.dataset.logic.validation.FieldValidationRunner;
 import com.netgrif.workflow.petrinet.domain.views.View;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.DataField;
@@ -24,6 +24,7 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Component
@@ -54,10 +55,10 @@ public final class FieldFactory {
                 field = buildFileField(data, importer);
                 break;
             case ENUMERATION:
-                field = buildEnumerationField(data.getValues(), data.getInit(), importer);
+                    field = buildEnumerationField(data.getValues(), data.getInit(), importer);
                 break;
             case MULTICHOICE:
-                field = buildMultichoiceField(data.getValues(), data.getInit(), importer);
+                    field = buildMultichoiceField(data.getValues(), data.getInit(), importer);
                 break;
             case NUMBER:
                 field = new NumberField();
@@ -74,6 +75,9 @@ public final class FieldFactory {
             case BUTTON:
                 field = new ButtonField();
                 break;
+            case TASK_REF:
+                field = new TaskField();
+                break;
             default:
                 throw new IllegalArgumentException(data.getType() + " is not a valid Field type");
         }
@@ -86,15 +90,25 @@ public final class FieldFactory {
         }
         if (data.getDesc() != null)
             field.setDescription(importer.toI18NString(data.getDesc()));
+
         if (data.getPlaceholder() != null)
             field.setPlaceholder(importer.toI18NString(data.getPlaceholder()));
-        if (data.getValid() != null && field instanceof ValidableField)
-            ((ValidableField) field).setValidationRules(data.getValid());
+
+        if (data.getValid() != null && field instanceof ValidableField){
+            List<String> list = data.getValid();
+            for (String item : list) {
+                ((ValidableField) field).addValidation(item,null);
+            }
+        }
+        if (data.getValidations() != null && field instanceof ValidableField) {
+            List<com.netgrif.workflow.importer.model.Validation> list = data.getValidations().getValidation();
+            for (com.netgrif.workflow.importer.model.Validation item : list) {
+                ((ValidableField) field).addValidation(item.getExpression(), importer.toI18NString(item.getMessage()));
+            }
+        }
         if (data.getInit() != null && field instanceof FieldWithDefault)
             setFieldDefaultValue((FieldWithDefault) field, data.getInit());
-        if (field instanceof ValidableField) {
-            resolveValidation(field);
-        }
+
         if (data.getFormat() != null) {
             Format format = formatFactory.buildFormat(data.getFormat());
             field.setFormat(format);
@@ -142,7 +156,7 @@ public final class FieldFactory {
         Map<String, LinkedHashSet<String>> netIds = new HashMap<>();
         DocumentRef documentRef = data.getDocumentRef();
 
-        PetriNet net = importer.getNetByImportId(documentRef.getId());
+        PetriNet net = importer.getNetByImportId(String.valueOf(documentRef.getId()));
         LinkedHashSet<String> fieldIds = new LinkedHashSet<>();
 
         net.getDataSet().values().forEach(field -> {
@@ -220,13 +234,7 @@ public final class FieldFactory {
 
     private Field buildField(Case useCase, String fieldId, boolean withValidation) {
         Field field = useCase.getPetriNet().getDataSet().get(fieldId);
-        if (field instanceof ValidableField) {
-            if (!withValidation) {
-                ((ValidableField) field).setValidationJS(null);
-            } else {
-                resolveValidation(field);
-            }
-        }
+
         resolveDataValues(field, useCase, fieldId);
         if (field instanceof ChoiceField)
             resolveChoices((ChoiceField) field, useCase);
@@ -238,12 +246,6 @@ public final class FieldFactory {
         if (choices == null)
             return;
         field.setChoices(choices);
-    }
-
-    private void resolveValidation(Field field) {
-        if (((ValidableField) field).getValidationRules() != null)
-            ((ValidableField) field).setValidationJS(FieldValidationRunner
-                    .toJavascript(field, ((ValidableField) field).getValidationRules()));
     }
 
     public Field buildImmediateField(Case useCase, String fieldId) {

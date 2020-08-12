@@ -3,6 +3,7 @@ package com.netgrif.workflow.petrinet.domain;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.FieldBehavior;
+import com.netgrif.workflow.petrinet.domain.dataset.logic.FieldLayout;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action;
 import lombok.Getter;
 import lombok.Setter;
@@ -21,17 +22,24 @@ public class DataFieldLogic {
     @Setter
     private LinkedHashSet<Action> actions;
 
+    @Getter
+    @Setter
+    private FieldLayout layout;
+
     public DataFieldLogic() {
         this.behavior = new HashSet<>();
         this.actions = new LinkedHashSet<>();
+        this.layout = new FieldLayout();
     }
 
-    public DataFieldLogic(Set<FieldBehavior> behavior, Set<Action> actions) {
+    public DataFieldLogic(Set<FieldBehavior> behavior, Set<Action> actions, FieldLayout layout) {
         this();
         if (behavior != null)
             this.behavior.addAll(behavior);
         if (actions != null)
             this.actions.addAll(actions);
+        if (layout != null)
+            this.layout = layout;
     }
 
     public void addActions(Collection<Action> actions) {
@@ -75,5 +83,9 @@ public class DataFieldLogic {
 
     public boolean isForbidden() {
         return behavior.contains(FieldBehavior.FORBIDDEN);
+    }
+
+    public boolean layoutExist() {
+        return this.layout != null;
     }
 }
