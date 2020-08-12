@@ -62,7 +62,7 @@ class FieldTest {
         superCreator.run()
         systemUserRunner.run()
 
-        limitsNetOptional = importer.importPetriNet(stream(LIMITS_NET_FILE), LIMITS_NET_TITLE, LIMITS_NET_INITIALS)
+        limitsNetOptional = importer.importPetriNet(stream(LIMITS_NET_FILE))
 
         assertNet()
         assertNumberField()
@@ -88,7 +88,9 @@ class FieldTest {
         assert field.description.defaultValue == "Number field description"
         assert field.name.defaultValue == "Number"
         assert field.placeholder.defaultValue == "Number field placeholder"
-        assert field.validationRules == "{inrange 0,inf}"
+        assert field.validations.get(0).validationRule == "inrange 0,inf"
+        assert field.validations.get(1).validationMessage.defaultValue == "Number field validation message"
+        assert field.validations.get(1).validationRule == "inrange 0,inf"
     }
 
     private void assertTextField() {
@@ -97,7 +99,9 @@ class FieldTest {
         assert field.description.defaultValue == "Text field description"
         assert field.name.defaultValue == "Text"
         assert field.placeholder.defaultValue == "Text field placeholder"
-        assert field.validationRules == "email"
+        assert field.validations.get(0).validationRule == "email"
+        assert field.validations.get(1).validationMessage.defaultValue == "Mail validation message"
+        assert field.validations.get(1).validationRule == "email"
     }
 
     private void assertEnumerationField() {
@@ -139,6 +143,11 @@ class FieldTest {
         assert field.description.defaultValue == "Date field description"
         assert field.name.defaultValue == "Date"
         assert field.placeholder.defaultValue == "Date field placeholder"
+        assert field.validations.get(0).validationRule == "between today,future"
+        assert field.validations.get(1).validationMessage.defaultValue == "Date field validation message"
+        assert field.validations.get(1).validationRule == "between today,future"
+        assert field.validations.get(2).validationMessage.defaultValue == "Date field validation message 2"
+        assert field.validations.get(2).validationRule == "between today,tommorow"
     }
 
     private void assertFileField() {
