@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="petriflow_schema.xsd">
+	<id>all_data</id>
+	<title>All Data</title>
+	<initials>ALL</initials>
     <!-- ROLES -->
     <role>
         <id>process_role</id>
@@ -101,6 +104,14 @@
     <data type="file">
         <id>file</id>
         <title>File</title>
+        <action trigger="set">
+            <!-- @formatter:off -->
+            textfield: f.text;
+            change textfield value {
+                "funguje to"
+            }
+            <!-- @formatter:on -->
+        </action>
     </data>
 
     <data type="user">
@@ -123,12 +134,14 @@
         <id>1</id>
         <x>379</x>
         <y>273</y>
+		<cols>6</cols>
         <label>Task - editable</label>
         <assignPolicy>auto</assignPolicy>
         <dataGroup>
             <id>number</id>
             <title>Number fields</title>
             <stretch>false</stretch>
+			<rows>2</rows>
             <dataRef>
                 <id>number</id>
                 <logic>

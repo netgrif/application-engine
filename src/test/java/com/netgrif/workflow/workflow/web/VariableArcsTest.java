@@ -6,7 +6,6 @@ import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.auth.domain.UserProcessRole;
 import com.netgrif.workflow.auth.domain.UserState;
 import com.netgrif.workflow.auth.service.interfaces.IAuthorityService;
-import com.netgrif.workflow.importer.service.Config;
 import com.netgrif.workflow.importer.service.Importer;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.arcs.Arc;
@@ -14,10 +13,12 @@ import com.netgrif.workflow.petrinet.domain.arcs.VariableArc;
 import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository;
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRole;
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRoleRepository;
+import com.netgrif.workflow.petrinet.domain.throwable.MissingPetriNetMetaDataException;
 import com.netgrif.workflow.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.workflow.startup.DefaultRoleRunner;
 import com.netgrif.workflow.startup.ImportHelper;
+import com.netgrif.workflow.startup.SuperCreator;
 import com.netgrif.workflow.startup.SystemUserRunner;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.Task;
@@ -35,7 +36,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -86,6 +88,9 @@ public class VariableArcsTest {
     @Autowired
     private SystemUserRunner userRunner;
 
+    @Autowired
+    private SuperCreator superCreator;
+
     @Before
     public void before() throws Exception {
         userRunner.run("");
@@ -100,8 +105,8 @@ public class VariableArcsTest {
     }
 
     @Test
-    public void importTest() throws TransitionNotExecutableException {
-        Optional<PetriNet> optionalNet = importer.importPetriNet(new File(NET_PATH), NET_TITLE, NET_INITIALS, new Config());
+    public void importTest() throws TransitionNotExecutableException, MissingPetriNetMetaDataException, IOException {
+        Optional<PetriNet> optionalNet = service.importPetriNet(new FileInputStream(NET_PATH), "major", superCreator.getLoggedSuper());
 
         assert optionalNet.isPresent();
         PetriNet net = optionalNet.get();

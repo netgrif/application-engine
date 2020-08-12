@@ -1,7 +1,9 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <!-- version 1.0.0 -->
 <document>
-    <id>1</id>
+    <id>prikladFM_test.xml</id>
+    <initials>TST</initials>
+    <title>Test</title>
     <defaultRole>false</defaultRole>
     <data type="number">
         <id>1</id>

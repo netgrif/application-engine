@@ -15,6 +15,7 @@ import org.elasticsearch.index.query.QueryStringQueryBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -28,6 +29,7 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.function.BinaryOperator;
 import java.util.stream.Collectors;
 
 import static org.elasticsearch.index.query.QueryBuilders.*;
@@ -37,16 +39,22 @@ public class ElasticTaskService implements IElasticTaskService {
 
     private static final Logger log = LoggerFactory.getLogger(ElasticTaskService.class);
 
-    @Autowired
     private ElasticTaskRepository repository;
-
-    @Autowired
     private ITaskService taskService;
+    private ElasticsearchTemplate template;
+    private ExecutorService executor = Executors.newSingleThreadExecutor();
 
     @Autowired
-    private ElasticsearchTemplate template;
+    public ElasticTaskService(ElasticTaskRepository repository, ElasticsearchTemplate template) {
+        this.repository = repository;
+        this.template = template;
+    }
 
-    private ExecutorService executor = Executors.newSingleThreadExecutor();
+    @Autowired
+    @Lazy
+    public void setTaskService(ITaskService taskService) {
+        this.taskService = taskService;
+    }
 
     private Map<String, Float> fullTextFieldMap = ImmutableMap.of(
             "title", 1f,
@@ -101,13 +109,8 @@ public class ElasticTaskService implements IElasticTaskService {
     }
 
     @Override
-    public Page<Task> search(TaskSearchRequest request, LoggedUser user, Pageable pageable) {
-        if (request == null) {
-            throw new IllegalArgumentException("Request can not be null!");
-        }
-        addRolesQueryConstraint(request, user);
-
-        SearchQuery query = buildQuery(request, user, pageable);
+    public Page<Task> search(List<TaskSearchRequest> requests, LoggedUser user, Pageable pageable, Boolean isIntersection) {
+        SearchQuery query = buildQuery(requests, user, pageable, isIntersection);
         Page<ElasticTask> indexedTasks = repository.search(query);
         List<Task> taskPage = taskService.findAllById(indexedTasks.get().map(ElasticTask::getStringId).collect(Collectors.toList()));
 
@@ -115,13 +118,8 @@ public class ElasticTaskService implements IElasticTaskService {
     }
 
     @Override
-    public long count(TaskSearchRequest request, LoggedUser user) {
-        if (request == null) {
-            throw new IllegalArgumentException("Request can not be null!");
-        }
-        addRolesQueryConstraint(request, user);
-
-        SearchQuery query = buildQuery(request, user, new FullPageRequest());
+    public long count(List<TaskSearchRequest> requests, LoggedUser user, Boolean isIntersection) {
+        SearchQuery query = buildQuery(requests, user, new FullPageRequest(), isIntersection);
 
         return template.count(query, ElasticTask.class);
     }
@@ -136,8 +134,30 @@ public class ElasticTaskService implements IElasticTaskService {
         }
     }
 
-    private SearchQuery buildQuery(TaskSearchRequest request, LoggedUser user, Pageable pageable) {
+    private SearchQuery buildQuery(List<TaskSearchRequest> requests, LoggedUser user, Pageable pageable, Boolean isIntersection) {
+        BinaryOperator<BoolQueryBuilder> reductionOperator;
+        if (isIntersection)
+            reductionOperator = BoolQueryBuilder::must;
+        else
+            reductionOperator = BoolQueryBuilder::should;
+
+        BoolQueryBuilder query = requests.stream()
+                .map(request -> buildSingleQuery(request, user))
+                .reduce(new BoolQueryBuilder(), reductionOperator);
+
         NativeSearchQueryBuilder builder = new NativeSearchQueryBuilder();
+        return builder
+                .withQuery(query)
+                .withPageable(pageable)
+                .build();
+    }
+
+    private BoolQueryBuilder buildSingleQuery(TaskSearchRequest request, LoggedUser user) {
+        if (request == null) {
+            throw new IllegalArgumentException("Request can not be null!");
+        }
+        addRolesQueryConstraint(request, user);
+
         BoolQueryBuilder query = boolQuery();
 
         buildRoleQuery(request, query);
@@ -148,24 +168,21 @@ public class ElasticTaskService implements IElasticTaskService {
         buildFullTextQuery(request, query);
         buildStringQuery(request, query);
 
-        return builder
-                .withQuery(query)
-                .withPageable(pageable)
-                .build();
+        return query;
     }
 
     /**
      * Tasks with role "5cb07b6ff05be15f0b972c31"
      * {
-     *     "role": "5cb07b6ff05be15f0b972c31"
+     * "role": "5cb07b6ff05be15f0b972c31"
      * }
-     *
+     * <p>
      * Tasks with role "5cb07b6ff05be15f0b972c31" OR "5cb07b6ff05be15f0b972c36"
      * {
-     *     "role": [
-     *         "5cb07b6ff05be15f0b972c31",
-     *         "5cb07b6ff05be15f0b972c36"
-     *     ]
+     * "role": [
+     * "5cb07b6ff05be15f0b972c31",
+     * "5cb07b6ff05be15f0b972c36"
+     * ]
      * }
      */
     private void buildRoleQuery(TaskSearchRequest request, BoolQueryBuilder query) {
@@ -184,15 +201,15 @@ public class ElasticTaskService implements IElasticTaskService {
     /**
      * Tasks of case with id "5cb07b6ff05be15f0b972c4d"
      * {
-     *     "case": "5cb07b6ff05be15f0b972c4d"
+     * "case": "5cb07b6ff05be15f0b972c4d"
      * }
-     *
+     * <p>
      * Tasks of cases with id "5cb07b6ff05be15f0b972c4d" OR "5cb07b6ff05be15f0b972c4e"
      * {
-     *     "case": [
-     *          "id": "5cb07b6ff05be15f0b972c4d",
-     *          "id": "5cb07b6ff05be15f0b972c4e"
-     *     ]
+     * "case": [
+     * "id": "5cb07b6ff05be15f0b972c4d",
+     * "id": "5cb07b6ff05be15f0b972c4e"
+     * ]
      * }
      */
     private void buildCaseQuery(TaskSearchRequest request, BoolQueryBuilder query) {
@@ -211,15 +228,15 @@ public class ElasticTaskService implements IElasticTaskService {
     /**
      * Tasks with title (default value) "New task"
      * {
-     *     "title": "New task"
+     * "title": "New task"
      * }
-     *
+     * <p>
      * Tasks with title (default value) "New task" OR "Status"
      * {
-     *     "title": [
-     *         "New task",
-     *         "Status"
-     *     ]
+     * "title": [
+     * "New task",
+     * "Status"
+     * ]
      * }
      */
     private void buildTitleQuery(TaskSearchRequest request, BoolQueryBuilder query) {
@@ -238,9 +255,9 @@ public class ElasticTaskService implements IElasticTaskService {
     /**
      * Tasks assigned to user with id 1
      * {
-     *     "user": 1
+     * "user": 1
      * }
-     *
+     * <p>
      * Tasks assigned to user with id 1 OR 2
      */
     private void buildUserQuery(TaskSearchRequest request, BoolQueryBuilder query) {
@@ -259,15 +276,15 @@ public class ElasticTaskService implements IElasticTaskService {
     /**
      * Tasks of process "document"
      * {
-     *     "process": "document"
+     * "process": "document"
      * }
-     *
+     * <p>
      * Tasks of process "document" OR "folder"
      * {
-     *     "process": [
-     *         "document",
-     *         "folder",
-     *     ]
+     * "process": [
+     * "document",
+     * "folder",
+     * ]
      * }
      */
     private void buildProcessQuery(TaskSearchRequest request, BoolQueryBuilder query) {

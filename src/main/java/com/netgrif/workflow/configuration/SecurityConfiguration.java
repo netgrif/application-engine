@@ -1,5 +1,6 @@
 package com.netgrif.workflow.configuration;
 
+import com.netgrif.workflow.configuration.security.RestAuthenticationEntryPoint;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,8 +11,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
 import org.springframework.security.web.header.writers.StaticHeadersWriter;
 import org.springframework.session.web.http.HeaderHttpSessionIdResolver;
 import org.springframework.session.web.http.HttpSessionIdResolver;
@@ -36,6 +39,9 @@ public class SecurityConfiguration extends AbstractSecurityConfiguration {
 
     @Autowired
     private Environment env;
+
+    @Autowired
+    private RestAuthenticationEntryPoint authenticationEntryPoint;
 
     @Value("${server.auth.open-registration}")
     private boolean openRegistration;
@@ -82,6 +88,11 @@ public class SecurityConfiguration extends AbstractSecurityConfiguration {
             .and()
             .logout()
                 .logoutUrl("/api/auth/logout")
+                .invalidateHttpSession(true)
+                .logoutSuccessHandler((new HttpStatusReturningLogoutSuccessHandler(HttpStatus.OK)))
+            .and()
+            .exceptionHandling()
+                .authenticationEntryPoint(authenticationEntryPoint)
             .and()
             .headers()
                 .frameOptions().disable()
@@ -104,14 +115,14 @@ public class SecurityConfiguration extends AbstractSecurityConfiguration {
 
     @Override
     String[] getStaticPatterns() {
-        return new String[] {
+        return new String[]{
                 "/**/favicon.ico", "/favicon.ico", "/**/manifest.json", "/manifest.json", "/configuration/**", "/swagger-resources/**", "/swagger-ui.html", "/webjars/**"
         };
     }
 
     @Override
     String[] getServerPatterns() {
-        return new String[] {
+        return new String[]{
                 "/api/auth/signup", "/api/auth/token/verify", "/api/auth/reset", "/api/auth/recover", "/v2/api-docs", "/swagger-ui.html"
         };
     }
