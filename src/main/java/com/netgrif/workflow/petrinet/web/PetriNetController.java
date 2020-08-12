@@ -1,13 +1,14 @@
 package com.netgrif.workflow.petrinet.web;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.importer.service.Importer;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
+import com.netgrif.workflow.petrinet.domain.version.StringToVersionConverter;
+import com.netgrif.workflow.petrinet.domain.throwable.MissingPetriNetMetaDataException;
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.workflow.petrinet.service.interfaces.IProcessRoleService;
-import com.netgrif.workflow.petrinet.web.requestbodies.UploadedFileMeta;
 import com.netgrif.workflow.petrinet.web.responsebodies.*;
+import com.netgrif.workflow.workflow.domain.FileStorageConfiguration;
 import com.netgrif.workflow.workflow.web.responsebodies.MessageResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,16 +28,10 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
-import java.util.Collections;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
@@ -48,35 +43,38 @@ public class PetriNetController {
     private static final Logger log = LoggerFactory.getLogger(PetriNetController.class);
 
     @Autowired
+    private FileStorageConfiguration fileStorageConfiguration;
+
+    @Autowired
     private IPetriNetService service;
 
     @Autowired
     private IProcessRoleService roleService;
 
+    @Autowired
+    private StringToVersionConverter converter;
+
     @PreAuthorize("hasRole('ADMIN')")
     @RequestMapping(value = "/import", method = POST)
     public
     @ResponseBody
-    MessageResource importPetriNet(
+    PetriNetReferenceWithMessageResource importPetriNet(
             @RequestParam(value = "file", required = true) MultipartFile multipartFile,
-            @RequestParam(value = "meta", required = false) String fileMetaJSON,
-            Authentication auth) {
+            @RequestParam(value = "meta", required = false) String releaseType,
+            Authentication auth, Locale locale) throws MissingPetriNetMetaDataException {
         try {
-            File file = new File(multipartFile.getOriginalFilename());
+            File file = new File(fileStorageConfiguration.getStorageArchived() + multipartFile.getOriginalFilename());
             file.createNewFile();
             FileOutputStream fout = new FileOutputStream(file);
             fout.write(multipartFile.getBytes());
+            String release = releaseType == null ? "major" : releaseType;
+
+            Optional<PetriNet> newPetriNet = service.importPetriNet(new FileInputStream(file), release, (LoggedUser) auth.getPrincipal());
             fout.close();
-
-            ObjectMapper mapper = new ObjectMapper();
-            UploadedFileMeta fileMeta = mapper.readValue(fileMetaJSON, UploadedFileMeta.class);
-            fileMeta.releaseType = fileMeta.releaseType == null ? "patch" : fileMeta.releaseType;
-
-            service.importPetriNetAndDeleteFile(file, fileMeta, (LoggedUser) auth.getPrincipal());
-            return MessageResource.successMessage("Petri net " + fileMeta.name + " imported successfully");
+            return PetriNetReferenceWithMessageResource.successMessage("Petri net " + multipartFile.getOriginalFilename() + " imported successfully", newPetriNet.get(), locale);
         } catch (IOException e) {
             log.error("Importing Petri net failed: ", e);
-            return MessageResource.errorMessage("IO error");
+            return PetriNetReferenceWithMessageResource.errorMessage("IO error");
         }
     }
 
@@ -87,9 +85,9 @@ public class PetriNetController {
         if (identifier != null && version == null) {
             return new PetriNetReferenceResources(service.getReferencesByIdentifier(identifier, user, locale));
         } else if (identifier == null && version != null) {
-            return new PetriNetReferenceResources(service.getReferencesByVersion(version, user, locale));
+            return new PetriNetReferenceResources(service.getReferencesByVersion(converter.convert(version), user, locale));
         } else if (identifier != null && version != null) {
-            return new PetriNetReferenceResources(Collections.singletonList(service.getReference(identifier, version, user, locale)));
+            return new PetriNetReferenceResources(Collections.singletonList(service.getReference(identifier, converter.convert(version), user, locale)));
         } else {
             return new PetriNetReferenceResources(service.getReferences(user, locale));
         }
@@ -104,7 +102,7 @@ public class PetriNetController {
     @RequestMapping(value = "/{identifier}/{version}", method = GET)
     public @ResponseBody
     PetriNetReferenceResource getOne(@PathVariable("identifier") String identifier, @PathVariable("version") String version, Authentication auth, Locale locale) {
-        return new PetriNetReferenceResource(service.getReference(identifier, version, (LoggedUser) auth.getPrincipal(), locale));
+        return new PetriNetReferenceResource(service.getReference(identifier, converter.convert(version), (LoggedUser) auth.getPrincipal(), locale));
     }
 
     @RequestMapping(value = "/transitions", method = GET)

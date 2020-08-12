@@ -2,6 +2,9 @@
 <document
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="../../main/resources/petriNets/petriflow_schema.xsd">
+    <id>variable_arc_test.xml</id>
+    <initials>TST</initials>
+    <title>Test</title>
     <data type="number">
         <id>1</id>
         <title>x</title>

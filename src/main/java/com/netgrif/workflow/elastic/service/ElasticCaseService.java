@@ -6,7 +6,7 @@ import com.netgrif.workflow.elastic.domain.ElasticCase;
 import com.netgrif.workflow.elastic.domain.ElasticCaseRepository;
 import com.netgrif.workflow.elastic.service.executors.Executor;
 import com.netgrif.workflow.elastic.service.interfaces.IElasticCaseService;
-import com.netgrif.workflow.elastic.web.CaseSearchRequest;
+import com.netgrif.workflow.elastic.web.requestbodies.CaseSearchRequest;
 import com.netgrif.workflow.utils.FullPageRequest;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
@@ -16,6 +16,7 @@ import org.elasticsearch.index.query.QueryStringQueryBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -23,10 +24,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
 import org.springframework.data.elasticsearch.core.query.SearchQuery;
+import org.springframework.data.rest.core.mapping.RepositoryResourceMappings;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.BinaryOperator;
 import java.util.stream.Collectors;
 
 import static org.elasticsearch.index.query.QueryBuilders.*;
@@ -36,17 +39,23 @@ public class ElasticCaseService implements IElasticCaseService {
 
     private static final Logger log = LoggerFactory.getLogger(ElasticCaseService.class);
 
-    @Autowired
     private ElasticCaseRepository repository;
-
-    @Autowired
     private IWorkflowService workflowService;
-
-    @Autowired
     private ElasticsearchTemplate template;
+    private Executor executors;
 
     @Autowired
-    private Executor executors;
+    public ElasticCaseService(ElasticCaseRepository repository, ElasticsearchTemplate template, Executor executors) {
+        this.repository = repository;
+        this.template = template;
+        this.executors = executors;
+    }
+
+    @Autowired
+    @Lazy
+    public void setWorkflowService(IWorkflowService workflowService) {
+        this.workflowService = workflowService;
+    }
 
     private Map<String, Float> fullTextFieldMap = ImmutableMap.of(
             "title", 2f,
@@ -99,12 +108,12 @@ public class ElasticCaseService implements IElasticCaseService {
     }
 
     @Override
-    public Page<Case> search(CaseSearchRequest request, LoggedUser user, Pageable pageable) {
-        if (request == null) {
+    public Page<Case> search(List<CaseSearchRequest> requests, LoggedUser user, Pageable pageable, Boolean isIntersection) {
+        if (requests == null) {
             throw new IllegalArgumentException("Request can not be null!");
         }
 
-        SearchQuery query = buildQuery(request, user, pageable);
+        SearchQuery query = buildQuery(requests, user, pageable, isIntersection);
         Page<ElasticCase> indexedCases = repository.search(query);
         List<Case> casePage = workflowService.findAllById(indexedCases.get().map(ElasticCase::getStringId).collect(Collectors.toList()));
 
@@ -112,18 +121,35 @@ public class ElasticCaseService implements IElasticCaseService {
     }
 
     @Override
-    public long count(CaseSearchRequest request, LoggedUser user) {
-        if (request == null) {
+    public long count(List<CaseSearchRequest> requests, LoggedUser user, Boolean isIntersection) {
+        if (requests == null) {
             throw new IllegalArgumentException("Request can not be null!");
         }
 
-        SearchQuery query = buildQuery(request, user, new FullPageRequest());
+        SearchQuery query = buildQuery(requests, user, new FullPageRequest(), isIntersection);
 
         return template.count(query, ElasticCase.class);
     }
 
-    private SearchQuery buildQuery(CaseSearchRequest request, LoggedUser user, Pageable pageable) {
+    private SearchQuery buildQuery(List<CaseSearchRequest> requests, LoggedUser user, Pageable pageable, Boolean isIntersection) {
+        BinaryOperator<BoolQueryBuilder> reductionOperator;
+        if(isIntersection)
+            reductionOperator = BoolQueryBuilder::must;
+        else
+            reductionOperator = BoolQueryBuilder::should;
+
+        BoolQueryBuilder query = requests.stream()
+                                            .map(request -> buildSingleQuery(request, user))
+                                            .reduce(new BoolQueryBuilder(), reductionOperator);
+
         NativeSearchQueryBuilder builder = new NativeSearchQueryBuilder();
+        return builder
+                .withQuery(query)
+                .withPageable(pageable)
+                .build();
+    }
+
+    private BoolQueryBuilder buildSingleQuery(CaseSearchRequest request, LoggedUser user) {
         BoolQueryBuilder query = boolQuery();
 
         buildPetriNetQuery(request, user, query);
@@ -136,10 +162,7 @@ public class ElasticCaseService implements IElasticCaseService {
 
         // TODO: filtered query https://stackoverflow.com/questions/28116404/filtered-query-using-nativesearchquerybuilder-in-spring-data-elasticsearch
 
-        return builder
-                .withQuery(query)
-                .withPageable(pageable)
-                .build();
+        return query;
     }
 
     /**
