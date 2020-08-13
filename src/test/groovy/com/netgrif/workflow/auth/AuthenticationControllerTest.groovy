@@ -10,7 +10,7 @@ import com.netgrif.workflow.auth.domain.repositories.UserRepository
 import com.netgrif.workflow.auth.web.AuthenticationController
 import com.netgrif.workflow.auth.web.requestbodies.NewUserRequest
 import com.netgrif.workflow.auth.web.requestbodies.RegistrationRequest
-import com.netgrif.workflow.importer.service.Config
+
 import com.netgrif.workflow.importer.service.Importer
 import com.netgrif.workflow.mail.EmailType
 import com.netgrif.workflow.orgstructure.domain.Group
