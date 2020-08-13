@@ -3,6 +3,14 @@
 	<id>test</id>
 	<initials>TST</initials>
 	<title>Test</title>
+	<role>
+		<id>user</id>
+		<title>User</title>
+	</role>
+	<role>
+		<id>admin</id>
+		<title>Admin</title>
+	</role>
 	<!-- TRANSITIONS -->
 	<transition>
 		<id>2</id>
