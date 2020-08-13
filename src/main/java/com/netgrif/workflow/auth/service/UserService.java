@@ -168,11 +168,14 @@ public class UserService implements IUserService {
         members.add(loggedUser.getId());
         BooleanExpression predicate = QUser.user
                 .id.in(members)
-                .and(QUser.user.state.eq(UserState.ACTIVE))
-                .andAnyOf(
-                        QUser.user.email.containsIgnoreCase(query),
-                        QUser.user.name.containsIgnoreCase(query),
-                        QUser.user.surname.containsIgnoreCase(query));
+                .and(QUser.user.state.eq(UserState.ACTIVE));
+        for (String word : query.split(" ")) {
+            predicate = predicate
+                    .andAnyOf(QUser.user.email.containsIgnoreCase(word),
+                              QUser.user.name.containsIgnoreCase(word),
+                              QUser.user.surname.containsIgnoreCase(word));
+        }
+
         Page<User> users = userRepository.findAll(predicate, pageable);
         if (!small)
             users.forEach(this::loadProcessRoles);
