@@ -33,10 +33,10 @@ public class KnowledgeBaseInitializer implements IKnowledgeBaseInitializer {
 
     private static final Logger log = LoggerFactory.getLogger(KnowledgeBaseInitializer.class);
 
-    @Value("${drools.template.path}")
+    @Value("${drools.template.path:rules/templates/template.drl}")
     private String templatePath;
 
-    @Value("${drools.compile.page-size}")
+    @Value("${drools.compile.page-size:100}")
     private Integer pageSize;
 
     @Autowired
