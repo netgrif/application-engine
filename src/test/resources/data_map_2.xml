@@ -6,15 +6,25 @@
     <title>Test</title>
     <defaultRole>true</defaultRole>
     <!-- DATA -->
-    <data type="multichoice_map">
+    <data type="multichoice_map" immediate="true">
         <id>multichoice</id>
         <title>Multichoice map</title>
         <options>
-            <option key="first">First option</option>
-            <option key="second">Second option</option>
-            <option key="third">Third option</option>
+            <option key="first" name="first_option">First option</option>
+            <option key="second" name="second_option">Second option</option>
+            <option key="third" name="third_option">Third option</option>
         </options>
         <init>second</init>
         <init>first</init>
     </data>
+    <!-- I18N -->
+    <i18n locale="sk">
+        <i18nString name="first_option">Prvá možnosť</i18nString>
+    </i18n>
+    <i18n locale="sk">
+        <i18nString name="second_option">Druhá možnosť</i18nString>
+    </i18n>
+    <i18n locale="sk">
+        <i18nString name="third_option">Tretia možnosť</i18nString>
+    </i18n>
 </document>
