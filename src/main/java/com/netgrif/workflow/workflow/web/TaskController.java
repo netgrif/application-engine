@@ -2,22 +2,17 @@ package com.netgrif.workflow.workflow.web;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.netgrif.workflow.auth.domain.LoggedUser;
-import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.auth.domain.throwable.UnauthorisedRequestException;
-import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.elastic.service.interfaces.IElasticTaskService;
 import com.netgrif.workflow.elastic.web.requestbodies.singleaslist.SingleTaskSearchRequestAsList;
 import com.netgrif.workflow.petrinet.domain.DataGroup;
-import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldByFileFieldContainer;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldContainer;
-import com.netgrif.workflow.petrinet.domain.roles.RolePermission;
 import com.netgrif.workflow.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.workflow.workflow.domain.MergeFilterOperation;
 import com.netgrif.workflow.workflow.domain.Task;
 import com.netgrif.workflow.workflow.service.FileFieldInputStream;
 import com.netgrif.workflow.workflow.service.interfaces.IDataService;
-import com.netgrif.workflow.workflow.service.interfaces.IFilterService;
 import com.netgrif.workflow.workflow.service.interfaces.ITaskAuthenticationService;
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
 import com.netgrif.workflow.workflow.web.responsebodies.*;
@@ -35,6 +30,7 @@ import org.springframework.hateoas.mvc.ControllerLinkBuilder;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -44,7 +40,6 @@ import java.io.FileNotFoundException;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/task")
@@ -56,16 +51,10 @@ public class TaskController {
     private ITaskService taskService;
 
     @Autowired
-    private IFilterService filterService;
-
-    @Autowired
     private IDataService dataService;
 
     @Autowired
     private IElasticTaskService searchService;
-
-    @Autowired
-    private IUserService userService;
 
     @Autowired
     private ITaskAuthenticationService taskAuthenticationService;
@@ -107,10 +96,9 @@ public class TaskController {
     }
 
     @RequestMapping(value = "/assign/{id}", method = RequestMethod.GET)
-    public MessageResource assign(Authentication auth, @PathVariable("id") String taskId) throws UnauthorisedRequestException {
+    @PreAuthorize("taskAuthenticationService.canCallAssign(#auth.getPrincipal(), #taskId)")
+    public MessageResource assign(Authentication auth, @PathVariable("id") String taskId) {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
-
-        taskAuthenticationService.checkAssign(loggedUser, taskId);
 
         try {
             taskService.assignTask(loggedUser, taskId);
@@ -122,10 +110,9 @@ public class TaskController {
     }
 
     @RequestMapping(value = "/delegate/{id}", method = RequestMethod.POST)
-    public MessageResource delegate(Authentication auth, @PathVariable("id") String taskId, @RequestBody Long delegatedId) throws UnauthorisedRequestException {
+    @PreAuthorize("taskAuthenticationService.canCallDelegate(#auth.getPrincipal(), #taskId)")
+    public MessageResource delegate(Authentication auth, @PathVariable("id") String taskId, @RequestBody Long delegatedId) {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
-
-        taskAuthenticationService.checkDelegate(loggedUser, taskId);
 
         try {
             taskService.delegateTask(loggedUser, delegatedId, taskId);
@@ -137,10 +124,9 @@ public class TaskController {
     }
 
     @RequestMapping(value = "/finish/{id}", method = RequestMethod.GET)
-    public MessageResource finish(Authentication auth, @PathVariable("id") String taskId) throws UnauthorisedRequestException {
+    @PreAuthorize("taskAuthenticationService.canCallFinish(#auth.getPrincipal(), #taskId)")
+    public MessageResource finish(Authentication auth, @PathVariable("id") String taskId) {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
-
-        taskAuthenticationService.checkFinish(loggedUser, taskId);
 
         try {
             taskService.finishTask(loggedUser, taskId);
@@ -152,10 +138,9 @@ public class TaskController {
     }
 
     @RequestMapping(value = "/cancel/{id}", method = RequestMethod.GET)
-    public MessageResource cancel(Authentication auth, @PathVariable("id") String taskId) throws UnauthorisedRequestException {
+    @PreAuthorize("taskAuthenticationService.canCallCancel(#auth.getPrincipal(), #taskId)")
+    public MessageResource cancel(Authentication auth, @PathVariable("id") String taskId) {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
-
-        taskAuthenticationService.checkCancel(loggedUser, taskId);
 
         try {
             taskService.cancelTask(loggedUser, taskId);
@@ -232,10 +217,9 @@ public class TaskController {
     }
 
     @RequestMapping(value = "/{id}/data", method = RequestMethod.POST)
-    public ChangedFieldContainer saveData(Authentication auth, @PathVariable("id") String taskId, @RequestBody ObjectNode dataBody) throws UnauthorisedRequestException {
+    @PreAuthorize("taskAuthenticationService.canCallSaveData(#auth.getPrincipal(), #taskId)")
+    public ChangedFieldContainer saveData(Authentication auth, @PathVariable("id") String taskId, @RequestBody ObjectNode dataBody) {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
-
-        taskAuthenticationService.checkSaveData(loggedUser, taskId);
 
         return dataService.setData(taskId, dataBody);
     }
@@ -258,10 +242,9 @@ public class TaskController {
      */
 
     @RequestMapping(value = "/{id}/file/{field}", method = RequestMethod.POST)
-    public ChangedFieldByFileFieldContainer saveFile(Authentication auth, @PathVariable("id") String taskId, @PathVariable("field") String fieldId, @RequestParam(value = "file") MultipartFile multipartFile) throws UnauthorisedRequestException {
+    @PreAuthorize("taskAuthenticationService.canCallSaveFile(#auth.getPrincipal(), #taskId)")
+    public ChangedFieldByFileFieldContainer saveFile(Authentication auth, @PathVariable("id") String taskId, @PathVariable("field") String fieldId, @RequestParam(value = "file") MultipartFile multipartFile) {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
-
-		taskAuthenticationService.checkSaveFile(loggedUser, taskId);
 
         return dataService.saveFile(taskId, fieldId, multipartFile);
     }
