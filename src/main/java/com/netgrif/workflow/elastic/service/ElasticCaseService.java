@@ -16,6 +16,7 @@ import org.elasticsearch.index.query.QueryStringQueryBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -44,11 +45,16 @@ public class ElasticCaseService implements IElasticCaseService {
     private Executor executors;
 
     @Autowired
-    public ElasticCaseService(ElasticCaseRepository repository, IWorkflowService workflowService, ElasticsearchTemplate template, Executor executors) {
+    public ElasticCaseService(ElasticCaseRepository repository, ElasticsearchTemplate template, Executor executors) {
         this.repository = repository;
-        this.workflowService = workflowService;
         this.template = template;
         this.executors = executors;
+    }
+
+    @Autowired
+    @Lazy
+    public void setWorkflowService(IWorkflowService workflowService) {
+        this.workflowService = workflowService;
     }
 
     private Map<String, Float> fullTextFieldMap = ImmutableMap.of(
