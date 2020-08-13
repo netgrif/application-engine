@@ -9,6 +9,7 @@ import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import org.springframework.scheduling.quartz.SpringBeanJobFactory;
 
@@ -27,6 +28,9 @@ public class QuartzConfiguration {
     @Value("${quartz.jdbc-password}")
     private String jdbcPass;
 
+    @Value("${quartz.default-properties.file:quartz.properties}")
+    private String defaultQuartzPropsPath;
+
     @Autowired
     private ApplicationContext applicationContext;
 
@@ -43,15 +47,17 @@ public class QuartzConfiguration {
     }
 
     @Bean
-    public Scheduler scheduler() {
+    public Scheduler scheduler() throws Exception {
         return schedulerFactoryBean().getScheduler();
     }
 
     @Bean
-    public SchedulerFactoryBean schedulerFactoryBean() {
+    public SchedulerFactoryBean schedulerFactoryBean() throws Exception {
         SchedulerFactoryBean schedulerFactory = new SchedulerFactoryBean();
         schedulerFactory.setApplicationContext(applicationContext);
         schedulerFactory.setAutoStartup(false);
+
+        schedulerFactory.setConfigLocation(new ClassPathResource(defaultQuartzPropsPath));
 
         Properties properties = new Properties();
         properties.putAll(quartzProperties.getProperties());
@@ -59,6 +65,8 @@ public class QuartzConfiguration {
 
         schedulerFactory.setJobFactory(new SpringBeanJobFactory());
         schedulerFactory.setDataSource(quartzDataSource());
+
+        schedulerFactory.afterPropertiesSet();
 
         return schedulerFactory;
     }
