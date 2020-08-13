@@ -16,6 +16,7 @@ import org.elasticsearch.index.query.QueryStringQueryBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -44,11 +45,16 @@ public class ElasticCaseService implements IElasticCaseService {
     private Executor executors;
 
     @Autowired
-    public ElasticCaseService(ElasticCaseRepository repository, IWorkflowService workflowService, ElasticsearchTemplate template, Executor executors) {
+    public ElasticCaseService(ElasticCaseRepository repository, ElasticsearchTemplate template, Executor executors) {
         this.repository = repository;
-        this.workflowService = workflowService;
         this.template = template;
         this.executors = executors;
+    }
+
+    @Autowired
+    @Lazy
+    public void setWorkflowService(IWorkflowService workflowService) {
+        this.workflowService = workflowService;
     }
 
     private Map<String, Float> fullTextFieldMap = ImmutableMap.of(
@@ -153,6 +159,7 @@ public class ElasticCaseService implements IElasticCaseService {
         buildDataQuery(request, query);
         buildFullTextQuery(request, query);
         buildStringQuery(request, query);
+        buildCaseIdQuery(request, query);
 
         // TODO: filtered query https://stackoverflow.com/questions/28116404/filtered-query-using-nativesearchquerybuilder-in-spring-data-elasticsearch
 
@@ -351,5 +358,33 @@ public class ElasticCaseService implements IElasticCaseService {
         }
 
         query.must(queryStringQuery(request.query));
+    }
+
+    /**
+     * Case with stringId "5cb07b6ff05be15f0b972c36"
+     * <pre>
+     * {
+     *     "stringId": "5cb07b6ff05be15f0b972c36"
+     * }
+     * </pre>
+     * <p>
+     * Cases with stringId "5cb07b6ff05be15f0b972c36" OR "5cb07b6ff05be15f0b972c31"
+     * <pre>
+     * {
+     *     "stringId" [
+     *         "5cb07b6ff05be15f0b972c36",
+     *         "5cb07b6ff05be15f0b972c31"
+     *     ]
+     * }
+     * </pre>
+     */
+    private void buildCaseIdQuery(CaseSearchRequest request, BoolQueryBuilder query) {
+        if(request.stringId == null || request.stringId.isEmpty()) {
+            return;
+        }
+
+        BoolQueryBuilder caseIdQuery = boolQuery();
+        request.stringId.forEach(caseId -> caseIdQuery.should(termQuery("stringId", caseId)));
+        query.filter(caseIdQuery);
     }
 }
