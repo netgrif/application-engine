@@ -12,6 +12,7 @@ import org.kie.api.runtime.KieSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Lookup;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
@@ -21,6 +22,9 @@ import java.util.List;
 public abstract class RuleEngine implements IRuleEngine {
 
     private static final Logger log = LoggerFactory.getLogger(RuleEngine.class);
+
+    @Value("${rule-engine.rethrow-exceptions:#{false}}")
+    protected boolean rethrowExceptions;
 
     @Lookup
     protected abstract KieSession ruleEngine();
@@ -52,15 +56,20 @@ public abstract class RuleEngine implements IRuleEngine {
 
 
     private void evaluateWithFacts(List<Object> facts) {
-        KieSession session = createSession();
-        facts.forEach(session::insert);
+        KieSession session = null;
         try {
+            session = createSession();
+            facts.forEach(session::insert);
             session.fireAllRules();
         } catch (Exception e) {
             log.error("Rule engine failure", e);
-            throw e;
+            if (rethrowExceptions) {
+                throw e;
+            }
         } finally {
-            session.destroy();
+            if (session != null) {
+                session.destroy();
+            }
         }
     }
 
