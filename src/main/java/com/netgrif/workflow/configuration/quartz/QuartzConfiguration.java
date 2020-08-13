@@ -19,13 +19,22 @@ import java.util.Properties;
 @Configuration
 public class QuartzConfiguration {
 
-    @Value("${quartz.jdbc-url}")
+    @Value("${spring.datasource.url}")
+    private String defaultJdbcUrl;
+
+    @Value("${spring.datasource.username}")
+    private String defaultJdbcUser;
+
+    @Value("${spring.datasource.password}")
+    private String defaultJdbcPass;
+
+    @Value("${quartz.jdbc-url:#{null}}")
     private String jdbcUrl;
 
-    @Value("${quartz.jdbc-user}")
+    @Value("${quartz.jdbc-user:#{null}}")
     private String jdbcUser;
 
-    @Value("${quartz.jdbc-password}")
+    @Value("${quartz.jdbc-password:#{null}}")
     private String jdbcPass;
 
     @Value("${quartz.default-properties.file:quartz.properties}")
@@ -40,9 +49,9 @@ public class QuartzConfiguration {
     @QuartzDataSource
     public DataSource quartzDataSource() {
         DataSourceBuilder dataSourceBuilder = DataSourceBuilder.create();
-        dataSourceBuilder.url(jdbcUrl);
-        dataSourceBuilder.username(jdbcUser);
-        dataSourceBuilder.password(jdbcPass);
+        dataSourceBuilder.url(jdbcUrl == null ? defaultJdbcUrl : jdbcUrl);
+        dataSourceBuilder.username(jdbcUser == null ? defaultJdbcUser : jdbcUser);
+        dataSourceBuilder.password(jdbcPass == null ? defaultJdbcPass : jdbcPass);
         return dataSourceBuilder.build();
     }
 
