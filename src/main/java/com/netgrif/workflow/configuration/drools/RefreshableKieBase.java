@@ -17,7 +17,7 @@ public class RefreshableKieBase implements IRefreshableKieBase {
 
     public static final Logger log = LoggerFactory.getLogger(RefreshableKieBase.class);
 
-    @Value("${drools.knowBase.auto-refresh}")
+    @Value("${drools.knowBase.auto-refresh:#{true}}")
     private boolean autoRefresh;
 
     private LocalDateTime lastRefresh;
