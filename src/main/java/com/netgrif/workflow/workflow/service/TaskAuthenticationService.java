@@ -83,47 +83,36 @@ public class TaskAuthenticationService implements ITaskAuthenticationService {
     }
 
     @Override
-    public void checkAssign(LoggedUser loggedUser, String taskId) throws UnauthorisedRequestException {
-        if (!loggedUser.isAdmin() && !userHasAtLeastOneRolePermission(loggedUser, taskId, RolePermission.PERFORM))
-            throw new UnauthorisedRequestException("User " + loggedUser.getUsername() + " doesn't have permission to assign task " + taskId);
+    public boolean canCallAssign(LoggedUser loggedUser, String taskId) {
+        return loggedUser.isAdmin() || userHasAtLeastOneRolePermission(loggedUser, taskId, RolePermission.PERFORM);
     }
 
     @Override
-    public void checkDelegate(LoggedUser loggedUser, String taskId) throws UnauthorisedRequestException {
-        if (!loggedUser.isAdmin() && !userHasAtLeastOneRolePermission(loggedUser, taskId, RolePermission.PERFORM, RolePermission.DELEGATE))
-            throw new UnauthorisedRequestException("User " + loggedUser.getUsername() + " doesn't have permission to delegate task " + taskId);
+    public boolean canCallDelegate(LoggedUser loggedUser, String taskId) {
+        return loggedUser.isAdmin() || userHasAtLeastOneRolePermission(loggedUser, taskId, RolePermission.PERFORM, RolePermission.DELEGATE);
     }
 
     @Override
-    public void checkFinish(LoggedUser loggedUser, String taskId) throws UnauthorisedRequestException {
-        if (!loggedUser.isAdmin()
-                && !(
-                userHasAtLeastOneRolePermission(loggedUser, taskId, RolePermission.PERFORM)
-                        && isAssignee(loggedUser, taskId)
-        ))
-            throw new UnauthorisedRequestException("User " + loggedUser.getUsername() + " doesn't have permission to finish task " + taskId);
+    public boolean canCallFinish(LoggedUser loggedUser, String taskId) {
+        return loggedUser.isAdmin()
+                || (userHasAtLeastOneRolePermission(loggedUser, taskId, RolePermission.PERFORM)
+                && isAssignee(loggedUser, taskId));
     }
 
     @Override
-    public void checkCancel(LoggedUser loggedUser, String taskId) throws UnauthorisedRequestException {
-        if (!loggedUser.isAdmin()
-                && !(
-                userHasAtLeastOneRolePermission(loggedUser, taskId, RolePermission.PERFORM, RolePermission.CANCEL)
-                        && isAssignee(loggedUser, taskId)
-        ))
-            throw new UnauthorisedRequestException("User " + loggedUser.getUsername() + " doesn't have permission to cancel task " + taskId);
+    public boolean canCallCancel(LoggedUser loggedUser, String taskId) {
+        return loggedUser.isAdmin()
+                || (userHasAtLeastOneRolePermission(loggedUser, taskId, RolePermission.PERFORM, RolePermission.CANCEL)
+                    && isAssignee(loggedUser, taskId));
     }
 
     @Override
-    public void checkSaveFile(LoggedUser loggedUser, String taskId) throws UnauthorisedRequestException {
-        if (!loggedUser.isAdmin() && !isAssignee(loggedUser, taskId))
-            throw new UnauthorisedRequestException("User " + loggedUser.getUsername() + " doesn't have permission to save file in task " + taskId);
+    public boolean canCallSaveData(LoggedUser loggedUser, String taskId) {
+        return loggedUser.isAdmin() || isAssignee(loggedUser, taskId);
     }
 
     @Override
-    public void checkSaveData(LoggedUser loggedUser, String taskId) throws UnauthorisedRequestException {
-        if (!loggedUser.isAdmin() && !isAssignee(loggedUser, taskId))
-            throw new UnauthorisedRequestException("User " + loggedUser.getUsername() + " doesn't have permission to save data in task " + taskId);
+    public boolean canCallSaveFile(LoggedUser loggedUser, String taskId) {
+        return loggedUser.isAdmin() || isAssignee(loggedUser, taskId);
     }
-
 }

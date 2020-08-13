@@ -17,16 +17,16 @@ public interface ITaskAuthenticationService {
 
 	boolean isAssignee(User user, Task task);
 
-	void checkAssign(LoggedUser loggedUser, String taskId) throws UnauthorisedRequestException;
+	boolean canCallAssign(LoggedUser loggedUser, String taskId);
 
-	void checkDelegate(LoggedUser loggedUser, String taskId) throws UnauthorisedRequestException;
+	boolean canCallDelegate(LoggedUser loggedUser, String taskId);
 
-	void checkFinish(LoggedUser loggedUser, String taskId) throws UnauthorisedRequestException;
+	boolean canCallFinish(LoggedUser loggedUser, String taskId);
 
-	void checkCancel(LoggedUser loggedUser, String taskId) throws UnauthorisedRequestException;
+	boolean canCallCancel(LoggedUser loggedUser, String taskId);
 
-	void checkSaveData(LoggedUser loggedUser, String taskId)throws UnauthorisedRequestException;
+	boolean canCallSaveData(LoggedUser loggedUser, String taskId);
 
-	void checkSaveFile(LoggedUser loggedUser, String taskId)throws UnauthorisedRequestException;
+	boolean canCallSaveFile(LoggedUser loggedUser, String taskId);
 
 }
