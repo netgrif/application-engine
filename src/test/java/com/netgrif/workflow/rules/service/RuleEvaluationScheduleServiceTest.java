@@ -14,6 +14,7 @@ import com.netgrif.workflow.rules.service.throwable.RuleEvaluationScheduleExcept
 import com.netgrif.workflow.startup.SuperCreator;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -71,7 +72,7 @@ public class RuleEvaluationScheduleServiceTest {
 
         StoredRule rule = StoredRule.builder()
                 .when("$case: Case() $event: ScheduledRuleFact(instanceId == $case.stringId, ruleIdentifier == \"rule2\")")
-                .then("log.info(\"matched rule\"); \n $case.dataSet[\"number_data\"].value += " + 1.0 + "")
+                .then("log.info(\"matched rule\"); \n $case.dataSet[\"number_data\"].value += " + 1.0 + "; \n workflowService.save($case);")
                 .identifier("rule2")
                 .lastUpdate(LocalDateTime.now())
                 .enabled(true)
@@ -90,6 +91,9 @@ public class RuleEvaluationScheduleServiceTest {
 
     }
 
-
+    @After
+    public void after() {
+        testHelper.truncateDbs();
+    }
 
 }
