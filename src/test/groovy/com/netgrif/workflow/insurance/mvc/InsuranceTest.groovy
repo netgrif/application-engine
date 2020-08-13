@@ -1,7 +1,7 @@
 package com.netgrif.workflow.insurance.mvc
 
 import com.netgrif.workflow.auth.domain.UserState
-import com.netgrif.workflow.importer.service.Config
+
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.workflow.startup.ImportHelper
 import com.netgrif.workflow.WorkflowManagementSystemApplication
