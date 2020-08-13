@@ -3,6 +3,7 @@ package com.netgrif.workflow.petrinet.web;
 import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.importer.service.Importer;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
+import com.netgrif.workflow.petrinet.domain.version.StringToVersionConverter;
 import com.netgrif.workflow.petrinet.domain.throwable.MissingPetriNetMetaDataException;
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.workflow.petrinet.service.interfaces.IProcessRoleService;
@@ -30,10 +31,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
-import java.util.Collections;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
@@ -53,14 +51,17 @@ public class PetriNetController {
     @Autowired
     private IProcessRoleService roleService;
 
+    @Autowired
+    private StringToVersionConverter converter;
+
     @PreAuthorize("hasRole('ADMIN')")
     @RequestMapping(value = "/import", method = POST)
     public
     @ResponseBody
-    MessageResource importPetriNet(
+    PetriNetReferenceWithMessageResource importPetriNet(
             @RequestParam(value = "file", required = true) MultipartFile multipartFile,
             @RequestParam(value = "meta", required = false) String releaseType,
-            Authentication auth) throws MissingPetriNetMetaDataException {
+            Authentication auth, Locale locale) throws MissingPetriNetMetaDataException {
         try {
             File file = new File(fileStorageConfiguration.getStorageArchived() + multipartFile.getOriginalFilename());
             file.createNewFile();
@@ -68,12 +69,12 @@ public class PetriNetController {
             fout.write(multipartFile.getBytes());
             String release = releaseType == null ? "major" : releaseType;
 
-            service.importPetriNet(new FileInputStream(file), release, (LoggedUser) auth.getPrincipal());
+            Optional<PetriNet> newPetriNet = service.importPetriNet(new FileInputStream(file), release, (LoggedUser) auth.getPrincipal());
             fout.close();
-            return MessageResource.successMessage("Petri net " + multipartFile.getOriginalFilename() + " imported successfully");
+            return PetriNetReferenceWithMessageResource.successMessage("Petri net " + multipartFile.getOriginalFilename() + " imported successfully", newPetriNet.get(), locale);
         } catch (IOException e) {
             log.error("Importing Petri net failed: ", e);
-            return MessageResource.errorMessage("IO error");
+            return PetriNetReferenceWithMessageResource.errorMessage("IO error");
         }
     }
 
@@ -84,9 +85,9 @@ public class PetriNetController {
         if (identifier != null && version == null) {
             return new PetriNetReferenceResources(service.getReferencesByIdentifier(identifier, user, locale));
         } else if (identifier == null && version != null) {
-            return new PetriNetReferenceResources(service.getReferencesByVersion(version, user, locale));
+            return new PetriNetReferenceResources(service.getReferencesByVersion(converter.convert(version), user, locale));
         } else if (identifier != null && version != null) {
-            return new PetriNetReferenceResources(Collections.singletonList(service.getReference(identifier, version, user, locale)));
+            return new PetriNetReferenceResources(Collections.singletonList(service.getReference(identifier, converter.convert(version), user, locale)));
         } else {
             return new PetriNetReferenceResources(service.getReferences(user, locale));
         }
@@ -101,7 +102,7 @@ public class PetriNetController {
     @RequestMapping(value = "/{identifier}/{version}", method = GET)
     public @ResponseBody
     PetriNetReferenceResource getOne(@PathVariable("identifier") String identifier, @PathVariable("version") String version, Authentication auth, Locale locale) {
-        return new PetriNetReferenceResource(service.getReference(identifier, version, (LoggedUser) auth.getPrincipal(), locale));
+        return new PetriNetReferenceResource(service.getReference(identifier, converter.convert(version), (LoggedUser) auth.getPrincipal(), locale));
     }
 
     @RequestMapping(value = "/transitions", method = GET)
