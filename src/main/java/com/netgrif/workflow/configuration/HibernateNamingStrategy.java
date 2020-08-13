@@ -13,7 +13,7 @@ import java.util.Locale;
 @Component
 public class HibernateNamingStrategy extends SpringPhysicalNamingStrategy {
 
-    @Value("${hibernate.naming-strategy.ignored-values}")
+    @Value("${hibernate.naming-strategy.ignored-values:DTYPE}")
     private List<String> ignored;
 
     @Override
