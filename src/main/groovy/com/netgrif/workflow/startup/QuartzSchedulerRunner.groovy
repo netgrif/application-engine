@@ -13,7 +13,7 @@ class QuartzSchedulerRunner extends AbstractOrderedCommandLineRunner {
 
     private static final Logger log = LoggerFactory.getLogger(QuartzSchedulerRunner)
 
-    @Value('${quartz.scheduler.run}')
+    @Value('${quartz.scheduler.run:#{true}}')
     private boolean start
 
     @Autowired
