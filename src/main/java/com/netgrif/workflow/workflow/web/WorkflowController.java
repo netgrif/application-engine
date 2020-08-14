@@ -42,9 +42,8 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 @RestController()
 @RequestMapping("/api/workflow")
@@ -117,6 +116,16 @@ public class WorkflowController {
         return resources;
     }
 
+    @PostMapping(value = "/case/search_mongo", produces = MediaTypes.HAL_JSON_VALUE)
+    public PagedResources<CaseResource> searchMongo(@RequestBody Map<String, Object> searchBody, Pageable pageable, PagedResourcesAssembler<Case> assembler, Authentication auth, Locale locale) {
+        Page<Case> cases = workflowService.search(searchBody, pageable, (LoggedUser) auth.getPrincipal(), locale);
+        Link selfLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(WorkflowController.class)
+                .searchMongo(searchBody, pageable, assembler, auth, locale)).withRel("search");
+        PagedResources<CaseResource> resources = assembler.toResource(cases, new CaseResourceAssembler(), selfLink);
+        ResourceLinkAssembler.addLinks(resources, Case.class, selfLink.getRel());
+        return resources;
+    }
+
     @PostMapping(value = "/case/count", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public CountResponse count(@RequestBody SingleCaseSearchRequestAsList searchBody, @RequestParam(defaultValue = "OR") MergeFilterOperation operation, Authentication auth) {
         long count = elasticCaseService.count(searchBody.getList(), (LoggedUser) auth.getPrincipal(), operation == MergeFilterOperation.AND);
@@ -132,6 +141,14 @@ public class WorkflowController {
 //        ResourceLinkAssembler.addLinks(resources, Case.class, selfLink.getRel());
 //        return resources;
 //    }
+
+    @GetMapping(value = "/case/{id}")
+    public CaseResource getOne(@PathVariable("id") String caseId) {
+        Case aCase = workflowService.findOne(caseId);
+        if (aCase == null)
+            return null;
+        return new CaseResource(aCase);
+    }
 
     @RequestMapping(value = "/case/author/{id}", method = RequestMethod.POST)
     public PagedResources<CaseResource> findAllByAuthor(@PathVariable("id") Long authorId, @RequestBody String petriNet, Pageable pageable, PagedResourcesAssembler<Case> assembler) {
@@ -186,17 +203,17 @@ public class WorkflowController {
         }
     }
 
-    @RequestMapping(value = "/case/{caseId}/field/{fieldId}", method = RequestMethod.GET)
-    public List<Case> getCaseFieldChoices(@PathVariable("caseId") String caseId, @PathVariable("fieldId") String fieldId, Pageable pageable) {
-        try {
-            caseId = URLDecoder.decode(caseId, StandardCharsets.UTF_8.name());
-            fieldId = URLDecoder.decode(fieldId, StandardCharsets.UTF_8.name());
-            return workflowService.getCaseFieldChoices(pageable, caseId, fieldId);
-        } catch (UnsupportedEncodingException e) {
-            log.error("Getting case field choices of ["+caseId+"] failed:", e);
-            return new LinkedList<>();
-        }
-    }
+//    @RequestMapping(value = "/case/{caseId}/field/{fieldId}", method = RequestMethod.GET)
+//    public List<Case> getCaseFieldChoices(@PathVariable("caseId") String caseId, @PathVariable("fieldId") String fieldId, Pageable pageable) {
+//        try {
+//            caseId = URLDecoder.decode(caseId, StandardCharsets.UTF_8.name());
+//            fieldId = URLDecoder.decode(fieldId, StandardCharsets.UTF_8.name());
+//            return workflowService.getCaseFieldChoices(pageable, caseId, fieldId);
+//        } catch (UnsupportedEncodingException e) {
+//            log.error("Getting case field choices of ["+caseId+"] failed:", e);
+//            return new LinkedList<>();
+//        }
+//    }
 
     @RequestMapping(value = "/case/{id}/file/{field}", method = RequestMethod.GET, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public ResponseEntity<Resource> getFile(@PathVariable("id") String caseId, @PathVariable("field") String fieldId) throws FileNotFoundException {
