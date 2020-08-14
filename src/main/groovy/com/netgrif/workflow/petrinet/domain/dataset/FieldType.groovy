@@ -14,7 +14,7 @@ enum FieldType {
     NUMBER("number"),
     USER("user"),
     TABULAR("tabular"),
-    CASEREF("caseref"),
+    CASE_REF("caseRef"),
     DATETIME("dateTime"),
     BUTTON("button"),
     TASK_REF("taskRef")
