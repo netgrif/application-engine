@@ -31,13 +31,17 @@ public interface IDataService {
 
     ChangedFieldContainer setData(String taskId, ObjectNode values);
 
-    FileFieldInputStream getFileByTask(String taskId, String fieldId, String name);
-
-    FileFieldInputStream getFileByCase(String caseId, String fieldId, String name);
-
     FileFieldInputStream getFile(Case useCase, FileField field);
 
     FileFieldInputStream getFileByName(Case useCase, FileListField field, String name);
+
+    FileFieldInputStream getFileByTask(String taskId, String fieldId);
+
+    FileFieldInputStream getFileByTaskAndName(String taskId, String fieldId, String name);
+
+    FileFieldInputStream getFileByCase(String caseId, String fieldId);
+
+    FileFieldInputStream getFileByCaseAndName(String caseId, String fieldId, String name);
 
     InputStream download(String url) throws IOException;
 

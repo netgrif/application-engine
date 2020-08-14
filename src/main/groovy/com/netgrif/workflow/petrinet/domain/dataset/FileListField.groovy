@@ -1,7 +1,5 @@
 package com.netgrif.workflow.petrinet.domain.dataset
 
-import org.apache.commons.lang3.tuple.ImmutablePair
-
 class FileListField extends ValidableField<FileListFieldValue> {
     private Boolean remote
 
@@ -22,24 +20,33 @@ class FileListField extends ValidableField<FileListFieldValue> {
 
     @Override
     void setValue(FileListFieldValue value) {
-        super.setValue(value)
+        if (value instanceof String)
+            this.setValue((String) value)
+        else
+            super.setValue(value)
+    }
+
+    void setValue(String value) {
+        this.setValue(FileListFieldValue.fromString(value))
     }
 
     @Override
     void setDefaultValue(FileListFieldValue defaultValue) {
-        super.setDefaultValue(defaultValue)
+        if (value instanceof String)
+            this.setDefaultValue((String) value)
+        else
+            super.setDefaultValue(defaultValue)
     }
 
-    boolean addValue(String fileName) {
-        if (this.getValue() == null || this.getValue().getNames() == null || this.getValue().getPaths() == null) {
+    void setDefaultValue(String defaultValue) {
+        this.setDefaultValue(FileListFieldValue.fromString(defaultValue))
+    }
+
+    void addValue(String fileName, String path) {
+        if (this.getValue() == null || this.getValue().getNamesPaths() == null) {
             this.setValue(new FileListFieldValue())
         }
-
-        if (!this.getValue().getNames().contains(fileName)) {
-            this.getValue().getNames().push(fileName)
-            return true
-        }
-        return false
+        this.getValue().getNamesPaths().add(new FileFieldValue(fileName, path))
     }
 
     /**
@@ -53,9 +60,11 @@ class FileListField extends ValidableField<FileListFieldValue> {
      * @return path to the saved file
      */
     String getFilePath(String caseId, String name) {
-        if (this.remote)
-            return this.getValue().getPaths().get(this.getValue().getNames().indexOf(name))
-        return this.getValue().getPath(caseId, getStringId(), name)
+        if (this.remote) {
+            FileFieldValue first = this.getValue().getNamesPaths().find({ namePath -> namePath.name == name})
+            return first != null ? first.path : null
+        }
+        return FileListFieldValue.getPath(caseId, getStringId(), name)
     }
 
     boolean isRemote() {

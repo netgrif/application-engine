@@ -251,15 +251,6 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void checkUsersPermissions(String taskId, ITaskAuthenticationService taskAuthenticationService) throws UnauthorisedRequestException {
-        User logged = this.getLoggedUser();
-        if (!logged.transformToLoggedUser().isAdmin() && !taskAuthenticationService.isAssignee(logged, taskId))
-            throw new UnauthorisedRequestException(
-                    "User " + logged.transformToLoggedUser().getUsername() + " doesn't have permission to modify file in task " + taskId
-            );
-    }
-
-    @Override
     public User addRole(User user, String roleStringId) {
         UserProcessRole role = userProcessRoleService.findByRoleId(roleStringId);
         user.addProcessRole(role);

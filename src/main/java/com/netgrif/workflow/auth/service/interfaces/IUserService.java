@@ -51,8 +51,6 @@ public interface IUserService {
 
     User getLoggedUser();
 
-    void checkUsersPermissions(String taskId, ITaskAuthenticationService taskAuthenticationService) throws UnauthorisedRequestException;
-
     User getSystem();
 
     User addRole(User user, String roleStringId);
