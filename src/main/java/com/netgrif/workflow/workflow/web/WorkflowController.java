@@ -194,7 +194,7 @@ public class WorkflowController {
 
     @RequestMapping(value = "/case/{id}/file/{field}", method = RequestMethod.GET, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public ResponseEntity<Resource> getFile(@PathVariable("id") String caseId, @PathVariable("field") String fieldId) throws FileNotFoundException {
-        FileFieldInputStream fileFieldInputStream = dataService.getFileByCase(caseId, fieldId, null);
+        FileFieldInputStream fileFieldInputStream = dataService.getFileByCase(caseId, fieldId);
 
         if (fileFieldInputStream.getInputStream() == null)
             throw new FileNotFoundException("File in field " + fieldId + " within case " + caseId + " was not found!");
@@ -211,7 +211,7 @@ public class WorkflowController {
 
     @RequestMapping(value = "/case/{id}/file/{field}/{name}", method = RequestMethod.GET, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public ResponseEntity<Resource> getFileByName(@PathVariable("id") String caseId, @PathVariable("field") String fieldId, @PathVariable("name") String name) throws FileNotFoundException {
-        FileFieldInputStream fileFieldInputStream = dataService.getFileByCase(caseId, fieldId, name);
+        FileFieldInputStream fileFieldInputStream = dataService.getFileByCaseAndName(caseId, fieldId, name);
 
         if (fileFieldInputStream.getInputStream() == null)
             throw new FileNotFoundException("File with name " + name + " in field " + fieldId + " within case " + caseId + " was not found!");

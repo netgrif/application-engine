@@ -27,8 +27,7 @@ public class LocalisedFieldFactory {
             return fromUser((UserField) field, locale);
         } else if (field instanceof FileListField) {
             return fromFileList((FileListField) field, locale);
-        }
-        else {
+        } else {
             return fromGeneral(field, locale);
         }
     }
