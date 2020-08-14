@@ -2,34 +2,40 @@ package com.netgrif.workflow.petrinet.domain.dataset
 
 import com.netgrif.workflow.configuration.ApplicationContextProvider
 import com.netgrif.workflow.workflow.domain.FileStorageConfiguration
-import org.apache.commons.lang3.tuple.ImmutablePair
 
 class FileListFieldValue {
 
-    private ArrayList<String> names
-
-    private ArrayList<String> paths
+    private HashSet<FileFieldValue> namesPaths
 
     FileListFieldValue() {
-        this.names = new ArrayList<>()
-        this.paths = new ArrayList<>()
+        this.namesPaths = new HashSet<>()
     }
 
-    ArrayList<String> getNames() {
-        return names
+    HashSet<FileFieldValue> getNamesPaths() {
+        return this.namesPaths
     }
 
-    ArrayList<String> getPaths() {
-        return paths
+    static FileListFieldValue fromString(String value) {
+        FileListFieldValue newVal = new FileListFieldValue()
+        String[] parts = value.split(",")
+        for (String part : parts) {
+            if (!part.contains(":"))
+                newVal.getNamesPaths().add(new FileFieldValue(part, null))
+            else {
+                String[] filePart = part.split(":", 2)
+                newVal.getNamesPaths().add(new FileFieldValue(filePart[0], filePart[1]))
+            }
+        }
+        return newVal
     }
 
-    String getPath(String caseId, String fieldId, String name) {
+    static String getPath(String caseId, String fieldId, String name) {
         FileStorageConfiguration fileStorageConfiguration = ApplicationContextProvider.getBean("fileStorageConfiguration")
         return "${fileStorageConfiguration.getStoragePath()}/${caseId}/${fieldId}/${name}"
     }
 
     @Override
     String toString() {
-        return paths.toString()
+        return namesPaths.toString()
     }
 }
