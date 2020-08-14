@@ -34,7 +34,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringRunner.class)
 @ActiveProfiles(["test"])
 @SpringBootTest
-class TaskAuthenticationServiceTest {
+class TaskAuthorizationServiceTest {
 
     private static final String ASSIGN_TASK_URL = "/api/task/assign/"
     private static final String DELEGATE_TASK_URL = "/api/task/delegate/"
@@ -128,14 +128,14 @@ class TaskAuthenticationServiceTest {
     private String taskId2
 
     @Test
-    void testTaskAuthenticationService() {
+    void testTaskAuthorizationService() {
         def tests = [
-                { -> testAssignAuthorisation() },
-                { -> testDelegateAuthorisation() },
-                { -> testFinishAuthorisation() },
-                { -> testCancelAuthorisation() },
-                { -> testSetDataAuthorisation() },
-//                { -> testSetFileAuthorisation() },
+                { -> testAssignAuthorization() },
+                { -> testDelegateAuthorization() },
+                { -> testFinishAuthorization() },
+                { -> testCancelAuthorization() },
+                { -> testSetDataAuthorization() },
+//                { -> testSetFileAuthorization() },
         ]
         tests.each { t ->
             beforeEach()
@@ -143,7 +143,7 @@ class TaskAuthenticationServiceTest {
         }
     }
 
-    void testAssignAuthorisation() {
+    void testAssignAuthorization() {
         mvc.perform(get(ASSIGN_TASK_URL + taskId)
                 .with(authentication(this.userWithoutRoleAuth)))
                 .andExpect(status().isForbidden())
@@ -155,7 +155,7 @@ class TaskAuthenticationServiceTest {
                 .andExpect(status().isOk())
     }
 
-    void testDelegateAuthorisation() {
+    void testDelegateAuthorization() {
         mvc.perform(post(DELEGATE_TASK_URL + taskId)
                 .content(userId.toString())
                 .contentType(APPLICATION_JSON)
@@ -173,7 +173,7 @@ class TaskAuthenticationServiceTest {
                 .andExpect(status().isOk())
     }
 
-    void testFinishAuthorisation() {
+    void testFinishAuthorization() {
         mvc.perform(get(ASSIGN_TASK_URL + taskId)
                 .with(authentication(this.userWithRoleAuth)))
                 .andExpect(status().isOk())
@@ -192,7 +192,7 @@ class TaskAuthenticationServiceTest {
                 .andExpect(status().isOk())
     }
 
-    void testCancelAuthorisation() {
+    void testCancelAuthorization() {
         mvc.perform(get(ASSIGN_TASK_URL + taskId)
                 .with(authentication(this.userWithRoleAuth)))
                 .andExpect(status().isOk())
@@ -211,7 +211,7 @@ class TaskAuthenticationServiceTest {
                 .andExpect(status().isOk())
     }
 
-    void testSetDataAuthorisation() {
+    void testSetDataAuthorization() {
         mvc.perform(get(ASSIGN_TASK_URL + taskId)
                 .with(authentication(this.userWithRoleAuth)))
                 .andExpect(status().isOk())
@@ -245,7 +245,7 @@ class TaskAuthenticationServiceTest {
 
 // TODO 14.8.2020 test for file upload endpoint
 
-//    void testSetFileAuthorisation() {
+//    void testSetFileAuthorization() {
 //        mvc.perform(get(ASSIGN_TASK_URL + taskId)
 //                .with(authentication(this.userWithRoleAuth)))
 //                .andExpect(status().isOk())
