@@ -477,7 +477,7 @@ public class Importer {
                 return;
             }
 
-            String appearance = "standard";
+            String appearance = "outline";
             if (layout.getAppearance() != null) {
                 appearance = layout.getAppearance().toString();
             }
