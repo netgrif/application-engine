@@ -13,6 +13,10 @@
         <title>Text</title>
         <init>text</init>
     </data>
+    <data type="file">
+        <id>file</id>
+        <title>File</title>
+    </data>
     <transition>
         <id>1</id>
         <x>1</x>
@@ -26,6 +30,12 @@
         </roleRef>
         <dataRef>
             <id>text</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>file</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
