@@ -16,6 +16,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.mock.web.MockMultipartFile
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.Authentication
 import org.springframework.test.context.ActiveProfiles
@@ -28,6 +29,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
@@ -41,6 +43,7 @@ class TaskAuthenticationServiceTest {
     private static final String FINISH_TASK_URL = "/api/task/finish/"
     private static final String CANCEL_TASK_URL = "/api/task/cancel/"
     private static final String SET_DATA_URL_TEMPLATE = "/api/task/%s/data"
+    private static final String SET_FILE_URL_TEMPLATE = "/api/task/%s/file/%s"
 
     private static final String USER_WITH_ROLE_EMAIL = "role@test.com"
     private static final String USER_WITHOUT_ROLE_EMAIL = "norole@test.com"
@@ -134,6 +137,7 @@ class TaskAuthenticationServiceTest {
                 { -> testFinishAuthorisation() },
                 { -> testCancelAuthorisation() },
                 { -> testSetDataAuthorisation() },
+//                { -> testSetFileAuthorisation() },
         ]
         tests.each { t ->
             beforeEach()
@@ -234,10 +238,40 @@ class TaskAuthenticationServiceTest {
                 .contentType(APPLICATION_JSON)
                 .with(authentication(this.userWithRoleAuth)))
                 .andExpect(status().isOk())
-        mvc.perform(post(String.format(SET_DATA_URL_TEMPLATE, taskId))
+        mvc.perform(post(String.format(SET_DATA_URL_TEMPLATE, taskId2))
                 .content(body)
                 .contentType(APPLICATION_JSON)
                 .with(authentication(this.adminAuth)))
                 .andExpect(status().isOk())
     }
+
+// TODO 14.8.2020 test for file upload endpoint
+
+//    void testSetFileAuthorisation() {
+//        mvc.perform(get(ASSIGN_TASK_URL + taskId)
+//                .with(authentication(this.userWithRoleAuth)))
+//                .andExpect(status().isOk())
+//        mvc.perform(get(ASSIGN_TASK_URL + taskId2)
+//                .with(authentication(this.userWithRoleAuth)))
+//                .andExpect(status().isOk())
+//
+//        MockMultipartFile file = new MockMultipartFile("data", "filename.txt", "text/plain", "some xml".getBytes());
+//
+//        mvc.perform(multipart(String.format(SET_FILE_URL_TEMPLATE, taskId, "file"))
+//                .file(file)
+//                .characterEncoding("UTF-8")
+//                .with(authentication(this.userWithoutRoleAuth)))
+//                .andExpect(status().isForbidden())
+//        mvc.perform(multipart(String.format(SET_FILE_URL_TEMPLATE, taskId, "file"))
+//                .file(file)
+//                .characterEncoding("UTF-8")
+//                .with(authentication(this.userWithRoleAuth)))
+//                .andExpect(status().isOk())
+//        mvc.perform(multipart(String.format(SET_FILE_URL_TEMPLATE, taskId2, "file"))
+//                .file(file)
+//                .characterEncoding("UTF-8")
+//                .contentType(APPLICATION_JSON)
+//                .with(authentication(this.adminAuth)))
+//                .andExpect(status().isOk())
+//    }
 }
