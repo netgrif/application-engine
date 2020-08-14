@@ -28,7 +28,7 @@ public interface IWorkflowService {
 
     void deleteCase(String caseId);
 
-    void deleteCase(String caseId, boolean deleteSubtree);
+    void deleteSubtreeRootedAt(String caseId);
 
     void updateMarking(Case useCase);
 
