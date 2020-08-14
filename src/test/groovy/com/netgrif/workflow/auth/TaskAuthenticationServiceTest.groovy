@@ -16,7 +16,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.mock.web.MockMultipartFile
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.Authentication
 import org.springframework.test.context.ActiveProfiles
@@ -29,7 +28,6 @@ import static org.springframework.http.MediaType.APPLICATION_JSON
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
@@ -108,6 +106,10 @@ class TaskAuthenticationServiceTest {
 
     private Long userId
 
+    private Authentication userWithRoleAuth
+    private Authentication userWithoutRoleAuth
+    private Authentication adminAuth
+
     void beforeEach() {
         def aCase = importHelper.createCase("Case", this.net)
         assert aCase != null
@@ -124,10 +126,6 @@ class TaskAuthenticationServiceTest {
 
     private String taskId
     private String taskId2
-
-    private Authentication userWithRoleAuth
-    private Authentication userWithoutRoleAuth
-    private Authentication adminAuth
 
     @Test
     void testTaskAuthenticationService() {
