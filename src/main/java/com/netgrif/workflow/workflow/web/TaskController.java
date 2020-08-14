@@ -213,7 +213,7 @@ public class TaskController {
 
     @RequestMapping(value = "/{id}/data", method = RequestMethod.POST)
     @PreAuthorize("@taskAuthorizationService.canCallSaveData(#auth.getPrincipal(), #taskId)")
-    public ChangedFieldContainer saveData(Authentication auth, @PathVariable("id") String taskId, @RequestBody ObjectNode dataBody) {
+    public ChangedFieldContainer setData(Authentication auth, @PathVariable("id") String taskId, @RequestBody ObjectNode dataBody) {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
 
         return dataService.setData(taskId, dataBody);

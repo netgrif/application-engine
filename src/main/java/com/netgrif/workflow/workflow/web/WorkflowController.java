@@ -42,8 +42,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -203,17 +201,17 @@ public class WorkflowController {
         }
     }
 
-    @RequestMapping(value = "/case/{caseId}/field/{fieldId}", method = RequestMethod.GET)
-    public List<Case> getCaseFieldChoices(@PathVariable("caseId") String caseId, @PathVariable("fieldId") String fieldId, Pageable pageable) {
-        try {
-            caseId = URLDecoder.decode(caseId, StandardCharsets.UTF_8.name());
-            fieldId = URLDecoder.decode(fieldId, StandardCharsets.UTF_8.name());
-            return workflowService.getCaseFieldChoices(pageable, caseId, fieldId);
-        } catch (UnsupportedEncodingException e) {
-            log.error("Getting case field choices of ["+caseId+"] failed:", e);
-            return new LinkedList<>();
-        }
-    }
+//    @RequestMapping(value = "/case/{caseId}/field/{fieldId}", method = RequestMethod.GET)
+//    public List<Case> getCaseFieldChoices(@PathVariable("caseId") String caseId, @PathVariable("fieldId") String fieldId, Pageable pageable) {
+//        try {
+//            caseId = URLDecoder.decode(caseId, StandardCharsets.UTF_8.name());
+//            fieldId = URLDecoder.decode(fieldId, StandardCharsets.UTF_8.name());
+//            return workflowService.getCaseFieldChoices(pageable, caseId, fieldId);
+//        } catch (UnsupportedEncodingException e) {
+//            log.error("Getting case field choices of ["+caseId+"] failed:", e);
+//            return new LinkedList<>();
+//        }
+//    }
 
     @RequestMapping(value = "/case/{id}/file/{field}", method = RequestMethod.GET, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public ResponseEntity<Resource> getFile(@PathVariable("id") String caseId, @PathVariable("field") String fieldId) throws FileNotFoundException {
