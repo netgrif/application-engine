@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="../../main/resources/petriNets/petriflow_schema.xsd">
+    <id>1</id>
+    <initials>TST</initials>
+    <title>TaskAuthenticationService test</title>
+    <role>
+        <id>role</id>
+        <name>role</name>
+    </role>
+    <data type="text">
+        <id>text</id>
+        <title>Text</title>
+        <init>text</init>
+    </data>
+    <transition>
+        <id>1</id>
+        <x>1</x>
+        <y>1</y>
+        <label>Transition</label>
+        <roleRef>
+            <id>role</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <dataRef>
+            <id>text</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+    </transition>
+</document>

@@ -2,7 +2,6 @@ package com.netgrif.workflow.workflow.web;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.netgrif.workflow.auth.domain.LoggedUser;
-import com.netgrif.workflow.auth.domain.throwable.UnauthorisedRequestException;
 import com.netgrif.workflow.elastic.service.interfaces.IElasticTaskService;
 import com.netgrif.workflow.elastic.web.requestbodies.singleaslist.SingleTaskSearchRequestAsList;
 import com.netgrif.workflow.petrinet.domain.DataGroup;
@@ -96,7 +95,7 @@ public class TaskController {
     }
 
     @RequestMapping(value = "/assign/{id}", method = RequestMethod.GET)
-    @PreAuthorize("taskAuthenticationService.canCallAssign(#auth.getPrincipal(), #taskId)")
+    @PreAuthorize("@taskAuthenticationService.canCallAssign(#auth.getPrincipal(), #taskId)")
     public MessageResource assign(Authentication auth, @PathVariable("id") String taskId) {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
 
@@ -110,7 +109,7 @@ public class TaskController {
     }
 
     @RequestMapping(value = "/delegate/{id}", method = RequestMethod.POST)
-    @PreAuthorize("taskAuthenticationService.canCallDelegate(#auth.getPrincipal(), #taskId)")
+    @PreAuthorize("@taskAuthenticationService.canCallDelegate(#auth.getPrincipal(), #taskId)")
     public MessageResource delegate(Authentication auth, @PathVariable("id") String taskId, @RequestBody Long delegatedId) {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
 
@@ -124,7 +123,7 @@ public class TaskController {
     }
 
     @RequestMapping(value = "/finish/{id}", method = RequestMethod.GET)
-    @PreAuthorize("taskAuthenticationService.canCallFinish(#auth.getPrincipal(), #taskId)")
+    @PreAuthorize("iTaskAuthenticationService.canCallFinish(#auth.getPrincipal(), #taskId)")
     public MessageResource finish(Authentication auth, @PathVariable("id") String taskId) {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
 
@@ -138,7 +137,7 @@ public class TaskController {
     }
 
     @RequestMapping(value = "/cancel/{id}", method = RequestMethod.GET)
-    @PreAuthorize("taskAuthenticationService.canCallCancel(#auth.getPrincipal(), #taskId)")
+    @PreAuthorize("iTaskAuthenticationService.canCallCancel(#auth.getPrincipal(), #taskId)")
     public MessageResource cancel(Authentication auth, @PathVariable("id") String taskId) {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
 
@@ -217,7 +216,7 @@ public class TaskController {
     }
 
     @RequestMapping(value = "/{id}/data", method = RequestMethod.POST)
-    @PreAuthorize("taskAuthenticationService.canCallSaveData(#auth.getPrincipal(), #taskId)")
+    @PreAuthorize("iTaskAuthenticationService.canCallSaveData(#auth.getPrincipal(), #taskId)")
     public ChangedFieldContainer saveData(Authentication auth, @PathVariable("id") String taskId, @RequestBody ObjectNode dataBody) {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
 
@@ -242,7 +241,7 @@ public class TaskController {
      */
 
     @RequestMapping(value = "/{id}/file/{field}", method = RequestMethod.POST)
-    @PreAuthorize("taskAuthenticationService.canCallSaveFile(#auth.getPrincipal(), #taskId)")
+    @PreAuthorize("iTaskAuthenticationService.canCallSaveFile(#auth.getPrincipal(), #taskId)")
     public ChangedFieldByFileFieldContainer saveFile(Authentication auth, @PathVariable("id") String taskId, @PathVariable("field") String fieldId, @RequestParam(value = "file") MultipartFile multipartFile) {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
 
