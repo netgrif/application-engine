@@ -202,12 +202,12 @@ public class WorkflowService implements IWorkflowService {
     }
 
     @Override
-    public void deleteCase(String caseId, boolean deleteSubtree) {
-        if (deleteSubtree) {
-            deleteSubtreeRootedAt(caseId);
-        } else {
-            deleteCase(caseId);
+    public void deleteSubtreeRootedAt(String subtreeRootCaseId) {
+        Case subtreeRoot = findOne(subtreeRootCaseId);
+        if (subtreeRoot.getImmediateDataFields().contains("treeChildCases")) {
+            ((List<String>) subtreeRoot.getDataSet().get("treeChildCases").getValue()).forEach(this::deleteSubtreeRootedAt);
         }
+        deleteCase(subtreeRootCaseId);
     }
 
     @Override
@@ -365,13 +365,5 @@ public class WorkflowService implements IWorkflowService {
         model.initializeTokens(useCase.getActivePlaces());
         model.initializeVarArcs(useCase.getDataSet());
         useCase.setPetriNet(model);
-    }
-
-    protected void deleteSubtreeRootedAt(String subtreeRootCaseId) {
-        Case subtreeRoot = findOne(subtreeRootCaseId);
-        if (subtreeRoot.getImmediateDataFields().contains("treeChildCases")) {
-            ((List<String>) subtreeRoot.getDataSet().get("treeChildCases").getValue()).forEach(this::deleteSubtreeRootedAt);
-        }
-        deleteCase(subtreeRootCaseId);
     }
 }

@@ -178,7 +178,11 @@ public class WorkflowController {
 
         try {
             caseId = URLDecoder.decode(caseId, StandardCharsets.UTF_8.name());
-            workflowService.deleteCase(caseId, deleteSubtree);
+            if(deleteSubtree) {
+                workflowService.deleteSubtreeRootedAt(caseId);
+            } else {
+                workflowService.deleteCase(caseId);
+            }
             return MessageResource.successMessage("Case " + caseId + " was deleted");
         } catch (UnsupportedEncodingException e) {
             log.error("Deleting case ["+caseId+"] failed:",e);
