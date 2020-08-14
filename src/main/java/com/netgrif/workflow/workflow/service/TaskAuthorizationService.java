@@ -2,11 +2,10 @@ package com.netgrif.workflow.workflow.service;
 
 import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.auth.domain.User;
-import com.netgrif.workflow.auth.domain.throwable.UnauthorisedRequestException;
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRole;
 import com.netgrif.workflow.petrinet.domain.roles.RolePermission;
 import com.netgrif.workflow.workflow.domain.Task;
-import com.netgrif.workflow.workflow.service.interfaces.ITaskAuthenticationService;
+import com.netgrif.workflow.workflow.service.interfaces.ITaskAuthorizationService;
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,7 +16,7 @@ import java.util.Map;
 import java.util.Set;
 
 @Service
-public class TaskAuthenticationService implements ITaskAuthenticationService {
+public class TaskAuthorizationService implements ITaskAuthorizationService {
 
     @Autowired
     ITaskService taskService;

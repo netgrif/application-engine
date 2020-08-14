@@ -35,7 +35,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringRunner.class)
 @ActiveProfiles(["test"])
 @SpringBootTest
-class WorkflowAuthenticationServiceTest {
+class WorkflowAuthorizationServiceTest {
 
     private static final String CREATE_CASE_URL = "/api/workflow/case"
     private static final String DELETE_CASE_URL = "/api/workflow/case/"

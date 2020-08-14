@@ -32,7 +32,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringRunner.class)
 @ActiveProfiles(["test"])
 @SpringBootTest
-class FilterAuthenticationServiceTest {
+class FilterAuthorizationServiceTest {
 
     private static final String CREATE_FILTER_URL = "/api/filter"
     private static final String DELETE_FILTER_URL = "/api/filter/"
