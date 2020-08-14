@@ -1,9 +1,7 @@
 package com.netgrif.workflow.importer;
 
 import com.netgrif.workflow.TestHelper;
-import com.netgrif.workflow.importer.service.Importer;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
-import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository;
 import com.netgrif.workflow.petrinet.domain.throwable.MissingPetriNetMetaDataException;
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
@@ -12,7 +10,6 @@ import com.netgrif.workflow.utils.FullPageRequest;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -83,25 +80,6 @@ public class ImporterTest {
         Optional<PetriNet> net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/datagroup_test.xml"), "major", superCreator.getLoggedSuper());
 
         assert net.isPresent();
-    }
-
-    @Test
-    @Ignore
-    public void caseRefTest() throws MissingPetriNetMetaDataException, IOException {
-        petriNetService.importPetriNet(new FileInputStream("src/test/resources/datagroup_test.xml"), "major", superCreator.getLoggedSuper());
-        Optional<PetriNet> net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/caseref_test.xml"), "major", superCreator.getLoggedSuper());
-        assert net.isPresent();
-
-        Case useCase = workflowService.createCase(net.get().getStringId(), net.get().getTitle().getDefaultValue(), "color", superCreator.getLoggedSuper());
-        assert useCase != null;
-
-        List<Field> data = workflowService.getData(useCase.getStringId());
-        assert data != null && data.size() > 0;
-
-        useCase.getDataSet().get(data.get(0).getStringId()).setValue(useCase.getStringId());
-        workflowService.save(useCase);
-        data = workflowService.getData(useCase.getStringId());
-        assert data != null && data.size() > 0;
     }
 
     @Test
