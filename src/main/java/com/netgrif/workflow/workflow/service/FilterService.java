@@ -27,7 +27,7 @@ public class FilterService implements IFilterService {
     private FilterSearchService searchService;
 
     @Autowired
-    private FilterAuthenticationService authenticationService;
+    private FilterAuthorizationService authenticationService;
 
     @Override
     public boolean deleteFilter(String filterId, LoggedUser user) throws UnauthorisedRequestException {

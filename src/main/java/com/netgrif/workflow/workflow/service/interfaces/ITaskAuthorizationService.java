@@ -5,7 +5,7 @@ import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.petrinet.domain.roles.RolePermission;
 import com.netgrif.workflow.workflow.domain.Task;
 
-public interface ITaskAuthenticationService {
+public interface ITaskAuthorizationService {
 	boolean userHasAtLeastOneRolePermission(LoggedUser loggedUser, String taskId, RolePermission... permissions);
 
 	boolean userHasAtLeastOneRolePermission(User user, Task task, RolePermission... permissions);
