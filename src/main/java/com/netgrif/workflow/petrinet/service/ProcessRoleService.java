@@ -19,6 +19,7 @@ import com.netgrif.workflow.petrinet.domain.roles.ProcessRole;
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRoleRepository;
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.workflow.petrinet.service.interfaces.IProcessRoleService;
+import org.apache.tomcat.jni.Proc;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
@@ -54,6 +55,11 @@ public class ProcessRoleService implements IProcessRoleService {
     private IPetriNetService petriNetService;
 
     private ProcessRole defaultRole;
+
+    @Override
+    public List<ProcessRole> saveAll(Iterable<ProcessRole> entities) {
+        return processRoleRepository.saveAll(entities);
+    }
 
     @Override
     public void assignRolesToUser(Long userId, Set<String> requestedRolesIds, LoggedUser loggedUser) {
