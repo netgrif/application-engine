@@ -41,7 +41,7 @@ class CaseField extends Field<List<String>> {
         return allowedNets
     }
 
-    void setAllowedNets(List<String> allowedNets) {
+    void setAllowedNets(Collection<String> allowedNets) {
         this.allowedNets.clear()
         this.allowedNets.addAll(allowedNets)
     }
