@@ -23,6 +23,8 @@ public class ViewFactory {
             return new TreeView();
         } else if (data.getView().getTable() != null) {
             return new TableView();
+        } else if (data.getView().getButtonType() != null) {
+            return new View(data.getView().getButtonType());
         } else {
             throw new UnsupportedViewException();
         }
