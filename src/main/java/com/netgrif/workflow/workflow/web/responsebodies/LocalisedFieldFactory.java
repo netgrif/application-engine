@@ -25,9 +25,15 @@ public class LocalisedFieldFactory {
             return fromBoolean((BooleanField) field, locale);
         } else if (field instanceof UserField) {
             return fromUser((UserField) field, locale);
+        } else if (field instanceof CaseField) {
+            return fromCase((CaseField) field, locale);
         } else {
             return fromGeneral(field, locale);
         }
+    }
+
+    private static LocalisedField fromGeneral(Field field, Locale locale) {
+        return new LocalisedField(field, locale);
     }
 
     private static LocalisedField fromNumber(NumberField field, Locale locale) {
@@ -58,11 +64,11 @@ public class LocalisedFieldFactory {
         return new LocalisedMultichoiceField(field, locale);
     }
 
-    public static LocalisedField fromGeneral(Field field, Locale locale) {
-        return new LocalisedField(field, locale);
+    private static LocalisedField fromEnumeration(EnumerationField field, Locale locale) {
+        return new LocalisedEnumerationField(field, locale);
     }
 
-    public static LocalisedField fromEnumeration(EnumerationField field, Locale locale) {
-        return new LocalisedEnumerationField(field, locale);
+    private static LocalisedField fromCase(CaseField field, Locale locale) {
+        return new LocalisedCaseField(field, locale);
     }
 }
