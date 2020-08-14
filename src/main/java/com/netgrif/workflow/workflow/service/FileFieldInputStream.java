@@ -12,7 +12,7 @@ public class FileFieldInputStream {
 
     private String fileName;
 
-    public FileFieldInputStream(String fileName, InputStream inputStream) {
+    public FileFieldInputStream(InputStream inputStream, String fileName) {
         this.inputStream = inputStream;
         this.fileName = fileName;
     }

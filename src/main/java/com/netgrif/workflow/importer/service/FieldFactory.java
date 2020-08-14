@@ -226,6 +226,9 @@ public final class FieldFactory {
             case FILE:
                 ((FileField) field).setDefaultValue(defaultValue);
                 break;
+            case FILELIST:
+                ((FileListField) field).setDefaultValue(defaultValue);
+                break;
             default:
                 field.setDefaultValue(defaultValue);
         }
@@ -478,7 +481,9 @@ public final class FieldFactory {
         if (value == null)
             return;
 
-        if (value instanceof FileListFieldValue) {
+        if (value instanceof String) {
+            field.setValue((String) value);
+        } else if (value instanceof FileListFieldValue) {
             field.setValue((FileListFieldValue) value);
         } else {
             throw new IllegalArgumentException("Object " + value.toString() + " cannot be set as value to the File list field [" + fieldId + "] !");

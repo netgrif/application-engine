@@ -2,6 +2,7 @@ package com.netgrif.workflow.workflow.service;
 
 import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.auth.domain.User;
+import com.netgrif.workflow.auth.domain.throwable.UnauthorisedRequestException;
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRole;
 import com.netgrif.workflow.petrinet.domain.roles.RolePermission;
 import com.netgrif.workflow.workflow.domain.Task;
@@ -48,6 +49,14 @@ public class TaskAuthenticationService implements ITaskAuthenticationService {
 	@Override
 	public boolean isAssignee(User user, String taskId) {
 		return isAssignee(user, taskService.findById(taskId));
+	}
+
+	@Override
+	public void checkUsersPermissions(User logged, String taskId) throws UnauthorisedRequestException {
+		if (!logged.transformToLoggedUser().isAdmin() && !isAssignee(logged, taskId))
+			throw new UnauthorisedRequestException(
+					"User " + logged.transformToLoggedUser().getUsername() + " doesn't have permission to modify file in task " + taskId
+			);
 	}
 
 	@Override
