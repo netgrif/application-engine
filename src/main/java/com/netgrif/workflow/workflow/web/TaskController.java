@@ -236,7 +236,6 @@ public class TaskController {
 
     @RequestMapping(value = "/{id}/data", method = RequestMethod.GET)
     public DataGroupsResource getData(@PathVariable("id") String taskId, Locale locale) {
-        dataService.setWrapping(0);
         List<DataGroup> dataGroups = dataService.getDataGroups(taskId, locale);
 
         return new DataGroupsResource(dataGroups, locale);
