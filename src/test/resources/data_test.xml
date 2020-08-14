@@ -85,7 +85,7 @@
                 <message>Date field validation message</message>
             </validation>
             <validation>
-                <expression>between today,future</expression>
+                <expression>between today,tommorow</expression>
                 <message>Date field validation message 2</message>
             </validation>
         </validations>
@@ -106,7 +106,7 @@
         <placeholder>User field placeholder</placeholder>
         <!--<valid></valid>-->
     </data>
-    <!-- DATETIME-->
+    <!-- DATETIME -->
     <data type="dateTime">
         <id>dateTime</id>
         <title>DateTime</title>
@@ -124,6 +124,16 @@
             </validation>
         </validations>
     </data>
+    <!-- CASE REF -->
+    <data type="caseRef">
+        <id>caseRef</id>
+        <title>CaseRef</title>
+        <allowedNets>
+            <allowedNet>processId1</allowedNet>
+            <allowedNet>processId2</allowedNet>
+        </allowedNets>
+    </data>
+
     <transition>
         <id>1</id>
         <x>1</x>
@@ -179,6 +189,12 @@
         </dataRef>
         <dataRef>
             <id>dateTime</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>caseRef</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
