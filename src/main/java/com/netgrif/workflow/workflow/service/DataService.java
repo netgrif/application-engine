@@ -14,6 +14,7 @@ import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldByFileFiel
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldContainer;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.FieldActionsRunner;
+import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.DataField;
 import com.netgrif.workflow.workflow.domain.Task;
@@ -62,6 +63,9 @@ public class DataService implements IDataService {
 
     @Autowired
     private FieldActionsRunner actionsRunner;
+
+    @Autowired
+    private IPetriNetService petriNetService;
 
     @Override
     public List<Field> getData(String taskId) {
@@ -144,7 +148,7 @@ public class DataService implements IDataService {
                 dataField = useCase.getDataField(fieldId);
             }
             if (dataField != null) {
-                dataField.setValue(parseFieldsValues(entry.getValue()));
+                dataField.setValue(parseFieldsValues(entry.getValue(), dataField));
                 Map<String, ChangedField> changedFieldMap = resolveActions(useCase.getPetriNet().getField(fieldId).get(),
                         Action.ActionTrigger.SET, useCase, useCase.getPetriNet().getTransition(task.getTransitionId()));
                 mergeChanges(changedFields, changedFieldMap);
@@ -195,13 +199,13 @@ public class DataService implements IDataService {
         ArrayList<DataGroup> dataGroups = new ArrayList<>(transition.getDataGroups().values());
         for (DataGroup dataGroup : dataGroups) {
             List<Field> resources = new LinkedList<>();
-            for (String datum : dataGroup.getData()) {
-                Field field = net.getDataSet().get(datum);
-                if (dataFieldMap.containsKey(datum)) {
+            for (String dataFieldId : dataGroup.getData()) {
+                Field field = net.getDataSet().get(dataFieldId);
+                if (dataFieldMap.containsKey(dataFieldId)) {
                     if (field.getType() == FieldType.TASK_REF) {
-                        collectTaskRefDataGroups((TaskField) dataFieldMap.get(datum), resources);
+                        collectTaskRefDataGroups((TaskField) dataFieldMap.get(dataFieldId), resources);
                     } else {
-                        resources.add(dataFieldMap.get(datum));
+                        resources.add(dataFieldMap.get(dataFieldId));
                     }
                 }
             }
@@ -627,7 +631,7 @@ public class DataService implements IDataService {
         });
     }
 
-    private Object parseFieldsValues(JsonNode jsonNode) {
+    private Object parseFieldsValues(JsonNode jsonNode, DataField dataField) {
         ObjectNode node = (ObjectNode) jsonNode;
         Object value;
         switch (node.get("type").asText()) {
@@ -680,6 +684,13 @@ public class DataService implements IDataService {
                 }
                 value = FileFieldValue.fromString(node.get("value").asText());
                 break;
+            case "caseRef":
+                ArrayNode valueArrayNode = (ArrayNode) node.get("value");
+                ArrayList<String> list = new ArrayList<>();
+                valueArrayNode.forEach(caseId -> list.add(caseId.asText()));
+                value = list;
+                validateCaseRefValue(list, dataField.getAllowedNets());
+                break;
             default:
                 if (node.get("value") == null) {
                     value = "null";
@@ -690,6 +701,16 @@ public class DataService implements IDataService {
         }
         if (value instanceof String && ((String) value).equalsIgnoreCase("null")) return null;
         else return value;
+    }
+
+    public void validateCaseRefValue(List<String> value, List<String> allowedNets) throws IllegalArgumentException {
+        List<Case> cases = workflowService.findAllById(value);
+        Set<String> nets = new HashSet<>(allowedNets);
+        cases.forEach(_case -> {
+            if (!nets.contains(_case.getProcessIdentifier())) {
+                throw new IllegalArgumentException(String.format("Case '%s' with id '%s' cannot be added to case ref, since it is an instance of process with identifier '%s', which is not one of the allowed nets", _case.getTitle(), _case.getStringId(), _case.getProcessIdentifier()));
+            }
+        });
     }
 
     @Data
