@@ -35,7 +35,7 @@ public class LocalisedTaskResource extends Resource<Task> {
         add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
                 .getData(task.getStringId(), null)).withRel("data"));
         add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
-                .saveData(null, task.getStringId(), null)).withRel("data-edit"));
+                .setData(null, task.getStringId(), null)).withRel("data-edit"));
         try {
             add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
                     .getFile(task.getStringId(), "", null)).withRel("file"));
