@@ -1,9 +1,8 @@
 package com.netgrif.workflow.importer.service;
 
 import com.netgrif.workflow.auth.domain.User;
-import com.netgrif.workflow.importer.model.*;
+import com.netgrif.workflow.importer.model.AllowedNets;
 import com.netgrif.workflow.importer.model.Data;
-import com.netgrif.workflow.importer.model.DocumentRef;
 import com.netgrif.workflow.importer.model.I18NStringType;
 import com.netgrif.workflow.petrinet.domain.Format;
 import com.netgrif.workflow.petrinet.domain.I18nString;
@@ -21,7 +20,6 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Component

@@ -49,5 +49,4 @@ public interface IDataService {
 
     void validateCaseRefValue(List<String> value, List<String> allowedNets) throws IllegalArgumentException;
 
-    void setWrapping(int wrapping);
 }

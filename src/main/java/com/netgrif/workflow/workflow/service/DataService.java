@@ -14,10 +14,10 @@ import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldByFileFiel
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldContainer;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.FieldActionsRunner;
-import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.DataField;
 import com.netgrif.workflow.workflow.domain.Task;
+import com.netgrif.workflow.workflow.domain.WrappingLayout;
 import com.netgrif.workflow.workflow.service.interfaces.IDataService;
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
@@ -44,8 +44,6 @@ public class DataService implements IDataService {
 
     public static final int MONGO_ID_LENGTH = 24;
 
-    private int wrapping = 0;
-
     @Autowired
     private ApplicationEventPublisher publisher;
 
@@ -63,9 +61,6 @@ public class DataService implements IDataService {
 
     @Autowired
     private FieldActionsRunner actionsRunner;
-
-    @Autowired
-    private IPetriNetService petriNetService;
 
     @Override
     public List<Field> getData(String taskId) {
@@ -95,7 +90,7 @@ public class DataService implements IDataService {
                     Field field = fieldFactory.buildFieldWithValidation(useCase, fieldId);
                     field.setBehavior(useCase.getDataSet().get(fieldId).applyBehavior(transition.getStringId()));
                     if (transition.getDataSet().get(fieldId).layoutExist() && transition.getDataSet().get(fieldId).getLayout().layoutFilled()) {
-                        field.setLayout(transition.getDataSet().get(fieldId).getLayout().of());
+                        field.setLayout(transition.getDataSet().get(fieldId).getLayout().clone());
                     }
                     dataSetFields.add(field);
                 }
@@ -104,7 +99,7 @@ public class DataService implements IDataService {
                     Field field = fieldFactory.buildFieldWithValidation(useCase, fieldId);
                     field.setBehavior(transition.getDataSet().get(fieldId).applyBehavior());
                     if (transition.getDataSet().get(fieldId).layoutExist() && transition.getDataSet().get(fieldId).getLayout().layoutFilled()) {
-                        field.setLayout(transition.getDataSet().get(fieldId).getLayout().of());
+                        field.setLayout(transition.getDataSet().get(fieldId).getLayout().clone());
                     }
                     dataSetFields.add(field);
                 }
@@ -177,10 +172,10 @@ public class DataService implements IDataService {
     private Map<String, Object> substituteTaskRefFieldBehavior(Map<String, Object> entryValue, Task referencedTask, String refereeTransId) {
         if (entryValue.containsKey("behavior")) {
             Map<String, Object> newBehavior = new HashMap<>();
-            ((Map<String, Object>) entryValue.get("behavior")).forEach((key, value) -> {
-                String behaviorChangedOnTrans = key.equals(referencedTask.getTransitionId()) ?
-                        refereeTransId : referencedTask.getStringId() + "-" + key;
-                newBehavior.put(behaviorChangedOnTrans, value);
+            ((Map<String, Object>) entryValue.get("behavior")).forEach((taskId, behavior) -> {
+                String behaviorChangedOnTrans = taskId.equals(referencedTask.getTransitionId()) ?
+                        refereeTransId : referencedTask.getStringId() + "-" + taskId;
+                newBehavior.put(behaviorChangedOnTrans, behavior);
             });
             entryValue.put("behavior", newBehavior);
         }
@@ -189,10 +184,10 @@ public class DataService implements IDataService {
 
     @Override
     public List<DataGroup> getDataGroups(String taskId, Locale locale) {
-        return getDataGroups(taskId, locale, new HashSet<>(), 0);
+        return getDataGroups(taskId, locale, new HashSet<>(), 0, new WrappingLayout(0));
     }
 
-    public List<DataGroup> getDataGroups(String taskId, Locale locale, Set<String> collectedTaskIds, int level) {
+    private List<DataGroup> getDataGroups(String taskId, Locale locale, Set<String> collectedTaskIds, int level, WrappingLayout wrappingLayout) {
         Task task = taskService.findOne(taskId);
         Case useCase = workflowService.findOne(task.getCaseId());
         PetriNet net = useCase.getPetriNet();
@@ -206,7 +201,7 @@ public class DataService implements IDataService {
         List<DataGroup> dataGroups = transition.getDataGroups().values().stream().map(DataGroup::clone).collect(Collectors.toList());
         for (DataGroup dataGroup : dataGroups) {
             resultDataGroups.add(dataGroup);
-            log.info("Setting groups of task " + taskId + " in case " + useCase.getTitle() + " level: " + level + " " + dataGroup.getImportId());
+            log.debug("Setting groups of task " + taskId + " in case " + useCase.getTitle() + " level: " + level + " " + dataGroup.getImportId());
             if (level != 0) dataGroup.setImportId(taskId + "-" + dataGroup.getStringId());
 
             List<Field> resources = new LinkedList<>();
@@ -214,11 +209,15 @@ public class DataService implements IDataService {
                 Field field = net.getDataSet().get(dataFieldId);
                 if (dataFieldMap.containsKey(dataFieldId)) {
                     if (field.getType() == FieldType.TASK_REF) {
-                        resultDataGroups.addAll(collectTaskRefDataGroups((TaskField) dataFieldMap.get(datum), locale, collectedTaskIds, level));
+                        resultDataGroups.addAll(collectTaskRefDataGroups((TaskField) dataFieldMap.get(dataFieldId), locale, collectedTaskIds, level, wrappingLayout));
                     } else {
-                        Field resource = dataFieldMap.get(datum);
-                        if (resource.getLayout() != null && !dataGroup.getImportId().contains("-") && wrapping != 0) {
-                            resource.getLayout().setY(resource.getLayout().getY() + wrapping - 1);
+                        Field resource = dataFieldMap.get(dataFieldId);
+                        if (resource.getLayout() != null && !dataGroup.getImportId().contains("-") && wrappingLayout.getWrapping() != 0) {
+                            if (resource.getLayout().getY() > 0) {
+                                resource.getLayout().setY(resource.getLayout().getY() + wrappingLayout.getWrapping() - 1);
+                            } else {
+                                resource.getLayout().setY(resource.getLayout().getY() + wrappingLayout.getWrapping());
+                            }
                         }
                         if (level != 0) resource.setImportId(taskId + "-" + resource.getImportId());
                         resources.add(resource);
@@ -231,17 +230,16 @@ public class DataService implements IDataService {
         return resultDataGroups;
     }
 
-    private List<DataGroup> collectTaskRefDataGroups(TaskField taskRefField, Locale locale, Set<String> collectedTaskIds, int level) {
+    private List<DataGroup> collectTaskRefDataGroups(TaskField taskRefField, Locale locale, Set<String> collectedTaskIds, int level, WrappingLayout wrappingLayout) {
         List<String> taskIds = taskRefField.getValue();
         List<DataGroup> groups = new ArrayList<>();
 
         if (taskIds != null) {
             taskIds = taskIds.stream().filter(id -> !collectedTaskIds.contains(id)).collect(Collectors.toList());
-
             taskIds.forEach(id -> {
                 collectedTaskIds.add(id);
-                List<DataGroup> taskRefDataGroups = getDataGroups(id, locale, collectedTaskIds, level + 1);
-                iterateTaskRefDataGroups(taskRefDataGroups, taskRefField);
+                List<DataGroup> taskRefDataGroups = getDataGroups(id, locale, collectedTaskIds, level + 1, wrappingLayout);
+                iterateTaskRefDataGroups(taskRefDataGroups, taskRefField, wrappingLayout);
                 groups.addAll(taskRefDataGroups);
             });
         }
@@ -250,8 +248,8 @@ public class DataService implements IDataService {
     }
 
 
-    private void iterateTaskRefDataGroups(List<DataGroup> taskRefDataGroups, TaskField taskRefField) {
-        int maxWrapping = wrapping;
+    private void iterateTaskRefDataGroups(List<DataGroup> taskRefDataGroups, TaskField taskRefField, WrappingLayout wrappingLayout) {
+        int maxWrapping = wrappingLayout.getWrapping();
         int maxRows = 0;
         for (DataGroup dataGroup : taskRefDataGroups) {
             for (LocalisedField localisedField : dataGroup.getFields().getContent()) {
@@ -264,8 +262,8 @@ public class DataService implements IDataService {
                 }
             }
         }
-        if (maxWrapping + maxRows > wrapping) {
-            wrapping = maxWrapping + maxRows;
+        if (maxWrapping + maxRows > wrappingLayout.getWrapping()) {
+            wrappingLayout.setWrapping(maxWrapping + maxRows);
         }
     }
 
@@ -437,11 +435,6 @@ public class DataService implements IDataService {
         });
         workflowService.save(case$);
         return changedFields;
-    }
-
-    @Override
-    public void setWrapping(int wrapping) {
-        this.wrapping = wrapping;
     }
 
     private void updateDataset(Case useCase) {
