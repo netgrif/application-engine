@@ -96,7 +96,7 @@ public class TaskAuthenticationService implements ITaskAuthenticationService {
     public boolean canCallFinish(LoggedUser loggedUser, String taskId) {
         return loggedUser.isAdmin()
                 || (userHasAtLeastOneRolePermission(loggedUser, taskId, RolePermission.PERFORM)
-                && isAssignee(loggedUser, taskId));
+                    && isAssignee(loggedUser, taskId));
     }
 
     @Override
