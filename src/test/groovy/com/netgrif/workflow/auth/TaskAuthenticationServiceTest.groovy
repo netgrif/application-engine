@@ -10,6 +10,7 @@ import com.netgrif.workflow.petrinet.domain.PetriNet
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.workflow.startup.ImportHelper
 import com.netgrif.workflow.startup.SuperCreator
+import groovy.json.JsonOutput
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -24,9 +25,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.web.context.WebApplicationContext
 
 import static org.springframework.http.MediaType.APPLICATION_JSON
-import static org.springframework.http.MediaType.TEXT_PLAIN
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
@@ -40,6 +39,8 @@ class TaskAuthenticationServiceTest {
     private static final String ASSIGN_TASK_URL = "/api/task/assign/"
     private static final String DELEGATE_TASK_URL = "/api/task/delegate/"
     private static final String FINISH_TASK_URL = "/api/task/finish/"
+    private static final String CANCEL_TASK_URL = "/api/task/cancel/"
+    private static final String SET_DATA_URL_TEMPLATE = "/api/task/%s/data"
 
     private static final String USER_WITH_ROLE_EMAIL = "role@test.com"
     private static final String USER_WITHOUT_ROLE_EMAIL = "norole@test.com"
@@ -129,7 +130,10 @@ class TaskAuthenticationServiceTest {
     void testTaskAuthenticationService() {
         def tests = [
                 { -> testAssignAuthorisation() },
-                { -> testDelegateAuthorisation() }
+                { -> testDelegateAuthorisation() },
+                { -> testFinishAuthorisation() },
+                { -> testCancelAuthorisation() },
+                { -> testSetDataAuthorisation() },
         ]
         tests.each { t ->
             beforeEach()
@@ -168,7 +172,12 @@ class TaskAuthenticationServiceTest {
     }
 
     void testFinishAuthorisation() {
-
+        mvc.perform(get(ASSIGN_TASK_URL + taskId)
+                .with(authentication(this.userWithRoleAuth)))
+                .andExpect(status().isOk())
+        mvc.perform(get(ASSIGN_TASK_URL + taskId2)
+                .with(authentication(this.userWithRoleAuth)))
+                .andExpect(status().isOk())
 
         mvc.perform(get(FINISH_TASK_URL + taskId)
                 .with(authentication(this.userWithoutRoleAuth)))
@@ -177,6 +186,57 @@ class TaskAuthenticationServiceTest {
                 .with(authentication(this.userWithRoleAuth)))
                 .andExpect(status().isOk())
         mvc.perform(get(FINISH_TASK_URL + taskId2)
+                .with(authentication(this.adminAuth)))
+                .andExpect(status().isOk())
+    }
+
+    void testCancelAuthorisation() {
+        mvc.perform(get(ASSIGN_TASK_URL + taskId)
+                .with(authentication(this.userWithRoleAuth)))
+                .andExpect(status().isOk())
+        mvc.perform(get(ASSIGN_TASK_URL + taskId2)
+                .with(authentication(this.userWithRoleAuth)))
+                .andExpect(status().isOk())
+
+        mvc.perform(get(CANCEL_TASK_URL + taskId)
+                .with(authentication(this.userWithoutRoleAuth)))
+                .andExpect(status().isForbidden())
+        mvc.perform(get(CANCEL_TASK_URL + taskId)
+                .with(authentication(this.userWithRoleAuth)))
+                .andExpect(status().isOk())
+        mvc.perform(get(CANCEL_TASK_URL + taskId2)
+                .with(authentication(this.adminAuth)))
+                .andExpect(status().isOk())
+    }
+
+    void testSetDataAuthorisation() {
+        mvc.perform(get(ASSIGN_TASK_URL + taskId)
+                .with(authentication(this.userWithRoleAuth)))
+                .andExpect(status().isOk())
+        mvc.perform(get(ASSIGN_TASK_URL + taskId2)
+                .with(authentication(this.userWithRoleAuth)))
+                .andExpect(status().isOk())
+
+        def body = JsonOutput.toJson([
+                text: [
+                        value: "Helo world",
+                        type : "text"
+                ]
+        ])
+
+        mvc.perform(post(String.format(SET_DATA_URL_TEMPLATE, taskId))
+                .content(body)
+                .contentType(APPLICATION_JSON)
+                .with(authentication(this.userWithoutRoleAuth)))
+                .andExpect(status().isForbidden())
+        mvc.perform(post(String.format(SET_DATA_URL_TEMPLATE, taskId))
+                .content(body)
+                .contentType(APPLICATION_JSON)
+                .with(authentication(this.userWithRoleAuth)))
+                .andExpect(status().isOk())
+        mvc.perform(post(String.format(SET_DATA_URL_TEMPLATE, taskId))
+                .content(body)
+                .contentType(APPLICATION_JSON)
                 .with(authentication(this.adminAuth)))
                 .andExpect(status().isOk())
     }
