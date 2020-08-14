@@ -55,9 +55,6 @@ public class TaskController {
     @Autowired
     private IElasticTaskService searchService;
 
-    @Autowired
-    private ITaskAuthenticationService taskAuthenticationService;
-
     @RequestMapping(method = RequestMethod.GET)
     public PagedResources<LocalisedTaskResource> getAll(Authentication auth, Pageable pageable, PagedResourcesAssembler<com.netgrif.workflow.workflow.domain.Task> assembler, Locale locale) {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
@@ -123,7 +120,7 @@ public class TaskController {
     }
 
     @RequestMapping(value = "/finish/{id}", method = RequestMethod.GET)
-    @PreAuthorize("iTaskAuthenticationService.canCallFinish(#auth.getPrincipal(), #taskId)")
+    @PreAuthorize("@taskAuthenticationService.canCallFinish(#auth.getPrincipal(), #taskId)")
     public MessageResource finish(Authentication auth, @PathVariable("id") String taskId) {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
 
@@ -137,7 +134,7 @@ public class TaskController {
     }
 
     @RequestMapping(value = "/cancel/{id}", method = RequestMethod.GET)
-    @PreAuthorize("iTaskAuthenticationService.canCallCancel(#auth.getPrincipal(), #taskId)")
+    @PreAuthorize("@taskAuthenticationService.canCallCancel(#auth.getPrincipal(), #taskId)")
     public MessageResource cancel(Authentication auth, @PathVariable("id") String taskId) {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
 
@@ -216,7 +213,7 @@ public class TaskController {
     }
 
     @RequestMapping(value = "/{id}/data", method = RequestMethod.POST)
-    @PreAuthorize("iTaskAuthenticationService.canCallSaveData(#auth.getPrincipal(), #taskId)")
+    @PreAuthorize("@taskAuthenticationService.canCallSaveData(#auth.getPrincipal(), #taskId)")
     public ChangedFieldContainer saveData(Authentication auth, @PathVariable("id") String taskId, @RequestBody ObjectNode dataBody) {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
 
@@ -241,7 +238,7 @@ public class TaskController {
      */
 
     @RequestMapping(value = "/{id}/file/{field}", method = RequestMethod.POST)
-    @PreAuthorize("iTaskAuthenticationService.canCallSaveFile(#auth.getPrincipal(), #taskId)")
+    @PreAuthorize("@taskAuthenticationService.canCallSaveFile(#auth.getPrincipal(), #taskId)")
     public ChangedFieldByFileFieldContainer saveFile(Authentication auth, @PathVariable("id") String taskId, @PathVariable("field") String fieldId, @RequestParam(value = "file") MultipartFile multipartFile) {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
 
