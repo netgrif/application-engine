@@ -13,6 +13,9 @@ import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.petrinet.domain.dataset.FieldType;
 import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository;
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
+import com.netgrif.workflow.rules.domain.facts.CaseCreatedFact;
+import com.netgrif.workflow.petrinet.domain.EventPhase;
+import com.netgrif.workflow.rules.service.interfaces.IRuleEngine;
 import com.netgrif.workflow.security.service.EncryptionService;
 import com.netgrif.workflow.utils.FullPageRequest;
 import com.netgrif.workflow.workflow.domain.Case;
@@ -76,6 +79,9 @@ public class WorkflowService implements IWorkflowService {
     @Autowired
     private FieldFactory fieldFactory;
 
+    @Autowired
+    private IRuleEngine ruleEngine;
+
     private IElasticCaseService elasticCaseService;
 
     @Autowired
@@ -90,6 +96,7 @@ public class WorkflowService implements IWorkflowService {
         }
         encryptDataSet(useCase);
         useCase = repository.save(useCase);
+
         try {
             setImmediateDataFields(useCase);
             elasticCaseService.indexNow(new ElasticCase(useCase));
@@ -165,6 +172,8 @@ public class WorkflowService implements IWorkflowService {
         useCase.setAuthor(user.transformToAuthor());
         useCase.setIcon(petriNet.getIcon());
         useCase.setCreationDate(LocalDateTime.now());
+
+        ruleEngine.evaluateRules(useCase, new CaseCreatedFact(useCase.getStringId(), EventPhase.PRE));
         useCase = save(useCase);
 
         publisher.publishEvent(new CreateCaseEvent(useCase));
@@ -174,6 +183,9 @@ public class WorkflowService implements IWorkflowService {
         taskService.reloadTasks(useCase);
 
         useCase = findOne(useCase.getStringId());
+        ruleEngine.evaluateRules(useCase, new CaseCreatedFact(useCase.getStringId(), EventPhase.POST));
+        useCase = save(useCase);
+
         return setImmediateDataFields(useCase);
     }
 
