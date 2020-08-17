@@ -14,6 +14,7 @@ import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldByFileFiel
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldContainer;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.FieldActionsRunner;
+import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.DataField;
 import com.netgrif.workflow.workflow.domain.Task;
@@ -23,6 +24,7 @@ import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
 import com.netgrif.workflow.workflow.web.responsebodies.DataFieldsResource;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,6 +63,9 @@ public class DataService implements IDataService {
 
     @Autowired
     private FieldActionsRunner actionsRunner;
+
+    @Autowired
+    private IPetriNetService petriNetService;
 
     @Override
     public List<Field> getData(String taskId) {
@@ -143,7 +148,7 @@ public class DataService implements IDataService {
                 dataField = useCase.getDataField(fieldId);
             }
             if (dataField != null) {
-                dataField.setValue(parseFieldsValues(entry.getValue()));
+                dataField.setValue(parseFieldsValues(entry.getValue(), dataField));
                 Map<String, ChangedField> changedFieldMap = resolveActions(useCase.getPetriNet().getField(fieldId).get(),
                         Action.ActionTrigger.SET, useCase, useCase.getPetriNet().getTransition(task.getTransitionId()));
                 mergeChanges(changedFields, changedFieldMap);
@@ -194,13 +199,13 @@ public class DataService implements IDataService {
         ArrayList<DataGroup> dataGroups = new ArrayList<>(transition.getDataGroups().values());
         for (DataGroup dataGroup : dataGroups) {
             List<Field> resources = new LinkedList<>();
-            for (String datum : dataGroup.getData()) {
-                Field field = net.getDataSet().get(datum);
-                if (dataFieldMap.containsKey(datum)) {
+            for (String dataFieldId : dataGroup.getData()) {
+                Field field = net.getDataSet().get(dataFieldId);
+                if (dataFieldMap.containsKey(dataFieldId)) {
                     if (field.getType() == FieldType.TASK_REF) {
-                        collectTaskRefDataGroups((TaskField) dataFieldMap.get(datum), resources);
+                        collectTaskRefDataGroups((TaskField) dataFieldMap.get(dataFieldId), resources);
                     } else {
-                        resources.add(dataFieldMap.get(datum));
+                        resources.add(dataFieldMap.get(dataFieldId));
                     }
                 }
             }
@@ -248,10 +253,50 @@ public class DataService implements IDataService {
     }
 
     @Override
+    public FileFieldInputStream getFileByTaskAndName(String taskId, String fieldId, String name) {
+        TaskRefFieldWrapper wrapper = decodeTaskRefFieldId(taskId, fieldId);
+        Task task = wrapper.getTask();
+        String parsedFieldId = wrapper.getParsedFieldId();
+
+        return getFileByCaseAndName(task.getCaseId(), parsedFieldId, name);
+    }
+
+    @Override
     public FileFieldInputStream getFileByCase(String caseId, String fieldId) {
         Case useCase = workflowService.findOne(caseId);
         FileField field = (FileField) useCase.getPetriNet().getDataSet().get(fieldId);
         return getFile(useCase, field);
+    }
+
+    @Override
+    public FileFieldInputStream getFileByCaseAndName(String caseId, String fieldId, String name) {
+        Case useCase = workflowService.findOne(caseId);
+        FileListField field = (FileListField) useCase.getPetriNet().getDataSet().get(fieldId);
+        return getFileByName(useCase, field, name);
+    }
+
+    @Override
+    public FileFieldInputStream getFileByName(Case useCase, FileListField field, String name) {
+        field.getActions().forEach(action -> actionsRunner.run(action, useCase));
+        if (useCase.getDataSet().get(field.getStringId()).getValue() == null)
+            return null;
+
+        workflowService.save(useCase);
+        field.setValue((FileListFieldValue) useCase.getDataSet().get(field.getStringId()).getValue());
+
+        Optional<FileFieldValue> fileField = field.getValue().getNamesPaths().stream().filter(namePath -> namePath.getName().equals(name)).findFirst();
+        if (!fileField.isPresent() || fileField.get().getPath() == null) {
+            log.error("File " + name + " not found!");
+            return null;
+        }
+
+        try {
+            return new FileFieldInputStream(field.isRemote() ? download(fileField.get().getPath()) :
+                    new FileInputStream(fileField.get().getPath()), name);
+        } catch (IOException e) {
+            log.error("Getting file failed: ", e);
+            return null;
+        }
     }
 
     @Override
@@ -263,20 +308,12 @@ public class DataService implements IDataService {
         workflowService.save(useCase);
         field.setValue((FileFieldValue) useCase.getDataSet().get(field.getStringId()).getValue());
 
-        if (field.isRemote()) {
-            try {
-                return new FileFieldInputStream(field, download(field.getValue().getPath()));
-            } catch (IOException e) {
-                log.error("Getting file failed: ", e);
-                return null;
-            }
-        } else {
-            try {
-                return new FileFieldInputStream(field, new FileInputStream(field.getFilePath(useCase.getStringId())));
-            } catch (FileNotFoundException e) {
-                log.error("Getting file failed: ", e);
-                return null;
-            }
+        try {
+            return new FileFieldInputStream(field, field.isRemote() ? download(field.getValue().getPath()) :
+                    new FileInputStream(field.getValue().getPath()));
+        } catch (IOException e) {
+            log.error("Getting file failed: ", e);
+            return null;
         }
     }
 
@@ -291,11 +328,11 @@ public class DataService implements IDataService {
         try {
             TaskRefFieldWrapper wrapper = decodeTaskRefFieldId(taskId, fieldId);
             Task task = wrapper.getTask();
-            String parsedFieldId = wrapper.getParsedFieldId();
 
-            Case useCase = workflowService.findOne(task.getCaseId());
-            FileField field = (FileField) useCase.getPetriNet().getDataSet().get(parsedFieldId);
-            field.setValue((FileFieldValue) useCase.getDataField(field.getStringId()).getValue());
+            ImmutablePair<Case, FileField> pair = getCaseAndFileField(taskId, fieldId);
+            FileField field = pair.getRight();
+            Case useCase = pair.getLeft();
+
             ChangedFieldByFileFieldContainer container = new ChangedFieldByFileFieldContainer(false);
 
             if (field.isRemote()) {
@@ -305,19 +342,48 @@ public class DataService implements IDataService {
                     return container;
             }
 
-
-            Map<String, ChangedField> changedFields = resolveActions(useCase.getPetriNet().getField(fieldId).get(),
-                    Action.ActionTrigger.SET, useCase, useCase.getPetriNet().getTransition(task.getTransitionId()));
-            container.putAll(changedFields);
-            container.setIsSave(true);
-            updateDataset(useCase);
-            workflowService.save(useCase);
-            return container;
-
+            return getChangedFieldByFileFieldContainer(fieldId, task, useCase, container);
         } catch (IOException e) {
             log.error("Saving file failed: ", e);
             return new ChangedFieldByFileFieldContainer(false);
         }
+    }
+
+    @Override
+    public ChangedFieldByFileFieldContainer saveFiles(String taskId, String fieldId, MultipartFile[] multipartFiles) {
+        try {
+            TaskRefFieldWrapper wrapper = decodeTaskRefFieldId(taskId, fieldId);
+            Task task = wrapper.getTask();
+
+            ImmutablePair<Case, FileListField> pair = getCaseAndFileListField(taskId, fieldId);
+            FileListField field = pair.getRight();
+            Case useCase = pair.getLeft();
+
+            ChangedFieldByFileFieldContainer container = new ChangedFieldByFileFieldContainer(false);
+
+            if (field.isRemote()) {
+                upload(useCase, field, multipartFiles);
+            } else {
+                if (!saveLocalFiles(useCase, field, multipartFiles))
+                    return container;
+            }
+
+            return getChangedFieldByFileFieldContainer(fieldId, task, useCase, container);
+        } catch (IOException e) {
+            log.error("Saving files failed: ", e);
+            return new ChangedFieldByFileFieldContainer(false);
+        }
+    }
+
+    private ChangedFieldByFileFieldContainer getChangedFieldByFileFieldContainer(String fieldId, Task task, Case useCase,
+                                                                                 ChangedFieldByFileFieldContainer container) {
+        Map<String, ChangedField> changedFields = resolveActions(useCase.getPetriNet().getField(fieldId).get(),
+                Action.ActionTrigger.SET, useCase, useCase.getPetriNet().getTransition(task.getTransitionId()));
+        container.putAll(changedFields);
+        container.setIsSave(true);
+        updateDataset(useCase);
+        workflowService.save(useCase);
+        return container;
     }
 
     private TaskRefFieldWrapper decodeTaskRefFieldId(String taskId, String fieldId) {
@@ -346,8 +412,26 @@ public class DataService implements IDataService {
         throw new IllegalArgumentException("fieldId is not referenced through taskRef");
     }
 
+    private boolean saveLocalFiles(Case useCase, FileListField field, MultipartFile[] multipartFiles) throws IOException {
+        for (MultipartFile oneFile : multipartFiles) {
+            if (field.getValue() != null && field.getValue().getNamesPaths() != null) {
+                Optional<FileFieldValue> fileField = field.getValue().getNamesPaths().stream().filter(namePath -> namePath.getName().equals(oneFile.getOriginalFilename())).findFirst();
+                if (fileField.isPresent()) {
+                    new File(field.getFilePath(useCase.getStringId(), oneFile.getOriginalFilename())).delete();
+                    field.getValue().getNamesPaths().remove(fileField.get());
+                }
+            }
 
-    public boolean saveLocalFile(Case useCase, FileField field, MultipartFile multipartFile) throws IOException {
+            field.addValue(oneFile.getOriginalFilename(), field.getFilePath(useCase.getStringId(), oneFile.getOriginalFilename()));
+            File file = new File(field.getFilePath(useCase.getStringId(), oneFile.getOriginalFilename()));
+
+            writeFile(oneFile, file);
+        }
+        useCase.getDataSet().get(field.getStringId()).setValue(field.getValue());
+        return true;
+    }
+
+    private boolean saveLocalFile(Case useCase, FileField field, MultipartFile multipartFile) throws IOException {
         if (useCase.getDataSet().get(field.getStringId()).getValue() != null) {
             new File(field.getFilePath(useCase.getStringId())).delete();
             useCase.getDataSet().get(field.getStringId()).setValue(null);
@@ -356,6 +440,13 @@ public class DataService implements IDataService {
         field.setValue(multipartFile.getOriginalFilename());
         field.getValue().setPath(field.getFilePath(useCase.getStringId()));
         File file = new File(field.getFilePath(useCase.getStringId()));
+        writeFile(multipartFile, file);
+
+        useCase.getDataSet().get(field.getStringId()).setValue(field.getValue());
+        return true;
+    }
+
+    private void writeFile(MultipartFile multipartFile, File file) throws IOException {
         file.getParentFile().mkdirs();
         if (!file.createNewFile()) {
             file.delete();
@@ -365,13 +456,88 @@ public class DataService implements IDataService {
         FileOutputStream fout = new FileOutputStream(file);
         fout.write(multipartFile.getBytes());
         fout.close();
+    }
 
-        useCase.getDataSet().get(field.getStringId()).setValue(field.getValue());
+    private boolean upload(Case useCase, FileField field, MultipartFile multipartFile) {
+        throw new UnsupportedOperationException("Upload new file to the remote storage is not implemented yet.");
+    }
+
+    private boolean upload(Case useCase, FileListField field, MultipartFile[] multipartFiles) {
+        throw new UnsupportedOperationException("Upload new files to the remote storage is not implemented yet.");
+    }
+
+    private boolean deleteRemote(Case useCase, FileField field) {
+        throw new UnsupportedOperationException("Delete file from the remote storage is not implemented yet.");
+    }
+
+    private boolean deleteRemote(Case useCase, FileListField field, String name) {
+        throw new UnsupportedOperationException("Delete file from the remote storage is not implemented yet.");
+    }
+
+    @Override
+    public boolean deleteFile(String taskId, String fieldId) {
+        ImmutablePair<Case, FileField> pair = getCaseAndFileField(taskId, fieldId);
+        FileField field = pair.getRight();
+        Case useCase = pair.getLeft();
+
+        if (useCase.getDataSet().get(field.getStringId()).getValue() != null) {
+            if (field.isRemote()) {
+                deleteRemote(useCase, field);
+            } else {
+                new File(field.getValue().getPath()).delete();
+            }
+            useCase.getDataSet().get(field.getStringId()).setValue(null);
+        }
+
+        updateDataset(useCase);
+        workflowService.save(useCase);
         return true;
     }
 
-    public boolean upload(Case useCase, FileField field, MultipartFile multipartFile) {
-        throw new UnsupportedOperationException("Upload new file to the remote storage is not implemented yet.");
+    private ImmutablePair<Case, FileField> getCaseAndFileField(String taskId, String fieldId) {
+        TaskRefFieldWrapper wrapper = decodeTaskRefFieldId(taskId, fieldId);
+        Task task = wrapper.getTask();
+        String parsedFieldId = wrapper.getParsedFieldId();
+
+        Case useCase = workflowService.findOne(task.getCaseId());
+        FileField field = (FileField) useCase.getPetriNet().getDataSet().get(parsedFieldId);
+        field.setValue((FileFieldValue) useCase.getDataField(field.getStringId()).getValue());
+
+        return new ImmutablePair<>(useCase, field);
+    }
+
+    @Override
+    public boolean deleteFileByName(String taskId, String fieldId, String name) {
+        ImmutablePair<Case, FileListField> pair = getCaseAndFileListField(taskId, fieldId);
+        FileListField field = pair.getRight();
+        Case useCase = pair.getLeft();
+
+        Optional<FileFieldValue> fileField = field.getValue().getNamesPaths().stream().filter(namePath -> namePath.getName().equals(name)).findFirst();
+
+        if (fileField.isPresent()) {
+            if (field.isRemote()) {
+                deleteRemote(useCase, field, name);
+            } else {
+                new File(fileField.get().getPath()).delete();
+                field.getValue().getNamesPaths().remove(fileField.get());
+            }
+            useCase.getDataSet().get(field.getStringId()).setValue(field.getValue());
+        }
+
+        updateDataset(useCase);
+        workflowService.save(useCase);
+        return true;
+    }
+
+    private ImmutablePair<Case, FileListField> getCaseAndFileListField(String taskId, String fieldId) {
+        TaskRefFieldWrapper wrapper = decodeTaskRefFieldId(taskId, fieldId);
+        Task task = wrapper.getTask();
+        String parsedFieldId = wrapper.getParsedFieldId();
+
+        Case useCase = workflowService.findOne(task.getCaseId());
+        FileListField field = (FileListField) useCase.getPetriNet().getDataSet().get(parsedFieldId);
+        field.setValue((FileListFieldValue) useCase.getDataField(field.getStringId()).getValue());
+        return new ImmutablePair<>(useCase, field);
     }
 
     @Override
@@ -418,7 +584,7 @@ public class DataService implements IDataService {
         });
     }
 
-    public Map<String, ChangedField> resolveActions(Field field, Action.ActionTrigger actionTrigger, Case useCase, Transition transition) {
+    private Map<String, ChangedField> resolveActions(Field field, Action.ActionTrigger actionTrigger, Case useCase, Transition transition) {
         Map<String, ChangedField> changedFields = new HashMap<>();
         processActions(field, actionTrigger, useCase, transition, changedFields);
         return changedFields;
@@ -465,7 +631,7 @@ public class DataService implements IDataService {
         });
     }
 
-    private Object parseFieldsValues(JsonNode jsonNode) {
+    private Object parseFieldsValues(JsonNode jsonNode, DataField dataField) {
         ObjectNode node = (ObjectNode) jsonNode;
         Object value;
         switch (node.get("type").asText()) {
@@ -518,6 +684,13 @@ public class DataService implements IDataService {
                 }
                 value = FileFieldValue.fromString(node.get("value").asText());
                 break;
+            case "caseRef":
+                ArrayNode valueArrayNode = (ArrayNode) node.get("value");
+                ArrayList<String> list = new ArrayList<>();
+                valueArrayNode.forEach(caseId -> list.add(caseId.asText()));
+                value = list;
+                validateCaseRefValue(list, dataField.getAllowedNets());
+                break;
             default:
                 if (node.get("value") == null) {
                     value = "null";
@@ -528,6 +701,16 @@ public class DataService implements IDataService {
         }
         if (value instanceof String && ((String) value).equalsIgnoreCase("null")) return null;
         else return value;
+    }
+
+    public void validateCaseRefValue(List<String> value, List<String> allowedNets) throws IllegalArgumentException {
+        List<Case> cases = workflowService.findAllById(value);
+        Set<String> nets = new HashSet<>(allowedNets);
+        cases.forEach(_case -> {
+            if (!nets.contains(_case.getProcessIdentifier())) {
+                throw new IllegalArgumentException(String.format("Case '%s' with id '%s' cannot be added to case ref, since it is an instance of process with identifier '%s', which is not one of the allowed nets", _case.getTitle(), _case.getStringId(), _case.getProcessIdentifier()));
+            }
+        });
     }
 
     @Data
