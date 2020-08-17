@@ -26,6 +26,9 @@ public class FilterService implements IFilterService {
     @Autowired
     private FilterSearchService searchService;
 
+    @Autowired
+    private FilterAuthorizationService authenticationService;
+
     @Override
     public boolean deleteFilter(String filterId, LoggedUser user) throws UnauthorisedRequestException {
         Optional<Filter> result = repository.findById(filterId);
@@ -33,7 +36,7 @@ public class FilterService implements IFilterService {
             throw new IllegalArgumentException("Filter not found");
 
         Filter filter = result.get();
-        if (!user.isAdmin() && !user.getId().equals(filter.getAuthor().getId()))
+        if (!authenticationService.canCallDelete(user, filter))
             throw new UnauthorisedRequestException("User " + user.getUsername() + " doesn't have permission to delete filter " + filter.getStringId());
 
         repository.delete(filter);

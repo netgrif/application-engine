@@ -12,6 +12,7 @@ import com.netgrif.workflow.workflow.domain.MergeFilterOperation;
 import com.netgrif.workflow.workflow.service.FileFieldInputStream;
 import com.netgrif.workflow.workflow.service.interfaces.IDataService;
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
+import com.netgrif.workflow.workflow.service.interfaces.IWorkflowAuthorizationService;
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
 import com.netgrif.workflow.workflow.web.requestbodies.CreateCaseBody;
 import com.netgrif.workflow.workflow.web.responsebodies.*;
@@ -70,6 +71,9 @@ public class WorkflowController {
 
     @Autowired
     private IUserService userService;
+
+    @Autowired
+    private IWorkflowAuthorizationService authenticationService;
 
     @RequestMapping(value = "/case", method = RequestMethod.POST)
     public CaseResource createCase(@RequestBody CreateCaseBody body, Authentication auth) {
@@ -179,7 +183,7 @@ public class WorkflowController {
     public MessageResource deleteCase(@PathVariable("id") String caseId, @RequestParam(defaultValue = "false") boolean deleteSubtree) throws UnauthorisedRequestException {
         User logged = userService.getLoggedUser();
         Case requestedCase = workflowService.findOne(caseId);
-        if( !logged.transformToLoggedUser().isAdmin() && !logged.getId().equals(requestedCase.getAuthor().getId()))
+        if (!this.authenticationService.canCallDelete(logged.transformToLoggedUser(), requestedCase))
             throw new UnauthorisedRequestException("User " + logged.transformToLoggedUser().getUsername() + " doesn't have permission to delete case " + requestedCase.getStringId());
 
         try {
