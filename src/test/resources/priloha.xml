@@ -1,0 +1,156 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<document xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:noNamespaceSchemaLocation='https://modeler.netgrif.com/petriflow_schema.xsd'>
+	<id>priloha</id>
+	<initials>IPR</initials>
+	<version>1.0.0</version>
+	<title>Iné príloha</title>
+	<icon>home</icon>
+	<defaultRole>true</defaultRole>
+	<transitionRole>false</transitionRole>
+	<!-- TRANSACTIONS -->
+	<!-- ROLES -->
+	<role>
+		<id>system</id>
+		<title>System</title>
+	</role>
+	<role>
+		<id>anonymous</id>
+		<title>Anonymous</title>
+	</role>
+	<role>
+		<id>admin</id>
+		<title>Admin</title>
+	</role>
+	<!-- DATA -->
+	<data type='file'>
+		<id>ine_prilohy_file</id>
+		<title>Súbor</title>
+	</data>
+	<data type='text'>
+		<id>ine_prilohy_text</id>
+		<title>Popis prílohy</title>
+	</data>
+	<data type="text">
+		<id>ine_prilohy_name</id>
+		<title>Názov prílohy</title>
+	</data>
+	<data type='text'>
+		<id>requestID</id>
+		<title></title>
+	</data>
+	<data type='text'>
+		<id>typ_prilohy</id>
+		<title></title>
+		<init>INE</init>
+	</data>
+	<data type="button">
+		<id>add_nested_task</id>
+		<title>Add Nested Task</title>
+		<action trigger="set">
+			<!-- @formatter:off -->
+			taskRef : f.nested_taskRef;
+
+			def aAdress = createCase("address")
+			aAdress.dataSet.get("requestID").setValue(useCase.stringId)
+			workflowService.save(aAdress)
+			def list = []
+			findCases { it.processIdentifier.eq("address") }.findAll { it.dataSet["requestID"].value == useCase.stringId }.each { list.addAll(it.tasks.collect { it.task }) }.sort{ it.creationDate }
+			change taskRef value { list }
+			<!-- @formatter:on -->
+		</action>
+	</data>
+	<data type="taskRef">
+		<id>nested_taskRef</id>
+		<title>Nested TaskRef</title>
+		<action trigger="get">
+			<!-- @formatter:off -->
+			taskRef : f.this;
+
+			def list = []
+			findCases { it.processIdentifier.eq("address") }.findAll { it.dataSet["requestID"].value == useCase.stringId }.each { list.addAll(it.tasks.collect { it.task }) }.sort{ it.creationDate }
+			change taskRef value { list }
+			<!-- @formatter:on -->
+		</action>
+	</data>
+	<data type="text">
+		<id>temp1</id>
+		<title>Temp 1</title>
+	</data>
+	<!-- TRANSITIONS -->
+	<transition>
+		<id>1</id>
+		<x>337</x>
+		<y>103</y>
+		<label>Vlož súbory</label>
+		<roleRef>
+			<id>admin</id>
+			<logic>
+				<view>true</view>
+			</logic>
+		</roleRef>
+		<roleRef>
+			<id>anonymous</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
+		<dataRef>
+			<id>ine_prilohy_file</id>
+			<logic>
+				<behavior>editable</behavior>
+			</logic>
+			<layout>
+				<x>0</x>
+				<y>0</y>
+				<rows>1</rows>
+				<cols>2</cols>
+				<template>material</template>
+				<appearance>outline</appearance>
+			</layout>
+		</dataRef>
+		<dataRef>
+			<id>ine_prilohy_text</id>
+			<logic>
+				<behavior>editable</behavior>
+			</logic>
+			<layout>
+				<x>2</x>
+				<y>0</y>
+				<rows>1</rows>
+				<cols>2</cols>
+				<template>material</template>
+				<appearance>outline</appearance>
+			</layout>
+		</dataRef>
+		<dataRef>
+			<id>temp1</id>
+			<logic>
+				<behavior>editable</behavior>
+			</logic>
+			<layout>
+				<x>0</x>
+				<y>1</y>
+				<rows>1</rows>
+				<cols>4</cols>
+				<template>material</template>
+				<appearance>outline</appearance>
+			</layout>
+		</dataRef>
+<!--		<dataRef>-->
+<!--			<id>add_nested_task</id>-->
+<!--			<logic>-->
+<!--				<behavior>editable</behavior>-->
+<!--			</logic>-->
+<!--			<layout>-->
+<!--				<x>0</x>-->
+<!--				<y>2</y>-->
+<!--				<rows>1</rows>-->
+<!--				<cols>4</cols>-->
+<!--				<template>material</template>-->
+<!--				<appearance>outline</appearance>-->
+<!--			</layout>-->
+<!--		</dataRef>-->
+	</transition>
+	<!-- PLACES -->
+	<!-- ARCS -->
+</document>

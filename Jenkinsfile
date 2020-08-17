@@ -174,14 +174,14 @@ pipeline {
         stage('ZIP file') {
             steps {
                 script {
-                    DATETIME_TAG = java.time.LocalDateTime.now()
+                    DATETIME_TAG = java.time.LocalDateTime.now().toString().replace(':','_')
                     pom = readMavenPom()
                     ZIP_FILE = "${pom.getName().replace(' ', '_')}-${pom.getVersion()}-Backend-${DATETIME_TAG}.zip"
                 }
                 sh '''
-            mkdir dist
-            cp target/*.jar pom.xml dist/
-        '''
+                    mkdir dist
+                    cp target/*.jar pom.xml dist/
+                '''
                 zip zipFile: ZIP_FILE, archive: false, dir: 'dist'
                 archiveArtifacts artifacts: ZIP_FILE, fingerprint: true
             }
