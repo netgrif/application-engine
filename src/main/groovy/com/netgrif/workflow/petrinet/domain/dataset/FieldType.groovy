@@ -8,6 +8,7 @@ enum FieldType {
     DATE("date"),
     BOOLEAN("boolean"),
     FILE("file"),
+    FILELIST('fileList'),
     ENUMERATION("enumeration"),
     MULTICHOICE("multichoice"),
     NUMBER("number"),
