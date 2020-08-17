@@ -17,7 +17,7 @@ class FileFieldValue {
         this.path = path
     }
 
-    public static FileFieldValue fromString(String value) {
+    static FileFieldValue fromString(String value) {
         if (!value.contains(":"))
             return new FileFieldValue(value, null)
 
@@ -48,7 +48,7 @@ class FileFieldValue {
 
 
     @Override
-    public String toString() {
+    String toString() {
         return path
     }
 }
