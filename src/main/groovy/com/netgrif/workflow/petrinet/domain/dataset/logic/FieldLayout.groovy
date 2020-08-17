@@ -25,7 +25,7 @@ class FieldLayout extends Layout {
     }
 
     FieldLayout clone() {
-        return new FieldLayout(this.getX(), this.getY(), this.getRows(), this.getCols(), this.getTemplate(), this.getAppearance())
+        return new FieldLayout(this.getX(), this.getY(), this.getRows(), this.getCols(),this.getOffset(), this.getTemplate(), this.getAppearance())
     }
 
     int getX() {
