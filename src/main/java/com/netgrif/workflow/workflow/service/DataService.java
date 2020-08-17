@@ -14,19 +14,19 @@ import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldByFileFiel
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldContainer;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.FieldActionsRunner;
-import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.DataField;
 import com.netgrif.workflow.workflow.domain.Task;
+import com.netgrif.workflow.workflow.domain.WrappingLayout;
 import com.netgrif.workflow.workflow.service.interfaces.IDataService;
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
 import com.netgrif.workflow.workflow.web.responsebodies.DataFieldsResource;
+import com.netgrif.workflow.workflow.web.responsebodies.LocalisedField;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
@@ -39,10 +39,9 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.LongStream;
 
+@Slf4j
 @Service
 public class DataService implements IDataService {
-
-    private static final Logger log = LoggerFactory.getLogger(DataService.class);
 
     public static final int MONGO_ID_LENGTH = 24;
 
@@ -63,9 +62,6 @@ public class DataService implements IDataService {
 
     @Autowired
     private FieldActionsRunner actionsRunner;
-
-    @Autowired
-    private IPetriNetService petriNetService;
 
     @Override
     public List<Field> getData(String taskId) {
@@ -95,7 +91,7 @@ public class DataService implements IDataService {
                     Field field = fieldFactory.buildFieldWithValidation(useCase, fieldId);
                     field.setBehavior(useCase.getDataSet().get(fieldId).applyBehavior(transition.getStringId()));
                     if (transition.getDataSet().get(fieldId).layoutExist() && transition.getDataSet().get(fieldId).getLayout().layoutFilled()) {
-                        field.setLayout(transition.getDataSet().get(fieldId).getLayout());
+                        field.setLayout(transition.getDataSet().get(fieldId).getLayout().clone());
                     }
                     dataSetFields.add(field);
                 }
@@ -104,7 +100,7 @@ public class DataService implements IDataService {
                     Field field = fieldFactory.buildFieldWithValidation(useCase, fieldId);
                     field.setBehavior(transition.getDataSet().get(fieldId).applyBehavior());
                     if (transition.getDataSet().get(fieldId).layoutExist() && transition.getDataSet().get(fieldId).getLayout().layoutFilled()) {
-                        field.setLayout(transition.getDataSet().get(fieldId).getLayout());
+                        field.setLayout(transition.getDataSet().get(fieldId).getLayout().clone());
                     }
                     dataSetFields.add(field);
                 }
@@ -177,10 +173,10 @@ public class DataService implements IDataService {
     private Map<String, Object> substituteTaskRefFieldBehavior(Map<String, Object> entryValue, Task referencedTask, String refereeTransId) {
         if (entryValue.containsKey("behavior")) {
             Map<String, Object> newBehavior = new HashMap<>();
-            ((Map<String, Object>) entryValue.get("behavior")).entrySet().forEach(behaviorEntry -> {
-                String behaviorChangedOnTrans = behaviorEntry.getKey().equals(referencedTask.getTransitionId()) ?
-                    refereeTransId : referencedTask.getStringId() + "-" + behaviorEntry.getKey();
-                newBehavior.put(behaviorChangedOnTrans, behaviorEntry.getValue());
+            ((Map<String, Object>) entryValue.get("behavior")).forEach((taskId, behavior) -> {
+                String behaviorChangedOnTrans = taskId.equals(referencedTask.getTransitionId()) ?
+                        refereeTransId : referencedTask.getStringId() + "-" + taskId;
+                newBehavior.put(behaviorChangedOnTrans, behavior);
             });
             entryValue.put("behavior", newBehavior);
         }
@@ -189,58 +185,87 @@ public class DataService implements IDataService {
 
     @Override
     public List<DataGroup> getDataGroups(String taskId, Locale locale) {
+        return getDataGroups(taskId, locale, new HashSet<>(), 0, new WrappingLayout(0));
+    }
+
+    private List<DataGroup> getDataGroups(String taskId, Locale locale, Set<String> collectedTaskIds, int level, WrappingLayout wrappingLayout) {
         Task task = taskService.findOne(taskId);
         Case useCase = workflowService.findOne(task.getCaseId());
         PetriNet net = useCase.getPetriNet();
         Transition transition = net.getTransition(task.getTransitionId());
 
-        List<Field> data1 = getData(taskId);
-        Map<String, Field> dataFieldMap = data1.stream().collect(Collectors.toMap(Field::getImportId, field -> field));
-        ArrayList<DataGroup> dataGroups = new ArrayList<>(transition.getDataGroups().values());
+        log.info("Getting groups of task " + taskId + " in case " + useCase.getTitle() + " level: " + level);
+        List<DataGroup> resultDataGroups = new ArrayList<>();
+
+        List<Field> data = getData(taskId);
+        Map<String, Field> dataFieldMap = data.stream().collect(Collectors.toMap(Field::getImportId, field -> field));
+        List<DataGroup> dataGroups = transition.getDataGroups().values().stream().map(DataGroup::clone).collect(Collectors.toList());
         for (DataGroup dataGroup : dataGroups) {
+            resultDataGroups.add(dataGroup);
+            log.debug("Setting groups of task " + taskId + " in case " + useCase.getTitle() + " level: " + level + " " + dataGroup.getImportId());
+            if (level != 0) dataGroup.setImportId(taskId + "-" + dataGroup.getStringId());
+
             List<Field> resources = new LinkedList<>();
             for (String dataFieldId : dataGroup.getData()) {
                 Field field = net.getDataSet().get(dataFieldId);
                 if (dataFieldMap.containsKey(dataFieldId)) {
                     if (field.getType() == FieldType.TASK_REF) {
-                        collectTaskRefDataGroups((TaskField) dataFieldMap.get(dataFieldId), resources);
+                        resultDataGroups.addAll(collectTaskRefDataGroups((TaskField) dataFieldMap.get(dataFieldId), locale, collectedTaskIds, level, wrappingLayout));
                     } else {
-                        resources.add(dataFieldMap.get(dataFieldId));
+                        Field resource = dataFieldMap.get(dataFieldId);
+                        if (resource.getLayout() != null && !dataGroup.getImportId().contains("-") && wrappingLayout.getWrapping() != 0) {
+                            if (resource.getLayout().getY() > 0) {
+                                resource.getLayout().setY(resource.getLayout().getY() + wrappingLayout.getWrapping() - 1);
+                            } else {
+                                resource.getLayout().setY(resource.getLayout().getY() + wrappingLayout.getWrapping());
+                            }
+                        }
+                        if (level != 0) resource.setImportId(taskId + "-" + resource.getImportId());
+                        resources.add(resource);
                     }
                 }
             }
             dataGroup.setFields(new DataFieldsResource(resources, locale));
         }
 
-        return dataGroups;
+        return resultDataGroups;
     }
 
-    private void collectTaskRefDataGroups(TaskField taskRefField, List<Field> resources) {
-        collectTaskRefDataGroups(taskRefField, resources, new HashSet<>());
-    }
-
-    private void collectTaskRefDataGroups(TaskField taskRefField, List<Field> resources, Set<String> collectedTasks) {
+    private List<DataGroup> collectTaskRefDataGroups(TaskField taskRefField, Locale locale, Set<String> collectedTaskIds, int level, WrappingLayout wrappingLayout) {
         List<String> taskIds = taskRefField.getValue();
-        if (taskIds == null) {
-            return;
+        List<DataGroup> groups = new ArrayList<>();
+
+        if (taskIds != null) {
+            taskIds = taskIds.stream().filter(id -> !collectedTaskIds.contains(id)).collect(Collectors.toList());
+            taskIds.forEach(id -> {
+                collectedTaskIds.add(id);
+                List<DataGroup> taskRefDataGroups = getDataGroups(id, locale, collectedTaskIds, level + 1, wrappingLayout);
+                iterateTaskRefDataGroups(taskRefDataGroups, taskRefField, wrappingLayout);
+                groups.addAll(taskRefDataGroups);
+            });
         }
 
-        taskIds = taskIds.stream().filter(it -> !collectedTasks.contains(it)).collect(Collectors.toList());
-        taskIds.forEach(taskId -> {
-            List<Field> data = getData(taskId);
-            Map<String, Field> dataFieldMap = data.stream().collect(Collectors.toMap(Field::getImportId, field -> field));
+        return groups;
+    }
 
-            collectedTasks.add(taskId);
-            data.forEach(field -> {
-                if (field.getType() == FieldType.TASK_REF) {
-                    collectTaskRefDataGroups((TaskField) dataFieldMap.get(field.getImportId()), resources, collectedTasks);
-                } else {
-                    field.setImportId(taskId + "-" + field.getImportId());
-                    field.setOrder((long) (resources.size() - 1));
-                    resources.add(field);
+
+    private void iterateTaskRefDataGroups(List<DataGroup> taskRefDataGroups, TaskField taskRefField, WrappingLayout wrappingLayout) {
+        int maxWrapping = wrappingLayout.getWrapping();
+        int maxRows = 0;
+        for (DataGroup dataGroup : taskRefDataGroups) {
+            for (LocalisedField localisedField : dataGroup.getFields().getContent()) {
+                if (localisedField.getLayout() == null || taskRefField.getLayout() == null) {
+                    return;
                 }
-            });
-        });
+                localisedField.getLayout().setY(taskRefField.getLayout().getY() + localisedField.getLayout().getY() + maxWrapping);
+                if (localisedField.getLayout().getRows() > maxRows) {
+                    maxRows = localisedField.getLayout().getRows();
+                }
+            }
+        }
+        if (maxWrapping + maxRows > wrappingLayout.getWrapping()) {
+            wrappingLayout.setWrapping(maxWrapping + maxRows);
+        }
     }
 
     @Override
