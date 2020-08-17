@@ -170,7 +170,7 @@ public class WorkflowController {
     }
 
     @RequestMapping(value = "/case/{id}", method = RequestMethod.DELETE)
-    public MessageResource deleteCase(@PathVariable("id") String caseId) throws UnauthorisedRequestException {
+    public MessageResource deleteCase(@PathVariable("id") String caseId, @RequestParam(defaultValue = "false") boolean deleteSubtree) throws UnauthorisedRequestException {
         User logged = userService.getLoggedUser();
         Case requestedCase = workflowService.findOne(caseId);
         if( !logged.transformToLoggedUser().isAdmin() && !logged.getId().equals(requestedCase.getAuthor().getId()))
@@ -178,7 +178,11 @@ public class WorkflowController {
 
         try {
             caseId = URLDecoder.decode(caseId, StandardCharsets.UTF_8.name());
-            workflowService.deleteCase(caseId);
+            if(deleteSubtree) {
+                workflowService.deleteSubtreeRootedAt(caseId);
+            } else {
+                workflowService.deleteCase(caseId);
+            }
             return MessageResource.successMessage("Case " + caseId + " was deleted");
         } catch (UnsupportedEncodingException e) {
             log.error("Deleting case ["+caseId+"] failed:",e);
