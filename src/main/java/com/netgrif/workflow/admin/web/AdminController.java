@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -28,6 +29,11 @@ import static com.netgrif.workflow.workflow.web.responsebodies.MessageResource.*
 
 @RestController
 @RequestMapping("/api/admin")
+@ConditionalOnProperty(
+        value = "nae.admin.web.enabled",
+        havingValue = "true",
+        matchIfMissing = true
+)
 public class AdminController {
 
     private static final Logger log = LoggerFactory.getLogger(AdminController.class.getName());
