@@ -15,12 +15,16 @@ public class ViewFactory {
             return buildListView(data);
         } else if (data.getView().getEditor() != null) {
             return new EditorView();
+        } else if (data.getView().getArea() != null) {
+            return new View("area");
         } else if (data.getView().getAutocomplete() != null) {
             return new View("autocomplete");
         } else if (data.getView().getTree() != null) {
             return new TreeView();
         } else if (data.getView().getTable() != null) {
             return new TableView();
+        } else if (data.getView().getButtonType() != null) {
+            return new View(data.getView().getButtonType());
         } else {
             throw new UnsupportedViewException();
         }
