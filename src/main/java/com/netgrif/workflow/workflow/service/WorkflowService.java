@@ -114,6 +114,7 @@ public class WorkflowService implements IWorkflowService {
         Case useCase = caseOptional.get();
         setPetriNet(useCase);
         decryptDataSet(useCase);
+        this.setImmediateDataFieldsReadOnly(useCase);
         return useCase;
     }
 
@@ -160,26 +161,6 @@ public class WorkflowService implements IWorkflowService {
     public long count(Map<String, Object> request, LoggedUser user, Locale locale) {
         Predicate searchPredicate = searchService.buildQuery(request, user, locale);
         return repository.count(searchPredicate);
-    }
-
-    @Override
-    public List<Case> getCaseFieldChoices(Pageable pageable, String caseId, String fieldId) {
-        Optional<Case> caseOptional = repository.findById(caseId);
-        if (!caseOptional.isPresent())
-            throw new IllegalArgumentException("Could not find case with id [" + caseId + "]");
-        Case useCase = caseOptional.get();
-
-        CaseField field = (CaseField) useCase.getPetriNet().getDataSet().get(fieldId);
-
-        List<Case> list = new LinkedList<>();
-        field.getConstraintNetIds().forEach((netImportId, fieldImportIds) -> {
-            Optional<PetriNet> netOptional = petriNetRepository.findById(netImportId);
-            if (!netOptional.isPresent())
-                throw new IllegalArgumentException("Could not find model with id [" + netImportId + "]");
-            list.addAll(repository.findAllByProcessIdentifier(netOptional.get().getIdentifier()));
-        });
-
-        return list;
     }
 
     @Override
@@ -230,6 +211,15 @@ public class WorkflowService implements IWorkflowService {
         repository.delete(useCase);
 
         publisher.publishEvent(new DeleteCaseEvent(useCase));
+    }
+
+    @Override
+    public void deleteSubtreeRootedAt(String subtreeRootCaseId) {
+        Case subtreeRoot = findOne(subtreeRootCaseId);
+        if (subtreeRoot.getImmediateDataFields().contains("treeChildCases")) {
+            ((List<String>) subtreeRoot.getDataSet().get("treeChildCases").getValue()).forEach(this::deleteSubtreeRootedAt);
+        }
+        deleteCase(subtreeRootCaseId);
     }
 
     @Override
