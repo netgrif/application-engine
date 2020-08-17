@@ -28,6 +28,8 @@ public interface IWorkflowService {
 
     void deleteCase(String caseId);
 
+    void deleteSubtreeRootedAt(String caseId);
+
     void updateMarking(Case useCase);
 
     Page<Case> searchAll(Predicate predicate);
