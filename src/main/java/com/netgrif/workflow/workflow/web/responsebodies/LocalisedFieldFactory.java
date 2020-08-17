@@ -27,6 +27,8 @@ public class LocalisedFieldFactory {
             return fromUser((UserField) field, locale);
         } else if (field instanceof CaseField) {
             return fromCase((CaseField) field, locale);
+        } else if (field instanceof FileListField) {
+            return fromFileList((FileListField) field, locale);
         } else {
             return fromGeneral(field, locale);
         }
@@ -70,5 +72,9 @@ public class LocalisedFieldFactory {
 
     private static LocalisedField fromCase(CaseField field, Locale locale) {
         return new LocalisedCaseField(field, locale);
+    }
+
+    public static LocalisedField fromFileList(FileListField field, Locale locale) {
+        return new LocalisedFileListField(field, locale);
     }
 }
