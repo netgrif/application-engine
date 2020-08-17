@@ -2,7 +2,6 @@ package com.netgrif.workflow.workflow.service;
 
 import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.elastic.domain.ElasticCase;
-import com.netgrif.workflow.elastic.service.ElasticCaseService;
 import com.netgrif.workflow.elastic.service.interfaces.IElasticCaseService;
 import com.netgrif.workflow.event.events.usecase.CreateCaseEvent;
 import com.netgrif.workflow.event.events.usecase.DeleteCaseEvent;
@@ -14,6 +13,9 @@ import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.petrinet.domain.dataset.FieldType;
 import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository;
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
+import com.netgrif.workflow.rules.domain.facts.CaseCreatedFact;
+import com.netgrif.workflow.petrinet.domain.EventPhase;
+import com.netgrif.workflow.rules.service.interfaces.IRuleEngine;
 import com.netgrif.workflow.security.service.EncryptionService;
 import com.netgrif.workflow.utils.FullPageRequest;
 import com.netgrif.workflow.workflow.domain.Case;
@@ -78,8 +80,14 @@ public class WorkflowService implements IWorkflowService {
     private FieldFactory fieldFactory;
 
     @Autowired
-    @Lazy
+    private IRuleEngine ruleEngine;
+
     private IElasticCaseService elasticCaseService;
+
+    @Autowired
+    public void setElasticCaseService(IElasticCaseService elasticCaseService) {
+        this.elasticCaseService = elasticCaseService;
+    }
 
     @Override
     public Case save(Case useCase) {
@@ -88,11 +96,12 @@ public class WorkflowService implements IWorkflowService {
         }
         encryptDataSet(useCase);
         useCase = repository.save(useCase);
+
         try {
             setImmediateDataFields(useCase);
             elasticCaseService.indexNow(new ElasticCase(useCase));
         } catch (Exception e) {
-            log.error("Indexing failed ["+useCase.getStringId()+"]", e);
+            log.error("Indexing failed [" + useCase.getStringId() + "]", e);
         }
         return useCase;
     }
@@ -101,10 +110,11 @@ public class WorkflowService implements IWorkflowService {
     public Case findOne(String caseId) {
         Optional<Case> caseOptional = repository.findById(caseId);
         if (!caseOptional.isPresent())
-            throw new IllegalArgumentException("Could not find Case with id ["+caseId+"]");
+            throw new IllegalArgumentException("Could not find Case with id [" + caseId + "]");
         Case useCase = caseOptional.get();
         setPetriNet(useCase);
         decryptDataSet(useCase);
+        this.setImmediateDataFieldsReadOnly(useCase);
         return useCase;
     }
 
@@ -154,26 +164,6 @@ public class WorkflowService implements IWorkflowService {
     }
 
     @Override
-    public List<Case> getCaseFieldChoices(Pageable pageable, String caseId, String fieldId) {
-        Optional<Case> caseOptional = repository.findById(caseId);
-        if (!caseOptional.isPresent())
-            throw new IllegalArgumentException("Could not find case with id ["+caseId+"]");
-        Case useCase = caseOptional.get();
-
-        CaseField field = (CaseField) useCase.getPetriNet().getDataSet().get(fieldId);
-
-        List<Case> list = new LinkedList<>();
-        field.getConstraintNetIds().forEach((netImportId, fieldImportIds) -> {
-            Optional<PetriNet> netOptional = petriNetRepository.findById(netImportId);
-            if (!netOptional.isPresent())
-                throw new IllegalArgumentException("Could not find model with id ["+netImportId+"]");
-            list.addAll(repository.findAllByProcessIdentifier(netOptional.get().getIdentifier()));
-        });
-
-        return list;
-    }
-
-    @Override
     public Case createCase(String netId, String title, String color, LoggedUser user) {
         PetriNet petriNet = petriNetService.clone(new ObjectId(netId));
         Case useCase = new Case(title, petriNet, petriNet.getActivePlaces());
@@ -182,15 +172,20 @@ public class WorkflowService implements IWorkflowService {
         useCase.setAuthor(user.transformToAuthor());
         useCase.setIcon(petriNet.getIcon());
         useCase.setCreationDate(LocalDateTime.now());
+
+        ruleEngine.evaluateRules(useCase, new CaseCreatedFact(useCase.getStringId(), EventPhase.PRE));
         useCase = save(useCase);
 
         publisher.publishEvent(new CreateCaseEvent(useCase));
-        log.info("["+useCase.getStringId()+"]: Case " + title + " created");
+        log.info("[" + useCase.getStringId() + "]: Case " + title + " created");
 
         useCase.getPetriNet().initializeVarArcs(useCase.getDataSet());
         taskService.reloadTasks(useCase);
 
         useCase = findOne(useCase.getStringId());
+        ruleEngine.evaluateRules(useCase, new CaseCreatedFact(useCase.getStringId(), EventPhase.POST));
+        useCase = save(useCase);
+
         return setImmediateDataFields(useCase);
     }
 
@@ -208,14 +203,23 @@ public class WorkflowService implements IWorkflowService {
     public void deleteCase(String caseId) {
         Optional<Case> caseOptional = repository.findById(caseId);
         if (!caseOptional.isPresent())
-            throw new IllegalArgumentException("Could not find case with id ["+caseId+"]");
+            throw new IllegalArgumentException("Could not find case with id [" + caseId + "]");
         Case useCase = caseOptional.get();
-        log.info("["+caseId+"]: Deleting case " + useCase.getTitle());
+        log.info("[" + caseId + "]: Deleting case " + useCase.getTitle());
 
         taskService.deleteTasksByCase(caseId);
         repository.delete(useCase);
 
         publisher.publishEvent(new DeleteCaseEvent(useCase));
+    }
+
+    @Override
+    public void deleteSubtreeRootedAt(String subtreeRootCaseId) {
+        Case subtreeRoot = findOne(subtreeRootCaseId);
+        if (subtreeRoot.getImmediateDataFields().contains("treeChildCases")) {
+            ((List<String>) subtreeRoot.getDataSet().get("treeChildCases").getValue()).forEach(this::deleteSubtreeRootedAt);
+        }
+        deleteCase(subtreeRootCaseId);
     }
 
     @Override
@@ -230,7 +234,7 @@ public class WorkflowService implements IWorkflowService {
     public boolean removeTasksFromCase(Iterable<? extends Task> tasks, String caseId) {
         Optional<Case> caseOptional = repository.findById(caseId);
         if (!caseOptional.isPresent())
-            throw new IllegalArgumentException("Could not find case with id ["+caseId+"]");
+            throw new IllegalArgumentException("Could not find case with id [" + caseId + "]");
         Case useCase = caseOptional.get();
         return removeTasksFromCase(tasks, useCase);
     }
@@ -258,7 +262,7 @@ public class WorkflowService implements IWorkflowService {
 
     @Override
     public Case searchOne(Predicate predicate) {
-        Page<Case> page = search(predicate, new PageRequest(0,1));
+        Page<Case> page = search(predicate, new PageRequest(0, 1));
         if (page.getContent().isEmpty())
             return null;
         return page.getContent().get(0);
@@ -267,7 +271,7 @@ public class WorkflowService implements IWorkflowService {
     public List<Field> getData(String caseId) {
         Optional<Case> optionalUseCase = repository.findById(caseId);
         if (!optionalUseCase.isPresent())
-            throw new IllegalArgumentException("Could not find case with id ["+caseId+"]");
+            throw new IllegalArgumentException("Could not find case with id [" + caseId + "]");
         Case useCase = optionalUseCase.get();
         List<Field> fields = new ArrayList<>();
         useCase.getDataSet().forEach((id, dataField) -> {
