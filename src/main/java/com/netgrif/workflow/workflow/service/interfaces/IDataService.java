@@ -62,4 +62,5 @@ public interface IDataService {
     Map<String, ChangedField> runActions(List<Action> actions, String useCaseId, Transition transition);
 
     void validateCaseRefValue(List<String> value, List<String> allowedNets) throws IllegalArgumentException;
+
 }

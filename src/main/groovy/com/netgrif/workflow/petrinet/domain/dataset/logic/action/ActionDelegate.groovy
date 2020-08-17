@@ -157,6 +157,7 @@ class ActionDelegate {
                         changedFields[field.stringId] = new ChangedField(field.stringId)
                     }
                     changedFields[field.stringId].addBehavior(useCase.dataSet.get(field.stringId).behavior)
+                    changedFields[field.stringId].addAttribute("type", field.type.name)
                 }
             }]
         }]
@@ -168,6 +169,7 @@ class ActionDelegate {
             changedFields[field.stringId] = new ChangedField(field.stringId)
         }
         changedFields[field.stringId].addAttribute("value", field.value)
+        changedFields[field.stringId].addAttribute("type", field.type.name)
     }
 
     def saveChangedChoices(ChoiceField field) {
