@@ -13,8 +13,6 @@ public interface ITaskAuthorizationService {
 
 	boolean isAssignee(LoggedUser loggedUser, String taskId);
 
-	void checkUsersPermissions(User logged, String taskId) throws UnauthorisedRequestException;
-
 	boolean isAssignee(User user, String taskId);
 
 	boolean isAssignee(User user, Task task);
