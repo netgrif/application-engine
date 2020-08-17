@@ -9,6 +9,7 @@ import com.netgrif.workflow.workflow.web.responsebodies.MessageResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -23,6 +24,11 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/elastic")
+@ConditionalOnProperty(
+        value = "nae.elastic.web.enabled",
+        havingValue = "true",
+        matchIfMissing = true
+)
 public class ElasticController {
 
     private static final Logger log = LoggerFactory.getLogger(ElasticController.class.getName());

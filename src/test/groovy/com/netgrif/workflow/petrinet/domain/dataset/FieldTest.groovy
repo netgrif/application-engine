@@ -79,7 +79,7 @@ class FieldTest {
     private void assertNet() {
         assert limitsNetOptional.isPresent()
         net = limitsNetOptional.get()
-        assert net.dataSet.size() == 9
+        assert net.dataSet.size() == 10
     }
 
     private void assertNumberField() {
@@ -169,5 +169,12 @@ class FieldTest {
         assert field.description.defaultValue == "DateTime field description"
         assert field.name.defaultValue == "DateTime"
         assert field.placeholder.defaultValue == "DateTime field placeholder"
+    }
+
+    private void assertCaseRef() {
+        CaseField field = net.dataSet["caseRef"] as CaseField
+        assert field.name.defaultValue == "CaseRef"
+        assert field.allowedNets.size() == 2
+        assert field.allowedNets.containsAll(["processId1", "processId2"])
     }
 }
