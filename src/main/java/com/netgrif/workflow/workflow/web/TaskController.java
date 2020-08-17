@@ -251,8 +251,9 @@ public class TaskController {
     }
 
     @RequestMapping(value = "/{id}/file/{field}", method = RequestMethod.DELETE)
-    public MessageResource deleteFile(@PathVariable("id") String taskId, @PathVariable("field") String fieldId) throws UnauthorisedRequestException {
-        taskAuthenticationService.checkUsersPermissions(userService.getLoggedUser(), taskId);
+    @PreAuthorize("@taskAuthorizationService.canCallSaveFile(#auth.getPrincipal(), #taskId)")
+    public MessageResource deleteFile(Authentication auth, @PathVariable("id") String taskId, @PathVariable("field") String fieldId) {
+        LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
 
         if (dataService.deleteFile(taskId, fieldId))
             return MessageResource.successMessage("File in field " + fieldId + " within task " + taskId + " was successfully deleted");
@@ -260,9 +261,10 @@ public class TaskController {
     }
 
     @RequestMapping(value = "/{id}/files/{field}", method = RequestMethod.POST)
-    public ChangedFieldByFileFieldContainer saveFiles(@PathVariable("id") String taskId, @PathVariable("field") String fieldId,
-                                                      @RequestParam(value = "files") MultipartFile[] multipartFiles) throws UnauthorisedRequestException {
-        taskAuthenticationService.checkUsersPermissions(userService.getLoggedUser(), taskId);
+    @PreAuthorize("@taskAuthorizationService.canCallSaveFile(#auth.getPrincipal(), #taskId)")
+    public ChangedFieldByFileFieldContainer saveFiles(Authentication auth, @PathVariable("id") String taskId, @PathVariable("field") String fieldId,
+                                                      @RequestParam(value = "files") MultipartFile[] multipartFiles) {
+        LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
 
         return dataService.saveFiles(taskId, fieldId, multipartFiles);
     }
@@ -286,9 +288,9 @@ public class TaskController {
     }
 
     @RequestMapping(value = "/{id}/file/{field}/{name}", method = RequestMethod.DELETE)
-    public MessageResource deleteNamedFile(@PathVariable("id") String taskId, @PathVariable("field") String fieldId, @PathVariable("name") String name)
-            throws UnauthorisedRequestException {
-        taskAuthenticationService.checkUsersPermissions(userService.getLoggedUser(), taskId);
+    @PreAuthorize("@taskAuthorizationService.canCallSaveFile(#auth.getPrincipal(), #taskId)")
+    public MessageResource deleteNamedFile(Authentication auth, @PathVariable("id") String taskId, @PathVariable("field") String fieldId, @PathVariable("name") String name) {
+        LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
 
         if (dataService.deleteFileByName(taskId, fieldId, name))
             return MessageResource.successMessage("File with name " + name + " in field " + fieldId + " within task " + taskId + " was successfully deleted");
