@@ -32,6 +32,7 @@ import java.util.function.BinaryOperator;
 import java.util.stream.Collectors;
 
 import static org.elasticsearch.index.query.QueryBuilders.*;
+import static org.elasticsearch.index.query.QueryBuilders.termQuery;
 
 @Service
 public class ElasticTaskService implements IElasticTaskService {
@@ -160,6 +161,7 @@ public class ElasticTaskService implements IElasticTaskService {
         buildProcessQuery(request, query);
         buildFullTextQuery(request, query);
         buildStringQuery(request, query);
+        buildTransitionQuery(request, query);
 
         return query;
     }
@@ -314,5 +316,30 @@ public class ElasticTaskService implements IElasticTaskService {
         }
 
         query.must(queryStringQuery(request.query));
+    }
+
+    /**
+     * Tasks with transition id "document"
+     * {
+     * "transitionId": "document"
+     * }
+     * <p>
+     * Tasks with transition id "document" OR "folder"
+     * {
+     * "transitionId": [
+     * "document",
+     * "folder",
+     * ]
+     * }
+     */
+    private void buildTransitionQuery(TaskSearchRequest request, BoolQueryBuilder query) {
+        if (request.transitionId == null || request.transitionId.isEmpty()) {
+            return;
+        }
+
+        BoolQueryBuilder transitionQuery = boolQuery();
+        request.transitionId.forEach(transitionId -> transitionQuery.should(termQuery("transitionId", transitionId)));
+
+        query.filter(transitionQuery);
     }
 }

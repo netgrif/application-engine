@@ -8,6 +8,7 @@ import com.netgrif.workflow.event.events.usecase.DeleteCaseEvent;
 import com.netgrif.workflow.event.events.usecase.UpdateMarkingEvent;
 import com.netgrif.workflow.importer.service.FieldFactory;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
+import com.netgrif.workflow.petrinet.domain.dataset.CaseField;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.petrinet.domain.dataset.FieldType;
 import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository;
@@ -198,6 +199,15 @@ public class WorkflowService implements IWorkflowService {
         repository.delete(useCase);
 
         publisher.publishEvent(new DeleteCaseEvent(useCase));
+    }
+
+    @Override
+    public void deleteSubtreeRootedAt(String subtreeRootCaseId) {
+        Case subtreeRoot = findOne(subtreeRootCaseId);
+        if (subtreeRoot.getImmediateDataFields().contains("treeChildCases")) {
+            ((List<String>) subtreeRoot.getDataSet().get("treeChildCases").getValue()).forEach(this::deleteSubtreeRootedAt);
+        }
+        deleteCase(subtreeRootCaseId);
     }
 
     @Override
