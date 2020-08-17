@@ -3,6 +3,7 @@ package com.netgrif.workflow.auth.service;
 import com.netgrif.workflow.auth.domain.*;
 import com.netgrif.workflow.auth.domain.repositories.AuthorityRepository;
 import com.netgrif.workflow.auth.domain.repositories.UserRepository;
+import com.netgrif.workflow.auth.domain.throwable.UnauthorisedRequestException;
 import com.netgrif.workflow.auth.service.interfaces.IUserProcessRoleService;
 import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.auth.web.requestbodies.UpdateUserRequest;
@@ -11,6 +12,7 @@ import com.netgrif.workflow.orgstructure.domain.Member;
 import com.netgrif.workflow.orgstructure.service.IMemberService;
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRoleRepository;
 import com.netgrif.workflow.startup.SystemUserRunner;
+import com.netgrif.workflow.workflow.service.interfaces.ITaskAuthenticationService;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
@@ -168,11 +170,14 @@ public class UserService implements IUserService {
         members.add(loggedUser.getId());
         BooleanExpression predicate = QUser.user
                 .id.in(members)
-                .and(QUser.user.state.eq(UserState.ACTIVE))
-                .andAnyOf(
-                        QUser.user.email.containsIgnoreCase(query),
-                        QUser.user.name.containsIgnoreCase(query),
-                        QUser.user.surname.containsIgnoreCase(query));
+                .and(QUser.user.state.eq(UserState.ACTIVE));
+        for (String word : query.split(" ")) {
+            predicate = predicate
+                    .andAnyOf(QUser.user.email.containsIgnoreCase(word),
+                              QUser.user.name.containsIgnoreCase(word),
+                              QUser.user.surname.containsIgnoreCase(word));
+        }
+
         Page<User> users = userRepository.findAll(predicate, pageable);
         if (!small)
             users.forEach(this::loadProcessRoles);
