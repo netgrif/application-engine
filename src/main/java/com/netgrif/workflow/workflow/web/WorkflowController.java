@@ -19,6 +19,7 @@ import com.querydsl.core.types.Predicate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
@@ -46,6 +47,11 @@ import java.util.Map;
 
 @RestController()
 @RequestMapping("/api/workflow")
+@ConditionalOnProperty(
+        value = "nae.case.web.enabled",
+        havingValue = "true",
+        matchIfMissing = true
+)
 public class WorkflowController {
 
     private static final Logger log = LoggerFactory.getLogger(WorkflowController.class.getName());

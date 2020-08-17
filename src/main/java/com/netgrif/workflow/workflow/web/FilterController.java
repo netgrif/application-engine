@@ -10,6 +10,7 @@ import com.netgrif.workflow.workflow.web.responsebodies.FilterResourceAssembler;
 import com.netgrif.workflow.workflow.web.responsebodies.LocalisedFilterResource;
 import com.netgrif.workflow.workflow.web.responsebodies.MessageResource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedResourcesAssembler;
@@ -24,6 +25,11 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/filter")
+@ConditionalOnProperty(
+        value = "nae.filter.web.enabled",
+        havingValue = "true",
+        matchIfMissing = true
+)
 public class FilterController {
 
     @Autowired
