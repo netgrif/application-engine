@@ -1,0 +1,348 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://modeler.netgrif.com/petriflow_schema.xsd">
+	<id>new_model</id>
+	<version>1.0.0</version>
+	<initials>PER</initials>
+	<title>Personal Information</title>
+	<icon>contacts</icon>
+    <i18n locale="en">
+        <i18nString name="surName">Surname</i18nString>
+        <i18nString name="question">Question</i18nString>
+        <i18nString name="answer">Answer</i18nString>
+        <i18nString name="subjectQuestion">Question Subject</i18nString>
+        <i18nString name="order">Order</i18nString>
+        <i18nString name="assigned">Assigned</i18nString>
+        <i18nString name="sentTo">Sent to</i18nString>
+        <i18nString name="department">Department</i18nString>
+        <i18nString name="taskAuthor">Task Author</i18nString>
+        <i18nString name="listOfItems">List of items</i18nString>
+        <i18nString name="viewQuestion">View question</i18nString>
+        <i18nString name="hideQuestion">Hide question</i18nString>
+        <i18nString name="questionTitle">Question Name</i18nString>
+        <i18nString name="questionText">Question Text</i18nString>
+        <i18nString name="questionAnswer">Question Answer</i18nString>
+        <i18nString name="answerExpert">Answer from expert</i18nString>
+        <i18nString name="assignAnswer">Assign Answer</i18nString>
+        <i18nString name="managementOfItems">Management of Items</i18nString>
+        <i18nString name="questionAndAnswer">Question and Answer</i18nString>
+        <i18nString name="questionDetails">Question Details</i18nString>
+
+    </i18n>
+	<!-- TRANSACTIONS -->
+	<!-- ROLES -->
+	<!-- DATA -->
+	<data type="text">
+		<id>first_name</id>
+		<title>Name</title>
+		<placeholder>Your name</placeholder>
+		<desc>Your first name</desc>
+		<init>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum is simply dummy text of the printing and typesetting industry. </init>
+	</data>
+	<data type="text">
+		<id>surname</id>
+		<title name="surName">Priezvisko</title>
+		<placeholder>Your surname</placeholder>
+		<desc>Your second name</desc>
+		<init>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum is simply dummy text of the printing and typesetting industry. </init>
+	</data>
+	<data type="date">
+		<id>date_of_birth</id>
+		<title>Date of Birth</title>
+	</data>
+	<data type="number">
+		<id>number_0</id>
+		<title>Počet detí</title>
+		<placeholder>placeholder</placeholder>
+		<desc>description</desc>
+		<init>123546369</init>
+	</data>
+	<data type="multichoice">
+		<id>multichoice_0</id>
+		<title>Ako často navštevujete náš aquapark?</title>
+		<placeholder>placeholder</placeholder>
+		<desc>description</desc>
+		<values>denne</values>
+		<values>tyzdenne</values>
+		<values>mesacne</values>
+	</data>
+	<data type="multichoice">
+		<id>multichoice_1</id>
+		<title>Voda je u nás:</title>
+		<placeholder>placeholder</placeholder>
+		<desc>description</desc>
+		<values>Studená</values>
+		<values>Dobrá</values>
+		<values>Teplá</values>
+	</data>
+	<data type="enumeration">
+		<id>enumeration_0</id>
+		<title>Využívate aj neštandardné služby?</title>
+		<placeholder>placeholder</placeholder>
+		<desc>description</desc>
+		<values>Áno</values>
+		<values>Nie</values>
+	</data>
+	<data type="text">
+		<id>text_0</id>
+		<title>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500</title>
+		<placeholder>placeholder</placeholder>
+		<desc>description</desc>
+		<init>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum is simply dummy text of the printing and typesetting industry. </init>
+	</data>
+	<data type="enumeration">
+		<id>enumeration_1</id>
+		<title>Koľko peňazí priemerne miniete počas jednej návštevy?</title>
+		<placeholder>placeholder</placeholder>
+		<desc>description</desc>
+		<values>Veľa</values>
+		<values>Viac než by som išiel nakupovať cez víkend alebo pred Vianocami.</values>
+		<values>Lorem Ipsum is simply dummy text of the printing and typesetting industry.</values>
+	</data>
+	<data type="multichoice">
+		<id>multichoice_2</id>
+		<title>It is a long established fact that a reader will be distracted by the readable content of a page when ?</title>
+		<placeholder>placeholder</placeholder>
+		<desc>description</desc>
+		<values>It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout.</values>
+		<values>It is a long fact that a reader will be distracted by the readable content of a page when looking at its layout.</values>
+		<values>It is a long established fact that a reader will be distracted by the readable content of a page when at its layout.</values>
+	</data>
+	<data type="multichoice">
+		<id>multichoice_3</id>
+		<title>set label</title>
+		<placeholder>placeholder</placeholder>
+		<desc>description</desc>
+		<values>option1</values>
+		<values>option2</values>
+		<values>option3</values>
+	</data>
+	<data type="boolean">
+		<id>boolean_1</id>
+		<title>set label?</title>
+	</data>
+	<data type="user">
+		<id>[object Object]_0</id>
+		<title>set label</title>
+		<placeholder>placeholder</placeholder>
+		<desc>description</desc>
+	</data>
+	<data type="file">
+		<id>[object Object]_1</id>
+		<title>set label</title>
+		<placeholder>placeholder</placeholder>
+	</data>
+	<!-- I18NS -->
+	<!-- TRANSITIONS -->
+	<transition>
+		<id>1</id>
+		<x>150</x>
+		<y>150</y>
+		<cols>4</cols>
+		<label>Personal information</label>
+		<dataRef>
+			<id>surname</id>
+			<logic>
+				<behavior>editable</behavior>
+			</logic>
+			<layout>
+				<x>0</x>
+				<y>0</y>
+				<rows>1</rows>
+				<cols>2</cols>
+				<template>netgrif</template>
+				<appearance>standard</appearance>
+			</layout>
+		</dataRef>
+		<dataRef>
+			<id>first_name</id>
+			<logic>
+				<behavior>editable</behavior>
+			</logic>
+			<layout>
+				<x>2</x>
+				<y>0</y>
+				<rows>1</rows>
+				<cols>2</cols>
+				<template>netgrif</template>
+				<appearance>standard</appearance>
+			</layout>
+		</dataRef>
+		<dataRef>
+			<id>date_of_birth</id>
+			<logic>
+				<behavior>editable</behavior>
+			</logic>
+			<layout>
+				<x>0</x>
+				<y>1</y>
+				<rows>1</rows>
+				<cols>2</cols>
+				<template>netgrif</template>
+				<appearance>standard</appearance>
+			</layout>
+		</dataRef>
+		<dataRef>
+			<id>number_0</id>
+			<logic>
+				<behavior>editable</behavior>
+			</logic>
+			<layout>
+				<x>2</x>
+				<y>1</y>
+				<rows>2</rows>
+				<cols>2</cols>
+				<template>netgrif</template>
+				<appearance>outline</appearance>
+			</layout>
+		</dataRef>
+		<dataRef>
+			<id>multichoice_0</id>
+			<logic>
+				<behavior>editable</behavior>
+			</logic>
+			<layout>
+				<x>0</x>
+				<y>2</y>
+				<rows>3</rows>
+				<cols>2</cols>
+				<template>netgrif</template>
+				<appearance>outline</appearance>
+			</layout>
+		</dataRef>
+		<dataRef>
+			<id>multichoice_1</id>
+			<logic>
+				<behavior>editable</behavior>
+			</logic>
+			<layout>
+				<x>2</x>
+				<y>3</y>
+				<rows>2</rows>
+				<cols>1</cols>
+				<template>netgrif</template>
+				<appearance>outline</appearance>
+			</layout>
+		</dataRef>
+		<dataRef>
+			<id>enumeration_0</id>
+			<logic>
+				<behavior>editable</behavior>
+			</logic>
+			<layout>
+				<x>3</x>
+				<y>3</y>
+				<rows>2</rows>
+				<cols>1</cols>
+				<template>netgrif</template>
+				<appearance>outline</appearance>
+			</layout>
+		</dataRef>
+		<dataRef>
+			<id>text_0</id>
+			<logic>
+				<behavior>editable</behavior>
+			</logic>
+			<layout>
+				<x>0</x>
+				<y>5</y>
+				<rows>1</rows>
+				<cols>4</cols>
+				<template>netgrif</template>
+				<appearance>outline</appearance>
+			</layout>
+		</dataRef>
+		<dataRef>
+			<id>enumeration_1</id>
+			<logic>
+				<behavior>editable</behavior>
+			</logic>
+			<layout>
+				<x>0</x>
+				<y>6</y>
+				<rows>1</rows>
+				<cols>1</cols>
+				<template>netgrif</template>
+				<appearance>outline</appearance>
+			</layout>
+		</dataRef>
+		<dataRef>
+			<id>multichoice_2</id>
+			<logic>
+				<behavior>editable</behavior>
+			</logic>
+			<layout>
+				<x>1</x>
+				<y>6</y>
+				<rows>1</rows>
+				<cols>1</cols>
+				<template>netgrif</template>
+				<appearance>outline</appearance>
+			</layout>
+		</dataRef>
+		<dataRef>
+			<id>multichoice_3</id>
+			<logic>
+				<behavior>editable</behavior>
+			</logic>
+			<layout>
+				<x>2</x>
+				<y>6</y>
+				<rows>2</rows>
+				<cols>2</cols>
+				<template>netgrif</template>
+				<appearance>outline</appearance>
+			</layout>
+		</dataRef>
+		<dataRef>
+			<id>boolean_1</id>
+			<logic>
+				<behavior>editable</behavior>
+			</logic>
+			<layout>
+				<x>1</x>
+				<y>8</y>
+				<rows>3</rows>
+				<cols>2</cols>
+				<template>netgrif</template>
+			</layout>
+		</dataRef>
+		<dataRef>
+			<id>[object Object]_0</id>
+			<logic>
+				<behavior>editable</behavior>
+			</logic>
+			<layout>
+				<x>0</x>
+				<y>7</y>
+				<rows>1</rows>
+				<cols>1</cols>
+				<template>material</template>
+				<appearance>outline</appearance>
+			</layout>
+		</dataRef>
+		<dataRef>
+			<id>[object Object]_1</id>
+			<logic>
+				<behavior>editable</behavior>
+			</logic>
+			<layout>
+				<x>1</x>
+				<y>7</y>
+				<rows>1</rows>
+				<cols>1</cols>
+				<template>material</template>
+			</layout>
+		</dataRef>
+		<event type="finish">
+			<id></id>
+			<actions phase="pre">
+				<action>
+                    trans: t.this;
+                    generatePDF(trans.importId)
+                </action>
+			</actions>
+		</event>
+	</transition>
+	<!-- PLACES -->
+	<!-- ARCS -->
+</document>
