@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://modeler.netgrif.com/petriflow_schema.xsd">
+	<id>rule_engine_test</id>
+	<version>1.0.0</version>
+	<initials>RLN</initials>
+	<title>Rule engine test process</title>
+	<icon>gavel</icon>
+	<defaultRole>true</defaultRole>
+	<transitionRole>false</transitionRole>
+	<!-- TRANSACTIONS -->
+	<!-- ROLES -->
+	<!-- DATA -->
+	<data type="text">
+		<id>text_data</id>
+		<title>Text</title>
+		<init>VALUE</init>
+	</data>
+	<data type="number">
+		<id>number_data</id>
+		<title>Number</title>
+	</data>
+	<!-- TRANSITIONS -->
+	<transition>
+		<id>2</id>
+		<x>340</x>
+		<y>180</y>
+		<label>Task 1</label>
+	</transition>
+	<transition>
+		<id>4</id>
+		<x>500</x>
+		<y>180</y>
+		<label>Task 2</label>
+	</transition>
+	<!-- PLACES -->
+	<place>
+		<id>1</id>
+		<x>220</x>
+		<y>180</y>
+		<label>init</label>
+		<tokens>1</tokens>
+		<static>false</static>
+	</place>
+	<place>
+		<id>3</id>
+		<x>420</x>
+		<y>180</y>
+		<label></label>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
+	<place>
+		<id>5</id>
+		<x>620</x>
+		<y>180</y>
+		<label></label>
+		<tokens>0</tokens>
+		<static>false</static>
+	</place>
+	<!-- ARCS -->
+	<arc>
+		<id>6</id>
+		<type>regular</type>
+		<sourceId>1</sourceId>
+		<destinationId>2</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>7</id>
+		<type>regular</type>
+		<sourceId>2</sourceId>
+		<destinationId>3</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>8</id>
+		<type>regular</type>
+		<sourceId>3</sourceId>
+		<destinationId>4</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>9</id>
+		<type>regular</type>
+		<sourceId>4</sourceId>
+		<destinationId>5</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+</document>

@@ -28,6 +28,8 @@ public interface IWorkflowService {
 
     void deleteCase(String caseId);
 
+    void deleteSubtreeRootedAt(String caseId);
+
     void updateMarking(Case useCase);
 
     Page<Case> searchAll(Predicate predicate);
@@ -40,7 +42,7 @@ public interface IWorkflowService {
 
     long count(Map<String, Object> request, LoggedUser user, Locale locale);
 
-    List<Case> getCaseFieldChoices(Pageable pageable, String caseId, String fieldId);
+//    List<Case> getCaseFieldChoices(Pageable pageable, String caseId, String fieldId);
 
     boolean removeTasksFromCase(Iterable<? extends Task> tasks, String caseId);
 

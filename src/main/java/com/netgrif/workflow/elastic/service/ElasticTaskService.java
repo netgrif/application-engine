@@ -15,6 +15,7 @@ import org.elasticsearch.index.query.QueryStringQueryBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -31,6 +32,7 @@ import java.util.function.BinaryOperator;
 import java.util.stream.Collectors;
 
 import static org.elasticsearch.index.query.QueryBuilders.*;
+import static org.elasticsearch.index.query.QueryBuilders.termQuery;
 
 @Service
 public class ElasticTaskService implements IElasticTaskService {
@@ -43,10 +45,15 @@ public class ElasticTaskService implements IElasticTaskService {
     private ExecutorService executor = Executors.newSingleThreadExecutor();
 
     @Autowired
-    public ElasticTaskService(ElasticTaskRepository repository, ITaskService taskService, ElasticsearchTemplate template) {
+    public ElasticTaskService(ElasticTaskRepository repository, ElasticsearchTemplate template) {
         this.repository = repository;
-        this.taskService = taskService;
         this.template = template;
+    }
+
+    @Autowired
+    @Lazy
+    public void setTaskService(ITaskService taskService) {
+        this.taskService = taskService;
     }
 
     private Map<String, Float> fullTextFieldMap = ImmutableMap.of(
@@ -78,7 +85,7 @@ public class ElasticTaskService implements IElasticTaskService {
         executor.execute(() -> {
             ElasticTask elasticTask = repository.findByStringId(task.getStringId());
 
-            if (elasticTask == null ) {
+            if (elasticTask == null) {
                 elasticTask = new ElasticTask(task);
             } else {
                 elasticTask.update(task);
@@ -123,14 +130,14 @@ public class ElasticTaskService implements IElasticTaskService {
 
     private SearchQuery buildQuery(List<TaskSearchRequest> requests, LoggedUser user, Pageable pageable, Boolean isIntersection) {
         BinaryOperator<BoolQueryBuilder> reductionOperator;
-        if(isIntersection)
+        if (isIntersection)
             reductionOperator = BoolQueryBuilder::must;
         else
             reductionOperator = BoolQueryBuilder::should;
 
         BoolQueryBuilder query = requests.stream()
-                                            .map(request -> buildSingleQuery(request, user))
-                                            .reduce(new BoolQueryBuilder(), reductionOperator);
+                .map(request -> buildSingleQuery(request, user))
+                .reduce(new BoolQueryBuilder(), reductionOperator);
 
         NativeSearchQueryBuilder builder = new NativeSearchQueryBuilder();
         return builder
@@ -154,6 +161,7 @@ public class ElasticTaskService implements IElasticTaskService {
         buildProcessQuery(request, query);
         buildFullTextQuery(request, query);
         buildStringQuery(request, query);
+        buildTransitionQuery(request, query);
 
         return query;
     }
@@ -161,15 +169,15 @@ public class ElasticTaskService implements IElasticTaskService {
     /**
      * Tasks with role "5cb07b6ff05be15f0b972c31"
      * {
-     *     "role": "5cb07b6ff05be15f0b972c31"
+     * "role": "5cb07b6ff05be15f0b972c31"
      * }
-     *
+     * <p>
      * Tasks with role "5cb07b6ff05be15f0b972c31" OR "5cb07b6ff05be15f0b972c36"
      * {
-     *     "role": [
-     *         "5cb07b6ff05be15f0b972c31",
-     *         "5cb07b6ff05be15f0b972c36"
-     *     ]
+     * "role": [
+     * "5cb07b6ff05be15f0b972c31",
+     * "5cb07b6ff05be15f0b972c36"
+     * ]
      * }
      */
     private void buildRoleQuery(TaskSearchRequest request, BoolQueryBuilder query) {
@@ -188,15 +196,15 @@ public class ElasticTaskService implements IElasticTaskService {
     /**
      * Tasks of case with id "5cb07b6ff05be15f0b972c4d"
      * {
-     *     "case": "5cb07b6ff05be15f0b972c4d"
+     * "case": "5cb07b6ff05be15f0b972c4d"
      * }
-     *
+     * <p>
      * Tasks of cases with id "5cb07b6ff05be15f0b972c4d" OR "5cb07b6ff05be15f0b972c4e"
      * {
-     *     "case": [
-     *          "id": "5cb07b6ff05be15f0b972c4d",
-     *          "id": "5cb07b6ff05be15f0b972c4e"
-     *     ]
+     * "case": [
+     * "id": "5cb07b6ff05be15f0b972c4d",
+     * "id": "5cb07b6ff05be15f0b972c4e"
+     * ]
      * }
      */
     private void buildCaseQuery(TaskSearchRequest request, BoolQueryBuilder query) {
@@ -215,15 +223,15 @@ public class ElasticTaskService implements IElasticTaskService {
     /**
      * Tasks with title (default value) "New task"
      * {
-     *     "title": "New task"
+     * "title": "New task"
      * }
-     *
+     * <p>
      * Tasks with title (default value) "New task" OR "Status"
      * {
-     *     "title": [
-     *         "New task",
-     *         "Status"
-     *     ]
+     * "title": [
+     * "New task",
+     * "Status"
+     * ]
      * }
      */
     private void buildTitleQuery(TaskSearchRequest request, BoolQueryBuilder query) {
@@ -242,9 +250,9 @@ public class ElasticTaskService implements IElasticTaskService {
     /**
      * Tasks assigned to user with id 1
      * {
-     *     "user": 1
+     * "user": 1
      * }
-     *
+     * <p>
      * Tasks assigned to user with id 1 OR 2
      */
     private void buildUserQuery(TaskSearchRequest request, BoolQueryBuilder query) {
@@ -263,15 +271,15 @@ public class ElasticTaskService implements IElasticTaskService {
     /**
      * Tasks of process "document"
      * {
-     *     "process": "document"
+     * "process": "document"
      * }
-     *
+     * <p>
      * Tasks of process "document" OR "folder"
      * {
-     *     "process": [
-     *         "document",
-     *         "folder",
-     *     ]
+     * "process": [
+     * "document",
+     * "folder",
+     * ]
      * }
      */
     private void buildProcessQuery(TaskSearchRequest request, BoolQueryBuilder query) {
@@ -308,5 +316,30 @@ public class ElasticTaskService implements IElasticTaskService {
         }
 
         query.must(queryStringQuery(request.query));
+    }
+
+    /**
+     * Tasks with transition id "document"
+     * {
+     * "transitionId": "document"
+     * }
+     * <p>
+     * Tasks with transition id "document" OR "folder"
+     * {
+     * "transitionId": [
+     * "document",
+     * "folder",
+     * ]
+     * }
+     */
+    private void buildTransitionQuery(TaskSearchRequest request, BoolQueryBuilder query) {
+        if (request.transitionId == null || request.transitionId.isEmpty()) {
+            return;
+        }
+
+        BoolQueryBuilder transitionQuery = boolQuery();
+        request.transitionId.forEach(transitionId -> transitionQuery.should(termQuery("transitionId", transitionId)));
+
+        query.filter(transitionQuery);
     }
 }

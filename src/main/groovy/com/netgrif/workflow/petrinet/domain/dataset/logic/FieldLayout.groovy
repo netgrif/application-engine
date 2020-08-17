@@ -4,9 +4,10 @@ import com.netgrif.workflow.petrinet.domain.layout.Layout
 import com.querydsl.core.annotations.PropertyType
 import com.querydsl.core.annotations.QueryType
 
-class FieldLayout extends Layout{
+class FieldLayout extends Layout {
     private int x
     private int y
+    private int offset
     private String template
     private String appearance
 
@@ -14,12 +15,17 @@ class FieldLayout extends Layout{
         super()
     }
 
-    FieldLayout(int x, int y, int rows, int cols, String template, String appearance) {
+    FieldLayout(int x, int y, int rows, int cols, int offset, String template, String appearance) {
         super(rows, cols)
         this.x = x
         this.y = y
+        this.offset = offset
         this.template = template?.toLowerCase()
         this.appearance = appearance?.toLowerCase()
+    }
+
+    FieldLayout clone() {
+        return new FieldLayout(this.getX(), this.getY(), this.getRows(), this.getCols(), this.getTemplate(), this.getAppearance())
     }
 
     int getX() {
@@ -36,6 +42,14 @@ class FieldLayout extends Layout{
 
     void setY(int y) {
         this.y = y
+    }
+
+    int getOffset() {
+        return offset
+    }
+
+    void setOffset(int offset) {
+        this.offset = offset
     }
 
     String getTemplate() {
