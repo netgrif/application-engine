@@ -1,12 +1,17 @@
 package com.netgrif.workflow.petrinet.domain.layout;
 
+import com.netgrif.workflow.importer.model.Transition;
+import lombok.*;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class TaskLayout extends Layout {
 
-    public TaskLayout(Integer rows, Integer cols) {
-        super(rows, cols);
-    }
+    private Integer offset;
 
-    public TaskLayout() {
-        super();
+    public TaskLayout(Transition data) {
+        super(data.getLayout().getRows(), data.getLayout().getCols());
+        this.offset = data.getLayout().getOffset();
     }
 }
