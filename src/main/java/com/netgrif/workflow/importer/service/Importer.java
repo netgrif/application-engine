@@ -294,7 +294,7 @@ public class Importer {
         transition.setTitle(toI18NString(importTransition.getLabel()));
         transition.setPosition(importTransition.getX(), importTransition.getY());
         if (importTransition.getLayout() != null && (importTransition.getLayout().getCols() != null || importTransition.getLayout().getRows() != null)) {
-            transition.setLayout(new TaskLayout(importTransition.getLayout().getRows(), importTransition.getLayout().getCols(), importTransition.getLayout().getOffset()));
+            transition.setLayout(new TaskLayout(importTransition));
         }
 
         transition.setPriority(importTransition.getPriority());
