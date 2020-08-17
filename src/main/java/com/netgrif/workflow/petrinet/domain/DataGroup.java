@@ -59,4 +59,15 @@ public class DataGroup extends PetriNetObject {
             return null;
         return title.getTranslation(locale);
     }
+
+    public DataGroup clone() {
+        DataGroup group = new DataGroup();
+        group.setImportId(this.getImportId());
+        group.setTitle(this.getTitle());
+        group.setData(this.getData());
+        group.setLayout(this.getLayout());
+        group.setAlignment(this.getAlignment());
+        group.setStretch(this.getStretch());
+        return group;
+    }
 }
