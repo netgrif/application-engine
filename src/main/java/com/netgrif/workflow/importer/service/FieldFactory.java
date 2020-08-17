@@ -1,20 +1,16 @@
 package com.netgrif.workflow.importer.service;
 
 import com.netgrif.workflow.auth.domain.User;
-import com.netgrif.workflow.importer.model.*;
+import com.netgrif.workflow.importer.model.AllowedNets;
 import com.netgrif.workflow.importer.model.Data;
-import com.netgrif.workflow.importer.model.DocumentRef;
 import com.netgrif.workflow.importer.model.I18NStringType;
 import com.netgrif.workflow.petrinet.domain.Format;
 import com.netgrif.workflow.petrinet.domain.I18nString;
-import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.dataset.*;
 import com.netgrif.workflow.petrinet.domain.views.View;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.DataField;
-import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
@@ -24,14 +20,10 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Component
 public final class FieldFactory {
-
-    @Autowired
-    private IWorkflowService workflowService;
 
     @Autowired
     private FormatFactory formatFactory;
@@ -52,13 +44,16 @@ public final class FieldFactory {
                 field = new DateField();
                 break;
             case FILE:
-                field = buildFileField(data, importer);
+                field = buildFileField(data);
+                break;
+            case FILE_LIST:
+                field = buildFileListField(data);
                 break;
             case ENUMERATION:
-                    field = buildEnumerationField(data.getValues(), data.getInit(), importer);
+                field = buildEnumerationField(data.getValues(), data.getInit(), importer);
                 break;
             case MULTICHOICE:
-                    field = buildMultichoiceField(data.getValues(), data.getInit(), importer);
+                field = buildMultichoiceField(data.getValues(), data.getInit(), importer);
                 break;
             case NUMBER:
                 field = new NumberField();
@@ -66,8 +61,8 @@ public final class FieldFactory {
             case USER:
                 field = buildUserField(data, importer);
                 break;
-            case CASEREF:
-                field = buildCaseField(data, importer);
+            case CASE_REF:
+                field = buildCaseField(data);
                 break;
             case DATE_TIME:
                 field = new DateTimeField();
@@ -152,21 +147,13 @@ public final class FieldFactory {
         return new TextField(value);
     }
 
-    private CaseField buildCaseField(Data data, Importer importer) {
-        Map<String, LinkedHashSet<String>> netIds = new HashMap<>();
-        DocumentRef documentRef = data.getDocumentRef();
-
-        PetriNet net = importer.getNetByImportId(documentRef.getId());
-        LinkedHashSet<String> fieldIds = new LinkedHashSet<>();
-
-        net.getDataSet().values().forEach(field -> {
-            if (documentRef.getFields().contains(field.getImportId())) {
-                fieldIds.add(field.getStringId());
-            }
-        });
-
-        netIds.put(net.getStringId(), fieldIds);
-        return new CaseField(netIds);
+    private CaseField buildCaseField(Data data) {
+        AllowedNets nets = data.getAllowedNets();
+        if (nets == null) {
+            return new CaseField();
+        } else {
+            return new CaseField(new ArrayList<>(nets.getAllowedNet()));
+        }
     }
 
     private UserField buildUserField(Data data, Importer importer) {
@@ -176,10 +163,16 @@ public final class FieldFactory {
         return new UserField(roles);
     }
 
-    private FileField buildFileField(Data data, Importer importer) {
+    private FileField buildFileField(Data data) {
         FileField fileField = new FileField();
         fileField.setRemote(data.getRemote() != null);
         return fileField;
+    }
+
+    private FileListField buildFileListField(Data data) {
+        FileListField fileListField = new FileListField();
+        fileListField.setRemote(data.getRemote() != null);
+        return fileListField;
     }
 
     private void setActions(Field field, Data data) {
@@ -219,6 +212,9 @@ public final class FieldFactory {
             case FILE:
                 ((FileField) field).setDefaultValue(defaultValue);
                 break;
+            case FILELIST:
+                ((FileListField) field).setDefaultValue(defaultValue);
+                break;
             default:
                 field.setDefaultValue(defaultValue);
         }
@@ -251,6 +247,7 @@ public final class FieldFactory {
     public Field buildImmediateField(Case useCase, String fieldId) {
         Field field = useCase.getPetriNet().getDataSet().get(fieldId);
         resolveDataValues(field, useCase, fieldId);
+        resolveAttributeValues(field, useCase, fieldId);
         return field;
     }
 
@@ -264,9 +261,6 @@ public final class FieldFactory {
             case NUMBER:
                 field.setValue(parseNumberValue(useCase, fieldId));
                 break;
-            case CASEREF:
-                parseCaseRefValue((CaseField) field);
-                break;
             case ENUMERATION:
                 field.setValue(parseEnumValue(useCase, fieldId, (EnumerationField) field));
                 break;
@@ -278,6 +272,9 @@ public final class FieldFactory {
                 break;
             case FILE:
                 parseFileValue((FileField) field, useCase, fieldId);
+                break;
+            case FILELIST:
+                parseFileListValue((FileListField) field, useCase, fieldId);
                 break;
             case USER:
                 parseUserValues((UserField) field, useCase, fieldId);
@@ -431,25 +428,6 @@ public final class FieldFactory {
         }
     }
 
-    private void parseCaseRefValue(CaseField field) {
-        Case refCase = workflowService.findOne(field.getValue());
-        PetriNet net = refCase.getPetriNet();
-
-        if (field.getConstraintNetIds() == null || !field.getConstraintNetIds().containsKey(net.getImportId()))
-            return;
-
-        Map<String, Object> values = field.getConstraintNetIds().get(net.getImportId()).stream().map(otherFieldId -> {
-            Optional<Field> optional = net.getDataSet().values().stream().filter(netField -> Objects.equals(netField.getImportId(), otherFieldId)).findFirst();
-            if (!optional.isPresent()) {
-                throw new IllegalArgumentException("Field [" + otherFieldId + "] not present in net [" + net.getStringId() + "]");
-            }
-            String fieldStringId = optional.get().getStringId();
-            return Pair.of(fieldStringId, refCase.getDataSet().get(fieldStringId).getValue());
-        }).collect(Collectors.toMap(Pair::getFirst, Pair::getSecond));
-
-        field.setImmediateFieldValues(values);
-    }
-
     private void parseFileValue(FileField field, Case useCase, String fieldId) {
         Object value = useCase.getFieldValue(fieldId);
         if (value == null)
@@ -461,5 +439,26 @@ public final class FieldFactory {
             field.setValue((FileFieldValue) value);
         } else
             throw new IllegalArgumentException("Object " + value.toString() + " cannot be set as value to the File field [" + fieldId + "] !");
+    }
+
+    private void parseFileListValue(FileListField field, Case useCase, String fieldId) {
+        Object value = useCase.getFieldValue(fieldId);
+        if (value == null)
+            return;
+
+        if (value instanceof String) {
+            field.setValue((String) value);
+        } else if (value instanceof FileListFieldValue) {
+            field.setValue((FileListFieldValue) value);
+        } else {
+            throw new IllegalArgumentException("Object " + value.toString() + " cannot be set as value to the File list field [" + fieldId + "] !");
+        }
+    }
+
+    private void resolveAttributeValues(Field field, Case useCase, String fieldId) {
+        if (field.getType().equals(FieldType.CASE_REF)) {
+            List<String> allowedNets = new ArrayList<>(useCase.getDataSet().get(fieldId).getAllowedNets());
+            ((CaseField) field).setAllowedNets(allowedNets);
+        }
     }
 }
