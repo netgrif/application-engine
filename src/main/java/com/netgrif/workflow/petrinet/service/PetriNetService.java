@@ -20,6 +20,9 @@ import com.netgrif.workflow.petrinet.web.responsebodies.DataFieldReference;
 import com.netgrif.workflow.petrinet.web.responsebodies.PetriNetReference;
 import com.netgrif.workflow.petrinet.web.responsebodies.TransitionReference;
 import com.netgrif.workflow.workflow.domain.FileStorageConfiguration;
+import com.netgrif.workflow.petrinet.domain.EventPhase;
+import com.netgrif.workflow.rules.domain.facts.NetImportedFact;
+import com.netgrif.workflow.rules.service.interfaces.IRuleEngine;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.bson.Document;
 import org.bson.types.ObjectId;
@@ -76,6 +79,9 @@ public abstract class PetriNetService implements IPetriNetService {
     @Autowired
     private FileStorageConfiguration fileStorageConfiguration;
 
+    @Autowired
+    private IRuleEngine ruleEngine;
+
     private Map<ObjectId, PetriNet> cache = new HashMap<>();
 
     @Override
@@ -124,10 +130,17 @@ public abstract class PetriNetService implements IPetriNetService {
         Path savedPath = getImporter().saveNetFile(net, xmlFile);
         log.info("Petri net " + net.getTitle() + " (" + net.getInitials() + " v" + net.getVersion() + ") imported successfully");
         publisher.publishEvent(new UserImportModelEvent(user, new File(savedPath.toString()), net.getTitle().getDefaultValue(), net.getInitials()));
+        evaluateRules(net, EventPhase.PRE);
+        saveNew(net);
+        evaluateRules(net, EventPhase.POST);
         saveNew(net);
         cache.put(net.getObjectId(), net);
 
         return imported;
+    }
+
+    protected void evaluateRules(PetriNet net, EventPhase phase) {
+        ruleEngine.evaluateRules(net, new NetImportedFact(net.getStringId(), phase));
     }
 
     private InputStream copy(InputStream xmlFile) throws IOException {

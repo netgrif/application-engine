@@ -23,6 +23,7 @@ import com.netgrif.workflow.workflow.web.responsebodies.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
@@ -46,15 +47,17 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/task")
+@ConditionalOnProperty(
+        value = "nae.task.web.enabled",
+        havingValue = "true",
+        matchIfMissing = true
+)
 public class TaskController {
 
     public static final Logger log = LoggerFactory.getLogger(TaskController.class);
 
     @Autowired
     private ITaskService taskService;
-
-    @Autowired
-    private IFilterService filterService;
 
     @Autowired
     private IDataService dataService;
@@ -243,9 +246,7 @@ public class TaskController {
 
     @RequestMapping(value = "/{id}/data", method = RequestMethod.POST)
     public ChangedFieldContainer setData(@PathVariable("id") String taskId, @RequestBody ObjectNode dataBody) throws UnauthorisedRequestException {
-    	User logged = userService.getLoggedUser();
-    	if( !logged.transformToLoggedUser().isAdmin() && !taskAuthenticationService.isAssignee(logged, taskId))
-    		throw new UnauthorisedRequestException("User " + logged.transformToLoggedUser().getUsername() + " doesn't have permission to save data in task " + taskId);
+        taskAuthenticationService.checkUsersPermissions(userService.getLoggedUser(), taskId);
 
         return dataService.setData(taskId, dataBody);
     }
@@ -253,18 +254,16 @@ public class TaskController {
     @RequestMapping(value = "/{id}/file/{field}", method = RequestMethod.POST)
     public ChangedFieldByFileFieldContainer saveFile(@PathVariable("id") String taskId, @PathVariable("field") String fieldId,
                                                      @RequestParam(value = "file") MultipartFile multipartFile) throws UnauthorisedRequestException {
-		User logged = userService.getLoggedUser();
-		if( !logged.transformToLoggedUser().isAdmin() && !taskAuthenticationService.isAssignee(logged, taskId))
-			throw new UnauthorisedRequestException("User " + logged.transformToLoggedUser().getUsername() + " doesn't have permission to save file in task " + taskId);
+        taskAuthenticationService.checkUsersPermissions(userService.getLoggedUser(), taskId);
 
-		return dataService.saveFile(taskId, fieldId, multipartFile);
+        return dataService.saveFile(taskId, fieldId, multipartFile);
     }
 
     @RequestMapping(value = "/{id}/file/{field}", method = RequestMethod.GET, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public ResponseEntity<Resource> getFile(@PathVariable("id") String taskId, @PathVariable("field") String fieldId, HttpServletResponse response) throws FileNotFoundException {
         FileFieldInputStream fileFieldInputStream = dataService.getFileByTask(taskId, fieldId);
 
-        if (fileFieldInputStream.getInputStream() == null)
+        if (fileFieldInputStream == null || fileFieldInputStream.getInputStream() == null)
             throw new FileNotFoundException("File in field " + fieldId + " within task " + taskId + " was not found!");
 
         HttpHeaders headers = new HttpHeaders();
@@ -275,5 +274,50 @@ public class TaskController {
                 .ok()
                 .headers(headers)
                 .body(new InputStreamResource(fileFieldInputStream.getInputStream()));
+    }
+
+    @RequestMapping(value = "/{id}/file/{field}", method = RequestMethod.DELETE)
+    public MessageResource deleteFile(@PathVariable("id") String taskId, @PathVariable("field") String fieldId) throws UnauthorisedRequestException {
+        taskAuthenticationService.checkUsersPermissions(userService.getLoggedUser(), taskId);
+
+        if (dataService.deleteFile(taskId, fieldId))
+            return MessageResource.successMessage("File in field " + fieldId + " within task " + taskId + " was successfully deleted");
+        return MessageResource.errorMessage("File in field " + fieldId + " within task" + taskId + " has failed to delete");
+    }
+
+    @RequestMapping(value = "/{id}/files/{field}", method = RequestMethod.POST)
+    public ChangedFieldByFileFieldContainer saveFiles(@PathVariable("id") String taskId, @PathVariable("field") String fieldId,
+                                                      @RequestParam(value = "files") MultipartFile[] multipartFiles) throws UnauthorisedRequestException {
+        taskAuthenticationService.checkUsersPermissions(userService.getLoggedUser(), taskId);
+
+        return dataService.saveFiles(taskId, fieldId, multipartFiles);
+    }
+
+    @RequestMapping(value = "/{id}/file/{field}/{name}", method = RequestMethod.GET, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    public ResponseEntity<Resource> getNamedFile(@PathVariable("id") String taskId, @PathVariable("field") String fieldId, @PathVariable("name") String name,
+                                                 HttpServletResponse response) throws FileNotFoundException {
+        FileFieldInputStream fileFieldInputStream = dataService.getFileByTaskAndName(taskId, fieldId, name);
+
+        if (fileFieldInputStream == null || fileFieldInputStream.getInputStream() == null)
+            throw new FileNotFoundException("File with name " + name + " in field " + fieldId + " within task " + taskId + " was not found!");
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_OCTET_STREAM_VALUE);
+        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + fileFieldInputStream.getFileName());
+
+        return ResponseEntity
+                .ok()
+                .headers(headers)
+                .body(new InputStreamResource(fileFieldInputStream.getInputStream()));
+    }
+
+    @RequestMapping(value = "/{id}/file/{field}/{name}", method = RequestMethod.DELETE)
+    public MessageResource deleteNamedFile(@PathVariable("id") String taskId, @PathVariable("field") String fieldId, @PathVariable("name") String name)
+            throws UnauthorisedRequestException {
+        taskAuthenticationService.checkUsersPermissions(userService.getLoggedUser(), taskId);
+
+        if (dataService.deleteFileByName(taskId, fieldId, name))
+            return MessageResource.successMessage("File with name " + name + " in field " + fieldId + " within task " + taskId + " was successfully deleted");
+        return MessageResource.errorMessage("File with name " + name + " in field " + fieldId + " within task" + taskId + " has failed to delete");
     }
 }

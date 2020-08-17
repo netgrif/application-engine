@@ -44,13 +44,16 @@ public final class FieldFactory {
                 field = new DateField();
                 break;
             case FILE:
-                field = buildFileField(data, importer);
+                field = buildFileField(data);
+                break;
+            case FILE_LIST:
+                field = buildFileListField(data);
                 break;
             case ENUMERATION:
-                    field = buildEnumerationField(data.getValues(), data.getInit(), importer);
+                field = buildEnumerationField(data.getValues(), data.getInit(), importer);
                 break;
             case MULTICHOICE:
-                    field = buildMultichoiceField(data.getValues(), data.getInit(), importer);
+                field = buildMultichoiceField(data.getValues(), data.getInit(), importer);
                 break;
             case NUMBER:
                 field = new NumberField();
@@ -160,10 +163,16 @@ public final class FieldFactory {
         return new UserField(roles);
     }
 
-    private FileField buildFileField(Data data, Importer importer) {
+    private FileField buildFileField(Data data) {
         FileField fileField = new FileField();
         fileField.setRemote(data.getRemote() != null);
         return fileField;
+    }
+
+    private FileListField buildFileListField(Data data) {
+        FileListField fileListField = new FileListField();
+        fileListField.setRemote(data.getRemote() != null);
+        return fileListField;
     }
 
     private void setActions(Field field, Data data) {
@@ -202,6 +211,9 @@ public final class FieldFactory {
                 break;
             case FILE:
                 ((FileField) field).setDefaultValue(defaultValue);
+                break;
+            case FILELIST:
+                ((FileListField) field).setDefaultValue(defaultValue);
                 break;
             default:
                 field.setDefaultValue(defaultValue);
@@ -260,6 +272,9 @@ public final class FieldFactory {
                 break;
             case FILE:
                 parseFileValue((FileField) field, useCase, fieldId);
+                break;
+            case FILELIST:
+                parseFileListValue((FileListField) field, useCase, fieldId);
                 break;
             case USER:
                 parseUserValues((UserField) field, useCase, fieldId);
@@ -424,6 +439,20 @@ public final class FieldFactory {
             field.setValue((FileFieldValue) value);
         } else
             throw new IllegalArgumentException("Object " + value.toString() + " cannot be set as value to the File field [" + fieldId + "] !");
+    }
+
+    private void parseFileListValue(FileListField field, Case useCase, String fieldId) {
+        Object value = useCase.getFieldValue(fieldId);
+        if (value == null)
+            return;
+
+        if (value instanceof String) {
+            field.setValue((String) value);
+        } else if (value instanceof FileListFieldValue) {
+            field.setValue((FileListFieldValue) value);
+        } else {
+            throw new IllegalArgumentException("Object " + value.toString() + " cannot be set as value to the File list field [" + fieldId + "] !");
+        }
     }
 
     private void resolveAttributeValues(Field field, Case useCase, String fieldId) {
