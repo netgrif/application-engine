@@ -2,28 +2,22 @@ package com.netgrif.workflow.workflow.web;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.netgrif.workflow.auth.domain.LoggedUser;
-import com.netgrif.workflow.auth.domain.User;
-import com.netgrif.workflow.auth.domain.throwable.UnauthorisedRequestException;
-import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.elastic.service.interfaces.IElasticTaskService;
 import com.netgrif.workflow.elastic.web.requestbodies.singleaslist.SingleTaskSearchRequestAsList;
 import com.netgrif.workflow.petrinet.domain.DataGroup;
-import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldByFileFieldContainer;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldContainer;
-import com.netgrif.workflow.petrinet.domain.roles.RolePermission;
 import com.netgrif.workflow.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.workflow.workflow.domain.MergeFilterOperation;
 import com.netgrif.workflow.workflow.domain.Task;
 import com.netgrif.workflow.workflow.service.FileFieldInputStream;
 import com.netgrif.workflow.workflow.service.interfaces.IDataService;
-import com.netgrif.workflow.workflow.service.interfaces.IFilterService;
-import com.netgrif.workflow.workflow.service.interfaces.ITaskAuthenticationService;
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
 import com.netgrif.workflow.workflow.web.responsebodies.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
@@ -35,6 +29,7 @@ import org.springframework.hateoas.mvc.ControllerLinkBuilder;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -44,10 +39,14 @@ import java.io.FileNotFoundException;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/task")
+@ConditionalOnProperty(
+        value = "nae.task.web.enabled",
+        havingValue = "true",
+        matchIfMissing = true
+)
 public class TaskController {
 
     public static final Logger log = LoggerFactory.getLogger(TaskController.class);
@@ -56,19 +55,10 @@ public class TaskController {
     private ITaskService taskService;
 
     @Autowired
-    private IFilterService filterService;
-
-    @Autowired
     private IDataService dataService;
 
     @Autowired
     private IElasticTaskService searchService;
-
-    @Autowired
-	private IUserService userService;
-
-    @Autowired
-    private ITaskAuthenticationService taskAuthenticationService;
 
     @RequestMapping(method = RequestMethod.GET)
     public PagedResources<LocalisedTaskResource> getAll(Authentication auth, Pageable pageable, PagedResourcesAssembler<com.netgrif.workflow.workflow.domain.Task> assembler, Locale locale) {
@@ -107,73 +97,57 @@ public class TaskController {
     }
 
     @RequestMapping(value = "/assign/{id}", method = RequestMethod.GET)
-    public MessageResource assign(Authentication auth, @PathVariable("id") String taskId) throws UnauthorisedRequestException {
+    @PreAuthorize("@taskAuthorizationService.canCallAssign(#auth.getPrincipal(), #taskId)")
+    public MessageResource assign(Authentication auth, @PathVariable("id") String taskId) {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
-
-        if( !loggedUser.isAdmin() && !taskAuthenticationService.userHasAtLeastOneRolePermission(loggedUser, taskId, RolePermission.PERFORM))
-            throw new UnauthorisedRequestException("User " + loggedUser.getUsername() + " doesn't have permission to assign task " + taskId);
 
         try {
             taskService.assignTask(loggedUser, taskId);
             return MessageResource.successMessage("LocalisedTask " + taskId + " assigned to " + loggedUser.getFullName());
         } catch (TransitionNotExecutableException e) {
-            log.error("Assigning task ["+taskId+"] failed: ", e);
+            log.error("Assigning task [" + taskId + "] failed: ", e);
             return MessageResource.errorMessage("LocalisedTask " + taskId + " cannot be assigned");
         }
     }
 
     @RequestMapping(value = "/delegate/{id}", method = RequestMethod.POST)
-    public MessageResource delegate(Authentication auth, @PathVariable("id") String taskId, @RequestBody Long delegatedId) throws UnauthorisedRequestException {
+    @PreAuthorize("@taskAuthorizationService.canCallDelegate(#auth.getPrincipal(), #taskId)")
+    public MessageResource delegate(Authentication auth, @PathVariable("id") String taskId, @RequestBody Long delegatedId) {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
-
-        if( !loggedUser.isAdmin() && !taskAuthenticationService.userHasAtLeastOneRolePermission(loggedUser, taskId, RolePermission.PERFORM, RolePermission.DELEGATE))
-            throw new UnauthorisedRequestException("User " + loggedUser.getUsername() + " doesn't have permission to delegate task " + taskId);
 
         try {
             taskService.delegateTask(loggedUser, delegatedId, taskId);
             return MessageResource.successMessage("LocalisedTask " + taskId + " assigned to [" + delegatedId + "]");
         } catch (Exception e) {
-            log.error("Delegating task ["+taskId+"] failed: ", e);
+            log.error("Delegating task [" + taskId + "] failed: ", e);
             return MessageResource.errorMessage("LocalisedTask " + taskId + " cannot be assigned");
         }
     }
 
     @RequestMapping(value = "/finish/{id}", method = RequestMethod.GET)
-    public MessageResource finish(Authentication auth, @PathVariable("id") String taskId) throws UnauthorisedRequestException {
+    @PreAuthorize("@taskAuthorizationService.canCallFinish(#auth.getPrincipal(), #taskId)")
+    public MessageResource finish(Authentication auth, @PathVariable("id") String taskId) {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
-
-        if(	!loggedUser.isAdmin()
-			&& !(
-				taskAuthenticationService.userHasAtLeastOneRolePermission(loggedUser, taskId, RolePermission.PERFORM)
-				&& taskAuthenticationService.isAssignee(loggedUser, taskId)
-			))
-            throw new UnauthorisedRequestException("User " + loggedUser.getUsername() + " doesn't have permission to finish task " + taskId);
 
         try {
             taskService.finishTask(loggedUser, taskId);
             return MessageResource.successMessage("LocalisedTask " + taskId + " finished");
         } catch (Exception e) {
-            log.error("Finishing task ["+taskId+"] failed: ", e);
+            log.error("Finishing task [" + taskId + "] failed: ", e);
             return MessageResource.errorMessage(e.getMessage());
         }
     }
 
     @RequestMapping(value = "/cancel/{id}", method = RequestMethod.GET)
-    public MessageResource cancel(Authentication auth, @PathVariable("id") String taskId) throws UnauthorisedRequestException {
+    @PreAuthorize("@taskAuthorizationService.canCallCancel(#auth.getPrincipal(), #taskId)")
+    public MessageResource cancel(Authentication auth, @PathVariable("id") String taskId) {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
-
-		if(	!loggedUser.isAdmin()
-			&& !(
-				taskAuthenticationService.userHasAtLeastOneRolePermission(loggedUser, taskId, RolePermission.PERFORM, RolePermission.CANCEL)
-				&& taskAuthenticationService.isAssignee(loggedUser, taskId)
-			))
-            throw new UnauthorisedRequestException("User " + loggedUser.getUsername() + " doesn't have permission to cancel task " + taskId);
 
         try {
             taskService.cancelTask(loggedUser, taskId);
             return MessageResource.successMessage("LocalisedTask " + taskId + " canceled");
         } catch (Exception e) {
-            log.error("Canceling task ["+taskId+"] failed: ", e);
+            log.error("Canceling task [" + taskId + "] failed: ", e);
             return MessageResource.errorMessage(e.getMessage());
         }
     }
@@ -244,29 +218,26 @@ public class TaskController {
     }
 
     @RequestMapping(value = "/{id}/data", method = RequestMethod.POST)
-    public ChangedFieldContainer saveData(@PathVariable("id") String taskId, @RequestBody ObjectNode dataBody) throws UnauthorisedRequestException {
-    	User logged = userService.getLoggedUser();
-    	if( !logged.transformToLoggedUser().isAdmin() && !taskAuthenticationService.isAssignee(logged, taskId))
-    		throw new UnauthorisedRequestException("User " + logged.transformToLoggedUser().getUsername() + " doesn't have permission to save data in task " + taskId);
+    @PreAuthorize("@taskAuthorizationService.canCallSaveData(#auth.getPrincipal(), #taskId)")
+    public ChangedFieldContainer setData(Authentication auth, @PathVariable("id") String taskId, @RequestBody ObjectNode dataBody) {
+        LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
 
         return dataService.setData(taskId, dataBody);
     }
 
     @RequestMapping(value = "/{id}/file/{field}", method = RequestMethod.POST)
-    public ChangedFieldByFileFieldContainer saveFile(@PathVariable("id") String taskId, @PathVariable("field") String fieldId,
-                                                     @RequestParam(value = "file") MultipartFile multipartFile) throws UnauthorisedRequestException {
-		User logged = userService.getLoggedUser();
-		if( !logged.transformToLoggedUser().isAdmin() && !taskAuthenticationService.isAssignee(logged, taskId))
-			throw new UnauthorisedRequestException("User " + logged.transformToLoggedUser().getUsername() + " doesn't have permission to save file in task " + taskId);
+    @PreAuthorize("@taskAuthorizationService.canCallSaveFile(#auth.getPrincipal(), #taskId)")
+    public ChangedFieldByFileFieldContainer saveFile(Authentication auth, @PathVariable("id") String taskId, @PathVariable("field") String fieldId, @RequestParam(value = "file") MultipartFile multipartFile) {
+        LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
 
-		return dataService.saveFile(taskId, fieldId, multipartFile);
+        return dataService.saveFile(taskId, fieldId, multipartFile);
     }
 
     @RequestMapping(value = "/{id}/file/{field}", method = RequestMethod.GET, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public ResponseEntity<Resource> getFile(@PathVariable("id") String taskId, @PathVariable("field") String fieldId, HttpServletResponse response) throws FileNotFoundException {
         FileFieldInputStream fileFieldInputStream = dataService.getFileByTask(taskId, fieldId);
 
-        if (fileFieldInputStream.getInputStream() == null)
+        if (fileFieldInputStream == null || fileFieldInputStream.getInputStream() == null)
             throw new FileNotFoundException("File in field " + fieldId + " within task " + taskId + " was not found!");
 
         HttpHeaders headers = new HttpHeaders();
@@ -277,5 +248,52 @@ public class TaskController {
                 .ok()
                 .headers(headers)
                 .body(new InputStreamResource(fileFieldInputStream.getInputStream()));
+    }
+
+    @RequestMapping(value = "/{id}/file/{field}", method = RequestMethod.DELETE)
+    @PreAuthorize("@taskAuthorizationService.canCallSaveFile(#auth.getPrincipal(), #taskId)")
+    public MessageResource deleteFile(Authentication auth, @PathVariable("id") String taskId, @PathVariable("field") String fieldId) {
+        LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
+
+        if (dataService.deleteFile(taskId, fieldId))
+            return MessageResource.successMessage("File in field " + fieldId + " within task " + taskId + " was successfully deleted");
+        return MessageResource.errorMessage("File in field " + fieldId + " within task" + taskId + " has failed to delete");
+    }
+
+    @RequestMapping(value = "/{id}/files/{field}", method = RequestMethod.POST)
+    @PreAuthorize("@taskAuthorizationService.canCallSaveFile(#auth.getPrincipal(), #taskId)")
+    public ChangedFieldByFileFieldContainer saveFiles(Authentication auth, @PathVariable("id") String taskId, @PathVariable("field") String fieldId,
+                                                      @RequestParam(value = "files") MultipartFile[] multipartFiles) {
+        LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
+
+        return dataService.saveFiles(taskId, fieldId, multipartFiles);
+    }
+
+    @RequestMapping(value = "/{id}/file/{field}/{name}", method = RequestMethod.GET, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    public ResponseEntity<Resource> getNamedFile(@PathVariable("id") String taskId, @PathVariable("field") String fieldId, @PathVariable("name") String name,
+                                                 HttpServletResponse response) throws FileNotFoundException {
+        FileFieldInputStream fileFieldInputStream = dataService.getFileByTaskAndName(taskId, fieldId, name);
+
+        if (fileFieldInputStream == null || fileFieldInputStream.getInputStream() == null)
+            throw new FileNotFoundException("File with name " + name + " in field " + fieldId + " within task " + taskId + " was not found!");
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_OCTET_STREAM_VALUE);
+        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + fileFieldInputStream.getFileName());
+
+        return ResponseEntity
+                .ok()
+                .headers(headers)
+                .body(new InputStreamResource(fileFieldInputStream.getInputStream()));
+    }
+
+    @RequestMapping(value = "/{id}/file/{field}/{name}", method = RequestMethod.DELETE)
+    @PreAuthorize("@taskAuthorizationService.canCallSaveFile(#auth.getPrincipal(), #taskId)")
+    public MessageResource deleteNamedFile(Authentication auth, @PathVariable("id") String taskId, @PathVariable("field") String fieldId, @PathVariable("name") String name) {
+        LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
+
+        if (dataService.deleteFileByName(taskId, fieldId, name))
+            return MessageResource.successMessage("File with name " + name + " in field " + fieldId + " within task " + taskId + " was successfully deleted");
+        return MessageResource.errorMessage("File with name " + name + " in field " + fieldId + " within task" + taskId + " has failed to delete");
     }
 }

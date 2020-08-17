@@ -1,46 +1,61 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../petriflow_schema.xsd">
+    <id>financial_data_doc</id>
+    <initials>FDC</initials>
+    <title>Financial Data Doc</title>
 
     <data type="text">
         <id>doc_info</id>
-        <title>Document info</title>
+        <title name="document_info">Document info</title>
     </data>
-
     <data type="number">
         <id>num</id>
-        <title>Document number</title>
+        <title name="document_number">Document number</title>
     </data>
-
     <data type="file">
         <id>doc</id>
-        <title>Document</title>
+        <title name="document">Document</title>
     </data>
+
+    <i18n locale="sk">
+        <i18nString name="income_title">Mesačný príjem v EUR</i18nString>
+        <i18nString name="document">Dokument</i18nString>
+        <i18nString name="document_number">Číslo dokumentu</i18nString>
+        <i18nString name="document_info">Info</i18nString>
+    </i18n>
 
     <transition>
         <id>doc</id>
         <x>50</x>
         <y>50</y>
-        <label name="financial_data">Document</label>
-        <dataRef>
-            <id>doc_info</id>
-            <logic>
-                <behavior>editable</behavior>
-                <behavior>required</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>num</id>
-            <logic>
-                <behavior>editable</behavior>
-                <behavior>required</behavior>
-            </logic>
-        </dataRef>
-        <dataRef>
-            <id>doc</id>
-            <logic>
-                <behavior>editable</behavior>
-                <behavior>required</behavior>
-            </logic>
-        </dataRef>
+        <label name="document">Document</label>
+
+        <dataGroup>
+            <id>0</id>
+            <title name="document">Document data</title>
+
+            <dataRef>
+                <id>doc_info</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>num</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>doc</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+
     </transition>
 </document>
