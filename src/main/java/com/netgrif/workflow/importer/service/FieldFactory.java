@@ -7,14 +7,11 @@ import com.netgrif.workflow.importer.model.DocumentRef;
 import com.netgrif.workflow.importer.model.I18NStringType;
 import com.netgrif.workflow.petrinet.domain.Format;
 import com.netgrif.workflow.petrinet.domain.I18nString;
-import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.dataset.*;
 import com.netgrif.workflow.petrinet.domain.views.View;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.DataField;
-import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
@@ -29,9 +26,6 @@ import java.util.stream.Collectors;
 
 @Component
 public final class FieldFactory {
-
-    @Autowired
-    private IWorkflowService workflowService;
 
     @Autowired
     private FormatFactory formatFactory;
@@ -66,8 +60,8 @@ public final class FieldFactory {
             case USER:
                 field = buildUserField(data, importer);
                 break;
-            case CASEREF:
-                field = buildCaseField(data, importer);
+            case CASE_REF:
+                field = buildCaseField(data);
                 break;
             case DATE_TIME:
                 field = new DateTimeField();
@@ -152,21 +146,13 @@ public final class FieldFactory {
         return new TextField(value);
     }
 
-    private CaseField buildCaseField(Data data, Importer importer) {
-        Map<String, LinkedHashSet<String>> netIds = new HashMap<>();
-        DocumentRef documentRef = data.getDocumentRef();
-
-        PetriNet net = importer.getNetByImportId(String.valueOf(documentRef.getId()));
-        LinkedHashSet<String> fieldIds = new LinkedHashSet<>();
-
-        net.getDataSet().values().forEach(field -> {
-            if (documentRef.getFields().contains(field.getImportId())) {
-                fieldIds.add(field.getStringId());
-            }
-        });
-
-        netIds.put(net.getStringId(), fieldIds);
-        return new CaseField(netIds);
+    private CaseField buildCaseField(Data data) {
+        AllowedNets nets = data.getAllowedNets();
+        if (nets == null) {
+            return new CaseField();
+        } else {
+            return new CaseField(new ArrayList<>(nets.getAllowedNet()));
+        }
     }
 
     private UserField buildUserField(Data data, Importer importer) {
@@ -251,6 +237,7 @@ public final class FieldFactory {
     public Field buildImmediateField(Case useCase, String fieldId) {
         Field field = useCase.getPetriNet().getDataSet().get(fieldId);
         resolveDataValues(field, useCase, fieldId);
+        resolveAttributeValues(field, useCase, fieldId);
         return field;
     }
 
@@ -263,9 +250,6 @@ public final class FieldFactory {
                 break;
             case NUMBER:
                 field.setValue(parseNumberValue(useCase, fieldId));
-                break;
-            case CASEREF:
-                parseCaseRefValue((CaseField) field);
                 break;
             case ENUMERATION:
                 field.setValue(parseEnumValue(useCase, fieldId, (EnumerationField) field));
@@ -431,25 +415,6 @@ public final class FieldFactory {
         }
     }
 
-    private void parseCaseRefValue(CaseField field) {
-        Case refCase = workflowService.findOne(field.getValue());
-        PetriNet net = refCase.getPetriNet();
-
-        if (field.getConstraintNetIds() == null || !field.getConstraintNetIds().containsKey(net.getImportId()))
-            return;
-
-        Map<String, Object> values = field.getConstraintNetIds().get(net.getImportId()).stream().map(otherFieldId -> {
-            Optional<Field> optional = net.getDataSet().values().stream().filter(netField -> Objects.equals(netField.getImportId(), otherFieldId)).findFirst();
-            if (!optional.isPresent()) {
-                throw new IllegalArgumentException("Field [" + otherFieldId + "] not present in net [" + net.getStringId() + "]");
-            }
-            String fieldStringId = optional.get().getStringId();
-            return Pair.of(fieldStringId, refCase.getDataSet().get(fieldStringId).getValue());
-        }).collect(Collectors.toMap(Pair::getFirst, Pair::getSecond));
-
-        field.setImmediateFieldValues(values);
-    }
-
     private void parseFileValue(FileField field, Case useCase, String fieldId) {
         Object value = useCase.getFieldValue(fieldId);
         if (value == null)
@@ -461,5 +426,12 @@ public final class FieldFactory {
             field.setValue((FileFieldValue) value);
         } else
             throw new IllegalArgumentException("Object " + value.toString() + " cannot be set as value to the File field [" + fieldId + "] !");
+    }
+
+    private void resolveAttributeValues(Field field, Case useCase, String fieldId) {
+        if (field.getType().equals(FieldType.CASE_REF)) {
+            List<String> allowedNets = new ArrayList<>(useCase.getDataSet().get(fieldId).getAllowedNets());
+            ((CaseField) field).setAllowedNets(allowedNets);
+        }
     }
 }
