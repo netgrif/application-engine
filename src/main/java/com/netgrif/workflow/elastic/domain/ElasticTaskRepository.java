@@ -8,5 +8,5 @@ public interface ElasticTaskRepository extends ElasticsearchRepository<ElasticTa
 
     ElasticTask findByStringId(String stringId);
 
-    void deleteByStringId(String taskId);
+    void deleteAllByStringId(String taskId);
 }
