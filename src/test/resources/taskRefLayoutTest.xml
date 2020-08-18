@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://modeler.netgrif.com/petriflow_schema.xsd">
+	<id>taskRefLayoutTest</id>
+	<version>1.0.0</version>
+	<initials>NEW</initials>
+	<title>taskRefLayoutTest</title>
+	<icon>home</icon>
+	<defaultRole>true</defaultRole>
+	<transitionRole>false</transitionRole>
+	<!-- TRANSACTIONS -->
+	<!-- ROLES -->
+	<!-- DATA -->
+	<!-- TRANSITIONS -->
+	<data type="taskRef">
+		<id>taskRef</id>
+		<title>TaskRef</title>
+		<action trigger="get">
+			taskRef : f.this;
+
+        	def list = []
+        	findCases { it.processIdentifier.eq("priloha") }.findAll { it.dataSet["requestID"].value == useCase.stringId }.each { list.addAll(it.tasks.collect { it.task }) }.sort{ it.creationDate }
+        	change taskRef value { list }
+		</action>
+	</data>
+	<data type="button">
+		<id>buttonicek</id>
+		<title></title>
+		<placeholder>Chuju</placeholder>
+		<action trigger="set">
+			taskRef : f.taskRef;
+
+			def aPriloha = createCase("priloha")
+			aPriloha.dataSet.get("requestID").setValue(useCase.stringId)
+			workflowService.save(aPriloha)
+			def list = []
+			findCases { it.processIdentifier.eq("priloha") }.findAll { it.dataSet["requestID"].value == useCase.stringId }.each { list.addAll(it.tasks.collect { it.task }) }.sort{ it.creationDate }
+			change taskRef value { list }
+		</action>
+	</data>
+	<data type="text">
+		<id>temp00</id>
+		<title>Temp00</title>
+	</data>
+	<data type="text">
+		<id>temp01</id>
+		<title>Temp00</title>
+	</data>
+	<data type="text">
+		<id>temp1</id>
+		<title>Temp1</title>
+	</data>
+	<data type="text">
+		<id>temp2</id>
+		<title>Temp2</title>
+	</data>
+	<transition>
+		<id>2</id>
+		<x>670</x>
+		<y>231</y>
+		<label>AOC</label>
+		<dataRef>
+			<id>temp00</id>
+			<logic>
+				<behavior>editable</behavior>
+			</logic>
+			<layout>
+				<x>0</x>
+				<y>0</y>
+				<rows>1</rows>
+				<cols>2</cols>
+				<template>material</template>
+				<appearance>outline</appearance>
+			</layout>
+		</dataRef>
+		<dataRef>
+			<id>temp01</id>
+			<logic>
+				<behavior>editable</behavior>
+			</logic>
+			<layout>
+				<x>2</x>
+				<y>0</y>
+				<rows>1</rows>
+				<cols>2</cols>
+				<template>material</template>
+				<appearance>outline</appearance>
+			</layout>
+		</dataRef>
+		<dataRef>
+			<id>taskRef</id>
+			<logic>
+				<behavior>editable</behavior>
+			</logic>
+			<layout>
+				<x>0</x>
+				<y>1</y>
+				<rows>1</rows>
+				<cols>4</cols>
+				<template>material</template>
+				<appearance>outline</appearance>
+			</layout>
+		</dataRef>
+		<dataRef>
+			<id>buttonicek</id>
+			<logic>
+				<behavior>editable</behavior>
+			</logic>
+			<layout>
+				<x>0</x>
+				<y>2</y>
+				<rows>1</rows>
+				<cols>4</cols>
+				<template>material</template>
+				<appearance>outline</appearance>
+			</layout>
+		</dataRef>
+		<dataRef>
+			<id>temp1</id>
+			<logic>
+				<behavior>editable</behavior>
+			</logic>
+			<layout>
+				<x>0</x>
+				<y>3</y>
+				<rows>1</rows>
+				<cols>4</cols>
+				<template>material</template>
+				<appearance>outline</appearance>
+			</layout>
+		</dataRef>
+		<dataRef>
+			<id>temp2</id>
+			<logic>
+				<behavior>editable</behavior>
+			</logic>
+			<layout>
+				<x>0</x>
+				<y>4</y>
+				<rows>1</rows>
+				<cols>4</cols>
+				<template>material</template>
+				<appearance>outline</appearance>
+			</layout>
+		</dataRef>
+	</transition>
+	<!-- PLACES -->
+	<place>
+		<id>1</id>
+		<x>459</x>
+		<y>231</y>
+		<label></label>
+		<tokens>1</tokens>
+		<static>false</static>
+	</place>
+	<!-- ARCS -->
+	<arc>
+		<id>3</id>
+		<type>regular</type>
+		<sourceId>1</sourceId>
+		<destinationId>2</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+</document>
