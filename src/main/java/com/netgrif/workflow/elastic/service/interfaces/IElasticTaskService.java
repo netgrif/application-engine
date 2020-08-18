@@ -1,6 +1,7 @@
 package com.netgrif.workflow.elastic.service.interfaces;
 
 import com.netgrif.workflow.auth.domain.LoggedUser;
+import com.netgrif.workflow.elastic.domain.ElasticTask;
 import com.netgrif.workflow.elastic.web.requestbodies.TaskSearchRequest;
 import com.netgrif.workflow.workflow.domain.Task;
 import org.springframework.data.domain.Page;
@@ -15,9 +16,9 @@ public interface IElasticTaskService {
     Map<String, Float> fullTextFields();
 
     @Async
-    void index(Task task);
+    void index(ElasticTask task);
 
-    void indexNow(Task task);
+    void indexNow(ElasticTask task);
 
     Page<Task> search(List<TaskSearchRequest> requests, LoggedUser user, Pageable pageable, Boolean isIntersection);
 
