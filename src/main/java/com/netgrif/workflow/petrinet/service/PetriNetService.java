@@ -1,7 +1,6 @@
 package com.netgrif.workflow.petrinet.service;
 
 import com.netgrif.workflow.auth.domain.LoggedUser;
-import com.netgrif.workflow.auth.service.UserProcessRoleService;
 import com.netgrif.workflow.auth.service.interfaces.IUserProcessRoleService;
 import com.netgrif.workflow.event.events.model.UserImportModelEvent;
 import com.netgrif.workflow.importer.service.Importer;
@@ -10,8 +9,6 @@ import com.netgrif.workflow.petrinet.domain.Transition;
 import com.netgrif.workflow.petrinet.domain.arcs.VariableArc;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository;
-import com.netgrif.workflow.petrinet.domain.roles.ProcessRole;
-import com.netgrif.workflow.petrinet.domain.roles.ProcessRoleRepository;
 import com.netgrif.workflow.petrinet.domain.version.Version;
 import com.netgrif.workflow.petrinet.domain.throwable.MissingPetriNetMetaDataException;
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
@@ -20,6 +17,9 @@ import com.netgrif.workflow.petrinet.web.responsebodies.DataFieldReference;
 import com.netgrif.workflow.petrinet.web.responsebodies.PetriNetReference;
 import com.netgrif.workflow.petrinet.web.responsebodies.TransitionReference;
 import com.netgrif.workflow.workflow.domain.FileStorageConfiguration;
+import com.netgrif.workflow.petrinet.domain.EventPhase;
+import com.netgrif.workflow.rules.domain.facts.NetImportedFact;
+import com.netgrif.workflow.rules.service.interfaces.IRuleEngine;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.bson.Document;
 import org.bson.types.ObjectId;
@@ -42,7 +42,6 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.repository.support.PageableExecutionUtils;
 import org.springframework.stereotype.Service;
 
-import javax.validation.constraints.NotNull;
 import java.io.*;
 import java.nio.file.Path;
 import java.util.*;
@@ -75,6 +74,9 @@ public abstract class PetriNetService implements IPetriNetService {
 
     @Autowired
     private FileStorageConfiguration fileStorageConfiguration;
+
+    @Autowired
+    private IRuleEngine ruleEngine;
 
     private Map<ObjectId, PetriNet> cache = new HashMap<>();
 
@@ -124,10 +126,17 @@ public abstract class PetriNetService implements IPetriNetService {
         Path savedPath = getImporter().saveNetFile(net, xmlFile);
         log.info("Petri net " + net.getTitle() + " (" + net.getInitials() + " v" + net.getVersion() + ") imported successfully");
         publisher.publishEvent(new UserImportModelEvent(user, new File(savedPath.toString()), net.getTitle().getDefaultValue(), net.getInitials()));
-        saveNew(net);
+        evaluateRules(net, EventPhase.PRE);
+        save(net);
+        evaluateRules(net, EventPhase.POST);
+        save(net);
         cache.put(net.getObjectId(), net);
 
         return imported;
+    }
+
+    protected void evaluateRules(PetriNet net, EventPhase phase) {
+        ruleEngine.evaluateRules(net, new NetImportedFact(net.getStringId(), phase));
     }
 
     private InputStream copy(InputStream xmlFile) throws IOException {
@@ -138,7 +147,7 @@ public abstract class PetriNetService implements IPetriNetService {
     }
 
     @Override
-    public Optional<PetriNet> saveNew(PetriNet petriNet) {
+    public Optional<PetriNet> save(PetriNet petriNet) {
         initializeVariableArcs(petriNet);
 
         return Optional.of(repository.save(petriNet));

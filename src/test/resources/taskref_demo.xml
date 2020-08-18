@@ -1,322 +1,303 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-          xsi:noNamespaceSchemaLocation="../../main/resources/petriNets/petriflow_schema.xsd">
-    <id>taskref_demo2</id>
-    <version>1.0.0</version>
-    <initials>TRD</initials>
-    <title>TaskRef demo 2</title>
-    <icon>home</icon>
-    <defaultRole>true</defaultRole>
-    <transitionRole>false</transitionRole>
-    <!-- TRANSACTIONS -->
-    <!-- ROLES -->
-    <role>
-        <id>1</id>
-        <name>Block</name>
-    </role>
-    <!-- DATA -->
-    <data type="enumeration">
-        <id>taskref_selector</id>
-        <title>Referenced tasks</title>
-        <placeholder>Select referenced tasks</placeholder>
-        <values>Fyzická osoba</values>
-        <values>Právnická osoba</values>
-        <values>SZČO</values>
-        <action trigger="set">
-            <!--@formatter:off-->
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://modeler.netgrif.com/petriflow_schema.xsd">
+	<id>taskref_demo</id>
+	<version>1.0.0</version>
+	<initials>TRD</initials>
+	<title>TaskRef demo</title>
+	<icon>home</icon>
+	<defaultRole>true</defaultRole>
+	<transitionRole>false</transitionRole>
+	<!-- TRANSACTIONS -->
+	<!-- ROLES -->
+	<role>
+		<id>1</id>
+		<name>Block</name>
+	</role>
+	<!-- DATA -->
+	<data type="multichoice">
+		<id>taskref_selector</id>
+		<title>Referenced tasks</title>
+		<placeholder>Select referenced tasks</placeholder>
+		<values>Task 1</values>
+		<values>Task 2</values>
+		<values>Task 3</values>
+		<action trigger="set">
 			taskrefInput: f.taskref_selector,
 			taskref: f.taskref;
 
-			change taskref value {
-				if (taskrefInput.value.defaultValue.contains("Fyzická osoba")) {
-					return getTaskId("2")
-				} else if (taskrefInput.value.defaultValue.contains("Právnická osoba")) {
-			        return getTaskId("3")
-			    } else {
-                    return getTaskId("4")
-			    }
+			def taskrefValue = []
+			if (taskrefInput.value.defaultValue.contains("Task 1")) {
+				taskrefValue.push(getTaskId("2"))
 			}
-			<!--@formatter:on-->
-        </action>
-    </data>
-    <data type="taskRef">
-        <id>taskref</id>
-        <title>set label</title>
-        <placeholder>placeholder</placeholder>
-        <desc>description</desc>
-        <init>value</init>
-    </data>
+			if (taskrefInput.value.defaultValue.contains("Task 2")) {
+				taskrefValue.push(getTaskId("3"))
+			}
+			if (taskrefInput.value.defaultValue.contains("Task 3")) {
+				taskrefValue.push(getTaskId("4"))
+			}
 
-    <data type="text">
-        <id>titule_pred</id>
-        <title>Titul pred</title>
-    </data>
-    <data type="text">
-        <id>meno</id>
-        <title>Meno</title>
-    </data>
-    <data type="text">
-        <id>priezvisko</id>
-        <title>Priezvisko</title>
-    </data>
-    <data type="text">
-        <id>titule_za</id>
-        <title>Titul za</title>
-    </data>
-    <data type="text">
-        <id>cislo_op</id>
-        <title>Číslo OP</title>
-    </data>
-    <data type="text">
-        <id>narodnost</id>
-        <title>Národnosť</title>
-    </data>
-    <data type="text">
-        <id>obchodne_meno</id>
-        <title>Obchodné meno</title>
-    </data>
-    <data type="text">
-        <id>ico</id>
-        <title>IČO</title>
-    </data>
+			change taskref value {return taskrefValue}
+		</action>
+	</data>
+	<data type="taskRef">
+		<id>taskref</id>
+		<title>set label</title>
+		<placeholder>placeholder</placeholder>
+		<desc>description</desc>
+		<init>value</init>
+	</data>
+	<data type="text">
+		<id>text1</id>
+		<title>Field under task ref</title>
+		<init>This field is placed under the task ref field</init>
+	</data>
+	<data type="text">
+		<id>textarea</id>
+		<title>Toggleable text area</title>
+		<values>area</values>
+		<init>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam eget venenatis enim. Suspendisse eu eros iaculis, rutrum massa vitae, eleifend magna. Vestibulum id tempus tortor. Donec tincidunt aliquet metus, ut maximus quam elementum nec. In semper risus vitae urna rutrum, sed consequat urna tincidunt. Integer nec nunc mi. Nam ultricies accumsan ornare. Quisque faucibus purus in metus mollis sagittis. Quisque in aliquam lectus. Duis sagittis condimentum ipsum, quis venenatis metus fringilla non.</init>
+	</data>
+	<data type="button">
+		<id>btn_show</id>
+		<title>Show text area</title>
+		<action trigger="set">
+			textarea: f.textarea,
+			trans: t.2;
 
-    <data type="taskRef">
-        <id>nested_taskref</id>
-        <title>Task ref with label</title>
-    </data>
-    <data type="text">
-        <id>text1</id>
-        <title>Field under task ref</title>
-        <init>This field is placed under the task ref field</init>
-    </data>
-    <!-- TRANSITIONS -->
-    <transition>
-        <id>1</id>
-        <x>340</x>
-        <y>260</y>
-        <label>Formulár</label>
-        <dataRef>
-            <id>taskref_selector</id>
-            <logic>
-                <behavior>editable</behavior>
-            </logic>
-            <layout>
-                <x>0</x>
-                <y>0</y>
-                <rows>1</rows>
-                <cols>2</cols>
-                <template>material</template>
-                <appearance>outline</appearance>
-            </layout>
-        </dataRef>
-        <dataRef>
-            <id>taskref</id>
-            <logic>
-                <behavior>editable</behavior>
-            </logic>
-            <layout>
-                <x>0</x>
-                <y>1</y>
-                <rows>1</rows>
-                <cols>4</cols>
-                <template>material</template>
-                <appearance>outline</appearance>
-            </layout>
-        </dataRef>
-        <dataRef>
-            <id>text1</id>
-            <logic>
-                <behavior>editable</behavior>
-            </logic>
-            <layout>
-                <x>0</x>
-                <y>2</y>
-                <rows>1</rows>
-                <cols>4</cols>
-                <template>material</template>
-                <appearance>outline</appearance>
-            </layout>
-        </dataRef>
-        <event type="assign">
-            <id>1_assign</id>
-            <actions phase="post">
-                <action>
-                    <!--@formatter:off-->
-                    taskref: f.nested_taskref;
-                    change taskref value {
-                        return [
-                            getTaskId("3"),
-                            getTaskId("2")
-                        ]
-                    }
-                    <!--@formatter:on-->
-                </action>
-            </actions>
-        </event>
-    </transition>
-    <transition>
-        <id>2</id>
-        <x>500</x>
-        <y>180</y>
-        <label>Fyzická osoba</label>
-        <cols>6</cols>
-        <roleRef>
-            <id>1</id>
-            <logic>
-                <perform>true</perform>
-            </logic>
-        </roleRef>
-        <dataRef>
-            <id>titule_pred</id>
-            <logic>
-                <behavior>editable</behavior>
-            </logic>
-            <layout>
-                <x>0</x>
-                <y>0</y>
-                <rows>1</rows>
-                <cols>1</cols>
-                <template>material</template>
-                <appearance>outline</appearance>
-            </layout>
-        </dataRef>
-        <dataRef>
-            <id>meno</id>
-            <logic>
-                <behavior>editable</behavior>
-            </logic>
-            <layout>
-                <x>1</x>
-                <y>0</y>
-                <rows>1</rows>
-                <cols>2</cols>
-                <template>material</template>
-                <appearance>outline</appearance>
-            </layout>
-        </dataRef>
-        <dataRef>
-            <id>priezvisko</id>
-            <logic>
-                <behavior>editable</behavior>
-            </logic>
-            <layout>
-                <x>3</x>
-                <y>0</y>
-                <rows>1</rows>
-                <cols>2</cols>
-                <template>material</template>
-                <appearance>outline</appearance>
-            </layout>
-        </dataRef>
-        <dataRef>
-            <id>titule_za</id>
-            <logic>
-                <behavior>editable</behavior>
-            </logic>
-            <layout>
-                <x>5</x>
-                <y>0</y>
-                <rows>1</rows>
-                <cols>1</cols>
-                <template>material</template>
-                <appearance>outline</appearance>
-            </layout>
-        </dataRef>
-        <dataRef>
-            <id>cislo_op</id>
-            <logic>
-                <behavior>editable</behavior>
-            </logic>
-            <layout>
-                <x>0</x>
-                <y>1</y>
-                <rows>1</rows>
-                <cols>3</cols>
-                <template>material</template>
-                <appearance>outline</appearance>
-            </layout>
-        </dataRef>
-        <dataRef>
-            <id>narodnost</id>
-            <logic>
-                <behavior>editable</behavior>
-            </logic>
-            <layout>
-                <x>3</x>
-                <y>1</y>
-                <rows>1</rows>
-                <cols>3</cols>
-                <template>material</template>
-                <appearance>outline</appearance>
-            </layout>
-        </dataRef>
-    </transition>
-    <transition>
-        <id>3</id>
-        <x>500</x>
-        <y>260</y>
-        <label>Právnická osoba</label>
-        <cols>6</cols>
-        <roleRef>
-            <id>1</id>
-            <logic>
-                <perform>true</perform>
-            </logic>
-        </roleRef>
-        <dataRef>
-            <id>obchodne_meno</id>
-            <logic>
-                <behavior>editable</behavior>
-            </logic>
-            <layout>
-                <x>0</x>
-                <y>0</y>
-                <rows>1</rows>
-                <cols>3</cols>
-                <template>material</template>
-                <appearance>outline</appearance>
-            </layout>
-        </dataRef>
-        <dataRef>
-            <id>ico</id>
-            <logic>
-                <behavior>editable</behavior>
-            </logic>
-            <layout>
-                <x>3</x>
-                <y>0</y>
-                <rows>1</rows>
-                <cols>3</cols>
-                <template>material</template>
-                <appearance>outline</appearance>
-            </layout>
-        </dataRef>
-    </transition>
-    <transition>
-        <id>4</id>
-        <x>500</x>
-        <y>340</y>
-        <label>SZČO</label>
-        <cols>6</cols>
-        <roleRef>
-            <id>1</id>
-            <logic>
-                <perform>true</perform>
-            </logic>
-        </roleRef>
-        <dataRef>
-            <id>nested_taskref</id>
-            <logic>
-                <behavior>editable</behavior>
-            </logic>
-            <layout>
-                <x>0</x>
-                <y>0</y>
-                <rows>1</rows>
-                <cols>6</cols>
-                <template>material</template>
-                <appearance>outline</appearance>
-            </layout>
-        </dataRef>
-    </transition>
+			make textarea,visible on trans when {return true}
+		</action>
+	</data>
+	<data type="button">
+		<id>btn_hide</id>
+		<title>Hide text area</title>
+		<action trigger="set">
+			textarea: f.textarea,
+			trans: t.2;
+
+			make textarea,hidden on trans when {return true}
+		</action>
+	</data>
+	<data type="text">
+		<id>even</id>
+		<title>Is the number even?</title>
+		<init>YES</init>
+	</data>
+	<data type="number">
+		<id>numberInput</id>
+		<title>Enter any number</title>
+		<init>0</init>
+		<action trigger="set">
+			numberInput: f.numberInput,
+			parity: f.even;
+
+			change parity value {return (((int)numberInput.value)%2 == 0 ? "YES" : "NO")}
+		</action>
+	</data>
+	<data type="text">
+		<id>text2</id>
+		<title>Nested task ref</title>
+		<init>This task contains a nested task ref</init>
+	</data>
+	<data type="taskRef">
+		<id>nested_taskref</id>
+		<title>Task ref with label</title>
+	</data>
+	<!-- I18NS -->
+	<!-- TRANSITIONS -->
+	<transition>
+		<id>1</id>
+		<x>340</x>
+		<y>260</y>
+		<label></label>
+		<dataRef>
+			<id>taskref_selector</id>
+			<logic>
+				<behavior>editable</behavior>
+			</logic>
+			<layout>
+				<x>0</x>
+				<y>0</y>
+				<rows>1</rows>
+				<cols>2</cols>
+				<template>material</template>
+				<appearance>outline</appearance>
+			</layout>
+		</dataRef>
+		<dataRef>
+			<id>taskref</id>
+			<logic>
+				<behavior>editable</behavior>
+			</logic>
+			<layout>
+				<x>0</x>
+				<y>1</y>
+				<rows>1</rows>
+				<cols>4</cols>
+				<template>material</template>
+				<appearance>outline</appearance>
+			</layout>
+		</dataRef>
+		<dataRef>
+			<id>text1</id>
+			<logic>
+				<behavior>editable</behavior>
+			</logic>
+			<layout>
+				<x>0</x>
+				<y>2</y>
+				<rows>1</rows>
+				<cols>4</cols>
+				<template>material</template>
+				<appearance>outline</appearance>
+			</layout>
+		</dataRef>
+		<event type="assign">
+			<id>1_assign</id>
+			<actions phase="post">
+				<action>
+					taskref: f.nested_taskref;
+
+					change taskref value {return [getTaskId("3")]}
+				</action>
+			</actions>
+		</event>
+	</transition>
+	<transition>
+		<id>2</id>
+		<x>500</x>
+		<y>180</y>
+		<roleRef>
+			<id>1</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
+		<label></label>
+		<dataRef>
+			<id>textarea</id>
+			<logic>
+				<behavior>hidden</behavior>
+			</logic>
+			<layout>
+				<x>0</x>
+				<y>1</y>
+				<rows>2</rows>
+				<cols>4</cols>
+				<template>material</template>
+				<appearance>outline</appearance>
+			</layout>
+		</dataRef>
+		<dataRef>
+			<id>btn_show</id>
+			<logic>
+				<behavior>editable</behavior>
+			</logic>
+			<layout>
+				<x>0</x>
+				<y>0</y>
+				<rows>1</rows>
+				<cols>2</cols>
+				<template>material</template>
+			</layout>
+		</dataRef>
+		<dataRef>
+			<id>btn_hide</id>
+			<logic>
+				<behavior>editable</behavior>
+			</logic>
+			<layout>
+				<x>2</x>
+				<y>0</y>
+				<rows>1</rows>
+				<cols>2</cols>
+				<template>material</template>
+			</layout>
+		</dataRef>
+	</transition>
+	<transition>
+		<id>3</id>
+		<x>500</x>
+		<y>260</y>
+		<roleRef>
+			<id>1</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
+		<label></label>
+		<dataRef>
+			<id>even</id>
+			<logic>
+				<behavior>visible</behavior>
+			</logic>
+			<layout>
+				<x>2</x>
+				<y>0</y>
+				<rows>1</rows>
+				<cols>2</cols>
+				<template>material</template>
+				<appearance>outline</appearance>
+			</layout>
+		</dataRef>
+		<dataRef>
+			<id>numberInput</id>
+			<logic>
+				<behavior>editable</behavior>
+			</logic>
+			<layout>
+				<x>0</x>
+				<y>0</y>
+				<rows>1</rows>
+				<cols>2</cols>
+				<template>material</template>
+				<appearance>outline</appearance>
+			</layout>
+		</dataRef>
+	</transition>
+	<transition>
+		<id>4</id>
+		<x>500</x>
+		<y>340</y>
+		<roleRef>
+			<id>1</id>
+			<logic>
+				<perform>true</perform>
+			</logic>
+		</roleRef>
+		<label></label>
+		<dataRef>
+			<id>text2</id>
+			<logic>
+				<behavior>editable</behavior>
+			</logic>
+			<layout>
+				<x>0</x>
+				<y>0</y>
+				<rows>1</rows>
+				<cols>2</cols>
+				<template>material</template>
+				<appearance>outline</appearance>
+			</layout>
+		</dataRef>
+		<dataRef>
+			<id>nested_taskref</id>
+			<logic>
+				<behavior>editable</behavior>
+				<action trigger="get">
+					nested_taskref: f.nested_taskref,
+					trans : t.this;
+					make nested_taskref, visible on trans when { nested_taskref.value.empty }
+
+				</action>
+			</logic>
+			<layout>
+				<x>0</x>
+				<y>1</y>
+				<rows>1</rows>
+				<cols>4</cols>
+				<template>material</template>
+				<appearance>outline</appearance>
+			</layout>
+		</dataRef>
+	</transition>
 </document>
