@@ -10,6 +10,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.support.PropertiesLoaderUtils;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import org.springframework.scheduling.quartz.SpringBeanJobFactory;
 
@@ -66,16 +67,12 @@ public class QuartzConfiguration {
         schedulerFactory.setApplicationContext(applicationContext);
         schedulerFactory.setAutoStartup(false);
 
-        schedulerFactory.setConfigLocation(new ClassPathResource(defaultQuartzPropsPath));
-
-        Properties properties = new Properties();
+        Properties properties = PropertiesLoaderUtils.loadProperties(new ClassPathResource(defaultQuartzPropsPath));
         properties.putAll(quartzProperties.getProperties());
         schedulerFactory.setQuartzProperties(properties);
 
         schedulerFactory.setJobFactory(new SpringBeanJobFactory());
         schedulerFactory.setDataSource(quartzDataSource());
-
-        schedulerFactory.afterPropertiesSet();
 
         return schedulerFactory;
     }
