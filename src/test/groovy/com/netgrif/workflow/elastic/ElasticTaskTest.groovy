@@ -4,10 +4,13 @@ import com.netgrif.workflow.TestHelper
 import com.netgrif.workflow.WorkflowManagementSystemApplication
 import com.netgrif.workflow.elastic.domain.ElasticTask
 import com.netgrif.workflow.elastic.domain.ElasticTaskRepository
+import com.netgrif.workflow.elastic.service.ReindexingTask
 import com.netgrif.workflow.elastic.service.interfaces.IElasticTaskService
+import com.netgrif.workflow.petrinet.domain.I18nString
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.workflow.startup.ImportHelper
 import com.netgrif.workflow.startup.SuperCreator
+import com.netgrif.workflow.workflow.domain.QCase
 import com.netgrif.workflow.workflow.domain.Task
 import com.netgrif.workflow.workflow.domain.repositories.TaskRepository
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService
@@ -22,6 +25,8 @@ import org.springframework.core.io.Resource
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit4.SpringRunner
 
+import java.time.LocalDateTime
+
 @RunWith(SpringRunner.class)
 @ActiveProfiles(["test"])
 @SpringBootTest(
@@ -32,21 +37,15 @@ import org.springframework.test.context.junit4.SpringRunner
 class ElasticTaskTest {
 
     @Autowired
-    private ImportHelper helper
-    @Autowired
-    private IPetriNetService petriNetService
-    @Autowired
-    private SuperCreator superCreator
-    @Autowired
     private ElasticTaskRepository elasticTaskRepository
-    @Autowired
-    private IElasticTaskService elasticTaskService
     @Autowired
     private TaskRepository taskRepository
     @Autowired
-    private ITaskService taskService
-    @Autowired
     private TestHelper testHelper
+    @Autowired
+    private ImportHelper helper
+    @Autowired
+    private ReindexingTask reindexingTask
 
     @Value("classpath:task_reindex_test.xml")
     private Resource netResource
@@ -58,34 +57,14 @@ class ElasticTaskTest {
 
     @Test
     void taskReindexTest() {
-        def netOptional = petriNetService.importPetriNet(netResource.inputStream, "major", superCreator.getLoggedSuper())
-        assert netOptional.isPresent()
-        def net = netOptional.get()
+        def optional = helper.createNet("all_data.xml", "major")
+        assert optional.isPresent()
 
-        def testCase = helper.createCase("Test case", net)
-        assert testCase.tasks.size() == 3
-
-        List<Task> tasks = taskRepository.findAllByCaseId(testCase.getStringId())
-        for (Task task : tasks) {
-            elasticTaskService.indexNow(new ElasticTask(task))
-        }
-        def all = elasticTaskRepository.findAll()
-        assert all.size() == 3
-        assert all.find { it.transitionId == "2" }
-        assert all.find { it.transitionId == "2" }
-        assert all.find { it.transitionId == "5" }
-
-        taskService.assignTask(tasks.find { it.transitionId == "2" }.stringId)
-        taskService.finishTask(tasks.find { it.transitionId == "2" }.stringId)
-
-        tasks = taskRepository.findAllByCaseId(testCase.getStringId())
-        for (Task task : tasks) {
-            elasticTaskService.indexNow(new ElasticTask(task));
+        def net = optional.get()
+        10.times {
+            helper.createCase("Case $it", net)
         }
 
-        all = elasticTaskRepository.findAll()
-        assert all.size() == 2
-        assert all.find { it.transitionId == "9" }
-        assert all.find { it.transitionId == "5" }
+        reindexingTask.forceReindexPage(QCase.case$.lastModified.before(LocalDateTime.now()), 0, 1)
     }
 }
