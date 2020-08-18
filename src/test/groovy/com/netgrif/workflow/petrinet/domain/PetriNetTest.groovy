@@ -43,6 +43,9 @@ class PetriNetTest {
     @Value("classpath:net_clone.xml")
     private Resource netResource
 
+    @Value("classpath:net_import_1.xml")
+    private Resource netResource2
+
     @Before
     void before() {
         testHelper.truncateDbs()
@@ -78,6 +81,12 @@ class PetriNetTest {
         def netOptional2 = petriNetService.importPetriNet(netResource.inputStream, "major", superCreator.loggedSuper)
         assert netOptional2.isPresent()
 
-        def net = petriNetService.getReferencesByVersion(null, superCreator.loggedSuper, Locale.UK)
+        def netOptional3 = petriNetService.importPetriNet(netResource2.inputStream, "major", superCreator.loggedSuper)
+        assert netOptional3.isPresent()
+
+        def nets = petriNetService.getReferencesByVersion(null, superCreator.loggedSuper, Locale.UK)
+        assert nets.size() == 2
+        assert nets.find { it.identifier == "new_model" }.version == "1.0.0"
+        assert nets.find { it.identifier == "test" }.version == "2.0.0"
     }
 }
