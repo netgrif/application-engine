@@ -69,4 +69,15 @@ class PetriNetTest {
         assert processRoleRepository.count() == 3
         assert userProcessRoleRepository.count() == 3
     }
+
+    @Test
+    void testVersioning() {
+        def netOptional = petriNetService.importPetriNet(netResource.inputStream, "major", superCreator.loggedSuper)
+        assert netOptional.isPresent()
+
+        def netOptional2 = petriNetService.importPetriNet(netResource.inputStream, "major", superCreator.loggedSuper)
+        assert netOptional2.isPresent()
+
+        def net = petriNetService.getReferencesByVersion(null, superCreator.loggedSuper, Locale.UK)
+    }
 }
