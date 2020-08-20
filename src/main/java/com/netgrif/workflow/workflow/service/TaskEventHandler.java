@@ -1,5 +1,6 @@
 package com.netgrif.workflow.workflow.service;
 
+import com.netgrif.workflow.elastic.domain.ElasticTask;
 import com.netgrif.workflow.elastic.service.interfaces.IElasticTaskService;
 import com.netgrif.workflow.workflow.domain.Task;
 import org.bson.Document;
@@ -24,7 +25,7 @@ public class TaskEventHandler extends AbstractMongoEventListener<Task> {
     @Async
     @Override
     public void onAfterSave(AfterSaveEvent<Task> event) {
-        service.index(event.getSource());
+        service.index(new ElasticTask(event.getSource()));
     }
 
     @Override
