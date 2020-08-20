@@ -543,7 +543,7 @@ public class Importer {
     }
 
     private boolean containsParams(String definition) {
-        return definition.matches("[\\W\\w\\s]*[\\w]*:[\\s]+[ft].[\\w]+;[\\w\\W\\s]*");
+        return definition.matches("[\\W\\w\\s]*[\\w]*:[\\s]*[ft].[\\w]+;[\\w\\W\\s]*");
     }
 
     @Transactional
