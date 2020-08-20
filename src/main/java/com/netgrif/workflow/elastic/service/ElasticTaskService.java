@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -74,31 +75,37 @@ public class ElasticTaskService implements IElasticTaskService {
     @Override
     public void remove(String taskId) {
         executor.execute(() -> {
-            repository.deleteByStringId(taskId);
+            repository.deleteAllByStringId(taskId);
             log.info("[?]: Task \"" + taskId + "\" deleted");
         });
     }
 
     @Async
     @Override
-    public void index(Task task) {
+    public void index(ElasticTask task) {
         executor.execute(() -> {
-            ElasticTask elasticTask = repository.findByStringId(task.getStringId());
+            try {
+                ElasticTask elasticTask = repository.findByStringId(task.getStringId());
 
-            if (elasticTask == null) {
-                elasticTask = new ElasticTask(task);
-            } else {
-                elasticTask.update(task);
+                if (elasticTask == null) {
+                    repository.save(task);
+                } else {
+                    elasticTask.update(task);
+                    repository.save(elasticTask);
+                }
+
+                log.debug("[" + task.getCaseId() + "]: Task \"" + task.getTitle() + "\" [" + task.getStringId() + "] indexed");
+            } catch (InvalidDataAccessApiUsageException e) {
+                log.debug("[" + task.getCaseId() + "]: Task \"" + task.getTitle() + "\" has duplicates, will be reindexed");
+                repository.deleteAllByStringId(task.getStringId());
+                repository.save(task);
+                log.debug("[" + task.getCaseId() + "]: Task \"" + task.getTitle() + "\" indexed");
             }
-
-            repository.save(elasticTask);
-
-            log.debug("[" + task.getCaseId() + "]: Task \"" + task.getTitle() + "\" [" + task.getStringId() + "] indexed");
         });
     }
 
     @Override
-    public void indexNow(Task task) {
+    public void indexNow(ElasticTask task) {
         index(task);
     }
 

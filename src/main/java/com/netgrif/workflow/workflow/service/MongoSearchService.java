@@ -64,7 +64,7 @@ public class MongoSearchService<T> {
         return queryParts;
     }
 
-    protected String buildQuery(Map<String, Object> queryParts) throws IllegalQueryException {
+    public String buildQuery(Map<String, Object> queryParts) throws IllegalQueryException {
         StringBuilder builder = new StringBuilder();
         builder.append("{");
         boolean result = queryParts.entrySet().stream().allMatch(entry -> {
