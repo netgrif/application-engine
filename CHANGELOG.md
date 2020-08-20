@@ -1,3 +1,15 @@
+<a name="https://netgrif.atlassian.net/projects/NAE/versions/10807/tab/release-report-all-issues"></a>
+## 4.1.1 - Navy Brass (20.8.2020)
+### Bug fixes
+ * [NAE-959](https://netgrif.atlassian.net/browse/NAE-959) - Broken getReferencesByVersion if version is null
+ * [NAE-962](https://netgrif.atlassian.net/browse/NAE-962) - Quartz scheduler duplicate initialisation
+
+### Improvements
+ * [NAE-480](https://netgrif.atlassian.net/browse/NAE-480) - Task Reindex Task
+
+### Features
+None
+
 <a name="https://netgrif.atlassian.net/projects/NAE/versions/10782/tab/release-report-all-issues"></a>
 ## 4.1.0 - White Titanium (17.08.2020)
 ### Bug Fixes
