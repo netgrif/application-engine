@@ -125,16 +125,6 @@ public class ElasticTaskService implements IElasticTaskService {
         return template.count(query, ElasticTask.class);
     }
 
-    protected void addRolesQueryConstraint(TaskSearchRequest request, LoggedUser user) {
-        if (request.role != null && !request.role.isEmpty()) {
-            Set<String> roles = new HashSet<>(request.role);
-            roles.addAll(user.getProcessRoles());
-            request.role = new ArrayList<>(roles);
-        } else {
-            request.role = new ArrayList<>(user.getProcessRoles());
-        }
-    }
-
     private SearchQuery buildQuery(List<TaskSearchRequest> requests, LoggedUser user, Pageable pageable, Boolean isIntersection) {
         BinaryOperator<BoolQueryBuilder> reductionOperator;
         if (isIntersection)
@@ -171,6 +161,16 @@ public class ElasticTaskService implements IElasticTaskService {
         buildTransitionQuery(request, query);
 
         return query;
+    }
+
+    protected void addRolesQueryConstraint(TaskSearchRequest request, LoggedUser user) {
+        if (request.role != null && !request.role.isEmpty()) {
+            Set<String> roles = new HashSet<>(request.role);
+            roles.addAll(user.getProcessRoles());
+            request.role = new ArrayList<>(roles);
+        } else {
+            request.role = new ArrayList<>(user.getProcessRoles());
+        }
     }
 
     /**
