@@ -23,7 +23,7 @@ public class TaskSearchService extends MongoSearchService<Task> {
     public static final String TRANSITION = "transition";
     public static final String FULL_TEXT = "fullText";
 
-    public com.querydsl.core.types.Predicate buildQuery(Map<String, Object> request, LoggedUser user, Locale locale) {
+    public Predicate buildQuery(Map<String, Object> request, LoggedUser user, Locale locale) {
         BooleanBuilder builder = new BooleanBuilder();
 
         if (request.containsKey(ROLE))
