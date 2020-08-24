@@ -194,16 +194,6 @@ public class TaskController {
         return resources;
     }
 
-//    @RequestMapping(value = "/search", method = RequestMethod.POST)
-//    public PagedResources<LocalisedTaskResource> search(Authentication auth, Pageable pageable, @RequestBody TaskSearchRequest searchBody, PagedResourcesAssembler<ElasticTask> assembler, Locale locale) {
-//        Page<ElasticTask> tasks = searchService.search(searchBody, (LoggedUser) auth.getPrincipal(), pageable);
-//        Link selfLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
-//                .search(auth, pageable, searchBody, assembler, locale)).withRel("search");
-//        PagedResources<LocalisedTaskResource> resources = assembler.toResource(tasks, new ElasticTaskResourceAssembler(), selfLink);
-//        ResourceLinkAssembler.addLinks(resources, com.netgrif.workflow.workflow.domain.Task.class, selfLink.getRel());
-//        return resources;
-//    }
-
     @PostMapping(value = "/count", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public CountResponse count(@RequestBody SingleTaskSearchRequestAsList query, @RequestParam(defaultValue = "OR") MergeFilterOperation operation, Authentication auth, Locale locale) {
         long count = searchService.count(query.getList(), (LoggedUser)auth.getPrincipal(), operation == MergeFilterOperation.AND);
