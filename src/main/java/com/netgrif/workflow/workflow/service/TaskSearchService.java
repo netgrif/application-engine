@@ -1,6 +1,7 @@
 package com.netgrif.workflow.workflow.service;
 
 import com.netgrif.workflow.auth.domain.LoggedUser;
+import com.netgrif.workflow.elastic.web.requestbodies.TaskSearchRequest;
 import com.netgrif.workflow.workflow.domain.QTask;
 import com.netgrif.workflow.workflow.domain.Task;
 import com.querydsl.core.BooleanBuilder;
@@ -14,16 +15,22 @@ import java.util.stream.Collectors;
 @Service
 public class TaskSearchService extends MongoSearchService<Task> {
 
-    public static final String TITLE = "title";
-    public static final String ID = "id";
-    public static final String ROLE = "role";
-    public static final String USER = "user";
-    public static final String PROCESS = "process";
-    public static final String CASE = "case";
-    public static final String TRANSITION = "transition";
-    public static final String FULL_TEXT = "fullText";
+    public Predicate buildQuery(List<TaskSearchRequest> requests, LoggedUser user, Locale locale, Boolean isIntersection) {
+        List<Predicate> singleQueries = requests.stream().map(request -> buildSingleQuery(request, user)).collect(Collectors.toList());
 
-    public Predicate buildQuery(Map<String, Object> request, LoggedUser user, Locale locale) {
+        BooleanBuilder builder = constructPredicateTree(singleQueries, isIntersection ? BooleanBuilder::and : BooleanBuilder::or);
+
+        builder.and(buildRolesQueryConstraint(user));
+
+        return builder;
+    }
+
+    protected Predicate buildRolesQueryConstraint(LoggedUser user) {
+        List<Predicate> roleConstraints = user.getProcessRoles().stream().map(this::roleString).collect(Collectors.toList());
+        return constructPredicateTree(roleConstraints, BooleanBuilder::or);
+    }
+
+    private Predicate buildSingleQuery(TaskSearchRequest request, LoggedUser user) {
         BooleanBuilder builder = new BooleanBuilder();
 
         if (request.containsKey(ROLE))
@@ -182,16 +189,16 @@ public class TaskSearchService extends MongoSearchService<Task> {
     }
 
     private BooleanBuilder constructPredicateTree(List<Predicate> elementaryPredicates, BiFunction<BooleanBuilder, Predicate, BooleanBuilder> nodeOperation) {
-        ArrayDeque<BooleanBuilder> subtrees = new ArrayDeque<>(elementaryPredicates.size()/2 + elementaryPredicates.size()%2);
+        ArrayDeque<BooleanBuilder> subtrees = new ArrayDeque<>(elementaryPredicates.size() / 2 + elementaryPredicates.size() % 2);
 
-        for(Iterator<Predicate> predicateIterator = elementaryPredicates.iterator(); predicateIterator.hasNext();) {
+        for (Iterator<Predicate> predicateIterator = elementaryPredicates.iterator(); predicateIterator.hasNext(); ) {
             BooleanBuilder subtree = new BooleanBuilder(predicateIterator.next());
-            if(predicateIterator.hasNext())
+            if (predicateIterator.hasNext())
                 nodeOperation.apply(subtree, predicateIterator.next());
             subtrees.addFirst(subtree);
         }
 
-        while(subtrees.size()!=1)
+        while (subtrees.size() != 1)
             subtrees.addLast(nodeOperation.apply(subtrees.pollFirst(), subtrees.pollFirst()));
 
         return subtrees.peekFirst();
