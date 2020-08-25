@@ -6,6 +6,8 @@ import com.netgrif.workflow.workflow.domain.QTask;
 import com.netgrif.workflow.workflow.domain.Task;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Predicate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -15,8 +17,10 @@ import java.util.stream.Collectors;
 @Service
 public class TaskSearchService extends MongoSearchService<Task> {
 
-    public Predicate buildQuery(List<TaskSearchRequest> requests, LoggedUser user, Locale locale, Boolean isIntersection) {
-        List<Predicate> singleQueries = requests.stream().map(request -> buildSingleQuery(request, user)).collect(Collectors.toList());
+    private static final Logger log = LoggerFactory.getLogger(TaskSearchService.class);
+
+    public Predicate buildQuery(List<TaskSearchRequest> requests, LoggedUser user, Boolean isIntersection) {
+        List<Predicate> singleQueries = requests.stream().map(this::buildSingleQuery).collect(Collectors.toList());
 
         BooleanBuilder builder = constructPredicateTree(singleQueries, isIntersection ? BooleanBuilder::and : BooleanBuilder::or);
 
@@ -26,169 +30,149 @@ public class TaskSearchService extends MongoSearchService<Task> {
     }
 
     protected Predicate buildRolesQueryConstraint(LoggedUser user) {
-        List<Predicate> roleConstraints = user.getProcessRoles().stream().map(this::roleString).collect(Collectors.toList());
+        List<Predicate> roleConstraints = user.getProcessRoles().stream().map(this::roleQuery).collect(Collectors.toList());
         return constructPredicateTree(roleConstraints, BooleanBuilder::or);
     }
 
-    private Predicate buildSingleQuery(TaskSearchRequest request, LoggedUser user) {
+    private Predicate buildSingleQuery(TaskSearchRequest request) {
         BooleanBuilder builder = new BooleanBuilder();
 
-        if (request.containsKey(ROLE))
-            builder.and(role(request.get(ROLE)));
-
-        if (request.containsKey(CASE))
-            builder.and(useCase(request.get(CASE)));
-
-        if (request.containsKey(TITLE))
-            builder.and(title(request.get(TITLE)));
-
-        if (request.containsKey(USER))
-            builder.and(user(request.get(USER)));
-
-        if (request.containsKey(TRANSITION))
-            builder.and(transition(request.get(TRANSITION)));
-
-        if (request.containsKey(PROCESS))
-            builder.and(process(request.get(PROCESS)));
-
-        if (request.containsKey(FULL_TEXT))
-            builder.and(fullText((String) request.get(FULL_TEXT)));
+        buildRoleQuery(request, builder);
+        buildCaseQuery(request, builder);
+        buildTitleQuery(request, builder);
+        buildUserQuery(request, builder);
+        buildProcessQuery(request, builder);
+        buildFullTextQuery(request, builder);
+        buildTransitionQuery(request, builder);
+        buildStringQuery(request);
 
         return builder;
     }
 
-    public Predicate role(Object query) {
-        if (query instanceof ArrayList)
-            return constructPredicateTree(((ArrayList<String>) query).stream().map(this::roleString).collect(Collectors.toList()), TaskSearchService::or);
-        else if (query instanceof String)
-            return roleString((String) query);
+    private void buildRoleQuery(TaskSearchRequest request, BooleanBuilder query) {
+        if (request.role == null || request.role.isEmpty()) {
+            return;
+        }
 
-        return null;
+        query.and(
+                constructPredicateTree(
+                        request.role.stream().map(this::roleQuery).collect(Collectors.toList()),
+                        BooleanBuilder::or)
+        );
     }
 
-    private Predicate roleString(String role) {
+    public Predicate roleQuery(String role) {
         return QTask.task.roles.containsKey(role);
     }
 
-    public Predicate useCase(Object query) {
-        if (query instanceof HashMap) {
-            return caseObject((HashMap<String, Object>) query);
-        } else if (query instanceof ArrayList) {
-            return caseArray((ArrayList<String>) query, ID);
-        } else if (query instanceof String) {
-            return caseId((String) query);
+
+    private void buildCaseQuery(TaskSearchRequest request, BooleanBuilder query) {
+        if (request.useCase == null || request.useCase.isEmpty()) {
+            return;
         }
 
-        return null;
+        query.and(
+                constructPredicateTree(
+                        request.useCase.stream().map(this::caseQuery).collect(Collectors.toList()),
+                        BooleanBuilder::or)
+        );
     }
 
-    private Predicate caseObject(Map<String, Object> query) {
-        if (query.containsKey(TITLE)) {
-            return query.get(TITLE) instanceof ArrayList ? caseArray((ArrayList<String>) query.get(TITLE), TITLE) : caseTitle((String) query.get(TITLE));
-        } else if (query.containsKey(ID)) {
-            return query.get(ID) instanceof ArrayList ? caseArray((ArrayList<String>) query.get(ID), ID) : caseId((String) query.get(ID));
-        }
-
-        return null;
-    }
-
-    private Predicate caseArray(ArrayList<String> query, String key) {
-        return constructPredicateTree(query.stream().map(q -> {
-            if (key.equalsIgnoreCase(TITLE))
-                return caseTitle(q);
-            else
-                return caseId(q);
-        }).collect(Collectors.toList()), TaskSearchService::or);
-    }
-
-    private Predicate caseId(String caseId) {
+    public Predicate caseQuery(String caseId) {
         return QTask.task.caseId.eq(caseId);
     }
 
-    private Predicate caseTitle(String caseTitle) {
-        return QTask.task.caseTitle.containsIgnoreCase(caseTitle);
+    private void buildTitleQuery(TaskSearchRequest request, BooleanBuilder query) {
+        if (request.title == null || request.title.isEmpty()) {
+            return;
+        }
+
+        query.and(
+                constructPredicateTree(
+                        request.title.stream().map(this::titleQuery).collect(Collectors.toList()),
+                        BooleanBuilder::or)
+        );
     }
 
-    public Predicate title(Object query) {
-        if (query instanceof ArrayList)
-            return constructPredicateTree(((ArrayList<String>) query).stream().map(this::titleString).collect(Collectors.toList()), TaskSearchService::or);
-        else if (query instanceof String)
-            return titleString((String) query);
-
-        return null;
-    }
-
-    private Predicate titleString(String query) {
+    public Predicate titleQuery(String query) {
         return QTask.task.title.defaultValue.containsIgnoreCase(query);
     }
 
-    public Predicate user(Object query) {
-        if (query instanceof ArrayList)
-            return constructPredicateTree(((ArrayList<Number>) query).stream().map(this::userLong).collect(Collectors.toList()), TaskSearchService::or);
-        else if (query instanceof Integer)
-            return userLong(Long.valueOf(((Integer) query).longValue()));
-        else if (query instanceof Long)
-            return userLong((Long) query);
-        else if (query instanceof String) {
-            try {
-                return userLong(Long.parseLong((String) query));
-            } catch (NumberFormatException queryShouldBeEmail) {
-                return userString((String) query);
-            }
+    private void buildUserQuery(TaskSearchRequest request, BooleanBuilder query) {
+        if (request.user == null || request.user.isEmpty()) {
+            return;
         }
 
-        return null;
+        query.and(
+                constructPredicateTree(
+                        request.user.stream().map(this::userQuery).collect(Collectors.toList()),
+                        BooleanBuilder::or)
+        );
     }
 
-    private Predicate userLong(Number userId) {
-        if (userId instanceof Integer)
-            return QTask.task.userId.eq(Long.valueOf(((Integer) userId).longValue()));
-        else if (userId instanceof Long)
-            return QTask.task.userId.eq((Long) userId);
-        return null;
+    public Predicate userQuery(Long userId) {
+        return QTask.task.userId.eq(userId);
     }
 
-    private Predicate userString(String userEmail) {
-        Long id = resolveAuthorByEmail(userEmail);
-        if (id != null)
-            return userLong(id);
-        return null;
+    private void buildProcessQuery(TaskSearchRequest request, BooleanBuilder query) {
+        if (request.process == null || request.process.isEmpty()) {
+            return;
+        }
+
+        query.and(
+                constructPredicateTree(
+                        request.process.stream().map(this::processQuery).collect(Collectors.toList()),
+                        BooleanBuilder::or)
+        );
     }
 
-    public Predicate transition(Object query) {
-        if (query instanceof ArrayList)
-            return constructPredicateTree(((ArrayList<String>) query).stream().map(this::transitionString).collect(Collectors.toList()), TaskSearchService::or);
-        else if (query instanceof String)
-            return transitionString((String) query);
-
-        return null;
-    }
-
-    private Predicate transitionString(String transitionId) {
-        return QTask.task.transitionId.eq(transitionId);
-    }
-
-    public Predicate process(Object query) {
-        if (query instanceof ArrayList)
-            return constructPredicateTree(((ArrayList<String>) query).stream().map(this::processString).collect(Collectors.toList()), TaskSearchService::or);
-        else if (query instanceof String)
-            return processString((String) query);
-
-        return null;
-    }
-
-    private Predicate processString(String processId) {
+    public Predicate processQuery(String processId) {
         return QTask.task.processId.eq(processId);
     }
 
-    public Predicate fullText(String query) {
+    private void buildFullTextQuery(TaskSearchRequest request, BooleanBuilder query) {
+        if (request.fullText == null || request.fullText.isEmpty()) {
+            return;
+        }
+
+        query.and(fullTextQuery(request.fullText));
+    }
+
+    public Predicate fullTextQuery(String searchedText) {
         BooleanBuilder builder = new BooleanBuilder();
-        builder.or(QTask.task.title.defaultValue.containsIgnoreCase(query));
-        builder.or(QTask.task.caseTitle.containsIgnoreCase(query));
+        builder.or(QTask.task.title.defaultValue.containsIgnoreCase(searchedText));
+        builder.or(QTask.task.caseTitle.containsIgnoreCase(searchedText));
         return builder;
     }
 
+    private void buildTransitionQuery(TaskSearchRequest request, BooleanBuilder query) {
+        if (request.transitionId == null || request.transitionId.isEmpty()) {
+            return;
+        }
+
+        query.and(
+                constructPredicateTree(
+                        request.transitionId.stream().map(this::transitionQuery).collect(Collectors.toList()),
+                        BooleanBuilder::or)
+        );
+    }
+
+    public Predicate transitionQuery(String transitionId) {
+        return QTask.task.transitionId.eq(transitionId);
+    }
+
+    private void buildStringQuery(TaskSearchRequest request) {
+        if (request.query == null || request.query.isEmpty()) {
+            return;
+        }
+        log.warn("Mongo task search requested with elastic query string query. Ignoring...");
+        log.debug("Ignored query: " + request.query);
+    }
+
     private BooleanBuilder constructPredicateTree(List<Predicate> elementaryPredicates, BiFunction<BooleanBuilder, Predicate, BooleanBuilder> nodeOperation) {
+        if (elementaryPredicates.size() == 0)
+            return new BooleanBuilder();
+
         ArrayDeque<BooleanBuilder> subtrees = new ArrayDeque<>(elementaryPredicates.size() / 2 + elementaryPredicates.size() % 2);
 
         for (Iterator<Predicate> predicateIterator = elementaryPredicates.iterator(); predicateIterator.hasNext(); ) {
@@ -202,9 +186,5 @@ public class TaskSearchService extends MongoSearchService<Task> {
             subtrees.addLast(nodeOperation.apply(subtrees.pollFirst(), subtrees.pollFirst()));
 
         return subtrees.peekFirst();
-    }
-
-    private static BooleanBuilder or(BooleanBuilder leftSubtree, Predicate rightSubtree) {
-        return leftSubtree.or(rightSubtree);
     }
 }
