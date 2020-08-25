@@ -153,8 +153,8 @@ public class ElasticTaskService implements IElasticTaskService {
         buildUserQuery(request, query);
         buildProcessQuery(request, query);
         buildFullTextQuery(request, query);
-        buildStringQuery(request, query);
         buildTransitionQuery(request, query);
+        buildStringQuery(request, query);
 
         return query;
     }
@@ -311,17 +311,6 @@ public class ElasticTaskService implements IElasticTaskService {
     }
 
     /**
-     * See <a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-query-string-query.html">Query String Query</a>
-     */
-    private void buildStringQuery(TaskSearchRequest request, BoolQueryBuilder query) {
-        if (request.query == null || request.query.isEmpty()) {
-            return;
-        }
-
-        query.must(queryStringQuery(request.query));
-    }
-
-    /**
      * Tasks with transition id "document"
      * {
      * "transitionId": "document"
@@ -344,5 +333,16 @@ public class ElasticTaskService implements IElasticTaskService {
         request.transitionId.forEach(transitionId -> transitionQuery.should(termQuery("transitionId", transitionId)));
 
         query.filter(transitionQuery);
+    }
+
+    /**
+     * See <a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-query-string-query.html">Query String Query</a>
+     */
+    private void buildStringQuery(TaskSearchRequest request, BoolQueryBuilder query) {
+        if (request.query == null || request.query.isEmpty()) {
+            return;
+        }
+
+        query.must(queryStringQuery(request.query));
     }
 }
