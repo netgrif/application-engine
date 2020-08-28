@@ -5,7 +5,7 @@ import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.elastic.domain.ElasticTask;
 import com.netgrif.workflow.elastic.domain.ElasticTaskRepository;
 import com.netgrif.workflow.elastic.service.interfaces.IElasticTaskService;
-import com.netgrif.workflow.elastic.web.requestbodies.TaskSearchRequest;
+import com.netgrif.workflow.elastic.web.requestbodies.ElasticTaskSearchRequest;
 import com.netgrif.workflow.utils.FullPageRequest;
 import com.netgrif.workflow.workflow.domain.Task;
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
@@ -110,7 +110,7 @@ public class ElasticTaskService implements IElasticTaskService {
     }
 
     @Override
-    public Page<Task> search(List<TaskSearchRequest> requests, LoggedUser user, Pageable pageable, Boolean isIntersection) {
+    public Page<Task> search(List<ElasticTaskSearchRequest> requests, LoggedUser user, Pageable pageable, Boolean isIntersection) {
         SearchQuery query = buildQuery(requests, user, pageable, isIntersection);
         Page<ElasticTask> indexedTasks = repository.search(query);
         List<Task> taskPage = taskService.findAllById(indexedTasks.get().map(ElasticTask::getStringId).collect(Collectors.toList()));
@@ -119,13 +119,13 @@ public class ElasticTaskService implements IElasticTaskService {
     }
 
     @Override
-    public long count(List<TaskSearchRequest> requests, LoggedUser user, Boolean isIntersection) {
+    public long count(List<ElasticTaskSearchRequest> requests, LoggedUser user, Boolean isIntersection) {
         SearchQuery query = buildQuery(requests, user, new FullPageRequest(), isIntersection);
 
         return template.count(query, ElasticTask.class);
     }
 
-    private SearchQuery buildQuery(List<TaskSearchRequest> requests, LoggedUser user, Pageable pageable, Boolean isIntersection) {
+    private SearchQuery buildQuery(List<ElasticTaskSearchRequest> requests, LoggedUser user, Pageable pageable, Boolean isIntersection) {
         BinaryOperator<BoolQueryBuilder> reductionOperator = isIntersection ? BoolQueryBuilder::must : BoolQueryBuilder::should;
 
         BoolQueryBuilder query = requests.stream()
@@ -139,7 +139,7 @@ public class ElasticTaskService implements IElasticTaskService {
                 .build();
     }
 
-    private BoolQueryBuilder buildSingleQuery(TaskSearchRequest request, LoggedUser user) {
+    private BoolQueryBuilder buildSingleQuery(ElasticTaskSearchRequest request, LoggedUser user) {
         if (request == null) {
             throw new IllegalArgumentException("Request can not be null!");
         }
@@ -159,7 +159,7 @@ public class ElasticTaskService implements IElasticTaskService {
         return query;
     }
 
-    protected void addRolesQueryConstraint(TaskSearchRequest request, LoggedUser user) {
+    protected void addRolesQueryConstraint(ElasticTaskSearchRequest request, LoggedUser user) {
         if (request.role != null && !request.role.isEmpty()) {
             Set<String> roles = new HashSet<>(request.role);
             roles.addAll(user.getProcessRoles());
@@ -183,7 +183,7 @@ public class ElasticTaskService implements IElasticTaskService {
      * ]
      * }
      */
-    private void buildRoleQuery(TaskSearchRequest request, BoolQueryBuilder query) {
+    private void buildRoleQuery(ElasticTaskSearchRequest request, BoolQueryBuilder query) {
         if (request.role == null || request.role.isEmpty()) {
             return;
         }
@@ -210,7 +210,7 @@ public class ElasticTaskService implements IElasticTaskService {
      * ]
      * }
      */
-    private void buildCaseQuery(TaskSearchRequest request, BoolQueryBuilder query) {
+    private void buildCaseQuery(ElasticTaskSearchRequest request, BoolQueryBuilder query) {
         if (request.useCase == null || request.useCase.isEmpty()) {
             return;
         }
@@ -237,7 +237,7 @@ public class ElasticTaskService implements IElasticTaskService {
      * ]
      * }
      */
-    private void buildTitleQuery(TaskSearchRequest request, BoolQueryBuilder query) {
+    private void buildTitleQuery(ElasticTaskSearchRequest request, BoolQueryBuilder query) {
         if (request.title == null || request.title.isEmpty()) {
             return;
         }
@@ -258,7 +258,7 @@ public class ElasticTaskService implements IElasticTaskService {
      * <p>
      * Tasks assigned to user with id 1 OR 2
      */
-    private void buildUserQuery(TaskSearchRequest request, BoolQueryBuilder query) {
+    private void buildUserQuery(ElasticTaskSearchRequest request, BoolQueryBuilder query) {
         if (request.user == null || request.user.isEmpty()) {
             return;
         }
@@ -285,7 +285,7 @@ public class ElasticTaskService implements IElasticTaskService {
      * ]
      * }
      */
-    private void buildProcessQuery(TaskSearchRequest request, BoolQueryBuilder query) {
+    private void buildProcessQuery(ElasticTaskSearchRequest request, BoolQueryBuilder query) {
         if (request.process == null || request.process.isEmpty()) {
             return;
         }
@@ -301,7 +301,7 @@ public class ElasticTaskService implements IElasticTaskService {
     /**
      * Full text search on fields defined by {@link #fullTextFields()}.
      */
-    private void buildFullTextQuery(TaskSearchRequest request, BoolQueryBuilder query) {
+    private void buildFullTextQuery(ElasticTaskSearchRequest request, BoolQueryBuilder query) {
         if (request.fullText == null || request.fullText.isEmpty()) {
             return;
         }
@@ -324,7 +324,7 @@ public class ElasticTaskService implements IElasticTaskService {
      * ]
      * }
      */
-    private void buildTransitionQuery(TaskSearchRequest request, BoolQueryBuilder query) {
+    private void buildTransitionQuery(ElasticTaskSearchRequest request, BoolQueryBuilder query) {
         if (request.transitionId == null || request.transitionId.isEmpty()) {
             return;
         }
@@ -338,7 +338,7 @@ public class ElasticTaskService implements IElasticTaskService {
     /**
      * See <a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-query-string-query.html">Query String Query</a>
      */
-    private void buildStringQuery(TaskSearchRequest request, BoolQueryBuilder query) {
+    private void buildStringQuery(ElasticTaskSearchRequest request, BoolQueryBuilder query) {
         if (request.query == null || request.query.isEmpty()) {
             return;
         }
