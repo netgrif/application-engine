@@ -25,7 +25,7 @@
                 </xs:choice>
                 <xs:choice>
                     <xs:element ref="valid" minOccurs="0" maxOccurs="unbounded"/>
-                    <xs:element ref="validations" minOccurs="0" />
+                    <xs:element ref="validations" minOccurs="0"/>
                 </xs:choice>
                 <xs:element ref="init" minOccurs="0" maxOccurs="unbounded"/>
                 <xs:element ref="format" minOccurs="0"/>
@@ -38,6 +38,7 @@
                 <xs:element ref="documentRef" minOccurs="0"/>
                 <xs:element ref="remote" minOccurs="0"/>
                 <xs:element ref="length" minOccurs="0"/>
+                <xs:element ref="allowedNets" minOccurs="0"/>
             </xs:sequence>
             <xs:attribute type="data_type" name="type" use="required"/>
             <xs:attribute type="xs:boolean" name="immediate"/>
@@ -74,8 +75,15 @@
                 <xs:element ref="x"/>
                 <xs:element ref="y"/>
                 <xs:element ref="label"/>
-                <xs:element ref="cols" minOccurs="0"/>
-                <xs:element ref="rows" minOccurs="0"/>
+                <xs:element name="layout">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element ref="cols" minOccurs="0"/>
+                            <xs:element ref="rows" minOccurs="0"/>
+                            <xs:element ref="offset" minOccurs="0"/>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
                 <xs:element ref="icon" minOccurs="0"/>
                 <xs:element ref="priority" minOccurs="0"/>
                 <xs:element ref="assignPolicy" minOccurs="0"/>
@@ -204,11 +212,12 @@
             <xs:enumeration value="boolean"/>
             <xs:enumeration value="date"/>
             <xs:enumeration value="file"/>
+            <xs:enumeration value="fileList"/>
             <xs:enumeration value="user"/>
-            <xs:enumeration value="caseref"/>
             <xs:enumeration value="dateTime"/>
             <xs:enumeration value="button"/>
             <xs:enumeration value="taskRef"/>
+            <xs:enumeration value="caseRef"/>
         </xs:restriction>
     </xs:simpleType>
     <xs:simpleType name="arc_type">
@@ -273,6 +282,7 @@
     <xs:element name="y" type="nonNegativeInteger"/>
     <xs:element name="cols" type="nonNegativeInteger"/>
     <xs:element name="rows" type="nonNegativeInteger"/>
+    <xs:element name="offset" type="nonNegativeInteger"/>
     <xs:element name="template" type="templateType"/>
     <xs:simpleType name="templateType">
         <xs:restriction base="xs:string">
@@ -318,7 +328,7 @@
     <xs:element name="options">
         <xs:complexType>
             <xs:sequence>
-                <xs:element ref="option" minOccurs="0" maxOccurs="unbounded" />
+                <xs:element ref="option" minOccurs="0" maxOccurs="unbounded"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
@@ -331,6 +341,14 @@
             </xs:simpleContent>
         </xs:complexType>
     </xs:element>
+    <xs:element name="allowedNets">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="allowedNet" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="allowedNet" type="xs:string"/>
     <xs:element name="perform" type="xs:boolean"/>
     <xs:element name="view" type="xs:boolean"/>
     <xs:element name="delegate" type="xs:boolean"/>
@@ -391,6 +409,7 @@
                 <xs:element ref="y"/>
                 <xs:element ref="rows"/>
                 <xs:element ref="cols"/>
+                <xs:element ref="offset"/>
                 <xs:element ref="template" minOccurs="0"/>
                 <xs:element ref="appearance" minOccurs="0"/>
             </xs:sequence>
@@ -421,14 +440,14 @@
     </xs:complexType>
     <xs:element name="placeholder" type="i18nStringType"/>
     <xs:element name="valid" type="validation"/>
-    <xs:element name="validations" >
+    <xs:element name="validations">
         <xs:complexType>
             <xs:sequence>
                 <xs:element ref="validation" maxOccurs="unbounded" minOccurs="0"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
-    <xs:element name="validation" >
+    <xs:element name="validation">
         <xs:complexType>
             <xs:sequence>
                 <xs:element name="expression" type="validation"/>
@@ -536,6 +555,19 @@
             <xs:element name="table" type="xs:string"/>
             <xs:element name="image" type="booleanImageView"/>
             <xs:element name="editor"/>
+            <xs:element name="buttonType">
+                <xs:simpleType>
+                    <xs:restriction base='xs:string'>
+                        <xs:enumeration value="standard"/>
+                        <xs:enumeration value="raised"/>
+                        <xs:enumeration value="stroked"/>
+                        <xs:enumeration value="flat"/>
+                        <xs:enumeration value="icon"/>
+                        <xs:enumeration value="fab"/>
+                        <xs:enumeration value="minifab"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
             <xs:element name="list">
                 <xs:simpleType>
                     <xs:union>

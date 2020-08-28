@@ -294,9 +294,8 @@ public class Importer {
         transition.setImportId(importTransition.getId());
         transition.setTitle(toI18NString(importTransition.getLabel()));
         transition.setPosition(importTransition.getX(), importTransition.getY());
-
-        if (importTransition.getCols() != null || importTransition.getRows() != null) {
-            transition.setLayout(new TaskLayout(importTransition.getRows(), importTransition.getCols()));
+        if (importTransition.getLayout() != null && (importTransition.getLayout().getCols() != null || importTransition.getLayout().getRows() != null)) {
+            transition.setLayout(new TaskLayout(importTransition));
         }
 
         transition.setPriority(importTransition.getPriority());
@@ -478,12 +477,12 @@ public class Importer {
                 return;
             }
 
-            String appearance = "standard";
+            String appearance = "outline";
             if (layout.getAppearance() != null) {
                 appearance = layout.getAppearance().toString();
             }
 
-            FieldLayout fieldLayout = new FieldLayout(layout.getX(), layout.getY(), layout.getRows(), layout.getCols(), layout.getTemplate().toString(), appearance);
+            FieldLayout fieldLayout = new FieldLayout(layout.getX(), layout.getY(), layout.getRows(), layout.getCols(), layout.getOffset(), layout.getTemplate().toString(), appearance);
             transition.addDataSet(fieldId, null, null, fieldLayout);
         } catch (NullPointerException e) {
             throw new IllegalArgumentException("Wrong dataRef id [" + dataRef.getId() + "] on transition [" + transition.getTitle() + "]", e);
@@ -545,7 +544,7 @@ public class Importer {
     }
 
     private boolean containsParams(String definition) {
-        return definition.matches("[\\W\\w\\s]*[\\w]*:[\\s][ft].[\\w]+;[\\w\\W\\s]*");
+        return definition.matches("[\\W\\w\\s]*[\\w]*:[\\s]*[ft].[\\w]+;[\\w\\W\\s]*");
     }
 
     @Transactional
