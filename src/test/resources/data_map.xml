@@ -3,12 +3,12 @@
           xsi:noNamespaceSchemaLocation="../../main/resources/petriNets/petriflow_schema.xsd">
     <id>test</id>
     <initials>TST</initials>
-    <title>Test</title>
+    <title name="doc_name">Test</title>
     <defaultRole>true</defaultRole>
     <!-- DATA -->
     <data type="enumeration_map" immediate="true">
         <id>enumeration</id>
-        <title>Enumeration map</title>
+        <title name="enum_map">Enumeration map</title>
         <options>
             <option key="first" name="first_option">First option</option>
             <option key="second" name="second_option">Second option</option>
@@ -19,11 +19,12 @@
     <!-- I18N -->
     <i18n locale="sk">
         <i18nString name="first_option">Prvá možnosť</i18nString>
-    </i18n>
-    <i18n locale="sk">
         <i18nString name="second_option">Druhá možnosť</i18nString>
-    </i18n>
-    <i18n locale="sk">
         <i18nString name="third_option">Tretia možnosť</i18nString>
+    </i18n>
+    <i18n locale="de">
+        <i18nString name="first_option">Erste Option</i18nString>
+        <i18nString name="second_option">Zweite Option</i18nString>
+        <i18nString name="third_option">Dritte Option</i18nString>
     </i18n>
 </document>
