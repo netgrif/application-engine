@@ -68,13 +68,26 @@ public class TaskSearchService extends MongoSearchService<Task> {
 
         query.and(
                 constructPredicateTree(
-                        request.useCase.stream().map(this::caseQuery).collect(Collectors.toList()),
+                        request.useCase.stream().map(this::caseRequestQuery).filter(Objects::nonNull).collect(Collectors.toList()),
                         BooleanBuilder::or)
         );
     }
 
-    public Predicate caseQuery(String caseId) {
+    private Predicate caseRequestQuery(TaskSearchRequest.TaskSearchCaseRequest caseRequest) {
+        if (caseRequest.id != null) {
+            return caseIdQuery(caseRequest.id);
+        } else if (caseRequest.title != null) {
+            return caseTitleQuery(caseRequest.title);
+        }
+        return null;
+    }
+
+    public Predicate caseIdQuery(String caseId) {
         return QTask.task.caseId.eq(caseId);
+    }
+
+    public Predicate caseTitleQuery(String caseTitle) {
+        return QTask.task.caseTitle.containsIgnoreCase(caseTitle);
     }
 
     private void buildTitleQuery(TaskSearchRequest request, BooleanBuilder query) {

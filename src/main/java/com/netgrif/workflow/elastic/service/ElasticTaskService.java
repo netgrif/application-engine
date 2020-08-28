@@ -9,6 +9,7 @@ import com.netgrif.workflow.elastic.web.requestbodies.ElasticTaskSearchRequest;
 import com.netgrif.workflow.utils.FullPageRequest;
 import com.netgrif.workflow.workflow.domain.Task;
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
+import com.netgrif.workflow.workflow.web.requestbodies.TaskSearchRequest;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryStringQueryBuilder;
@@ -59,6 +60,10 @@ public class ElasticTaskService implements IElasticTaskService {
 
     private Map<String, Float> fullTextFieldMap = ImmutableMap.of(
             "title", 1f,
+            "caseTitle", 1f
+    );
+
+    private Map<String, Float> caseTitledMap = ImmutableMap.of(
             "caseTitle", 1f
     );
 
@@ -216,11 +221,18 @@ public class ElasticTaskService implements IElasticTaskService {
         }
 
         BoolQueryBuilder casesQuery = boolQuery();
-        for (String caseId : request.useCase) {
-            casesQuery.should(termQuery("caseId", caseId));
-        }
+        request.useCase.stream().map(this::caseRequestQuery).filter(Objects::nonNull).forEach(casesQuery::should);
 
         query.filter(casesQuery);
+    }
+
+    private QueryBuilder caseRequestQuery(TaskSearchRequest.TaskSearchCaseRequest caseRequest) {
+        if (caseRequest.id != null) {
+            return termQuery("caseId", caseRequest.id);
+        } else if (caseRequest.title != null) {
+            return queryStringQuery("*" + caseRequest.title + "*").fields(this.caseTitledMap);
+        }
+        return null;
     }
 
     /**
