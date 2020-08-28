@@ -1,13 +1,11 @@
 package com.netgrif.workflow.workflow.service;
 
 import com.netgrif.workflow.auth.domain.LoggedUser;
-import com.netgrif.workflow.elastic.web.requestbodies.TaskSearchRequest;
+import com.netgrif.workflow.workflow.web.requestbodies.TaskSearchRequest;
 import com.netgrif.workflow.workflow.domain.QTask;
 import com.netgrif.workflow.workflow.domain.Task;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Predicate;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -16,8 +14,6 @@ import java.util.stream.Collectors;
 
 @Service
 public class TaskSearchService extends MongoSearchService<Task> {
-
-    private static final Logger log = LoggerFactory.getLogger(TaskSearchService.class);
 
     public Predicate buildQuery(List<TaskSearchRequest> requests, LoggedUser user, Boolean isIntersection) {
         List<Predicate> singleQueries = requests.stream().map(this::buildSingleQuery).collect(Collectors.toList());
@@ -44,7 +40,6 @@ public class TaskSearchService extends MongoSearchService<Task> {
         buildProcessQuery(request, builder);
         buildFullTextQuery(request, builder);
         buildTransitionQuery(request, builder);
-        buildStringQuery(request);
 
         return builder;
     }
@@ -159,14 +154,6 @@ public class TaskSearchService extends MongoSearchService<Task> {
 
     public Predicate transitionQuery(String transitionId) {
         return QTask.task.transitionId.eq(transitionId);
-    }
-
-    private void buildStringQuery(TaskSearchRequest request) {
-        if (request.query == null || request.query.isEmpty()) {
-            return;
-        }
-        log.warn("Mongo task search requested with elastic query string query. Ignoring...");
-        log.debug("Ignored query: " + request.query);
     }
 
     private BooleanBuilder constructPredicateTree(List<Predicate> elementaryPredicates, BiFunction<BooleanBuilder, Predicate, BooleanBuilder> nodeOperation) {

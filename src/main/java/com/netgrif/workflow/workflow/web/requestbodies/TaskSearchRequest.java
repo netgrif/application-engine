@@ -1,4 +1,4 @@
-package com.netgrif.workflow.elastic.web.requestbodies;
+package com.netgrif.workflow.workflow.web.requestbodies;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -31,6 +31,4 @@ public class TaskSearchRequest {
     public List<String> transitionId;
 
     public String fullText;
-
-    public String query;
 }
