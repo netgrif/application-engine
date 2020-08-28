@@ -4,14 +4,11 @@ import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.importer.model.*;
 import com.netgrif.workflow.petrinet.domain.Format;
 import com.netgrif.workflow.petrinet.domain.I18nString;
-import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.dataset.*;
 import com.netgrif.workflow.petrinet.domain.views.View;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.DataField;
-import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
@@ -25,9 +22,6 @@ import java.util.stream.Collectors;
 
 @Component
 public final class FieldFactory {
-
-    @Autowired
-    private IWorkflowService workflowService;
 
     @Autowired
     private FormatFactory formatFactory;
