@@ -73,6 +73,10 @@ public class TaskSearchService extends MongoSearchService<Task> {
         );
     }
 
+    /**
+     * @return Predicate for ID if only ID is present. Predicate for title if only title is present.
+     * If both are present an ID predicate is returned. If neither are present null is returned.
+     */
     private Predicate caseRequestQuery(TaskSearchRequest.TaskSearchCaseRequest caseRequest) {
         if (caseRequest.id != null) {
             return caseIdQuery(caseRequest.id);
