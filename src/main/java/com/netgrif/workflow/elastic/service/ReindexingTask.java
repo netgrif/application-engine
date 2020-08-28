@@ -2,11 +2,15 @@ package com.netgrif.workflow.elastic.service;
 
 import com.netgrif.workflow.elastic.domain.ElasticCase;
 import com.netgrif.workflow.elastic.domain.ElasticCaseRepository;
+import com.netgrif.workflow.elastic.domain.ElasticTask;
 import com.netgrif.workflow.elastic.service.interfaces.IElasticCaseService;
 import com.netgrif.workflow.elastic.service.interfaces.IElasticTaskService;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.QCase;
+import com.netgrif.workflow.workflow.domain.Task;
 import com.netgrif.workflow.workflow.domain.repositories.CaseRepository;
+import com.netgrif.workflow.workflow.domain.repositories.TaskRepository;
+import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,6 +25,7 @@ import org.springframework.stereotype.Component;
 import java.sql.Timestamp;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Component
 @ConditionalOnExpression("'${spring.data.elasticsearch.reindex}'!= 'null'")
@@ -30,6 +35,7 @@ public class ReindexingTask {
 
     private int pageSize;
     private CaseRepository caseRepository;
+    private TaskRepository taskRepository;
     private ElasticCaseRepository elasticCaseRepository;
     private IElasticCaseService elasticCaseService;
     private IElasticTaskService elasticTaskService;
@@ -37,8 +43,16 @@ public class ReindexingTask {
     private LocalDateTime lastRun;
 
     @Autowired
-    public ReindexingTask(CaseRepository caseRepository, ElasticCaseRepository elasticCaseRepository, IElasticCaseService elasticCaseService, IElasticTaskService elasticTaskService, @Value("${spring.data.elasticsearch.reindex-size:20}") int pageSize, @Value("${spring.data.elasticsearch.reindex-from:#{null}}") Duration from) {
+    public ReindexingTask(
+            CaseRepository caseRepository,
+            TaskRepository taskRepository,
+            ElasticCaseRepository elasticCaseRepository,
+            IElasticCaseService elasticCaseService,
+            IElasticTaskService elasticTaskService,
+            @Value("${spring.data.elasticsearch.reindex-size:20}") int pageSize,
+            @Value("${spring.data.elasticsearch.reindex-from:#{null}}") Duration from) {
         this.caseRepository = caseRepository;
+        this.taskRepository = taskRepository;
         this.elasticCaseRepository = elasticCaseRepository;
         this.elasticCaseService = elasticCaseService;
         this.elasticTaskService = elasticTaskService;
@@ -70,18 +84,25 @@ public class ReindexingTask {
         log.info("Reindexing " + numOfPages + " pages");
 
         for (int page = 0; page < numOfPages; page++) {
-            reindexPage(predicate, page, numOfPages);
+            reindexPage(predicate, page, numOfPages, false);
         }
     }
 
-    private void reindexPage(BooleanExpression predicate, int page, long numOfPages) {
+    public void forceReindexPage(Predicate predicate, int page, long numOfPages) {
+        reindexPage(predicate, page, numOfPages, true);
+    }
+
+    private void reindexPage(Predicate predicate, int page, long numOfPages, boolean forced) {
         log.info("Reindexing " + (page + 1) + " / " + numOfPages);
         Page<Case> cases = caseRepository.findAll(predicate, PageRequest.of(page, pageSize));
 
         for (Case aCase : cases) {
-            if (elasticCaseRepository.countByStringIdAndLastModified(aCase.getStringId(), Timestamp.valueOf(aCase.getLastModified()).getTime()) == 0) {
+            if (forced || elasticCaseRepository.countByStringIdAndLastModified(aCase.getStringId(), Timestamp.valueOf(aCase.getLastModified()).getTime()) == 0) {
                 elasticCaseService.indexNow(new ElasticCase(aCase));
-
+                List<Task> tasks = taskRepository.findAllByCaseId(aCase.getStringId());
+                for (Task task : tasks) {
+                    elasticTaskService.indexNow(new ElasticTask(task));
+                }
             }
         }
     }

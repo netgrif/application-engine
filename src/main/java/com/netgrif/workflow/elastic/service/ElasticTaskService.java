@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -32,6 +33,7 @@ import java.util.function.BinaryOperator;
 import java.util.stream.Collectors;
 
 import static org.elasticsearch.index.query.QueryBuilders.*;
+import static org.elasticsearch.index.query.QueryBuilders.termQuery;
 
 @Service
 public class ElasticTaskService implements IElasticTaskService {
@@ -73,31 +75,37 @@ public class ElasticTaskService implements IElasticTaskService {
     @Override
     public void remove(String taskId) {
         executor.execute(() -> {
-            repository.deleteByStringId(taskId);
+            repository.deleteAllByStringId(taskId);
             log.info("[?]: Task \"" + taskId + "\" deleted");
         });
     }
 
     @Async
     @Override
-    public void index(Task task) {
+    public void index(ElasticTask task) {
         executor.execute(() -> {
-            ElasticTask elasticTask = repository.findByStringId(task.getStringId());
+            try {
+                ElasticTask elasticTask = repository.findByStringId(task.getStringId());
 
-            if (elasticTask == null) {
-                elasticTask = new ElasticTask(task);
-            } else {
-                elasticTask.update(task);
+                if (elasticTask == null) {
+                    repository.save(task);
+                } else {
+                    elasticTask.update(task);
+                    repository.save(elasticTask);
+                }
+
+                log.debug("[" + task.getCaseId() + "]: Task \"" + task.getTitle() + "\" [" + task.getStringId() + "] indexed");
+            } catch (InvalidDataAccessApiUsageException e) {
+                log.debug("[" + task.getCaseId() + "]: Task \"" + task.getTitle() + "\" has duplicates, will be reindexed");
+                repository.deleteAllByStringId(task.getStringId());
+                repository.save(task);
+                log.debug("[" + task.getCaseId() + "]: Task \"" + task.getTitle() + "\" indexed");
             }
-
-            repository.save(elasticTask);
-
-            log.debug("[" + task.getCaseId() + "]: Task \"" + task.getTitle() + "\" [" + task.getStringId() + "] indexed");
         });
     }
 
     @Override
-    public void indexNow(Task task) {
+    public void indexNow(ElasticTask task) {
         index(task);
     }
 
@@ -160,6 +168,7 @@ public class ElasticTaskService implements IElasticTaskService {
         buildProcessQuery(request, query);
         buildFullTextQuery(request, query);
         buildStringQuery(request, query);
+        buildTransitionQuery(request, query);
 
         return query;
     }
@@ -314,5 +323,30 @@ public class ElasticTaskService implements IElasticTaskService {
         }
 
         query.must(queryStringQuery(request.query));
+    }
+
+    /**
+     * Tasks with transition id "document"
+     * {
+     * "transitionId": "document"
+     * }
+     * <p>
+     * Tasks with transition id "document" OR "folder"
+     * {
+     * "transitionId": [
+     * "document",
+     * "folder",
+     * ]
+     * }
+     */
+    private void buildTransitionQuery(TaskSearchRequest request, BoolQueryBuilder query) {
+        if (request.transitionId == null || request.transitionId.isEmpty()) {
+            return;
+        }
+
+        BoolQueryBuilder transitionQuery = boolQuery();
+        request.transitionId.forEach(transitionId -> transitionQuery.should(termQuery("transitionId", transitionId)));
+
+        query.filter(transitionQuery);
     }
 }

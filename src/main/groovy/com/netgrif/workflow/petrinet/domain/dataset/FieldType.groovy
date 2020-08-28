@@ -8,6 +8,7 @@ enum FieldType {
     DATE("date"),
     BOOLEAN("boolean"),
     FILE("file"),
+    FILELIST('fileList'),
     ENUMERATION("enumeration"),
     ENUMERATION_MAP("enumeration_map"),
     MULTICHOICE("multichoice"),
@@ -15,7 +16,7 @@ enum FieldType {
     NUMBER("number"),
     USER("user"),
     TABULAR("tabular"),
-    CASEREF("caseref"),
+    CASE_REF("caseRef"),
     DATETIME("dateTime"),
     BUTTON("button"),
     TASK_REF("taskRef")
