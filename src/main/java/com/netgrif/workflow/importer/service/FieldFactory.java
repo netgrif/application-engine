@@ -240,6 +240,7 @@ public final class FieldFactory {
             case NUMBER:
                 field.setDefaultValue(Double.parseDouble(defaultValue));
                 break;
+            case MULTICHOICE_MAP:
             case MULTICHOICE:
                 if (field.getDefaultValue() != null)
                     break;
@@ -247,8 +248,6 @@ public final class FieldFactory {
                 break;
             case FILE:
                 ((FileField) field).setDefaultValue(defaultValue);
-                break;
-            case MULTICHOICE_MAP:
                 break;
             default:
                 field.setDefaultValue(defaultValue);
@@ -310,6 +309,9 @@ public final class FieldFactory {
             case ENUMERATION:
                 field.setValue(parseEnumValue(useCase, fieldId, (EnumerationField) field));
                 break;
+            case MULTICHOICE_MAP:
+                field.setValue(parseMultichoiceMapValue(useCase, fieldId));
+                break;
             case MULTICHOICE:
                 field.setValue(parseMultichoiceValue(useCase, fieldId));
                 break;
@@ -342,6 +344,15 @@ public final class FieldFactory {
             return (Set<I18nString>) ((ArrayList) values).stream().map(val -> new I18nString(val.toString())).collect(Collectors.toSet());
         } else {
             return (Set<I18nString>) values;
+        }
+    }
+
+    public static Set<String> parseMultichoiceMapValue(Case useCase, String fieldId) {
+        Object values = useCase.getFieldValue(fieldId);
+        if (values instanceof ArrayList) {
+            return (Set<String>) ((ArrayList) values).stream().map(val -> val.toString()).collect(Collectors.toSet());
+        } else {
+            return (Set<String>) values;
         }
     }
 

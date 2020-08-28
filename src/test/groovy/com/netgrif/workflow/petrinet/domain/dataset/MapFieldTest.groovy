@@ -54,10 +54,13 @@ class MapFieldTest {
         assert field.options.size() == 3
         assert field.options["first"].defaultValue == "First option"
         assert field.options["first"].getTranslation("sk") == "Prvá možnosť"
+        assert field.options["first"].getTranslation("de") == "Erste Option"
         assert field.options["second"].defaultValue == "Second option"
         assert field.options["second"].getTranslation("sk") == "Druhá možnosť"
+        assert field.options["second"].getTranslation("de") == "Zweite Option"
         assert field.options["third"].defaultValue == "Third option"
         assert field.options["third"].getTranslation("sk") == "Tretia možnosť"
+        assert field.options["third"].getTranslation("de") == "Dritte Option"
         assert field.defaultValue == "second"
     }
 
@@ -113,8 +116,14 @@ class MapFieldTest {
         assert field.name.defaultValue == "Multichoice map"
         assert field.options.size() == 3
         assert field.options["first"].defaultValue == "First option"
+        assert field.options["first"].getTranslation("sk") == "Prvá možnosť"
+        assert field.options["first"].getTranslation("de") == "Erste Option"
         assert field.options["second"].defaultValue == "Second option"
+        assert field.options["second"].getTranslation("sk") == "Druhá možnosť"
+        assert field.options["second"].getTranslation("de") == "Zweite Option"
         assert field.options["third"].defaultValue == "Third option"
+        assert field.options["third"].getTranslation("sk") == "Tretia možnosť"
+        assert field.options["third"].getTranslation("de") == "Dritte Option"
         assert field.defaultValue.contains("second")
         assert field.defaultValue.contains("first")
     }
