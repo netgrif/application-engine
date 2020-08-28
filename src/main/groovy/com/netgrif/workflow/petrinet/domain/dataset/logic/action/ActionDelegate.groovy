@@ -1,6 +1,5 @@
 package com.netgrif.workflow.petrinet.domain.dataset.logic.action
 
-import com.netgrif.workflow.*
 import com.netgrif.workflow.AsyncRunner
 import com.netgrif.workflow.auth.domain.User
 import com.netgrif.workflow.auth.service.interfaces.IUserService
@@ -10,6 +9,8 @@ import com.netgrif.workflow.orgstructure.domain.Group
 import com.netgrif.workflow.orgstructure.domain.Member
 import com.netgrif.workflow.orgstructure.service.GroupService
 import com.netgrif.workflow.orgstructure.service.MemberService
+import com.netgrif.workflow.pdf.generator.config.PdfResource
+import com.netgrif.workflow.pdf.generator.service.interfaces.IPdfGenerator
 import com.netgrif.workflow.petrinet.domain.I18nString
 import com.netgrif.workflow.petrinet.domain.PetriNet
 import com.netgrif.workflow.petrinet.domain.Transition
@@ -31,8 +32,11 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.i18n.LocaleContextHolder
+import org.springframework.core.io.ClassPathResource
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
+
+import java.util.stream.Collectors
 
 /**
  * ActionDelegate class contains Actions API methods.
@@ -72,6 +76,9 @@ class ActionDelegate {
 
     @Autowired
     MemberService memberService
+
+    @Autowired
+    IPdfGenerator pdfGenerator
 
     /**
      * Reference of case in which current action is taking place.
@@ -155,6 +162,7 @@ class ActionDelegate {
                         changedFields[field.stringId] = new ChangedField(field.stringId)
                     }
                     changedFields[field.stringId].addBehavior(useCase.dataSet.get(field.stringId).behavior)
+                    changedFields[field.stringId].addAttribute("type", field.type.name)
                 }
             }]
         }]
@@ -166,6 +174,7 @@ class ActionDelegate {
             changedFields[field.stringId] = new ChangedField(field.stringId)
         }
         changedFields[field.stringId].addAttribute("value", field.value)
+        changedFields[field.stringId].addAttribute("type", field.type.name)
     }
 
     def saveChangedChoices(ChoiceField field) {
@@ -174,6 +183,14 @@ class ActionDelegate {
             changedFields[field.stringId] = new ChangedField(field.stringId)
         }
         changedFields[field.stringId].addAttribute("choices", field.choices.collect { it.getTranslation(LocaleContextHolder.locale) })
+    }
+
+    def saveChangedAllowedNets(CaseField field) {
+        useCase.dataSet.get(field.stringId).allowedNets = field.allowedNets
+        if (!changedFields.containsKey(field.stringId)) {
+            changedFields[field.stringId] = new ChangedField(field.stringId)
+        }
+        changedFields[field.stringId].addAttribute("allowedNets", field.allowedNets)
     }
 
     def saveChangedOptions(MapOptionsField field) {
@@ -234,13 +251,13 @@ class ActionDelegate {
     }
 
     def change(Field field) {
-        [about  : { cl -> // TODO: deprecated
+        [about      : { cl -> // TODO: deprecated
             changeFieldValue(field, cl)
         },
-         value  : { cl ->
+         value      : { cl ->
              changeFieldValue(field, cl)
          },
-         choices: { cl ->
+         choices    : { cl ->
              if (!(field instanceof MultichoiceField || field instanceof EnumerationField))
                  return
 
@@ -256,6 +273,24 @@ class ActionDelegate {
                      field.setChoicesFromStrings(values as Set<String>)
                  }
              saveChangedChoices(field)
+         },
+         allowedNets: { cl ->
+             if (!(field instanceof CaseField))
+                 return
+
+             def allowedNets = cl()
+             if (allowedNets instanceof Closure && allowedNets() == UNCHANGED_VALUE)
+                 return
+
+             field = (CaseField) field
+             if (allowedNets == null) {
+                 field.setAllowedNets(new ArrayList<String>())
+             } else if (allowedNets instanceof List) {
+                 field.setAllowedNets(allowedNets)
+             } else {
+                 return
+             }
+             saveChangedAllowedNets(field)
          },
         options: { cl ->
             if (!(field instanceof MultichoiceMapField || field instanceof EnumerationMapField))
@@ -294,6 +329,10 @@ class ActionDelegate {
             return
         }
         if (value != null) {
+            if (field instanceof CaseField) {
+                value = ((List) value).stream().map({ entry -> entry instanceof Case ? entry.getStringId() : entry }).collect(Collectors.toList())
+                dataService.validateCaseRefValue((List<String>) value, ((CaseField) field).getAllowedNets())
+            }
             field.value = value
             saveChangedValue(field)
         }
@@ -541,5 +580,44 @@ class ActionDelegate {
 
     User loggedUser() {
         return userService.loggedUser
+    }
+
+    void generatePDF(String transitionId, String fileFieldId){
+        PdfResource pdfResource = ApplicationContextProvider.getBean(PdfResource.class) as PdfResource
+        String filename = pdfResource.getOutputResource().getFilename()
+        String storagePath = new FileFieldValue(pdfResource.getOutputResource().getFilename(), ((ClassPathResource)pdfResource.getOutputResource()).getPath()).getPath(useCase.stringId, "pdf_file")
+
+        pdfResource.setOutputResource(new ClassPathResource(storagePath))
+        pdfGenerator.setupPdfGenerator(pdfResource)
+        pdfGenerator.generatePdf(useCase, transitionId, pdfResource)
+        change useCase.getField(fileFieldId) value {new FileFieldValue(filename, storagePath)}
+    }
+
+    void generatePdfWithTemplate(String transitionId, String fileFieldId, String template){
+        PdfResource pdfResource = ApplicationContextProvider.getBean(PdfResource.class) as PdfResource
+        String filename = pdfResource.getOutputResource().getFilename()
+        String storagePath = new FileFieldValue(pdfResource.getOutputResource().getFilename(), ((ClassPathResource)pdfResource.getOutputResource()).getPath()).getPath(useCase.stringId, "pdf_file")
+
+        pdfResource.setOutputResource(new ClassPathResource(storagePath))
+        pdfResource.setTemplateResource(new ClassPathResource(template))
+        pdfResource.setMarginTitle(100)
+        pdfResource.setMarginLeft(75)
+        pdfResource.setMarginRight(75)
+        pdfResource.updateProperties()
+        pdfGenerator.setupPdfGenerator(pdfResource)
+        pdfGenerator.generatePdf(useCase, transitionId, pdfResource)
+        change useCase.getField(fileFieldId) value {new FileFieldValue(filename, storagePath)}
+    }
+
+    void generatePdfWithLocale(String transitionId, String fileFieldId, Locale locale){
+        PdfResource pdfResource = ApplicationContextProvider.getBean(PdfResource.class) as PdfResource
+        String filename = pdfResource.getOutputResource().getFilename()
+        String storagePath = new FileFieldValue(pdfResource.getOutputResource().getFilename(), ((ClassPathResource)pdfResource.getOutputResource()).getPath()).getPath(useCase.stringId, fileFieldId)
+
+        pdfResource.setOutputResource(new ClassPathResource(storagePath))
+        pdfResource.setTextLocale(locale)
+        pdfGenerator.setupPdfGenerator(pdfResource)
+        pdfGenerator.generatePdf(useCase, transitionId, pdfResource)
+        change useCase.getField(fileFieldId) value {new FileFieldValue(filename, storagePath)}
     }
 }
