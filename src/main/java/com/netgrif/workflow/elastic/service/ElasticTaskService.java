@@ -204,15 +204,36 @@ public class ElasticTaskService implements IElasticTaskService {
     /**
      * Tasks of case with id "5cb07b6ff05be15f0b972c4d"
      * {
-     * "case": "5cb07b6ff05be15f0b972c4d"
+     * "case": {
+     * "id": "5cb07b6ff05be15f0b972c4d"
+     * }
      * }
      * <p>
      * Tasks of cases with id "5cb07b6ff05be15f0b972c4d" OR "5cb07b6ff05be15f0b972c4e"
      * {
-     * "case": [
-     * "id": "5cb07b6ff05be15f0b972c4d",
+     * "case": [{
+     * "id": "5cb07b6ff05be15f0b972c4d"
+     * },
+     * {
      * "id": "5cb07b6ff05be15f0b972c4e"
-     * ]
+     * }]
+     * }
+     * <p>
+     * Tasks of case with case title containing "foo"
+     * {
+     * "case": {
+     * "title": "foo"
+     * }
+     * }
+     * <p>
+     * Tasks of case with case title containing "foo" OR "bar"
+     * {
+     * "case": [{
+     * "title": "foo"
+     * },
+     * {
+     * "title: "bar"
+     * }]
      * }
      */
     private void buildCaseQuery(ElasticTaskSearchRequest request, BoolQueryBuilder query) {
@@ -226,6 +247,10 @@ public class ElasticTaskService implements IElasticTaskService {
         query.filter(casesQuery);
     }
 
+    /**
+     * @return query for ID if only ID is present. Query for title if only title is present.
+     * If both are present an ID query is returned. If neither are present null is returned.
+     */
     private QueryBuilder caseRequestQuery(TaskSearchRequest.TaskSearchCaseRequest caseRequest) {
         if (caseRequest.id != null) {
             return termQuery("caseId", caseRequest.id);
