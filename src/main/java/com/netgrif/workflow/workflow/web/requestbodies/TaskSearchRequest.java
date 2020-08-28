@@ -16,7 +16,7 @@ public class TaskSearchRequest {
 
     @JsonProperty("case")
     @JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
-    public List<String> useCase;
+    public List<TaskSearchCaseRequest> useCase;
 
     @JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
     public List<String> title;
@@ -31,4 +31,12 @@ public class TaskSearchRequest {
     public List<String> transitionId;
 
     public String fullText;
+
+
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class TaskSearchCaseRequest {
+        public String id;
+        public String title;
+    }
 }
