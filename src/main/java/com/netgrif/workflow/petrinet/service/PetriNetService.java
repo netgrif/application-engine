@@ -1,24 +1,24 @@
 package com.netgrif.workflow.petrinet.service;
 
 import com.netgrif.workflow.auth.domain.LoggedUser;
-import com.netgrif.workflow.auth.service.UserProcessRoleService;
 import com.netgrif.workflow.auth.service.interfaces.IUserProcessRoleService;
 import com.netgrif.workflow.event.events.model.UserImportModelEvent;
 import com.netgrif.workflow.importer.service.Importer;
+import com.netgrif.workflow.petrinet.domain.EventPhase;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.Transition;
 import com.netgrif.workflow.petrinet.domain.arcs.VariableArc;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository;
-import com.netgrif.workflow.petrinet.domain.roles.ProcessRole;
-import com.netgrif.workflow.petrinet.domain.roles.ProcessRoleRepository;
-import com.netgrif.workflow.petrinet.domain.version.Version;
 import com.netgrif.workflow.petrinet.domain.throwable.MissingPetriNetMetaDataException;
+import com.netgrif.workflow.petrinet.domain.version.Version;
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.workflow.petrinet.service.interfaces.IProcessRoleService;
 import com.netgrif.workflow.petrinet.web.responsebodies.DataFieldReference;
 import com.netgrif.workflow.petrinet.web.responsebodies.PetriNetReference;
 import com.netgrif.workflow.petrinet.web.responsebodies.TransitionReference;
+import com.netgrif.workflow.rules.domain.facts.NetImportedFact;
+import com.netgrif.workflow.rules.service.interfaces.IRuleEngine;
 import com.netgrif.workflow.workflow.domain.FileStorageConfiguration;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.bson.Document;
@@ -42,7 +42,6 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.repository.support.PageableExecutionUtils;
 import org.springframework.stereotype.Service;
 
-import javax.validation.constraints.NotNull;
 import java.io.*;
 import java.nio.file.Path;
 import java.util.*;
@@ -75,6 +74,9 @@ public abstract class PetriNetService implements IPetriNetService {
 
     @Autowired
     private FileStorageConfiguration fileStorageConfiguration;
+
+    @Autowired
+    private IRuleEngine ruleEngine;
 
     private Map<ObjectId, PetriNet> cache = new HashMap<>();
 
@@ -124,10 +126,17 @@ public abstract class PetriNetService implements IPetriNetService {
         Path savedPath = getImporter().saveNetFile(net, xmlFile);
         log.info("Petri net " + net.getTitle() + " (" + net.getInitials() + " v" + net.getVersion() + ") imported successfully");
         publisher.publishEvent(new UserImportModelEvent(user, new File(savedPath.toString()), net.getTitle().getDefaultValue(), net.getInitials()));
-        saveNew(net);
+        evaluateRules(net, EventPhase.PRE);
+        save(net);
+        evaluateRules(net, EventPhase.POST);
+        save(net);
         cache.put(net.getObjectId(), net);
 
         return imported;
+    }
+
+    protected void evaluateRules(PetriNet net, EventPhase phase) {
+        ruleEngine.evaluateRules(net, new NetImportedFact(net.getStringId(), phase));
     }
 
     private InputStream copy(InputStream xmlFile) throws IOException {
@@ -138,7 +147,7 @@ public abstract class PetriNetService implements IPetriNetService {
     }
 
     @Override
-    public Optional<PetriNet> saveNew(PetriNet petriNet) {
+    public Optional<PetriNet> save(PetriNet petriNet) {
         initializeVariableArcs(petriNet);
 
         return Optional.of(repository.save(petriNet));
@@ -172,7 +181,7 @@ public abstract class PetriNetService implements IPetriNetService {
 
     @Override
     public PetriNet getNewestVersionByIdentifier(String identifier) {
-        List<PetriNet> nets = repository.findByIdentifier(identifier, PageRequest.of(0, 1, Sort.Direction.DESC, "version.major" , "version.minor" , "version.patch")).getContent();
+        List<PetriNet> nets = repository.findByIdentifier(identifier, PageRequest.of(0, 1, Sort.Direction.DESC, "version.major", "version.minor", "version.patch")).getContent();
         if (nets.isEmpty())
             return null;
         return nets.get(0);
@@ -217,7 +226,11 @@ public abstract class PetriNetService implements IPetriNetService {
             Aggregation aggregation = Aggregation.newAggregation(groupByIdentifier);
             AggregationResults<Document> results = mongoTemplate.aggregate(aggregation, "petriNet", Document.class);
             references = results.getMappedResults().stream()
-                    .map(doc -> getReference(doc.getString("_id"), doc.get("version", Version.class), user, locale))
+                    .map(doc -> {
+                        Document versionDoc = doc.get("version", Document.class);
+                        Version refVersion = new Version(versionDoc.getLong("major"), versionDoc.getLong("minor"), versionDoc.getLong("patch"));
+                        return getReference(doc.getString("_id"), refVersion, user, locale);
+                    })
                     .collect(Collectors.toList());
         } else {
             references = repository.findAllByVersion(version).stream()
@@ -235,7 +248,7 @@ public abstract class PetriNetService implements IPetriNetService {
 
     @Override
     public PetriNetReference getReference(String identifier, Version version, LoggedUser user, Locale locale) {
-        PetriNet net =  version == null ? getNewestVersionByIdentifier(identifier) : getPetriNet(identifier, version);
+        PetriNet net = version == null ? getNewestVersionByIdentifier(identifier) : getPetriNet(identifier, version);
         return net != null ? transformToReference(net, locale) : new PetriNetReference();
     }
 
