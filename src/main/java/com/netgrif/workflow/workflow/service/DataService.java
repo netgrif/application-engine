@@ -401,11 +401,6 @@ public class DataService implements IDataService {
 
     private ChangedFieldByFileFieldContainer getChangedFieldByFileFieldContainer(String fieldId, Task task, Case useCase,
                                                                                  ChangedFieldByFileFieldContainer container) {
-        try {
-            fieldId = decodeTaskRefFieldId(fieldId)[1];
-        } catch (IllegalArgumentException e) {
-            log.debug("fieldId is not referenced through taskRef", e);
-        }
         Map<String, ChangedField> changedFields = resolveActions(useCase.getPetriNet().getField(fieldId).get(),
                 Action.ActionTrigger.SET, useCase, useCase.getPetriNet().getTransition(task.getTransitionId()));
         container.putAll(changedFields);
