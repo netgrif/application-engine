@@ -250,21 +250,20 @@ public class DataService implements IDataService {
 
 
     private void iterateTaskRefDataGroups(List<DataGroup> taskRefDataGroups, TaskField taskRefField, WrappingLayout wrappingLayout) {
-        int maxWrapping = wrappingLayout.getWrapping();
         int maxRows = 0;
         for (DataGroup dataGroup : taskRefDataGroups) {
             for (LocalisedField localisedField : dataGroup.getFields().getContent()) {
                 if (localisedField.getLayout() == null || taskRefField.getLayout() == null) {
                     return;
                 }
-                localisedField.getLayout().setY(taskRefField.getLayout().getY() + localisedField.getLayout().getY() + maxWrapping);
-                if (localisedField.getLayout().getRows() > maxRows) {
-                    maxRows = localisedField.getLayout().getRows();
+                localisedField.getLayout().setY(taskRefField.getLayout().getY() + localisedField.getLayout().getY() + wrappingLayout.getWrapping());
+                if (localisedField.getLayout().getRows() + localisedField.getLayout().getY() > maxRows) {
+                    maxRows = localisedField.getLayout().getRows() + localisedField.getLayout().getY();
                 }
             }
         }
-        if (maxWrapping + maxRows > wrappingLayout.getWrapping()) {
-            wrappingLayout.setWrapping(maxWrapping + maxRows);
+        if (maxRows > wrappingLayout.getWrapping()) {
+            wrappingLayout.setWrapping(maxRows);
         }
     }
 
@@ -402,6 +401,11 @@ public class DataService implements IDataService {
 
     private ChangedFieldByFileFieldContainer getChangedFieldByFileFieldContainer(String fieldId, Task task, Case useCase,
                                                                                  ChangedFieldByFileFieldContainer container) {
+        try {
+            fieldId = decodeTaskRefFieldId(fieldId)[1];
+        } catch (IllegalArgumentException e) {
+            log.debug("fieldId is not referenced through taskRef", e);
+        }
         Map<String, ChangedField> changedFields = resolveActions(useCase.getPetriNet().getField(fieldId).get(),
                 Action.ActionTrigger.SET, useCase, useCase.getPetriNet().getTransition(task.getTransitionId()));
         container.putAll(changedFields);
