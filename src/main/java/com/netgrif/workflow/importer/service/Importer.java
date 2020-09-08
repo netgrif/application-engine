@@ -293,7 +293,7 @@ public class Importer {
         transition.setImportId(importTransition.getId());
         transition.setTitle(toI18NString(importTransition.getLabel()));
         transition.setPosition(importTransition.getX(), importTransition.getY());
-        if (importTransition.getLayout() != null && (importTransition.getLayout().getCols() != null || importTransition.getLayout().getRows() != null)) {
+        if (importTransition.getLayout() != null) {
             transition.setLayout(new TaskLayout(importTransition));
         }
 
@@ -481,7 +481,12 @@ public class Importer {
                 appearance = layout.getAppearance().toString();
             }
 
-            FieldLayout fieldLayout = new FieldLayout(layout.getX(), layout.getY(), layout.getRows(), layout.getCols(), layout.getOffset(), layout.getTemplate().toString(), appearance);
+            String alignment = "center";
+            if (layout.getAlignment() != null) {
+                alignment = layout.getAlignment().value();
+            }
+
+            FieldLayout fieldLayout = new FieldLayout(layout.getX(), layout.getY(), layout.getRows(), layout.getCols(), layout.getOffset(), layout.getTemplate().toString(), appearance, alignment);
             transition.addDataSet(fieldId, null, null, fieldLayout);
         } catch (NullPointerException e) {
             throw new IllegalArgumentException("Wrong dataRef id [" + dataRef.getId() + "] on transition [" + transition.getTitle() + "]", e);
