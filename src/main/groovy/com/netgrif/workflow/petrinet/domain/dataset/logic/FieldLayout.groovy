@@ -16,7 +16,7 @@ class FieldLayout extends Layout {
         super()
     }
 
-    FieldLayout(int x, int y, int rows, int cols, int offset, String template, String appearance, String alignment) {
+    FieldLayout(int x, int y, Integer rows, Integer cols, int offset, String template, String appearance, String alignment) {
         super(rows, cols)
         this.x = x
         this.y = y
@@ -27,7 +27,7 @@ class FieldLayout extends Layout {
     }
 
     FieldLayout clone() {
-        return new FieldLayout(this.getX(), this.getY(), this.getRows(), this.getCols(),this.getOffset(), this.getTemplate(), this.getAppearance(), this.getAlignment())
+        return new FieldLayout(this.getX(), this.getY(), this.getRows(), this.getCols(), this.getOffset(), this.getTemplate(), this.getAppearance(), this.getAlignment())
     }
 
     int getX() {
@@ -79,7 +79,14 @@ class FieldLayout extends Layout {
     }
 
     boolean layoutFilled() {
-        return (this.rows != null && this.rows != 0) && (this.cols != null && this.cols != 0)
+        return (this.rows != null
+                || this.cols != null
+                || this.x != 0
+                || this.y != 0
+                || this.offset != 0
+                || this.template != null
+                || this.appearance != null
+                || this.alignment != null)
     }
 
     @Override
