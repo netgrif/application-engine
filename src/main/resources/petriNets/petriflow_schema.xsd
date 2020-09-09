@@ -80,7 +80,7 @@
                             <xs:element ref="offset" minOccurs="0"/>
                             <xs:element name="fieldAlignment" type="fieldAlignment" minOccurs="0"/>
                         </xs:sequence>
-                        <xs:attribute name="type" use="required" type="layoutType"/>
+                        <xs:attribute name="type" type="layoutType" default="legacy"/>
                     </xs:complexType>
                 </xs:element>
                 <xs:element ref="icon" minOccurs="0"/>
@@ -293,6 +293,7 @@
             <xs:enumeration value="standard"/>
             <xs:enumeration value="outline"/>
             <xs:enumeration value="fill"/>
+            <xs:enumeration value="legacy"/>
         </xs:restriction>
     </xs:simpleType>
     <xs:element name="label" type="i18nStringType"/>
@@ -424,6 +425,7 @@
         <xs:restriction base="xs:string">
             <xs:enumeration value="flow"/>
             <xs:enumeration value="grid"/>
+            <xs:enumeration value="legacy"/>
         </xs:restriction>
     </xs:simpleType>
     <xs:element name="dataGroup">
