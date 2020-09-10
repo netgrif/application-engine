@@ -12,9 +12,9 @@ public class DashboardController {
     @Autowired
     private IDashboardService dashboardService;
 
-    @RequestMapping(value = "/cases", method = RequestMethod.POST)
+    @RequestMapping(value = "/search", method = RequestMethod.POST)
     @ResponseBody
-    public String getAggregationByQuery(@RequestBody String query){
-        return dashboardService.searchByQuery(query, "case");
+    public String getAggregationByQuery(@RequestBody String query, @RequestParam("type") String type){
+        return dashboardService.searchByQuery(query, type);
     }
 }
