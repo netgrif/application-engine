@@ -80,6 +80,7 @@
                             <xs:element ref="offset" minOccurs="0"/>
                             <xs:element name="fieldAlignment" type="fieldAlignment" minOccurs="0"/>
                         </xs:sequence>
+                        <xs:attribute name="type" type="layoutType"/>
                     </xs:complexType>
                 </xs:element>
                 <xs:element ref="icon" minOccurs="0"/>
