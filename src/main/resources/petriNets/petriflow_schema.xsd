@@ -80,7 +80,6 @@
                             <xs:element ref="offset" minOccurs="0"/>
                             <xs:element name="fieldAlignment" type="fieldAlignment" minOccurs="0"/>
                         </xs:sequence>
-                        <xs:attribute name="type" type="layoutType" default="legacy"/>
                     </xs:complexType>
                 </xs:element>
                 <xs:element ref="icon" minOccurs="0"/>
@@ -434,6 +433,7 @@
                 <xs:element ref="id"/>
                 <xs:element ref="cols" minOccurs="0"/>
                 <xs:element ref="rows" minOccurs="0"/>
+                <xs:element name="layout" type="layoutType"/>
                 <xs:element ref="title" minOccurs="0"/>
                 <xs:element ref="alignment" minOccurs="0"/>
                 <xs:element ref="stretch" minOccurs="0"/>
