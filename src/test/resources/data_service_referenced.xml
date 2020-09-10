@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="https://modeler.netgrif.com/petriflow_schema.xsd">
+    <id>referenced</id>
+    <version>1.0.0</version>
+    <initials>RFD</initials>
+    <title>Referenced</title>
+    <defaultRole>true</defaultRole>
+    <transitionRole>false</transitionRole>
+    <!-- TRANSACTIONS -->
+    <!-- ROLES -->
+    <!-- DATA -->
+    <data type="file">
+        <id>file</id>
+        <title>File</title>
+        <action trigger="set">
+            res: f.result;
+            change res value {
+            return "OK";
+            }
+        </action>
+    </data>
+    <data type="text">
+        <id>result</id>
+        <title>Result</title>
+    </data>
+    <!-- TRANSITIONS -->
+    <transition>
+        <id>1</id>
+        <x>546</x>
+        <y>177</y>
+        <label>Transition</label>
+        <dataRef>
+            <id>file</id>
+            <logic><behavior>editable</behavior></logic>
+        </dataRef>
+        <dataRef>
+            <id>result</id>
+            <logic><behavior>editable</behavior></logic>
+        </dataRef>
+    </transition>
+    <!-- PLACES -->
+    <!-- ARCS -->
+</document>
