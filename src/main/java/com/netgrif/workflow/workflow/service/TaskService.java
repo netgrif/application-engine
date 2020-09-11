@@ -5,6 +5,7 @@ import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.elastic.domain.ElasticTask;
 import com.netgrif.workflow.elastic.service.interfaces.IElasticTaskService;
+import com.netgrif.workflow.workflow.web.requestbodies.TaskSearchRequest;
 import com.netgrif.workflow.event.events.task.*;
 import com.netgrif.workflow.petrinet.domain.*;
 import com.netgrif.workflow.petrinet.domain.arcs.Arc;
@@ -540,9 +541,8 @@ public class TaskService implements ITaskService {
     }
 
     @Override
-    public Page<Task> search(Map<String, Object> request, Pageable pageable, LoggedUser user) {
-        request = addRolesQueryConstraint(request, user);
-        com.querydsl.core.types.Predicate searchPredicate = searchService.buildQuery(request, user, null);
+    public Page<Task> search(List<TaskSearchRequest> requests, Pageable pageable, LoggedUser user, Boolean isIntersection) {
+        com.querydsl.core.types.Predicate searchPredicate = searchService.buildQuery(requests, user, isIntersection);
         Page<Task> page = taskRepository.findAll(searchPredicate, pageable);
         page = loadUsers(page);
         page = dataService.setImmediateFields(page);
@@ -550,22 +550,9 @@ public class TaskService implements ITaskService {
     }
 
     @Override
-    public long count(Map<String, Object> request, LoggedUser user, Locale locale) {
-        request = addRolesQueryConstraint(request, user);
-        com.querydsl.core.types.Predicate searchPredicate = searchService.buildQuery(request, user, locale);
+    public long count(List<TaskSearchRequest> requests, LoggedUser user, Boolean isIntersection) {
+        com.querydsl.core.types.Predicate searchPredicate = searchService.buildQuery(requests, user, isIntersection);
         return taskRepository.count(searchPredicate);
-    }
-
-    protected Map<String, Object> addRolesQueryConstraint(Map<String, Object> request, LoggedUser user) {
-        if (request.containsKey("role")) {
-            Set<String> roles = new HashSet<>((List) request.get("role"));
-            roles.addAll(user.getProcessRoles());
-            request.put("role", new ArrayList<>(roles));
-        } else {
-            request.put("role", new ArrayList<>(user.getProcessRoles()));
-        }
-
-        return request;
     }
 
     @Override
