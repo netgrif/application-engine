@@ -81,7 +81,9 @@
                             <xs:element ref="cols" minOccurs="0"/>
                             <xs:element ref="rows" minOccurs="0"/>
                             <xs:element ref="offset" minOccurs="0"/>
+                            <xs:element name="fieldAlignment" type="fieldAlignment" minOccurs="0"/>
                         </xs:sequence>
+                        <xs:attribute name="type" type="layoutType"/>
                     </xs:complexType>
                 </xs:element>
                 <xs:element ref="icon" minOccurs="0"/>
@@ -296,6 +298,7 @@
             <xs:enumeration value="standard"/>
             <xs:enumeration value="outline"/>
             <xs:enumeration value="fill"/>
+            <xs:enumeration value="legacy"/>
         </xs:restriction>
     </xs:simpleType>
     <xs:element name="label" type="i18nStringType"/>
@@ -412,15 +415,31 @@
                 <xs:element ref="offset"/>
                 <xs:element ref="template" minOccurs="0"/>
                 <xs:element ref="appearance" minOccurs="0"/>
+                <xs:element name="alignment" type="fieldAlignment" minOccurs="0"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
+    <xs:simpleType name="fieldAlignment">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="top"/>
+            <xs:enumeration value="center"/>
+            <xs:enumeration value="bottom"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="layoutType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="flow"/>
+            <xs:enumeration value="grid"/>
+            <xs:enumeration value="legacy"/>
+        </xs:restriction>
+    </xs:simpleType>
     <xs:element name="dataGroup">
         <xs:complexType>
             <xs:sequence>
                 <xs:element ref="id"/>
                 <xs:element ref="cols" minOccurs="0"/>
                 <xs:element ref="rows" minOccurs="0"/>
+                <xs:element name="layout" type="layoutType"/>
                 <xs:element ref="title" minOccurs="0"/>
                 <xs:element ref="alignment" minOccurs="0"/>
                 <xs:element ref="stretch" minOccurs="0"/>
