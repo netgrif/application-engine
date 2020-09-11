@@ -193,6 +193,14 @@ class ActionDelegate {
         changedFields[field.stringId].addAttribute("allowedNets", field.allowedNets)
     }
 
+    def saveChangedOptions(MapOptionsField field) {
+        useCase.dataSet.get(field.stringId).options = field.options
+        if (!changedFields.containsKey(field.stringId)) {
+            changedFields[field.stringId] = new ChangedField(field.stringId)
+        }
+        changedFields[field.stringId].addAttribute("options", field.options.collectEntries {key, value -> [key, (value as I18nString).getTranslation(LocaleContextHolder.locale)]} )
+    }
+
     def close = { Transition[] transitions ->
         def service = ApplicationContextProvider.getBean("taskService")
         if (!service) {
@@ -283,7 +291,26 @@ class ActionDelegate {
                  return
              }
              saveChangedAllowedNets(field)
-         }]
+         },
+        options: { cl ->
+            if (!(field instanceof MultichoiceMapField || field instanceof EnumerationMapField))
+                return
+
+            def options = cl()
+            if (options == null || (options instanceof Closure && options() == UNCHANGED_VALUE))
+                return
+            if (!(options instanceof Map && options.every {it.getKey() instanceof String}))
+                return
+            field = (MapOptionsField) field
+            if (options.every {it.getValue() instanceof I18nString}) {
+                field.setOptions(options)
+            } else {
+                Map<String, I18nString> newOptions = new LinkedHashMap<>();
+                options.each {it -> newOptions.put(it.getKey() as String, new I18nString(it.getValue() as String))}
+                field.setOptions(newOptions)
+            }
+            saveChangedOptions(field)
+        }]
     }
 
     void changeFieldValue(Field field, def cl) {
