@@ -150,12 +150,12 @@ public class DataService implements IDataService {
                 mergeChanges(changedFields, changedFieldMap);
             } else try {
                 if (entry.getKey().contains("-")) {
-                    String[] parts = entry.getKey().split("-");
-                    Task referencedTask = taskService.findOne(parts[0]);
+                    TaskRefFieldWrapper decoded = decodeTaskRefFieldId(entry.getKey());
+                    Task referencedTask = taskService.findOne(decoded.getTaskId());
                     ChangedFieldContainer changedFieldContainer = setData(referencedTask, values);
                     for (Map.Entry<String, Map<String, Object>> stringMapEntry : changedFieldContainer.getChangedFields().entrySet()) {
                         Map<String, Object> entryValue = substituteTaskRefFieldBehavior(stringMapEntry.getValue(), referencedTask, task.getTransitionId());
-                        container.getChangedFields().put(parts[0] + "-" + stringMapEntry.getKey(), entryValue);
+                        container.getChangedFields().put(decoded.getTaskId() + "-" + stringMapEntry.getKey(), entryValue);
                     }
                 }
             } catch (Exception e) {
@@ -170,17 +170,21 @@ public class DataService implements IDataService {
         return container;
     }
 
-    private Map<String, Object> substituteTaskRefFieldBehavior(Map<String, Object> entryValue, Task referencedTask, String refereeTransId) {
-        if (entryValue.containsKey("behavior")) {
+    private Map<String, Object> substituteTaskRefFieldBehavior(Map<String, Object> change, Task referencedTask, String refereeTransId) {
+        if (change.containsKey("behavior")) {
             Map<String, Object> newBehavior = new HashMap<>();
-            ((Map<String, Object>) entryValue.get("behavior")).forEach((taskId, behavior) -> {
+            ((Map<String, Object>) change.get("behavior")).forEach((taskId, behavior) -> {
                 String behaviorChangedOnTrans = taskId.equals(referencedTask.getTransitionId()) ?
                         refereeTransId : referencedTask.getStringId() + "-" + taskId;
                 newBehavior.put(behaviorChangedOnTrans, behavior);
             });
-            entryValue.put("behavior", newBehavior);
+            change.put("behavior", newBehavior);
         }
-        return entryValue;
+        return change;
+    }
+
+    private void substituteTaskRefFieldBehavior(ChangedField change, Task referencedTask, String refereeTransId) {
+        substituteTaskRefFieldBehavior(change.getAttributes(), referencedTask, refereeTransId);
     }
 
     @Override
@@ -250,21 +254,20 @@ public class DataService implements IDataService {
 
 
     private void iterateTaskRefDataGroups(List<DataGroup> taskRefDataGroups, TaskField taskRefField, WrappingLayout wrappingLayout) {
-        int maxWrapping = wrappingLayout.getWrapping();
         int maxRows = 0;
         for (DataGroup dataGroup : taskRefDataGroups) {
             for (LocalisedField localisedField : dataGroup.getFields().getContent()) {
                 if (localisedField.getLayout() == null || taskRefField.getLayout() == null) {
                     return;
                 }
-                localisedField.getLayout().setY(taskRefField.getLayout().getY() + localisedField.getLayout().getY() + maxWrapping);
-                if (localisedField.getLayout().getRows() > maxRows) {
-                    maxRows = localisedField.getLayout().getRows();
+                localisedField.getLayout().setY(taskRefField.getLayout().getY() + localisedField.getLayout().getY() + wrappingLayout.getWrapping());
+                if (localisedField.getLayout().getRows() + localisedField.getLayout().getY() > maxRows) {
+                    maxRows = localisedField.getLayout().getRows() + localisedField.getLayout().getY();
                 }
             }
         }
-        if (maxWrapping + maxRows > wrappingLayout.getWrapping()) {
-            wrappingLayout.setWrapping(maxWrapping + maxRows);
+        if (maxRows > wrappingLayout.getWrapping()) {
+            wrappingLayout.setWrapping(maxRows);
         }
     }
 
@@ -272,7 +275,7 @@ public class DataService implements IDataService {
     public FileFieldInputStream getFileByTask(String taskId, String fieldId) {
         TaskRefFieldWrapper wrapper = decodeTaskRefFieldId(taskId, fieldId);
         Task task = wrapper.getTask();
-        String parsedFieldId = wrapper.getParsedFieldId();
+        String parsedFieldId = wrapper.getFieldId();
 
         return getFileByCase(task.getCaseId(), parsedFieldId);
     }
@@ -281,7 +284,7 @@ public class DataService implements IDataService {
     public FileFieldInputStream getFileByTaskAndName(String taskId, String fieldId, String name) {
         TaskRefFieldWrapper wrapper = decodeTaskRefFieldId(taskId, fieldId);
         Task task = wrapper.getTask();
-        String parsedFieldId = wrapper.getParsedFieldId();
+        String parsedFieldId = wrapper.getFieldId();
 
         return getFileByCaseAndName(task.getCaseId(), parsedFieldId, name);
     }
@@ -402,8 +405,29 @@ public class DataService implements IDataService {
 
     private ChangedFieldByFileFieldContainer getChangedFieldByFileFieldContainer(String fieldId, Task task, Case useCase,
                                                                                  ChangedFieldByFileFieldContainer container) {
+        TaskRefFieldWrapper decodedTaskRef = null;
+        try {
+            decodedTaskRef = decodeTaskRefFieldId(fieldId);
+            fieldId = decodedTaskRef.getFieldId();
+        } catch (IllegalArgumentException e) {
+            log.debug("fieldId is not referenced through taskRef", e);
+        }
+
         Map<String, ChangedField> changedFields = resolveActions(useCase.getPetriNet().getField(fieldId).get(),
                 Action.ActionTrigger.SET, useCase, useCase.getPetriNet().getTransition(task.getTransitionId()));
+
+        if (decodedTaskRef != null) {
+            Task referencedTask = taskService.findOne(decodedTaskRef.getTaskId());
+            Map<String, ChangedField> substitutedChangedFields = new HashMap<>();
+            for (Map.Entry<String, ChangedField> changedFieldEntry : changedFields.entrySet()) {
+                ChangedField change = changedFieldEntry.getValue();
+                substituteTaskRefFieldBehavior(change, referencedTask, task.getTransitionId());
+                change.setId(decodedTaskRef.getTaskId() + "-" + changedFieldEntry.getKey());
+                substitutedChangedFields.put(change.getId(), change);
+            }
+            changedFields = substitutedChangedFields;
+        }
+
         container.putAll(changedFields);
         container.setIsSave(true);
         updateDataset(useCase);
@@ -412,26 +436,21 @@ public class DataService implements IDataService {
     }
 
     private TaskRefFieldWrapper decodeTaskRefFieldId(String taskId, String fieldId) {
-        Task task;
-        String parsedFieldId;
         try {
-            String[] parts = decodeTaskRefFieldId(fieldId);
-            task = taskService.findOne(parts[0]);
-            parsedFieldId = parts[1];
-
+            TaskRefFieldWrapper decoded = decodeTaskRefFieldId(fieldId);
+            Task task = taskService.findOne(decoded.getTaskId());
+            decoded.setTask(task);
+            return decoded;
         } catch (IllegalArgumentException e) {
-            task = taskService.findOne(taskId);
-            parsedFieldId = fieldId;
+            Task task = taskService.findOne(taskId);
+            return new TaskRefFieldWrapper(task, task.getStringId(), fieldId);
         }
-
-        return new TaskRefFieldWrapper(task, parsedFieldId);
     }
 
-
-    private String[] decodeTaskRefFieldId(String fieldId) {
+    private TaskRefFieldWrapper decodeTaskRefFieldId(String fieldId) throws IllegalArgumentException {
         String[] split = fieldId.split("-", 2);
         if (split[0].length() == MONGO_ID_LENGTH && split.length == 2) {
-            return split;
+            return new TaskRefFieldWrapper(null, split[0], split[1]);
         }
 
         throw new IllegalArgumentException("fieldId is not referenced through taskRef");
@@ -522,7 +541,7 @@ public class DataService implements IDataService {
     private ImmutablePair<Case, FileField> getCaseAndFileField(String taskId, String fieldId) {
         TaskRefFieldWrapper wrapper = decodeTaskRefFieldId(taskId, fieldId);
         Task task = wrapper.getTask();
-        String parsedFieldId = wrapper.getParsedFieldId();
+        String parsedFieldId = wrapper.getFieldId();
 
         Case useCase = workflowService.findOne(task.getCaseId());
         FileField field = (FileField) useCase.getPetriNet().getDataSet().get(parsedFieldId);
@@ -557,7 +576,7 @@ public class DataService implements IDataService {
     private ImmutablePair<Case, FileListField> getCaseAndFileListField(String taskId, String fieldId) {
         TaskRefFieldWrapper wrapper = decodeTaskRefFieldId(taskId, fieldId);
         Task task = wrapper.getTask();
-        String parsedFieldId = wrapper.getParsedFieldId();
+        String parsedFieldId = wrapper.getFieldId();
 
         Case useCase = workflowService.findOne(task.getCaseId());
         FileListField field = (FileListField) useCase.getPetriNet().getDataSet().get(parsedFieldId);
@@ -749,6 +768,7 @@ public class DataService implements IDataService {
     @AllArgsConstructor
     private class TaskRefFieldWrapper {
         private Task task;
-        private String parsedFieldId;
+        private String taskId;
+        private String fieldId;
     }
 }
