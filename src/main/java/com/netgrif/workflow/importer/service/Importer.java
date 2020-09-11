@@ -148,10 +148,11 @@ public class Importer {
     protected Optional<PetriNet> createPetriNet() throws MissingPetriNetMetaDataException {
         net = new PetriNet();
 
+        document.getI18N().forEach(this::addI18N);
+
         setMetaData();
         net.setIcon(document.getIcon());
 
-        document.getI18N().forEach(this::addI18N);
         document.getRole().forEach(this::createRole);
         document.getData().forEach(this::createDataSet);
         document.getTransaction().forEach(this::createTransaction);
