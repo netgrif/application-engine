@@ -132,11 +132,7 @@ public class ElasticCaseService implements IElasticCaseService {
     }
 
     private SearchQuery buildQuery(List<CaseSearchRequest> requests, LoggedUser user, Pageable pageable, Boolean isIntersection) {
-        BinaryOperator<BoolQueryBuilder> reductionOperator;
-        if(isIntersection)
-            reductionOperator = BoolQueryBuilder::must;
-        else
-            reductionOperator = BoolQueryBuilder::should;
+        BinaryOperator<BoolQueryBuilder> reductionOperator = isIntersection ? BoolQueryBuilder::must : BoolQueryBuilder::should;
 
         BoolQueryBuilder query = requests.stream()
                                             .map(request -> buildSingleQuery(request, user))
