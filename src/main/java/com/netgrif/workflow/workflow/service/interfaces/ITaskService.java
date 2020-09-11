@@ -2,6 +2,7 @@ package com.netgrif.workflow.workflow.service.interfaces;
 
 import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.auth.domain.User;
+import com.netgrif.workflow.workflow.web.requestbodies.TaskSearchRequest;
 import com.netgrif.workflow.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.EventOutcome;
@@ -13,7 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Set;
 
 public interface ITaskService {
@@ -25,9 +25,9 @@ public interface ITaskService {
 
     Page<Task> getAll(LoggedUser loggedUser, Pageable pageable, Locale locale);
 
-    Page<Task> search(Map<String, Object> request, Pageable pageable, LoggedUser user);
+    Page<Task> search(List<TaskSearchRequest> requests, Pageable pageable, LoggedUser user, Boolean isIntersection);
 
-    long count(Map<String, Object> request, LoggedUser user, Locale locale);
+    long count(List<TaskSearchRequest> requests, LoggedUser user, Boolean isIntersection);
 
     Page<Task> findByCases(Pageable pageable, List<String> cases);
 
