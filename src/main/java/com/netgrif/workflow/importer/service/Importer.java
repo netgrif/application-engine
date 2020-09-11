@@ -483,7 +483,7 @@ public class Importer {
                 appearance = layout.getAppearance().toString();
             }
 
-            String alignment = "center";
+            String alignment = null;
             if (layout.getAlignment() != null) {
                 alignment = layout.getAlignment().value();
             }
