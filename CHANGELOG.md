@@ -1,3 +1,15 @@
+<a name="https://netgrif.atlassian.net/projects/NAE/versions/10813/tab/release-report-all-issues"></a>
+## 4.1.2 - Purple Mercury (10.9.2020)
+### Bug fixes
+ * [NAE-970](https://netgrif.atlassian.net/browse/NAE-970) - TaskReference File Upload ResolveActions problem
+ * [NAE-977](https://netgrif.atlassian.net/browse/NAE-977) - Taskref layout broken
+ 
+### Improvements
+ None
+ 
+### Features
+ None
+ 
 <a name="https://netgrif.atlassian.net/projects/NAE/versions/10807/tab/release-report-all-issues"></a>
 ## 4.1.1 - Navy Brass (20.8.2020)
 ### Bug fixes
