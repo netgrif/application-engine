@@ -23,9 +23,21 @@ class DashboardServiceTest {
     ImportHelper helper
 
     String[] testData = ["dummy", "prod", "dev", "pre-prod", "helper"]
+    int[] testDataInt = [15, 20, 32, 11, 7, 12]
 
     @Test
-    void dashboardTest(){
+    void dashboardIntegerTest(){
+        PetriNet net1 = helper.createNet("all_data.xml", "major").get()
+        Random random = new Random()
+        (1..30).each {
+            Case aCase = helper.createCase("Default title", net1)
+            aCase.dataSet["number"].value = testDataInt[random.nextInt(testDataInt.length - 1)]
+            workflowService.save(aCase)
+        }
+    }
+
+    @Test
+    void dashboardStringTest(){
         PetriNet net1 = helper.createNet("all_data.xml", "major").get()
         Random random = new Random()
         (1..30).each {
