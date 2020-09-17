@@ -15,7 +15,7 @@ CREATE DATABASE nae
 ```
 
 
-DOCKER
+## DOCKER
 ```
 sudo docker build -t netgrif/4.1.2 .
 sudo docker image ls
