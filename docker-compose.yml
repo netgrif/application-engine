@@ -1,12 +1,15 @@
-version: "3.8"
+version: "3.3"
 
 services:
   engine:
     image: netgrif-nae:4.2.0
     ports:
-    - 8080:8080
+      - 8080:8080
     depends_on:
       - docker-mysql
+      - docker-mongo
+      - docker-neo4j
+      - docker-elastic
 
   docker-mysql:
     image: mysql:5.7
@@ -17,3 +20,20 @@ services:
       MYSQL_DATABASE: nae
       MYSQL_USER: netgrif_nae
       MYSQL_PASSWORD: netgrif_nae
+
+  docker-mongo:
+    image: mongo:3.6
+#    environment:
+#      MONGO_INITDB_ROOT_USERNAME: netgrif_nae
+#      MONGO_INITDB_ROOT_PASSWORD: netgrif_nae
+
+  docker-neo4j:
+    image: neo4j
+    environment:
+      NEO4J_AUTH: none
+
+  docker-elastic:
+    image: elasticsearch:6.8.12
+
+  docker-redis:
+    image: redis
