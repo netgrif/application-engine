@@ -24,6 +24,8 @@ public class ElasticsearchProperties {
 
     private int port;
 
+    private int searchPort;
+
     private String url;
 
     private Map<String, String> index;
