@@ -5,14 +5,17 @@ import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldContainer;
 import com.netgrif.workflow.workflow.domain.EventOutcome;
 import lombok.Data;
 
+import java.time.LocalDateTime;
 import java.util.Locale;
 
 @Data
 public class LocalisedEventOutcome extends ChangedFieldContainer {
 
-    private String successMessage;
-    private String errorMessage;
+    private String success;
+    private String error;
     private User assignee;
+    private LocalDateTime startDate;
+    private LocalDateTime finishDate;
 
     public LocalisedEventOutcome() {
         super();
@@ -22,17 +25,19 @@ public class LocalisedEventOutcome extends ChangedFieldContainer {
         LocalisedEventOutcome result = new LocalisedEventOutcome();
         result.putAll(outcome.getChangedFields());
         result.assignee = outcome.getAssignee();
+        result.startDate = outcome.getStartDate();
+        result.finishDate = outcome.getFinishDate();
         if (outcome.getMessage() != null) {
-            result.successMessage = outcome.getMessage().getTranslation(locale);
+            result.success = outcome.getMessage().getTranslation(locale);
         } else {
-            result.successMessage = defaultSuccessMessage;
+            result.success = defaultSuccessMessage;
         }
         return result;
     }
 
     public static LocalisedEventOutcome errorOutcome(String errorMessage) {
         LocalisedEventOutcome result = new LocalisedEventOutcome();
-        result.errorMessage = errorMessage;
+        result.error = errorMessage;
         return result;
     }
 }
