@@ -1,9 +1,7 @@
 package com.netgrif.workflow.importer.service;
 
 import com.netgrif.workflow.auth.domain.User;
-import com.netgrif.workflow.importer.model.AllowedNets;
-import com.netgrif.workflow.importer.model.Data;
-import com.netgrif.workflow.importer.model.I18NStringType;
+import com.netgrif.workflow.importer.model.*;
 import com.netgrif.workflow.petrinet.domain.Format;
 import com.netgrif.workflow.petrinet.domain.I18nString;
 import com.netgrif.workflow.petrinet.domain.dataset.*;
@@ -31,6 +29,7 @@ public final class FieldFactory {
     @Autowired
     private ViewFactory viewFactory;
 
+    // TODO: refactor this shit
     Field getField(Data data, Importer importer) throws IllegalArgumentException {
         Field field;
         switch (data.getType()) {
@@ -73,6 +72,12 @@ public final class FieldFactory {
             case TASK_REF:
                 field = new TaskField();
                 break;
+            case ENUMERATION_MAP:
+                field = buildEnumerationMapField(data.getOptions(), data.getInit(), importer);
+                break;
+            case MULTICHOICE_MAP:
+                field = buildMultichoiceMapField(data.getOptions(), data.getInit(), importer);
+                break;
             default:
                 throw new IllegalArgumentException(data.getType() + " is not a valid Field type");
         }
@@ -101,8 +106,9 @@ public final class FieldFactory {
                 ((ValidableField) field).addValidation(item.getExpression(), importer.toI18NString(item.getMessage()));
             }
         }
-        if (data.getInit() != null && field instanceof FieldWithDefault)
-            setFieldDefaultValue((FieldWithDefault) field, data.getInit());
+        if (data.getInit() != null && !data.getInit().isEmpty() && field instanceof FieldWithDefault) {
+            setFieldDefaultValue((FieldWithDefault) field, data.getInit().get(0));
+        }
 
         if (data.getFormat() != null) {
             Format format = formatFactory.buildFormat(data.getFormat());
@@ -118,24 +124,49 @@ public final class FieldFactory {
         return field;
     }
 
-    private MultichoiceField buildMultichoiceField(List<I18NStringType> values, String init, Importer importer) {
+    private MultichoiceMapField buildMultichoiceMapField(Options options, List<String> init, Importer importer) {
+        Map<String, I18nString> choices = options.getOption().stream()
+                .collect(Collectors.toMap(Option::getKey, importer::toI18NString));
+        return new MultichoiceMapField(choices, new HashSet<>(init));
+    }
+
+    private MultichoiceField buildMultichoiceField(List<I18NStringType> values, List<String> init, Importer importer) {
         List<I18nString> choices = values.stream()
                 .map(importer::toI18NString)
                 .collect(Collectors.toList());
         MultichoiceField field = new MultichoiceField(choices);
-        field.setDefaultValue(init);
+        if (init!= null && !init.isEmpty()) {
+            field.setDefaultValue(init.get(0));
+        }
 
         return field;
     }
 
-    private EnumerationField buildEnumerationField(List<I18NStringType> values, String init, Importer importer) {
+    private EnumerationField buildEnumerationField(List<I18NStringType> values, List<String> init, Importer importer) {
         List<I18nString> choices = values.stream()
                 .map(importer::toI18NString)
                 .collect(Collectors.toList());
 
         EnumerationField field = new EnumerationField(choices);
-        field.setDefaultValue(init);
+        if (init != null && !init.isEmpty()) {
+            field.setDefaultValue(init.get(0));
+        }
 
+        return field;
+    }
+
+    private EnumerationMapField buildEnumerationMapField(Options options, List<String> init, Importer importer) {
+        Map<String, I18nString> choices;
+        if (options == null) {
+            choices = new LinkedHashMap<>();
+        } else {
+            choices = options.getOption().stream()
+                    .collect(Collectors.toMap(Option::getKey, importer::toI18NString, (o1, o2) -> o1, LinkedHashMap::new));
+        }
+        EnumerationMapField field = new EnumerationMapField(choices);
+        if (init!= null && !init.isEmpty()) {
+            field.setDefaultValue(init.get(0));
+        }
         return field;
     }
 
@@ -204,6 +235,7 @@ public final class FieldFactory {
             case NUMBER:
                 field.setDefaultValue(Double.parseDouble(defaultValue));
                 break;
+            case MULTICHOICE_MAP:
             case MULTICHOICE:
                 if (field.getDefaultValue() != null)
                     break;
@@ -234,6 +266,8 @@ public final class FieldFactory {
         resolveDataValues(field, useCase, fieldId);
         if (field instanceof ChoiceField)
             resolveChoices((ChoiceField) field, useCase);
+        if (field instanceof MapOptionsField)
+            resolveMapOptions((MapOptionsField) field, useCase);
         return field;
     }
 
@@ -242,6 +276,13 @@ public final class FieldFactory {
         if (choices == null)
             return;
         field.setChoices(choices);
+    }
+
+    private void resolveMapOptions(MapOptionsField field, Case useCase) {
+        Map options = useCase.getDataField(field.getImportId()).getOptions();
+        if (options == null)
+            return;
+        field.setOptions(options);
     }
 
     public Field buildImmediateField(Case useCase, String fieldId) {
@@ -263,6 +304,9 @@ public final class FieldFactory {
                 break;
             case ENUMERATION:
                 field.setValue(parseEnumValue(useCase, fieldId, (EnumerationField) field));
+                break;
+            case MULTICHOICE_MAP:
+                field.setValue(parseMultichoiceMapValue(useCase, fieldId));
                 break;
             case MULTICHOICE:
                 field.setValue(parseMultichoiceValue(useCase, fieldId));
@@ -299,6 +343,15 @@ public final class FieldFactory {
             return (Set<I18nString>) ((ArrayList) values).stream().map(val -> new I18nString(val.toString())).collect(Collectors.toSet());
         } else {
             return (Set<I18nString>) values;
+        }
+    }
+
+    public static Set<String> parseMultichoiceMapValue(Case useCase, String fieldId) {
+        Object values = useCase.getFieldValue(fieldId);
+        if (values instanceof ArrayList) {
+            return (Set<String>) ((ArrayList) values).stream().map(val -> val.toString()).collect(Collectors.toSet());
+        } else {
+            return (Set<String>) values;
         }
     }
 
