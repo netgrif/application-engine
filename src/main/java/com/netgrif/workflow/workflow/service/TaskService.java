@@ -135,6 +135,8 @@ public class TaskService implements ITaskService {
         outcome.add(dataService.runActions(transition.getPostAssignActions(), useCase.getStringId(), transition));
         useCase = evaluateRules(useCase.getStringId(), task, EventType.ASSIGN, EventPhase.POST);
 
+        addTaskStateInformationToEventOutcome(outcome, task);
+
         publisher.publishEvent(new UserAssignTaskEvent(user, task, useCase));
         log.info("[" + useCase.getStringId() + "]: Task [" + task.getTitle() + "] in case [" + useCase.getTitle() + "] assigned to [" + user.getEmail() + "]");
         return outcome;
@@ -215,6 +217,8 @@ public class TaskService implements ITaskService {
         outcome.add(dataService.runActions(transition.getPostFinishActions(), useCase.getStringId(), transition));
         useCase = evaluateRules(useCase.getStringId(), task, EventType.FINISH, EventPhase.POST);
 
+        addTaskStateInformationToEventOutcome(outcome, task);
+
         publisher.publishEvent(new UserFinishTaskEvent(user, task, useCase));
         log.info("[" + useCase.getStringId() + "]: Task [" + task.getTitle() + "] in case [" + useCase.getTitle() + "] assigned to [" + user.getEmail() + "] was finished");
 
@@ -256,6 +260,8 @@ public class TaskService implements ITaskService {
         reloadTasks(useCase);
         outcome.add(dataService.runActions(transition.getPostCancelActions(), useCase.getStringId(), transition));
         useCase = evaluateRules(useCase.getStringId(), task, EventType.CANCEL, EventPhase.POST);
+
+        addTaskStateInformationToEventOutcome(outcome, task);
 
         publisher.publishEvent(new UserCancelTaskEvent(user, task, useCase));
         log.info("[" + useCase.getStringId() + "]: Task [" + task.getTitle() + "] in case [" + useCase.getTitle() + "] assigned to [" + user.getEmail() + "] was cancelled");
@@ -321,13 +327,14 @@ public class TaskService implements ITaskService {
 
         outcome.add(dataService.runActions(transition.getPreDelegateActions(), useCase.getStringId(), transition));
         useCase = evaluateRules(useCase.getStringId(), task, EventType.DELEGATE, EventPhase.PRE);
-
         delegate(delegatedUser, task, useCase);
         outcome.add(dataService.runActions(transition.getPostDelegateActions(), useCase.getStringId(), transition));
         useCase = evaluateRules(useCase.getStringId(), task, EventType.DELEGATE, EventPhase.POST);
 
         useCase = workflowService.findOne(useCase.getStringId());
         reloadTasks(useCase);
+
+        addTaskStateInformationToEventOutcome(outcome, task);
 
         publisher.publishEvent(new UserDelegateTaskEvent(delegateUser, task, useCase, delegatedUser));
         log.info("Task [" + task.getTitle() + "] in case [" + useCase.getTitle() + "] assigned to [" + delegateUser.getEmail() + "] was delegated to [" + delegatedUser.getEmail() + "]");
@@ -346,9 +353,20 @@ public class TaskService implements ITaskService {
 
     protected Case evaluateRules(String caseId, Task task, EventType eventType, EventPhase eventPhase) {
         Case useCase = workflowService.findOne(caseId);
-        log.info("["+useCase.getStringId()+"]: Task [" + task.getTitle() + "] in case [" + useCase.getTitle() + "] evaluating rules of event " + eventType.name() + " of phase " + eventPhase.name());
+        log.info("[" + useCase.getStringId() + "]: Task [" + task.getTitle() + "] in case [" + useCase.getTitle() + "] evaluating rules of event " + eventType.name() + " of phase " + eventPhase.name());
         ruleEngine.evaluateRules(useCase, task, TransitionEventFact.of(task, eventType, eventPhase));
         return workflowService.save(useCase);
+    }
+
+    protected void addTaskStateInformationToEventOutcome(EventOutcome outcome, Task task) {
+        Optional<Task> taskOptional = taskRepository.findById(task.getStringId());
+        if (!taskOptional.isPresent())
+            return;
+        Long assigneeId = taskOptional.get().getUserId();
+        if (assigneeId != null)
+            outcome.setAssignee(userService.findById(assigneeId, true));
+        outcome.setStartDate(task.getStartDate());
+        outcome.setFinishDate(task.getFinishDate());
     }
 
     /**
