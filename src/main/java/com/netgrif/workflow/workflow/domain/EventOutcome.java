@@ -5,6 +5,7 @@ import com.netgrif.workflow.petrinet.domain.I18nString;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedField;
 import lombok.Data;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -16,6 +17,10 @@ public class EventOutcome {
     private Map<String, ChangedField> changedFields;
 
     private User assignee;
+
+    private LocalDateTime startDate;
+    
+    private LocalDateTime finishDate;
 
     public void add(Map<String, ChangedField> changedFields) {
         this.changedFields.putAll(changedFields);
