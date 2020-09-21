@@ -353,7 +353,7 @@ public class TaskService implements ITaskService {
 
     protected Case evaluateRules(String caseId, Task task, EventType eventType, EventPhase eventPhase) {
         Case useCase = workflowService.findOne(caseId);
-        log.info("["+useCase.getStringId()+"]: Task [" + task.getTitle() + "] in case [" + useCase.getTitle() + "] evaluating rules of event " + eventType.name() + " of phase " + eventPhase.name());
+        log.info("[" + useCase.getStringId() + "]: Task [" + task.getTitle() + "] in case [" + useCase.getTitle() + "] evaluating rules of event " + eventType.name() + " of phase " + eventPhase.name());
         ruleEngine.evaluateRules(useCase, task, TransitionEventFact.of(task, eventType, eventPhase));
         return workflowService.save(useCase);
     }
@@ -362,7 +362,9 @@ public class TaskService implements ITaskService {
         Optional<Task> taskOptional = taskRepository.findById(task.getStringId());
         if (!taskOptional.isPresent())
             return;
-        outcome.setAssignee(userService.findById(taskOptional.get().getUserId(), true));
+        Long assigneeId = taskOptional.get().getUserId();
+        if (assigneeId != null)
+            outcome.setAssignee(userService.findById(assigneeId, true));
         outcome.setStartDate(task.getStartDate());
         outcome.setFinishDate(task.getFinishDate());
     }
