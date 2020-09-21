@@ -15,6 +15,8 @@ public class ViewFactory {
             return buildListView(data);
         } else if (data.getView().getEditor() != null) {
             return new EditorView();
+        } else if (data.getView().getHtmlEditor() != null) {
+            return new HtmlEditorView();
         } else if (data.getView().getArea() != null) {
             return new View("area");
         } else if (data.getView().getAutocomplete() != null) {
