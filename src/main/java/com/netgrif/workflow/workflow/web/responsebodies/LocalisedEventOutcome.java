@@ -1,6 +1,6 @@
 package com.netgrif.workflow.workflow.web.responsebodies;
 
-import com.netgrif.workflow.auth.domain.User;
+import com.netgrif.workflow.auth.web.responsebodies.User;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldContainer;
 import com.netgrif.workflow.workflow.domain.EventOutcome;
 import lombok.Data;
@@ -23,10 +23,20 @@ public class LocalisedEventOutcome extends ChangedFieldContainer {
 
     public static LocalisedEventOutcome successOutcome(EventOutcome outcome, Locale locale, String defaultSuccessMessage) {
         LocalisedEventOutcome result = new LocalisedEventOutcome();
+
         result.putAll(outcome.getChangedFields());
-        result.assignee = outcome.getAssignee();
         result.startDate = outcome.getStartDate();
         result.finishDate = outcome.getFinishDate();
+
+        if (outcome.getAssignee() != null) {
+            result.assignee = new User(outcome.getAssignee(), locale);
+            result.assignee.setPassword(null);
+            result.assignee.setTelNumber(null);
+            result.assignee.setGroups(null);
+            result.assignee.setAuthorities(null);
+            result.assignee.setProcessRoles(null);
+        }
+
         if (outcome.getMessage() != null) {
             result.success = outcome.getMessage().getTranslation(locale);
         } else {
