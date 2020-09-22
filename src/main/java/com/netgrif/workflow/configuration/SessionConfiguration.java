@@ -1,14 +1,14 @@
 package com.netgrif.workflow.configuration;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.session.data.redis.config.annotation.web.http.EnableRedisHttpSession;
 import org.springframework.session.web.http.HeaderHttpSessionIdResolver;
-import org.springframework.session.web.http.HeaderHttpSessionStrategy;
 import org.springframework.session.web.http.HttpSessionIdResolver;
-import org.springframework.session.web.http.HttpSessionStrategy;
 
 @EnableRedisHttpSession
 @Configuration
@@ -18,9 +18,16 @@ import org.springframework.session.web.http.HttpSessionStrategy;
 )
 public class SessionConfiguration {
 
+    @Value("${spring.session.redis.host}")
+    private String hostName;
+
+    @Value("${spring.session.redis.port}")
+    private Integer port;
+
     @Bean
     public JedisConnectionFactory jedisConnectionFactory() {
-        return new JedisConnectionFactory();
+        RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration(hostName, port);
+        return new JedisConnectionFactory(redisStandaloneConfiguration);
     }
 
 
