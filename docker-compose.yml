@@ -1,6 +1,13 @@
 version: "3.3"
 
 services:
+#  front:
+#    image: demo:4.2.0
+#    ports:
+#    - 80:80
+#    depends_on:
+#      - engine
+
   engine:
     image: netgrif-nae:4.2.0
     ports:
@@ -10,11 +17,13 @@ services:
       - docker-mongo
       - docker-neo4j
       - docker-elastic
+      - docker-redis
 
   docker-mysql:
     image: mysql:5.7
     healthcheck:
       test: "/usr/bin/mysql -u root -psecret -e \"show databases;\""
+    command: [ 'mysqld', '--character-set-server=utf8mb4', '--collation-server=utf8mb4_unicode_ci' ]
     environment:
       MYSQL_ROOT_PASSWORD: secret
       MYSQL_DATABASE: nae
@@ -23,12 +32,12 @@ services:
 
   docker-mongo:
     image: mongo:3.6
-#    environment:
-#      MONGO_INITDB_ROOT_USERNAME: netgrif_nae
-#      MONGO_INITDB_ROOT_PASSWORD: netgrif_nae
+  #    environment:
+  #        MONGO_INITDB_ROOT_USERNAME: netgrif_nae
+  #        MONGO_INITDB_ROOT_PASSWORD: netgrif_nae
 
   docker-neo4j:
-    image: neo4j
+    image: neo4j:3.5
     environment:
       NEO4J_AUTH: none
 
