@@ -12,19 +12,23 @@
 	<!-- DATA -->
 	<data type="text">
 		<id>group_id</id>
-		<title name="group_id">Group ID</title>
-		<placeholder name="group_id_placeh">Enter group ID</placeholder>
-		<desc name="group_id_desc">ID of organization group</desc>
+		<title>Group ID</title>
+		<placeholder>Enter group ID</placeholder>
+		<desc>ID of organization group</desc>
 		<action trigger="get">
 			id: f.group_id;
 			change id value { useCase.stringId }
 		</action>
 	</data>
+	<data type="user">
+		<id>author</id>
+		<title>Group Author</title>
+	</data>
 	<data type="text">
 		<id>group_name</id>
-		<title name="group_name">Group name</title>
-		<placeholder name="group_name_placeh">Enter group name</placeholder>
-		<desc name="group_name_desc">Name of organization group</desc>
+		<title>Group name</title>
+		<placeholder>Enter group name</placeholder>
+		<desc>Name of organization group</desc>
 		<action trigger="set">
 			name: f.group_name;
 			useCase.setTitle(name.value)
@@ -33,9 +37,9 @@
 	</data>
 	<data type="user">
 		<id>user_selection</id>
-		<title name="user_selection">Select user</title>
-		<placeholder name="user_selection_placeh">No user selected</placeholder>
-		<desc name="user_selection_desc">Select user to be added as a group member</desc>
+		<title>Select user</title>
+		<placeholder>No user selected</placeholder>
+		<desc>Select user to be added as a group member</desc>
 		<action trigger="get">
 			userField: f.user_selection;
 			change userField value { null }
@@ -48,15 +52,44 @@
 	</data>
 	<data type="multichoice_map">
 		<id>members</id>
-		<title name="members">Members</title>
-		<desc name="members_desc">Members of current organization group</desc>
+		<title>Members</title>
+		<desc>Members of current organization group</desc>
 		<options/>
 		<view>
-			<list></list>
+			<list/>
 		</view>
+	</data>
+	<data type="enumeration_map">
+		<id>user_action_selection</id>
+		<title name="user_action_selection">Select action</title>
+		<options>
+			<option key="add" name="user_action_selection_add">Add existing user</option>
+			<option key="invite" name="user_action_selection_invite">Invite new user</option>
+		</options>
+		<init>Add existing user</init>
+		<action trigger="set">
+			action_selection: f.user_action_selection,
+			user_selection: f.user_selection,
+			invite_by_mail: f.invite_by_mail,
+			trans: t.8;
+
+			make user_selection, editable on trans when { action_selection.value == "add" }
+			make invite_by_mail, hidden on trans when { action_selection.value == "add" }
+
+			make user_selection, hidden on trans when { action_selection.value == "invite" }
+			make invite_by_mail, editable on trans when { action_selection.value == "invite" }
+		</action>
+	</data>
+	<data type="text">
+		<id>invite_by_mail</id>
+		<title name="invite_by_mail">Add e-mail address</title>
+		<placeholder>example@example.com</placeholder>
+		<desc name="invite_by_mail_desc">Add e-meail address to send invitation</desc>
+		<valid>email</valid>
 	</data>
 	<!-- I18NS -->
 	<i18n locale="sk">
+		<i18nString name="author">Autor grupy</i18nString>
 		<i18nString name="group_id">ID grupy</i18nString>
 		<i18nString name="group_id_desc">ID organizačnej grupy</i18nString>
 		<i18nString name="group_id_placeh">Zadajte ID grupy</i18nString>
@@ -68,13 +101,18 @@
 		<i18nString name="user_selection_placeh">Nebol vybraný žiadny používateľ</i18nString>
 		<i18nString name="members">Členovia grupy</i18nString>
 		<i18nString name="members_desc">Členovia organizačnej grupy</i18nString>
+		<i18nString name="user_action_selection">Vyberte akciu</i18nString>
+		<i18nString name="user_action_selection_add">Pridať existujúceho používateľa</i18nString>
+		<i18nString name="user_action_selection_invite">Pozvať nového používateľa</i18nString>
+		<i18nString name="invite_by_mail">Zadaj e-mail adresu</i18nString>
+		<i18nString name="invite_by_mail_desc">Zadaj e-mail adresu</i18nString>
 	</i18n>
 	<!-- TRANSITIONS -->
 	<transition>
 		<id>2</id>
 		<x>420</x>
 		<y>220</y>
-		<label>Create new group</label>
+		<label>Initialize group</label>
 		<layout>
 			<offset>0</offset>
 		</layout>
@@ -175,13 +213,43 @@
 		</layout>
 		<assignPolicy>auto</assignPolicy>
 		<dataRef>
-			<id>user_selection</id>
+			<id>user_action_selection</id>
 			<logic>
 				<behavior>editable</behavior>
 			</logic>
 			<layout>
 				<x>0</x>
 				<y>0</y>
+				<rows>2</rows>
+				<cols>4</cols>
+				<offset>6</offset>
+				<template>material</template>
+				<appearance>outline</appearance>
+			</layout>
+		</dataRef>
+		<dataRef>
+			<id>user_selection</id>
+			<logic>
+				<behavior>editable</behavior>
+			</logic>
+			<layout>
+				<x>0</x>
+				<y>2</y>
+				<rows>1</rows>
+				<cols>4</cols>
+				<offset>6</offset>
+				<template>material</template>
+				<appearance>outline</appearance>
+			</layout>
+		</dataRef>
+		<dataRef>
+			<id>invite_by_mail</id>
+			<logic>
+				<behavior>hidden</behavior>
+			</logic>
+			<layout>
+				<x>0</x>
+				<y>3</y>
 				<rows>1</rows>
 				<cols>4</cols>
 				<offset>6</offset>
@@ -196,7 +264,7 @@
 			</logic>
 			<layout>
 				<x>0</x>
-				<y>1</y>
+				<y>4</y>
 				<rows>1</rows>
 				<cols>4</cols>
 				<offset>6</offset>
@@ -204,6 +272,20 @@
 				<appearance>outline</appearance>
 			</layout>
 		</dataRef>
+		<event type="finish">
+			<id>invite_new_user</id>
+			<actions phase="pre">
+				<action>
+					action_selection: f.user_action_selection,
+					invite_by_mail: f.invite_by_mail,
+					members: f.members;
+
+					if(action_selection.value == "invite" &amp;&amp; invite_by_mail.value != null){
+						change members options { nextGroupService.inviteUser(invite_by_mail.value, members.options, useCase) }
+					}
+				</action>
+			</actions>
+		</event>
 	</transition>
 	<transition>
 		<id>25</id>
@@ -274,7 +356,7 @@
 			<actions phase="pre">
 				<action>
 					members: f.members;
-					change members options { nextGroupService.removeUser(members.value, members.options) }
+					change members options { nextGroupService.removeUser(members.value, members.options, useCase) }
 					change members value { [] }
 				</action>
 			</actions>
