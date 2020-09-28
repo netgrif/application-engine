@@ -8,6 +8,7 @@ import com.netgrif.workflow.auth.service.interfaces.IRegistrationService;
 import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.auth.web.requestbodies.NewUserRequest;
 import com.netgrif.workflow.auth.web.requestbodies.RegistrationRequest;
+import com.netgrif.workflow.orgstructure.groups.interfaces.INextGroupService;
 import com.netgrif.workflow.orgstructure.service.IGroupService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,6 +42,9 @@ public class RegistrationService implements IRegistrationService {
 
     @Autowired
     private IGroupService groupService;
+
+    @Autowired
+    private INextGroupService nextGroupService;
 
     @Value("${server.auth.token-validity-period}")
     private int tokenValidityPeriod;
@@ -144,6 +148,7 @@ public class RegistrationService implements IRegistrationService {
         user.setExpirationDate(null);
         user.setState(UserState.ACTIVE);
 
+        nextGroupService.createGroup(user.getFullName(), user);
         return userService.saveNew(user);
     }
 
