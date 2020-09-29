@@ -700,11 +700,13 @@ public class DataService implements IDataService {
                 value = FileFieldValue.fromString(node.get("value").asText());
                 break;
             case "caseRef":
-                ArrayNode valueArrayNode = (ArrayNode) node.get("value");
-                ArrayList<String> list = new ArrayList<>();
-                valueArrayNode.forEach(caseId -> list.add(caseId.asText()));
-                value = list;
+                List<String> list = parseListStringValues(node);
                 validateCaseRefValue(list, dataField.getAllowedNets());
+                value = list;
+                break;
+            case "taskRef":
+                value = parseListStringValues(node);
+                // TODO 29.9.2020: validate task ref value? is such feature desired?
                 break;
             default:
                 if (node.get("value") == null) {
@@ -723,6 +725,13 @@ public class DataService implements IDataService {
         HashSet<String> set = new HashSet<>();
         arrayNode.forEach(item -> set.add(item.asText()));
         return set;
+    }
+
+    private List<String> parseListStringValues(ObjectNode node) {
+        ArrayNode arrayNode = (ArrayNode) node.get("value");
+        ArrayList<String> list = new ArrayList<>();
+        arrayNode.forEach(string -> list.add(string.asText()));
+        return list;
     }
 
     public void validateCaseRefValue(List<String> value, List<String> allowedNets) throws IllegalArgumentException {
