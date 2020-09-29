@@ -16,14 +16,18 @@ class FieldLayout extends Layout {
         super()
     }
 
-    FieldLayout(int x, int y, Integer rows, Integer cols, Integer offset, String template, String appearance, String alignment) {
+    FieldLayout(Integer x, Integer y, Integer rows, Integer cols, Integer offset, String template, String appearance, String alignment) {
         super(rows, cols)
-        this.x = x
-        this.y = y
-        this.offset = offset != null ? offset : 0
+        this.x = nullToZero(x)
+        this.y = nullToZero(y)
+        this.offset = nullToZero(offset)
         this.template = template?.toLowerCase()
         this.appearance = appearance?.toLowerCase()
         this.alignment = alignment
+    }
+
+    private int nullToZero(Integer i) {
+        return i != null ? i : 0
     }
 
     FieldLayout clone() {
