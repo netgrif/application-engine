@@ -16,11 +16,11 @@ class FieldLayout extends Layout {
         super()
     }
 
-    FieldLayout(int x, int y, Integer rows, Integer cols, int offset, String template, String appearance, String alignment) {
+    FieldLayout(int x, int y, Integer rows, Integer cols, Integer offset, String template, String appearance, String alignment) {
         super(rows, cols)
         this.x = x
         this.y = y
-        this.offset = offset
+        this.offset = offset != null ? offset : 0
         this.template = template?.toLowerCase()
         this.appearance = appearance?.toLowerCase()
         this.alignment = alignment
