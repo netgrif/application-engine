@@ -9,6 +9,7 @@ import com.querydsl.core.types.Predicate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -40,6 +41,9 @@ public class ElasticController {
     @Autowired
     private ReindexingTask reindexingTask;
 
+    @Value("${spring.data.elasticsearch.reindex-size}")
+    private int pageSize;
+
     @PreAuthorize("hasRole('ADMIN')")
     @RequestMapping(value = "/reindex", method = RequestMethod.POST)
     public MessageResource reindex(@RequestBody Map<String, Object> searchBody, Authentication auth, Locale locale) {
@@ -50,7 +54,7 @@ public class ElasticController {
             if (count == 0) {
                 log.info("No cases to reindex");
             } else {
-                long numOfPages = (long) ((count / 100.0) + 1);
+                long numOfPages = (long) ((count / pageSize) + 1);
                 log.info("Reindexing cases: " + numOfPages + " pages");
 
                 for (int page = 0; page < numOfPages; page++) {
