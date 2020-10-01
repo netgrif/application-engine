@@ -74,7 +74,10 @@ public class SwaggerConfiguration {
                 .genericModelSubstitutes(PagedResources.class, ResponseEntity.class, List.class)
                 .useDefaultResponseMessages(false)
                 .tags(
+                        new Tag("Admin console", "Administrator console"),
                         new Tag("Authentication", "User authentication services"),
+                        new Tag("Dashboard", "Dashboard content services"),
+                        new Tag("Elasticsearch", "Elasticsearch management services"),
                         new Tag("Filter", "Persisted filters services"),
                         new Tag("Group", "Group management services"),
                         new Tag("Petri net", "Petri net management services"),
