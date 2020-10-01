@@ -324,7 +324,7 @@
         <resources>
             <resource>
                 <directory>src/main/resources</directory>
-                <!--<filtering>true</filtering>-->
+                <filtering>true</filtering>
             </resource>
         </resources>
         <plugins>
