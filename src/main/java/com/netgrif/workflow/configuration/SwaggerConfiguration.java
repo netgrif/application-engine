@@ -90,7 +90,7 @@ public class SwaggerConfiguration {
                 .title("Netgrif Application Engine")
                 .description("Web services used in every Netgrif application engine project.")
                 .contact(new Contact("NETGRIF, s.r.o.", "https://netgrif.com", "info@netgrif.com"))
-                .version("2.3.0")
+                .version("4.3.0")
                 .build();
     }
 
