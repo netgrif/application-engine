@@ -37,8 +37,8 @@ public class GroupController {
     @Autowired
     private IGroupService service;
 
-    @ApiOperation(value = "Get all groups in the system", authorizations = @Authorization("BasicAuth"))
     @PreAuthorize("hasRole('ADMIN')")
+    @ApiOperation(value = "Get all groups in the system", authorizations = @Authorization("BasicAuth"))
     @RequestMapping(value = "/all", method = RequestMethod.GET, produces = MediaTypes.HAL_JSON_VALUE)
     public GroupsResource getAllGroups() {
         Set<Group> groups = service.findAll();
