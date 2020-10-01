@@ -118,7 +118,8 @@ public class AuthenticationController {
         }
     }
 
-    @GetMapping("/verify")
+    @ApiOperation(value = "Verify validity of an authentication token")
+    @GetMapping(value = "/verify", produces = MediaTypes.HAL_JSON_VALUE)
     public MessageResource verifyAuthToken(Authentication auth) {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
         return MessageResource.successMessage("Auth Token successfully verified, for user [" + loggedUser.getId() + "] " + loggedUser.getFullName());

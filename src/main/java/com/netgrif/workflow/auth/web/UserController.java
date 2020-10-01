@@ -163,15 +163,15 @@ public class UserController {
         }
     }
 
-    @ApiOperation(value = "Get all authorities of the system", authorizations = @Authorization("BasicAuth"))
     @PreAuthorize("hasRole('ADMIN')")
+    @ApiOperation(value = "Get all authorities of the system", authorizations = @Authorization("BasicAuth"))
     @GetMapping(value = "/authority", produces = MediaTypes.HAL_JSON_VALUE)
     public AuthoritiesResources getAllAuthorities(Authentication auth) {
         return new AuthoritiesResources(authorityService.findAll());
     }
 
-    @ApiOperation(value = "Assign authority to the user", authorizations = @Authorization("BasicAuth"))
     @PreAuthorize("hasRole('ADMIN')")
+    @ApiOperation(value = "Assign authority to the user", authorizations = @Authorization("BasicAuth"))
     @PostMapping(value = "/{id}/authority/assign", consumes = MediaType.TEXT_PLAIN_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public MessageResource assignAuthorityToUser(@PathVariable("id") Long userId, @RequestBody Long authorityId) {
         userService.assignAuthority(userId, authorityId);
