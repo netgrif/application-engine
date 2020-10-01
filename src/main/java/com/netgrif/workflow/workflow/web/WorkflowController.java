@@ -17,11 +17,9 @@ import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
 import com.netgrif.workflow.workflow.web.requestbodies.CreateCaseBody;
 import com.netgrif.workflow.workflow.web.responsebodies.*;
 import com.querydsl.core.types.Predicate;
+import io.swagger.annotations.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.Authorization;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.io.InputStreamResource;
@@ -169,9 +167,13 @@ public class WorkflowController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @ApiOperation(value = "Reload tasks of case",
-            notes = "Caller must be an ADMIN",
+            notes = "Caller must have the ADMIN role",
             authorizations = @Authorization("BasicAuth"))
     @GetMapping(value = "/case/reload/{id}", produces = MediaTypes.HAL_JSON_VALUE)
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "OK", response = MessageResource.class),
+            @ApiResponse(code = 403, message = "Caller doesn't fulfill the authorisation requirements"),
+    })
     public MessageResource reloadTasks(@PathVariable("id") String caseId) {
         try {
             caseId = URLDecoder.decode(caseId, StandardCharsets.UTF_8.name());

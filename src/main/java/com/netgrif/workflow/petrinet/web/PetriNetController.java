@@ -69,7 +69,8 @@ public class PetriNetController {
             authorizations = @Authorization("BasicAuth"))
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "OK", response = PetriNetReferenceWithMessageResource.class),
-            @ApiResponse(code = 400, message = "Process model is invalid", response = MessageResource.class)
+            @ApiResponse(code = 400, message = "Process model is invalid", response = MessageResource.class),
+            @ApiResponse(code = 403, message = "Caller doesn't fulfill the authorisation requirements")
     })
     @RequestMapping(value = "/import", method = POST, produces = MediaTypes.HAL_JSON_VALUE)
     public

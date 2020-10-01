@@ -104,7 +104,8 @@ public class AuthenticationController {
         }
     }
 
-    @ApiOperation(value = "Verify validity of a registration token")
+    @ApiOperation(value = "Verify validity of a registration token",
+            authorizations = @Authorization("BasicAuth"))
     @PostMapping(value = "/token/verify", consumes = MediaType.TEXT_PLAIN_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public MessageResource verifyToken(@RequestBody String token) {
         try {
