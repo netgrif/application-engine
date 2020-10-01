@@ -51,7 +51,7 @@ import java.util.Locale;
         havingValue = "true",
         matchIfMissing = true
 )
-@Api(tags = {"Task"})
+@Api(tags = {"Task"}, authorizations = @Authorization("BasicAuth"))
 public class TaskController {
 
     public static final Logger log = LoggerFactory.getLogger(TaskController.class);
@@ -105,9 +105,11 @@ public class TaskController {
         return new LocalisedTaskResource(new com.netgrif.workflow.workflow.web.responsebodies.Task(task, locale));
     }
 
-    @ApiOperation(value = "Assign task", authorizations = @Authorization("BasicAuth"))
-    @RequestMapping(value = "/assign/{id}", method = RequestMethod.GET, produces = MediaTypes.HAL_JSON_VALUE)
     @PreAuthorize("@taskAuthorizationService.canCallAssign(#auth.getPrincipal(), #taskId)")
+    @ApiOperation(value = "Assign task",
+            notes = "Caller must be able to perform the task, or must be an ADMIN",
+            authorizations = @Authorization("BasicAuth"))
+    @RequestMapping(value = "/assign/{id}", method = RequestMethod.GET, produces = MediaTypes.HAL_JSON_VALUE)
     public LocalisedEventOutcomeResource assign(Authentication auth, @PathVariable("id") String taskId, Locale locale) {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
 
@@ -120,9 +122,11 @@ public class TaskController {
         }
     }
 
-    @ApiOperation(value = "Delegate task", authorizations = @Authorization("BasicAuth"))
-    @RequestMapping(value = "/delegate/{id}", method = RequestMethod.POST, consumes = MediaType.TEXT_PLAIN_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     @PreAuthorize("@taskAuthorizationService.canCallDelegate(#auth.getPrincipal(), #taskId)")
+    @ApiOperation(value = "Delegate task",
+            notes = "Caller must be able to delegate the task, or must be an ADMIN",
+            authorizations = @Authorization("BasicAuth"))
+    @RequestMapping(value = "/delegate/{id}", method = RequestMethod.POST, consumes = MediaType.TEXT_PLAIN_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public LocalisedEventOutcomeResource delegate(Authentication auth, @PathVariable("id") String taskId, @RequestBody Long delegatedId, Locale locale) {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
 
@@ -135,9 +139,11 @@ public class TaskController {
         }
     }
 
-    @ApiOperation(value = "Finish task", authorizations = @Authorization("BasicAuth"))
-    @RequestMapping(value = "/finish/{id}", method = RequestMethod.GET, produces = MediaTypes.HAL_JSON_VALUE)
     @PreAuthorize("@taskAuthorizationService.canCallFinish(#auth.getPrincipal(), #taskId)")
+    @ApiOperation(value = "Finish task",
+            notes = "Caller must be assigned to the task, or must be an ADMIN",
+            authorizations = @Authorization("BasicAuth"))
+    @RequestMapping(value = "/finish/{id}", method = RequestMethod.GET, produces = MediaTypes.HAL_JSON_VALUE)
     public LocalisedEventOutcomeResource finish(Authentication auth, @PathVariable("id") String taskId, Locale locale) {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
 
@@ -150,9 +156,11 @@ public class TaskController {
         }
     }
 
-    @ApiOperation(value = "Cancel task", authorizations = @Authorization("BasicAuth"))
-    @RequestMapping(value = "/cancel/{id}", method = RequestMethod.GET, produces = MediaTypes.HAL_JSON_VALUE)
     @PreAuthorize("@taskAuthorizationService.canCallCancel(#auth.getPrincipal(), #taskId)")
+    @ApiOperation(value = "Cancel task",
+            notes = "Caller must be assigned to the task, or must be an ADMIN",
+            authorizations = @Authorization("BasicAuth"))
+    @RequestMapping(value = "/cancel/{id}", method = RequestMethod.GET, produces = MediaTypes.HAL_JSON_VALUE)
     public LocalisedEventOutcomeResource cancel(Authentication auth, @PathVariable("id") String taskId, Locale locale) {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
 
@@ -189,7 +197,7 @@ public class TaskController {
         return resources;
     }
 
-    @ApiOperation(value = "Generic task search", authorizations = @Authorization("BasicAuth"))
+    @ApiOperation(value = "Generic task search on Mongo database", authorizations = @Authorization("BasicAuth"))
     @RequestMapping(value = "/search", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public PagedResources<LocalisedTaskResource> search(Authentication auth, Pageable pageable, @RequestBody SingleTaskSearchRequestAsList searchBody, @RequestParam(defaultValue = "OR") MergeFilterOperation operation, PagedResourcesAssembler<Task> assembler, Locale locale) {
         Page<Task> tasks = taskService.search(searchBody.getList(), pageable, (LoggedUser) auth.getPrincipal(), operation == MergeFilterOperation.AND);
@@ -200,7 +208,8 @@ public class TaskController {
         return resources;
     }
 
-    @RequestMapping(value = "/search_es", method = RequestMethod.POST)
+    @ApiOperation(value = "Generic task search on Elasticsearch database", authorizations = @Authorization("BasicAuth"))
+    @RequestMapping(value = "/search_es", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public PagedResources<LocalisedTaskResource> searchElastic(Authentication auth, Pageable pageable, @RequestBody SingleElasticTaskSearchRequestAsList searchBody, @RequestParam(defaultValue = "OR") MergeFilterOperation operation, PagedResourcesAssembler<Task> assembler, Locale locale) {
         Page<Task> tasks = searchService.search(searchBody.getList(), (LoggedUser) auth.getPrincipal(), pageable, operation == MergeFilterOperation.AND);
         Link selfLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
@@ -211,7 +220,7 @@ public class TaskController {
     }
 
     @ApiOperation(value = "Count tasks by provided criteria", authorizations = @Authorization("BasicAuth"))
-    @PostMapping(value = "/count", produces = MediaType.APPLICATION_JSON_UTF8_VALUE, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @PostMapping(value = "/count", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public CountResponse count(@RequestBody SingleElasticTaskSearchRequestAsList query, @RequestParam(defaultValue = "OR") MergeFilterOperation operation, Authentication auth, Locale locale) {
         long count = searchService.count(query.getList(), (LoggedUser)auth.getPrincipal(), operation == MergeFilterOperation.AND);
         return CountResponse.taskCount(count);
@@ -224,24 +233,28 @@ public class TaskController {
         return new DataGroupsResource(dataGroups, locale);
     }
 
-    @ApiOperation(value = "Set task data", authorizations = @Authorization("BasicAuth"))
-    @RequestMapping(value = "/{id}/data", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @PreAuthorize("@taskAuthorizationService.canCallSaveData(#auth.getPrincipal(), #taskId)")
+    @ApiOperation(value = "Set task data",
+            notes = "Caller must be assigned to the task, or must be an ADMIN",
+            authorizations = @Authorization("BasicAuth"))
+    @RequestMapping(value = "/{id}/data", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ChangedFieldContainer setData(Authentication auth, @PathVariable("id") String taskId, @RequestBody ObjectNode dataBody) {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
         return dataService.setData(taskId, dataBody);
     }
 
-    @ApiOperation(value = "Upload file into the task", authorizations = @Authorization("BasicAuth"))
-    @RequestMapping(value = "/{id}/file/{field}", method = RequestMethod.POST, produces = MediaTypes.HAL_JSON_VALUE)
     @PreAuthorize("@taskAuthorizationService.canCallSaveFile(#auth.getPrincipal(), #taskId)")
+    @ApiOperation(value = "Upload file into the task",
+            notes = "Caller must be assigned to the task, or must be an ADMIN",
+            authorizations = @Authorization("BasicAuth"))
+    @RequestMapping(value = "/{id}/file/{field}", method = RequestMethod.POST, produces = MediaTypes.HAL_JSON_VALUE)
     public ChangedFieldByFileFieldContainer saveFile(Authentication auth, @PathVariable("id") String taskId, @PathVariable("field") String fieldId, @RequestParam(value = "file") MultipartFile multipartFile) {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
         return dataService.saveFile(taskId, fieldId, multipartFile);
     }
 
     @ApiOperation(value = "Download task file field value", authorizations = @Authorization("BasicAuth"))
-    @RequestMapping(value = "/{id}/file/{field}", method = RequestMethod.GET, consumes = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    @RequestMapping(value = "/{id}/file/{field}", method = RequestMethod.GET, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public ResponseEntity<Resource> getFile(@PathVariable("id") String taskId, @PathVariable("field") String fieldId, HttpServletResponse response) throws FileNotFoundException {
         FileFieldInputStream fileFieldInputStream = dataService.getFileByTask(taskId, fieldId);
 
@@ -258,8 +271,11 @@ public class TaskController {
                 .body(new InputStreamResource(fileFieldInputStream.getInputStream()));
     }
 
-    @RequestMapping(value = "/{id}/file/{field}", method = RequestMethod.DELETE)
     @PreAuthorize("@taskAuthorizationService.canCallSaveFile(#auth.getPrincipal(), #taskId)")
+    @ApiOperation(value = "Remove file from the task",
+            notes = "Caller must be assigned to the task, or must be an ADMIN",
+            authorizations = @Authorization("BasicAuth"))
+    @RequestMapping(value = "/{id}/file/{field}", method = RequestMethod.DELETE, produces = MediaTypes.HAL_JSON_VALUE)
     public MessageResource deleteFile(Authentication auth, @PathVariable("id") String taskId, @PathVariable("field") String fieldId) {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
 
@@ -268,8 +284,11 @@ public class TaskController {
         return MessageResource.errorMessage("File in field " + fieldId + " within task" + taskId + " has failed to delete");
     }
 
-    @RequestMapping(value = "/{id}/files/{field}", method = RequestMethod.POST)
     @PreAuthorize("@taskAuthorizationService.canCallSaveFile(#auth.getPrincipal(), #taskId)")
+    @ApiOperation(value = "Upload multiple files into the task",
+            notes = "Caller must be assigned to the task, or must be an ADMIN",
+            authorizations = @Authorization("BasicAuth"))
+    @RequestMapping(value = "/{id}/files/{field}", method = RequestMethod.POST, produces = MediaTypes.HAL_JSON_VALUE)
     public ChangedFieldByFileFieldContainer saveFiles(Authentication auth, @PathVariable("id") String taskId, @PathVariable("field") String fieldId,
                                                       @RequestParam(value = "files") MultipartFile[] multipartFiles) {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
@@ -277,6 +296,7 @@ public class TaskController {
         return dataService.saveFiles(taskId, fieldId, multipartFiles);
     }
 
+    @ApiOperation(value = "Download one file from tasks file list field value", authorizations = @Authorization("BasicAuth"))
     @RequestMapping(value = "/{id}/file/{field}/{name}", method = RequestMethod.GET, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public ResponseEntity<Resource> getNamedFile(@PathVariable("id") String taskId, @PathVariable("field") String fieldId, @PathVariable("name") String name,
                                                  HttpServletResponse response) throws FileNotFoundException {
@@ -295,8 +315,11 @@ public class TaskController {
                 .body(new InputStreamResource(fileFieldInputStream.getInputStream()));
     }
 
-    @RequestMapping(value = "/{id}/file/{field}/{name}", method = RequestMethod.DELETE)
     @PreAuthorize("@taskAuthorizationService.canCallSaveFile(#auth.getPrincipal(), #taskId)")
+    @ApiOperation(value = "Remove file from tasks file list field value",
+            notes = "Caller must be assigned to the task, or must be an ADMIN",
+            authorizations = @Authorization("BasicAuth"))
+    @RequestMapping(value = "/{id}/file/{field}/{name}", method = RequestMethod.DELETE, produces = MediaTypes.HAL_JSON_VALUE)
     public MessageResource deleteNamedFile(Authentication auth, @PathVariable("id") String taskId, @PathVariable("field") String fieldId, @PathVariable("name") String name) {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
 
