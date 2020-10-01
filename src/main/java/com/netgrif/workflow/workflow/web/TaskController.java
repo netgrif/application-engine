@@ -15,11 +15,9 @@ import com.netgrif.workflow.workflow.service.FileFieldInputStream;
 import com.netgrif.workflow.workflow.service.interfaces.IDataService;
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
 import com.netgrif.workflow.workflow.web.responsebodies.*;
+import io.swagger.annotations.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.Authorization;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.io.InputStreamResource;
@@ -110,6 +108,10 @@ public class TaskController {
             notes = "Caller must be able to perform the task, or must be an ADMIN",
             authorizations = @Authorization("BasicAuth"))
     @RequestMapping(value = "/assign/{id}", method = RequestMethod.GET, produces = MediaTypes.HAL_JSON_VALUE)
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "OK", response = LocalisedEventOutcomeResource.class),
+            @ApiResponse(code = 403, message = "Caller doesn't fulfill the authorisation requirements"),
+    })
     public LocalisedEventOutcomeResource assign(Authentication auth, @PathVariable("id") String taskId, Locale locale) {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
 
@@ -127,6 +129,10 @@ public class TaskController {
             notes = "Caller must be able to delegate the task, or must be an ADMIN",
             authorizations = @Authorization("BasicAuth"))
     @RequestMapping(value = "/delegate/{id}", method = RequestMethod.POST, consumes = MediaType.TEXT_PLAIN_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "OK", response = LocalisedEventOutcomeResource.class),
+            @ApiResponse(code = 403, message = "Caller doesn't fulfill the authorisation requirements"),
+    })
     public LocalisedEventOutcomeResource delegate(Authentication auth, @PathVariable("id") String taskId, @RequestBody Long delegatedId, Locale locale) {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
 
@@ -144,6 +150,10 @@ public class TaskController {
             notes = "Caller must be assigned to the task, or must be an ADMIN",
             authorizations = @Authorization("BasicAuth"))
     @RequestMapping(value = "/finish/{id}", method = RequestMethod.GET, produces = MediaTypes.HAL_JSON_VALUE)
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "OK", response = LocalisedEventOutcomeResource.class),
+            @ApiResponse(code = 403, message = "Caller doesn't fulfill the authorisation requirements"),
+    })
     public LocalisedEventOutcomeResource finish(Authentication auth, @PathVariable("id") String taskId, Locale locale) {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
 
@@ -161,6 +171,10 @@ public class TaskController {
             notes = "Caller must be assigned to the task, or must be an ADMIN",
             authorizations = @Authorization("BasicAuth"))
     @RequestMapping(value = "/cancel/{id}", method = RequestMethod.GET, produces = MediaTypes.HAL_JSON_VALUE)
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "OK", response = LocalisedEventOutcomeResource.class),
+            @ApiResponse(code = 403, message = "Caller doesn't fulfill the authorisation requirements"),
+    })
     public LocalisedEventOutcomeResource cancel(Authentication auth, @PathVariable("id") String taskId, Locale locale) {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
 
@@ -238,6 +252,10 @@ public class TaskController {
             notes = "Caller must be assigned to the task, or must be an ADMIN",
             authorizations = @Authorization("BasicAuth"))
     @RequestMapping(value = "/{id}/data", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "OK", response = ChangedFieldContainer.class),
+            @ApiResponse(code = 403, message = "Caller doesn't fulfill the authorisation requirements"),
+    })
     public ChangedFieldContainer setData(Authentication auth, @PathVariable("id") String taskId, @RequestBody ObjectNode dataBody) {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
         return dataService.setData(taskId, dataBody);
@@ -248,6 +266,10 @@ public class TaskController {
             notes = "Caller must be assigned to the task, or must be an ADMIN",
             authorizations = @Authorization("BasicAuth"))
     @RequestMapping(value = "/{id}/file/{field}", method = RequestMethod.POST, produces = MediaTypes.HAL_JSON_VALUE)
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "OK", response = ChangedFieldByFileFieldContainer.class),
+            @ApiResponse(code = 403, message = "Caller doesn't fulfill the authorisation requirements"),
+    })
     public ChangedFieldByFileFieldContainer saveFile(Authentication auth, @PathVariable("id") String taskId, @PathVariable("field") String fieldId, @RequestParam(value = "file") MultipartFile multipartFile) {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
         return dataService.saveFile(taskId, fieldId, multipartFile);
@@ -276,6 +298,10 @@ public class TaskController {
             notes = "Caller must be assigned to the task, or must be an ADMIN",
             authorizations = @Authorization("BasicAuth"))
     @RequestMapping(value = "/{id}/file/{field}", method = RequestMethod.DELETE, produces = MediaTypes.HAL_JSON_VALUE)
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "OK", response = MessageResource.class),
+            @ApiResponse(code = 403, message = "Caller doesn't fulfill the authorisation requirements"),
+    })
     public MessageResource deleteFile(Authentication auth, @PathVariable("id") String taskId, @PathVariable("field") String fieldId) {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
 
@@ -289,6 +315,10 @@ public class TaskController {
             notes = "Caller must be assigned to the task, or must be an ADMIN",
             authorizations = @Authorization("BasicAuth"))
     @RequestMapping(value = "/{id}/files/{field}", method = RequestMethod.POST, produces = MediaTypes.HAL_JSON_VALUE)
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "OK", response = ChangedFieldByFileFieldContainer.class),
+            @ApiResponse(code = 403, message = "Caller doesn't fulfill the authorisation requirements"),
+    })
     public ChangedFieldByFileFieldContainer saveFiles(Authentication auth, @PathVariable("id") String taskId, @PathVariable("field") String fieldId,
                                                       @RequestParam(value = "files") MultipartFile[] multipartFiles) {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
@@ -320,6 +350,10 @@ public class TaskController {
             notes = "Caller must be assigned to the task, or must be an ADMIN",
             authorizations = @Authorization("BasicAuth"))
     @RequestMapping(value = "/{id}/file/{field}/{name}", method = RequestMethod.DELETE, produces = MediaTypes.HAL_JSON_VALUE)
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "OK", response = MessageResource.class),
+            @ApiResponse(code = 403, message = "Caller doesn't fulfill the authorisation requirements"),
+    })
     public MessageResource deleteNamedFile(Authentication auth, @PathVariable("id") String taskId, @PathVariable("field") String fieldId, @PathVariable("name") String name) {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
 

@@ -5,9 +5,8 @@ import com.netgrif.workflow.orgstructure.domain.Group;
 import com.netgrif.workflow.orgstructure.service.IGroupService;
 import com.netgrif.workflow.orgstructure.web.responsebodies.GroupsMinimalResource;
 import com.netgrif.workflow.orgstructure.web.responsebodies.GroupsResource;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.Authorization;
+import com.netgrif.workflow.workflow.web.responsebodies.MessageResource;
+import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.hateoas.MediaTypes;
@@ -38,8 +37,14 @@ public class GroupController {
     private IGroupService service;
 
     @PreAuthorize("hasRole('ADMIN')")
-    @ApiOperation(value = "Get all groups in the system", authorizations = @Authorization("BasicAuth"))
+    @ApiOperation(value = "Get all groups in the system",
+            notes = "Caller must have the ADMIN role",
+            authorizations = @Authorization("BasicAuth"))
     @RequestMapping(value = "/all", method = RequestMethod.GET, produces = MediaTypes.HAL_JSON_VALUE)
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "OK", response = GroupsResource.class),
+            @ApiResponse(code = 403, message = "Caller doesn't fulfill the authorisation requirements"),
+    })
     public GroupsResource getAllGroups() {
         Set<Group> groups = service.findAll();
         return new GroupsMinimalResource(groups);
