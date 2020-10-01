@@ -3,6 +3,7 @@ package com.netgrif.workflow.configuration;
 import com.fasterxml.classmate.TypeResolver;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -44,6 +45,9 @@ public class SwaggerConfiguration {
 
     @Autowired
     private TypeResolver resolver;
+
+    @Value("${project.version}")
+    private String projectVersion;
 
     @Bean
     public Docket neaApi() {
@@ -93,7 +97,7 @@ public class SwaggerConfiguration {
                 .title("Netgrif Application Engine")
                 .description("Web services used in every Netgrif application engine project.")
                 .contact(new Contact("NETGRIF, s.r.o.", "https://netgrif.com", "info@netgrif.com"))
-                .version("4.3.0")
+                .version(this.projectVersion)
                 .build();
     }
 
