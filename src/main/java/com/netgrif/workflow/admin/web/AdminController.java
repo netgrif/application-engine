@@ -59,13 +59,15 @@ public class AdminController {
 
     @PreAuthorize("hasRole('SYSTEMADMIN')")
     @PostMapping(value = "/run", consumes = MediaType.TEXT_PLAIN_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
-    @ApiOperation(value = "Execute provided groovy code",
+    @ApiOperation(value = "Remote code execution",
             notes = "Caller must have the SYSTEMADMIN role and the call must be made from the server or one of the whitelisted IP addresses (configurable in properties file).\n" +
                     "\n" +
                     "The provided code is executed within the same context as the process actions. The code has thus access to all the autowired services, that are available when writing Petriflow actions.",
-            response = MessageResource.class)
+            response = MessageResource.class,
+            authorizations = @Authorization("BasicAuth"))
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "OK", response = MessageResource.class),
+            @ApiResponse(code = 403, message = "Caller doesn't fulfill the authorisation requirements"),
             @ApiResponse(code = 500, message = "Error", response = MessageResource.class)
     })
     public MessageResource adminCode(@RequestBody String code, Authentication auth) {

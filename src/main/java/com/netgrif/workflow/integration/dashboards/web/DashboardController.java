@@ -18,7 +18,7 @@ public class DashboardController {
     @Autowired
     private IDashboardService dashboardService;
 
-    @ApiOperation(value = "Execute provided Elasticsearch aggregation",
+    @ApiOperation(value = "Execute Elasticsearch aggregation",
             notes = "The provided aggregation is executed and its result is returned",
             authorizations = @Authorization("BasicAuth"))
     @RequestMapping(value = "/search", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)

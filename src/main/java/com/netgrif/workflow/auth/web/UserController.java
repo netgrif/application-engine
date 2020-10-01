@@ -17,11 +17,9 @@ import com.netgrif.workflow.settings.service.IPreferencesService;
 import com.netgrif.workflow.settings.web.PreferencesResource;
 import com.netgrif.workflow.workflow.web.responsebodies.MessageResource;
 import com.netgrif.workflow.workflow.web.responsebodies.ResourceLinkAssembler;
+import io.swagger.annotations.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.Authorization;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -150,8 +148,14 @@ public class UserController {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @ApiOperation(value = "Assign role to the user", authorizations = @Authorization("BasicAuth"))
+    @ApiOperation(value = "Assign role to the user",
+            notes = "Caller must have the ADMIN role",
+            authorizations = @Authorization("BasicAuth"))
     @PostMapping(value = "/{id}/role/assign", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "OK", response = MessageResource.class),
+            @ApiResponse(code = 403, message = "Caller doesn't fulfill the authorisation requirements"),
+    })
     public MessageResource assignRolesToUser(@PathVariable("id") Long userId, @RequestBody Set<String> roleIds, Authentication auth) {
         try {
             processRoleService.assignRolesToUser(userId, roleIds, (LoggedUser) auth.getPrincipal());
@@ -164,15 +168,27 @@ public class UserController {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @ApiOperation(value = "Get all authorities of the system", authorizations = @Authorization("BasicAuth"))
+    @ApiOperation(value = "Get all authorities of the system",
+            notes = "Caller must have the ADMIN role",
+            authorizations = @Authorization("BasicAuth"))
     @GetMapping(value = "/authority", produces = MediaTypes.HAL_JSON_VALUE)
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "OK", response = MessageResource.class),
+            @ApiResponse(code = 403, message = "Caller doesn't fulfill the authorisation requirements"),
+    })
     public AuthoritiesResources getAllAuthorities(Authentication auth) {
         return new AuthoritiesResources(authorityService.findAll());
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @ApiOperation(value = "Assign authority to the user", authorizations = @Authorization("BasicAuth"))
+    @ApiOperation(value = "Assign authority to the user",
+            notes = "Caller must have the ADMIN role",
+            authorizations = @Authorization("BasicAuth"))
     @PostMapping(value = "/{id}/authority/assign", consumes = MediaType.TEXT_PLAIN_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "OK", response = MessageResource.class),
+            @ApiResponse(code = 403, message = "Caller doesn't fulfill the authorisation requirements"),
+    })
     public MessageResource assignAuthorityToUser(@PathVariable("id") Long userId, @RequestBody Long authorityId) {
         userService.assignAuthority(userId, authorityId);
         return MessageResource.successMessage("Authority " + authorityId + " assigned to user " + userId);
