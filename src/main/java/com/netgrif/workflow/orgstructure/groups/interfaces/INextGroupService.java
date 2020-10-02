@@ -34,4 +34,6 @@ public interface INextGroupService {
     Map<String, I18nString> removeUser(HashSet<String> usersToRemove, Map<String, I18nString> existingUsers, Case groupCase);
 
     List<User> getMembers(Case groupCase);
+
+    String getGroupOwnerId(String groupId);
 }
