@@ -1,3 +1,18 @@
+<a name="https://netgrif.atlassian.net/projects/NAE/versions/10785/tab/release-report-all-issues"></a>
+## 4.2.0 - Maroon Bronze (21.9.2020)
+### Bug fixes
+ * [NAE-979](https://netgrif.atlassian.net/browse/NAE-979) - Set data on component Rich Text Area
+
+### Improvements
+ * [NAE-966](https://netgrif.atlassian.net/browse/NAE-966) - Task search on MongoDB refactor
+ * [NAE-495](https://netgrif.atlassian.net/browse/NAE-495) - Dashboard
+ * [NAE-301](https://netgrif.atlassian.net/browse/NAE-301) - Add key param to data-fields of type enumeration and multi-choice
+ * [NAE-267](https://netgrif.atlassian.net/browse/NAE-267) - Action result propagation
+
+### Features
+ * [NAE-980](https://netgrif.atlassian.net/browse/NAE-980) - Create HTML textarea field
+ * [NAE-542](https://netgrif.atlassian.net/browse/NAE-542) - Dashboard Card
+
 <a name="https://netgrif.atlassian.net/projects/NAE/versions/10813/tab/release-report-all-issues"></a>
 ## 4.1.2 - Purple Mercury (10.9.2020)
 ### Bug fixes
