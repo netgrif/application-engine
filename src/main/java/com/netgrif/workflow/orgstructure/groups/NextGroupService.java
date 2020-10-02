@@ -156,7 +156,7 @@ public class NextGroupService implements INextGroupService {
 
     @Override
     public Map<String, I18nString> removeUser(HashSet<String> usersToRemove, Map<String, I18nString> existingUsers, Case groupCase){
-        String authorId = groupCase.getAuthor().getId().toString();
+        String authorId = this.getGroupOwnerId(groupCase);
         usersToRemove.forEach(user -> {
             if(user.equals(authorId)){
                 log.error("Author with id [" + authorId + "] cannot be removed from group with ID [" + groupCase.get_id().toString() + "]");
@@ -178,6 +178,11 @@ public class NextGroupService implements INextGroupService {
         return resultList;
     }
 
+    @Override
+    public String getGroupOwnerId(String groupId) {
+        return this.getGroupOwnerId(this.findGroup(groupId));
+    }
+
     private boolean isGroupCase(Case aCase){
         if(aCase == null){
             log.error("The input case is a null object.");
@@ -187,6 +192,10 @@ public class NextGroupService implements INextGroupService {
             return false;
         }
         return true;
+    }
+
+    private String getGroupOwnerId(Case groupCase) {
+        return groupCase.getAuthor().getId().toString();
     }
 
 }
