@@ -8,6 +8,7 @@ import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.auth.web.requestbodies.UpdateUserRequest;
 import com.netgrif.workflow.event.events.user.UserRegistrationEvent;
 import com.netgrif.workflow.orgstructure.domain.Member;
+import com.netgrif.workflow.orgstructure.groups.interfaces.INextGroupService;
 import com.netgrif.workflow.orgstructure.service.IMemberService;
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRoleRepository;
 import com.netgrif.workflow.startup.SystemUserRunner;
@@ -48,11 +49,15 @@ public class UserService implements IUserService {
     @Autowired
     private IMemberService memberService;
 
+    @Autowired
+    private INextGroupService groupService;
+
     @Override
     public User saveNew(User user) {
         encodeUserPassword(user);
         addDefaultRole(user);
         addDefaultAuthorities(user);
+        groupService.createGroup(user.getFullName(), user);
 
         User savedUser = userRepository.save(user);
         groupService.createGroup(savedUser);
