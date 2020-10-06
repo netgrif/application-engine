@@ -3,12 +3,12 @@ package com.netgrif.workflow.workflow.service;
 import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.importer.service.FieldFactory;
-import com.netgrif.workflow.orgstructure.groups.interfaces.INextGroupService;
 import com.netgrif.workflow.petrinet.domain.I18nString;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.dataset.FieldType;
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.workflow.petrinet.web.responsebodies.PetriNetReference;
+import com.netgrif.workflow.utils.FullPageRequest;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.QCase;
 import com.querydsl.core.BooleanBuilder;
@@ -51,9 +51,6 @@ public class CaseSearchService extends MongoSearchService<Case> {
     @Autowired
     private IPetriNetService petriNetService;
 
-    @Autowired
-    private INextGroupService groupService;
-
     public Predicate buildQuery(Map<String, Object> requestQuery, LoggedUser user, Locale locale) {
         BooleanBuilder builder = new BooleanBuilder();
 
@@ -79,7 +76,7 @@ public class CaseSearchService extends MongoSearchService<Case> {
             builder.and(caseId(requestQuery.get(CASE_ID)));
         }
         if (requestQuery.containsKey(GROUP)) {
-            builder.and(group(requestQuery.get(GROUP)));
+            builder.and(group(requestQuery.get(GROUP), user, locale));
         }
 
         return builder;
@@ -284,17 +281,16 @@ public class CaseSearchService extends MongoSearchService<Case> {
         return QCase.case$._id.eq(new ObjectId(caseId));
     }
 
-    public Predicate group(Object query) {
-        if (query instanceof ArrayList) {
-            List<BooleanExpression> processAuthorQueries = this.groupService.getGroupsOwnerIds((List<String>) query).stream().map(this::processAuthorLong).collect(Collectors.toList());
-            BooleanBuilder builder = new BooleanBuilder();
-            processAuthorQueries.forEach(builder::or);
-            return builder;
-        } else if (query instanceof String) {
-            return processAuthorLong(this.groupService.getGroupOwnerId((String) query));
-        }
-        return null;
-    }
+    public Predicate group(Object query, LoggedUser user, Locale locale) {
+        Map<String, Object> processQuery = new HashMap<>();
+        processQuery.put(GROUP, query);
+        List<PetriNetReference> groupProcesses = this.petriNetService.search(processQuery, user, new FullPageRequest(), locale).getContent();
+        if (groupProcesses.size() == 0)
+            return null;
 
-    private BooleanExpression processAuthorLong(Long processAuthorId) {return QCase.case$.petriNet.author.id.eq(processAuthorId);}
+        List<BooleanExpression> processQueries = groupProcesses.stream().map(PetriNetReference::getIdentifier).map(QCase.case$.processIdentifier::eq).collect(Collectors.toList());
+        BooleanBuilder builder = new BooleanBuilder();
+        processQueries.forEach(builder::or);
+        return builder;
+    }
 }
