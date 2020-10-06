@@ -133,13 +133,28 @@
 			</layout>
 		</dataRef>
 		<dataRef>
+			<id>author</id>
+			<logic>
+				<behavior>visible</behavior>
+			</logic>
+			<layout>
+				<x>0</x>
+				<y>1</y>
+				<rows>1</rows>
+				<cols>4</cols>
+				<offset>6</offset>
+				<template>material</template>
+				<appearance>outline</appearance>
+			</layout>
+		</dataRef>
+		<dataRef>
 			<id>group_name</id>
 			<logic>
 				<behavior>editable</behavior>
 			</logic>
 			<layout>
 				<x>0</x>
-				<y>1</y>
+				<y>2</y>
 				<rows>1</rows>
 				<cols>4</cols>
 				<offset>6</offset>
@@ -173,7 +188,7 @@
 			</layout>
 		</dataRef>
 		<dataRef>
-			<id>group_name</id>
+			<id>author</id>
 			<logic>
 				<behavior>visible</behavior>
 			</logic>
@@ -188,13 +203,28 @@
 			</layout>
 		</dataRef>
 		<dataRef>
-			<id>members</id>
+			<id>group_name</id>
 			<logic>
 				<behavior>visible</behavior>
 			</logic>
 			<layout>
 				<x>0</x>
 				<y>2</y>
+				<rows>1</rows>
+				<cols>4</cols>
+				<offset>0</offset>
+				<template>material</template>
+				<appearance>outline</appearance>
+			</layout>
+		</dataRef>
+		<dataRef>
+			<id>members</id>
+			<logic>
+				<behavior>visible</behavior>
+			</logic>
+			<layout>
+				<x>0</x>
+				<y>3</y>
 				<rows>1</rows>
 				<cols>4</cols>
 				<offset>0</offset>
@@ -312,13 +342,28 @@
 			</layout>
 		</dataRef>
 		<dataRef>
+			<id>author</id>
+			<logic>
+				<behavior>visible</behavior>
+			</logic>
+			<layout>
+				<x>0</x>
+				<y>1</y>
+				<rows>1</rows>
+				<cols>4</cols>
+				<offset>6</offset>
+				<template>material</template>
+				<appearance>outline</appearance>
+			</layout>
+		</dataRef>
+		<dataRef>
 			<id>group_name</id>
 			<logic>
 				<behavior>editable</behavior>
 			</logic>
 			<layout>
 				<x>0</x>
-				<y>1</y>
+				<y>2</y>
 				<rows>1</rows>
 				<cols>4</cols>
 				<offset>6</offset>
