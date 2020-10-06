@@ -18,6 +18,8 @@ public interface INextGroupService {
 
     Case findGroup(String groupID);
 
+    List<Case> findByIds(Collection<String> groupIds);
+
     List<Case> findAllGroups();
 
     Case findDefaultGroup();
@@ -39,4 +41,8 @@ public interface INextGroupService {
     Long getGroupOwnerId(String groupId);
 
     Collection<Long> getGroupsOwnerIds(Collection<String> groupIds);
+
+    String getGroupOwnerEmail(String groupId);
+
+    Collection<String> getGroupsOwnerEmails(Collection<String> groupIds);
 }
