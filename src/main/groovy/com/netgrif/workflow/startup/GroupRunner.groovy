@@ -19,13 +19,16 @@ public class GroupRunner extends AbstractOrderedCommandLineRunner {
     private INextGroupService nextGroupService
 
     @Autowired
-    private IUserService userService;
+    private IUserService userService
+
+    @Autowired
+    private SystemUserRunner systemCreator
 
     private static final String GROUP_FILE_NAME = "engine-processes/org_group.xml";
 
     @Override
     void run(String... args) throws Exception {
-        helper.createNet(GROUP_FILE_NAME, "major").get()
+        helper.createNet(GROUP_FILE_NAME, "major", systemCreator.loggedSystem).get()
         nextGroupService.createGroup("Default system group", userService.getLoggedOrSystem())
     }
 }

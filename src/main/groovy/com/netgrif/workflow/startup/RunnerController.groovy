@@ -14,14 +14,14 @@ class RunnerController {
             DefaultRoleRunner,
             DefaultGroupRunner,
             AuthorityRunner,
-            SuperCreator,
             SystemUserRunner,
+            GroupRunner,
+            SuperCreator,
             FlushSessionsRunner,
             MailRunner,
             PostalCodeImporter,
             DummyUserRunner,
             DemoRunner,
-            GroupRunner,
             QuartzSchedulerRunner,
             FinisherRunner
     ]
