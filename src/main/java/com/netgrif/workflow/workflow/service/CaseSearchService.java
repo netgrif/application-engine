@@ -3,6 +3,7 @@ package com.netgrif.workflow.workflow.service;
 import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.importer.service.FieldFactory;
+import com.netgrif.workflow.orgstructure.groups.interfaces.INextGroupService;
 import com.netgrif.workflow.petrinet.domain.I18nString;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.dataset.FieldType;
@@ -45,9 +46,13 @@ public class CaseSearchService extends MongoSearchService<Case> {
     public static final String TRANSITION = "transition";
     public static final String FULLTEXT = "fullText";
     public static final String CASE_ID = "stringId";
+    public static final String GROUP = "group";
 
     @Autowired
     private IPetriNetService petriNetService;
+
+    @Autowired
+    private INextGroupService groupService;
 
     public Predicate buildQuery(Map<String, Object> requestQuery, LoggedUser user, Locale locale) {
         BooleanBuilder builder = new BooleanBuilder();
@@ -72,6 +77,9 @@ public class CaseSearchService extends MongoSearchService<Case> {
         }
         if (requestQuery.containsKey(CASE_ID)) {
             builder.and(caseId(requestQuery.get(CASE_ID)));
+        }
+        if (requestQuery.containsKey(GROUP)) {
+            builder.and(group(requestQuery.get(GROUP)));
         }
 
         return builder;
@@ -275,4 +283,18 @@ public class CaseSearchService extends MongoSearchService<Case> {
     private static BooleanExpression caseIdString(String caseId) {
         return QCase.case$._id.eq(new ObjectId(caseId));
     }
+
+    public Predicate group(Object query) {
+        if (query instanceof ArrayList) {
+            List<BooleanExpression> processAuthorQueries = this.groupService.getGroupsOwnerIds((List<String>) query).stream().map(this::processAuthorLong).collect(Collectors.toList());
+            BooleanBuilder builder = new BooleanBuilder();
+            processAuthorQueries.forEach(builder::or);
+            return builder;
+        } else if (query instanceof String) {
+            return processAuthorLong(this.groupService.getGroupOwnerId((String) query));
+        }
+        return null;
+    }
+
+    private BooleanExpression processAuthorLong(Long processAuthorId) {return QCase.case$.petriNet.author.id.eq(processAuthorId);}
 }
