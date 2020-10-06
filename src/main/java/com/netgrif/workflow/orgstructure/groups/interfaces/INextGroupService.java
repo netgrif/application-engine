@@ -25,6 +25,8 @@ public interface INextGroupService {
 
     Map<String, I18nString> inviteUser(String email, Map<String, I18nString> existingUsers, Case groupCase);
 
+    void addUserToDefaultGroup(User user);
+
     void addUser(User user, Case groupCase);
 
     Map<String, I18nString> addUser(User user, Map<String, I18nString> existingUsers);

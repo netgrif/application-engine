@@ -107,6 +107,14 @@ public class User {
         this.id = id;
     }
 
+    public User(User user){
+        this.id = user.getId();
+        this.email = user.getEmail();
+        this.surname = user.getSurname();
+        this.name = user.getName();
+        this.state = user.getState();
+    }
+
     public User(String email, String password, String name, String surname) {
         this();
         this.email = email;
