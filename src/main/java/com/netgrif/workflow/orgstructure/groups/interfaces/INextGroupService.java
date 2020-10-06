@@ -8,6 +8,7 @@ import com.querydsl.core.types.Predicate;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public interface INextGroupService {
 
@@ -29,6 +30,7 @@ public interface INextGroupService {
 
     void addUser(User user, Case groupCase);
 
+
     Map<String, I18nString> addUser(User user, Map<String, I18nString> existingUsers);
 
     void removeUser(User user, Case groupCase);
@@ -36,4 +38,6 @@ public interface INextGroupService {
     Map<String, I18nString> removeUser(HashSet<String> usersToRemove, Map<String, I18nString> existingUsers, Case groupCase);
 
     List<User> getMembers(Case groupCase);
+
+    Set<String> getAllGroupsOfUser(User groupUser);
 }
