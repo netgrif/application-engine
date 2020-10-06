@@ -5,6 +5,7 @@ import com.netgrif.workflow.petrinet.domain.I18nString;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.querydsl.core.types.Predicate;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -35,5 +36,7 @@ public interface INextGroupService {
 
     List<User> getMembers(Case groupCase);
 
-    String getGroupOwnerId(String groupId);
+    Long getGroupOwnerId(String groupId);
+
+    Collection<Long> getGroupsOwnerIds(Collection<String> groupIds);
 }
