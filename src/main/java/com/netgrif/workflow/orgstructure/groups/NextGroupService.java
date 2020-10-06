@@ -63,16 +63,17 @@ public class NextGroupService implements INextGroupService {
 
     @Override
     public Case createGroup(String title, User author){
-        Case defaultGroup = findDefaultGroup();
-        if(defaultGroup != null && defaultGroup.getTitle().equals("Default system group")){
-            log.error("Group with title \"Default system group\" is already exists and must be unique");
-            return null;
-        }
         PetriNet orgGroupNet = petriNetService.getNewestVersionByIdentifier(GROUP_NET_IDENTIFIER);
         Case groupCase = workflowService.createCase(orgGroupNet.getStringId(), title, "", author.transformToLoggedUser());
 
         groupCase.getDataField(GROUP_MEMBERS_FIELD).setOptions(addUser(author, new HashMap<>()));
-        groupCase.getDataField(GROUP_AUTHOR_FIELD).setValue(author);
+        // TODO 6.10.2020 - Setting value in a more controlled manner, so that this value fixing is only done in one place
+        User authorValue = userService.findById(author.getId(), true);
+        authorValue.setPassword(null);
+        authorValue.setGroups(null);
+        authorValue.setAuthorities(null);
+        authorValue.setUserProcessRoles(null);
+        groupCase.getDataField(GROUP_AUTHOR_FIELD).setValue(authorValue);
         groupCase.getDataField(GROUP_TITLE_FIELD).setValue(title);
 
         workflowService.save(groupCase);
@@ -142,6 +143,8 @@ public class NextGroupService implements INextGroupService {
         existingUsers.put(user.getId().toString(), new I18nString(user.getEmail()));
         return existingUsers;
     }
+
+
 
     @Override
     public void removeUser(User user, Case groupCase){
