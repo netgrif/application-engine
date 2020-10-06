@@ -59,7 +59,8 @@ public class UserService implements IUserService {
         addDefaultAuthorities(user);
 
         User savedUser = userRepository.save(user);
-        groupService.createGroup(savedUser);
+        groupService.createGroup(user);
+        groupService.addUserToDefaultGroup(user);
         savedUser.setGroups(user.getGroups());
         upsertGroupMember(savedUser);
         publisher.publishEvent(new UserRegistrationEvent(savedUser));

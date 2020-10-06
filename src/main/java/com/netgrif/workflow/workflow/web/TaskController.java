@@ -98,57 +98,57 @@ public class TaskController {
 
     @RequestMapping(value = "/assign/{id}", method = RequestMethod.GET)
     @PreAuthorize("@taskAuthorizationService.canCallAssign(#auth.getPrincipal(), #taskId)")
-    public MessageResource assign(Authentication auth, @PathVariable("id") String taskId) {
+    public LocalisedEventOutcomeResource assign(Authentication auth, @PathVariable("id") String taskId, Locale locale) {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
 
         try {
-            taskService.assignTask(loggedUser, taskId);
-            return MessageResource.successMessage("LocalisedTask " + taskId + " assigned to " + loggedUser.getFullName());
+            return LocalisedEventOutcomeResource.successOutcome(taskService.assignTask(loggedUser, taskId), locale,
+                    "LocalisedTask " + taskId + " assigned to " + loggedUser.getFullName());
         } catch (TransitionNotExecutableException e) {
             log.error("Assigning task [" + taskId + "] failed: ", e);
-            return MessageResource.errorMessage("LocalisedTask " + taskId + " cannot be assigned");
+            return LocalisedEventOutcomeResource.errorOutcome("LocalisedTask " + taskId + " cannot be assigned");
         }
     }
 
     @RequestMapping(value = "/delegate/{id}", method = RequestMethod.POST)
     @PreAuthorize("@taskAuthorizationService.canCallDelegate(#auth.getPrincipal(), #taskId)")
-    public MessageResource delegate(Authentication auth, @PathVariable("id") String taskId, @RequestBody Long delegatedId) {
+    public LocalisedEventOutcomeResource delegate(Authentication auth, @PathVariable("id") String taskId, @RequestBody Long delegatedId, Locale locale) {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
 
         try {
-            taskService.delegateTask(loggedUser, delegatedId, taskId);
-            return MessageResource.successMessage("LocalisedTask " + taskId + " assigned to [" + delegatedId + "]");
+            return LocalisedEventOutcomeResource.successOutcome(taskService.delegateTask(loggedUser, delegatedId, taskId), locale,
+                    "LocalisedTask " + taskId + " assigned to [" + delegatedId + "]");
         } catch (Exception e) {
             log.error("Delegating task [" + taskId + "] failed: ", e);
-            return MessageResource.errorMessage("LocalisedTask " + taskId + " cannot be assigned");
+            return LocalisedEventOutcomeResource.errorOutcome("LocalisedTask " + taskId + " cannot be assigned");
         }
     }
 
     @RequestMapping(value = "/finish/{id}", method = RequestMethod.GET)
     @PreAuthorize("@taskAuthorizationService.canCallFinish(#auth.getPrincipal(), #taskId)")
-    public MessageResource finish(Authentication auth, @PathVariable("id") String taskId) {
+    public LocalisedEventOutcomeResource finish(Authentication auth, @PathVariable("id") String taskId, Locale locale) {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
 
         try {
-            taskService.finishTask(loggedUser, taskId);
-            return MessageResource.successMessage("LocalisedTask " + taskId + " finished");
+            return LocalisedEventOutcomeResource.successOutcome(taskService.finishTask(loggedUser, taskId), locale,
+                    "LocalisedTask " + taskId + " finished");
         } catch (Exception e) {
             log.error("Finishing task [" + taskId + "] failed: ", e);
-            return MessageResource.errorMessage(e.getMessage());
+            return LocalisedEventOutcomeResource.errorOutcome(e.getMessage());
         }
     }
 
     @RequestMapping(value = "/cancel/{id}", method = RequestMethod.GET)
     @PreAuthorize("@taskAuthorizationService.canCallCancel(#auth.getPrincipal(), #taskId)")
-    public MessageResource cancel(Authentication auth, @PathVariable("id") String taskId) {
+    public LocalisedEventOutcomeResource cancel(Authentication auth, @PathVariable("id") String taskId, Locale locale) {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
 
         try {
-            taskService.cancelTask(loggedUser, taskId);
-            return MessageResource.successMessage("LocalisedTask " + taskId + " canceled");
+            return LocalisedEventOutcomeResource.successOutcome(taskService.cancelTask(loggedUser, taskId), locale,
+                    "LocalisedTask " + taskId + " canceled");
         } catch (Exception e) {
             log.error("Canceling task [" + taskId + "] failed: ", e);
-            return MessageResource.errorMessage(e.getMessage());
+            return LocalisedEventOutcomeResource.errorOutcome(e.getMessage());
         }
     }
 

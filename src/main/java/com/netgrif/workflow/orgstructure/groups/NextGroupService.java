@@ -10,8 +10,11 @@ import com.netgrif.workflow.orgstructure.groups.interfaces.INextGroupService;
 import com.netgrif.workflow.petrinet.domain.I18nString;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
+import com.netgrif.workflow.startup.ImportHelper;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.QCase;
+import com.netgrif.workflow.workflow.domain.Task;
+import com.netgrif.workflow.workflow.domain.repositories.TaskRepository;
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Predicate;
@@ -49,8 +52,15 @@ public class NextGroupService implements INextGroupService {
     @Autowired
     private IPetriNetService petriNetService;
 
+    @Autowired
+    private ImportHelper importHelper;
+
+    @Autowired
+    private TaskRepository taskRepository;
+
 
     private final static String GROUP_NET_IDENTIFIER = "org_group";
+    private final static String GROUP_INIT_TASK_ID = "2";
 
     private final static String GROUP_CASE_IDENTIFIER = "org_group";
     private final static String GROUP_MEMBERS_FIELD = "members";
@@ -64,20 +74,32 @@ public class NextGroupService implements INextGroupService {
 
     @Override
     public Case createGroup(String title, User author){
-        PetriNet orgGroupNet = petriNetService.getNewestVersionByIdentifier(GROUP_NET_IDENTIFIER);
+        if(authorHasDefaultGroup(author)){
+            return null;
+        }
+        PetriNet orgGroupNet = importHelper.createNet("engine-processes/org_group.xml", "major", author.transformToLoggedUser()).get();
         Case groupCase = workflowService.createCase(orgGroupNet.getStringId(), title, "", author.transformToLoggedUser());
 
         groupCase.getDataField(GROUP_MEMBERS_FIELD).setOptions(addUser(author, new HashMap<>()));
-        // TODO 6.10.2020 - Setting value in a more controlled manner, so that this value fixing is only done in one place
-        User authorValue = userService.findById(author.getId(), true);
-        authorValue.setPassword(null);
-        authorValue.setGroups(null);
-        authorValue.setAuthorities(null);
-        authorValue.setUserProcessRoles(null);
-        groupCase.getDataField(GROUP_AUTHOR_FIELD).setValue(authorValue);
-        groupCase.getDataField(GROUP_TITLE_FIELD).setValue(title);
-
         workflowService.save(groupCase);
+
+        List<Task> taskList = taskRepository.findAllByCaseId(groupCase.getStringId());
+        Task initTask = taskList.stream().filter(task -> task.getTransitionId().equals(GROUP_INIT_TASK_ID)).findFirst().get();
+        Map<String, Map<String,String>> taskData = new HashMap<>();
+
+        Map<String, String> authorData = new HashMap<>();
+        authorData.put("type", "user");
+        authorData.put("value", author.getId().toString());
+
+        Map<String, String> titleData = new HashMap<>();
+        titleData.put("type", "text");
+        titleData.put("value", title);
+
+        taskData.put(GROUP_TITLE_FIELD, titleData);
+        taskData.put(GROUP_AUTHOR_FIELD, authorData);
+
+        importHelper.setTaskData(initTask.getStringId(), taskData);
+
         return groupCase;
     }
 
@@ -138,6 +160,11 @@ public class NextGroupService implements INextGroupService {
     }
 
     @Override
+    public void addUserToDefaultGroup(User user){
+        addUser(user, findDefaultGroup());
+    }
+
+    @Override
     public void addUser(User user, Case groupCase){
         Map<String, I18nString> existingUsers = groupCase.getDataField(GROUP_MEMBERS_FIELD).getOptions();
         if(existingUsers == null){
@@ -152,8 +179,6 @@ public class NextGroupService implements INextGroupService {
         existingUsers.put(user.getId().toString(), new I18nString(user.getEmail()));
         return existingUsers;
     }
-
-
 
     @Override
     public void removeUser(User user, Case groupCase){
@@ -222,6 +247,16 @@ public class NextGroupService implements INextGroupService {
             return false;
         }
         return true;
+    }
+
+    private boolean authorHasDefaultGroup(User author){
+        List<Case> allGroups = findAllGroups();
+        for (Case group : allGroups){
+            if(group.getAuthor().getId().equals(author.getId())){
+                return true;
+            }
+        }
+        return false;
     }
 
     private Long getGroupOwnerId(Case groupCase) {
