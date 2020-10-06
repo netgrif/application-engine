@@ -18,6 +18,7 @@ import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import freemarker.template.TemplateException;
 import lombok.extern.slf4j.Slf4j;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -82,7 +83,7 @@ public class NextGroupService implements INextGroupService {
 
     @Override
     public Case findGroup(String groupID){
-        Case result = workflowService.searchOne(groupCase().and(QCase.case$.stringId.eq(groupID)));
+        Case result = workflowService.searchOne(groupCase().and(QCase.case$._id.eq(new ObjectId(groupID))));
         if(!isGroupCase(result)){
             return null;
         }
@@ -187,7 +188,7 @@ public class NextGroupService implements INextGroupService {
 
     @Override
     public Collection<Long> getGroupsOwnerIds(Collection<String> groupIds) {
-        List<BooleanExpression> groupQueries = groupIds.stream().map(QCase.case$.stringId::eq).collect(Collectors.toList());
+        List<BooleanExpression> groupQueries = groupIds.stream().map(ObjectId::new).map(QCase.case$._id::eq).collect(Collectors.toList());
         BooleanBuilder builder = new BooleanBuilder();
         groupQueries.forEach(builder::or);
         List<Case> groupCases = this.workflowService.searchAll(groupCase().and(builder)).getContent();
