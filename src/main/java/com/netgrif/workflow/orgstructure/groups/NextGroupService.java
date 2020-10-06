@@ -101,6 +101,14 @@ public class NextGroupService implements INextGroupService {
     }
 
     @Override
+    public List<Case> findByIds(Collection<String> groupIds) {
+        List<BooleanExpression> groupQueries = groupIds.stream().map(ObjectId::new).map(QCase.case$._id::eq).collect(Collectors.toList());
+        BooleanBuilder builder = new BooleanBuilder();
+        groupQueries.forEach(builder::or);
+        return this.workflowService.searchAll(groupCase().and(builder)).getContent();
+    }
+
+    @Override
     public List<Case> findAllGroups(){
         return workflowService.searchAll(groupCase()).getContent();
     }
@@ -188,11 +196,17 @@ public class NextGroupService implements INextGroupService {
 
     @Override
     public Collection<Long> getGroupsOwnerIds(Collection<String> groupIds) {
-        List<BooleanExpression> groupQueries = groupIds.stream().map(ObjectId::new).map(QCase.case$._id::eq).collect(Collectors.toList());
-        BooleanBuilder builder = new BooleanBuilder();
-        groupQueries.forEach(builder::or);
-        List<Case> groupCases = this.workflowService.searchAll(groupCase().and(builder)).getContent();
-        return groupCases.stream().map(this::getGroupOwnerId).collect(Collectors.toList());
+        return this.findByIds(groupIds).stream().map(this::getGroupOwnerId).collect(Collectors.toList());
+    }
+
+    @Override
+    public String getGroupOwnerEmail(String groupId) {
+        return this.getGroupOwnerEmail(this.findGroup(groupId));
+    }
+
+    @Override
+    public Collection<String> getGroupsOwnerEmails(Collection<String> groupIds) {
+        return this.findByIds(groupIds).stream().map(this::getGroupOwnerEmail).collect(Collectors.toList());
     }
 
     private static BooleanExpression groupCase() {
@@ -212,6 +226,10 @@ public class NextGroupService implements INextGroupService {
 
     private Long getGroupOwnerId(Case groupCase) {
         return groupCase.getAuthor().getId();
+    }
+
+    private String getGroupOwnerEmail(Case groupCase) {
+        return groupCase.getAuthor().getEmail();
     }
 
 }
