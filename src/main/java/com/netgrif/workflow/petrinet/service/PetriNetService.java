@@ -302,10 +302,10 @@ public abstract class PetriNetService implements IPetriNetService {
             Criteria valueCriteria;
             if (key.equalsIgnoreCase("group")) {
                 if (value instanceof List) {
-                    Collection<Long> authors = this.groupService.getGroupsOwnerIds((List<String>) value);
-                    valueCriteria = Criteria.where("author.id").in(authors);
+                    Collection<String> authors = this.groupService.getGroupsOwnerEmails((List<String>) value);
+                    valueCriteria = Criteria.where("author.email").in(authors);
                 } else {
-                    valueCriteria = Criteria.where("author.id").is(this.groupService.getGroupOwnerId((String) value));
+                    valueCriteria = Criteria.where("author.email").is(this.groupService.getGroupOwnerEmail((String) value));
                 }
             } else if (value instanceof List)
                 valueCriteria = Criteria.where(key).in(value);
