@@ -43,9 +43,6 @@ public class RegistrationService implements IRegistrationService {
     @Autowired
     private IGroupService groupService;
 
-    @Autowired
-    private INextGroupService nextGroupService;
-
     @Value("${server.auth.token-validity-period}")
     private int tokenValidityPeriod;
 
@@ -148,7 +145,6 @@ public class RegistrationService implements IRegistrationService {
         user.setExpirationDate(null);
         user.setState(UserState.ACTIVE);
 
-        nextGroupService.createGroup(user.getFullName(), user);
         return userService.saveNew(user);
     }
 
