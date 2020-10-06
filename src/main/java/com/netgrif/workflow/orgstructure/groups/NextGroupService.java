@@ -9,12 +9,14 @@ import com.netgrif.workflow.mail.interfaces.IMailService;
 import com.netgrif.workflow.orgstructure.groups.interfaces.INextGroupService;
 import com.netgrif.workflow.petrinet.domain.I18nString;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
+import com.netgrif.workflow.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.workflow.startup.ImportHelper;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.QCase;
 import com.netgrif.workflow.workflow.domain.Task;
 import com.netgrif.workflow.workflow.domain.repositories.TaskRepository;
+import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
 import com.querydsl.core.types.Predicate;
 import freemarker.template.TemplateException;
@@ -53,6 +55,9 @@ public class NextGroupService implements INextGroupService {
 
     @Autowired
     private TaskRepository taskRepository;
+    
+    @Autowired
+    private ITaskService taskService;
 
 
     private final static String GROUP_NET_IDENTIFIER = "org_group";
@@ -73,7 +78,7 @@ public class NextGroupService implements INextGroupService {
         if(authorHasDefaultGroup(author)){
             return null;
         }
-        PetriNet orgGroupNet = importHelper.createNet("engine-processes/org_group.xml", "major", author.transformToLoggedUser()).get();
+        PetriNet orgGroupNet = petriNetService.getNewestVersionByIdentifier(GROUP_NET_IDENTIFIER);
         Case groupCase = workflowService.createCase(orgGroupNet.getStringId(), title, "", author.transformToLoggedUser());
 
         groupCase.getDataField(GROUP_MEMBERS_FIELD).setOptions(addUser(author, new HashMap<>()));
@@ -95,6 +100,13 @@ public class NextGroupService implements INextGroupService {
         taskData.put(GROUP_AUTHOR_FIELD, authorData);
 
         importHelper.setTaskData(initTask.getStringId(), taskData);
+
+        try {
+            taskService.assignTask(initTask.getStringId());
+            taskService.finishTask(initTask.getStringId());
+        } catch (TransitionNotExecutableException e) {
+            log.error(e.getMessage());
+        }
 
         return groupCase;
     }
@@ -225,6 +237,14 @@ public class NextGroupService implements INextGroupService {
             }
         }
         return false;
+    }
+
+    @Override
+    public Set<String> getAllGroupsOfUser(User groupUser) {
+        QCase qCase = new QCase("case");
+        List<String> groupList = workflowService.searchAll(qCase.processIdentifier.eq(GROUP_CASE_IDENTIFIER).and(qCase.dataSet.get(GROUP_MEMBERS_FIELD).options.containsKey(groupUser.getId().toString())))
+                .map(aCase -> aCase.get_id().toString()).getContent();
+        return new HashSet<>(groupList);
     }
 
 }
