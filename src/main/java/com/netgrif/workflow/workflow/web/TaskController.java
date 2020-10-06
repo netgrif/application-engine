@@ -186,7 +186,7 @@ public class TaskController {
 
     @RequestMapping(value = "/search_es", method = RequestMethod.POST)
     public PagedResources<LocalisedTaskResource> searchElastic(Authentication auth, Pageable pageable, @RequestBody SingleElasticTaskSearchRequestAsList searchBody, @RequestParam(defaultValue = "OR") MergeFilterOperation operation, PagedResourcesAssembler<Task> assembler, Locale locale) {
-        Page<Task> tasks = searchService.search(searchBody.getList(), (LoggedUser) auth.getPrincipal(), pageable, operation == MergeFilterOperation.AND);
+        Page<Task> tasks = searchService.search(searchBody.getList(), (LoggedUser) auth.getPrincipal(), pageable, locale, operation == MergeFilterOperation.AND);
         Link selfLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
                 .searchElastic(auth, pageable, searchBody, operation, assembler, locale)).withRel("search_es");
         PagedResources<LocalisedTaskResource> resources = assembler.toResource(tasks, new TaskResourceAssembler(locale), selfLink);
@@ -196,7 +196,7 @@ public class TaskController {
 
     @PostMapping(value = "/count", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public CountResponse count(@RequestBody SingleElasticTaskSearchRequestAsList query, @RequestParam(defaultValue = "OR") MergeFilterOperation operation, Authentication auth, Locale locale) {
-        long count = searchService.count(query.getList(), (LoggedUser)auth.getPrincipal(), operation == MergeFilterOperation.AND);
+        long count = searchService.count(query.getList(), (LoggedUser)auth.getPrincipal(), locale, operation == MergeFilterOperation.AND);
         return CountResponse.taskCount(count);
     }
 
