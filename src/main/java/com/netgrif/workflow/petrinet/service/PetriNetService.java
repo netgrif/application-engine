@@ -302,8 +302,7 @@ public abstract class PetriNetService implements IPetriNetService {
             Criteria valueCriteria;
             if (key.equalsIgnoreCase("group")) {
                 if (value instanceof List) {
-                    // TODO 2.10.2020 - might be an unnecessary strain on the database, searching all groups with one query might be preferred
-                    List<String> authors = ((List<String>) value).stream().map(v -> this.groupService.getGroupOwnerId(v)).collect(Collectors.toList());
+                    Collection<Long> authors = this.groupService.getGroupsOwnerIds((List<String>) value);
                     valueCriteria = Criteria.where("author.id").in(authors);
                 } else {
                     valueCriteria = Criteria.where("author.id").is(this.groupService.getGroupOwnerId((String) value));

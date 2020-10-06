@@ -13,7 +13,9 @@ import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.QCase;
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
+import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Predicate;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import freemarker.template.TemplateException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +24,7 @@ import org.springframework.stereotype.Service;
 import javax.mail.MessagingException;
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -78,8 +81,7 @@ public class NextGroupService implements INextGroupService {
 
     @Override
     public Case findGroup(String groupID){
-        QCase qCase = new QCase("case");
-        Case result = workflowService.searchOne(qCase.processIdentifier.eq(GROUP_CASE_IDENTIFIER).and(qCase.stringId.eq(groupID)));
+        Case result = workflowService.searchOne(groupCase().and(QCase.case$.stringId.eq(groupID)));
         if(!isGroupCase(result)){
             return null;
         }
@@ -88,9 +90,7 @@ public class NextGroupService implements INextGroupService {
 
     @Override
     public Case findDefaultGroup(){
-        QCase qCase = new QCase("case");
-        Case result = workflowService.searchOne(qCase.processIdentifier.eq(GROUP_CASE_IDENTIFIER).and(qCase.title.eq("Default system group")));
-        return result;
+        return workflowService.searchOne(groupCase().and(QCase.case$.title.eq("Default system group")));
     }
 
     @Override
@@ -100,8 +100,7 @@ public class NextGroupService implements INextGroupService {
 
     @Override
     public List<Case> findAllGroups(){
-        QCase qCase = new QCase("case");
-        return workflowService.searchAll(qCase.processIdentifier.eq(GROUP_CASE_IDENTIFIER)).getContent();
+        return workflowService.searchAll(groupCase()).getContent();
     }
 
     @Override
@@ -156,7 +155,7 @@ public class NextGroupService implements INextGroupService {
 
     @Override
     public Map<String, I18nString> removeUser(HashSet<String> usersToRemove, Map<String, I18nString> existingUsers, Case groupCase){
-        String authorId = this.getGroupOwnerId(groupCase);
+        String authorId = this.getGroupOwnerId(groupCase).toString();
         usersToRemove.forEach(user -> {
             if(user.equals(authorId)){
                 log.error("Author with id [" + authorId + "] cannot be removed from group with ID [" + groupCase.get_id().toString() + "]");
@@ -179,8 +178,21 @@ public class NextGroupService implements INextGroupService {
     }
 
     @Override
-    public String getGroupOwnerId(String groupId) {
+    public Long getGroupOwnerId(String groupId) {
         return this.getGroupOwnerId(this.findGroup(groupId));
+    }
+
+    @Override
+    public Collection<Long> getGroupsOwnerIds(Collection<String> groupIds) {
+        List<BooleanExpression> groupQueries = groupIds.stream().map(QCase.case$.stringId::eq).collect(Collectors.toList());
+        BooleanBuilder builder = new BooleanBuilder();
+        groupQueries.forEach(builder::or);
+        List<Case> groupCases = this.workflowService.searchAll(groupCase().and(builder)).getContent();
+        return groupCases.stream().map(this::getGroupOwnerId).collect(Collectors.toList());
+    }
+
+    private static BooleanExpression groupCase() {
+        return QCase.case$.processIdentifier.eq(GROUP_CASE_IDENTIFIER);
     }
 
     private boolean isGroupCase(Case aCase){
@@ -194,8 +206,8 @@ public class NextGroupService implements INextGroupService {
         return true;
     }
 
-    private String getGroupOwnerId(Case groupCase) {
-        return groupCase.getAuthor().getId().toString();
+    private Long getGroupOwnerId(Case groupCase) {
+        return groupCase.getAuthor().getId();
     }
 
 }
