@@ -541,8 +541,8 @@ public class TaskService implements ITaskService {
     }
 
     @Override
-    public Page<Task> search(List<TaskSearchRequest> requests, Pageable pageable, LoggedUser user, Boolean isIntersection) {
-        com.querydsl.core.types.Predicate searchPredicate = searchService.buildQuery(requests, user, isIntersection);
+    public Page<Task> search(List<TaskSearchRequest> requests, Pageable pageable, LoggedUser user, Locale locale, Boolean isIntersection) {
+        com.querydsl.core.types.Predicate searchPredicate = searchService.buildQuery(requests, user, locale, isIntersection);
         Page<Task> page = taskRepository.findAll(searchPredicate, pageable);
         page = loadUsers(page);
         page = dataService.setImmediateFields(page);
@@ -550,8 +550,8 @@ public class TaskService implements ITaskService {
     }
 
     @Override
-    public long count(List<TaskSearchRequest> requests, LoggedUser user, Boolean isIntersection) {
-        com.querydsl.core.types.Predicate searchPredicate = searchService.buildQuery(requests, user, isIntersection);
+    public long count(List<TaskSearchRequest> requests, LoggedUser user, Locale locale, Boolean isIntersection) {
+        com.querydsl.core.types.Predicate searchPredicate = searchService.buildQuery(requests, user, locale, isIntersection);
         return taskRepository.count(searchPredicate);
     }
 
