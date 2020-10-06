@@ -1,11 +1,17 @@
 package com.netgrif.workflow.workflow.service;
 
 import com.netgrif.workflow.auth.domain.LoggedUser;
+import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
+import com.netgrif.workflow.petrinet.web.responsebodies.PetriNetReference;
+import com.netgrif.workflow.utils.FullPageRequest;
+import com.netgrif.workflow.workflow.domain.QCase;
 import com.netgrif.workflow.workflow.web.requestbodies.TaskSearchRequest;
 import com.netgrif.workflow.workflow.domain.QTask;
 import com.netgrif.workflow.workflow.domain.Task;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Predicate;
+import com.querydsl.core.types.dsl.BooleanExpression;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -15,8 +21,11 @@ import java.util.stream.Collectors;
 @Service
 public class TaskSearchService extends MongoSearchService<Task> {
 
-    public Predicate buildQuery(List<TaskSearchRequest> requests, LoggedUser user, Boolean isIntersection) {
-        List<Predicate> singleQueries = requests.stream().map(this::buildSingleQuery).collect(Collectors.toList());
+    @Autowired
+    private IPetriNetService petriNetService;
+
+    public Predicate buildQuery(List<TaskSearchRequest> requests, LoggedUser user, Locale locale, Boolean isIntersection) {
+        List<Predicate> singleQueries = requests.stream().map(r -> this.buildSingleQuery(r, user, locale)).collect(Collectors.toList());
 
         BooleanBuilder builder = constructPredicateTree(singleQueries, isIntersection ? BooleanBuilder::and : BooleanBuilder::or);
 
@@ -30,7 +39,7 @@ public class TaskSearchService extends MongoSearchService<Task> {
         return constructPredicateTree(roleConstraints, BooleanBuilder::or);
     }
 
-    private Predicate buildSingleQuery(TaskSearchRequest request) {
+    private Predicate buildSingleQuery(TaskSearchRequest request, LoggedUser user, Locale locale) {
         BooleanBuilder builder = new BooleanBuilder();
 
         buildRoleQuery(request, builder);
@@ -40,6 +49,7 @@ public class TaskSearchService extends MongoSearchService<Task> {
         buildProcessQuery(request, builder);
         buildFullTextQuery(request, builder);
         buildTransitionQuery(request, builder);
+        buildGroupQuery(request, user, locale, builder);
 
         return builder;
     }
@@ -171,6 +181,24 @@ public class TaskSearchService extends MongoSearchService<Task> {
 
     public Predicate transitionQuery(String transitionId) {
         return QTask.task.transitionId.eq(transitionId);
+    }
+
+    public void buildGroupQuery(TaskSearchRequest request, LoggedUser user, Locale locale, BooleanBuilder query) {
+        if (request.group == null || request.group.isEmpty())
+            return;
+
+        Map<String, Object> processQuery = new HashMap<>();
+        processQuery.put("group", request.group);
+        List<PetriNetReference> groupProcesses = this.petriNetService.search(processQuery, user, new FullPageRequest(), locale).getContent();
+        if (groupProcesses.size() == 0)
+            return;
+
+        query.and(
+                constructPredicateTree(
+                        groupProcesses.stream().map(PetriNetReference::getStringId).map(QTask.task.processId::eq).collect(Collectors.toList()),
+                        BooleanBuilder::or
+                )
+        );
     }
 
     private BooleanBuilder constructPredicateTree(List<Predicate> elementaryPredicates, BiFunction<BooleanBuilder, Predicate, BooleanBuilder> nodeOperation) {
