@@ -4,6 +4,7 @@ import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRole;
 import com.netgrif.workflow.petrinet.domain.roles.RolePermission;
+import com.netgrif.workflow.petrinet.domain.throwable.IllegalTaskStateException;
 import com.netgrif.workflow.workflow.domain.Task;
 import com.netgrif.workflow.workflow.service.interfaces.ITaskAuthorizationService;
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
@@ -52,7 +53,7 @@ public class TaskAuthorizationService implements ITaskAuthorizationService {
 
     @Override
     public boolean isAssignee(User user, Task task) {
-        if (task.getUserId() == null)
+        if (!isAssigned(task))
             return false;
         else
             return task.getUserId().equals(user.getId());
@@ -81,6 +82,14 @@ public class TaskAuthorizationService implements ITaskAuthorizationService {
         return aggregatePermissions;
     }
 
+    private boolean isAssigned(String taskId) {
+        return isAssigned(taskService.findById(taskId));
+    }
+
+    private boolean isAssigned(Task task) {
+        return task.getUserId() != null;
+    }
+
     @Override
     public boolean canCallAssign(LoggedUser loggedUser, String taskId) {
         return loggedUser.isAdmin() || userHasAtLeastOneRolePermission(loggedUser, taskId, RolePermission.PERFORM);
@@ -92,14 +101,20 @@ public class TaskAuthorizationService implements ITaskAuthorizationService {
     }
 
     @Override
-    public boolean canCallFinish(LoggedUser loggedUser, String taskId) {
+    public boolean canCallFinish(LoggedUser loggedUser, String taskId) throws IllegalTaskStateException {
+        if (!isAssigned(taskId))
+            throw new IllegalTaskStateException("Task with ID '"+taskId+"' cannot be finished, because it is not assigned!");
+
         return loggedUser.isAdmin()
                 || (userHasAtLeastOneRolePermission(loggedUser, taskId, RolePermission.PERFORM)
                     && isAssignee(loggedUser, taskId));
     }
 
     @Override
-    public boolean canCallCancel(LoggedUser loggedUser, String taskId) {
+    public boolean canCallCancel(LoggedUser loggedUser, String taskId) throws IllegalTaskStateException {
+        if (!isAssigned(taskId))
+            throw new IllegalTaskStateException("Task with ID '"+taskId+"' cannot be canceled, because it is not assigned!");
+
         return loggedUser.isAdmin()
                 || (userHasAtLeastOneRolePermission(loggedUser, taskId, RolePermission.PERFORM, RolePermission.CANCEL)
                     && isAssignee(loggedUser, taskId));
