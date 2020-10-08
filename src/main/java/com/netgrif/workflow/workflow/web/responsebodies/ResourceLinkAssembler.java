@@ -33,7 +33,7 @@ public class ResourceLinkAssembler {
                     .getMyFinished(null, null, null, null)).withRel("finished"));
         if (!selfRel.equalsIgnoreCase("search"))
             pagedResources.add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
-                    .search(null, null, null, null, null, null)).withRel("search"));
+                    .search(null, null, null, null, null)).withRel("search"));
         if (!selfRel.equalsIgnoreCase("search_es"))
             pagedResources.add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
                     .searchElastic(null, null, null, null, null, null)).withRel("search_es"));

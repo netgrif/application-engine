@@ -25,13 +25,13 @@ public class LocalisedTaskResource extends Resource<Task> {
         add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
                 .getOne(task.getStringId(), null)).withSelfRel());
         add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
-                .assign(null, task.getStringId(), null)).withRel("assign"));
+                .assign(null, task.getStringId())).withRel("assign"));
         add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
-                .delegate(null, task.getStringId(), null, null)).withRel("delegate"));
+                .delegate(null, task.getStringId(), null)).withRel("delegate"));
         add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
-                .finish(null, task.getStringId(), null)).withRel("finish"));
+                .finish(null, task.getStringId())).withRel("finish"));
         add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
-                .cancel(null, task.getStringId(), null)).withRel("cancel"));
+                .cancel(null, task.getStringId())).withRel("cancel"));
         add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
                 .getData(task.getStringId(), null)).withRel("data"));
         add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)

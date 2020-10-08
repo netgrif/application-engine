@@ -9,12 +9,12 @@
         <title>Process role</title>
     </role>
     <!-- DATA -->
-    <data type="number" immediate="true">
+    <data type="number">
         <id>number</id>
         <title>Number</title>
         <init>10000</init>
     </data>
-    <data type="number" immediate="true">
+    <data type="number">
         <id>number_currency</id>
         <title>Number currency</title>
         <init>10000</init>
@@ -27,7 +27,7 @@
         </format>
     </data>
 
-    <data type="text" immediate="true">
+    <data type="text">
         <id>text</id>
         <title>Text</title>
         <init>Lorem ipsum</init>

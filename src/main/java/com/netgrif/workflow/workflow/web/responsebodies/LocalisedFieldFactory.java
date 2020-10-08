@@ -25,10 +25,6 @@ public class LocalisedFieldFactory {
             return fromBoolean((BooleanField) field, locale);
         } else if (field instanceof UserField) {
             return fromUser((UserField) field, locale);
-        } else if (field instanceof EnumerationMapField) {
-            return fromEnumerationMap((EnumerationMapField) field, locale);
-        } else if (field instanceof MultichoiceMapField) {
-            return fromMultichoiceMap((MultichoiceMapField) field, locale);
         } else if (field instanceof CaseField) {
             return fromCase((CaseField) field, locale);
         } else if (field instanceof FileListField) {
@@ -72,14 +68,6 @@ public class LocalisedFieldFactory {
 
     private static LocalisedField fromEnumeration(EnumerationField field, Locale locale) {
         return new LocalisedEnumerationField(field, locale);
-    }
-
-    public static LocalisedField fromEnumerationMap(EnumerationMapField field, Locale locale) {
-        return new LocalisedEnumerationMapField(field, locale);
-    }
-
-    public static LocalisedField fromMultichoiceMap(MultichoiceMapField field, Locale locale) {
-        return new LocalisedMultichoiceMapField(field, locale);
     }
 
     private static LocalisedField fromCase(CaseField field, Locale locale) {

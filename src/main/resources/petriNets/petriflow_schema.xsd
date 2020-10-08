@@ -19,15 +19,12 @@
                 <xs:element ref="title"/>
                 <xs:element ref="placeholder" minOccurs="0"/>
                 <xs:element ref="desc" minOccurs="0"/>
-                <xs:choice>
-                    <xs:element ref="values" minOccurs="0" maxOccurs="unbounded"/>
-                    <xs:element ref="options" minOccurs="0"/>
-                </xs:choice>
+                <xs:element ref="values" minOccurs="0" maxOccurs="unbounded"/>
                 <xs:choice>
                     <xs:element ref="valid" minOccurs="0" maxOccurs="unbounded"/>
                     <xs:element ref="validations" minOccurs="0"/>
                 </xs:choice>
-                <xs:element ref="init" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:element ref="init" minOccurs="0"/>
                 <xs:element ref="format" minOccurs="0"/>
                 <xs:choice>
                     <xs:element name="view" minOccurs="0" type="fieldView"/>
@@ -81,9 +78,7 @@
                             <xs:element ref="cols" minOccurs="0"/>
                             <xs:element ref="rows" minOccurs="0"/>
                             <xs:element ref="offset" minOccurs="0"/>
-                            <xs:element name="fieldAlignment" type="fieldAlignment" minOccurs="0"/>
                         </xs:sequence>
-                        <xs:attribute name="type" type="layoutType"/>
                     </xs:complexType>
                 </xs:element>
                 <xs:element ref="icon" minOccurs="0"/>
@@ -208,9 +203,7 @@
             <xs:enumeration value="number"/>
             <xs:enumeration value="text"/>
             <xs:enumeration value="enumeration"/>
-            <xs:enumeration value="enumeration_map"/>
             <xs:enumeration value="multichoice"/>
-            <xs:enumeration value="multichoice_map"/>
             <xs:enumeration value="boolean"/>
             <xs:enumeration value="date"/>
             <xs:enumeration value="file"/>
@@ -298,7 +291,6 @@
             <xs:enumeration value="standard"/>
             <xs:enumeration value="outline"/>
             <xs:enumeration value="fill"/>
-            <xs:enumeration value="legacy"/>
         </xs:restriction>
     </xs:simpleType>
     <xs:element name="label" type="i18nStringType"/>
@@ -415,31 +407,15 @@
                 <xs:element ref="offset"/>
                 <xs:element ref="template" minOccurs="0"/>
                 <xs:element ref="appearance" minOccurs="0"/>
-                <xs:element name="alignment" type="fieldAlignment" minOccurs="0"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
-    <xs:simpleType name="fieldAlignment">
-        <xs:restriction base="xs:string">
-            <xs:enumeration value="top"/>
-            <xs:enumeration value="center"/>
-            <xs:enumeration value="bottom"/>
-        </xs:restriction>
-    </xs:simpleType>
-    <xs:simpleType name="layoutType">
-        <xs:restriction base="xs:string">
-            <xs:enumeration value="flow"/>
-            <xs:enumeration value="grid"/>
-            <xs:enumeration value="legacy"/>
-        </xs:restriction>
-    </xs:simpleType>
     <xs:element name="dataGroup">
         <xs:complexType>
             <xs:sequence>
                 <xs:element ref="id"/>
                 <xs:element ref="cols" minOccurs="0"/>
                 <xs:element ref="rows" minOccurs="0"/>
-                <xs:element name="layout" type="layoutType"/>
                 <xs:element ref="title" minOccurs="0"/>
                 <xs:element ref="alignment" minOccurs="0"/>
                 <xs:element ref="stretch" minOccurs="0"/>
@@ -574,7 +550,6 @@
             <xs:element name="table" type="xs:string"/>
             <xs:element name="image" type="booleanImageView"/>
             <xs:element name="editor"/>
-            <xs:element name="htmlEditor"/>
             <xs:element name="buttonType">
                 <xs:simpleType>
                     <xs:restriction base='xs:string'>

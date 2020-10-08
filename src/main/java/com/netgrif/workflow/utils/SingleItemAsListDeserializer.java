@@ -5,8 +5,6 @@ import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.deser.ContextualDeserializer;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
 import java.util.List;
@@ -56,9 +54,9 @@ public class SingleItemAsListDeserializer extends StdDeserializer<Object> implem
                 wrapper.getList().addAll(requests);
             } catch (IllegalArgumentException arrayException) {
                 if(node.isArray())
-                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Single item as list deserialization failed. List deserialization exception: " + arrayException.getMessage(), arrayException);
+                    throw new IllegalArgumentException("Single item as list deserialization failed. List deserialization exception: " + arrayException.getMessage(), arrayException);
                 else
-                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Single item as list deserialization failed. Single item deserialization exception: " + singleItemException.getMessage(), singleItemException);
+                    throw new IllegalArgumentException("Single item as list deserialization failed. Single item deserialization exception: " + singleItemException.getMessage(), singleItemException);
             }
         }
 

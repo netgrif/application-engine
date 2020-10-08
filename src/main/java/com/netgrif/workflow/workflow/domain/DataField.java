@@ -27,9 +27,6 @@ public class DataField {
     @Getter @Setter
     private List<String> allowedNets;
 
-    @Getter @Setter
-    private Map<String, I18nString> options;
-
     @Getter
     @Setter
     @JsonIgnore

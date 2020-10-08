@@ -1,4 +1,4 @@
-package com.netgrif.workflow.workflow.web.requestbodies;
+package com.netgrif.workflow.elastic.web.requestbodies;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -16,7 +16,7 @@ public class TaskSearchRequest {
 
     @JsonProperty("case")
     @JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
-    public List<TaskSearchCaseRequest> useCase;
+    public List<String> useCase;
 
     @JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
     public List<String> title;
@@ -32,11 +32,5 @@ public class TaskSearchRequest {
 
     public String fullText;
 
-
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class TaskSearchCaseRequest {
-        public String id;
-        public String title;
-    }
+    public String query;
 }

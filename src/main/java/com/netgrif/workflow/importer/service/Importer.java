@@ -148,11 +148,10 @@ public class Importer {
     protected Optional<PetriNet> createPetriNet() throws MissingPetriNetMetaDataException {
         net = new PetriNet();
 
-        document.getI18N().forEach(this::addI18N);
-
         setMetaData();
         net.setIcon(document.getIcon());
 
+        document.getI18N().forEach(this::addI18N);
         document.getRole().forEach(this::createRole);
         document.getData().forEach(this::createDataSet);
         document.getTransaction().forEach(this::createTransaction);
@@ -294,7 +293,7 @@ public class Importer {
         transition.setImportId(importTransition.getId());
         transition.setTitle(toI18NString(importTransition.getLabel()));
         transition.setPosition(importTransition.getX(), importTransition.getY());
-        if (importTransition.getLayout() != null) {
+        if (importTransition.getLayout() != null && (importTransition.getLayout().getCols() != null || importTransition.getLayout().getRows() != null)) {
             transition.setLayout(new TaskLayout(importTransition));
         }
 
@@ -389,7 +388,7 @@ public class Importer {
         DataGroup dataGroup = new DataGroup();
         dataGroup.setImportId(transition.getImportId() + "_" + dataRef.getId() + "_" + System.currentTimeMillis());
         if (transition.getLayout() != null && transition.getLayout().getCols() != null) {
-            dataGroup.setLayout(new DataGroupLayout(null, transition.getLayout().getCols(), null));
+            dataGroup.setLayout(new DataGroupLayout(null, transition.getLayout().getCols()));
         }
         dataGroup.setAlignment("start");
         dataGroup.setStretch(true);
@@ -406,15 +405,13 @@ public class Importer {
         DataGroup dataGroup = new DataGroup();
         dataGroup.setImportId(importDataGroup.getId());
 
-        String dataGroupLayout = importDataGroup.getLayout() != null ? importDataGroup.getLayout().value() : null;
-
         if (importDataGroup.getCols() != null || importDataGroup.getRows() != null) {
-            dataGroup.setLayout(new DataGroupLayout(importDataGroup.getRows(), importDataGroup.getCols(), dataGroupLayout));
+            dataGroup.setLayout(new DataGroupLayout(importDataGroup.getRows(), importDataGroup.getCols()));
         }
         if (importDataGroup.getCols() == null && (transition.getLayout() != null && transition.getLayout().getCols() != null)) {
             dataGroup.setLayout(dataGroup.getLayout() != null ?
-                    new DataGroupLayout(dataGroup.getLayout().getRows(), transition.getLayout().getCols(), dataGroupLayout) :
-                    new DataGroupLayout(null, transition.getLayout().getCols(), dataGroupLayout));
+                    new DataGroupLayout(dataGroup.getLayout().getRows(), transition.getLayout().getCols()) :
+                    new DataGroupLayout(null, transition.getLayout().getCols()));
         }
 
         dataGroup.setTitle(toI18NString(importDataGroup.getTitle()));
@@ -484,12 +481,7 @@ public class Importer {
                 appearance = layout.getAppearance().toString();
             }
 
-            String alignment = null;
-            if (layout.getAlignment() != null) {
-                alignment = layout.getAlignment().value();
-            }
-
-            FieldLayout fieldLayout = new FieldLayout(layout.getX(), layout.getY(), layout.getRows(), layout.getCols(), layout.getOffset(), layout.getTemplate().toString(), appearance, alignment);
+            FieldLayout fieldLayout = new FieldLayout(layout.getX(), layout.getY(), layout.getRows(), layout.getCols(), layout.getOffset(), layout.getTemplate().toString(), appearance);
             transition.addDataSet(fieldId, null, null, fieldLayout);
         } catch (NullPointerException e) {
             throw new IllegalArgumentException("Wrong dataRef id [" + dataRef.getId() + "] on transition [" + transition.getTitle() + "]", e);

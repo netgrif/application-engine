@@ -11,8 +11,8 @@ public abstract class Layout {
     private Integer cols;
 
     public Layout(Integer rows, Integer cols) {
-        this.rows = rows == null || rows == 0 ? null : rows;
-        this.cols = cols == null || cols == 0 ? null : cols;
+        this.rows = rows;
+        this.cols = cols;
     }
 
     public Layout() {
