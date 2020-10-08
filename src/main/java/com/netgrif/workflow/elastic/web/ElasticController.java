@@ -10,6 +10,7 @@ import io.swagger.annotations.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.MediaType;
@@ -44,6 +45,9 @@ public class ElasticController {
     @Autowired
     private ReindexingTask reindexingTask;
 
+    @Value("${spring.data.elasticsearch.reindex-size}")
+    private int pageSize;
+
     @PreAuthorize("hasRole('ADMIN')")
     @ApiOperation(value = "Reindex specified cases",
             notes = "Caller must have the ADMIN role",
@@ -61,7 +65,7 @@ public class ElasticController {
             if (count == 0) {
                 log.info("No cases to reindex");
             } else {
-                long numOfPages = (long) ((count / 100.0) + 1);
+                long numOfPages = (long) ((count / pageSize) + 1);
                 log.info("Reindexing cases: " + numOfPages + " pages");
 
                 for (int page = 0; page < numOfPages; page++) {
