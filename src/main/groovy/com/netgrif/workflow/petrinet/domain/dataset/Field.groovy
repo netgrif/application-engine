@@ -2,6 +2,7 @@ package com.netgrif.workflow.petrinet.domain.dataset
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.databind.node.ObjectNode
+import com.netgrif.workflow.importer.model.Component
 import com.netgrif.workflow.petrinet.domain.Format
 import com.netgrif.workflow.petrinet.domain.I18nString
 import com.netgrif.workflow.petrinet.domain.Imported
@@ -52,6 +53,8 @@ abstract class Field<T> extends Imported {
     private View view
 
     private Integer length
+
+    private Component component
 
     Field() {
         _id = new ObjectId()
@@ -172,6 +175,14 @@ abstract class Field<T> extends Imported {
         this.encryption = encryption
     }
 
+    Component getComponent() {
+        return component
+    }
+
+    void setComponent(Component component) {
+        this.component = component
+    }
+
     void clearValue() {}
 //operators overloading
     T plus(final Field field) {
@@ -246,6 +257,7 @@ abstract class Field<T> extends Imported {
         clone.view = this.view
         clone.format = this.format
         clone.length = this.length
+        clone.component = this.component
     }
 
     abstract Field clone()
