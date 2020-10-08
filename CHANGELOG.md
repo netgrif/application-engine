@@ -1,3 +1,14 @@
+<a name="https://netgrif.atlassian.net/projects/NAE/versions/10822/tab/release-report-all-issues"></a>
+## 4.1.3 - Maroon Zinc (08.10.2020)
+### Bug fixes
+ * [NAE-1029](https://netgrif.atlassian.net/browse/NAE-1029) - 	Unassigned task can be canceled by admin
+ 
+### Improvements
+ None
+ 
+### Features
+ None
+
 <a name="https://netgrif.atlassian.net/projects/NAE/versions/10813/tab/release-report-all-issues"></a>
 ## 4.1.2 - Purple Mercury (10.9.2020)
 ### Bug fixes
