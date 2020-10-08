@@ -10,6 +10,7 @@ import com.netgrif.workflow.petrinet.service.interfaces.IProcessRoleService;
 import com.netgrif.workflow.petrinet.web.responsebodies.*;
 import com.netgrif.workflow.workflow.domain.FileStorageConfiguration;
 import com.netgrif.workflow.workflow.web.responsebodies.MessageResource;
+import io.swagger.annotations.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.Link;
+import org.springframework.hateoas.MediaTypes;
 import org.springframework.hateoas.PagedResources;
 import org.springframework.hateoas.mvc.ControllerLinkBuilder;
 import org.springframework.http.MediaType;
@@ -44,6 +46,7 @@ import static org.springframework.web.bind.annotation.RequestMethod.POST;
         havingValue = "true",
         matchIfMissing = true
 )
+@Api(tags = {"Petri net"}, authorizations = @Authorization("BasicAuth"))
 public class PetriNetController {
 
     private static final Logger log = LoggerFactory.getLogger(PetriNetController.class);
@@ -61,7 +64,15 @@ public class PetriNetController {
     private StringToVersionConverter converter;
 
     @PreAuthorize("hasRole('ADMIN')")
-    @RequestMapping(value = "/import", method = POST)
+    @ApiOperation(value = "Import new process",
+            notes = "Caller must have the ADMIN role. Imports an entirely new process or a new version of an existing process.",
+            authorizations = @Authorization("BasicAuth"))
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "OK", response = PetriNetReferenceWithMessageResource.class),
+            @ApiResponse(code = 400, message = "Process model is invalid", response = MessageResource.class),
+            @ApiResponse(code = 403, message = "Caller doesn't fulfill the authorisation requirements")
+    })
+    @RequestMapping(value = "/import", method = POST, produces = MediaTypes.HAL_JSON_VALUE)
     public
     @ResponseBody
     PetriNetReferenceWithMessageResource importPetriNet(
@@ -84,7 +95,8 @@ public class PetriNetController {
         }
     }
 
-    @RequestMapping(method = GET)
+    @ApiOperation(value = "Get all processes", authorizations = @Authorization("BasicAuth"))
+    @RequestMapping(method = GET, produces = MediaTypes.HAL_JSON_VALUE)
     public @ResponseBody
     PetriNetReferenceResources getAll(@RequestParam(value = "indentifier", required = false) String identifier, @RequestParam(value = "version", required = false) String version, Authentication auth, Locale locale) {
         LoggedUser user = (LoggedUser) auth.getPrincipal();
@@ -99,19 +111,22 @@ public class PetriNetController {
         }
     }
 
-    @RequestMapping(value = "/{id}", method = GET)
+    @ApiOperation(value = "Get process by id", authorizations = @Authorization("BasicAuth"))
+    @RequestMapping(value = "/{id}", method = GET, produces = MediaTypes.HAL_JSON_VALUE)
     public @ResponseBody
     PetriNetReferenceResource getOne(@PathVariable("id") String id, Authentication auth, Locale locale) {
         return new PetriNetReferenceResource(IPetriNetService.transformToReference(service.getPetriNet(decodeUrl(id)), locale));
     }
 
-    @RequestMapping(value = "/{identifier}/{version}", method = GET)
+    @ApiOperation(value = "Get process by identifier and version", authorizations = @Authorization("BasicAuth"))
+    @RequestMapping(value = "/{identifier}/{version}", method = GET, produces = MediaTypes.HAL_JSON_VALUE)
     public @ResponseBody
     PetriNetReferenceResource getOne(@PathVariable("identifier") String identifier, @PathVariable("version") String version, Authentication auth, Locale locale) {
         return new PetriNetReferenceResource(service.getReference(identifier, converter.convert(version), (LoggedUser) auth.getPrincipal(), locale));
     }
 
-    @RequestMapping(value = "/transitions", method = GET)
+    @ApiOperation(value = "Get transitions of processes", authorizations = @Authorization("BasicAuth"))
+    @RequestMapping(value = "/transitions", method = GET, produces = MediaTypes.HAL_JSON_VALUE)
     public
     @ResponseBody
     TransitionReferencesResource getTransitionReferences(@RequestParam List<String> ids, Authentication auth, Locale locale) {
@@ -119,27 +134,31 @@ public class PetriNetController {
         return new TransitionReferencesResource(service.getTransitionReferences(ids, (LoggedUser) auth.getPrincipal(), locale));
     }
 
-    @RequestMapping(value = "/data", method = POST)
+    @ApiOperation(value = "Get data fields of transitions", authorizations = @Authorization("BasicAuth"))
+    @RequestMapping(value = "/data", method = POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public
     @ResponseBody
     DataFieldReferencesResource getDataFieldReferences(@RequestBody List<TransitionReference> referenceBody, Locale locale) {
         return new DataFieldReferencesResource(service.getDataFieldReferences(referenceBody, locale));
     }
 
-    @RequestMapping(value = "/{netId}/roles", method = GET)
+    @ApiOperation(value = "Get roles of process", authorizations = @Authorization("BasicAuth"))
+    @RequestMapping(value = "/{netId}/roles", method = GET, produces = MediaTypes.HAL_JSON_VALUE)
     public @ResponseBody
     ProcessRolesResource getRoles(@PathVariable("netId") String netId, Locale locale) {
         netId = decodeUrl(netId);
         return new ProcessRolesResource(roleService.findAll(netId), netId, locale);
     }
 
-    @RequestMapping(value = "/{netId}/transactions", method = GET)
+    @ApiOperation(value = "Get transactions of process", authorizations = @Authorization("BasicAuth"))
+    @RequestMapping(value = "/{netId}/transactions", method = GET, produces = MediaTypes.HAL_JSON_VALUE)
     public @ResponseBody
     TransactionsResource getTransactions(@PathVariable("netId") String netId, Locale locale) {
         PetriNet net = service.getPetriNet(decodeUrl(netId));
         return new TransactionsResource(net.getTransactions().values(), netId, locale);
     }
 
+    @ApiOperation(value = "Download process model", authorizations = @Authorization("BasicAuth"))
     @RequestMapping(value = "/{netId}/file", method = GET, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public FileSystemResource getNetFile(@PathVariable("netId") String netId, @RequestParam(value = "title", required = false) String title, Authentication auth, HttpServletResponse response) {
         FileSystemResource fileResource = service.getFile(decodeUrl(netId), decodeUrl(title));
@@ -150,7 +169,8 @@ public class PetriNetController {
         return fileResource;
     }
 
-    @RequestMapping(value = "/search", method = POST)
+    @ApiOperation(value = "Search processes", authorizations = @Authorization("BasicAuth"))
+    @RequestMapping(value = "/search", method = POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public @ResponseBody
     PagedResources<PetriNetReferenceResource> searchPetriNets(@RequestBody Map<String, Object> criteria, Authentication auth, Pageable pageable, PagedResourcesAssembler<PetriNetReference> assembler, Locale locale) {
         LoggedUser user = (LoggedUser) auth.getPrincipal();
