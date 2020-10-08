@@ -10,22 +10,24 @@ class FieldLayout extends Layout {
     private int offset
     private String template
     private String appearance
+    private String alignment
 
     FieldLayout() {
         super()
     }
 
-    FieldLayout(int x, int y, int rows, int cols, int offset, String template, String appearance) {
+    FieldLayout(int x, int y, Integer rows, Integer cols, int offset, String template, String appearance, String alignment) {
         super(rows, cols)
         this.x = x
         this.y = y
         this.offset = offset
         this.template = template?.toLowerCase()
         this.appearance = appearance?.toLowerCase()
+        this.alignment = alignment
     }
 
     FieldLayout clone() {
-        return new FieldLayout(this.getX(), this.getY(), this.getRows(), this.getCols(),this.getOffset(), this.getTemplate(), this.getAppearance())
+        return new FieldLayout(this.getX(), this.getY(), this.getRows(), this.getCols(), this.getOffset(), this.getTemplate(), this.getAppearance(), this.getAlignment())
     }
 
     int getX() {
@@ -68,8 +70,23 @@ class FieldLayout extends Layout {
         this.appearance = appearance
     }
 
+    String getAlignment() {
+        return alignment
+    }
+
+    void setAlignment(String alignment) {
+        this.alignment = alignment
+    }
+
     boolean layoutFilled() {
-        return (this.rows != null && this.rows != 0) && (this.cols != null && this.cols != 0)
+        return (this.rows != null
+                || this.cols != null
+                || this.x != 0
+                || this.y != 0
+                || this.offset != 0
+                || this.template != null
+                || this.appearance != null
+                || this.alignment != null)
     }
 
     @Override
