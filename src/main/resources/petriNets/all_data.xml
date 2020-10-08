@@ -32,6 +32,17 @@
         <title>Text</title>
         <init>Lorem ipsum</init>
     </data>
+    <data type="text" immediate="true">
+        <id>password_data</id>
+        <title>Password from data</title>
+        <component>
+            <name>password</name>
+        </component>
+    </data>
+    <data type="text" immediate="true">
+        <id>password_dataref</id>
+        <title>Password from dataRef</title>
+    </data>
     <data type="text">
         <id>text_area</id>
         <title>Text area</title>
@@ -170,6 +181,21 @@
                 <logic>
                     <behavior>editable</behavior>
                 </logic>
+            </dataRef>
+            <dataRef>
+                <id>password_data</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>password_dataref</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <component>
+                    <name>password</name>
+                </component>
             </dataRef>
         </dataGroup>
         <dataGroup>
