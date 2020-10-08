@@ -49,7 +49,7 @@ public class ReindexingTask {
             ElasticCaseRepository elasticCaseRepository,
             IElasticCaseService elasticCaseService,
             IElasticTaskService elasticTaskService,
-            @Value("${spring.data.elasticsearch.reindex-size:20}") int pageSize,
+            @Value("${spring.data.elasticsearch.reindex-size}") int pageSize,
             @Value("${spring.data.elasticsearch.reindex-from:#{null}}") Duration from) {
         this.caseRepository = caseRepository;
         this.taskRepository = taskRepository;
