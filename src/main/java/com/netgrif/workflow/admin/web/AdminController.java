@@ -4,14 +4,13 @@ import com.netgrif.workflow.admin.service.AdminActionException;
 import com.netgrif.workflow.admin.service.interfaces.IAdminService;
 import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.workflow.web.responsebodies.MessageResource;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -34,6 +33,7 @@ import static com.netgrif.workflow.workflow.web.responsebodies.MessageResource.*
         havingValue = "true",
         matchIfMissing = true
 )
+@Api(tags = {"Admin console"}, authorizations = @Authorization("BasicAuth"))
 public class AdminController {
 
     private static final Logger log = LoggerFactory.getLogger(AdminController.class.getName());
@@ -58,13 +58,17 @@ public class AdminController {
 
 
     @PreAuthorize("hasRole('SYSTEMADMIN')")
-    @PostMapping(value = "/run", consumes = MediaType.TEXT_PLAIN_VALUE)
-    @ApiOperation(value = "Admin console running code",
-            notes = "End-point",
-            response = MessageResource.class)
+    @PostMapping(value = "/run", consumes = MediaType.TEXT_PLAIN_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
+    @ApiOperation(value = "Remote code execution",
+            notes = "Caller must have the SYSTEMADMIN role and the call must be made from the server or one of the whitelisted IP addresses (configurable in properties file).\n" +
+                    "\n" +
+                    "The provided code is executed within the same context as the process actions. The code has thus access to all the autowired services, that are available when writing Petriflow actions.",
+            response = MessageResource.class,
+            authorizations = @Authorization("BasicAuth"))
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "OK", response = MessageResource.class),
-            @ApiResponse(code = 500, message = "Chyba", response = MessageResource.class)
+            @ApiResponse(code = 403, message = "Caller doesn't fulfill the authorisation requirements"),
+            @ApiResponse(code = 500, message = "Error", response = MessageResource.class)
     })
     public MessageResource adminCode(@RequestBody String code, Authentication auth) {
         if (activateRun) {
