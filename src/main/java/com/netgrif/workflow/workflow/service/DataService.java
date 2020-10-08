@@ -17,12 +17,10 @@ import com.netgrif.workflow.petrinet.domain.dataset.logic.action.FieldActionsRun
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.DataField;
 import com.netgrif.workflow.workflow.domain.Task;
-import com.netgrif.workflow.workflow.domain.WrappingLayout;
 import com.netgrif.workflow.workflow.service.interfaces.IDataService;
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
 import com.netgrif.workflow.workflow.web.responsebodies.DataFieldsResource;
-import com.netgrif.workflow.workflow.web.responsebodies.LocalisedField;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -189,10 +187,10 @@ public class DataService implements IDataService {
 
     @Override
     public List<DataGroup> getDataGroups(String taskId, Locale locale) {
-        return getDataGroups(taskId, locale, new HashSet<>(), 0, new WrappingLayout(0));
+        return getDataGroups(taskId, locale, new HashSet<>(), 0);
     }
 
-    private List<DataGroup> getDataGroups(String taskId, Locale locale, Set<String> collectedTaskIds, int level, WrappingLayout wrappingLayout) {
+    private List<DataGroup> getDataGroups(String taskId, Locale locale, Set<String> collectedTaskIds, int level) {
         Task task = taskService.findOne(taskId);
         Case useCase = workflowService.findOne(task.getCaseId());
         PetriNet net = useCase.getPetriNet();
@@ -214,16 +212,9 @@ public class DataService implements IDataService {
                 Field field = net.getDataSet().get(dataFieldId);
                 if (dataFieldMap.containsKey(dataFieldId)) {
                     if (field.getType() == FieldType.TASK_REF) {
-                        resultDataGroups.addAll(collectTaskRefDataGroups((TaskField) dataFieldMap.get(dataFieldId), locale, collectedTaskIds, level, wrappingLayout));
+                        resultDataGroups.addAll(collectTaskRefDataGroups((TaskField) dataFieldMap.get(dataFieldId), locale, collectedTaskIds, level));
                     } else {
                         Field resource = dataFieldMap.get(dataFieldId);
-                        if (resource.getLayout() != null && !dataGroup.getImportId().contains("-") && wrappingLayout.getWrapping() != 0) {
-                            if (resource.getLayout().getY() > 0) {
-                                resource.getLayout().setY(resource.getLayout().getY() + wrappingLayout.getWrapping() - 1);
-                            } else {
-                                resource.getLayout().setY(resource.getLayout().getY() + wrappingLayout.getWrapping());
-                            }
-                        }
                         if (level != 0) resource.setImportId(taskId + "-" + resource.getImportId());
                         resources.add(resource);
                     }
@@ -235,7 +226,7 @@ public class DataService implements IDataService {
         return resultDataGroups;
     }
 
-    private List<DataGroup> collectTaskRefDataGroups(TaskField taskRefField, Locale locale, Set<String> collectedTaskIds, int level, WrappingLayout wrappingLayout) {
+    private List<DataGroup> collectTaskRefDataGroups(TaskField taskRefField, Locale locale, Set<String> collectedTaskIds, int level) {
         List<String> taskIds = taskRefField.getValue();
         List<DataGroup> groups = new ArrayList<>();
 
@@ -243,32 +234,12 @@ public class DataService implements IDataService {
             taskIds = taskIds.stream().filter(id -> !collectedTaskIds.contains(id)).collect(Collectors.toList());
             taskIds.forEach(id -> {
                 collectedTaskIds.add(id);
-                List<DataGroup> taskRefDataGroups = getDataGroups(id, locale, collectedTaskIds, level + 1, wrappingLayout);
-                iterateTaskRefDataGroups(taskRefDataGroups, taskRefField, wrappingLayout);
+                List<DataGroup> taskRefDataGroups = getDataGroups(id, locale, collectedTaskIds, level + 1);
                 groups.addAll(taskRefDataGroups);
             });
         }
 
         return groups;
-    }
-
-
-    private void iterateTaskRefDataGroups(List<DataGroup> taskRefDataGroups, TaskField taskRefField, WrappingLayout wrappingLayout) {
-        int maxRows = 0;
-        for (DataGroup dataGroup : taskRefDataGroups) {
-            for (LocalisedField localisedField : dataGroup.getFields().getContent()) {
-                if (localisedField.getLayout() == null || taskRefField.getLayout() == null) {
-                    return;
-                }
-                localisedField.getLayout().setY(taskRefField.getLayout().getY() + localisedField.getLayout().getY() + wrappingLayout.getWrapping());
-                if (localisedField.getLayout().getRows() + localisedField.getLayout().getY() > maxRows) {
-                    maxRows = localisedField.getLayout().getRows() + localisedField.getLayout().getY();
-                }
-            }
-        }
-        if (maxRows > wrappingLayout.getWrapping()) {
-            wrappingLayout.setWrapping(maxRows);
-        }
     }
 
     @Override
@@ -729,11 +700,13 @@ public class DataService implements IDataService {
                 value = FileFieldValue.fromString(node.get("value").asText());
                 break;
             case "caseRef":
-                ArrayNode valueArrayNode = (ArrayNode) node.get("value");
-                ArrayList<String> list = new ArrayList<>();
-                valueArrayNode.forEach(caseId -> list.add(caseId.asText()));
-                value = list;
+                List<String> list = parseListStringValues(node);
                 validateCaseRefValue(list, dataField.getAllowedNets());
+                value = list;
+                break;
+            case "taskRef":
+                value = parseListStringValues(node);
+                // TODO 29.9.2020: validate task ref value? is such feature desired?
                 break;
             default:
                 if (node.get("value").isNull()) {
@@ -752,6 +725,13 @@ public class DataService implements IDataService {
         HashSet<String> set = new HashSet<>();
         arrayNode.forEach(item -> set.add(item.asText()));
         return set;
+    }
+
+    private List<String> parseListStringValues(ObjectNode node) {
+        ArrayNode arrayNode = (ArrayNode) node.get("value");
+        ArrayList<String> list = new ArrayList<>();
+        arrayNode.forEach(string -> list.add(string.asText()));
+        return list;
     }
 
     public void validateCaseRefValue(List<String> value, List<String> allowedNets) throws IllegalArgumentException {
