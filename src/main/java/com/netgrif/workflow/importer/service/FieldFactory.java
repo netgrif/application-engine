@@ -124,7 +124,7 @@ public final class FieldFactory {
             field.setView(view);
         }
 
-        if (data.getView() != null) {
+        if (data.getComponent() != null) {
             Component component = componentFactory.buildComponent(data);
             field.setComponent(component);
         }
