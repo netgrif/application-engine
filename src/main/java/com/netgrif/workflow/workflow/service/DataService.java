@@ -657,7 +657,7 @@ public class DataService implements IDataService {
                 value = FieldFactory.parseDateTime(node.get("value").asText());
                 break;
             case "boolean":
-                value = node.get("value") != null && node.get("value").asBoolean();
+                value = !node.get("value").isNull() && node.get("value").asBoolean();
                 break;
             case "multichoice":
                 value = parseMultichoiceFieldValues(node).stream().map(I18nString::new).collect(Collectors.toSet());
@@ -674,7 +674,7 @@ public class DataService implements IDataService {
                 value = new I18nString(val);
                 break;
             case "user":
-                if (node.get("value") == null) {
+                if (node.get("value").isNull()) {
                     value = null;
                     break;
                 }
@@ -686,14 +686,14 @@ public class DataService implements IDataService {
                 value = user;
                 break;
             case "number":
-                if (node.get("value") == null) {
+                if (node.get("value").isNull()) {
                     value = 0.0;
                     break;
                 }
                 value = node.get("value").asDouble();
                 break;
             case "file":
-                if (node.get("value") == null) {
+                if (node.get("value").isNull()) {
                     value = new FileFieldValue();
                     break;
                 }
@@ -709,8 +709,8 @@ public class DataService implements IDataService {
                 // TODO 29.9.2020: validate task ref value? is such feature desired?
                 break;
             default:
-                if (node.get("value") == null) {
-                    value = "null";
+                if (node.get("value").isNull()) {
+                    value = null;
                     break;
                 }
                 value = node.get("value").asText();
