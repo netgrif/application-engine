@@ -2,8 +2,8 @@ package com.netgrif.workflow.workflow.service.interfaces;
 
 import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.auth.domain.User;
-import com.netgrif.workflow.auth.domain.throwable.UnauthorisedRequestException;
 import com.netgrif.workflow.petrinet.domain.roles.RolePermission;
+import com.netgrif.workflow.petrinet.domain.throwable.IllegalTaskStateException;
 import com.netgrif.workflow.workflow.domain.Task;
 
 public interface ITaskAuthorizationService {
@@ -21,9 +21,9 @@ public interface ITaskAuthorizationService {
 
 	boolean canCallDelegate(LoggedUser loggedUser, String taskId);
 
-	boolean canCallFinish(LoggedUser loggedUser, String taskId);
+	boolean canCallFinish(LoggedUser loggedUser, String taskId) throws IllegalTaskStateException;
 
-	boolean canCallCancel(LoggedUser loggedUser, String taskId);
+	boolean canCallCancel(LoggedUser loggedUser, String taskId) throws IllegalTaskStateException;
 
 	boolean canCallSaveData(LoggedUser loggedUser, String taskId);
 
