@@ -3,6 +3,7 @@ package com.netgrif.workflow.startup
 import com.netgrif.workflow.elastic.domain.ElasticCaseRepository
 import com.netgrif.workflow.elastic.domain.ElasticTaskRepository
 import com.netgrif.workflow.elastic.service.interfaces.IElasticCaseService
+import com.netgrif.workflow.petrinet.domain.PetriNet
 import com.netgrif.workflow.workflow.domain.repositories.CaseRepository
 import com.netgrif.workflow.workflow.domain.repositories.TaskRepository
 import org.slf4j.Logger
@@ -37,5 +38,7 @@ class DemoRunner extends AbstractOrderedCommandLineRunner {
 
     @Override
     void run(String... args) throws Exception {
+        PetriNet net = helper.createNet("all_data.xml", "major").get()
+        helper.createCase("Custom", net)
     }
 }
