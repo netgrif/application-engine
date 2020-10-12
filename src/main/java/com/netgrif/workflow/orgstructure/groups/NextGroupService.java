@@ -16,18 +16,26 @@ import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.QCase;
 import com.netgrif.workflow.workflow.domain.Task;
 import com.netgrif.workflow.workflow.domain.repositories.TaskRepository;
+import com.netgrif.workflow.workflow.service.interfaces.IDataService;
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
+import com.netgrif.workflow.workflow.web.responsebodies.TaskReference;
 import com.querydsl.core.types.Predicate;
 import freemarker.template.TemplateException;
 import lombok.extern.slf4j.Slf4j;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 
 import javax.mail.MessagingException;
 import java.io.IOException;
 import java.util.*;
 
+@ConditionalOnProperty(value = "nae.group.default.enabled",
+        havingValue = "true",
+        matchIfMissing = true)
 @Service
 @Slf4j
 public class NextGroupService implements INextGroupService {
@@ -45,16 +53,13 @@ public class NextGroupService implements INextGroupService {
     private IUserService userService;
 
     @Autowired
+    private IDataService dataService;
+
+    @Autowired
     private IRegistrationService registrationService;
 
     @Autowired
     private IPetriNetService petriNetService;
-
-    @Autowired
-    private ImportHelper importHelper;
-
-    @Autowired
-    private TaskRepository taskRepository;
     
     @Autowired
     private ITaskService taskService;
@@ -69,6 +74,15 @@ public class NextGroupService implements INextGroupService {
     private final static String GROUP_TITLE_FIELD = "group_name";
 
     @Override
+    public Case createDefaultSystemGroup(User author){
+        if(findDefaultGroup() != null) {
+            log.info("Default system group has already been created.");
+            return null;
+        }
+        return createGroup("Default system group", author);
+    }
+
+    @Override
     public Case createGroup(User author){
         return createGroup(author.getFullName(), author);
     }
@@ -81,25 +95,10 @@ public class NextGroupService implements INextGroupService {
         PetriNet orgGroupNet = petriNetService.getNewestVersionByIdentifier(GROUP_NET_IDENTIFIER);
         Case groupCase = workflowService.createCase(orgGroupNet.getStringId(), title, "", author.transformToLoggedUser());
 
-        groupCase.getDataField(GROUP_MEMBERS_FIELD).setOptions(addUser(author, new HashMap<>()));
-        workflowService.save(groupCase);
 
-        List<Task> taskList = taskRepository.findAllByCaseId(groupCase.getStringId());
-        Task initTask = taskList.stream().filter(task -> task.getTransitionId().equals(GROUP_INIT_TASK_ID)).findFirst().get();
-        Map<String, Map<String,String>> taskData = new HashMap<>();
-
-        Map<String, String> authorData = new HashMap<>();
-        authorData.put("type", "user");
-        authorData.put("value", author.getId().toString());
-
-        Map<String, String> titleData = new HashMap<>();
-        titleData.put("type", "text");
-        titleData.put("value", title);
-
-        taskData.put(GROUP_TITLE_FIELD, titleData);
-        taskData.put(GROUP_AUTHOR_FIELD, authorData);
-
-        importHelper.setTaskData(initTask.getStringId(), taskData);
+        Map<String, Map<String,String>> taskData = getInitialGroupData(author, title, groupCase);
+        Task initTask = getGroupInitTask(groupCase);
+        dataService.setData(initTask.getStringId(), ImportHelper.populateDataset(taskData));
 
         try {
             taskService.assignTask(initTask.getStringId());
@@ -107,14 +106,13 @@ public class NextGroupService implements INextGroupService {
         } catch (TransitionNotExecutableException e) {
             log.error(e.getMessage());
         }
-
         return groupCase;
     }
 
     @Override
     public Case findGroup(String groupID){
         QCase qCase = new QCase("case");
-        Case result = workflowService.searchOne(qCase.processIdentifier.eq(GROUP_CASE_IDENTIFIER).and(qCase.stringId.eq(groupID)));
+        Case result = workflowService.searchOne(qCase.processIdentifier.eq(GROUP_CASE_IDENTIFIER).and(qCase._id.eq(new ObjectId(groupID))));
         if(!isGroupCase(result)){
             return null;
         }
@@ -124,8 +122,7 @@ public class NextGroupService implements INextGroupService {
     @Override
     public Case findDefaultGroup(){
         QCase qCase = new QCase("case");
-        Case result = workflowService.searchOne(qCase.processIdentifier.eq(GROUP_CASE_IDENTIFIER).and(qCase.title.eq("Default system group")));
-        return result;
+        return workflowService.searchOne(qCase.processIdentifier.eq(GROUP_CASE_IDENTIFIER).and(qCase.title.eq("Default system group")));
     }
 
     @Override
@@ -218,6 +215,14 @@ public class NextGroupService implements INextGroupService {
         return resultList;
     }
 
+    @Override
+    public Set<String> getAllGroupsOfUser(User groupUser) {
+        QCase qCase = new QCase("case");
+        List<String> groupList = workflowService.searchAll(qCase.processIdentifier.eq(GROUP_CASE_IDENTIFIER).and(qCase.dataSet.get(GROUP_MEMBERS_FIELD).options.containsKey(groupUser.getId().toString())))
+                .map(aCase -> aCase.get_id().toString()).getContent();
+        return new HashSet<>(groupList);
+    }
+
     private boolean isGroupCase(Case aCase){
         if(aCase == null){
             log.error("The input case is a null object.");
@@ -239,12 +244,38 @@ public class NextGroupService implements INextGroupService {
         return false;
     }
 
-    @Override
-    public Set<String> getAllGroupsOfUser(User groupUser) {
-        QCase qCase = new QCase("case");
-        List<String> groupList = workflowService.searchAll(qCase.processIdentifier.eq(GROUP_CASE_IDENTIFIER).and(qCase.dataSet.get(GROUP_MEMBERS_FIELD).options.containsKey(groupUser.getId().toString())))
-                .map(aCase -> aCase.get_id().toString()).getContent();
-        return new HashSet<>(groupList);
+    private Task getGroupInitTask(Case groupCase){
+        List<TaskReference> taskList = taskService.findAllByCase(groupCase.getStringId(), LocaleContextHolder.getLocale());
+        Optional<TaskReference> initTaskReference = taskList.stream().filter(taskReference ->
+                taskReference.getTransitionId().equals(GROUP_INIT_TASK_ID))
+                .findFirst();
+
+        if(!initTaskReference.isPresent()){
+            log.error("Initial task of group case is not present!");
+            return null;
+        }
+
+        String initTaskId = initTaskReference.get().getStringId();
+        return taskService.findById(initTaskId);
+    }
+
+    private Map<String, Map<String, String>> getInitialGroupData(User author, String title, Case groupCase){
+        Map<String, Map<String,String>> taskData = new HashMap<>();
+
+        groupCase.getDataField(GROUP_MEMBERS_FIELD).setOptions(addUser(author, new HashMap<>()));
+        workflowService.save(groupCase);
+
+        Map<String, String> authorData = new HashMap<>();
+        authorData.put("type", "user");
+        authorData.put("value", author.getId().toString());
+
+        Map<String, String> titleData = new HashMap<>();
+        titleData.put("type", "text");
+        titleData.put("value", title);
+
+        taskData.put(GROUP_TITLE_FIELD, titleData);
+        taskData.put(GROUP_AUTHOR_FIELD, authorData);
+        return taskData;
     }
 
 }
