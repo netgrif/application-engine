@@ -9,6 +9,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public interface INextGroupService {
 
@@ -39,6 +40,8 @@ public interface INextGroupService {
     Map<String, I18nString> removeUser(HashSet<String> usersToRemove, Map<String, I18nString> existingUsers, Case groupCase);
 
     List<User> getMembers(Case groupCase);
+
+    Set<String> getAllGroupsOfUser(User groupUser);
 
     Long getGroupOwnerId(String groupId);
 
