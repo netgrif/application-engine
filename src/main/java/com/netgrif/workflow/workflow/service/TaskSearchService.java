@@ -27,6 +27,17 @@ public class TaskSearchService extends MongoSearchService<Task> {
     public Predicate buildQuery(List<TaskSearchRequest> requests, LoggedUser user, Locale locale, Boolean isIntersection) {
         List<Predicate> singleQueries = requests.stream().map(r -> this.buildSingleQuery(r, user, locale)).collect(Collectors.toList());
 
+        if (isIntersection && !singleQueries.stream().allMatch(Objects::nonNull)) {
+            // one of the queries evaluates to empty set => the entire result is an empty set
+            return null;
+        } else if (!isIntersection) {
+            singleQueries = singleQueries.stream().filter(Objects::nonNull).collect(Collectors.toList());
+            if (singleQueries.size() == 0) {
+                // all queries result in an empty set => the entire result is an empty set
+                return null;
+            }
+        }
+
         BooleanBuilder builder = constructPredicateTree(singleQueries, isIntersection ? BooleanBuilder::and : BooleanBuilder::or);
 
         builder.and(buildRolesQueryConstraint(user));
@@ -49,9 +60,12 @@ public class TaskSearchService extends MongoSearchService<Task> {
         buildProcessQuery(request, builder);
         buildFullTextQuery(request, builder);
         buildTransitionQuery(request, builder);
-        buildGroupQuery(request, user, locale, builder);
+        boolean resultAlwaysEmpty = buildGroupQuery(request, user, locale, builder);
 
-        return builder;
+        if (resultAlwaysEmpty)
+            return null;
+        else
+            return builder;
     }
 
     private void buildRoleQuery(TaskSearchRequest request, BooleanBuilder query) {
@@ -183,15 +197,15 @@ public class TaskSearchService extends MongoSearchService<Task> {
         return QTask.task.transitionId.eq(transitionId);
     }
 
-    public void buildGroupQuery(TaskSearchRequest request, LoggedUser user, Locale locale, BooleanBuilder query) {
+    public boolean buildGroupQuery(TaskSearchRequest request, LoggedUser user, Locale locale, BooleanBuilder query) {
         if (request.group == null || request.group.isEmpty())
-            return;
+            return false;
 
         Map<String, Object> processQuery = new HashMap<>();
         processQuery.put("group", request.group);
         List<PetriNetReference> groupProcesses = this.petriNetService.search(processQuery, user, new FullPageRequest(), locale).getContent();
         if (groupProcesses.size() == 0)
-            return;
+            return true;
 
         query.and(
                 constructPredicateTree(
@@ -199,6 +213,7 @@ public class TaskSearchService extends MongoSearchService<Task> {
                         BooleanBuilder::or
                 )
         );
+        return false;
     }
 
     private BooleanBuilder constructPredicateTree(List<Predicate> elementaryPredicates, BiFunction<BooleanBuilder, Predicate, BooleanBuilder> nodeOperation) {
