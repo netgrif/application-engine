@@ -76,7 +76,12 @@ public class CaseSearchService extends MongoSearchService<Case> {
             builder.and(caseId(requestQuery.get(CASE_ID)));
         }
         if (requestQuery.containsKey(GROUP)) {
-            builder.and(group(requestQuery.get(GROUP), user, locale));
+            Predicate groupPredicate = group(requestQuery.get(GROUP), user, locale);
+            if (groupPredicate != null) {
+                builder.and(groupPredicate);
+            } else {
+                return null;
+            }
         }
 
         return builder;
