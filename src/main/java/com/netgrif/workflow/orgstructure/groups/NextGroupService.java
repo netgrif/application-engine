@@ -15,7 +15,6 @@ import com.netgrif.workflow.startup.ImportHelper;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.QCase;
 import com.netgrif.workflow.workflow.domain.Task;
-import com.netgrif.workflow.workflow.domain.repositories.TaskRepository;
 import com.netgrif.workflow.workflow.service.interfaces.IDataService;
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
@@ -89,12 +88,12 @@ public class NextGroupService implements INextGroupService {
 
     @Override
     public Case createGroup(String title, User author){
-        if(authorHasDefaultGroup(author)){
+        Case userDefaultGroup = findUserDefaultGroup(author);
+        if(userDefaultGroup != null && userDefaultGroup.getTitle().equals(title)){
             return null;
         }
         PetriNet orgGroupNet = petriNetService.getNewestVersionByIdentifier(GROUP_NET_IDENTIFIER);
         Case groupCase = workflowService.createCase(orgGroupNet.getStringId(), title, "", author.transformToLoggedUser());
-
 
         Map<String, Map<String,String>> taskData = getInitialGroupData(author, title, groupCase);
         Task initTask = getGroupInitTask(groupCase);
@@ -234,14 +233,9 @@ public class NextGroupService implements INextGroupService {
         return true;
     }
 
-    private boolean authorHasDefaultGroup(User author){
-        List<Case> allGroups = findAllGroups();
-        for (Case group : allGroups){
-            if(group.getAuthor().getId().equals(author.getId())){
-                return true;
-            }
-        }
-        return false;
+    private Case findUserDefaultGroup(User author){
+        QCase qCase = new QCase("case");
+        return workflowService.searchOne(qCase.author.id.eq(author.getId()).and(qCase.title.eq(author.getFullName())));
     }
 
     private Task getGroupInitTask(Case groupCase){
