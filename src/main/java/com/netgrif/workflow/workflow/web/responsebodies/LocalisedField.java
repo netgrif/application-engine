@@ -1,7 +1,7 @@
 package com.netgrif.workflow.workflow.web.responsebodies;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.netgrif.workflow.importer.model.Component;
+import com.netgrif.workflow.petrinet.domain.Component;
 import com.netgrif.workflow.petrinet.domain.Format;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.petrinet.domain.dataset.FieldType;

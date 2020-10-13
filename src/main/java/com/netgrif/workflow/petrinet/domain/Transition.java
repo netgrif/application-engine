@@ -1,6 +1,5 @@
 package com.netgrif.workflow.petrinet.domain;
 
-import com.netgrif.workflow.importer.model.Component;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.FieldBehavior;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.FieldLayout;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action;
