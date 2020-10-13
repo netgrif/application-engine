@@ -29,10 +29,7 @@ import org.springframework.data.elasticsearch.core.query.SearchQuery;
 import org.springframework.data.rest.core.mapping.RepositoryResourceMappings;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 import java.util.function.BinaryOperator;
 import java.util.stream.Collectors;
 
@@ -121,10 +118,18 @@ public class ElasticCaseService implements IElasticCaseService {
         }
 
         SearchQuery query = buildQuery(requests, user, pageable, locale, isIntersection);
-        Page<ElasticCase> indexedCases = repository.search(query);
-        List<Case> casePage = workflowService.findAllById(indexedCases.get().map(ElasticCase::getStringId).collect(Collectors.toList()));
+        List<Case> casePage;
+        long total;
+        if (query != null) {
+            Page<ElasticCase> indexedCases = repository.search(query);
+            casePage = workflowService.findAllById(indexedCases.get().map(ElasticCase::getStringId).collect(Collectors.toList()));
+            total = indexedCases.getTotalElements();
+        } else {
+            casePage = Collections.emptyList();
+            total = 0;
+        }
 
-        return new PageImpl<>(casePage, pageable, indexedCases.getTotalElements());
+        return new PageImpl<>(casePage, pageable, total);
     }
 
     @Override
@@ -134,16 +139,29 @@ public class ElasticCaseService implements IElasticCaseService {
         }
 
         SearchQuery query = buildQuery(requests, user, new FullPageRequest(), locale, isIntersection);
-
-        return template.count(query, ElasticCase.class);
+        if (query != null) {
+            return template.count(query, ElasticCase.class);
+        } else {
+            return 0;
+        }
     }
 
     private SearchQuery buildQuery(List<CaseSearchRequest> requests, LoggedUser user, Pageable pageable, Locale locale, Boolean isIntersection) {
-        BinaryOperator<BoolQueryBuilder> reductionOperator = isIntersection ? BoolQueryBuilder::must : BoolQueryBuilder::should;
+        List<BoolQueryBuilder> singleQueries = requests.stream().map(request -> buildSingleQuery(request, user, locale)).collect(Collectors.toList());
 
-        BoolQueryBuilder query = requests.stream()
-                                            .map(request -> buildSingleQuery(request, user, locale))
-                                            .reduce(new BoolQueryBuilder(), reductionOperator);
+        if (isIntersection && !singleQueries.stream().allMatch(Objects::nonNull)) {
+            // one of the queries evaluates to empty set => the entire result is an empty set
+            return null;
+        } else if (!isIntersection) {
+            singleQueries = singleQueries.stream().filter(Objects::nonNull).collect(Collectors.toList());
+            if (singleQueries.size() == 0) {
+                // all queries result in an empty set => the entire result is an empty set
+                return null;
+            }
+        }
+
+        BinaryOperator<BoolQueryBuilder> reductionOperator = isIntersection ? BoolQueryBuilder::must : BoolQueryBuilder::should;
+        BoolQueryBuilder query = singleQueries.stream().reduce(new BoolQueryBuilder(), reductionOperator);
 
         NativeSearchQueryBuilder builder = new NativeSearchQueryBuilder();
         return builder
@@ -163,11 +181,14 @@ public class ElasticCaseService implements IElasticCaseService {
         buildFullTextQuery(request, query);
         buildStringQuery(request, query);
         buildCaseIdQuery(request, query);
-        buildGroupQuery(request, user, locale, query);
+        boolean resultAlwaysEmpty = buildGroupQuery(request, user, locale, query);
 
         // TODO: filtered query https://stackoverflow.com/questions/28116404/filtered-query-using-nativesearchquerybuilder-in-spring-data-elasticsearch
 
-        return query;
+        if (resultAlwaysEmpty)
+            return null;
+        else
+            return query;
     }
 
     /**
@@ -410,21 +431,22 @@ public class ElasticCaseService implements IElasticCaseService {
      * }
      * </pre>
      */
-    private void buildGroupQuery(CaseSearchRequest request, LoggedUser user, Locale locale, BoolQueryBuilder query) {
+    private boolean buildGroupQuery(CaseSearchRequest request, LoggedUser user, Locale locale, BoolQueryBuilder query) {
         if (request.group == null || request.group.isEmpty()) {
-            return;
+            return false;
         }
 
         Map<String, Object> processQuery = new HashMap<>();
         processQuery.put("group", request.group);
         List<PetriNetReference> groupProcesses = this.petriNetService.search(processQuery, user, new FullPageRequest(), locale).getContent();
         if (groupProcesses.size() == 0)
-            return;
+            return true;
 
         BoolQueryBuilder groupQuery = boolQuery();
         groupProcesses.stream().map(PetriNetReference::getIdentifier)
                 .map(netIdentifier -> termQuery("processIdentifier", netIdentifier))
                 .forEach(groupQuery::should);
         query.filter(groupQuery);
+        return false;
     }
 }
