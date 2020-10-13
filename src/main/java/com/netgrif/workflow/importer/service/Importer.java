@@ -409,14 +409,7 @@ public class Importer {
 
         String dataGroupLayout = importDataGroup.getLayout() != null ? importDataGroup.getLayout().value() : null;
 
-        if (importDataGroup.getCols() != null || importDataGroup.getRows() != null) {
-            dataGroup.setLayout(new DataGroupLayout(importDataGroup.getRows(), importDataGroup.getCols(), dataGroupLayout));
-        }
-        if (importDataGroup.getCols() == null && (transition.getLayout() != null && transition.getLayout().getCols() != null)) {
-            dataGroup.setLayout(dataGroup.getLayout() != null ?
-                    new DataGroupLayout(dataGroup.getLayout().getRows(), transition.getLayout().getCols(), dataGroupLayout) :
-                    new DataGroupLayout(null, transition.getLayout().getCols(), dataGroupLayout));
-        }
+        dataGroup.setLayout(new DataGroupLayout(importDataGroup.getRows(), importDataGroup.getCols(), dataGroupLayout));
 
         dataGroup.setTitle(toI18NString(importDataGroup.getTitle()));
         dataGroup.setAlignment(alignment);
@@ -489,6 +482,11 @@ public class Importer {
             String alignment = null;
             if (layout.getAlignment() != null) {
                 alignment = layout.getAlignment().value();
+            }
+
+            String template = null;
+            if (layout.getTemplate() != null) {
+                template = layout.getTemplate().toString();
             }
 
             FieldLayout fieldLayout = new FieldLayout(layout.getX(), layout.getY(), layout.getRows(), layout.getCols(), layout.getOffset(), layout.getTemplate().toString(), appearance, alignment);
