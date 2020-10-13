@@ -1,6 +1,7 @@
 package com.netgrif.workflow.importer.service;
 
 import com.netgrif.workflow.importer.model.*;
+import com.netgrif.workflow.petrinet.domain.Component;
 import com.netgrif.workflow.petrinet.domain.DataGroup;
 import com.netgrif.workflow.petrinet.domain.Event;
 import com.netgrif.workflow.petrinet.domain.EventType;
@@ -498,10 +499,12 @@ public class Importer {
 
     @Transactional
     protected void addDataComponent(Transition transition, DataRef dataRef){
-        Component component = new Component();
         String fieldId = getField(dataRef.getId()).getStringId();
-        if((component = dataRef.getComponent()) == null)
+        Component component;
+        if((dataRef.getComponent()) == null)
             component = getField(dataRef.getId()).getComponent();
+        else
+            component = new Component(dataRef.getComponent().getName());
         transition.addDataSet(fieldId, null, null, null, component);
     }
 
