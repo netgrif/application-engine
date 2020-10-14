@@ -49,6 +49,9 @@
         <init>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque vitae magna in libero semper
             vulputate ut eu sapien. Phasellus vel.
         </init>
+        <component>
+            <name>textarea</name>
+        </component>
     </data>
 
     <data type="enumeration">
@@ -66,9 +69,9 @@
         <values>Bob</values>
         <values>Carol</values>
         <init>Bob</init>
-        <view>
-            <autocomplete/>
-        </view>
+        <component>
+            <name>autocomplete</name>
+        </component>
     </data>
     <data type="enumeration">
         <id>enumeration_list</id>
@@ -77,9 +80,9 @@
         <values>Bob</values>
         <values>Carol</values>
         <init>Bob</init>
-        <view>
-            <list/>
-        </view>
+        <component>
+            <name>list</name>
+        </component>
     </data>
 
     <data type="multichoice">
@@ -97,9 +100,9 @@
         <values>Bob</values>
         <values>Carol</values>
         <init>Alice,Bob</init>
-        <view>
-            <list/>
-        </view>
+        <component>
+            <name>list</name>
+        </component>
     </data>
 
     <data type="boolean">
@@ -139,6 +142,9 @@
         <id>button</id>
         <title>Button</title>
         <placeholder>Push</placeholder>
+        <component>
+            <name>fab</name>
+        </component>
     </data>
     <!-- TRANSITIONS -->
     <transition>
