@@ -118,7 +118,6 @@ public final class FieldFactory {
             View view = viewFactory.buildView(data);
             field.setView(view);
         }
-        setActions(field, data);
         setEncryption(field, data);
 
         return field;
@@ -204,12 +203,6 @@ public final class FieldFactory {
         FileListField fileListField = new FileListField();
         fileListField.setRemote(data.getRemote() != null);
         return fileListField;
-    }
-
-    private void setActions(Field field, Data data) {
-        if (data.getAction() != null && data.getAction().size() != 0) {
-//            data.getAction().forEach(action -> field.addAction(action.getValue(), action.getTrigger()));
-        }
     }
 
     private void setEncryption(Field field, Data data) {
