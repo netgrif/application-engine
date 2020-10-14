@@ -223,6 +223,9 @@ public class Importer {
         if (data.getActionRef() != null) {
             getField(data.getId()).addActions(buildActionRefs(data.getActionRef()));
         }
+        if (data.getEvent() != null) {
+
+        }
     }
 
     private LinkedHashSet<Action> buildActionRefs(List<ActionRefType> actionRefs) {
