@@ -2,6 +2,7 @@ package com.netgrif.workflow.petrinet.domain.dataset
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.databind.node.ObjectNode
+import com.netgrif.workflow.petrinet.domain.DataEvent
 import com.netgrif.workflow.petrinet.domain.Format
 import com.netgrif.workflow.petrinet.domain.I18nString
 import com.netgrif.workflow.petrinet.domain.Imported
@@ -43,6 +44,9 @@ abstract class Field<T> extends Imported {
 
     @JsonIgnore
     private LinkedHashSet<Action> actions
+
+    @JsonIgnore
+    private LinkedHashSet<DataEvent> events;
 
     @JsonIgnore
     private String encryption
@@ -162,6 +166,14 @@ abstract class Field<T> extends Imported {
         if (action == null) return
 
         this.actions.add(action)
+    }
+
+    LinkedHashSet<DataEvent> getEvents() {
+        return events
+    }
+
+    void setEvents(LinkedHashSet<DataEvent> events) {
+        this.events = events
     }
 
     String getEncryption() {
