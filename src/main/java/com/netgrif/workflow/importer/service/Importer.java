@@ -1,6 +1,8 @@
 package com.netgrif.workflow.importer.service;
 
 import com.netgrif.workflow.importer.model.*;
+import com.netgrif.workflow.importer.model.DataEventType;
+import com.netgrif.workflow.petrinet.domain.DataEvent;
 import com.netgrif.workflow.petrinet.domain.DataGroup;
 import com.netgrif.workflow.petrinet.domain.Event;
 import com.netgrif.workflow.petrinet.domain.EventType;
@@ -21,7 +23,6 @@ import com.netgrif.workflow.petrinet.domain.policies.DataFocusPolicy;
 import com.netgrif.workflow.petrinet.domain.policies.FinishPolicy;
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRole;
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRoleRepository;
-import com.netgrif.workflow.petrinet.domain.roles.RolePermission;
 import com.netgrif.workflow.petrinet.domain.throwable.MissingPetriNetMetaDataException;
 import com.netgrif.workflow.petrinet.service.ArcFactory;
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
@@ -39,9 +40,6 @@ import javax.xml.bind.Unmarshaller;
 import java.io.*;
 import java.nio.file.Path;
 import java.util.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadPoolExecutor;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -223,8 +221,8 @@ public class Importer {
         if (data.getActionRef() != null) {
             getField(data.getId()).addActions(buildActionRefs(data.getActionRef()));
         }
-        if (data.getEvent() != null) {
-
+        if (data.getEvent() != null && data.getEvent().size() > 0) {
+            getField(data.getId()).setEvents(buildEvents(data.getEvent(), getField(data.getId()).getStringId(), null));
         }
     }
 
@@ -379,6 +377,19 @@ public class Importer {
         return actionList;
     }
 
+    private List<Action> parsePhaseActions(EventPhaseType phase, String transitionId, com.netgrif.workflow.importer.model.DataEvent dataEvent) {
+        List<Action> actionList = dataEvent.getActions().stream()
+                .filter(actions -> actions.getPhase().equals(phase))
+                .flatMap(actions -> actions.getAction().parallelStream()
+                        .map(action -> parseAction(transitionId, action)))
+                .collect(Collectors.toList());
+        actionList.addAll(dataEvent.getActions().stream()
+                .filter(actions -> actions.getPhase().equals(phase))
+                .flatMap(actions -> actions.getActionRef().stream().map(this::fromActionRef))
+                .collect(Collectors.toList()));
+        return actionList;
+    }
+
     @Transactional
     protected void addDefaultRole(Transition transition) {
         Logic logic = new Logic();
@@ -497,6 +508,31 @@ public class Importer {
         } catch (NullPointerException e) {
             throw new IllegalArgumentException("Wrong dataRef id [" + dataRef.getId() + "] on transition [" + transition.getTitle() + "]", e);
         }
+    }
+
+    @Transactional
+    protected LinkedHashSet<DataEvent> buildEvents(List<com.netgrif.workflow.importer.model.DataEvent> events, String fieldId, String transitionId) {
+        return events.stream()
+                .map(event -> parseDataEvents(fieldId, transitionId, event, event.getType()))
+                .collect(Collectors.toCollection(LinkedHashSet::new));
+    }
+
+    private DataEvent parseDataEvents(String fieldId, String transitionId, com.netgrif.workflow.importer.model.DataEvent event, com.netgrif.workflow.importer.model.DataEventType type){
+        DataEvent dataEvent = new DataEvent(event.getId(), event.getType().value());
+        Map<String, List<Action>> actions = new HashMap<>();
+
+        actions.put(EventPhaseType.PRE.value(), new ArrayList<>());
+        actions.put(EventPhaseType.POST.value(), new ArrayList<>());
+
+        event.getActions().forEach(eventAction -> {
+            EventPhaseType phaseType = eventAction.getPhase();
+            if(eventAction.getPhase() == null){
+                phaseType = event.getType().equals(DataEventType.GET) ? EventPhaseType.PRE : EventPhaseType.POST;
+            }
+                actions.get(phaseType.value()).addAll(parsePhaseActions(phaseType, transitionId, event));
+        });
+        dataEvent.setActions(actions);
+        return dataEvent;
     }
 
     @Transactional
