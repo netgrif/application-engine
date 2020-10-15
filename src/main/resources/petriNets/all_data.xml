@@ -31,6 +31,15 @@
         <id>text</id>
         <title>Text</title>
         <init>Lorem ipsum</init>
+        <event type="get">
+            <id>get_event</id>
+            <actions phase="pre">
+                <action>
+                    text: f.text;
+                    change text value { "Hello World!"}
+                </action>
+            </actions>
+        </event>
     </data>
     <data type="text">
         <id>text_area</id>
@@ -38,6 +47,9 @@
         <init>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque vitae magna in libero semper
             vulputate ut eu sapien. Phasellus vel.
         </init>
+        <action trigger="set">
+
+        </action>
     </data>
 
     <data type="enumeration">
