@@ -95,7 +95,7 @@ public class DataFieldLogic {
         return actions.stream().filter(action -> action.isTriggeredBy(trigger)).collect(Collectors.toList());
     }
 
-    public static List<Action> getEventAction(LinkedHashSet<DataEvent> events, Action.ActionTrigger trigger, DataEventPhase phase){
+    public static List<Action> getEventAction(LinkedHashSet<DataEvent> events, Action.ActionTrigger trigger, EventPhase phase){
         List<Action> actionList = new ArrayList<>();
         events.stream().filter(event -> event.getTrigger().equals(trigger))
                 .flatMap(event -> event.getActions().entrySet().stream()

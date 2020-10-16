@@ -519,21 +519,21 @@ public class Importer {
     }
 
     private DataEvent parseDataEvents(String transitionId, com.netgrif.workflow.importer.model.DataEvent event){
-        Map<DataEventPhase, List<Action>> actions = new HashMap<>();
-        actions.put(DataEventPhase.PRE, new ArrayList<>());
-        actions.put(DataEventPhase.POST, new ArrayList<>());
+        Map<EventPhase, List<Action>> actions = new HashMap<>();
+        actions.put(EventPhase.PRE, new ArrayList<>());
+        actions.put(EventPhase.POST, new ArrayList<>());
 
         return parseDataEvent(event, actions, transitionId);
     }
 
-    private DataEvent parseDataEvent(com.netgrif.workflow.importer.model.DataEvent event, Map<DataEventPhase, List<Action>> actions, String transitionId){
+    private DataEvent parseDataEvent(com.netgrif.workflow.importer.model.DataEvent event, Map<EventPhase, List<Action>> actions, String transitionId){
         DataEvent dataEvent = new DataEvent(event.getId(), event.getType().value());
         event.getActions().forEach(eventAction -> {
             EventPhaseType phaseType = eventAction.getPhase();
             if(eventAction.getPhase() == null){
                 phaseType = event.getType().equals(DataEventType.GET) ? EventPhaseType.PRE : EventPhaseType.POST;
             }
-            actions.get(DataEventPhase.valueOf(phaseType.value().toUpperCase())).addAll(parsePhaseActions(phaseType, transitionId, event));
+            actions.get(EventPhase.valueOf(phaseType.value().toUpperCase())).addAll(parsePhaseActions(phaseType, transitionId, event));
         });
         dataEvent.setActions(actions);
         return dataEvent;
@@ -553,7 +553,6 @@ public class Importer {
         } else {
             dataEvent = new DataEvent(new ObjectId().toString(), action.getTrigger().toString());
         }
-        dataEvent.resolveDefaultPhase();
         return dataEvent;
     }
 
