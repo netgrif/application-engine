@@ -3,7 +3,6 @@ package com.netgrif.workflow.petrinet.domain;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action;
 import lombok.Data;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -12,7 +11,7 @@ public class DataEvent {
 
     private String id;
 
-    private DataEventType type;
+    private Action.ActionTrigger trigger;
 
     private Map<String, List<Action>> actions;
 
@@ -22,6 +21,6 @@ public class DataEvent {
 
     public DataEvent(String id, String type) {
         this.id = id;
-        this.type = DataEventType.valueOf(type.toUpperCase());
+        this.trigger = Action.ActionTrigger.fromString(type);
     }
 }

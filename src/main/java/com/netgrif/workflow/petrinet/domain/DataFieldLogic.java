@@ -7,6 +7,7 @@ import com.netgrif.workflow.petrinet.domain.dataset.logic.FieldLayout;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action;
 import lombok.Getter;
 import lombok.Setter;
+import sun.awt.image.ImageWatched;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -24,11 +25,16 @@ public class DataFieldLogic {
 
     @Getter
     @Setter
+    private LinkedHashSet<DataEvent> events;
+
+    @Getter
+    @Setter
     private FieldLayout layout;
 
     public DataFieldLogic() {
         this.behavior = new HashSet<>();
         this.actions = new LinkedHashSet<>();
+        this.events = new LinkedHashSet<>();
         this.layout = new FieldLayout();
     }
 
@@ -42,8 +48,24 @@ public class DataFieldLogic {
             this.layout = layout;
     }
 
+    public DataFieldLogic(Set<FieldBehavior> behavior, Set<Action> actions, Set<DataEvent> events, FieldLayout layout) {
+        this();
+        if (behavior != null)
+            this.behavior.addAll(behavior);
+        if (actions != null)
+            this.actions.addAll(actions);
+        if (events != null)
+            this.events.addAll(events);
+        if (layout != null)
+            this.layout = layout;
+    }
+
     public void addActions(Collection<Action> actions) {
         this.actions.addAll(actions);
+    }
+
+    public void addDataEvents(Collection<DataEvent> events){
+        this.events.addAll(events);
     }
 
     public ObjectNode applyBehavior(ObjectNode jsonNode) {
@@ -70,6 +92,15 @@ public class DataFieldLogic {
 
     public static List<Action> getActionByTrigger(Set<Action> actions, Action.ActionTrigger trigger) {
         return actions.stream().filter(action -> action.isTriggeredBy(trigger)).collect(Collectors.toList());
+    }
+
+    public static List<Action> getEventAction(LinkedHashSet<DataEvent> events, Action.ActionTrigger trigger, EventPhase phase){
+        List<Action> actionList = new ArrayList<>();
+        events.stream().filter(event -> event.getTrigger().equals(trigger))
+                .flatMap(event -> event.getActions().entrySet().stream()
+                        .filter(actions -> actions.getKey().equals(phase.name().toLowerCase()))
+                        .map(Map.Entry::getValue)).forEach(actionList::addAll);
+        return actionList;
     }
 
     public boolean isRequired() {
