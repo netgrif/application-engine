@@ -412,11 +412,11 @@
     <xs:element name="layout">
         <xs:complexType>
             <xs:sequence>
-                <xs:element ref="x"/>
-                <xs:element ref="y"/>
-                <xs:element ref="rows"/>
-                <xs:element ref="cols"/>
-                <xs:element ref="offset"/>
+                <xs:element ref="x" minOccurs="0"/>
+                <xs:element ref="y" minOccurs="0"/>
+                <xs:element ref="rows" minOccurs="0"/>
+                <xs:element ref="cols" minOccurs="0"/>
+                <xs:element ref="offset" minOccurs="0"/>
                 <xs:element ref="template" minOccurs="0"/>
                 <xs:element ref="appearance" minOccurs="0"/>
                 <xs:element name="alignment" type="fieldAlignment" minOccurs="0"/>
