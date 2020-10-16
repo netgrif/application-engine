@@ -254,6 +254,7 @@ abstract class Field<T> extends Imported {
         clone.order = this.order
         clone.immediate = this.immediate
         clone.actions = this.actions
+        clone.events = this.events
         clone.encryption = this.encryption
         clone.view = this.view
         clone.format = this.format
