@@ -31,12 +31,13 @@
         <id>text</id>
         <title>Text</title>
         <init>Lorem ipsum</init>
-        <event type="get">
-            <id>get_event</id>
-            <actions phase="pre">
+        <event type="set">
+            <id>set_event</id>
+            <actions phase="post">
                 <action>
-                    text: f.text;
-                    change text value { "Hello World!"}
+                    sds: f.text,
+                    text: f.text_area;
+                    change text value { "Changed to " + sds.value}
                 </action>
             </actions>
         </event>
@@ -47,9 +48,6 @@
         <init>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque vitae magna in libero semper
             vulputate ut eu sapien. Phasellus vel.
         </init>
-        <action trigger="set">
-
-        </action>
     </data>
 
     <data type="enumeration">
@@ -124,6 +122,25 @@
             }
             <!-- @formatter:on -->
         </action>
+        <event type="set">
+            <id>pre_event</id>
+            <actions phase="pre">
+                <action>
+                    textfield: f.text_area;
+                    change textfield value {
+                    "funguje to z pre event"
+                    }
+                </action>
+            </actions>
+            <actions phase="post">
+                <action>
+                    numberField: f.number;
+                    change numberField value {
+                        455669988
+                    }
+                </action>
+            </actions>
+        </event>
     </data>
 
     <data type="user">
@@ -176,6 +193,16 @@
                 <logic>
                     <behavior>editable</behavior>
                 </logic>
+                <event type="set">
+                    <id>set_event</id>
+                    <actions phase="post">
+                        <action>
+                            sds: f.text,
+                            text: f.text_area;
+                            change text value { "Changed from transition to " + sds.value}
+                        </action>
+                    </actions>
+                </event>
             </dataRef>
             <dataRef>
                 <id>text_area</id>

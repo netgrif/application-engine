@@ -222,7 +222,7 @@ public class Importer {
             getField(data.getId()).addActions(buildActionRefs(data.getActionRef()));
         }
         if (data.getEvent() != null && data.getEvent().size() > 0) {
-            getField(data.getId()).setEvents(buildEvents(data.getEvent(), getField(data.getId()).getStringId(), null));
+            getField(data.getId()).setEvents(buildEvents(data.getEvent(), null));
         }
     }
 
@@ -266,6 +266,9 @@ public class Importer {
             }
             if (ref.getLogic().getActionRef() != null) {
                 getTransition(trans.getId()).addActions(fieldId, buildActionRefs(ref.getLogic().getActionRef()));
+            }
+            if (ref.getEvent() != null){
+                getTransition(trans.getId()).addDataEvents(fieldId, buildEvents(ref.getEvent(), getTransition(trans.getId()).getStringId()));
             }
         });
     }
@@ -511,13 +514,13 @@ public class Importer {
     }
 
     @Transactional
-    protected LinkedHashSet<DataEvent> buildEvents(List<com.netgrif.workflow.importer.model.DataEvent> events, String fieldId, String transitionId) {
+    protected LinkedHashSet<DataEvent> buildEvents(List<com.netgrif.workflow.importer.model.DataEvent> events, String transitionId) {
         return events.stream()
-                .map(event -> parseDataEvents(fieldId, transitionId, event, event.getType()))
+                .map(event -> parseDataEvents(transitionId, event, event.getType()))
                 .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
-    private DataEvent parseDataEvents(String fieldId, String transitionId, com.netgrif.workflow.importer.model.DataEvent event, com.netgrif.workflow.importer.model.DataEventType type){
+    private DataEvent parseDataEvents(String transitionId, com.netgrif.workflow.importer.model.DataEvent event, com.netgrif.workflow.importer.model.DataEventType type){
         DataEvent dataEvent = new DataEvent(event.getId(), event.getType().value());
         Map<String, List<Action>> actions = new HashMap<>();
 

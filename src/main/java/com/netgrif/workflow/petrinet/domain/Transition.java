@@ -88,6 +88,12 @@ public class Transition extends Node {
         }
     }
 
+    public void addDataEvents(String field, LinkedHashSet<DataEvent> events){
+        if(dataSet.containsKey(field)){
+            dataSet.get(field).addDataEvents(events);
+        }
+    }
+
     public void addRole(String roleId, Set<RolePermission> permissions) {
         if (roles.containsKey(roleId) && roles.get(roleId) != null) {
             roles.get(roleId).addAll(permissions);
