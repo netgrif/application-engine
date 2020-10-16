@@ -122,25 +122,6 @@
             }
             <!-- @formatter:on -->
         </action>
-        <event type="set">
-            <id>pre_event</id>
-            <actions phase="pre">
-                <action>
-                    textfield: f.text_area;
-                    change textfield value {
-                    "funguje to z pre event"
-                    }
-                </action>
-            </actions>
-            <actions phase="post">
-                <action>
-                    numberField: f.number;
-                    change numberField value {
-                        455669988
-                    }
-                </action>
-            </actions>
-        </event>
     </data>
 
     <data type="user">
