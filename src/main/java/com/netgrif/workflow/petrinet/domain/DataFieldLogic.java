@@ -7,7 +7,6 @@ import com.netgrif.workflow.petrinet.domain.dataset.logic.FieldLayout;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action;
 import lombok.Getter;
 import lombok.Setter;
-import sun.awt.image.ImageWatched;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -21,6 +20,7 @@ public class DataFieldLogic {
 
     @Getter
     @Setter
+    @Deprecated
     private LinkedHashSet<Action> actions;
 
     @Getter
@@ -60,6 +60,7 @@ public class DataFieldLogic {
             this.layout = layout;
     }
 
+    @Deprecated
     public void addActions(Collection<Action> actions) {
         this.actions.addAll(actions);
     }
@@ -94,11 +95,11 @@ public class DataFieldLogic {
         return actions.stream().filter(action -> action.isTriggeredBy(trigger)).collect(Collectors.toList());
     }
 
-    public static List<Action> getEventAction(LinkedHashSet<DataEvent> events, Action.ActionTrigger trigger, EventPhase phase){
+    public static List<Action> getEventAction(LinkedHashSet<DataEvent> events, Action.ActionTrigger trigger, DataEventPhase phase){
         List<Action> actionList = new ArrayList<>();
         events.stream().filter(event -> event.getTrigger().equals(trigger))
                 .flatMap(event -> event.getActions().entrySet().stream()
-                        .filter(actions -> actions.getKey().equals(phase.name().toLowerCase()))
+                        .filter(actions -> actions.getKey().equals(phase))
                         .map(Map.Entry::getValue)).forEach(actionList::addAll);
         return actionList;
     }
