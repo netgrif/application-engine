@@ -43,6 +43,7 @@ abstract class Field<T> extends Imported {
     private boolean immediate
 
     @JsonIgnore
+    @Deprecated
     private LinkedHashSet<Action> actions
 
     @JsonIgnore
@@ -59,6 +60,7 @@ abstract class Field<T> extends Imported {
 
     Field() {
         _id = new ObjectId()
+        this.events = new LinkedHashSet<>();
     }
 
     Field(Long importId) {
@@ -148,18 +150,22 @@ abstract class Field<T> extends Imported {
         this.immediate = immediate != null && immediate
     }
 
+    @Deprecated
     LinkedHashSet<Action> getActions() {
         return actions
     }
 
+    @Deprecated
     void setActions(LinkedHashSet<Action> actions) {
         this.actions = actions
     }
 
+    @Deprecated
     void addActions(Collection<Action> actions) {
         actions.each { addAction(it) }
     }
 
+    @Deprecated
     void addAction(Action action) {
         if (this.actions == null)
             this.actions = new LinkedHashSet<>()
@@ -174,6 +180,18 @@ abstract class Field<T> extends Imported {
 
     void setEvents(LinkedHashSet<DataEvent> events) {
         this.events = events
+    }
+
+    void addEvents(Collection<DataEvent> dataEvents) {
+        dataEvents.each { addEvent(it) }
+    }
+
+    void addEvent(DataEvent event) {
+        if (this.events == null)
+            this.events = new LinkedHashSet<>()
+        if (event == null) return
+
+        this.events.add(event)
     }
 
     String getEncryption() {
