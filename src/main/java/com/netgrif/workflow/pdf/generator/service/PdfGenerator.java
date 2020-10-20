@@ -5,8 +5,10 @@ import com.netgrif.workflow.pdf.generator.domain.PdfField;
 import com.netgrif.workflow.pdf.generator.service.interfaces.IPdfDataHelper;
 import com.netgrif.workflow.pdf.generator.service.interfaces.IPdfDrawer;
 import com.netgrif.workflow.pdf.generator.service.interfaces.IPdfGenerator;
+import com.netgrif.workflow.petrinet.domain.DataFieldLogic;
 import com.netgrif.workflow.petrinet.domain.DataGroup;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
+import com.netgrif.workflow.petrinet.domain.Transition;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.DataField;
 import lombok.extern.slf4j.Slf4j;
@@ -65,7 +67,8 @@ public class PdfGenerator implements IPdfGenerator {
     @Override
     public File generatePdf(Case formCase, String transitionId, PdfResource pdfResource) {
         Map<String, DataGroup> dataGroupMap = formCase.getPetriNet().getTransition(transitionId).getDataGroups();
-        generateData(formCase.getPetriNet(), dataGroupMap, formCase.getDataSet(), pdfResource);
+        Map<String, DataFieldLogic> dataSetMap = formCase.getPetriNet().getTransition(transitionId).getDataSet();
+        generateData(formCase.getPetriNet(), dataGroupMap, formCase.getDataSet(), dataSetMap, pdfResource);
         return generatePdf(pdfResource);
     }
 
@@ -81,12 +84,13 @@ public class PdfGenerator implements IPdfGenerator {
 
     @Override
     public void generatePdf(Case formCase, String transitionId, PdfResource pdfResource, OutputStream stream) {
-        generatePdf(formCase, formCase.getPetriNet().getTransition(transitionId).getDataGroups(), pdfResource, stream);
+        Transition transition = formCase.getPetriNet().getTransition(transitionId);
+        generatePdf(formCase, transition.getDataGroups(), transition.getDataSet(), pdfResource, stream);
     }
 
     @Override
-    public void generatePdf(Case formCase, Map<String, DataGroup> dataGroupMap, PdfResource pdfResource, OutputStream stream) {
-        generateData(formCase.getPetriNet(), dataGroupMap, formCase.getDataSet(), pdfResource);
+    public void generatePdf(Case formCase, Map<String, DataGroup> dataGroupMap, Map<String, DataFieldLogic> dataSetMap, PdfResource pdfResource, OutputStream stream) {
+        generateData(formCase.getPetriNet(), dataGroupMap, formCase.getDataSet(), dataSetMap, pdfResource);
         try {
             transformRequestToPdf(pdfDataHelper.getPdfFields(), pdfResource, stream);
         } catch (IOException e) {
@@ -95,10 +99,11 @@ public class PdfGenerator implements IPdfGenerator {
     }
 
     @Override
-    public void generateData(PetriNet petriNet, Map<String, DataGroup> dataGroupMap, Map<String, DataField> dataSet, PdfResource pdfResource) {
+    public void generateData(PetriNet petriNet, Map<String, DataGroup> dataGroupMap, Map<String, DataField> dataSet, Map<String, DataFieldLogic> transDataSet, PdfResource pdfResource) {
         pdfDataHelper.setPetriNet(petriNet);
         pdfDataHelper.setDataGroups(dataGroupMap);
         pdfDataHelper.setDataSet(dataSet);
+        pdfDataHelper.setFieldLogicMap(transDataSet);
         pdfDataHelper.generateTitleField();
         pdfDataHelper.generatePdfFields();
         pdfDataHelper.generatePdfDataGroups();
