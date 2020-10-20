@@ -4,12 +4,11 @@ import com.netgrif.workflow.pdf.generator.config.PdfResource;
 import com.netgrif.workflow.pdf.generator.domain.PdfField;
 import com.netgrif.workflow.pdf.generator.service.fieldbuilder.*;
 import com.netgrif.workflow.pdf.generator.service.interfaces.IPdfDataHelper;
+import com.netgrif.workflow.petrinet.domain.DataFieldLogic;
 import com.netgrif.workflow.petrinet.domain.DataGroup;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
+import com.netgrif.workflow.petrinet.domain.dataset.logic.FieldBehavior;
 import com.netgrif.workflow.workflow.domain.DataField;
-import com.netgrif.workflow.workflow.web.responsebodies.LocalisedEnumerationField;
-import com.netgrif.workflow.workflow.web.responsebodies.LocalisedField;
-import com.netgrif.workflow.workflow.web.responsebodies.LocalisedMultichoiceField;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -30,6 +29,10 @@ public class PdfDataHelper implements IPdfDataHelper {
     @Getter
     @Setter
     private Map<String, DataGroup> dataGroups;
+
+    @Getter
+    @Setter
+    private Map<String, DataFieldLogic> fieldLogicMap;
 
     @Getter
     @Setter
@@ -67,8 +70,8 @@ public class PdfDataHelper implements IPdfDataHelper {
         lastY = 0;
         dataGroups.forEach((dataGroupId, dataGroup) ->{
                 refreshGrid(dataGroup);
-                dataGroup.getFields().getContent().forEach(field -> {
-                            generateField(dataGroup, field);
+                dataGroup.getData().forEach(field -> {
+                            generateField(dataGroup, field, fieldLogicMap.get(field));
                         }
                 );});
         Collections.sort(pdfFields);
@@ -93,6 +96,7 @@ public class PdfDataHelper implements IPdfDataHelper {
 
     @Override
     public void correctFieldsPosition() {
+        log.info("Correcting field positions for correct export to PDF.");
         pdfFields.forEach(pdfField -> {
             if (pdfField.isChangedSize()) {
                 pdfField.setBottomY(updateBottomY(pdfField));
@@ -111,42 +115,42 @@ public class PdfDataHelper implements IPdfDataHelper {
         }
     }
 
-    protected void generateField(DataGroup dataGroup, LocalisedField field) {
-        if (field.getBehavior().get("hidden") == null) {
-            switch (field.getType()) {
+    protected void generateField(DataGroup dataGroup, String fieldId, DataFieldLogic fieldLogic) {
+        if (!fieldLogic.getBehavior().contains(FieldBehavior.HIDDEN)) {
+            switch (petriNet.getDataSet().get(fieldId).getType()) {
                 case BUTTON:
                 case FILE:
                     break;
                 case ENUMERATION:
-                    pdfFields.add(createEnumField(dataGroup, (LocalisedEnumerationField) field));
+                    pdfFields.add(createEnumField(dataGroup, fieldId, fieldLogic));
                     break;
                 case MULTICHOICE:
-                    pdfFields.add(createMultiChoiceField(dataGroup, (LocalisedMultichoiceField) field));
+                    pdfFields.add(createMultiChoiceField(dataGroup, fieldId, fieldLogic));
                     break;
                 default:
-                    pdfFields.add(createPdfTextField(dataGroup, field));
+                    pdfFields.add(createPdfTextField(dataGroup, fieldId, fieldLogic));
                     break;
             }
         }
     }
 
-    protected PdfField createPdfTextField(DataGroup dataGroup, LocalisedField field) {
+    protected PdfField createPdfTextField(DataGroup dataGroup, String fieldId, DataFieldLogic field) {
         TextFieldBuilder builder = new TextFieldBuilder(resource);
-        PdfField pdfField = builder.buildField(dataGroup, field, dataSet, petriNet, lastX, lastY);
+        PdfField pdfField = builder.buildField(dataGroup, fieldId, field, dataSet, petriNet, lastX, lastY);
         updateLastCoordinates(builder.getLastX(), builder.getLastY());
         return pdfField;
     }
 
-    protected PdfField createEnumField(DataGroup dataGroup, LocalisedEnumerationField field) {
+    protected PdfField createEnumField(DataGroup dataGroup, String fieldId, DataFieldLogic field) {
         EnumerationFieldBuilder builder = new EnumerationFieldBuilder(resource);
-        PdfField pdfField = builder.buildField(dataGroup, field, dataSet, petriNet, lastX, lastY);
+        PdfField pdfField = builder.buildField(dataGroup, fieldId, field, dataSet, petriNet, lastX, lastY);
         updateLastCoordinates(builder.getLastX(), builder.getLastY());
         return pdfField;
     }
 
-    protected PdfField createMultiChoiceField(DataGroup dataGroup, LocalisedMultichoiceField field) {
+    protected PdfField createMultiChoiceField(DataGroup dataGroup, String fieldId, DataFieldLogic field) {
         MultiChoiceFieldBuilder builder = new MultiChoiceFieldBuilder(resource);
-        PdfField pdfField = builder.buildField(dataGroup, field, dataSet, petriNet, lastX, lastY);
+        PdfField pdfField = builder.buildField(dataGroup, fieldId, field, dataSet, petriNet, lastX, lastY);
         updateLastCoordinates(builder.getLastX(), builder.getLastY());
         return pdfField;
     }
@@ -198,7 +202,8 @@ public class PdfDataHelper implements IPdfDataHelper {
 
     protected void refreshGrid(DataGroup dataGroup){
         if(dataGroup.getLayout() != null){
-            resource.setFormGridCols(dataGroup.getLayout().getCols());
+            Integer cols = dataGroup.getLayout().getCols();
+            resource.setFormGridCols(cols == null ? resource.getFormGridCols() : cols);
             resource.updateProperties();
         }
     }
