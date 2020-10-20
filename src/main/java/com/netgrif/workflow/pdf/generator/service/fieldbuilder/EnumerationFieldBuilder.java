@@ -4,6 +4,7 @@ import com.netgrif.workflow.pdf.generator.config.PdfResource;
 import com.netgrif.workflow.pdf.generator.domain.PdfEnumerationField;
 import com.netgrif.workflow.pdf.generator.domain.PdfField;
 import com.netgrif.workflow.pdf.generator.domain.PdfSelectionField;
+import com.netgrif.workflow.petrinet.domain.DataFieldLogic;
 import com.netgrif.workflow.petrinet.domain.DataGroup;
 import com.netgrif.workflow.petrinet.domain.I18nString;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
@@ -33,19 +34,19 @@ public class EnumerationFieldBuilder extends SelectionFieldBuilder {
         return choices.stream().filter(s -> s.toString().equals(value)).map(s -> s.getTranslation(resource.getTextLocale())).findAny().get();
     }
 
-    public PdfField buildField(DataGroup dataGroup, LocalisedEnumerationField field, Map<String, DataField> dataSet, PetriNet petriNet,
-                                int lastX, int lastY){
+    public PdfField buildField(DataGroup dataGroup, String fieldId, DataFieldLogic fieldLogic, Map<String, DataField> dataSet, PetriNet petriNet,
+                               int lastX, int lastY){
         this.lastX = lastX;
         this.lastY = lastY;
         List<String> choices;
         List<String> values = new ArrayList<>();
-        choices = getTranslatedSet(((EnumerationField)petriNet.getDataSet().get(field.getStringId())).getChoices());
-        if (dataSet.get(field.getStringId()).getValue() != null) {
-            values.add(getTranslatedString(((EnumerationField)petriNet.getDataSet().get(field.getStringId())).getChoices(), dataSet.get(field.getStringId()).getValue().toString()));
+        choices = getTranslatedSet(((EnumerationField)petriNet.getDataSet().get(fieldId)).getChoices());
+        if (dataSet.get(fieldId).getValue() != null) {
+            values.add(getTranslatedString(((EnumerationField)petriNet.getDataSet().get(fieldId)).getChoices(), dataSet.get(fieldId).getValue().toString()));
         }
-        String translatedTitle = getTranslatedLabel(field.getStringId(), petriNet);
-        PdfSelectionField pdfField = new PdfEnumerationField(field.getStringId(), dataGroup, field.getType(), translatedTitle, values, choices, resource);
-        setFieldParams(dataGroup, field, pdfField);
+        String translatedTitle = getTranslatedLabel(fieldId, petriNet);
+        PdfSelectionField pdfField = new PdfEnumerationField(fieldId, dataGroup, petriNet.getDataSet().get(fieldId).getType(), translatedTitle, values, choices, resource);
+        setFieldParams(dataGroup, fieldLogic, pdfField);
         setFieldPositions(pdfField, resource.getFontLabelSize());
         return pdfField;
     }
