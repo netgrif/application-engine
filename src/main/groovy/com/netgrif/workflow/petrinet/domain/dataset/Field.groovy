@@ -43,10 +43,6 @@ abstract class Field<T> extends Imported {
     private boolean immediate
 
     @JsonIgnore
-    @Deprecated
-    private LinkedHashSet<Action> actions
-
-    @JsonIgnore
     private LinkedHashSet<DataEvent> events;
 
     @JsonIgnore
@@ -150,29 +146,6 @@ abstract class Field<T> extends Imported {
         this.immediate = immediate != null && immediate
     }
 
-    @Deprecated
-    LinkedHashSet<Action> getActions() {
-        return actions
-    }
-
-    @Deprecated
-    void setActions(LinkedHashSet<Action> actions) {
-        this.actions = actions
-    }
-
-    @Deprecated
-    void addActions(Collection<Action> actions) {
-        actions.each { addAction(it) }
-    }
-
-    @Deprecated
-    void addAction(Action action) {
-        if (this.actions == null)
-            this.actions = new LinkedHashSet<>()
-        if (action == null) return
-
-        this.actions.add(action)
-    }
 
     LinkedHashSet<DataEvent> getEvents() {
         return events
@@ -271,7 +244,6 @@ abstract class Field<T> extends Imported {
         clone.placeholder = this.placeholder
         clone.order = this.order
         clone.immediate = this.immediate
-        clone.actions = this.actions
         clone.events = this.events
         clone.encryption = this.encryption
         clone.view = this.view

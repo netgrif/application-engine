@@ -160,6 +160,7 @@ public class Importer {
         document.getMapping().forEach(this::applyMapping);
         document.getTransition().forEach(this::resolveTransitionActions);
         document.getData().forEach(this::resolveDataActions);
+        document.getData().forEach(this::addActionRefs);
         actionRefs.forEach(this::resolveActionRefs);
         actions.forEach(this::evaluateActions);
 
@@ -218,18 +219,25 @@ public class Importer {
         if (data.getAction() != null) {
             getField(data.getId()).setEvents(buildActions(data.getAction(), getField(data.getId()).getStringId(), null));
         }
-        if (data.getActionRef() != null) {
-            getField(data.getId()).addActions(buildActionRefs(data.getActionRef()));
-        }
         if (data.getEvent() != null && data.getEvent().size() > 0) {
             getField(data.getId()).addEvents(buildEvents(data.getEvent(), null));
         }
     }
 
-    private LinkedHashSet<Action> buildActionRefs(List<ActionRefType> actionRefs) {
-        LinkedHashSet<Action> refs = new LinkedHashSet<>();
+    @Transactional
+    protected void addActionRefs(Data data) {
+        if (data.getActionRef() != null) {
+            getField(data.getId()).addEvents(buildActionRefs(data.getActionRef()));
+        }
+    }
+
+    private LinkedHashSet<DataEvent> buildActionRefs(List<ActionRefType> actionRefs) {
+        LinkedHashSet<DataEvent> refs = new LinkedHashSet<>();
         for (ActionRefType actionRef : actionRefs) {
-            refs.add(fromActionRef(actionRef));
+            Action action = actions.get(actionRef.getId());
+            DataEvent dataEvent = new DataEvent(action.getId().toString(), action.getTrigger().toString());
+            dataEvent.getActions().get(dataEvent.getDefaultPhase()).add(fromActionRef(actionRef));
+            refs.add(dataEvent);
         }
         return refs;
     }
@@ -265,7 +273,7 @@ public class Importer {
                         getTransition(trans.getId()).getStringId()));
             }
             if (ref.getLogic().getActionRef() != null) {
-                getTransition(trans.getId()).addActions(fieldId, buildActionRefs(ref.getLogic().getActionRef()));
+                getTransition(trans.getId()).addDataEvents(fieldId, buildActionRefs(ref.getLogic().getActionRef()));
             }
             if (ref.getEvent() != null){
                 getTransition(trans.getId()).addDataEvents(fieldId, buildEvents(ref.getEvent(), getTransition(trans.getId()).getStringId()));
@@ -380,11 +388,13 @@ public class Importer {
         return actionList;
     }
 
-    private List<Action> parsePhaseActions(EventPhaseType phase, String transitionId, com.netgrif.workflow.importer.model.DataEvent dataEvent) {
+    private List<Action> parsePhaseActions(EventPhaseType phase, Action.ActionTrigger trigger, String transitionId, com.netgrif.workflow.importer.model.DataEvent dataEvent) {
         List<Action> actionList = dataEvent.getActions().stream()
                 .filter(actions -> actions.getPhase().equals(phase))
                 .flatMap(actions -> actions.getAction().stream()
-                        .map(action -> parseAction(transitionId, action)))
+                        .map(action -> {
+                            action.setTrigger(trigger.name());
+                            return parseAction(transitionId, action);}))
                 .collect(Collectors.toList());
         actionList.addAll(dataEvent.getActions().stream()
                 .filter(actions -> actions.getPhase().equals(phase))
@@ -533,7 +543,7 @@ public class Importer {
             if(eventAction.getPhase() == null){
                 phaseType = event.getType().equals(DataEventType.GET) ? EventPhaseType.PRE : EventPhaseType.POST;
             }
-            actions.get(EventPhase.valueOf(phaseType.value().toUpperCase())).addAll(parsePhaseActions(phaseType, transitionId, event));
+            actions.get(EventPhase.valueOf(phaseType.value().toUpperCase())).addAll(parsePhaseActions(phaseType, dataEvent.getTrigger(), transitionId, event));
         });
         dataEvent.setActions(actions);
         return dataEvent;
