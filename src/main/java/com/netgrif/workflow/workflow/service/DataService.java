@@ -280,7 +280,10 @@ public class DataService implements IDataService {
 
     @Override
     public FileFieldInputStream getFileByName(Case useCase, FileListField field, String name) {
-        field.getActions().forEach(action -> actionsRunner.run(action, useCase));
+        field.getEvents().forEach(dataEvent -> {
+            dataEvent.getActions().get(EventPhase.PRE).forEach(action -> actionsRunner.run(action, useCase));
+            dataEvent.getActions().get(EventPhase.POST).forEach(action -> actionsRunner.run(action, useCase));
+        });
         if (useCase.getDataSet().get(field.getStringId()).getValue() == null)
             return null;
 
@@ -304,7 +307,10 @@ public class DataService implements IDataService {
 
     @Override
     public FileFieldInputStream getFile(Case useCase, FileField field) {
-        field.getActions().forEach(action -> actionsRunner.run(action, useCase));
+        field.getEvents().forEach(dataEvent -> {
+            dataEvent.getActions().get(EventPhase.PRE).forEach(action -> actionsRunner.run(action, useCase));
+            dataEvent.getActions().get(EventPhase.POST).forEach(action -> actionsRunner.run(action, useCase));
+        });
         if (useCase.getDataSet().get(field.getStringId()).getValue() == null)
             return null;
 
@@ -590,7 +596,7 @@ public class DataService implements IDataService {
             if (changedField.isEmpty())
                 return;
             mergeChanges(changedFields, changedField);
-            runActionsOnChanged(Action.ActionTrigger.SET, case$, transition, changedFields, true, changedField);
+            runEventActionsOnChanged(case$, transition, changedFields, changedField, Action.ActionTrigger.SET,true);
         });
         workflowService.save(case$);
         return changedFields;
@@ -641,48 +647,6 @@ public class DataService implements IDataService {
                 Field field = useCase.getField(s);
                 processDataEvents(field, trigger, EventPhase.PRE, useCase, changedFields, transition);
                 processDataEvents(field, trigger, EventPhase.POST, useCase, changedFields, transition);
-            }
-        });
-    }
-
-    @Deprecated
-    private Map<String, ChangedField> resolveActions(Field field, Action.ActionTrigger actionTrigger, Case useCase, Transition transition) {
-        Map<String, ChangedField> changedFields = new HashMap<>();
-        processActions(field, actionTrigger, useCase, transition, changedFields);
-        return changedFields;
-    }
-
-    @Deprecated
-    private void processActions(Field field, Action.ActionTrigger actionTrigger, Case useCase, Transition transition, Map<String, ChangedField> changedFields) {
-        LinkedList<Action> fieldActions = new LinkedList<>();
-        if (field.getActions() != null)
-            fieldActions.addAll(DataFieldLogic.getActionByTrigger(field.getActions(), actionTrigger));
-        if (transition.getDataSet().containsKey(field.getStringId()) && !transition.getDataSet().get(field.getStringId()).getActions().isEmpty())
-            fieldActions.addAll(DataFieldLogic.getActionByTrigger(transition.getDataSet().get(field.getStringId()).getActions(), actionTrigger));
-
-        if (fieldActions.isEmpty()) return;
-
-        runActions(fieldActions, actionTrigger, useCase, transition, changedFields, actionTrigger == Action.ActionTrigger.SET);
-    }
-
-    @Deprecated
-    private void runActions(List<Action> actions, Action.ActionTrigger trigger, Case useCase, Transition transition, Map<String, ChangedField> changedFields, boolean recursive) {
-        actions.forEach(action -> {
-            Map<String, ChangedField> currentChangedFields = actionsRunner.run(action, useCase);
-            if (currentChangedFields.isEmpty())
-                return;
-
-            mergeChanges(changedFields, currentChangedFields);
-            runActionsOnChanged(trigger, useCase, transition, changedFields, recursive, currentChangedFields);
-        });
-    }
-
-    @Deprecated
-    private void runActionsOnChanged(Action.ActionTrigger trigger, Case useCase, Transition transition, Map<String, ChangedField> changedFields, boolean recursive, Map<String, ChangedField> newChangedField) {
-        newChangedField.forEach((s, changedField) -> {
-            if ((changedField.getAttributes().containsKey("value") && changedField.getAttributes().get("value") != null) && recursive) {
-                Field field = useCase.getField(s);
-                processActions(field, trigger, useCase, transition, changedFields);
             }
         });
     }
