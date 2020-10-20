@@ -20,11 +20,6 @@ public class DataFieldLogic {
 
     @Getter
     @Setter
-    @Deprecated
-    private LinkedHashSet<Action> actions;
-
-    @Getter
-    @Setter
     private LinkedHashSet<DataEvent> events;
 
     @Getter
@@ -33,36 +28,18 @@ public class DataFieldLogic {
 
     public DataFieldLogic() {
         this.behavior = new HashSet<>();
-        this.actions = new LinkedHashSet<>();
         this.events = new LinkedHashSet<>();
         this.layout = new FieldLayout();
     }
 
-    public DataFieldLogic(Set<FieldBehavior> behavior, Set<Action> actions, FieldLayout layout) {
+    public DataFieldLogic(Set<FieldBehavior> behavior, Set<DataEvent> events, FieldLayout layout) {
         this();
         if (behavior != null)
             this.behavior.addAll(behavior);
-        if (actions != null)
-            this.actions.addAll(actions);
-        if (layout != null)
-            this.layout = layout;
-    }
-
-    public DataFieldLogic(Set<FieldBehavior> behavior, Set<Action> actions, Set<DataEvent> events, FieldLayout layout) {
-        this();
-        if (behavior != null)
-            this.behavior.addAll(behavior);
-        if (actions != null)
-            this.actions.addAll(actions);
         if (events != null)
             this.events.addAll(events);
         if (layout != null)
             this.layout = layout;
-    }
-
-    @Deprecated
-    public void addActions(Collection<Action> actions) {
-        this.actions.addAll(actions);
     }
 
     public void addDataEvents(Collection<DataEvent> events){
@@ -80,7 +57,7 @@ public class DataFieldLogic {
 
     public void merge(DataFieldLogic other) {
         this.behavior.addAll(other.behavior);
-        this.actions.addAll(other.actions);
+        this.events.addAll(other.events);
     }
 
     public boolean isDisplayable() {
@@ -89,10 +66,6 @@ public class DataFieldLogic {
 
     public boolean isDisplayableForCase() {
         return behavior.contains(FieldBehavior.EDITABLE) || behavior.contains(FieldBehavior.VISIBLE) || behavior.contains(FieldBehavior.HIDDEN);
-    }
-
-    public static List<Action> getActionByTrigger(Set<Action> actions, Action.ActionTrigger trigger) {
-        return actions.stream().filter(action -> action.isTriggeredBy(trigger)).collect(Collectors.toList());
     }
 
     public static List<Action> getEventAction(LinkedHashSet<DataEvent> events, Action.ActionTrigger trigger, EventPhase phase){
