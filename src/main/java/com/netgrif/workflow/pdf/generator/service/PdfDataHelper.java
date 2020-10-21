@@ -4,9 +4,7 @@ import com.netgrif.workflow.pdf.generator.config.PdfResource;
 import com.netgrif.workflow.pdf.generator.domain.PdfField;
 import com.netgrif.workflow.pdf.generator.service.fieldbuilder.*;
 import com.netgrif.workflow.pdf.generator.service.interfaces.IPdfDataHelper;
-import com.netgrif.workflow.petrinet.domain.DataFieldLogic;
-import com.netgrif.workflow.petrinet.domain.DataGroup;
-import com.netgrif.workflow.petrinet.domain.PetriNet;
+import com.netgrif.workflow.petrinet.domain.*;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.FieldBehavior;
 import com.netgrif.workflow.workflow.domain.DataField;
 import lombok.Getter;
@@ -28,6 +26,10 @@ public class PdfDataHelper implements IPdfDataHelper {
 
     @Getter
     @Setter
+    private Transition transition;
+
+    @Getter
+    @Setter
     private Map<String, DataGroup> dataGroups;
 
     @Getter
@@ -44,7 +46,7 @@ public class PdfDataHelper implements IPdfDataHelper {
 
     private Stack<PdfField> changedPdfFields;
 
-    private int lastX, lastY;
+    private int lastX, lastY, lastLayoutY;
 
     @Override
     public void setupDataHelper(PdfResource resource){
@@ -59,7 +61,7 @@ public class PdfDataHelper implements IPdfDataHelper {
         resource.setBaseY(resource.getPageHeight() - resource.getMarginTitle());
         PdfField titleField = new TitleFieldBuilder(resource).createTitleField();
         pdfFields.add(titleField);
-        resource.setBaseY(resource.getBaseY() - titleField.getBottomY());
+        resource.setBaseY(resource.getBaseY() - titleField.getHeight());
     }
 
     @Override
@@ -116,7 +118,7 @@ public class PdfDataHelper implements IPdfDataHelper {
     }
 
     protected void generateField(DataGroup dataGroup, String fieldId, DataFieldLogic fieldLogic) {
-        if (!fieldLogic.getBehavior().contains(FieldBehavior.HIDDEN)) {
+        if (isNotHidden(fieldId)) {
             switch (petriNet.getDataSet().get(fieldId).getType()) {
                 case BUTTON:
                 case FILE:
@@ -177,15 +179,28 @@ public class PdfDataHelper implements IPdfDataHelper {
         belowTopY = fieldBelow.getTopY();
         cFieldBottomY = currentField.getBottomY();
         if ((isCoveredByDataField(currentField, fieldBelow) || isCoveredByDataGroup(currentField, fieldBelow)) && (cFieldBottomY > belowTopY)) {
-            setNewPositions(belowTopY, cFieldBottomY, fieldBelow, currentField.getResource());
+            shiftDown(belowTopY, cFieldBottomY, fieldBelow, currentField.getResource());
+        } else if(isEmptySpace(currentField, fieldBelow) && isNearestToBelow(currentField, fieldBelow)){
+            shiftUp(belowTopY, cFieldBottomY, fieldBelow, currentField.getResource());
         }
     }
 
-    private void setNewPositions(int belowTopY, int cFieldBottomY, PdfField fieldBelow, PdfResource resource) {
+    private void shiftDown(int belowTopY, int cFieldBottomY, PdfField fieldBelow, PdfResource resource) {
         int currentDiff;
         currentDiff = cFieldBottomY - belowTopY + resource.getPadding();
         fieldBelow.setTopY(belowTopY + currentDiff);
         fieldBelow.setBottomY(fieldBelow.getBottomY() + currentDiff);
+        fieldBelow.setChangedPosition(true);
+        if (!changedPdfFields.contains(fieldBelow)) {
+            changedPdfFields.push(fieldBelow);
+        }
+    }
+
+    private void shiftUp(int belowTopY, int cFieldBottomY, PdfField fieldBelow, PdfResource resource){
+        int currentDiff;
+        currentDiff = belowTopY - cFieldBottomY - resource.getPadding();
+        fieldBelow.setTopY(belowTopY - currentDiff);
+        fieldBelow.setBottomY(fieldBelow.getBottomY() - currentDiff);
         fieldBelow.setChangedPosition(true);
         if (!changedPdfFields.contains(fieldBelow)) {
             changedPdfFields.push(fieldBelow);
@@ -200,11 +215,44 @@ public class PdfDataHelper implements IPdfDataHelper {
         return currentField.getOriginalBottomY() < fieldBelow.getOriginalTopY();
     }
 
+    private boolean isNearestToBelow(PdfField currentField, PdfField fieldBelow){
+        int difference = fieldBelow.getTopY() - currentField.getBottomY();
+
+        if(currentField.isDgField() && fieldBelow.getOriginalTopY() == fieldBelow.getOriginalTopY()){
+            return true;
+        }
+
+        for(PdfField field : pdfFields) {
+            int tempDiff = fieldBelow.getTopY() - field.getBottomY();
+            if(fieldBelow.getOriginalTopY() != field.getOriginalTopY() && difference > tempDiff && tempDiff > 0){
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private boolean isEmptySpace(PdfField currentField, PdfField fieldBelow){
+        return (fieldBelow.getTopY() - currentField.getBottomY()) > 2 * resource.getLineHeight();
+    }
+
     protected void refreshGrid(DataGroup dataGroup){
         if(dataGroup.getLayout() != null){
             Integer cols = dataGroup.getLayout().getCols();
             resource.setFormGridCols(cols == null ? resource.getFormGridCols() : cols);
             resource.updateProperties();
         }
+    }
+
+    private boolean isNotHidden(String fieldId){
+        boolean result = true;
+        if(transition.getDataSet().get(fieldId).getBehavior().contains(FieldBehavior.HIDDEN)){
+            result = false;
+        }
+        if(dataSet.get(fieldId).getBehavior().size() > 0
+                && (dataSet.get(fieldId).getBehavior().get(transition.getStringId()).contains(FieldBehavior.EDITABLE)
+                || dataSet.get(fieldId).getBehavior().get(transition.getStringId()).contains(FieldBehavior.VISIBLE))){
+            result = true;
+        }
+        return result;
     }
 }
