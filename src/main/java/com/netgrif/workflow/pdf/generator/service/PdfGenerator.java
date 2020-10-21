@@ -68,7 +68,7 @@ public class PdfGenerator implements IPdfGenerator {
     public File generatePdf(Case formCase, String transitionId, PdfResource pdfResource) {
         Map<String, DataGroup> dataGroupMap = formCase.getPetriNet().getTransition(transitionId).getDataGroups();
         Map<String, DataFieldLogic> dataSetMap = formCase.getPetriNet().getTransition(transitionId).getDataSet();
-        generateData(formCase.getPetriNet(), dataGroupMap, formCase.getDataSet(), dataSetMap, pdfResource);
+        generateData(formCase.getPetriNet(), formCase.getPetriNet().getTransition(transitionId), dataGroupMap, formCase.getDataSet(), dataSetMap, pdfResource);
         return generatePdf(pdfResource);
     }
 
@@ -85,12 +85,12 @@ public class PdfGenerator implements IPdfGenerator {
     @Override
     public void generatePdf(Case formCase, String transitionId, PdfResource pdfResource, OutputStream stream) {
         Transition transition = formCase.getPetriNet().getTransition(transitionId);
-        generatePdf(formCase, transition.getDataGroups(), transition.getDataSet(), pdfResource, stream);
+        generatePdf(formCase, transition, transition.getDataGroups(), transition.getDataSet(), pdfResource, stream);
     }
 
     @Override
-    public void generatePdf(Case formCase, Map<String, DataGroup> dataGroupMap, Map<String, DataFieldLogic> dataSetMap, PdfResource pdfResource, OutputStream stream) {
-        generateData(formCase.getPetriNet(), dataGroupMap, formCase.getDataSet(), dataSetMap, pdfResource);
+    public void generatePdf(Case formCase, Transition transition, Map<String, DataGroup> dataGroupMap, Map<String, DataFieldLogic> dataSetMap, PdfResource pdfResource, OutputStream stream) {
+        generateData(formCase.getPetriNet(), transition, dataGroupMap, formCase.getDataSet(), dataSetMap, pdfResource);
         try {
             transformRequestToPdf(pdfDataHelper.getPdfFields(), pdfResource, stream);
         } catch (IOException e) {
@@ -99,8 +99,9 @@ public class PdfGenerator implements IPdfGenerator {
     }
 
     @Override
-    public void generateData(PetriNet petriNet, Map<String, DataGroup> dataGroupMap, Map<String, DataField> dataSet, Map<String, DataFieldLogic> transDataSet, PdfResource pdfResource) {
+    public void generateData(PetriNet petriNet, Transition transition, Map<String, DataGroup> dataGroupMap, Map<String, DataField> dataSet, Map<String, DataFieldLogic> transDataSet, PdfResource pdfResource) {
         pdfDataHelper.setPetriNet(petriNet);
+        pdfDataHelper.setTransition(transition);
         pdfDataHelper.setDataGroups(dataGroupMap);
         pdfDataHelper.setDataSet(dataSet);
         pdfDataHelper.setFieldLogicMap(transDataSet);
