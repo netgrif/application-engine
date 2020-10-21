@@ -182,6 +182,25 @@ public class PetriNetController {
         return resources;
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
+    @ApiOperation(value = "Delete process",
+            notes = "Caller must have the ADMIN role. Removes the specified process, along with it's cases, tasks and process roles.",
+            authorizations = @Authorization("BasicAuth"))
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "OK", response = MessageResource.class),
+            @ApiResponse(code = 403, message = "Caller doesn't fulfill the authorisation requirements")
+    })
+    @RequestMapping(value = "/{id}", method = RequestMethod.DELETE, produces = MediaTypes.HAL_JSON_VALUE)
+    public MessageResource deletePetriNet(@PathVariable("id") String processId) {
+        String decodedProcessId = decodeUrl(processId);
+        if (Objects.equals(decodedProcessId, "")) {
+            log.error("Deleting Petri net [" + processId + "] failed: could not decode process ID from URL");
+            return MessageResource.errorMessage("Deleting Petri net " + processId + " failed!");
+        }
+        this.service.deletePetriNet(decodedProcessId);
+        return MessageResource.successMessage("Petri net " + decodedProcessId + " was deleted");
+    }
+
     public static String decodeUrl(String s1) {
         try {
             if (s1 == null)
