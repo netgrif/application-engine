@@ -77,4 +77,6 @@ public interface IPetriNetService {
     PetriNet get(ObjectId petriNetId);
 
     PetriNet clone(ObjectId petriNetId);
+
+    void deletePetriNet(String id);
 }
