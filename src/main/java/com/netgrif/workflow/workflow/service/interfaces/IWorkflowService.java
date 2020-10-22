@@ -1,6 +1,7 @@
 package com.netgrif.workflow.workflow.service.interfaces;
 
 import com.netgrif.workflow.auth.domain.LoggedUser;
+import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.Task;
@@ -31,7 +32,7 @@ public interface IWorkflowService {
 
     void deleteSubtreeRootedAt(String caseId);
 
-    void deleteInstancesOfPetriNet(ObjectId petriNetObjectId);
+    void deleteInstancesOfPetriNet(PetriNet net);
 
     void updateMarking(Case useCase);
 

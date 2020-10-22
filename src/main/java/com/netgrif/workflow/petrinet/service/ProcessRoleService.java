@@ -5,6 +5,7 @@ import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.auth.domain.UserProcessRole;
 import com.netgrif.workflow.auth.domain.repositories.UserProcessRoleRepository;
 import com.netgrif.workflow.auth.service.UserDetailsServiceImpl;
+import com.netgrif.workflow.auth.service.interfaces.IUserProcessRoleService;
 import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.event.events.user.UserRoleChangeEvent;
 import com.netgrif.workflow.importer.model.EventPhaseType;
@@ -19,7 +20,9 @@ import com.netgrif.workflow.petrinet.domain.roles.ProcessRole;
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRoleRepository;
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.workflow.petrinet.service.interfaces.IProcessRoleService;
-import org.apache.tomcat.jni.Proc;
+import org.bson.types.ObjectId;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
@@ -29,6 +32,8 @@ import java.util.stream.Collectors;
 
 @Service
 public class ProcessRoleService implements IProcessRoleService {
+
+    private static final Logger log = LoggerFactory.getLogger(ProcessRoleService.class);
 
     @Autowired
     private IUserService userService;
@@ -53,6 +58,9 @@ public class ProcessRoleService implements IProcessRoleService {
 
     @Autowired
     private IPetriNetService petriNetService;
+
+    @Autowired
+    private IUserProcessRoleService userProcessRoleService;
 
     private ProcessRole defaultRole;
 
@@ -206,7 +214,11 @@ public class ProcessRoleService implements IProcessRoleService {
         Optional<PetriNet> netOptional = netRepository.findById(netId);
         if (!netOptional.isPresent())
             throw new IllegalArgumentException("Could not find model with id [" + netId + "]");
-        return new LinkedList<>(netOptional.get().getRoles().values());
+        return findAll(netOptional.get());
+    }
+
+    private List<ProcessRole> findAll(PetriNet net) {
+        return new LinkedList<>(net.getRoles().values());
     }
 
     @Override
@@ -214,5 +226,13 @@ public class ProcessRoleService implements IProcessRoleService {
         if (defaultRole == null)
             defaultRole = processRoleRepository.findByName_DefaultValue(ProcessRole.DEFAULT_ROLE);
         return defaultRole;
+    }
+
+    @Override
+    public void deleteRolesOfNet(PetriNet net) {
+        this.userProcessRoleService.deleteRolesOfNet(net);
+        log.info("[" + net.getStringId() + "]: Deleting all roles of Petri net " + net.getIdentifier() + " version " + net.getVersion().toString());
+        List<ObjectId> roleIds = this.findAll(net).stream().map(ProcessRole::get_id).collect(Collectors.toList());
+        this.processRoleRepository.deleteAllBy_idIn(roleIds);
     }
 }

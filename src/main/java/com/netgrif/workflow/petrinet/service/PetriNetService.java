@@ -330,8 +330,8 @@ public abstract class PetriNetService implements IPetriNetService {
         PetriNet petriNet = petriNetOptional.get();
         log.info("[" + processId + "]: Initiating deletion of Petri net " + petriNet.getIdentifier() + " version " + petriNet.getVersion().toString());
 
-        log.info("[" + processId + "]: Deleting all cases of Petri net " + petriNet.getIdentifier() + " version " + petriNet.getVersion().toString());
-        this.workflowService.deleteInstancesOfPetriNet(petriNet.getObjectId());
+        this.workflowService.deleteInstancesOfPetriNet(petriNet);
+        this.processRoleService.deleteRolesOfNet(petriNet);
 
 
     }
