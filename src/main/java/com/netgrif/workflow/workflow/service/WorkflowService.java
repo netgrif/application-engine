@@ -214,6 +214,22 @@ public class WorkflowService implements IWorkflowService {
     }
 
     @Override
+    public void deleteInstancesOfPetriNet(ObjectId petriNetObjectId) {
+        List<Case> cases = repository.findAllByPetriNetObjectId(petriNetObjectId);
+
+        for (Case c : cases) {
+            log.info("[" + c.getStringId() + "]: Deleting case " + c.getTitle());
+            taskService.deleteTasksByCase(c.getStringId());
+        }
+
+        repository.deleteAllByPetriNetObjectId(petriNetObjectId);
+
+        for (Case c : cases) {
+            publisher.publishEvent(new DeleteCaseEvent(c));
+        }
+    }
+
+    @Override
     public void deleteSubtreeRootedAt(String subtreeRootCaseId) {
         Case subtreeRoot = findOne(subtreeRootCaseId);
         if (subtreeRoot.getImmediateDataFields().contains("treeChildCases")) {
@@ -377,5 +393,9 @@ public class WorkflowService implements IWorkflowService {
         model.initializeTokens(useCase.getActivePlaces());
         model.initializeVarArcs(useCase.getDataSet());
         useCase.setPetriNet(model);
+    }
+
+    private void deleteCase(Case caseToDelete) {
+
     }
 }
