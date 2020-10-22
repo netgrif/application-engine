@@ -2,6 +2,7 @@ package com.netgrif.workflow.petrinet.domain.repositories;
 
 import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.version.Version;
+import org.bson.types.ObjectId;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
@@ -21,4 +22,6 @@ public interface PetriNetRepository extends MongoRepository<PetriNet, String> {
     Page<PetriNet> findByIdentifier(String identifier, Pageable pageable);
 
     List<PetriNet> findAllByVersion(Version version);
+
+    void deleteByObjectId(ObjectId id);
 }
