@@ -2,16 +2,17 @@ package com.netgrif.workflow.pdf.generator.service.fieldbuilder;
 
 import com.netgrif.workflow.pdf.generator.config.PdfResource;
 import com.netgrif.workflow.pdf.generator.domain.PdfField;
+import com.netgrif.workflow.pdf.generator.domain.PdfTaskRefField;
 import com.netgrif.workflow.pdf.generator.domain.PdfTextField;
 import com.netgrif.workflow.petrinet.domain.DataFieldLogic;
 import com.netgrif.workflow.petrinet.domain.DataGroup;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.dataset.FileFieldValue;
 import com.netgrif.workflow.workflow.domain.DataField;
-import com.netgrif.workflow.workflow.web.responsebodies.LocalisedField;
 
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
+import java.util.List;
 import java.util.Map;
 
 public class TextFieldBuilder extends FieldBuilder{
