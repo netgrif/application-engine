@@ -107,7 +107,6 @@ public class PdfGenerator implements IPdfGenerator {
         pdfDataHelper.setFieldLogicMap(transDataSet);
         pdfDataHelper.generateTitleField();
         pdfDataHelper.generatePdfFields();
-        pdfDataHelper.generatePdfDataGroups();
         pdfDataHelper.correctFieldsPosition();
         pdfDrawer.setupDrawer(pdf, pdfResource);
     }
