@@ -166,10 +166,12 @@ public class PdfDataHelper implements IPdfDataHelper {
                     if (pdfField != null)
                         taskRefFields.add((PdfTaskRefField) pdfField);
                     break;
+                case ENUMERATION_MAP:
                 case ENUMERATION:
                     pdfField = createEnumField(petriNet, dataSet, dataGroup, fieldId, fieldLogic);
                     pdfFields.add(pdfField);
                     break;
+                case MULTICHOICE_MAP:
                 case MULTICHOICE:
                     pdfField = createMultiChoiceField(petriNet, dataSet, dataGroup, fieldId, fieldLogic);
                     pdfFields.add(pdfField);

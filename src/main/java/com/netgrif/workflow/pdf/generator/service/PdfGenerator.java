@@ -147,9 +147,11 @@ public class PdfGenerator implements IPdfGenerator {
                 pdfDrawer.drawTitleField(pdfField);
             } else if (!pdfField.isDgField()) {
                 switch (pdfField.getType()) {
+                    case MULTICHOICE_MAP:
                     case MULTICHOICE:
                         pdfDrawer.drawMultiChoiceField(pdfField);
                         break;
+                    case ENUMERATION_MAP:
                     case ENUMERATION:
                         pdfDrawer.drawEnumerationField(pdfField);
                         break;
