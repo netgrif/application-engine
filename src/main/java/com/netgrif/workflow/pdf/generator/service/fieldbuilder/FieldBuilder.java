@@ -6,7 +6,6 @@ import com.netgrif.workflow.petrinet.domain.DataFieldLogic;
 import com.netgrif.workflow.petrinet.domain.DataGroup;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.FieldLayout;
-import com.netgrif.workflow.workflow.web.responsebodies.LocalisedField;
 import lombok.Getter;
 
 import java.util.ArrayList;
@@ -37,8 +36,8 @@ public abstract class FieldBuilder {
 
     protected void setFieldPositions(PdfField pdfField, int fontSize) {
         pdfField.setX(countPosX(pdfField));
-        pdfField.setOriginalTopY(countTopPosY(pdfField));
-        pdfField.setTopY(countTopPosY(pdfField));
+        pdfField.setOriginalTopY(countTopPosY(pdfField, resource));
+        pdfField.setTopY(countTopPosY(pdfField, resource));
         pdfField.setOriginalBottomY(countBottomPosY(pdfField,resource));
         pdfField.setBottomY(countBottomPosY(pdfField,resource));
         pdfField.countMultiLineHeight(fontSize, resource);
@@ -48,6 +47,7 @@ public abstract class FieldBuilder {
         int x = 0;
         if (checkCol(field.getLayout())) {
             x = field.getLayout().getX();
+            lastX = x;
         } else if (dataGroup.getStretch() == null || !dataGroup.getStretch()) {
             lastX = (lastX == 0 ? 2 : 0);
             x = lastX;
@@ -59,6 +59,7 @@ public abstract class FieldBuilder {
         int y;
         if (checkRow(field.getLayout())) {
             y = field.getLayout().getY();
+            lastY = y;
         } else if (dataGroup.getStretch() != null && dataGroup.getStretch()) {
             y = ++lastY;
         } else {
@@ -72,7 +73,7 @@ public abstract class FieldBuilder {
         return (field.getLayoutX() * resource.getFormGridColWidth() + resource.getPadding());
     }
 
-    public int countTopPosY(PdfField field) {
+    public static int countTopPosY(PdfField field, PdfResource resource) {
         return (field.getLayoutY() * resource.getFormGridRowHeight()) + resource.getPadding();
     }
 
