@@ -23,6 +23,5 @@ public interface IPdfDataHelper {
     void setupDataHelper(PdfResource resource);
     void generateTitleField();
     void generatePdfFields();
-    void generatePdfDataGroups();
     void correctFieldsPosition();
 }

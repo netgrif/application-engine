@@ -9,7 +9,6 @@ import com.netgrif.workflow.petrinet.domain.I18nString;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.dataset.MultichoiceField;
 import com.netgrif.workflow.workflow.domain.DataField;
-import com.netgrif.workflow.workflow.web.responsebodies.LocalisedMultichoiceField;
 
 import java.util.ArrayList;
 import java.util.List;

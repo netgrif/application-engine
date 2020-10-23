@@ -19,8 +19,8 @@ public abstract class SelectionFieldBuilder extends FieldBuilder {
 
     protected void setFieldPositions(PdfSelectionField pdfField, int fontSize) {
         pdfField.setX(countPosX(pdfField));
-        pdfField.setOriginalTopY(countTopPosY(pdfField));
-        pdfField.setTopY(countTopPosY(pdfField));
+        pdfField.setOriginalTopY(countTopPosY(pdfField, resource));
+        pdfField.setTopY(countTopPosY(pdfField, resource));
         pdfField.setOriginalBottomY(countBottomPosY(pdfField,resource));
         pdfField.setBottomY(countBottomPosY(pdfField,resource));
         pdfField.countMultiLineHeight(fontSize, resource);
