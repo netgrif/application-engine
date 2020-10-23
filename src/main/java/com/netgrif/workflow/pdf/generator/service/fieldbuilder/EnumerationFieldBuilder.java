@@ -9,12 +9,11 @@ import com.netgrif.workflow.petrinet.domain.DataGroup;
 import com.netgrif.workflow.petrinet.domain.I18nString;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.dataset.EnumerationField;
+import com.netgrif.workflow.petrinet.domain.dataset.EnumerationMapField;
+import com.netgrif.workflow.petrinet.domain.dataset.FieldType;
 import com.netgrif.workflow.workflow.domain.DataField;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class EnumerationFieldBuilder extends SelectionFieldBuilder {
@@ -35,16 +34,31 @@ public class EnumerationFieldBuilder extends SelectionFieldBuilder {
 
     public PdfField buildField(DataGroup dataGroup, String fieldId, DataFieldLogic fieldLogic, Map<String, DataField> dataSet, PetriNet petriNet,
                                int lastX, int lastY){
+        List<String> choices = new ArrayList<>();;
+        List<String> values = new ArrayList<>();
         this.lastX = lastX;
         this.lastY = lastY;
-        List<String> choices;
-        List<String> values = new ArrayList<>();
-        choices = getTranslatedSet(((EnumerationField)petriNet.getDataSet().get(fieldId)).getChoices());
-        if (dataSet.get(fieldId).getValue() != null) {
-            values.add(getTranslatedString(((EnumerationField)petriNet.getDataSet().get(fieldId)).getChoices(), dataSet.get(fieldId).getValue().toString()));
+        FieldType type = petriNet.getDataSet().get(fieldId).getType();
+
+        switch (type) {
+            case ENUMERATION_MAP:
+                choices = getTranslatedSet(new HashSet<>(((EnumerationMapField)petriNet.getDataSet().get(fieldId)).getOptions().values()));
+                if (dataSet.get(fieldId).getValue() != null) {
+                    values.add(getTranslatedString(new HashSet<>(((EnumerationMapField)petriNet.getDataSet().get(fieldId)).getOptions().values()), dataSet.get(fieldId).getValue().toString()));
+                }
+                break;
+            case ENUMERATION:
+                choices = getTranslatedSet(((EnumerationField)petriNet.getDataSet().get(fieldId)).getChoices());
+                if (dataSet.get(fieldId).getValue() != null) {
+                    values.add(getTranslatedString(((EnumerationField)petriNet.getDataSet().get(fieldId)).getChoices(), dataSet.get(fieldId).getValue().toString()));
+                }
+                break;
+            default:
+                break;
         }
+
         String translatedTitle = getTranslatedLabel(fieldId, petriNet);
-        PdfSelectionField pdfField = new PdfEnumerationField(fieldId, dataGroup, petriNet.getDataSet().get(fieldId).getType(), translatedTitle, values, choices, resource);
+        PdfSelectionField pdfField = new PdfEnumerationField(fieldId, dataGroup, type, translatedTitle, values, choices, resource);
         setFieldParams(dataGroup, fieldLogic, pdfField);
         setFieldPositions(pdfField, resource.getFontLabelSize());
         return pdfField;
