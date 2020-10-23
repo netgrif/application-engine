@@ -1,3 +1,21 @@
+<a name="https://netgrif.atlassian.net/projects/NAE/versions/10819/tab/release-report-all-issues"></a>
+## 4.2.1 - Gray Zinc (23.9.2020)
+### Bug fixes
+ * [NAE-1024](https://netgrif.atlassian.net/browse/NAE-1024) - Redis namespace is not set from application properties
+ * [NAE-1001](https://netgrif.atlassian.net/browse/NAE-1001) - Security Config
+ * [NAE-1010](https://netgrif.atlassian.net/browse/NAE-1010) - 500 error po zavolaní getData v taskRefe
+ * [NAE-1011](https://netgrif.atlassian.net/browse/NAE-1011) - Redis deserialization error
+ * [NAE-1012](https://netgrif.atlassian.net/browse/NAE-1012) - Chybné parsovanie dataFieldov
+ * [NAE-1013](https://netgrif.atlassian.net/browse/NAE-1013) - ReindexingTask volane cez ElasticController ignoruje pripady
+ * [NAE-1015](https://netgrif.atlassian.net/browse/NAE-1015) - Title pre datagrupu sa nezobrazuje.
+ * [NAE-1034](https://netgrif.atlassian.net/browse/NAE-1034) - Reindex size property not loaded
+
+### Improvements
+ * [NAE-1022](https://netgrif.atlassian.net/browse/NAE-1022) - Repair and update swagger definitions
+
+### Features
+ None
+
 <a name="https://netgrif.atlassian.net/projects/NAE/versions/10785/tab/release-report-all-issues"></a>
 ## 4.2.0 - Maroon Bronze (21.9.2020)
 ### Bug fixes
