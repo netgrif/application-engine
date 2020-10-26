@@ -38,12 +38,17 @@ public class PdfGenerator implements IPdfGenerator {
     @Autowired
     private IPdfDrawer pdfDrawer;
 
+    @Override
+    public void setupPdfGenerator(PdfResource pdfResource) throws IOException{
+        setupPdfGenerator(pdfResource, 1.4f);
+    }
 
     @Override
-    public void setupPdfGenerator(PdfResource pdfResource) throws IOException {
+    public void setupPdfGenerator(PdfResource pdfResource, float version) throws IOException {
         log.info("Setting up PDF generator.");
 
         this.pdf = new PDDocument();
+        this.pdf.setVersion(version);
         pdfDataHelper.setupDataHelper(pdfResource);
         pdfDrawer.setupDrawer(pdf, pdfResource);
 
