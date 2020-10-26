@@ -78,5 +78,5 @@ public interface IPetriNetService {
 
     PetriNet clone(ObjectId petriNetId);
 
-    void deletePetriNet(String id);
+    void deletePetriNet(String id, LoggedUser loggedUser);
 }
