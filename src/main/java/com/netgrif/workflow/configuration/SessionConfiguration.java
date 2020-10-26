@@ -26,6 +26,8 @@ public class SessionConfiguration {
 
     @Bean
     public JedisConnectionFactory jedisConnectionFactory() {
+        hostName = hostName == null ? "localhost" : hostName;
+        port = port == null || port == 0 ? 6379 : port;
         RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration(hostName, port);
         return new JedisConnectionFactory(redisStandaloneConfiguration);
     }
