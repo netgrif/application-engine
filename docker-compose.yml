@@ -2,7 +2,7 @@ version: "3.3"
 
 services:
 #  front:
-#    image: demo:4.2.0
+#    image: demo:4.3.0
 #    ports:
 #    - 80:80
 #    depends_on:
@@ -12,7 +12,7 @@ services:
     build:
       context: ./
       dockerfile: Dockerfile
-    image: engine:4.2.0
+    image: engine:4.3.0
     ports:
       - 8080:8080
     depends_on:
@@ -36,7 +36,7 @@ services:
       MYSQL_PASSWORD: netgrif_nae
 
   docker-mongo:
-    image: mongo:3.6
+    image: mongo:4.2
 #    ports:
 #    - 27017:27017
   #    environment:

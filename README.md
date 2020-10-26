@@ -17,7 +17,7 @@ CREATE DATABASE nae
 
 ## DOCKER
 ```
-sudo docker build -t netgrif/4.1.2 .
+sudo docker build -t netgrif/4.3.0 .
 sudo docker image ls
-sudo docker run --publish 8000:8080 netgrif/4.1.2
+sudo docker run --publish 8000:8080 netgrif/4.3.0
 ```
