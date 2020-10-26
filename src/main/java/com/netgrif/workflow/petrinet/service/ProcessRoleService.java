@@ -229,10 +229,22 @@ public class ProcessRoleService implements IProcessRoleService {
     }
 
     @Override
-    public void deleteRolesOfNet(PetriNet net) {
-        this.userProcessRoleService.deleteRolesOfNet(net);
+    public void deleteRolesOfNet(PetriNet net, LoggedUser loggedUser) {
+        log.info("[" + net.getStringId() + "]: Initiating deletion of all roles of Petri net " + net.getIdentifier() + " version " + net.getVersion().toString());
+        List<ObjectId> deletedRoleIds = this.findAll(net).stream().map(ProcessRole::get_id).collect(Collectors.toList());
+        Set<String> deletedRoleStringIds = deletedRoleIds.stream().map(ObjectId::toString).collect(Collectors.toSet());
+
+        List<User> usersWithRemovedRoles = this.userService.findAllByProcessRoles(deletedRoleStringIds, false);
+        for(User user : usersWithRemovedRoles) {
+            log.info("[" + net.getStringId() + "]: Removing deleted roles of Petri net " + net.getIdentifier() + " version " + net.getVersion().toString() + " from user "+ user.getFullName() + " with id "+user.getId().toString());
+            Set<String> newRoles = user.getProcessRoles().stream()
+                    .filter(role -> !deletedRoleStringIds.contains(role.getStringId()))
+                    .map(ProcessRole::getStringId)
+                    .collect(Collectors.toSet());
+            this.assignRolesToUser(user.getId(), newRoles, loggedUser);
+        }
+
         log.info("[" + net.getStringId() + "]: Deleting all roles of Petri net " + net.getIdentifier() + " version " + net.getVersion().toString());
-        List<ObjectId> roleIds = this.findAll(net).stream().map(ProcessRole::get_id).collect(Collectors.toList());
-        this.processRoleRepository.deleteAllBy_idIn(roleIds);
+        this.processRoleRepository.deleteAllBy_idIn(deletedRoleIds);
     }
 }

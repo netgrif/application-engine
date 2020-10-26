@@ -17,5 +17,5 @@ public interface IProcessRoleService {
 
     ProcessRole defaultRole();
 
-    void deleteRolesOfNet(PetriNet net);
+    void deleteRolesOfNet(PetriNet net, LoggedUser loggedUser);
 }
