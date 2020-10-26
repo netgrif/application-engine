@@ -91,6 +91,7 @@ public class DataService implements IDataService {
                     if (transition.getDataSet().get(fieldId).layoutExist() && transition.getDataSet().get(fieldId).getLayout().layoutFilled()) {
                         field.setLayout(transition.getDataSet().get(fieldId).getLayout().clone());
                     }
+                    resolveComponents(field, transition);
                     dataSetFields.add(field);
                 }
             } else {
@@ -100,6 +101,7 @@ public class DataService implements IDataService {
                     if (transition.getDataSet().get(fieldId).layoutExist() && transition.getDataSet().get(fieldId).getLayout().layoutFilled()) {
                         field.setLayout(transition.getDataSet().get(fieldId).getLayout().clone());
                     }
+                    resolveComponents(field, transition);
                     dataSetFields.add(field);
                 }
             }
@@ -118,6 +120,10 @@ public class DataService implements IDataService {
                 .forEach(index -> dataSetFields.get((int) index).setOrder(index));
 
         return dataSetFields;
+    }
+
+    private void resolveComponents(Field field, Transition transition){
+        field.setComponent(transition.getDataSet().get(field.getImportId()).getComponent());
     }
 
     private boolean isForbidden(String fieldId, Transition transition, DataField dataField) {

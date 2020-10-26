@@ -72,13 +72,14 @@ public class Transition extends Node {
         events = new HashMap<>();
     }
 
-    public void addDataSet(String field, Set<FieldBehavior> behavior, Set<Action> actions, FieldLayout layout){
+    public void addDataSet(String field, Set<FieldBehavior> behavior, Set<Action> actions, FieldLayout layout, Component component){
         if(dataSet.containsKey(field) && dataSet.get(field) != null){
             if(behavior != null) dataSet.get(field).getBehavior().addAll(behavior);
             if(actions != null) dataSet.get(field).getActions().addAll(actions);
             if(layout != null) dataSet.get(field).setLayout(layout);
+            if(component != null) dataSet.get(field).setComponent(component);
         } else {
-            dataSet.put(field,new DataFieldLogic(behavior, actions, layout));
+            dataSet.put(field,new DataFieldLogic(behavior, actions, layout, component));
         }
     }
 
