@@ -68,4 +68,10 @@ public class UserProcessRoleService implements IUserProcessRoleService {
         }
         return DEFAULT_ROLE_ID;
     }
+
+    @Override
+    public void deleteRolesOfNet(PetriNet net) {
+        log.info("[" + net.getStringId() + "]: Deleting all user process roles of Petri net " + net.getIdentifier() + " version " + net.getVersion().toString());
+        this.repository.deleteAllByNetId(net.getStringId());
+    }
 }
