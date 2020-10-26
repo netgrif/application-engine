@@ -1,6 +1,7 @@
 package com.netgrif.workflow.importer.service;
 
 import com.netgrif.workflow.importer.model.*;
+import com.netgrif.workflow.petrinet.domain.Component;
 import com.netgrif.workflow.petrinet.domain.DataGroup;
 import com.netgrif.workflow.petrinet.domain.Event;
 import com.netgrif.workflow.petrinet.domain.EventType;
@@ -398,6 +399,7 @@ public class Importer {
 
         addDataLogic(transition, dataRef);
         addDataLayout(transition, dataRef);
+        addDataComponent(transition, dataRef);
     }
 
     @Transactional
@@ -419,6 +421,7 @@ public class Importer {
         for (DataRef dataRef : importDataGroup.getDataRef()) {
             addDataLogic(transition, dataRef);
             addDataLayout(transition, dataRef);
+            addDataComponent(transition, dataRef);
         }
     }
 
@@ -457,7 +460,7 @@ public class Importer {
                 logic.getBehavior().forEach(b -> behavior.add(FieldBehavior.fromString(b)));
             }
 
-            transition.addDataSet(fieldId, behavior, null, null);
+            transition.addDataSet(fieldId, behavior, null, null, null);
         } catch (NullPointerException e) {
             throw new IllegalArgumentException("Wrong dataRef id [" + dataRef.getId() + "] on transition [" + transition.getTitle() + "]", e);
         }
@@ -487,11 +490,22 @@ public class Importer {
                 template = layout.getTemplate().toString();
             }
 
-            FieldLayout fieldLayout = new FieldLayout(layout.getX(), layout.getY(), layout.getRows(), layout.getCols(), layout.getOffset(), template, appearance, alignment);
-            transition.addDataSet(fieldId, null, null, fieldLayout);
+            FieldLayout fieldLayout = new FieldLayout(layout.getX(), layout.getY(), layout.getRows(), layout.getCols(), layout.getOffset(), layout.getTemplate().toString(), appearance, alignment);
+            transition.addDataSet(fieldId, null, null, fieldLayout, null);
         } catch (NullPointerException e) {
             throw new IllegalArgumentException("Wrong dataRef id [" + dataRef.getId() + "] on transition [" + transition.getTitle() + "]", e);
         }
+    }
+
+    @Transactional
+    protected void addDataComponent(Transition transition, DataRef dataRef){
+        String fieldId = getField(dataRef.getId()).getStringId();
+        Component component;
+        if((dataRef.getComponent()) == null)
+            component = getField(dataRef.getId()).getComponent();
+        else
+            component = new Component(dataRef.getComponent().getName());
+        transition.addDataSet(fieldId, null, null, null, component);
     }
 
     @Transactional
