@@ -3,15 +3,15 @@ package com.netgrif.workflow.pdf.generator.config;
 import lombok.Data;
 import org.apache.pdfbox.pdmodel.font.PDType0Font;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.annotation.Scope;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
-import java.io.File;
 
 @Component
+@PropertySource("classpath:application.properties")
 @ConfigurationProperties(prefix = "nae.pdf.resources")
 @Data
 @Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE)
