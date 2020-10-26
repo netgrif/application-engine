@@ -18,6 +18,8 @@ import java.util.Map;
 public interface IPdfGenerator {
     void setupPdfGenerator(PdfResource pdfResource) throws IOException;
 
+    void setupPdfGenerator(PdfResource pdfResource, float version) throws IOException;
+
     void addCustomField(PdfField field, PdfResource pdfResource) throws IOException;
 
     File generatePdf(Case formCase, String transitionId, PdfResource pdfResource) throws IOException;
