@@ -2,18 +2,18 @@ package com.netgrif.workflow.pdf.generator.domain;
 
 import com.netgrif.workflow.pdf.generator.config.PdfResource;
 import com.netgrif.workflow.pdf.generator.service.fieldbuilder.FieldBuilder;
-import lombok.Data;
+import lombok.*;
 
 import java.util.Collections;
 import java.util.List;
 
-@Data
 public abstract class PdfSelectionField extends PdfField {
 
     public PdfSelectionField(PdfResource resource){
         super(resource);
     }
 
+    @Getter @Setter
     protected List<String> choices = null;
 
     @Override
