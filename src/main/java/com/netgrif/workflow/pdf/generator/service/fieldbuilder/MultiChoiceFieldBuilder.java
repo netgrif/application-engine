@@ -26,7 +26,7 @@ public class MultiChoiceFieldBuilder extends SelectionFieldBuilder {
 
     @Override
     protected String getTranslatedString(Set<I18nString> choices, String value) {
-        return choices.stream().filter(s -> s.toString().equals(value)).map(s -> s.getTranslation(resource.getTextLocale())).findAny().get();
+        return choices.stream().filter(s -> s.toString().equals(value) || s.getKey().equals(value)).map(s -> s.getTranslation(resource.getTextLocale())).findAny().get();
     }
 
 
@@ -40,10 +40,10 @@ public class MultiChoiceFieldBuilder extends SelectionFieldBuilder {
 
         switch (type) {
             case MULTICHOICE_MAP:
-                choices = getTranslatedSet(new HashSet<>(((MultichoiceMapField)petriNet.getDataSet().get(fieldId)).getOptions().values()));
+                choices = getTranslatedSet(resolveOptions(((EnumerationMapField)petriNet.getDataSet().get(fieldId)).getOptions()));
                 if (dataSet.get(fieldId).getValue() != null) {
                     for (I18nString value : (List<I18nString>) dataSet.get(fieldId).getValue()) {
-                        values.add(getTranslatedString(new HashSet<>(((MultichoiceMapField)petriNet.getDataSet().get(fieldId)).getOptions().values()), value.toString()));
+                        values.add(getTranslatedString(resolveOptions(((EnumerationMapField)petriNet.getDataSet().get(fieldId)).getOptions()), value.toString()));
                     }
                 }
                 break;

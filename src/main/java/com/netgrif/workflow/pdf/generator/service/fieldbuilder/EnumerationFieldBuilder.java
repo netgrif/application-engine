@@ -29,7 +29,8 @@ public class EnumerationFieldBuilder extends SelectionFieldBuilder {
 
     @Override
     protected String getTranslatedString(Set<I18nString> choices, String value) {
-        return choices.stream().filter(s -> s.toString().equals(value)).map(s -> s.getTranslation(resource.getTextLocale())).findAny().get();
+        return choices.stream().filter(s -> s.toString().equals(value) || (s.getKey() != null && s.getKey().equals(value)))
+                .map(s -> s.getTranslation(resource.getTextLocale())).findAny().get();
     }
 
     public PdfField buildField(DataGroup dataGroup, String fieldId, DataFieldLogic fieldLogic, Map<String, DataField> dataSet, PetriNet petriNet,
@@ -42,9 +43,9 @@ public class EnumerationFieldBuilder extends SelectionFieldBuilder {
 
         switch (type) {
             case ENUMERATION_MAP:
-                choices = getTranslatedSet(new HashSet<>(((EnumerationMapField)petriNet.getDataSet().get(fieldId)).getOptions().values()));
+                choices = getTranslatedSet(resolveOptions(((EnumerationMapField)petriNet.getDataSet().get(fieldId)).getOptions()));
                 if (dataSet.get(fieldId).getValue() != null) {
-                    values.add(getTranslatedString(new HashSet<>(((EnumerationMapField)petriNet.getDataSet().get(fieldId)).getOptions().values()), dataSet.get(fieldId).getValue().toString()));
+                    values.add(getTranslatedString(resolveOptions(((EnumerationMapField)petriNet.getDataSet().get(fieldId)).getOptions()), dataSet.get(fieldId).getValue().toString()));
                 }
                 break;
             case ENUMERATION:
