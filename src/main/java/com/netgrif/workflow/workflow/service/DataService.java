@@ -91,6 +91,7 @@ public class DataService implements IDataService {
                     if (transition.getDataSet().get(fieldId).layoutExist() && transition.getDataSet().get(fieldId).getLayout().layoutFilled()) {
                         field.setLayout(transition.getDataSet().get(fieldId).getLayout().clone());
                     }
+                    resolveComponents(field, transition);
                     dataSetFields.add(field);
                 }
             } else {
@@ -100,6 +101,7 @@ public class DataService implements IDataService {
                     if (transition.getDataSet().get(fieldId).layoutExist() && transition.getDataSet().get(fieldId).getLayout().layoutFilled()) {
                         field.setLayout(transition.getDataSet().get(fieldId).getLayout().clone());
                     }
+                    resolveComponents(field, transition);
                     dataSetFields.add(field);
                 }
             }
@@ -107,10 +109,21 @@ public class DataService implements IDataService {
 
         workflowService.save(useCase);
 
+        dataSetFields.stream().filter(field -> field instanceof NumberField).forEach(field -> {
+            DataField dataField = useCase.getDataSet().get(field.getImportId());
+            if (dataField.getVersion().equals(0L) && dataField.getValue().equals(0.0)) {
+                field.setValue(null);
+            }
+        });
+
         LongStream.range(0L, dataSetFields.size())
                 .forEach(index -> dataSetFields.get((int) index).setOrder(index));
 
         return dataSetFields;
+    }
+
+    private void resolveComponents(Field field, Transition transition){
+        field.setComponent(transition.getDataSet().get(field.getImportId()).getComponent());
     }
 
     private boolean isForbidden(String fieldId, Transition transition, DataField dataField) {
