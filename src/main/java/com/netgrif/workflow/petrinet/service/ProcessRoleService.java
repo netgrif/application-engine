@@ -73,7 +73,7 @@ public class ProcessRoleService implements IProcessRoleService {
     public void assignRolesToUser(Long userId, Set<String> requestedRolesIds, LoggedUser loggedUser) {
         User user = userService.findById(userId, true);
         List<UserProcessRole> requestedRoles = roleRepository.findByRoleIdIn(requestedRolesIds);
-        if (requestedRoles.isEmpty())
+        if (requestedRoles.isEmpty() && requestedRolesIds.size() != 0)
             throw new IllegalArgumentException("No process roles found.");
         if (requestedRoles.size() != requestedRolesIds.size())
             throw new IllegalArgumentException("Not all process roles were found!");
@@ -237,6 +237,10 @@ public class ProcessRoleService implements IProcessRoleService {
         List<User> usersWithRemovedRoles = this.userService.findAllByProcessRoles(deletedRoleStringIds, false);
         for(User user : usersWithRemovedRoles) {
             log.info("[" + net.getStringId() + "]: Removing deleted roles of Petri net " + net.getIdentifier() + " version " + net.getVersion().toString() + " from user "+ user.getFullName() + " with id "+user.getId().toString());
+
+            if (user.getProcessRoles().size() == 0)
+                continue;
+
             Set<String> newRoles = user.getProcessRoles().stream()
                     .filter(role -> !deletedRoleStringIds.contains(role.getStringId()))
                     .map(ProcessRole::getStringId)
