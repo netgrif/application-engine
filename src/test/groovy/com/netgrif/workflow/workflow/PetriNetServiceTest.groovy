@@ -1,21 +1,17 @@
 package com.netgrif.workflow.workflow
 
 import com.netgrif.workflow.TestHelper
-import com.netgrif.workflow.auth.domain.User
-import com.netgrif.workflow.auth.domain.UserState
 import com.netgrif.workflow.auth.service.interfaces.IUserProcessRoleService
 import com.netgrif.workflow.auth.service.interfaces.IUserService
 import com.netgrif.workflow.ipc.TaskApiTest
 import com.netgrif.workflow.petrinet.domain.PetriNet
 import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository
+import com.netgrif.workflow.petrinet.domain.roles.ProcessRoleRepository
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
-import com.netgrif.workflow.petrinet.service.interfaces.IProcessRoleService
 import com.netgrif.workflow.startup.ImportHelper
 import com.netgrif.workflow.startup.SuperCreator
 import com.netgrif.workflow.utils.FullPageRequest
-import com.netgrif.workflow.workflow.domain.Case
 import com.netgrif.workflow.workflow.domain.repositories.TaskRepository
-import com.netgrif.workflow.workflow.service.interfaces.ITaskService
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService
 import org.junit.Before
 import org.junit.Test
@@ -51,9 +47,6 @@ class PetriNetServiceTest {
     private TaskRepository taskRepository
 
     @Autowired
-    private IProcessRoleService processRoleService
-
-    @Autowired
     private IUserProcessRoleService userProcessRoleService
 
     @Autowired
@@ -61,6 +54,9 @@ class PetriNetServiceTest {
 
     @Autowired
     private PetriNetRepository petriNetRepository
+
+    @Autowired
+    private ProcessRoleRepository processRoleRepository
 
     private def stream = { String name ->
         return TaskApiTest.getClassLoader().getResourceAsStream(name)
@@ -73,6 +69,8 @@ class PetriNetServiceTest {
 
     @Test
     void processDelete() {
+        int processRoleCount = processRoleRepository.findAll().size()
+
         Optional<PetriNet> testNetOptional = petriNetService.importPetriNet(stream(NET_FILE), "major", superCreator.getLoggedSuper())
         assert testNetOptional.isPresent()
         assert petriNetRepository.findAll().size() == 1
@@ -81,14 +79,13 @@ class PetriNetServiceTest {
 
         assert workflowService.getAll(new FullPageRequest()).size() == 1
         assert taskRepository.findAll().size() == 2
-        def roles = processRoleService.findAll(testNet.stringId)
-        assert roles.size() == 2
+        assert processRoleRepository.findAll().size() == processRoleCount + 2
 
         def user = userService.findByEmail("user@netgrif.com", false)
         assert user != null
         assert user.processRoles.size() == 0
 
-        userService.addRole(user, roles.get(0).stringId)
+        userService.addRole(user, testNet.roles.values().collect().get(0).stringId)
         user = userService.findByEmail("user@netgrif.com", false)
         assert user != null
         assert user.processRoles.size() == 1
@@ -98,7 +95,7 @@ class PetriNetServiceTest {
         assert petriNetRepository.findAll().size() == 0
         assert workflowService.getAll(new FullPageRequest()).size() == 0
         assert taskRepository.findAll().size() == 0
-        assert processRoleService.findAll(testNet.stringId).size() == 0
+        assert processRoleRepository.findAll().size() == processRoleCount
         user = userService.findByEmail("user@netgrif.com", false)
         assert user != null
         assert user.processRoles.size() == 0
