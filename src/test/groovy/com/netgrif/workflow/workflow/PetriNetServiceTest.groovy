@@ -91,7 +91,7 @@ class PetriNetServiceTest {
         assert user.processRoles.size() == 1
 
 
-        petriNetService.deletePetriNet(testNet.stringId)
+        petriNetService.deletePetriNet(testNet.stringId, superCreator.getLoggedSuper())
         assert petriNetRepository.findAll().size() == 0
         assert workflowService.getAll(new FullPageRequest()).size() == 0
         assert taskRepository.findAll().size() == 0
