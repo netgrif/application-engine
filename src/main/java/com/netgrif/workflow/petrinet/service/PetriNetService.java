@@ -334,7 +334,7 @@ public abstract class PetriNetService implements IPetriNetService {
         this.processRoleService.deleteRolesOfNet(petriNet);
 
         log.info("[" + processId + "]: Deleting Petri net " + petriNet.getIdentifier() + " version " + petriNet.getVersion().toString());
-        this.repository.deleteByObjectId(petriNet.getObjectId());
+        this.repository.deleteBy_id(petriNet.getObjectId());
     }
 
     private Criteria getProcessRolesCriteria(LoggedUser user) {
