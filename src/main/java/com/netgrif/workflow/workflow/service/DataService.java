@@ -107,6 +107,13 @@ public class DataService implements IDataService {
 
         workflowService.save(useCase);
 
+        dataSetFields.stream().filter(field -> field instanceof NumberField).forEach(field -> {
+            DataField dataField = useCase.getDataSet().get(field.getImportId());
+            if (dataField.getVersion().equals(0L) && dataField.getValue().equals(0.0)) {
+                field.setValue(null);
+            }
+        });
+
         LongStream.range(0L, dataSetFields.size())
                 .forEach(index -> dataSetFields.get((int) index).setOrder(index));
 
