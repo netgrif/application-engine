@@ -23,7 +23,7 @@ public class UserProcessRole {
     private String netId;
 
     @JsonIgnore
-    @ManyToMany(mappedBy = "userProcessRoles", cascade = CascadeType.REMOVE)
+    @ManyToMany(mappedBy = "userProcessRoles")
     private Set<User> users;
 
     public UserProcessRole() {
