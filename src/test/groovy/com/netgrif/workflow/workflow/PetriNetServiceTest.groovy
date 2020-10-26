@@ -73,18 +73,19 @@ class PetriNetServiceTest {
 
     @Test
     void processDelete() {
-        int processRoleCount = processRoleRepository.findAll().size()
-        int userProcessRoleCount = userProcessRoleRepository.findAll().size()
+        long processRoleCount = processRoleRepository.count()
+        long userProcessRoleCount = userProcessRoleRepository.count()
 
         Optional<PetriNet> testNetOptional = petriNetService.importPetriNet(stream(NET_FILE), "major", superCreator.getLoggedSuper())
         assert testNetOptional.isPresent()
-        assert petriNetRepository.findAll().size() == 1
+        assert petriNetRepository.count() == 1
         PetriNet testNet = testNetOptional.get()
         importHelper.createCase("Case 1", testNet)
 
         assert workflowService.getAll(new FullPageRequest()).size() == 1
-        assert taskRepository.findAll().size() == 2
-        assert processRoleRepository.findAll().size() == processRoleCount + 2
+        assert taskRepository.count() == 2
+        assert processRoleRepository.count() == processRoleCount + 2
+        assert userProcessRoleRepository.count() == userProcessRoleCount + 2
 
         def user = userService.findByEmail("user@netgrif.com", false)
         assert user != null
@@ -94,14 +95,13 @@ class PetriNetServiceTest {
         user = userService.findByEmail("user@netgrif.com", false)
         assert user != null
         assert user.processRoles.size() == 1
-        assert userProcessRoleRepository.findAll().size() == userProcessRoleCount + 2
 
         petriNetService.deletePetriNet(testNet.stringId, superCreator.getLoggedSuper())
-        assert petriNetRepository.findAll().size() == 0
+        assert petriNetRepository.count() == 0
         assert workflowService.getAll(new FullPageRequest()).size() == 0
-        assert taskRepository.findAll().size() == 0
-        assert processRoleRepository.findAll().size() == processRoleCount
-        assert userProcessRoleRepository.findAll().size() == userProcessRoleCount
+        assert taskRepository.count() == 0
+        assert processRoleRepository.count() == processRoleCount
+        assert userProcessRoleRepository.count() == userProcessRoleCount
         user = userService.findByEmail("user@netgrif.com", false)
         assert user != null
         assert user.processRoles.size() == 0
