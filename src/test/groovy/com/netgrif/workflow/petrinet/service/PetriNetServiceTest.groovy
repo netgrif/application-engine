@@ -1,4 +1,4 @@
-package com.netgrif.workflow.workflow
+package com.netgrif.workflow.petrinet.service
 
 import com.netgrif.workflow.TestHelper
 import com.netgrif.workflow.auth.domain.repositories.UserProcessRoleRepository
