@@ -3,6 +3,7 @@ package com.netgrif.workflow.petrinet.domain.dataset
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.netgrif.workflow.petrinet.domain.DataEvent
+import com.netgrif.workflow.petrinet.domain.Component
 import com.netgrif.workflow.petrinet.domain.Format
 import com.netgrif.workflow.petrinet.domain.I18nString
 import com.netgrif.workflow.petrinet.domain.Imported
@@ -53,6 +54,8 @@ abstract class Field<T> extends Imported {
     private View view
 
     private Integer length
+
+    private Component component
 
     Field() {
         _id = new ObjectId()
@@ -146,7 +149,6 @@ abstract class Field<T> extends Imported {
         this.immediate = immediate != null && immediate
     }
 
-
     LinkedHashSet<DataEvent> getEvents() {
         return events
     }
@@ -173,6 +175,14 @@ abstract class Field<T> extends Imported {
 
     void setEncryption(String encryption) {
         this.encryption = encryption
+    }
+
+    Component getComponent() {
+        return component
+    }
+
+    void setComponent(Component component) {
+        this.component = component
     }
 
     void clearValue() {}
@@ -249,6 +259,7 @@ abstract class Field<T> extends Imported {
         clone.view = this.view
         clone.format = this.format
         clone.length = this.length
+        clone.component = this.component
     }
 
     abstract Field clone()
