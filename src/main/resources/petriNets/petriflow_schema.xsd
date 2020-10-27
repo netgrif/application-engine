@@ -32,6 +32,7 @@
                 <xs:choice>
                     <xs:element name="view" minOccurs="0" type="fieldView"/>
                 </xs:choice>
+                <xs:element type="component" name="component" minOccurs="0"/>
                 <xs:element ref="encryption" minOccurs="0"/>
                 <xs:element ref="action" minOccurs="0" maxOccurs="unbounded"/>
                 <xs:element ref="actionRef" minOccurs="0" maxOccurs="unbounded"/>
@@ -335,6 +336,11 @@
             </xs:sequence>
         </xs:complexType>
     </xs:element>
+    <xs:complexType name="component">
+        <xs:sequence>
+            <xs:element name="name" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
     <xs:element name="option">
         <xs:complexType>
             <xs:simpleContent>
@@ -402,6 +408,7 @@
                 <xs:element ref="id"/>
                 <xs:element ref="logic"/>
                 <xs:element ref="layout" minOccurs="0"/>
+                <xs:element type="component" name="component" minOccurs="0"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
