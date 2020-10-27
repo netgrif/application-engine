@@ -23,23 +23,29 @@ class ActionMigration {
     void migrateActions(String petriNetPath){
         InputStream netStream = new ClassPathResource(petriNetPath).inputStream
         Optional<PetriNet> newPetriNet = petriNetService.importPetriNet(netStream, "major", userService.loggedOrSystem.transformToLoggedUser())
-        List<PetriNet> oldPetriNets = new ArrayList<>()
+        List<PetriNet> oldPetriNets
 
-        if(newPetriNet.isPresent())
+        if(!newPetriNet.isPresent()) {
+            String message = "Petri net from file [" + petriNetPath + "] was not imported"
+            log.error(message)
+            throw new IllegalArgumentException(message)
+        } else {
             oldPetriNets = petriNetService.getByIdentifier(newPetriNet.get().importId)
                     .stream().filter({ net -> (net.version != newPetriNet.get().version)})
                     .collect(Collectors.toList())
-        else
-            log.error("Petri net from file [" + petriNetPath + "] was not imported.")
+        }
 
-        if(oldPetriNets.size() > 0)
+        if(oldPetriNets.size() == 0){
+            String message = "Older version of Petri net with ID [" + newPetriNet.get().importId + "] is not present in MongoDB."
+            log.error(message)
+            throw new IllegalArgumentException(message)
+        } else {
             oldPetriNets.each {net ->
                 migrateDataSetActions(newPetriNet.get(), net)
                 migrateDataRefActions(newPetriNet.get(), net)
                 petriNetService.save(net)
             }
-        else
-            log.error("Petri net from file [" + petriNetPath + "] was not imported.")
+        }
     }
 
     private void migrateDataSetActions(PetriNet newPetriNet, PetriNet oldPetriNet){
