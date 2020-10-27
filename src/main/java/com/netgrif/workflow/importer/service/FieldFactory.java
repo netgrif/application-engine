@@ -2,6 +2,7 @@ package com.netgrif.workflow.importer.service;
 
 import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.importer.model.*;
+import com.netgrif.workflow.petrinet.domain.Component;
 import com.netgrif.workflow.petrinet.domain.Format;
 import com.netgrif.workflow.petrinet.domain.I18nString;
 import com.netgrif.workflow.petrinet.domain.dataset.*;
@@ -9,7 +10,6 @@ import com.netgrif.workflow.petrinet.domain.views.View;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.DataField;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -20,7 +20,7 @@ import java.time.format.DateTimeParseException;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Component
+@org.springframework.stereotype.Component
 public final class FieldFactory {
 
     @Autowired
@@ -28,6 +28,12 @@ public final class FieldFactory {
 
     @Autowired
     private ViewFactory viewFactory;
+
+    @Autowired
+    private ComponentFactory componentFactory;
+
+    @Autowired
+    private IDataValidator dataValidator;
 
     // TODO: refactor this shit
     Field getField(Data data, Importer importer) throws IllegalArgumentException {
@@ -118,8 +124,16 @@ public final class FieldFactory {
             View view = viewFactory.buildView(data);
             field.setView(view);
         }
+
+        if (data.getComponent() != null) {
+            Component component = componentFactory.buildComponent(data);
+            field.setComponent(component);
+        }
+
+        setActions(field, data);
         setEncryption(field, data);
 
+        dataValidator.checkDeprecatedAttributes(data);
         return field;
     }
 
@@ -203,6 +217,12 @@ public final class FieldFactory {
         FileListField fileListField = new FileListField();
         fileListField.setRemote(data.getRemote() != null);
         return fileListField;
+    }
+
+    private void setActions(Field field, Data data) {
+        if (data.getAction() != null && data.getAction().size() != 0) {
+//            data.getAction().forEach(action -> field.addAction(action.getValue(), action.getTrigger()));
+        }
     }
 
     private void setEncryption(Field field, Data data) {
