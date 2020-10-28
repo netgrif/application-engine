@@ -2,10 +2,10 @@ package com.netgrif.workflow.pdf.generator.service.fieldbuilder;
 
 import com.netgrif.workflow.pdf.generator.config.PdfResource;
 import com.netgrif.workflow.pdf.generator.domain.PdfField;
-import com.netgrif.workflow.petrinet.domain.DataFieldLogic;
 import com.netgrif.workflow.petrinet.domain.DataGroup;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.FieldLayout;
+import com.netgrif.workflow.workflow.web.responsebodies.LocalisedField;
 import lombok.Getter;
 
 import java.util.ArrayList;
@@ -27,7 +27,7 @@ public abstract class FieldBuilder {
         return petriNet.getDataSet().get(fieldStringId).getName().getTranslation(resource.getTextLocale());
     }
 
-    protected void setFieldParams(DataGroup dg, DataFieldLogic field, PdfField pdfField) {
+    protected void setFieldParams(DataGroup dg, LocalisedField field, PdfField pdfField) {
         pdfField.setLayoutX(countFieldLayoutX(dg, field));
         pdfField.setLayoutY(countFieldLayoutY(dg, field));
         pdfField.setWidth(countFieldWidth(dg, field));
@@ -43,24 +43,20 @@ public abstract class FieldBuilder {
         pdfField.countMultiLineHeight(fontSize, resource);
     }
 
-    private int countFieldLayoutX(DataGroup dataGroup, DataFieldLogic field) {
+    private int countFieldLayoutX(DataGroup dataGroup, LocalisedField field) {
         int x = 0;
-        if (checkCol(field.getLayout())) {
+        /*if (field.getLayout() != null) {
             x = field.getLayout().getX();
-            lastX = x;
-        } else if (dataGroup.getStretch() == null || !dataGroup.getStretch()) {
+        } else */if (dataGroup.getStretch() == null || !dataGroup.getStretch()) {
             lastX = (lastX == 0 ? 2 : 0);
             x = lastX;
         }
         return x;
     }
 
-    private int countFieldLayoutY(DataGroup dataGroup, DataFieldLogic field) {
+    private int countFieldLayoutY(DataGroup dataGroup, LocalisedField field) {
         int y;
-        if (checkRow(field.getLayout())) {
-            y = field.getLayout().getY();
-            lastY = y;
-        } else if (dataGroup.getStretch() != null && dataGroup.getStretch()) {
+        if (dataGroup.getStretch() != null && dataGroup.getStretch()){
             y = ++lastY;
         } else {
             lastY = (lastX == 0 ? ++lastY : lastY);
@@ -105,22 +101,22 @@ public abstract class FieldBuilder {
         return result;
     }
 
-    private int countFieldWidth(DataGroup dataGroup, DataFieldLogic field) {
-        if (checkCol(field.getLayout())) {
+    private int countFieldWidth(DataGroup dataGroup, LocalisedField field) {
+/*        if (checkCol(field.getLayout())) {
             return field.getLayout().getCols() * resource.getFormGridColWidth() - resource.getPadding();
-        } else {
+        } else {*/
             return (dataGroup.getStretch() != null && dataGroup.getStretch() ?
                     (resource.getFormGridColWidth() * resource.getFormGridCols())
                     : (resource.getFormGridColWidth() * resource.getFormGridCols() / 2)) - resource.getPadding();
-        }
+        /*}*/
     }
 
-    private int countFieldHeight(DataFieldLogic field) {
-        if (checkRow(field.getLayout())) {
+    private int countFieldHeight(LocalisedField field) {
+/*        if (checkRow(field.getLayout())) {
             return field.getLayout().getRows() * resource.getFormGridRowHeight() - resource.getPadding();
-        } else {
+        } else {*/
             return resource.getFormGridRowHeight() - resource.getPadding();
-        }
+        /*}*/
     }
 
     private boolean checkRow(FieldLayout layout){
