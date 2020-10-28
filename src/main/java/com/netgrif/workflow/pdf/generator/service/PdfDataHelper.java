@@ -214,7 +214,6 @@ public class PdfDataHelper implements IPdfDataHelper {
         pdfFields.forEach(field -> {
             if (currentField != field) {
                 shiftField(currentField, field);
-//                shiftField(field, currentField);
             }
         });
     }
