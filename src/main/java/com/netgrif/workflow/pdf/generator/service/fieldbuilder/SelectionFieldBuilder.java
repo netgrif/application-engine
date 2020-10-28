@@ -15,10 +15,6 @@ public abstract class SelectionFieldBuilder extends FieldBuilder {
         super(resource);
     }
 
-    protected abstract List<String> getTranslatedSet(Set<I18nString> choices);
-
-    protected abstract String getTranslatedString(Set<I18nString> choices, String value);
-
     protected void setFieldPositions(PdfSelectionField pdfField, int fontSize) {
         pdfField.setX(countPosX(pdfField));
         pdfField.setOriginalTopY(countTopPosY(pdfField, resource));
