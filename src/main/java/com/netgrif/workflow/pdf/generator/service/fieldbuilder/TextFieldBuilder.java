@@ -5,10 +5,14 @@ import com.netgrif.workflow.pdf.generator.domain.PdfField;
 import com.netgrif.workflow.pdf.generator.domain.PdfTextField;
 import com.netgrif.workflow.petrinet.domain.DataGroup;
 import com.netgrif.workflow.petrinet.domain.dataset.FileFieldValue;
+import com.netgrif.workflow.utils.DateUtils;
 import com.netgrif.workflow.workflow.web.responsebodies.LocalisedField;
 
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Date;
 
 public class TextFieldBuilder extends FieldBuilder{
 
@@ -47,16 +51,26 @@ public class TextFieldBuilder extends FieldBuilder{
     }
 
     private String formatDate(LocalisedField field) {
+        Date value = new Date();
         if (field.getValue() != null) {
-            return new SimpleDateFormat(resource.getDateFormat().getValue()).format(field.getValue());
+            if(field.getValue() instanceof LocalDate)
+                value = DateUtils.localDateToDate((LocalDate) field.getValue());
+            else if(field.getValue() instanceof Date)
+                value = (Date) field.getValue();
+            return new SimpleDateFormat(resource.getDateFormat().getValue()).format(value);
         } else {
             return "";
         }
     }
 
     private String formatDateTime(LocalisedField field) {
+        Date value = new Date();
         if (field.getValue() != null) {
-            return new SimpleDateFormat(resource.getDateTimeFormat().getValue()).format(field.getValue());
+            if(field.getValue() instanceof LocalDateTime)
+                value = DateUtils.localDateTimeToDate((LocalDateTime) field.getValue());
+            else if(field.getValue() instanceof Date)
+                value = (Date) field.getValue();
+            return new SimpleDateFormat(resource.getDateTimeFormat().getValue()).format(value);
         } else {
             return "";
         }
