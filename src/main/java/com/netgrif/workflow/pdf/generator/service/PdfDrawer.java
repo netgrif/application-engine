@@ -207,7 +207,7 @@ public class PdfDrawer implements IPdfDrawer {
         contentStream.setFont(font, fontSize);
         contentStream.beginText();
         contentStream.newLineAtOffset(x, y);
-        contentStream.showText(text);
+        contentStream.showText(text.replaceAll("\\s{1,}", " "));
         contentStream.endText();
     }
 
