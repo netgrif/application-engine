@@ -59,11 +59,11 @@ public abstract class FieldBuilder {
         int y;
         if (checkFullRow(dataGroup, field)){
             y = ++lastY;
-            resource.setRowGridFree(resource.getFormGridCols());
+            resolveRowGridFree(dataGroup, field.getLayout());
         } else {
             if(lastX == 0){
                 y = ++lastY;
-                resource.setRowGridFree(resource.getFormGridCols());
+                resolveRowGridFree(dataGroup, field.getLayout());
             }else{
                 y = lastY;
                 resource.setRowGridFree(field.getLayout() == null ? 2 : resource.getRowGridFree() - field.getLayout().getCols());
@@ -126,7 +126,20 @@ public abstract class FieldBuilder {
         return (dataGroup.getTitle() != null && dataGroup.getStretch() != null && dataGroup.getStretch()) ||
                 (field.getLayout() != null && resource.getRowGridFree() < field.getLayout().getCols());
     }
+
     private boolean checkCol(FieldLayout layout){
         return layout != null && layout.getCols() != null;
+    }
+
+    private void resolveRowGridFree(DataGroup dataGroup, FieldLayout layout){
+        if(layout != null && layout.getCols() != null){
+            resource.setRowGridFree(resource.getFormGridCols() - layout.getCols());
+        }else{
+            if(dataGroup.getStretch() != null && dataGroup.getStretch())
+                resource.setRowGridFree(0);
+            else{
+                resource.setRowGridFree(resource.getFormGridCols() - 2);
+            }
+        }
     }
 }

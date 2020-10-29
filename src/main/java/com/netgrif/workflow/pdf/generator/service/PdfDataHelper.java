@@ -135,6 +135,7 @@ public class PdfDataHelper implements IPdfDataHelper {
             switch (field.getType()) {
                 case BUTTON:
                 case TASK_REF:
+                case FILE:
                     break;
                 case ENUMERATION_MAP:
                     pdfField = createEnumMapField(dataGroup, (LocalisedEnumerationMapField) field);
