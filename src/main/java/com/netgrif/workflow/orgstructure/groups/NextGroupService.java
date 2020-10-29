@@ -100,8 +100,8 @@ public class NextGroupService implements INextGroupService {
         dataService.setData(initTask.getStringId(), ImportHelper.populateDataset(taskData));
 
         try {
-            taskService.assignTask(initTask.getStringId());
-            taskService.finishTask(initTask.getStringId());
+            taskService.assignTask(author.transformToLoggedUser(), initTask.getStringId());
+            taskService.finishTask(author.transformToLoggedUser(), initTask.getStringId());
         } catch (TransitionNotExecutableException e) {
             log.error(e.getMessage());
         }
