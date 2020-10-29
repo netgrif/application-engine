@@ -8,6 +8,7 @@ import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.auth.web.requestbodies.UpdateUserRequest;
 import com.netgrif.workflow.event.events.user.UserRegistrationEvent;
 import com.netgrif.workflow.orgstructure.domain.Member;
+import com.netgrif.workflow.orgstructure.groups.interfaces.INextGroupService;
 import com.netgrif.workflow.orgstructure.service.IMemberService;
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRoleRepository;
 import com.netgrif.workflow.startup.SystemUserRunner;
@@ -48,6 +49,9 @@ public class UserService implements IUserService {
     @Autowired
     private IMemberService memberService;
 
+    @Autowired
+    private INextGroupService groupService;
+
     @Override
     public User saveNew(User user) {
         encodeUserPassword(user);
@@ -55,6 +59,8 @@ public class UserService implements IUserService {
         addDefaultAuthorities(user);
 
         User savedUser = userRepository.save(user);
+        groupService.createGroup(user);
+        groupService.addUserToDefaultGroup(user);
         savedUser.setGroups(user.getGroups());
         upsertGroupMember(savedUser);
         publisher.publishEvent(new UserRegistrationEvent(savedUser));
@@ -131,6 +137,7 @@ public class UserService implements IUserService {
         if (!user.isPresent())
             throw new IllegalArgumentException("Could not find user with id ["+id+"]");
         if (!small) {
+            loadGroups(user.get());
             return loadProcessRoles(user.get());
         }
         return user.get();
@@ -139,8 +146,10 @@ public class UserService implements IUserService {
     @Override
     public User findByEmail(String email, boolean small) {
         User user = userRepository.findByEmail(email);
-        if (!small)
+        if (!small) {
+            loadGroups(user);
             return loadProcessRoles(user);
+        }
         return user;
     }
 
@@ -260,6 +269,13 @@ public class UserService implements IUserService {
             return null;
         user.setProcessRoles(processRoleRepository.findAllById(user.getUserProcessRoles()
                 .stream().map(UserProcessRole::getRoleId).collect(Collectors.toList())));
+        return user;
+    }
+
+    private User loadGroups(User user){
+        if (user == null)
+            return null;
+        user.setNextGroups(this.groupService.getAllGroupsOfUser(user));
         return user;
     }
 }

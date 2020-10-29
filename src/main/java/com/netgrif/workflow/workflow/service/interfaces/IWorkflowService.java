@@ -1,6 +1,7 @@
 package com.netgrif.workflow.workflow.service.interfaces;
 
 import com.netgrif.workflow.auth.domain.LoggedUser;
+import com.netgrif.workflow.petrinet.domain.I18nString;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.Task;
@@ -35,6 +36,8 @@ public interface IWorkflowService {
     Page<Case> searchAll(Predicate predicate);
 
     Case searchOne(Predicate predicate);
+
+    Map<String, I18nString> listToMap(List<Case> cases);
 
     List<Field> getData(String caseId);
 
