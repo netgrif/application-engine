@@ -88,10 +88,10 @@ public abstract class FieldBuilder {
         StringTokenizer tokenizer;
         StringBuilder output;
         List<String> result = new ArrayList<>();
-        int lineLen = 1;
+        int lineLen = 0;
 
         for (String value : values) {
-            tokenizer = new StringTokenizer(value, " ");
+            tokenizer = new StringTokenizer(value.trim(), " ");
             output = new StringBuilder(value.length());
             while (tokenizer.hasMoreTokens()) {
                 String word = tokenizer.nextToken();
@@ -103,6 +103,7 @@ public abstract class FieldBuilder {
                 output.append(word + " ");
                 lineLen += word.length() + 1;
             }
+            lineLen = 0;
             result.addAll(Arrays.asList(output.toString().split("\n")));
         }
         return result;
