@@ -67,15 +67,20 @@ public class AuthenticationController {
     @ApiOperation(value = "New user registration")
     @PostMapping(value = "/signup", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public MessageResource signup(@RequestBody RegistrationRequest regRequest) {
-        if (!registrationService.verifyToken(regRequest.token))
-            return MessageResource.errorMessage("Registration of " + regRequest.email + " has failed! Invalid token!");
+        try {
+            if (!registrationService.verifyToken(regRequest.token))
+                return MessageResource.errorMessage("Registration of " + regRequest.email + " has failed! Invalid token!");
 
-        regRequest.password = new String(Base64.getDecoder().decode(regRequest.password));
-        User user = registrationService.registerUser(regRequest);
-        if (user == null)
-            return MessageResource.errorMessage("Registration of " + regRequest.email + " has failed! No user with this email was found.");
+            regRequest.password = new String(Base64.getDecoder().decode(regRequest.password));
+            User user = registrationService.registerUser(regRequest);
+            if (user == null)
+                return MessageResource.errorMessage("Registration of " + regRequest.email + " has failed! No user with this email was found.");
 
-        return MessageResource.successMessage("Registration complete");
+            return MessageResource.successMessage("Registration complete");
+        } catch (InvalidUserTokenException e) {
+            log.error(e.getMessage());
+            return MessageResource.errorMessage("Invalid token!");
+        }
     }
 
     @ApiOperation(value = "Send invitation to a new user", authorizations = @Authorization("BasicAuth"))
