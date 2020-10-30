@@ -131,8 +131,9 @@ public class RegistrationService implements IRegistrationService {
 
     @Override
     public User registerUser(RegistrationRequest registrationRequest) throws InvalidUserTokenException {
-        log.info("Registering user " + registrationRequest.email);
-        User user = userRepository.findByEmail(decodeToken(registrationRequest.token)[0]);
+        String email = decodeToken(registrationRequest.token)[0];
+        log.info("Registering user " + email);
+        User user = userRepository.findByEmail(email);
         if (user == null)
             return null;
 

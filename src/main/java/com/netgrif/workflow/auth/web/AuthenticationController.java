@@ -68,13 +68,14 @@ public class AuthenticationController {
     @PostMapping(value = "/signup", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public MessageResource signup(@RequestBody RegistrationRequest regRequest) {
         try {
+            String email = registrationService.decodeToken(regRequest.token)[0];
             if (!registrationService.verifyToken(regRequest.token))
-                return MessageResource.errorMessage("Registration of " + regRequest.email + " has failed! Invalid token!");
+                return MessageResource.errorMessage("Registration of " + email + " has failed! Invalid token!");
 
             regRequest.password = new String(Base64.getDecoder().decode(regRequest.password));
             User user = registrationService.registerUser(regRequest);
             if (user == null)
-                return MessageResource.errorMessage("Registration of " + regRequest.email + " has failed! No user with this email was found.");
+                return MessageResource.errorMessage("Registration of " + email + " has failed! No user with this email was found.");
 
             return MessageResource.successMessage("Registration complete");
         } catch (InvalidUserTokenException e) {
