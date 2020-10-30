@@ -256,9 +256,6 @@ public class PdfDataHelper implements IPdfDataHelper {
     }
 
     private boolean isNotHidden(LocalisedField field){
-        if(!field.getBehavior().has("hidden") || !field.getBehavior().get("hidden").asBoolean()){
-            return true;
-        }
-        return false;
+        return !field.getBehavior().has("hidden") || !field.getBehavior().get("hidden").asBoolean();
     }
 }
