@@ -5,6 +5,8 @@ import com.netgrif.workflow.auth.domain.User
 import com.netgrif.workflow.auth.service.interfaces.IUserService
 import com.netgrif.workflow.configuration.ApplicationContextProvider
 import com.netgrif.workflow.importer.service.FieldFactory
+import com.netgrif.workflow.mail.EmailType
+import com.netgrif.workflow.mail.interfaces.IMailService
 import com.netgrif.workflow.orgstructure.domain.Group
 import com.netgrif.workflow.orgstructure.domain.Member
 import com.netgrif.workflow.orgstructure.service.GroupService
@@ -79,6 +81,9 @@ class ActionDelegate {
 
     @Autowired
     IPdfGenerator pdfGenerator
+
+    @Autowired
+    IMailService mailService
 
     /**
      * Reference of case in which current action is taking place.
@@ -619,5 +624,13 @@ class ActionDelegate {
         pdfGenerator.setupPdfGenerator(pdfResource)
         pdfGenerator.generatePdf(useCase, transitionId, pdfResource)
         change useCase.getField(fileFieldId) value {new FileFieldValue(filename, storagePath)}
+    }
+
+    void sendMail(List<String> recipients, EmailType type, Map<String, Object> model, Map<String, File> attachments = new HashMap<>()){
+        mailService.sendMail(recipients, type, model, attachments)
+    }
+
+    void sendMail(List<String> recipients, String subject, String text, boolean isHtml = false, Map<String, File> attachments = new HashMap<>()){
+        mailService.sendMail(recipients, subject, text, isHtml, attachments)
     }
 }

@@ -108,7 +108,35 @@ public class MailService implements IMailService {
 //        }
     }
 
+    @Override
+    public void sendMail(List<String> recipients, EmailType type, Map<String, Object> model, Map<String, File> attachments) throws MessagingException, IOException, TemplateException {
+        MimeMessage email = buildEmail(type, recipients, model, new HashMap<>());
+        mailSender.send(email);
+
+        StringBuilder recipientsBuilder = new StringBuilder("");
+        recipients.forEach(recipient -> {
+            recipientsBuilder.append(recipient).append(" ");
+        });
+        log.info("Email sent to [" + recipientsBuilder.toString() + "]");
+    }
+
+    @Override
+    public void sendMail(List<String> recipients, String subject, String text, boolean isHtml, Map<String, File> attachments) throws MessagingException, IOException, TemplateException {
+        MimeMessage email = buildEmail(recipients, subject, text, isHtml, attachments);
+        mailSender.send(email);
+
+        StringBuilder recipientsBuilder = new StringBuilder("");
+        recipients.forEach(recipient -> {
+            recipientsBuilder.append(recipient).append(" ");
+        });
+        log.info("Email sent to [ " + recipientsBuilder.toString() + "]");
+    }
+
     protected MimeMessage buildEmail(EmailType type, List<String> recipients, Map<String, Object> model, Map<String, File> attachments) throws MessagingException, IOException, TemplateException {
+        if(type.template == null || type.subject == null){
+            log.error("The email has no template or subject defined in object of EmailType.");
+            throw new NullPointerException();
+        }
         MimeMessage message = mailSender.createMimeMessage();
         message.setSubject(type.subject);
         MimeMessageHelper helper = new MimeMessageHelper(message, true, StandardCharsets.UTF_8.name());
@@ -125,6 +153,26 @@ public class MailService implements IMailService {
         });
         return message;
     }
+
+    protected MimeMessage buildEmail(List<String> recipients, String subject, String text, boolean isHtml, Map<String, File> attachments) throws MessagingException, IOException, TemplateException {
+        MimeMessage message = mailSender.createMimeMessage();
+        message.setSubject(subject);
+        MimeMessageHelper helper = new MimeMessageHelper(message, true, StandardCharsets.UTF_8.name());
+        helper.setFrom(mailFrom);
+        helper.setTo(recipients.toArray(new String[recipients.size()]));
+        helper.setText(text, isHtml);
+
+        attachments.forEach((s, inputStream) -> {
+            try {
+                helper.addAttachment(s, inputStream);
+            } catch (MessagingException e) {
+                log.error("Building email failed: ", e);
+            }
+        });
+        return message;
+    }
+
+
 
     protected String getServerURL() {
         String encryptedHttp = ssl ? "https://" : "http://";
