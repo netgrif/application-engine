@@ -152,7 +152,12 @@ public class WorkflowService implements IWorkflowService {
     @Override
     public Page<Case> search(Map<String, Object> request, Pageable pageable, LoggedUser user, Locale locale) {
         Predicate searchPredicate = searchService.buildQuery(request, user, locale);
-        Page<Case> page = repository.findAll(searchPredicate, pageable);
+        Page<Case> page;
+        if (searchPredicate != null) {
+            page = repository.findAll(searchPredicate, pageable);
+        } else {
+            page = Page.empty();
+        }
         page.getContent().forEach(this::setPetriNet);
         decryptDataSets(page.getContent());
         return setImmediateDataFields(page);
@@ -161,7 +166,11 @@ public class WorkflowService implements IWorkflowService {
     @Override
     public long count(Map<String, Object> request, LoggedUser user, Locale locale) {
         Predicate searchPredicate = searchService.buildQuery(request, user, locale);
-        return repository.count(searchPredicate);
+        if (searchPredicate != null) {
+            return repository.count(searchPredicate);
+        } else {
+            return 0;
+        }
     }
 
     @Override
