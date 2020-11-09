@@ -61,6 +61,8 @@
         </init>
         <component>
             <name>textarea</name>
+            <property key="color">red</property>
+            <property key="fontSize">12</property>
         </component>
     </data>
 
