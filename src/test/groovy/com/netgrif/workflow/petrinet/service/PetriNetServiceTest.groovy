@@ -75,15 +75,18 @@ class PetriNetServiceTest {
     void processDelete() {
         long processRoleCount = processRoleRepository.count()
         long userProcessRoleCount = userProcessRoleRepository.count()
+        long processCount = petriNetRepository.count()
+        int caseCount = workflowService.getAll(new FullPageRequest()).size()
+        long taskCount = taskRepository.count()
 
         Optional<PetriNet> testNetOptional = petriNetService.importPetriNet(stream(NET_FILE), "major", superCreator.getLoggedSuper())
         assert testNetOptional.isPresent()
-        assert petriNetRepository.count() == 1
+        assert petriNetRepository.count() == processCount + 1
         PetriNet testNet = testNetOptional.get()
         importHelper.createCase("Case 1", testNet)
 
-        assert workflowService.getAll(new FullPageRequest()).size() == 1
-        assert taskRepository.count() == 2
+        assert workflowService.getAll(new FullPageRequest()).size() == caseCount + 1
+        assert taskRepository.count() == taskCount + 2
         assert processRoleRepository.count() == processRoleCount + 2
         assert userProcessRoleRepository.count() == userProcessRoleCount + 2
 
@@ -97,9 +100,9 @@ class PetriNetServiceTest {
         assert user.processRoles.size() == 1
 
         petriNetService.deletePetriNet(testNet.stringId, superCreator.getLoggedSuper())
-        assert petriNetRepository.count() == 0
-        assert workflowService.getAll(new FullPageRequest()).size() == 0
-        assert taskRepository.count() == 0
+        assert petriNetRepository.count() == processCount
+        assert workflowService.getAll(new FullPageRequest()).size() == caseCount
+        assert taskRepository.count() == taskCount
         assert processRoleRepository.count() == processRoleCount
         assert userProcessRoleRepository.count() == userProcessRoleCount
         user = userService.findByEmail("user@netgrif.com", false)
