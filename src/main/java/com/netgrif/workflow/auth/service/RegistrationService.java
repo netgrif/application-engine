@@ -8,7 +8,6 @@ import com.netgrif.workflow.auth.service.interfaces.IRegistrationService;
 import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.auth.web.requestbodies.NewUserRequest;
 import com.netgrif.workflow.auth.web.requestbodies.RegistrationRequest;
-import com.netgrif.workflow.orgstructure.groups.interfaces.INextGroupService;
 import com.netgrif.workflow.orgstructure.service.IGroupService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -131,9 +130,10 @@ public class RegistrationService implements IRegistrationService {
     }
 
     @Override
-    public User registerUser(RegistrationRequest registrationRequest) {
-        log.info("Registering user " + registrationRequest.email);
-        User user = userRepository.findByEmail(registrationRequest.email);
+    public User registerUser(RegistrationRequest registrationRequest) throws InvalidUserTokenException {
+        String email = decodeToken(registrationRequest.token)[0];
+        log.info("Registering user " + email);
+        User user = userRepository.findByEmail(email);
         if (user == null)
             return null;
 

@@ -4,6 +4,7 @@ import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.petrinet.domain.I18nString;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.querydsl.core.types.Predicate;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -11,7 +12,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+@ConditionalOnProperty(value = "nae.group.default.enabled",
+        havingValue = "true",
+        matchIfMissing = true)
 public interface INextGroupService {
+
+    Case createDefaultSystemGroup(User author);
 
     Case createGroup(User author);
 
