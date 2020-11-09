@@ -47,6 +47,9 @@ class PdfGeneratorTest {
     private IPetriNetService petriNetService
 
     @Autowired
+    private PdfResource pdfResource
+
+    @Autowired
     private IDataService dataService;
 
     @Autowired
