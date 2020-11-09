@@ -224,8 +224,7 @@ public class NextGroupService implements INextGroupService {
 
     @Override
     public Set<String> getAllGroupsOfUser(User groupUser) {
-        QCase qCase = new QCase("case");
-        List<String> groupList = workflowService.searchAll(qCase.processIdentifier.eq(GROUP_CASE_IDENTIFIER).and(qCase.dataSet.get(GROUP_MEMBERS_FIELD).options.containsKey(groupUser.getId().toString())))
+        List<String> groupList = workflowService.searchAll(groupCase().and(QCase.case$.dataSet.get(GROUP_MEMBERS_FIELD).options.containsKey(groupUser.getId().toString())))
                 .map(aCase -> aCase.get_id().toString()).getContent();
         return new HashSet<>(groupList);
     }
@@ -248,14 +247,6 @@ public class NextGroupService implements INextGroupService {
     @Override
     public Collection<String> getGroupsOwnerEmails(Collection<String> groupIds) {
         return this.findByIds(groupIds).stream().map(this::getGroupOwnerEmail).collect(Collectors.toList());
-    }
-
-    @Override
-    public Set<String> getAllGroupsOfUser(User groupUser) {
-        QCase qCase = new QCase("case");
-        List<String> groupList = workflowService.searchAll(qCase.processIdentifier.eq(GROUP_CASE_IDENTIFIER).and(qCase.dataSet.get(GROUP_MEMBERS_FIELD).options.containsKey(groupUser.getId().toString())))
-                .map(aCase -> aCase.get_id().toString()).getContent();
-        return new HashSet<>(groupList);
     }
 
     private static BooleanExpression groupCase() {
@@ -288,8 +279,7 @@ public class NextGroupService implements INextGroupService {
     }
 
     private Case findUserDefaultGroup(User author){
-        QCase qCase = new QCase("case");
-        return workflowService.searchOne(qCase.author.id.eq(author.getId()).and(qCase.title.eq(author.getFullName())));
+        return workflowService.searchOne(QCase.case$.author.id.eq(author.getId()).and(QCase.case$.title.eq(author.getFullName())));
     }
 
     private Task getGroupInitTask(Case groupCase){
