@@ -6,6 +6,7 @@ import com.netgrif.workflow.workflow.domain.Case;
 import com.querydsl.core.types.Predicate;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -24,6 +25,8 @@ public interface INextGroupService {
 
     Case findGroup(String groupID);
 
+    List<Case> findByIds(Collection<String> groupIds);
+
     List<Case> findAllGroups();
 
     Case findDefaultGroup();
@@ -36,7 +39,6 @@ public interface INextGroupService {
 
     void addUser(User user, Case groupCase);
 
-
     Map<String, I18nString> addUser(User user, Map<String, I18nString> existingUsers);
 
     void removeUser(User user, Case groupCase);
@@ -46,4 +48,12 @@ public interface INextGroupService {
     List<User> getMembers(Case groupCase);
 
     Set<String> getAllGroupsOfUser(User groupUser);
+
+    Long getGroupOwnerId(String groupId);
+
+    Collection<Long> getGroupsOwnerIds(Collection<String> groupIds);
+
+    String getGroupOwnerEmail(String groupId);
+
+    Collection<String> getGroupsOwnerEmails(Collection<String> groupIds);
 }

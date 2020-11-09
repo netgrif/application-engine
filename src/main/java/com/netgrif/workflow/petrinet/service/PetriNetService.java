@@ -4,6 +4,7 @@ import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.auth.service.interfaces.IUserProcessRoleService;
 import com.netgrif.workflow.event.events.model.UserImportModelEvent;
 import com.netgrif.workflow.importer.service.Importer;
+import com.netgrif.workflow.orgstructure.groups.interfaces.INextGroupService;
 import com.netgrif.workflow.petrinet.domain.EventPhase;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.Transition;
@@ -77,6 +78,9 @@ public abstract class PetriNetService implements IPetriNetService {
 
     @Autowired
     private IRuleEngine ruleEngine;
+
+    @Autowired
+    private INextGroupService groupService;
 
     private Map<ObjectId, PetriNet> cache = new HashMap<>();
 
@@ -296,7 +300,14 @@ public abstract class PetriNetService implements IPetriNetService {
 
         criteria.forEach((key, value) -> {
             Criteria valueCriteria;
-            if (value instanceof List)
+            if (key.equalsIgnoreCase("group")) {
+                if (value instanceof List) {
+                    Collection<String> authors = this.groupService.getGroupsOwnerEmails((List<String>) value);
+                    valueCriteria = Criteria.where("author.email").in(authors);
+                } else {
+                    valueCriteria = Criteria.where("author.email").is(this.groupService.getGroupOwnerEmail((String) value));
+                }
+            } else if (value instanceof List)
                 valueCriteria = Criteria.where(key).in(value);
             else if (key.equalsIgnoreCase("title") || key.equalsIgnoreCase("initials") || key.equalsIgnoreCase("identifier"))
                 valueCriteria = Criteria.where(key).regex((String) value, "i");
