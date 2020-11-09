@@ -81,8 +81,7 @@ public class DataService implements IDataService {
             if (isForbidden(fieldId, transition, useCase.getDataField(fieldId)))
                 return;
 
-            resolveActions(useCase.getPetriNet().getField(fieldId).get(),
-                    Action.ActionTrigger.GET, useCase, transition);
+            resolveDataEvents(useCase.getPetriNet().getField(fieldId).get(), Action.ActionTrigger.GET, EventPhase.PRE, useCase, transition);
 
             if (useCase.hasFieldBehavior(fieldId, transition.getStringId())) {
                 if (useCase.getDataSet().get(fieldId).isDisplayable(transition.getStringId())) {
@@ -105,6 +104,7 @@ public class DataService implements IDataService {
                     dataSetFields.add(field);
                 }
             }
+            resolveDataEvents(useCase.getPetriNet().getField(fieldId).get(), Action.ActionTrigger.GET, EventPhase.POST, useCase, transition);
         });
 
         workflowService.save(useCase);
@@ -157,9 +157,13 @@ public class DataService implements IDataService {
                 dataField = useCase.getDataField(fieldId);
             }
             if (dataField != null) {
+                Map<String, ChangedField> changedFieldMap = resolveDataEvents(useCase.getPetriNet().getField(fieldId).get(),
+                        Action.ActionTrigger.SET, EventPhase.PRE, useCase, useCase.getPetriNet().getTransition(task.getTransitionId()));
+
                 dataField.setValue(parseFieldsValues(entry.getValue(), dataField));
-                Map<String, ChangedField> changedFieldMap = resolveActions(useCase.getPetriNet().getField(fieldId).get(),
-                        Action.ActionTrigger.SET, useCase, useCase.getPetriNet().getTransition(task.getTransitionId()));
+
+                changedFieldMap.putAll(resolveDataEvents(useCase.getPetriNet().getField(fieldId).get(),
+                        Action.ActionTrigger.SET, EventPhase.POST, useCase, useCase.getPetriNet().getTransition(task.getTransitionId())));
                 mergeChanges(changedFields, changedFieldMap);
             } else try {
                 if (entry.getKey().contains("-")) {
@@ -291,7 +295,10 @@ public class DataService implements IDataService {
 
     @Override
     public FileFieldInputStream getFileByName(Case useCase, FileListField field, String name) {
-        field.getActions().forEach(action -> actionsRunner.run(action, useCase));
+        field.getEvents().forEach(dataEvent -> {
+            dataEvent.getActions().get(EventPhase.PRE).forEach(action -> actionsRunner.run(action, useCase));
+            dataEvent.getActions().get(EventPhase.POST).forEach(action -> actionsRunner.run(action, useCase));
+        });
         if (useCase.getDataSet().get(field.getStringId()).getValue() == null)
             return null;
 
@@ -315,7 +322,10 @@ public class DataService implements IDataService {
 
     @Override
     public FileFieldInputStream getFile(Case useCase, FileField field) {
-        field.getActions().forEach(action -> actionsRunner.run(action, useCase));
+        field.getEvents().forEach(dataEvent -> {
+            dataEvent.getActions().get(EventPhase.PRE).forEach(action -> actionsRunner.run(action, useCase));
+            dataEvent.getActions().get(EventPhase.POST).forEach(action -> actionsRunner.run(action, useCase));
+        });
         if (useCase.getDataSet().get(field.getStringId()).getValue() == null)
             return null;
 
@@ -399,8 +409,10 @@ public class DataService implements IDataService {
             log.debug("fieldId is not referenced through taskRef", e);
         }
 
-        Map<String, ChangedField> changedFields = resolveActions(useCase.getPetriNet().getField(fieldId).get(),
-                Action.ActionTrigger.SET, useCase, useCase.getPetriNet().getTransition(task.getTransitionId()));
+        Map<String, ChangedField> changedFields = resolveDataEvents(useCase.getPetriNet().getField(fieldId).get(),Action.ActionTrigger.SET,
+                EventPhase.PRE, useCase, useCase.getPetriNet().getTransition(task.getTransitionId()));
+        changedFields.putAll(resolveDataEvents(useCase.getPetriNet().getField(fieldId).get(),Action.ActionTrigger.SET,
+                EventPhase.POST, useCase, useCase.getPetriNet().getTransition(task.getTransitionId())));
 
         if (decodedTaskRef != null) {
             Task referencedTask = taskService.findOne(decodedTaskRef.getTaskId());
@@ -599,7 +611,7 @@ public class DataService implements IDataService {
             if (changedField.isEmpty())
                 return;
             mergeChanges(changedFields, changedField);
-            runActionsOnChanged(Action.ActionTrigger.SET, case$, transition, changedFields, true, changedField);
+            runEventActionsOnChanged(case$, transition, changedFields, changedField, Action.ActionTrigger.SET,true);
         });
         workflowService.save(case$);
         return changedFields;
@@ -614,40 +626,42 @@ public class DataService implements IDataService {
         });
     }
 
-    private Map<String, ChangedField> resolveActions(Field field, Action.ActionTrigger actionTrigger, Case useCase, Transition transition) {
+    private Map<String, ChangedField> resolveDataEvents(Field field, Action.ActionTrigger trigger, EventPhase phase, Case useCase, Transition transition) {
         Map<String, ChangedField> changedFields = new HashMap<>();
-        processActions(field, actionTrigger, useCase, transition, changedFields);
+        processDataEvents(field, trigger, phase, useCase, changedFields, transition);
         return changedFields;
     }
 
-    private void processActions(Field field, Action.ActionTrigger actionTrigger, Case useCase, Transition transition, Map<String, ChangedField> changedFields) {
+    private void processDataEvents(Field field, Action.ActionTrigger actionTrigger, EventPhase phase, Case useCase, Map<String, ChangedField> changedFields, Transition transition){
         LinkedList<Action> fieldActions = new LinkedList<>();
-        if (field.getActions() != null)
-            fieldActions.addAll(DataFieldLogic.getActionByTrigger(field.getActions(), actionTrigger));
-        if (transition.getDataSet().containsKey(field.getStringId()) && !transition.getDataSet().get(field.getStringId()).getActions().isEmpty())
-            fieldActions.addAll(DataFieldLogic.getActionByTrigger(transition.getDataSet().get(field.getStringId()).getActions(), actionTrigger));
+        if (field.getEvents() != null){
+            fieldActions.addAll(DataFieldLogic.getEventAction(field.getEvents(), actionTrigger, phase));
+        }
+        if (transition.getDataSet().containsKey(field.getStringId()) && !transition.getDataSet().get(field.getStringId()).getEvents().isEmpty())
+            fieldActions.addAll(DataFieldLogic.getEventAction(transition.getDataSet().get(field.getStringId()).getEvents(), actionTrigger, phase));
 
         if (fieldActions.isEmpty()) return;
 
-        runActions(fieldActions, actionTrigger, useCase, transition, changedFields, actionTrigger == Action.ActionTrigger.SET);
+        runEventActions(useCase, transition, fieldActions, changedFields, actionTrigger);
     }
 
-    private void runActions(List<Action> actions, Action.ActionTrigger trigger, Case useCase, Transition transition, Map<String, ChangedField> changedFields, boolean recursive) {
+    private void runEventActions(Case useCase, Transition transition, List<Action> actions, Map<String, ChangedField> changedFields, Action.ActionTrigger trigger){
         actions.forEach(action -> {
             Map<String, ChangedField> currentChangedFields = actionsRunner.run(action, useCase);
             if (currentChangedFields.isEmpty())
                 return;
 
             mergeChanges(changedFields, currentChangedFields);
-            runActionsOnChanged(trigger, useCase, transition, changedFields, recursive, currentChangedFields);
+            runEventActionsOnChanged(useCase, transition, changedFields, currentChangedFields, trigger,trigger == Action.ActionTrigger.SET);
         });
     }
 
-    private void runActionsOnChanged(Action.ActionTrigger trigger, Case useCase, Transition transition, Map<String, ChangedField> changedFields, boolean recursive, Map<String, ChangedField> newChangedField) {
+    private void runEventActionsOnChanged(Case useCase, Transition transition, Map<String, ChangedField> changedFields, Map<String, ChangedField> newChangedField, Action.ActionTrigger trigger, boolean recursive) {
         newChangedField.forEach((s, changedField) -> {
             if ((changedField.getAttributes().containsKey("value") && changedField.getAttributes().get("value") != null) && recursive) {
                 Field field = useCase.getField(s);
-                processActions(field, trigger, useCase, transition, changedFields);
+                processDataEvents(field, trigger, EventPhase.PRE, useCase, changedFields, transition);
+                processDataEvents(field, trigger, EventPhase.POST, useCase, changedFields, transition);
             }
         });
     }
