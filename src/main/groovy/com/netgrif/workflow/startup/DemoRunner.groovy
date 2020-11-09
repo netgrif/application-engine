@@ -38,5 +38,7 @@ class DemoRunner extends AbstractOrderedCommandLineRunner {
 
     @Override
     void run(String... args) throws Exception {
+        PetriNet net = helper.createNet("all_data.xml", "major").get()
+        helper.createCase("Custom", net)
     }
 }

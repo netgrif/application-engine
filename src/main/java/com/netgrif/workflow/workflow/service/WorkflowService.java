@@ -7,6 +7,7 @@ import com.netgrif.workflow.event.events.usecase.CreateCaseEvent;
 import com.netgrif.workflow.event.events.usecase.DeleteCaseEvent;
 import com.netgrif.workflow.event.events.usecase.UpdateMarkingEvent;
 import com.netgrif.workflow.importer.service.FieldFactory;
+import com.netgrif.workflow.petrinet.domain.I18nString;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.dataset.CaseField;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
@@ -267,6 +268,14 @@ public class WorkflowService implements IWorkflowService {
             return null;
         return page.getContent().get(0);
     }
+
+    @Override
+    public Map<String, I18nString> listToMap(List<Case> cases){
+        Map<String, I18nString> options = new HashMap<>();
+        cases.forEach(aCase -> options.put(aCase.getStringId(), new I18nString(aCase.getTitle())));
+        return  options;
+    }
+
 
     public List<Field> getData(String caseId) {
         Optional<Case> optionalUseCase = repository.findById(caseId);
