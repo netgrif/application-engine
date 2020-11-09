@@ -34,7 +34,6 @@ public class DataFieldLogic {
         this.behavior = new HashSet<>();
         this.events = new LinkedHashSet<>();
         this.layout = new FieldLayout();
-        this.component = new Component();
     }
 
     public DataFieldLogic(Set<FieldBehavior> behavior, Set<DataEvent> events, FieldLayout layout, Component component) {

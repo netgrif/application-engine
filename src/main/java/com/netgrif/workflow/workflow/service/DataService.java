@@ -123,7 +123,9 @@ public class DataService implements IDataService {
     }
 
     private void resolveComponents(Field field, Transition transition){
-        field.setComponent(transition.getDataSet().get(field.getImportId()).getComponent());
+        Component transitionComponent = transition.getDataSet().get(field.getImportId()).getComponent();
+        if(transitionComponent != null)
+            field.setComponent(transitionComponent);
     }
 
     private boolean isForbidden(String fieldId, Transition transition, DataField dataField) {
