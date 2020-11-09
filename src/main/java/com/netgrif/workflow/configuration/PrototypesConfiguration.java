@@ -37,9 +37,9 @@ public class PrototypesConfiguration {
         return new FileStorageConfiguration();
     }
 
-    @Bean("dataConverter")
+    @Bean("pdfDataHelper")
     @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-    public IPdfDataHelper dataConverter(){return new PdfDataHelper();}
+    public IPdfDataHelper nextPdfDataHelper(){return new PdfDataHelper();}
 
     @Bean("pdfGenerator")
     @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
