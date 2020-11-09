@@ -5,24 +5,24 @@ import com.netgrif.workflow.pdf.generator.domain.PdfEnumerationField;
 import com.netgrif.workflow.pdf.generator.domain.PdfField;
 import com.netgrif.workflow.pdf.generator.domain.PdfSelectionField;
 import com.netgrif.workflow.petrinet.domain.DataGroup;
-import com.netgrif.workflow.workflow.web.responsebodies.LocalisedEnumerationField;
+import com.netgrif.workflow.workflow.web.responsebodies.LocalisedEnumerationMapField;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class EnumerationFieldBuilder extends SelectionFieldBuilder {
+public class EnumerationMapFieldBuilder extends SelectionFieldBuilder {
 
-    public EnumerationFieldBuilder(PdfResource resource) {
+    public EnumerationMapFieldBuilder(PdfResource resource) {
         super(resource);
     }
 
-    public PdfField buildField(DataGroup dataGroup, LocalisedEnumerationField field, int lastX, int lastY){
+    public PdfField buildField(DataGroup dataGroup, LocalisedEnumerationMapField field, int lastX, int lastY){
         List<String> choices;
         List<String> values = new ArrayList<>();
         this.lastX = lastX;
         this.lastY = lastY;
 
-        choices = field.getChoices();
+        choices = (List<String>) field.getOptions().values();
         if (field.getValue() != null) {
             values.add((String) field.getValue());
         }
