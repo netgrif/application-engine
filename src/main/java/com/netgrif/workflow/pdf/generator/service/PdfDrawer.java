@@ -174,15 +174,15 @@ public class PdfDrawer implements IPdfDrawer {
     @Override
     public boolean drawSelectionButton(List<String> values, String choice, int x, int y, FieldType fieldType) throws IOException {
         if (values.contains(choice)) {
-            if (fieldType == FieldType.MULTICHOICE) {
+            if (fieldType == FieldType.MULTICHOICE || fieldType == FieldType.MULTICHOICE_MAP) {
                 contentStream.drawImage(resource.getCheckboxChecked(), x, y - resource.getBoxPadding(), boxSize, boxSize);
-            } else if (fieldType == FieldType.ENUMERATION) {
+            } else if (fieldType == FieldType.ENUMERATION || fieldType == FieldType.ENUMERATION_MAP) {
                 contentStream.drawImage(resource.getRadioChecked(), x, y - resource.getBoxPadding(), boxSize, boxSize);
             }
         } else {
-            if (fieldType == FieldType.MULTICHOICE) {
+            if (fieldType == FieldType.MULTICHOICE || fieldType == FieldType.MULTICHOICE_MAP) {
                 contentStream.drawImage(resource.getCheckboxUnchecked(), x, y - resource.getBoxPadding(), boxSize, boxSize);
-            } else if (fieldType == FieldType.ENUMERATION) {
+            } else if (fieldType == FieldType.ENUMERATION || fieldType == FieldType.ENUMERATION_MAP) {
                 contentStream.drawImage(resource.getRadioUnchecked(), x, y - resource.getBoxPadding(), boxSize, boxSize);
             }
         }
