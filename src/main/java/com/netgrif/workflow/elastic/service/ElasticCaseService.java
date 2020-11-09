@@ -86,6 +86,14 @@ public class ElasticCaseService implements IElasticCaseService {
     }
 
     @Override
+    public void removeByPetriNetId(String processId) {
+        executors.execute(processId, () -> {
+            repository.deleteAllByProcessId(processId);
+            log.info("[" + processId + "]: All cases of Petri Net with id \"" + processId + "\" deleted");
+        });
+    }
+
+    @Override
     public void index(ElasticCase useCase) {
         executors.execute(useCase.getStringId(), () -> {
             try {
