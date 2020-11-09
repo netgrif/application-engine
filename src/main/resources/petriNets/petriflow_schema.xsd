@@ -34,7 +34,10 @@
                 </xs:choice>
                 <xs:element type="component" name="component" minOccurs="0"/>
                 <xs:element ref="encryption" minOccurs="0"/>
-                <xs:element ref="action" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:choice>
+                    <xs:element ref="action" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element type="dataEvent" name="event" maxOccurs="unbounded" minOccurs="0"/>
+                </xs:choice>
                 <xs:element ref="actionRef" minOccurs="0" maxOccurs="unbounded"/>
                 <xs:element ref="documentRef" minOccurs="0"/>
                 <xs:element ref="remote" minOccurs="0"/>
@@ -76,7 +79,7 @@
                 <xs:element ref="x"/>
                 <xs:element ref="y"/>
                 <xs:element ref="label"/>
-                <xs:element name="layout">
+                <xs:element name="layout" minOccurs="0">
                     <xs:complexType>
                         <xs:sequence>
                             <xs:element ref="cols" minOccurs="0"/>
@@ -419,6 +422,7 @@
                 <xs:element ref="logic"/>
                 <xs:element ref="layout" minOccurs="0"/>
                 <xs:element type="component" name="component" minOccurs="0"/>
+                <xs:element type="dataEvent" name="event" minOccurs="0" maxOccurs="unbounded"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
@@ -553,12 +557,25 @@
             <xs:attribute name="type" use="required" type="eventType"/>
         </xs:complexType>
     </xs:element>
+    <xs:complexType name="dataEvent">
+        <xs:sequence>
+            <xs:element ref="id"/>
+            <xs:element ref="actions" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+        <xs:attribute name="type" use="required" type="dataEventType"/>
+    </xs:complexType>
     <xs:simpleType name="eventType">
         <xs:restriction base="xs:string">
             <xs:enumeration value="assign"/>
             <xs:enumeration value="cancel"/>
             <xs:enumeration value="finish"/>
             <xs:enumeration value="delegate"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="dataEventType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="set"/>
+            <xs:enumeration value="get"/>
         </xs:restriction>
     </xs:simpleType>
     <xs:simpleType name="eventPhaseType">
