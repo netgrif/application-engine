@@ -535,7 +535,7 @@ public class Importer {
         if((dataRef.getComponent()) == null)
             component = getField(dataRef.getId()).getComponent();
         else
-            component = new Component(dataRef.getComponent().getName());
+            component = new Component(dataRef.getComponent().getName(), ComponentFactory.buildPropertyMap(dataRef.getComponent().getProperty()));
         transition.addDataSet(fieldId, null, null, null, component);
     }
 

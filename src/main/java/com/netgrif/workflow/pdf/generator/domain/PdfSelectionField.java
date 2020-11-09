@@ -2,7 +2,8 @@ package com.netgrif.workflow.pdf.generator.domain;
 
 import com.netgrif.workflow.pdf.generator.config.PdfResource;
 import com.netgrif.workflow.pdf.generator.service.fieldbuilder.FieldBuilder;
-import lombok.*;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.Collections;
 import java.util.List;
@@ -21,7 +22,7 @@ public abstract class PdfSelectionField extends PdfField {
         int padding = resource.getPadding();
         int lineHeight = resource.getLineHeight();
         int maxLabelLineLength = getMaxLabelLineSize(this.width, fontSize, padding);
-        int maxValueLineLength = getMaxValueLineSize(this.width - 3 * padding, resource.getFontValueSize(), padding);
+        int maxValueLineLength = getMaxValueLineSize(this.width - 2 * padding , resource.getFontValueSize(), padding);
         int multiLineHeight = 0;
 
         List<String> splitLabel = FieldBuilder.generateMultiLineText(Collections.singletonList(this.label), maxLabelLineLength);
