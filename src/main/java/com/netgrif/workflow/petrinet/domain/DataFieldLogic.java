@@ -26,13 +26,17 @@ public class DataFieldLogic {
     @Setter
     private FieldLayout layout;
 
+    @Getter
+    @Setter
+    private Component component;
+
     public DataFieldLogic() {
         this.behavior = new HashSet<>();
         this.actions = new LinkedHashSet<>();
         this.layout = new FieldLayout();
     }
 
-    public DataFieldLogic(Set<FieldBehavior> behavior, Set<Action> actions, FieldLayout layout) {
+    public DataFieldLogic(Set<FieldBehavior> behavior, Set<Action> actions, FieldLayout layout, Component component) {
         this();
         if (behavior != null)
             this.behavior.addAll(behavior);
@@ -40,6 +44,8 @@ public class DataFieldLogic {
             this.actions.addAll(actions);
         if (layout != null)
             this.layout = layout;
+        if (component != null)
+            this.component = getComponent();
     }
 
     public void addActions(Collection<Action> actions) {
