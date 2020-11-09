@@ -7,7 +7,7 @@ import lombok.Data;
 
 import java.util.List;
 
-@Data
+
 public class PdfMultiChoiceField extends PdfSelectionField{
 
     public PdfMultiChoiceField(String fieldId, DataGroup dataGroup, FieldType type, String label, List<String> values, List<String> choices, PdfResource resource) {

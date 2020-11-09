@@ -31,6 +31,27 @@
         <id>text</id>
         <title>Text</title>
         <init>Lorem ipsum</init>
+        <event type="set">
+            <id>set_event</id>
+            <actions phase="post">
+                <action>
+                    sds: f.text,
+                    text: f.text_area;
+                    change text value { "Changed to " + sds.value}
+                </action>
+            </actions>
+        </event>
+    </data>
+    <data type="text" immediate="true">
+        <id>password_data</id>
+        <title>Password from data</title>
+        <component>
+            <name>password</name>
+        </component>
+    </data>
+    <data type="text" immediate="true">
+        <id>password_dataref</id>
+        <title>Password from dataRef</title>
     </data>
     <data type="text">
         <id>text_area</id>
@@ -38,6 +59,11 @@
         <init>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque vitae magna in libero semper
             vulputate ut eu sapien. Phasellus vel.
         </init>
+        <component>
+            <name>textarea</name>
+            <property key="color">red</property>
+            <property key="fontSize">12</property>
+        </component>
     </data>
 
     <data type="enumeration">
@@ -55,9 +81,9 @@
         <values>Bob</values>
         <values>Carol</values>
         <init>Bob</init>
-        <view>
-            <autocomplete/>
-        </view>
+        <component>
+            <name>autocomplete</name>
+        </component>
     </data>
     <data type="enumeration">
         <id>enumeration_list</id>
@@ -66,9 +92,9 @@
         <values>Bob</values>
         <values>Carol</values>
         <init>Bob</init>
-        <view>
-            <list/>
-        </view>
+        <component>
+            <name>list</name>
+        </component>
     </data>
 
     <data type="multichoice">
@@ -86,19 +112,25 @@
         <values>Bob</values>
         <values>Carol</values>
         <init>Alice,Bob</init>
-        <view>
-            <list/>
-        </view>
+        <component>
+            <name>list</name>
+        </component>
     </data>
 
     <data type="boolean">
         <id>boolean</id>
         <title>Boolean</title>
+        <placeholder>True</placeholder>
     </data>
 
     <data type="date">
         <id>date</id>
         <title>Date</title>
+    </data>
+
+    <data type="taskRef">
+        <id>taskRef</id>
+        <title>Task Ref</title>
     </data>
 
     <data type="file">
@@ -128,6 +160,9 @@
         <id>button</id>
         <title>Button</title>
         <placeholder>Push</placeholder>
+        <component>
+            <name>fab</name>
+        </component>
     </data>
     <!-- TRANSITIONS -->
     <transition>
@@ -164,12 +199,37 @@
                 <logic>
                     <behavior>editable</behavior>
                 </logic>
+                <event type="set">
+                    <id>set_event</id>
+                    <actions phase="post">
+                        <action>
+                            sds: f.text,
+                            text: f.text_area;
+                            change text value { "Changed from transition to " + sds.value}
+                        </action>
+                    </actions>
+                </event>
             </dataRef>
             <dataRef>
                 <id>text_area</id>
                 <logic>
                     <behavior>editable</behavior>
                 </logic>
+            </dataRef>
+            <dataRef>
+                <id>password_data</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>password_dataref</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <component>
+                    <name>password</name>
+                </component>
             </dataRef>
         </dataGroup>
         <dataGroup>
@@ -273,6 +333,17 @@
                 </logic>
             </dataRef>
         </dataGroup>
+        <event type="finish">
+            <id>pdf</id>
+            <actions phase="pre">
+                <action>
+                    file: f.file,
+                    trans: t.this;
+
+                    generatePDF(trans.importId, file.stringId)
+                </action>
+            </actions>
+        </event>
     </transition>
     <transition>
         <id>2</id>
