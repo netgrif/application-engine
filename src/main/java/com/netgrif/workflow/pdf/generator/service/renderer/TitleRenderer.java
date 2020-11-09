@@ -41,7 +41,7 @@ public class TitleRenderer extends Renderer{
         }
 
         for (String line : multiLineText) {
-            y = pageHeight - marginTop - fieldY - lineHeight * lineCounter;
+            y = pageHeight - resource.getMarginTitle() - fieldY - lineHeight * lineCounter;
             pdfDrawer.writeString(resource.getTitleFont(), fontTitleSize, x, y, line);
             lineCounter++;
         }
