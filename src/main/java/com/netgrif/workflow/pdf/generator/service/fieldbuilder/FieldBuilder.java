@@ -2,9 +2,10 @@ package com.netgrif.workflow.pdf.generator.service.fieldbuilder;
 
 import com.netgrif.workflow.pdf.generator.config.PdfResource;
 import com.netgrif.workflow.pdf.generator.domain.PdfField;
+import com.netgrif.workflow.petrinet.domain.DataFieldLogic;
 import com.netgrif.workflow.petrinet.domain.DataGroup;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
-import com.netgrif.workflow.workflow.web.responsebodies.LocalisedField;
+import com.netgrif.workflow.petrinet.domain.dataset.logic.FieldLayout;
 import lombok.Getter;
 
 import java.util.ArrayList;
@@ -26,7 +27,7 @@ public abstract class FieldBuilder {
         return petriNet.getDataSet().get(fieldStringId).getName().getTranslation(resource.getTextLocale());
     }
 
-    protected void setFieldParams(DataGroup dg, LocalisedField field, PdfField pdfField) {
+    protected void setFieldParams(DataGroup dg, DataFieldLogic field, PdfField pdfField) {
         pdfField.setLayoutX(countFieldLayoutX(dg, field));
         pdfField.setLayoutY(countFieldLayoutY(dg, field));
         pdfField.setWidth(countFieldWidth(dg, field));
@@ -35,17 +36,18 @@ public abstract class FieldBuilder {
 
     protected void setFieldPositions(PdfField pdfField, int fontSize) {
         pdfField.setX(countPosX(pdfField));
-        pdfField.setOriginalTopY(countTopPosY(pdfField));
-        pdfField.setTopY(countTopPosY(pdfField));
+        pdfField.setOriginalTopY(countTopPosY(pdfField, resource));
+        pdfField.setTopY(countTopPosY(pdfField, resource));
         pdfField.setOriginalBottomY(countBottomPosY(pdfField,resource));
         pdfField.setBottomY(countBottomPosY(pdfField,resource));
         pdfField.countMultiLineHeight(fontSize, resource);
     }
 
-    private int countFieldLayoutX(DataGroup dataGroup, LocalisedField field) {
+    private int countFieldLayoutX(DataGroup dataGroup, DataFieldLogic field) {
         int x = 0;
-        if (field.getLayout() != null) {
+        if (checkCol(field.getLayout())) {
             x = field.getLayout().getX();
+            lastX = x;
         } else if (dataGroup.getStretch() == null || !dataGroup.getStretch()) {
             lastX = (lastX == 0 ? 2 : 0);
             x = lastX;
@@ -53,10 +55,11 @@ public abstract class FieldBuilder {
         return x;
     }
 
-    private int countFieldLayoutY(DataGroup dataGroup, LocalisedField field) {
+    private int countFieldLayoutY(DataGroup dataGroup, DataFieldLogic field) {
         int y;
-        if (field.getLayout() != null) {
+        if (checkRow(field.getLayout())) {
             y = field.getLayout().getY();
+            lastY = y;
         } else if (dataGroup.getStretch() != null && dataGroup.getStretch()) {
             y = ++lastY;
         } else {
@@ -70,7 +73,7 @@ public abstract class FieldBuilder {
         return (field.getLayoutX() * resource.getFormGridColWidth() + resource.getPadding());
     }
 
-    public int countTopPosY(PdfField field) {
+    public static int countTopPosY(PdfField field, PdfResource resource) {
         return (field.getLayoutY() * resource.getFormGridRowHeight()) + resource.getPadding();
     }
 
@@ -102,8 +105,8 @@ public abstract class FieldBuilder {
         return result;
     }
 
-    private int countFieldWidth(DataGroup dataGroup, LocalisedField field) {
-        if (field.getLayout() != null) {
+    private int countFieldWidth(DataGroup dataGroup, DataFieldLogic field) {
+        if (checkCol(field.getLayout())) {
             return field.getLayout().getCols() * resource.getFormGridColWidth() - resource.getPadding();
         } else {
             return (dataGroup.getStretch() != null && dataGroup.getStretch() ?
@@ -112,11 +115,19 @@ public abstract class FieldBuilder {
         }
     }
 
-    private int countFieldHeight(LocalisedField field) {
-        if (field.getLayout() != null) {
+    private int countFieldHeight(DataFieldLogic field) {
+        if (checkRow(field.getLayout())) {
             return field.getLayout().getRows() * resource.getFormGridRowHeight() - resource.getPadding();
         } else {
             return resource.getFormGridRowHeight() - resource.getPadding();
         }
+    }
+
+    private boolean checkRow(FieldLayout layout){
+        return layout != null && layout.getRows() != null;
+    }
+
+    private boolean checkCol(FieldLayout layout){
+        return layout != null && layout.getCols() != null;
     }
 }
