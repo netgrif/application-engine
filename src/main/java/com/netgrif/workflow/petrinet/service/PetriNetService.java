@@ -21,6 +21,7 @@ import com.netgrif.workflow.petrinet.web.responsebodies.TransitionReference;
 import com.netgrif.workflow.rules.domain.facts.NetImportedFact;
 import com.netgrif.workflow.rules.service.interfaces.IRuleEngine;
 import com.netgrif.workflow.workflow.domain.FileStorageConfiguration;
+import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.bson.Document;
 import org.bson.types.ObjectId;
@@ -42,6 +43,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.repository.support.PageableExecutionUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.*;
 import java.nio.file.Path;
@@ -78,6 +80,9 @@ public abstract class PetriNetService implements IPetriNetService {
 
     @Autowired
     private IRuleEngine ruleEngine;
+
+    @Autowired
+    private IWorkflowService workflowService;
 
     @Autowired
     private INextGroupService groupService;
@@ -292,6 +297,7 @@ public abstract class PetriNetService implements IPetriNetService {
         return Optional.of(repository.findByImportId(id));
     }
 
+    @Override
     public Page<PetriNetReference> search(Map<String, Object> criteria, LoggedUser user, Pageable pageable, Locale locale) {
         Query query = new Query();
 
@@ -322,6 +328,24 @@ public abstract class PetriNetService implements IPetriNetService {
                         .map(net -> new PetriNetReference(net, locale)).collect(Collectors.toList()),
                 pageable,
                 () -> mongoTemplate.count(query, PetriNet.class));
+    }
+
+    @Override
+    @Transactional
+    public void deletePetriNet(String processId, LoggedUser loggedUser) {
+        Optional<PetriNet> petriNetOptional = repository.findById(processId);
+        if (!petriNetOptional.isPresent()) {
+            throw new IllegalArgumentException("Could not find process with id [" + processId + "]");
+        }
+
+        PetriNet petriNet = petriNetOptional.get();
+        log.info("[" + processId + "]: Initiating deletion of Petri net " + petriNet.getIdentifier() + " version " + petriNet.getVersion().toString());
+
+        this.workflowService.deleteInstancesOfPetriNet(petriNet);
+        this.processRoleService.deleteRolesOfNet(petriNet, loggedUser);
+
+        log.info("[" + processId + "]: Deleting Petri net " + petriNet.getIdentifier() + " version " + petriNet.getVersion().toString());
+        this.repository.deleteBy_id(petriNet.getObjectId());
     }
 
     private Criteria getProcessRolesCriteria(LoggedUser user) {
