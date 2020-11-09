@@ -339,12 +339,22 @@
     <xs:complexType name="component">
         <xs:sequence>
             <xs:element name="name" type="xs:string"/>
+            <xs:element ref="property" minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
     </xs:complexType>
     <xs:element name="option">
         <xs:complexType>
             <xs:simpleContent>
                 <xs:extension base="i18nStringType">
+                    <xs:attribute name="key" type="xs:string" use="required"/>
+                </xs:extension>
+            </xs:simpleContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="property">
+        <xs:complexType>
+            <xs:simpleContent>
+                <xs:extension base="xs:string">
                     <xs:attribute name="key" type="xs:string" use="required"/>
                 </xs:extension>
             </xs:simpleContent>
