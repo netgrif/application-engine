@@ -395,8 +395,4 @@ public class WorkflowService implements IWorkflowService {
         model.initializeVarArcs(useCase.getDataSet());
         useCase.setPetriNet(model);
     }
-
-    private void deleteCase(Case caseToDelete) {
-
-    }
 }
