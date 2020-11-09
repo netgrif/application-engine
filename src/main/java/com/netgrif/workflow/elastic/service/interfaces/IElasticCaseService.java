@@ -26,4 +26,6 @@ public interface IElasticCaseService {
     Map<String, Float> fullTextFields();
 
     void remove(String caseId);
+
+    void removeByPetriNetId(String processId);
 }

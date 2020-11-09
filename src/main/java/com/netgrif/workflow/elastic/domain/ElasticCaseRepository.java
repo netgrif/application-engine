@@ -11,4 +11,6 @@ public interface ElasticCaseRepository extends ElasticsearchRepository<ElasticCa
     long countByStringIdAndLastModified(String stringId, long lastUpdated);
 
     void deleteAllByStringId(String id);
+
+    void deleteAllByProcessId(String processId);
 }

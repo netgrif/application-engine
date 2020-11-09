@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://modeler.netgrif.com/petriflow_schema.xsd">
+	<id>processDeleteTest</id>
+	<initials>PDT</initials>
+	<title>Process Delete Test</title>
+	<transitionRole>false</transitionRole>
+	<!-- TRANSACTIONS -->
+	<!-- ROLES -->
+	<role>
+		<id>role1</id>
+		<title>Role 1</title>
+	</role>
+	<role>
+		<id>role2</id>
+		<title>Role 2</title>
+	</role>
+	<!-- DATA -->
+	<!-- I18NS -->
+	<!-- TRANSITIONS -->
+	<transition>
+		<id>1</id>
+		<x>553</x>
+		<y>304</y>
+		<label>Task 1</label>
+	</transition>
+	<transition>
+		<id>2</id>
+		<x>653</x>
+		<y>304</y>
+		<label>Task 2</label>
+	</transition>
+	<!-- PLACES -->
+	<!-- ARCS -->
+</document>
