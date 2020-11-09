@@ -2,14 +2,20 @@ package com.netgrif.workflow.petrinet.domain.dataset.logic.action
 
 import com.netgrif.workflow.business.IPostalCodeService
 import com.netgrif.workflow.business.orsr.IOrsrService
+import com.netgrif.workflow.configuration.properties.ActionsProperties
 import com.netgrif.workflow.importer.service.FieldFactory
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedField
 import com.netgrif.workflow.workflow.domain.Case
+import org.codehaus.groovy.control.CompilerConfiguration
+import org.codehaus.groovy.control.customizers.ImportCustomizer
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Lookup
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
+
+import java.time.LocalDate
 
 @Component
 @SuppressWarnings("GrMethodMayBeStatic")
@@ -31,9 +37,17 @@ abstract class FieldActionsRunner {
 
     private Map<String, Object> actionsCache = new HashMap<>()
     private Map<String, Closure> actions = new HashMap<>()
+    private ImportCustomizer importCustomizer
+    private CompilerConfiguration configuration
 
-    FieldActionsRunner() {
-        actionsCache = new HashMap<>()
+    @Autowired
+    FieldActionsRunner(ActionsProperties actionsProperties) {
+        importCustomizer = new ImportCustomizer()
+        importCustomizer.addImports(actionsProperties.imports as String[])
+        importCustomizer.addStarImports(actionsProperties.starImports as String[])
+        importCustomizer.addStaticStars(actionsProperties.staticStarImports as String[])
+        configuration = new CompilerConfiguration()
+        configuration.addCompilationCustomizers(importCustomizer)
     }
 
     Map<String, ChangedField> run(Action action, Case useCase) {
@@ -57,7 +71,7 @@ abstract class FieldActionsRunner {
         if (actions.containsKey(action.importId)) {
             code = actions.get(action.importId)
         } else {
-            code = (Closure) new GroovyShell().evaluate("{-> ${action.definition}}")
+            code = (Closure) new GroovyShell(configuration).evaluate("{-> ${action.definition}}")
             actions.put(action.importId, code)
         }
         return code.rehydrate(getActionDeleget(), code.owner, code.thisObject)
