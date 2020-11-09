@@ -1,6 +1,7 @@
 package com.netgrif.workflow.workflow.web.responsebodies;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.netgrif.workflow.petrinet.domain.Component;
 import com.netgrif.workflow.petrinet.domain.Format;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.petrinet.domain.dataset.FieldType;
@@ -37,6 +38,8 @@ public class LocalisedField {
 
     private Integer length;
 
+    private Component component;
+
     public LocalisedField() {
     }
 
@@ -53,5 +56,6 @@ public class LocalisedField {
         formatFilter = field.getFormat();
         view = field.getView();
         length = field.getLength();
+        component = field.getComponent();
     }
 }
