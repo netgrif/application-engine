@@ -707,7 +707,7 @@ public class DataService implements IDataService {
                     value = null;
                     break;
                 }
-                User user = userService.findById(node.get("value").asLong(), true);
+                User user = new User(userService.findById(node.get("value").asLong(), true));
                 user.setPassword(null);
                 user.setGroups(null);
                 user.setAuthorities(null);
