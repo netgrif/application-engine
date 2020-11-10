@@ -4,6 +4,7 @@ import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @ConfigurationProperties(prefix = "nae.actions")
@@ -19,7 +20,7 @@ public class ActionsProperties {
      * <code>import java.date.LocalDate</code>
      * </pre>
      */
-    private List<String> imports;
+    private List<String> imports = new ArrayList<>();
 
     /**
      * <pre>
@@ -30,7 +31,7 @@ public class ActionsProperties {
      * import com.netgrif.*</code>
      * </pre>
      */
-    private List<String> starImports;
+    private List<String> starImports = new ArrayList<>();
 
     /**
      * <pre>
@@ -40,5 +41,5 @@ public class ActionsProperties {
      * <code>import static java.time.LocalDate.*</code>
      * </pre>
      */
-    private List<String> staticStarImports;
+    private List<String> staticStarImports = new ArrayList<>();
 }
