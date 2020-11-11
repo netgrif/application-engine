@@ -35,6 +35,8 @@ public interface IUserService {
 
     Page<User> findAllActiveByProcessRoles(Set<String> roleIds, boolean small, Pageable pageable);
 
+    List<User> findAllByProcessRoles(Set<String> roleIds, boolean small);
+
     void assignAuthority(Long userId, Long authorityId);
 
     void addDefaultRole(User user);
