@@ -12,8 +12,8 @@ public class DataGroupFieldBuilder extends FieldBuilder {
     }
 
     public PdfField buildField(DataGroup dataGroup, PdfField pdfField){
-        PdfField dgField = new PdfDataGroupField(dataGroup.getImportId(), pdfField.getLayoutX(), pdfField.getLayoutY(),
-                pdfField.getWidth(), resource.getLineHeight(), dataGroup.getTitle().toString(), true, resource);
+        PdfField dgField = new PdfDataGroupField(dataGroup.getImportId(), 0, pdfField.getLayoutY(),
+                resource.getPageDrawableWidth(), resource.getFormGridRowHeight() - resource.getPadding(), dataGroup.getTitle().toString(), true, resource);
         setFieldPositions(dgField, resource.getFontGroupSize());
         return dgField;
     }
