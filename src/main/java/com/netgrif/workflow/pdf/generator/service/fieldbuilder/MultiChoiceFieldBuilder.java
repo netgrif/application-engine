@@ -3,15 +3,12 @@ package com.netgrif.workflow.pdf.generator.service.fieldbuilder;
 import com.netgrif.workflow.pdf.generator.config.PdfResource;
 import com.netgrif.workflow.pdf.generator.domain.PdfField;
 import com.netgrif.workflow.pdf.generator.domain.PdfMultiChoiceField;
-import com.netgrif.workflow.petrinet.domain.DataFieldLogic;
 import com.netgrif.workflow.petrinet.domain.DataGroup;
-import com.netgrif.workflow.petrinet.domain.I18nString;
-import com.netgrif.workflow.petrinet.domain.PetriNet;
-import com.netgrif.workflow.petrinet.domain.dataset.*;
-import com.netgrif.workflow.workflow.domain.DataField;
+import com.netgrif.workflow.workflow.web.responsebodies.LocalisedMultichoiceField;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 public class MultiChoiceFieldBuilder extends SelectionFieldBuilder {
 
@@ -19,50 +16,20 @@ public class MultiChoiceFieldBuilder extends SelectionFieldBuilder {
         super(resource);
     }
 
-    @Override
-    protected List<String> getTranslatedSet(Set<I18nString> choices) {
-        return choices.stream().map(s -> s.getTranslation(resource.getTextLocale())).collect(Collectors.toList());
-    }
-
-    @Override
-    protected String getTranslatedString(Set<I18nString> choices, String value) {
-        return choices.stream().filter(s -> s.toString().equals(value) || s.getKey().equals(value)).map(s -> s.getTranslation(resource.getTextLocale())).findAny().get();
-    }
-
-
-    public PdfField buildField(DataGroup dataGroup, String fieldId, DataFieldLogic fieldLogic, Map<String, DataField> dataSet, PetriNet petriNet,
-                               int lastX, int lastY){
-        List<String> choices = new ArrayList<>();;
+    public PdfField buildField(DataGroup dataGroup, LocalisedMultichoiceField field, int lastX, int lastY){
+        List<String> choices;
         List<String> values = new ArrayList<>();
         this.lastX = lastX;
         this.lastY = lastY;
-        FieldType type = petriNet.getDataSet().get(fieldId).getType();
 
-        switch (type) {
-            case MULTICHOICE_MAP:
-                choices = getTranslatedSet(resolveOptions(((EnumerationMapField)petriNet.getDataSet().get(fieldId)).getOptions()));
-                if (dataSet.get(fieldId).getValue() != null) {
-                    for (I18nString value : (List<I18nString>) dataSet.get(fieldId).getValue()) {
-                        values.add(getTranslatedString(resolveOptions(((EnumerationMapField)petriNet.getDataSet().get(fieldId)).getOptions()), value.toString()));
-                    }
-                }
-                break;
-            case MULTICHOICE:
-                choices = getTranslatedSet(((MultichoiceField)petriNet.getDataSet().get(fieldId)).getChoices());
-                if (dataSet.get(fieldId).getValue() != null) {
-                    values = getTranslatedSet(((MultichoiceField)petriNet.getDataSet().get(fieldId)).getValue());
-                    for (I18nString value : (List<I18nString>) dataSet.get(fieldId).getValue()) {
-                        values.add(getTranslatedString(((MultichoiceField)petriNet.getDataSet().get(fieldId)).getChoices(), value.toString()));
-                    }
-                }
-                break;
-            default:
-                break;
+        choices = field.getChoices();
+        if (field.getValue() != null) {
+            values.addAll((Collection<? extends String>) field.getValue());
         }
 
-        String translatedTitle = getTranslatedLabel(fieldId, petriNet);
-        PdfMultiChoiceField pdfField = new PdfMultiChoiceField(fieldId, dataGroup, petriNet.getDataSet().get(fieldId).getType(), translatedTitle, values, choices, resource);
-        setFieldParams(dataGroup, fieldLogic, pdfField);
+        String translatedTitle = field.getName();
+        PdfMultiChoiceField pdfField = new PdfMultiChoiceField(field.getStringId(), dataGroup, field.getType(), translatedTitle, values, choices, resource);
+        setFieldParams(dataGroup, field, pdfField);
         setFieldPositions(pdfField, resource.getFontLabelSize());
         return pdfField;
     }
