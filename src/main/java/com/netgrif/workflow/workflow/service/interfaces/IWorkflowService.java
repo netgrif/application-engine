@@ -1,11 +1,13 @@
 package com.netgrif.workflow.workflow.service.interfaces;
 
 import com.netgrif.workflow.auth.domain.LoggedUser;
+import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.I18nString;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.Task;
 import com.querydsl.core.types.Predicate;
+import org.bson.types.ObjectId;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -30,6 +32,8 @@ public interface IWorkflowService {
     void deleteCase(String caseId);
 
     void deleteSubtreeRootedAt(String caseId);
+
+    void deleteInstancesOfPetriNet(PetriNet net);
 
     void updateMarking(Case useCase);
 
