@@ -2,6 +2,8 @@ package com.netgrif.workflow.petrinet.domain.dataset
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.databind.node.ObjectNode
+import com.netgrif.workflow.petrinet.domain.DataEvent
+import com.netgrif.workflow.petrinet.domain.Component
 import com.netgrif.workflow.petrinet.domain.Format
 import com.netgrif.workflow.petrinet.domain.I18nString
 import com.netgrif.workflow.petrinet.domain.Imported
@@ -42,7 +44,7 @@ abstract class Field<T> extends Imported {
     private boolean immediate
 
     @JsonIgnore
-    private LinkedHashSet<Action> actions
+    private LinkedHashSet<DataEvent> events;
 
     @JsonIgnore
     private String encryption
@@ -53,8 +55,11 @@ abstract class Field<T> extends Imported {
 
     private Integer length
 
+    private Component component
+
     Field() {
         _id = new ObjectId()
+        this.events = new LinkedHashSet<>();
     }
 
     Field(Long importId) {
@@ -144,24 +149,24 @@ abstract class Field<T> extends Imported {
         this.immediate = immediate != null && immediate
     }
 
-    LinkedHashSet<Action> getActions() {
-        return actions
+    LinkedHashSet<DataEvent> getEvents() {
+        return events
     }
 
-    void setActions(LinkedHashSet<Action> actions) {
-        this.actions = actions
+    void setEvents(LinkedHashSet<DataEvent> events) {
+        this.events = events
     }
 
-    void addActions(Collection<Action> actions) {
-        actions.each { addAction(it) }
+    void addEvents(Collection<DataEvent> dataEvents) {
+        dataEvents.each { addEvent(it) }
     }
 
-    void addAction(Action action) {
-        if (this.actions == null)
-            this.actions = new LinkedHashSet<>()
-        if (action == null) return
+    void addEvent(DataEvent event) {
+        if (this.events == null)
+            this.events = new LinkedHashSet<>()
+        if (event == null) return
 
-        this.actions.add(action)
+        this.events.add(event)
     }
 
     String getEncryption() {
@@ -170,6 +175,14 @@ abstract class Field<T> extends Imported {
 
     void setEncryption(String encryption) {
         this.encryption = encryption
+    }
+
+    Component getComponent() {
+        return component
+    }
+
+    void setComponent(Component component) {
+        this.component = component
     }
 
     void clearValue() {}
@@ -241,11 +254,12 @@ abstract class Field<T> extends Imported {
         clone.placeholder = this.placeholder
         clone.order = this.order
         clone.immediate = this.immediate
-        clone.actions = this.actions
+        clone.events = this.events
         clone.encryption = this.encryption
         clone.view = this.view
         clone.format = this.format
         clone.length = this.length
+        clone.component = this.component
     }
 
     abstract Field clone()
