@@ -8,6 +8,7 @@ import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.dataset.FieldType;
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.workflow.petrinet.web.responsebodies.PetriNetReference;
+import com.netgrif.workflow.utils.FullPageRequest;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.QCase;
 import com.querydsl.core.BooleanBuilder;
@@ -45,6 +46,7 @@ public class CaseSearchService extends MongoSearchService<Case> {
     public static final String TRANSITION = "transition";
     public static final String FULLTEXT = "fullText";
     public static final String CASE_ID = "stringId";
+    public static final String GROUP = "group";
 
     @Autowired
     private IPetriNetService petriNetService;
@@ -72,6 +74,14 @@ public class CaseSearchService extends MongoSearchService<Case> {
         }
         if (requestQuery.containsKey(CASE_ID)) {
             builder.and(caseId(requestQuery.get(CASE_ID)));
+        }
+        if (requestQuery.containsKey(GROUP)) {
+            Predicate groupPredicate = group(requestQuery.get(GROUP), user, locale);
+            if (groupPredicate != null) {
+                builder.and(groupPredicate);
+            } else {
+                return null;
+            }
         }
 
         return builder;
@@ -274,5 +284,18 @@ public class CaseSearchService extends MongoSearchService<Case> {
 
     private static BooleanExpression caseIdString(String caseId) {
         return QCase.case$._id.eq(new ObjectId(caseId));
+    }
+
+    public Predicate group(Object query, LoggedUser user, Locale locale) {
+        Map<String, Object> processQuery = new HashMap<>();
+        processQuery.put(GROUP, query);
+        List<PetriNetReference> groupProcesses = this.petriNetService.search(processQuery, user, new FullPageRequest(), locale).getContent();
+        if (groupProcesses.size() == 0)
+            return null;
+
+        List<BooleanExpression> processQueries = groupProcesses.stream().map(PetriNetReference::getIdentifier).map(QCase.case$.processIdentifier::eq).collect(Collectors.toList());
+        BooleanBuilder builder = new BooleanBuilder();
+        processQueries.forEach(builder::or);
+        return builder;
     }
 }
