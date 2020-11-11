@@ -1,6 +1,7 @@
 package com.netgrif.workflow.petrinet.service.interfaces;
 
 import com.netgrif.workflow.auth.domain.LoggedUser;
+import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRole;
 
 import java.util.List;
@@ -15,4 +16,6 @@ public interface IProcessRoleService {
     List<ProcessRole> findAll(String netId);
 
     ProcessRole defaultRole();
+
+    void deleteRolesOfNet(PetriNet net, LoggedUser loggedUser);
 }
