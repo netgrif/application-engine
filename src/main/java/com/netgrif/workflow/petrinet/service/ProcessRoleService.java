@@ -5,6 +5,7 @@ import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.auth.domain.UserProcessRole;
 import com.netgrif.workflow.auth.domain.repositories.UserProcessRoleRepository;
 import com.netgrif.workflow.auth.service.UserDetailsServiceImpl;
+import com.netgrif.workflow.auth.service.interfaces.IUserProcessRoleService;
 import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.event.events.user.UserRoleChangeEvent;
 import com.netgrif.workflow.importer.model.EventPhaseType;
@@ -19,7 +20,9 @@ import com.netgrif.workflow.petrinet.domain.roles.ProcessRole;
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRoleRepository;
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.workflow.petrinet.service.interfaces.IProcessRoleService;
-import org.apache.tomcat.jni.Proc;
+import org.bson.types.ObjectId;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
@@ -29,6 +32,8 @@ import java.util.stream.Collectors;
 
 @Service
 public class ProcessRoleService implements IProcessRoleService {
+
+    private static final Logger log = LoggerFactory.getLogger(ProcessRoleService.class);
 
     @Autowired
     private IUserService userService;
@@ -54,6 +59,9 @@ public class ProcessRoleService implements IProcessRoleService {
     @Autowired
     private IPetriNetService petriNetService;
 
+    @Autowired
+    private IUserProcessRoleService userProcessRoleService;
+
     private ProcessRole defaultRole;
 
     @Override
@@ -65,7 +73,7 @@ public class ProcessRoleService implements IProcessRoleService {
     public void assignRolesToUser(Long userId, Set<String> requestedRolesIds, LoggedUser loggedUser) {
         User user = userService.findById(userId, true);
         List<UserProcessRole> requestedRoles = roleRepository.findByRoleIdIn(requestedRolesIds);
-        if (requestedRoles.isEmpty())
+        if (requestedRoles.isEmpty() && requestedRolesIds.size() != 0)
             throw new IllegalArgumentException("No process roles found.");
         if (requestedRoles.size() != requestedRolesIds.size())
             throw new IllegalArgumentException("Not all process roles were found!");
@@ -206,7 +214,11 @@ public class ProcessRoleService implements IProcessRoleService {
         Optional<PetriNet> netOptional = netRepository.findById(netId);
         if (!netOptional.isPresent())
             throw new IllegalArgumentException("Could not find model with id [" + netId + "]");
-        return new LinkedList<>(netOptional.get().getRoles().values());
+        return findAll(netOptional.get());
+    }
+
+    private List<ProcessRole> findAll(PetriNet net) {
+        return new LinkedList<>(net.getRoles().values());
     }
 
     @Override
@@ -214,5 +226,30 @@ public class ProcessRoleService implements IProcessRoleService {
         if (defaultRole == null)
             defaultRole = processRoleRepository.findByName_DefaultValue(ProcessRole.DEFAULT_ROLE);
         return defaultRole;
+    }
+
+    @Override
+    public void deleteRolesOfNet(PetriNet net, LoggedUser loggedUser) {
+        log.info("[" + net.getStringId() + "]: Initiating deletion of all roles of Petri net " + net.getIdentifier() + " version " + net.getVersion().toString());
+        List<ObjectId> deletedRoleIds = this.findAll(net).stream().map(ProcessRole::get_id).collect(Collectors.toList());
+        Set<String> deletedRoleStringIds = deletedRoleIds.stream().map(ObjectId::toString).collect(Collectors.toSet());
+
+        List<User> usersWithRemovedRoles = this.userService.findAllByProcessRoles(deletedRoleStringIds, false);
+        for(User user : usersWithRemovedRoles) {
+            log.info("[" + net.getStringId() + "]: Removing deleted roles of Petri net " + net.getIdentifier() + " version " + net.getVersion().toString() + " from user "+ user.getFullName() + " with id "+user.getId().toString());
+
+            if (user.getProcessRoles().size() == 0)
+                continue;
+
+            Set<String> newRoles = user.getProcessRoles().stream()
+                    .filter(role -> !deletedRoleStringIds.contains(role.getStringId()))
+                    .map(ProcessRole::getStringId)
+                    .collect(Collectors.toSet());
+            this.assignRolesToUser(user.getId(), newRoles, loggedUser);
+        }
+        this.userProcessRoleService.deleteRolesOfNet(net);
+
+        log.info("[" + net.getStringId() + "]: Deleting all roles of Petri net " + net.getIdentifier() + " version " + net.getVersion().toString());
+        this.processRoleRepository.deleteAllBy_idIn(deletedRoleIds);
     }
 }

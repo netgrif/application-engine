@@ -7,7 +7,6 @@ import lombok.Data;
 
 import java.util.List;
 
-@Data
 public class PdfEnumerationField extends PdfSelectionField {
 
     public PdfEnumerationField(String fieldId, DataGroup dataGroup, FieldType type, String label, List<String> values, List<String> choices, PdfResource resource) {
