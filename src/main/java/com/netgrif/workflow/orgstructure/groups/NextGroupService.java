@@ -18,8 +18,10 @@ import com.netgrif.workflow.workflow.domain.Task;
 import com.netgrif.workflow.workflow.service.interfaces.IDataService;
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
+import com.querydsl.core.BooleanBuilder;
 import com.netgrif.workflow.workflow.web.responsebodies.TaskReference;
 import com.querydsl.core.types.Predicate;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import freemarker.template.TemplateException;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
@@ -31,6 +33,7 @@ import org.springframework.stereotype.Service;
 import javax.mail.MessagingException;
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @ConditionalOnProperty(value = "nae.group.default.enabled",
         havingValue = "true",
@@ -59,7 +62,7 @@ public class NextGroupService implements INextGroupService {
 
     @Autowired
     private IPetriNetService petriNetService;
-    
+
     @Autowired
     private ITaskService taskService;
 
@@ -110,8 +113,7 @@ public class NextGroupService implements INextGroupService {
 
     @Override
     public Case findGroup(String groupID){
-        QCase qCase = new QCase("case");
-        Case result = workflowService.searchOne(qCase.processIdentifier.eq(GROUP_CASE_IDENTIFIER).and(qCase._id.eq(new ObjectId(groupID))));
+        Case result = workflowService.searchOne(groupCase().and(QCase.case$._id.eq(new ObjectId(groupID))));
         if(!isGroupCase(result)){
             return null;
         }
@@ -120,8 +122,7 @@ public class NextGroupService implements INextGroupService {
 
     @Override
     public Case findDefaultGroup(){
-        QCase qCase = new QCase("case");
-        return workflowService.searchOne(qCase.processIdentifier.eq(GROUP_CASE_IDENTIFIER).and(qCase.title.eq("Default system group")));
+        return workflowService.searchOne(groupCase().and(QCase.case$.title.eq("Default system group")));
     }
 
     @Override
@@ -130,9 +131,16 @@ public class NextGroupService implements INextGroupService {
     }
 
     @Override
+    public List<Case> findByIds(Collection<String> groupIds) {
+        List<BooleanExpression> groupQueries = groupIds.stream().map(ObjectId::new).map(QCase.case$._id::eq).collect(Collectors.toList());
+        BooleanBuilder builder = new BooleanBuilder();
+        groupQueries.forEach(builder::or);
+        return this.workflowService.searchAll(groupCase().and(builder)).getContent();
+    }
+
+    @Override
     public List<Case> findAllGroups(){
-        QCase qCase = new QCase("case");
-        return workflowService.searchAll(qCase.processIdentifier.eq(GROUP_CASE_IDENTIFIER)).getContent();
+        return workflowService.searchAll(groupCase()).getContent();
     }
 
     @Override
@@ -192,7 +200,7 @@ public class NextGroupService implements INextGroupService {
 
     @Override
     public Map<String, I18nString> removeUser(HashSet<String> usersToRemove, Map<String, I18nString> existingUsers, Case groupCase){
-        String authorId = groupCase.getAuthor().getId().toString();
+        String authorId = this.getGroupOwnerId(groupCase).toString();
         usersToRemove.forEach(user -> {
             if(user.equals(authorId)){
                 log.error("Author with id [" + authorId + "] cannot be removed from group with ID [" + groupCase.get_id().toString() + "]");
@@ -216,10 +224,33 @@ public class NextGroupService implements INextGroupService {
 
     @Override
     public Set<String> getAllGroupsOfUser(User groupUser) {
-        QCase qCase = new QCase("case");
-        List<String> groupList = workflowService.searchAll(qCase.processIdentifier.eq(GROUP_CASE_IDENTIFIER).and(qCase.dataSet.get(GROUP_MEMBERS_FIELD).options.containsKey(groupUser.getId().toString())))
+        List<String> groupList = workflowService.searchAll(groupCase().and(QCase.case$.dataSet.get(GROUP_MEMBERS_FIELD).options.containsKey(groupUser.getId().toString())))
                 .map(aCase -> aCase.get_id().toString()).getContent();
         return new HashSet<>(groupList);
+    }
+
+    @Override
+    public Long getGroupOwnerId(String groupId) {
+        return this.getGroupOwnerId(this.findGroup(groupId));
+    }
+
+    @Override
+    public Collection<Long> getGroupsOwnerIds(Collection<String> groupIds) {
+        return this.findByIds(groupIds).stream().map(this::getGroupOwnerId).collect(Collectors.toList());
+    }
+
+    @Override
+    public String getGroupOwnerEmail(String groupId) {
+        return this.getGroupOwnerEmail(this.findGroup(groupId));
+    }
+
+    @Override
+    public Collection<String> getGroupsOwnerEmails(Collection<String> groupIds) {
+        return this.findByIds(groupIds).stream().map(this::getGroupOwnerEmail).collect(Collectors.toList());
+    }
+
+    private static BooleanExpression groupCase() {
+        return QCase.case$.processIdentifier.eq(GROUP_CASE_IDENTIFIER);
     }
 
     private boolean isGroupCase(Case aCase){
@@ -233,9 +264,22 @@ public class NextGroupService implements INextGroupService {
         return true;
     }
 
+    private boolean authorHasDefaultGroup(User author){
+        List<Case> allGroups = findAllGroups();
+        for (Case group : allGroups){
+            if(group.getAuthor().getId().equals(author.getId())){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private Long getGroupOwnerId(Case groupCase) {
+        return groupCase.getAuthor().getId();
+    }
+
     private Case findUserDefaultGroup(User author){
-        QCase qCase = new QCase("case");
-        return workflowService.searchOne(qCase.author.id.eq(author.getId()).and(qCase.title.eq(author.getFullName())));
+        return workflowService.searchOne(QCase.case$.author.id.eq(author.getId()).and(QCase.case$.title.eq(author.getFullName())));
     }
 
     private Task getGroupInitTask(Case groupCase){
@@ -272,4 +316,7 @@ public class NextGroupService implements INextGroupService {
         return taskData;
     }
 
+    private String getGroupOwnerEmail(Case groupCase) {
+        return groupCase.getAuthor().getEmail();
+    }
 }
