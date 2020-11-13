@@ -5,7 +5,8 @@ import com.netgrif.workflow.auth.domain.User
 import com.netgrif.workflow.auth.service.interfaces.IUserService
 import com.netgrif.workflow.configuration.ApplicationContextProvider
 import com.netgrif.workflow.importer.service.FieldFactory
-import com.netgrif.workflow.mail.EmailType
+import com.netgrif.workflow.mail.domain.SimpleMailDraft
+import com.netgrif.workflow.mail.domain.TypedMailDraft
 import com.netgrif.workflow.mail.interfaces.IMailService
 import com.netgrif.workflow.orgstructure.domain.Group
 import com.netgrif.workflow.orgstructure.domain.Member
@@ -39,7 +40,6 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 
 import java.util.stream.Collectors
-
 /**
  * ActionDelegate class contains Actions API methods.
  */
@@ -626,11 +626,11 @@ class ActionDelegate {
         change useCase.getField(fileFieldId) value {new FileFieldValue(filename, storagePath)}
     }
 
-    void sendMail(List<String> recipients, EmailType type, Map<String, Object> model, Map<String, File> attachments = new HashMap<>()){
-        mailService.sendMail(recipients, type, model, attachments)
+    void sendMail(TypedMailDraft mailDraft){
+        mailService.sendMail(mailDraft.recipients, mailDraft.type, mailDraft.model, mailDraft.attachments)
     }
 
-    void sendMail(List<String> recipients, String subject, String text, boolean isHtml = false, Map<String, File> attachments = new HashMap<>()){
-        mailService.sendMail(recipients, subject, text, isHtml, attachments)
+    void sendMail(SimpleMailDraft mailDraft){
+        mailService.sendMail(mailDraft.recipients, mailDraft.subject, mailDraft.body, mailDraft.isHtml, mailDraft.attachments)
     }
 }
