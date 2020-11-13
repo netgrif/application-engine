@@ -2,6 +2,8 @@ package com.netgrif.workflow.mail;
 
 import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.auth.service.interfaces.IRegistrationService;
+import com.netgrif.workflow.mail.domain.SimpleMailDraft;
+import com.netgrif.workflow.mail.domain.TypedMailDraft;
 import com.netgrif.workflow.mail.interfaces.IMailService;
 import com.netgrif.workflow.mail.throwables.NoEmailTypeDefinedException;
 import freemarker.template.Configuration;
@@ -111,20 +113,20 @@ public class MailService implements IMailService {
     }
 
     @Override
-    public void sendMail(List<String> recipients, EmailType type, Map<String, Object> model, Map<String, File> attachments) throws MessagingException, IOException, TemplateException {
-        MimeMessage email = buildEmail(type, recipients, model, new HashMap<>());
+    public void sendMail(TypedMailDraft mailDraft) throws MessagingException, IOException, TemplateException {
+        MimeMessage email = buildEmail(mailDraft.getType(), mailDraft.getRecipients(), mailDraft.getModel(), mailDraft.getAttachments());
         mailSender.send(email);
 
-        String formattedRecipients = StringUtils.join(recipients, ", ");
+        String formattedRecipients = StringUtils.join(mailDraft.getRecipients(), ", ");
         log.info("Email sent to [" + formattedRecipients + "]");
     }
 
     @Override
-    public void sendMail(List<String> recipients, String subject, String text, boolean isHtml, Map<String, File> attachments) throws MessagingException, IOException, TemplateException {
-        MimeMessage email = buildEmail(recipients, subject, text, isHtml, attachments);
+    public void sendMail(SimpleMailDraft mailDraft) throws MessagingException, IOException, TemplateException {
+        MimeMessage email = buildEmail(mailDraft.getRecipients(), mailDraft.getSubject(), mailDraft.getBody(), mailDraft.isHtml(), mailDraft.getAttachments());
         mailSender.send(email);
 
-        String formattedRecipients = StringUtils.join(recipients, ", ");
+        String formattedRecipients = StringUtils.join(mailDraft.getRecipients(), ", ");
         log.info("Email sent to [" + formattedRecipients + "]");
     }
 
