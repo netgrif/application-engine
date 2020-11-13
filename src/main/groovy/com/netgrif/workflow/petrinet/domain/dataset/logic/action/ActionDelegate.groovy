@@ -627,10 +627,10 @@ class ActionDelegate {
     }
 
     void sendMail(TypedMailDraft mailDraft){
-        mailService.sendMail(mailDraft.recipients, mailDraft.type, mailDraft.model, mailDraft.attachments)
+        mailService.sendMail(mailDraft)
     }
 
     void sendMail(SimpleMailDraft mailDraft){
-        mailService.sendMail(mailDraft.recipients, mailDraft.subject, mailDraft.body, mailDraft.isHtml, mailDraft.attachments)
+        mailService.sendMail(mailDraft)
     }
 }

@@ -2,6 +2,8 @@ package com.netgrif.workflow.mail.interfaces;
 
 import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.mail.EmailType;
+import com.netgrif.workflow.mail.domain.SimpleMailDraft;
+import com.netgrif.workflow.mail.domain.TypedMailDraft;
 import freemarker.template.TemplateException;
 import org.springframework.stereotype.Service;
 
@@ -20,7 +22,7 @@ public interface IMailService {
 
     void testConnection();
 
-    void sendMail(List<String> recipients, EmailType type, Map<String, Object> model, Map<String, File> attachments) throws MessagingException, IOException, TemplateException;
+    void sendMail(TypedMailDraft mailDraft) throws MessagingException, IOException, TemplateException;
 
-    void sendMail(List<String> recipients, String subject, String text, boolean isHtml, Map<String, File> attachments) throws MessagingException, IOException, TemplateException;
+    void sendMail(SimpleMailDraft mailDraft) throws MessagingException, IOException, TemplateException;
 }
