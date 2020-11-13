@@ -3,11 +3,13 @@ package com.netgrif.workflow.mail;
 import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.auth.service.interfaces.IRegistrationService;
 import com.netgrif.workflow.mail.interfaces.IMailService;
+import com.netgrif.workflow.mail.throwables.NoEmailTypeDefinedException;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -113,11 +115,8 @@ public class MailService implements IMailService {
         MimeMessage email = buildEmail(type, recipients, model, new HashMap<>());
         mailSender.send(email);
 
-        StringBuilder recipientsBuilder = new StringBuilder("");
-        recipients.forEach(recipient -> {
-            recipientsBuilder.append(recipient).append(" ");
-        });
-        log.info("Email sent to [" + recipientsBuilder.toString() + "]");
+        String formattedRecipients = StringUtils.join(recipients, ", ");
+        log.info("Email sent to [" + formattedRecipients + "]");
     }
 
     @Override
@@ -125,17 +124,14 @@ public class MailService implements IMailService {
         MimeMessage email = buildEmail(recipients, subject, text, isHtml, attachments);
         mailSender.send(email);
 
-        StringBuilder recipientsBuilder = new StringBuilder("");
-        recipients.forEach(recipient -> {
-            recipientsBuilder.append(recipient).append(" ");
-        });
-        log.info("Email sent to [ " + recipientsBuilder.toString() + "]");
+        String formattedRecipients = StringUtils.join(recipients, ", ");
+        log.info("Email sent to [" + formattedRecipients + "]");
     }
 
     protected MimeMessage buildEmail(EmailType type, List<String> recipients, Map<String, Object> model, Map<String, File> attachments) throws MessagingException, IOException, TemplateException {
         if(type.template == null || type.subject == null){
             log.error("The email has no template or subject defined in object of EmailType.");
-            throw new NullPointerException();
+            throw new NoEmailTypeDefinedException("The email has no template or subject defined in object of EmailType.");
         }
         MimeMessage message = mailSender.createMimeMessage();
         message.setSubject(type.subject);
