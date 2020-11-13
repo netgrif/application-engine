@@ -266,7 +266,8 @@ public class DataService implements IDataService {
         } else if (taskRefField.getBehavior().has("hidden") && taskRefField.getBehavior().get("hidden").asBoolean()){
             taskRefDataGroups.forEach(dataGroup -> {
                 dataGroup.getFields().getContent().forEach(field -> {
-                    changeTaskRefBehavior(field, FieldBehavior.HIDDEN);
+                    if(!field.getBehavior().has("forbidden") || !field.getBehavior().get("forbidden").asBoolean())
+                        changeTaskRefBehavior(field, FieldBehavior.HIDDEN);
                 });
             });
         }
