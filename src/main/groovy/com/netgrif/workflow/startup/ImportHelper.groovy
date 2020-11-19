@@ -30,10 +30,12 @@ import groovy.json.JsonOutput
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.core.io.ClassPathResource
 import org.springframework.core.io.ResourceLoader
 import org.springframework.stereotype.Component
 
+@ConditionalOnProperty(value = "admin.create-super", matchIfMissing = true)
 @Component
 class ImportHelper {
 
