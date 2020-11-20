@@ -2,6 +2,7 @@ package com.netgrif.workflow.workflow.web.responsebodies;
 
 import com.netgrif.workflow.auth.web.responsebodies.User;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldContainer;
+import com.netgrif.workflow.petrinet.domain.dataset.logic.TaskAwareChangedFieldContainer;
 import com.netgrif.workflow.workflow.domain.EventOutcome;
 import lombok.Data;
 
@@ -24,7 +25,7 @@ public class LocalisedEventOutcome extends ChangedFieldContainer {
     public static LocalisedEventOutcome successOutcome(EventOutcome outcome, Locale locale, String defaultSuccessMessage) {
         LocalisedEventOutcome result = new LocalisedEventOutcome();
 
-        result.putAll(outcome.getChangedFields());
+        TaskAwareChangedFieldContainer.flatten(outcome.getTaskId(), outcome.getChangedFields(), result);
         result.startDate = outcome.getStartDate();
         result.finishDate = outcome.getFinishDate();
 

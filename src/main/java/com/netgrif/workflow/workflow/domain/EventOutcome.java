@@ -12,9 +12,11 @@ import java.util.Map;
 @Data
 public class EventOutcome {
 
+    private String taskId;
+
     private I18nString message;
 
-    private Map<String, ChangedField> changedFields;
+    private Map<String, Map<String, ChangedField>> changedFields;
 
     private User assignee;
 
@@ -22,7 +24,7 @@ public class EventOutcome {
     
     private LocalDateTime finishDate;
 
-    public void add(Map<String, ChangedField> changedFields) {
+    public void add(Map<String, Map<String, ChangedField>> changedFields) {
         this.changedFields.putAll(changedFields);
     }
 
