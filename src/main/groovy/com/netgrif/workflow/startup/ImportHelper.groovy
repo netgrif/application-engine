@@ -12,6 +12,7 @@ import com.netgrif.workflow.orgstructure.service.IMemberService
 import com.netgrif.workflow.petrinet.domain.PetriNet
 import com.netgrif.workflow.petrinet.domain.dataset.Field
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldContainer
+import com.netgrif.workflow.petrinet.domain.dataset.logic.TaskAwareChangedFieldContainer
 import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.workflow.petrinet.web.requestbodies.UploadedFileMeta
@@ -209,12 +210,12 @@ class ImportHelper {
         return references.find { it.getTitle() == taskTitle }.stringId
     }
 
-    ChangedFieldContainer setTaskData(String taskId, Map<String, Map<String,String>> data) {
+    TaskAwareChangedFieldContainer setTaskData(String taskId, Map<String, Map<String,String>> data) {
         ObjectNode dataSet = populateDataset(data)
-         dataService.setData(taskId, dataSet)
+        dataService.setData(taskId, dataSet)
     }
 
-    ChangedFieldContainer setTaskData(String taskTitle, String caseId, Map<String, Map<String,String>> data) {
+    TaskAwareChangedFieldContainer setTaskData(String taskTitle, String caseId, Map<String, Map<String,String>> data) {
         setTaskData(getTaskId(taskTitle, caseId), data)
     }
 

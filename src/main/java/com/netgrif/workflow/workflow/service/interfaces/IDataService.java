@@ -9,6 +9,7 @@ import com.netgrif.workflow.petrinet.domain.dataset.FileListField;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedField;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldByFileFieldContainer;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldContainer;
+import com.netgrif.workflow.petrinet.domain.dataset.logic.TaskAwareChangedFieldContainer;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.Task;
@@ -29,9 +30,9 @@ public interface IDataService {
 
     List<Field> getData(Task task, Case useCase);
 
-    ChangedFieldContainer setData(String taskId, ObjectNode values);
+    TaskAwareChangedFieldContainer setData(String taskId, ObjectNode values);
 
-    FileFieldInputStream getFile(Case useCase, FileField field);
+    FileFieldInputStream getFile(Case useCase, Task task, FileField field);
 
     FileFieldInputStream getFileByName(Case useCase, FileListField field, String name);
 
@@ -39,7 +40,7 @@ public interface IDataService {
 
     FileFieldInputStream getFileByTaskAndName(String taskId, String fieldId, String name);
 
-    FileFieldInputStream getFileByCase(String caseId, String fieldId);
+    FileFieldInputStream getFileByCase(String caseId, Task task, String fieldId);
 
     FileFieldInputStream getFileByCaseAndName(String caseId, String fieldId, String name);
 
@@ -59,7 +60,9 @@ public interface IDataService {
 
     List<Field> getImmediateFields(Task task);
 
-    Map<String, ChangedField> runActions(List<Action> actions, String useCaseId, Transition transition);
+    Map<String, Map<String, ChangedField>> runActions(List<Action> actions, String useCaseId, String taskId, Transition transition);
+
+    void mergeChangesOnTaskTree(Map<String, Map<String, ChangedField>> changedFields, Map<String, Map<String, ChangedField>> newChangedFields);
 
     void validateCaseRefValue(List<String> value, List<String> allowedNets) throws IllegalArgumentException;
 

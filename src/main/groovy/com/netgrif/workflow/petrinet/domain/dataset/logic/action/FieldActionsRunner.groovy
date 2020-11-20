@@ -6,6 +6,7 @@ import com.netgrif.workflow.configuration.properties.ActionsProperties
 import com.netgrif.workflow.importer.service.FieldFactory
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedField
 import com.netgrif.workflow.workflow.domain.Case
+import com.netgrif.workflow.workflow.domain.Task
 import org.codehaus.groovy.control.CompilerConfiguration
 import org.codehaus.groovy.control.customizers.ImportCustomizer
 import org.slf4j.Logger
@@ -50,14 +51,14 @@ abstract class FieldActionsRunner {
         configuration.addCompilationCustomizers(importCustomizer)
     }
 
-    Map<String, ChangedField> run(Action action, Case useCase) {
+    Map<String, Map<String, ChangedField>> run(Action action, Case useCase, Optional<Task> task) {
         if (!actionsCache)
             actionsCache = new HashMap<>()
 
         log.debug("Action: $action")
         def code = getActionCode(action)
         try {
-            code.init(action, useCase, this)
+            code.init(action, useCase, task, this)
             code()
         } catch (Exception e) {
             log.error("Action: $action.definition")
