@@ -213,19 +213,26 @@ class ActionDelegate {
     }
 
     void putIntoChangedFields(Field field, ChangedField changedField) {
-        getChangedFieldsForTask().put(field.stringId, changedField)
+        putIntoChangedFields(field.stringId, changedField, task.isPresent() ? task.get().stringId : "task")
+    }
+
+    void putIntoChangedFields(String fieldId, ChangedField changedField, String taskId) {
+        getChangedFieldsForTask(taskId).put(fieldId, changedField)
     }
 
     void addAttributeToChangedField(Field field, String attribute, Object value) {
         getChangedFieldsForTask()[field.stringId].addAttribute(attribute, value)
     }
 
-    Map<String, ChangedField> getChangedFieldsForTask(Optional<Task> aTask = task) {
-        String taskKey = task.isPresent() ? task.get().stringId : "task" // TODO NAE-1109 resolve no task reference
-        if (!changedFields.containsKey(taskKey)) {
-            changedFields.put(taskKey, [:])
+    Map<String, ChangedField> getChangedFieldsForTask() {
+        return getChangedFieldsForTask(task.isPresent() ? task.get().stringId : "task")
+    }
+
+    Map<String, ChangedField> getChangedFieldsForTask(String taskId) {
+        if (!changedFields.containsKey(taskId)) {
+            changedFields.put(taskId, [:])
         }
-        return changedFields[taskKey]
+        return changedFields[taskId]
     }
 
     def close = { Transition[] transitions ->
@@ -543,11 +550,24 @@ class ActionDelegate {
     }
 
     def setDataExperimental(String transitionId, Case caze, Map dataSet) {
+        List<ChangedField> changingDataSet = makeDataSetIntoChangedFields(dataSet)
         Task task = taskService.findOne(caze.tasks.find { it.transition == transitionId }.task)
         TaskAwareChangedFieldContainer changedFieldContainer = setData(task, dataSet)
         dataService.mergeChangesOnTaskTree(this.changedFields, changedFieldContainer.changedFields)
+        changingDataSet.each {
+            putIntoChangedFields(it.id, it, task.stringId)
+        }
+        return changedFieldContainer
+    }
 
-        log.debug(this.changedFields.toString())
+    List<ChangedField> makeDataSetIntoChangedFields(Map<String, Map<String, String>> map) {
+        return map.collect { fieldAttributes ->
+            ChangedField changedField = new ChangedField(fieldAttributes.key)
+            fieldAttributes.value.each {attribute ->
+                changedField.addAttribute(attribute.key, attribute.value)
+            }
+            return changedField
+        }
     }
 
     Map<String, Field> getData(Task task) {
