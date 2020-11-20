@@ -54,13 +54,15 @@
             text_from_child_setter: f.text_from_child_setter,
             text_from_child: f.text_from_child;
 
+            log.info("DEBUG: set action of text_from_child_setter $useCase.title")
+
             change text_from_child value { text_from_child_setter.value as String }
         </action>
     </data>
     <!-- I18NS -->
     <!-- TRANSITIONS -->
     <transition>
-        <id>2</id>
+        <id>4</id>
         <x>580</x>
         <y>220</y>
         <layout>
@@ -89,9 +91,15 @@
 					def cases = []
                     number.value.times {
 						def caze = createCase("child", "Child$it" as String)
-						caze.dataSet["parentId"].value = useCase.stringId
-						workflowService.save(caze)
-						tasks.add(caze.tasks.first().task)
+                        caze.dataSet["parentId"].value = useCase.stringId
+
+                        def childChild = createCase("child", "Child of Child$it" as String)
+						caze.dataSet["children"].value = [childChild.tasks.first().task]
+                        childChild.dataSet["parentId"].value = caze.stringId
+                        workflowService.save(childChild)
+
+                        workflowService.save(caze)
+                        tasks.add(caze.tasks.first().task)
 						cases.add(caze.stringId)
                     }
 
@@ -103,7 +111,7 @@
     </transition>
 
     <transition>
-        <id>4</id>
+        <id>2</id>
         <x>780</x>
         <y>220</y>
         <layout>
@@ -163,13 +171,13 @@
         <id>5</id>
         <type>regular</type>
         <sourceId>1</sourceId>
-        <destinationId>2</destinationId>
+        <destinationId>4</destinationId>
         <multiplicity>1</multiplicity>
     </arc>
     <arc>
         <id>6</id>
         <type>regular</type>
-        <sourceId>2</sourceId>
+        <sourceId>4</sourceId>
         <destinationId>3</destinationId>
         <multiplicity>1</multiplicity>
     </arc>
@@ -177,7 +185,7 @@
         <id>7</id>
         <type>read</type>
         <sourceId>3</sourceId>
-        <destinationId>4</destinationId>
+        <destinationId>2</destinationId>
         <multiplicity>1</multiplicity>
     </arc>
 </document>
