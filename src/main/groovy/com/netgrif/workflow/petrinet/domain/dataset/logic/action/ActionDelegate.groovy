@@ -169,7 +169,7 @@ class ActionDelegate {
             [when: { Closure condition ->
                 if (condition()) {
                     behavior(field, trans)
-                    if (!changedFields.containsKey(field.stringId)) {
+                    if (!getChangedFieldsForTask().containsKey(field.stringId)) {
                         putIntoChangedFields(field, new ChangedField(field.stringId))
                     }
                     getChangedFieldsForTask()[field.stringId].addBehavior(useCase.dataSet.get(field.stringId).behavior)
@@ -181,7 +181,7 @@ class ActionDelegate {
 
     def saveChangedValue(Field field) {
         useCase.dataSet.get(field.stringId).value = field.value
-        if (!changedFields.containsKey(field.stringId)) {
+        if (!getChangedFieldsForTask().containsKey(field.stringId)) {
             putIntoChangedFields(field, new ChangedField(field.stringId))
         }
         addAttributeToChangedField(field, "value", field.value)
@@ -190,7 +190,7 @@ class ActionDelegate {
 
     def saveChangedChoices(ChoiceField field) {
         useCase.dataSet.get(field.stringId).choices = field.choices
-        if (!changedFields.containsKey(field.stringId)) {
+        if (!getChangedFieldsForTask().containsKey(field.stringId)) {
             putIntoChangedFields(field, new ChangedField(field.stringId))
         }
         addAttributeToChangedField(field, "choices", field.choices.collect { it.getTranslation(LocaleContextHolder.locale) })
@@ -198,7 +198,7 @@ class ActionDelegate {
 
     def saveChangedAllowedNets(CaseField field) {
         useCase.dataSet.get(field.stringId).allowedNets = field.allowedNets
-        if (!changedFields.containsKey(field.stringId)) {
+        if (!getChangedFieldsForTask().containsKey(field.stringId)) {
             putIntoChangedFields(field, new ChangedField(field.stringId))
         }
         addAttributeToChangedField(field, "allowedNets", field.allowedNets)
@@ -206,7 +206,7 @@ class ActionDelegate {
 
     def saveChangedOptions(MapOptionsField field) {
         useCase.dataSet.get(field.stringId).options = field.options
-        if (!changedFields.containsKey(field.stringId)) {
+        if (!getChangedFieldsForTask().containsKey(field.stringId)) {
             putIntoChangedFields(field, new ChangedField(field.stringId))
         }
         addAttributeToChangedField(field, "options", field.options.collectEntries {key, value -> [key, (value as I18nString).getTranslation(LocaleContextHolder.locale)]} )
@@ -294,11 +294,11 @@ class ActionDelegate {
              if (!(values instanceof Collection))
                  values = [values]
              field = (ChoiceField) field
-                 if (values.every { it instanceof I18nString }) {
-                     field.setChoices(values as Set<I18nString>)
-                 } else {
-                     field.setChoicesFromStrings(values as Set<String>)
-                 }
+             if (values.every { it instanceof I18nString }) {
+                 field.setChoices(values as Set<I18nString>)
+             } else {
+                 field.setChoicesFromStrings(values as Set<String>)
+             }
              saveChangedChoices(field)
          },
          allowedNets: { cl ->
