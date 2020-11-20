@@ -22,6 +22,8 @@
 			text1: f.text1,
 			number1: f.number1;
 
+			log.info("DEBUG: set action of text1 $useCase.title")
+
 			change number1 value { text1.value ? (text1.value as String).length() : -1 }
 		</action>
 	</data>
@@ -34,9 +36,17 @@
 			parentId: f.parentId;
 
 			def parentCase = workflowService.findOne(parentId.value)
-			setDataExperimental("4", parentCase, [
+			setDataExperimental("2", parentCase, [
 				"text_from_child_setter": ["type": "text", "value": text2.value as String]
 			])
+		</action>
+	</data>
+	<data type="text">
+		<id>text3</id>
+		<title>Text3</title>
+
+		<action trigger="set">
+			log.info("DEBUG: set action of text3 $useCase.title")
 		</action>
 	</data>
 	<data type="number">
@@ -54,6 +64,8 @@
 			enumeration1: f.enumeration1,
 			parentId: f.parentId;
 
+			log.info("DEBUG: set action of enumeration1 $useCase.title")
+
 			def parent = workflowService.findOne(parentId.value as String)
 			def children = parent.dataSet["children_cases"].value as Set
 			children.each {
@@ -63,7 +75,7 @@
 
 				def childCase = workflowService.findOne(caseId)
 				setDataExperimental("2", childCase, [
-					"enumeration1": ["type": "enumeration", "value": enumeration1.value as String]
+					"text3": ["type": "text", "value": enumeration1.value as String]
 				])
 			}
 		</action>
@@ -75,6 +87,28 @@
 	<data type="file">
 		<id>file1</id>
 		<title>File1</title>
+	</data>
+
+	<data type="text">
+		<id>text_from_child</id>
+		<title>Text from child</title>
+	</data>
+	<data type="text">
+		<id>text_from_child_setter</id>
+		<title/>
+
+		<action trigger="set">
+			trans: t.2,
+			text_from_child_setter: f.text_from_child_setter,
+			text_from_child: f.text_from_child;
+
+			log.info("DEBUG: set action of text_from_child_setter $useCase.title")
+
+			change text_from_child value { text_from_child_setter.value as String }
+
+			make text_from_child,visible on trans when { text_from_child.value == "ABC" }
+			make text_from_child,editable on trans when { text_from_child.value != "ABC" }
+		</action>
 	</data>
 
 	<data type="taskRef">
@@ -105,6 +139,12 @@
 			</logic>
 		</dataRef>
 		<dataRef>
+			<id>text3</id>
+			<logic>
+				<behavior>editable</behavior>
+			</logic>
+		</dataRef>
+		<dataRef>
 			<id>number1</id>
 			<logic>
 				<behavior>editable</behavior>
@@ -124,6 +164,20 @@
 		</dataRef>
 		<dataRef>
 			<id>file1</id>
+			<logic>
+				<behavior>editable</behavior>
+			</logic>
+		</dataRef>
+
+		<dataRef>
+			<id>text_from_child</id>
+			<logic>
+				<behavior>editable</behavior>
+			</logic>
+		</dataRef>
+
+		<dataRef>
+			<id>children</id>
 			<logic>
 				<behavior>editable</behavior>
 			</logic>
