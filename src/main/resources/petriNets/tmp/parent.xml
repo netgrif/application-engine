@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="https://modeler.netgrif.com/petriflow_schema.xsd">
+    <id>parent</id>
+    <version>1.0.0</version>
+    <initials>PAR</initials>
+    <title>parent</title>
+    <icon>home</icon>
+    <defaultRole>true</defaultRole>
+    <transitionRole>false</transitionRole>
+    <!-- TRANSACTIONS -->
+    <!-- ROLES -->
+    <!-- DATA -->
+    <data type="text">
+        <id>text</id>
+        <title>Text</title>
+
+        <action trigger="set">
+			text: f.text,
+			children_cases: f.children_cases;
+
+			def ids = children_cases.value ? children_cases.value : []
+			ids.each {
+				def caseId = it as String
+				def childCase = workflowService.findOne(caseId)
+				setDataExperimental("2", childCase, [
+					"text1": ["type": "text", "value": text.value as String]
+				])
+			}
+        </action>
+    </data>
+    <data type="number">
+        <id>number</id>
+        <title>Number</title>
+    </data>
+    <data type="multichoice">
+        <id>children_cases</id>
+        <title>children_cases</title>
+    </data>
+    <data type="taskRef">
+        <id>children_tasks</id>
+        <title>whatever</title>
+    </data>
+
+    <data type="text">
+        <id>text_from_child</id>
+        <title>Text from child</title>
+    </data>
+    <data type="text">
+        <id>text_from_child_setter</id>
+        <title/>
+
+        <action trigger="set">
+            text_from_child_setter: f.text_from_child_setter,
+            text_from_child: f.text_from_child;
+
+            change text_from_child value { text_from_child_setter.value as String }
+        </action>
+    </data>
+    <!-- I18NS -->
+    <!-- TRANSITIONS -->
+    <transition>
+        <id>2</id>
+        <x>580</x>
+        <y>220</y>
+        <layout>
+            <offset>0</offset>
+        </layout>
+        <label>Constructor</label>
+        <assignPolicy>auto</assignPolicy>
+
+        <dataRef>
+            <id>number</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+            </logic>
+        </dataRef>
+
+        <event type="finish">
+            <id>finish</id>
+            <actions phase="pre">
+                <action>
+                    number: f.number,
+                    children_cases: f.children_cases,
+                    children_tasks: f.children_tasks;
+
+					def tasks = []
+					def cases = []
+                    number.value.times {
+						def caze = createCase("child", "Child$it" as String)
+						caze.dataSet["parentId"].value = useCase.stringId
+						workflowService.save(caze)
+						tasks.add(caze.tasks.first().task)
+						cases.add(caze.stringId)
+                    }
+
+					change children_cases value { cases }
+					change children_tasks value { tasks }
+                </action>
+            </actions>
+        </event>
+    </transition>
+
+    <transition>
+        <id>4</id>
+        <x>780</x>
+        <y>220</y>
+        <layout>
+            <offset>0</offset>
+        </layout>
+        <label>View</label>
+        <assignPolicy>auto</assignPolicy>
+
+        <dataGroup>
+            <id>0</id>
+			<title>Edit</title>
+            <dataRef>
+                <id>text</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>text_from_child</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+
+        <dataGroup>
+            <id>1</id>
+			<title>Inštancie</title>
+            <dataRef>
+                <id>children_tasks</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+
+    </transition>
+    <!-- PLACES -->
+    <place>
+        <id>1</id>
+        <x>460</x>
+        <y>220</y>
+        <label></label>
+        <tokens>1</tokens>
+        <static>false</static>
+    </place>
+    <place>
+        <id>3</id>
+        <x>660</x>
+        <y>220</y>
+        <label></label>
+        <tokens>0</tokens>
+        <static>false</static>
+    </place>
+    <!-- ARCS -->
+    <arc>
+        <id>5</id>
+        <type>regular</type>
+        <sourceId>1</sourceId>
+        <destinationId>2</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>6</id>
+        <type>regular</type>
+        <sourceId>2</sourceId>
+        <destinationId>3</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>7</id>
+        <type>read</type>
+        <sourceId>3</sourceId>
+        <destinationId>4</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+</document>
