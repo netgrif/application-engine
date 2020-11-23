@@ -258,7 +258,7 @@ public class TaskController {
     })
     public ChangedFieldContainer setData(Authentication auth, @PathVariable("id") String taskId, @RequestBody ObjectNode dataBody) {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
-        return dataService.setData(taskId, dataBody).flatten(taskId);
+        return dataService.setData(taskId, dataBody).flatten();
     }
 
     @PreAuthorize("@taskAuthorizationService.canCallSaveFile(#auth.getPrincipal(), #taskId)")
