@@ -1,6 +1,7 @@
 package com.netgrif.workflow.petrinet.domain.dataset.logic
 
 
+// TODO NAE-1109 remove
 class TaskAwareChangedFieldContainer {
 
     private Map<String, Map<String, ChangedField>> changedFields

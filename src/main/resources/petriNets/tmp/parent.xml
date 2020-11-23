@@ -93,12 +93,14 @@
 						def caze = createCase("child", "Child$it" as String)
                         caze.dataSet["parentId"].value = useCase.stringId
 
-                        def childChild = createCase("child", "Child of Child$it" as String)
-						caze.dataSet["children"].value = [childChild.tasks.first().task]
+                        /*def childChild = createCase("child", "Child of Child$it" as String)
                         childChild.dataSet["parentId"].value = caze.stringId
                         workflowService.save(childChild)
+                        caze.dataSet["children"].value = [childChild.tasks.first().task]
+                        */
 
                         workflowService.save(caze)
+
                         tasks.add(caze.tasks.first().task)
 						cases.add(caze.stringId)
                     }
