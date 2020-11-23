@@ -26,6 +26,13 @@
 
 			change number1 value { text1.value ? (text1.value as String).length() : -1 }
 		</action>
+
+		<action trigger="set">
+			text1: f.text1,
+			text2: f.text2;
+
+			change text2 value { text1.value }
+		</action>
 	</data>
 	<data type="text">
 		<id>text2</id>
