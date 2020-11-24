@@ -27,6 +27,8 @@ public interface IDataService {
 
     TaskChangedFieldContainer setData(String taskId, ObjectNode values);
 
+    TaskChangedFieldContainer setData(Task task, ObjectNode values);
+
     FileFieldInputStream getFile(Case useCase, Task task, FileField field);
 
     FileFieldInputStream getFileByName(Case useCase, FileListField field, String name);
