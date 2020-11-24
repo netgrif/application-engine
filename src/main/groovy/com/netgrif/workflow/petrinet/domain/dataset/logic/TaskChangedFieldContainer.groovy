@@ -1,18 +1,16 @@
 package com.netgrif.workflow.petrinet.domain.dataset.logic
 
 
-// TODO NAE-1109 remove
-class TaskAwareChangedFieldContainer {
+class TaskChangedFieldContainer {
 
     private Map<String, Map<String, ChangedField>> changedFields
 
-    TaskAwareChangedFieldContainer() {
-        changedFields = new HashMap<>()
+    TaskChangedFieldContainer() {
+        this(new HashMap<String, Map<String, ChangedField>>())
     }
 
-    @Override
-    protected Object clone() throws CloneNotSupportedException {
-        return super.clone()
+    TaskChangedFieldContainer(Map<String, Map<String, ChangedField>> changedFields) {
+        this.changedFields = changedFields
     }
 
     Map<String, Map<String, ChangedField>> getChangedFields() {
@@ -41,8 +39,7 @@ class TaskAwareChangedFieldContainer {
         return container
     }
 
-    // TODO NAE-1109 duplicate
-    void mergeChangesOnTaskTree(Map<String, Map<String, ChangedField>> newChangedFields) {
+    void mergeChanges(Map<String, Map<String, ChangedField>> newChangedFields) {
         newChangedFields.forEach({ taskId, fieldsMap ->
             if (!changedFields.containsKey(taskId)) {
                 changedFields.put(taskId, new HashMap<>())
@@ -52,12 +49,13 @@ class TaskAwareChangedFieldContainer {
         })
     }
 
-    private void mergeChanges(Map<String, ChangedField> changedFields, Map<String, ChangedField> newChangedFields) {
+    void mergeChanges(Map<String, ChangedField> changedFields, Map<String, ChangedField> newChangedFields) {
         newChangedFields.forEach({ s, changedField ->
             if (changedFields.containsKey(s))
                 changedFields.get(s).merge(changedField)
             else
                 changedFields.put(s, changedField)
-        });
+        })
     }
+
 }
