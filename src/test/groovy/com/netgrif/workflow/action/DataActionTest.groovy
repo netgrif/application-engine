@@ -2,9 +2,8 @@ package com.netgrif.workflow.action
 
 import com.netgrif.workflow.importer.service.Importer
 import com.netgrif.workflow.petrinet.domain.dataset.Field
-import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldContainer
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldsTree
-import com.netgrif.workflow.petrinet.domain.dataset.logic.TaskAwareChangedFieldContainer
+import com.netgrif.workflow.petrinet.domain.dataset.logic.TaskChangedFieldContainer
 import com.netgrif.workflow.startup.ImportHelper
 import com.netgrif.workflow.workflow.domain.Task
 import com.netgrif.workflow.workflow.service.interfaces.IDataService
@@ -45,12 +44,12 @@ class DataActionTest {
         List<Field> dataGet = dataService.getData($case.tasks.first().task)
         dataGet.first().value == ";get-pre;get-post"
 
-        ChangedFieldsTree dataSet = dataService.setData(task.stringId, ImportHelper.populateDataset(
+        TaskChangedFieldContainer dataSet = dataService.setData(task.stringId, ImportHelper.populateDataset(
                 "text_field": [
                         "value": "",
                         "type" : "text"
                 ] as Map
         ))
-        dataSet.getRoot().getChangedFields()[task.stringId]["text_field"]["value"] == ";set-pre;set-post"
+        dataSet.getChangedFields()[task.stringId]["text_field"]["value"] == ";set-pre;set-post"
     }
 }

@@ -18,7 +18,7 @@ import com.netgrif.workflow.petrinet.domain.Transition
 import com.netgrif.workflow.petrinet.domain.dataset.*
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedField
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldsTree
-import com.netgrif.workflow.petrinet.domain.dataset.logic.TaskAwareChangedFieldContainer
+import com.netgrif.workflow.petrinet.domain.dataset.logic.TaskChangedFieldContainer
 import com.netgrif.workflow.petrinet.domain.dataset.logic.TaskChangedFields
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.workflow.startup.ImportHelper
@@ -171,10 +171,10 @@ class ActionDelegate {
             [when: { Closure condition ->
                 if (condition()) {
                     behavior(field, trans)
-                    if (!changedFieldsTree.root.changedFields.containsKey(field.stringId)) {
+                    if (!changedFieldsTree.changedFields.containsKey(field.stringId)) {
                         putIntoChangedFields(field, new ChangedField(field.stringId))
                     }
-                    changedFieldsTree.root.addBehavior(field.stringId, useCase.dataSet.get(field.stringId).behavior)
+                    changedFieldsTree.addBehavior(field.stringId, useCase.dataSet.get(field.stringId).behavior)
                     addAttributeToChangedField(field, "type", field.type.name)
                 }
             }]
@@ -183,7 +183,7 @@ class ActionDelegate {
 
     def saveChangedValue(Field field) {
         useCase.dataSet.get(field.stringId).value = field.value
-        if (!changedFieldsTree.root.changedFields.containsKey(field.stringId)) {
+        if (!changedFieldsTree.changedFields.containsKey(field.stringId)) {
             putIntoChangedFields(field, new ChangedField(field.stringId))
         }
         addAttributeToChangedField(field, "value", field.value)
@@ -192,7 +192,7 @@ class ActionDelegate {
 
     def saveChangedChoices(ChoiceField field) {
         useCase.dataSet.get(field.stringId).choices = field.choices
-        if (!changedFieldsTree.root.changedFields.containsKey(field.stringId)) {
+        if (!changedFieldsTree.changedFields.containsKey(field.stringId)) {
             putIntoChangedFields(field, new ChangedField(field.stringId))
         }
         addAttributeToChangedField(field, "choices", field.choices.collect { it.getTranslation(LocaleContextHolder.locale) })
@@ -200,7 +200,7 @@ class ActionDelegate {
 
     def saveChangedAllowedNets(CaseField field) {
         useCase.dataSet.get(field.stringId).allowedNets = field.allowedNets
-        if (!changedFieldsTree.root.changedFields.containsKey(field.stringId)) {
+        if (!changedFieldsTree.changedFields.containsKey(field.stringId)) {
             putIntoChangedFields(field, new ChangedField(field.stringId))
         }
         addAttributeToChangedField(field, "allowedNets", field.allowedNets)
@@ -208,7 +208,7 @@ class ActionDelegate {
 
     def saveChangedOptions(MapOptionsField field) {
         useCase.dataSet.get(field.stringId).options = field.options
-        if (!changedFieldsTree.root.changedFields.containsKey(field.stringId)) {
+        if (!changedFieldsTree.changedFields.containsKey(field.stringId)) {
             putIntoChangedFields(field, new ChangedField(field.stringId))
         }
         addAttributeToChangedField(field, "options", field.options.collectEntries {key, value -> [key, (value as I18nString).getTranslation(LocaleContextHolder.locale)]} )
@@ -219,11 +219,11 @@ class ActionDelegate {
     }
 
     void putIntoChangedFields(String fieldId, ChangedField changedField) {
-        changedFieldsTree.root.put(fieldId, changedField)
+        changedFieldsTree.put(fieldId, changedField)
     }
 
     void addAttributeToChangedField(Field field, String attribute, Object value) {
-        changedFieldsTree.root.changedFields[field.stringId].addAttribute(attribute, value)
+        changedFieldsTree.addAttribute(field.stringId, attribute, value)
     }
 
     def close = { Transition[] transitions ->
@@ -540,14 +540,16 @@ class ActionDelegate {
         dataService.setData(task.stringId, ImportHelper.populateDataset(dataSet))
     }
 
-    def setDataExperimental(String transitionId, Case caze, Map dataSet) {
+    def setDataWithPropagation(String transitionId, Case caze, Map dataSet) {
         // TODO NAE-1109 - same case?
         Map<String, ChangedField> changingDataSet = makeDataSetIntoChangedFields(dataSet)
         Task task = taskService.findOne(caze.tasks.find { it.transition == transitionId }.task)
-        ChangedFieldsTree tree = setData(task, dataSet)
-        this.changedFieldsTree.append(tree.root)
-        this.changedFieldsTree.append(new TaskChangedFields(task.stringId, changingDataSet))
-        return tree
+        TaskChangedFieldContainer container = setData(task, dataSet)
+        this.changedFieldsTree.addPropagated(task.stringId, changingDataSet)
+        container.changedFields.each {
+            this.changedFieldsTree.addPropagated(it.key, it.value)
+        }
+        return container
     }
 
     Map<String, ChangedField> makeDataSetIntoChangedFields(Map<String, Map<String, String>> map) {
