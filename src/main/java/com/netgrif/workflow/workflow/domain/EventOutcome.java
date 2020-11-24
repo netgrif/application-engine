@@ -12,6 +12,8 @@ public class EventOutcome {
 
     private String taskId;
 
+    private String caseId;
+
     private I18nString message;
 
     private TaskChangedFieldContainer changedFields;
@@ -26,12 +28,14 @@ public class EventOutcome {
         this.changedFields.mergeChanges(taskChangedFieldContainer.getChangedFields());
     }
 
-    public EventOutcome(String taskId) {
+    public EventOutcome(String taskId, String caseId) {
+        this.taskId = taskId;
+        this.caseId = caseId;
         this.changedFields = new TaskChangedFieldContainer();
     }
 
-    public EventOutcome(String taskId, I18nString message) {
-        this(taskId);
+    public EventOutcome(String taskId, String caseId, I18nString message) {
+        this(taskId, caseId);
         this.message = message;
     }
 }
