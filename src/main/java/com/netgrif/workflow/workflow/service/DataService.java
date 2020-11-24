@@ -140,7 +140,8 @@ public class DataService implements IDataService {
         return setData(task, values);
     }
 
-    private TaskChangedFieldContainer setData(Task task, ObjectNode values) {
+    @Override
+    public TaskChangedFieldContainer setData(Task task, ObjectNode values) {
         Case useCase = workflowService.findOne(task.getCaseId());
         TaskChangedFieldContainer taskChangedFieldContainer = new TaskChangedFieldContainer();
 
@@ -172,7 +173,6 @@ public class DataService implements IDataService {
                     for (Map.Entry<String, Map<String, ChangedField>> taskFields : changedFieldContainer.getChangedFields().entrySet()) {
                         for (Map.Entry<String, ChangedField> fieldEntry : taskFields.getValue().entrySet()) {
                             substituteTaskRefFieldBehavior(fieldEntry.getValue(), referencedTask, task.getTransitionId());
-                            taskChangedFieldContainer.add(taskFields.getKey(), fieldEntry.getKey(), fieldEntry.getValue());
                         }
                     }
                     taskChangedFieldContainer.mergeChanges(changedFieldContainer.getChangedFields());
@@ -299,8 +299,8 @@ public class DataService implements IDataService {
     @Override
     public FileFieldInputStream getFileByName(Case useCase, FileListField field, String name) {
         field.getEvents().forEach(dataEvent -> {
-            dataEvent.getActions().get(EventPhase.PRE).forEach(action -> actionsRunner.run(action, useCase, Optional.empty()));
-            dataEvent.getActions().get(EventPhase.POST).forEach(action -> actionsRunner.run(action, useCase, Optional.empty()));
+            dataEvent.getActions().get(EventPhase.PRE).forEach(action -> actionsRunner.run(action, useCase));
+            dataEvent.getActions().get(EventPhase.POST).forEach(action -> actionsRunner.run(action, useCase));
         });
         if (useCase.getDataSet().get(field.getStringId()).getValue() == null)
             return null;
@@ -326,8 +326,8 @@ public class DataService implements IDataService {
     @Override
     public FileFieldInputStream getFile(Case useCase, Task task, FileField field) {
         field.getEvents().forEach(dataEvent -> {
-            dataEvent.getActions().get(EventPhase.PRE).forEach(action -> actionsRunner.run(action, useCase, Optional.of(task)));
-            dataEvent.getActions().get(EventPhase.POST).forEach(action -> actionsRunner.run(action, useCase, Optional.of(task)));
+            dataEvent.getActions().get(EventPhase.PRE).forEach(action -> actionsRunner.run(action, useCase, Optional.ofNullable(task)));
+            dataEvent.getActions().get(EventPhase.POST).forEach(action -> actionsRunner.run(action, useCase, Optional.ofNullable(task)));
         });
         if (useCase.getDataSet().get(field.getStringId()).getValue() == null)
             return null;

@@ -48,6 +48,10 @@ abstract class FieldActionsRunner {
         configuration.addCompilationCustomizers(importCustomizer)
     }
 
+    ChangedFieldsTree run(Action action, Case useCase) {
+        return run(action, useCase, Optional.empty())
+    }
+
     ChangedFieldsTree run(Action action, Case useCase, Optional<Task> task) {
         if (!actionsCache)
             actionsCache = new HashMap<>()
