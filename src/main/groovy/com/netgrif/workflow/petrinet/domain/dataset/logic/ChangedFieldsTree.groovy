@@ -36,8 +36,8 @@ class ChangedFieldsTree extends TaskChangedFields {
         findInPropagated(fieldId).ifPresent { it.merge(changedField) }
     }
 
-    void mergeChangesOnTaskTree(ChangedFieldsTree newChangedFields) {
-        addPropagated(newChangedFields.taskId, newChangedFields.changedFields)
+    void mergeChangedFields(ChangedFieldsTree newChangedFields) {
+        mergeChanges(this.changedFields, newChangedFields.changedFields)
         newChangedFields.propagatedChanges.each {
             addPropagated(it.key, it.value.changedFields)
         }

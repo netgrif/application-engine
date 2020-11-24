@@ -11,6 +11,25 @@
     <!-- TRANSACTIONS -->
     <!-- ROLES -->
     <!-- DATA -->
+    <data type="file">
+        <id>file</id>
+        <title>File</title>
+
+        <action trigger="set">
+            children_cases: f.children_cases,
+            file: f.file;
+
+            def ids = children_cases.value ? children_cases.value : []
+            ids.each {
+                def caseId = it as String
+                def childCase = workflowService.findOne(caseId)
+                setDataWithPropagation("2", childCase, [
+                    "text3": ["type": "text", "value": file.value?.name as String]
+                ])
+            }
+        </action>
+    </data>
+
     <data type="text">
         <id>text</id>
         <title>Text</title>
@@ -32,6 +51,7 @@
                     text: f.text,
                     text_from_child: f.text_from_child,
                     children_cases: f.children_cases;
+
 
                     def ids = children_cases.value ? children_cases.value : []
                     ids.each {
@@ -152,6 +172,12 @@
             <id>0</id>
 			<title>Edit</title>
             <dataRef>
+                <id>file</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
                 <id>text</id>
                 <logic>
                     <behavior>editable</behavior>
@@ -182,6 +208,58 @@
             </dataRef>
         </dataGroup>
 
+    </transition>
+
+    <transition>
+        <id>66</id>
+        <x>100</x>
+        <y>100</y>
+        <label>Task</label>
+        <assignPolicy>auto</assignPolicy>
+
+        <dataGroup>
+            <id>0</id>
+            <dataRef>
+                <id>text</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>number</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>text_from_child</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+
+        <dataGroup>
+            <id>1</id>
+            <dataRef>
+                <id>children_tasks</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+
+        <event type="assign">
+            <id>0</id>
+
+            <actions phase="pre">
+                <action>
+                    text: f.text;
+
+                    change text value { "ASSIGN EVENT" }
+                </action>
+            </actions>
+        </event>
     </transition>
     <!-- PLACES -->
     <place>
