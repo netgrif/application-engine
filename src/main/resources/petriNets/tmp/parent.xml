@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-          xsi:noNamespaceSchemaLocation="https://modeler.netgrif.com/petriflow_schema.xsd">
+          xsi:noNamespaceSchemaLocation="../petriflow_schema.xsd">
     <id>parent</id>
     <version>1.0.0</version>
     <initials>PAR</initials>
@@ -15,19 +15,45 @@
         <id>text</id>
         <title>Text</title>
 
-        <action trigger="set">
-			text: f.text,
-			children_cases: f.children_cases;
+        <event type="set">
+            <id>id</id>
 
-			def ids = children_cases.value ? children_cases.value : []
-			ids.each {
-				def caseId = it as String
-				def childCase = workflowService.findOne(caseId)
-				setDataExperimental("2", childCase, [
-					"text1": ["type": "text", "value": text.value as String]
-				])
-			}
-        </action>
+            <actions phase="pre">
+                <action>
+                    number: f.number;
+
+                    change number value { 666 as Double }
+                </action>
+            </actions>
+
+            <actions phase="post">
+                <action>
+                    trans: t.2,
+                    text: f.text,
+                    text_from_child: f.text_from_child,
+                    children_cases: f.children_cases;
+
+                    def ids = children_cases.value ? children_cases.value : []
+                    ids.each {
+                        def caseId = it as String
+                        def childCase = workflowService.findOne(caseId)
+                        setDataWithPropagation("2", childCase, [
+                            "text1": ["type": "text", "value": text.value as String]
+                        ])
+                    }
+
+                    def actualValue = workflowService.findOne(useCase.stringId).dataSet["text_from_child"].value as String
+                    make text_from_child,editable on trans when { actualValue == "ABC" }
+                    make text_from_child,required on trans when { actualValue == "ABC" }
+                    make text_from_child,visible on trans when { actualValue != "ABC" }
+
+                    change text_from_child value { "OVERRIDE" }
+
+                    log.warn("POST " + text_from_child.value)
+                </action>
+            </actions>
+        </event>
+
     </data>
     <data type="number">
         <id>number</id>
@@ -127,6 +153,12 @@
 			<title>Edit</title>
             <dataRef>
                 <id>text</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>number</id>
                 <logic>
                     <behavior>editable</behavior>
                 </logic>
