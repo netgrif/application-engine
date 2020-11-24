@@ -135,14 +135,14 @@ public class DataService implements IDataService {
     }
 
     @Override
-    public ChangedFieldsTree setData(String taskId, ObjectNode values) {
+    public TaskChangedFieldContainer setData(String taskId, ObjectNode values) {
         Task task = taskService.findOne(taskId);
         return setData(task, values);
     }
 
-    private ChangedFieldsTree setData(Task task, ObjectNode values) {
+    private TaskChangedFieldContainer setData(Task task, ObjectNode values) {
         Case useCase = workflowService.findOne(task.getCaseId());
-        ChangedFieldsTree container = ChangedFieldsTree.createNew(task.getStringId());
+        TaskChangedFieldContainer taskChangedFieldContainer = new TaskChangedFieldContainer();
 
         log.info("[" + useCase.getStringId() + "]: Setting data of task " + task.getTransitionId() + " [" + task.getStringId() + "]");
 
@@ -156,26 +156,26 @@ public class DataService implements IDataService {
             if (dataField != null) {
                 ChangedFieldsTree changedFieldsTreePre = resolveDataEvents(useCase.getPetriNet().getField(fieldId).get(),
                         Action.ActionTrigger.SET, EventPhase.PRE, useCase, task, useCase.getPetriNet().getTransition(task.getTransitionId()));
-                container.mergeChangesOnTaskTree(changedFieldsTreePre);
+                taskChangedFieldContainer.mergeChanges(changedFieldsTreePre.toMap());
 
                 dataField.setValue(parseFieldsValues(entry.getValue(), dataField));
                 ChangedFieldsTree changedFieldsTreePost = resolveDataEvents(useCase.getPetriNet().getField(fieldId).get(),
                         Action.ActionTrigger.SET, EventPhase.POST, useCase, task, useCase.getPetriNet().getTransition(task.getTransitionId()));
-                container.mergeChangesOnTaskTree(changedFieldsTreePost);
+                taskChangedFieldContainer.mergeChanges(changedFieldsTreePost.toMap());
 
                 log.info("Ran actions on set fields " + values.toString() + " in " + task.getStringId() + " in " + useCase.getStringId() + " " + useCase.getTitle());
             } else try {
                 if (entry.getKey().contains("-")) {
                     TaskRefFieldWrapper decoded = decodeTaskRefFieldId(entry.getKey());
                     Task referencedTask = taskService.findOne(decoded.getTaskId());
-                    ChangedFieldsTree taskRefChangedTree = setData(referencedTask, values);
-//                    for (Map.Entry<String, Map<String, ChangedField>> stringMapEntry : changedFieldContainer.getChangedFields().entrySet()) {
-//                        for (Map.Entry<String, ChangedField> fieldEntry : stringMapEntry.getValue().entrySet()) {
-//                            substituteTaskRefFieldBehavior(fieldEntry.getValue(), referencedTask, task.getTransitionId());
-//                            container.add(stringMapEntry.getKey(), fieldEntry.getKey(), fieldEntry.getValue());
-//                        }
-//                    }
-                    container.append(taskRefChangedTree.getRoot());
+                    TaskChangedFieldContainer changedFieldContainer = setData(referencedTask, values);
+                    for (Map.Entry<String, Map<String, ChangedField>> stringMapEntry : changedFieldContainer.getChangedFields().entrySet()) {
+                        for (Map.Entry<String, ChangedField> fieldEntry : stringMapEntry.getValue().entrySet()) {
+                            substituteTaskRefFieldBehavior(fieldEntry.getValue(), referencedTask, task.getTransitionId());
+                            taskChangedFieldContainer.add(stringMapEntry.getKey(), fieldEntry.getKey(), fieldEntry.getValue());
+                        }
+                    }
+                    taskChangedFieldContainer.mergeChanges(changedFieldContainer.getChangedFields());
                     log.info("Ran actions on set taskRef fields " + values.toString() + " in " + referencedTask.getStringId() + " in " + referencedTask.getCaseId());
                 }
             } catch (Exception e) {
@@ -184,9 +184,10 @@ public class DataService implements IDataService {
         });
         updateDataset(useCase);
         workflowService.save(useCase);
-        publisher.publishEvent(new SaveCaseDataEvent(useCase, values, container.getRoot().getChangedFields().values()));
+        publisher.publishEvent(new SaveCaseDataEvent(useCase, values, taskChangedFieldContainer.getChangedFields().containsKey(task.getStringId()) ?
+                taskChangedFieldContainer.getChangedFields().get(task.getStringId()).values() : new HashSet<>()));
 
-        return container;
+        return taskChangedFieldContainer;
     }
 
     private Map<String, Object> substituteTaskRefFieldBehavior(Map<String, Object> change, Task referencedTask, String refereeTransId) {
@@ -602,23 +603,23 @@ public class DataService implements IDataService {
     }
 
     @Override
-    public ChangedFieldsTree runActions(List<Action> actions, String useCaseId, String taskId, Transition transition) {
+    public TaskChangedFieldContainer runActions(List<Action> actions, String useCaseId, String taskId, Transition transition) {
         log.info("[" + useCaseId + "]: Running actions of transition " + transition.getStringId());
         ChangedFieldsTree changedFields = ChangedFieldsTree.createNew(taskId);
         if (actions.isEmpty())
-            return changedFields;
+            return new TaskChangedFieldContainer(changedFields.toMap());
 
         Case case$ = workflowService.findOne(useCaseId);
         Task task = taskService.findOne(taskId);
         actions.forEach(action -> {
             ChangedFieldsTree changedFieldsTree = actionsRunner.run(action, case$, Optional.of(task));
-            if (changedFieldsTree.getRoot().getChangedFields().isEmpty())
+            if (changedFieldsTree.getChangedFields().isEmpty())
                 return;
             changedFields.mergeChangesOnTaskTree(changedFieldsTree);
-            runEventActionsOnChanged(case$, task, transition, changedFields, changedFieldsTree.getRoot().getChangedFields(), Action.ActionTrigger.SET,true);
+            runEventActionsOnChanged(case$, task, transition, changedFields, changedFieldsTree.getChangedFields(), Action.ActionTrigger.SET,true);
         });
         workflowService.save(case$);
-        return changedFields;
+        return new TaskChangedFieldContainer(changedFields.toMap());
     }
 
     private void updateDataset(Case useCase) {
@@ -654,10 +655,10 @@ public class DataService implements IDataService {
             ChangedFieldsTree currentChangedFields = actionsRunner.run(action, useCase, Optional.of(task));
             changedFields.mergeChangesOnTaskTree(currentChangedFields);
 
-            if (currentChangedFields.getRoot().getChangedFields().isEmpty())
+            if (currentChangedFields.getChangedFields().isEmpty())
                 return;
 
-            runEventActionsOnChanged(useCase, task, transition, changedFields, currentChangedFields.getRoot().getChangedFields(), trigger,trigger == Action.ActionTrigger.SET);
+            runEventActionsOnChanged(useCase, task, transition, changedFields, currentChangedFields.getChangedFields(), trigger,trigger == Action.ActionTrigger.SET);
         });
     }
 

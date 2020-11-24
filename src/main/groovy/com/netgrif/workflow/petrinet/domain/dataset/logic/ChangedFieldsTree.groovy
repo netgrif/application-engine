@@ -1,82 +1,90 @@
 package com.netgrif.workflow.petrinet.domain.dataset.logic
 
-
 import com.querydsl.core.annotations.QueryExclude
 
 @QueryExclude
-class ChangedFieldsTree {
+class ChangedFieldsTree extends TaskChangedFields {
 
-    private TaskChangedFields root
+    private Map<String, TaskChangedFields> propagatedChanges = new HashMap<>()
 
-    ChangedFieldsTree(TaskChangedFields root) {
-        this.root = root
-    }
-
-    TaskChangedFields getRoot() {
-        return root
+    ChangedFieldsTree(String taskId) {
+        super(taskId)
     }
 
     static ChangedFieldsTree createNew(String taskId) {
-        return new ChangedFieldsTree(new TaskChangedFields(taskId))
+        return new ChangedFieldsTree(taskId)
     }
 
-    ChangedFieldContainer flatten() {
-        return flatten(new ChangedFieldContainer())
-    }
-
-    ChangedFieldContainer flatten(ChangedFieldContainer existing) {
-        Map<String, ChangedField> fields = collectChangedFields()
-        fields.each {
-            existing.changedFields.put(it.key, it.value.attributes)
+    void put(String fieldId, ChangedField changedField) {
+        if (!changedFields.containsKey(fieldId)) {
+            changedFields.put(fieldId, changedField)
+        } else {
+            changedFields.get(fieldId).merge(changedField)
         }
-        return existing
+        findInPropagated(fieldId).ifPresent {it.merge(changedField) }
+    }
+
+    void addBehavior(String fieldId, Map<String, Set<FieldBehavior>> behavior) {
+        ChangedField changedField = changedFields.get(fieldId)
+        changedField.addBehavior(behavior)
+        findInPropagated(fieldId).ifPresent { it.merge(changedField) }
+    }
+
+    void addAttribute(String fieldId, String attribute, Object value) {
+        ChangedField changedField = changedFields.get(fieldId)
+        changedField.addAttribute(attribute, value)
+        findInPropagated(fieldId).ifPresent { it.merge(changedField) }
     }
 
     void mergeChangesOnTaskTree(ChangedFieldsTree newChangedFields) {
-        if (root.getTaskId() == newChangedFields.getRoot().getTaskId()) {
-            mergeChanges(root.getChangedFields(), newChangedFields.getRoot().getChangedFields())
-            newChangedFields.root.getChildren().each {
-                root.addChild(it.value)
-            }
-
-        } else {
-            append(newChangedFields.getRoot())
+        addPropagated(newChangedFields.taskId, newChangedFields.changedFields)
+        newChangedFields.propagatedChanges.each {
+            addPropagated(it.key, it.value.changedFields)
         }
     }
 
-    void append(TaskChangedFields changedFields) {
-        this.root.addChild(changedFields)
+    void addPropagated(String taskId, Map<String, ChangedField> propagatedFields) {
+        if (this.taskId == taskId) {
+            propagatedFields.each {
+                if (this.changedFields.containsKey(it.key)) {
+                    this.changedFields.get(it.key).merge(it.value)
+                }
+            }
+        }
+
+        if (!propagatedChanges.containsKey(taskId)) {
+            propagatedChanges.put(taskId, new TaskChangedFields(taskId, new HashMap<>(propagatedFields)))
+        } else {
+            propagatedChanges.get(taskId).mergeChanges(propagatedFields)
+        }
     }
 
-    private void mergeChanges(Map<String, ChangedField> changedFields, Map<String, ChangedField> newChangedFields) {
-        newChangedFields.forEach({ s, changedField ->
-            if (changedFields.containsKey(s))
-                changedFields.get(s).merge(changedField)
-            else
-                changedFields.put(s, changedField)
-        })
-    }
+    Map<String, Map<String, ChangedField>> toMap() {
+        Map<String, Map<String, ChangedField>> result = new HashMap<>()
+        this.propagatedChanges.each {
+            if (!result.containsKey(it.key)) {
+                result.put(it.key, new HashMap<String, ChangedField>())
+            }
+            mergeChanges(result.get(it.key), it.value.changedFields)
+        }
 
-    private Map<String, ChangedField> collectChangedFields() {
-        Map<String, ChangedField> result = new HashMap<>()
-        collectChangedFields(root, result)
+        if (!result.containsKey(this.taskId)) {
+            result.put(this.taskId, new HashMap<String, ChangedField>())
+        }
+        mergeChanges(result.get(this.taskId), this.changedFields)
+
         return result
     }
 
-    private void collectChangedFields(TaskChangedFields taskChangedFields, Map<String, ChangedField> result) {
-        taskChangedFields.changedFields.each { changedField ->
-            String complexId = taskChangedFields.taskId == this.root.taskId ?
-                    changedField.value.id : taskChangedFields.taskId + "-" + changedField.value.id
-            if (result.containsKey(complexId)) {
-                result.get(complexId).merge(changedField.value)
-            } else {
-                result.put(complexId, changedField.value)
-            }
-        }
+    Map<String, TaskChangedFields> getPropagatedChanges() {
+        return propagatedChanges
+    }
 
-        taskChangedFields.children.each { taskFields ->
-            collectChangedFields(taskFields.value, result)
+    private Optional<ChangedField> findInPropagated(String fieldId) {
+        if (propagatedChanges[taskId] && propagatedChanges[taskId].changedFields[fieldId]) {
+            return Optional.of(propagatedChanges[taskId].changedFields[fieldId])
+        } else {
+            return Optional.empty()
         }
-
     }
 }

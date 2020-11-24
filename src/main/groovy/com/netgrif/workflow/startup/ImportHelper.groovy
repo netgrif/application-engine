@@ -11,11 +11,10 @@ import com.netgrif.workflow.orgstructure.service.IGroupService
 import com.netgrif.workflow.orgstructure.service.IMemberService
 import com.netgrif.workflow.petrinet.domain.PetriNet
 import com.netgrif.workflow.petrinet.domain.dataset.Field
-import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldContainer
-import com.netgrif.workflow.petrinet.domain.dataset.logic.TaskAwareChangedFieldContainer
+import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldsTree
+import com.netgrif.workflow.petrinet.domain.dataset.logic.TaskChangedFieldContainer
 import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
-import com.netgrif.workflow.petrinet.web.requestbodies.UploadedFileMeta
 import com.netgrif.workflow.workflow.domain.Case
 import com.netgrif.workflow.workflow.domain.EventOutcome
 import com.netgrif.workflow.workflow.domain.Filter
@@ -210,12 +209,12 @@ class ImportHelper {
         return references.find { it.getTitle() == taskTitle }.stringId
     }
 
-    TaskAwareChangedFieldContainer setTaskData(String taskId, Map<String, Map<String,String>> data) {
+    TaskChangedFieldContainer setTaskData(String taskId, Map<String, Map<String,String>> data) {
         ObjectNode dataSet = populateDataset(data)
         dataService.setData(taskId, dataSet)
     }
 
-    TaskAwareChangedFieldContainer setTaskData(String taskTitle, String caseId, Map<String, Map<String,String>> data) {
+    TaskChangedFieldContainer setTaskData(String taskTitle, String caseId, Map<String, Map<String, String>> data) {
         setTaskData(getTaskId(taskTitle, caseId), data)
     }
 

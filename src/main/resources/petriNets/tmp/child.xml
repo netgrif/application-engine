@@ -43,8 +43,8 @@
 			parentId: f.parentId;
 
 			def parentCase = workflowService.findOne(parentId.value)
-			setDataExperimental("2", parentCase, [
-				"text_from_child_setter": ["type": "text", "value": text2.value as String]
+			setDataWithPropagation("2", parentCase, [
+				"text_from_child_setter": ["type": "text", "value": (text2.value) as String]
 			])
 		</action>
 	</data>
@@ -81,7 +81,7 @@
 				if (caseId == useCase.stringId) return
 
 				def childCase = workflowService.findOne(caseId)
-				setDataExperimental("2", childCase, [
+				setDataWithPropagation("2", childCase, [
 					"text3": ["type": "text", "value": enumeration1.value as String]
 				])
 			}
