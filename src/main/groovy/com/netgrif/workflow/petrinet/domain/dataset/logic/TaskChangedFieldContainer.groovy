@@ -26,10 +26,10 @@ class TaskChangedFieldContainer {
     }
 
     ChangedFieldContainer flatten(String rootTaskId) {
-        return flatten(rootTaskId, this.changedFields, new ChangedFieldContainer())
+        return flatten(rootTaskId, new ChangedFieldContainer())
     }
 
-    static ChangedFieldContainer flatten(String rootTaskId, Map<String, Map<String, ChangedField>> changedFields, ChangedFieldContainer container) {
+    ChangedFieldContainer flatten(String rootTaskId, ChangedFieldContainer container) {
         changedFields.each { taskFields ->
             String taskIdPrefix = taskFields.key == rootTaskId ? "" : (taskFields.key + "-")
             taskFields.value.each { field ->
