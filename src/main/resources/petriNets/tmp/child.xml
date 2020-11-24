@@ -55,6 +55,20 @@
 		<action trigger="set">
 			log.info("DEBUG: set action of text3 $useCase.title")
 		</action>
+
+		<action trigger="set">
+			text3: f.text3,
+			multichoice1: f.multichoice1,
+			number1: f.number1;
+
+			def newChoices = []
+			number1.value.times {
+				newChoices.add("choice $it" as String)
+			}
+
+			change multichoice1 choices { newChoices }
+			change multichoice1 value { newChoices }
+		</action>
 	</data>
 	<data type="number">
 		<id>number1</id>
