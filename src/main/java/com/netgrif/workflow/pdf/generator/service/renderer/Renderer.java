@@ -46,8 +46,9 @@ public abstract class Renderer {
     protected static int getTextWidth(List<String> values, PDType0Font font, int fontSize) throws IOException {
         int result = 0;
         for (String value : values) {
-            if (result < font.getStringWidth(value) / 1000 * fontSize)
-                result = (int) (font.getStringWidth(value) / 1000 * fontSize);
+            String formattedValue = value.replaceAll("\\s{1,}", " ");
+            if (result < font.getStringWidth(formattedValue) / 1000 * fontSize)
+                result = (int) (font.getStringWidth(formattedValue) / 1000 * fontSize);
         }
         return result;
     }
