@@ -23,6 +23,14 @@ class ChangedFieldsTree extends TaskChangedFields {
         return new ChangedFieldsTree(caseId, taskId, transitionId)
     }
 
+    void setPropagatedChanges(Map<String, Map<String, TaskChangedFields>> propagatedChanges) {
+        this.propagatedChanges = propagatedChanges
+    }
+
+    Map<String, Map<String, TaskChangedFields>> getPropagatedChanges() {
+        return propagatedChanges
+    }
+
     void put(String fieldId, ChangedField changedField) {
         if (!changedFields.containsKey(fieldId)) {
             changedFields.put(fieldId, changedField)

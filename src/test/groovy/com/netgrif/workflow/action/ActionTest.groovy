@@ -5,6 +5,7 @@ import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.FieldActionsRunner
 import com.netgrif.workflow.workflow.domain.Case
 import com.netgrif.workflow.workflow.domain.Task
+import org.bson.types.ObjectId
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -23,7 +24,7 @@ class ActionTest {
     @Test
     void testActionImports() {
         Case dummy = new Case()
-        Task task = new Task()
+        Task task = Task.with()._id(new ObjectId()).transitionId("0").build()
         Action testAction = new Action('''
             println LocalDate.now()
             println LocalDate.MAX
