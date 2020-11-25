@@ -15,7 +15,7 @@ public class TitleFieldBuilder extends FieldBuilder {
                 resource.getFormGridRowHeight(), resource.getDocumentTitle(), resource);
         titleField.setOriginalBottomY(countBottomPosY(titleField, resource));
         titleField.countMultiLineHeight(resource.getFontTitleSize(), resource);
-        titleField.setHeight(titleField.getHeight() + 2 * resource.getLineHeight());
+        titleField.setHeight(titleField.getHeight() + resource.getLineHeight());
         titleField.setBottomY(countBottomPosY(titleField,resource));
         return titleField;
     }
