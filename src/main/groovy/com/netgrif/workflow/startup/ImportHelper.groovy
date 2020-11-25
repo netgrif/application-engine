@@ -12,7 +12,7 @@ import com.netgrif.workflow.orgstructure.service.IMemberService
 import com.netgrif.workflow.petrinet.domain.PetriNet
 import com.netgrif.workflow.petrinet.domain.dataset.Field
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldsTree
-import com.netgrif.workflow.petrinet.domain.dataset.logic.TaskChangedFieldContainer
+
 import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.workflow.workflow.domain.Case
@@ -209,12 +209,12 @@ class ImportHelper {
         return references.find { it.getTitle() == taskTitle }.stringId
     }
 
-    TaskChangedFieldContainer setTaskData(String taskId, Map<String, Map<String,String>> data) {
+    ChangedFieldsTree setTaskData(String taskId, Map<String, Map<String,String>> data) {
         ObjectNode dataSet = populateDataset(data)
         dataService.setData(taskId, dataSet)
     }
 
-    TaskChangedFieldContainer setTaskData(String taskTitle, String caseId, Map<String, Map<String, String>> data) {
+    ChangedFieldsTree setTaskData(String taskTitle, String caseId, Map<String, Map<String, String>> data) {
         setTaskData(getTaskId(taskTitle, caseId), data)
     }
 

@@ -18,7 +18,7 @@ import com.netgrif.workflow.petrinet.domain.Transition
 import com.netgrif.workflow.petrinet.domain.dataset.*
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedField
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldsTree
-import com.netgrif.workflow.petrinet.domain.dataset.logic.TaskChangedFieldContainer
+
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.workflow.startup.ImportHelper
 import com.netgrif.workflow.workflow.domain.Case
@@ -110,7 +110,9 @@ class ActionDelegate {
         action.transitionIds.each { name, id ->
             set(name, useCase.petriNet.transitions[id])
         }
-        changedFieldsTree = ChangedFieldsTree.createNew(task.isPresent() ? task.get().stringId : "task")
+        changedFieldsTree = ChangedFieldsTree.createNew(useCase.stringId,
+                task.isPresent() ? task.get().stringId : "task",
+                task.isPresent() ? task.get().transitionId : "trans")
     }
 
     def copyBehavior(Field field, Transition transition) {
@@ -540,18 +542,15 @@ class ActionDelegate {
     }
 
     def setDataWithPropagation(String transitionId, Case caze, Map dataSet) {
-        // TODO NAE-1109 - same case?
-        Map<String, ChangedField> changingDataSet = makeDataSetIntoChangedFields(dataSet)
         Task task = taskService.findOne(caze.tasks.find { it.transition == transitionId }.task)
-        TaskChangedFieldContainer container = setData(task, dataSet)
-        this.changedFieldsTree.addPropagated(task.stringId, changingDataSet)
-        container.changedFields.each {
-            this.changedFieldsTree.addPropagated(it.key, it.value)
-        }
+        ChangedFieldsTree container = setData(task, dataSet)
+        caze = workflowService.findOne(caze.stringId)
+        this.changedFieldsTree.addPropagated(caze.stringId, task.stringId, task.transitionId, makeDataSetIntoChangedFields(dataSet, caze))
+        this.changedFieldsTree.propagate(container)
         return container
     }
 
-    Map<String, ChangedField> makeDataSetIntoChangedFields(Map<String, Map<String, String>> map) {
+    Map<String, ChangedField> makeDataSetIntoChangedFields(Map<String, Map<String, String>> map, Case caze) {
         return map.collect { fieldAttributes ->
             ChangedField changedField = new ChangedField(fieldAttributes.key)
             fieldAttributes.value.each {attribute ->
