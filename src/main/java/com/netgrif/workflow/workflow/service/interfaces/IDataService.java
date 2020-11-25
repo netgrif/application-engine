@@ -25,9 +25,9 @@ public interface IDataService {
 
     List<Field> getData(Task task, Case useCase);
 
-    TaskChangedFieldContainer setData(String taskId, ObjectNode values);
+    ChangedFieldsTree setData(String taskId, ObjectNode values);
 
-    TaskChangedFieldContainer setData(Task task, ObjectNode values);
+    ChangedFieldsTree setData(Task task, ObjectNode values);
 
     FileFieldInputStream getFile(Case useCase, Task task, FileField field);
 
@@ -57,7 +57,7 @@ public interface IDataService {
 
     List<Field> getImmediateFields(Task task);
 
-    TaskChangedFieldContainer runActions(List<Action> actions, String useCaseId, String taskId, Transition transition);
+    ChangedFieldsTree runActions(List<Action> actions, String useCaseId, String taskId, Transition transition);
 
     void validateCaseRefValue(List<String> value, List<String> allowedNets) throws IllegalArgumentException;
 

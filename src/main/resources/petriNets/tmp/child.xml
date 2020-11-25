@@ -58,6 +58,14 @@
 
 		<action trigger="set">
 			text3: f.text3,
+			trans: t.2;
+
+			make text3,visible on trans when { text3.value.contains(".txt") }
+			make text3,editable on trans when { !text3.value.contains(".txt") }
+		</action>
+
+		<action trigger="set">
+			text3: f.text3,
 			multichoice1: f.multichoice1,
 			number1: f.number1;
 

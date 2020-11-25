@@ -1,18 +1,26 @@
 package com.netgrif.workflow.petrinet.domain.dataset.logic
 
+import com.netgrif.workflow.workflow.domain.Task
 import com.querydsl.core.annotations.QueryExclude
 
 @QueryExclude
 class ChangedFieldsTree extends TaskChangedFields {
 
-    private Map<String, TaskChangedFields> propagatedChanges = new HashMap<>()
+    /**
+     * caseId -> [taskId -> changedFields]
+     */
+    private Map<String, Map<String, TaskChangedFields>> propagatedChanges = new HashMap<>()
 
-    ChangedFieldsTree(String taskId) {
-        super(taskId)
+    ChangedFieldsTree(String caseId, String taskId, String transitionId) {
+        super(caseId, taskId, transitionId)
     }
 
-    static ChangedFieldsTree createNew(String taskId) {
-        return new ChangedFieldsTree(taskId)
+    static ChangedFieldsTree createNew(String caseId, Task task) {
+        return new ChangedFieldsTree(caseId, task.stringId, task.transitionId)
+    }
+
+    static ChangedFieldsTree createNew(String caseId, String taskId, String transitionId) {
+        return new ChangedFieldsTree(caseId, taskId, transitionId)
     }
 
     void put(String fieldId, ChangedField changedField) {
@@ -21,30 +29,37 @@ class ChangedFieldsTree extends TaskChangedFields {
         } else {
             changedFields.get(fieldId).merge(changedField)
         }
-        findInPropagated(fieldId).ifPresent {it.merge(changedField) }
+        findInPropagated(fieldId).each {it.merge(changedField) }
     }
 
     void addBehavior(String fieldId, Map<String, Set<FieldBehavior>> behavior) {
         ChangedField changedField = changedFields.get(fieldId)
         changedField.addBehavior(behavior)
-        findInPropagated(fieldId).ifPresent { it.merge(changedField) }
+        findInPropagated(fieldId).each { it.merge(changedField) }
     }
 
     void addAttribute(String fieldId, String attribute, Object value) {
         ChangedField changedField = changedFields.get(fieldId)
         changedField.addAttribute(attribute, value)
-        findInPropagated(fieldId).ifPresent { it.merge(changedField) }
+        findInPropagated(fieldId).each { it.merge(changedField) }
     }
 
     void mergeChangedFields(ChangedFieldsTree newChangedFields) {
         mergeChanges(this.changedFields, newChangedFields.changedFields)
-        newChangedFields.propagatedChanges.each {
-            addPropagated(it.key, it.value.changedFields)
-        }
+        mergePropagated(newChangedFields)
     }
 
-    void addPropagated(String taskId, Map<String, ChangedField> propagatedFields) {
-        if (this.taskId == taskId) {
+    void propagate(ChangedFieldsTree toPropagate) {
+        addPropagated(toPropagate.caseId, toPropagate.taskId, toPropagate.transitionId, toPropagate.changedFields)
+        mergePropagated(toPropagate)
+    }
+
+    void addPropagated(String caseId, Task task, Map<String, ChangedField> propagatedFields) {
+       addPropagated(caseId, task.stringId, task.transitionId, propagatedFields)
+    }
+
+    void addPropagated(String caseId, String taskId, String transitionId, Map<String, ChangedField> propagatedFields) {
+        if (this.caseId == caseId) {
             propagatedFields.each {
                 if (this.changedFields.containsKey(it.key)) {
                     this.changedFields.get(it.key).merge(it.value)
@@ -52,39 +67,84 @@ class ChangedFieldsTree extends TaskChangedFields {
             }
         }
 
-        if (!propagatedChanges.containsKey(taskId)) {
-            propagatedChanges.put(taskId, new TaskChangedFields(taskId, new HashMap<>(propagatedFields)))
+        if (!propagatedChanges.containsKey(caseId)) {
+            propagatedChanges.put(caseId, new HashMap<>())
+        }
+
+        Map<String, TaskChangedFields> taskChangedFields = propagatedChanges.get(caseId)
+        if (!taskChangedFields.containsKey(taskId)) {
+            taskChangedFields.put(taskId, new TaskChangedFields(caseId, taskId, transitionId, new HashMap<>(propagatedFields)))
         } else {
-            propagatedChanges.get(taskId).mergeChanges(propagatedFields)
+            taskChangedFields.get(taskId).mergeChanges(propagatedFields)
         }
     }
 
-    Map<String, Map<String, ChangedField>> toMap() {
-        Map<String, Map<String, ChangedField>> result = new HashMap<>()
-        this.propagatedChanges.each {
-            if (!result.containsKey(it.key)) {
-                result.put(it.key, new HashMap<String, ChangedField>())
+    ChangedFieldContainer flatten() {
+        return flatten(new ChangedFieldContainer())
+    }
+
+    ChangedFieldContainer flatten(ChangedFieldContainer container) {
+        Map<String, ChangedField> result = new HashMap<>()
+        this.propagatedChanges.each { caseFields ->
+            caseFields.value.each { taskFields ->
+                String prefix = caseFields.key == this.caseId ? "" : taskFields.key + "-"
+                Map<String, ChangedField> localChanges = taskFields.value.changedFields.collectEntries {
+                    if (taskFields.value.taskId != this.taskId) {
+                        substituteTaskRefFieldBehavior(it.value, taskFields.value.transitionId, taskFields.value.taskId, this.transitionId)
+                    }
+                    return [(prefix + it.key): (it.value)]
+                } as Map<String, ChangedField>
+                mergeChanges(result, localChanges)
             }
-            mergeChanges(result.get(it.key), it.value.changedFields)
         }
-
-        if (!result.containsKey(this.taskId)) {
-            result.put(this.taskId, new HashMap<String, ChangedField>())
+        mergeChanges(result, this.changedFields)
+        result.each {
+            container.changedFields.put(it.key, it.value.attributes)
         }
-        mergeChanges(result.get(this.taskId), this.changedFields)
-
-        return result
+        return container
     }
 
-    Map<String, TaskChangedFields> getPropagatedChanges() {
-        return propagatedChanges
+    private void mergePropagated(ChangedFieldsTree newChangedFields) {
+        newChangedFields.propagatedChanges.each { caseFields ->
+            caseFields.value.each {taskFields ->
+                taskFields.value.each {
+                    addPropagated(caseFields.key, taskFields.key, taskFields.value.transitionId, taskFields.value.changedFields)
+                }
+            }
+        }
     }
 
-    private Optional<ChangedField> findInPropagated(String fieldId) {
-        if (propagatedChanges[taskId] && propagatedChanges[taskId].changedFields[fieldId]) {
-            return Optional.of(propagatedChanges[taskId].changedFields[fieldId])
-        } else {
-            return Optional.empty()
+    private List<ChangedField> findInPropagated(String fieldId) {
+        return findInPropagated(this.caseId, fieldId)
+    }
+
+    private List<ChangedField> findInPropagated(String caseId, String fieldId) {
+        List<ChangedField> occurrences = []
+        if (!propagatedChanges[caseId]) {
+            return occurrences
         }
+
+        propagatedChanges[caseId].each {
+            ChangedField occurrence = it.value.changedFields[fieldId]
+            !occurrence ?: occurrences.add(occurrence)
+        }
+        occurrences
+    }
+
+    private void substituteTaskRefFieldBehavior(ChangedField change, String referencedTaskTrans, String referencedTaskStringId, String refereeTransId) {
+        substituteTaskRefFieldBehavior(change.getAttributes(), referencedTaskTrans, referencedTaskStringId, refereeTransId)
+    }
+
+    private Map<String, Object> substituteTaskRefFieldBehavior(Map<String, Object> change, String referencedTaskTrans, String referencedTaskStringId, String refereeTransId) {
+        if (change.containsKey("behavior")) {
+            Map<String, Object> newBehavior = new HashMap<>()
+            ((Map<String, Object>) change.get("behavior")).forEach({ transId, behavior ->
+                String behaviorChangedOnTrans = transId == referencedTaskTrans ?
+                        refereeTransId : referencedTaskStringId + "-" + transId
+                newBehavior.put(behaviorChangedOnTrans, behavior)
+            });
+            change.put("behavior", newBehavior)
+        }
+        return change
     }
 }

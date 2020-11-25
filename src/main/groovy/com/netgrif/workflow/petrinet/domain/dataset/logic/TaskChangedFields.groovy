@@ -1,17 +1,28 @@
 package com.netgrif.workflow.petrinet.domain.dataset.logic
 
+import com.netgrif.workflow.workflow.domain.Task
+
 
 class TaskChangedFields {
 
     protected String taskId
+    protected String caseId
+    protected String transitionId
     protected Map<String, ChangedField> changedFields = new HashMap<>()
 
-    TaskChangedFields(String taskId) {
-        this.taskId = taskId
+    TaskChangedFields(String caseId, Task task) {
+        this(caseId, task.stringId, task.transitionId)
+
     }
 
-    TaskChangedFields(String taskId, Map<String, ChangedField> changedFields) {
+    TaskChangedFields(String caseId, String taskId, String transitionId) {
         this.taskId = taskId
+        this.transitionId = transitionId
+        this.caseId = caseId
+    }
+
+    TaskChangedFields(String caseId, String taskId, String transitionId, Map<String, ChangedField> changedFields) {
+        this(caseId, taskId, transitionId)
         this.changedFields = changedFields
     }
 
@@ -20,16 +31,22 @@ class TaskChangedFields {
     }
 
     void mergeChanges(Map<String, ChangedField> changedFields, Map<String, ChangedField> newChangedFields) {
-        newChangedFields.forEach({ s, changedField ->
-            if (changedFields.containsKey(s))
-                changedFields.get(s).merge(changedField)
-            else
-                changedFields.put(s, changedField)
+        newChangedFields.forEach({ fieldId, changedField ->
+            if (changedFields.containsKey(fieldId)) {
+                changedFields.get(fieldId).merge(changedField)
+
+            } else {
+                changedFields.put(fieldId, changedField)
+            }
         })
     }
 
     String getTaskId() {
         return taskId
+    }
+
+    String getCaseId() {
+        return caseId
     }
 
     Map<String, ChangedField> getChangedFields() {

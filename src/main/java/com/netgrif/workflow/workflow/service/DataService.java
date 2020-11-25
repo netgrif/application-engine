@@ -135,15 +135,15 @@ public class DataService implements IDataService {
     }
 
     @Override
-    public TaskChangedFieldContainer setData(String taskId, ObjectNode values) {
+    public ChangedFieldsTree setData(String taskId, ObjectNode values) {
         Task task = taskService.findOne(taskId);
         return setData(task, values);
     }
 
     @Override
-    public TaskChangedFieldContainer setData(Task task, ObjectNode values) {
+    public ChangedFieldsTree setData(Task task, ObjectNode values) {
         Case useCase = workflowService.findOne(task.getCaseId());
-        TaskChangedFieldContainer taskChangedFieldContainer = new TaskChangedFieldContainer();
+        ChangedFieldsTree changedFieldsTree = ChangedFieldsTree.createNew(task.getCaseId(), task);
 
         log.info("[" + useCase.getStringId() + "]: Setting data of task " + task.getTransitionId() + " [" + task.getStringId() + "]");
 
@@ -157,25 +157,20 @@ public class DataService implements IDataService {
             if (dataField != null) {
                 ChangedFieldsTree changedFieldsTreePre = resolveDataEvents(useCase.getPetriNet().getField(fieldId).get(),
                         Action.ActionTrigger.SET, EventPhase.PRE, useCase, task, useCase.getPetriNet().getTransition(task.getTransitionId()));
-                taskChangedFieldContainer.mergeChanges(changedFieldsTreePre.toMap());
+                changedFieldsTree.mergeChangedFields(changedFieldsTreePre);
 
                 dataField.setValue(parseFieldsValues(entry.getValue(), dataField));
                 ChangedFieldsTree changedFieldsTreePost = resolveDataEvents(useCase.getPetriNet().getField(fieldId).get(),
                         Action.ActionTrigger.SET, EventPhase.POST, useCase, task, useCase.getPetriNet().getTransition(task.getTransitionId()));
-                taskChangedFieldContainer.mergeChanges(changedFieldsTreePost.toMap());
+                changedFieldsTree.mergeChangedFields(changedFieldsTreePost);
 
                 log.info("Ran actions on set fields " + values.toString() + " in " + task.getStringId() + " in " + useCase.getStringId() + " " + useCase.getTitle());
             } else try {
                 if (entry.getKey().contains("-")) {
                     TaskRefFieldWrapper decoded = decodeTaskRefFieldId(entry.getKey());
                     Task referencedTask = taskService.findOne(decoded.getTaskId());
-                    TaskChangedFieldContainer changedFieldContainer = setData(referencedTask, values);
-                    for (Map.Entry<String, Map<String, ChangedField>> taskFields : changedFieldContainer.getChangedFields().entrySet()) {
-                        for (Map.Entry<String, ChangedField> fieldEntry : taskFields.getValue().entrySet()) {
-                            substituteTaskRefFieldBehavior(fieldEntry.getValue(), referencedTask, task.getTransitionId());
-                        }
-                    }
-                    taskChangedFieldContainer.mergeChanges(changedFieldContainer.getChangedFields());
+                    ChangedFieldsTree taskRefChangedFields = setData(referencedTask, values);
+                    changedFieldsTree.propagate(taskRefChangedFields);
                     log.info("Ran actions on set taskRef fields " + values.toString() + " in " + referencedTask.getStringId() + " in " + referencedTask.getCaseId());
                 }
             } catch (Exception e) {
@@ -184,28 +179,12 @@ public class DataService implements IDataService {
         });
         updateDataset(useCase);
         workflowService.save(useCase);
-        publisher.publishEvent(new SaveCaseDataEvent(useCase, values, taskChangedFieldContainer.getChangedFields().containsKey(task.getStringId()) ?
-                taskChangedFieldContainer.getChangedFields().get(task.getStringId()).values() : new HashSet<>()));
+        publisher.publishEvent(new SaveCaseDataEvent(useCase, values, changedFieldsTree.getChangedFields().values()));
 
-        return taskChangedFieldContainer;
+        return changedFieldsTree;
     }
 
-    private Map<String, Object> substituteTaskRefFieldBehavior(Map<String, Object> change, Task referencedTask, String refereeTransId) {
-        if (change.containsKey("behavior")) {
-            Map<String, Object> newBehavior = new HashMap<>();
-            ((Map<String, Object>) change.get("behavior")).forEach((taskId, behavior) -> {
-                String behaviorChangedOnTrans = taskId.equals(referencedTask.getTransitionId()) ?
-                        refereeTransId : referencedTask.getStringId() + "-" + taskId;
-                newBehavior.put(behaviorChangedOnTrans, behavior);
-            });
-            change.put("behavior", newBehavior);
-        }
-        return change;
-    }
 
-    private void substituteTaskRefFieldBehavior(ChangedField change, Task referencedTask, String refereeTransId) {
-        substituteTaskRefFieldBehavior(change.getAttributes(), referencedTask, refereeTransId);
-    }
 
     @Override
     public List<DataGroup> getDataGroups(String taskId, Locale locale) {
@@ -417,20 +396,8 @@ public class DataService implements IDataService {
         ChangedFieldsTree changedFieldsPost = resolveDataEvents(useCase.getPetriNet().getField(fieldId).get(),Action.ActionTrigger.SET,
                 EventPhase.POST, useCase, task, useCase.getPetriNet().getTransition(task.getTransitionId()));
         changedFieldsPre.mergeChangedFields(changedFieldsPost);
-        Map<String, Map<String, ChangedField>> changedFields = changedFieldsPre.toMap();
 
-        if (decodedTaskRef != null) {
-            Task referencedTask = taskService.findOne(decodedTaskRef.getTaskId());
-            for (Map.Entry<String, Map<String, ChangedField>> taskFields : changedFields.entrySet()) {
-                for (Map.Entry<String, ChangedField> fieldEntry : taskFields.getValue().entrySet()) {
-                    ChangedField change = fieldEntry.getValue();
-                    substituteTaskRefFieldBehavior(change, referencedTask, task.getTransitionId());
-                }
-            }
-        }
-
-        TaskChangedFieldContainer taskChangedFieldContainer = new TaskChangedFieldContainer(changedFieldsPre.toMap());
-        taskChangedFieldContainer.flatten(task.getStringId(), container);
+        changedFieldsPre.flatten(container);
         container.setIsSave(true);
         updateDataset(useCase);
         workflowService.save(useCase);
@@ -603,11 +570,11 @@ public class DataService implements IDataService {
     }
 
     @Override
-    public TaskChangedFieldContainer runActions(List<Action> actions, String useCaseId, String taskId, Transition transition) {
+    public ChangedFieldsTree runActions(List<Action> actions, String useCaseId, String taskId, Transition transition) {
         log.info("[" + useCaseId + "]: Running actions of transition " + transition.getStringId());
-        ChangedFieldsTree changedFields = ChangedFieldsTree.createNew(taskId);
+        ChangedFieldsTree changedFields = ChangedFieldsTree.createNew(useCaseId, taskId, transition.getImportId());
         if (actions.isEmpty())
-            return new TaskChangedFieldContainer(changedFields.toMap());
+            return changedFields;
 
         Case case$ = workflowService.findOne(useCaseId);
         Task task = taskService.findOne(taskId);
@@ -620,7 +587,7 @@ public class DataService implements IDataService {
             runEventActionsOnChanged(case$, task, transition, changedFields, changedFieldsTree.getChangedFields(), Action.ActionTrigger.SET,true);
         });
         workflowService.save(case$);
-        return new TaskChangedFieldContainer(changedFields.toMap());
+        return changedFields;
     }
 
     private void updateDataset(Case useCase) {
@@ -633,7 +600,7 @@ public class DataService implements IDataService {
     }
 
     private ChangedFieldsTree resolveDataEvents(Field field, Action.ActionTrigger trigger, EventPhase phase, Case useCase, Task task, Transition transition) {
-        ChangedFieldsTree changedFields = ChangedFieldsTree.createNew(task.getStringId());
+        ChangedFieldsTree changedFields = ChangedFieldsTree.createNew(useCase.getStringId(), task);
         processDataEvents(field, trigger, phase, useCase, task, changedFields, transition);
         return changedFields;
     }
