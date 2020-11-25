@@ -5,6 +5,7 @@ import com.netgrif.workflow.auth.domain.repositories.UserRepository
 import com.netgrif.workflow.elastic.domain.ElasticCaseRepository
 import com.netgrif.workflow.elastic.domain.ElasticTaskRepository
 import com.netgrif.workflow.startup.DefaultRoleRunner
+import com.netgrif.workflow.startup.GroupRunner
 import com.netgrif.workflow.startup.SuperCreator
 import com.netgrif.workflow.startup.SystemUserRunner
 import org.springframework.beans.factory.annotation.Autowired
@@ -30,6 +31,8 @@ class TestHelper {
     private ElasticTaskRepository elasticTaskRepository
     @Autowired
     private ElasticCaseRepository elasticCaseRepository
+    @Autowired
+    private GroupRunner groupRunner
 
     void truncateDbs() {
         template.db.drop()
@@ -38,7 +41,8 @@ class TestHelper {
         elasticTaskRepository.deleteAll()
         elasticCaseRepository.deleteAll()
         roleRunner.run()
-        superCreator.run()
         systemUserRunner.run()
+        groupRunner.run()
+        superCreator.run()
     }
 }
