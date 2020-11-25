@@ -78,7 +78,7 @@ class ActionRefTest {
 
         def net = petriNetService.importPetriNet(stream(NET_FILE), "major", superCreator.getLoggedSuper()).get()
 
-        assert net.dataSet.get("text_1").actions.size() == 8
-        assert net.transitions.get("task").dataSet.get("text_1").actions.size() == 8
+        assert net.dataSet.get("text_1").events.size() == 8
+        assert net.transitions.get("task").dataSet.get("text_1").events.size() == 8
     }
 }
