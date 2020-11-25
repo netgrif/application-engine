@@ -136,7 +136,7 @@ class ChangedFieldsTree extends TaskChangedFields {
             ChangedField occurrence = it.value.changedFields[fieldId]
             !occurrence ?: occurrences.add(occurrence)
         }
-        occurrences
+        return occurrences
     }
 
     private void substituteTaskRefFieldBehavior(ChangedField change, String referencedTaskTrans, String referencedTaskStringId, String refereeTransId) {
