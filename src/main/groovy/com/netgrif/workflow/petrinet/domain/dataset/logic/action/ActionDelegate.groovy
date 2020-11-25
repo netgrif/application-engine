@@ -7,6 +7,7 @@ import com.netgrif.workflow.configuration.ApplicationContextProvider
 import com.netgrif.workflow.importer.service.FieldFactory
 import com.netgrif.workflow.orgstructure.domain.Group
 import com.netgrif.workflow.orgstructure.domain.Member
+import com.netgrif.workflow.orgstructure.groups.interfaces.INextGroupService
 import com.netgrif.workflow.orgstructure.service.GroupService
 import com.netgrif.workflow.orgstructure.service.MemberService
 import com.netgrif.workflow.pdf.generator.config.PdfResource
@@ -79,6 +80,9 @@ class ActionDelegate {
 
     @Autowired
     IPdfGenerator pdfGenerator
+
+    @Autowired
+    INextGroupService nextGroupService
 
     /**
      * Reference of case in which current action is taking place.

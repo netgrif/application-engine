@@ -559,18 +559,25 @@ public class TaskService implements ITaskService {
     }
 
     @Override
-    public Page<Task> search(List<TaskSearchRequest> requests, Pageable pageable, LoggedUser user, Boolean isIntersection) {
-        com.querydsl.core.types.Predicate searchPredicate = searchService.buildQuery(requests, user, isIntersection);
-        Page<Task> page = taskRepository.findAll(searchPredicate, pageable);
-        page = loadUsers(page);
-        page = dataService.setImmediateFields(page);
-        return page;
+    public Page<Task> search(List<TaskSearchRequest> requests, Pageable pageable, LoggedUser user, Locale locale, Boolean isIntersection) {
+        com.querydsl.core.types.Predicate searchPredicate = searchService.buildQuery(requests, user, locale, isIntersection);
+        if(searchPredicate != null) {
+            Page<Task> page = taskRepository.findAll(searchPredicate, pageable);
+            page = loadUsers(page);
+            page = dataService.setImmediateFields(page);
+            return page;
+        } else {
+            return Page.empty();
+        }
     }
 
     @Override
-    public long count(List<TaskSearchRequest> requests, LoggedUser user, Boolean isIntersection) {
-        com.querydsl.core.types.Predicate searchPredicate = searchService.buildQuery(requests, user, isIntersection);
-        return taskRepository.count(searchPredicate);
+    public long count(List<TaskSearchRequest> requests, LoggedUser user, Locale locale, Boolean isIntersection) {
+        com.querydsl.core.types.Predicate searchPredicate = searchService.buildQuery(requests, user, locale, isIntersection);
+        if (searchPredicate != null)
+            return taskRepository.count(searchPredicate);
+        else
+            return 0;
     }
 
     @Override
