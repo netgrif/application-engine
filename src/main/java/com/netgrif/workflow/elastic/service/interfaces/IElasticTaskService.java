@@ -9,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Async;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 public interface IElasticTaskService {
@@ -20,9 +21,9 @@ public interface IElasticTaskService {
 
     void indexNow(ElasticTask task);
 
-    Page<Task> search(List<ElasticTaskSearchRequest> requests, LoggedUser user, Pageable pageable, Boolean isIntersection);
+    Page<Task> search(List<ElasticTaskSearchRequest> requests, LoggedUser user, Pageable pageable, Locale locale, Boolean isIntersection);
 
-    long count(List<ElasticTaskSearchRequest> requests, LoggedUser user, Boolean isIntersection);
+    long count(List<ElasticTaskSearchRequest> requests, LoggedUser user, Locale locale, Boolean isIntersection);
 
     void remove(String taskId);
 }

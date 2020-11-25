@@ -6,6 +6,8 @@ import com.netgrif.workflow.elastic.domain.ElasticTask;
 import com.netgrif.workflow.elastic.domain.ElasticTaskRepository;
 import com.netgrif.workflow.elastic.service.interfaces.IElasticTaskService;
 import com.netgrif.workflow.elastic.web.requestbodies.ElasticTaskSearchRequest;
+import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
+import com.netgrif.workflow.petrinet.web.responsebodies.PetriNetReference;
 import com.netgrif.workflow.utils.FullPageRequest;
 import com.netgrif.workflow.workflow.domain.Task;
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
@@ -45,6 +47,9 @@ public class ElasticTaskService implements IElasticTaskService {
     private ITaskService taskService;
     private ElasticsearchTemplate template;
     private ExecutorService executor = Executors.newSingleThreadExecutor();
+
+    @Autowired
+    private IPetriNetService petriNetService;
 
     @Autowired
     public ElasticTaskService(ElasticTaskRepository repository, ElasticsearchTemplate template) {
@@ -115,27 +120,48 @@ public class ElasticTaskService implements IElasticTaskService {
     }
 
     @Override
-    public Page<Task> search(List<ElasticTaskSearchRequest> requests, LoggedUser user, Pageable pageable, Boolean isIntersection) {
-        SearchQuery query = buildQuery(requests, user, pageable, isIntersection);
-        Page<ElasticTask> indexedTasks = repository.search(query);
-        List<Task> taskPage = taskService.findAllById(indexedTasks.get().map(ElasticTask::getStringId).collect(Collectors.toList()));
+    public Page<Task> search(List<ElasticTaskSearchRequest> requests, LoggedUser user, Pageable pageable, Locale locale, Boolean isIntersection) {
+        SearchQuery query = buildQuery(requests, user, pageable, locale, isIntersection);
+        List<Task> taskPage;
+        long total;
+        if (query != null) {
+            Page<ElasticTask> indexedTasks = repository.search(query);
+            taskPage = taskService.findAllById(indexedTasks.get().map(ElasticTask::getStringId).collect(Collectors.toList()));
+            total = indexedTasks.getTotalElements();
+        } else {
+            taskPage = Collections.emptyList();
+            total = 0;
+        }
 
-        return new PageImpl<>(taskPage, pageable, indexedTasks.getTotalElements());
+        return new PageImpl<>(taskPage, pageable, total);
     }
 
     @Override
-    public long count(List<ElasticTaskSearchRequest> requests, LoggedUser user, Boolean isIntersection) {
-        SearchQuery query = buildQuery(requests, user, new FullPageRequest(), isIntersection);
-
-        return template.count(query, ElasticTask.class);
+    public long count(List<ElasticTaskSearchRequest> requests, LoggedUser user, Locale locale, Boolean isIntersection) {
+        SearchQuery query = buildQuery(requests, user, new FullPageRequest(), locale, isIntersection);
+        if (query != null) {
+            return template.count(query, ElasticTask.class);
+        } else {
+            return 0;
+        }
     }
 
-    private SearchQuery buildQuery(List<ElasticTaskSearchRequest> requests, LoggedUser user, Pageable pageable, Boolean isIntersection) {
-        BinaryOperator<BoolQueryBuilder> reductionOperator = isIntersection ? BoolQueryBuilder::must : BoolQueryBuilder::should;
+    private SearchQuery buildQuery(List<ElasticTaskSearchRequest> requests, LoggedUser user, Pageable pageable, Locale locale, Boolean isIntersection) {
+        List<BoolQueryBuilder> singleQueries = requests.stream().map(request -> buildSingleQuery(request, user, locale)).collect(Collectors.toList());
 
-        BoolQueryBuilder query = requests.stream()
-                .map(request -> buildSingleQuery(request, user))
-                .reduce(new BoolQueryBuilder(), reductionOperator);
+        if (isIntersection && !singleQueries.stream().allMatch(Objects::nonNull)) {
+            // one of the queries evaluates to empty set => the entire result is an empty set
+            return null;
+        } else if (!isIntersection) {
+            singleQueries = singleQueries.stream().filter(Objects::nonNull).collect(Collectors.toList());
+            if (singleQueries.size() == 0) {
+                // all queries result in an empty set => the entire result is an empty set
+                return null;
+            }
+        }
+
+        BinaryOperator<BoolQueryBuilder> reductionOperator = isIntersection ? BoolQueryBuilder::must : BoolQueryBuilder::should;
+        BoolQueryBuilder query = singleQueries.stream().reduce(new BoolQueryBuilder(), reductionOperator);
 
         NativeSearchQueryBuilder builder = new NativeSearchQueryBuilder();
         return builder
@@ -144,7 +170,7 @@ public class ElasticTaskService implements IElasticTaskService {
                 .build();
     }
 
-    private BoolQueryBuilder buildSingleQuery(ElasticTaskSearchRequest request, LoggedUser user) {
+    private BoolQueryBuilder buildSingleQuery(ElasticTaskSearchRequest request, LoggedUser user, Locale locale) {
         if (request == null) {
             throw new IllegalArgumentException("Request can not be null!");
         }
@@ -160,8 +186,12 @@ public class ElasticTaskService implements IElasticTaskService {
         buildFullTextQuery(request, query);
         buildTransitionQuery(request, query);
         buildStringQuery(request, query);
+        boolean resultAlwaysEmpty = buildGroupQuery(request, user, locale, query);
 
-        return query;
+        if (resultAlwaysEmpty)
+            return null;
+        else
+            return query;
     }
 
     protected void addRolesQueryConstraint(ElasticTaskSearchRequest request, LoggedUser user) {
@@ -381,5 +411,38 @@ public class ElasticTaskService implements IElasticTaskService {
         }
 
         query.must(queryStringQuery(request.query));
+    }
+
+    /**
+     * Tasks of cases of group with id "5cb07b6ff05be15f0b972c4d"
+     * {
+     * "group": "5cb07b6ff05be15f0b972c4d"
+     * }
+     * <p>
+     * Tasks of cases of group with id "5cb07b6ff05be15f0b972c4d" OR "5cb07b6ff05be15f0b972c4e"
+     * {
+     * "transitionId": [
+     * "5cb07b6ff05be15f0b972c4d",
+     * "5cb07b6ff05be15f0b972c4e",
+     * ]
+     * }
+     */
+    public boolean buildGroupQuery(TaskSearchRequest request, LoggedUser user, Locale locale, BoolQueryBuilder query) {
+        if (request.group == null || request.group.isEmpty())
+            return false;
+
+        Map<String, Object> processQuery = new HashMap<>();
+        processQuery.put("group", request.group);
+        List<PetriNetReference> groupProcesses = this.petriNetService.search(processQuery, user, new FullPageRequest(), locale).getContent();
+        if (groupProcesses.size() == 0)
+            return true;
+
+        BoolQueryBuilder groupProcessQuery = boolQuery();
+        for (PetriNetReference process : groupProcesses) {
+            groupProcessQuery.should(termQuery("processId", process.getStringId()));
+        }
+
+        query.filter(groupProcessQuery);
+        return false;
     }
 }
