@@ -540,6 +540,16 @@ class ActionDelegate {
 
     def setDataWithPropagation(String transitionId, Case caze, Map dataSet) {
         Task task = taskService.findOne(caze.tasks.find { it.transition == transitionId }.task)
+        return setDataWithPropagation(task, dataSet)
+    }
+
+    def setDataWithPropagation(Task task, Map dataSet) {
+        return setDataWithPropagation(task.stringId, dataSet)
+    }
+
+    def setDataWithPropagation(String taskId, Map dataSet) {
+        Task task = taskService.findOne(taskId)
+        Case caze = workflowService.findOne(task.caseId)
         ChangedFieldsTree container = setData(task, dataSet)
         caze = workflowService.findOne(caze.stringId)
         this.changedFieldsTree.addPropagated(caze.stringId, task.stringId, task.transitionId, makeDataSetIntoChangedFields(dataSet, caze))
