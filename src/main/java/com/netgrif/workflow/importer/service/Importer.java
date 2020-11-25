@@ -1,6 +1,9 @@
 package com.netgrif.workflow.importer.service;
 
 import com.netgrif.workflow.importer.model.*;
+import com.netgrif.workflow.importer.model.DataEventType;
+import com.netgrif.workflow.petrinet.domain.DataEvent;
+import com.netgrif.workflow.petrinet.domain.Component;
 import com.netgrif.workflow.petrinet.domain.DataGroup;
 import com.netgrif.workflow.petrinet.domain.Event;
 import com.netgrif.workflow.petrinet.domain.EventType;
@@ -162,6 +165,7 @@ public class Importer {
         document.getMapping().forEach(this::applyMapping);
         document.getTransition().forEach(this::resolveTransitionActions);
         document.getData().forEach(this::resolveDataActions);
+        document.getData().forEach(this::addActionRefs);
         actionRefs.forEach(this::resolveActionRefs);
         actions.forEach(this::evaluateActions);
 
@@ -218,17 +222,27 @@ public class Importer {
     @Transactional
     protected void resolveDataActions(Data data) {
         if (data.getAction() != null) {
-            getField(data.getId()).setActions(buildActions(data.getAction(), getField(data.getId()).getStringId(), null));
+            getField(data.getId()).setEvents(buildActions(data.getAction(), getField(data.getId()).getStringId(), null));
         }
-        if (data.getActionRef() != null) {
-            getField(data.getId()).addActions(buildActionRefs(data.getActionRef()));
+        if (data.getEvent() != null && data.getEvent().size() > 0) {
+            getField(data.getId()).addEvents(buildEvents(data.getEvent(), null));
         }
     }
 
-    private LinkedHashSet<Action> buildActionRefs(List<ActionRefType> actionRefs) {
-        LinkedHashSet<Action> refs = new LinkedHashSet<>();
+    @Transactional
+    protected void addActionRefs(Data data) {
+        if (data.getActionRef() != null) {
+            getField(data.getId()).addEvents(buildActionRefs(data.getActionRef()));
+        }
+    }
+
+    private LinkedHashSet<DataEvent> buildActionRefs(List<ActionRefType> actionRefs) {
+        LinkedHashSet<DataEvent> refs = new LinkedHashSet<>();
         for (ActionRefType actionRef : actionRefs) {
-            refs.add(fromActionRef(actionRef));
+            Action action = actions.get(actionRef.getId());
+            DataEvent dataEvent = new DataEvent(action.getId().toString(), action.getTrigger().toString());
+            dataEvent.getActions().get(dataEvent.getDefaultPhase()).add(fromActionRef(actionRef));
+            refs.add(dataEvent);
         }
         return refs;
     }
@@ -259,12 +273,15 @@ public class Importer {
         dataRef.forEach(ref -> {
             String fieldId = getField(ref.getId()).getStringId();
             if (ref.getLogic().getAction() != null) {
-                getTransition(trans.getId()).addActions(fieldId, buildActions(ref.getLogic().getAction(),
+                getTransition(trans.getId()).addDataEvents(fieldId, buildActions(ref.getLogic().getAction(),
                         fieldId,
                         getTransition(trans.getId()).getStringId()));
             }
             if (ref.getLogic().getActionRef() != null) {
-                getTransition(trans.getId()).addActions(fieldId, buildActionRefs(ref.getLogic().getActionRef()));
+                getTransition(trans.getId()).addDataEvents(fieldId, buildActionRefs(ref.getLogic().getActionRef()));
+            }
+            if (ref.getEvent() != null){
+                getTransition(trans.getId()).addDataEvents(fieldId, buildEvents(ref.getEvent(), getTransition(trans.getId()).getStringId()));
             }
         });
     }
@@ -376,6 +393,21 @@ public class Importer {
         return actionList;
     }
 
+    private List<Action> parsePhaseActions(EventPhaseType phase, Action.ActionTrigger trigger, String transitionId, com.netgrif.workflow.importer.model.DataEvent dataEvent) {
+        List<Action> actionList = dataEvent.getActions().stream()
+                .filter(actions -> actions.getPhase().equals(phase))
+                .flatMap(actions -> actions.getAction().stream()
+                        .map(action -> {
+                            action.setTrigger(trigger.name());
+                            return parseAction(transitionId, action);}))
+                .collect(Collectors.toList());
+        actionList.addAll(dataEvent.getActions().stream()
+                .filter(actions -> actions.getPhase().equals(phase))
+                .flatMap(actions -> actions.getActionRef().stream().map(this::fromActionRef))
+                .collect(Collectors.toList()));
+        return actionList;
+    }
+
     @Transactional
     protected void addDefaultRole(Transition transition) {
         Logic logic = new Logic();
@@ -398,6 +430,7 @@ public class Importer {
 
         addDataLogic(transition, dataRef);
         addDataLayout(transition, dataRef);
+        addDataComponent(transition, dataRef);
     }
 
     @Transactional
@@ -419,6 +452,7 @@ public class Importer {
         for (DataRef dataRef : importDataGroup.getDataRef()) {
             addDataLogic(transition, dataRef);
             addDataLayout(transition, dataRef);
+            addDataComponent(transition, dataRef);
         }
     }
 
@@ -457,7 +491,7 @@ public class Importer {
                 logic.getBehavior().forEach(b -> behavior.add(FieldBehavior.fromString(b)));
             }
 
-            transition.addDataSet(fieldId, behavior, null, null);
+            transition.addDataSet(fieldId, behavior, null, null, null);
         } catch (NullPointerException e) {
             throw new IllegalArgumentException("Wrong dataRef id [" + dataRef.getId() + "] on transition [" + transition.getTitle() + "]", e);
         }
@@ -487,17 +521,73 @@ public class Importer {
                 template = layout.getTemplate().toString();
             }
 
-            FieldLayout fieldLayout = new FieldLayout(layout.getX(), layout.getY(), layout.getRows(), layout.getCols(), layout.getOffset(), template, appearance, alignment);
-            transition.addDataSet(fieldId, null, null, fieldLayout);
+            FieldLayout fieldLayout = new FieldLayout(layout.getX(), layout.getY(), layout.getRows(), layout.getCols(), layout.getOffset(), layout.getTemplate().toString(), appearance, alignment);
+            transition.addDataSet(fieldId, null, null, fieldLayout, null);
         } catch (NullPointerException e) {
             throw new IllegalArgumentException("Wrong dataRef id [" + dataRef.getId() + "] on transition [" + transition.getTitle() + "]", e);
         }
     }
 
     @Transactional
-    protected LinkedHashSet<Action> buildActions(List<ActionType> imported, String fieldId, String transitionId) {
+    protected void addDataComponent(Transition transition, DataRef dataRef){
+        String fieldId = getField(dataRef.getId()).getStringId();
+        Component component;
+        if((dataRef.getComponent()) == null)
+            component = getField(dataRef.getId()).getComponent();
+        else
+            component = new Component(dataRef.getComponent().getName(), ComponentFactory.buildPropertyMap(dataRef.getComponent().getProperty()));
+        transition.addDataSet(fieldId, null, null, null, component);
+    }
+
+    @Transactional
+    protected LinkedHashSet<DataEvent> buildEvents(List<com.netgrif.workflow.importer.model.DataEvent> events, String transitionId) {
+        return events.stream()
+                .map(event -> parseDataEvents(transitionId, event))
+                .collect(Collectors.toCollection(LinkedHashSet::new));
+    }
+
+    private DataEvent parseDataEvents(String transitionId, com.netgrif.workflow.importer.model.DataEvent event){
+        Map<EventPhase, List<Action>> actions = new HashMap<>();
+        actions.put(EventPhase.PRE, new ArrayList<>());
+        actions.put(EventPhase.POST, new ArrayList<>());
+
+        return parseDataEvent(event, actions, transitionId);
+    }
+
+    private DataEvent parseDataEvent(com.netgrif.workflow.importer.model.DataEvent event, Map<EventPhase, List<Action>> actions, String transitionId){
+        DataEvent dataEvent = new DataEvent(event.getId(), event.getType().value());
+        event.getActions().forEach(eventAction -> {
+            EventPhaseType phaseType = eventAction.getPhase();
+            if(eventAction.getPhase() == null){
+                phaseType = event.getType().equals(DataEventType.GET) ? EventPhaseType.PRE : EventPhaseType.POST;
+            }
+            actions.get(EventPhase.valueOf(phaseType.value().toUpperCase())).addAll(parsePhaseActions(phaseType, dataEvent.getTrigger(), transitionId, event));
+        });
+        dataEvent.setActions(actions);
+        return dataEvent;
+    }
+
+    private DataEvent convertAction(String fieldId, String transitionId, ActionType importedAction){
+        Action action = parseAction(fieldId, transitionId, importedAction);
+        DataEvent dataEvent = createDataEvent(action);
+        dataEvent.getActions().get(dataEvent.getDefaultPhase()).add(action);
+        return dataEvent;
+    }
+
+    private DataEvent createDataEvent(Action action) {
+        DataEvent dataEvent;
+        if (action.getId() != null) {
+            dataEvent = new DataEvent(action.getId().toString(), action.getTrigger().toString());
+        } else {
+            dataEvent = new DataEvent(new ObjectId().toString(), action.getTrigger().toString());
+        }
+        return dataEvent;
+    }
+
+    @Transactional
+    protected LinkedHashSet<DataEvent> buildActions(List<ActionType> imported, String fieldId, String transitionId) {
         return imported.stream()
-                .map(action -> parseAction(fieldId, transitionId, action))
+                .map(action -> convertAction(fieldId, transitionId, action))
                 .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
