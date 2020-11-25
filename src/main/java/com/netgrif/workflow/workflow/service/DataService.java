@@ -330,9 +330,7 @@ public class DataService implements IDataService {
     @Override
     public ChangedFieldByFileFieldContainer saveFile(String taskId, String fieldId, MultipartFile multipartFile) {
         try {
-            TaskRefFieldWrapper wrapper = decodeTaskRefFieldId(taskId, fieldId);
-            Task task = wrapper.getTask();
-
+            Task task = taskService.findOne(taskId);
             ImmutablePair<Case, FileField> pair = getCaseAndFileField(taskId, fieldId);
             FileField field = pair.getRight();
             Case useCase = pair.getLeft();
@@ -356,9 +354,7 @@ public class DataService implements IDataService {
     @Override
     public ChangedFieldByFileFieldContainer saveFiles(String taskId, String fieldId, MultipartFile[] multipartFiles) {
         try {
-            TaskRefFieldWrapper wrapper = decodeTaskRefFieldId(taskId, fieldId);
-            Task task = wrapper.getTask();
-
+            Task task = taskService.findOne(taskId);
             ImmutablePair<Case, FileListField> pair = getCaseAndFileListField(taskId, fieldId);
             FileListField field = pair.getRight();
             Case useCase = pair.getLeft();
@@ -379,12 +375,14 @@ public class DataService implements IDataService {
         }
     }
 
-    private ChangedFieldByFileFieldContainer getChangedFieldByFileFieldContainer(String fieldId, Task task, Case useCase,
+    private ChangedFieldByFileFieldContainer getChangedFieldByFileFieldContainer(String fieldId, Task referencingTask, Case useCase,
                                                                                  ChangedFieldByFileFieldContainer container) {
         TaskRefFieldWrapper decodedTaskRef = null;
+        Task task = referencingTask;
         try {
             decodedTaskRef = decodeTaskRefFieldId(fieldId);
             fieldId = decodedTaskRef.getFieldId();
+            task = taskService.findOne(decodedTaskRef.getTaskId());
         } catch (IllegalArgumentException e) {
             log.debug("fieldId is not referenced through taskRef", e);
         }
@@ -395,10 +393,23 @@ public class DataService implements IDataService {
                 EventPhase.POST, useCase, task, useCase.getPetriNet().getTransition(task.getTransitionId()));
         changedFieldsPre.mergeChangedFields(changedFieldsPost);
 
-        changedFieldsPre.flatten(container);
         container.setIsSave(true);
         updateDataset(useCase);
         workflowService.save(useCase);
+        return resolveChangedFieldsByFileTree(changedFieldsPre, container, referencingTask, task);
+    }
+
+    private ChangedFieldByFileFieldContainer resolveChangedFieldsByFileTree(ChangedFieldsTree changedFields,
+                                                                            ChangedFieldByFileFieldContainer container,
+                                                                            Task referencingTask, Task referencedTask) {
+        if (referencingTask.getStringId().equals(referencedTask.getStringId())) {
+            changedFields.flatten(container);
+        } else {
+            ChangedFieldsTree parent = ChangedFieldsTree.createNew(referencingTask.getCaseId(), referencingTask);
+            parent.setPropagatedChanges(changedFields.getPropagatedChanges());
+            parent.addPropagated(referencedTask.getCaseId(), referencedTask, changedFields.getChangedFields());
+            parent.flatten(container);
+        }
         return container;
     }
 
