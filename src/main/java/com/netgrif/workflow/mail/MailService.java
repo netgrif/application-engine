@@ -2,12 +2,16 @@ package com.netgrif.workflow.mail;
 
 import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.auth.service.interfaces.IRegistrationService;
+import com.netgrif.workflow.mail.domain.SimpleMailDraft;
+import com.netgrif.workflow.mail.domain.TypedMailDraft;
 import com.netgrif.workflow.mail.interfaces.IMailService;
+import com.netgrif.workflow.mail.throwables.NoEmailTypeDefinedException;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -108,7 +112,29 @@ public class MailService implements IMailService {
 //        }
     }
 
+    @Override
+    public void sendMail(TypedMailDraft mailDraft) throws MessagingException, IOException, TemplateException {
+        MimeMessage email = buildEmail(mailDraft.getType(), mailDraft.getRecipients(), mailDraft.getModel(), mailDraft.getAttachments());
+        mailSender.send(email);
+
+        String formattedRecipients = StringUtils.join(mailDraft.getRecipients(), ", ");
+        log.info("Email sent to [" + formattedRecipients + "]");
+    }
+
+    @Override
+    public void sendMail(SimpleMailDraft mailDraft) throws MessagingException, IOException, TemplateException {
+        MimeMessage email = buildEmail(mailDraft.getRecipients(), mailDraft.getSubject(), mailDraft.getBody(), mailDraft.isHtml(), mailDraft.getAttachments());
+        mailSender.send(email);
+
+        String formattedRecipients = StringUtils.join(mailDraft.getRecipients(), ", ");
+        log.info("Email sent to [" + formattedRecipients + "]");
+    }
+
     protected MimeMessage buildEmail(EmailType type, List<String> recipients, Map<String, Object> model, Map<String, File> attachments) throws MessagingException, IOException, TemplateException {
+        if(type.template == null || type.subject == null){
+            log.error("The email has no template or subject defined in object of EmailType.");
+            throw new NoEmailTypeDefinedException("The email has no template or subject defined in object of EmailType.");
+        }
         MimeMessage message = mailSender.createMimeMessage();
         message.setSubject(type.subject);
         MimeMessageHelper helper = new MimeMessageHelper(message, true, StandardCharsets.UTF_8.name());
@@ -125,6 +151,26 @@ public class MailService implements IMailService {
         });
         return message;
     }
+
+    protected MimeMessage buildEmail(List<String> recipients, String subject, String text, boolean isHtml, Map<String, File> attachments) throws MessagingException, IOException, TemplateException {
+        MimeMessage message = mailSender.createMimeMessage();
+        message.setSubject(subject);
+        MimeMessageHelper helper = new MimeMessageHelper(message, true, StandardCharsets.UTF_8.name());
+        helper.setFrom(mailFrom);
+        helper.setTo(recipients.toArray(new String[recipients.size()]));
+        helper.setText(text, isHtml);
+
+        attachments.forEach((s, inputStream) -> {
+            try {
+                helper.addAttachment(s, inputStream);
+            } catch (MessagingException e) {
+                log.error("Building email failed: ", e);
+            }
+        });
+        return message;
+    }
+
+
 
     protected String getServerURL() {
         String encryptedHttp = ssl ? "https://" : "http://";
