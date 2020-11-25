@@ -1,26 +1,35 @@
 package com.netgrif.workflow.configuration;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.session.data.redis.config.annotation.web.http.EnableRedisHttpSession;
 import org.springframework.session.web.http.HeaderHttpSessionIdResolver;
-import org.springframework.session.web.http.HeaderHttpSessionStrategy;
 import org.springframework.session.web.http.HttpSessionIdResolver;
-import org.springframework.session.web.http.HttpSessionStrategy;
 
-@EnableRedisHttpSession
 @Configuration
+@EnableRedisHttpSession(redisNamespace = "spring:session:${spring.session.redis.namespace}")
 @ConditionalOnProperty(
         value = "server.security.static.enabled",
         havingValue = "false"
 )
 public class SessionConfiguration {
 
+    @Value("${spring.session.redis.host}")
+    private String hostName;
+
+    @Value("${spring.session.redis.port}")
+    private Integer port;
+
     @Bean
     public JedisConnectionFactory jedisConnectionFactory() {
-        return new JedisConnectionFactory();
+        hostName = hostName == null ? "localhost" : hostName;
+        port = port == null || port == 0 ? 6379 : port;
+        RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration(hostName, port);
+        return new JedisConnectionFactory(redisStandaloneConfiguration);
     }
 
 

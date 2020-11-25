@@ -21,7 +21,7 @@ public interface IRegistrationService {
 
     User createNewUser(NewUserRequest newUser);
 
-    User registerUser(RegistrationRequest registrationRequest);
+    User registerUser(RegistrationRequest registrationRequest) throws InvalidUserTokenException;
 
     User resetPassword(String email);
 

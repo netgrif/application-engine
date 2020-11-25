@@ -1,8 +1,8 @@
 package com.netgrif.workflow.auth.web.responsebodies;
 
 import com.netgrif.workflow.auth.domain.Authority;
-import com.netgrif.workflow.orgstructure.domain.Group;
 import com.netgrif.workflow.auth.domain.UserProcessRole;
+import com.netgrif.workflow.orgstructure.domain.Group;
 import lombok.Data;
 
 import java.util.Locale;
@@ -36,6 +36,8 @@ public class User {
 
     private Set<UserProcessRole> userProcessRoles;
 
+    private Set<String> nextGroups;
+
     public User(com.netgrif.workflow.auth.domain.User user, Locale locale) {
         id = user.getId();
         email = user.getEmail();
@@ -51,5 +53,6 @@ public class User {
         processRoles = user.getProcessRoles().stream()
                 .map(role -> new ProcessRole(role, locale))
                 .collect(Collectors.toSet());
+        nextGroups = user.getNextGroups();
     }
 }
