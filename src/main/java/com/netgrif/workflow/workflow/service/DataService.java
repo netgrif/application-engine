@@ -164,14 +164,12 @@ public class DataService implements IDataService {
                         Action.ActionTrigger.SET, EventPhase.POST, useCase, task, useCase.getPetriNet().getTransition(task.getTransitionId()));
                 changedFieldsTree.mergeChangedFields(changedFieldsTreePost);
 
-                log.info("Ran actions on set fields " + values.toString() + " in " + task.getStringId() + " in " + useCase.getStringId() + " " + useCase.getTitle());
             } else try {
                 if (entry.getKey().contains("-")) {
                     TaskRefFieldWrapper decoded = decodeTaskRefFieldId(entry.getKey());
                     Task referencedTask = taskService.findOne(decoded.getTaskId());
                     ChangedFieldsTree taskRefChangedFields = setData(referencedTask, values);
                     changedFieldsTree.propagate(taskRefChangedFields);
-                    log.info("Ran actions on set taskRef fields " + values.toString() + " in " + referencedTask.getStringId() + " in " + referencedTask.getCaseId());
                 }
             } catch (Exception e) {
                 log.error("Failed to set taskRef references fields", e);
