@@ -7,6 +7,7 @@ import com.netgrif.workflow.event.events.usecase.CreateCaseEvent;
 import com.netgrif.workflow.event.events.usecase.DeleteCaseEvent;
 import com.netgrif.workflow.event.events.usecase.UpdateMarkingEvent;
 import com.netgrif.workflow.importer.service.FieldFactory;
+import com.netgrif.workflow.petrinet.domain.I18nString;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.dataset.CaseField;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
@@ -151,7 +152,12 @@ public class WorkflowService implements IWorkflowService {
     @Override
     public Page<Case> search(Map<String, Object> request, Pageable pageable, LoggedUser user, Locale locale) {
         Predicate searchPredicate = searchService.buildQuery(request, user, locale);
-        Page<Case> page = repository.findAll(searchPredicate, pageable);
+        Page<Case> page;
+        if (searchPredicate != null) {
+            page = repository.findAll(searchPredicate, pageable);
+        } else {
+            page = Page.empty();
+        }
         page.getContent().forEach(this::setPetriNet);
         decryptDataSets(page.getContent());
         return setImmediateDataFields(page);
@@ -160,7 +166,11 @@ public class WorkflowService implements IWorkflowService {
     @Override
     public long count(Map<String, Object> request, LoggedUser user, Locale locale) {
         Predicate searchPredicate = searchService.buildQuery(request, user, locale);
-        return repository.count(searchPredicate);
+        if (searchPredicate != null) {
+            return repository.count(searchPredicate);
+        } else {
+            return 0;
+        }
     }
 
     @Override
@@ -211,6 +221,23 @@ public class WorkflowService implements IWorkflowService {
         repository.delete(useCase);
 
         publisher.publishEvent(new DeleteCaseEvent(useCase));
+    }
+
+    @Override
+    public void deleteInstancesOfPetriNet(PetriNet net) {
+        log.info("[" + net.getStringId() + "]: Deleting all cases of Petri net " + net.getIdentifier() + " version " + net.getVersion().toString());
+        List<Case> cases = repository.findAllByPetriNetObjectId(net.getObjectId());
+
+        for (Case c : cases) {
+            log.info("[" + c.getStringId() + "]: Deleting case " + c.getTitle());
+            taskService.deleteTasksByCase(c.getStringId());
+        }
+
+        repository.deleteAllByPetriNetObjectId(net.getObjectId());
+
+        for (Case c : cases) {
+            publisher.publishEvent(new DeleteCaseEvent(c));
+        }
     }
 
     @Override
@@ -267,6 +294,14 @@ public class WorkflowService implements IWorkflowService {
             return null;
         return page.getContent().get(0);
     }
+
+    @Override
+    public Map<String, I18nString> listToMap(List<Case> cases){
+        Map<String, I18nString> options = new HashMap<>();
+        cases.forEach(aCase -> options.put(aCase.getStringId(), new I18nString(aCase.getTitle())));
+        return  options;
+    }
+
 
     public List<Field> getData(String caseId) {
         Optional<Case> optionalUseCase = repository.findById(caseId);
