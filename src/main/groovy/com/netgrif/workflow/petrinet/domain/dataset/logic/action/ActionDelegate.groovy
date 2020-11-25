@@ -94,9 +94,6 @@ class ActionDelegate {
     def map = [:]
     Action action
     FieldActionsRunner actionsRunner
-    /**
-     * taskId -> [fieldId -> changedField]
-     */
     ChangedFieldsTree changedFieldsTree
 
     def init(Action action, Case useCase, Optional<Task> task, FieldActionsRunner actionsRunner) {
