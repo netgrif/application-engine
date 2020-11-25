@@ -52,6 +52,8 @@
                     text_from_child: f.text_from_child,
                     children_cases: f.children_cases;
 
+                    change text_from_child value { "OVERRIDE" }
+
 
                     def ids = children_cases.value ? children_cases.value : []
                     ids.each {
@@ -67,7 +69,6 @@
                     make text_from_child,required on trans when { actualValue == "ABC" }
                     make text_from_child,visible on trans when { actualValue != "ABC" }
 
-                    change text_from_child value { "OVERRIDE" }
 
                     log.warn("POST " + text_from_child.value)
                 </action>
@@ -219,6 +220,12 @@
 
         <dataGroup>
             <id>0</id>
+            <dataRef>
+                <id>file</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
             <dataRef>
                 <id>text</id>
                 <logic>
