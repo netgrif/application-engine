@@ -61,6 +61,8 @@ public class PdfProperties {
 
    protected int formGridRowHeight = ((pageHeight - marginBottom - marginTop) / formGridRows);
 
+   protected int rowGridFree = formGridCols;
+
    protected float strokeWidth = 0.5f;
 
    protected int boxSize = 10;
@@ -91,6 +93,7 @@ public class PdfProperties {
       pageDrawableWidth = pageWidth - marginLeft - marginRight;
       formGridColWidth = (pageDrawableWidth / formGridCols);
       formGridRowHeight = ((pageHeight - marginBottom - marginTop) / formGridRows);
+      rowGridFree = formGridCols;
       baseX = marginLeft;
    }
 
