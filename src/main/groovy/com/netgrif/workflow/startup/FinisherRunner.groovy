@@ -29,11 +29,6 @@ class FinisherRunner extends AbstractOrderedCommandLineRunner {
 
     @Override
     void run(String... strings) throws Exception {
-        log.info("sasda")
-
-        helper.createNet("tmp/child.xml", "major", superCreator.getLoggedSuper())
-        helper.createNet("tmp/parent.xml", "major", superCreator.getLoggedSuper())
-
         superCreator.setAllToSuperUser()
     }
 }
