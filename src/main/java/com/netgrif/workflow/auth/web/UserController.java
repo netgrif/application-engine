@@ -189,8 +189,9 @@ public class UserController {
             @ApiResponse(code = 200, message = "OK", response = MessageResource.class),
             @ApiResponse(code = 403, message = "Caller doesn't fulfill the authorisation requirements"),
     })
-    public MessageResource assignAuthorityToUser(@PathVariable("id") Long userId, @RequestBody Long authorityId) {
-        userService.assignAuthority(userId, authorityId);
+    public MessageResource assignAuthorityToUser(@PathVariable("id") Long userId, @RequestBody String authorityId) {
+        Long authority = authorityId != null ? Long.parseLong(authorityId) : null;
+        userService.assignAuthority(userId, authority);
         return MessageResource.successMessage("Authority " + authorityId + " assigned to user " + userId);
     }
 
