@@ -407,7 +407,7 @@ public class DataService implements IDataService {
         } else {
             ChangedFieldsTree parent = ChangedFieldsTree.createNew(referencingTask.getCaseId(), referencingTask);
             parent.setPropagatedChanges(changedFields.getPropagatedChanges());
-            parent.addPropagated(referencedTask.getCaseId(), referencedTask, changedFields.getChangedFields());
+            parent.addPropagated(referencedTask.getCaseId(), changedFields.getChangedFields());
             parent.flatten(container);
         }
         return container;
