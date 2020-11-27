@@ -192,7 +192,7 @@ public class UserController {
     public MessageResource assignAuthorityToUser(@PathVariable("id") Long userId, @RequestBody String authorityId) {
         Long authority = authorityId != null ? Long.parseLong(authorityId) : null;
         userService.assignAuthority(userId, authority);
-        return MessageResource.successMessage("Authority " + authorityId + " assigned to user " + userId);
+        return MessageResource.successMessage("Authority " + authority + " assigned to user " + userId);
     }
 
     @ApiOperation(value = "Get user's preferences", authorizations = @Authorization("BasicAuth"))
