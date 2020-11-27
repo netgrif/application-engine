@@ -552,14 +552,15 @@ class ActionDelegate {
         Case caze = workflowService.findOne(task.caseId)
         ChangedFieldsTree container = setData(task, dataSet)
         caze = workflowService.findOne(caze.stringId)
-        this.changedFieldsTree.addPropagated(caze.stringId, task.stringId, task.transitionId, makeDataSetIntoChangedFields(dataSet, caze))
+        this.changedFieldsTree.addPropagated(caze.stringId, makeDataSetIntoChangedFields(dataSet, caze, task))
         this.changedFieldsTree.propagate(container)
         return container
     }
 
-    Map<String, ChangedField> makeDataSetIntoChangedFields(Map<String, Map<String, String>> map, Case caze) {
+    Map<String, ChangedField> makeDataSetIntoChangedFields(Map<String, Map<String, String>> map, Case caze, Task task) {
         return map.collect { fieldAttributes ->
             ChangedField changedField = new ChangedField(fieldAttributes.key)
+            changedField.wasChangedOn(task)
             fieldAttributes.value.each {attribute ->
                 changedField.addAttribute(attribute.key, attribute.value)
             }
