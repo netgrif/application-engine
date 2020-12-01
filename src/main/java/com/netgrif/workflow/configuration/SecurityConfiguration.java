@@ -43,9 +43,6 @@ public class SecurityConfiguration extends AbstractSecurityConfiguration {
     @Autowired
     private RestAuthenticationEntryPoint authenticationEntryPoint;
 
-    @Value("${server.auth.open-registration}")
-    private boolean openRegistration;
-
     @Value("${server.security.csrf}")
     private boolean csrf = true;
 
@@ -102,7 +99,7 @@ public class SecurityConfiguration extends AbstractSecurityConfiguration {
 
     @Override
     boolean isOpenRegistration() {
-        return openRegistration;
+        return this.serverAuthProperties.isOpenRegistration();
     }
 
     @Override

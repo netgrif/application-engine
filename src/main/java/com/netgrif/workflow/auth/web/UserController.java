@@ -11,6 +11,7 @@ import com.netgrif.workflow.auth.web.requestbodies.UserSearchRequestBody;
 import com.netgrif.workflow.auth.web.responsebodies.AuthoritiesResources;
 import com.netgrif.workflow.auth.web.responsebodies.UserResource;
 import com.netgrif.workflow.auth.web.responsebodies.UserResourceAssembler;
+import com.netgrif.workflow.configuration.properties.ServerAuthProperties;
 import com.netgrif.workflow.petrinet.service.interfaces.IProcessRoleService;
 import com.netgrif.workflow.settings.domain.Preferences;
 import com.netgrif.workflow.settings.service.IPreferencesService;
@@ -67,8 +68,8 @@ public class UserController {
     @Autowired
     private IPreferencesService preferencesService;
 
-    @Value("${server.auth.enable-profile-edit}")
-    private boolean enableProfileEdit;
+    @Autowired
+    private ServerAuthProperties serverAuthProperties;
 
     @ApiOperation(value = "Get all users", authorizations = @Authorization("BasicAuth"))
     @GetMapping(produces = MediaTypes.HAL_JSON_VALUE)
@@ -119,7 +120,7 @@ public class UserController {
     @ApiOperation(value = "Update user", authorizations = @Authorization("BasicAuth"))
     @PostMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public UserResource updateUser(@PathVariable("id") Long userId, @RequestBody UpdateUserRequest updates, Authentication auth, Locale locale) throws UnauthorisedRequestException {
-        if (!enableProfileEdit) return null;
+        if (!serverAuthProperties.isEnableProfileEdit()) return null;
 
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
         User user = userService.findById(userId, false);
