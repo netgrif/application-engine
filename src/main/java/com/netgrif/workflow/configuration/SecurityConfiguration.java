@@ -1,8 +1,7 @@
 package com.netgrif.workflow.configuration;
 
 import com.netgrif.workflow.configuration.security.RestAuthenticationEntryPoint;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -25,6 +24,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import static org.springframework.http.HttpMethod.OPTIONS;
 
+@Slf4j
 @Configuration
 @Controller
 @EnableWebSecurity
@@ -34,8 +34,6 @@ import static org.springframework.http.HttpMethod.OPTIONS;
         havingValue = "false"
 )
 public class SecurityConfiguration extends AbstractSecurityConfiguration {
-
-    private static final Logger log = LoggerFactory.getLogger(SecurityConfiguration.class);
 
     @Autowired
     private Environment env;
