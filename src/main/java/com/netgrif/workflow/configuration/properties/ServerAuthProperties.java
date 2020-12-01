@@ -17,5 +17,5 @@ public class ServerAuthProperties {
 
     private boolean enableProfileEdit = true;
 
-    private String[] noAuthorizationPatterns = new String[0];
+    private String[] noAuthenticationPatterns = new String[0];
 }

@@ -27,7 +27,7 @@ public abstract class AbstractSecurityConfiguration extends WebSecurityConfigure
     String[] getPatterns() {
         List<String> patterns = new ArrayList<>(Arrays.asList(getStaticPatterns()));
         patterns.addAll(Arrays.asList(getServerPatterns()));
-        patterns.addAll(Arrays.asList(serverAuthProperties.getNoAuthorizationPatterns()));
+        patterns.addAll(Arrays.asList(serverAuthProperties.getNoAuthenticationPatterns()));
         if (isOpenRegistration()) {
             patterns.add("/api/auth/invite");
         }
