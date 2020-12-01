@@ -8,8 +8,8 @@ import java.util.concurrent.TimeUnit;
 
 @Data
 @Configuration
-@ConfigurationProperties(prefix = "spring.max")
-public class BruteForceProperties {
+@ConfigurationProperties(prefix = "nae.security.limits")
+public class SecurityLimitsProperties {
 
     private int loginAttempts = 10;
 
