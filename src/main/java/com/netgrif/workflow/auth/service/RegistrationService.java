@@ -8,6 +8,7 @@ import com.netgrif.workflow.auth.service.interfaces.IRegistrationService;
 import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.auth.web.requestbodies.NewUserRequest;
 import com.netgrif.workflow.auth.web.requestbodies.RegistrationRequest;
+import com.netgrif.workflow.configuration.properties.ServerAuthProperties;
 import com.netgrif.workflow.orgstructure.service.IGroupService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,11 +43,8 @@ public class RegistrationService implements IRegistrationService {
     @Autowired
     private IGroupService groupService;
 
-    @Value("${server.auth.token-validity-period}")
-    private int tokenValidityPeriod;
-
-    @Value("${server.auth.minimal-password-length}")
-    private int minimalPasswordLength;
+    @Autowired
+    private ServerAuthProperties serverAuthProperties;
 
     @Override
     @Transactional
@@ -201,11 +199,11 @@ public class RegistrationService implements IRegistrationService {
 
     @Override
     public LocalDateTime generateExpirationDate() {
-        return LocalDateTime.now().plusDays(tokenValidityPeriod);
+        return LocalDateTime.now().plusDays(serverAuthProperties.getTokenValidityPeriod());
     }
 
     @Override
     public boolean isPasswordSufficient(String password) {
-        return password.length() >= minimalPasswordLength;
+        return password.length() >= serverAuthProperties.getMinimalPasswordLength();
     }
 }

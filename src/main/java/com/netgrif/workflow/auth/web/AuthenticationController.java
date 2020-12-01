@@ -10,6 +10,7 @@ import com.netgrif.workflow.auth.web.requestbodies.ChangePasswordRequest;
 import com.netgrif.workflow.auth.web.requestbodies.NewUserRequest;
 import com.netgrif.workflow.auth.web.requestbodies.RegistrationRequest;
 import com.netgrif.workflow.auth.web.responsebodies.UserResource;
+import com.netgrif.workflow.configuration.properties.ServerAuthProperties;
 import com.netgrif.workflow.mail.interfaces.IMailAttemptService;
 import com.netgrif.workflow.mail.interfaces.IMailService;
 import com.netgrif.workflow.workflow.web.responsebodies.MessageResource;
@@ -61,8 +62,8 @@ public class AuthenticationController {
     @Autowired
     private IMailAttemptService mailAttemptService;
 
-    @Value("${server.auth.open-registration}")
-    private boolean openRegistration;
+    @Autowired
+    private ServerAuthProperties serverAuthProperties;
 
     @ApiOperation(value = "New user registration")
     @PostMapping(value = "/signup", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
@@ -88,7 +89,7 @@ public class AuthenticationController {
     @PostMapping(value = "/invite", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public MessageResource invite(@RequestBody NewUserRequest newUserRequest, Authentication auth) {
         try {
-            if (!openRegistration && (auth == null || !((LoggedUser) auth.getPrincipal()).isAdmin())) {
+            if (!serverAuthProperties.isOpenRegistration() && (auth == null || !((LoggedUser) auth.getPrincipal()).isAdmin())) {
                 return MessageResource.errorMessage("Only admin can invite new users!");
             }
 
