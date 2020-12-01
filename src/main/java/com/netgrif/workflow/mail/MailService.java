@@ -2,6 +2,7 @@ package com.netgrif.workflow.mail;
 
 import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.auth.service.interfaces.IRegistrationService;
+import com.netgrif.workflow.configuration.properties.ServerAuthProperties;
 import com.netgrif.workflow.mail.domain.SimpleMailDraft;
 import com.netgrif.workflow.mail.domain.TypedMailDraft;
 import com.netgrif.workflow.mail.interfaces.IMailService;
@@ -40,6 +41,9 @@ public class MailService implements IMailService {
     @Autowired
     private IRegistrationService registrationService;
 
+    @Autowired
+    private ServerAuthProperties serverAuthProperties;
+
     @Getter
     @Value("${mail.server.port}")
     protected String port;
@@ -57,10 +61,6 @@ public class MailService implements IMailService {
     protected String mailFrom;
 
     @Getter
-    @Value("${server.auth.token-validity-period}")
-    protected String validityPeriod;
-
-    @Getter
     @Setter
     protected JavaMailSender mailSender;
 
@@ -76,7 +76,7 @@ public class MailService implements IMailService {
         recipients.add(user.getEmail());
         model.put(TOKEN, registrationService.encodeToken(user.getEmail(), user.getToken()));
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
-        model.put(VALIDITY, validityPeriod);
+        model.put(VALIDITY, ""+serverAuthProperties.getTokenValidityPeriod());
         model.put(EXPIRATION, registrationService.generateExpirationDate().format(formatter));
         model.put(SERVER, getServerURL());
 
@@ -92,7 +92,7 @@ public class MailService implements IMailService {
 
         model.put(NAME, user.getName());
         model.put(TOKEN, registrationService.encodeToken(user.getEmail(), user.getToken()));
-        model.put(VALIDITY, validityPeriod);
+        model.put(VALIDITY, ""+serverAuthProperties.getTokenValidityPeriod());
         model.put(EXPIRATION, registrationService.generateExpirationDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
         model.put(SERVER, getServerURL());
 
@@ -131,7 +131,7 @@ public class MailService implements IMailService {
     }
 
     protected MimeMessage buildEmail(EmailType type, List<String> recipients, Map<String, Object> model, Map<String, File> attachments) throws MessagingException, IOException, TemplateException {
-        if(type.template == null || type.subject == null){
+        if (type.template == null || type.subject == null) {
             log.error("The email has no template or subject defined in object of EmailType.");
             throw new NoEmailTypeDefinedException("The email has no template or subject defined in object of EmailType.");
         }
@@ -169,7 +169,6 @@ public class MailService implements IMailService {
         });
         return message;
     }
-
 
 
     protected String getServerURL() {
