@@ -4,7 +4,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import com.netgrif.workflow.auth.service.interfaces.ILoginAttemptService;
-import com.netgrif.workflow.configuration.properties.BruteForceProperties;
+import com.netgrif.workflow.configuration.properties.SecurityLimitsProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,7 +19,7 @@ import com.google.common.cache.LoadingCache;
 public class LoginAttemptService implements ILoginAttemptService {
 
     @Autowired
-    private BruteForceProperties bruteForceProperties;
+    private SecurityLimitsProperties securityLimitsProperties;
 
     private LoadingCache<String, Integer> attemptsCache;
 
@@ -51,7 +51,7 @@ public class LoginAttemptService implements ILoginAttemptService {
 
     public boolean isBlocked(String key) {
         try {
-            return attemptsCache.get(key) >= bruteForceProperties.getLoginAttempts();
+            return attemptsCache.get(key) >= securityLimitsProperties.getLoginAttempts();
         } catch (ExecutionException e) {
             log.error("Error reading login attempts cache for key " + key , e);
             return false;
