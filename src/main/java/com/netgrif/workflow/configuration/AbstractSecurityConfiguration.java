@@ -1,5 +1,6 @@
 package com.netgrif.workflow.configuration;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -10,6 +11,9 @@ import java.util.Arrays;
 import java.util.List;
 
 public abstract class AbstractSecurityConfiguration extends WebSecurityConfigurerAdapter {
+
+    @Value("${server.security.no-authorization-patterns}")
+    protected String[] applicationPropertiesPatterns;
 
     void setCsrf(HttpSecurity http) throws Exception {
         if (isCsrfEnabled()) {
@@ -22,6 +26,7 @@ public abstract class AbstractSecurityConfiguration extends WebSecurityConfigure
     String[] getPatterns() {
         List<String> patterns = new ArrayList<>(Arrays.asList(getStaticPatterns()));
         patterns.addAll(Arrays.asList(getServerPatterns()));
+        patterns.addAll(Arrays.asList(applicationPropertiesPatterns));
         if (isOpenRegistration()) {
             patterns.add("/api/auth/invite");
         }
