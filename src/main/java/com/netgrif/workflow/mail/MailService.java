@@ -12,9 +12,8 @@ import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -29,9 +28,9 @@ import java.nio.charset.StandardCharsets;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
+@Slf4j
 public class MailService implements IMailService {
 
-    static final Logger log = LoggerFactory.getLogger(MailService.class.getName());
     public static final String TOKEN = "token";
     public static final String VALIDITY = "validity";
     public static final String EXPIRATION = "expiration";
@@ -76,7 +75,7 @@ public class MailService implements IMailService {
         recipients.add(user.getEmail());
         model.put(TOKEN, registrationService.encodeToken(user.getEmail(), user.getToken()));
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
-        model.put(VALIDITY, ""+serverAuthProperties.getTokenValidityPeriod());
+        model.put(VALIDITY, "" + serverAuthProperties.getTokenValidityPeriod());
         model.put(EXPIRATION, registrationService.generateExpirationDate().format(formatter));
         model.put(SERVER, getServerURL());
 
@@ -92,7 +91,7 @@ public class MailService implements IMailService {
 
         model.put(NAME, user.getName());
         model.put(TOKEN, registrationService.encodeToken(user.getEmail(), user.getToken()));
-        model.put(VALIDITY, ""+serverAuthProperties.getTokenValidityPeriod());
+        model.put(VALIDITY, "" + serverAuthProperties.getTokenValidityPeriod());
         model.put(EXPIRATION, registrationService.generateExpirationDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
         model.put(SERVER, getServerURL());
 
