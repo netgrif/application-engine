@@ -1,7 +1,7 @@
 package com.netgrif.workflow.mail;
 import java.util.concurrent.ExecutionException;
 
-import com.netgrif.workflow.configuration.properties.BruteForceProperties;
+import com.netgrif.workflow.configuration.properties.SecurityLimitsProperties;
 import com.netgrif.workflow.mail.interfaces.IMailAttemptService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,16 +15,16 @@ import com.google.common.cache.LoadingCache;
 @Service
 public class MailAttemptService implements IMailAttemptService {
 
-    private BruteForceProperties bruteForceProperties;
+    private SecurityLimitsProperties securityLimitsProperties;
 
     private LoadingCache<String, Integer> attemptsCache;
 
     @Autowired
-    public MailAttemptService(BruteForceProperties bruteForceProperties) {
+    public MailAttemptService(SecurityLimitsProperties securityLimitsProperties) {
           super();
-          this.bruteForceProperties = bruteForceProperties;
+          this.securityLimitsProperties = securityLimitsProperties;
           attemptsCache = CacheBuilder.newBuilder().
-                expireAfterWrite(bruteForceProperties.getEmailBlockDuration(), bruteForceProperties.getEmailBlockTimeType()).build(new CacheLoader<String, Integer>() {
+                expireAfterWrite(securityLimitsProperties.getEmailBlockDuration(), securityLimitsProperties.getEmailBlockTimeType()).build(new CacheLoader<String, Integer>() {
                 public Integer load(String key) {
                     return 0;
                 }
@@ -45,7 +45,7 @@ public class MailAttemptService implements IMailAttemptService {
 
     public boolean isBlocked(String key) {
         try {
-            return attemptsCache.get(key) >= bruteForceProperties.getEmailSendsAttempts();
+            return attemptsCache.get(key) >= securityLimitsProperties.getEmailSendsAttempts();
         } catch (ExecutionException e) {
             log.error("Error reading mail attempts cache for key " + key , e);
             return false;
