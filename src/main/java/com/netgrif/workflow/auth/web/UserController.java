@@ -19,10 +19,8 @@ import com.netgrif.workflow.settings.web.PreferencesResource;
 import com.netgrif.workflow.workflow.web.responsebodies.MessageResource;
 import com.netgrif.workflow.workflow.web.responsebodies.ResourceLinkAssembler;
 import io.swagger.annotations.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -41,6 +39,7 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.Set;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/user")
 @ConditionalOnProperty(
@@ -50,8 +49,6 @@ import java.util.Set;
 )
 @Api(tags = {"User"})
 public class UserController {
-
-    private static final Logger log = LoggerFactory.getLogger(UserController.class);
 
     @Autowired
     private IUserService userService;

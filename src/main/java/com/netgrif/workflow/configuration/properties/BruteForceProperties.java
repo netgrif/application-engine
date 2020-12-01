@@ -9,7 +9,7 @@ import java.util.concurrent.TimeUnit;
 @Data
 @Configuration
 @ConfigurationProperties(prefix = "spring.max")
-public class ConfigurationProps {
+public class BruteForceProperties {
 
     private int loginAttempts = 10;
 

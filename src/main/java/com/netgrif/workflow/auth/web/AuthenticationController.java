@@ -18,10 +18,8 @@ import freemarker.template.TemplateException;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.Authorization;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.MediaType;
@@ -35,6 +33,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Locale;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/auth")
 @ConditionalOnProperty(
@@ -44,8 +43,6 @@ import java.util.Locale;
 )
 @Api(tags = {"Authentication"})
 public class AuthenticationController {
-
-    private static final Logger log = LoggerFactory.getLogger(AuthenticationController.class);
 
     @Autowired
     private IRegistrationService registrationService;

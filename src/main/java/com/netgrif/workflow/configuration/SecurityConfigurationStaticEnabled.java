@@ -1,8 +1,7 @@
 package com.netgrif.workflow.configuration;
 
 import com.netgrif.workflow.configuration.security.RestAuthenticationEntryPoint;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -20,6 +19,7 @@ import org.springframework.session.web.http.HeaderHttpSessionStrategy;
 import org.springframework.session.web.http.HttpSessionStrategy;
 import org.springframework.stereotype.Controller;
 
+@Slf4j
 @Configuration
 @Controller
 @EnableWebSecurity
@@ -29,8 +29,6 @@ import org.springframework.stereotype.Controller;
         havingValue = "true"
 )
 public class SecurityConfigurationStaticEnabled extends AbstractSecurityConfiguration {
-
-    private static final Logger log = LoggerFactory.getLogger(SecurityConfigurationStaticEnabled.class);
 
     @Autowired
     private Environment env;
