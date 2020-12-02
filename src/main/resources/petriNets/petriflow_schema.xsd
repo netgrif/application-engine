@@ -220,6 +220,7 @@
             <xs:enumeration value="file"/>
             <xs:enumeration value="fileList"/>
             <xs:enumeration value="user"/>
+            <xs:enumeration value="userList"/>
             <xs:enumeration value="dateTime"/>
             <xs:enumeration value="button"/>
             <xs:enumeration value="taskRef"/>
