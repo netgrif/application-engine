@@ -180,6 +180,7 @@ public class DataService implements IDataService {
             }
         });
         updateDataset(useCase);
+        taskService.resolveUserRef(task, useCase);
         workflowService.save(useCase);
         publisher.publishEvent(new SaveCaseDataEvent(useCase, values, changedFields.values()));
 

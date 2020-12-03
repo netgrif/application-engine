@@ -674,6 +674,7 @@ public class TaskService implements ITaskService {
 
     @Override
     public void resolveUserRef(Task task, Case useCase) {
+        task.getUsers().clear();
         task.getUserRefs().forEach((id, permission) -> {
             List<Long> userIds = getExistingUsers((List<Long>) useCase.getDataSet().get(id).getValue());
             if (userIds != null && userIds.size() != 0) {
