@@ -28,7 +28,6 @@ import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Lookup;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.data.domain.Page;
@@ -45,6 +44,7 @@ import org.springframework.data.repository.support.PageableExecutionUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.inject.Provider;
 import java.io.*;
 import java.nio.file.Path;
 import java.util.*;
@@ -53,12 +53,9 @@ import java.util.stream.Collectors;
 import static com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService.transformToReference;
 
 @Service
-public abstract class PetriNetService implements IPetriNetService {
+public class PetriNetService implements IPetriNetService {
 
     private static final Logger log = LoggerFactory.getLogger(PetriNetService.class);
-
-    @Lookup("importer")
-    abstract Importer getImporter();
 
     @Autowired
     private IUserProcessRoleService userProcessRoleService;
@@ -87,7 +84,14 @@ public abstract class PetriNetService implements IPetriNetService {
     @Autowired
     private INextGroupService groupService;
 
+    @Autowired
+    private Provider<Importer> importerProvider;
+
     private Map<ObjectId, PetriNet> cache = new HashMap<>();
+
+    protected Importer getImporter() {
+        return importerProvider.get();
+    }
 
     @Override
     public void evictCache() {
