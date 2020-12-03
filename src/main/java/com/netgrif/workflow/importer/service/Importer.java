@@ -1,9 +1,8 @@
 package com.netgrif.workflow.importer.service;
 
 import com.netgrif.workflow.importer.model.*;
-import com.netgrif.workflow.importer.model.DataEventType;
-import com.netgrif.workflow.petrinet.domain.DataEvent;
 import com.netgrif.workflow.petrinet.domain.Component;
+import com.netgrif.workflow.petrinet.domain.DataEvent;
 import com.netgrif.workflow.petrinet.domain.DataGroup;
 import com.netgrif.workflow.petrinet.domain.Event;
 import com.netgrif.workflow.petrinet.domain.EventType;
@@ -24,7 +23,6 @@ import com.netgrif.workflow.petrinet.domain.policies.DataFocusPolicy;
 import com.netgrif.workflow.petrinet.domain.policies.FinishPolicy;
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRole;
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRoleRepository;
-import com.netgrif.workflow.petrinet.domain.roles.RolePermission;
 import com.netgrif.workflow.petrinet.domain.throwable.MissingPetriNetMetaDataException;
 import com.netgrif.workflow.petrinet.service.ArcFactory;
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
@@ -42,9 +40,6 @@ import javax.xml.bind.Unmarshaller;
 import java.io.*;
 import java.nio.file.Path;
 import java.util.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadPoolExecutor;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -326,6 +321,10 @@ public class Importer {
                     addRoleLogic(transition, roleRef)
             );
         }
+        if (importTransition.getUserListRef() != null) {
+            importTransition.getUserListRef().forEach(userListRef ->
+                    addUserLogic(transition, userListRef));
+        }
         if (importTransition.getDataRef() != null) {
             importTransition.getDataRef().forEach(dataRef ->
                     addDataWithDefaultGroup(transition, dataRef)
@@ -475,6 +474,17 @@ public class Importer {
         }
 
         transition.addRole(roleId, roleFactory.getPermissions(logic));
+    }
+
+    @Transactional
+    protected void addUserLogic(Transition transition, UserListRef userListRef) {
+        Logic logic = userListRef.getLogic();
+        String userRef = userListRef.getId();
+
+        if (logic == null || userRef == null) {
+            return;
+        }
+        transition.addUserRef(userRef, roleFactory.getPermissions(logic));
     }
 
     @Transactional
