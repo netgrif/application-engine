@@ -32,6 +32,10 @@ public class Transition extends Node {
     @Getter @Setter
     private Map<String, Set<RolePermission>> roles;
 
+    @Field("users")
+    @Getter @Setter
+    private Map<String, Set<RolePermission>> userRefs;
+
     @Field("triggers")
     @Getter @Setter
     private List<Trigger> triggers;
@@ -64,6 +68,7 @@ public class Transition extends Node {
         super();
         dataSet = new LinkedHashMap<>();
         roles = new HashMap<>();
+        userRefs = new HashMap<>();
         triggers = new LinkedList<>();
         dataGroups = new LinkedHashMap<>();
         assignPolicy = AssignPolicy.MANUAL;
@@ -94,6 +99,14 @@ public class Transition extends Node {
             roles.get(roleId).addAll(permissions);
         } else {
             roles.put(roleId, permissions);
+        }
+    }
+
+    public void addUserRef(String userRefId, Set<RolePermission> permissions) {
+        if (userRefs.containsKey(userRefId) && userRefs.get(userRefId) != null) {
+            userRefs.get(userRefId).addAll(permissions);
+        } else {
+            userRefs.put(userRefId, permissions);
         }
     }
 
