@@ -98,6 +98,7 @@
                 <xs:element ref="trigger" minOccurs="0" maxOccurs="unbounded"/>
                 <xs:element ref="transactionRef" minOccurs="0"/>
                 <xs:element ref="roleRef" maxOccurs="unbounded" minOccurs="0"/>
+                <xs:element ref="userListRef" maxOccurs="unbounded" minOccurs="0"/>
                 <xs:element ref="dataRef" maxOccurs="unbounded" minOccurs="0"/>
                 <xs:element ref="dataGroup" maxOccurs="unbounded" minOccurs="0"/>
                 <xs:element ref="event" maxOccurs="unbounded" minOccurs="0"/>
@@ -398,6 +399,14 @@
         </xs:complexType>
     </xs:element>
     <xs:element name="roleRef">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="id"/>
+                <xs:element ref="logic"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="userListRef">
         <xs:complexType>
             <xs:sequence>
                 <xs:element ref="id"/>
