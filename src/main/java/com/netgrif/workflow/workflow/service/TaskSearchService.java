@@ -39,10 +39,15 @@ public class TaskSearchService extends MongoSearchService<Task> {
         }
 
         BooleanBuilder builder = constructPredicateTree(singleQueries, isIntersection ? BooleanBuilder::and : BooleanBuilder::or);
-
-        builder.and(buildRolesQueryConstraint(user));
-
+        BooleanBuilder constraints = new BooleanBuilder(buildRolesQueryConstraint(user));
+        constraints.or(buildUserRefQueryConstraint(user));
+        builder.and(constraints);
         return builder;
+    }
+
+    protected Predicate buildUserRefQueryConstraint(LoggedUser user) {
+        Predicate userConstraints = usersQuery(user.getId());
+        return constructPredicateTree(Collections.singletonList(userConstraints), BooleanBuilder::or);
     }
 
     protected Predicate buildRolesQueryConstraint(LoggedUser user) {
@@ -82,6 +87,10 @@ public class TaskSearchService extends MongoSearchService<Task> {
 
     public Predicate roleQuery(String role) {
         return QTask.task.roles.containsKey(role);
+    }
+
+    public Predicate usersQuery(Long userId) {
+        return QTask.task.users.containsKey(userId);
     }
 
 
