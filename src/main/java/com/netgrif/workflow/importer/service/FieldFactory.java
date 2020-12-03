@@ -66,6 +66,9 @@ public final class FieldFactory {
             case USER:
                 field = buildUserField(data, importer);
                 break;
+            case USER_LIST:
+                field = buildUserListField();
+                break;
             case CASE_REF:
                 field = buildCaseField(data);
                 break;
@@ -205,6 +208,10 @@ public final class FieldFactory {
                 .map(value -> importer.getRoles().get(value.getValue()).getStringId())
                 .toArray(String[]::new);
         return new UserField(roles);
+    }
+
+    private UserListField buildUserListField() {
+        return new UserListField();
     }
 
     private FileField buildFileField(Data data) {
