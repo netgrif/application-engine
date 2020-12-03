@@ -175,6 +175,7 @@ public class ElasticTaskService implements IElasticTaskService {
             throw new IllegalArgumentException("Request can not be null!");
         }
         addRolesQueryConstraint(request, user);
+        addUsersQueryConstraint(request, user);
 
         BoolQueryBuilder query = boolQuery();
 
@@ -201,6 +202,16 @@ public class ElasticTaskService implements IElasticTaskService {
             request.role = new ArrayList<>(roles);
         } else {
             request.role = new ArrayList<>(user.getProcessRoles());
+        }
+    }
+
+    protected void addUsersQueryConstraint(ElasticTaskSearchRequest request, LoggedUser user) {
+        if (request.userRefs != null && !request.userRefs.isEmpty()) {
+            Set<Long> users = new HashSet<>(request.userRefs);
+            users.add(user.getId());
+            request.userRefs = new ArrayList<>(users);
+        } else {
+            request.userRefs = Collections.singletonList(user.getId());
         }
     }
 
