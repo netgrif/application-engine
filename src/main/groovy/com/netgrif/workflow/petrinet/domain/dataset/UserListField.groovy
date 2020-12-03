@@ -1,16 +1,9 @@
 package com.netgrif.workflow.petrinet.domain.dataset
 
-import com.netgrif.workflow.auth.domain.User;
-
 class UserListField extends Field<List<Long>> {
 
     UserListField(){
         super()
-    }
-
-    @Override
-    void setValue(List<User> value) {
-        super.setValue(value)
     }
 
     @Override
