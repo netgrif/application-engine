@@ -180,6 +180,7 @@ public class ElasticTaskService implements IElasticTaskService {
         BoolQueryBuilder query = boolQuery();
 
         buildRoleQuery(request, query);
+        buildUsersQuery(request, query);
         buildCaseQuery(request, query);
         buildTitleQuery(request, query);
         buildUserQuery(request, query);
@@ -206,12 +207,12 @@ public class ElasticTaskService implements IElasticTaskService {
     }
 
     protected void addUsersQueryConstraint(ElasticTaskSearchRequest request, LoggedUser user) {
-        if (request.userRefs != null && !request.userRefs.isEmpty()) {
-            Set<Long> users = new HashSet<>(request.userRefs);
+        if (request.users != null && !request.users.isEmpty()) {
+            Set<Long> users = new HashSet<>(request.users);
             users.add(user.getId());
-            request.userRefs = new ArrayList<>(users);
+            request.users = new ArrayList<>(users);
         } else {
-            request.userRefs = Collections.singletonList(user.getId());
+            request.users = Collections.singletonList(user.getId());
         }
     }
 
@@ -241,6 +242,21 @@ public class ElasticTaskService implements IElasticTaskService {
 
         query.filter(roleQuery);
     }
+
+    private void buildUsersQuery(ElasticTaskSearchRequest request, BoolQueryBuilder query) {
+        if (request.users == null || request.users.isEmpty()) {
+            return;
+        }
+
+        BoolQueryBuilder roleQuery = boolQuery();
+        for (Long userId : request.users) {
+            roleQuery.should(termQuery("users", userId));
+        }
+
+        query.filter(roleQuery);
+    }
+
+
 
     /**
      * Tasks of case with id "5cb07b6ff05be15f0b972c4d"
