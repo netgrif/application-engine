@@ -11,6 +11,7 @@ import com.netgrif.workflow.auth.web.requestbodies.UserSearchRequestBody;
 import com.netgrif.workflow.auth.web.responsebodies.AuthoritiesResources;
 import com.netgrif.workflow.auth.web.responsebodies.UserResource;
 import com.netgrif.workflow.auth.web.responsebodies.UserResourceAssembler;
+import com.netgrif.workflow.configuration.properties.ServerAuthProperties;
 import com.netgrif.workflow.petrinet.service.interfaces.IProcessRoleService;
 import com.netgrif.workflow.settings.domain.Preferences;
 import com.netgrif.workflow.settings.service.IPreferencesService;
@@ -18,10 +19,8 @@ import com.netgrif.workflow.settings.web.PreferencesResource;
 import com.netgrif.workflow.workflow.web.responsebodies.MessageResource;
 import com.netgrif.workflow.workflow.web.responsebodies.ResourceLinkAssembler;
 import io.swagger.annotations.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -40,6 +39,7 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.Set;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/user")
 @ConditionalOnProperty(
@@ -49,8 +49,6 @@ import java.util.Set;
 )
 @Api(tags = {"User"})
 public class UserController {
-
-    private static final Logger log = LoggerFactory.getLogger(UserController.class);
 
     @Autowired
     private IUserService userService;
@@ -67,8 +65,8 @@ public class UserController {
     @Autowired
     private IPreferencesService preferencesService;
 
-    @Value("${server.auth.enable-profile-edit}")
-    private boolean enableProfileEdit;
+    @Autowired
+    private ServerAuthProperties serverAuthProperties;
 
     @ApiOperation(value = "Get all users", authorizations = @Authorization("BasicAuth"))
     @GetMapping(produces = MediaTypes.HAL_JSON_VALUE)
@@ -119,7 +117,7 @@ public class UserController {
     @ApiOperation(value = "Update user", authorizations = @Authorization("BasicAuth"))
     @PostMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public UserResource updateUser(@PathVariable("id") Long userId, @RequestBody UpdateUserRequest updates, Authentication auth, Locale locale) throws UnauthorisedRequestException {
-        if (!enableProfileEdit) return null;
+        if (!serverAuthProperties.isEnableProfileEdit()) return null;
 
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
         User user = userService.findById(userId, false);
@@ -189,9 +187,10 @@ public class UserController {
             @ApiResponse(code = 200, message = "OK", response = MessageResource.class),
             @ApiResponse(code = 403, message = "Caller doesn't fulfill the authorisation requirements"),
     })
-    public MessageResource assignAuthorityToUser(@PathVariable("id") Long userId, @RequestBody Long authorityId) {
-        userService.assignAuthority(userId, authorityId);
-        return MessageResource.successMessage("Authority " + authorityId + " assigned to user " + userId);
+    public MessageResource assignAuthorityToUser(@PathVariable("id") Long userId, @RequestBody String authorityId) {
+        Long authority = authorityId != null ? Long.parseLong(authorityId) : null;
+        userService.assignAuthority(userId, authority);
+        return MessageResource.successMessage("Authority " + authority + " assigned to user " + userId);
     }
 
     @ApiOperation(value = "Get user's preferences", authorizations = @Authorization("BasicAuth"))
