@@ -66,6 +66,9 @@ public class ElasticTask {
     private Set<String> roles;
 
     @Field(type = Keyword)
+    private Set<Long> users;
+
+    @Field(type = Keyword)
     private String icon;
 
     @Field(type = Keyword)
@@ -91,6 +94,7 @@ public class ElasticTask {
         this.userId = task.getUserId();
         this.startDate = task.getStartDate();
         this.roles = task.getRoles().keySet();
+        this.users = task.getUsers().keySet();
     }
 
     public void update(ElasticTask task) {
@@ -102,5 +106,6 @@ public class ElasticTask {
         this.userId = task.getUserId();
         this.startDate = task.getStartDate();
         this.roles = task.getRoles();
+        this.users = task.getUsers();
     }
 }

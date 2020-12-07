@@ -36,7 +36,7 @@ public class TaskSearchRequest {
     public List<String> group;
 
     @JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
-    public List<Long> userRefs;
+    public List<Long> users;
 
     @NoArgsConstructor
     @AllArgsConstructor
