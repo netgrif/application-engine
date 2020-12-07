@@ -5,6 +5,9 @@ import com.netgrif.workflow.auth.domain.User
 import com.netgrif.workflow.auth.service.interfaces.IUserService
 import com.netgrif.workflow.configuration.ApplicationContextProvider
 import com.netgrif.workflow.importer.service.FieldFactory
+import com.netgrif.workflow.mail.domain.SimpleMailDraft
+import com.netgrif.workflow.mail.domain.TypedMailDraft
+import com.netgrif.workflow.mail.interfaces.IMailService
 import com.netgrif.workflow.orgstructure.domain.Group
 import com.netgrif.workflow.orgstructure.domain.Member
 import com.netgrif.workflow.orgstructure.groups.interfaces.INextGroupService
@@ -38,7 +41,6 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 
 import java.util.stream.Collectors
-
 /**
  * ActionDelegate class contains Actions API methods.
  */
@@ -80,6 +82,9 @@ class ActionDelegate {
 
     @Autowired
     IPdfGenerator pdfGenerator
+
+    @Autowired
+    IMailService mailService
 
     @Autowired
     INextGroupService nextGroupService
@@ -623,5 +628,13 @@ class ActionDelegate {
         pdfGenerator.setupPdfGenerator(pdfResource)
         pdfGenerator.generatePdf(useCase, transitionId, pdfResource)
         change useCase.getField(fileFieldId) value {new FileFieldValue(filename, storagePath)}
+    }
+
+    void sendMail(TypedMailDraft mailDraft){
+        mailService.sendMail(mailDraft)
+    }
+
+    void sendMail(SimpleMailDraft mailDraft){
+        mailService.sendMail(mailDraft)
     }
 }
