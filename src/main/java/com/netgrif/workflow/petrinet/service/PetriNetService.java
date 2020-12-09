@@ -7,6 +7,7 @@ import com.netgrif.workflow.importer.service.Importer;
 import com.netgrif.workflow.orgstructure.groups.interfaces.INextGroupService;
 import com.netgrif.workflow.petrinet.domain.EventPhase;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
+import com.netgrif.workflow.petrinet.domain.PetriNetHashMap;
 import com.netgrif.workflow.petrinet.domain.Transition;
 import com.netgrif.workflow.petrinet.domain.arcs.VariableArc;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
@@ -87,7 +88,7 @@ public class PetriNetService implements IPetriNetService {
     @Autowired
     private Provider<Importer> importerProvider;
 
-    private Map<ObjectId, PetriNet> cache = new HashMap<>();
+    private Map<ObjectId, PetriNet> cache = new PetriNetHashMap();
 
     protected Importer getImporter() {
         return importerProvider.get();
@@ -113,6 +114,16 @@ public class PetriNetService implements IPetriNetService {
             cache.put(petriNetId, net);
         }
         return net;
+    }
+
+    @Override
+    public List<PetriNet> get(Collection<ObjectId> petriNetIds) {
+        return petriNetIds.stream().map(this::get).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<PetriNet> get(List<String> petriNetIds) {
+        return this.get(petriNetIds.stream().map(ObjectId::new).collect(Collectors.toList()));
     }
 
     @Override
@@ -267,7 +278,7 @@ public class PetriNetService implements IPetriNetService {
 
     @Override
     public List<TransitionReference> getTransitionReferences(List<String> netIds, LoggedUser user, Locale locale) {
-        Iterable<PetriNet> nets = repository.findAllById(netIds);
+        Iterable<PetriNet> nets = get(netIds);
         List<TransitionReference> references = new ArrayList<>();
 
         nets.forEach(net -> references.addAll(net.getTransitions().entrySet().stream()
