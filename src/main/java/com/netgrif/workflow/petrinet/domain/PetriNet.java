@@ -89,6 +89,11 @@ public class PetriNet extends PetriNetObject {
 
     @Getter
     @Setter
+    @Transient
+    private Map<String, Field> taskImmediateData;
+
+    @Getter
+    @Setter
     private String importXmlPath;
 
     public PetriNet() {
