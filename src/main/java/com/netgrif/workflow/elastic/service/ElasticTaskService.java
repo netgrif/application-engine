@@ -179,8 +179,7 @@ public class ElasticTaskService implements IElasticTaskService {
 
         BoolQueryBuilder query = boolQuery();
 
-        buildRoleQuery(request, query);
-        buildUsersQuery(request, query);
+        buildUsersRoleQuery(request, query);
         buildCaseQuery(request, query);
         buildTitleQuery(request, query);
         buildUserQuery(request, query);
@@ -216,6 +215,14 @@ public class ElasticTaskService implements IElasticTaskService {
         }
     }
 
+    protected void buildUsersRoleQuery(ElasticTaskSearchRequest request, BoolQueryBuilder query){
+        BoolQueryBuilder userRoleQuery = boolQuery();
+        buildRoleQuery(request, userRoleQuery);
+        buildUsersQuery(request, userRoleQuery);
+
+        query.filter(userRoleQuery);
+    }
+
     /**
      * Tasks with role "5cb07b6ff05be15f0b972c31"
      * {
@@ -240,7 +247,7 @@ public class ElasticTaskService implements IElasticTaskService {
             roleQuery.should(termQuery("roles", roleId));
         }
 
-        query.filter(roleQuery);
+        query.should(roleQuery);
     }
 
     private void buildUsersQuery(ElasticTaskSearchRequest request, BoolQueryBuilder query) {
@@ -253,9 +260,8 @@ public class ElasticTaskService implements IElasticTaskService {
             roleQuery.should(termQuery("users", userId));
         }
 
-        query.filter(roleQuery);
+        query.should(roleQuery);
     }
-
 
 
     /**

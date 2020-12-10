@@ -65,7 +65,6 @@ public class ElasticTask {
     @Field(type = Keyword)
     private Set<String> roles;
 
-    @Field(type = Keyword)
     private Set<Long> users;
 
     @Field(type = Keyword)
