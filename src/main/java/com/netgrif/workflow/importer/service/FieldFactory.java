@@ -6,9 +6,9 @@ import com.netgrif.workflow.petrinet.domain.Component;
 import com.netgrif.workflow.petrinet.domain.Format;
 import com.netgrif.workflow.petrinet.domain.I18nString;
 import com.netgrif.workflow.petrinet.domain.dataset.*;
-import com.netgrif.workflow.petrinet.domain.views.View;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.DataField;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDate;
@@ -20,14 +20,12 @@ import java.time.format.DateTimeParseException;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Slf4j
 @org.springframework.stereotype.Component
 public final class FieldFactory {
 
     @Autowired
     private FormatFactory formatFactory;
-
-    @Autowired
-    private ViewFactory viewFactory;
 
     @Autowired
     private ComponentFactory componentFactory;
@@ -120,10 +118,6 @@ public final class FieldFactory {
             Format format = formatFactory.buildFormat(data.getFormat());
             field.setFormat(format);
         }
-        if (data.getView() != null) {
-            View view = viewFactory.buildView(data);
-            field.setView(view);
-        }
 
         if (data.getComponent() != null) {
             Component component = componentFactory.buildComponent(data);
@@ -147,7 +141,7 @@ public final class FieldFactory {
         }
         MultichoiceMapField field = new MultichoiceMapField(choices);
         if (init!= null && !init.isEmpty()) {
-            field.setDefaultValue(new HashSet<>(init));
+            field.setDefaultValue(new HashSet<>(Arrays.asList(init.get(0).split(","))));
         }
         return field;
     }

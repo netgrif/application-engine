@@ -29,9 +29,6 @@
                 </xs:choice>
                 <xs:element ref="init" minOccurs="0" maxOccurs="unbounded"/>
                 <xs:element ref="format" minOccurs="0"/>
-                <xs:choice>
-                    <xs:element name="view" minOccurs="0" type="fieldView"/>
-                </xs:choice>
                 <xs:element type="component" name="component" minOccurs="0"/>
                 <xs:element ref="encryption" minOccurs="0"/>
                 <xs:choice>
@@ -599,44 +596,6 @@
         <xs:sequence>
             <xs:element ref="id"/>
         </xs:sequence>
-    </xs:complexType>
-    <xs:complexType name="fieldView">
-        <xs:choice>
-            <xs:element name="area" type="xs:string"/>
-            <xs:element name="autocomplete" type="xs:string"/>
-            <xs:element name="tree" type="xs:string"/>
-            <xs:element name="table" type="xs:string"/>
-            <xs:element name="image" type="booleanImageView"/>
-            <xs:element name="editor"/>
-            <xs:element name="htmlEditor"/>
-            <xs:element name="buttonType">
-                <xs:simpleType>
-                    <xs:restriction base='xs:string'>
-                        <xs:enumeration value="standard"/>
-                        <xs:enumeration value="raised"/>
-                        <xs:enumeration value="stroked"/>
-                        <xs:enumeration value="flat"/>
-                        <xs:enumeration value="icon"/>
-                        <xs:enumeration value="fab"/>
-                        <xs:enumeration value="minifab"/>
-                    </xs:restriction>
-                </xs:simpleType>
-            </xs:element>
-            <xs:element name="list">
-                <xs:simpleType>
-                    <xs:union>
-                        <xs:simpleType>
-                            <xs:restriction base='xs:string'>
-                                <xs:length value="0"/>
-                            </xs:restriction>
-                        </xs:simpleType>
-                        <xs:simpleType>
-                            <xs:restriction base='xs:int'/>
-                        </xs:simpleType>
-                    </xs:union>
-                </xs:simpleType>
-            </xs:element>
-        </xs:choice>
     </xs:complexType>
     <xs:complexType name="booleanImageView">
         <xs:sequence>

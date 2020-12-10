@@ -9,11 +9,13 @@
         <title>Process role</title>
     </role>
     <!-- DATA -->
+    <!-- NUMBER -->
     <data type="number" immediate="true">
         <id>number</id>
-        <title>Number</title>
+        <title name="number">Number</title>
         <init>10000</init>
     </data>
+
     <data type="number" immediate="true">
         <id>number_currency</id>
         <title>Number currency</title>
@@ -25,24 +27,26 @@
                 <locale>sk_SK</locale>
             </currency>
         </format>
+        <component>
+            <name>currency</name>
+        </component>
     </data>
 
+    <!-- TEXT -->
     <data type="text" immediate="true">
         <id>text</id>
         <title>Text</title>
         <init>Lorem ipsum</init>
     </data>
+
     <data type="text" immediate="true">
         <id>password_data</id>
-        <title>Password from data</title>
+        <title>Password</title>
         <component>
             <name>password</name>
         </component>
     </data>
-    <data type="text" immediate="true">
-        <id>password_dataref</id>
-        <title>Password from dataRef</title>
-    </data>
+
     <data type="text">
         <id>text_area</id>
         <title>Text area</title>
@@ -51,11 +55,32 @@
         </init>
         <component>
             <name>textarea</name>
-            <property key="color">red</property>
-            <property key="fontSize">12</property>
         </component>
     </data>
 
+    <data type="text">
+        <id>text_markdown_area</id>
+        <title>Text Markdown area</title>
+        <init>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque vitae magna in libero semper
+            vulputate ut eu sapien. Phasellus vel.
+        </init>
+        <component>
+            <name>richtextarea</name>
+        </component>
+    </data>
+
+    <data type="text">
+        <id>text_html_area</id>
+        <title>Text HTML area</title>
+        <init>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque vitae magna in libero semper
+            vulputate ut eu sapien. Phasellus vel.
+        </init>
+        <component>
+            <name>htmltextarea</name>
+        </component>
+    </data>
+
+    <!-- ENUMERATION -->
     <data type="enumeration">
         <id>enumeration</id>
         <title>Enumeration</title>
@@ -86,7 +111,31 @@
             <name>list</name>
         </component>
     </data>
+    <data type="enumeration">
+        <id>enumeration_stepper</id>
+        <title>Enumeration Stepper</title>
+        <values>Alice</values>
+        <values>Bob</values>
+        <values>Carol</values>
+        <init>Bob</init>
+        <component>
+            <name>stepper</name>
+        </component>
+    </data>
+    <data type="enumeration">
+        <id>enumeration_arrow</id>
+        <title>Enumeration Arrow Stepper</title>
+        <values>Alice</values>
+        <values>Bob</values>
+        <values>Carol</values>
+        <init>Bob</init>
+        <component>
+            <name>stepper</name>
+            <property key="arrowStepper">true</property>
+        </component>
+    </data>
 
+    <!-- MULTICHOICE -->
     <data type="multichoice">
         <id>multichoice</id>
         <title>Multichoice</title>
@@ -107,66 +156,222 @@
         </component>
     </data>
 
+    <!-- ENUMERATION MAP -->
+    <data type="enumeration_map">
+        <id>enumeration_map</id>
+        <title>Enumeration map</title>
+        <options>
+            <option key="alice">Alice</option>
+            <option key="bob">Bob</option>
+            <option key="carol">Carol</option>
+        </options>
+        <init>bob</init>
+    </data>
+    <data type="enumeration_map">
+        <id>enumeration_autocomplete_map</id>
+        <title>Enumeration autocomplete map</title>
+        <options>
+            <option key="alice">Alice</option>
+            <option key="bob">Bob</option>
+            <option key="carol">Carol</option>
+        </options>
+        <init>bob</init>
+        <component>
+            <name>autocomplete</name>
+        </component>
+    </data>
+    <data type="enumeration_map">
+        <id>enumeration_list_map</id>
+        <title>Enumeration list map</title>
+        <options>
+            <option key="alice">Alice</option>
+            <option key="bob">Bob</option>
+            <option key="carol">Carol</option>
+        </options>
+        <init>bob</init>
+        <component>
+            <name>list</name>
+        </component>
+    </data>
+    <data type="enumeration_map">
+        <id>enumeration_stepper_map</id>
+        <title>Enumeration Stepper map</title>
+        <options>
+            <option key="alice">Alice</option>
+            <option key="bob">Bob</option>
+            <option key="carol">Carol</option>
+        </options>
+        <init>bob</init>
+        <component>
+            <name>stepper</name>
+        </component>
+    </data>
+    <data type="enumeration_map">
+        <id>enumeration_arrow_map</id>
+        <title>Enumeration Arrow Stepper map</title>
+        <options>
+            <option key="alice">Alice</option>
+            <option key="bob">Bob</option>
+            <option key="carol">Carol</option>
+        </options>
+        <init>bob</init>
+        <component>
+            <name>stepper</name>
+            <property key="arrowStepper">true</property>
+        </component>
+    </data>
+
+    <!-- MULTICHOICE MAP -->
+    <data type="multichoice_map">
+        <id>multichoice_map</id>
+        <title>Multichoice map</title>
+        <options>
+            <option key="alice">Alice</option>
+            <option key="bob">Bob</option>
+            <option key="carol">Carol</option>
+        </options>
+        <init>alice,bob</init>
+    </data>
+    <data type="multichoice_map">
+        <id>multichoice_list_map</id>
+        <title>Multichoice list map</title>
+        <options>
+            <option key="alice">Alice</option>
+            <option key="bob">Bob</option>
+            <option key="carol">Carol</option>
+        </options>
+        <init>alice,bob</init>
+        <component>
+            <name>list</name>
+        </component>
+    </data>
+
+    <!-- BOOLEAN -->
     <data type="boolean">
         <id>boolean</id>
         <title>Boolean</title>
         <placeholder>True</placeholder>
     </data>
 
+    <!-- DATE -->
     <data type="date">
         <id>date</id>
         <title>Date</title>
     </data>
 
-    <data type="taskRef">
-        <id>taskRef</id>
-        <title>Task Ref</title>
-    </data>
-
-    <data type="file">
-        <id>file</id>
-        <title>File</title>
-        <action trigger="set">
-            <!-- @formatter:off -->
-            textfield: f.text;
-            change textfield value {
-                "funguje to"
-            }
-            <!-- @formatter:on -->
-        </action>
-    </data>
-
-    <data type="user">
-        <id>user</id>
-        <title>User</title>
-    </data>
-
+    <!-- DATETIME -->
     <data type="dateTime">
         <id>datetime</id>
         <title>Datetime</title>
     </data>
 
+    <!-- TASKREF -->
+    <data type="taskRef">
+        <id>taskRef</id>
+        <title>Task Ref</title>
+    </data>
+
+    <!-- FILE -->
+    <data type="file">
+        <id>file</id>
+        <title>File</title>
+    </data>
+
+    <!-- FILELIST -->
+    <data type="fileList">
+        <id>fileList</id>
+        <title>File List</title>
+    </data>
+
+    <!-- USER -->
+    <data type="user">
+        <id>user</id>
+        <title>User</title>
+    </data>
+
+    <!-- BUTTONS -->
     <data type="button">
-        <id>button</id>
+        <id>button_classic</id>
         <title>Button</title>
         <placeholder>Push</placeholder>
+    </data>
+
+    <data type="button">
+        <id>button_raised</id>
+        <title>Button Raised</title>
+        <placeholder>Push</placeholder>
+        <component>
+            <name>raised</name>
+        </component>
+    </data>
+
+    <data type="button">
+        <id>button_stroked</id>
+        <title>Button Stroked</title>
+        <placeholder>Push</placeholder>
+        <component>
+            <name>stroked</name>
+        </component>
+    </data>
+
+    <data type="button">
+        <id>button_flat</id>
+        <title>Button Flat</title>
+        <placeholder>Push</placeholder>
+        <component>
+            <name>flat</name>
+        </component>
+    </data>
+
+    <data type="button">
+        <id>button_icon</id>
+        <title>Button Icon</title>
+        <placeholder>home</placeholder>
+        <component>
+            <name>icon</name>
+        </component>
+    </data>
+
+    <data type="button">
+        <id>button_fab</id>
+        <title>Button Fab</title>
+        <placeholder>home</placeholder>
         <component>
             <name>fab</name>
         </component>
     </data>
+
+    <data type="button">
+        <id>button_minifab</id>
+        <title>Button Minifab</title>
+        <placeholder>home</placeholder>
+        <component>
+            <name>minifab</name>
+        </component>
+    </data>
+
+    <data type="button">
+        <id>button_dialog</id>
+        <title>Button with Dialog</title>
+        <placeholder>Open dialog</placeholder>
+        <component>
+            <name>stroked</name>
+            <property key="dialogTitle">Opened Dialog</property>
+            <property key="dialogText">If you want to proceed, click the button!</property>
+        </component>
+    </data>
+
     <!-- TRANSITIONS -->
     <transition>
         <id>1</id>
         <x>379</x>
         <y>273</y>
-		<cols>6</cols>
         <label>Task - editable</label>
         <assignPolicy>auto</assignPolicy>
         <dataGroup>
             <id>number</id>
             <title>Number fields</title>
             <stretch>false</stretch>
-			<rows>2</rows>
             <dataRef>
                 <id>number</id>
                 <logic>
@@ -197,19 +402,22 @@
                 </logic>
             </dataRef>
             <dataRef>
-                <id>password_data</id>
+                <id>text_markdown_area</id>
                 <logic>
                     <behavior>editable</behavior>
                 </logic>
             </dataRef>
             <dataRef>
-                <id>password_dataref</id>
+                <id>text_html_area</id>
                 <logic>
                     <behavior>editable</behavior>
                 </logic>
-                <component>
-                    <name>password</name>
-                </component>
+            </dataRef>
+            <dataRef>
+                <id>password_data</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
             </dataRef>
         </dataGroup>
         <dataGroup>
@@ -236,6 +444,23 @@
             </dataRef>
         </dataGroup>
         <dataGroup>
+            <id>enumeration_steppers</id>
+            <title>Enumeration stepper fields</title>
+            <stretch>true</stretch>
+            <dataRef>
+                <id>enumeration_stepper</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>enumeration_arrow</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
             <id>multichoice</id>
             <title>Multichoice fields</title>
             <stretch>false</stretch>
@@ -247,6 +472,63 @@
             </dataRef>
             <dataRef>
                 <id>multichoice_list</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>enumeration_map</id>
+            <title>Enumeration fields map</title>
+            <stretch>false</stretch>
+            <dataRef>
+                <id>enumeration_map</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>enumeration_autocomplete_map</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>enumeration_list_map</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>enumeration_steppers_map</id>
+            <title>Enumeration stepper fields map</title>
+            <stretch>true</stretch>
+            <dataRef>
+                <id>enumeration_stepper_map</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>enumeration_arrow_map</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>multichoice_map</id>
+            <title>Multichoice fields map</title>
+            <stretch>false</stretch>
+            <dataRef>
+                <id>multichoice_map</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>multichoice_list_map</id>
                 <logic>
                     <behavior>editable</behavior>
                 </logic>
@@ -290,6 +572,12 @@
                     <behavior>editable</behavior>
                 </logic>
             </dataRef>
+            <dataRef>
+                <id>fileList</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
         </dataGroup>
         <dataGroup>
             <id>user</id>
@@ -307,7 +595,49 @@
             <title>Button fields</title>
             <stretch>false</stretch>
             <dataRef>
-                <id>button</id>
+                <id>button_classic</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>button_stroked</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>button_flat</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>button_raised</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>button_fab</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>button_minifab</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>button_icon</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>button_dialog</id>
                 <logic>
                     <behavior>editable</behavior>
                 </logic>
@@ -364,6 +694,24 @@
                     <behavior>visible</behavior>
                 </logic>
             </dataRef>
+            <dataRef>
+                <id>text_markdown_area</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>text_html_area</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>password_data</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
         </dataGroup>
         <dataGroup>
             <id>enumeration</id>
@@ -389,6 +737,23 @@
             </dataRef>
         </dataGroup>
         <dataGroup>
+            <id>enumeration_steppers</id>
+            <title>Enumeration stepper fields</title>
+            <stretch>true</stretch>
+            <dataRef>
+                <id>enumeration_stepper</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>enumeration_arrow</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
             <id>multichoice</id>
             <title>Multichoice fields</title>
             <stretch>false</stretch>
@@ -400,6 +765,63 @@
             </dataRef>
             <dataRef>
                 <id>multichoice_list</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>enumeration_map</id>
+            <title>Enumeration fields map</title>
+            <stretch>false</stretch>
+            <dataRef>
+                <id>enumeration_map</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>enumeration_autocomplete_map</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>enumeration_list_map</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>enumeration_steppers_map</id>
+            <title>Enumeration stepper fields map</title>
+            <stretch>true</stretch>
+            <dataRef>
+                <id>enumeration_stepper_map</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>enumeration_arrow_map</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>multichoice_map</id>
+            <title>Multichoice fields map</title>
+            <stretch>false</stretch>
+            <dataRef>
+                <id>multichoice_map</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>multichoice_list_map</id>
                 <logic>
                     <behavior>visible</behavior>
                 </logic>
@@ -443,6 +865,12 @@
                     <behavior>visible</behavior>
                 </logic>
             </dataRef>
+            <dataRef>
+                <id>fileList</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
         </dataGroup>
         <dataGroup>
             <id>user</id>
@@ -460,7 +888,49 @@
             <title>Button fields</title>
             <stretch>false</stretch>
             <dataRef>
-                <id>button</id>
+                <id>button_classic</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>button_stroked</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>button_flat</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>button_raised</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>button_fab</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>button_minifab</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>button_icon</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>button_dialog</id>
                 <logic>
                     <behavior>visible</behavior>
                 </logic>
