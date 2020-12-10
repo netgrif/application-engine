@@ -1,7 +1,7 @@
 package com.netgrif.workflow.configuration;
 
 import com.netgrif.workflow.configuration.security.RestAuthenticationEntryPoint;
-import com.netgrif.workflow.configuration.security.jwt.JwtAuthenticationFilter;
+import com.netgrif.workflow.configuration.security.jwt.JwtAuthenticationProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -83,9 +83,6 @@ public class SecurityConfiguration extends AbstractSecurityConfiguration {
                 .antMatchers(getPatterns()).permitAll()
                 .antMatchers(OPTIONS).permitAll()
                 .anyRequest().authenticated()
-            .and()
-                .anonymous()
-                .authenticationFilter(new JwtAuthenticationFilter("anonymousUser"))
             .and()
             .logout()
                 .logoutUrl("/api/auth/logout")
