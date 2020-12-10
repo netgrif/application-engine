@@ -1,33 +1,30 @@
 package com.netgrif.workflow.mail;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
 
+import com.netgrif.workflow.configuration.properties.SecurityLimitsProperties;
 import com.netgrif.workflow.mail.interfaces.IMailAttemptService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 
-import javax.annotation.Nonnull;
-
+@Slf4j
 @Service
 public class MailAttemptService implements IMailAttemptService {
 
-    static final Logger log = LoggerFactory.getLogger(MailAttemptService.class);
-
-    @Value("${spring.max.emailSendsAttempts}")
-    private int MAX_ATTEMPT;
+    private SecurityLimitsProperties securityLimitsProperties;
 
     private LoadingCache<String, Integer> attemptsCache;
 
-    public MailAttemptService(@Value("${spring.max.emailBlockDuration}") final int BLOCK_DURATION, @Value("${spring.max.emailBlockTimeType}") @Nonnull final TimeUnit BLOCK_TIME_TYPE) {
+    @Autowired
+    public MailAttemptService(SecurityLimitsProperties securityLimitsProperties) {
           super();
+          this.securityLimitsProperties = securityLimitsProperties;
           attemptsCache = CacheBuilder.newBuilder().
-                expireAfterWrite(BLOCK_DURATION, BLOCK_TIME_TYPE).build(new CacheLoader<String, Integer>() {
+                expireAfterWrite(securityLimitsProperties.getEmailBlockDuration(), securityLimitsProperties.getEmailBlockTimeType()).build(new CacheLoader<String, Integer>() {
                 public Integer load(String key) {
                     return 0;
                 }
@@ -48,7 +45,7 @@ public class MailAttemptService implements IMailAttemptService {
 
     public boolean isBlocked(String key) {
         try {
-            return attemptsCache.get(key) >= MAX_ATTEMPT;
+            return attemptsCache.get(key) >= securityLimitsProperties.getEmailSendsAttempts();
         } catch (ExecutionException e) {
             log.error("Error reading mail attempts cache for key " + key , e);
             return false;
