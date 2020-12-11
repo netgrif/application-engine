@@ -10,9 +10,9 @@ public class UserResourceAssembler implements ResourceAssembler<User, UserResour
     private Locale locale;
     private String selfRel;
     private boolean small;
-    private UserFactory userFactory;
+    private IUserFactory userFactory;
 
-    public UserResourceAssembler(Locale locale, boolean small, String selfRel, UserFactory userFactory) {
+    public UserResourceAssembler(Locale locale, boolean small, String selfRel, IUserFactory userFactory) {
         this.locale = locale;
         this.selfRel = selfRel;
         this.small = small;
