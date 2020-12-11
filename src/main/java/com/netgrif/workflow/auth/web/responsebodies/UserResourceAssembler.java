@@ -10,15 +10,17 @@ public class UserResourceAssembler implements ResourceAssembler<User, UserResour
     private Locale locale;
     private String selfRel;
     private boolean small;
+    private UserFactory userFactory;
 
-    public UserResourceAssembler(Locale locale, boolean small, String selfRel) {
+    public UserResourceAssembler(Locale locale, boolean small, String selfRel, UserFactory userFactory) {
         this.locale = locale;
         this.selfRel = selfRel;
         this.small = small;
+        this.userFactory = userFactory;
     }
 
     @Override
     public UserResource toResource(User entity) {
-        return new UserResource(entity, selfRel, locale, small);
+        return new UserResource(userFactory.getUser(entity, locale, small), selfRel);
     }
 }
