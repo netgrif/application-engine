@@ -78,7 +78,7 @@ public class Task {
         this.caseColor = task.getCaseColor();
         this.caseTitle = task.getCaseTitle();
         this.priority = task.getPriority();
-        this.user = new User(task.getUser(), true);
+        this.user = task.getUser() != null ? new User(task.getUser(), true) : null;
         this.roles = task.getRoles();
         this.startDate = task.getStartDate();
         this.finishDate = task.getFinishDate();
