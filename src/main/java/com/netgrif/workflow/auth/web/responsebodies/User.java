@@ -27,20 +27,30 @@ public class User {
 
     private Set<Authority> authorities;
 
+    // process roles are set with the factory
     private Set<ProcessRole> processRoles;
 
     private Set<String> nextGroups;
 
+    /**
+     * Equivalent to calling User(user, false)
+     */
     public User(com.netgrif.workflow.auth.domain.User user) {
+        this(user, false);
+    }
+
+    public User(com.netgrif.workflow.auth.domain.User user, boolean small) {
         id = user.getId();
         email = user.getEmail();
-        telNumber = user.getTelNumber();
         avatar = user.getAvatar();
         name = user.getName();
         surname = user.getSurname();
         fullName = user.getFullName();
-        groups = user.getGroups();
-        authorities = user.getAuthorities();
-        nextGroups = user.getNextGroups();
+        if (!small) {
+            telNumber = user.getTelNumber();
+            groups = user.getGroups();
+            authorities = user.getAuthorities();
+            nextGroups = user.getNextGroups();
+        }
     }
 }
