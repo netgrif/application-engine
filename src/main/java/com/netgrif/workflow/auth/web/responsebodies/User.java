@@ -39,6 +39,11 @@ public class User {
         this(user, false);
     }
 
+    /**
+     * The constructor doesn't set attributes regarding the ProcessRoles
+     *
+     * Use the UserFactory to create instances that have these attributes set.
+     */
     public User(com.netgrif.workflow.auth.domain.User user, boolean small) {
         id = user.getId();
         email = user.getEmail();

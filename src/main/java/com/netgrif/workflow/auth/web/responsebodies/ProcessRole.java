@@ -22,6 +22,11 @@ public class ProcessRole {
 
     private String netStringId;
 
+    /**
+     * The constructor doesn't set attributes regarding the Petri net.
+     *
+     * Use the ProcessRoleFactory to create instances that have these attributes set.
+     */
     public ProcessRole(com.netgrif.workflow.petrinet.domain.roles.ProcessRole role, Locale locale) {
         stringId = role.getStringId();
         name = role.getLocalisedName(locale);
