@@ -79,7 +79,7 @@ public class UserController {
         Page<User> page = userService.findAllCoMembers(((LoggedUser) auth.getPrincipal()), small, pageable);
         Link selfLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(UserController.class)
                 .getAll(small, pageable, assembler, auth, locale)).withRel("all");
-        PagedResources<UserResource> resources = assembler.toResource(page, new UserResourceAssembler(locale, small, "all"), selfLink);
+        PagedResources<UserResource> resources = assembler.toResource(page, new UserResourceAssembler(locale, small, "all", userResponseFactory), selfLink);
         ResourceLinkAssembler.addLinks(resources, User.class, selfLink.getRel());
         return resources;
     }
@@ -91,7 +91,7 @@ public class UserController {
         Page<User> page = userService.searchAllCoMembers(query.getFulltext(), query.getRoles(), ((LoggedUser) auth.getPrincipal()), small, pageable);
         Link selfLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(UserController.class)
                 .search(small, query, pageable, assembler, auth, locale)).withRel("search");
-        PagedResources<UserResource> resources = assembler.toResource(page, new UserResourceAssembler(locale, small, "search"), selfLink);
+        PagedResources<UserResource> resources = assembler.toResource(page, new UserResourceAssembler(locale, small, "search", userResponseFactory), selfLink);
         ResourceLinkAssembler.addLinks(resources, User.class, selfLink.getRel());
         return resources;
     }
@@ -144,7 +144,7 @@ public class UserController {
         Page<User> page = userService.findAllActiveByProcessRoles(roleIds, small, pageable);
         Link selfLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(UserController.class)
                 .getAllWithRole(roleIds, small, pageable, assembler, locale)).withRel("role");
-        PagedResources<UserResource> resources = assembler.toResource(page, new UserResourceAssembler(locale, small, "role"), selfLink);
+        PagedResources<UserResource> resources = assembler.toResource(page, new UserResourceAssembler(locale, small, "role", userResponseFactory), selfLink);
         ResourceLinkAssembler.addLinks(resources, User.class, selfLink.getRel());
         return resources;
     }
