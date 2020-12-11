@@ -9,6 +9,7 @@ import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.auth.web.requestbodies.UpdateUserRequest;
 import com.netgrif.workflow.auth.web.requestbodies.UserSearchRequestBody;
 import com.netgrif.workflow.auth.web.responsebodies.AuthoritiesResources;
+import com.netgrif.workflow.auth.web.responsebodies.UserFactory;
 import com.netgrif.workflow.auth.web.responsebodies.UserResource;
 import com.netgrif.workflow.auth.web.responsebodies.UserResourceAssembler;
 import com.netgrif.workflow.configuration.properties.ServerAuthProperties;
@@ -68,6 +69,9 @@ public class UserController {
     @Autowired
     private ServerAuthProperties serverAuthProperties;
 
+    @Autowired
+    private UserFactory userResponseFactory;
+
     @ApiOperation(value = "Get all users", authorizations = @Authorization("BasicAuth"))
     @GetMapping(produces = MediaTypes.HAL_JSON_VALUE)
     public PagedResources<UserResource> getAll(@RequestParam(value = "small", required = false) Boolean small, Pageable pageable, PagedResourcesAssembler<User> assembler, Authentication auth, Locale locale) {
@@ -101,7 +105,7 @@ public class UserController {
             log.info("User " + loggedUser.getUsername() + " trying to get another user with ID "+userId);
             throw new IllegalArgumentException("Could not find user with id ["+userId+"]");
         }
-        return new UserResource(userService.findById(userId, small), "profile", locale, small);
+        return new UserResource(userResponseFactory.getUser(userService.findById(userId, small), locale, small), "profile");
     }
 
     @ApiOperation(value = "Get logged user", authorizations = @Authorization("BasicAuth"))
@@ -109,9 +113,9 @@ public class UserController {
     public UserResource getLoggedUser(@RequestParam(value = "small", required = false) Boolean small, Authentication auth, Locale locale) {
         small = small == null ? false : small;
         if (!small)
-            return new UserResource(userService.findById(((LoggedUser) auth.getPrincipal()).getId(), false), "profile", locale);
+            return new UserResource(userResponseFactory.getUser(userService.findById(((LoggedUser) auth.getPrincipal()).getId(), false), locale), "profile");
         else
-            return new UserResource(((LoggedUser) auth.getPrincipal()).transformToUser(), "profile", locale);
+            return new UserResource(userResponseFactory.getUser(((LoggedUser) auth.getPrincipal()).transformToUser(), locale), "profile");
     }
 
     @ApiOperation(value = "Update user", authorizations = @Authorization("BasicAuth"))
@@ -130,7 +134,7 @@ public class UserController {
             userDetailsService.reloadSecurityContext(loggedUser);
         }
         log.info("Updating user " + user.getEmail() + " with data " + updates.toString());
-        return new UserResource(user, "profile", locale);
+        return new UserResource(userResponseFactory.getUser(user, locale), "profile");
     }
 
     @ApiOperation(value = "Get all users with specified roles", authorizations = @Authorization("BasicAuth"))

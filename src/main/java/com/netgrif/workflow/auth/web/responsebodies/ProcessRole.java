@@ -15,6 +15,7 @@ public class ProcessRole {
 
     private String importId;
 
+    // net attributes are set in the Factory service
     private String netImportId;
 
     private String netVersion;
