@@ -9,6 +9,7 @@ import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.event.events.usecase.SaveCaseDataEvent;
 import com.netgrif.workflow.importer.service.FieldFactory;
 import com.netgrif.workflow.petrinet.domain.*;
+import com.netgrif.workflow.petrinet.domain.Component;
 import com.netgrif.workflow.petrinet.domain.dataset.*;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedField;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldByFileFieldContainer;
@@ -28,16 +29,23 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.rendering.PDFRenderer;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.FieldRetrievingFactoryBean;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.URL;
 import java.util.*;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.LongStream;
 
@@ -64,6 +72,9 @@ public class DataService implements IDataService {
 
     @Autowired
     private FieldActionsRunner actionsRunner;
+
+    @Value("${nae.image.scaling}")
+    private int imageScale;
 
     @Override
     public List<Field> getData(String taskId) {
@@ -294,12 +305,12 @@ public class DataService implements IDataService {
     }
 
     @Override
-    public FileFieldInputStream getFileByTask(String taskId, String fieldId) {
+    public FileFieldInputStream getFileByTask(String taskId, String fieldId, boolean forPreview) {
         TaskRefFieldWrapper wrapper = decodeTaskRefFieldId(taskId, fieldId);
         Task task = wrapper.getTask();
         String parsedFieldId = wrapper.getFieldId();
 
-        return getFileByCase(task.getCaseId(), parsedFieldId);
+        return getFileByCase(task.getCaseId(), parsedFieldId, forPreview);
     }
 
     @Override
@@ -312,10 +323,10 @@ public class DataService implements IDataService {
     }
 
     @Override
-    public FileFieldInputStream getFileByCase(String caseId, String fieldId) {
+    public FileFieldInputStream getFileByCase(String caseId, String fieldId, boolean forPreview) {
         Case useCase = workflowService.findOne(caseId);
         FileField field = (FileField) useCase.getPetriNet().getDataSet().get(fieldId);
-        return getFile(useCase, field);
+        return getFile(useCase, field, forPreview);
     }
 
     @Override
@@ -353,7 +364,7 @@ public class DataService implements IDataService {
     }
 
     @Override
-    public FileFieldInputStream getFile(Case useCase, FileField field) {
+    public FileFieldInputStream getFile(Case useCase, FileField field, boolean forPreview) {
         field.getEvents().forEach(dataEvent -> {
             dataEvent.getActions().get(EventPhase.PRE).forEach(action -> actionsRunner.run(action, useCase));
             dataEvent.getActions().get(EventPhase.POST).forEach(action -> actionsRunner.run(action, useCase));
@@ -365,11 +376,45 @@ public class DataService implements IDataService {
         field.setValue((FileFieldValue) useCase.getDataSet().get(field.getStringId()).getValue());
 
         try {
-            return new FileFieldInputStream(field, field.isRemote() ? download(field.getValue().getPath()) :
-                    new FileInputStream(field.getValue().getPath()));
+            if (forPreview) {
+                return getFilePreview(field);
+            } else {
+                return new FileFieldInputStream(field, field.isRemote() ? download(field.getValue().getPath()) :
+                        new FileInputStream(field.getValue().getPath()));
+            }
         } catch (IOException e) {
             log.error("Getting file failed: ", e);
             return null;
+        }
+    }
+
+    private FileFieldInputStream getFilePreview(FileField field) throws IOException {
+        if (field.isRemote()) {
+            // TODO: for remote file
+            return null;
+        } else {
+            File file = new File(field.getValue().getPath());
+            int dot = file.getName().lastIndexOf(".");
+            String extension = (dot == -1) ? "" : file.getName().substring(dot + 1);
+            BufferedImage image;
+            if (extension.equals("pdf")) {
+                PDDocument document = PDDocument.load(file);
+                PDFRenderer renderer = new PDFRenderer(document);
+                image = renderer.renderImage(0);
+            } else {
+                image = ImageIO.read(file);
+            }
+            if (image.getWidth() > imageScale || image.getHeight() > imageScale) {
+                float ratio = image.getHeight() > image.getWidth() ? image.getHeight() / (float) imageScale : image.getWidth() / (float) imageScale;
+                int targetWidth = Math.round(image.getWidth() / ratio);
+                int targetHeight = Math.round(image.getHeight() / ratio);
+                Image targetImage = image.getScaledInstance(targetWidth, targetHeight, Image.SCALE_DEFAULT);
+                image = new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_RGB);
+                image.getGraphics().drawImage(targetImage, 0, 0, null);
+            }
+            ByteArrayOutputStream os = new ByteArrayOutputStream();
+            ImageIO.write(image, "jpg", os);
+            return new FileFieldInputStream(field, new ByteArrayInputStream(os.toByteArray()));
         }
     }
 
