@@ -19,6 +19,11 @@ public class UserFactory implements IUserFactory {
     private IProcessRoleFactory processRoleFactory;
 
     @Override
+    public User getUser(com.netgrif.workflow.auth.domain.User user, Locale locale) {
+        return getUser(user, locale, false);
+    }
+
+    @Override
     public User getUser(com.netgrif.workflow.auth.domain.User user, Locale locale, boolean small) {
         User result = new User(user);
 
