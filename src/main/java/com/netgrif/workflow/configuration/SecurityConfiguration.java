@@ -1,6 +1,9 @@
 package com.netgrif.workflow.configuration;
 
+import com.netgrif.workflow.auth.domain.Authority;
+import com.netgrif.workflow.auth.service.interfaces.IAuthorityService;
 import com.netgrif.workflow.configuration.security.RestAuthenticationEntryPoint;
+import com.netgrif.workflow.configuration.security.PublicAuthenticationFilter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -11,9 +14,12 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.AnonymousAuthenticationProvider;
+import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.header.writers.StaticHeadersWriter;
 import org.springframework.session.web.http.HeaderHttpSessionIdResolver;
 import org.springframework.session.web.http.HttpSessionIdResolver;
@@ -41,8 +47,13 @@ public class SecurityConfiguration extends AbstractSecurityConfiguration {
     @Autowired
     private RestAuthenticationEntryPoint authenticationEntryPoint;
 
+    @Autowired
+    private IAuthorityService authorityService;
+
     @Value("${server.security.csrf}")
     private boolean csrf = true;
+
+    private static final String ANONYMOUS_USER = "anonymousUser";
 
     @Bean
     public HttpSessionIdResolver httpSessionIdResolver() {
@@ -73,6 +84,7 @@ public class SecurityConfiguration extends AbstractSecurityConfiguration {
             .and()
                 .cors()
                 .and()
+            .addFilterAfter(createPublicAuthenticationFilter(), BasicAuthenticationFilter.class)
             .authorizeRequests()
                 .antMatchers(getPatterns()).permitAll()
                 .antMatchers(OPTIONS).permitAll()
@@ -93,6 +105,11 @@ public class SecurityConfiguration extends AbstractSecurityConfiguration {
                 .addHeaderWriter(new StaticHeadersWriter("X-Content-Security-Policy","frame-src: 'none'"));
 //        @formatter:on
         setCsrf(http);
+    }
+
+    @Override
+    protected ProviderManager authenticationManager() throws Exception {
+        return (ProviderManager) super.authenticationManager();
     }
 
     @Override
@@ -122,5 +139,12 @@ public class SecurityConfiguration extends AbstractSecurityConfiguration {
     @Override
     Environment getEnvironment() {
         return env;
+    }
+
+    private PublicAuthenticationFilter createPublicAuthenticationFilter() throws Exception {
+        return new PublicAuthenticationFilter(
+                    authenticationManager(),
+                    new AnonymousAuthenticationProvider(ANONYMOUS_USER),
+                    authorityService.getOrCreate(Authority.anonymous));
     }
 }
