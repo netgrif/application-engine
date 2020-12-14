@@ -4,9 +4,9 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import com.netgrif.workflow.auth.service.interfaces.ILoginAttemptService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
+import com.netgrif.workflow.configuration.properties.SecurityLimitsProperties;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.google.common.cache.CacheBuilder;
@@ -14,13 +14,12 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 
 
+@Slf4j
 @Service
 public class LoginAttemptService implements ILoginAttemptService {
 
-    static final Logger log = LoggerFactory.getLogger(LoginAttemptService.class);
-
-    @Value("${spring.max.loginAttempts}")
-    private int MAX_ATTEMPT;
+    @Autowired
+    private SecurityLimitsProperties securityLimitsProperties;
 
     private LoadingCache<String, Integer> attemptsCache;
 
@@ -52,7 +51,7 @@ public class LoginAttemptService implements ILoginAttemptService {
 
     public boolean isBlocked(String key) {
         try {
-            return attemptsCache.get(key) >= MAX_ATTEMPT;
+            return attemptsCache.get(key) >= securityLimitsProperties.getLoginAttempts();
         } catch (ExecutionException e) {
             log.error("Error reading login attempts cache for key " + key , e);
             return false;
