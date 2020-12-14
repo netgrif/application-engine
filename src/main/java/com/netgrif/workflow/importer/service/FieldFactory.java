@@ -138,9 +138,18 @@ public final class FieldFactory {
     }
 
     private MultichoiceMapField buildMultichoiceMapField(Options options, List<String> init, Importer importer) {
-        Map<String, I18nString> choices = options.getOption().stream()
-                .collect(Collectors.toMap(Option::getKey, importer::toI18NString));
-        return new MultichoiceMapField(choices, new HashSet<>(init));
+        Map<String, I18nString> choices;
+        if (options == null) {
+            choices = new LinkedHashMap<>();
+        } else {
+            choices = options.getOption().stream()
+                    .collect(Collectors.toMap(Option::getKey, importer::toI18NString));
+        }
+        MultichoiceMapField field = new MultichoiceMapField(choices);
+        if (init!= null && !init.isEmpty()) {
+            field.setDefaultValue(new HashSet<>(init));
+        }
+        return field;
     }
 
     private MultichoiceField buildMultichoiceField(List<I18NStringType> values, List<String> init, Importer importer) {
