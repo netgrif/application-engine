@@ -31,6 +31,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.rendering.PDFRenderer;
+import org.apache.poi.util.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.FieldRetrievingFactoryBean;
@@ -389,33 +390,37 @@ public class DataService implements IDataService {
     }
 
     private FileFieldInputStream getFilePreview(FileField field) throws IOException {
+        File file;
         if (field.isRemote()) {
-            // TODO: for remote file
-            return null;
+            InputStream is = download(field.getValue().getPath());
+            file = File.createTempFile(field.getStringId(), "pdf");
+            file.deleteOnExit();
+            FileOutputStream fos = new FileOutputStream(file);
+            IOUtils.copy(is, fos);
         } else {
-            File file = new File(field.getValue().getPath());
-            int dot = file.getName().lastIndexOf(".");
-            String extension = (dot == -1) ? "" : file.getName().substring(dot + 1);
-            BufferedImage image;
-            if (extension.equals("pdf")) {
-                PDDocument document = PDDocument.load(file);
-                PDFRenderer renderer = new PDFRenderer(document);
-                image = renderer.renderImage(0);
-            } else {
-                image = ImageIO.read(file);
-            }
-            if (image.getWidth() > imageScale || image.getHeight() > imageScale) {
-                float ratio = image.getHeight() > image.getWidth() ? image.getHeight() / (float) imageScale : image.getWidth() / (float) imageScale;
-                int targetWidth = Math.round(image.getWidth() / ratio);
-                int targetHeight = Math.round(image.getHeight() / ratio);
-                Image targetImage = image.getScaledInstance(targetWidth, targetHeight, Image.SCALE_DEFAULT);
-                image = new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_RGB);
-                image.getGraphics().drawImage(targetImage, 0, 0, null);
-            }
-            ByteArrayOutputStream os = new ByteArrayOutputStream();
-            ImageIO.write(image, "jpg", os);
-            return new FileFieldInputStream(field, new ByteArrayInputStream(os.toByteArray()));
+            file = new File(field.getValue().getPath());
         }
+        int dot = file.getName().lastIndexOf(".");
+        String extension = (dot == -1) ? "" : file.getName().substring(dot + 1);
+        BufferedImage image;
+        if (extension.equals("pdf")) {
+            PDDocument document = PDDocument.load(file);
+            PDFRenderer renderer = new PDFRenderer(document);
+            image = renderer.renderImage(0);
+        } else {
+            image = ImageIO.read(file);
+        }
+        if (image.getWidth() > imageScale || image.getHeight() > imageScale) {
+            float ratio = image.getHeight() > image.getWidth() ? image.getHeight() / (float) imageScale : image.getWidth() / (float) imageScale;
+            int targetWidth = Math.round(image.getWidth() / ratio);
+            int targetHeight = Math.round(image.getHeight() / ratio);
+            Image targetImage = image.getScaledInstance(targetWidth, targetHeight, Image.SCALE_DEFAULT);
+            image = new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_RGB);
+            image.getGraphics().drawImage(targetImage, 0, 0, null);
+        }
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        ImageIO.write(image, "jpg", os);
+        return new FileFieldInputStream(field, new ByteArrayInputStream(os.toByteArray()));
     }
 
     @Override
