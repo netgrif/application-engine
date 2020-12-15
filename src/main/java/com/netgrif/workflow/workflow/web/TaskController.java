@@ -133,12 +133,13 @@ public class TaskController {
             @ApiResponse(code = 200, message = "OK", response = LocalisedEventOutcomeResource.class),
             @ApiResponse(code = 403, message = "Caller doesn't fulfill the authorisation requirements"),
     })
-    public LocalisedEventOutcomeResource delegate(Authentication auth, @PathVariable("id") String taskId, @RequestBody Long delegatedId, Locale locale) {
+    public LocalisedEventOutcomeResource delegate(Authentication auth, @PathVariable("id") String taskId, @RequestBody String delegatedId, Locale locale) {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
+        Long userId = delegatedId != null ? Long.parseLong(delegatedId) : null;
 
         try {
-            return LocalisedEventOutcomeResource.successOutcome(taskService.delegateTask(loggedUser, delegatedId, taskId), locale,
-                    "LocalisedTask " + taskId + " assigned to [" + delegatedId + "]");
+            return LocalisedEventOutcomeResource.successOutcome(taskService.delegateTask(loggedUser, userId, taskId), locale,
+                    "LocalisedTask " + taskId + " assigned to [" + userId + "]");
         } catch (Exception e) {
             log.error("Delegating task [" + taskId + "] failed: ", e);
             return LocalisedEventOutcomeResource.errorOutcome("LocalisedTask " + taskId + " cannot be assigned");
