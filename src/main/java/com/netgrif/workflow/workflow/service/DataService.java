@@ -2,6 +2,7 @@ package com.netgrif.workflow.workflow.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.auth.service.interfaces.IUserService;
@@ -19,11 +20,13 @@ import com.netgrif.workflow.workflow.service.interfaces.IDataService;
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
 import com.netgrif.workflow.workflow.web.responsebodies.DataFieldsResource;
+import com.netgrif.workflow.workflow.web.responsebodies.LocalisedField;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.FieldRetrievingFactoryBean;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
@@ -234,11 +237,39 @@ public class DataService implements IDataService {
             taskIds.forEach(id -> {
                 collectedTaskIds.add(id);
                 List<DataGroup> taskRefDataGroups = getDataGroups(id, locale, collectedTaskIds, level + 1);
+                resolveTaskRefBehavior(taskRefField, taskRefDataGroups);
                 groups.addAll(taskRefDataGroups);
             });
         }
 
         return groups;
+    }
+
+    private void resolveTaskRefBehavior(TaskField taskRefField, List<DataGroup> taskRefDataGroups){
+        if(taskRefField.getBehavior().has("visible") && taskRefField.getBehavior().get("visible").asBoolean()){
+            taskRefDataGroups.forEach(dataGroup -> {
+                dataGroup.getFields().getContent().forEach(field -> {
+                    if(field.getBehavior().has("editable") && field.getBehavior().get("editable").asBoolean()){
+                        changeTaskRefBehavior(field, FieldBehavior.VISIBLE);
+                    }
+                });
+            });
+        } else if (taskRefField.getBehavior().has("hidden") && taskRefField.getBehavior().get("hidden").asBoolean()){
+            taskRefDataGroups.forEach(dataGroup -> {
+                dataGroup.getFields().getContent().forEach(field -> {
+                    if(!field.getBehavior().has("forbidden") || !field.getBehavior().get("forbidden").asBoolean())
+                        changeTaskRefBehavior(field, FieldBehavior.HIDDEN);
+                });
+            });
+        }
+    }
+
+    private void changeTaskRefBehavior(LocalisedField field, FieldBehavior behavior){
+        List<FieldBehavior> antonymBehaviors = Arrays.asList(behavior.getAntonyms());
+        antonymBehaviors.forEach(beh -> field.getBehavior().remove(beh.name()));
+        ObjectNode behaviorNode = JsonNodeFactory.instance.objectNode();
+        behaviorNode.put(behavior.toString(), true);
+        field.setBehavior(behaviorNode);
     }
 
     @Override
