@@ -74,7 +74,7 @@ public class DataService implements IDataService {
     @Autowired
     private FieldActionsRunner actionsRunner;
 
-    @Value("${nae.image.scaling}")
+    @Value("${nae.image.preview.scaling.px}")
     private int imageScale;
 
     @Override
@@ -370,7 +370,7 @@ public class DataService implements IDataService {
             dataEvent.getActions().get(EventPhase.PRE).forEach(action -> actionsRunner.run(action, useCase));
             dataEvent.getActions().get(EventPhase.POST).forEach(action -> actionsRunner.run(action, useCase));
         });
-        if (useCase.getDataSet().get(field.getStringId()).getValue() == null)
+        if (useCase.getFieldValue(field.getStringId()) == null)
             return null;
 
         workflowService.save(useCase);
@@ -392,35 +392,52 @@ public class DataService implements IDataService {
     private FileFieldInputStream getFilePreview(FileField field) throws IOException {
         File file;
         if (field.isRemote()) {
-            InputStream is = download(field.getValue().getPath());
-            file = File.createTempFile(field.getStringId(), "pdf");
-            file.deleteOnExit();
-            FileOutputStream fos = new FileOutputStream(file);
-            IOUtils.copy(is, fos);
+            file = getRemoteFile(field);
         } else {
             file = new File(field.getValue().getPath());
         }
         int dot = file.getName().lastIndexOf(".");
-        String extension = (dot == -1) ? "" : file.getName().substring(dot + 1);
+        FileFieldDataType fileType = FileFieldDataType.resolveType((dot == -1) ? "" : file.getName().substring(dot + 1));
+        BufferedImage image = getBufferedImageFromFile(file, fileType);
+        if (image.getWidth() > imageScale || image.getHeight() > imageScale) {
+            image = scaleImagePreview(image);
+        }
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        ImageIO.write(image, "jpg", os);
+        return new FileFieldInputStream(field, new ByteArrayInputStream(os.toByteArray()));
+    }
+
+    private BufferedImage getBufferedImageFromFile(File file, FileFieldDataType fileType) throws IOException {
         BufferedImage image;
-        if (extension.equals("pdf")) {
+        if (fileType.equals(FileFieldDataType.PDF)) {
             PDDocument document = PDDocument.load(file);
             PDFRenderer renderer = new PDFRenderer(document);
             image = renderer.renderImage(0);
         } else {
             image = ImageIO.read(file);
+
         }
-        if (image.getWidth() > imageScale || image.getHeight() > imageScale) {
-            float ratio = image.getHeight() > image.getWidth() ? image.getHeight() / (float) imageScale : image.getWidth() / (float) imageScale;
-            int targetWidth = Math.round(image.getWidth() / ratio);
-            int targetHeight = Math.round(image.getHeight() / ratio);
-            Image targetImage = image.getScaledInstance(targetWidth, targetHeight, Image.SCALE_DEFAULT);
-            image = new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_RGB);
-            image.getGraphics().drawImage(targetImage, 0, 0, null);
-        }
-        ByteArrayOutputStream os = new ByteArrayOutputStream();
-        ImageIO.write(image, "jpg", os);
-        return new FileFieldInputStream(field, new ByteArrayInputStream(os.toByteArray()));
+        return image;
+    }
+
+    private BufferedImage scaleImagePreview(BufferedImage image) {
+        float ratio = image.getHeight() > image.getWidth() ? image.getHeight() / (float) imageScale : image.getWidth() / (float) imageScale;
+        int targetWidth = Math.round(image.getWidth() / ratio);
+        int targetHeight = Math.round(image.getHeight() / ratio);
+        Image targetImage = image.getScaledInstance(targetWidth, targetHeight, Image.SCALE_DEFAULT);
+        image = new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_RGB);
+        image.getGraphics().drawImage(targetImage, 0, 0, null);
+        return image;
+    }
+
+    private File getRemoteFile(FileField field) throws IOException {
+        File file;
+        InputStream is = download(field.getValue().getPath());
+        file = File.createTempFile(field.getStringId(), "pdf");
+        file.deleteOnExit();
+        FileOutputStream fos = new FileOutputStream(file);
+        IOUtils.copy(is, fos);
+        return file;
     }
 
     @Override
