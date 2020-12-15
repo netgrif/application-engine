@@ -1,21 +1,35 @@
+<a name="https://netgrif.atlassian.net/projects/NAE/versions/10826/tab/release-report-all-issues"></a>
+## 4.4.0 - Olive Nickel (14.12.2020)
+### Bug fixes
+* [NAE-1096](https://netgrif.atlassian.net/browse/NAE-1096) - Change MultichoiceMapField/EnumerationMapField value na null hodnotu nefunguje
+* [NAE-1100](https://netgrif.atlassian.net/browse/NAE-1100) - Set UserField data after finish
+* [NAE-1102](https://netgrif.atlassian.net/browse/NAE-1102) - Zlé definovanie Multichoice map
+* [NAE-1136](https://netgrif.atlassian.net/browse/NAE-1136) - Delegate endpoint doesn't work
+
+### Improvements
+* [NAE-1109](https://netgrif.atlassian.net/browse/NAE-1109) - Task ref set data propagation
+* [NAE-1139](https://netgrif.atlassian.net/browse/NAE-1139) - Improve overridability of petri net service
+* [NAE-1142](https://netgrif.atlassian.net/browse/NAE-1142) - Whitelist URLs trough application properties
+
+### Features
+None
+
+<a name="https://netgrif.atlassian.net/projects/NAE/versions/10832/tab/release-report-all-issues"></a>
+## 4.3.1 - Green Nickel (13.11.2020)
+### Bug fixes
+ None
+ 
+### Improvements
+ None
+ 
+### Features
+ None
+
 <a name="https://netgrif.atlassian.net/projects/NAE/versions/10815/tab/release-report-all-issues"></a>
 ## 4.3.0 - Orange Copper (11.11.2020)
-### Task
- * [NAE-994](https://netgrif.atlassian.net/browse/NAE-994) - Group Managment
-### Improvement
- * [NAE-997](https://netgrif.atlassian.net/browse/NAE-997) - Engine docker image
- * [NAE-1002](https://netgrif.atlassian.net/browse/NAE-1002) - Boolean field visible values
- * [NAE-1008](https://netgrif.atlassian.net/browse/NAE-1008) - Update demo application
- * [NAE-1014](https://netgrif.atlassian.net/browse/NAE-1014) - Pass DI context into ComponentPortals
- * [NAE-1020](https://netgrif.atlassian.net/browse/NAE-1020) - Change empty value of number field from 0 to 'empty'
- * [NAE-1023](https://netgrif.atlassian.net/browse/NAE-1023) - Password view for text field
- * [NAE-1025](https://netgrif.atlassian.net/browse/NAE-1025) - Update Petriflow XSD schema
- * [NAE-1027](https://netgrif.atlassian.net/browse/NAE-1027) - Event phases for data fields events
- * [NAE-1063](https://netgrif.atlassian.net/browse/NAE-1063) - Display only the newest process version in create case
- * [NAE-1077](https://netgrif.atlassian.net/browse/NAE-1077) - Component tag sending all included information
-### Bug
+### Bug fixes
  * [NAE-986](https://netgrif.atlassian.net/browse/NAE-986) - Virtual scroll tab initialization broken
- * [NAE-1006](https://netgrif.atlassian.net/browse/NAE-1006) - Broken headers alignment with 9 columns
+ * [NAE-1006](https://netgrif.atlassian.net/browse/NAE-1006) - Broken headers' alignment with 9 columns
  * [NAE-1035](https://netgrif.atlassian.net/browse/NAE-1035) - PDF Generator issue due to layout
  * [NAE-1039](https://netgrif.atlassian.net/browse/NAE-1039) - PetriNetResourceService bad return type
  * [NAE-1041](https://netgrif.atlassian.net/browse/NAE-1041) - Page interface not exported
@@ -23,7 +37,7 @@
  * [NAE-1064](https://netgrif.atlassian.net/browse/NAE-1064) - Validácia File Field - Required
  * [NAE-1065](https://netgrif.atlassian.net/browse/NAE-1065) - Fix bug with redirect service
  * [NAE-1066](https://netgrif.atlassian.net/browse/NAE-1066) - Fix Empty list text when list has loading
- * [NAE-1069](https://netgrif.atlassian.net/browse/NAE-1069) - PDF generator - enumeration and multichoice options
+ * [NAE-1069](https://netgrif.atlassian.net/browse/NAE-1069) - PDF generator - enumeration and multi-choice options
  * [NAE-1070](https://netgrif.atlassian.net/browse/NAE-1070) - PDF generator - nested taskRef position calculating
  * [NAE-1073](https://netgrif.atlassian.net/browse/NAE-1073) - Registration component stuck with bad token
  * [NAE-1074](https://netgrif.atlassian.net/browse/NAE-1074) - User cannot register with new groups
@@ -34,7 +48,21 @@
  * [NAE-1083](https://netgrif.atlassian.net/browse/NAE-1083) - Enforce minimum password length
  * [NAE-1084](https://netgrif.atlassian.net/browse/NAE-1084) - LoadAllPages utility function break if there is no content
  * [NAE-1094](https://netgrif.atlassian.net/browse/NAE-1094) - Current CaseTree node reloads incorrectly
-### Feature
+
+### Improvements
+ * [NAE-997](https://netgrif.atlassian.net/browse/NAE-997) - Engine docker image
+ * [NAE-1002](https://netgrif.atlassian.net/browse/NAE-1002) - Boolean field visible values
+ * [NAE-1008](https://netgrif.atlassian.net/browse/NAE-1008) - Update demo application
+ * [NAE-1014](https://netgrif.atlassian.net/browse/NAE-1014) - Pass DI context into ComponentPortals
+ * [NAE-1020](https://netgrif.atlassian.net/browse/NAE-1020) - Change empty value of number field from 0 to 'empty'
+ * [NAE-1023](https://netgrif.atlassian.net/browse/NAE-1023) - Password view for text field
+ * [NAE-1025](https://netgrif.atlassian.net/browse/NAE-1025) - Update Petriflow XSD schema
+ * [NAE-1027](https://netgrif.atlassian.net/browse/NAE-1027) - Event phases for data fields events
+ * [NAE-1063](https://netgrif.atlassian.net/browse/NAE-1063) - Display only the newest process version in create case
+ * [NAE-1077](https://netgrif.atlassian.net/browse/NAE-1077) - Component tag sending all included information
+ 
+### Features
+ * [NAE-994](https://netgrif.atlassian.net/browse/NAE-994) - Group Management
  * [NAE-1021](https://netgrif.atlassian.net/browse/NAE-1021) - App to Docker guidelines
  * [NAE-1026](https://netgrif.atlassian.net/browse/NAE-1026) - Filter by group
  * [NAE-1031](https://netgrif.atlassian.net/browse/NAE-1031) - Case delete button
