@@ -378,7 +378,7 @@ public class DataService implements IDataService {
 
         try {
             if (forPreview) {
-                return getFilePreview(field);
+                return getFilePreview(field, useCase);
             } else {
                 return new FileFieldInputStream(field, field.isRemote() ? download(field.getValue().getPath()) :
                         new FileInputStream(field.getValue().getPath()));
@@ -389,7 +389,11 @@ public class DataService implements IDataService {
         }
     }
 
-    private FileFieldInputStream getFilePreview(FileField field) throws IOException {
+    private FileFieldInputStream getFilePreview(FileField field, Case useCase) throws IOException {
+        File localPreview = new File(field.getFilePreviewPath(useCase.getStringId()));
+        if (localPreview.exists()) {
+            return new FileFieldInputStream(field, new FileInputStream(localPreview));
+        }
         File file;
         if (field.isRemote()) {
             file = getRemoteFile(field);
@@ -404,7 +408,16 @@ public class DataService implements IDataService {
         }
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         ImageIO.write(image, "jpg", os);
+        saveFilePreview(localPreview, os);
         return new FileFieldInputStream(field, new ByteArrayInputStream(os.toByteArray()));
+    }
+
+    private void saveFilePreview(File localPreview, ByteArrayOutputStream os) throws IOException {
+        localPreview.getParentFile().mkdirs();
+        localPreview.createNewFile();
+        FileOutputStream fos = new FileOutputStream(localPreview);
+        fos.write(os.toByteArray());
+        fos.close();
     }
 
     private BufferedImage getBufferedImageFromFile(File file, FileFieldDataType fileType) throws IOException {
@@ -626,6 +639,7 @@ public class DataService implements IDataService {
                 deleteRemote(useCase, field);
             } else {
                 new File(field.getValue().getPath()).delete();
+                new File(field.getFilePreviewPath(useCase.getStringId())).delete();
             }
             useCase.getDataSet().get(field.getStringId()).setValue(null);
         }
