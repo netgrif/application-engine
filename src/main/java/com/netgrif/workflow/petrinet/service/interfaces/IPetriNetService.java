@@ -62,7 +62,7 @@ public interface IPetriNetService {
 
     static TransitionReference transformToReference(PetriNet net, Transition transition, Locale locale) {
         List<com.netgrif.workflow.workflow.web.responsebodies.DataFieldReference> list = new ArrayList<>();
-        transition.getImmediateData().forEach(fieldId -> list.add(new com.netgrif.workflow.workflow.web.responsebodies.DataFieldReference(net.getTaskImmediateData().get(fieldId), locale)));
+        transition.getImmediateData().forEach(fieldId -> list.add(new com.netgrif.workflow.workflow.web.responsebodies.DataFieldReference(net.getDataSet().get(fieldId), locale)));
         return new TransitionReference(transition.getStringId(), transition.getTitle().getTranslation(locale), net.getStringId(), list);
     }
 

@@ -7,7 +7,6 @@ import com.netgrif.workflow.importer.service.Importer;
 import com.netgrif.workflow.orgstructure.groups.interfaces.INextGroupService;
 import com.netgrif.workflow.petrinet.domain.EventPhase;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
-import com.netgrif.workflow.petrinet.domain.PetriNetHashMap;
 import com.netgrif.workflow.petrinet.domain.Transition;
 import com.netgrif.workflow.petrinet.domain.arcs.VariableArc;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
@@ -88,7 +87,7 @@ public class PetriNetService implements IPetriNetService {
     @Autowired
     private Provider<Importer> importerProvider;
 
-    private Map<ObjectId, PetriNet> cache = new PetriNetHashMap();
+    private Map<ObjectId, PetriNet> cache = new HashMap<>();
 
     protected Importer getImporter() {
         return importerProvider.get();
