@@ -6,7 +6,6 @@ import com.netgrif.workflow.petrinet.domain.Transition;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.petrinet.domain.version.Version;
 import com.netgrif.workflow.petrinet.domain.throwable.MissingPetriNetMetaDataException;
-import com.netgrif.workflow.petrinet.web.requestbodies.UploadedFileMeta;
 import com.netgrif.workflow.petrinet.web.responsebodies.DataFieldReference;
 import com.netgrif.workflow.petrinet.web.responsebodies.PetriNetReference;
 import com.netgrif.workflow.petrinet.web.responsebodies.TransitionReference;
@@ -18,10 +17,7 @@ import org.springframework.data.domain.Pageable;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 public interface IPetriNetService {
 
@@ -65,7 +61,9 @@ public interface IPetriNetService {
     }
 
     static TransitionReference transformToReference(PetriNet net, Transition transition, Locale locale) {
-        return new TransitionReference(transition.getStringId(), transition.getTitle().getTranslation(locale), net.getStringId());
+        List<com.netgrif.workflow.workflow.web.responsebodies.DataFieldReference> list = new ArrayList<>();
+        transition.getImmediateData().forEach(fieldId -> list.add(new com.netgrif.workflow.workflow.web.responsebodies.DataFieldReference(net.getDataSet().get(fieldId), locale)));
+        return new TransitionReference(transition.getStringId(), transition.getTitle().getTranslation(locale), net.getStringId(), list);
     }
 
     static DataFieldReference transformToReference(PetriNet net, Transition transition, Field field, Locale locale) {
@@ -75,6 +73,10 @@ public interface IPetriNetService {
     void evictCache();
 
     PetriNet get(ObjectId petriNetId);
+
+    List<PetriNet> get(Collection<ObjectId> petriNetId);
+
+    List<PetriNet> get(List<String> petriNetIds);
 
     PetriNet clone(ObjectId petriNetId);
 
