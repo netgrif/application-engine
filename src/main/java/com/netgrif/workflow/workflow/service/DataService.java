@@ -347,7 +347,7 @@ public class DataService implements IDataService {
             return null;
 
         workflowService.save(useCase);
-        field.setValue((FileListFieldValue) useCase.getDataSet().get(field.getStringId()).getValue());
+        field.setValue((FileListFieldValue) useCase.getFieldValue(field.getStringId()));
 
         Optional<FileFieldValue> fileField = field.getValue().getNamesPaths().stream().filter(namePath -> namePath.getName().equals(name)).findFirst();
         if (!fileField.isPresent() || fileField.get().getPath() == null) {
@@ -374,7 +374,7 @@ public class DataService implements IDataService {
             return null;
 
         workflowService.save(useCase);
-        field.setValue((FileFieldValue) useCase.getDataSet().get(field.getStringId()).getValue());
+        field.setValue((FileFieldValue) useCase.getFieldValue(field.getStringId()));
 
         try {
             if (forPreview) {
