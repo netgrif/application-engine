@@ -7,11 +7,9 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.formula.functions.T;
+import org.springframework.security.core.GrantedAuthority;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 
 @Slf4j
@@ -35,14 +33,14 @@ public class JwtUtils {
         return getAllClaimsFromToken(token).get(key, tClass);
     }
 
-    public static LoggedUser getLoggedUser(String token) {
+    public static LoggedUser getLoggedUser(String token, Authority anonymousRole) {
         Map<String, Object> userMap = (LinkedHashMap)getAllClaimsFromToken(token).get("user");
         LoggedUser user = new LoggedUser(
                 Long.getLong(userMap.get("id").toString()),
                 userMap.get("username").toString(),
                 userMap.get("password").toString(),
-                (ArrayList)userMap.get("authorities")
-                );
+                Collections.singleton(anonymousRole)
+        );
         return user;
     }
 
