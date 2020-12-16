@@ -2,7 +2,6 @@ package com.netgrif.workflow.configuration.security;
 
 import com.netgrif.workflow.auth.domain.Authority;
 import com.netgrif.workflow.auth.domain.LoggedUser;
-import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.configuration.security.jwt.JwtUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AnonymousAuthenticationProvider;
@@ -28,17 +27,19 @@ import java.util.UUID;
 public class PublicAuthenticationFilter extends OncePerRequestFilter {
 
     private final ProviderManager authenticationManager;
-    private AuthenticationDetailsSource<HttpServletRequest, ?> authenticationDetailsSource = new WebAuthenticationDetailsSource();
-    private Authority anonymousRole;
+    private final AuthenticationDetailsSource<HttpServletRequest, ?> authenticationDetailsSource = new WebAuthenticationDetailsSource();
+    private final Authority anonymousRole;
     private final static String JWT_HEADER_NAME = "Jwt-Auth-Token";
     private final static String BEARER = "Bearer ";
+    private final String[] anonymousAccessUrls;
 
 
 
-    public PublicAuthenticationFilter(ProviderManager authenticationManager, AnonymousAuthenticationProvider provider, Authority anonymousRole) {
+    public PublicAuthenticationFilter(ProviderManager authenticationManager, AnonymousAuthenticationProvider provider, Authority anonymousRole, String[] urls) {
         this.authenticationManager = authenticationManager;
         this.authenticationManager.getProviders().add(provider);
         this.anonymousRole = anonymousRole;
+        this.anonymousAccessUrls = urls;
     }
 
     @Override
@@ -56,7 +57,7 @@ public class PublicAuthenticationFilter extends OncePerRequestFilter {
     private void authenticate(HttpServletRequest request, String jwtToken){
         AnonymousAuthenticationToken authRequest = new AnonymousAuthenticationToken(
                 "anonymousUser",
-                JwtUtils.getLoggedUser(jwtToken),
+                JwtUtils.getLoggedUser(jwtToken, this.anonymousRole),
                 Collections.singleton(this.anonymousRole)
         );
         authRequest.setDetails(this.authenticationDetailsSource.buildDetails(request));
@@ -87,16 +88,27 @@ public class PublicAuthenticationFilter extends OncePerRequestFilter {
     }
 
     private void resolveClaims(Map<String, Object> claims, HttpServletRequest request) {
-        LoggedUser user = new LoggedUser(-1L,
+        claims.put("user", createAnonymousUser(request));
+        claims.put("authorities", this.anonymousRole);
+    }
+
+    private LoggedUser createAnonymousUser(HttpServletRequest request) {
+        long hash = UUID.fromString(request.getSession().getId()).getMostSignificantBits() & Long.MAX_VALUE;
+        LoggedUser user = new LoggedUser(hash,
                 request.getRemoteAddr(),
                 "",
                 Collections.singleton(this.anonymousRole)
         );
-        claims.put("user", user);
-        claims.put("authorities", this.anonymousRole);
+        user.setFullName("Anonymous " + user.getId().toString());
+        return user;
     }
 
     private boolean isPublicApi(String path) {
-        return path.startsWith("/api/public");
+        for (String url : this.anonymousAccessUrls) {
+            if (path.matches(url.replace("*", ".*?"))) {
+                return true;
+            }
+        }
+        return false;
     }
 }
