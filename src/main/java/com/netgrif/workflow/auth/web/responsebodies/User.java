@@ -32,30 +32,35 @@ public class User {
 
     private Set<String> nextGroups;
 
-    /**
-     * Equivalent to calling User(user, false)
-     */
-    public User(com.netgrif.workflow.auth.domain.User user) {
-        this(user, false);
-    }
-
-    /**
-     * The constructor doesn't set attributes regarding the ProcessRoles
-     *
-     * Use the UserFactory to create instances that have these attributes set.
-     */
-    public User(com.netgrif.workflow.auth.domain.User user, boolean small) {
+    protected User(com.netgrif.workflow.auth.domain.User user) {
         id = user.getId();
         email = user.getEmail();
         avatar = user.getAvatar();
         name = user.getName();
         surname = user.getSurname();
         fullName = user.getFullName();
-        if (!small) {
-            telNumber = user.getTelNumber();
-            groups = user.getGroups();
-            authorities = user.getAuthorities();
-            nextGroups = user.getNextGroups();
-        }
+    }
+
+    /**
+     * This static method doesn't set attributes regarding the ProcessRoles
+     *
+     * Use the IUserFactory service to create instances that have these attributes set.
+     */
+    public static User createSmallUser(com.netgrif.workflow.auth.domain.User user) {
+        return new User(user);
+    }
+
+    /**
+     * This static method doesn't set attributes regarding the ProcessRoles
+     *
+     * Use the IUserFactory service to create instances that have these attributes set.
+     */
+    public static User createUser(com.netgrif.workflow.auth.domain.User user) {
+        User result = new User(user);
+        result.setTelNumber(user.getTelNumber());
+        result.setGroups(user.getGroups());
+        result.setAuthorities(user.getAuthorities());
+        result.setNextGroups(user.getNextGroups());
+        return result;
     }
 }

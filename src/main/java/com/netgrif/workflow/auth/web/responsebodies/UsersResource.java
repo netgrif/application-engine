@@ -11,13 +11,16 @@ import java.util.stream.Collectors;
 
 public class UsersResource extends Resources<UserResource> {
 
+    public static final String SELF_REL_SMALL = "small";
+    public static final String SELF_REL_PROFILE = "profile";
+
     public UsersResource(Collection<UserResource> content, String selfRel) {
         super(content, new ArrayList<>());
         buildLinks(selfRel);
     }
 
     public UsersResource(Collection<User> content, String selfRel, boolean small) {
-        this(content.stream().map(user -> new UserResource(user, small ? "small" : "profile"))
+        this(content.stream().map(user -> new UserResource(user, small ? SELF_REL_SMALL : SELF_REL_PROFILE))
                 .collect(Collectors.toList()), selfRel);
     }
 
