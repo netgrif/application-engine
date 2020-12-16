@@ -74,6 +74,22 @@ public class LoggedUser extends org.springframework.security.core.userdetails.Us
         return user;
     }
 
+    public User transformToAnonymousUser() {
+        User user = new User(this.id);
+        user.setEmail(getUsername());
+        user.setPassword(getPassword());
+        user.setState(UserState.ACTIVE);
+        user.setAuthorities(getAuthorities().stream().map(a -> (Authority) a).collect(Collectors.toSet()));
+        user.setGroups(groups.stream().map(Group::new).collect(Collectors.toSet()));
+        user.setProcessRoles(processRoles.stream().map(roleId -> {
+            ProcessRole role = new ProcessRole();
+            role.set_id(roleId);
+            return role;
+        }).collect(Collectors.toSet()));
+
+        return user;
+    }
+
     @Override
     public String toString() {
         return "LoggedUser{" +
