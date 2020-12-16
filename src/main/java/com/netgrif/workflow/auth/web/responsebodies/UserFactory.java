@@ -25,7 +25,7 @@ public class UserFactory implements IUserFactory {
 
     @Override
     public User getUser(com.netgrif.workflow.auth.domain.User user, Locale locale, boolean small) {
-        User result = new User(user, small);
+        User result = small ? User.createSmallUser(user) : User.createUser(user);
 
         if (small) {
            return result;
