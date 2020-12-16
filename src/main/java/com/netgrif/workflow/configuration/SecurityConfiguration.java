@@ -28,6 +28,8 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import java.util.HashSet;
+
 import static org.springframework.http.HttpMethod.OPTIONS;
 
 @Slf4j
@@ -142,9 +144,11 @@ public class SecurityConfiguration extends AbstractSecurityConfiguration {
     }
 
     private PublicAuthenticationFilter createPublicAuthenticationFilter() throws Exception {
+        Authority authority = authorityService.getOrCreate(Authority.anonymous);
+        authority.setUsers(new HashSet<>());
         return new PublicAuthenticationFilter(
                     authenticationManager(),
                     new AnonymousAuthenticationProvider(ANONYMOUS_USER),
-                    authorityService.getOrCreate(Authority.anonymous));
+                    authority);
     }
 }

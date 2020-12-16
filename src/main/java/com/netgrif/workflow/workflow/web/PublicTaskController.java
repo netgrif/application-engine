@@ -62,7 +62,7 @@ public class PublicTaskController extends PublicAbstractController {
     public LocalisedEventOutcomeResource assign(@PathVariable("id") String taskId, Locale locale) {
         LoggedUser loggedUser = getAnonym();
         try {
-            return LocalisedEventOutcomeResource.successOutcome(this.taskService.assignTask(loggedUser, taskId), locale, "LocalisedTask " + taskId + " assigned to " + loggedUser.getFullName());
+            return LocalisedEventOutcomeResource.successOutcome(this.taskService.assignPublicTask(loggedUser, taskId), locale, "LocalisedTask " + taskId + " assigned to " + loggedUser.getFullName());
         } catch (TransitionNotExecutableException var6) {
             log.error("Assigning task [" + taskId + "] failed: ", var6);
             return LocalisedEventOutcomeResource.errorOutcome("LocalisedTask " + taskId + " cannot be assigned");
@@ -82,7 +82,7 @@ public class PublicTaskController extends PublicAbstractController {
     public LocalisedEventOutcomeResource finish(@PathVariable("id") String taskId, Locale locale) {
         LoggedUser loggedUser = getAnonym();
         try {
-            return LocalisedEventOutcomeResource.successOutcome(this.taskService.finishTask(loggedUser, taskId), locale, "LocalisedTask " + taskId + " finished");
+            return LocalisedEventOutcomeResource.successOutcome(this.taskService.finishPublicTask(loggedUser, taskId), locale, "LocalisedTask " + taskId + " finished");
         } catch (Exception var6) {
             log.error("Finishing task [" + taskId + "] failed: ", var6);
             return LocalisedEventOutcomeResource.errorOutcome(var6.getMessage());
@@ -102,7 +102,7 @@ public class PublicTaskController extends PublicAbstractController {
     public LocalisedEventOutcomeResource cancel(@PathVariable("id") String taskId, Locale locale) {
         LoggedUser loggedUser = getAnonym();
         try {
-            return LocalisedEventOutcomeResource.successOutcome(this.taskService.cancelTask(loggedUser, taskId), locale, "LocalisedTask " + taskId + " canceled");
+            return LocalisedEventOutcomeResource.successOutcome(this.taskService.cancelPublicTask(loggedUser, taskId), locale, "LocalisedTask " + taskId + " canceled");
         } catch (Exception var6) {
             log.error("Canceling task [" + taskId + "] failed: ", var6);
             return LocalisedEventOutcomeResource.errorOutcome(var6.getMessage());
