@@ -17,7 +17,7 @@ public class ProcessRoleFactory implements IProcessRoleFactory {
     @Override
     public ProcessRole getProcessRole(com.netgrif.workflow.petrinet.domain.roles.ProcessRole role, UserProcessRole userProcessRole, Locale locale) {
         if (!role.getStringId().equals(userProcessRole.getRoleId())) {
-            throw new IllegalArgumentException("ProcessRole StringId and UserProcessRole roleId must match!");
+            throw new IllegalArgumentException(String.format("ProcessRole StringId (%s) and UserProcessRole roleId (%s) must match!", role.getStringId(), userProcessRole.getRoleId()));
         }
         ProcessRole result = new ProcessRole(role, locale);
         PetriNet net = petriNetService.getPetriNet(userProcessRole.getNetId());
