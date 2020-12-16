@@ -62,6 +62,10 @@ class FileField extends FieldWithDefault<FileFieldValue> {
         return this.getValue().getPath(caseId, getStringId())
     }
 
+    String getFilePreviewPath(String caseId) {
+        return this.getValue().getPreviewPath(caseId, getStringId())
+    }
+
     boolean isRemote() {
         return this.remote
     }
