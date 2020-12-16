@@ -8,9 +8,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 public abstract class PublicAbstractController {
 
-    @Value("${anonymous.email.address}")
-    private String anonymousEmail;
-
     protected final IUserService userService;
 
 
