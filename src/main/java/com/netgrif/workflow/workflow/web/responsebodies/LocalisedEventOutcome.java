@@ -29,7 +29,7 @@ public class LocalisedEventOutcome extends ChangedFieldContainer {
         result.finishDate = outcome.getFinishDate();
 
         if (outcome.getAssignee() != null) {
-            result.assignee = new User(outcome.getAssignee(), true);
+            result.assignee = User.createSmallUser(outcome.getAssignee());
         }
 
         if (outcome.getMessage() != null) {
