@@ -31,15 +31,15 @@ public interface IDataService {
 
     ChangedFieldContainer setData(String taskId, ObjectNode values);
 
-    FileFieldInputStream getFile(Case useCase, FileField field);
+    FileFieldInputStream getFile(Case useCase, FileField field, boolean forPreview);
 
     FileFieldInputStream getFileByName(Case useCase, FileListField field, String name);
 
-    FileFieldInputStream getFileByTask(String taskId, String fieldId);
+    FileFieldInputStream getFileByTask(String taskId, String fieldId, boolean forPreview);
 
     FileFieldInputStream getFileByTaskAndName(String taskId, String fieldId, String name);
 
-    FileFieldInputStream getFileByCase(String caseId, String fieldId);
+    FileFieldInputStream getFileByCase(String caseId, String fieldId, boolean forPreview);
 
     FileFieldInputStream getFileByCaseAndName(String caseId, String fieldId, String name);
 
