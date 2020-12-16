@@ -41,7 +41,7 @@ class DummyUserRunner extends AbstractOrderedCommandLineRunner {
             memberService.save(member)
         }
 
-        user = userService.findByEmail("anonymous@netgrif.com", true)
+        /*user = userService.findByEmail("anonymous@netgrif.com", true)
         if (!user) {
             user = new User("anonymous@netgrif.com", "password", "Anonymous", "user")
             user.state = UserState.ACTIVE
@@ -49,7 +49,7 @@ class DummyUserRunner extends AbstractOrderedCommandLineRunner {
             def member = memberService.findByEmail(user.email)
             group.addMember(member)
             memberService.save(member)
-        }
+        }*/
 
         user = userService.findByEmail("customer@netgrif.com", true)
         if (!user) {
