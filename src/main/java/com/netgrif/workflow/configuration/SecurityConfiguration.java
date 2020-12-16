@@ -68,6 +68,7 @@ public class SecurityConfiguration extends AbstractSecurityConfiguration {
         config.addAllowedMethod("*");
         config.addAllowedHeader("*");
         config.addExposedHeader("X-Auth-Token");
+        config.addExposedHeader("Jwt-Auth-Token");
         config.addAllowedOrigin("*");
         config.setAllowCredentials(true);
 
@@ -86,7 +87,7 @@ public class SecurityConfiguration extends AbstractSecurityConfiguration {
             .and()
                 .cors()
                 .and()
-            .addFilterAfter(createPublicAuthenticationFilter(), BasicAuthenticationFilter.class)
+            .addFilterBefore(createPublicAuthenticationFilter(), BasicAuthenticationFilter.class)
             .authorizeRequests()
                 .antMatchers(getPatterns()).permitAll()
                 .antMatchers(OPTIONS).permitAll()
@@ -149,6 +150,8 @@ public class SecurityConfiguration extends AbstractSecurityConfiguration {
         return new PublicAuthenticationFilter(
                     authenticationManager(),
                     new AnonymousAuthenticationProvider(ANONYMOUS_USER),
-                    authority);
+                    authority,
+                    getServerPatterns()
+                );
     }
 }
