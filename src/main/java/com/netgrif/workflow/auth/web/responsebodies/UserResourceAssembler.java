@@ -1,26 +1,37 @@
 package com.netgrif.workflow.auth.web.responsebodies;
 
 import com.netgrif.workflow.auth.domain.User;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.ResourceAssembler;
 
 import java.util.Locale;
 
 public class UserResourceAssembler implements ResourceAssembler<User, UserResource> {
 
+    @Autowired
+    private IUserFactory userFactory;
+
     private Locale locale;
     private String selfRel;
     private boolean small;
-    private IUserFactory userFactory;
 
-    public UserResourceAssembler(Locale locale, boolean small, String selfRel, IUserFactory userFactory) {
+    private boolean initialized = false;
+
+    public UserResourceAssembler() {
+    }
+
+    public void initialize(Locale locale, boolean small, String selfRel) {
         this.locale = locale;
         this.selfRel = selfRel;
         this.small = small;
-        this.userFactory = userFactory;
+        this.initialized = true;
     }
 
     @Override
     public UserResource toResource(User entity) {
-        return new UserResource(userFactory.getUser(entity, locale, small), selfRel);
+        if (!initialized) {
+           throw new IllegalStateException("You must initialize the UserResourceAssembler before calling the toResource method! To initialize the assembler call the initialize method.");
+        }
+        return new UserResource(small ? userFactory.getSmallUser(entity) : userFactory.getUser(entity, locale), selfRel);
     }
 }
