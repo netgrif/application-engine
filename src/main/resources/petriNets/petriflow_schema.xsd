@@ -147,6 +147,20 @@
             <xs:field xpath="@name"/>
         </xs:unique>
     </xs:element>
+    <xs:element name="processEvents">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element type="processEvent" name="event" maxOccurs="unbounded" minOccurs="0"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="caseEvents">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element type="caseEvent" name="event" maxOccurs="unbounded" minOccurs="0"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
     <xs:element name="document">
         <xs:complexType>
             <xs:sequence>
@@ -158,6 +172,9 @@
                 <xs:element ref="defaultRole" minOccurs="0"/>
                 <xs:element ref="transitionRole" minOccurs="0"/>
                 <xs:element ref="caseName" minOccurs="0"/>
+                <xs:element type="caseRoleRef" name="roleRef" maxOccurs="unbounded" minOccurs="0"/>
+                <xs:element ref="processEvents" minOccurs="0"/>
+                <xs:element ref="caseEvents" minOccurs="0"/>
                 <xs:element ref="transaction" maxOccurs="unbounded" minOccurs="0"/>
                 <xs:element ref="role" maxOccurs="unbounded" minOccurs="0"/>
                 <xs:element ref="data" maxOccurs="unbounded" minOccurs="0"/>
@@ -375,6 +392,9 @@
     <xs:element name="view" type="xs:boolean"/>
     <xs:element name="delegate" type="xs:boolean"/>
     <xs:element name="cancel" type="xs:boolean"/>
+    <xs:element name="create" type="xs:boolean"/>
+    <xs:element name="delete" type="xs:boolean"/>
+    <xs:element name="upload" type="xs:boolean"/>
     <xs:element name="logic">
         <xs:complexType>
             <xs:sequence>
@@ -383,6 +403,17 @@
                 <xs:element ref="view" minOccurs="0"/>
                 <xs:element ref="cancel" minOccurs="0"/>
                 <xs:element name="behavior" type="behavior" maxOccurs="unbounded" minOccurs="0"/>
+                <xs:element ref="action" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:element ref="actionRef" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="caseLogic">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="create" minOccurs="0"/>
+                <xs:element ref="delete" minOccurs="0"/>
+                <xs:element ref="upload" minOccurs="0"/>
                 <xs:element ref="action" minOccurs="0" maxOccurs="unbounded"/>
                 <xs:element ref="actionRef" minOccurs="0" maxOccurs="unbounded"/>
             </xs:sequence>
@@ -404,6 +435,12 @@
             </xs:sequence>
         </xs:complexType>
     </xs:element>
+    <xs:complexType name="caseRoleRef">
+        <xs:sequence>
+            <xs:element ref="id"/>
+            <xs:element ref="caseLogic"/>
+        </xs:sequence>
+    </xs:complexType>
     <xs:simpleType name="behavior">
         <xs:restriction base="xs:string">
             <xs:enumeration value="forbidden"/>
@@ -548,21 +585,43 @@
     <xs:element name="caseName" type="i18nStringType"/>
     <xs:element name="event">
         <xs:complexType>
-            <xs:sequence>
-                <xs:element ref="id"/>
-                <xs:element ref="title" minOccurs="0"/>
-                <xs:element ref="message" minOccurs="0"/>
-                <xs:element ref="actions" minOccurs="0" maxOccurs="unbounded"/>
-            </xs:sequence>
-            <xs:attribute name="type" use="required" type="eventType"/>
+            <xs:complexContent>
+                <xs:extension base="baseEvent">
+                    <xs:sequence>
+                        <xs:element ref="title" minOccurs="0"/>
+                        <xs:element ref="message" minOccurs="0"/>
+                    </xs:sequence>
+                    <xs:attribute name="type" use="required" type="eventType"/>
+                </xs:extension>
+            </xs:complexContent>
         </xs:complexType>
     </xs:element>
-    <xs:complexType name="dataEvent">
+    <xs:complexType name="baseEvent">
         <xs:sequence>
             <xs:element ref="id"/>
             <xs:element ref="actions" minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
-        <xs:attribute name="type" use="required" type="dataEventType"/>
+    </xs:complexType>
+    <xs:complexType name="dataEvent">
+        <xs:complexContent>
+            <xs:extension base="baseEvent">
+                <xs:attribute name="type" use="required" type="dataEventType"/>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:complexType name="caseEvent">
+        <xs:complexContent>
+            <xs:extension base="baseEvent">
+                <xs:attribute name="type" use="required" type="caseEventType"/>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:complexType name="processEvent">
+        <xs:complexContent>
+            <xs:extension base="baseEvent">
+                <xs:attribute name="type" use="required" type="processEventType"/>
+            </xs:extension>
+        </xs:complexContent>
     </xs:complexType>
     <xs:simpleType name="eventType">
         <xs:restriction base="xs:string">
@@ -576,6 +635,17 @@
         <xs:restriction base="xs:string">
             <xs:enumeration value="set"/>
             <xs:enumeration value="get"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="caseEventType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="create"/>
+            <xs:enumeration value="delete"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="processEventType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="upload"/>
         </xs:restriction>
     </xs:simpleType>
     <xs:simpleType name="eventPhaseType">

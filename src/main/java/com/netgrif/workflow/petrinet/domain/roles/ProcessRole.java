@@ -1,7 +1,7 @@
 package com.netgrif.workflow.petrinet.domain.roles;
 
-import com.netgrif.workflow.petrinet.domain.Event;
-import com.netgrif.workflow.petrinet.domain.EventType;
+import com.netgrif.workflow.petrinet.domain.events.Event;
+import com.netgrif.workflow.petrinet.domain.events.EventType;
 import com.netgrif.workflow.petrinet.domain.I18nString;
 import com.netgrif.workflow.petrinet.domain.Imported;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action;

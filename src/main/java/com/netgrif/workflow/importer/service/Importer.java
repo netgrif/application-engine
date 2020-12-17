@@ -2,11 +2,9 @@ package com.netgrif.workflow.importer.service;
 
 import com.netgrif.workflow.importer.model.*;
 import com.netgrif.workflow.importer.model.DataEventType;
-import com.netgrif.workflow.petrinet.domain.DataEvent;
+import com.netgrif.workflow.petrinet.domain.events.*;
 import com.netgrif.workflow.petrinet.domain.Component;
 import com.netgrif.workflow.petrinet.domain.DataGroup;
-import com.netgrif.workflow.petrinet.domain.Event;
-import com.netgrif.workflow.petrinet.domain.EventType;
 import com.netgrif.workflow.petrinet.domain.Place;
 import com.netgrif.workflow.petrinet.domain.Transaction;
 import com.netgrif.workflow.petrinet.domain.Transition;
@@ -17,6 +15,9 @@ import com.netgrif.workflow.petrinet.domain.dataset.logic.FieldBehavior;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.FieldLayout;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.FieldActionsRunner;
+import com.netgrif.workflow.petrinet.domain.events.CaseEventType;
+import com.netgrif.workflow.petrinet.domain.events.EventType;
+import com.netgrif.workflow.petrinet.domain.events.ProcessEventType;
 import com.netgrif.workflow.petrinet.domain.layout.DataGroupLayout;
 import com.netgrif.workflow.petrinet.domain.layout.TaskLayout;
 import com.netgrif.workflow.petrinet.domain.policies.AssignPolicy;
@@ -24,7 +25,6 @@ import com.netgrif.workflow.petrinet.domain.policies.DataFocusPolicy;
 import com.netgrif.workflow.petrinet.domain.policies.FinishPolicy;
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRole;
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRoleRepository;
-import com.netgrif.workflow.petrinet.domain.roles.RolePermission;
 import com.netgrif.workflow.petrinet.domain.throwable.MissingPetriNetMetaDataException;
 import com.netgrif.workflow.petrinet.service.ArcFactory;
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
@@ -42,9 +42,6 @@ import javax.xml.bind.Unmarshaller;
 import java.io.*;
 import java.nio.file.Path;
 import java.util.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadPoolExecutor;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -156,6 +153,9 @@ public class Importer {
         setMetaData();
         net.setIcon(document.getIcon());
 
+        resolveRoleRef();
+        resolveProcessEvents(document.getProcessEvents());
+        resolveCaseEvents(document.getCaseEvents());
         document.getRole().forEach(this::createRole);
         document.getData().forEach(this::createDataSet);
         document.getTransaction().forEach(this::createTransaction);
@@ -172,6 +172,25 @@ public class Importer {
         net.setDefaultCaseName(toI18NString(document.getCaseName()));
 
         return Optional.of(net);
+    }
+
+    @Transactional
+    protected void resolveRoleRef() {
+        // TODO
+    }
+
+    @Transactional
+    protected void resolveProcessEvents(ProcessEvents processEvents) {
+        if (processEvents != null && processEvents.getEvent() != null) {
+           net.setProcessEvents(createProcessEventsMap(processEvents.getEvent()));
+        }
+    }
+
+    @Transactional
+    protected void resolveCaseEvents(CaseEvents caseEvents) {
+        if (caseEvents != null && caseEvents.getEvent() != null) {
+            net.setCaseEvents(createCaseEventsMap(caseEvents.getEvent()));
+        }
     }
 
     @Transactional
@@ -236,11 +255,11 @@ public class Importer {
         }
     }
 
-    private LinkedHashSet<DataEvent> buildActionRefs(List<ActionRefType> actionRefs) {
-        LinkedHashSet<DataEvent> refs = new LinkedHashSet<>();
+    private LinkedHashSet<com.netgrif.workflow.petrinet.domain.events.DataEvent> buildActionRefs(List<ActionRefType> actionRefs) {
+        LinkedHashSet<com.netgrif.workflow.petrinet.domain.events.DataEvent> refs = new LinkedHashSet<>();
         for (ActionRefType actionRef : actionRefs) {
             Action action = actions.get(actionRef.getId());
-            DataEvent dataEvent = new DataEvent(action.getId().toString(), action.getTrigger().toString());
+            com.netgrif.workflow.petrinet.domain.events.DataEvent dataEvent = new com.netgrif.workflow.petrinet.domain.events.DataEvent(action.getId().toString(), action.getTrigger().toString());
             dataEvent.getActions().get(dataEvent.getDefaultPhase()).add(fromActionRef(actionRef));
             refs.add(dataEvent);
         }
@@ -358,8 +377,8 @@ public class Importer {
     }
 
     @Transactional
-    protected Event addEvent(String transitionId, com.netgrif.workflow.importer.model.Event imported) {
-        Event event = new Event();
+    protected com.netgrif.workflow.petrinet.domain.events.Event addEvent(String transitionId, com.netgrif.workflow.importer.model.Event imported) {
+        com.netgrif.workflow.petrinet.domain.events.Event event = new com.netgrif.workflow.petrinet.domain.events.Event();
         event.setImportId(imported.getId());
         event.setMessage(toI18NString(imported.getMessage()));
         event.setTitle(toI18NString(imported.getTitle()));
@@ -370,15 +389,37 @@ public class Importer {
         return event;
     }
 
-    private List<Action> parsePostActions(String transitionId, com.netgrif.workflow.importer.model.Event imported) {
+    @Transactional
+    protected com.netgrif.workflow.petrinet.domain.events.ProcessEvent addProcessEvent(com.netgrif.workflow.importer.model.ProcessEvent imported) {
+        com.netgrif.workflow.petrinet.domain.events.ProcessEvent event = new com.netgrif.workflow.petrinet.domain.events.ProcessEvent();
+        event.setImportId(imported.getId());
+        event.setType(ProcessEventType.valueOf(imported.getType().value().toUpperCase()));
+        event.setPostActions(parsePostActions(null, imported));
+        event.setPreActions(parsePreActions(null, imported));
+
+        return event;
+    }
+
+    @Transactional
+    protected com.netgrif.workflow.petrinet.domain.events.CaseEvent addCaseEvent(com.netgrif.workflow.importer.model.CaseEvent imported) {
+        com.netgrif.workflow.petrinet.domain.events.CaseEvent event = new com.netgrif.workflow.petrinet.domain.events.CaseEvent();
+        event.setImportId(imported.getId());
+        event.setType(CaseEventType.valueOf(imported.getType().value().toUpperCase()));
+        event.setPostActions(parsePostActions(null, imported));
+        event.setPreActions(parsePreActions(null, imported));
+
+        return event;
+    }
+
+    private List<Action> parsePostActions(String transitionId, com.netgrif.workflow.importer.model.BaseEvent imported) {
         return parsePhaseActions(EventPhaseType.POST, transitionId, imported);
     }
 
-    private List<Action> parsePreActions(String transitionId, com.netgrif.workflow.importer.model.Event imported) {
+    private List<Action> parsePreActions(String transitionId, com.netgrif.workflow.importer.model.BaseEvent imported) {
         return parsePhaseActions(EventPhaseType.PRE, transitionId, imported);
     }
 
-    private List<Action> parsePhaseActions(EventPhaseType phase, String transitionId, com.netgrif.workflow.importer.model.Event imported) {
+    private List<Action> parsePhaseActions(EventPhaseType phase, String transitionId, com.netgrif.workflow.importer.model.BaseEvent imported) {
         List<Action> actionList = imported.getActions().stream()
                 .filter(actions -> actions.getPhase().equals(phase))
                 .map(actions -> actions.getAction().parallelStream()
@@ -540,13 +581,13 @@ public class Importer {
     }
 
     @Transactional
-    protected LinkedHashSet<DataEvent> buildEvents(List<com.netgrif.workflow.importer.model.DataEvent> events, String transitionId) {
+    protected LinkedHashSet<com.netgrif.workflow.petrinet.domain.events.DataEvent> buildEvents(List<com.netgrif.workflow.importer.model.DataEvent> events, String transitionId) {
         return events.stream()
                 .map(event -> parseDataEvents(transitionId, event))
                 .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
-    private DataEvent parseDataEvents(String transitionId, com.netgrif.workflow.importer.model.DataEvent event){
+    private com.netgrif.workflow.petrinet.domain.events.DataEvent parseDataEvents(String transitionId, com.netgrif.workflow.importer.model.DataEvent event){
         Map<EventPhase, List<Action>> actions = new HashMap<>();
         actions.put(EventPhase.PRE, new ArrayList<>());
         actions.put(EventPhase.POST, new ArrayList<>());
@@ -554,8 +595,8 @@ public class Importer {
         return parseDataEvent(event, actions, transitionId);
     }
 
-    private DataEvent parseDataEvent(com.netgrif.workflow.importer.model.DataEvent event, Map<EventPhase, List<Action>> actions, String transitionId){
-        DataEvent dataEvent = new DataEvent(event.getId(), event.getType().value());
+    private com.netgrif.workflow.petrinet.domain.events.DataEvent parseDataEvent(com.netgrif.workflow.importer.model.DataEvent event, Map<EventPhase, List<Action>> actions, String transitionId){
+        com.netgrif.workflow.petrinet.domain.events.DataEvent dataEvent = new com.netgrif.workflow.petrinet.domain.events.DataEvent(event.getId(), event.getType().value());
         event.getActions().forEach(eventAction -> {
             EventPhaseType phaseType = eventAction.getPhase();
             if(eventAction.getPhase() == null){
@@ -567,25 +608,25 @@ public class Importer {
         return dataEvent;
     }
 
-    private DataEvent convertAction(String fieldId, String transitionId, ActionType importedAction){
+    private com.netgrif.workflow.petrinet.domain.events.DataEvent convertAction(String fieldId, String transitionId, ActionType importedAction){
         Action action = parseAction(fieldId, transitionId, importedAction);
-        DataEvent dataEvent = createDataEvent(action);
+        com.netgrif.workflow.petrinet.domain.events.DataEvent dataEvent = createDataEvent(action);
         dataEvent.getActions().get(dataEvent.getDefaultPhase()).add(action);
         return dataEvent;
     }
 
-    private DataEvent createDataEvent(Action action) {
-        DataEvent dataEvent;
+    private com.netgrif.workflow.petrinet.domain.events.DataEvent createDataEvent(Action action) {
+        com.netgrif.workflow.petrinet.domain.events.DataEvent dataEvent;
         if (action.getId() != null) {
-            dataEvent = new DataEvent(action.getId().toString(), action.getTrigger().toString());
+            dataEvent = new com.netgrif.workflow.petrinet.domain.events.DataEvent(action.getId().toString(), action.getTrigger().toString());
         } else {
-            dataEvent = new DataEvent(new ObjectId().toString(), action.getTrigger().toString());
+            dataEvent = new com.netgrif.workflow.petrinet.domain.events.DataEvent(new ObjectId().toString(), action.getTrigger().toString());
         }
         return dataEvent;
     }
 
     @Transactional
-    protected LinkedHashSet<DataEvent> buildActions(List<ActionType> imported, String fieldId, String transitionId) {
+    protected LinkedHashSet<com.netgrif.workflow.petrinet.domain.events.DataEvent> buildActions(List<ActionType> imported, String fieldId, String transitionId) {
         return imported.stream()
                 .map(action -> convertAction(fieldId, transitionId, action))
                 .collect(Collectors.toCollection(LinkedHashSet::new));
@@ -725,7 +766,7 @@ public class Importer {
     @Transactional
     protected void createRole(Role importRole) {
         ProcessRole role = new ProcessRole();
-        Map<EventType, Event> events = createEventsMap(importRole.getEvent());
+        Map<EventType, com.netgrif.workflow.petrinet.domain.events.Event> events = createEventsMap(importRole.getEvent());
 
         role.setImportId(importRole.getId());
         role.setEvents(events);
@@ -741,10 +782,28 @@ public class Importer {
         roles.put(importRole.getId(), role);
     }
 
-    private Map<EventType, Event> createEventsMap(List<com.netgrif.workflow.importer.model.Event> events) {
-        Map<EventType, Event> finalEvents = new HashMap<>();
+    private Map<EventType, com.netgrif.workflow.petrinet.domain.events.Event> createEventsMap(List<com.netgrif.workflow.importer.model.Event> events) {
+        Map<EventType, com.netgrif.workflow.petrinet.domain.events.Event> finalEvents = new HashMap<>();
         events.forEach(event ->
                 finalEvents.put(EventType.valueOf(event.getType().value().toUpperCase()), addEvent(null, event))
+        );
+
+        return finalEvents;
+    }
+
+    private Map<ProcessEventType, com.netgrif.workflow.petrinet.domain.events.ProcessEvent> createProcessEventsMap(List<com.netgrif.workflow.importer.model.ProcessEvent> events) {
+        Map<ProcessEventType, com.netgrif.workflow.petrinet.domain.events.ProcessEvent> finalEvents = new HashMap<>();
+        events.forEach(event ->
+                finalEvents.put(ProcessEventType.valueOf(event.getType().value().toUpperCase()), addProcessEvent(event))
+        );
+
+        return finalEvents;
+    }
+
+    private Map<CaseEventType, com.netgrif.workflow.petrinet.domain.events.CaseEvent> createCaseEventsMap(List<com.netgrif.workflow.importer.model.CaseEvent> events) {
+        Map<CaseEventType, com.netgrif.workflow.petrinet.domain.events.CaseEvent> finalEvents = new HashMap<>();
+        events.forEach(event ->
+                finalEvents.put(CaseEventType.valueOf(event.getType().value().toUpperCase()), addCaseEvent(event))
         );
 
         return finalEvents;

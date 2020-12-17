@@ -1,4 +1,4 @@
-package com.netgrif.workflow.petrinet.domain;
+package com.netgrif.workflow.petrinet.domain.events;
 
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action;
 import lombok.Data;
