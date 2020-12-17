@@ -4,6 +4,10 @@ import com.netgrif.workflow.auth.domain.Author;
 import com.netgrif.workflow.petrinet.domain.arcs.Arc;
 import com.netgrif.workflow.petrinet.domain.arcs.VariableArc;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
+import com.netgrif.workflow.petrinet.domain.events.CaseEvent;
+import com.netgrif.workflow.petrinet.domain.events.CaseEventType;
+import com.netgrif.workflow.petrinet.domain.events.ProcessEvent;
+import com.netgrif.workflow.petrinet.domain.events.ProcessEventType;
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRole;
 import com.netgrif.workflow.petrinet.domain.version.Version;
 import com.netgrif.workflow.workflow.domain.DataField;
@@ -84,6 +88,14 @@ public class PetriNet extends PetriNetObject {
     @Setter
     private Map<String, Transaction> transactions;//todo: import id
 
+    @Getter
+    @Setter
+    private Map<ProcessEventType, ProcessEvent> processEvents;
+
+    @Getter
+    @Setter
+    private Map<CaseEventType, CaseEvent> caseEvents;
+
     @Transient
     private boolean initialized;
 
@@ -107,6 +119,8 @@ public class PetriNet extends PetriNetObject {
         dataSet = new LinkedHashMap<>();
         roles = new HashMap<>();
         transactions = new LinkedHashMap<>();
+        processEvents = new LinkedHashMap<>();
+        caseEvents = new LinkedHashMap<>();
     }
 
     public void addPlace(Place place) {

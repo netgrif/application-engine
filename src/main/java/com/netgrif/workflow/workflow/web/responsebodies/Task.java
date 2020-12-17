@@ -3,7 +3,7 @@ package com.netgrif.workflow.workflow.web.responsebodies;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.elastic.domain.ElasticTask;
-import com.netgrif.workflow.petrinet.domain.EventType;
+import com.netgrif.workflow.petrinet.domain.events.EventType;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.petrinet.domain.layout.TaskLayout;
 import lombok.Data;
