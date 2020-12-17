@@ -20,16 +20,7 @@ public class UserFactory implements IUserFactory {
 
     @Override
     public User getUser(com.netgrif.workflow.auth.domain.User user, Locale locale) {
-        return getUser(user, locale, false);
-    }
-
-    @Override
-    public User getUser(com.netgrif.workflow.auth.domain.User user, Locale locale, boolean small) {
-        User result = small ? User.createSmallUser(user) : User.createUser(user);
-
-        if (small) {
-           return result;
-        }
+        User result = User.createUser(user);
 
         String defaultRoleId = processRoleService.defaultRole().getStringId();
         Map<String, UserProcessRole> userProcessRoles = user.getUserProcessRoles().stream().collect(Collectors.toMap(UserProcessRole::getRoleId, r -> r));
@@ -45,5 +36,10 @@ public class UserFactory implements IUserFactory {
         }).collect(Collectors.toSet()));
 
         return result;
+    }
+
+    @Override
+    public User getSmallUser(com.netgrif.workflow.auth.domain.User user) {
+        return User.createSmallUser(user);
     }
 }
