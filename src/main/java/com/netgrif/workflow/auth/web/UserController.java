@@ -8,10 +8,7 @@ import com.netgrif.workflow.auth.service.interfaces.IAuthorityService;
 import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.auth.web.requestbodies.UpdateUserRequest;
 import com.netgrif.workflow.auth.web.requestbodies.UserSearchRequestBody;
-import com.netgrif.workflow.auth.web.responsebodies.AuthoritiesResources;
-import com.netgrif.workflow.auth.web.responsebodies.UserFactory;
-import com.netgrif.workflow.auth.web.responsebodies.UserResource;
-import com.netgrif.workflow.auth.web.responsebodies.UserResourceAssembler;
+import com.netgrif.workflow.auth.web.responsebodies.*;
 import com.netgrif.workflow.configuration.properties.ServerAuthProperties;
 import com.netgrif.workflow.petrinet.service.interfaces.IProcessRoleService;
 import com.netgrif.workflow.settings.domain.Preferences;
@@ -36,6 +33,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import javax.inject.Provider;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Set;
@@ -70,7 +68,16 @@ public class UserController {
     private ServerAuthProperties serverAuthProperties;
 
     @Autowired
-    private UserFactory userResponseFactory;
+    private IUserFactory userResponseFactory;
+
+    @Autowired
+    private Provider<UserResourceAssembler> userResourceAssemblerProvider;
+
+    protected UserResourceAssembler getUserResourceAssembler(Locale locale, boolean small, String selfRel) {
+        UserResourceAssembler result = userResourceAssemblerProvider.get();
+        result.initialize(locale, small, selfRel);
+        return result;
+    }
 
     @ApiOperation(value = "Get all users", authorizations = @Authorization("BasicAuth"))
     @GetMapping(produces = MediaTypes.HAL_JSON_VALUE)
@@ -79,7 +86,7 @@ public class UserController {
         Page<User> page = userService.findAllCoMembers(((LoggedUser) auth.getPrincipal()), small, pageable);
         Link selfLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(UserController.class)
                 .getAll(small, pageable, assembler, auth, locale)).withRel("all");
-        PagedResources<UserResource> resources = assembler.toResource(page, new UserResourceAssembler(locale, small, "all", userResponseFactory), selfLink);
+        PagedResources<UserResource> resources = assembler.toResource(page, getUserResourceAssembler(locale, small, "all"), selfLink);
         ResourceLinkAssembler.addLinks(resources, User.class, selfLink.getRel());
         return resources;
     }
@@ -91,7 +98,7 @@ public class UserController {
         Page<User> page = userService.searchAllCoMembers(query.getFulltext(), query.getRoles(), ((LoggedUser) auth.getPrincipal()), small, pageable);
         Link selfLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(UserController.class)
                 .search(small, query, pageable, assembler, auth, locale)).withRel("search");
-        PagedResources<UserResource> resources = assembler.toResource(page, new UserResourceAssembler(locale, small, "search", userResponseFactory), selfLink);
+        PagedResources<UserResource> resources = assembler.toResource(page, getUserResourceAssembler(locale, small, "search"), selfLink);
         ResourceLinkAssembler.addLinks(resources, User.class, selfLink.getRel());
         return resources;
     }
@@ -105,7 +112,8 @@ public class UserController {
             log.info("User " + loggedUser.getUsername() + " trying to get another user with ID "+userId);
             throw new IllegalArgumentException("Could not find user with id ["+userId+"]");
         }
-        return new UserResource(userResponseFactory.getUser(userService.findById(userId, small), locale, small), "profile");
+        User user = userService.findById(userId, small);
+        return new UserResource(small ? userResponseFactory.getSmallUser(user) : userResponseFactory.getUser(user, locale), "profile");
     }
 
     @ApiOperation(value = "Get logged user", authorizations = @Authorization("BasicAuth"))
@@ -144,7 +152,7 @@ public class UserController {
         Page<User> page = userService.findAllActiveByProcessRoles(roleIds, small, pageable);
         Link selfLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(UserController.class)
                 .getAllWithRole(roleIds, small, pageable, assembler, locale)).withRel("role");
-        PagedResources<UserResource> resources = assembler.toResource(page, new UserResourceAssembler(locale, small, "role", userResponseFactory), selfLink);
+        PagedResources<UserResource> resources = assembler.toResource(page, getUserResourceAssembler(locale, small, "role"), selfLink);
         ResourceLinkAssembler.addLinks(resources, User.class, selfLink.getRel());
         return resources;
     }
