@@ -77,10 +77,11 @@
     </data>
     <data type="enumeration">
         <id>enumeration_list</id>
-        <title>Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. list</title>
-        <values>Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.</values>
-        <values>Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.</values>
-        <values>Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.</values>
+        <title>Enumeration list</title>
+        <values>Alice</values>
+        <values>Bob</values>
+        <values>Carol</values>
+        <init>Bob</init>
         <component>
             <name>list</name>
         </component>
@@ -88,17 +89,17 @@
 
     <data type="multichoice">
         <id>multichoice</id>
-        <title>Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.</title>
-        <values>Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.</values>
-        <values>Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.</values>
-        <values>Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.</values>
+        <values>Alice</values>
+        <values>Bob</values>
+        <values>Carol</values>
+        <init>Alice,Bob</init>
     </data>
     <data type="multichoice">
         <id>multichoice_list</id>
-        <title>Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.</title>
-        <values>Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.</values>
-        <values>Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.</values>
-        <values>Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.</values>
+        <values>Alice</values>
+        <values>Bob</values>
+        <values>Carol</values>
+        <init>Alice,Bob</init>
         <component>
             <name>list</name>
         </component>
@@ -106,7 +107,7 @@
 
     <data type="boolean">
         <id>boolean</id>
-        <title>Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.</title>
+        <title>Boolean</title>
         <placeholder>True</placeholder>
     </data>
 
@@ -308,16 +309,6 @@
                 <logic>
                     <behavior>editable</behavior>
                 </logic>
-                <event type="set">
-                    <id>pdf</id>
-                    <actions phase="pre">
-                        <action>
-                            file: f.file,
-                            button: f.button;
-                            generatePDF("1", "file")
-                        </action>
-                    </actions>
-                </event>
             </dataRef>
         </dataGroup>
         <event type="finish">
