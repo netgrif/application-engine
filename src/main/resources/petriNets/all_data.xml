@@ -89,6 +89,7 @@
 
     <data type="multichoice">
         <id>multichoice</id>
+        <title>Multichoice</title>
         <values>Alice</values>
         <values>Bob</values>
         <values>Carol</values>
@@ -96,6 +97,7 @@
     </data>
     <data type="multichoice">
         <id>multichoice_list</id>
+        <title>Multichoice list</title>
         <values>Alice</values>
         <values>Bob</values>
         <values>Carol</values>
