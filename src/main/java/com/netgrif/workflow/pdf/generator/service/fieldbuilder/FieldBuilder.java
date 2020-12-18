@@ -6,6 +6,7 @@ import com.netgrif.workflow.petrinet.domain.DataGroup;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.FieldLayout;
 import com.netgrif.workflow.workflow.web.responsebodies.LocalisedField;
+import lombok.Data;
 import lombok.Getter;
 
 import java.util.ArrayList;
@@ -45,7 +46,7 @@ public abstract class FieldBuilder {
 
     private int countFieldLayoutX(DataGroup dataGroup, LocalisedField field) {
         int x = 0;
-        if (field.getLayout() != null) {
+        if (field.getLayout() != null  && !isStretch(dataGroup)) {
             x = field.getLayout().getX();
             lastX = x;
         } else if (dataGroup.getStretch() == null || !dataGroup.getStretch()) {
@@ -110,10 +111,10 @@ public abstract class FieldBuilder {
     }
 
     private int countFieldWidth(DataGroup dataGroup, LocalisedField field) {
-        if (checkCol(field.getLayout())) {
+        if (checkCol(field.getLayout()) && !isStretch(dataGroup)) {
             return field.getLayout().getCols() * resource.getFormGridColWidth() - resource.getPadding();
         } else {
-            return (dataGroup.getStretch() != null && dataGroup.getStretch() ?
+            return (isStretch(dataGroup) ?
                     (resource.getFormGridColWidth() * resource.getFormGridCols())
                     : (resource.getFormGridColWidth() * resource.getFormGridCols() / 2)) - resource.getPadding();
         }
@@ -124,7 +125,7 @@ public abstract class FieldBuilder {
     }
 
     private boolean checkFullRow(DataGroup dataGroup, LocalisedField field){
-        return (dataGroup.getStretch() != null && dataGroup.getStretch()) ||
+        return (isStretch(dataGroup)) ||
                 (checkCol(field.getLayout()) && resource.getRowGridFree() < field.getLayout().getCols());
     }
 
@@ -132,11 +133,15 @@ public abstract class FieldBuilder {
         return layout != null && layout.getCols() != null;
     }
 
+    private boolean isStretch(DataGroup dataGroup) {
+        return dataGroup.getStretch() != null && dataGroup.getStretch();
+    }
+
     private void resolveRowGridFree(DataGroup dataGroup, FieldLayout layout){
         if(checkCol(layout)){
             resource.setRowGridFree(resource.getFormGridCols() - layout.getCols());
         }else{
-            if(dataGroup.getStretch() != null && dataGroup.getStretch())
+            if(isStretch(dataGroup))
                 resource.setRowGridFree(0);
             else{
                 resource.setRowGridFree(resource.getFormGridCols() - 2);
