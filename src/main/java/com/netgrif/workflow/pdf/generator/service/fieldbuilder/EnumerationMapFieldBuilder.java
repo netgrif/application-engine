@@ -17,15 +17,15 @@ public class EnumerationMapFieldBuilder extends SelectionFieldBuilder {
     }
 
     public PdfField buildField(DataGroup dataGroup, LocalisedEnumerationMapField field, int lastX, int lastY){
-        List<String> choices;
+        List<String> choices = new ArrayList<>();
         List<String> values = new ArrayList<>();
         this.lastX = lastX;
         this.lastY = lastY;
 
-        choices = (List<String>) field.getOptions().values();
-        if (field.getValue() != null) {
+        if (field.getOptions() != null)
+            choices = (List<String>) field.getOptions().values();
+        if (field.getValue() != null)
             values.add((String) field.getValue());
-        }
 
         String translatedTitle = field.getName();
         PdfSelectionField pdfField = new PdfEnumerationField(field.getStringId(), dataGroup, field.getType(), translatedTitle, values, choices, resource);
