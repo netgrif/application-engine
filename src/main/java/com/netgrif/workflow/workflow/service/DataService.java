@@ -74,7 +74,7 @@ public class DataService implements IDataService {
     @Autowired
     private FieldActionsRunner actionsRunner;
 
-    @Value("${nae.image.preview.scaling.px}")
+    @Value("${nae.image.preview.scaling.px:400}")
     private int imageScale;
 
     @Override
@@ -407,7 +407,7 @@ public class DataService implements IDataService {
             image = scaleImagePreview(image);
         }
         ByteArrayOutputStream os = new ByteArrayOutputStream();
-        ImageIO.write(image, "jpg", os);
+        ImageIO.write(image, !fileType.extension.equals(FileFieldDataType.PDF.extension) ? fileType.extension : FileFieldDataType.JPG.extension, os);
         saveFilePreview(localPreview, os);
         return new FileFieldInputStream(field, new ByteArrayInputStream(os.toByteArray()));
     }
