@@ -121,7 +121,7 @@ class ChangedFieldsTree extends CaseChangedFields {
             return Optional.empty()
         }
 
-        return Optional.of(propagatedChanges[caseId].changedFields[fieldId])
+        return Optional.ofNullable(propagatedChanges[caseId].changedFields[fieldId])
     }
 
     private void substituteTaskRefFieldBehavior(ChangedField change, String referencedTaskTrans, String referencedTaskStringId, String refereeTransId) {
