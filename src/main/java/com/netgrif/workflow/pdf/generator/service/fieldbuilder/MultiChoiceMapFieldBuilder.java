@@ -9,6 +9,7 @@ import com.netgrif.workflow.workflow.web.responsebodies.LocalisedMultichoiceMapF
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class MultiChoiceMapFieldBuilder extends SelectionFieldBuilder {
 
@@ -23,9 +24,10 @@ public class MultiChoiceMapFieldBuilder extends SelectionFieldBuilder {
         this.lastY = lastY;
 
         if (field.getOptions() != null)
-            choices = (List<String>) field.getOptions().values();
+            choices = new ArrayList<>(field.getOptions().values());
         if (field.getValue() != null)
-            values.addAll((Collection<? extends String>) field.getValue());
+            values.addAll(((Collection<? extends String>) field.getValue()).stream().map(value ->
+                    field.getOptions().get(value)).collect(Collectors.toList()));
 
         String translatedTitle = field.getName();
         PdfMultiChoiceField pdfField = new PdfMultiChoiceField(field.getStringId(), dataGroup, field.getType(), translatedTitle, values, choices, resource);
