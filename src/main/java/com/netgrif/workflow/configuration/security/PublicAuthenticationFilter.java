@@ -48,7 +48,7 @@ public class PublicAuthenticationFilter extends OncePerRequestFilter {
             log.info("Trying to authenticate anonymous user...");
             String jwtToken = resolveValidToken(request);
             authenticate(request, jwtToken);
-            response.setHeader(JWT_HEADER_NAME, jwtToken);
+            response.setHeader(JWT_HEADER_NAME, BEARER + jwtToken);
             log.info("Anonymous user was successfully authenticated.");
         }
         filterChain.doFilter(request, response);
