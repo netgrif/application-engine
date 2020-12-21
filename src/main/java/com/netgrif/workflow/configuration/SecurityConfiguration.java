@@ -55,6 +55,9 @@ public class SecurityConfiguration extends AbstractSecurityConfiguration {
     @Value("${server.security.csrf}")
     private boolean csrf = true;
 
+    @Value("${nae.security.jwt.enabled}")
+    private boolean jwtEnabled = false;
+
     private static final String ANONYMOUS_USER = "anonymousUser";
 
     @Bean
@@ -151,7 +154,8 @@ public class SecurityConfiguration extends AbstractSecurityConfiguration {
                     authenticationManager(),
                     new AnonymousAuthenticationProvider(ANONYMOUS_USER),
                     authority,
-                    getServerPatterns()
+                    getServerPatterns(),
+                    this.jwtEnabled
                 );
     }
 }
