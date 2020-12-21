@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.elastic.service.interfaces.IElasticTaskService;
 import com.netgrif.workflow.elastic.web.requestbodies.singleaslist.SingleElasticTaskSearchRequestAsList;
-import com.netgrif.workflow.workflow.domain.IllegalExceptionWithChangedFields;
+import com.netgrif.workflow.workflow.domain.IllegalArgumentWithChangedFieldsException;
 import com.netgrif.workflow.workflow.web.requestbodies.singleaslist.SingleTaskSearchRequestAsList;
 import com.netgrif.workflow.petrinet.domain.DataGroup;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldByFileFieldContainer;
@@ -164,8 +164,8 @@ public class TaskController {
                     "LocalisedTask " + taskId + " finished");
         } catch (Exception e) {
             log.error("Finishing task [" + taskId + "] failed: ", e);
-            if (e instanceof IllegalExceptionWithChangedFields) {
-                return LocalisedEventOutcomeResource.errorOutcome(e.getMessage(), ((IllegalExceptionWithChangedFields) e).getChangedFields());
+            if (e instanceof IllegalArgumentWithChangedFieldsException) {
+                return LocalisedEventOutcomeResource.errorOutcome(e.getMessage(), ((IllegalArgumentWithChangedFieldsException) e).getChangedFields());
             } else {
                 return LocalisedEventOutcomeResource.errorOutcome(e.getMessage());
             }
@@ -189,8 +189,8 @@ public class TaskController {
                     "LocalisedTask " + taskId + " canceled");
         } catch (Exception e) {
             log.error("Canceling task [" + taskId + "] failed: ", e);
-            if (e instanceof IllegalExceptionWithChangedFields) {
-                return LocalisedEventOutcomeResource.errorOutcome(e.getMessage(), ((IllegalExceptionWithChangedFields) e).getChangedFields());
+            if (e instanceof IllegalArgumentWithChangedFieldsException) {
+                return LocalisedEventOutcomeResource.errorOutcome(e.getMessage(), ((IllegalArgumentWithChangedFieldsException) e).getChangedFields());
             } else {
                 return LocalisedEventOutcomeResource.errorOutcome(e.getMessage());
             }
