@@ -6,16 +6,17 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.poi.ss.formula.functions.T;
-import org.springframework.security.core.GrantedAuthority;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.Date;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.function.Function;
 
 @Slf4j
 public class JwtUtils {
     private static final long EXPIRATION_TIME = 900000;
-    private static final String SECRET = "SECRET_KEY";
+    private static final String SECRET = "NAE_JWT_ANONYMOUS_AUTHORIZATION";
 
     public static String tokenFrom(Map<String, Object> claims) {
         log.info("Generating new JWT token.");
@@ -35,13 +36,12 @@ public class JwtUtils {
 
     public static LoggedUser getLoggedUser(String token, Authority anonymousRole) {
         Map<String, Object> userMap = (LinkedHashMap)getAllClaimsFromToken(token).get("user");
-        LoggedUser user = new LoggedUser(
+        return new LoggedUser(
                 Long.getLong(userMap.get("id").toString()),
                 userMap.get("username").toString(),
                 userMap.get("password").toString(),
                 Collections.singleton(anonymousRole)
         );
-        return user;
     }
 
     private static Date getExpirationDateFromToken(String token) {
