@@ -6,12 +6,12 @@ import lombok.Setter;
 
 import java.util.Map;
 
-public class IllegalExceptionWithChangedFields extends IllegalArgumentException {
+public class IllegalArgumentWithChangedFieldsException extends IllegalArgumentException {
 
     @Getter @Setter
     private Map<String, ChangedField> changedFields;
 
-    public IllegalExceptionWithChangedFields(String var1, Map<String, ChangedField> changedFields) {
+    public IllegalArgumentWithChangedFieldsException(String var1, Map<String, ChangedField> changedFields) {
         super(var1);
         this.changedFields = changedFields;
     }
