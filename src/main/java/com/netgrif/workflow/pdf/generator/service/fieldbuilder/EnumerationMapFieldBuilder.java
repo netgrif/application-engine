@@ -23,9 +23,9 @@ public class EnumerationMapFieldBuilder extends SelectionFieldBuilder {
         this.lastY = lastY;
 
         if (field.getOptions() != null)
-            choices = (List<String>) field.getOptions().values();
+            choices = new ArrayList<>(field.getOptions().values());
         if (field.getValue() != null)
-            values.add((String) field.getValue());
+            values.add(field.getOptions().get(field.getValue()));
 
         String translatedTitle = field.getName();
         PdfSelectionField pdfField = new PdfEnumerationField(field.getStringId(), dataGroup, field.getType(), translatedTitle, values, choices, resource);
