@@ -17,12 +17,13 @@ public class EnumerationFieldBuilder extends SelectionFieldBuilder {
     }
 
     public PdfField buildField(DataGroup dataGroup, LocalisedEnumerationField field, int lastX, int lastY){
-        List<String> choices;
+        List<String> choices = new ArrayList<>();
         List<String> values = new ArrayList<>();
         this.lastX = lastX;
         this.lastY = lastY;
 
-        choices = field.getChoices();
+        if (field.getChoices() != null)
+            choices = field.getChoices();
         if (field.getValue() != null) {
             values.add((String) field.getValue());
         }
