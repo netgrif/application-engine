@@ -32,19 +32,21 @@ public class PublicAuthenticationFilter extends OncePerRequestFilter {
     private final static String JWT_HEADER_NAME = "Jwt-Auth-Token";
     private final static String BEARER = "Bearer ";
     private final String[] anonymousAccessUrls;
+    private final boolean jwtEnabled;
 
 
 
-    public PublicAuthenticationFilter(ProviderManager authenticationManager, AnonymousAuthenticationProvider provider, Authority anonymousRole, String[] urls) {
+    public PublicAuthenticationFilter(ProviderManager authenticationManager, AnonymousAuthenticationProvider provider, Authority anonymousRole, String[] urls, boolean jwtEnabled) {
         this.authenticationManager = authenticationManager;
         this.authenticationManager.getProviders().add(provider);
         this.anonymousRole = anonymousRole;
         this.anonymousAccessUrls = urls;
+        this.jwtEnabled = jwtEnabled;
     }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        if (isPublicApi(request.getRequestURI())) {
+        if (isPublicApi(request.getRequestURI()) && jwtEnabled) {
             log.info("Trying to authenticate anonymous user...");
             String jwtToken = resolveValidToken(request);
             authenticate(request, jwtToken);
