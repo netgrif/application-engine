@@ -16,13 +16,6 @@ public abstract class PublicAbstractController {
     }
 
     protected LoggedUser getAnonym() {
-        /*LoggedUser user = userService.findByEmail(anonymousEmail, true).transformToLoggedUser();
-        reloadSecurityContext(user);*/
         return (LoggedUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
-
-    /*protected void reloadSecurityContext(LoggedUser loggedUser) {
-        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(loggedUser, SecurityContextHolder.getContext().getAuthentication().getCredentials(), loggedUser.getAuthorities());
-        SecurityContextHolder.getContext().setAuthentication(token);
-    }*/
 }

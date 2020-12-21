@@ -41,16 +41,6 @@ class DummyUserRunner extends AbstractOrderedCommandLineRunner {
             memberService.save(member)
         }
 
-        /*user = userService.findByEmail("anonymous@netgrif.com", true)
-        if (!user) {
-            user = new User("anonymous@netgrif.com", "password", "Anonymous", "user")
-            user.state = UserState.ACTIVE
-            user = userService.saveNew(user)
-            def member = memberService.findByEmail(user.email)
-            group.addMember(member)
-            memberService.save(member)
-        }*/
-
         user = userService.findByEmail("customer@netgrif.com", true)
         if (!user) {
             user = new User("customer@netgrif.com", "password", "Netgrif", "customer")
