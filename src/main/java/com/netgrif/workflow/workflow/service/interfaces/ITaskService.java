@@ -19,6 +19,9 @@ import java.util.Set;
 public interface ITaskService {
 
     @Transactional
+    EventOutcome cancelPublicTask(LoggedUser loggedUser, String taskId);
+
+    @Transactional
     void reloadTasks(Case useCase);
 
     Task findOne(String taskId);
@@ -47,6 +50,9 @@ public interface ITaskService {
 
 	Task searchOne(com.querydsl.core.types.Predicate predicate);
 
+    @Transactional
+    EventOutcome assignPublicTask(LoggedUser loggedUser, String taskId) throws TransitionNotExecutableException;
+
     @Transactional(rollbackFor = Exception.class)
     void finishTasks(List<Task> tasks, User user) throws TransitionNotExecutableException;
 
@@ -66,6 +72,9 @@ public interface ITaskService {
     EventOutcome assignTask(LoggedUser loggedUser, String taskId) throws TransitionNotExecutableException;
 
     EventOutcome assignTask(String taskId) throws TransitionNotExecutableException;
+
+    @Transactional
+    EventOutcome finishPublicTask(LoggedUser loggedUser, String taskId) throws IllegalArgumentException, TransitionNotExecutableException;
 
     @Transactional(rollbackFor = Exception.class)
     void cancelTasks(List<Task> tasks, User user);
