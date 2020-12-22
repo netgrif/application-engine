@@ -115,7 +115,7 @@ public class SecurityConfiguration extends AbstractSecurityConfiguration {
     @Override
     String[] getServerPatterns() {
         return new String[]{
-                "/api/auth/signup", "/api/auth/token/verify", "/api/auth/reset", "/api/auth/recover", "/v2/api-docs", "/swagger-ui.html"
+                "/api/auth/signup", "/api/auth/token/verify", "/api/auth/reset", "/api/auth/recover", "/v2/api-docs", "/swagger-ui.html", "/api/public/**"
         };
     }
 
