@@ -5,11 +5,11 @@
 * [NAE-1162](https://netgrif.atlassian.net/browse/NAE-1162) - PDF tool null-pointer on layout 
 
 ### Improvements
-* [NAE-1168](https://netgrif.atlassian.net/browse/NAE-1168) - Task ref representation
-* [NAE-1172](https://netgrif.atlassian.net/browse/NAE-1172) - Frontend control from process actions
+* [NAE-1178](https://netgrif.atlassian.net/browse/NAE-1178) - Cancel and finish error changed fields propagation
 
 ### Features
-* [NAE-1178](https://netgrif.atlassian.net/browse/NAE-1178) - Cancel and finish error changed fields propagation
+* [NAE-1168](https://netgrif.atlassian.net/browse/NAE-1168) - Task ref representation
+* [NAE-1172](https://netgrif.atlassian.net/browse/NAE-1172) - Frontend control from process actions
 
 <a name="https://netgrif.atlassian.net/projects/NAE/versions/10826/tab/release-report-all-issues"></a>
 ## 4.4.0 - Olive Nickel (14.12.2020)
