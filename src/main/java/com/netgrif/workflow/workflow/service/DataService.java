@@ -234,12 +234,11 @@ public class DataService implements IDataService {
             for (String dataFieldId : dataGroup.getData()) {
                 Field field = net.getDataSet().get(dataFieldId);
                 if (dataFieldMap.containsKey(dataFieldId)) {
+                    Field resource = dataFieldMap.get(dataFieldId);
+                    if (level != 0) resource.setImportId(taskId + "-" + resource.getImportId());
+                    resources.add(resource);
                     if (field.getType() == FieldType.TASK_REF) {
                         resultDataGroups.addAll(collectTaskRefDataGroups((TaskField) dataFieldMap.get(dataFieldId), locale, collectedTaskIds, level));
-                    } else {
-                        Field resource = dataFieldMap.get(dataFieldId);
-                        if (level != 0) resource.setImportId(taskId + "-" + resource.getImportId());
-                        resources.add(resource);
                     }
                 }
             }
