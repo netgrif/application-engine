@@ -32,6 +32,10 @@ public class LoggedUser extends org.springframework.security.core.userdetails.Us
     @Setter
     private Set<String> processRoles;
 
+    @Getter
+    @Setter
+    private boolean anonymous;
+
     public LoggedUser(Long id, String username, String password, Collection<? extends GrantedAuthority> authorities) {
         super(username, password, authorities);
         this.id = id;
@@ -77,7 +81,6 @@ public class LoggedUser extends org.springframework.security.core.userdetails.Us
     public User transformToAnonymousUser() {
         User user = new User(this.id);
         user.setEmail(getUsername());
-        user.setPassword(getPassword());
         user.setState(UserState.ACTIVE);
         user.setAuthorities(getAuthorities().stream().map(a -> (Authority) a).collect(Collectors.toSet()));
         user.setGroups(groups.stream().map(Group::new).collect(Collectors.toSet()));
