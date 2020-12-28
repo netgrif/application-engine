@@ -2,7 +2,7 @@ package com.netgrif.workflow.configuration.security;
 
 import com.netgrif.workflow.auth.domain.Authority;
 import com.netgrif.workflow.auth.domain.LoggedUser;
-import com.netgrif.workflow.configuration.security.jwt.JwtUtils;
+import com.netgrif.workflow.configuration.security.jwt.IJwtService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AnonymousAuthenticationProvider;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
@@ -29,24 +29,23 @@ public class PublicAuthenticationFilter extends OncePerRequestFilter {
     private final ProviderManager authenticationManager;
     private final AuthenticationDetailsSource<HttpServletRequest, ?> authenticationDetailsSource = new WebAuthenticationDetailsSource();
     private final Authority anonymousRole;
-    private final static String JWT_HEADER_NAME = "Jwt-Auth-Token";
+    private final static String JWT_HEADER_NAME = "X-Jwt-Token";
     private final static String BEARER = "Bearer ";
     private final String[] anonymousAccessUrls;
-    private final boolean jwtEnabled;
 
+    private final IJwtService jwtService;
 
-
-    public PublicAuthenticationFilter(ProviderManager authenticationManager, AnonymousAuthenticationProvider provider, Authority anonymousRole, String[] urls, boolean jwtEnabled) {
+    public PublicAuthenticationFilter(ProviderManager authenticationManager, AnonymousAuthenticationProvider provider, Authority anonymousRole, String[] urls, IJwtService jwtService) {
         this.authenticationManager = authenticationManager;
         this.authenticationManager.getProviders().add(provider);
         this.anonymousRole = anonymousRole;
         this.anonymousAccessUrls = urls;
-        this.jwtEnabled = jwtEnabled;
+        this.jwtService = jwtService;
     }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        if (isPublicApi(request.getRequestURI()) && jwtEnabled) {
+        if (isPublicApi(request.getRequestURI())) {
             log.info("Trying to authenticate anonymous user...");
             String jwtToken = resolveValidToken(request);
             authenticate(request, jwtToken);
@@ -59,7 +58,7 @@ public class PublicAuthenticationFilter extends OncePerRequestFilter {
     private void authenticate(HttpServletRequest request, String jwtToken){
         AnonymousAuthenticationToken authRequest = new AnonymousAuthenticationToken(
                 "anonymousUser",
-                JwtUtils.getLoggedUser(jwtToken, this.anonymousRole),
+                jwtService.getLoggedUser(jwtToken, this.anonymousRole),
                 Collections.singleton(this.anonymousRole)
         );
         authRequest.setDetails(this.authenticationDetailsSource.buildDetails(request));
@@ -75,15 +74,14 @@ public class PublicAuthenticationFilter extends OncePerRequestFilter {
         if (jwtHeader == null || !jwtHeader.startsWith(BEARER)) {
             log.warn("There is no JWT token or token is invalid.");
             resolveClaims(claims, request);
-            jwtToken = JwtUtils.tokenFrom(claims);
+            jwtToken = jwtService.tokenFrom(claims);
         } else {
             jwtToken = jwtHeader.replace(BEARER, "");
         }
 
-        if (JwtUtils.isExpired(jwtToken)) {
-            log.warn("Jwt token for [" + JwtUtils.getClaim(jwtToken, "address", String.class) + "] is expired.");
+        if (jwtService.isExpired(jwtToken)) {
             resolveClaims(claims, request);
-            jwtToken = JwtUtils.tokenFrom(claims);
+            jwtToken = jwtService.tokenFrom(claims);
         }
 
         return jwtToken;
@@ -102,6 +100,7 @@ public class PublicAuthenticationFilter extends OncePerRequestFilter {
                 Collections.singleton(this.anonymousRole)
         );
         user.setFullName("Anonymous " + user.getId().toString());
+        user.setAnonymous(true);
         return user;
     }
 
