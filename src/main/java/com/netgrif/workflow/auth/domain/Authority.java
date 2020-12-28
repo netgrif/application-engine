@@ -21,6 +21,8 @@ public class Authority implements GrantedAuthority {
     public static final String admin = ROLE + "ADMIN";
     public static final String systemAdmin = ROLE + "SYSTEMADMIN";
     public static final String user = ROLE + "USER";
+    public static final String anonymous = ROLE + "ANONYMOUS";
+
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
