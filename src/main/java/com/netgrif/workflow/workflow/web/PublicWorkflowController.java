@@ -5,12 +5,10 @@ import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
 import com.netgrif.workflow.workflow.web.requestbodies.CreateCaseBody;
-import com.netgrif.workflow.workflow.web.responsebodies.CaseResource;
-import com.netgrif.workflow.workflow.web.responsebodies.DataFieldsResource;
+import com.netgrif.workflow.workflow.web.responsebodies.*;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
-
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
@@ -21,13 +19,13 @@ import java.util.Locale;
 @RequestMapping({"/api/public"})
 @Slf4j
 public class PublicWorkflowController extends PublicAbstractController {
+
     private final IWorkflowService workflowService;
 
     public PublicWorkflowController(IWorkflowService workflowService, IUserService userService) {
         super(userService);
         this.workflowService = workflowService;
     }
-
 
     @PostMapping(value = "/case", consumes = "application/json;charset=UTF-8", produces = "application/hal+json")
     @ApiOperation(value = "Create new case")
@@ -40,9 +38,7 @@ public class PublicWorkflowController extends PublicAbstractController {
             log.error("Creating case failed:", var5);
             return null;
         }
-
     }
-
 
     @GetMapping(value = "/case/{id}/data", produces = "application/hal+json")
     @ApiOperation(value = "Get all case data")
@@ -54,7 +50,5 @@ public class PublicWorkflowController extends PublicAbstractController {
             log.error("Getting all case data of [" + caseId + "] failed:", var4);
             return new DataFieldsResource(new ArrayList<>(), locale);
         }
-
     }
-
 }

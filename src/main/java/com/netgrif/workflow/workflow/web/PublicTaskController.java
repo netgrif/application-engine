@@ -1,6 +1,5 @@
 package com.netgrif.workflow.workflow.web;
 
-
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.auth.service.interfaces.IUserService;
@@ -60,7 +59,6 @@ public class PublicTaskController extends PublicAbstractController {
             code = 403,
             message = "Caller doesn't fulfill the authorisation requirements"
     )})
-
     public LocalisedEventOutcomeResource assign(@PathVariable("id") String taskId, Locale locale) {
         LoggedUser loggedUser = getAnonym();
         try {
@@ -101,7 +99,6 @@ public class PublicTaskController extends PublicAbstractController {
             code = 403,
             message = "Caller doesn't fulfill the authorisation requirements"
     )})
-
     public LocalisedEventOutcomeResource cancel(@PathVariable("id") String taskId, Locale locale) {
         LoggedUser loggedUser = getAnonym();
         try {
@@ -110,9 +107,7 @@ public class PublicTaskController extends PublicAbstractController {
             log.error("Canceling task [" + taskId + "] failed: ", var6);
             return LocalisedEventOutcomeResource.errorOutcome(var6.getMessage());
         }
-
     }
-
 
     @GetMapping(value = "/task/{id}/data", produces = "application/hal+json")
     @ApiOperation(value = "Get all task data")
@@ -120,7 +115,6 @@ public class PublicTaskController extends PublicAbstractController {
         List<DataGroup> dataGroups = this.dataService.getDataGroups(taskId, locale);
         return new DataGroupsResource(dataGroups, locale);
     }
-
 
     @PostMapping(value = "/task/{id}/data", consumes = "application/json;charset=UTF-8", produces = "application/json;charset=UTF-8")
     @ApiOperation(value = "Set task data", notes = "Caller must be assigned to the task, or must be an ADMIN")
@@ -136,15 +130,16 @@ public class PublicTaskController extends PublicAbstractController {
         return this.dataService.setData(taskId, dataBody);
     }
 
-
     @ApiOperation(value = "Generic task search on Mongo database")
     @PostMapping(value = "/task/search", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
-    public PagedResources<LocalisedTaskResource> search(Pageable pageable, @RequestBody SingleTaskSearchRequestAsList searchBody, @RequestParam(defaultValue = "OR") MergeFilterOperation operation, PagedResourcesAssembler<Task> assembler, Locale locale) {
-        Page<Task> tasks = taskService.search(searchBody.getList(), pageable, getAnonym(),locale, operation == MergeFilterOperation.AND);
+    public PagedResources<LocalisedTaskResource> search(Pageable pageable, @RequestBody SingleTaskSearchRequestAsList searchBody, @RequestParam(defaultValue = "OR") MergeFilterOperation operation, PagedResourcesAssembler<com.netgrif.workflow.workflow.domain.Task> assembler, Locale locale) {
+        Page<com.netgrif.workflow.workflow.domain.Task> tasks = taskService.search(searchBody.getList(), pageable, getAnonym(),locale, operation == MergeFilterOperation.AND);
         Link selfLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(PublicTaskController.class)
                 .search(pageable, searchBody, operation, assembler, locale)).withRel("search");
         PagedResources<LocalisedTaskResource> resources = assembler.toResource(tasks, new TaskResourceAssembler(locale), selfLink);
         ResourceLinkAssembler.addLinks(resources, Task.class, selfLink.getRel());
         return resources;
     }
+
+
 }

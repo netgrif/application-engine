@@ -10,11 +10,11 @@ import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.workflow.petrinet.web.responsebodies.PetriNetReferenceResource;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
+
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Locale;
-
 
 @RestController
 @RequestMapping({"/api/public"})
@@ -29,7 +29,6 @@ public class PublicPetriNetController extends PublicAbstractController {
         super(userService);
         this.service = service;
         this.converter = converter;
-
     }
 
     @GetMapping(value = "/petrinet/{id}", produces = "application/hal+json")
@@ -50,6 +49,7 @@ public class PublicPetriNetController extends PublicAbstractController {
         return new PetriNetReferenceResource(this.service.getReference(identifier, this.converter.convert(version), getAnonym(), locale));
     }
 
+
     private static String decodeUrl(String s1) {
         try {
             return s1 == null ? null : URLDecoder.decode(s1, StandardCharsets.UTF_8.name());
@@ -58,5 +58,4 @@ public class PublicPetriNetController extends PublicAbstractController {
             return "";
         }
     }
-
 }
