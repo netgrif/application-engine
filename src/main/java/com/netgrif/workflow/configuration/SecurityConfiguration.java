@@ -2,8 +2,9 @@ package com.netgrif.workflow.configuration;
 
 import com.netgrif.workflow.auth.domain.Authority;
 import com.netgrif.workflow.auth.service.interfaces.IAuthorityService;
-import com.netgrif.workflow.configuration.security.RestAuthenticationEntryPoint;
 import com.netgrif.workflow.configuration.security.PublicAuthenticationFilter;
+import com.netgrif.workflow.configuration.security.RestAuthenticationEntryPoint;
+import com.netgrif.workflow.configuration.security.jwt.IJwtService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -52,11 +53,11 @@ public class SecurityConfiguration extends AbstractSecurityConfiguration {
     @Autowired
     private IAuthorityService authorityService;
 
+    @Autowired
+    private IJwtService jwtService;
+
     @Value("${server.security.csrf}")
     private boolean csrf = true;
-
-    @Value("${nae.security.jwt.enabled}")
-    private boolean jwtEnabled = false;
 
     private static final String ANONYMOUS_USER = "anonymousUser";
 
@@ -71,7 +72,7 @@ public class SecurityConfiguration extends AbstractSecurityConfiguration {
         config.addAllowedMethod("*");
         config.addAllowedHeader("*");
         config.addExposedHeader("X-Auth-Token");
-        config.addExposedHeader("Jwt-Auth-Token");
+        config.addExposedHeader("X-Jwt-Token");
         config.addAllowedOrigin("*");
         config.setAllowCredentials(true);
 
@@ -155,7 +156,7 @@ public class SecurityConfiguration extends AbstractSecurityConfiguration {
                     new AnonymousAuthenticationProvider(ANONYMOUS_USER),
                     authority,
                     getServerPatterns(),
-                    this.jwtEnabled
+                    this.jwtService
                 );
     }
 }
