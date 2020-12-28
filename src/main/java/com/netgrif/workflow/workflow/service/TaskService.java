@@ -242,17 +242,16 @@ public class TaskService implements ITaskService {
         Optional<Task> taskOptional = taskRepository.findById(taskId);
         if (!taskOptional.isPresent())
             throw new IllegalArgumentException("Could not find task with id [" + taskId + "]");
-
         Task task = taskOptional.get();
         User user = loggedUser.transformToAnonymousUser();
 
         if (task.getUserId() == null) {
             throw new IllegalArgumentException("Task with id=" + taskId + " is not assigned to any user.");
         }
-
         if (!task.getUserId().equals(loggedUser.getId())) {
             throw new IllegalArgumentException("User that is not assigned tried to finish task");
         }
+
         return finishTask(task, user);
     }
 
@@ -299,6 +298,17 @@ public class TaskService implements ITaskService {
         return outcome;
     }
 
+    @Override
+    @Transactional
+    public EventOutcome cancelPublicTask(LoggedUser loggedUser, String taskId) {
+        Optional<Task> taskOptional = taskRepository.findById(taskId);
+        if (!taskOptional.isPresent())
+            throw new IllegalArgumentException("Could not find task with id [" + taskId + "]");
+
+        User user = loggedUser.transformToAnonymousUser();
+        return cancelTask(taskOptional.get(), user);
+    }
+
     /**
      * Used in cancel task action
      */
@@ -316,16 +326,6 @@ public class TaskService implements ITaskService {
                 dataService.runActions(transition.getPostCancelActions(), useCase.getStringId(), transition);
             }
         }
-    }
-
-    @Override
-    @Transactional
-    public EventOutcome cancelPublicTask(LoggedUser loggedUser, String taskId) {
-        Optional<Task> taskOptional = taskRepository.findById(taskId);
-        if (!taskOptional.isPresent())
-            throw new IllegalArgumentException("Could not find task with id [" + taskId + "]");
-        User user = loggedUser.transformToAnonymousUser();
-        return cancelTask(taskOptional.get(), user);
     }
 
     private Task returnTokens(Task task, String useCaseId) {
