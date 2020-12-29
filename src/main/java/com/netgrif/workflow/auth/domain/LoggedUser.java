@@ -101,7 +101,10 @@ public class LoggedUser extends org.springframework.security.core.userdetails.Us
     public User transformToAnonymousUser() {
         User user = new User(this.id);
         user.setEmail(getUsername());
-        user.setPassword(getPassword());
+        String[] names = this.fullName.split(" ");
+        user.setName(names[0]);
+        user.setSurname(names[1]);
+        user.setAnonymous(this.anonymous);
         user.setState(UserState.ACTIVE);
         user.setAuthorities(getAuthorities().stream().map(a -> (Authority) a).collect(Collectors.toSet()));
         user.setGroups(groups.stream().map(Group::new).collect(Collectors.toSet()));
