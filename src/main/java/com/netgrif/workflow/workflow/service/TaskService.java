@@ -135,7 +135,10 @@ public class TaskService implements ITaskService {
         outcome.add(dataService.runActions(transition.getPostAssignActions(), useCase.getStringId(), transition));
         useCase = evaluateRules(useCase.getStringId(), task, EventType.ASSIGN, EventPhase.POST);
 
-        addTaskStateInformationToEventOutcome(outcome, task);
+        if(user.isAnonymous())
+            addTaskStateInformationToPublicEventOutcome(outcome, task, user);
+        else
+            addTaskStateInformationToEventOutcome(outcome, task);
 
         publisher.publishEvent(new UserAssignTaskEvent(user, task, useCase));
         log.info("[" + useCase.getStringId() + "]: Task [" + task.getTitle() + "] in case [" + useCase.getTitle() + "] assigned to [" + user.getEmail() + "]");
@@ -410,6 +413,16 @@ public class TaskService implements ITaskService {
         outcome.setFinishDate(task.getFinishDate());
     }
 
+    protected void addTaskStateInformationToPublicEventOutcome(EventOutcome outcome, Task task, User user) {
+        Optional<Task> taskOptional = taskRepository.findById(task.getStringId());
+        if (!taskOptional.isPresent())
+            return;
+        if (user != null)
+            outcome.setAssignee(user);
+        outcome.setStartDate(task.getStartDate());
+        outcome.setFinishDate(task.getFinishDate());
+    }
+
     /**
      * Reloads all unassigned tasks of given case:
      * <table border="1">
@@ -605,6 +618,18 @@ public class TaskService implements ITaskService {
         if(searchPredicate != null) {
             Page<Task> page = taskRepository.findAll(searchPredicate, pageable);
             page = loadUsers(page);
+            page = dataService.setImmediateFields(page);
+            return page;
+        } else {
+            return Page.empty();
+        }
+    }
+
+    @Override
+    public Page<Task> searchPublic(List<TaskSearchRequest> requests, Pageable pageable, LoggedUser user, Locale locale, Boolean isIntersection) {
+        com.querydsl.core.types.Predicate searchPredicate = searchService.buildQuery(requests, user, locale, isIntersection);
+        if(searchPredicate != null) {
+            Page<Task> page = taskRepository.findAll(searchPredicate, pageable);
             page = dataService.setImmediateFields(page);
             return page;
         } else {

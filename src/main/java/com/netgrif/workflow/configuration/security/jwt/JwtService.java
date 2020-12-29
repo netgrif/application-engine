@@ -3,6 +3,7 @@ package com.netgrif.workflow.configuration.security.jwt;
 import com.netgrif.workflow.auth.domain.Authority;
 import com.netgrif.workflow.auth.domain.LoggedUser;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.extern.slf4j.Slf4j;
@@ -46,32 +47,38 @@ public class JwtService implements IJwtService {
 
     @Override
     public boolean isExpired(String token) {
-        Date expiration = getExpirationDateFromToken(token);
-        Date currentDate = new Date();
-        return expiration.compareTo(currentDate) < 0;
+        try {
+            getExpirationDateFromToken(token);
+        } catch (ExpiredJwtException e) {
+            return true;
+        }
+        return false;
     }
 
     @Override
     public LoggedUser getLoggedUser(String token, Authority anonymousRole) {
         LinkedHashMap<String, Object> userMap = (LinkedHashMap<String, Object>)getAllClaimsFromToken(token).get("user");
-        return new LoggedUser(
-                Long.getLong(userMap.get("id").toString()),
+        LoggedUser user = new LoggedUser(
+                Long.parseLong(userMap.get("id").toString()),
                 userMap.get("username").toString(),
                 userMap.get("password").toString(),
                 Collections.singleton(anonymousRole)
         );
+        user.setFullName(userMap.get("fullName").toString());
+        user.setAnonymous((boolean)userMap.get("anonymous"));
+        return user;
     }
 
-    private Date getExpirationDateFromToken(String token) {
+    private Date getExpirationDateFromToken(String token)  throws ExpiredJwtException {
         return getClaimFromToken(token, Claims::getExpiration);
     }
 
-    private <T> T getClaimFromToken(String token, Function<Claims, T> claimsResolver) {
+    private <T> T getClaimFromToken(String token, Function<Claims, T> claimsResolver) throws ExpiredJwtException {
         final Claims claims = getAllClaimsFromToken(token);
         return claimsResolver.apply(claims);
     }
 
-    private Claims getAllClaimsFromToken(String token) {
+    private Claims getAllClaimsFromToken(String token) throws ExpiredJwtException {
         return Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody();
     }
 }
