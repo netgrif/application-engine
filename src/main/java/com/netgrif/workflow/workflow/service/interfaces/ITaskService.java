@@ -30,6 +30,8 @@ public interface ITaskService {
 
     Page<Task> search(List<TaskSearchRequest> requests, Pageable pageable, LoggedUser user, Locale locale, Boolean isIntersection);
 
+    Page<Task> searchPublic(List<TaskSearchRequest> requests, Pageable pageable, LoggedUser user, Locale locale, Boolean isIntersection);
+
     long count(List<TaskSearchRequest> requests, LoggedUser user, Locale locale, Boolean isIntersection);
 
     Page<Task> findByCases(Pageable pageable, List<String> cases);

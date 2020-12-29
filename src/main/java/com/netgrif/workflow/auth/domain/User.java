@@ -99,6 +99,11 @@ public class User {
     @Setter
     private Set<String> nextGroups;
 
+    @Transient
+    @Getter
+    @Setter
+    private boolean anonymous;
+
     public User() {
         groups = new HashSet<>();
         authorities = new HashSet<>();
@@ -155,6 +160,7 @@ public class User {
     public LoggedUser transformToLoggedUser() {
         LoggedUser loggedUser = new LoggedUser(this.getId(), this.getEmail(), this.getPassword(), this.getAuthorities());
         loggedUser.setFullName(this.getFullName());
+        loggedUser.setAnonymous(this.anonymous);
         if (!this.getUserProcessRoles().isEmpty())
             loggedUser.parseProcessRoles(this.getUserProcessRoles());
         if (!this.getGroups().isEmpty())
