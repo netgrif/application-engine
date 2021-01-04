@@ -49,6 +49,10 @@ public class PdfDataHelper implements IPdfDataHelper {
     @Setter
     private List<PdfField> pdfFields;
 
+    @Getter
+    @Setter
+    private List<String> excludedFields;
+
     private PdfResource resource;
 
     private Stack<PdfField> changedPdfFields;
@@ -61,6 +65,7 @@ public class PdfDataHelper implements IPdfDataHelper {
         this.pdfFields = new ArrayList<>();
         this.dataGroups = new ArrayList<>();
         this.changedPdfFields = new Stack<>();
+        this.excludedFields = new ArrayList<>();
     }
 
     @Override
@@ -130,7 +135,7 @@ public class PdfDataHelper implements IPdfDataHelper {
     }
 
     protected void generateField(DataGroup dataGroup, LocalisedField field) {
-        if (isNotHidden(field)) {
+        if (isNotHidden(field) && isNotExcluded(field.getStringId())) {
             PdfField pdfField = null;
             switch (field.getType()) {
                 case BUTTON:
@@ -257,5 +262,9 @@ public class PdfDataHelper implements IPdfDataHelper {
 
     private boolean isNotHidden(LocalisedField field){
         return !field.getBehavior().has("hidden") || !field.getBehavior().get("hidden").asBoolean();
+    }
+
+    private boolean isNotExcluded(String fieldId) {
+        return !excludedFields.contains(fieldId);
     }
 }
