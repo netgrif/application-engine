@@ -7,6 +7,7 @@ import com.netgrif.workflow.petrinet.domain.DataGroup;
 import com.netgrif.workflow.petrinet.domain.dataset.FileFieldValue;
 import com.netgrif.workflow.utils.DateUtils;
 import com.netgrif.workflow.workflow.web.responsebodies.LocalisedField;
+import org.jsoup.Jsoup;
 
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
@@ -40,7 +41,7 @@ public class TextFieldBuilder extends FieldBuilder{
                 value = field.getValue() != null ? ((FileFieldValue)field.getValue()).getName() : "";
                 break;
             default:
-                value = field.getValue() != null ? field.getValue().toString() : "";
+                value = field.getValue() != null ? Jsoup.parse(field.getValue().toString()).text() : "";
                 break;
         }
         String translatedTitle = field.getName();
