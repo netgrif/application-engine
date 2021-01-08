@@ -153,9 +153,6 @@ public class Importer {
         setMetaData();
         net.setIcon(document.getIcon());
 
-        resolveRoleRef();
-        resolveProcessEvents(document.getProcessEvents());
-        resolveCaseEvents(document.getCaseEvents());
         document.getRole().forEach(this::createRole);
         document.getData().forEach(this::createDataSet);
         document.getTransaction().forEach(this::createTransaction);
@@ -168,6 +165,9 @@ public class Importer {
         document.getData().forEach(this::addActionRefs);
         actionRefs.forEach(this::resolveActionRefs);
         actions.forEach(this::evaluateActions);
+        document.getRoleRef().forEach(this::resolveRoleRef);
+        resolveProcessEvents(document.getProcessEvents());
+        resolveCaseEvents(document.getCaseEvents());
 
         net.setDefaultCaseName(toI18NString(document.getCaseName()));
 
@@ -175,8 +175,15 @@ public class Importer {
     }
 
     @Transactional
-    protected void resolveRoleRef() {
-        // TODO
+    protected void resolveRoleRef(CaseRoleRef roleRef) {
+        CaseLogic logic = roleRef.getCaseLogic();
+        String roleId = getRole(roleRef.getId()).getStringId();
+
+        if (logic == null || roleId == null) {
+            return;
+        }
+
+        net.addProcessRole(roleId, roleFactory.getProcessPermissions(logic));
     }
 
     @Transactional
