@@ -208,10 +208,6 @@ public class PdfDataHelper implements IPdfDataHelper {
         this.lastY = lastY;
     }
 
-    protected int updateTopY(PdfField pdfField){
-        return FieldBuilder.countTopPosY(pdfField, pdfField.getResource());
-    }
-
     protected int updateBottomY(PdfField pdfField){
         return FieldBuilder.countBottomPosY(pdfField, pdfField.getResource());
     }
@@ -253,7 +249,7 @@ public class PdfDataHelper implements IPdfDataHelper {
     }
 
     private void refreshGrid(DataGroup dataGroup){
-        if(dataGroup.getLayout() != null){
+        if(dataGroup.getLayout() != null && dataGroup.getLayout().getCols() != null){
             Integer cols = dataGroup.getLayout().getCols();
             resource.setFormGridCols(cols == null ? resource.getFormGridCols() : cols);
             resource.updateProperties();
