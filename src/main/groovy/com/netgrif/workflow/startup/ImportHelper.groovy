@@ -123,13 +123,21 @@ class ImportHelper {
         return authorityService.getOrCreate(name)
     }
 
-    Optional<PetriNet> createNet(String fileName, String release) {
-        createNet(fileName, release, superCreator.loggedSuper)
+    Optional<PetriNet> createNet(String fileName, String release, LoggedUser author = superCreator.loggedSuper) {
+        return createNet(fileName, PetriNet.VersionType.valueOf(release.trim().toUpperCase()), author)
     }
 
-    Optional<PetriNet> createNet(String fileName, String release, LoggedUser loggedUser) {
+    Optional<PetriNet> createNet(String fileName, PetriNet.VersionType release = PetriNet.VersionType.MAJOR, LoggedUser author = superCreator.loggedSuper) {
         InputStream netStream = new ClassPathResource("petriNets/$fileName" as String).inputStream
-        return petriNetService.importPetriNet(netStream, release, loggedUser)
+        return petriNetService.importPetriNet(netStream, release, author)
+    }
+
+    Optional<PetriNet> upsertNet(String filename, String identifier, PetriNet.VersionType release = PetriNet.VersionType.MAJOR, LoggedUser author = superCreator.loggedSuper) {
+        PetriNet petriNet = petriNetService.getNewestVersionByIdentifier(identifier)
+        if (!petriNet) {
+            return createNet(filename, release, author)
+        }
+        return Optional.of(petriNet)
     }
 
     UserProcessRole createUserProcessRole(PetriNet net, String name) {
