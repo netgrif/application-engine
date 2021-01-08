@@ -4,11 +4,13 @@ import com.netgrif.workflow.auth.domain.Author;
 import com.netgrif.workflow.petrinet.domain.arcs.Arc;
 import com.netgrif.workflow.petrinet.domain.arcs.VariableArc;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
+import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.workflow.petrinet.domain.events.CaseEvent;
 import com.netgrif.workflow.petrinet.domain.events.CaseEventType;
 import com.netgrif.workflow.petrinet.domain.events.ProcessEvent;
 import com.netgrif.workflow.petrinet.domain.events.ProcessEventType;
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRole;
+import com.netgrif.workflow.petrinet.domain.roles.ProcessRolePermission;
 import com.netgrif.workflow.petrinet.domain.version.Version;
 import com.netgrif.workflow.workflow.domain.DataField;
 import lombok.Getter;
@@ -96,6 +98,9 @@ public class PetriNet extends PetriNetObject {
     @Setter
     private Map<CaseEventType, CaseEvent> caseEvents;
 
+    @Getter @Setter
+    private Map<String, Set<ProcessRolePermission>> processRoles;
+
     @Transient
     private boolean initialized;
 
@@ -133,6 +138,14 @@ public class PetriNet extends PetriNetObject {
 
     public void addRole(ProcessRole role) {
         this.roles.put(role.getStringId(), role);
+    }
+
+    public void addProcessRole(String roleId, Set<ProcessRolePermission> permissions) {
+        if (processRoles.containsKey(roleId) && processRoles.get(roleId) != null) {
+            processRoles.get(roleId).addAll(permissions);
+        } else {
+            processRoles.put(roleId, permissions);
+        }
     }
 
     public List<Arc> getArcsOfTransition(Transition transition) {
@@ -276,6 +289,54 @@ public class PetriNet extends PetriNetObject {
         MAJOR,
         MINOR,
         PATCH
+    }
+
+    public List<Action> getPreCreateActions() {
+        return getPreCaseActions(CaseEventType.CREATE);
+    }
+
+    public List<Action> getPostCreateActions() {
+        return getPostCaseActions(CaseEventType.CREATE);
+    }
+
+    public List<Action> getPreDeleteActions() {
+        return getPreCaseActions(CaseEventType.CREATE);
+    }
+
+    public List<Action> getPostDeleteActions() {
+        return getPostCaseActions(CaseEventType.CREATE);
+    }
+
+    public List<Action> getPreUploadActions() {
+        return getPreProcessActions(ProcessEventType.UPLOAD);
+    }
+
+    public List<Action> getPostUploadActions() {
+        return getPostProcessActions(ProcessEventType.UPLOAD);
+    }
+
+    private List<Action> getPreCaseActions(CaseEventType type) {
+        if (caseEvents.containsKey(type))
+            return caseEvents.get(type).getPreActions();
+        return new LinkedList<>();
+    }
+
+    private List<Action> getPostCaseActions(CaseEventType type) {
+        if (caseEvents.containsKey(type))
+            return caseEvents.get(type).getPostActions();
+        return new LinkedList<>();
+    }
+
+    private List<Action> getPreProcessActions(ProcessEventType type) {
+        if (processEvents.containsKey(type))
+            return processEvents.get(type).getPreActions();
+        return new LinkedList<>();
+    }
+
+    private List<Action> getPostProcessActions(ProcessEventType type) {
+        if (processEvents.containsKey(type))
+            return processEvents.get(type).getPostActions();
+        return new LinkedList<>();
     }
 
     @Override
