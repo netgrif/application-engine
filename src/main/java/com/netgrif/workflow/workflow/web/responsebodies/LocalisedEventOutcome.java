@@ -29,12 +29,7 @@ public class LocalisedEventOutcome extends ChangedFieldContainer {
         result.finishDate = outcome.getFinishDate();
 
         if (outcome.getAssignee() != null) {
-            result.assignee = new User(outcome.getAssignee(), locale);
-            result.assignee.setPassword(null);
-            result.assignee.setTelNumber(null);
-            result.assignee.setGroups(null);
-            result.assignee.setAuthorities(null);
-            result.assignee.setProcessRoles(null);
+            result.assignee = User.createSmallUser(outcome.getAssignee());
         }
 
         if (outcome.getMessage() != null) {
