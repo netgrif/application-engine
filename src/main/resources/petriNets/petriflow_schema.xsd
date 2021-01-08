@@ -413,7 +413,6 @@
             <xs:sequence>
                 <xs:element ref="create" minOccurs="0"/>
                 <xs:element ref="delete" minOccurs="0"/>
-                <xs:element ref="upload" minOccurs="0"/>
                 <xs:element ref="action" minOccurs="0" maxOccurs="unbounded"/>
                 <xs:element ref="actionRef" minOccurs="0" maxOccurs="unbounded"/>
             </xs:sequence>
