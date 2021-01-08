@@ -21,7 +21,10 @@ import java.util.*;
 
 public interface IPetriNetService {
 
+    @Deprecated
     Optional<PetriNet> importPetriNet(InputStream xmlFile, String releaseType, LoggedUser user) throws IOException, MissingPetriNetMetaDataException;
+
+    Optional<PetriNet> importPetriNet(InputStream xmlFile, PetriNet.VersionType releaseType, LoggedUser user) throws IOException, MissingPetriNetMetaDataException;
 
     Optional<PetriNet> save(PetriNet petriNet);
 
