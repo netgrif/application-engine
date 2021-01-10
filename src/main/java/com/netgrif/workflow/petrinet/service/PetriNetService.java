@@ -8,6 +8,7 @@ import com.netgrif.workflow.orgstructure.groups.interfaces.INextGroupService;
 import com.netgrif.workflow.petrinet.domain.EventPhase;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.Transition;
+import com.netgrif.workflow.petrinet.domain.VersionType;
 import com.netgrif.workflow.petrinet.domain.arcs.VariableArc;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository;
@@ -133,11 +134,11 @@ public class PetriNetService implements IPetriNetService {
     @Override
     @Deprecated
     public Optional<PetriNet> importPetriNet(InputStream xmlFile, String releaseType, LoggedUser author) throws IOException, MissingPetriNetMetaDataException {
-        return importPetriNet(xmlFile, PetriNet.VersionType.valueOf(releaseType.trim().toUpperCase()), author);
+        return importPetriNet(xmlFile, VersionType.valueOf(releaseType.trim().toUpperCase()), author);
     }
 
     @Override
-    public Optional<PetriNet> importPetriNet(InputStream xmlFile, PetriNet.VersionType releaseType, LoggedUser author) throws IOException, MissingPetriNetMetaDataException {
+    public Optional<PetriNet> importPetriNet(InputStream xmlFile, VersionType releaseType, LoggedUser author) throws IOException, MissingPetriNetMetaDataException {
         Optional<PetriNet> imported = getImporter().importPetriNet(copy(xmlFile));
         if (!imported.isPresent()) {
             return imported;
