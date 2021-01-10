@@ -258,12 +258,6 @@ public class PetriNet extends PetriNetObject {
         return title.getTranslation(locale);
     }
 
-    public enum VersionType {
-        MAJOR,
-        MINOR,
-        PATCH
-    }
-
     @Override
     public String getStringId() {
         return _id.toString();
