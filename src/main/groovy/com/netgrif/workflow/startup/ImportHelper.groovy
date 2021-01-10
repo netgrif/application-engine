@@ -10,11 +10,11 @@ import com.netgrif.workflow.orgstructure.domain.Group
 import com.netgrif.workflow.orgstructure.service.IGroupService
 import com.netgrif.workflow.orgstructure.service.IMemberService
 import com.netgrif.workflow.petrinet.domain.PetriNet
+import com.netgrif.workflow.petrinet.domain.VersionType
 import com.netgrif.workflow.petrinet.domain.dataset.Field
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldContainer
 import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
-import com.netgrif.workflow.petrinet.web.requestbodies.UploadedFileMeta
 import com.netgrif.workflow.workflow.domain.Case
 import com.netgrif.workflow.workflow.domain.EventOutcome
 import com.netgrif.workflow.workflow.domain.Filter
@@ -33,6 +33,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.io.ClassPathResource
 import org.springframework.core.io.ResourceLoader
 import org.springframework.stereotype.Component
+
 
 @Component
 class ImportHelper {
@@ -124,15 +125,15 @@ class ImportHelper {
     }
 
     Optional<PetriNet> createNet(String fileName, String release, LoggedUser author = superCreator.loggedSuper) {
-        return createNet(fileName, PetriNet.VersionType.valueOf(release.trim().toUpperCase()), author)
+        return createNet(fileName, VersionType.valueOf(release.trim().toUpperCase()), author)
     }
 
-    Optional<PetriNet> createNet(String fileName, PetriNet.VersionType release = PetriNet.VersionType.MAJOR, LoggedUser author = superCreator.loggedSuper) {
+    Optional<PetriNet> createNet(String fileName, VersionType release = VersionType.MAJOR, LoggedUser author = superCreator.loggedSuper) {
         InputStream netStream = new ClassPathResource("petriNets/$fileName" as String).inputStream
         return petriNetService.importPetriNet(netStream, release, author)
     }
 
-    Optional<PetriNet> upsertNet(String filename, String identifier, PetriNet.VersionType release = PetriNet.VersionType.MAJOR, LoggedUser author = superCreator.loggedSuper) {
+    Optional<PetriNet> upsertNet(String filename, String identifier, VersionType release = VersionType.MAJOR, LoggedUser author = superCreator.loggedSuper) {
         PetriNet petriNet = petriNetService.getNewestVersionByIdentifier(identifier)
         if (!petriNet) {
             return createNet(filename, release, author)
