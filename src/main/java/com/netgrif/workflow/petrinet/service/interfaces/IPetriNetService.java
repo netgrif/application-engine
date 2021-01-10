@@ -3,6 +3,7 @@ package com.netgrif.workflow.petrinet.service.interfaces;
 import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.Transition;
+import com.netgrif.workflow.petrinet.domain.VersionType;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.petrinet.domain.version.Version;
 import com.netgrif.workflow.petrinet.domain.throwable.MissingPetriNetMetaDataException;
@@ -24,7 +25,7 @@ public interface IPetriNetService {
     @Deprecated
     Optional<PetriNet> importPetriNet(InputStream xmlFile, String releaseType, LoggedUser user) throws IOException, MissingPetriNetMetaDataException;
 
-    Optional<PetriNet> importPetriNet(InputStream xmlFile, PetriNet.VersionType releaseType, LoggedUser user) throws IOException, MissingPetriNetMetaDataException;
+    Optional<PetriNet> importPetriNet(InputStream xmlFile, VersionType releaseType, LoggedUser user) throws IOException, MissingPetriNetMetaDataException;
 
     Optional<PetriNet> save(PetriNet petriNet);
 
