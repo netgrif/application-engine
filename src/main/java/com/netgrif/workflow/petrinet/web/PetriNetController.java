@@ -62,7 +62,7 @@ public class PetriNetController {
     @Autowired
     private StringToVersionConverter converter;
 
-    @PreAuthorize("@petriNetAuthorizationService.canCallUpload(#auth.getPrincipal(), #processId)")
+    @PreAuthorize("hasRole('ADMIN')")
     @ApiOperation(value = "Import new process",
             notes = "Caller must have the ADMIN role. Imports an entirely new process or a new version of an existing process.",
             authorizations = @Authorization("BasicAuth"))
@@ -136,7 +136,7 @@ public class PetriNetController {
     @RequestMapping(value = "/{netId}/roles", method = GET, produces = MediaTypes.HAL_JSON_VALUE)
     public ProcessRolesResource getRoles(@PathVariable("netId") String netId, Locale locale) {
         netId = decodeUrl(netId);
-        return new ProcessRolesResource(roleService.findAll(netId), netId, locale);
+        return new ProcessRolesResource(roleService.findAll(netId), service.getPetriNet(decodeUrl(netId)).getPermissions(), netId, locale);
     }
 
     @ApiOperation(value = "Get transactions of process", authorizations = @Authorization("BasicAuth"))
