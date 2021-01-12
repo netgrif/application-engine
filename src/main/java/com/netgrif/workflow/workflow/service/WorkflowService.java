@@ -183,8 +183,13 @@ public class WorkflowService implements IWorkflowService {
         useCase.setAuthor(user.transformToAuthor());
         useCase.setIcon(petriNet.getIcon());
         useCase.setCreationDate(LocalDateTime.now());
+        useCase.setPermissions(petriNet.getPermissions().entrySet().stream()
+                .filter(role -> role.getValue().containsKey("delete"))
+                .map(role -> new AbstractMap.SimpleEntry<>(role.getKey(), Collections.singletonMap("delete", role.getValue().get("delete"))))
+                .collect(Collectors.toMap(x -> x.getKey(), y -> y.getValue()))
+        );
 
-        runActions(petriNet.getPreCreateActions(), useCase.getStringId());
+        runActions(petriNet.getPreCreateActions());
         ruleEngine.evaluateRules(useCase, new CaseCreatedFact(useCase.getStringId(), EventPhase.PRE));
         useCase = save(useCase);
 
@@ -196,6 +201,7 @@ public class WorkflowService implements IWorkflowService {
 
         useCase = findOne(useCase.getStringId());
         runActions(petriNet.getPostCreateActions(), useCase.getStringId());
+        useCase = findOne(useCase.getStringId());
         ruleEngine.evaluateRules(useCase, new CaseCreatedFact(useCase.getStringId(), EventPhase.POST));
         useCase = save(useCase);
 
@@ -222,7 +228,7 @@ public class WorkflowService implements IWorkflowService {
         taskService.deleteTasksByCase(caseId);
         repository.delete(useCase);
 
-        runActions(useCase.getPetriNet().getPostDeleteActions(), useCase.getStringId());
+        runActions(useCase.getPetriNet().getPostDeleteActions());
 
         publisher.publishEvent(new DeleteCaseEvent(useCase));
     }
@@ -420,7 +426,7 @@ public class WorkflowService implements IWorkflowService {
 
     @Override
     public Map<String, ChangedField> runActions(List<Action> actions, String useCaseId) {
-        log.info("[" + useCaseId + "]: Running actions of net ");
+        log.info("[" + useCaseId + "]: Running actions on case");
         Map<String, ChangedField> changedFields = new HashMap<>();
         if (actions.isEmpty())
             return changedFields;
@@ -474,6 +480,15 @@ public class WorkflowService implements IWorkflowService {
 
             mergeChanges(changedFields, currentChangedFields);
             runEventActionsOnChanged(useCase, changedFields, currentChangedFields, trigger,trigger == Action.ActionTrigger.SET);
+        });
+    }
+
+    @Override
+    public void runActions(List<Action> actions) {
+        log.info("Running actions without context on cases");
+
+        actions.forEach(action -> {
+            actionsRunner.run(action, null);
         });
     }
 }
