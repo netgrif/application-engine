@@ -124,6 +124,10 @@ public class Case {
     @JsonIgnore
     private Set<String> enabledRoles;
 
+    @Getter
+    @Setter
+    private Map<String, Map<String, Boolean>> permissions;
+
     public Case() {
         _id = new ObjectId();
         activePlaces = new HashMap<>();
@@ -133,6 +137,7 @@ public class Case {
         tasks = new HashSet<>();
         visualId = generateVisualId();
         enabledRoles = new HashSet<>();
+        permissions = new HashMap<>();
     }
 
     public Case(String title) {

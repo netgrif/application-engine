@@ -42,6 +42,10 @@ public class WorkflowAuthorizationService implements IWorkflowAuthorizationServi
     public boolean userHasAtLeastOneRolePermission(User user, PetriNet net, ProcessRolePermission... permissions) {
         Map<String, Boolean> aggregatePermissions = getAggregatePermissions(user, net);
 
+        if (net.getPermissions().isEmpty()) {
+            return true;
+        }
+
         for (ProcessRolePermission permission : permissions) {
             Boolean hasPermission = aggregatePermissions.get(permission.toString());
             if (hasPermission != null && hasPermission) {
@@ -60,15 +64,7 @@ public class WorkflowAuthorizationService implements IWorkflowAuthorizationServi
             userProcessRoleIDs.add(role.get_id().toString());
         }
 
-        Map<String, Map<String, Boolean>> roles = new HashMap<>();
-        for (Map.Entry<String, Set<ProcessRolePermission>> entry : net.getProcessRoles().entrySet()) {
-            if(roles.containsKey(entry.getKey()) && roles.get(entry.getKey()) != null)
-                roles.get(entry.getKey()).putAll(parsePermissionMap(entry.getValue()));
-            else
-                roles.put(entry.getKey(),parsePermissionMap(entry.getValue()));
-        }
-
-        for (Map.Entry<String, Map<String, Boolean>> role : roles.entrySet()) {
+        for (Map.Entry<String, Map<String, Boolean>> role : net.getPermissions().entrySet()) {
             if (userProcessRoleIDs.contains(role.getKey())) {
                 for (Map.Entry<String, Boolean> permission : role.getValue().entrySet()) {
                     if (aggregatePermissions.containsKey(permission.getKey())) {
@@ -81,11 +77,5 @@ public class WorkflowAuthorizationService implements IWorkflowAuthorizationServi
         }
 
         return aggregatePermissions;
-    }
-
-    private Map<String, Boolean> parsePermissionMap(Set<ProcessRolePermission> permissions){
-        Map<String, Boolean> map = new HashMap<>();
-        permissions.forEach(perm -> map.put(perm.toString(),true));
-        return map;
     }
 }
