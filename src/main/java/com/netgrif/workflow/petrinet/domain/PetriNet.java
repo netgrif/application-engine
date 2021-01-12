@@ -298,12 +298,6 @@ public class PetriNet extends PetriNetObject {
         return title.getTranslation(locale);
     }
 
-    public enum VersionType {
-        MAJOR,
-        MINOR,
-        PATCH
-    }
-
     public List<Action> getPreCreateActions() {
         return getPreCaseActions(CaseEventType.CREATE);
     }
