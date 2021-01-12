@@ -183,7 +183,7 @@ public class Importer {
             return;
         }
 
-        net.addProcessRole(roleId, roleFactory.getProcessPermissions(logic));
+        net.addPermission(roleId, roleFactory.getProcessPermissions(logic));
     }
 
     @Transactional

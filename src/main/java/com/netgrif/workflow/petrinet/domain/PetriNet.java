@@ -98,8 +98,9 @@ public class PetriNet extends PetriNetObject {
     @Setter
     private Map<CaseEventType, CaseEvent> caseEvents;
 
-    @Getter @Setter
-    private Map<String, Set<ProcessRolePermission>> processRoles;
+    @Getter
+    @Setter
+    private Map<String, Set<ProcessRolePermission>> permissions;
 
     @Transient
     private boolean initialized;
@@ -126,6 +127,7 @@ public class PetriNet extends PetriNetObject {
         transactions = new LinkedHashMap<>();
         processEvents = new LinkedHashMap<>();
         caseEvents = new LinkedHashMap<>();
+        permissions = new HashMap<>();
     }
 
     public void addPlace(Place place) {
@@ -140,12 +142,23 @@ public class PetriNet extends PetriNetObject {
         this.roles.put(role.getStringId(), role);
     }
 
-    public void addProcessRole(String roleId, Set<ProcessRolePermission> permissions) {
-        if (processRoles.containsKey(roleId) && processRoles.get(roleId) != null) {
-            processRoles.get(roleId).addAll(permissions);
+    public void addPermission(String roleId, Set<ProcessRolePermission> permissions) {
+        if (this.permissions.containsKey(roleId) && this.permissions.get(roleId) != null) {
+            this.permissions.get(roleId).addAll(permissions);
         } else {
-            processRoles.put(roleId, permissions);
+            this.permissions.put(roleId, permissions);
         }
+    }
+
+    public Map<String, Map<String, Boolean>> getPermissions() {
+        Map<String, Map<String, Boolean>> roles = new HashMap<>();
+        for (Map.Entry<String, Set<ProcessRolePermission>> entry : permissions.entrySet()) {
+            if(roles.containsKey(entry.getKey()) && roles.get(entry.getKey()) != null)
+                roles.get(entry.getKey()).putAll(parsePermissionMap(entry.getValue()));
+            else
+                roles.put(entry.getKey(),parsePermissionMap(entry.getValue()));
+        }
+        return roles;
     }
 
     public List<Arc> getArcsOfTransition(Transition transition) {
@@ -300,11 +313,11 @@ public class PetriNet extends PetriNetObject {
     }
 
     public List<Action> getPreDeleteActions() {
-        return getPreCaseActions(CaseEventType.CREATE);
+        return getPreCaseActions(CaseEventType.DELETE);
     }
 
     public List<Action> getPostDeleteActions() {
-        return getPostCaseActions(CaseEventType.CREATE);
+        return getPostCaseActions(CaseEventType.DELETE);
     }
 
     public List<Action> getPreUploadActions() {
@@ -337,6 +350,12 @@ public class PetriNet extends PetriNetObject {
         if (processEvents.containsKey(type))
             return processEvents.get(type).getPostActions();
         return new LinkedList<>();
+    }
+
+    private Map<String, Boolean> parsePermissionMap(Set<ProcessRolePermission> permissions){
+        Map<String, Boolean> map = new HashMap<>();
+        permissions.forEach(perm -> map.put(perm.toString(),true));
+        return map;
     }
 
     @Override
@@ -375,6 +394,9 @@ public class PetriNet extends PetriNetObject {
                         .collect(Collectors.toList())))
         );
         clone.initializeArcs();
+        clone.setCaseEvents(this.caseEvents);
+        clone.setProcessEvents(this.processEvents);
+        clone.setPermissions(this.permissions);
         return clone;
     }
 }
