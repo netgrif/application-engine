@@ -30,6 +30,8 @@ public class Preferences implements Serializable {
 
     private String locale;
 
+    private Integer drawerWidth;
+
     /**
      * taskViewId: [filterIds]
      */
@@ -50,5 +52,6 @@ public class Preferences implements Serializable {
 
     public Preferences(Long userId) {
         this.userId = userId;
+        this.drawerWidth = 200;
     }
 }
