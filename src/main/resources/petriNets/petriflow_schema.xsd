@@ -394,7 +394,6 @@
     <xs:element name="cancel" type="xs:boolean"/>
     <xs:element name="create" type="xs:boolean"/>
     <xs:element name="delete" type="xs:boolean"/>
-    <xs:element name="upload" type="xs:boolean"/>
     <xs:element name="logic">
         <xs:complexType>
             <xs:sequence>

@@ -62,4 +62,6 @@ public interface IWorkflowService {
     Page<Case> search(Predicate predicate, Pageable pageable);
 
     Map<String, ChangedField> runActions(List<Action> actions, String useCaseId);
+
+    void runActions(List<Action> actions);
 }
