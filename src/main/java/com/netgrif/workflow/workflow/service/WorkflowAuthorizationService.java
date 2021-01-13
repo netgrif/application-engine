@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class WorkflowAuthorizationService implements IWorkflowAuthorizationService {
@@ -42,7 +43,9 @@ public class WorkflowAuthorizationService implements IWorkflowAuthorizationServi
     public boolean userHasAtLeastOneRolePermission(User user, PetriNet net, ProcessRolePermission... permissions) {
         Map<String, Boolean> aggregatePermissions = getAggregatePermissions(user, net);
 
-        if (net.getPermissions().isEmpty()) {
+        if (net.getPermissions().entrySet().stream()
+                .filter(role -> role.getValue().containsKey(permissions[0].toString()))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)).isEmpty()) {
             return true;
         }
 
