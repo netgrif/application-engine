@@ -186,7 +186,7 @@ public class WorkflowService implements IWorkflowService {
         useCase.setPermissions(petriNet.getPermissions().entrySet().stream()
                 .filter(role -> role.getValue().containsKey("delete"))
                 .map(role -> new AbstractMap.SimpleEntry<>(role.getKey(), Collections.singletonMap("delete", role.getValue().get("delete"))))
-                .collect(Collectors.toMap(x -> x.getKey(), y -> y.getValue()))
+                .collect(Collectors.toMap(AbstractMap.SimpleEntry::getKey, AbstractMap.SimpleEntry::getValue))
         );
 
         runActions(petriNet.getPreCreateActions());
