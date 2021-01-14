@@ -859,7 +859,12 @@ public class Importer {
             }
         }
         // TRUE if no roles and no triggers
-        return (transition.getRoleRef() == null || transition.getRoleRef().isEmpty()) && (transition.getTrigger() == null || transition.getTrigger().isEmpty());
+        return (transition.getRoleRef() == null || transition.getRoleRef().stream().noneMatch(roleRef ->
+                    (roleRef.getLogic().isPerform() != null && roleRef.getLogic().isPerform()) ||
+                    (roleRef.getLogic().isCancel() != null && roleRef.getLogic().isCancel()) ||
+                    (roleRef.getLogic().isView() != null && roleRef.getLogic().isView()) ||
+                    (roleRef.getLogic().isDelegate() != null && roleRef.getLogic().isDelegate())
+                )) && (transition.getTrigger() == null || transition.getTrigger().isEmpty());
     }
 
     PetriNet getNetByImportId(String id) {
