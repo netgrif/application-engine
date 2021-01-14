@@ -701,7 +701,7 @@ public class TaskService implements ITaskService {
             }
         }
         ProcessRole defaultRole = processRoleService.defaultRole();
-        for (Map.Entry<String, Set<RolePermission>> entry : transition.getRoles().entrySet()) {
+        for (Map.Entry<String, Map<String, Boolean>> entry : transition.getRoles().entrySet()) {
             if (useCase.getEnabledRoles().contains(entry.getKey()) || defaultRole.getStringId().equals(entry.getKey())) {
                 task.addRole(entry.getKey(), entry.getValue());
             }

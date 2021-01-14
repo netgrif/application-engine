@@ -14,8 +14,8 @@ import com.netgrif.workflow.petrinet.domain.roles.RolePermission;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.HashMap;
+import java.util.Map;
 
 @Component
 public class RoleFactory {
@@ -26,8 +26,8 @@ public class RoleFactory {
     @Autowired
     private UserProcessRoleRepository userProcessRoleRepository;
 
-    Set<RolePermission> getPermissions(Logic roleLogic) {
-        Set<RolePermission> permissions = new HashSet<>();
+    Map<String, Boolean> getPermissions(Logic roleLogic) {
+        Map<String, Boolean> permissions = new HashMap<>();
 
         addPerform(permissions, roleLogic);
         addDelegate(permissions, roleLogic);
@@ -36,8 +36,8 @@ public class RoleFactory {
         return permissions;
     }
 
-    Set<ProcessRolePermission> getProcessPermissions(CaseLogic roleLogic) {
-        Set<ProcessRolePermission> permissions = new HashSet<>();
+    Map<String, Boolean> getProcessPermissions(CaseLogic roleLogic) {
+        Map<String, Boolean> permissions = new HashMap<>();
 
         addCreate(permissions, roleLogic);
         addDelete(permissions, roleLogic);
@@ -45,29 +45,29 @@ public class RoleFactory {
         return permissions;
     }
 
-    private void addPerform(Set<RolePermission> permissions, Logic roleLogic) {
-        if (roleLogic.isPerform() != null && roleLogic.isPerform())
-            permissions.add(RolePermission.PERFORM);
+    private void addPerform(Map<String, Boolean> permissions, Logic roleLogic) {
+        if (roleLogic.isPerform() != null)
+            permissions.put(RolePermission.PERFORM.toString(), roleLogic.isPerform());
     }
 
-    private void addDelegate(Set<RolePermission> permissions, Logic roleLogic) {
-        if (roleLogic.isDelegate() != null && roleLogic.isDelegate())
-            permissions.add(RolePermission.DELEGATE);
+    private void addDelegate(Map<String, Boolean> permissions, Logic roleLogic) {
+        if (roleLogic.isDelegate() != null)
+            permissions.put(RolePermission.DELEGATE.toString(), roleLogic.isDelegate());
     }
 
-    private void addCancel(Set<RolePermission> permissions, Logic roleLogic) {
-        if (roleLogic.isCancel() != null && roleLogic.isCancel())
-            permissions.add(RolePermission.CANCEL);
+    private void addCancel(Map<String, Boolean> permissions, Logic roleLogic) {
+        if (roleLogic.isCancel() != null)
+            permissions.put(RolePermission.CANCEL.toString(), roleLogic.isCancel());
     }
 
-    private void addCreate(Set<ProcessRolePermission> permissions, CaseLogic roleLogic) {
-        if (roleLogic.isCreate() != null && roleLogic.isCreate())
-            permissions.add(ProcessRolePermission.CREATE);
+    private void addCreate(Map<String, Boolean> permissions, CaseLogic roleLogic) {
+        if (roleLogic.isCreate() != null)
+            permissions.put(ProcessRolePermission.CREATE.toString(), roleLogic.isCreate());
     }
 
-    private void addDelete(Set<ProcessRolePermission> permissions, CaseLogic roleLogic) {
-        if (roleLogic.isDelete() != null && roleLogic.isDelete())
-            permissions.add(ProcessRolePermission.DELETE);
+    private void addDelete(Map<String, Boolean> permissions, CaseLogic roleLogic) {
+        if (roleLogic.isDelete() != null)
+            permissions.put(ProcessRolePermission.DELETE.toString(), roleLogic.isDelete());
     }
 
     ProcessRole transitionRole(PetriNet net, Transition transition) {
