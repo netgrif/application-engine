@@ -153,17 +153,11 @@ public class Task {
         return icon;
     }
 
-    public void addRole(String roleId, Set<RolePermission> permissions){
+    public void addRole(String roleId, Map<String, Boolean> permissions){
         if(roles.containsKey(roleId) && roles.get(roleId) != null)
-            roles.get(roleId).putAll(parsePermissionMap(permissions));
+            roles.get(roleId).putAll(permissions);
         else
-            roles.put(roleId,parsePermissionMap(permissions));
-    }
-
-    private Map<String, Boolean> parsePermissionMap(Set<RolePermission> permissions){
-        Map<String, Boolean> map = new HashMap<>();
-        permissions.forEach(perm -> map.put(perm.toString(),true));
-        return map;
+            roles.put(roleId, permissions);
     }
 
     @JsonIgnore
