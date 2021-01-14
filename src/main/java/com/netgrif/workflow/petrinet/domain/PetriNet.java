@@ -100,7 +100,7 @@ public class PetriNet extends PetriNetObject {
 
     @Getter
     @Setter
-    private Map<String, Set<ProcessRolePermission>> permissions;
+    private Map<String, Map<String, Boolean>> permissions;
 
     @Transient
     private boolean initialized;
@@ -142,23 +142,12 @@ public class PetriNet extends PetriNetObject {
         this.roles.put(role.getStringId(), role);
     }
 
-    public void addPermission(String roleId, Set<ProcessRolePermission> permissions) {
+    public void addPermission(String roleId, Map<String, Boolean> permissions) {
         if (this.permissions.containsKey(roleId) && this.permissions.get(roleId) != null) {
-            this.permissions.get(roleId).addAll(permissions);
+            this.permissions.get(roleId).putAll(permissions);
         } else {
             this.permissions.put(roleId, permissions);
         }
-    }
-
-    public Map<String, Map<String, Boolean>> getPermissions() {
-        Map<String, Map<String, Boolean>> roles = new HashMap<>();
-        for (Map.Entry<String, Set<ProcessRolePermission>> entry : permissions.entrySet()) {
-            if(roles.containsKey(entry.getKey()) && roles.get(entry.getKey()) != null)
-                roles.get(entry.getKey()).putAll(parsePermissionMap(entry.getValue()));
-            else
-                roles.put(entry.getKey(),parsePermissionMap(entry.getValue()));
-        }
-        return roles;
     }
 
     public List<Arc> getArcsOfTransition(Transition transition) {
@@ -344,12 +333,6 @@ public class PetriNet extends PetriNetObject {
         if (processEvents.containsKey(type))
             return processEvents.get(type).getPostActions();
         return new LinkedList<>();
-    }
-
-    private Map<String, Boolean> parsePermissionMap(Set<ProcessRolePermission> permissions){
-        Map<String, Boolean> map = new HashMap<>();
-        permissions.forEach(perm -> map.put(perm.toString(),true));
-        return map;
     }
 
     @Override
