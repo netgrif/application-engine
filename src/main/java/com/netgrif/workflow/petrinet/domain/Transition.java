@@ -33,7 +33,7 @@ public class Transition extends Node {
 
     @Field("roles")
     @Getter @Setter
-    private Map<String, Set<RolePermission>> roles;
+    private Map<String, Map<String, Boolean>> roles;
 
     @Field("triggers")
     @Getter @Setter
@@ -92,9 +92,9 @@ public class Transition extends Node {
         }
     }
 
-    public void addRole(String roleId, Set<RolePermission> permissions) {
+    public void addRole(String roleId, Map<String, Boolean> permissions) {
         if (roles.containsKey(roleId) && roles.get(roleId) != null) {
-            roles.get(roleId).addAll(permissions);
+            roles.get(roleId).putAll(permissions);
         } else {
             roles.put(roleId, permissions);
         }
