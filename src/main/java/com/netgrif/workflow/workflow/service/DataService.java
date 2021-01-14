@@ -306,7 +306,16 @@ public class DataService implements IDataService {
 
     @Override
     public FileFieldInputStream getFileByTask(String taskId, String fieldId, boolean forPreview) {
-        TaskRefFieldWrapper wrapper = decodeTaskRefFieldId(taskId, fieldId);
+        TaskRefFieldWrapper wrapper;
+        try {
+            wrapper = decodeTaskRefFieldId(taskId, fieldId);
+        } catch (IllegalArgumentException e) {
+            if (forPreview) {
+                return null;
+            } else {
+                throw new IllegalArgumentException("Could not find task with id [" + taskId + "]");
+            }
+        }
         Task task = wrapper.getTask();
         String parsedFieldId = wrapper.getFieldId();
 
