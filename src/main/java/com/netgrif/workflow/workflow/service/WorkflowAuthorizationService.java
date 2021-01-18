@@ -34,15 +34,13 @@ public class WorkflowAuthorizationService implements IWorkflowAuthorizationServi
     @Override
     public boolean canCallDelete(LoggedUser user, String caseId) {
         Case requestedCase = workflowService.findOne(caseId);
-        User fullUser = userService.findByEmail(user.getEmail(), false);
-        return user.isAdmin() || userHasAtLeastOneRolePermission(fullUser, requestedCase.getPetriNet(), ProcessRolePermission.DELETE);
+        return user.isAdmin() || userHasAtLeastOneRolePermission(user.transformToUser(), requestedCase.getPetriNet(), ProcessRolePermission.DELETE);
     }
 
     @Override
     public boolean canCallCreate(LoggedUser user, String netId) {
         PetriNet net = petriNetService.getPetriNet(netId);
-        User fullUser = userService.findByEmail(user.getEmail(), false);
-        return user.isAdmin() || userHasAtLeastOneRolePermission(fullUser, net, ProcessRolePermission.CREATE);
+        return user.isAdmin() || userHasAtLeastOneRolePermission(user.transformToUser(), net, ProcessRolePermission.CREATE);
     }
 
     @Override

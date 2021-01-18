@@ -98,6 +98,7 @@
                 <xs:element ref="trigger" minOccurs="0" maxOccurs="unbounded"/>
                 <xs:element ref="transactionRef" minOccurs="0"/>
                 <xs:element ref="roleRef" maxOccurs="unbounded" minOccurs="0"/>
+                <xs:element ref="assignedUser" minOccurs="0"/>
                 <xs:element ref="dataRef" maxOccurs="unbounded" minOccurs="0"/>
                 <xs:element ref="dataGroup" maxOccurs="unbounded" minOccurs="0"/>
                 <xs:element ref="event" maxOccurs="unbounded" minOccurs="0"/>
@@ -392,8 +393,10 @@
     <xs:element name="view" type="xs:boolean"/>
     <xs:element name="delegate" type="xs:boolean"/>
     <xs:element name="cancel" type="xs:boolean"/>
+    <xs:element name="assigned" type="xs:boolean"/>
     <xs:element name="create" type="xs:boolean"/>
     <xs:element name="delete" type="xs:boolean"/>
+    <xs:element name="reassign" type="xs:boolean"/>
     <xs:element name="logic">
         <xs:complexType>
             <xs:sequence>
@@ -401,6 +404,7 @@
                 <xs:element ref="delegate" minOccurs="0"/>
                 <xs:element ref="view" minOccurs="0"/>
                 <xs:element ref="cancel" minOccurs="0"/>
+                <xs:element ref="assigned" minOccurs="0"/>
                 <xs:element name="behavior" type="behavior" maxOccurs="unbounded" minOccurs="0"/>
                 <xs:element ref="action" minOccurs="0" maxOccurs="unbounded"/>
                 <xs:element ref="actionRef" minOccurs="0" maxOccurs="unbounded"/>
@@ -472,6 +476,14 @@
                 <xs:element ref="template" minOccurs="0"/>
                 <xs:element ref="appearance" minOccurs="0"/>
                 <xs:element name="alignment" type="fieldAlignment" minOccurs="0"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="assignedUser">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="cancel" minOccurs="0"/>
+                <xs:element ref="reassign" minOccurs="0"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
