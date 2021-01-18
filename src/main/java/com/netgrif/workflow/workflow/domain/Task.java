@@ -131,6 +131,10 @@ public class Task {
     @Builder.Default
     private Map<EventType, I18nString> eventTitles = new HashMap<>();
 
+    @Getter @Setter
+    @Builder.Default
+    private Map<String, Boolean> assignedUserPolicy = new HashMap<>();
+
     private Map<String, Integer> consumedTokens = new HashMap<>();
 
     public Task() {
@@ -158,6 +162,10 @@ public class Task {
             roles.get(roleId).putAll(permissions);
         else
             roles.put(roleId, permissions);
+    }
+
+    public void addAssignedUserPolicy(Map<String, Boolean> assignedUser){
+        assignedUserPolicy.putAll(assignedUser);
     }
 
     @JsonIgnore

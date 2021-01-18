@@ -61,6 +61,9 @@ public class Transition extends Node {
     private Map<EventType, Event> events;
 
     @Getter @Setter
+    private Map<String, Boolean> assignedUserPolicy;
+
+    @Getter @Setter
     private String defaultRoleId;
 
     public Transition() {
@@ -73,6 +76,7 @@ public class Transition extends Node {
         dataFocusPolicy = DataFocusPolicy.MANUAL;
         finishPolicy = FinishPolicy.MANUAL;
         events = new HashMap<>();
+        assignedUserPolicy = new HashMap<>();
     }
 
     public void addDataSet(String field, Set<FieldBehavior> behavior, Set<DataEvent> events, FieldLayout layout, Component component){

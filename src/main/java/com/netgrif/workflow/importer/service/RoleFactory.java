@@ -32,6 +32,7 @@ public class RoleFactory {
         addPerform(permissions, roleLogic);
         addDelegate(permissions, roleLogic);
         addCancel(permissions, roleLogic);
+        addAssigned(permissions, roleLogic);
 
         return permissions;
     }
@@ -58,6 +59,11 @@ public class RoleFactory {
     private void addCancel(Map<String, Boolean> permissions, Logic roleLogic) {
         if (roleLogic.isCancel() != null)
             permissions.put(RolePermission.CANCEL.toString(), roleLogic.isCancel());
+    }
+
+    private void addAssigned(Map<String, Boolean> permissions, Logic roleLogic) {
+        if (roleLogic.isAssigned() != null)
+            permissions.put(RolePermission.ASSIGNED.toString(), roleLogic.isAssigned());
     }
 
     private void addCreate(Map<String, Boolean> permissions, CaseLogic roleLogic) {

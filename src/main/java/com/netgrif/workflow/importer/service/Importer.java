@@ -378,9 +378,22 @@ public class Importer {
                     transition.addEvent(addEvent(transition.getImportId(), event))
             );
         }
+        if (importTransition.getAssignedUser() != null) {
+            addAssignedUserPolicy(importTransition, transition);
+        }
 
         net.addTransition(transition);
         transitions.put(importTransition.getId(), transition);
+    }
+
+    @Transactional
+    protected void addAssignedUserPolicy(com.netgrif.workflow.importer.model.Transition importTransition, Transition transition) {
+        if (importTransition.getAssignedUser().isCancel() != null) {
+            transition.getAssignedUserPolicy().put("cancel", importTransition.getAssignedUser().isCancel());
+        }
+        if (importTransition.getAssignedUser().isReassign() != null) {
+            transition.getAssignedUserPolicy().put("reassign", importTransition.getAssignedUser().isReassign());
+        }
     }
 
     @Transactional
