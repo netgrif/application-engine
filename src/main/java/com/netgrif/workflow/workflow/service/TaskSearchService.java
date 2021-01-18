@@ -157,7 +157,7 @@ public class TaskSearchService extends MongoSearchService<Task> {
 
         query.and(
                 constructPredicateTree(
-                        request.process.stream().map(this::processQuery).collect(Collectors.toList()),
+                        request.process.stream().map(p -> processQuery(p.identifier)).collect(Collectors.toList()),
                         BooleanBuilder::or)
         );
     }
