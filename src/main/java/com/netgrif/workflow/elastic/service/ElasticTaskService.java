@@ -359,7 +359,9 @@ public class ElasticTaskService implements IElasticTaskService {
 
         BoolQueryBuilder processQuery = boolQuery();
         for (TaskSearchRequest.PetriNet process : request.process) {
-            processQuery.should(termQuery("processId", process.identifier));
+            if (process.identifier != null) {
+                processQuery.should(termQuery("processId", process.identifier));
+            }
         }
 
         query.filter(processQuery);
