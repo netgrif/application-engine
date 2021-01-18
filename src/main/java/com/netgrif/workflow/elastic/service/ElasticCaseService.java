@@ -228,9 +228,9 @@ public class ElasticCaseService implements IElasticCaseService {
 
         BoolQueryBuilder petriNetQuery = boolQuery();
 
-        for (CaseSearchRequest.PetriNet petriNet : request.process) {
-            if (petriNet.identifier != null) {
-                petriNetQuery.should(termQuery("processIdentifier", petriNet.identifier));
+        for (CaseSearchRequest.PetriNet process : request.process) {
+            if (process.identifier != null) {
+                petriNetQuery.should(termQuery("processIdentifier", process.identifier));
             }
         }
 
