@@ -3,6 +3,7 @@ package com.netgrif.workflow.workflow.service;
 import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRole;
+import com.netgrif.workflow.petrinet.domain.roles.ProcessRolePermission;
 import com.netgrif.workflow.petrinet.domain.roles.RolePermission;
 import com.netgrif.workflow.petrinet.domain.throwable.IllegalTaskStateException;
 import com.netgrif.workflow.workflow.domain.Task;
@@ -30,6 +31,13 @@ public class TaskAuthorizationService implements ITaskAuthorizationService {
     @Override
     public boolean userHasAtLeastOneRolePermission(User user, Task task, RolePermission... permissions) {
         Map<String, Boolean> aggregatePermissions = getAggregatePermissions(user, task);
+
+        for (RolePermission permission : permissions) {
+            Boolean hasPermission = aggregatePermissions.get(permission.toString());
+            if (hasPermission != null && !hasPermission) {
+                return false;
+            }
+        }
 
         for (RolePermission permission : permissions) {
             Boolean hasPermission = aggregatePermissions.get(permission.toString());
@@ -110,6 +118,14 @@ public class TaskAuthorizationService implements ITaskAuthorizationService {
                     && isAssignee(loggedUser, taskId));
     }
 
+    private boolean canAssignedCancel(User user, String taskId) {
+        Task task = taskService.findById(taskId);
+        if (!isAssigned(task) || !task.getUserId().equals(user.getId())) {
+            return true;
+        }
+        return (task.getAssignedUserPolicy() == null || task.getAssignedUserPolicy().get("cancel") == null) || task.getAssignedUserPolicy().get("cancel");
+    }
+
     @Override
     public boolean canCallCancel(LoggedUser loggedUser, String taskId) throws IllegalTaskStateException {
         if (!isAssigned(taskId))
@@ -117,7 +133,7 @@ public class TaskAuthorizationService implements ITaskAuthorizationService {
 
         return loggedUser.isAdmin()
                 || (userHasAtLeastOneRolePermission(loggedUser, taskId, RolePermission.PERFORM, RolePermission.CANCEL)
-                    && isAssignee(loggedUser, taskId));
+                    && isAssignee(loggedUser, taskId) && canAssignedCancel(loggedUser.transformToUser(), taskId));
     }
 
     @Override
