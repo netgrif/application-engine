@@ -175,41 +175,46 @@ public class UserService implements IUserService {
     public Page<User> searchAllCoMembers(String query, LoggedUser loggedUser, Boolean small, Pageable pageable) {
         Set<Long> members = memberService.findAllCoMembersIds(loggedUser.getEmail());
         members.add(loggedUser.getId());
-        BooleanExpression predicate = QUser.user
-                .id.in(members)
-                .and(QUser.user.state.eq(UserState.ACTIVE));
-        for (String word : query.split(" ")) {
-            predicate = predicate
-                    .andAnyOf(QUser.user.email.containsIgnoreCase(word),
-                              QUser.user.name.containsIgnoreCase(word),
-                              QUser.user.surname.containsIgnoreCase(word));
-        }
 
-        Page<User> users = userRepository.findAll(predicate, pageable);
+        Page<User> users = userRepository.findAll(buildPredicate(members, query), pageable);
         if (!small)
             users.forEach(this::loadProcessRoles);
         return users;
     }
 
     @Override
-    public Page<User> searchAllCoMembers(String query, List<String> roleIds, LoggedUser loggedUser, Boolean small, Pageable pageable) {
-        if (roleIds == null || roleIds.isEmpty())
+    public Page<User> searchAllCoMembers(String query, List<String> roleIds, List<String> negateRoleIds, LoggedUser loggedUser, Boolean small, Pageable pageable) {
+        if ((roleIds == null || roleIds.isEmpty()) && (negateRoleIds == null || negateRoleIds.isEmpty()))
             return searchAllCoMembers(query, loggedUser, small, pageable);
+
+        if (negateRoleIds == null) {
+            negateRoleIds = new ArrayList<>();
+        }
 
         Set<Long> members = memberService.findAllCoMembersIds(loggedUser.getEmail());
         members.add(loggedUser.getId());
-        BooleanExpression predicate = QUser.user
-                .id.in(members)
-                .and(QUser.user.state.eq(UserState.ACTIVE))
-                .and(QUser.user.userProcessRoles.any().roleId.in(roleIds))
-                .andAnyOf(
-                        QUser.user.email.containsIgnoreCase(query),
-                        QUser.user.name.containsIgnoreCase(query),
-                        QUser.user.surname.containsIgnoreCase(query));
+        BooleanExpression predicate = buildPredicate(members, query);
+        if (!(roleIds == null || roleIds.isEmpty())) {
+            predicate = predicate.and(QUser.user.userProcessRoles.any().roleId.in(roleIds));
+        }
+        predicate = predicate.and(QUser.user.userProcessRoles.any().roleId.in(negateRoleIds).not());
         Page<User> users = userRepository.findAll(predicate, pageable);
         if (!small)
             users.forEach(this::loadProcessRoles);
         return users;
+    }
+
+    private BooleanExpression buildPredicate(Set<Long> members, String query) {
+        BooleanExpression predicate = QUser.user
+                .id.in(members)
+                .and(QUser.user.state.eq(UserState.ACTIVE));
+        for (String word : query.split(" ")) {
+            predicate = predicate
+                    .andAnyOf(QUser.user.email.containsIgnoreCase(word),
+                            QUser.user.name.containsIgnoreCase(word),
+                            QUser.user.surname.containsIgnoreCase(word));
+        }
+        return predicate;
     }
 
     @Override

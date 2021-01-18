@@ -4,7 +4,8 @@ package com.netgrif.workflow.petrinet.domain.roles;
 public enum RolePermission {
     PERFORM("perform"),
     DELEGATE("delegate"),
-    CANCEL("cancel");
+    CANCEL("cancel"),
+    ASSIGNED("assigned");
 
     private String value;
 
