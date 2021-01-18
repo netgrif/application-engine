@@ -222,13 +222,13 @@ public class ElasticCaseService implements IElasticCaseService {
      * </pre>
      */
     private void buildPetriNetQuery(CaseSearchRequest request, LoggedUser user, BoolQueryBuilder query) {
-        if (request.petriNet == null || request.petriNet.isEmpty()) {
+        if (request.process == null || request.process.isEmpty()) {
             return;
         }
 
         BoolQueryBuilder petriNetQuery = boolQuery();
 
-        for (CaseSearchRequest.PetriNet petriNet : request.petriNet) {
+        for (CaseSearchRequest.PetriNet petriNet : request.process) {
             if (petriNet.identifier != null) {
                 petriNetQuery.should(termQuery("processIdentifier", petriNet.identifier));
             }
