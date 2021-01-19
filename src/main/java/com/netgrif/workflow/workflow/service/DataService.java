@@ -610,13 +610,18 @@ public class DataService implements IDataService {
 
     @Override
     public ChangedFieldsTree runActions(List<Action> actions, String useCaseId, String taskId, Transition transition) {
+        Task task = taskService.findOne(taskId);
+        return runActions(actions, useCaseId, task, transition);
+    }
+
+    @Override
+    public ChangedFieldsTree runActions(List<Action> actions, String useCaseId, Task task, Transition transition) {
         log.info("[" + useCaseId + "]: Running actions of transition " + transition.getStringId());
-        ChangedFieldsTree changedFields = ChangedFieldsTree.createNew(useCaseId, taskId, transition.getImportId());
+        ChangedFieldsTree changedFields = ChangedFieldsTree.createNew(useCaseId, task.getStringId(), transition.getImportId());
         if (actions.isEmpty())
             return changedFields;
 
         Case case$ = workflowService.findOne(useCaseId);
-        Task task = taskService.findOne(taskId);
         actions.forEach(action -> {
             ChangedFieldsTree changedFieldsTree = actionsRunner.run(action, case$, Optional.of(task));
             changedFields.mergeChangedFields(changedFieldsTree);
