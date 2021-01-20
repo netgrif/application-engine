@@ -59,6 +59,8 @@ public interface IDataService {
 
     ChangedFieldsTree runActions(List<Action> actions, String useCaseId, String taskId, Transition transition);
 
+    ChangedFieldsTree runActions(List<Action> actions, String useCaseId, Task task, Transition transition);
+
     void validateCaseRefValue(List<String> value, List<String> allowedNets) throws IllegalArgumentException;
 
 }
