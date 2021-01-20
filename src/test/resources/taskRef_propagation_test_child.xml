@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		  xsi:noNamespaceSchemaLocation="../../main/resources/petriNets/petriflow_schema.xsd">
+	<id>child</id>
+	<version>1.0.0</version>
+	<initials>CHL</initials>
+	<title>child</title>
+	<icon>home</icon>
+	<defaultRole>true</defaultRole>
+	<transitionRole>false</transitionRole>
+	<!-- TRANSACTIONS -->
+	<!-- ROLES -->
+	<!-- DATA -->
+	<data type="text">
+		<id>parentId</id>
+		<title>Parent id</title>
+	</data>
+	<data type="text">
+		<id>text1</id>
+		<title>Text1</title>
+
+		<action trigger="set">
+			text1: f.text1,
+			text2: f.text2;
+
+			change text2 value { text1.value }
+		</action>
+	</data>
+	<data type="text">
+		<id>text2</id>
+		<title>Text2</title>
+
+		<action trigger="set">
+			text2: f.text2,
+			parentId: f.parentId;
+
+			def parentCase = workflowService.findOne(parentId.value)
+			setDataWithPropagation("2", parentCase, [
+				"text_from_child_setter": ["type": "text", "value": (text2.value + "-propagated-up") as String]
+			])
+		</action>
+	</data>
+	<data type="text">
+		<id>text3</id>
+		<title>Text3</title>
+
+		<action trigger="set">
+			text4: f.text4;
+
+			change text4 value { "TEXT_4_VALUE" }
+		</action>
+	</data>
+	<data type="text">
+		<id>text4</id>
+		<title>Text4</title>
+	</data>
+
+	<data type="text">
+		<id>text5</id>
+		<title>Text5</title>
+
+		<action trigger="set">
+			text5: f.text5,
+			parentId: f.parentId;
+
+			def parentCase = workflowService.findOne(parentId.value)
+			setDataWithPropagation("2", parentCase, [
+				"multichoice_setter": ["type": "text", "value": (text5.value) as String]
+			])
+		</action>
+
+	</data>
+	<data type="text">
+		<id>text6</id>
+		<title>Text6</title>
+
+		<action trigger="set">
+			text6: f.text6,
+			parentId: f.parentId;
+
+			def parentCase = workflowService.findOne(parentId.value)
+			setDataWithPropagation("2", parentCase, [
+				"multichoice": ["type": "multichoice", "value": [text6.value] as List]
+			])
+		</action>
+	</data>
+
+	<!-- TRANSITIONS -->
+	<transition>
+		<id>2</id>
+		<x>580</x>
+		<y>220</y>
+		<label>Task 1</label>
+		<dataRef>
+			<id>text1</id>
+			<logic>
+				<behavior>editable</behavior>
+			</logic>
+		</dataRef>
+		<dataRef>
+			<id>text2</id>
+			<logic>
+				<behavior>editable</behavior>
+			</logic>
+		</dataRef>
+		<dataRef>
+			<id>text3</id>
+			<logic>
+				<behavior>editable</behavior>
+			</logic>
+		</dataRef>
+		<dataRef>
+			<id>text4</id>
+			<logic>
+				<behavior>editable</behavior>
+			</logic>
+		</dataRef>
+		<dataRef>
+			<id>text5</id>
+			<logic>
+				<behavior>editable</behavior>
+			</logic>
+		</dataRef>
+		<dataRef>
+			<id>text6</id>
+			<logic>
+				<behavior>editable</behavior>
+			</logic>
+		</dataRef>
+	</transition>
+
+	<transition>
+		<id>4</id>
+		<x>780</x>
+		<y>220</y>
+		<label>Task 2</label>
+		<dataGroup>
+			<id>0</id>
+			<title>Údaje inštancie</title>
+			<dataRef>
+				<id>text1</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+			</dataRef>
+			<dataRef>
+				<id>text2</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+			</dataRef>
+			<dataRef>
+				<id>text3</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+			</dataRef>
+			<dataRef>
+				<id>text4</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+			</dataRef>
+			<dataRef>
+				<id>text5</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+			</dataRef>
+			<dataRef>
+				<id>text6</id>
+				<logic>
+					<behavior>editable</behavior>
+				</logic>
+			</dataRef>
+		</dataGroup>
+
+	</transition>
+	<!-- PLACES -->
+	<!-- ARCS -->
+</document>
