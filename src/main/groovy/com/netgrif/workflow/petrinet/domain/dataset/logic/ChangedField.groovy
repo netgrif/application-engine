@@ -1,21 +1,38 @@
 package com.netgrif.workflow.petrinet.domain.dataset.logic
 
 import com.netgrif.workflow.petrinet.domain.I18nString
+import com.netgrif.workflow.workflow.domain.Task
 import com.querydsl.core.annotations.QueryExclude
 
 @QueryExclude
 class ChangedField {
 
     String id
+    List<TaskPair> changedOn
     Map<String, Object> attributes
 
     ChangedField() {
         attributes = new HashMap<>()
+        changedOn = new ArrayList<>()
     }
 
     ChangedField(String id) {
         this()
         this.id = id
+    }
+
+    void wasChangedOn(Task task) {
+        wasChangedOn(task.stringId, task.transitionId)
+    }
+
+    void wasChangedOn(String taskId, String transition) {
+        if (!isChangedOn(taskId)) {
+            changedOn.add(new TaskPair(taskId, transition))
+        }
+    }
+
+    boolean isChangedOn(String taskId) {
+        return changedOn.any {it.taskId == taskId }
     }
 
     void addAttribute(String name, Object value) {
@@ -36,6 +53,9 @@ class ChangedField {
     }
 
     void merge(ChangedField changedField) {
+        changedField.changedOn.each {
+            wasChangedOn(it.taskId, it.transition)
+        }
         this.attributes.putAll(changedField.attributes)
     }
 
@@ -79,5 +99,15 @@ class ChangedField {
     @Override
     String toString() {
         return attributes as String
+    }
+
+    class TaskPair {
+        String taskId
+        String transition
+
+        TaskPair(String taskId, String transition) {
+            this.taskId = taskId
+            this.transition = transition
+        }
     }
 }
