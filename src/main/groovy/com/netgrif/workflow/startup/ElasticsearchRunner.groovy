@@ -183,8 +183,8 @@ class ElasticsearchRunner extends AbstractOrderedCommandLineRunner {
             }
             if (!elasticsearch.indexExists(TASK_INDEX)) {
                 log.info "Creating Elasticsearch task mapping"
-                elasticsearch.createIndex(CASE_INDEX)
-                elasticsearch.putMapping(CASE_INDEX, CASE_TYPE, CASE_MAPPING)
+                elasticsearch.createIndex(TASK_INDEX)
+                elasticsearch.putMapping(TASK_INDEX, TASK_TYPE, TASK_MAPPING)
             } else {
                 log.info "Elasticsearch task mapping exists"
             }
