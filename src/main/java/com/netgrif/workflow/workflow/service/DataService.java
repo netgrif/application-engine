@@ -305,7 +305,7 @@ public class DataService implements IDataService {
     }
 
     @Override
-    public FileFieldInputStream getFileByTask(String taskId, String fieldId, boolean forPreview) {
+    public FileFieldInputStream getFileByTask(String taskId, String fieldId, boolean forPreview) throws FileNotFoundException {
         TaskRefFieldWrapper wrapper;
         try {
             wrapper = decodeTaskRefFieldId(taskId, fieldId);
@@ -319,7 +319,12 @@ public class DataService implements IDataService {
         Task task = wrapper.getTask();
         String parsedFieldId = wrapper.getFieldId();
 
-        return getFileByCase(task.getCaseId(), parsedFieldId, forPreview);
+        FileFieldInputStream fileFieldInputStream = getFileByCase(task.getCaseId(), parsedFieldId, forPreview);
+
+        if (fileFieldInputStream == null || fileFieldInputStream.getInputStream() == null)
+            throw new FileNotFoundException("File in field " + fieldId + " within task " + taskId + " was not found!");
+
+        return fileFieldInputStream;
     }
 
     @Override
