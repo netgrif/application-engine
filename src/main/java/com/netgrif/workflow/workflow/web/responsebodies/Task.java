@@ -1,7 +1,7 @@
 package com.netgrif.workflow.workflow.web.responsebodies;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.netgrif.workflow.auth.domain.User;
+import com.netgrif.workflow.auth.web.responsebodies.User;
 import com.netgrif.workflow.elastic.domain.ElasticTask;
 import com.netgrif.workflow.petrinet.domain.EventType;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
@@ -78,7 +78,7 @@ public class Task {
         this.caseColor = task.getCaseColor();
         this.caseTitle = task.getCaseTitle();
         this.priority = task.getPriority();
-        this.user = task.getUser();
+        this.user = task.getUser() != null ? User.createSmallUser(task.getUser()) : null;
         this.roles = task.getRoles();
         this.startDate = task.getStartDate();
         this.finishDate = task.getFinishDate();
