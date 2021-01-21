@@ -6,6 +6,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -20,27 +21,25 @@ import java.util.function.Function;
 @Service
 public class JwtService implements IJwtService {
 
-    @Value("${nae.security.jwt.expiration}")
-    private final long EXPIRATION_TIME = 900000;
-
-    @Value("${nae.security.jwt.private-key}")
-    private String secretPath;
-
     private String secret = "";
+
+    @Autowired
+    private JwtProperties properties;
 
     @PostConstruct
     private void resolveSecret(){
         try {
-            secret = Base64.getEncoder().encodeToString(PrivateKeyReader.get(secretPath).getEncoded());
+            PrivateKeyReader reader = new PrivateKeyReader(properties.getAlgorithm());
+            secret = Base64.getEncoder().encodeToString(reader.get(properties.getPrivateKey()).getEncoded());
         } catch (IOException | NoSuchAlgorithmException | InvalidKeySpecException e) {
-            log.error(e.getMessage());
+            log.error("Error while resolving secret key: " + e.getMessage(), e);
         }
     }
 
     @Override
     public String tokenFrom(Map<String, Object> claims) {
         log.info("Generating new JWT token.");
-        return Jwts.builder().addClaims(claims).setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
+        return Jwts.builder().addClaims(claims).setExpiration(new Date(System.currentTimeMillis() + properties.getExpiration()))
                 .signWith(SignatureAlgorithm.HS512, secret).compact();
     }
 

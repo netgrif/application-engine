@@ -34,7 +34,7 @@ public class PublicPetriNetController extends PublicAbstractController {
     @GetMapping(value = "/petrinet/{id}", produces = "application/hal+json")
     @ApiOperation(value = "Get process by id")
     public PetriNetReferenceResource getOne(@PathVariable("id") String id, Locale locale) {
-        return new PetriNetReferenceResource(IPetriNetService.transformToReference(this.service.getPetriNet(decodeUrl(id)), locale));
+        return new PetriNetReferenceResource(IPetriNetService.transformToReference(this.service.getPetriNet(PetriNetController.decodeUrl(id)), locale));
     }
 
     @ApiOperation(
@@ -49,13 +49,4 @@ public class PublicPetriNetController extends PublicAbstractController {
         return new PetriNetReferenceResource(this.service.getReference(identifier, this.converter.convert(version), getAnonym(), locale));
     }
 
-
-    private static String decodeUrl(String s1) {
-        try {
-            return s1 == null ? null : URLDecoder.decode(s1, StandardCharsets.UTF_8.name());
-        } catch (UnsupportedEncodingException var2) {
-            log.error("Decoding URL failed: ", var2);
-            return "";
-        }
-    }
 }
