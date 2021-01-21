@@ -673,7 +673,7 @@ public class TaskService implements ITaskService {
     }
 
     @Override
-    public void resolveUserRef(Task task, Case useCase) {
+    public Task resolveUserRef(Task task, Case useCase) {
         task.getUsers().clear();
         task.getUserRefs().forEach((id, permission) -> {
             List<Long> userIds = getExistingUsers((List<Long>) useCase.getDataSet().get(id).getValue());
@@ -682,21 +682,13 @@ public class TaskService implements ITaskService {
             }
         });
         taskRepository.save(task);
+        return task;
     }
 
     private List<Long> getExistingUsers(List<Long> userIds) {
         if (userIds == null)
             return null;
-
-        List<Long> result = new ArrayList<>();
-        userIds.forEach( userId -> {
-            if (userService.findById(userId, false) != null){
-                result.add(userId);
-            } else {
-                log.warn("User with provided user ID does not exist. User cannot be referenced to userRef.");
-            }
-        });
-        return result;
+        return userIds.stream().filter(userId -> userService.findById(userId, false) != null).collect(Collectors.toList());
     }
 
     private Task createFromTransition(Transition transition, Case useCase) {
