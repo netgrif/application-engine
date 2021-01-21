@@ -2,6 +2,8 @@ package com.netgrif.workflow.workflow.web.requestbodies;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.netgrif.workflow.workflow.web.requestbodies.taskSearch.PetriNet;
+import com.netgrif.workflow.workflow.web.requestbodies.taskSearch.TaskSearchCaseRequest;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -36,19 +38,4 @@ public class TaskSearchRequest {
     @JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
     public List<String> group;
 
-
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class TaskSearchCaseRequest {
-        public String id;
-        public String title;
-    }
-
-    @Data
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class PetriNet {
-
-        public String identifier;
-    }
 }
