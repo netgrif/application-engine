@@ -19,9 +19,6 @@ import java.util.Set;
 public interface ITaskService {
 
     @Transactional
-    EventOutcome cancelPublicTask(LoggedUser loggedUser, String taskId);
-
-    @Transactional
     void reloadTasks(Case useCase);
 
     Task findOne(String taskId);
@@ -29,8 +26,6 @@ public interface ITaskService {
     Page<Task> getAll(LoggedUser loggedUser, Pageable pageable, Locale locale);
 
     Page<Task> search(List<TaskSearchRequest> requests, Pageable pageable, LoggedUser user, Locale locale, Boolean isIntersection);
-
-    Page<Task> searchPublic(List<TaskSearchRequest> requests, Pageable pageable, LoggedUser user, Locale locale, Boolean isIntersection);
 
     long count(List<TaskSearchRequest> requests, LoggedUser user, Locale locale, Boolean isIntersection);
 
@@ -52,17 +47,11 @@ public interface ITaskService {
 
 	Task searchOne(com.querydsl.core.types.Predicate predicate);
 
-    @Transactional
-    EventOutcome assignPublicTask(LoggedUser loggedUser, String taskId) throws TransitionNotExecutableException;
-
     @Transactional(rollbackFor = Exception.class)
     void finishTasks(List<Task> tasks, User user) throws TransitionNotExecutableException;
 
     @Transactional
     EventOutcome finishTask(Task task, User user) throws TransitionNotExecutableException;
-
-    @Transactional
-    EventOutcome finishPublicTask(LoggedUser loggedUser, String taskId) throws IllegalArgumentException, TransitionNotExecutableException;
 
     EventOutcome finishTask(LoggedUser loggedUser, String taskId) throws IllegalArgumentException, TransitionNotExecutableException;
 
@@ -85,6 +74,7 @@ public interface ITaskService {
     EventOutcome cancelTask(Task task, User user);
 
     EventOutcome cancelTask(LoggedUser loggedUser, String taskId);
+
     /**
      * cancel task action
      */
