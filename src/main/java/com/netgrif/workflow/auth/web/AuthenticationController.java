@@ -9,7 +9,9 @@ import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.auth.web.requestbodies.ChangePasswordRequest;
 import com.netgrif.workflow.auth.web.requestbodies.NewUserRequest;
 import com.netgrif.workflow.auth.web.requestbodies.RegistrationRequest;
+import com.netgrif.workflow.auth.web.responsebodies.IUserFactory;
 import com.netgrif.workflow.auth.web.responsebodies.UserResource;
+import com.netgrif.workflow.configuration.properties.ServerAuthProperties;
 import com.netgrif.workflow.mail.interfaces.IMailAttemptService;
 import com.netgrif.workflow.mail.interfaces.IMailService;
 import com.netgrif.workflow.workflow.web.responsebodies.MessageResource;
@@ -17,10 +19,8 @@ import freemarker.template.TemplateException;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.Authorization;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.MediaType;
@@ -34,6 +34,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Locale;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/auth")
 @ConditionalOnProperty(
@@ -43,8 +44,6 @@ import java.util.Locale;
 )
 @Api(tags = {"Authentication"})
 public class AuthenticationController {
-
-    private static final Logger log = LoggerFactory.getLogger(AuthenticationController.class);
 
     @Autowired
     private IRegistrationService registrationService;
@@ -61,8 +60,11 @@ public class AuthenticationController {
     @Autowired
     private IMailAttemptService mailAttemptService;
 
-    @Value("${server.auth.open-registration}")
-    private boolean openRegistration;
+    @Autowired
+    private ServerAuthProperties serverAuthProperties;
+
+    @Autowired
+    private IUserFactory userResponseFactory;
 
     @ApiOperation(value = "New user registration")
     @PostMapping(value = "/signup", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
@@ -88,7 +90,7 @@ public class AuthenticationController {
     @PostMapping(value = "/invite", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public MessageResource invite(@RequestBody NewUserRequest newUserRequest, Authentication auth) {
         try {
-            if (!openRegistration && (auth == null || !((LoggedUser) auth.getPrincipal()).isAdmin())) {
+            if (!serverAuthProperties.isOpenRegistration() && (auth == null || !((LoggedUser) auth.getPrincipal()).isAdmin())) {
                 return MessageResource.errorMessage("Only admin can invite new users!");
             }
 
@@ -135,7 +137,7 @@ public class AuthenticationController {
     @ApiOperation(value = "Login to the system", authorizations = @Authorization("BasicAuth"))
     @GetMapping(value = "/login", produces = MediaTypes.HAL_JSON_VALUE)
     public UserResource login(Authentication auth, Locale locale) {
-        return new UserResource(userService.findByAuth(auth), "profile", locale);
+        return new UserResource(userResponseFactory.getUser(userService.findByAuth(auth), locale), "profile");
     }
 
     @ApiOperation(value = "Reset password")

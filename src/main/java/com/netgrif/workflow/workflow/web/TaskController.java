@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.elastic.service.interfaces.IElasticTaskService;
 import com.netgrif.workflow.elastic.web.requestbodies.singleaslist.SingleElasticTaskSearchRequestAsList;
+import com.netgrif.workflow.workflow.domain.IllegalArgumentWithChangedFieldsException;
 import com.netgrif.workflow.workflow.web.requestbodies.singleaslist.SingleTaskSearchRequestAsList;
 import com.netgrif.workflow.petrinet.domain.DataGroup;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldByFileFieldContainer;
@@ -133,12 +134,13 @@ public class TaskController {
             @ApiResponse(code = 200, message = "OK", response = LocalisedEventOutcomeResource.class),
             @ApiResponse(code = 403, message = "Caller doesn't fulfill the authorisation requirements"),
     })
-    public LocalisedEventOutcomeResource delegate(Authentication auth, @PathVariable("id") String taskId, @RequestBody Long delegatedId, Locale locale) {
+    public LocalisedEventOutcomeResource delegate(Authentication auth, @PathVariable("id") String taskId, @RequestBody String delegatedId, Locale locale) {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
+        Long userId = delegatedId != null ? Long.parseLong(delegatedId) : null;
 
         try {
-            return LocalisedEventOutcomeResource.successOutcome(taskService.delegateTask(loggedUser, delegatedId, taskId), locale,
-                    "LocalisedTask " + taskId + " assigned to [" + delegatedId + "]");
+            return LocalisedEventOutcomeResource.successOutcome(taskService.delegateTask(loggedUser, userId, taskId), locale,
+                    "LocalisedTask " + taskId + " assigned to [" + userId + "]");
         } catch (Exception e) {
             log.error("Delegating task [" + taskId + "] failed: ", e);
             return LocalisedEventOutcomeResource.errorOutcome("LocalisedTask " + taskId + " cannot be assigned");
@@ -162,7 +164,11 @@ public class TaskController {
                     "LocalisedTask " + taskId + " finished");
         } catch (Exception e) {
             log.error("Finishing task [" + taskId + "] failed: ", e);
-            return LocalisedEventOutcomeResource.errorOutcome(e.getMessage());
+            if (e instanceof IllegalArgumentWithChangedFieldsException) {
+                return LocalisedEventOutcomeResource.errorOutcome(e.getMessage(), ((IllegalArgumentWithChangedFieldsException) e).getChangedFields());
+            } else {
+                return LocalisedEventOutcomeResource.errorOutcome(e.getMessage());
+            }
         }
     }
 
@@ -183,7 +189,11 @@ public class TaskController {
                     "LocalisedTask " + taskId + " canceled");
         } catch (Exception e) {
             log.error("Canceling task [" + taskId + "] failed: ", e);
-            return LocalisedEventOutcomeResource.errorOutcome(e.getMessage());
+            if (e instanceof IllegalArgumentWithChangedFieldsException) {
+                return LocalisedEventOutcomeResource.errorOutcome(e.getMessage(), ((IllegalArgumentWithChangedFieldsException) e).getChangedFields());
+            } else {
+                return LocalisedEventOutcomeResource.errorOutcome(e.getMessage());
+            }
         }
     }
 
@@ -278,7 +288,7 @@ public class TaskController {
     @ApiOperation(value = "Download task file field value", authorizations = @Authorization("BasicAuth"))
     @RequestMapping(value = "/{id}/file/{field}", method = RequestMethod.GET, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public ResponseEntity<Resource> getFile(@PathVariable("id") String taskId, @PathVariable("field") String fieldId, HttpServletResponse response) throws FileNotFoundException {
-        FileFieldInputStream fileFieldInputStream = dataService.getFileByTask(taskId, fieldId);
+        FileFieldInputStream fileFieldInputStream = dataService.getFileByTask(taskId, fieldId, false);
 
         if (fileFieldInputStream == null || fileFieldInputStream.getInputStream() == null)
             throw new FileNotFoundException("File in field " + fieldId + " within task " + taskId + " was not found!");
@@ -360,5 +370,20 @@ public class TaskController {
         if (dataService.deleteFileByName(taskId, fieldId, name))
             return MessageResource.successMessage("File with name " + name + " in field " + fieldId + " within task " + taskId + " was successfully deleted");
         return MessageResource.errorMessage("File with name " + name + " in field " + fieldId + " within task" + taskId + " has failed to delete");
+    }
+
+    @ApiOperation(value = "Download preview for file field value", authorizations = @Authorization("BasicAuth"))
+    @RequestMapping(value = "/{id}/file_preview/{field}", method = RequestMethod.GET, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    public ResponseEntity<Resource> getFilePreview(@PathVariable("id") String taskId, @PathVariable("field") String fieldId, HttpServletResponse response) throws FileNotFoundException {
+        FileFieldInputStream fileFieldInputStream = dataService.getFileByTask(taskId, fieldId, true);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_OCTET_STREAM_VALUE);
+        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + (fileFieldInputStream != null ? fileFieldInputStream.getFileName() : "null"));
+
+        return ResponseEntity
+                .ok()
+                .headers(headers)
+                .body(fileFieldInputStream != null ? new InputStreamResource(fileFieldInputStream.getInputStream()) : null);
     }
 }

@@ -17,6 +17,7 @@ import com.netgrif.workflow.workflow.web.responsebodies.MessageResource;
 import org.springframework.data.domain.Page;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
@@ -31,15 +32,15 @@ public interface IDataService {
 
     ChangedFieldContainer setData(String taskId, ObjectNode values);
 
-    FileFieldInputStream getFile(Case useCase, FileField field);
+    FileFieldInputStream getFile(Case useCase, FileField field, boolean forPreview);
 
     FileFieldInputStream getFileByName(Case useCase, FileListField field, String name);
 
-    FileFieldInputStream getFileByTask(String taskId, String fieldId);
+    FileFieldInputStream getFileByTask(String taskId, String fieldId, boolean forPreview) throws FileNotFoundException;
 
     FileFieldInputStream getFileByTaskAndName(String taskId, String fieldId, String name);
 
-    FileFieldInputStream getFileByCase(String caseId, String fieldId);
+    FileFieldInputStream getFileByCase(String caseId, String fieldId, boolean forPreview);
 
     FileFieldInputStream getFileByCaseAndName(String caseId, String fieldId, String name);
 
