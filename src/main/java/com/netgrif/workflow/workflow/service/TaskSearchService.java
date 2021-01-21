@@ -8,6 +8,7 @@ import com.netgrif.workflow.workflow.domain.QCase;
 import com.netgrif.workflow.workflow.web.requestbodies.TaskSearchRequest;
 import com.netgrif.workflow.workflow.domain.QTask;
 import com.netgrif.workflow.workflow.domain.Task;
+import com.netgrif.workflow.workflow.web.requestbodies.taskSearch.TaskSearchCaseRequest;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -101,7 +102,7 @@ public class TaskSearchService extends MongoSearchService<Task> {
      * @return Predicate for ID if only ID is present. Predicate for title if only title is present.
      * If both are present an ID predicate is returned. If neither are present null is returned.
      */
-    private Predicate caseRequestQuery(TaskSearchRequest.TaskSearchCaseRequest caseRequest) {
+    private Predicate caseRequestQuery(TaskSearchCaseRequest caseRequest) {
         if (caseRequest.id != null) {
             return caseIdQuery(caseRequest.id);
         } else if (caseRequest.title != null) {
