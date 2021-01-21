@@ -653,6 +653,17 @@ class ActionDelegate {
         change useCase.getField(fileFieldId) value {new FileFieldValue(filename, storagePath)}
     }
 
+    void generatePDF(String transitionId, String fileFieldId, List<String> excludedFields){
+        PdfResource pdfResource = ApplicationContextProvider.getBean(PdfResource.class) as PdfResource
+        String filename = pdfResource.getOutputResource().getFilename()
+        String storagePath = new FileFieldValue(pdfResource.getOutputResource().getFilename(), ((ClassPathResource)pdfResource.getOutputResource()).getPath()).getPath(useCase.stringId, "pdf_file")
+
+        pdfResource.setOutputResource(new ClassPathResource(storagePath))
+        pdfGenerator.setupPdfGenerator(pdfResource)
+        pdfGenerator.generatePdf(useCase, transitionId, pdfResource, excludedFields)
+        change useCase.getField(fileFieldId) value {new FileFieldValue(filename, storagePath)}
+    }
+
     void generatePdfWithTemplate(String transitionId, String fileFieldId, String template){
         PdfResource pdfResource = ApplicationContextProvider.getBean(PdfResource.class) as PdfResource
         String filename = pdfResource.getOutputResource().getFilename()
