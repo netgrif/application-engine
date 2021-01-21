@@ -1,12 +1,14 @@
 package com.netgrif.workflow.workflow.web.responsebodies;
 
 import com.netgrif.workflow.auth.web.responsebodies.User;
+import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedField;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldContainer;
 import com.netgrif.workflow.workflow.domain.EventOutcome;
 import lombok.Data;
 
 import java.time.LocalDateTime;
 import java.util.Locale;
+import java.util.Map;
 
 @Data
 public class LocalisedEventOutcome extends ChangedFieldContainer {
@@ -29,12 +31,7 @@ public class LocalisedEventOutcome extends ChangedFieldContainer {
         result.finishDate = outcome.getFinishDate();
 
         if (outcome.getAssignee() != null) {
-            result.assignee = new User(outcome.getAssignee(), locale);
-            result.assignee.setPassword(null);
-            result.assignee.setTelNumber(null);
-            result.assignee.setGroups(null);
-            result.assignee.setAuthorities(null);
-            result.assignee.setProcessRoles(null);
+            result.assignee = User.createSmallUser(outcome.getAssignee());
         }
 
         if (outcome.getMessage() != null) {
@@ -47,6 +44,14 @@ public class LocalisedEventOutcome extends ChangedFieldContainer {
 
     public static LocalisedEventOutcome errorOutcome(String errorMessage) {
         LocalisedEventOutcome result = new LocalisedEventOutcome();
+        result.error = errorMessage;
+        return result;
+    }
+
+    public static LocalisedEventOutcome errorOutcome(String errorMessage, Map<String, ChangedField> changedFields) {
+        LocalisedEventOutcome result = new LocalisedEventOutcome();
+
+        result.putAll(changedFields);
         result.error = errorMessage;
         return result;
     }
