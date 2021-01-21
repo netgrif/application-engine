@@ -47,7 +47,7 @@ public class PublicPetriNetController extends PublicAbstractController {
         this.converter = converter;
     }
 
-    @GetMapping(value = "/petrinet/{id}", produces = "application/hal+json")
+    @GetMapping(value = "/petrinet/{id}", produces = MediaTypes.HAL_JSON_VALUE)
     @ApiOperation(value = "Get process by id")
     public PetriNetReferenceResource getOne(@PathVariable("id") String id, Locale locale) {
         return new PetriNetReferenceResource(IPetriNetService.transformToReference(this.service.getPetriNet(decodeUrl(id)), locale));
@@ -58,7 +58,7 @@ public class PublicPetriNetController extends PublicAbstractController {
     )
     @GetMapping(
             value = {"/petrinet/{identifier}/{version}"},
-            produces = {"application/hal+json"}
+            produces = {MediaTypes.HAL_JSON_VALUE}
     )
     @ResponseBody
     public PetriNetReferenceResource getOne(@PathVariable("identifier") String identifier, @PathVariable("version") String version, Locale locale) {
