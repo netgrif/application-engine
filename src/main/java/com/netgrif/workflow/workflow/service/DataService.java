@@ -246,12 +246,11 @@ public class DataService implements IDataService {
             for (String dataFieldId : dataGroup.getData()) {
                 Field field = net.getDataSet().get(dataFieldId);
                 if (dataFieldMap.containsKey(dataFieldId)) {
+                    Field resource = dataFieldMap.get(dataFieldId);
+                    if (level != 0) resource.setImportId(taskId + "-" + resource.getImportId());
+                    resources.add(resource);
                     if (field.getType() == FieldType.TASK_REF) {
                         resultDataGroups.addAll(collectTaskRefDataGroups((TaskField) dataFieldMap.get(dataFieldId), locale, collectedTaskIds, level));
-                    } else {
-                        Field resource = dataFieldMap.get(dataFieldId);
-                        if (level != 0) resource.setImportId(taskId + "-" + resource.getImportId());
-                        resources.add(resource);
                     }
                 }
             }
@@ -306,12 +305,26 @@ public class DataService implements IDataService {
     }
 
     @Override
-    public FileFieldInputStream getFileByTask(String taskId, String fieldId, boolean forPreview) {
-        TaskRefFieldWrapper wrapper = decodeTaskRefFieldId(taskId, fieldId);
+    public FileFieldInputStream getFileByTask(String taskId, String fieldId, boolean forPreview) throws FileNotFoundException {
+        TaskRefFieldWrapper wrapper;
+        try {
+            wrapper = decodeTaskRefFieldId(taskId, fieldId);
+        } catch (IllegalArgumentException e) {
+            if (forPreview) {
+                return null;
+            } else {
+                throw new IllegalArgumentException("Could not find task with id [" + taskId + "]");
+            }
+        }
         Task task = wrapper.getTask();
         String parsedFieldId = wrapper.getFieldId();
 
-        return getFileByCase(task.getCaseId(), parsedFieldId, forPreview);
+        FileFieldInputStream fileFieldInputStream = getFileByCase(task.getCaseId(), parsedFieldId, forPreview);
+
+        if (fileFieldInputStream == null || fileFieldInputStream.getInputStream() == null)
+            throw new FileNotFoundException("File in field " + fieldId + " within task " + taskId + " was not found!");
+
+        return fileFieldInputStream;
     }
 
     @Override
