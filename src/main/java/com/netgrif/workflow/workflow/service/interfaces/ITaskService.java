@@ -53,15 +53,9 @@ public interface ITaskService {
     @Transactional
     EventOutcome finishTask(Task task, User user) throws TransitionNotExecutableException;
 
-    @Transactional
-    EventOutcome finishPublicTask(LoggedUser loggedUser, String taskId) throws IllegalArgumentException, TransitionNotExecutableException;
-
     EventOutcome finishTask(LoggedUser loggedUser, String taskId) throws IllegalArgumentException, TransitionNotExecutableException;
 
     EventOutcome finishTask(String taskId) throws IllegalArgumentException, TransitionNotExecutableException;
-
-    @Transactional
-    EventOutcome assignPublicTask(LoggedUser loggedUser, String taskId) throws TransitionNotExecutableException;
 
     @Transactional
     void assignTasks(List<Task> tasks, User user) throws TransitionNotExecutableException;
@@ -80,9 +74,6 @@ public interface ITaskService {
     EventOutcome cancelTask(Task task, User user);
 
     EventOutcome cancelTask(LoggedUser loggedUser, String taskId);
-
-    @Transactional
-    EventOutcome cancelPublicTask(LoggedUser loggedUser, String taskId);
 
     /**
      * cancel task action
