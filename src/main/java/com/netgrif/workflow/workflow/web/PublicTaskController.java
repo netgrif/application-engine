@@ -2,6 +2,7 @@ package com.netgrif.workflow.workflow.web;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.netgrif.workflow.auth.domain.LoggedUser;
+import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.petrinet.domain.DataGroup;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldContainer;
@@ -27,6 +28,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 
 @RestController
 @RequestMapping({"/api/public"})
@@ -60,11 +62,12 @@ public class PublicTaskController extends PublicAbstractController {
             message = "Caller doesn't fulfill the authorisation requirements"
     )})
     public LocalisedEventOutcomeResource assign(@PathVariable("id") String taskId, Locale locale) {
-        LoggedUser loggedUser = getAnonym();
+        User user = getAnonym().transformToAnonymousUser();
         try {
-            return LocalisedEventOutcomeResource.successOutcome(this.taskService.assignPublicTask(loggedUser, taskId), locale, "LocalisedTask " + taskId + " assigned to " + loggedUser.getFullName());
-        } catch (TransitionNotExecutableException var6) {
-            log.error("Assigning task [" + taskId + "] failed: ", var6);
+            Task task = taskService.findById(taskId);
+            return LocalisedEventOutcomeResource.successOutcome(this.taskService.assignTask(task, user), locale, "LocalisedTask " + taskId + " assigned to " + user.getFullName());
+        } catch (TransitionNotExecutableException | IllegalArgumentException e) {
+            log.error("Assigning task [" + taskId + "] failed: " + e.getMessage(), e);
             return LocalisedEventOutcomeResource.errorOutcome("LocalisedTask " + taskId + " cannot be assigned");
         }
     }
@@ -80,12 +83,14 @@ public class PublicTaskController extends PublicAbstractController {
             message = "Caller doesn't fulfill the authorisation requirements"
     )})
     public LocalisedEventOutcomeResource finish(@PathVariable("id") String taskId, Locale locale) {
-        LoggedUser loggedUser = getAnonym();
+        User user = getAnonym().transformToAnonymousUser();
         try {
-            return LocalisedEventOutcomeResource.successOutcome(this.taskService.finishPublicTask(loggedUser, taskId), locale, "LocalisedTask " + taskId + " finished");
-        } catch (Exception var6) {
-            log.error("Finishing task [" + taskId + "] failed: ", var6);
-            return LocalisedEventOutcomeResource.errorOutcome(var6.getMessage());
+            Task task = taskService.findById(taskId);
+            checkAssignedUser(task, user);
+            return LocalisedEventOutcomeResource.successOutcome(this.taskService.finishTask(task, user), locale, "LocalisedTask " + taskId + " finished");
+        } catch (Exception e) {
+            log.error("Finishing task [" + taskId + "] failed: " + e.getMessage(), e);
+            return LocalisedEventOutcomeResource.errorOutcome(e.getMessage());
         }
     }
 
@@ -100,12 +105,13 @@ public class PublicTaskController extends PublicAbstractController {
             message = "Caller doesn't fulfill the authorisation requirements"
     )})
     public LocalisedEventOutcomeResource cancel(@PathVariable("id") String taskId, Locale locale) {
-        LoggedUser loggedUser = getAnonym();
+        User user  = getAnonym().transformToAnonymousUser();
         try {
-            return LocalisedEventOutcomeResource.successOutcome(this.taskService.cancelPublicTask(loggedUser, taskId), locale, "LocalisedTask " + taskId + " canceled");
-        } catch (Exception var6) {
-            log.error("Canceling task [" + taskId + "] failed: ", var6);
-            return LocalisedEventOutcomeResource.errorOutcome(var6.getMessage());
+            Task task = taskService.findById(taskId);
+            return LocalisedEventOutcomeResource.successOutcome(this.taskService.cancelTask(task, user), locale, "LocalisedTask " + taskId + " canceled");
+        } catch (Exception e) {
+            log.error("Canceling task [" + taskId + "] failed: " + e.getMessage(), e);
+            return LocalisedEventOutcomeResource.errorOutcome(e.getMessage());
         }
     }
 
@@ -141,5 +147,13 @@ public class PublicTaskController extends PublicAbstractController {
         return resources;
     }
 
+    void checkAssignedUser(Task task, User user) throws IllegalArgumentException{
+        if (task.getUserId() == null) {
+            throw new IllegalArgumentException("Task with id=" + task.getStringId() + " is not assigned to any user.");
+        }
+        if (!task.getUserId().equals(user.getId())) {
+            throw new IllegalArgumentException("User that is not assigned tried to finish task");
+        }
+    }
 
 }
