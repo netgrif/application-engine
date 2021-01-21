@@ -2,14 +2,18 @@ package com.netgrif.workflow.mail;
 
 import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.auth.service.interfaces.IRegistrationService;
+import com.netgrif.workflow.configuration.properties.ServerAuthProperties;
+import com.netgrif.workflow.mail.domain.SimpleMailDraft;
+import com.netgrif.workflow.mail.domain.TypedMailDraft;
 import com.netgrif.workflow.mail.interfaces.IMailService;
+import com.netgrif.workflow.mail.throwables.NoEmailTypeDefinedException;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import lombok.Getter;
 import lombok.Setter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -24,9 +28,9 @@ import java.nio.charset.StandardCharsets;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
+@Slf4j
 public class MailService implements IMailService {
 
-    static final Logger log = LoggerFactory.getLogger(MailService.class.getName());
     public static final String TOKEN = "token";
     public static final String VALIDITY = "validity";
     public static final String EXPIRATION = "expiration";
@@ -35,6 +39,9 @@ public class MailService implements IMailService {
 
     @Autowired
     private IRegistrationService registrationService;
+
+    @Autowired
+    private ServerAuthProperties serverAuthProperties;
 
     @Getter
     @Value("${mail.server.port}")
@@ -53,10 +60,6 @@ public class MailService implements IMailService {
     protected String mailFrom;
 
     @Getter
-    @Value("${server.auth.token-validity-period}")
-    protected String validityPeriod;
-
-    @Getter
     @Setter
     protected JavaMailSender mailSender;
 
@@ -72,7 +75,7 @@ public class MailService implements IMailService {
         recipients.add(user.getEmail());
         model.put(TOKEN, registrationService.encodeToken(user.getEmail(), user.getToken()));
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
-        model.put(VALIDITY, validityPeriod);
+        model.put(VALIDITY, "" + serverAuthProperties.getTokenValidityPeriod());
         model.put(EXPIRATION, registrationService.generateExpirationDate().format(formatter));
         model.put(SERVER, getServerURL());
 
@@ -88,7 +91,7 @@ public class MailService implements IMailService {
 
         model.put(NAME, user.getName());
         model.put(TOKEN, registrationService.encodeToken(user.getEmail(), user.getToken()));
-        model.put(VALIDITY, validityPeriod);
+        model.put(VALIDITY, "" + serverAuthProperties.getTokenValidityPeriod());
         model.put(EXPIRATION, registrationService.generateExpirationDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
         model.put(SERVER, getServerURL());
 
@@ -108,7 +111,29 @@ public class MailService implements IMailService {
 //        }
     }
 
+    @Override
+    public void sendMail(TypedMailDraft mailDraft) throws MessagingException, IOException, TemplateException {
+        MimeMessage email = buildEmail(mailDraft.getType(), mailDraft.getRecipients(), mailDraft.getModel(), mailDraft.getAttachments());
+        mailSender.send(email);
+
+        String formattedRecipients = StringUtils.join(mailDraft.getRecipients(), ", ");
+        log.info("Email sent to [" + formattedRecipients + "]");
+    }
+
+    @Override
+    public void sendMail(SimpleMailDraft mailDraft) throws MessagingException, IOException, TemplateException {
+        MimeMessage email = buildEmail(mailDraft.getRecipients(), mailDraft.getSubject(), mailDraft.getBody(), mailDraft.isHtml(), mailDraft.getAttachments());
+        mailSender.send(email);
+
+        String formattedRecipients = StringUtils.join(mailDraft.getRecipients(), ", ");
+        log.info("Email sent to [" + formattedRecipients + "]");
+    }
+
     protected MimeMessage buildEmail(EmailType type, List<String> recipients, Map<String, Object> model, Map<String, File> attachments) throws MessagingException, IOException, TemplateException {
+        if (type.template == null || type.subject == null) {
+            log.error("The email has no template or subject defined in object of EmailType.");
+            throw new NoEmailTypeDefinedException("The email has no template or subject defined in object of EmailType.");
+        }
         MimeMessage message = mailSender.createMimeMessage();
         message.setSubject(type.subject);
         MimeMessageHelper helper = new MimeMessageHelper(message, true, StandardCharsets.UTF_8.name());
@@ -125,6 +150,25 @@ public class MailService implements IMailService {
         });
         return message;
     }
+
+    protected MimeMessage buildEmail(List<String> recipients, String subject, String text, boolean isHtml, Map<String, File> attachments) throws MessagingException, IOException, TemplateException {
+        MimeMessage message = mailSender.createMimeMessage();
+        message.setSubject(subject);
+        MimeMessageHelper helper = new MimeMessageHelper(message, true, StandardCharsets.UTF_8.name());
+        helper.setFrom(mailFrom);
+        helper.setTo(recipients.toArray(new String[recipients.size()]));
+        helper.setText(text, isHtml);
+
+        attachments.forEach((s, inputStream) -> {
+            try {
+                helper.addAttachment(s, inputStream);
+            } catch (MessagingException e) {
+                log.error("Building email failed: ", e);
+            }
+        });
+        return message;
+    }
+
 
     protected String getServerURL() {
         String encryptedHttp = ssl ? "https://" : "http://";
