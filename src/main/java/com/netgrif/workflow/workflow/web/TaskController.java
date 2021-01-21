@@ -377,16 +377,13 @@ public class TaskController {
     public ResponseEntity<Resource> getFilePreview(@PathVariable("id") String taskId, @PathVariable("field") String fieldId, HttpServletResponse response) throws FileNotFoundException {
         FileFieldInputStream fileFieldInputStream = dataService.getFileByTask(taskId, fieldId, true);
 
-        if (fileFieldInputStream == null || fileFieldInputStream.getInputStream() == null)
-            throw new FileNotFoundException("File in field " + fieldId + " within task " + taskId + " was not found!");
-
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_OCTET_STREAM_VALUE);
-        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + fileFieldInputStream.getFileName());
+        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + (fileFieldInputStream != null ? fileFieldInputStream.getFileName() : "null"));
 
         return ResponseEntity
                 .ok()
                 .headers(headers)
-                .body(new InputStreamResource(fileFieldInputStream.getInputStream()));
+                .body(fileFieldInputStream != null ? new InputStreamResource(fileFieldInputStream.getInputStream()) : null);
     }
 }
