@@ -5,6 +5,7 @@ import com.netgrif.workflow.pdf.generator.domain.PdfField;
 import com.netgrif.workflow.pdf.generator.service.interfaces.IPdfDrawer;
 import lombok.Data;
 import org.apache.pdfbox.pdmodel.font.PDType0Font;
+import org.jsoup.Jsoup;
 
 import java.io.IOException;
 import java.util.List;
@@ -46,7 +47,7 @@ public abstract class Renderer {
     protected static int getTextWidth(List<String> values, PDType0Font font, int fontSize) throws IOException {
         int result = 0;
         for (String value : values) {
-            String formattedValue = value.replaceAll("\\s{1,}", " ");
+            String formattedValue = Jsoup.parse(value.replaceAll("\\s{1,}", " ")).text();
             if (result < font.getStringWidth(formattedValue) / 1000 * fontSize)
                 result = (int) (font.getStringWidth(formattedValue) / 1000 * fontSize);
         }

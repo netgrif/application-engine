@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.elastic.service.interfaces.IElasticTaskService;
 import com.netgrif.workflow.elastic.web.requestbodies.singleaslist.SingleElasticTaskSearchRequestAsList;
+import com.netgrif.workflow.workflow.domain.IllegalArgumentWithChangedFieldsException;
 import com.netgrif.workflow.workflow.web.requestbodies.singleaslist.SingleTaskSearchRequestAsList;
 import com.netgrif.workflow.petrinet.domain.DataGroup;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldByFileFieldContainer;
@@ -163,7 +164,11 @@ public class TaskController {
                     "LocalisedTask " + taskId + " finished");
         } catch (Exception e) {
             log.error("Finishing task [" + taskId + "] failed: ", e);
-            return LocalisedEventOutcomeResource.errorOutcome(e.getMessage());
+            if (e instanceof IllegalArgumentWithChangedFieldsException) {
+                return LocalisedEventOutcomeResource.errorOutcome(e.getMessage(), ((IllegalArgumentWithChangedFieldsException) e).getChangedFields());
+            } else {
+                return LocalisedEventOutcomeResource.errorOutcome(e.getMessage());
+            }
         }
     }
 
@@ -184,7 +189,11 @@ public class TaskController {
                     "LocalisedTask " + taskId + " canceled");
         } catch (Exception e) {
             log.error("Canceling task [" + taskId + "] failed: ", e);
-            return LocalisedEventOutcomeResource.errorOutcome(e.getMessage());
+            if (e instanceof IllegalArgumentWithChangedFieldsException) {
+                return LocalisedEventOutcomeResource.errorOutcome(e.getMessage(), ((IllegalArgumentWithChangedFieldsException) e).getChangedFields());
+            } else {
+                return LocalisedEventOutcomeResource.errorOutcome(e.getMessage());
+            }
         }
     }
 
@@ -368,16 +377,13 @@ public class TaskController {
     public ResponseEntity<Resource> getFilePreview(@PathVariable("id") String taskId, @PathVariable("field") String fieldId, HttpServletResponse response) throws FileNotFoundException {
         FileFieldInputStream fileFieldInputStream = dataService.getFileByTask(taskId, fieldId, true);
 
-        if (fileFieldInputStream == null || fileFieldInputStream.getInputStream() == null)
-            throw new FileNotFoundException("File in field " + fieldId + " within task " + taskId + " was not found!");
-
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_OCTET_STREAM_VALUE);
-        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + fileFieldInputStream.getFileName());
+        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + (fileFieldInputStream != null ? fileFieldInputStream.getFileName() : "null"));
 
         return ResponseEntity
                 .ok()
                 .headers(headers)
-                .body(new InputStreamResource(fileFieldInputStream.getInputStream()));
+                .body(fileFieldInputStream != null ? new InputStreamResource(fileFieldInputStream.getInputStream()) : null);
     }
 }
