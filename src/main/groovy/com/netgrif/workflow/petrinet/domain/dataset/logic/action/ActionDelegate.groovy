@@ -648,4 +648,49 @@ class ActionDelegate {
     void sendMail(SimpleMailDraft mailDraft){
         mailService.sendMail(mailDraft)
     }
+
+    def changeUser(String email) {
+        [email: {cl ->
+            changeUser(email, "email", cl)
+        },
+         name: {cl ->
+             changeUser(email, "name", cl)
+         },
+         surname: {cl ->
+             changeUser(email, "surname", cl)
+         },
+         tel: {cl ->
+             changeUser(email, "tel", cl)
+         },
+        ]
+    }
+
+    def changeUser(String email, String attribute, def cl) {
+        String value = cl()
+        User user = userService.findByEmail(email, false)
+
+        if (user == null) {
+            log.error("Cannot find user with email [" + email + "]")
+            return
+        }
+
+        switch (attribute) {
+            case "email":
+                user.setEmail(value)
+                break
+            case "name":
+                user.setName(value)
+                break
+            case "surname":
+                user.setSurname(value)
+                break
+            case "tel":
+                user.setTelNumber(value)
+                break
+            default:
+                break
+        }
+        userService.save(user)
+    }
+
 }
