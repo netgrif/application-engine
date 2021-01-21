@@ -10,6 +10,7 @@ import com.netgrif.workflow.orgstructure.domain.Group
 import com.netgrif.workflow.orgstructure.service.IGroupService
 import com.netgrif.workflow.orgstructure.service.IMemberService
 import com.netgrif.workflow.petrinet.domain.PetriNet
+import com.netgrif.workflow.petrinet.domain.VersionType
 import com.netgrif.workflow.petrinet.domain.dataset.Field
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldsTree
 
@@ -33,6 +34,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.io.ClassPathResource
 import org.springframework.core.io.ResourceLoader
 import org.springframework.stereotype.Component
+
 
 @Component
 class ImportHelper {
@@ -123,13 +125,21 @@ class ImportHelper {
         return authorityService.getOrCreate(name)
     }
 
-    Optional<PetriNet> createNet(String fileName, String release) {
-        createNet(fileName, release, superCreator.loggedSuper)
+    Optional<PetriNet> createNet(String fileName, String release, LoggedUser author = superCreator.loggedSuper) {
+        return createNet(fileName, VersionType.valueOf(release.trim().toUpperCase()), author)
     }
 
-    Optional<PetriNet> createNet(String fileName, String release, LoggedUser loggedUser) {
+    Optional<PetriNet> createNet(String fileName, VersionType release = VersionType.MAJOR, LoggedUser author = superCreator.loggedSuper) {
         InputStream netStream = new ClassPathResource("petriNets/$fileName" as String).inputStream
-        return petriNetService.importPetriNet(netStream, release, loggedUser)
+        return petriNetService.importPetriNet(netStream, release, author)
+    }
+
+    Optional<PetriNet> upsertNet(String filename, String identifier, VersionType release = VersionType.MAJOR, LoggedUser author = superCreator.loggedSuper) {
+        PetriNet petriNet = petriNetService.getNewestVersionByIdentifier(identifier)
+        if (!petriNet) {
+            return createNet(filename, release, author)
+        }
+        return Optional.of(petriNet)
     }
 
     UserProcessRole createUserProcessRole(PetriNet net, String name) {
