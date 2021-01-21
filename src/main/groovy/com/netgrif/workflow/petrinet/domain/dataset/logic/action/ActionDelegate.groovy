@@ -665,31 +665,61 @@ class ActionDelegate {
         ]
     }
 
-    def changeUser(String email, String attribute, def cl) {
-        String value = cl()
-        User user = userService.findByEmail(email, false)
+    def changeUser(Long id) {
+        [email: {cl ->
+            changeUser(id, "email", cl)
+        },
+         name: {cl ->
+             changeUser(id, "name", cl)
+         },
+         surname: {cl ->
+             changeUser(id, "surname", cl)
+         },
+         tel: {cl ->
+             changeUser(id, "tel", cl)
+         },
+        ]
+    }
 
+    def changeUser(User user) {
+        [email: {cl ->
+            changeUser(user, "email", cl)
+        },
+         name: {cl ->
+             changeUser(user, "name", cl)
+         },
+         surname: {cl ->
+             changeUser(user, "surname", cl)
+         },
+         tel: {cl ->
+             changeUser(user, "tel", cl)
+         },
+        ]
+    }
+
+    def changeUser(String email, String attribute, def cl) {
+        User user = userService.findByEmail(email, false)
+        changeUser(user, attribute, cl)
+    }
+
+    def changeUser(Long id, String attribute, def cl) {
+        User user = userService.findById(id, false)
+        changeUser(user, attribute, cl)
+    }
+
+    def changeUser(User user, String attribute, def cl) {
+        String value = cl()
         if (user == null) {
-            log.error("Cannot find user with email [" + email + "]")
+            log.error("Cannot find user.")
             return
         }
 
-        switch (attribute) {
-            case "email":
-                user.setEmail(value)
-                break
-            case "name":
-                user.setName(value)
-                break
-            case "surname":
-                user.setSurname(value)
-                break
-            case "tel":
-                user.setTelNumber(value)
-                break
-            default:
-                break
+        if (user.hasProperty(attribute) == null) {
+            log.error("User object does not have property [" + attribute + "]")
+            return
         }
+
+        user[attribute] = value
         userService.save(user)
     }
 
