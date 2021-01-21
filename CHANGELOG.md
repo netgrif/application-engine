@@ -1,3 +1,32 @@
+<a name="https://netgrif.atlassian.net/projects/NAE/versions/10850/tab/release-report-all-issues"></a>
+## 4.5.0 - Orange Bubble (22.12.2020)
+### Bug fixes
+* [NAE-1161](https://netgrif.atlassian.net/browse/NAE-1161) - PDF tool wrongly generated enumerations, multi-choice, and HTML 
+* [NAE-1162](https://netgrif.atlassian.net/browse/NAE-1162) - PDF tool null-pointer on layout 
+
+### Improvements
+* [NAE-1178](https://netgrif.atlassian.net/browse/NAE-1178) - Cancel and finish error changed fields propagation
+
+### Features
+* [NAE-1168](https://netgrif.atlassian.net/browse/NAE-1168) - Task ref representation
+* [NAE-1172](https://netgrif.atlassian.net/browse/NAE-1172) - Frontend control from process actions
+
+<a name="https://netgrif.atlassian.net/projects/NAE/versions/10826/tab/release-report-all-issues"></a>
+## 4.4.0 - Olive Nickel (14.12.2020)
+### Bug fixes
+* [NAE-1096](https://netgrif.atlassian.net/browse/NAE-1096) - Change MultichoiceMapField/EnumerationMapField value na null hodnotu nefunguje
+* [NAE-1100](https://netgrif.atlassian.net/browse/NAE-1100) - Set UserField data after finish
+* [NAE-1102](https://netgrif.atlassian.net/browse/NAE-1102) - Zlé definovanie Multichoice map
+* [NAE-1136](https://netgrif.atlassian.net/browse/NAE-1136) - Delegate endpoint doesn't work
+
+### Improvements
+* [NAE-1109](https://netgrif.atlassian.net/browse/NAE-1109) - Task ref set data propagation
+* [NAE-1139](https://netgrif.atlassian.net/browse/NAE-1139) - Improve overridability of petri net service
+* [NAE-1142](https://netgrif.atlassian.net/browse/NAE-1142) - Whitelist URLs trough application properties
+
+### Features
+None
+
 <a name="https://netgrif.atlassian.net/projects/NAE/versions/10832/tab/release-report-all-issues"></a>
 ## 4.3.1 - Green Nickel (13.11.2020)
 ### Bug fixes
