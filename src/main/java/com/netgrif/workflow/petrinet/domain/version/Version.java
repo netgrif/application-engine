@@ -1,11 +1,11 @@
 package com.netgrif.workflow.petrinet.domain.version;
 
-import com.netgrif.workflow.petrinet.domain.PetriNet;
+import com.netgrif.workflow.petrinet.domain.VersionType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
-import static com.netgrif.workflow.petrinet.domain.PetriNet.VersionType.MAJOR;
-import static com.netgrif.workflow.petrinet.domain.PetriNet.VersionType.MINOR;
+import static com.netgrif.workflow.petrinet.domain.VersionType.MAJOR;
+import static com.netgrif.workflow.petrinet.domain.VersionType.MINOR;
 
 @Data
 @AllArgsConstructor
@@ -30,7 +30,7 @@ public class Version {
         return major + "." + minor + "." + patch;
     }
 
-    public void increment(PetriNet.VersionType type) {
+    public void increment(VersionType type) {
         if (type == MAJOR) {
             major += 1;
             minor = 0;
