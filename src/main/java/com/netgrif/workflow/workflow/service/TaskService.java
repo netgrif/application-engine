@@ -673,6 +673,15 @@ public class TaskService implements ITaskService {
     }
 
     @Override
+    public void resolveUserRef(Case useCase) {
+        useCase.getTasks().forEach(taskPair -> {
+            Optional<Task> taskOptional = taskRepository.findById(taskPair.getTask());
+            taskOptional.ifPresent(task -> resolveUserRef(task, useCase));
+        });
+
+    }
+
+    @Override
     public Task resolveUserRef(Task task, Case useCase) {
         task.getUsers().clear();
         task.getUserRefs().forEach((id, permission) -> {
