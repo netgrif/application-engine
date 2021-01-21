@@ -34,8 +34,8 @@ public class PublicWorkflowController extends PublicAbstractController {
         try {
             Case useCase = this.workflowService.createCase(body.netId, body.title, body.color, loggedUser);
             return new CaseResource(useCase);
-        } catch (Exception var5) {
-            log.error("Creating case failed:", var5);
+        } catch (Exception e) {
+            log.error("Creating case failed:" + e.getMessage(), e);
             return null;
         }
     }
@@ -46,8 +46,8 @@ public class PublicWorkflowController extends PublicAbstractController {
         try {
             caseId = URLDecoder.decode(caseId, StandardCharsets.UTF_8.name());
             return new DataFieldsResource(this.workflowService.getData(caseId), locale);
-        } catch (UnsupportedEncodingException var4) {
-            log.error("Getting all case data of [" + caseId + "] failed:", var4);
+        } catch (UnsupportedEncodingException e) {
+            log.error("Getting all case data of [" + caseId + "] failed:" + e.getMessage(), e);
             return new DataFieldsResource(new ArrayList<>(), locale);
         }
     }
