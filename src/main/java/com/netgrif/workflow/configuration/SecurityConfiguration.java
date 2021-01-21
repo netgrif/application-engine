@@ -2,6 +2,7 @@ package com.netgrif.workflow.configuration;
 
 import com.netgrif.workflow.auth.domain.Authority;
 import com.netgrif.workflow.auth.service.interfaces.IAuthorityService;
+import com.netgrif.workflow.configuration.properties.SecurityConfigProperties;
 import com.netgrif.workflow.configuration.security.PublicAuthenticationFilter;
 import com.netgrif.workflow.configuration.security.RestAuthenticationEntryPoint;
 import com.netgrif.workflow.configuration.security.jwt.IJwtService;
@@ -56,8 +57,8 @@ public class SecurityConfiguration extends AbstractSecurityConfiguration {
     @Autowired
     private IJwtService jwtService;
 
-    @Value("${server.security.csrf}")
-    private boolean csrf = true;
+    @Autowired
+    private SecurityConfigProperties properties;
 
     @Value("${nae.security.server-patterns}")
     private String[] serverPatterns;
@@ -129,7 +130,7 @@ public class SecurityConfiguration extends AbstractSecurityConfiguration {
 
     @Override
     boolean isCsrfEnabled() {
-        return csrf;
+        return properties.isCsrf();
     }
 
     @Override
