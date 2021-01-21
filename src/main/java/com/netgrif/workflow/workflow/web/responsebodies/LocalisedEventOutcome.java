@@ -26,7 +26,7 @@ public class LocalisedEventOutcome extends ChangedFieldContainer {
     public static LocalisedEventOutcome successOutcome(EventOutcome outcome, Locale locale, String defaultSuccessMessage) {
         LocalisedEventOutcome result = new LocalisedEventOutcome();
 
-        result.putAll(outcome.getChangedFields());
+        outcome.getChangedFields().flatten(result);
         result.startDate = outcome.getStartDate();
         result.finishDate = outcome.getFinishDate();
 
