@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="../../main/resources/petriNets/petriflow_schema.xsd">
+    <id>parent</id>
+    <version>1.0.0</version>
+    <initials>PAR</initials>
+    <title>parent</title>
+    <icon>home</icon>
+    <defaultRole>true</defaultRole>
+    <transitionRole>false</transitionRole>
+    <!-- TRANSACTIONS -->
+    <!-- ROLES -->
+    <!-- DATA -->
+    <data type="file">
+        <id>file</id>
+        <title>File</title>
+    </data>
+
+    <data type="text">
+        <id>text</id>
+        <title>Text</title>
+
+        <event type="set">
+            <id>set</id>
+
+            <actions phase="pre">
+                <action>
+                    text: f.text,
+                    children_tasks: f.children_tasks;
+
+                    children_tasks.value.each {
+                        setDataWithPropagation(it as String, [
+                            "text3": ["type": "text", "value": ((text.value ?: "") + "-propagated-down-pre") as String]
+                        ])
+                    }
+                </action>
+            </actions>
+
+            <actions phase="post">
+                <action>
+                    text: f.text,
+                    children_tasks: f.children_tasks;
+
+                    children_tasks.value.each {
+                        setDataWithPropagation(it as String, [
+                            "text1": ["type": "text", "value": (text.value + "-propagated-down-post") as String]
+                        ])
+                    }
+                </action>
+            </actions>
+        </event>
+    </data>
+
+    <data type="multichoice">
+        <id>multichoice</id>
+        <title>Multichoice</title>
+    </data>
+
+    <data type="text">
+        <id>multichoice_setter</id>
+        <title>Multichoice Setter</title>
+
+        <action trigger="set">
+            multichoice_setter: f.multichoice_setter,
+            multichoice: f.multichoice;
+
+            def newChoices = multichoice_setter.value.split(";") as List
+            change multichoice choices { newChoices }
+        </action>
+    </data>
+
+    <data type="number">
+        <id>number</id>
+        <title>Number</title>
+    </data>
+
+    <data type="taskRef">
+        <id>children_tasks</id>
+        <title>TaskRef</title>
+    </data>
+
+    <data type="text">
+        <id>text_from_child</id>
+        <title>Text from child</title>
+    </data>
+
+    <data type="text">
+        <id>text_from_child_setter</id>
+        <title>Text from child setter</title>
+
+        <action trigger="set">
+            text_from_child_setter: f.text_from_child_setter,
+            text_from_child: f.text_from_child;
+
+            change text_from_child value { text_from_child_setter.value as String }
+        </action>
+    </data>
+    <!-- I18NS -->
+    <!-- TRANSITIONS -->
+    <transition>
+        <id>4</id>
+        <x>580</x>
+        <y>220</y>
+		<label>Task 1</label>
+        <assignPolicy>auto</assignPolicy>
+
+        <dataGroup>
+            <id>0</id>
+            <title>Edit</title>
+            <dataRef>
+                <id>file</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>text</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>text_from_child</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>multichoice</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>multichoice_setter</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+
+        <dataGroup>
+            <id>1</id>
+            <title>Inštancie</title>
+            <dataRef>
+                <id>children_tasks</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+
+
+    </transition>
+
+    <transition>
+        <id>2</id>
+        <x>780</x>
+        <y>220</y>
+		<label>Task 2</label>
+        <assignPolicy>auto</assignPolicy>
+
+        <dataGroup>
+            <id>0</id>
+			<title>Edit</title>
+            <dataRef>
+                <id>file</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>text</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>text_from_child</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>multichoice</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>multichoice_setter</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+
+        <dataGroup>
+            <id>1</id>
+			<title>Inštancie</title>
+            <dataRef>
+                <id>children_tasks</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+    </transition>
+    <!-- PLACES -->
+    <!-- ARCS -->
+</document>
