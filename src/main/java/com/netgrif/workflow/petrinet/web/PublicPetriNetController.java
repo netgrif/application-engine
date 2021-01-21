@@ -62,14 +62,14 @@ public class PublicPetriNetController extends PublicAbstractController {
     @ApiOperation(value = "Get roles of process")
     @RequestMapping(value = "/{netId}/roles", method = GET, produces = MediaTypes.HAL_JSON_VALUE)
     public ProcessRolesResource getRoles(@PathVariable("netId") String netId, Locale locale) {
-        netId = decodeUrl(netId);
+        netId = PetriNetController.decodeUrl(netId);
         return new ProcessRolesResource(roleService.findAll(netId), netId, locale);
     }
 
     @ApiOperation(value = "Get transactions of process")
     @RequestMapping(value = "/{netId}/transactions", method = GET, produces = MediaTypes.HAL_JSON_VALUE)
     public TransactionsResource getTransactions(@PathVariable("netId") String netId, Locale locale) {
-        PetriNet net = service.getPetriNet(decodeUrl(netId));
+        PetriNet net = service.getPetriNet(PetriNetController.decodeUrl(netId));
         return new TransactionsResource(net.getTransactions().values(), netId, locale);
     }
 
@@ -82,7 +82,7 @@ public class PublicPetriNetController extends PublicAbstractController {
     @ApiOperation(value = "Get transitions of processes")
     @RequestMapping(value = "/transitions", method = GET, produces = MediaTypes.HAL_JSON_VALUE)
     public TransitionReferencesResource getTransitionReferences(@RequestParam List<String> ids, Locale locale) {
-        ids.forEach(id -> id = decodeUrl(id));
+        ids.forEach(id -> id = PetriNetController.decodeUrl(id));
         return new TransitionReferencesResource(service.getTransitionReferences(ids, getAnonym(), locale));
     }
 }

@@ -139,7 +139,7 @@ public class PublicTaskController extends PublicAbstractController {
     @ApiOperation(value = "Generic task search on Mongo database")
     @PostMapping(value = "/task/search", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public PagedResources<LocalisedTaskResource> search(Pageable pageable, @RequestBody SingleTaskSearchRequestAsList searchBody, @RequestParam(defaultValue = "OR") MergeFilterOperation operation, PagedResourcesAssembler<com.netgrif.workflow.workflow.domain.Task> assembler, Locale locale) {
-        Page<com.netgrif.workflow.workflow.domain.Task> tasks = taskService.searchPublic(searchBody.getList(), pageable, getAnonym(),locale, operation == MergeFilterOperation.AND);
+        Page<com.netgrif.workflow.workflow.domain.Task> tasks = taskService.search(searchBody.getList(), pageable, getAnonym(),locale, operation == MergeFilterOperation.AND);
         Link selfLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(PublicTaskController.class)
                 .search(pageable, searchBody, operation, assembler, locale)).withRel("search");
         PagedResources<LocalisedTaskResource> resources = assembler.toResource(tasks, new TaskResourceAssembler(locale), selfLink);
