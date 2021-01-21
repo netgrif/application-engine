@@ -12,6 +12,8 @@ import com.netgrif.workflow.utils.FullPageRequest;
 import com.netgrif.workflow.workflow.domain.Task;
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
 import com.netgrif.workflow.workflow.web.requestbodies.TaskSearchRequest;
+import com.netgrif.workflow.workflow.web.requestbodies.taskSearch.PetriNet;
+import com.netgrif.workflow.workflow.web.requestbodies.taskSearch.TaskSearchCaseRequest;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryStringQueryBuilder;
@@ -281,7 +283,7 @@ public class ElasticTaskService implements IElasticTaskService {
      * @return query for ID if only ID is present. Query for title if only title is present.
      * If both are present an ID query is returned. If neither are present null is returned.
      */
-    private QueryBuilder caseRequestQuery(TaskSearchRequest.TaskSearchCaseRequest caseRequest) {
+    private QueryBuilder caseRequestQuery(TaskSearchCaseRequest caseRequest) {
         if (caseRequest.id != null) {
             return termQuery("caseId", caseRequest.id);
         } else if (caseRequest.title != null) {
@@ -358,7 +360,7 @@ public class ElasticTaskService implements IElasticTaskService {
         }
 
         BoolQueryBuilder processQuery = boolQuery();
-        for (TaskSearchRequest.PetriNet process : request.process) {
+        for (PetriNet process : request.process) {
             if (process.identifier != null) {
                 processQuery.should(termQuery("processId", process.identifier));
             }
