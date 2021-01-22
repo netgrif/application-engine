@@ -14,9 +14,6 @@ import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Locale;
 
@@ -56,7 +53,7 @@ public class PublicPetriNetController extends PublicAbstractController {
     )
     @ResponseBody
     public PetriNetReferenceResource getOne(@PathVariable("identifier") String identifier, @PathVariable("version") String version, Locale locale) {
-        return new PetriNetReferenceResource(this.service.getReference(identifier, this.converter.convert(version), getAnonym(), locale));
+        return new PetriNetReferenceResource(this.service.getReference(identifier, this.converter.convert(version), getAnonymous(), locale));
     }
 
     @ApiOperation(value = "Get roles of process")
@@ -83,6 +80,6 @@ public class PublicPetriNetController extends PublicAbstractController {
     @RequestMapping(value = "/transitions", method = GET, produces = MediaTypes.HAL_JSON_VALUE)
     public TransitionReferencesResource getTransitionReferences(@RequestParam List<String> ids, Locale locale) {
         ids.forEach(id -> id = PetriNetController.decodeUrl(id));
-        return new TransitionReferencesResource(service.getTransitionReferences(ids, getAnonym(), locale));
+        return new TransitionReferencesResource(service.getTransitionReferences(ids, getAnonymous(), locale));
     }
 }

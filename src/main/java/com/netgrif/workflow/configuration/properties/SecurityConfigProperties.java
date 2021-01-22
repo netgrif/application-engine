@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Configuration;
 
 @Data
 @Configuration
-@ConfigurationProperties(prefix = "nae.security")
+@ConfigurationProperties(prefix = "nae.server.security")
 public class SecurityConfigProperties {
 
     /**
