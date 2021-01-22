@@ -6,6 +6,7 @@ import com.netgrif.workflow.petrinet.domain.Component;
 import com.netgrif.workflow.petrinet.domain.Format;
 import com.netgrif.workflow.petrinet.domain.I18nString;
 import com.netgrif.workflow.petrinet.domain.dataset.*;
+import com.netgrif.workflow.petrinet.domain.views.View;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.DataField;
 import lombok.extern.slf4j.Slf4j;
@@ -26,6 +27,9 @@ public final class FieldFactory {
 
     @Autowired
     private FormatFactory formatFactory;
+
+    @Autowired
+    private ViewFactory viewFactory;
 
     @Autowired
     private ComponentFactory componentFactory;
@@ -118,7 +122,11 @@ public final class FieldFactory {
             Format format = formatFactory.buildFormat(data.getFormat());
             field.setFormat(format);
         }
-
+        if (data.getView() != null) {
+            log.warn("Data attribute [view] is deprecated.");
+            View view = viewFactory.buildView(data);
+            field.setComponent(new Component(view.getValue()));
+        }
         if (data.getComponent() != null) {
             Component component = componentFactory.buildComponent(data);
             field.setComponent(component);
