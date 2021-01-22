@@ -770,7 +770,9 @@ public class TaskService implements ITaskService {
     }
 
     private void setUser(Task task) {
-        if (task.getUserId() != null)
+        if (task.getUserId() != null && userService.getAnonymousLogged().isAnonymous()){
+            task.setUser(userService.getAnonymousLogged().transformToAnonymousUser());
+        } else if (task.getUserId() != null)
             task.setUser(userService.findById(task.getUserId(), true));
     }
 }

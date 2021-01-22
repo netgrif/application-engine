@@ -1,7 +1,6 @@
 package com.netgrif.workflow.workflow.web;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.petrinet.domain.DataGroup;
@@ -28,10 +27,9 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Locale;
-import java.util.Optional;
 
 @RestController
-@RequestMapping({"/api/public"})
+@RequestMapping({"/api/public/task"})
 @Slf4j
 public class PublicTaskController extends PublicAbstractController {
 
@@ -45,13 +43,13 @@ public class PublicTaskController extends PublicAbstractController {
         this.dataService = dataService;
     }
 
-    @GetMapping(value = "/task/case/{id}", produces = "application/json;charset=UTF-8")
+    @GetMapping(value = "/case/{id}", produces = "application/json;charset=UTF-8")
     @ApiOperation(value = "Get tasks of the case")
     public List<TaskReference> getTasksOfCase(@PathVariable("id") String caseId, Locale locale) {
         return this.taskService.findAllByCase(caseId, locale);
     }
 
-    @GetMapping(value = "/task/assign/{id}", produces = "application/hal+json")
+    @GetMapping(value = "/assign/{id}", produces = "application/hal+json")
     @ApiOperation(value = "Assign task", notes = "Caller must be able to perform the task, or must be an ADMIN")
     @ApiResponses({@ApiResponse(
             code = 200,
@@ -62,7 +60,7 @@ public class PublicTaskController extends PublicAbstractController {
             message = "Caller doesn't fulfill the authorisation requirements"
     )})
     public LocalisedEventOutcomeResource assign(@PathVariable("id") String taskId, Locale locale) {
-        User user = getAnonym().transformToAnonymousUser();
+        User user = getAnonymous().transformToAnonymousUser();
         try {
             Task task = taskService.findById(taskId);
             return LocalisedEventOutcomeResource.successOutcome(this.taskService.assignTask(task, user), locale, "LocalisedTask " + taskId + " assigned to " + user.getFullName());
@@ -72,7 +70,7 @@ public class PublicTaskController extends PublicAbstractController {
         }
     }
 
-    @GetMapping(value = "/task/finish/{id}", produces = "application/hal+json")
+    @GetMapping(value = "/finish/{id}", produces = "application/hal+json")
     @ApiOperation(value = "Finish task", notes = "Caller must be assigned to the task, or must be an ADMIN")
     @ApiResponses({@ApiResponse(
             code = 200,
@@ -83,7 +81,7 @@ public class PublicTaskController extends PublicAbstractController {
             message = "Caller doesn't fulfill the authorisation requirements"
     )})
     public LocalisedEventOutcomeResource finish(@PathVariable("id") String taskId, Locale locale) {
-        User user = getAnonym().transformToAnonymousUser();
+        User user = getAnonymous().transformToAnonymousUser();
         try {
             Task task = taskService.findById(taskId);
             checkAssignedUser(task, user);
@@ -94,7 +92,7 @@ public class PublicTaskController extends PublicAbstractController {
         }
     }
 
-    @GetMapping(value = "/task/cancel/{id}", produces = "application/hal+json")
+    @GetMapping(value = "/cancel/{id}", produces = "application/hal+json")
     @ApiOperation(value = "Cancel task", notes = "Caller must be assigned to the task, or must be an ADMIN")
     @ApiResponses({@ApiResponse(
             code = 200,
@@ -105,7 +103,7 @@ public class PublicTaskController extends PublicAbstractController {
             message = "Caller doesn't fulfill the authorisation requirements"
     )})
     public LocalisedEventOutcomeResource cancel(@PathVariable("id") String taskId, Locale locale) {
-        User user  = getAnonym().transformToAnonymousUser();
+        User user  = getAnonymous().transformToAnonymousUser();
         try {
             Task task = taskService.findById(taskId);
             return LocalisedEventOutcomeResource.successOutcome(this.taskService.cancelTask(task, user), locale, "LocalisedTask " + taskId + " canceled");
@@ -115,14 +113,14 @@ public class PublicTaskController extends PublicAbstractController {
         }
     }
 
-    @GetMapping(value = "/task/{id}/data", produces = "application/hal+json")
+    @GetMapping(value = "/{id}/data", produces = "application/hal+json")
     @ApiOperation(value = "Get all task data")
     public DataGroupsResource getData(@PathVariable("id") String taskId, Locale locale) {
         List<DataGroup> dataGroups = this.dataService.getDataGroups(taskId, locale);
         return new DataGroupsResource(dataGroups, locale);
     }
 
-    @PostMapping(value = "/task/{id}/data", consumes = "application/json;charset=UTF-8", produces = "application/json;charset=UTF-8")
+    @PostMapping(value = "/{id}/data", consumes = "application/json;charset=UTF-8", produces = "application/json;charset=UTF-8")
     @ApiOperation(value = "Set task data", notes = "Caller must be assigned to the task, or must be an ADMIN")
     @ApiResponses({@ApiResponse(
             code = 200,
@@ -137,9 +135,9 @@ public class PublicTaskController extends PublicAbstractController {
     }
 
     @ApiOperation(value = "Generic task search on Mongo database")
-    @PostMapping(value = "/task/search", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
+    @PostMapping(value = "/search", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public PagedResources<LocalisedTaskResource> search(Pageable pageable, @RequestBody SingleTaskSearchRequestAsList searchBody, @RequestParam(defaultValue = "OR") MergeFilterOperation operation, PagedResourcesAssembler<com.netgrif.workflow.workflow.domain.Task> assembler, Locale locale) {
-        Page<com.netgrif.workflow.workflow.domain.Task> tasks = taskService.search(searchBody.getList(), pageable, getAnonym(),locale, operation == MergeFilterOperation.AND);
+        Page<com.netgrif.workflow.workflow.domain.Task> tasks = taskService.search(searchBody.getList(), pageable, getAnonymous(),locale, operation == MergeFilterOperation.AND);
         Link selfLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(PublicTaskController.class)
                 .search(pageable, searchBody, operation, assembler, locale)).withRel("search");
         PagedResources<LocalisedTaskResource> resources = assembler.toResource(tasks, new TaskResourceAssembler(locale), selfLink);
