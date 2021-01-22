@@ -30,7 +30,7 @@ public class Preferences implements Serializable {
 
     private String locale;
 
-    private Integer drawerWidth;
+    private int drawerWidth;
 
     /**
      * taskViewId: [filterIds]
