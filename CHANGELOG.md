@@ -1,3 +1,14 @@
+<a name="https://netgrif.atlassian.net/projects/NAE/versions/10851/tab/release-report-all-issues"></a>
+## 4.6.0 - Green Silver (20.01.2021)
+### Bug fixes
+* [NAE-1202](https://netgrif.atlassian.net/browse/NAE-1202) - Bug in ChangedFieldTree
+
+### Improvements
+* [NAE-1109](https://netgrif.atlassian.net/browse/NAE-1109) - Task ref set data propagation
+
+### Features
+None
+
 <a name="https://netgrif.atlassian.net/projects/NAE/versions/10850/tab/release-report-all-issues"></a>
 ## 4.5.0 - Orange Bubble (22.12.2020)
 ### Bug fixes
