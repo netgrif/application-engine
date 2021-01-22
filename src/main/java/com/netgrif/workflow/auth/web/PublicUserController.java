@@ -37,6 +37,6 @@ public class PublicUserController extends PublicAbstractController {
     @ApiOperation(value = "Get logged user")
     @GetMapping(value = "/me", produces = MediaTypes.HAL_JSON_VALUE)
     public UserResource getLoggedUser(Locale locale) {
-        return new UserResource(userResponseFactory.getUser(getAnonym().transformToAnonymousUser(), locale), "profile");
+        return new UserResource(userResponseFactory.getUser(getAnonymous().transformToAnonymousUser(), locale), "profile");
     }
 }

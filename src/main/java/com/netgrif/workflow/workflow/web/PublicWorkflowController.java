@@ -30,7 +30,7 @@ public class PublicWorkflowController extends PublicAbstractController {
     @PostMapping(value = "/case", consumes = "application/json;charset=UTF-8", produces = "application/hal+json")
     @ApiOperation(value = "Create new case")
     public CaseResource createCase(@RequestBody CreateCaseBody body) {
-        LoggedUser loggedUser = getAnonym();
+        LoggedUser loggedUser = getAnonymous();
         try {
             Case useCase = this.workflowService.createCase(body.netId, body.title, body.color, loggedUser);
             return new CaseResource(useCase);
