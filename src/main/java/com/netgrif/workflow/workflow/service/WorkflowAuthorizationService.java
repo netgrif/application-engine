@@ -12,10 +12,7 @@ import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -49,23 +46,16 @@ public class WorkflowAuthorizationService implements IWorkflowAuthorizationServi
             return true;
         }
 
-        for (ProcessRolePermission permission : permissions) {
+        return Arrays.stream(permissions).anyMatch(permission -> {
             Boolean hasPermission = aggregatePermissions.get(permission.toString());
-            if (hasPermission != null && hasPermission) {
-                return true;
-            }
-        }
-
-        return false;
+            return hasPermission != null && hasPermission;
+        });
     }
 
     private Map<String, Boolean> getAggregatePermissions(User user, PetriNet net) {
         Map<String, Boolean> aggregatePermissions = new HashMap<>();
 
-        Set<String> userProcessRoleIDs = new LinkedHashSet<>();
-        for (ProcessRole role : user.getProcessRoles()) {
-            userProcessRoleIDs.add(role.get_id().toString());
-        }
+        Set<String> userProcessRoleIDs = user.getProcessRoles().stream().map(role ->  role.get_id().toString()).collect(Collectors.toSet());
 
         for (Map.Entry<String, Map<String, Boolean>> role : net.getPermissions().entrySet()) {
             if (userProcessRoleIDs.contains(role.getKey())) {
