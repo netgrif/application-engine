@@ -5,7 +5,11 @@ import com.netgrif.workflow.auth.service.interfaces.IUserProcessRoleService;
 import com.netgrif.workflow.event.events.model.UserImportModelEvent;
 import com.netgrif.workflow.importer.service.Importer;
 import com.netgrif.workflow.orgstructure.groups.interfaces.INextGroupService;
-import com.netgrif.workflow.petrinet.domain.EventPhase;
+import com.netgrif.workflow.petrinet.domain.DataFieldLogic;
+import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedField;
+import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action;
+import com.netgrif.workflow.petrinet.domain.dataset.logic.action.FieldActionsRunner;
+import com.netgrif.workflow.petrinet.domain.events.EventPhase;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.Transition;
 import com.netgrif.workflow.petrinet.domain.VersionType;
@@ -21,6 +25,7 @@ import com.netgrif.workflow.petrinet.web.responsebodies.PetriNetReference;
 import com.netgrif.workflow.petrinet.web.responsebodies.TransitionReference;
 import com.netgrif.workflow.rules.domain.facts.NetImportedFact;
 import com.netgrif.workflow.rules.service.interfaces.IRuleEngine;
+import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.FileStorageConfiguration;
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
@@ -87,6 +92,9 @@ public class PetriNetService implements IPetriNetService {
 
     @Autowired
     private Provider<Importer> importerProvider;
+
+    @Autowired
+    private FieldActionsRunner actionsRunner;
 
     private Map<ObjectId, PetriNet> cache = new HashMap<>();
 
@@ -156,8 +164,10 @@ public class PetriNetService implements IPetriNetService {
         Path savedPath = getImporter().saveNetFile(net, xmlFile);
         log.info("Petri net " + net.getTitle() + " (" + net.getInitials() + " v" + net.getVersion() + ") imported successfully");
         publisher.publishEvent(new UserImportModelEvent(author, new File(savedPath.toString()), net.getTitle().getDefaultValue(), net.getInitials()));
+        runActions(net.getPreUploadActions(), net.getStringId());
         evaluateRules(net, EventPhase.PRE);
         save(net);
+        runActions(net.getPostUploadActions(), net.getStringId());
         evaluateRules(net, EventPhase.POST);
         save(net);
         cache.put(net.getObjectId(), net);
@@ -387,4 +397,14 @@ public class PetriNetService implements IPetriNetService {
             throw new IllegalArgumentException("Field with import id " + arc.getMultiplicity() + " not found.");
         arc.setFieldId(field.get().getStringId());
     }
+
+    @Override
+    public void runActions(List<Action> actions, String netId) {
+        log.info("Running actions of net [" + netId + "]");
+
+        actions.forEach(action -> {
+            actionsRunner.run(action, null);
+        });
+    }
+
 }
