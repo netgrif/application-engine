@@ -648,8 +648,4 @@ class ActionDelegate {
     void sendMail(SimpleMailDraft mailDraft){
         mailService.sendMail(mailDraft)
     }
-
-    def testos() {
-        assignRole(useCase.getPetriNet().roles.values().find { role -> role.importId == "student"}.stringId)
-    }
 }
