@@ -21,13 +21,13 @@ public class DataField {
     @Getter
     private Object value;
 
-    @Getter @Setter
+    @Getter
     private Set<I18nString> choices;
 
-    @Getter @Setter
+    @Getter
     private List<String> allowedNets;
 
-    @Getter @Setter
+    @Getter
     private Map<String, I18nString> options;
 
     @Getter
@@ -55,6 +55,21 @@ public class DataField {
 
     public void setValue(Object value) {
         this.value = value;
+        update();
+    }
+
+    public void setChoices(Set<I18nString> choices) {
+        this.choices = choices;
+        update();
+    }
+
+    public void setAllowedNets(List<String> allowedNets) {
+        this.allowedNets = allowedNets;
+        update();
+    }
+
+    public void setOptions(Map<String, I18nString> options) {
+        this.options = options;
         update();
     }
 
