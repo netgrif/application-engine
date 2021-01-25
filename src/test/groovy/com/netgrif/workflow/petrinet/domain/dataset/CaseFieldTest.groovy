@@ -3,6 +3,7 @@ package com.netgrif.workflow.petrinet.domain.dataset
 import com.netgrif.workflow.TestHelper
 import com.netgrif.workflow.ipc.TaskApiTest
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldContainer
+import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldsTree
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.workflow.startup.ImportHelper
 import com.netgrif.workflow.startup.SuperCreator
@@ -67,7 +68,7 @@ class CaseFieldTest {
         assert ((CaseField) aCase.getField("caseref")).allowedNets.get(0) == "lorem"
 
         importHelper.assignTaskToSuper(ALLOWED_NETS_TASK_TITLE, aCase.stringId)
-        ChangedFieldContainer changed1 = importHelper.setTaskData(ALLOWED_NETS_TASK_TITLE, aCase.stringId, [
+        ChangedFieldsTree changed1 = importHelper.setTaskData(ALLOWED_NETS_TASK_TITLE, aCase.stringId, [
                 "setVal": [
                         "value": true,
                         "type": importHelper.FIELD_BOOLEAN
@@ -75,9 +76,9 @@ class CaseFieldTest {
         ])
 
         assert changed1.getChangedFields().containsKey("caseref")
-        assert changed1.getChangedFields().get("caseref").containsKey("allowedNets")
-        assert changed1.getChangedFields().get("caseref").get("allowedNets") instanceof List
-        List<String> list1 = (List<String>) changed1.getChangedFields().get("caseref").get("allowedNets")
+        assert changed1.getChangedFields().get("caseref").attributes.containsKey("allowedNets")
+        assert changed1.getChangedFields().get("caseref").attributes.get("allowedNets") instanceof List
+        List<String> list1 = (List<String>) changed1.getChangedFields().get("caseref").attributes.get("allowedNets")
         assert list1.size() == 2
         assert list1.get(0) == "hello"
         assert list1.get(1) == "world"
@@ -89,7 +90,7 @@ class CaseFieldTest {
         assert aCase.getDataSet().get("caseref").allowedNets.get(0) == "hello"
         assert aCase.getDataSet().get("caseref").allowedNets.get(1) == "world"
 
-        ChangedFieldContainer changed2 = importHelper.setTaskData(ALLOWED_NETS_TASK_TITLE, aCase.stringId, [
+        ChangedFieldsTree changed2 = importHelper.setTaskData(ALLOWED_NETS_TASK_TITLE, aCase.stringId, [
                 "setNull": [
                         "value": true,
                         "type": importHelper.FIELD_BOOLEAN
@@ -97,9 +98,9 @@ class CaseFieldTest {
         ])
 
         assert changed2.getChangedFields().containsKey("caseref")
-        assert changed2.getChangedFields().get("caseref").containsKey("allowedNets")
-        assert changed2.getChangedFields().get("caseref").get("allowedNets") instanceof List
-        List<String> list2 = (List<String>) changed2.getChangedFields().get("caseref").get("allowedNets")
+        assert changed2.getChangedFields().get("caseref").attributes.containsKey("allowedNets")
+        assert changed2.getChangedFields().get("caseref").attributes.get("allowedNets") instanceof List
+        List<String> list2 = (List<String>) changed2.getChangedFields().get("caseref").attributes.get("allowedNets")
         assert list2.size() == 0
 
         caseOpt = caseRepository.findById(aCase.stringId)
@@ -146,7 +147,7 @@ class CaseFieldTest {
         assert caseRef.allowedNets.get(0).equals("hello")
         assert caseRef.allowedNets.get(1).equals("world")
 
-        ChangedFieldContainer changed2 = importHelper.setTaskData(ALLOWED_NETS_TASK_TITLE, aCase.stringId, [
+        ChangedFieldsTree changed2 = importHelper.setTaskData(ALLOWED_NETS_TASK_TITLE, aCase.stringId, [
                 "setNull": [
                         "value": true,
                         "type": importHelper.FIELD_BOOLEAN
