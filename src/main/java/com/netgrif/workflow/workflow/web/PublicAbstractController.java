@@ -8,9 +8,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 public abstract class PublicAbstractController {
 
-    @Value("${anonymous.email.address}")
-    private String anonymousEmail;
-
     protected final IUserService userService;
 
 
@@ -19,13 +16,6 @@ public abstract class PublicAbstractController {
     }
 
     protected LoggedUser getAnonym() {
-        LoggedUser user = userService.findByEmail(anonymousEmail, true).transformToLoggedUser();
-        reloadSecurityContext(user);
-        return user;
-    }
-
-    protected void reloadSecurityContext(LoggedUser loggedUser) {
-        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(loggedUser, SecurityContextHolder.getContext().getAuthentication().getCredentials(), loggedUser.getAuthorities());
-        SecurityContextHolder.getContext().setAuthentication(token);
+        return (LoggedUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
 }
