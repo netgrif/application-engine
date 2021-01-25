@@ -20,6 +20,8 @@ import com.netgrif.workflow.petrinet.domain.PetriNet
 import com.netgrif.workflow.petrinet.domain.Transition
 import com.netgrif.workflow.petrinet.domain.dataset.*
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedField
+import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldsTree
+
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.workflow.startup.ImportHelper
 import com.netgrif.workflow.workflow.domain.Case
@@ -90,17 +92,19 @@ class ActionDelegate {
     INextGroupService nextGroupService
 
     /**
-     * Reference of case in which current action is taking place.
+     * Reference of case and task in which current action is taking place.
      */
     Case useCase
+    Optional<Task> task
     def map = [:]
     Action action
     FieldActionsRunner actionsRunner
-    Map<String, ChangedField> changedFields = new HashMap<>()
+    ChangedFieldsTree changedFieldsTree
 
-    def init(Action action, Case useCase, FieldActionsRunner actionsRunner) {
+    def init(Action action, Case useCase, Optional<Task> task, FieldActionsRunner actionsRunner) {
         this.action = action
         this.useCase = useCase
+        this.task = task
         this.actionsRunner = actionsRunner
         action.fieldIds.each { name, id ->
             set(name, fieldFactory.buildFieldWithoutValidation(useCase, id))
@@ -108,6 +112,9 @@ class ActionDelegate {
         action.transitionIds.each { name, id ->
             set(name, useCase.petriNet.transitions[id])
         }
+        changedFieldsTree = ChangedFieldsTree.createNew(useCase.stringId,
+                task.isPresent() ? task.get().stringId : "task",
+                task.isPresent() ? task.get().transitionId : "trans")
     }
 
     def copyBehavior(Field field, Transition transition) {
@@ -167,11 +174,11 @@ class ActionDelegate {
             [when: { Closure condition ->
                 if (condition()) {
                     behavior(field, trans)
-                    if (!changedFields.containsKey(field.stringId)) {
-                        changedFields[field.stringId] = new ChangedField(field.stringId)
+                    if (!changedFieldsTree.changedFields.containsKey(field.stringId)) {
+                        putIntoChangedFields(field, new ChangedField(field.stringId))
                     }
-                    changedFields[field.stringId].addBehavior(useCase.dataSet.get(field.stringId).behavior)
-                    changedFields[field.stringId].addAttribute("type", field.type.name)
+                    changedFieldsTree.addBehavior(field.stringId, useCase.dataSet.get(field.stringId).behavior)
+                    addAttributeToChangedField(field, "type", field.type.name)
                 }
             }]
         }]
@@ -179,35 +186,47 @@ class ActionDelegate {
 
     def saveChangedValue(Field field) {
         useCase.dataSet.get(field.stringId).value = field.value
-        if (!changedFields.containsKey(field.stringId)) {
-            changedFields[field.stringId] = new ChangedField(field.stringId)
+        if (!changedFieldsTree.changedFields.containsKey(field.stringId)) {
+            putIntoChangedFields(field, new ChangedField(field.stringId))
         }
-        changedFields[field.stringId].addAttribute("value", field.value)
-        changedFields[field.stringId].addAttribute("type", field.type.name)
+        addAttributeToChangedField(field, "value", field.value)
+        addAttributeToChangedField(field, "type", field.type.name)
     }
 
     def saveChangedChoices(ChoiceField field) {
         useCase.dataSet.get(field.stringId).choices = field.choices
-        if (!changedFields.containsKey(field.stringId)) {
-            changedFields[field.stringId] = new ChangedField(field.stringId)
+        if (!changedFieldsTree.changedFields.containsKey(field.stringId)) {
+            putIntoChangedFields(field, new ChangedField(field.stringId))
         }
-        changedFields[field.stringId].addAttribute("choices", field.choices.collect { it.getTranslation(LocaleContextHolder.locale) })
+        addAttributeToChangedField(field, "choices", field.choices.collect { it.getTranslation(LocaleContextHolder.locale) })
     }
 
     def saveChangedAllowedNets(CaseField field) {
         useCase.dataSet.get(field.stringId).allowedNets = field.allowedNets
-        if (!changedFields.containsKey(field.stringId)) {
-            changedFields[field.stringId] = new ChangedField(field.stringId)
+        if (!changedFieldsTree.changedFields.containsKey(field.stringId)) {
+            putIntoChangedFields(field, new ChangedField(field.stringId))
         }
-        changedFields[field.stringId].addAttribute("allowedNets", field.allowedNets)
+        addAttributeToChangedField(field, "allowedNets", field.allowedNets)
     }
 
     def saveChangedOptions(MapOptionsField field) {
         useCase.dataSet.get(field.stringId).options = field.options
-        if (!changedFields.containsKey(field.stringId)) {
-            changedFields[field.stringId] = new ChangedField(field.stringId)
+        if (!changedFieldsTree.changedFields.containsKey(field.stringId)) {
+            putIntoChangedFields(field, new ChangedField(field.stringId))
         }
-        changedFields[field.stringId].addAttribute("options", field.options.collectEntries {key, value -> [key, (value as I18nString).getTranslation(LocaleContextHolder.locale)]} )
+        addAttributeToChangedField(field, "options", field.options.collectEntries {key, value -> [key, (value as I18nString).getTranslation(LocaleContextHolder.locale)]} )
+    }
+
+    void putIntoChangedFields(Field field, ChangedField changedField) {
+        putIntoChangedFields(field.stringId, changedField)
+    }
+
+    void putIntoChangedFields(String fieldId, ChangedField changedField) {
+        changedFieldsTree.put(fieldId, changedField)
+    }
+
+    void addAttributeToChangedField(Field field, String attribute, Object value) {
+        changedFieldsTree.addAttribute(field.stringId, attribute, value)
     }
 
     def close = { Transition[] transitions ->
@@ -276,11 +295,11 @@ class ActionDelegate {
              if (!(values instanceof Collection))
                  values = [values]
              field = (ChoiceField) field
-                 if (values.every { it instanceof I18nString }) {
-                     field.setChoices(values as Set<I18nString>)
-                 } else {
-                     field.setChoicesFromStrings(values as Set<String>)
-                 }
+             if (values.every { it instanceof I18nString }) {
+                 field.setChoices(values as Set<I18nString>)
+             } else {
+                 field.setChoicesFromStrings(values as Set<String>)
+             }
              saveChangedChoices(field)
          },
          allowedNets: { cl ->
@@ -522,6 +541,38 @@ class ActionDelegate {
         def predicate = QTask.task.caseId.eq(useCase.stringId) & QTask.task.transitionId.eq(transitionId)
         def task = taskService.searchOne(predicate)
         dataService.setData(task.stringId, ImportHelper.populateDataset(dataSet))
+    }
+
+    def setDataWithPropagation(String transitionId, Case caze, Map dataSet) {
+        Task task = taskService.findOne(caze.tasks.find { it.transition == transitionId }.task)
+        return setDataWithPropagation(task, dataSet)
+    }
+
+    def setDataWithPropagation(Task task, Map dataSet) {
+        return setDataWithPropagation(task.stringId, dataSet)
+    }
+
+    def setDataWithPropagation(String taskId, Map dataSet) {
+        Task task = taskService.findOne(taskId)
+        Case caze = workflowService.findOne(task.caseId)
+        ChangedFieldsTree container = setData(task, dataSet)
+        caze = workflowService.findOne(caze.stringId)
+        this.changedFieldsTree.addPropagated(caze.stringId, makeDataSetIntoChangedFields(dataSet, caze, task))
+        this.changedFieldsTree.propagate(container)
+        return container
+    }
+
+    Map<String, ChangedField> makeDataSetIntoChangedFields(Map<String, Map<String, String>> map, Case caze, Task task) {
+        return map.collect { fieldAttributes ->
+            ChangedField changedField = new ChangedField(fieldAttributes.key)
+            changedField.wasChangedOn(task)
+            fieldAttributes.value.each {attribute ->
+                changedField.addAttribute(attribute.key, attribute.value)
+            }
+            return changedField
+        }.collectEntries {
+            return [(it.id): (it)]
+        }
     }
 
     Map<String, Field> getData(Task task) {
