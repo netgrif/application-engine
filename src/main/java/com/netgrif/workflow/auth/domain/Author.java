@@ -17,6 +17,14 @@ public class Author {
         this.fullName = fullName;
     }
 
+    public static Author createDeletedAuthor() {
+        Author author = new Author();
+        author.setId(-1L);
+        author.setEmail("***");
+        author.setFullName("***");
+        return author;
+    }
+
     @Override
     public String toString() {
         return "Author{" +
