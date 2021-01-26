@@ -720,7 +720,6 @@ class ActionDelegate {
     }
 
     def changeUser(User user, String attribute, def cl) {
-        String value = cl()
         if (user == null) {
             log.error("Cannot find user.")
             return
@@ -731,16 +730,16 @@ class ActionDelegate {
             return
         }
 
-        user[attribute] = value
+        user[attribute] = cl() as String
         userService.save(user)
     }
 
-    def inviteUser(String email) {
+    MessageResource inviteUser(String email) {
         NewUserRequest newUserRequest = new NewUserRequest()
         newUserRequest.email = email
         newUserRequest.groups = new HashSet<>()
         newUserRequest.processRoles = new HashSet<>()
-        inviteUser(newUserRequest)
+        return inviteUser(newUserRequest)
     }
 
     MessageResource inviteUser(NewUserRequest newUserRequest) {
@@ -753,14 +752,14 @@ class ActionDelegate {
         return MessageResource.successMessage("Done");
     }
 
-    def deleteUser(String email) {
+    void deleteUser(String email) {
         User user = userService.findByEmail(email, false)
         if (user == null)
             log.error("Cannot find user with email [" + email + "]")
         deleteUser(user)
     }
 
-    def deleteUser(User user) {
+    void deleteUser(User user) {
         List<Task> tasks = taskService.findByUser(new FullPageRequest(), user).toList()
         if (tasks != null && tasks.size() > 0)
             taskService.cancelTasks(tasks, user)
@@ -768,7 +767,7 @@ class ActionDelegate {
         QCase qCase = new QCase("case")
         List<Case> cases = workflowService.searchAll(qCase.author.eq(user.transformToAuthor())).toList()
         if (cases != null)
-            cases.forEach({ aCase -> aCase.setAuthor(Author.createDeletedAuthor()) })
+            cases.forEach({ aCase -> aCase.setAuthor(Author.createAnonymizedAuthor()) })
 
         userService.deleteUser(user)
     }
