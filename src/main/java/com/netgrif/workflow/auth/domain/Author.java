@@ -17,7 +17,7 @@ public class Author {
         this.fullName = fullName;
     }
 
-    public static Author createDeletedAuthor() {
+    public static Author createAnonymizedAuthor() {
         Author author = new Author();
         author.setId(-1L);
         author.setEmail("***");
