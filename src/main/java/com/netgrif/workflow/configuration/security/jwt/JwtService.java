@@ -31,7 +31,7 @@ public class JwtService implements IJwtService {
     private void resolveSecret(){
         try {
             PrivateKeyReader reader = new PrivateKeyReader(properties.getAlgorithm());
-            secret = Base64.getEncoder().encodeToString(reader.get(properties.getPrivateKey()).getEncoded());
+            secret = Base64.getEncoder().encodeToString(reader.get(properties.getPrivateKey().getFile().getPath()).getEncoded());
         } catch (IOException | NoSuchAlgorithmException | InvalidKeySpecException e) {
             log.error("Error while resolving secret key: " + e.getMessage(), e);
         }
