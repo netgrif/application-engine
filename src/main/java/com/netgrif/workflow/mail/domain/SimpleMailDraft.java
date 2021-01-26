@@ -19,7 +19,8 @@ public class SimpleMailDraft {
 
     boolean isHtml;
 
-    Map<String, File> attachments;
+    @Builder.Default
+    Map<String, File> attachments = new HashMap<>();
 
     public static SimpleMailDraftBuilder builder(List<String> recipients){
         return simpleMailDraftBuilder().recipients(recipients).subject("").body("").isHtml(false).attachments(new HashMap<>());
