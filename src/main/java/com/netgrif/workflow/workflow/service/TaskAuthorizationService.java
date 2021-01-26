@@ -158,10 +158,8 @@ public class TaskAuthorizationService implements ITaskAuthorizationService {
 
         return loggedUser.isAdmin()
                 || (userHasAtLeastOneRolePermission(loggedUser, taskId, RolePermission.PERFORM, RolePermission.CANCEL)
-                    && isAssignee(loggedUser, taskId)) && canAssignedCancel(loggedUser.transformToUser(), taskId)
-                ||
-                userHasUserListPermission(loggedUser, taskId, RolePermission.PERFORM, RolePermission.CANCEL)
-                ;
+                || userHasUserListPermission(loggedUser, taskId, RolePermission.PERFORM, RolePermission.CANCEL)
+                && isAssignee(loggedUser, taskId)) && canAssignedCancel(loggedUser.transformToUser(), taskId);
     }
 
     @Override

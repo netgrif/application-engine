@@ -192,6 +192,7 @@ public class DataService implements IDataService {
         });
         updateDataset(useCase);
         taskService.resolveUserRef(useCase);
+        workflowService.resolveUserRef(useCase);
         workflowService.save(useCase);
         publisher.publishEvent(new SaveCaseDataEvent(useCase, values, changedFieldsTree.getChangedFields().values()));
 
