@@ -26,6 +26,8 @@ public interface IWorkflowService {
 
     Page<Case> getAll(Pageable pageable);
 
+    Case resolveUserRef(Case useCase);
+
     Case createCase(String netId, String title, String color, LoggedUser user);
 
     Page<Case> findAllByAuthor(Long authorId, String petriNet, Pageable pageable);

@@ -166,6 +166,7 @@ public class Importer {
         actionRefs.forEach(this::resolveActionRefs);
         actions.forEach(this::evaluateActions);
         document.getRoleRef().forEach(this::resolveRoleRef);
+        document.getUsersRef().forEach(this::resolveUsersRef);
         resolveProcessEvents(document.getProcessEvents());
         resolveCaseEvents(document.getCaseEvents());
 
@@ -184,6 +185,18 @@ public class Importer {
         }
 
         net.addPermission(roleId, roleFactory.getProcessPermissions(logic));
+    }
+
+    @Transactional
+    protected void resolveUsersRef(CaseUsersRef usersRef) {
+        CaseLogic logic = usersRef.getCaseLogic();
+        String usersId = usersRef.getId();
+
+        if (logic == null || usersId == null) {
+            return;
+        }
+
+        net.addUsersPermission(usersId, roleFactory.getProcessPermissions(logic));
     }
 
     @Transactional
@@ -352,9 +365,9 @@ public class Importer {
                     addRoleLogic(transition, roleRef)
             );
         }
-        if (importTransition.getUserListRef() != null) {
-            importTransition.getUserListRef().forEach(userListRef ->
-                    addUserLogic(transition, userListRef));
+        if (importTransition.getUsersRef() != null) {
+            importTransition.getUsersRef().forEach(usersRef ->
+                    addUserLogic(transition, usersRef));
         }
         if (importTransition.getDataRef() != null) {
             importTransition.getDataRef().forEach(dataRef ->
@@ -543,9 +556,9 @@ public class Importer {
     }
 
     @Transactional
-    protected void addUserLogic(Transition transition, UserListRef userListRef) {
-        Logic logic = userListRef.getLogic();
-        String userRef = userListRef.getId();
+    protected void addUserLogic(Transition transition, UsersRef usersRef) {
+        Logic logic = usersRef.getLogic();
+        String userRef = usersRef.getId();
 
         if (logic == null || userRef == null) {
             return;
