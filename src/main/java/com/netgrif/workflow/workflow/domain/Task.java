@@ -172,8 +172,8 @@ public class Task {
             roles.put(roleId, permissions);
     }
 
-    public void addUserRef(String userRefId, Set<RolePermission> permissions) {
-        userRefs.put(userRefId, parsePermissionMap(permissions));
+    public void addUserRef(String userRefId, Map<String, Boolean> permissions) {
+        userRefs.put(userRefId,permissions);
     }
 
     public void addUsers(Set<Long> userIds, Map<String, Boolean> permissions){
@@ -184,12 +184,6 @@ public class Task {
                 users.put(userId, permissions);
             }
         });
-    }
-
-    private Map<String, Boolean> parsePermissionMap(Set<RolePermission> permissions){
-        Map<String, Boolean> map = new HashMap<>();
-        permissions.forEach(perm -> map.put(perm.toString(),true));
-        return map;
     }
 
     public void addAssignedUserPolicy(Map<String, Boolean> assignedUser){
