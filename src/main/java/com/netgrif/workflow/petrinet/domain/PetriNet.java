@@ -10,7 +10,6 @@ import com.netgrif.workflow.petrinet.domain.events.CaseEventType;
 import com.netgrif.workflow.petrinet.domain.events.ProcessEvent;
 import com.netgrif.workflow.petrinet.domain.events.ProcessEventType;
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRole;
-import com.netgrif.workflow.petrinet.domain.roles.ProcessRolePermission;
 import com.netgrif.workflow.petrinet.domain.version.Version;
 import com.netgrif.workflow.workflow.domain.DataField;
 import lombok.Getter;
@@ -102,6 +101,10 @@ public class PetriNet extends PetriNetObject {
     @Setter
     private Map<String, Map<String, Boolean>> permissions;
 
+    @Getter
+    @Setter
+    private Map<String, Map<String, Boolean>> userRefs;
+
     @Transient
     private boolean initialized;
 
@@ -128,6 +131,7 @@ public class PetriNet extends PetriNetObject {
         processEvents = new LinkedHashMap<>();
         caseEvents = new LinkedHashMap<>();
         permissions = new HashMap<>();
+        userRefs = new HashMap<>();
     }
 
     public void addPlace(Place place) {
@@ -147,6 +151,14 @@ public class PetriNet extends PetriNetObject {
             this.permissions.get(roleId).putAll(permissions);
         } else {
             this.permissions.put(roleId, permissions);
+        }
+    }
+
+    public void addUsersPermission(String usersRefId, Map<String, Boolean> permissions) {
+        if (this.userRefs.containsKey(usersRefId) && this.userRefs.get(usersRefId) != null) {
+            this.userRefs.get(usersRefId).putAll(permissions);
+        } else {
+            this.userRefs.put(usersRefId, permissions);
         }
     }
 
@@ -374,6 +386,7 @@ public class PetriNet extends PetriNetObject {
         clone.setCaseEvents(this.caseEvents);
         clone.setProcessEvents(this.processEvents);
         clone.setPermissions(this.permissions);
+        clone.setUserRefs(this.userRefs);
         return clone;
     }
 }
