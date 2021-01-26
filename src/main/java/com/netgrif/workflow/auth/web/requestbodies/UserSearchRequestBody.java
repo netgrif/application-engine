@@ -10,4 +10,6 @@ public class UserSearchRequestBody {
     private String fulltext;
 
     private List<String> roles;
+
+    private List<String> negativeRoles;
 }
