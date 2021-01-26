@@ -4,7 +4,6 @@ import com.netgrif.workflow.importer.model.*;
 import com.netgrif.workflow.importer.model.DataEventType;
 import com.netgrif.workflow.petrinet.domain.events.*;
 import com.netgrif.workflow.petrinet.domain.Component;
-import com.netgrif.workflow.petrinet.domain.DataEvent;
 import com.netgrif.workflow.petrinet.domain.DataGroup;
 import com.netgrif.workflow.petrinet.domain.Place;
 import com.netgrif.workflow.petrinet.domain.Transaction;
