@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../main/resources/petriNets/petriflow_schema.xsd">
+    <id>constructor_destructor</id>
+    <title>Constructor and Destructor</title>
+    <initials>CAD</initials>
+    <!-- ROLES -->
+    <role>
+        <id>process_role</id>
+        <title>Process role</title>
+    </role>
+    <roleRef>
+        <id>process_role</id>
+        <caseLogic>
+            <create>true</create>
+            <delete>false</delete>
+        </caseLogic>
+    </roleRef>
+    <processEvents>
+        <event type="upload">
+            <id>upload</id>
+            <actions phase="post">
+                <action>
+                    createCase("construtor_destructor", "Construct")
+                </action>
+            </actions>
+        </event>
+    </processEvents>
+    <caseEvents>
+        <event type="create">
+            <id>create</id>
+            <actions phase="post">
+                <action>
+                    text: f.text;
+
+                    change text value {return "Its working..."}
+                </action>
+            </actions>
+        </event>
+        <event type="delete">
+            <id>pdf</id>
+            <actions phase="post">
+                <action>
+                    createCase("construtor_destructor", "Destruct")
+                </action>
+            </actions>
+        </event>
+    </caseEvents>
+    <data type="text">
+        <id>text</id>
+        <title>Text</title>
+        <init>text</init>
+    </data>
+
+</document>
