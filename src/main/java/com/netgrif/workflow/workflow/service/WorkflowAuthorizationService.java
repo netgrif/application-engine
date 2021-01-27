@@ -17,7 +17,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
-public class WorkflowAuthorizationService implements IWorkflowAuthorizationService {
+public class WorkflowAuthorizationService extends AbstractAuthorizationService implements IWorkflowAuthorizationService {
 
     @Autowired
     private IWorkflowService workflowService;
@@ -42,11 +42,10 @@ public class WorkflowAuthorizationService implements IWorkflowAuthorizationServi
 
     @Override
     public boolean userHasAtLeastOneRolePermission(User user, PetriNet net, ProcessRolePermission... permissions) {
-        Map<String, Boolean> aggregatePermissions = getAggregatePermissions(user, net);
+        Map<String, Boolean> aggregatePermissions = getAggregatePermissions(user, net.getPermissions());
 
         for (ProcessRolePermission permission : permissions) {
-            Boolean hasPermission = aggregatePermissions.get(permission.toString());
-            if (hasPermission != null && !hasPermission) {
+            if (hasRestrictedPermission(aggregatePermissions.get(permission.toString()))) {
                 return false;
             }
         }
@@ -58,29 +57,6 @@ public class WorkflowAuthorizationService implements IWorkflowAuthorizationServi
             return true;
         }
 
-        return Arrays.stream(permissions).anyMatch(permission -> {
-            Boolean hasPermission = aggregatePermissions.get(permission.toString());
-            return hasPermission != null && hasPermission;
-        });
-    }
-
-    private Map<String, Boolean> getAggregatePermissions(User user, PetriNet net) {
-        Map<String, Boolean> aggregatePermissions = new HashMap<>();
-
-        Set<String> userProcessRoleIDs = user.getProcessRoles().stream().map(role ->  role.get_id().toString()).collect(Collectors.toSet());
-
-        for (Map.Entry<String, Map<String, Boolean>> role : net.getPermissions().entrySet()) {
-            if (userProcessRoleIDs.contains(role.getKey())) {
-                for (Map.Entry<String, Boolean> permission : role.getValue().entrySet()) {
-                    if (aggregatePermissions.containsKey(permission.getKey())) {
-                        aggregatePermissions.put(permission.getKey(), aggregatePermissions.get(permission.getKey()) || permission.getValue());
-                    } else {
-                        aggregatePermissions.put(permission.getKey(), permission.getValue());
-                    }
-                }
-            }
-        }
-
-        return aggregatePermissions;
+        return Arrays.stream(permissions).anyMatch(permission -> hasPermission(aggregatePermissions.get(permission.toString())));
     }
 }
