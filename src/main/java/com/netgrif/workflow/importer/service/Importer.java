@@ -4,6 +4,7 @@ import com.netgrif.workflow.importer.model.*;
 import com.netgrif.workflow.importer.model.DataEventType;
 import com.netgrif.workflow.petrinet.domain.events.*;
 import com.netgrif.workflow.petrinet.domain.Component;
+import com.netgrif.workflow.petrinet.domain.DataEvent;
 import com.netgrif.workflow.petrinet.domain.DataGroup;
 import com.netgrif.workflow.petrinet.domain.Place;
 import com.netgrif.workflow.petrinet.domain.Transaction;
@@ -352,6 +353,10 @@ public class Importer {
                     addRoleLogic(transition, roleRef)
             );
         }
+        if (importTransition.getUserListRef() != null) {
+            importTransition.getUserListRef().forEach(userListRef ->
+                    addUserLogic(transition, userListRef));
+        }
         if (importTransition.getDataRef() != null) {
             importTransition.getDataRef().forEach(dataRef ->
                     addDataWithDefaultGroup(transition, dataRef)
@@ -378,9 +383,22 @@ public class Importer {
                     transition.addEvent(addEvent(transition.getImportId(), event))
             );
         }
+        if (importTransition.getAssignedUser() != null) {
+            addAssignedUserPolicy(importTransition, transition);
+        }
 
         net.addTransition(transition);
         transitions.put(importTransition.getId(), transition);
+    }
+
+    @Transactional
+    protected void addAssignedUserPolicy(com.netgrif.workflow.importer.model.Transition importTransition, Transition transition) {
+        if (importTransition.getAssignedUser().isCancel() != null) {
+            transition.getAssignedUserPolicy().put("cancel", importTransition.getAssignedUser().isCancel());
+        }
+        if (importTransition.getAssignedUser().isReassign() != null) {
+            transition.getAssignedUserPolicy().put("reassign", importTransition.getAssignedUser().isReassign());
+        }
     }
 
     @Transactional
@@ -523,6 +541,17 @@ public class Importer {
         }
 
         transition.addRole(roleId, roleFactory.getPermissions(logic));
+    }
+
+    @Transactional
+    protected void addUserLogic(Transition transition, UserListRef userListRef) {
+        Logic logic = userListRef.getLogic();
+        String userRef = userListRef.getId();
+
+        if (logic == null || userRef == null) {
+            return;
+        }
+        transition.addUserRef(userRef, roleFactory.getPermissions(logic));
     }
 
     @Transactional
@@ -859,7 +888,12 @@ public class Importer {
             }
         }
         // TRUE if no roles and no triggers
-        return (transition.getRoleRef() == null || transition.getRoleRef().isEmpty()) && (transition.getTrigger() == null || transition.getTrigger().isEmpty());
+        return (transition.getRoleRef() == null || transition.getRoleRef().stream().noneMatch(roleRef ->
+                    (roleRef.getLogic().isPerform() != null && roleRef.getLogic().isPerform()) ||
+                    (roleRef.getLogic().isCancel() != null && roleRef.getLogic().isCancel()) ||
+                    (roleRef.getLogic().isView() != null && roleRef.getLogic().isView()) ||
+                    (roleRef.getLogic().isDelegate() != null && roleRef.getLogic().isDelegate())
+                )) && (transition.getTrigger() == null || transition.getTrigger().isEmpty());
     }
 
     PetriNet getNetByImportId(String id) {
