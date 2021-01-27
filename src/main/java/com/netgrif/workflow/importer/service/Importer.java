@@ -166,6 +166,7 @@ public class Importer {
         actionRefs.forEach(this::resolveActionRefs);
         actions.forEach(this::evaluateActions);
         document.getRoleRef().forEach(this::resolveRoleRef);
+        document.getUsersRef().forEach(this::resolveUsersRef);
         resolveProcessEvents(document.getProcessEvents());
         resolveCaseEvents(document.getCaseEvents());
 
@@ -184,6 +185,18 @@ public class Importer {
         }
 
         net.addPermission(roleId, roleFactory.getProcessPermissions(logic));
+    }
+
+    @Transactional
+    protected void resolveUsersRef(CaseUsersRef usersRef) {
+        CaseLogic logic = usersRef.getCaseLogic();
+        String usersId = usersRef.getId();
+
+        if (logic == null || usersId == null) {
+            return;
+        }
+
+        net.addUsersPermission(usersId, roleFactory.getProcessPermissions(logic));
     }
 
     @Transactional
@@ -352,6 +365,10 @@ public class Importer {
                     addRoleLogic(transition, roleRef)
             );
         }
+        if (importTransition.getUsersRef() != null) {
+            importTransition.getUsersRef().forEach(usersRef ->
+                    addUserLogic(transition, usersRef));
+        }
         if (importTransition.getDataRef() != null) {
             importTransition.getDataRef().forEach(dataRef ->
                     addDataWithDefaultGroup(transition, dataRef)
@@ -378,9 +395,22 @@ public class Importer {
                     transition.addEvent(addEvent(transition.getImportId(), event))
             );
         }
+        if (importTransition.getAssignedUser() != null) {
+            addAssignedUserPolicy(importTransition, transition);
+        }
 
         net.addTransition(transition);
         transitions.put(importTransition.getId(), transition);
+    }
+
+    @Transactional
+    protected void addAssignedUserPolicy(com.netgrif.workflow.importer.model.Transition importTransition, Transition transition) {
+        if (importTransition.getAssignedUser().isCancel() != null) {
+            transition.getAssignedUserPolicy().put("cancel", importTransition.getAssignedUser().isCancel());
+        }
+        if (importTransition.getAssignedUser().isReassign() != null) {
+            transition.getAssignedUserPolicy().put("reassign", importTransition.getAssignedUser().isReassign());
+        }
     }
 
     @Transactional
@@ -523,6 +553,17 @@ public class Importer {
         }
 
         transition.addRole(roleId, roleFactory.getPermissions(logic));
+    }
+
+    @Transactional
+    protected void addUserLogic(Transition transition, UsersRef usersRef) {
+        Logic logic = usersRef.getLogic();
+        String userRef = usersRef.getId();
+
+        if (logic == null || userRef == null) {
+            return;
+        }
+        transition.addUserRef(userRef, roleFactory.getPermissions(logic));
     }
 
     @Transactional
@@ -859,7 +900,12 @@ public class Importer {
             }
         }
         // TRUE if no roles and no triggers
-        return (transition.getRoleRef() == null || transition.getRoleRef().isEmpty()) && (transition.getTrigger() == null || transition.getTrigger().isEmpty());
+        return (transition.getRoleRef() == null || transition.getRoleRef().stream().noneMatch(roleRef ->
+                    (roleRef.getLogic().isPerform() != null && roleRef.getLogic().isPerform()) ||
+                    (roleRef.getLogic().isCancel() != null && roleRef.getLogic().isCancel()) ||
+                    (roleRef.getLogic().isView() != null && roleRef.getLogic().isView()) ||
+                    (roleRef.getLogic().isDelegate() != null && roleRef.getLogic().isDelegate())
+                )) && (transition.getTrigger() == null || transition.getTrigger().isEmpty());
     }
 
     PetriNet getNetByImportId(String id) {
