@@ -3,7 +3,7 @@ package com.netgrif.workflow.workflow.web.responsebodies;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.netgrif.workflow.auth.web.responsebodies.User;
 import com.netgrif.workflow.elastic.domain.ElasticTask;
-import com.netgrif.workflow.petrinet.domain.EventType;
+import com.netgrif.workflow.petrinet.domain.events.EventType;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.petrinet.domain.layout.TaskLayout;
 import lombok.Data;
@@ -69,6 +69,8 @@ public class Task {
 
     private String assignTitle;
 
+    private Map<String, Boolean> assignedUserPolicy;
+
     public Task(com.netgrif.workflow.workflow.domain.Task task, Locale locale) {
         this._id = task.getObjectId();
         this.caseId = task.getCaseId();
@@ -94,6 +96,7 @@ public class Task {
         this.assignTitle = task.getTranslatedEventTitle(EventType.ASSIGN, locale);
         this.cancelTitle = task.getTranslatedEventTitle(EventType.CANCEL, locale);
         this.delegateTitle = task.getTranslatedEventTitle(EventType.DELEGATE, locale);
+        this.assignedUserPolicy = task.getAssignedUserPolicy();
     }
 
     public Task(ElasticTask entity) {

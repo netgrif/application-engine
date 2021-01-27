@@ -8,6 +8,7 @@ import com.netgrif.workflow.workflow.domain.QCase;
 import com.netgrif.workflow.workflow.web.requestbodies.TaskSearchRequest;
 import com.netgrif.workflow.workflow.domain.QTask;
 import com.netgrif.workflow.workflow.domain.Task;
+import com.netgrif.workflow.workflow.web.requestbodies.taskSearch.TaskSearchCaseRequest;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -39,10 +40,15 @@ public class TaskSearchService extends MongoSearchService<Task> {
         }
 
         BooleanBuilder builder = constructPredicateTree(singleQueries, isIntersection ? BooleanBuilder::and : BooleanBuilder::or);
-
-        builder.and(buildRolesQueryConstraint(user));
-
+        BooleanBuilder constraints = new BooleanBuilder(buildRolesQueryConstraint(user));
+        constraints.or(buildUserRefQueryConstraint(user));
+        builder.and(constraints);
         return builder;
+    }
+
+    protected Predicate buildUserRefQueryConstraint(LoggedUser user) {
+        Predicate userConstraints = usersQuery(user.getId());
+        return constructPredicateTree(Collections.singletonList(userConstraints), BooleanBuilder::or);
     }
 
     protected Predicate buildRolesQueryConstraint(LoggedUser user) {
@@ -84,6 +90,10 @@ public class TaskSearchService extends MongoSearchService<Task> {
         return QTask.task.roles.containsKey(role);
     }
 
+    public Predicate usersQuery(Long userId) {
+        return QTask.task.users.containsKey(userId);
+    }
+
 
     private void buildCaseQuery(TaskSearchRequest request, BooleanBuilder query) {
         if (request.useCase == null || request.useCase.isEmpty()) {
@@ -101,7 +111,7 @@ public class TaskSearchService extends MongoSearchService<Task> {
      * @return Predicate for ID if only ID is present. Predicate for title if only title is present.
      * If both are present an ID predicate is returned. If neither are present null is returned.
      */
-    private Predicate caseRequestQuery(TaskSearchRequest.TaskSearchCaseRequest caseRequest) {
+    private Predicate caseRequestQuery(TaskSearchCaseRequest caseRequest) {
         if (caseRequest.id != null) {
             return caseIdQuery(caseRequest.id);
         } else if (caseRequest.title != null) {
@@ -157,7 +167,7 @@ public class TaskSearchService extends MongoSearchService<Task> {
 
         query.and(
                 constructPredicateTree(
-                        request.process.stream().map(this::processQuery).collect(Collectors.toList()),
+                        request.process.stream().map(p -> processQuery(p.identifier)).collect(Collectors.toList()),
                         BooleanBuilder::or)
         );
     }
