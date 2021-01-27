@@ -15,7 +15,7 @@ public abstract class PublicAbstractController {
         this.userService = userService;
     }
 
-    protected LoggedUser getAnonym() {
-        return (LoggedUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    protected LoggedUser getAnonymous() {
+        return userService.getAnonymousLogged();
     }
 }
