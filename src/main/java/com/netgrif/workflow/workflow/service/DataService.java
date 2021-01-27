@@ -14,6 +14,7 @@ import com.netgrif.workflow.petrinet.domain.dataset.*;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.*;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.FieldActionsRunner;
+import com.netgrif.workflow.petrinet.domain.events.EventPhase;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.DataField;
 import com.netgrif.workflow.workflow.domain.Task;
@@ -31,7 +32,6 @@ import org.apache.pdfbox.rendering.PDFRenderer;
 import org.apache.poi.util.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.beans.factory.config.FieldRetrievingFactoryBean;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
@@ -191,6 +191,7 @@ public class DataService implements IDataService {
             }
         });
         updateDataset(useCase);
+        taskService.resolveUserRef(useCase);
         workflowService.save(useCase);
         publisher.publishEvent(new SaveCaseDataEvent(useCase, values, changedFieldsTree.getChangedFields().values()));
 
@@ -850,6 +851,13 @@ public class DataService implements IDataService {
                 value = parseListStringValues(node);
                 // TODO 29.9.2020: validate task ref value? is such feature desired?
                 break;
+            case "userList":
+                if (node.get("value") == null) {
+                    value = null;
+                    break;
+                }
+                value = parseListLongValues(node);
+                break;
             default:
                 if (node.get("value") == null || node.get("value").isNull()) {
                     value = null;
@@ -873,6 +881,13 @@ public class DataService implements IDataService {
         ArrayNode arrayNode = (ArrayNode) node.get("value");
         ArrayList<String> list = new ArrayList<>();
         arrayNode.forEach(string -> list.add(string.asText()));
+        return list;
+    }
+
+    private List<Long> parseListLongValues(ObjectNode node) {
+        ArrayNode arrayNode = (ArrayNode) node.get("value");
+        ArrayList<Long> list = new ArrayList<>();
+        arrayNode.forEach(string -> list.add(string.asLong()));
         return list;
     }
 
