@@ -137,6 +137,9 @@ class ElasticsearchRunner extends AbstractOrderedCommandLineRunner {
             "roles": {
                 "type": "keyword"
             },
+            "users": {
+                "type": "long"
+            },
             "stringId": {
                 "type": "keyword"
             },
