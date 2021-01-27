@@ -272,10 +272,22 @@ public class UserService implements IUserService {
     }
 
     @Override
+    public LoggedUser getAnonymousLogged() {
+        return (LoggedUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    }
+
+    @Override
     public User addRole(User user, String roleStringId) {
         UserProcessRole role = userProcessRoleService.findByRoleId(roleStringId);
         user.addProcessRole(role);
         return userRepository.save(user);
+    }
+
+    @Override
+    public void deleteUser(User user) {
+        if (!userRepository.findById(user.getId()).isPresent())
+            throw new IllegalArgumentException("Could not find user with id [" + user.getId() + "]");
+        userRepository.delete(user);
     }
 
     private User loadProcessRoles(User user) {
