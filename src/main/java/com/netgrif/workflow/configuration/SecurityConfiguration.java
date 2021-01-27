@@ -60,6 +60,9 @@ public class SecurityConfiguration extends AbstractSecurityConfiguration {
     @Autowired
     private SecurityConfigProperties properties;
 
+    @Value("${nae.security.server-patterns}")
+    private String[] serverPatterns;
+
     private static final String ANONYMOUS_USER = "anonymousUser";
 
     @Bean
@@ -139,9 +142,7 @@ public class SecurityConfiguration extends AbstractSecurityConfiguration {
 
     @Override
     String[] getServerPatterns() {
-        return new String[]{
-                "/api/auth/signup", "/api/auth/token/verify", "/api/auth/reset", "/api/auth/recover", "/v2/api-docs", "/swagger-ui.html", "/api/public/**"
-        };
+        return this.serverPatterns;
     }
 
     @Override
@@ -156,7 +157,7 @@ public class SecurityConfiguration extends AbstractSecurityConfiguration {
                     authenticationManager(),
                     new AnonymousAuthenticationProvider(ANONYMOUS_USER),
                     authority,
-                    getServerPatterns(),
+                    this.serverPatterns,
                     this.jwtService
                 );
     }

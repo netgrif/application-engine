@@ -462,21 +462,30 @@ public class WorkflowService implements IWorkflowService {
 
         Case case$ = findOne(useCaseId);
         actions.forEach(action -> {
-            ChangedFieldsTree changedField = actionsRunner.run(action, case$);
-            if (changedField.getChangedFields().isEmpty())
+            ChangedFieldsTree changedFieldsTree = actionsRunner.run(action, case$, Optional.empty());
+            changedFields.mergeChangedFields(changedFieldsTree);
+            if (changedFieldsTree.getChangedFields().isEmpty()) {
                 return;
-            changedFields.mergeChangedFields(changedField);
-            runEventActionsOnChanged(case$, changedFields, changedFields.getChangedFields(), Action.ActionTrigger.SET,true);
+            }
+            runEventActionsOnChanged(case$, changedFields, changedFieldsTree.getChangedFields(), Action.ActionTrigger.SET,true);
         });
         save(case$);
         return changedFields;
+    }
+
+    private void mergeChanges(Map<String, ChangedField> changedFields, Map<String, ChangedField> newChangedFields) {
+        newChangedFields.forEach((s, changedField) -> {
+            if (changedFields.containsKey(s))
+                changedFields.get(s).merge(changedField);
+            else
+                changedFields.put(s, changedField);
+        });
     }
 
     private void runEventActionsOnChanged(Case useCase, ChangedFieldsTree changedFields, Map<String, ChangedField> newChangedField, Action.ActionTrigger trigger, boolean recursive) {
         newChangedField.forEach((s, changedField) -> {
             if ((changedField.getAttributes().containsKey("value") && changedField.getAttributes().get("value") != null) && recursive) {
                 Field field = useCase.getField(s);
-                log.info("[" + useCase.getStringId() + "] " + useCase.getTitle() + ": Running actions on changed field " + s);
                 processDataEvents(field, trigger, EventPhase.PRE, useCase, changedFields);
                 processDataEvents(field, trigger, EventPhase.POST, useCase, changedFields);
             }
@@ -495,11 +504,12 @@ public class WorkflowService implements IWorkflowService {
 
     private void runEventActions(Case useCase, List<Action> actions, ChangedFieldsTree changedFields, Action.ActionTrigger trigger){
         actions.forEach(action -> {
-            ChangedFieldsTree currentChangedFields = actionsRunner.run(action, useCase);
+            ChangedFieldsTree currentChangedFields = actionsRunner.run(action, useCase, Optional.empty());
+            changedFields.mergeChangedFields(currentChangedFields);
+
             if (currentChangedFields.getChangedFields().isEmpty())
                 return;
 
-            changedFields.mergeChangedFields(currentChangedFields);
             runEventActionsOnChanged(useCase, changedFields, currentChangedFields.getChangedFields(), trigger,trigger == Action.ActionTrigger.SET);
         });
     }
@@ -509,7 +519,7 @@ public class WorkflowService implements IWorkflowService {
         log.info("Running actions without context on cases");
 
         actions.forEach(action -> {
-            actionsRunner.run(action, null);
+            actionsRunner.run(action, null, Optional.empty());
         });
     }
 }
