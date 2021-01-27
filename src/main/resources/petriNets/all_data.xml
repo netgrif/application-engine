@@ -260,6 +260,9 @@
                 <id>boolean</id>
                 <logic>
                     <behavior>editable</behavior>
+                    <action trigger="set">
+                        test()
+                    </action>
                 </logic>
             </dataRef>
         </dataGroup>
