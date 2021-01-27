@@ -10,7 +10,6 @@ import com.netgrif.workflow.petrinet.domain.events.CaseEventType;
 import com.netgrif.workflow.petrinet.domain.events.ProcessEvent;
 import com.netgrif.workflow.petrinet.domain.events.ProcessEventType;
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRole;
-import com.netgrif.workflow.petrinet.domain.roles.ProcessRolePermission;
 import com.netgrif.workflow.petrinet.domain.version.Version;
 import com.netgrif.workflow.workflow.domain.DataField;
 import lombok.Getter;
@@ -100,7 +99,11 @@ public class PetriNet extends PetriNetObject {
 
     @Getter
     @Setter
-    private Map<String, Set<ProcessRolePermission>> permissions;
+    private Map<String, Map<String, Boolean>> permissions;
+
+    @Getter
+    @Setter
+    private Map<String, Map<String, Boolean>> userRefs;
 
     @Transient
     private boolean initialized;
@@ -128,6 +131,7 @@ public class PetriNet extends PetriNetObject {
         processEvents = new LinkedHashMap<>();
         caseEvents = new LinkedHashMap<>();
         permissions = new HashMap<>();
+        userRefs = new HashMap<>();
     }
 
     public void addPlace(Place place) {
@@ -142,23 +146,20 @@ public class PetriNet extends PetriNetObject {
         this.roles.put(role.getStringId(), role);
     }
 
-    public void addPermission(String roleId, Set<ProcessRolePermission> permissions) {
+    public void addPermission(String roleId, Map<String, Boolean> permissions) {
         if (this.permissions.containsKey(roleId) && this.permissions.get(roleId) != null) {
-            this.permissions.get(roleId).addAll(permissions);
+            this.permissions.get(roleId).putAll(permissions);
         } else {
             this.permissions.put(roleId, permissions);
         }
     }
 
-    public Map<String, Map<String, Boolean>> getPermissions() {
-        Map<String, Map<String, Boolean>> roles = new HashMap<>();
-        for (Map.Entry<String, Set<ProcessRolePermission>> entry : permissions.entrySet()) {
-            if(roles.containsKey(entry.getKey()) && roles.get(entry.getKey()) != null)
-                roles.get(entry.getKey()).putAll(parsePermissionMap(entry.getValue()));
-            else
-                roles.put(entry.getKey(),parsePermissionMap(entry.getValue()));
+    public void addUsersPermission(String usersRefId, Map<String, Boolean> permissions) {
+        if (this.userRefs.containsKey(usersRefId) && this.userRefs.get(usersRefId) != null) {
+            this.userRefs.get(usersRefId).putAll(permissions);
+        } else {
+            this.userRefs.put(usersRefId, permissions);
         }
-        return roles;
     }
 
     public List<Arc> getArcsOfTransition(Transition transition) {
@@ -346,12 +347,6 @@ public class PetriNet extends PetriNetObject {
         return new LinkedList<>();
     }
 
-    private Map<String, Boolean> parsePermissionMap(Set<ProcessRolePermission> permissions){
-        Map<String, Boolean> map = new HashMap<>();
-        permissions.forEach(perm -> map.put(perm.toString(),true));
-        return map;
-    }
-
     @Override
     public String getStringId() {
         return _id.toString();
@@ -391,6 +386,7 @@ public class PetriNet extends PetriNetObject {
         clone.setCaseEvents(this.caseEvents);
         clone.setProcessEvents(this.processEvents);
         clone.setPermissions(this.permissions);
+        clone.setUserRefs(this.userRefs);
         return clone;
     }
 }

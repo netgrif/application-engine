@@ -82,6 +82,14 @@ public class Task {
     private Map<String, Map<String, Boolean>> roles = new HashMap<>();
 
     @Getter @Setter
+    @Builder.Default
+    private Map<Long, Map<String, Boolean>> users = new HashMap<>();
+
+    @Getter @Setter
+    @Builder.Default
+    private Map<String, Map<String, Boolean>> userRefs = new HashMap<>();
+
+    @Getter @Setter
     private LocalDateTime startDate;
 
     @Getter @Setter
@@ -131,6 +139,10 @@ public class Task {
     @Builder.Default
     private Map<EventType, I18nString> eventTitles = new HashMap<>();
 
+    @Getter @Setter
+    @Builder.Default
+    private Map<String, Boolean> assignedUserPolicy = new HashMap<>();
+
     private Map<String, Integer> consumedTokens = new HashMap<>();
 
     public Task() {
@@ -153,17 +165,29 @@ public class Task {
         return icon;
     }
 
-    public void addRole(String roleId, Set<RolePermission> permissions){
+    public void addRole(String roleId, Map<String, Boolean> permissions){
         if(roles.containsKey(roleId) && roles.get(roleId) != null)
-            roles.get(roleId).putAll(parsePermissionMap(permissions));
+            roles.get(roleId).putAll(permissions);
         else
-            roles.put(roleId,parsePermissionMap(permissions));
+            roles.put(roleId, permissions);
     }
 
-    private Map<String, Boolean> parsePermissionMap(Set<RolePermission> permissions){
-        Map<String, Boolean> map = new HashMap<>();
-        permissions.forEach(perm -> map.put(perm.toString(),true));
-        return map;
+    public void addUserRef(String userRefId, Map<String, Boolean> permissions) {
+        userRefs.put(userRefId,permissions);
+    }
+
+    public void addUsers(Set<Long> userIds, Map<String, Boolean> permissions){
+        userIds.forEach(userId -> {
+            if (users.containsKey(userId) && users.get(userId) != null) {
+                users.get(userId).putAll(permissions);
+            } else {
+                users.put(userId, permissions);
+            }
+        });
+    }
+
+    public void addAssignedUserPolicy(Map<String, Boolean> assignedUser){
+        assignedUserPolicy.putAll(assignedUser);
     }
 
     @JsonIgnore
