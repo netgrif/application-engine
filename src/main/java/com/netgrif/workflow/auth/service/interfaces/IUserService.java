@@ -53,6 +53,8 @@ public interface IUserService {
 
     User getSystem();
 
+    LoggedUser getAnonymousLogged();
+
     User addRole(User user, String roleStringId);
 
     Page<User> searchAllCoMembers(String query, LoggedUser principal, Boolean small, Pageable pageable);
@@ -60,4 +62,5 @@ public interface IUserService {
     Page<User> searchAllCoMembers(String query, List<String> roles, LoggedUser principal, Boolean small, Pageable pageable);
 
     void deleteUser(User user);
+    Page<User> searchAllCoMembers(String query, List<String> roles, List<String> negateRoleIds, LoggedUser principal, Boolean small, Pageable pageable);
 }
