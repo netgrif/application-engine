@@ -46,11 +46,10 @@ public class PublicAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         if (isPublicApi(request.getRequestURI())) {
-            log.info("Trying to authenticate anonymous user...");
             String jwtToken = resolveValidToken(request);
             authenticate(request, jwtToken);
             response.setHeader(JWT_HEADER_NAME, BEARER + jwtToken);
-            log.info("Anonymous user was successfully authenticated.");
+            log.info("Anonymous user was authenticated.");
         }
         filterChain.doFilter(request, response);
     }
