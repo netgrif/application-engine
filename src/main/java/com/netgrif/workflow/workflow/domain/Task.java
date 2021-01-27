@@ -82,6 +82,14 @@ public class Task {
     private Map<String, Map<String, Boolean>> roles = new HashMap<>();
 
     @Getter @Setter
+    @Builder.Default
+    private Map<Long, Map<String, Boolean>> users = new HashMap<>();
+
+    @Getter @Setter
+    @Builder.Default
+    private Map<String, Map<String, Boolean>> userRefs = new HashMap<>();
+
+    @Getter @Setter
     private LocalDateTime startDate;
 
     @Getter @Setter
@@ -162,6 +170,20 @@ public class Task {
             roles.get(roleId).putAll(permissions);
         else
             roles.put(roleId, permissions);
+    }
+
+    public void addUserRef(String userRefId, Set<RolePermission> permissions) {
+        userRefs.put(userRefId, parsePermissionMap(permissions));
+    }
+
+    public void addUsers(Set<Long> userIds, Map<String, Boolean> permissions){
+        userIds.forEach(userId -> {
+            if (users.containsKey(userId) && users.get(userId) != null) {
+                users.get(userId).putAll(permissions);
+            } else {
+                users.put(userId, permissions);
+            }
+        });
     }
 
     public void addAssignedUserPolicy(Map<String, Boolean> assignedUser){
