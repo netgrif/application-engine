@@ -283,6 +283,13 @@ public class UserService implements IUserService {
         return userRepository.save(user);
     }
 
+    @Override
+    public void deleteUser(User user) {
+        if (!userRepository.findById(user.getId()).isPresent())
+            throw new IllegalArgumentException("Could not find user with id [" + user.getId() + "]");
+        userRepository.delete(user);
+    }
+
     private User loadProcessRoles(User user) {
         if (user == null)
             return null;
