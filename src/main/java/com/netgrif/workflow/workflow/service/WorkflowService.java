@@ -7,15 +7,17 @@ import com.netgrif.workflow.event.events.usecase.CreateCaseEvent;
 import com.netgrif.workflow.event.events.usecase.DeleteCaseEvent;
 import com.netgrif.workflow.event.events.usecase.UpdateMarkingEvent;
 import com.netgrif.workflow.importer.service.FieldFactory;
+import com.netgrif.workflow.petrinet.domain.DataFieldLogic;
 import com.netgrif.workflow.petrinet.domain.I18nString;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
-import com.netgrif.workflow.petrinet.domain.dataset.CaseField;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.petrinet.domain.dataset.FieldType;
-import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository;
+import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedField;
+import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action;
+import com.netgrif.workflow.petrinet.domain.dataset.logic.action.FieldActionsRunner;
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.workflow.rules.domain.facts.CaseCreatedFact;
-import com.netgrif.workflow.petrinet.domain.EventPhase;
+import com.netgrif.workflow.petrinet.domain.events.EventPhase;
 import com.netgrif.workflow.rules.service.interfaces.IRuleEngine;
 import com.netgrif.workflow.security.service.EncryptionService;
 import com.netgrif.workflow.utils.FullPageRequest;
@@ -31,7 +33,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -57,9 +58,6 @@ public class WorkflowService implements IWorkflowService {
     private CaseRepository repository;
 
     @Autowired
-    private PetriNetRepository petriNetRepository;
-
-    @Autowired
     private MongoTemplate mongoTemplate;
 
     @Autowired
@@ -82,6 +80,9 @@ public class WorkflowService implements IWorkflowService {
 
     @Autowired
     private IRuleEngine ruleEngine;
+
+    @Autowired
+    private FieldActionsRunner actionsRunner;
 
     private IElasticCaseService elasticCaseService;
 
@@ -182,7 +183,13 @@ public class WorkflowService implements IWorkflowService {
         useCase.setAuthor(user.transformToAuthor());
         useCase.setIcon(petriNet.getIcon());
         useCase.setCreationDate(LocalDateTime.now());
+        useCase.setPermissions(petriNet.getPermissions().entrySet().stream()
+                .filter(role -> role.getValue().containsKey("delete"))
+                .map(role -> new AbstractMap.SimpleEntry<>(role.getKey(), Collections.singletonMap("delete", role.getValue().get("delete"))))
+                .collect(Collectors.toMap(AbstractMap.SimpleEntry::getKey, AbstractMap.SimpleEntry::getValue))
+        );
 
+        runActions(petriNet.getPreCreateActions());
         ruleEngine.evaluateRules(useCase, new CaseCreatedFact(useCase.getStringId(), EventPhase.PRE));
         useCase = save(useCase);
 
@@ -192,6 +199,8 @@ public class WorkflowService implements IWorkflowService {
         useCase.getPetriNet().initializeVarArcs(useCase.getDataSet());
         taskService.reloadTasks(useCase);
 
+        useCase = findOne(useCase.getStringId());
+        runActions(petriNet.getPostCreateActions(), useCase.getStringId());
         useCase = findOne(useCase.getStringId());
         ruleEngine.evaluateRules(useCase, new CaseCreatedFact(useCase.getStringId(), EventPhase.POST));
         useCase = save(useCase);
@@ -211,14 +220,15 @@ public class WorkflowService implements IWorkflowService {
 
     @Override
     public void deleteCase(String caseId) {
-        Optional<Case> caseOptional = repository.findById(caseId);
-        if (!caseOptional.isPresent())
-            throw new IllegalArgumentException("Could not find case with id [" + caseId + "]");
-        Case useCase = caseOptional.get();
+        Case useCase = findOne(caseId);
+
+        runActions(useCase.getPetriNet().getPreDeleteActions(), useCase.getStringId());
         log.info("[" + caseId + "]: Deleting case " + useCase.getTitle());
 
         taskService.deleteTasksByCase(caseId);
         repository.delete(useCase);
+
+        runActions(useCase.getPetriNet().getPostDeleteActions());
 
         publisher.publishEvent(new DeleteCaseEvent(useCase));
     }
@@ -412,5 +422,73 @@ public class WorkflowService implements IWorkflowService {
         model.initializeTokens(useCase.getActivePlaces());
         model.initializeVarArcs(useCase.getDataSet());
         useCase.setPetriNet(model);
+    }
+
+    @Override
+    public Map<String, ChangedField> runActions(List<Action> actions, String useCaseId) {
+        log.info("[" + useCaseId + "]: Running actions on case");
+        Map<String, ChangedField> changedFields = new HashMap<>();
+        if (actions.isEmpty())
+            return changedFields;
+
+        Case case$ = findOne(useCaseId);
+        actions.forEach(action -> {
+            Map<String, ChangedField> changedField = actionsRunner.run(action, case$);
+            if (changedField.isEmpty())
+                return;
+            mergeChanges(changedFields, changedField);
+            runEventActionsOnChanged(case$, changedFields, changedField, Action.ActionTrigger.SET,true);
+        });
+        save(case$);
+        return changedFields;
+    }
+
+    private void mergeChanges(Map<String, ChangedField> changedFields, Map<String, ChangedField> newChangedFields) {
+        newChangedFields.forEach((s, changedField) -> {
+            if (changedFields.containsKey(s))
+                changedFields.get(s).merge(changedField);
+            else
+                changedFields.put(s, changedField);
+        });
+    }
+
+    private void runEventActionsOnChanged(Case useCase, Map<String, ChangedField> changedFields, Map<String, ChangedField> newChangedField, Action.ActionTrigger trigger, boolean recursive) {
+        newChangedField.forEach((s, changedField) -> {
+            if ((changedField.getAttributes().containsKey("value") && changedField.getAttributes().get("value") != null) && recursive) {
+                Field field = useCase.getField(s);
+                processDataEvents(field, trigger, EventPhase.PRE, useCase, changedFields);
+                processDataEvents(field, trigger, EventPhase.POST, useCase, changedFields);
+            }
+        });
+    }
+
+    private void processDataEvents(Field field, Action.ActionTrigger actionTrigger, EventPhase phase, Case useCase, Map<String, ChangedField> changedFields){
+        LinkedList<Action> fieldActions = new LinkedList<>();
+        if (field.getEvents() != null){
+            fieldActions.addAll(DataFieldLogic.getEventAction(field.getEvents(), actionTrigger, phase));
+        }
+        if (fieldActions.isEmpty()) return;
+
+        runEventActions(useCase, fieldActions, changedFields, actionTrigger);
+    }
+
+    private void runEventActions(Case useCase, List<Action> actions, Map<String, ChangedField> changedFields, Action.ActionTrigger trigger){
+        actions.forEach(action -> {
+            Map<String, ChangedField> currentChangedFields = actionsRunner.run(action, useCase);
+            if (currentChangedFields.isEmpty())
+                return;
+
+            mergeChanges(changedFields, currentChangedFields);
+            runEventActionsOnChanged(useCase, changedFields, currentChangedFields, trigger,trigger == Action.ActionTrigger.SET);
+        });
+    }
+
+    @Override
+    public void runActions(List<Action> actions) {
+        log.info("Running actions without context on cases");
+
+        actions.forEach(action -> {
+            actionsRunner.run(action, null);
+        });
     }
 }
