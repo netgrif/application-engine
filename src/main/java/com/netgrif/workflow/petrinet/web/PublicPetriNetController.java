@@ -10,9 +10,12 @@ import com.netgrif.workflow.workflow.web.PublicAbstractController;
 import com.netgrif.workflow.petrinet.web.responsebodies.PetriNetReference;
 import com.netgrif.workflow.petrinet.web.responsebodies.PetriNetReferenceResource;
 import com.netgrif.workflow.petrinet.web.responsebodies.PetriNetReferenceResourceAssembler;
+import com.netgrif.workflow.petrinet.service.interfaces.IProcessRoleService;
+import com.netgrif.workflow.petrinet.web.responsebodies.*;
 import com.netgrif.workflow.workflow.web.PublicAbstractController;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedResourcesAssembler;
@@ -30,8 +33,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-
-import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
@@ -54,22 +55,28 @@ public class PublicPetriNetController extends PublicAbstractController {
         this.converter = converter;
     }
 
-    @GetMapping(value = "/{id}", produces = "application/hal+json")
+    @GetMapping(value = "/{id}", produces = MediaTypes.HAL_JSON_VALUE)
     @ApiOperation(value = "Get process by id")
     public PetriNetReferenceResource getOne(@PathVariable("id") String id, Locale locale) {
         return new PetriNetReferenceResource(IPetriNetService.transformToReference(this.service.getPetriNet(PetriNetController.decodeUrl(id)), locale));
     }
 
-    @ApiOperation(
-            value = "Get process by identifier and version"
-    )
-    @GetMapping(
-            value = {"/{identifier}/{version}"},
-            produces = {"application/hal+json"}
-    )
+    @ApiOperation(value = "Get process by identifier and version")
+    @GetMapping(value = "/{identifier}/{version}", produces = MediaTypes.HAL_JSON_VALUE)
     @ResponseBody
     public PetriNetReferenceResource getOne(@PathVariable("identifier") String identifier, @PathVariable("version") String version, Locale locale) {
         return new PetriNetReferenceResource(this.service.getReference(identifier, this.converter.convert(version), getAnonymous(), locale));
+    }
+
+    @ApiOperation(value = "Search processes")
+    @RequestMapping(value = "/search", method = POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
+    public PagedResources<PetriNetReferenceResource> searchPetriNets(@RequestBody Map<String, Object> criteria, Pageable pageable, PagedResourcesAssembler<PetriNetReference> assembler, Locale locale) {
+        Page<PetriNetReference> nets = service.search(criteria, getAnonymous(), pageable, locale);
+        Link selfLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(PublicPetriNetController.class)
+                .searchPetriNets(criteria, pageable, assembler, locale)).withRel("search");
+        PagedResources<PetriNetReferenceResource> resources = assembler.toResource(nets, new PetriNetReferenceResourceAssembler(), selfLink);
+        PetriNetReferenceResourceAssembler.buildLinks(resources);
+        return resources;
     }
 
     @ApiOperation(value = "Get roles of process")
@@ -108,4 +115,5 @@ public class PublicPetriNetController extends PublicAbstractController {
         PetriNetReferenceResourceAssembler.buildLinks(resources);
         return resources;
     }
+
 }
