@@ -83,6 +83,7 @@ public class LoggedUser extends org.springframework.security.core.userdetails.Us
         user.setName("Anonymous");
         user.setSurname(user.getId().toString());
         user.setPassword(null);
+        user.setAnonymous(true);
         return user;
     }
 
