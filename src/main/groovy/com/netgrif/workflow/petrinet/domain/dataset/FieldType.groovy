@@ -15,6 +15,7 @@ enum FieldType {
     MULTICHOICE_MAP("multichoice_map"),
     NUMBER("number"),
     USER("user"),
+    USERLIST("userList"),
     TABULAR("tabular"),
     CASE_REF("caseRef"),
     DATETIME("dateTime"),
