@@ -124,7 +124,7 @@ class ActionDelegate {
         action.transitionIds.each { name, id ->
             set(name, useCase.petriNet.transitions[id])
         }
-        changedFieldsTree = ChangedFieldsTree.createNew(useCase.stringId,
+        changedFieldsTree = ChangedFieldsTree.createNew(useCase ? useCase.stringId : "case",
                 task.isPresent() ? task.get().stringId : "task",
                 task.isPresent() ? task.get().transitionId : "trans")
     }

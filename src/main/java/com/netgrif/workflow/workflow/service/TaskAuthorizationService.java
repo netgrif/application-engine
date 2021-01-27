@@ -2,7 +2,6 @@ package com.netgrif.workflow.workflow.service;
 
 import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.auth.domain.User;
-import com.netgrif.workflow.petrinet.domain.roles.ProcessRole;
 import com.netgrif.workflow.petrinet.domain.roles.RolePermission;
 import com.netgrif.workflow.petrinet.domain.throwable.IllegalTaskStateException;
 import com.netgrif.workflow.workflow.domain.Task;
@@ -11,13 +10,10 @@ import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @Service
-public class TaskAuthorizationService implements ITaskAuthorizationService {
+public class TaskAuthorizationService extends AbstractAuthorizationService implements ITaskAuthorizationService {
 
     @Autowired
     ITaskService taskService;
@@ -29,16 +25,15 @@ public class TaskAuthorizationService implements ITaskAuthorizationService {
 
     @Override
     public boolean userHasAtLeastOneRolePermission(User user, Task task, RolePermission... permissions) {
-        Map<String, Boolean> aggregatePermissions = getAggregatePermissions(user, task);
+        Map<String, Boolean> aggregatePermissions = getAggregatePermissions(user, task.getRoles());
 
         for (RolePermission permission : permissions) {
-            Boolean hasPermission = aggregatePermissions.get(permission.toString());
-            if (hasPermission != null && hasPermission) {
-                return true;
+            if (hasRestrictedPermission(aggregatePermissions.get(permission.toString()))) {
+                return false;
             }
         }
 
-        return false;
+        return Arrays.stream(permissions).anyMatch(permission -> hasPermission(aggregatePermissions.get(permission.toString())));
     }
 
     @Override
@@ -57,29 +52,6 @@ public class TaskAuthorizationService implements ITaskAuthorizationService {
             return false;
         else
             return task.getUserId().equals(user.getId());
-    }
-
-    private Map<String, Boolean> getAggregatePermissions(User user, Task task) {
-        Map<String, Boolean> aggregatePermissions = new HashMap<>();
-
-        Set<String> userProcessRoleIDs = new LinkedHashSet<>();
-        for (ProcessRole role : user.getProcessRoles()) {
-            userProcessRoleIDs.add(role.get_id().toString());
-        }
-
-        for (Map.Entry<String, Map<String, Boolean>> role : task.getRoles().entrySet()) {
-            if (userProcessRoleIDs.contains(role.getKey())) {
-                for (Map.Entry<String, Boolean> permission : role.getValue().entrySet()) {
-                    if (aggregatePermissions.containsKey(permission.getKey())) {
-                        aggregatePermissions.put(permission.getKey(), aggregatePermissions.get(permission.getKey()) || permission.getValue());
-                    } else {
-                        aggregatePermissions.put(permission.getKey(), permission.getValue());
-                    }
-                }
-            }
-        }
-
-        return aggregatePermissions;
     }
 
     private boolean isAssigned(String taskId) {
@@ -110,6 +82,14 @@ public class TaskAuthorizationService implements ITaskAuthorizationService {
                     && isAssignee(loggedUser, taskId));
     }
 
+    private boolean canAssignedCancel(User user, String taskId) {
+        Task task = taskService.findById(taskId);
+        if (!isAssigned(task) || !task.getUserId().equals(user.getId())) {
+            return true;
+        }
+        return (task.getAssignedUserPolicy() == null || task.getAssignedUserPolicy().get("cancel") == null) || task.getAssignedUserPolicy().get("cancel");
+    }
+
     @Override
     public boolean canCallCancel(LoggedUser loggedUser, String taskId) throws IllegalTaskStateException {
         if (!isAssigned(taskId))
@@ -117,7 +97,7 @@ public class TaskAuthorizationService implements ITaskAuthorizationService {
 
         return loggedUser.isAdmin()
                 || (userHasAtLeastOneRolePermission(loggedUser, taskId, RolePermission.PERFORM, RolePermission.CANCEL)
-                    && isAssignee(loggedUser, taskId));
+                    && isAssignee(loggedUser, taskId) && canAssignedCancel(loggedUser.transformToUser(), taskId));
     }
 
     @Override
