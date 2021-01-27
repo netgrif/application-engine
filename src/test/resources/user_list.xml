@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="petriNets/petriflow_schema.xsd">
+    <id>user_list</id>
+    <title>User list</title>
+    <initials>ULT</initials>
+    <data type="userList">
+        <id>users_1</id>
+    </data>
+    <usersRef>
+        <id>users_1</id>
+        <caseLogic>
+            <create>false</create>
+            <delete>true</delete>
+        </caseLogic>
+    </usersRef>
+    <processEvents>
+        <event type="upload">
+            <id>upload</id>
+            <actions phase="post">
+                <action>
+                    createCase("user_list", "User List")
+                </action>
+            </actions>
+        </event>
+    </processEvents>
+    <caseEvents>
+        <event type="create">
+            <id>create</id>
+            <actions phase="post">
+                <action>
+                    text: f.text;
+
+                    change text value {return "Its working..."}
+                </action>
+            </actions>
+        </event>
+        <event type="delete">
+            <id>pdf</id>
+            <actions phase="post">
+                <action>
+                    createCase("user_list", "Destruct")
+                </action>
+            </actions>
+        </event>
+    </caseEvents>
+    <data type="text">
+        <id>text</id>
+        <title>Text</title>
+        <init>text</init>
+    </data>
+
+    <transition>
+        <id>1</id>
+        <label>Title</label>
+        <usersRef>
+            <id>users_1</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </usersRef>
+    </transition>
+
+</document>

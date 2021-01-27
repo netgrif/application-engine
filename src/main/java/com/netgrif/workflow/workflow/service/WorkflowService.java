@@ -1,6 +1,7 @@
 package com.netgrif.workflow.workflow.service;
 
 import com.netgrif.workflow.auth.domain.LoggedUser;
+import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.elastic.domain.ElasticCase;
 import com.netgrif.workflow.elastic.service.interfaces.IElasticCaseService;
 import com.netgrif.workflow.event.events.usecase.CreateCaseEvent;
@@ -13,6 +14,7 @@ import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.petrinet.domain.dataset.FieldType;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedField;
+import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldsTree;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.FieldActionsRunner;
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
@@ -83,6 +85,9 @@ public class WorkflowService implements IWorkflowService {
 
     @Autowired
     private FieldActionsRunner actionsRunner;
+
+    @Autowired
+    private IUserService userService;
 
     private IElasticCaseService elasticCaseService;
 
@@ -175,6 +180,25 @@ public class WorkflowService implements IWorkflowService {
     }
 
     @Override
+    public Case resolveUserRef(Case useCase) {
+        useCase.getUsers().clear();
+        useCase.getUserRefs().forEach((id, permission) -> {
+            List<Long> userIds = getExistingUsers((List<Long>) useCase.getDataSet().get(id).getValue());
+            if (userIds != null && userIds.size() != 0) {
+                useCase.addUsers(new HashSet<>(userIds), permission);
+            }
+        });
+        return repository.save(useCase);
+    }
+
+    private List<Long> getExistingUsers(List<Long> userIds) {
+        if (userIds == null)
+            return null;
+        return userIds.stream().filter(userId -> userService.findById(userId, false) != null).collect(Collectors.toList());
+    }
+
+
+    @Override
     public Case createCase(String netId, String title, String color, LoggedUser user) {
         PetriNet petriNet = petriNetService.clone(new ObjectId(netId));
         Case useCase = new Case(title, petriNet, petriNet.getActivePlaces());
@@ -184,6 +208,11 @@ public class WorkflowService implements IWorkflowService {
         useCase.setIcon(petriNet.getIcon());
         useCase.setCreationDate(LocalDateTime.now());
         useCase.setPermissions(petriNet.getPermissions().entrySet().stream()
+                .filter(role -> role.getValue().containsKey("delete"))
+                .map(role -> new AbstractMap.SimpleEntry<>(role.getKey(), Collections.singletonMap("delete", role.getValue().get("delete"))))
+                .collect(Collectors.toMap(AbstractMap.SimpleEntry::getKey, AbstractMap.SimpleEntry::getValue))
+        );
+        useCase.setUserRefs(petriNet.getUserRefs().entrySet().stream()
                 .filter(role -> role.getValue().containsKey("delete"))
                 .map(role -> new AbstractMap.SimpleEntry<>(role.getKey(), Collections.singletonMap("delete", role.getValue().get("delete"))))
                 .collect(Collectors.toMap(AbstractMap.SimpleEntry::getKey, AbstractMap.SimpleEntry::getValue))
@@ -425,44 +454,36 @@ public class WorkflowService implements IWorkflowService {
     }
 
     @Override
-    public Map<String, ChangedField> runActions(List<Action> actions, String useCaseId) {
+    public ChangedFieldsTree runActions(List<Action> actions, String useCaseId) {
         log.info("[" + useCaseId + "]: Running actions on case");
-        Map<String, ChangedField> changedFields = new HashMap<>();
+        ChangedFieldsTree changedFields = ChangedFieldsTree.createNew(useCaseId, "", "");
         if (actions.isEmpty())
             return changedFields;
 
         Case case$ = findOne(useCaseId);
         actions.forEach(action -> {
-            Map<String, ChangedField> changedField = actionsRunner.run(action, case$);
-            if (changedField.isEmpty())
+            ChangedFieldsTree changedField = actionsRunner.run(action, case$);
+            if (changedField.getChangedFields().isEmpty())
                 return;
-            mergeChanges(changedFields, changedField);
-            runEventActionsOnChanged(case$, changedFields, changedField, Action.ActionTrigger.SET,true);
+            changedFields.mergeChangedFields(changedField);
+            runEventActionsOnChanged(case$, changedFields, changedFields.getChangedFields(), Action.ActionTrigger.SET,true);
         });
         save(case$);
         return changedFields;
     }
 
-    private void mergeChanges(Map<String, ChangedField> changedFields, Map<String, ChangedField> newChangedFields) {
-        newChangedFields.forEach((s, changedField) -> {
-            if (changedFields.containsKey(s))
-                changedFields.get(s).merge(changedField);
-            else
-                changedFields.put(s, changedField);
-        });
-    }
-
-    private void runEventActionsOnChanged(Case useCase, Map<String, ChangedField> changedFields, Map<String, ChangedField> newChangedField, Action.ActionTrigger trigger, boolean recursive) {
+    private void runEventActionsOnChanged(Case useCase, ChangedFieldsTree changedFields, Map<String, ChangedField> newChangedField, Action.ActionTrigger trigger, boolean recursive) {
         newChangedField.forEach((s, changedField) -> {
             if ((changedField.getAttributes().containsKey("value") && changedField.getAttributes().get("value") != null) && recursive) {
                 Field field = useCase.getField(s);
+                log.info("[" + useCase.getStringId() + "] " + useCase.getTitle() + ": Running actions on changed field " + s);
                 processDataEvents(field, trigger, EventPhase.PRE, useCase, changedFields);
                 processDataEvents(field, trigger, EventPhase.POST, useCase, changedFields);
             }
         });
     }
 
-    private void processDataEvents(Field field, Action.ActionTrigger actionTrigger, EventPhase phase, Case useCase, Map<String, ChangedField> changedFields){
+    private void processDataEvents(Field field, Action.ActionTrigger actionTrigger, EventPhase phase, Case useCase, ChangedFieldsTree changedFields){
         LinkedList<Action> fieldActions = new LinkedList<>();
         if (field.getEvents() != null){
             fieldActions.addAll(DataFieldLogic.getEventAction(field.getEvents(), actionTrigger, phase));
@@ -472,14 +493,14 @@ public class WorkflowService implements IWorkflowService {
         runEventActions(useCase, fieldActions, changedFields, actionTrigger);
     }
 
-    private void runEventActions(Case useCase, List<Action> actions, Map<String, ChangedField> changedFields, Action.ActionTrigger trigger){
+    private void runEventActions(Case useCase, List<Action> actions, ChangedFieldsTree changedFields, Action.ActionTrigger trigger){
         actions.forEach(action -> {
-            Map<String, ChangedField> currentChangedFields = actionsRunner.run(action, useCase);
-            if (currentChangedFields.isEmpty())
+            ChangedFieldsTree currentChangedFields = actionsRunner.run(action, useCase);
+            if (currentChangedFields.getChangedFields().isEmpty())
                 return;
 
-            mergeChanges(changedFields, currentChangedFields);
-            runEventActionsOnChanged(useCase, changedFields, currentChangedFields, trigger,trigger == Action.ActionTrigger.SET);
+            changedFields.mergeChangedFields(currentChangedFields);
+            runEventActionsOnChanged(useCase, changedFields, currentChangedFields.getChangedFields(), trigger,trigger == Action.ActionTrigger.SET);
         });
     }
 
