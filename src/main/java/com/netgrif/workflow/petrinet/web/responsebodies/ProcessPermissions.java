@@ -11,7 +11,7 @@ public class ProcessPermissions {
     private Map<String, Map<String, Boolean>> permissions;
 
     public ProcessPermissions(Map<String, Map<String, Boolean>> permissions) {
-        this.permissions = new HashMap<>();
+        this();
         this.permissions.putAll(permissions);
     }
 

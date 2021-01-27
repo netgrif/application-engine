@@ -19,7 +19,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
-public class WorkflowAuthorizationService implements IWorkflowAuthorizationService {
+public class WorkflowAuthorizationService extends AbstractAuthorizationService implements IWorkflowAuthorizationService {
 
     @Autowired
     private IWorkflowService workflowService;
@@ -45,11 +45,10 @@ public class WorkflowAuthorizationService implements IWorkflowAuthorizationServi
 
     @Override
     public boolean userHasAtLeastOneRolePermission(User user, PetriNet net, ProcessRolePermission... permissions) {
-        Map<String, Boolean> aggregatePermissions = getAggregatePermissions(user, net);
+        Map<String, Boolean> aggregatePermissions = getAggregatePermissions(user, net.getPermissions());
 
         for (ProcessRolePermission permission : permissions) {
-            Boolean hasPermission = aggregatePermissions.get(permission.toString());
-            if (hasPermission != null && !hasPermission) {
+            if (hasRestrictedPermission(aggregatePermissions.get(permission.toString()))) {
                 return false;
             }
         }
@@ -61,10 +60,7 @@ public class WorkflowAuthorizationService implements IWorkflowAuthorizationServi
             return true;
         }
 
-        return Arrays.stream(permissions).anyMatch(permission -> {
-            Boolean hasPermission = aggregatePermissions.get(permission.toString());
-            return hasPermission != null && hasPermission;
-        });
+        return Arrays.stream(permissions).anyMatch(permission -> hasPermission(aggregatePermissions.get(permission.toString())));
     }
 
     @Override
