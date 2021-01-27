@@ -49,7 +49,7 @@ public class PublicTaskController extends PublicAbstractController {
         return this.taskService.findAllByCase(caseId, locale);
     }
 
-    @GetMapping(value = "/assign/{id}", produces = "application/hal+json")
+    @GetMapping(value = "/task/assign/{id}", produces = MediaTypes.HAL_JSON_VALUE)
     @ApiOperation(value = "Assign task", notes = "Caller must be able to perform the task, or must be an ADMIN")
     @ApiResponses({@ApiResponse(
             code = 200,
@@ -70,7 +70,7 @@ public class PublicTaskController extends PublicAbstractController {
         }
     }
 
-    @GetMapping(value = "/finish/{id}", produces = "application/hal+json")
+    @GetMapping(value = "/task/finish/{id}", produces = MediaTypes.HAL_JSON_VALUE)
     @ApiOperation(value = "Finish task", notes = "Caller must be assigned to the task, or must be an ADMIN")
     @ApiResponses({@ApiResponse(
             code = 200,
@@ -92,7 +92,7 @@ public class PublicTaskController extends PublicAbstractController {
         }
     }
 
-    @GetMapping(value = "/cancel/{id}", produces = "application/hal+json")
+    @GetMapping(value = "/task/cancel/{id}", produces = MediaTypes.HAL_JSON_VALUE)
     @ApiOperation(value = "Cancel task", notes = "Caller must be assigned to the task, or must be an ADMIN")
     @ApiResponses({@ApiResponse(
             code = 200,
@@ -113,7 +113,7 @@ public class PublicTaskController extends PublicAbstractController {
         }
     }
 
-    @GetMapping(value = "/{id}/data", produces = "application/hal+json")
+    @GetMapping(value = "/task/{id}/data", produces = MediaTypes.HAL_JSON_VALUE)
     @ApiOperation(value = "Get all task data")
     public DataGroupsResource getData(@PathVariable("id") String taskId, Locale locale) {
         List<DataGroup> dataGroups = this.dataService.getDataGroups(taskId, locale);
