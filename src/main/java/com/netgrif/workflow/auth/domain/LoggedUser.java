@@ -84,6 +84,11 @@ public class LoggedUser extends org.springframework.security.core.userdetails.Us
         user.setSurname(user.getId().toString());
         user.setPassword(null);
         user.setAnonymous(true);
+        user.setProcessRoles(processRoles.stream().map(roleId -> {
+            ProcessRole role = new ProcessRole();
+            role.set_id(roleId);
+            return role;
+        }).collect(Collectors.toSet()));
         return user;
     }
 
