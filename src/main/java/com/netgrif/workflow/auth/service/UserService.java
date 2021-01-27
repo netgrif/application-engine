@@ -272,6 +272,11 @@ public class UserService implements IUserService {
     }
 
     @Override
+    public LoggedUser getAnonymousLogged() {
+        return (LoggedUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    }
+
+    @Override
     public User addRole(User user, String roleStringId) {
         UserProcessRole role = userProcessRoleService.findByRoleId(roleStringId);
         user.addProcessRole(role);
