@@ -3,6 +3,7 @@ package com.netgrif.workflow.configuration.security.jwt;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.Resource;
 
 @Data
 @Configuration
@@ -18,7 +19,7 @@ public class JwtProperties {
     /**
      * Defines path to a file that contains generated private key with certificate
      * */
-    private String privateKey = "src/main/resources/certificates/private.der";
+    private Resource privateKey;
 
     /**
      * Defines which algorithm is used when generating JWT token
