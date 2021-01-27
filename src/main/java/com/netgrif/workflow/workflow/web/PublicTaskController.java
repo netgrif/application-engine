@@ -131,7 +131,7 @@ public class PublicTaskController extends PublicAbstractController {
             message = "Caller doesn't fulfill the authorisation requirements"
     )})
     public ChangedFieldContainer setData(@PathVariable("id") String taskId, @RequestBody ObjectNode dataBody) {
-        return this.dataService.setData(taskId, dataBody);
+        return this.dataService.setData(taskId, dataBody).flatten();
     }
 
     @ApiOperation(value = "Generic task search on Mongo database")

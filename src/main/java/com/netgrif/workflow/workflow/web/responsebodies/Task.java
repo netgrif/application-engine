@@ -10,6 +10,7 @@ import lombok.Data;
 import org.bson.types.ObjectId;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -41,6 +42,8 @@ public class Task {
 
     private Map<String, Map<String, Boolean>> roles;
 
+    private Map<Long, Map<String, Boolean>> users;
+
     private LocalDateTime startDate;
 
     private LocalDateTime finishDate;
@@ -69,6 +72,8 @@ public class Task {
 
     private String assignTitle;
 
+    private Map<String, Boolean> assignedUserPolicy;
+
     public Task(com.netgrif.workflow.workflow.domain.Task task, Locale locale) {
         this._id = task.getObjectId();
         this.caseId = task.getCaseId();
@@ -80,6 +85,7 @@ public class Task {
         this.priority = task.getPriority();
         this.user = task.getUser() != null ? User.createSmallUser(task.getUser()) : null;
         this.roles = task.getRoles();
+        this.users = task.getUsers();
         this.startDate = task.getStartDate();
         this.finishDate = task.getFinishDate();
         this.finishedBy = task.getFinishedBy();
@@ -94,6 +100,7 @@ public class Task {
         this.assignTitle = task.getTranslatedEventTitle(EventType.ASSIGN, locale);
         this.cancelTitle = task.getTranslatedEventTitle(EventType.CANCEL, locale);
         this.delegateTitle = task.getTranslatedEventTitle(EventType.DELEGATE, locale);
+        this.assignedUserPolicy = task.getAssignedUserPolicy();
     }
 
     public Task(ElasticTask entity) {
