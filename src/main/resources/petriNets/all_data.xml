@@ -140,9 +140,6 @@
         <id>user</id>
         <title>User</title>
     </data>
-    <data type="userList">
-        <id>userList1</id>
-    </data>
 
     <data type="dateTime">
         <id>datetime</id>
@@ -165,16 +162,6 @@
 		<cols>6</cols>
         <label>Task - editable</label>
         <assignPolicy>auto</assignPolicy>
-        <roleRef>
-            <id>process_role</id>
-            <logic>
-                <perform>true</perform>
-            </logic>
-        </roleRef>
-        <userListRef>
-            <id>userList1</id>
-            <logic><perform>true</perform></logic>
-        </userListRef>
         <dataGroup>
             <id>number</id>
             <title>Number fields</title>
@@ -273,9 +260,6 @@
                 <id>boolean</id>
                 <logic>
                     <behavior>editable</behavior>
-                    <action trigger="set">
-                        test()
-                    </action>
                 </logic>
             </dataRef>
         </dataGroup>
@@ -329,17 +313,6 @@
                 </logic>
             </dataRef>
         </dataGroup>
-        <event type="finish">
-            <id>pdf</id>
-            <actions phase="pre">
-                <action>
-                    file: f.file,
-                    trans: t.this;
-
-                    generatePDF(trans.importId, file.stringId)
-                </action>
-            </actions>
-        </event>
     </transition>
     <transition>
         <id>2</id>
