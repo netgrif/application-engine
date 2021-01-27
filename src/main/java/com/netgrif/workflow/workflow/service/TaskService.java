@@ -411,6 +411,7 @@ public class TaskService implements ITaskService {
                 executeTransition(task, workflowService.findOne(useCase.getStringId()));
                 return;
             }
+            resolveUserRef(task, useCase);
         }
     }
 
@@ -673,6 +674,33 @@ public class TaskService implements ITaskService {
         return task;
     }
 
+    @Override
+    public void resolveUserRef(Case useCase) {
+        useCase.getTasks().forEach(taskPair -> {
+            Optional<Task> taskOptional = taskRepository.findById(taskPair.getTask());
+            taskOptional.ifPresent(task -> resolveUserRef(task, useCase));
+        });
+
+    }
+
+    @Override
+    public Task resolveUserRef(Task task, Case useCase) {
+        task.getUsers().clear();
+        task.getUserRefs().forEach((id, permission) -> {
+            List<Long> userIds = getExistingUsers((List<Long>) useCase.getDataSet().get(id).getValue());
+            if (userIds != null && userIds.size() != 0) {
+                task.addUsers(new HashSet<>(userIds), permission);
+            }
+        });
+        return taskRepository.save(task);
+    }
+
+    private List<Long> getExistingUsers(List<Long> userIds) {
+        if (userIds == null)
+            return null;
+        return userIds.stream().filter(userId -> userService.findById(userId, false) != null).collect(Collectors.toList());
+    }
+
     private Task createFromTransition(Transition transition, Case useCase) {
         final Task task = Task.with()
                 .title(transition.getTitle())
@@ -708,10 +736,16 @@ public class TaskService implements ITaskService {
             }
         }
 
+        for (Map.Entry<String, Set<RolePermission>> entry : transition.getUserRefs().entrySet()) {
+            task.addUserRef(entry.getKey(), entry.getValue());
+        }
+
         Transaction transaction = useCase.getPetriNet().getTransactionByTransition(transition);
         if (transaction != null) {
             task.setTransactionId(transaction.getStringId());
         }
+
+        resolveUserRef(task, useCase);
         Task savedTask = save(task);
 
         useCase.addTask(savedTask);
