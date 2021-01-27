@@ -4,6 +4,7 @@ import com.netgrif.workflow.importer.model.*;
 import com.netgrif.workflow.importer.model.DataEventType;
 import com.netgrif.workflow.petrinet.domain.events.*;
 import com.netgrif.workflow.petrinet.domain.Component;
+import com.netgrif.workflow.petrinet.domain.DataEvent;
 import com.netgrif.workflow.petrinet.domain.DataGroup;
 import com.netgrif.workflow.petrinet.domain.Place;
 import com.netgrif.workflow.petrinet.domain.Transaction;
@@ -352,6 +353,10 @@ public class Importer {
                     addRoleLogic(transition, roleRef)
             );
         }
+        if (importTransition.getUserListRef() != null) {
+            importTransition.getUserListRef().forEach(userListRef ->
+                    addUserLogic(transition, userListRef));
+        }
         if (importTransition.getDataRef() != null) {
             importTransition.getDataRef().forEach(dataRef ->
                     addDataWithDefaultGroup(transition, dataRef)
@@ -523,6 +528,17 @@ public class Importer {
         }
 
         transition.addRole(roleId, roleFactory.getPermissions(logic));
+    }
+
+    @Transactional
+    protected void addUserLogic(Transition transition, UserListRef userListRef) {
+        Logic logic = userListRef.getLogic();
+        String userRef = userListRef.getId();
+
+        if (logic == null || userRef == null) {
+            return;
+        }
+        transition.addUserRef(userRef, roleFactory.getPermissions(logic));
     }
 
     @Transactional
