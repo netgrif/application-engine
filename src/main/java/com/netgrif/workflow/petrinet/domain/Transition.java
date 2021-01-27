@@ -33,7 +33,11 @@ public class Transition extends Node {
 
     @Field("roles")
     @Getter @Setter
-    private Map<String, Set<RolePermission>> roles;
+    private Map<String, Map<String, Boolean>> roles;
+
+    @Field("users")
+    @Getter @Setter
+    private Map<String, Set<RolePermission>> userRefs;
 
     @Field("triggers")
     @Getter @Setter
@@ -61,18 +65,23 @@ public class Transition extends Node {
     private Map<EventType, Event> events;
 
     @Getter @Setter
+    private Map<String, Boolean> assignedUserPolicy;
+
+    @Getter @Setter
     private String defaultRoleId;
 
     public Transition() {
         super();
         dataSet = new LinkedHashMap<>();
         roles = new HashMap<>();
+        userRefs = new HashMap<>();
         triggers = new LinkedList<>();
         dataGroups = new LinkedHashMap<>();
         assignPolicy = AssignPolicy.MANUAL;
         dataFocusPolicy = DataFocusPolicy.MANUAL;
         finishPolicy = FinishPolicy.MANUAL;
         events = new HashMap<>();
+        assignedUserPolicy = new HashMap<>();
     }
 
     public void addDataSet(String field, Set<FieldBehavior> behavior, Set<DataEvent> events, FieldLayout layout, Component component){
@@ -92,11 +101,19 @@ public class Transition extends Node {
         }
     }
 
-    public void addRole(String roleId, Set<RolePermission> permissions) {
+    public void addRole(String roleId, Map<String, Boolean> permissions) {
         if (roles.containsKey(roleId) && roles.get(roleId) != null) {
-            roles.get(roleId).addAll(permissions);
+            roles.get(roleId).putAll(permissions);
         } else {
             roles.put(roleId, permissions);
+        }
+    }
+
+    public void addUserRef(String userRefId, Set<RolePermission> permissions) {
+        if (userRefs.containsKey(userRefId) && userRefs.get(userRefId) != null) {
+            userRefs.get(userRefId).addAll(permissions);
+        } else {
+            userRefs.put(userRefId, permissions);
         }
     }
 
