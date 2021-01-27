@@ -706,8 +706,7 @@ public class TaskService implements ITaskService {
                 task.addUsers(new HashSet<>(userIds), permission);
             }
         });
-        taskRepository.save(task);
-        return task;
+        return taskRepository.save(task);
     }
 
     private List<Long> getExistingUsers(List<Long> userIds) {
