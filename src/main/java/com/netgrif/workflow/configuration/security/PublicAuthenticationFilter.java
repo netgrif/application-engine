@@ -2,7 +2,9 @@ package com.netgrif.workflow.configuration.security;
 
 import com.netgrif.workflow.auth.domain.Authority;
 import com.netgrif.workflow.auth.domain.LoggedUser;
+import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.configuration.security.jwt.IJwtService;
+import com.netgrif.workflow.petrinet.service.interfaces.IProcessRoleService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AnonymousAuthenticationProvider;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
@@ -29,18 +31,22 @@ public class PublicAuthenticationFilter extends OncePerRequestFilter {
     private final ProviderManager authenticationManager;
     private final AuthenticationDetailsSource<HttpServletRequest, ?> authenticationDetailsSource = new WebAuthenticationDetailsSource();
     private final Authority anonymousRole;
+
     private final static String JWT_HEADER_NAME = "X-Jwt-Token";
     private final static String BEARER = "Bearer ";
     private final String[] anonymousAccessUrls;
 
     private final IJwtService jwtService;
+    private final IProcessRoleService roleService;
 
-    public PublicAuthenticationFilter(ProviderManager authenticationManager, AnonymousAuthenticationProvider provider, Authority anonymousRole, String[] urls, IJwtService jwtService) {
+    public PublicAuthenticationFilter(ProviderManager authenticationManager, AnonymousAuthenticationProvider provider,
+                                      Authority anonymousRole, String[] urls, IJwtService jwtService, IProcessRoleService roleService) {
         this.authenticationManager = authenticationManager;
         this.authenticationManager.getProviders().add(provider);
         this.anonymousRole = anonymousRole;
         this.anonymousAccessUrls = urls;
         this.jwtService = jwtService;
+        this.roleService = roleService;
     }
 
     @Override
@@ -100,6 +106,7 @@ public class PublicAuthenticationFilter extends OncePerRequestFilter {
         );
         user.setFullName("Anonymous " + user.getId().toString());
         user.setAnonymous(true);
+        user.setProcessRoles(Collections.singleton(roleService.defaultRole().getStringId()));
         return user;
     }
 
