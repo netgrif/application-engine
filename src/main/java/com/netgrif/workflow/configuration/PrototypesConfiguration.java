@@ -1,5 +1,6 @@
 package com.netgrif.workflow.configuration;
 
+import com.netgrif.workflow.auth.web.responsebodies.UserResourceAssembler;
 import com.netgrif.workflow.importer.service.Importer;
 import com.netgrif.workflow.pdf.generator.service.PdfDataHelper;
 import com.netgrif.workflow.pdf.generator.service.PdfDrawer;
@@ -48,4 +49,10 @@ public class PrototypesConfiguration {
     @Bean("pdfDrawer")
     @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
     public IPdfDrawer pdfDrawer(){return new PdfDrawer();}
+
+    @Bean("userResourceAssembler")
+    @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
+    public UserResourceAssembler userResourceAssembler() {
+        return new UserResourceAssembler();
+    }
 }

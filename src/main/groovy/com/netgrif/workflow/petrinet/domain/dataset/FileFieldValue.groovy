@@ -42,6 +42,11 @@ class FileFieldValue {
         return "${fileStorageConfiguration.getStoragePath()}/${caseId}-${fieldId}-${name}"
     }
 
+    String getPreviewPath(String caseId, String fieldId) {
+        FileStorageConfiguration fileStorageConfiguration = ApplicationContextProvider.getBean("fileStorageConfiguration")
+        return "${fileStorageConfiguration.getStoragePath()}/file_preview/${caseId}-${fieldId}-${name}"
+    }
+
     void setPath(String path) {
         this.path = path
     }

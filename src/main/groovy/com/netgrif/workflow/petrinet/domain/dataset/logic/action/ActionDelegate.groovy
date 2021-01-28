@@ -1,12 +1,16 @@
 package com.netgrif.workflow.petrinet.domain.dataset.logic.action
 
 import com.netgrif.workflow.AsyncRunner
+import com.netgrif.workflow.auth.domain.Author
 import com.netgrif.workflow.auth.domain.User
+import com.netgrif.workflow.auth.service.interfaces.IRegistrationService
 import com.netgrif.workflow.auth.service.interfaces.IUserService
+import com.netgrif.workflow.auth.web.requestbodies.NewUserRequest
 import com.netgrif.workflow.configuration.ApplicationContextProvider
 import com.netgrif.workflow.importer.service.FieldFactory
 import com.netgrif.workflow.mail.domain.SimpleMailDraft
 import com.netgrif.workflow.mail.domain.TypedMailDraft
+import com.netgrif.workflow.mail.interfaces.IMailAttemptService
 import com.netgrif.workflow.mail.interfaces.IMailService
 import com.netgrif.workflow.orgstructure.domain.Group
 import com.netgrif.workflow.orgstructure.domain.Member
@@ -24,6 +28,7 @@ import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldsTree
 
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.workflow.startup.ImportHelper
+import com.netgrif.workflow.utils.FullPageRequest
 import com.netgrif.workflow.workflow.domain.Case
 import com.netgrif.workflow.workflow.domain.QCase
 import com.netgrif.workflow.workflow.domain.QTask
@@ -31,6 +36,7 @@ import com.netgrif.workflow.workflow.domain.Task
 import com.netgrif.workflow.workflow.service.TaskService
 import com.netgrif.workflow.workflow.service.interfaces.IDataService
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService
+import com.netgrif.workflow.workflow.web.responsebodies.MessageResource
 import com.netgrif.workflow.workflow.web.responsebodies.TaskReference
 import com.querydsl.core.types.Predicate
 import org.bson.types.ObjectId
@@ -91,6 +97,12 @@ class ActionDelegate {
     @Autowired
     INextGroupService nextGroupService
 
+    @Autowired
+    IRegistrationService registrationService
+
+    @Autowired
+    IMailAttemptService mailAttemptService
+
     /**
      * Reference of case and task in which current action is taking place.
      */
@@ -112,7 +124,7 @@ class ActionDelegate {
         action.transitionIds.each { name, id ->
             set(name, useCase.petriNet.transitions[id])
         }
-        changedFieldsTree = ChangedFieldsTree.createNew(useCase.stringId,
+        changedFieldsTree = ChangedFieldsTree.createNew(useCase ? useCase.stringId : "case",
                 task.isPresent() ? task.get().stringId : "task",
                 task.isPresent() ? task.get().transitionId : "trans")
     }
@@ -653,6 +665,17 @@ class ActionDelegate {
         change useCase.getField(fileFieldId) value {new FileFieldValue(filename, storagePath)}
     }
 
+    void generatePDF(String transitionId, String fileFieldId, List<String> excludedFields){
+        PdfResource pdfResource = ApplicationContextProvider.getBean(PdfResource.class) as PdfResource
+        String filename = pdfResource.getOutputResource().getFilename()
+        String storagePath = new FileFieldValue(pdfResource.getOutputResource().getFilename(), ((ClassPathResource)pdfResource.getOutputResource()).getPath()).getPath(useCase.stringId, "pdf_file")
+
+        pdfResource.setOutputResource(new ClassPathResource(storagePath))
+        pdfGenerator.setupPdfGenerator(pdfResource)
+        pdfGenerator.generatePdf(useCase, transitionId, pdfResource, excludedFields)
+        change useCase.getField(fileFieldId) value {new FileFieldValue(filename, storagePath)}
+    }
+
     void generatePdfWithTemplate(String transitionId, String fileFieldId, String template){
         PdfResource pdfResource = ApplicationContextProvider.getBean(PdfResource.class) as PdfResource
         String filename = pdfResource.getOutputResource().getFilename()
@@ -688,4 +711,116 @@ class ActionDelegate {
     void sendMail(SimpleMailDraft mailDraft){
         mailService.sendMail(mailDraft)
     }
+
+    def changeUser(String email) {
+        [email: {cl ->
+            changeUser(email, "email", cl)
+        },
+         name: {cl ->
+             changeUser(email, "name", cl)
+         },
+         surname: {cl ->
+             changeUser(email, "surname", cl)
+         },
+         tel: {cl ->
+             changeUser(email, "tel", cl)
+         },
+        ]
+    }
+
+    def changeUser(Long id) {
+        [email: {cl ->
+            changeUser(id, "email", cl)
+        },
+         name: {cl ->
+             changeUser(id, "name", cl)
+         },
+         surname: {cl ->
+             changeUser(id, "surname", cl)
+         },
+         tel: {cl ->
+             changeUser(id, "tel", cl)
+         },
+        ]
+    }
+
+    def changeUser(User user) {
+        [email: {cl ->
+            changeUser(user, "email", cl)
+        },
+         name: {cl ->
+             changeUser(user, "name", cl)
+         },
+         surname: {cl ->
+             changeUser(user, "surname", cl)
+         },
+         tel: {cl ->
+             changeUser(user, "tel", cl)
+         },
+        ]
+    }
+
+    def changeUser(String email, String attribute, def cl) {
+        User user = userService.findByEmail(email, false)
+        changeUser(user, attribute, cl)
+    }
+
+    def changeUser(Long id, String attribute, def cl) {
+        User user = userService.findById(id, false)
+        changeUser(user, attribute, cl)
+    }
+
+    def changeUser(User user, String attribute, def cl) {
+        if (user == null) {
+            log.error("Cannot find user.")
+            return
+        }
+
+        if (user.hasProperty(attribute) == null) {
+            log.error("User object does not have property [" + attribute + "]")
+            return
+        }
+
+        user[attribute] = cl() as String
+        userService.save(user)
+    }
+
+    MessageResource inviteUser(String email) {
+        NewUserRequest newUserRequest = new NewUserRequest()
+        newUserRequest.email = email
+        newUserRequest.groups = new HashSet<>()
+        newUserRequest.processRoles = new HashSet<>()
+        return inviteUser(newUserRequest)
+    }
+
+    MessageResource inviteUser(NewUserRequest newUserRequest) {
+        User user = registrationService.createNewUser(newUserRequest);
+        if (user == null)
+            return MessageResource.successMessage("Done");
+        mailService.sendRegistrationEmail(user);
+
+        mailAttemptService.mailAttempt(newUserRequest.email);
+        return MessageResource.successMessage("Done");
+    }
+
+    void deleteUser(String email) {
+        User user = userService.findByEmail(email, false)
+        if (user == null)
+            log.error("Cannot find user with email [" + email + "]")
+        deleteUser(user)
+    }
+
+    void deleteUser(User user) {
+        List<Task> tasks = taskService.findByUser(new FullPageRequest(), user).toList()
+        if (tasks != null && tasks.size() > 0)
+            taskService.cancelTasks(tasks, user)
+
+        QCase qCase = new QCase("case")
+        List<Case> cases = workflowService.searchAll(qCase.author.eq(user.transformToAuthor())).toList()
+        if (cases != null)
+            cases.forEach({ aCase -> aCase.setAuthor(Author.createAnonymizedAuthor()) })
+
+        userService.deleteUser(user)
+    }
+
 }

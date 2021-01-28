@@ -1,13 +1,10 @@
 package com.netgrif.workflow.auth.web.responsebodies;
 
 import com.netgrif.workflow.auth.domain.Authority;
-import com.netgrif.workflow.auth.domain.UserProcessRole;
 import com.netgrif.workflow.orgstructure.domain.Group;
 import lombok.Data;
 
-import java.util.Locale;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Data
 public class User {
@@ -15,8 +12,6 @@ public class User {
     private Long id;
 
     private String email;
-
-    private String password;
 
     private String telNumber;
 
@@ -32,27 +27,40 @@ public class User {
 
     private Set<Authority> authorities;
 
+    // process roles are set with the factory
     private Set<ProcessRole> processRoles;
-
-    private Set<UserProcessRole> userProcessRoles;
 
     private Set<String> nextGroups;
 
-    public User(com.netgrif.workflow.auth.domain.User user, Locale locale) {
+    protected User(com.netgrif.workflow.auth.domain.User user) {
         id = user.getId();
         email = user.getEmail();
-        password = user.getPassword();
-        telNumber = user.getTelNumber();
         avatar = user.getAvatar();
         name = user.getName();
         surname = user.getSurname();
         fullName = user.getFullName();
-        groups = user.getGroups();
-        authorities = user.getAuthorities();
-        userProcessRoles = user.getUserProcessRoles();
-        processRoles = user.getProcessRoles().stream()
-                .map(role -> new ProcessRole(role, locale))
-                .collect(Collectors.toSet());
-        nextGroups = user.getNextGroups();
+    }
+
+    /**
+     * This static method doesn't set attributes regarding the ProcessRoles
+     *
+     * Use the IUserFactory service to create instances that have these attributes set.
+     */
+    public static User createSmallUser(com.netgrif.workflow.auth.domain.User user) {
+        return new User(user);
+    }
+
+    /**
+     * This static method doesn't set attributes regarding the ProcessRoles
+     *
+     * Use the IUserFactory service to create instances that have these attributes set.
+     */
+    public static User createUser(com.netgrif.workflow.auth.domain.User user) {
+        User result = new User(user);
+        result.setTelNumber(user.getTelNumber());
+        result.setGroups(user.getGroups());
+        result.setAuthorities(user.getAuthorities());
+        result.setNextGroups(user.getNextGroups());
+        return result;
     }
 }
