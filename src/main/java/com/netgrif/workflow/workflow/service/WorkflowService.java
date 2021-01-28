@@ -1,6 +1,7 @@
 package com.netgrif.workflow.workflow.service;
 
 import com.netgrif.workflow.auth.domain.LoggedUser;
+import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.elastic.domain.ElasticCase;
 import com.netgrif.workflow.elastic.service.interfaces.IElasticCaseService;
 import com.netgrif.workflow.event.events.usecase.CreateCaseEvent;
@@ -84,6 +85,9 @@ public class WorkflowService implements IWorkflowService {
 
     @Autowired
     private FieldActionsRunner actionsRunner;
+
+    @Autowired
+    private IUserService userService;
 
     private IElasticCaseService elasticCaseService;
 
@@ -176,6 +180,25 @@ public class WorkflowService implements IWorkflowService {
     }
 
     @Override
+    public Case resolveUserRef(Case useCase) {
+        useCase.getUsers().clear();
+        useCase.getUserRefs().forEach((id, permission) -> {
+            List<Long> userIds = getExistingUsers((List<Long>) useCase.getDataSet().get(id).getValue());
+            if (userIds != null && userIds.size() != 0) {
+                useCase.addUsers(new HashSet<>(userIds), permission);
+            }
+        });
+        return repository.save(useCase);
+    }
+
+    private List<Long> getExistingUsers(List<Long> userIds) {
+        if (userIds == null)
+            return null;
+        return userIds.stream().filter(userId -> userService.findById(userId, false) != null).collect(Collectors.toList());
+    }
+
+
+    @Override
     public Case createCase(String netId, String title, String color, LoggedUser user) {
         PetriNet petriNet = petriNetService.clone(new ObjectId(netId));
         Case useCase = new Case(title, petriNet, petriNet.getActivePlaces());
@@ -185,6 +208,11 @@ public class WorkflowService implements IWorkflowService {
         useCase.setIcon(petriNet.getIcon());
         useCase.setCreationDate(LocalDateTime.now());
         useCase.setPermissions(petriNet.getPermissions().entrySet().stream()
+                .filter(role -> role.getValue().containsKey("delete"))
+                .map(role -> new AbstractMap.SimpleEntry<>(role.getKey(), Collections.singletonMap("delete", role.getValue().get("delete"))))
+                .collect(Collectors.toMap(AbstractMap.SimpleEntry::getKey, AbstractMap.SimpleEntry::getValue))
+        );
+        useCase.setUserRefs(petriNet.getUserRefs().entrySet().stream()
                 .filter(role -> role.getValue().containsKey("delete"))
                 .map(role -> new AbstractMap.SimpleEntry<>(role.getKey(), Collections.singletonMap("delete", role.getValue().get("delete"))))
                 .collect(Collectors.toMap(AbstractMap.SimpleEntry::getKey, AbstractMap.SimpleEntry::getValue))
