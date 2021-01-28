@@ -6,25 +6,12 @@ import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.mvc.ControllerLinkBuilder;
 
 import java.util.ArrayList;
-import java.util.Locale;
 
 public class UserResource extends Resource<User> {
 
-    public UserResource(com.netgrif.workflow.auth.domain.User content, String selfRel, Locale locale) {
-        super(new User(content, locale), new ArrayList<>());
-        getContent().setPassword(null);
+    public UserResource(User content, String selfRel) {
+        super(content, new ArrayList<>());
         buildLinks(selfRel);
-    }
-
-    public UserResource(com.netgrif.workflow.auth.domain.User content, String selfRel, Locale locale, boolean small) {
-        this(content, selfRel, locale);
-        getContent().setPassword(null);
-        if (small) {
-            getContent().setTelNumber(null);
-            getContent().setGroups(null);
-            getContent().setAuthorities(null);
-            getContent().setProcessRoles(null);
-        }
     }
 
     private void buildLinks(String selfRel) {

@@ -12,6 +12,8 @@ import com.netgrif.workflow.utils.FullPageRequest;
 import com.netgrif.workflow.workflow.domain.Task;
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
 import com.netgrif.workflow.workflow.web.requestbodies.TaskSearchRequest;
+import com.netgrif.workflow.workflow.web.requestbodies.taskSearch.PetriNet;
+import com.netgrif.workflow.workflow.web.requestbodies.taskSearch.TaskSearchCaseRequest;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryStringQueryBuilder;
@@ -175,10 +177,11 @@ public class ElasticTaskService implements IElasticTaskService {
             throw new IllegalArgumentException("Request can not be null!");
         }
         addRolesQueryConstraint(request, user);
+        addUsersQueryConstraint(request, user);
 
         BoolQueryBuilder query = boolQuery();
 
-        buildRoleQuery(request, query);
+        buildUsersRoleQuery(request, query);
         buildCaseQuery(request, query);
         buildTitleQuery(request, query);
         buildUserQuery(request, query);
@@ -202,6 +205,24 @@ public class ElasticTaskService implements IElasticTaskService {
         } else {
             request.role = new ArrayList<>(user.getProcessRoles());
         }
+    }
+
+    protected void addUsersQueryConstraint(ElasticTaskSearchRequest request, LoggedUser user) {
+        if (request.users != null && !request.users.isEmpty()) {
+            Set<Long> users = new HashSet<>(request.users);
+            users.add(user.getId());
+            request.users = new ArrayList<>(users);
+        } else {
+            request.users = Collections.singletonList(user.getId());
+        }
+    }
+
+    protected void buildUsersRoleQuery(ElasticTaskSearchRequest request, BoolQueryBuilder query){
+        BoolQueryBuilder userRoleQuery = boolQuery();
+        buildRoleQuery(request, userRoleQuery);
+        buildUsersQuery(request, userRoleQuery);
+
+        query.filter(userRoleQuery);
     }
 
     /**
@@ -228,8 +249,22 @@ public class ElasticTaskService implements IElasticTaskService {
             roleQuery.should(termQuery("roles", roleId));
         }
 
-        query.filter(roleQuery);
+        query.should(roleQuery);
     }
+
+    private void buildUsersQuery(ElasticTaskSearchRequest request, BoolQueryBuilder query) {
+        if (request.users == null || request.users.isEmpty()) {
+            return;
+        }
+
+        BoolQueryBuilder roleQuery = boolQuery();
+        for (Long userId : request.users) {
+            roleQuery.should(termQuery("users", userId));
+        }
+
+        query.should(roleQuery);
+    }
+
 
     /**
      * Tasks of case with id "5cb07b6ff05be15f0b972c4d"
@@ -281,7 +316,7 @@ public class ElasticTaskService implements IElasticTaskService {
      * @return query for ID if only ID is present. Query for title if only title is present.
      * If both are present an ID query is returned. If neither are present null is returned.
      */
-    private QueryBuilder caseRequestQuery(TaskSearchRequest.TaskSearchCaseRequest caseRequest) {
+    private QueryBuilder caseRequestQuery(TaskSearchCaseRequest caseRequest) {
         if (caseRequest.id != null) {
             return termQuery("caseId", caseRequest.id);
         } else if (caseRequest.title != null) {
@@ -358,8 +393,10 @@ public class ElasticTaskService implements IElasticTaskService {
         }
 
         BoolQueryBuilder processQuery = boolQuery();
-        for (String process : request.process) {
-            processQuery.should(termQuery("processId", process));
+        for (PetriNet process : request.process) {
+            if (process.identifier != null) {
+                processQuery.should(termQuery("processId", process.identifier));
+            }
         }
 
         query.filter(processQuery);
