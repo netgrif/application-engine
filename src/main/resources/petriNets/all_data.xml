@@ -313,17 +313,6 @@
                 </logic>
             </dataRef>
         </dataGroup>
-        <event type="finish">
-            <id>pdf</id>
-            <actions phase="pre">
-                <action>
-                    file: f.file,
-                    trans: t.this;
-
-                    generatePDF(trans.importId, file.stringId)
-                </action>
-            </actions>
-        </event>
     </transition>
     <transition>
         <id>2</id>

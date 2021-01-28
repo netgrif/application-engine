@@ -11,7 +11,11 @@ public interface ITaskAuthorizationService {
 
 	boolean userHasAtLeastOneRolePermission(User user, Task task, RolePermission... permissions);
 
-	boolean isAssignee(LoggedUser loggedUser, String taskId);
+	boolean userHasUserListPermission(LoggedUser loggedUser, String taskId, RolePermission... permissions);
+
+	boolean userHasUserListPermission(User user, Task task, RolePermission... permissions);
+
+    boolean isAssignee(LoggedUser loggedUser, String taskId);
 
 	boolean isAssignee(User user, String taskId);
 
