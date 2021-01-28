@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import static com.netgrif.workflow.petrinet.web.PetriNetController.decodeUrl;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
@@ -46,7 +47,7 @@ public class PublicPetriNetController extends PublicAbstractController {
     @GetMapping(value = "/{id}", produces = MediaTypes.HAL_JSON_VALUE)
     @ApiOperation(value = "Get process by id")
     public PetriNetReferenceResource getOne(@PathVariable("id") String id, Locale locale) {
-        return new PetriNetReferenceResource(IPetriNetService.transformToReference(this.service.getPetriNet(PetriNetController.decodeUrl(id)), locale));
+        return new PetriNetReferenceResource(IPetriNetService.transformToReference(this.service.getPetriNet(decodeUrl(id)), locale));
     }
 
     @ApiOperation(value = "Get process by identifier and version")
@@ -70,8 +71,8 @@ public class PublicPetriNetController extends PublicAbstractController {
     @ApiOperation(value = "Get roles of process")
     @RequestMapping(value = "/{netId}/roles", method = GET, produces = MediaTypes.HAL_JSON_VALUE)
     public ProcessRolesResource getRoles(@PathVariable("netId") String netId, Locale locale) {
-        netId = PetriNetController.decodeUrl(netId);
-        return new ProcessRolesResource(roleService.findAll(netId), netId, locale);
+        netId = decodeUrl(netId);
+        return new ProcessRolesResource(roleService.findAll(netId), service.getPetriNet(decodeUrl(netId)).getPermissions(), netId, locale);
     }
 
     @ApiOperation(value = "Get transactions of process")
@@ -90,7 +91,7 @@ public class PublicPetriNetController extends PublicAbstractController {
     @ApiOperation(value = "Get transitions of processes")
     @RequestMapping(value = "/transitions", method = GET, produces = MediaTypes.HAL_JSON_VALUE)
     public TransitionReferencesResource getTransitionReferences(@RequestParam List<String> ids, Locale locale) {
-        ids.forEach(id -> id = PetriNetController.decodeUrl(id));
+        ids.forEach(id -> id = decodeUrl(id));
         return new TransitionReferencesResource(service.getTransitionReferences(ids, getAnonymous(), locale));
     }
 

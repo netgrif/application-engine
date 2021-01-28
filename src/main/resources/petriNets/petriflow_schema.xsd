@@ -98,8 +98,8 @@
                 <xs:element ref="trigger" minOccurs="0" maxOccurs="unbounded"/>
                 <xs:element ref="transactionRef" minOccurs="0"/>
                 <xs:element ref="roleRef" maxOccurs="unbounded" minOccurs="0"/>
+                <xs:element type="usersRef" name="usersRef" maxOccurs="unbounded" minOccurs="0"/>
                 <xs:element ref="assignedUser" minOccurs="0"/>
-                <xs:element ref="userListRef" maxOccurs="unbounded" minOccurs="0"/>
                 <xs:element ref="dataRef" maxOccurs="unbounded" minOccurs="0"/>
                 <xs:element ref="dataGroup" maxOccurs="unbounded" minOccurs="0"/>
                 <xs:element ref="event" maxOccurs="unbounded" minOccurs="0"/>
@@ -175,6 +175,7 @@
                 <xs:element ref="transitionRole" minOccurs="0"/>
                 <xs:element ref="caseName" minOccurs="0"/>
                 <xs:element type="caseRoleRef" name="roleRef" maxOccurs="unbounded" minOccurs="0"/>
+                <xs:element type="caseUsersRef" name="usersRef" maxOccurs="unbounded" minOccurs="0"/>
                 <xs:element ref="processEvents" minOccurs="0"/>
                 <xs:element ref="caseEvents" minOccurs="0"/>
                 <xs:element ref="transaction" maxOccurs="unbounded" minOccurs="0"/>
@@ -439,15 +440,19 @@
             </xs:sequence>
         </xs:complexType>
     </xs:element>
-    <xs:element name="userListRef">
-        <xs:complexType>
+    <xs:complexType name="usersRef">
             <xs:sequence>
                 <xs:element ref="id"/>
                 <xs:element ref="logic"/>
             </xs:sequence>
-        </xs:complexType>
-    </xs:element>
+    </xs:complexType>
     <xs:complexType name="caseRoleRef">
+        <xs:sequence>
+            <xs:element ref="id"/>
+            <xs:element ref="caseLogic"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="caseUsersRef">
         <xs:sequence>
             <xs:element ref="id"/>
             <xs:element ref="caseLogic"/>
