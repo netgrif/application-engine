@@ -74,9 +74,7 @@ public class WorkflowController {
     @Autowired
     private IUserService userService;
 
-    @Autowired
-    private IWorkflowAuthorizationService authenticationService;
-
+    @PreAuthorize("@workflowAuthorizationService.canCallCreate(#auth.getPrincipal(), #body.netId)")
     @ApiOperation(value = "Create new case", authorizations = @Authorization("BasicAuth"))
     @RequestMapping(value = "/case", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public CaseResource createCase(@RequestBody CreateCaseBody body, Authentication auth) {
@@ -187,14 +185,10 @@ public class WorkflowController {
         }
     }
 
+    @PreAuthorize("@workflowAuthorizationService.canCallDelete(#auth.getPrincipal(), #caseId)")
     @ApiOperation(value = "Delete case", authorizations = @Authorization("BasicAuth"))
     @RequestMapping(value = "/case/{id}", method = RequestMethod.DELETE, produces = MediaTypes.HAL_JSON_VALUE)
-    public MessageResource deleteCase(@PathVariable("id") String caseId, @RequestParam(defaultValue = "false") boolean deleteSubtree) throws UnauthorisedRequestException {
-        User logged = userService.getLoggedUser();
-        Case requestedCase = workflowService.findOne(caseId);
-        if (!this.authenticationService.canCallDelete(logged.transformToLoggedUser(), requestedCase))
-            throw new UnauthorisedRequestException("User " + logged.transformToLoggedUser().getUsername() + " doesn't have permission to delete case " + requestedCase.getStringId());
-
+    public MessageResource deleteCase(Authentication auth, @PathVariable("id") String caseId, @RequestParam(defaultValue = "false") boolean deleteSubtree) {
         try {
             caseId = URLDecoder.decode(caseId, StandardCharsets.UTF_8.name());
             if(deleteSubtree) {
@@ -224,7 +218,7 @@ public class WorkflowController {
     @ApiOperation(value = "Download case file field value", authorizations = @Authorization("BasicAuth"))
     @RequestMapping(value = "/case/{id}/file/{field}", method = RequestMethod.GET, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public ResponseEntity<Resource> getFile(@PathVariable("id") String caseId, @PathVariable("field") String fieldId) throws FileNotFoundException {
-        FileFieldInputStream fileFieldInputStream = dataService.getFileByCase(caseId, null, fieldId);
+        FileFieldInputStream fileFieldInputStream = dataService.getFileByCase(caseId, null, fieldId, false);
 
         if (fileFieldInputStream.getInputStream() == null)
             throw new FileNotFoundException("File in field " + fieldId + " within case " + caseId + " was not found!");

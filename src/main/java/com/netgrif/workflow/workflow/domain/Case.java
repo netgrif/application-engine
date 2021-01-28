@@ -8,6 +8,7 @@ import com.netgrif.workflow.petrinet.domain.dataset.CaseField;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.petrinet.domain.dataset.FieldWithDefault;
 import com.netgrif.workflow.petrinet.domain.dataset.UserField;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import org.bson.types.ObjectId;
@@ -21,7 +22,6 @@ import javax.validation.constraints.NotNull;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Document
@@ -124,6 +124,18 @@ public class Case {
     @JsonIgnore
     private Set<String> enabledRoles;
 
+    @Getter
+    @Setter
+    private Map<String, Map<String, Boolean>> permissions;
+
+    @Getter @Setter
+    @Builder.Default
+    private Map<Long, Map<String, Boolean>> users = new HashMap<>();
+
+    @Getter @Setter
+    @Builder.Default
+    private Map<String, Map<String, Boolean>> userRefs = new HashMap<>();
+
     public Case() {
         _id = new ObjectId();
         activePlaces = new HashMap<>();
@@ -133,6 +145,9 @@ public class Case {
         tasks = new HashSet<>();
         visualId = generateVisualId();
         enabledRoles = new HashSet<>();
+        permissions = new HashMap<>();
+        users = new HashMap<>();
+        userRefs = new HashMap<>();
     }
 
     public Case(String title) {
@@ -226,5 +241,15 @@ public class Case {
 
     public String getPetriNetId() {
         return petriNetObjectId.toString();
+    }
+
+    public void addUsers(Set<Long> userIds, Map<String, Boolean> permissions){
+        userIds.forEach(userId -> {
+            if (users.containsKey(userId) && users.get(userId) != null) {
+                users.get(userId).putAll(permissions);
+            } else {
+                users.put(userId, permissions);
+            }
+        });
     }
 }
