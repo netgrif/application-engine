@@ -80,4 +80,24 @@ public class WorkflowAuthorizationService extends AbstractAuthorizationService i
         }
         return false;
     }
+
+    private Map<String, Boolean> getAggregatePermissions(User user, PetriNet net) {
+        Map<String, Boolean> aggregatePermissions = new HashMap<>();
+
+        Set<String> userProcessRoleIDs = user.getProcessRoles().stream().map(role ->  role.get_id().toString()).collect(Collectors.toSet());
+
+        for (Map.Entry<String, Map<String, Boolean>> role : net.getPermissions().entrySet()) {
+            if (userProcessRoleIDs.contains(role.getKey())) {
+                for (Map.Entry<String, Boolean> permission : role.getValue().entrySet()) {
+                    if (aggregatePermissions.containsKey(permission.getKey())) {
+                        aggregatePermissions.put(permission.getKey(), aggregatePermissions.get(permission.getKey()) || permission.getValue());
+                    } else {
+                        aggregatePermissions.put(permission.getKey(), permission.getValue());
+                    }
+                }
+            }
+        }
+
+        return aggregatePermissions;
+    }
 }
