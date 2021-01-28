@@ -10,7 +10,6 @@ import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.Task;
 import com.querydsl.core.types.Predicate;
-import org.bson.types.ObjectId;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -27,6 +26,8 @@ public interface IWorkflowService {
     List<Case> findAllById(List<String> ids);
 
     Page<Case> getAll(Pageable pageable);
+
+    Case resolveUserRef(Case useCase);
 
     Case createCase(String netId, String title, String color, LoggedUser user);
 
