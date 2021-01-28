@@ -7,6 +7,12 @@ import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.workflow.petrinet.service.interfaces.IProcessRoleService;
 import com.netgrif.workflow.petrinet.web.responsebodies.*;
 import com.netgrif.workflow.workflow.web.PublicAbstractController;
+import com.netgrif.workflow.petrinet.web.responsebodies.PetriNetReference;
+import com.netgrif.workflow.petrinet.web.responsebodies.PetriNetReferenceResource;
+import com.netgrif.workflow.petrinet.web.responsebodies.PetriNetReferenceResourceAssembler;
+import com.netgrif.workflow.petrinet.service.interfaces.IProcessRoleService;
+import com.netgrif.workflow.petrinet.web.responsebodies.*;
+import com.netgrif.workflow.workflow.web.PublicAbstractController;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +23,10 @@ import org.springframework.hateoas.Link;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.hateoas.PagedResources;
 import org.springframework.hateoas.mvc.ControllerLinkBuilder;
+import org.springframework.http.MediaType;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
@@ -34,14 +44,16 @@ import static org.springframework.web.bind.annotation.RequestMethod.POST;
 public class PublicPetriNetController extends PublicAbstractController {
 
     private final IPetriNetService service;
-    private final IProcessRoleService roleService;
+
+    @Autowired
+    private IProcessRoleService roleService;
+
     private final StringToVersionConverter converter;
 
-    public PublicPetriNetController(IPetriNetService service, IUserService userService, StringToVersionConverter converter, IProcessRoleService roleService) {
+    public PublicPetriNetController(IPetriNetService service, IUserService userService, StringToVersionConverter converter) {
         super(userService);
         this.service = service;
         this.converter = converter;
-        this.roleService = roleService;
     }
 
     @GetMapping(value = "/{id}", produces = MediaTypes.HAL_JSON_VALUE)
@@ -78,7 +90,7 @@ public class PublicPetriNetController extends PublicAbstractController {
     @ApiOperation(value = "Get transactions of process")
     @RequestMapping(value = "/{netId}/transactions", method = GET, produces = MediaTypes.HAL_JSON_VALUE)
     public TransactionsResource getTransactions(@PathVariable("netId") String netId, Locale locale) {
-        PetriNet net = service.getPetriNet(PetriNetController.decodeUrl(netId));
+        PetriNet net = service.getPetriNet(decodeUrl(netId));
         return new TransactionsResource(net.getTransactions().values(), netId, locale);
     }
 
@@ -94,5 +106,4 @@ public class PublicPetriNetController extends PublicAbstractController {
         ids.forEach(id -> id = decodeUrl(id));
         return new TransitionReferencesResource(service.getTransitionReferences(ids, getAnonymous(), locale));
     }
-
 }
