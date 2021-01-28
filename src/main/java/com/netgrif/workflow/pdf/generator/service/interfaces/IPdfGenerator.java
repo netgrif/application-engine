@@ -22,6 +22,8 @@ public interface IPdfGenerator {
 
     void addCustomField(PdfField field, PdfResource pdfResource) throws IOException;
 
+    File generatePdf(Case formCase, String transitionId, PdfResource pdfResource, List<String> excludedFields);
+
     File generatePdf(Case formCase, String transitionId, PdfResource pdfResource) throws IOException;
 
     File generatePdf(PdfResource pdfResource) throws IOException;
@@ -29,6 +31,8 @@ public interface IPdfGenerator {
     void generatePdf(Case formCase, String transitionId, PdfResource pdfResource, OutputStream stream);
 
     void generatePdf(Case formCase, Transition transition, PdfResource pdfResource, OutputStream stream);
+
+    void generateData(PetriNet petriNet, Case useCase, Transition transition, PdfResource pdfResource, List<String> excludedFields);
 
     void generateData(PetriNet petriNet, Case useCase, Transition transition, PdfResource pdfResource);
 

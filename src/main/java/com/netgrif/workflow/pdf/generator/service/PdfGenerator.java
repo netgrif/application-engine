@@ -66,6 +66,12 @@ public class PdfGenerator implements IPdfGenerator {
     }
 
     @Override
+    public File generatePdf(Case formCase, String transitionId, PdfResource pdfResource, List<String> excludedFields){
+        generateData(formCase.getPetriNet(), formCase, formCase.getPetriNet().getTransition(transitionId), pdfResource, excludedFields);
+        return generatePdf(pdfResource);
+    }
+
+    @Override
     public File generatePdf(Case formCase, String transitionId, PdfResource pdfResource) {
         generateData(formCase.getPetriNet(), formCase, formCase.getPetriNet().getTransition(transitionId), pdfResource);
         return generatePdf(pdfResource);
@@ -95,6 +101,12 @@ public class PdfGenerator implements IPdfGenerator {
         } catch (IOException e) {
             log.error("Error occurred while converting form data to PDF", e);
         }
+    }
+
+    @Override
+    public void generateData(PetriNet petriNet, Case useCase, Transition transition, PdfResource pdfResource, List<String> excludedFields) {
+        pdfDataHelper.setExcludedFields(excludedFields);
+        generateData(useCase.getPetriNet(), useCase, transition, pdfResource);
     }
 
     @Override
