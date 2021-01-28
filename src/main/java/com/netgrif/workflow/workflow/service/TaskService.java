@@ -751,7 +751,7 @@ public class TaskService implements ITaskService {
             }
         }
 
-        for (Map.Entry<String, Set<RolePermission>> entry : transition.getUserRefs().entrySet()) {
+        for (Map.Entry<String, Map<String, Boolean>> entry : transition.getUserRefs().entrySet()) {
             task.addUserRef(entry.getKey(), entry.getValue());
         }
 

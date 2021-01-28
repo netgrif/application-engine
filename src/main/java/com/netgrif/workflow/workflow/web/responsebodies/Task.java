@@ -10,6 +10,7 @@ import lombok.Data;
 import org.bson.types.ObjectId;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -40,6 +41,8 @@ public class Task {
     private User user;
 
     private Map<String, Map<String, Boolean>> roles;
+
+    private Map<Long, Map<String, Boolean>> users;
 
     private LocalDateTime startDate;
 
@@ -82,6 +85,7 @@ public class Task {
         this.priority = task.getPriority();
         this.user = task.getUser() != null ? User.createSmallUser(task.getUser()) : null;
         this.roles = task.getRoles();
+        this.users = task.getUsers();
         this.startDate = task.getStartDate();
         this.finishDate = task.getFinishDate();
         this.finishedBy = task.getFinishedBy();
