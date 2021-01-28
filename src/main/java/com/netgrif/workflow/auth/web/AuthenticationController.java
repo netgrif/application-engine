@@ -9,6 +9,7 @@ import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.auth.web.requestbodies.ChangePasswordRequest;
 import com.netgrif.workflow.auth.web.requestbodies.NewUserRequest;
 import com.netgrif.workflow.auth.web.requestbodies.RegistrationRequest;
+import com.netgrif.workflow.auth.web.responsebodies.IUserFactory;
 import com.netgrif.workflow.auth.web.responsebodies.UserResource;
 import com.netgrif.workflow.configuration.properties.ServerAuthProperties;
 import com.netgrif.workflow.mail.interfaces.IMailAttemptService;
@@ -61,6 +62,9 @@ public class AuthenticationController {
 
     @Autowired
     private ServerAuthProperties serverAuthProperties;
+
+    @Autowired
+    private IUserFactory userResponseFactory;
 
     @ApiOperation(value = "New user registration")
     @PostMapping(value = "/signup", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
@@ -133,7 +137,7 @@ public class AuthenticationController {
     @ApiOperation(value = "Login to the system", authorizations = @Authorization("BasicAuth"))
     @GetMapping(value = "/login", produces = MediaTypes.HAL_JSON_VALUE)
     public UserResource login(Authentication auth, Locale locale) {
-        return new UserResource(userService.findByAuth(auth), "profile", locale);
+        return new UserResource(userResponseFactory.getUser(userService.findByAuth(auth), locale), "profile");
     }
 
     @ApiOperation(value = "Reset password")
