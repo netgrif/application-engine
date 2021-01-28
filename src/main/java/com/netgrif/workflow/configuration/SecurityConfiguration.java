@@ -2,10 +2,12 @@ package com.netgrif.workflow.configuration;
 
 import com.netgrif.workflow.auth.domain.Authority;
 import com.netgrif.workflow.auth.service.interfaces.IAuthorityService;
+import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.configuration.properties.SecurityConfigProperties;
 import com.netgrif.workflow.configuration.security.PublicAuthenticationFilter;
 import com.netgrif.workflow.configuration.security.RestAuthenticationEntryPoint;
 import com.netgrif.workflow.configuration.security.jwt.IJwtService;
+import com.netgrif.workflow.petrinet.service.interfaces.IProcessRoleService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -56,6 +58,9 @@ public class SecurityConfiguration extends AbstractSecurityConfiguration {
 
     @Autowired
     private IJwtService jwtService;
+
+    @Autowired
+    private IProcessRoleService roleService;
 
     @Autowired
     private SecurityConfigProperties properties;
@@ -158,7 +163,8 @@ public class SecurityConfiguration extends AbstractSecurityConfiguration {
                     new AnonymousAuthenticationProvider(ANONYMOUS_USER),
                     authority,
                     this.serverPatterns,
-                    this.jwtService
+                    this.jwtService,
+                    this.roleService
                 );
     }
 }
