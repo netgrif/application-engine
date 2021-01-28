@@ -1,3 +1,35 @@
+<a name="https://netgrif.atlassian.net/projects/NAE/versions/10732/tab/release-report-all-issues"></a>
+## 5.0.0 - Silver Steel (28.02.2021)
+### Bug fixes
+* [NAE-1097](https://netgrif.atlassian.net/browse/NAE-1097) - Null file field value set by assign action
+* [NAE-1144](https://netgrif.atlassian.net/browse/NAE-1144) - Elastic runner doesn't create indices without drop
+* [NAE-1181](https://netgrif.atlassian.net/browse/NAE-1181) - Nefunkčný regex pri required field(e)
+* [NAE-1185](https://netgrif.atlassian.net/browse/NAE-1185) - Auto-open subtree not working correctly
+* [NAE-1194](https://netgrif.atlassian.net/browse/NAE-1194) - Náhľad dokumentu spôsobuje vyhodenie chybovej hlášky 'sťahovanie zlyhalo'
+* [NAE-1197](https://netgrif.atlassian.net/browse/NAE-1197) - Frontend - Spotreba RAM
+* [NAE-1199](https://netgrif.atlassian.net/browse/NAE-1199) - Loading data task
+* [NAE-1201](https://netgrif.atlassian.net/browse/NAE-1201) - MailDraft null values
+* [NAE-1206](https://netgrif.atlassian.net/browse/NAE-1206) - Prihlasovanie verzia 5.0.0-SNAPSHOT
+
+### Improvements
+* [NAE-1028](https://netgrif.atlassian.net/browse/NAE-1028) - Anonymous access
+* [NAE-1149](https://netgrif.atlassian.net/browse/NAE-1149) - Immediate task data
+* [NAE-1186](https://netgrif.atlassian.net/browse/NAE-1186) - Negatively defined roles permissions
+* [NAE-492](https://netgrif.atlassian.net/browse/NAE-492) - MongoDB v4
+* [NAE-1092](https://netgrif.atlassian.net/browse/NAE-1092) - Zjednotenie názvov atribútov filtrov
+* [NAE-1180](https://netgrif.atlassian.net/browse/NAE-1180) - PDF Generator - allow for developer to define which fields to be exported to PDF
+* [NAE-1195](https://netgrif.atlassian.net/browse/NAE-1195) - Update userlists according to roleRef update
+* [NAE-1196](https://netgrif.atlassian.net/browse/NAE-1196) - Additional actions for user management
+
+### Features
+* [NAE-1054](https://netgrif.atlassian.net/browse/NAE-1054) - Public view
+* [NAE-1056](https://netgrif.atlassian.net/browse/NAE-1056) - File view with content preview
+* [NAE-1059](https://netgrif.atlassian.net/browse/NAE-1059) - JWT Authentication
+* [NAE-1115](https://netgrif.atlassian.net/browse/NAE-1115) - User list on task instead of roles
+* [NAE-1119](https://netgrif.atlassian.net/browse/NAE-1119) - Constructor and destructor as process meta-data
+* [NAE-1175](https://netgrif.atlassian.net/browse/NAE-1175) - Import helper upsert
+* [NAE-1203](https://netgrif.atlassian.net/browse/NAE-1203) - User delete
+
 <a name="https://netgrif.atlassian.net/projects/NAE/versions/10851/tab/release-report-all-issues"></a>
 ## 4.6.0 - Green Silver (20.01.2021)
 ### Bug fixes
