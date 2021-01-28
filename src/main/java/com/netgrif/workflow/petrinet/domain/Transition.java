@@ -37,7 +37,7 @@ public class Transition extends Node {
 
     @Field("users")
     @Getter @Setter
-    private Map<String, Set<RolePermission>> userRefs;
+    private Map<String, Map<String, Boolean>> userRefs;
 
     @Field("triggers")
     @Getter @Setter
@@ -109,9 +109,9 @@ public class Transition extends Node {
         }
     }
 
-    public void addUserRef(String userRefId, Set<RolePermission> permissions) {
+    public void addUserRef(String userRefId, Map<String, Boolean> permissions) {
         if (userRefs.containsKey(userRefId) && userRefs.get(userRefId) != null) {
-            userRefs.get(userRefId).addAll(permissions);
+            userRefs.get(userRefId).putAll(permissions);
         } else {
             userRefs.put(userRefId, permissions);
         }
