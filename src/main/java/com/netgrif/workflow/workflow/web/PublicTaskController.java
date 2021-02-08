@@ -217,7 +217,7 @@ public class PublicTaskController extends PublicAbstractController {
         return dataService.saveFiles(taskId, fieldId, multipartFiles);
     }
 
-    @ApiOperation(value = "Download one file from tasks file list field value", authorizations = @Authorization("BasicAuth"))
+    @ApiOperation(value = "Download one file from tasks file list field value")
     @RequestMapping(value = "/{id}/file/{field}/{name}", method = RequestMethod.GET, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public ResponseEntity<Resource> getNamedFile(@PathVariable("id") String taskId, @PathVariable("field") String fieldId, @PathVariable("name") String name) throws FileNotFoundException {
         FileFieldInputStream fileFieldInputStream = dataService.getFileByTaskAndName(taskId, fieldId, name);
@@ -236,8 +236,7 @@ public class PublicTaskController extends PublicAbstractController {
     }
 
     @ApiOperation(value = "Remove file from tasks file list field value",
-            notes = "Caller must be assigned to the task, or must be an ADMIN",
-            authorizations = @Authorization("BasicAuth"))
+            notes = "Caller must be assigned to the task, or must be an ADMIN")
     @RequestMapping(value = "/{id}/file/{field}/{name}", method = RequestMethod.DELETE, produces = MediaTypes.HAL_JSON_VALUE)
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "OK", response = MessageResource.class),
