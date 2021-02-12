@@ -8,7 +8,6 @@ import com.netgrif.workflow.auth.domain.UserState
 import com.netgrif.workflow.elastic.domain.ElasticCase
 import com.netgrif.workflow.elastic.domain.ElasticCaseRepository
 import com.netgrif.workflow.elastic.domain.ElasticTask
-import com.netgrif.workflow.importer.service.Config
 import com.netgrif.workflow.importer.service.Importer
 import com.netgrif.workflow.orgstructure.domain.Group
 import com.netgrif.workflow.startup.ImportHelper
@@ -106,8 +105,8 @@ class ElasticSearchTest {
 
         repository.deleteAll()
 
-        def net = importer.importPetriNet(new File("src/test/resources/all_data.xml"), PROCESS_TITLE, PROCESS_INITIALS, new Config())
-        def net2 = importer.importPetriNet(new File("src/test/resources/all_data.xml"), PROCESS_TITLE, PROCESS_INITIALS, new Config())
+        def net = importer.importPetriNet(new File("src/test/resources/all_data.xml"))
+        def net2 = importer.importPetriNet(new File("src/test/resources/all_data.xml"))
         assert net.isPresent()
         assert net2.isPresent()
 
