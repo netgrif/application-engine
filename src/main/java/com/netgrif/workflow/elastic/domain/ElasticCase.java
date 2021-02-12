@@ -1,6 +1,5 @@
 package com.netgrif.workflow.elastic.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
@@ -19,6 +18,7 @@ import org.springframework.data.elasticsearch.annotations.Field;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -44,7 +44,6 @@ public class ElasticCase {
     @Field(type = Keyword)
     private String stringId;
 
-    @Field(type = Keyword)
     private String visualId;
 
     @Field(type = Keyword)
@@ -54,9 +53,6 @@ public class ElasticCase {
     private String processId;
 
     private String title;
-
-    @Field(type = Keyword)
-    private String titleSortable;
 
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
@@ -68,7 +64,6 @@ public class ElasticCase {
 
     private String authorName;
 
-    @Field(type = Keyword)
     private String authorEmail;
 
     private Map<String, DataField> dataSet;
@@ -89,7 +84,6 @@ public class ElasticCase {
         processId = useCase.getPetriNetId();
         visualId = useCase.getVisualId();
         title = useCase.getTitle();
-        titleSortable = useCase.getTitle();
         creationDate = useCase.getCreationDate();
         creationDateSortable = Timestamp.valueOf(useCase.getCreationDate()).getTime();
         author = useCase.getAuthor().getId();
@@ -112,7 +106,6 @@ public class ElasticCase {
         version++;
         lastModified = useCase.getLastModified();
         title = useCase.getTitle();
-        titleSortable = useCase.getTitle();
         taskIds = useCase.getTaskIds();
         taskMongoIds = useCase.getTaskMongoIds();
         enabledRoles = useCase.getEnabledRoles();
@@ -121,43 +114,51 @@ public class ElasticCase {
 
     private Optional<DataField> parseValue(com.netgrif.workflow.workflow.domain.DataField dataField) {
         // Set<I18nString>
-        if (dataField.getValue() instanceof User) {
+        if (dataField.getValue() instanceof Set) {
+            if (dataField.getValue() == null)
+                return Optional.empty();
+            Set values = (Set) dataField.getValue();
+            return Optional.of(new TextField((String) values.stream().map(Object::toString).collect(Collectors.joining(" "))));
+        } else if (dataField.getValue() instanceof Number) {
+            return Optional.of(new NumberField((Double) dataField.getValue()));
+        } else if (dataField.getValue() instanceof User) {
             User user = (User) dataField.getValue();
             if (user == null)
-                return Optional.of(new DataField(""," "));
-            StringBuilder fullname = new StringBuilder("");
+                return Optional.empty();
+            StringBuilder fullName = new StringBuilder();
             if (user.getSurname() != null) {
-                fullname.append(user.getSurname());
-                fullname.append(" ");
+                fullName.append(user.getSurname());
+                fullName.append(" ");
             }
             if (user.getName() != null) {
-                fullname.append(user.getName());
+                fullName.append(user.getName());
             }
-            return Optional.of(new DataField(String.valueOf(user.getId()), fullname.toString()));
+            return Optional.of(new UserField(user.getId(), user.getEmail(), fullName.toString()));
         } else if (dataField.getValue() instanceof LocalDate) {
             LocalDate date = (LocalDate) dataField.getValue();
-            if (date == null)
-                return Optional.empty();
-            return Optional.of(new DataField(String.valueOf(date), date.format(DateTimeFormatter.BASIC_ISO_DATE)));
+            return parseDateField(LocalDateTime.of(date, LocalTime.NOON));
         } else if (dataField.getValue() instanceof LocalDateTime) {
-            LocalDateTime date = (LocalDateTime) dataField.getValue();
-            if (date == null)
-                return Optional.empty();
-            return Optional.of(new DataField(String.valueOf(date), date.format(DateTimeFormatter.BASIC_ISO_DATE)));
+            return parseDateField((LocalDateTime) dataField.getValue());
         } else if (dataField.getValue() instanceof Date) {
-            LocalDateTime date = ((Date)dataField.getValue()).toInstant()
+            LocalDateTime date = ((Date) dataField.getValue()).toInstant()
                     .atZone(ZoneId.systemDefault())
                     .toLocalDateTime();
-            if (date == null)
-                return Optional.empty();
-            return Optional.of(new DataField(String.valueOf(date), date.format(DateTimeFormatter.BASIC_ISO_DATE)));
+            return parseDateField(date);
+        } else if (dataField.getValue() instanceof Boolean) {
+            return Optional.of(new BooleanField((Boolean) dataField.getValue()));
         } else {
             if (dataField.getValue() == null)
                 return Optional.empty();
             String string = dataField.getValue().toString();
             if (string == null)
                 return Optional.empty();
-            return Optional.of(new DataField(string));
+            return Optional.of(new TextField(string));
         }
+    }
+
+    private Optional<DataField> parseDateField(LocalDateTime date) {
+        if (date == null)
+            return Optional.empty();
+        return Optional.of(new DateField(date.format(DateTimeFormatter.BASIC_ISO_DATE), date));
     }
 }
