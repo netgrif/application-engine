@@ -1,6 +1,7 @@
 package com.netgrif.workflow.startup
 
-
+import com.netgrif.workflow.elastic.domain.ElasticCase
+import com.netgrif.workflow.elastic.domain.ElasticTask
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -16,181 +17,55 @@ class ElasticsearchRunner extends AbstractOrderedCommandLineRunner {
     @Value('${spring.data.elasticsearch.drop}')
     private boolean drop
 
-    @Autowired
-    private ElasticsearchTemplate elasticsearch
+    @Value('${spring.data.elasticsearch.cluster-name}')
+    private String clusterName
+
+    @Value('${spring.data.elasticsearch.url}')
+    private String url
+
+    @Value('${spring.data.elasticsearch.port}')
+    private int port
 
     @Value('${spring.data.elasticsearch.index.case}')
-    private String CASE_INDEX
-    private static final String CASE_TYPE = "case"
-    private static final String CASE_MAPPING = '''
-    {
-       "properties":{
-          "author":{
-             "type":"long"
-          },
-          "authorEmail":{
-             "type":"keyword"
-          },
-          "authorName":{
-             "type":"text",
-             "fields":{
-                "keyword":{
-                   "type":"keyword",
-                   "ignore_above":256
-                }
-             }
-          },
-          "creationDate":{
-             "type":"long"
-          },
-          "creationDateSortable": {
-              "type": "long"
-          },
-          "enabledRoles":{
-             "type":"keyword"
-          },
-          "id":{
-             "type":"text",
-             "fields":{
-                "keyword":{
-                   "type":"keyword",
-                   "ignore_above":256
-                }
-             }
-          },
-          "processIdentifier":{
-             "type":"keyword"
-          },
-          "processId":{
-             "type":"keyword"
-          },
-          "stringId":{
-             "type":"keyword"
-          },
-          "taskIds":{
-             "type":"keyword"
-          },
-          "taskMongoIds":{
-             "type":"keyword"
-          },
-          "title":{
-             "type":"text",
-             "fields":{
-                "keyword":{
-                   "type":"keyword",
-                   "ignore_above":256
-                }
-             }
-          },
-          "titleSortable":{
-             "type":"keyword"
-          },
-          "visualId":{
-             "type":"keyword"
-          }
-       }
-    }
-    '''
+    private String caseIndex
 
     @Value('${spring.data.elasticsearch.index.task}')
-    private String TASK_INDEX
-    private static final String TASK_TYPE = "task"
-    private static final String TASK_MAPPING = '''
-    {
-        "properties": {
-            "assignPolicy": {
-                "type": "keyword"
-            },
-            "caseColor": {
-                "type": "keyword"
-            },
-            "caseId": {
-                "type": "keyword"
-            },
-            "caseTitle": {
-                "type": "text",
-                "fields": {
-                    "keyword": {
-                        "type": "keyword",
-                        "ignore_above": 256
-                    }
-                }
-            },
-            "caseTitleSortable": {
-                "type": "keyword"
-            },
-            "dataFocusPolicy": {
-                "type": "keyword"
-            },
-            "finishPolicy": {
-                "type": "keyword"
-            },
-            "icon": {
-                "type": "keyword"
-            },
-            "priority": {
-                "type": "long"
-            },
-            "processId": {
-                "type": "keyword"
-            },
-            "roles": {
-                "type": "keyword"
-            },
-            "users": {
-                "type": "long"
-            },
-            "stringId": {
-                "type": "keyword"
-            },
-            "title": {
-                "type": "text",
-                "fields": {
-                    "keyword": {
-                        "type": "keyword",
-                        "ignore_above": 256
-                    }
-                }
-            },
-            "titleSortable": {
-                "type": "keyword"
-            },
-            "transactionId": {
-                "type": "keyword"
-            },
-            "transitionId": {
-                "type": "keyword"
-            }
-        }
-    }
-    '''
+    private String taskIndex
+
+    @Autowired
+    private ElasticsearchTemplate template
 
     @Override
     void run(String... args) throws Exception {
         if (drop) {
+            log.info("Dropping Elasticsearch database [${url}:${port}/${clusterName}]")
             log.info "Creating Elasticsearch mapping"
-            elasticsearch.deleteIndex(CASE_INDEX)
-            elasticsearch.createIndex(CASE_INDEX)
-            elasticsearch.putMapping(CASE_INDEX, CASE_TYPE, CASE_MAPPING)
+            template.deleteIndex(CASE_INDEX)
+            template.createIndex(CASE_INDEX)
+            template.putMapping(CASE_INDEX, CASE_TYPE, CASE_MAPPING)
 
-            elasticsearch.deleteIndex(TASK_INDEX)
-            elasticsearch.createIndex(TASK_INDEX)
-            elasticsearch.putMapping(TASK_INDEX, TASK_TYPE, TASK_MAPPING)
+            template.deleteIndex(TASK_INDEX)
+            template.createIndex(TASK_INDEX)
+            template.putMapping(TASK_INDEX, TASK_TYPE, TASK_MAPPING)
         } else {
-            if (!elasticsearch.indexExists(CASE_INDEX)) {
+            if (!template.indexExists(CASE_INDEX)) {
                 log.info "Creating Elasticsearch case mapping"
-                elasticsearch.createIndex(CASE_INDEX)
-                elasticsearch.putMapping(CASE_INDEX, CASE_TYPE, CASE_MAPPING)
+                template.createIndex(CASE_INDEX)
+                template.putMapping(CASE_INDEX, CASE_TYPE, CASE_MAPPING)
             } else {
                 log.info "Elasticsearch case mapping exists"
             }
-            if (!elasticsearch.indexExists(TASK_INDEX)) {
+            if (!template.indexExists(TASK_INDEX)) {
                 log.info "Creating Elasticsearch task mapping"
-                elasticsearch.createIndex(TASK_INDEX)
-                elasticsearch.putMapping(TASK_INDEX, TASK_TYPE, TASK_MAPPING)
+                template.createIndex(TASK_INDEX)
+                template.putMapping(TASK_INDEX, TASK_TYPE, TASK_MAPPING)
             } else {
                 log.info "Elasticsearch task mapping exists"
             }
         }
+        log.info("Updating Elasticsearch case mapping [${caseIndex}]")
+        template.putMapping(ElasticCase.class)
+        log.info("Updating Elasticsearch task mapping [${taskIndex}]")
+        template.putMapping(ElasticTask.class)
     }
 }
