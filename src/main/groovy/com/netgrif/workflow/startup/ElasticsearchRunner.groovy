@@ -43,16 +43,16 @@ class ElasticsearchRunner extends AbstractOrderedCommandLineRunner {
             template.deleteIndex(ElasticTask.class)
         }
         if (!template.indexExists(ElasticCase.class)) {
-            log.info "Creating Elasticsearch case index"
+            log.info "Creating Elasticsearch case index [${caseIndex}]"
             template.createIndex(ElasticCase.class)
         } else {
-            log.info "Elasticsearch case index exists"
+            log.info "Elasticsearch case index exists [${caseIndex}]"
         }
         if (!template.indexExists(ElasticTask.class)) {
-            log.info "Creating Elasticsearch task index"
+            log.info "Creating Elasticsearch task index [${taskIndex}]"
             template.createIndex(ElasticTask.class)
         } else {
-            log.info "Elasticsearch task index exists"
+            log.info "Elasticsearch task index exists [${taskIndex}]"
         }
         log.info("Updating Elasticsearch case mapping [${caseIndex}]")
         template.putMapping(ElasticCase.class)

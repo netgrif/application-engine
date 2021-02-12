@@ -7,7 +7,6 @@ import com.netgrif.workflow.elastic.domain.ElasticCaseRepository
 import com.netgrif.workflow.elastic.domain.ElasticTask
 import com.netgrif.workflow.elastic.service.interfaces.IElasticCaseService
 import com.netgrif.workflow.elastic.web.requestbodies.CaseSearchRequest
-import com.netgrif.workflow.importer.service.Config
 import com.netgrif.workflow.importer.service.Importer
 import com.netgrif.workflow.startup.ImportHelper
 import com.netgrif.workflow.workflow.domain.Case
@@ -82,7 +81,7 @@ class DataSearchRequestTest {
 
         repository.deleteAll()
 
-        def net = importer.importPetriNet(new File("src/test/resources/all_data.xml"), PROCESS_TITLE, PROCESS_INITIALS, new Config())
+        def net = importer.importPetriNet(new File("src/test/resources/all_data.xml"))
         assert net.isPresent()
 
         def users = userService.findAll(true)
