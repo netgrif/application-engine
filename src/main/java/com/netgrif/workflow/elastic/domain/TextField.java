@@ -1,6 +1,5 @@
 package com.netgrif.workflow.elastic.domain;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -10,10 +9,14 @@ import static org.springframework.data.elasticsearch.annotations.FieldType.Text;
 
 @Data
 @NoArgsConstructor
-@EqualsAndHashCode
-@AllArgsConstructor
-public class DataField {
+@EqualsAndHashCode(callSuper = true)
+public class TextField extends DataField {
 
     @Field(type = Text)
-    public String fulltextValue;
+    public String textValue;
+
+    public TextField(String value) {
+        super(value);
+        this.textValue = value;
+    }
 }
