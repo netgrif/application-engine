@@ -39,29 +39,20 @@ class ElasticsearchRunner extends AbstractOrderedCommandLineRunner {
     void run(String... args) throws Exception {
         if (drop) {
             log.info("Dropping Elasticsearch database [${url}:${port}/${clusterName}]")
-            log.info "Creating Elasticsearch mapping"
-            template.deleteIndex(CASE_INDEX)
-            template.createIndex(CASE_INDEX)
-            template.putMapping(CASE_INDEX, CASE_TYPE, CASE_MAPPING)
-
-            template.deleteIndex(TASK_INDEX)
-            template.createIndex(TASK_INDEX)
-            template.putMapping(TASK_INDEX, TASK_TYPE, TASK_MAPPING)
+            template.deleteIndex(ElasticCase.class)
+            template.deleteIndex(ElasticTask.class)
+        }
+        if (!template.indexExists(ElasticCase.class)) {
+            log.info "Creating Elasticsearch case index"
+            template.createIndex(ElasticCase.class)
         } else {
-            if (!template.indexExists(CASE_INDEX)) {
-                log.info "Creating Elasticsearch case mapping"
-                template.createIndex(CASE_INDEX)
-                template.putMapping(CASE_INDEX, CASE_TYPE, CASE_MAPPING)
-            } else {
-                log.info "Elasticsearch case mapping exists"
-            }
-            if (!template.indexExists(TASK_INDEX)) {
-                log.info "Creating Elasticsearch task mapping"
-                template.createIndex(TASK_INDEX)
-                template.putMapping(TASK_INDEX, TASK_TYPE, TASK_MAPPING)
-            } else {
-                log.info "Elasticsearch task mapping exists"
-            }
+            log.info "Elasticsearch case index exists"
+        }
+        if (!template.indexExists(ElasticTask.class)) {
+            log.info "Creating Elasticsearch task index"
+            template.createIndex(ElasticTask.class)
+        } else {
+            log.info "Elasticsearch task index exists"
         }
         log.info("Updating Elasticsearch case mapping [${caseIndex}]")
         template.putMapping(ElasticCase.class)
