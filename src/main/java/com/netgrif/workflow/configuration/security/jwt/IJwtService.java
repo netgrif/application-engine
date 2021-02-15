@@ -8,7 +8,7 @@ import java.util.Map;
 public interface IJwtService {
     String tokenFrom(Map<String, Object> claims);
 
-    boolean isExpired(String token);
+    void isExpired(String token);
 
     LoggedUser getLoggedUser(String token, Authority anonymousRole);
 }
