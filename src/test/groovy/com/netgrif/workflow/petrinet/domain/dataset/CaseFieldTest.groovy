@@ -2,7 +2,7 @@ package com.netgrif.workflow.petrinet.domain.dataset
 
 import com.netgrif.workflow.TestHelper
 import com.netgrif.workflow.ipc.TaskApiTest
-import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldContainer
+import com.netgrif.workflow.petrinet.domain.VersionType
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldsTree
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.workflow.startup.ImportHelper
@@ -10,15 +10,15 @@ import com.netgrif.workflow.startup.SuperCreator
 import com.netgrif.workflow.workflow.domain.Case
 import com.netgrif.workflow.workflow.domain.repositories.CaseRepository
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService
-import org.junit.Before
-import org.junit.Test
-import org.junit.runner.RunWith
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
-import org.springframework.test.context.junit4.SpringRunner
+import org.springframework.test.context.junit.jupiter.SpringExtension
 
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])
 @SpringBootTest
 class CaseFieldTest {
@@ -51,14 +51,14 @@ class CaseFieldTest {
         return TaskApiTest.getClassLoader().getResourceAsStream(name)
     }
 
-    @Before
+    @BeforeEach
     void setup() {
         testHelper.truncateDbs()
     }
 
     @Test
     void testAllowedNets() {
-        def testNet = petriNetService.importPetriNet(stream(ALLOWED_NETS_NET_FILE), "major", superCreator.getLoggedSuper())
+        def testNet = petriNetService.importPetriNet(stream(ALLOWED_NETS_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper())
         assert testNet.isPresent()
 
         Case aCase = importHelper.createCase("Case 1", testNet.get())
@@ -71,7 +71,7 @@ class CaseFieldTest {
         ChangedFieldsTree changed1 = importHelper.setTaskData(ALLOWED_NETS_TASK_TITLE, aCase.stringId, [
                 "setVal": [
                         "value": true,
-                        "type": importHelper.FIELD_BOOLEAN
+                        "type" : importHelper.FIELD_BOOLEAN
                 ]
         ])
 
@@ -93,7 +93,7 @@ class CaseFieldTest {
         ChangedFieldsTree changed2 = importHelper.setTaskData(ALLOWED_NETS_TASK_TITLE, aCase.stringId, [
                 "setNull": [
                         "value": true,
-                        "type": importHelper.FIELD_BOOLEAN
+                        "type" : importHelper.FIELD_BOOLEAN
                 ]
         ])
 
@@ -112,7 +112,7 @@ class CaseFieldTest {
 
     @Test
     void testImmediateAllowedNets() {
-        def testNet = petriNetService.importPetriNet(stream(ALLOWED_NETS_NET_FILE), "major", superCreator.getLoggedSuper())
+        def testNet = petriNetService.importPetriNet(stream(ALLOWED_NETS_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper())
         assert testNet.isPresent()
 
         Case aCase = importHelper.createCase("Case 1", testNet.get())
@@ -134,7 +134,7 @@ class CaseFieldTest {
         importHelper.setTaskData(ALLOWED_NETS_TASK_TITLE, aCase.stringId, [
                 "setVal": [
                         "value": true,
-                        "type": importHelper.FIELD_BOOLEAN
+                        "type" : importHelper.FIELD_BOOLEAN
                 ]
         ])
 
@@ -150,7 +150,7 @@ class CaseFieldTest {
         ChangedFieldsTree changed2 = importHelper.setTaskData(ALLOWED_NETS_TASK_TITLE, aCase.stringId, [
                 "setNull": [
                         "value": true,
-                        "type": importHelper.FIELD_BOOLEAN
+                        "type" : importHelper.FIELD_BOOLEAN
                 ]
         ])
 
@@ -165,10 +165,10 @@ class CaseFieldTest {
 
     @Test
     void testChangeValueAction() {
-        def notAllowedNet = petriNetService.importPetriNet(stream(ALLOWED_NETS_NET_FILE), "major", superCreator.getLoggedSuper())
+        def notAllowedNet = petriNetService.importPetriNet(stream(ALLOWED_NETS_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper())
         assert notAllowedNet.isPresent()
 
-        def testNet = petriNetService.importPetriNet(stream(CHANGE_VALUE_NET_FILE), "major", superCreator.getLoggedSuper())
+        def testNet = petriNetService.importPetriNet(stream(CHANGE_VALUE_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper())
         assert testNet.isPresent()
 
         Case aCase = importHelper.createCase("Case 1", testNet.get())
@@ -180,7 +180,7 @@ class CaseFieldTest {
         importHelper.setTaskData(CHANGE_VALUE_TASK_TITLE, aCase.stringId, [
                 "addExisting": [
                         "value": true,
-                        "type": importHelper.FIELD_BOOLEAN
+                        "type" : importHelper.FIELD_BOOLEAN
                 ]
         ])
 
@@ -193,7 +193,7 @@ class CaseFieldTest {
         importHelper.setTaskData(CHANGE_VALUE_TASK_TITLE, aCase.stringId, [
                 "addNew": [
                         "value": true,
-                        "type": importHelper.FIELD_BOOLEAN
+                        "type" : importHelper.FIELD_BOOLEAN
                 ]
         ])
 
@@ -210,7 +210,7 @@ class CaseFieldTest {
         importHelper.setTaskData(CHANGE_VALUE_TASK_TITLE, aCase.stringId, [
                 "addInvalidNet": [
                         "value": true,
-                        "type": importHelper.FIELD_BOOLEAN
+                        "type" : importHelper.FIELD_BOOLEAN
                 ]
         ])
 

@@ -1,10 +1,10 @@
 package com.netgrif.workflow.workflow.web.responsebodies;
 
-import org.springframework.hateoas.ResourceAssembler;
+import org.springframework.hateoas.server.RepresentationModelAssembler;
 
 import java.util.Locale;
 
-public class FilterResourceAssembler implements ResourceAssembler<com.netgrif.workflow.workflow.domain.Filter, LocalisedFilterResource> {
+public class FilterResourceAssembler implements RepresentationModelAssembler<com.netgrif.workflow.workflow.domain.Filter, LocalisedFilterResource> {
 
     private Locale locale;
 
@@ -13,7 +13,7 @@ public class FilterResourceAssembler implements ResourceAssembler<com.netgrif.wo
     }
 
     @Override
-    public LocalisedFilterResource toResource(com.netgrif.workflow.workflow.domain.Filter filter) {
+    public LocalisedFilterResource toModel(com.netgrif.workflow.workflow.domain.Filter filter) {
         return new LocalisedFilterResource(new Filter(filter,locale));
     }
 }

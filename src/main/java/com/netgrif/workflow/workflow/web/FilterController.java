@@ -19,8 +19,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.MediaTypes;
-import org.springframework.hateoas.PagedResources;
-import org.springframework.hateoas.mvc.ControllerLinkBuilder;
+import org.springframework.hateoas.PagedModel;
+import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -42,7 +42,7 @@ public class FilterController {
     private IFilterService filterService;
 
     @ApiOperation(value = "Save new filter", authorizations = @Authorization("BasicAuth"))
-    @RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
+    @RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public MessageResource createFilter(@RequestBody CreateFilterBody newFilter, @RequestParam(required = false) MergeFilterOperation operation, Authentication auth, Locale locale) {
         Filter filter = filterService.saveFilter(newFilter, operation, (LoggedUser) auth.getPrincipal());
         if (filter != null)
@@ -61,12 +61,12 @@ public class FilterController {
     }
 
     @ApiOperation(value = "Search for filter by provided criteria", authorizations = @Authorization("BasicAuth"))
-    @RequestMapping(value = "/search", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
-    public PagedResources<LocalisedFilterResource> search(@RequestBody Map<String, Object> searchCriteria, Authentication auth, Locale locale, Pageable pageable, PagedResourcesAssembler<Filter> assembler) {
+    @RequestMapping(value = "/search", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
+    public PagedModel<LocalisedFilterResource> search(@RequestBody Map<String, Object> searchCriteria, Authentication auth, Locale locale, Pageable pageable, PagedResourcesAssembler<Filter> assembler) {
         Page<Filter> page = filterService.search(searchCriteria, pageable, (LoggedUser) auth.getPrincipal());
-        Link selfLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(this.getClass())
+        Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(this.getClass())
                 .search(searchCriteria, auth, locale, pageable, assembler)).withRel("search");
-        return assembler.toResource(page, new FilterResourceAssembler(locale), selfLink);
+        return assembler.toModel(page, new FilterResourceAssembler(locale), selfLink);
     }
 
 }

@@ -5,21 +5,21 @@ import com.icegreen.greenmail.util.ServerSetup;
 import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.mail.EmailType;
 import com.netgrif.workflow.mail.interfaces.IMailService;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
 @SpringBootTest
 @ActiveProfiles({"test"})
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 public class MailSenderServiceTest {
 
     static final String RECIPIENT = "valdyreinn@gmail.com";
@@ -30,7 +30,7 @@ public class MailSenderServiceTest {
 
     private GreenMail smtpServer;
 
-    @Before
+    @BeforeEach
     public void before() {
         smtpServer = new GreenMail(new ServerSetup(2525, null, "smtp"));
         smtpServer.start();
@@ -38,14 +38,14 @@ public class MailSenderServiceTest {
 
     @Test
     public void testSend() throws Exception {
-        service.sendRegistrationEmail(new User(RECIPIENT,"","",""));
+        service.sendRegistrationEmail(new User(RECIPIENT, "", "", ""));
 
         MimeMessage[] messages = smtpServer.getReceivedMessages();
 
         assertMessageReceived(messages);
     }
 
-    @After
+    @AfterEach
     public void after() {
         smtpServer.stop();
     }

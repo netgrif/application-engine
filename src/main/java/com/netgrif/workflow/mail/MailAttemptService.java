@@ -1,15 +1,15 @@
 package com.netgrif.workflow.mail;
-import java.util.concurrent.ExecutionException;
 
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import com.netgrif.workflow.configuration.properties.SecurityLimitsProperties;
 import com.netgrif.workflow.mail.interfaces.IMailAttemptService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
+import java.util.concurrent.ExecutionException;
 
 @Slf4j
 @Service

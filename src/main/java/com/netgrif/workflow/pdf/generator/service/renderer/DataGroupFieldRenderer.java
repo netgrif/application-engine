@@ -2,6 +2,7 @@ package com.netgrif.workflow.pdf.generator.service.renderer;
 
 import com.netgrif.workflow.pdf.generator.domain.PdfDataGroupField;
 import com.netgrif.workflow.pdf.generator.domain.PdfField;
+
 import java.io.IOException;
 
 public class DataGroupFieldRenderer extends FieldRenderer<TextFieldRenderer> {

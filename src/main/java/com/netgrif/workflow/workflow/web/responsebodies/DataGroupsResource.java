@@ -1,14 +1,14 @@
 package com.netgrif.workflow.workflow.web.responsebodies;
 
 import com.netgrif.workflow.workflow.web.TaskController;
-import org.springframework.hateoas.Resources;
-import org.springframework.hateoas.mvc.ControllerLinkBuilder;
+import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 
 import java.util.Collection;
 import java.util.Locale;
 import java.util.stream.Collectors;
 
-public class DataGroupsResource extends Resources<DataGroup> {
+public class DataGroupsResource extends CollectionModel<DataGroup> {
 
     public DataGroupsResource(Collection<com.netgrif.workflow.petrinet.domain.DataGroup> content, Locale locale) {
         super(content.stream()
@@ -18,7 +18,7 @@ public class DataGroupsResource extends Resources<DataGroup> {
     }
 
     private void buildLinks(){
-        add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
+        add(WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(TaskController.class)
                 .getData("", null)).withSelfRel());
     }
 }

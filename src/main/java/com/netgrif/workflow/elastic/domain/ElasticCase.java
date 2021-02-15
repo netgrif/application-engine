@@ -1,10 +1,5 @@
 package com.netgrif.workflow.elastic.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
-import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.TaskPair;
@@ -30,7 +25,7 @@ import static org.springframework.data.elasticsearch.annotations.FieldType.Keywo
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Document(indexName = "#{@elasticCaseIndex}", type = "case")
+@Document(indexName = "#{@elasticCaseIndex}")
 public class ElasticCase {
 
     @Id
@@ -58,9 +53,9 @@ public class ElasticCase {
     @Field(type = Keyword)
     private String titleSortable;
 
-    @JsonSerialize(using = LocalDateTimeSerializer.class)
-    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
-    private LocalDateTime creationDate;
+//    @JsonSerialize(using = LocalDateTimeSerializer.class)
+//    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+//    private LocalDateTime creationDate;
 
     private Long creationDateSortable;
 
@@ -90,7 +85,7 @@ public class ElasticCase {
         visualId = useCase.getVisualId();
         title = useCase.getTitle();
         titleSortable = useCase.getTitle();
-        creationDate = useCase.getCreationDate();
+//        creationDate = useCase.getCreationDate();
         creationDateSortable = Timestamp.valueOf(useCase.getCreationDate()).getTime();
         author = useCase.getAuthor().getId();
         authorName = useCase.getAuthor().getFullName();
