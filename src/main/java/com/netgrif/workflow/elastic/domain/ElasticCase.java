@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.netgrif.workflow.auth.domain.User;
+import com.netgrif.workflow.petrinet.domain.I18nString;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.TaskPair;
 import lombok.AllArgsConstructor;
@@ -114,11 +115,21 @@ public class ElasticCase {
 
     private Optional<DataField> parseValue(com.netgrif.workflow.workflow.domain.DataField dataField) {
         // Set<I18nString>
-        if (dataField.getValue() instanceof Set) {
+        if (dataField.getOptions() != null) {
+            if (dataField.getValue() instanceof Set) {
+                // Multichoice Map
+                List<Map.Entry<String, I18nString>> values = new ArrayList<>();
+                ((Set) dataField.getValue()).stream().forEach(key -> values.add(new AbstractMap.SimpleEntry<>((String) key, dataField.getOptions().get(key))));
+                return Optional.of(new MapField(values));
+            } else {
+                // Enumeration Map
+                return Optional.of(new MapField(new AbstractMap.SimpleEntry<>((String) dataField.getValue(), dataField.getOptions().get(dataField.getValue()))));
+            }
+        } else if (dataField.getValue() instanceof Set) {
             if (dataField.getValue() == null)
                 return Optional.empty();
             Set values = (Set) dataField.getValue();
-            return Optional.of(new TextField((String) values.stream().map(Object::toString).collect(Collectors.joining(" "))));
+            return Optional.of(new TextField((String[]) values.stream().map(Object::toString).toArray(String[]::new)));
         } else if (dataField.getValue() instanceof Number) {
             return Optional.of(new NumberField((Double) dataField.getValue()));
         } else if (dataField.getValue() instanceof User) {
