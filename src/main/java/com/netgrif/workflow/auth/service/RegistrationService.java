@@ -9,7 +9,6 @@ import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.auth.web.requestbodies.NewUserRequest;
 import com.netgrif.workflow.auth.web.requestbodies.RegistrationRequest;
 import com.netgrif.workflow.configuration.properties.ServerAuthProperties;
-import com.netgrif.workflow.orgstructure.service.IGroupService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -37,8 +36,8 @@ public class RegistrationService implements IRegistrationService {
     @Autowired
     private IUserService userService;
 
-    @Autowired
-    private IGroupService groupService;
+//    @Autowired
+//    private IGroupService groupService;
 
     @Autowired
     private ServerAuthProperties serverAuthProperties;
@@ -111,16 +110,16 @@ public class RegistrationService implements IRegistrationService {
         userService.addDefaultRole(user);
         userService.addDefaultAuthorities(user);
 
-        if (newUser.groups != null && !newUser.groups.isEmpty()) {
-            user.setGroups(groupService.findAllById(newUser.groups));
-        }
+//        if (newUser.groups != null && !newUser.groups.isEmpty()) {
+//            user.setGroups(groupService.findAllById(newUser.groups));
+//        }
         if (newUser.processRoles != null && !newUser.processRoles.isEmpty()) {
             user.setUserProcessRoles(new HashSet<>(userProcessRoleRepository.findByRoleIdIn(newUser.processRoles)));
         }
 
         User saved = userRepository.save(user);
-        saved.setGroups(user.getGroups());
-        userService.upsertGroupMember(saved);
+//        saved.setGroups(user.getGroups());
+//        userService.upsertGroupMember(saved);
         return saved;
     }
 

@@ -8,6 +8,7 @@ import com.netgrif.workflow.auth.domain.UserState;
 import com.netgrif.workflow.auth.service.interfaces.IAuthorityService;
 import com.netgrif.workflow.importer.service.Importer;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
+import com.netgrif.workflow.petrinet.domain.VersionType;
 import com.netgrif.workflow.petrinet.domain.arcs.Arc;
 import com.netgrif.workflow.petrinet.domain.arcs.VariableArc;
 import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository;
@@ -24,9 +25,9 @@ import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.Task;
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +35,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -46,7 +47,7 @@ import java.util.stream.Collectors;
 
 @SpringBootTest
 @ActiveProfiles({"test"})
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 public class VariableArcsTest {
 
     public static final Logger log = LoggerFactory.getLogger(VariableArcsTest.class);
@@ -91,7 +92,7 @@ public class VariableArcsTest {
     @Autowired
     private SuperCreator superCreator;
 
-    @Before
+    @BeforeEach
     public void before() throws Exception {
         userRunner.run("");
         repository.deleteAll();
@@ -106,7 +107,7 @@ public class VariableArcsTest {
 
     @Test
     public void importTest() throws TransitionNotExecutableException, MissingPetriNetMetaDataException, IOException {
-        Optional<PetriNet> optionalNet = service.importPetriNet(new FileInputStream(NET_PATH), "major", superCreator.getLoggedSuper());
+        Optional<PetriNet> optionalNet = service.importPetriNet(new FileInputStream(NET_PATH), VersionType.MAJOR, superCreator.getLoggedSuper());
 
         assert optionalNet.isPresent();
         PetriNet net = optionalNet.get();
@@ -119,7 +120,6 @@ public class VariableArcsTest {
         user.setEmail("VariableArcsTest@test.com");
         user = importHelper.createUser(user,
                 new Authority[]{authorityService.getOrCreate(Authority.user)},
-                new com.netgrif.workflow.orgstructure.domain.Group[]{importHelper.createGroup("VariableArcsTest")},
                 new UserProcessRole[]{});
 
         List<Arc> arcs = loaded.getArcs().values().stream().flatMap(List::stream).collect(Collectors.toList());
@@ -137,7 +137,7 @@ public class VariableArcsTest {
                 .filter(arc -> arc instanceof VariableArc)
                 .allMatch(arc -> ((VariableArc) arc).getField() != null);
 
-        Page<Task> tasks = taskService.findByCases(new PageRequest(0, 10), Collections.singletonList(useCase.getStringId()));
+        Page<Task> tasks = taskService.findByCases(PageRequest.of(0, 10), Collections.singletonList(useCase.getStringId()));
         assert tasks.getContent() != null && tasks.getContent().size() > 0;
 
         Task task = tasks.getContent().get(0);

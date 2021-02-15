@@ -11,8 +11,8 @@ import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.mongodb.config.EnableMongoAuditing;
 import org.springframework.data.mongodb.core.convert.MongoCustomConversions;
-import org.springframework.hateoas.RelProvider;
 import org.springframework.hateoas.config.EnableHypermediaSupport;
+import org.springframework.hateoas.server.LinkRelationProvider;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 
 import java.util.ArrayList;
@@ -34,7 +34,7 @@ public class WorkflowManagementSystemApplication {
     }
 
     @Bean
-    RelProvider relProvider() {
+    LinkRelationProvider relProvider() {
         return new JsonRootRelProvider();
     }
 

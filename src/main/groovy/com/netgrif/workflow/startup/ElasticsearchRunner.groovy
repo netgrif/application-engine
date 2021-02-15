@@ -1,11 +1,13 @@
 package com.netgrif.workflow.startup
 
-
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.data.elasticsearch.core.ElasticsearchTemplate
+import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate
+import org.springframework.data.elasticsearch.core.IndexOperations
+import org.springframework.data.elasticsearch.core.document.Document
+import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates
 import org.springframework.stereotype.Component
 
 @Component
@@ -17,7 +19,7 @@ class ElasticsearchRunner extends AbstractOrderedCommandLineRunner {
     private boolean drop
 
     @Autowired
-    private ElasticsearchTemplate elasticsearch
+    private ElasticsearchRestTemplate elasticsearch
 
     @Value('${spring.data.elasticsearch.index.case}')
     private String CASE_INDEX
@@ -167,30 +169,20 @@ class ElasticsearchRunner extends AbstractOrderedCommandLineRunner {
 
     @Override
     void run(String... args) throws Exception {
-        if (drop) {
+//        if (drop) {
             log.info "Creating Elasticsearch mapping"
-            elasticsearch.deleteIndex(CASE_INDEX)
-            elasticsearch.createIndex(CASE_INDEX)
-            elasticsearch.putMapping(CASE_INDEX, CASE_TYPE, CASE_MAPPING)
 
-            elasticsearch.deleteIndex(TASK_INDEX)
-            elasticsearch.createIndex(TASK_INDEX)
-            elasticsearch.putMapping(TASK_INDEX, TASK_TYPE, TASK_MAPPING)
-        } else {
-            if (!elasticsearch.indexExists(CASE_INDEX)) {
-                log.info "Creating Elasticsearch case mapping"
-                elasticsearch.createIndex(CASE_INDEX)
-                elasticsearch.putMapping(CASE_INDEX, CASE_TYPE, CASE_MAPPING)
-            } else {
-                log.info "Elasticsearch case mapping exists"
-            }
-            if (!elasticsearch.indexExists(TASK_INDEX)) {
-                log.info "Creating Elasticsearch task mapping"
-                elasticsearch.createIndex(TASK_INDEX)
-                elasticsearch.putMapping(TASK_INDEX, TASK_TYPE, TASK_MAPPING)
-            } else {
-                log.info "Elasticsearch task mapping exists"
-            }
-        }
+            IndexOperations caseOps = elasticsearch.indexOps(IndexCoordinates.of(CASE_INDEX))
+            assert caseOps.delete()
+            assert caseOps.create()
+            assert caseOps.putMapping(Document.parse(CASE_MAPPING))
+
+            IndexOperations taskOps = elasticsearch.indexOps(IndexCoordinates.of(TASK_INDEX))
+            assert taskOps.delete()
+            assert taskOps.create()
+            assert taskOps.putMapping(Document.parse(TASK_MAPPING))
+//        } else {
+//            log.info "Elasticsearch mapping exists"
+//        }
     }
 }

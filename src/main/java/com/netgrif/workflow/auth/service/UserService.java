@@ -7,9 +7,7 @@ import com.netgrif.workflow.auth.service.interfaces.IUserProcessRoleService;
 import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.auth.web.requestbodies.UpdateUserRequest;
 import com.netgrif.workflow.event.events.user.UserRegistrationEvent;
-import com.netgrif.workflow.orgstructure.domain.Member;
 import com.netgrif.workflow.orgstructure.groups.interfaces.INextGroupService;
-import com.netgrif.workflow.orgstructure.service.IMemberService;
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRoleRepository;
 import com.netgrif.workflow.startup.SystemUserRunner;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -46,8 +44,8 @@ public class UserService implements IUserService {
     @Autowired
     private IUserProcessRoleService userProcessRoleService;
 
-    @Autowired
-    private IMemberService memberService;
+//    @Autowired
+//    private IMemberService memberService;
 
     @Autowired
     private INextGroupService groupService;
@@ -61,8 +59,8 @@ public class UserService implements IUserService {
         User savedUser = userRepository.save(user);
         groupService.createGroup(user);
         groupService.addUserToDefaultGroup(user);
-        savedUser.setGroups(user.getGroups());
-        upsertGroupMember(savedUser);
+//        savedUser.setGroups(user.getGroups());
+//        upsertGroupMember(savedUser);
         publisher.publishEvent(new UserRegistrationEvent(savedUser));
         return savedUser;
     }
@@ -85,14 +83,14 @@ public class UserService implements IUserService {
         return user;
     }
 
-    @Override
-    public Member upsertGroupMember(User user) {
-        Member member = memberService.findByEmail(user.getEmail());
-        if (member == null)
-            member = new Member(user.getId(), user.getName(), user.getSurname(), user.getEmail());
-        member.setGroups(user.getGroups());
-        return memberService.save(member);
-    }
+//    @Override
+//    public Member upsertGroupMember(User user) {
+//        Member member = memberService.findByEmail(user.getEmail());
+//        if (member == null)
+//            member = new Member(user.getId(), user.getName(), user.getSurname(), user.getEmail());
+//        member.setGroups(user.getGroups());
+//        return memberService.save(member);
+//    }
 
     @Override
     public void encodeUserPassword(User user) {
@@ -160,49 +158,53 @@ public class UserService implements IUserService {
         return users;
     }
 
+// TODO: NEEXISTUJE
     @Override
     public Page<User> findAllCoMembers(LoggedUser loggedUser, boolean small, Pageable pageable) {
         // TODO: 8/27/18 make all pageable
-        Set<Long> members = memberService.findAllCoMembersIds(loggedUser.getEmail());
-        members.add(loggedUser.getId());
-        Page<User> users = userRepository.findAllByIdInAndState(members, UserState.ACTIVE, pageable);
+//        Set<Long> members = memberService.findAllCoMembersIds(loggedUser.getEmail());
+//        members.add(loggedUser.getId());
+        Page<User> users = userRepository.findAll(pageable);
         if (!small)
             users.forEach(this::loadProcessRoles);
         return users;
     }
+// TODO: NEEXISTUJE
 
-    @Override
-    public Page<User> searchAllCoMembers(String query, LoggedUser loggedUser, Boolean small, Pageable pageable) {
-        Set<Long> members = memberService.findAllCoMembersIds(loggedUser.getEmail());
-        members.add(loggedUser.getId());
+//    @Override
+//    public Page<User> searchAllCoMembers(String query, LoggedUser loggedUser, Boolean small, Pageable pageable) {
+//        Set<Long> members = memberService.findAllCoMembersIds(loggedUser.getEmail());
+//        members.add(loggedUser.getId());
+//
+//        Page<User> users = userRepository.findAll(buildPredicate(members, query), pageable);
+//        if (!small)
+//            users.forEach(this::loadProcessRoles);
+//        return users;
+//    }
 
-        Page<User> users = userRepository.findAll(buildPredicate(members, query), pageable);
-        if (!small)
-            users.forEach(this::loadProcessRoles);
-        return users;
-    }
+// TODO: NEEXISTUJE
 
-    @Override
-    public Page<User> searchAllCoMembers(String query, List<String> roleIds, List<String> negateRoleIds, LoggedUser loggedUser, Boolean small, Pageable pageable) {
-        if ((roleIds == null || roleIds.isEmpty()) && (negateRoleIds == null || negateRoleIds.isEmpty()))
-            return searchAllCoMembers(query, loggedUser, small, pageable);
-
-        if (negateRoleIds == null) {
-            negateRoleIds = new ArrayList<>();
-        }
-
-        Set<Long> members = memberService.findAllCoMembersIds(loggedUser.getEmail());
-        members.add(loggedUser.getId());
-        BooleanExpression predicate = buildPredicate(members, query);
-        if (!(roleIds == null || roleIds.isEmpty())) {
-            predicate = predicate.and(QUser.user.userProcessRoles.any().roleId.in(roleIds));
-        }
-        predicate = predicate.and(QUser.user.userProcessRoles.any().roleId.in(negateRoleIds).not());
-        Page<User> users = userRepository.findAll(predicate, pageable);
-        if (!small)
-            users.forEach(this::loadProcessRoles);
-        return users;
-    }
+//    @Override
+//    public Page<User> searchAllCoMembers(String query, List<String> roleIds, List<String> negateRoleIds, LoggedUser loggedUser, Boolean small, Pageable pageable) {
+//        if ((roleIds == null || roleIds.isEmpty()) && (negateRoleIds == null || negateRoleIds.isEmpty()))
+//            return searchAllCoMembers(query, loggedUser, small, pageable);
+//
+//        if (negateRoleIds == null) {
+//            negateRoleIds = new ArrayList<>();
+//        }
+//
+//        Set<Long> members = memberService.findAllCoMembersIds(loggedUser.getEmail());
+//        members.add(loggedUser.getId());
+//        BooleanExpression predicate = buildPredicate(members, query);
+//        if (!(roleIds == null || roleIds.isEmpty())) {
+//            predicate = predicate.and(QUser.user.userProcessRoles.any().roleId.in(roleIds));
+//        }
+//        predicate = predicate.and(QUser.user.userProcessRoles.any().roleId.in(negateRoleIds).not());
+//        Page<User> users = userRepository.findAll(predicate, pageable);
+//        if (!small)
+//            users.forEach(this::loadProcessRoles);
+//        return users;
+//    }
 
     private BooleanExpression buildPredicate(Set<Long> members, String query) {
         BooleanExpression predicate = QUser.user

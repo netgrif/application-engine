@@ -1,7 +1,6 @@
 package com.netgrif.workflow.auth.web.responsebodies;
 
 import com.netgrif.workflow.auth.domain.Authority;
-import com.netgrif.workflow.orgstructure.domain.Group;
 import lombok.Data;
 
 import java.util.Set;
@@ -23,7 +22,7 @@ public class User {
 
     private String fullName;
 
-    private Set<Group> groups;
+//    private Set<Group> groups;
 
     private Set<Authority> authorities;
 
@@ -58,7 +57,7 @@ public class User {
     public static User createUser(com.netgrif.workflow.auth.domain.User user) {
         User result = new User(user);
         result.setTelNumber(user.getTelNumber());
-        result.setGroups(user.getGroups());
+//        result.setGroups(user.getGroups());
         result.setAuthorities(user.getAuthorities());
         result.setNextGroups(user.getNextGroups());
         return result;

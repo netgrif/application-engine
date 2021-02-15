@@ -1,10 +1,6 @@
 package com.netgrif.workflow.petrinet.service;
 
-import com.netgrif.workflow.petrinet.domain.arcs.Arc;
-import com.netgrif.workflow.petrinet.domain.arcs.InhibitorArc;
-import com.netgrif.workflow.petrinet.domain.arcs.ReadArc;
-import com.netgrif.workflow.petrinet.domain.arcs.ResetArc;
-import com.netgrif.workflow.petrinet.domain.arcs.VariableArc;
+import com.netgrif.workflow.petrinet.domain.arcs.*;
 import org.springframework.stereotype.Component;
 
 @Component

@@ -10,17 +10,17 @@ import com.netgrif.workflow.petrinet.domain.arcs.ResetArc
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRoleRepository
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.workflow.startup.SuperCreator
-import org.junit.Before
-import org.junit.Test
-import org.junit.runner.RunWith
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.core.io.Resource
 import org.springframework.test.context.ActiveProfiles
-import org.springframework.test.context.junit4.SpringRunner
+import org.springframework.test.context.junit.jupiter.SpringExtension
 
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])
 @SpringBootTest
 class PetriNetTest {
@@ -46,14 +46,14 @@ class PetriNetTest {
     @Value("classpath:net_import_1.xml")
     private Resource netResource2
 
-    @Before
+    @BeforeEach
     void before() {
         testHelper.truncateDbs()
     }
 
     @Test
     void testClone() {
-        def netOptional = petriNetService.importPetriNet(netResource.inputStream, "major", superCreator.loggedSuper)
+        def netOptional = petriNetService.importPetriNet(netResource.inputStream, VersionType.MAJOR, superCreator.loggedSuper)
 
         assert netOptional.isPresent()
 
@@ -75,17 +75,17 @@ class PetriNetTest {
 
     @Test
     void testVersioning() {
-        def netOptional = petriNetService.importPetriNet(netResource.inputStream, "major", superCreator.loggedSuper)
+        def netOptional = petriNetService.importPetriNet(netResource.inputStream, VersionType.MAJOR, superCreator.loggedSuper)
         assert netOptional.isPresent()
 
-        def netOptional2 = petriNetService.importPetriNet(netResource.inputStream, "major", superCreator.loggedSuper)
+        def netOptional2 = petriNetService.importPetriNet(netResource.inputStream, VersionType.MAJOR, superCreator.loggedSuper)
         assert netOptional2.isPresent()
 
-        def netOptional3 = petriNetService.importPetriNet(netResource2.inputStream, "major", superCreator.loggedSuper)
+        def netOptional3 = petriNetService.importPetriNet(netResource2.inputStream, VersionType.MAJOR, superCreator.loggedSuper)
         assert netOptional3.isPresent()
 
         def nets = petriNetService.getReferencesByVersion(null, superCreator.loggedSuper, Locale.UK)
-        assert nets.size() == 2
+        assert nets.size() == 3
         assert nets.find { it.identifier == "new_model" }.version == "1.0.0"
         assert nets.find { it.identifier == "test" }.version == "2.0.0"
     }

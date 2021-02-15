@@ -5,11 +5,13 @@ import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
 import com.netgrif.workflow.workflow.web.requestbodies.CreateCaseBody;
-import com.netgrif.workflow.workflow.web.responsebodies.*;
+import com.netgrif.workflow.workflow.web.responsebodies.CaseResource;
+import com.netgrif.workflow.workflow.web.responsebodies.DataFieldsResource;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.web.bind.annotation.*;
+
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
