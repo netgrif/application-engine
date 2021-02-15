@@ -2,27 +2,27 @@ package com.netgrif.workflow.configuration
 
 import com.fasterxml.jackson.annotation.JsonRootName
 import org.atteo.evo.inflector.English
-import org.springframework.hateoas.RelProvider
-import org.springframework.hateoas.core.DefaultRelProvider
+import org.springframework.hateoas.server.LinkRelationProvider
 import org.springframework.util.StringUtils
+import org.springframework.hateoas.*
 
-class JsonRootRelProvider implements RelProvider {
+class JsonRootRelProvider implements LinkRelationProvider {
 
-    DefaultRelProvider defaultProvider = new DefaultRelProvider()
 
     @Override
-    String getItemResourceRelFor(Class<?> aClass) {
-        return defaultProvider.getItemResourceRelFor(aClass)
+    LinkRelation getItemResourceRelFor(Class<?> aClass) {
+       return LinkRelationProvider.getItemResourceRelFor(aClass)
     }
 
     @Override
-    String getCollectionResourceRelFor(Class<?> type) {
+    LinkRelation getCollectionResourceRelFor(Class<?> type) {
         JsonRootName rootName = type.getAnnotationsByType(JsonRootName)?.find{true}
         return rootName ? English.plural(rootName.value()) : English.plural(StringUtils.uncapitalize(type.getSimpleName()))
     }
 
     @Override
-    boolean supports(Class<?> aClass) {
-        return defaultProvider.supports(aClass)
+    boolean supports(LookupContext delimiter) {
+        return LinkRelationProvider.supports(aClass)
     }
+
 }

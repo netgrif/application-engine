@@ -1,21 +1,24 @@
 package com.netgrif.workflow.petrinet.domain.roles
 
+import com.netgrif.workflow.TestHelper
 import com.netgrif.workflow.auth.domain.repositories.UserProcessRoleRepository
 import com.netgrif.workflow.auth.domain.repositories.UserRepository
 import com.netgrif.workflow.importer.service.Importer
+import com.netgrif.workflow.petrinet.domain.VersionType
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.workflow.startup.DefaultRoleRunner
 import com.netgrif.workflow.startup.SuperCreator
 import com.netgrif.workflow.startup.SystemUserRunner
-import org.junit.Test
-import org.junit.runner.RunWith
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.data.mongodb.core.MongoTemplate
 import org.springframework.test.context.ActiveProfiles
-import org.springframework.test.context.junit4.SpringRunner
+import org.springframework.test.context.junit.jupiter.SpringExtension
 
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])
 @SpringBootTest
 class TransitionRoleTest {
@@ -23,6 +26,9 @@ class TransitionRoleTest {
     public static final String LIMITS_NET_FILE = "ipc_transition_role.xml"
     public static final String LIMITS_NET_TITLE = "Transition role"
     public static final String LIMITS_NET_INITIALS = "TR"
+
+    @Autowired
+    private TestHelper testHelper
 
     @Autowired
     private Importer importer
@@ -55,20 +61,20 @@ class TransitionRoleTest {
         return TransitionRoleTest.getClassLoader().getResourceAsStream(name)
     }
 
+    @BeforeEach
+    void before() {
+        testHelper.truncateDbs()
+    }
+
     @Test
     void testTaskExecution() {
-        template.db.drop()
-        userRepository.deleteAll()
-        roleRepository.deleteAll()
-        roleRunner.run()
-        superCreator.run()
-        systemUserRunner.run()
 
-        def netOptional = petriNetService.importPetriNet(stream(LIMITS_NET_FILE), "major", superCreator.getLoggedSuper())
+
+        def netOptional = petriNetService.importPetriNet(stream(LIMITS_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper())
         assert netOptional.isPresent()
 
         def net = netOptional.get()
-        assert net.transitions["task"].roles.values().size() == 1
-        assert processRoleRepository.count() == 4
+        assert net.transitions["user_task"].roles.values().size() == 1
+        assert processRoleRepository.count() == 2
     }
 }

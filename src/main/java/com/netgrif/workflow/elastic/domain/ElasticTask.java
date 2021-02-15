@@ -1,9 +1,5 @@
 package com.netgrif.workflow.elastic.domain;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
-import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.netgrif.workflow.workflow.domain.Task;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -12,7 +8,6 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 
-import java.time.LocalDateTime;
 import java.util.Set;
 
 import static org.springframework.data.elasticsearch.annotations.FieldType.Keyword;
@@ -20,7 +15,7 @@ import static org.springframework.data.elasticsearch.annotations.FieldType.Keywo
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Document(indexName = "#{@elasticTaskIndex}", type = "task")
+@Document(indexName = "#{@elasticTaskIndex}")
 public class ElasticTask {
 
     @Id
@@ -55,9 +50,9 @@ public class ElasticTask {
 
     private Long userId;
 
-    @JsonSerialize(using = LocalDateTimeSerializer.class)
-    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
-    private LocalDateTime startDate;
+//    @JsonSerialize(using = LocalDateTimeSerializer.class)
+//    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+//    private LocalDateTime startDate;
 
     @Field(type = Keyword)
     private String transactionId;
@@ -91,7 +86,7 @@ public class ElasticTask {
         if (task.getPriority() != null)
             this.priority = task.getPriority();
         this.userId = task.getUserId();
-        this.startDate = task.getStartDate();
+//        this.startDate = task.getStartDate();
         this.roles = task.getRoles().keySet();
         this.users = task.getUsers().keySet();
     }
@@ -103,7 +98,7 @@ public class ElasticTask {
         this.caseTitleSortable = this.caseTitle;
         this.priority = task.getPriority();
         this.userId = task.getUserId();
-        this.startDate = task.getStartDate();
+//        this.startDate = task.getStartDate();
         this.roles = task.getRoles();
         this.users = task.getUsers();
     }

@@ -3,7 +3,6 @@ package com.netgrif.workflow.pdf.generator.domain;
 import com.netgrif.workflow.pdf.generator.config.PdfResource;
 import com.netgrif.workflow.petrinet.domain.DataGroup;
 import com.netgrif.workflow.petrinet.domain.dataset.FieldType;
-import lombok.Data;
 
 import java.util.List;
 

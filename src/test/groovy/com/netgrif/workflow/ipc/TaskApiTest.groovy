@@ -7,6 +7,7 @@ import com.netgrif.workflow.history.domain.UserTaskEventLog
 import com.netgrif.workflow.history.domain.repository.EventLogRepository
 import com.netgrif.workflow.importer.service.Importer
 import com.netgrif.workflow.petrinet.domain.PetriNet
+import com.netgrif.workflow.petrinet.domain.VersionType
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.workflow.startup.ImportHelper
 import com.netgrif.workflow.startup.SuperCreator
@@ -14,15 +15,15 @@ import com.netgrif.workflow.workflow.domain.Case
 import com.netgrif.workflow.workflow.domain.QTask
 import com.netgrif.workflow.workflow.domain.repositories.CaseRepository
 import com.netgrif.workflow.workflow.domain.repositories.TaskRepository
-import org.junit.Before
-import org.junit.Test
-import org.junit.runner.RunWith
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
-import org.springframework.test.context.junit4.SpringRunner
+import org.springframework.test.context.junit.jupiter.SpringExtension
 
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])
 @SpringBootTest
 class TaskApiTest {
@@ -59,7 +60,7 @@ class TaskApiTest {
     }
     private boolean initialised = false
 
-    @Before
+    @BeforeEach
     void setup() {
         if (!initialised) {
             testHelper.truncateDbs()
@@ -71,7 +72,7 @@ class TaskApiTest {
 
     @Test
     void testTaskSearch() {
-        def netOptional = petriNetService.importPetriNet(stream(TASK_SEARCH_NET_FILE), "major", superCreator.getLoggedSuper())
+        def netOptional = petriNetService.importPetriNet(stream(TASK_SEARCH_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper())
 
         assert netOptional.isPresent()
 
@@ -101,7 +102,7 @@ class TaskApiTest {
 
     @Test
     void testTaskEventActions() {
-        def netOptional = petriNetService.importPetriNet(stream(TASK_EVENTS_NET_FILE), "major", superCreator.getLoggedSuper())
+        def netOptional = petriNetService.importPetriNet(stream(TASK_EVENTS_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper())
 
         assert netOptional.isPresent()
 
@@ -133,8 +134,8 @@ class TaskApiTest {
 
     @Test
     void testTaskExecution() {
-        def limitsNetOptional = petriNetService.importPetriNet(stream(LIMITS_NET_FILE), "major", superCreator.getLoggedSuper())
-        def leasingNetOptional = petriNetService.importPetriNet(stream(LEASING_NET_FILE), "major", superCreator.getLoggedSuper())
+        def limitsNetOptional = petriNetService.importPetriNet(stream(LIMITS_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper())
+        def leasingNetOptional = petriNetService.importPetriNet(stream(LEASING_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper())
 
         assert limitsNetOptional.isPresent()
         assert leasingNetOptional.isPresent()
@@ -167,11 +168,11 @@ class TaskApiTest {
         leasing2 = leasing2Opt.get()
 
 //@formatter:off
-        assert limits.dataSet["limit"].value as Double  == 970_000 as Double
-        assert leasing1.dataSet["2"].value as Double    == 970_000 as Double
-        assert leasing1.dataSet["1"].value as Double    ==  30_000 as Double
-        assert leasing2.dataSet["2"].value as Double    == 970_000 as Double
-        assert leasing2.dataSet["1"].value as Double    ==       0 as Double
+        assert limits.dataSet["limit"].value as Double == 970_000 as Double
+        assert leasing1.dataSet["2"].value as Double == 970_000 as Double
+        assert leasing1.dataSet["1"].value as Double == 30_000 as Double
+        assert leasing2.dataSet["2"].value as Double == 970_000 as Double
+        assert leasing2.dataSet["1"].value as Double == 0 as Double
 //@formatter:on
 
         helper.assignTaskToSuper(LEASING_NET_TASK_EDIT_COST, leasing2.stringId)
@@ -210,7 +211,7 @@ class TaskApiTest {
 
     @Test
     void testTaskBulkActions() {
-        def netOptional = petriNetService.importPetriNet(stream(TASK_BULK_NET_FILE), "major", superCreator.getLoggedSuper())
+        def netOptional = petriNetService.importPetriNet(stream(TASK_BULK_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper())
 
         assert netOptional.isPresent()
         PetriNet net = netOptional.get()
@@ -235,7 +236,7 @@ class TaskApiTest {
 
     @Test
     void testGetData() {
-        def netOptional = petriNetService.importPetriNet(stream(TASK_GETTER_NET_FILE), "major", superCreator.getLoggedSuper())
+        def netOptional = petriNetService.importPetriNet(stream(TASK_GETTER_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper())
 
         assert netOptional.isPresent()
         PetriNet net = netOptional.get()
@@ -270,7 +271,7 @@ class TaskApiTest {
 
     @Test
     void testSetData() {
-        def netOptional = petriNetService.importPetriNet(stream(TASK_SETTER_NET_FILE), "major", superCreator.getLoggedSuper())
+        def netOptional = petriNetService.importPetriNet(stream(TASK_SETTER_NET_FILE), VersionType.MAJOR, superCreator.getLoggedSuper())
 
         assert netOptional.isPresent()
         PetriNet net = netOptional.get()

@@ -6,7 +6,6 @@ import com.netgrif.workflow.petrinet.domain.DataGroup;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.FieldLayout;
 import com.netgrif.workflow.workflow.web.responsebodies.LocalisedField;
-import lombok.Data;
 import lombok.Getter;
 
 import java.util.ArrayList;

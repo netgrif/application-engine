@@ -6,9 +6,9 @@ import com.netgrif.workflow.auth.domain.*
 import com.netgrif.workflow.auth.domain.repositories.UserProcessRoleRepository
 import com.netgrif.workflow.auth.service.interfaces.IAuthorityService
 import com.netgrif.workflow.auth.service.interfaces.IUserService
-import com.netgrif.workflow.orgstructure.domain.Group
-import com.netgrif.workflow.orgstructure.service.IGroupService
-import com.netgrif.workflow.orgstructure.service.IMemberService
+//import com.netgrif.workflow.orgstructure.domain.Group
+//import com.netgrif.workflow.orgstructure.service.IGroupService
+//import com.netgrif.workflow.orgstructure.service.IMemberService
 import com.netgrif.workflow.petrinet.domain.PetriNet
 import com.netgrif.workflow.petrinet.domain.VersionType
 import com.netgrif.workflow.petrinet.domain.dataset.Field
@@ -79,11 +79,11 @@ class ImportHelper {
     @Autowired
     private SuperCreator superCreator
 
-    @Autowired
-    private IGroupService groupService
-
-    @Autowired
-    private IMemberService memberService
+//    @Autowired
+//    private IGroupService groupService
+//
+//    @Autowired
+//    private IMemberService memberService
 
     @Autowired
     private IDataService dataService
@@ -93,21 +93,21 @@ class ImportHelper {
 
     private final ClassLoader loader = ImportHelper.getClassLoader()
 
-    @SuppressWarnings("GroovyAssignabilityCheck")
-    Map<String, Group> createGroups(Map<String, String> groups) {
-        HashMap<String, Group> groupsMap = new HashMap<>()
-        groups.each { groupEntry ->
-            groupsMap.put(groupEntry.key, createGroup(groupEntry.value))
-        }
+//    @SuppressWarnings("GroovyAssignabilityCheck")
+//    Map<String, Group> createGroups(Map<String, String> groups) {
+//        HashMap<String, Group> groupsMap = new HashMap<>()
+//        groups.each { groupEntry ->
+//            groupsMap.put(groupEntry.key, createGroup(groupEntry.value))
+//        }
+//
+//        log.info("Created ${groupsMap.size()} groups")
+//        return groupsMap
+//    }
 
-        log.info("Created ${groupsMap.size()} groups")
-        return groupsMap
-    }
-
-    Group createGroup(String name) {
-        log.info("Creating Group $name")
-        return groupService.save(new Group(name))
-    }
+//    Group createGroup(String name) {
+//        log.info("Creating Group $name")
+//        return groupService.save(new Group(name))
+//    }
 
     @SuppressWarnings("GroovyAssignabilityCheck")
     Map<String, Authority> createAuthorities(Map<String, String> authorities) {
@@ -168,10 +168,10 @@ class ImportHelper {
         return map
     }
 
-    User createUser(User user, Authority[] authorities, Group[] orgs, UserProcessRole[] roles) {
+//    User createUser(User user, Authority[] authorities, Group[] orgs, UserProcessRole[] roles) {
+    User createUser(User user, Authority[] authorities, UserProcessRole[] roles) {
         authorities.each { user.addAuthority(it) }
         roles.each { user.addProcessRole(it) }
-        user.groups = orgs as Set
         user.state = UserState.ACTIVE
         user = userService.saveNew(user)
         log.info("User $user.name $user.surname created")

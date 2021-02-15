@@ -3,7 +3,6 @@ package com.netgrif.workflow.auth.domain;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.netgrif.workflow.orgstructure.domain.Group;
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRole;
 import lombok.Getter;
 import lombok.Setter;
@@ -89,10 +88,10 @@ public class User {
     @Setter
     private Set<ProcessRole> processRoles;
 
-    @Transient
-    @Getter
-    @Setter
-    private Set<Group> groups;
+//    @Transient
+//    @Getter
+//    @Setter
+//    private Set<Group> groups;
 
     @Transient
     @Getter
@@ -105,7 +104,7 @@ public class User {
     private boolean anonymous;
 
     public User() {
-        groups = new HashSet<>();
+//        groups = new HashSet<>();
         authorities = new HashSet<>();
         nextGroups = new HashSet<>();
         userProcessRoles = new HashSet<>();
@@ -153,9 +152,9 @@ public class User {
         return name + " " + surname;
     }
 
-    public void addGroup(Group group) {
-        this.groups.add(group);
-    }
+//    public void addGroup(Group group) {
+//        this.groups.add(group);
+//    }
 
     public LoggedUser transformToLoggedUser() {
         LoggedUser loggedUser = new LoggedUser(this.getId(), this.getEmail(), this.getPassword(), this.getAuthorities());
@@ -163,8 +162,8 @@ public class User {
         loggedUser.setAnonymous(this.anonymous);
         if (!this.getUserProcessRoles().isEmpty())
             loggedUser.parseProcessRoles(this.getUserProcessRoles());
-        if (!this.getGroups().isEmpty())
-            loggedUser.parseGroups(this.getGroups());
+//        if (!this.getGroups().isEmpty())
+//            loggedUser.parseGroups(this.getGroups());
 
         return loggedUser;
     }
@@ -184,7 +183,7 @@ public class User {
                 ", authorities=" + authorities +
                 ", userProcessRoles=" + userProcessRoles +
                 ", processRoles=" + processRoles +
-                ", groups=" + groups +
+//                ", groups=" + groups +
                 '}';
     }
 

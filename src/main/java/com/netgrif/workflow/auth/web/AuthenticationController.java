@@ -67,7 +67,7 @@ public class AuthenticationController {
     private IUserFactory userResponseFactory;
 
     @ApiOperation(value = "New user registration")
-    @PostMapping(value = "/signup", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
+    @PostMapping(value = "/signup", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public MessageResource signup(@RequestBody RegistrationRequest regRequest) {
         try {
             String email = registrationService.decodeToken(regRequest.token)[0];
@@ -87,7 +87,7 @@ public class AuthenticationController {
     }
 
     @ApiOperation(value = "Send invitation to a new user", authorizations = @Authorization("BasicAuth"))
-    @PostMapping(value = "/invite", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
+    @PostMapping(value = "/invite", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public MessageResource invite(@RequestBody NewUserRequest newUserRequest, Authentication auth) {
         try {
             if (!serverAuthProperties.isOpenRegistration() && (auth == null || !((LoggedUser) auth.getPrincipal()).isAdmin())) {
@@ -162,7 +162,7 @@ public class AuthenticationController {
     }
 
     @ApiOperation(value = "Account recovery")
-    @PostMapping(value = "/recover", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
+    @PostMapping(value = "/recover", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public MessageResource recoverAccount(@RequestBody RegistrationRequest request) {
         try {
             if (!registrationService.verifyToken(request.token))
@@ -178,7 +178,7 @@ public class AuthenticationController {
     }
 
     @ApiOperation(value = "Set a new password", authorizations = @Authorization("BasicAuth"))
-    @PostMapping(value = "/changePassword", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
+    @PostMapping(value = "/changePassword", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public MessageResource changePassword(Authentication auth, @RequestBody ChangePasswordRequest request) {
         try {
             User user = userService.findByEmail(request.login, false);
