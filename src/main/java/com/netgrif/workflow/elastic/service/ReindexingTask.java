@@ -1,9 +1,9 @@
 package com.netgrif.workflow.elastic.service;
 
-import com.netgrif.workflow.elastic.domain.ElasticCase;
 import com.netgrif.workflow.elastic.domain.ElasticCaseRepository;
-import com.netgrif.workflow.elastic.domain.ElasticTask;
+import com.netgrif.workflow.elastic.service.interfaces.IElasticCaseMappingService;
 import com.netgrif.workflow.elastic.service.interfaces.IElasticCaseService;
+import com.netgrif.workflow.elastic.service.interfaces.IElasticTaskMappingService;
 import com.netgrif.workflow.elastic.service.interfaces.IElasticTaskService;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.QCase;
@@ -41,6 +41,12 @@ public class ReindexingTask {
     private IElasticTaskService elasticTaskService;
 
     private LocalDateTime lastRun;
+
+    @Autowired
+    private IElasticCaseMappingService caseMappingService;
+
+    @Autowired
+    private IElasticTaskMappingService taskMappingService;
 
     @Autowired
     public ReindexingTask(
@@ -98,10 +104,10 @@ public class ReindexingTask {
 
         for (Case aCase : cases) {
             if (forced || elasticCaseRepository.countByStringIdAndLastModified(aCase.getStringId(), Timestamp.valueOf(aCase.getLastModified()).getTime()) == 0) {
-                elasticCaseService.indexNow(new ElasticCase(aCase));
+                elasticCaseService.indexNow(this.caseMappingService.transform(aCase));
                 List<Task> tasks = taskRepository.findAllByCaseId(aCase.getStringId());
                 for (Task task : tasks) {
-                    elasticTaskService.indexNow(new ElasticTask(task));
+                    elasticTaskService.indexNow(this.taskMappingService.transform(task));
                 }
             }
         }
