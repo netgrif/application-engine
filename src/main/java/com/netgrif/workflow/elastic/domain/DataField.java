@@ -15,5 +15,10 @@ import static org.springframework.data.elasticsearch.annotations.FieldType.Text;
 public class DataField {
 
     @Field(type = Text)
-    public String fulltextValue;
+    public String[] fulltextValue;
+
+    DataField(String fulltextValue) {
+        this.fulltextValue = new String[1];
+        this.fulltextValue[0] = fulltextValue;
+    }
 }
