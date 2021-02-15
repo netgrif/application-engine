@@ -18,6 +18,7 @@ import java.util.Set;
 
 @Entity
 @Table(name = "user")
+@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 public class User {
 
     public static final String UNKNOWN = "unknown";
