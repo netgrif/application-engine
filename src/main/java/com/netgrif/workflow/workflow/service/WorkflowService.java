@@ -2,7 +2,7 @@ package com.netgrif.workflow.workflow.service;
 
 import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.auth.service.interfaces.IUserService;
-import com.netgrif.workflow.elastic.domain.ElasticCase;
+import com.netgrif.workflow.elastic.service.interfaces.IElasticCaseMappingService;
 import com.netgrif.workflow.elastic.service.interfaces.IElasticCaseService;
 import com.netgrif.workflow.event.events.usecase.CreateCaseEvent;
 import com.netgrif.workflow.event.events.usecase.DeleteCaseEvent;
@@ -89,6 +89,9 @@ public class WorkflowService implements IWorkflowService {
     @Autowired
     private IUserService userService;
 
+    @Autowired
+    private IElasticCaseMappingService caseMappingService;
+
     private IElasticCaseService elasticCaseService;
 
     @Autowired
@@ -106,7 +109,7 @@ public class WorkflowService implements IWorkflowService {
 
         try {
             setImmediateDataFields(useCase);
-            elasticCaseService.indexNow(new ElasticCase(useCase));
+            elasticCaseService.indexNow(this.caseMappingService.transform(useCase));
         } catch (Exception e) {
             log.error("Indexing failed [" + useCase.getStringId() + "]", e);
         }
