@@ -26,43 +26,27 @@ public class ElasticCaseMappingService implements IElasticCaseMappingService {
 
     protected void populateDataSet(ElasticCase transformedCase, Case useCase) {
         for (String id : useCase.getImmediateDataFields()) {
-            Optional<DataField> parsedValue = this.transformValue(useCase.getDataField(id));
+            Optional<DataField> parsedValue = this.transformDataField(useCase.getDataField(id));
             parsedValue.ifPresent(dataField -> transformedCase.getDataSet().put(id, dataField));
         }
     }
 
-    protected Optional<DataField> transformValue(com.netgrif.workflow.workflow.domain.DataField dataField) {
+    protected Optional<DataField> transformDataField(com.netgrif.workflow.workflow.domain.DataField dataField) {
         // Set<I18nString>
         if (dataField.getOptions() != null) {
             if (dataField.getValue() instanceof Set) {
-                // Multichoice Map
-                List<Map.Entry<String, I18nString>> values = new ArrayList<>();
-                ((Set) dataField.getValue()).stream().forEach(key -> values.add(new AbstractMap.SimpleEntry<>((String) key, dataField.getOptions().get(key))));
-                return Optional.of(new MapField(values));
+                return this.transformMultichoiceMapField(dataField);
             } else {
-                // Enumeration Map
-                return Optional.of(new MapField(new AbstractMap.SimpleEntry<>((String) dataField.getValue(), dataField.getOptions().get(dataField.getValue()))));
+                return this.transformEnumerationMapField(dataField);
             }
         } else if (dataField.getValue() instanceof Set) {
             if (dataField.getValue() == null)
                 return Optional.empty();
-            Set values = (Set) dataField.getValue();
-            return Optional.of(new TextField((String[]) values.stream().map(Object::toString).toArray(String[]::new)));
+            return this.transformMultichoiceField(dataField);
         } else if (dataField.getValue() instanceof Number) {
-            return Optional.of(new NumberField((Double) dataField.getValue()));
+            return this.transformNumberField(dataField);
         } else if (dataField.getValue() instanceof User) {
-            User user = (User) dataField.getValue();
-            if (user == null)
-                return Optional.empty();
-            StringBuilder fullName = new StringBuilder();
-            if (user.getSurname() != null) {
-                fullName.append(user.getSurname());
-                fullName.append(" ");
-            }
-            if (user.getName() != null) {
-                fullName.append(user.getName());
-            }
-            return Optional.of(new UserField(user.getId(), user.getEmail(), fullName.toString()));
+            return this.transformUserField(dataField);
         } else if (dataField.getValue() instanceof LocalDate) {
             LocalDate date = (LocalDate) dataField.getValue();
             return transformDateField(LocalDateTime.of(date, LocalTime.NOON));
@@ -83,6 +67,47 @@ public class ElasticCaseMappingService implements IElasticCaseMappingService {
                 return Optional.empty();
             return Optional.of(new TextField(string));
         }
+    }
+
+    protected Optional<DataField> transformMultichoiceMapField(com.netgrif.workflow.workflow.domain.DataField multichoiceMap) {
+        List<Map.Entry<String, I18nString>> values = new ArrayList<>();
+        for(String key : (Set<String>) multichoiceMap.getValue()) {
+            values.add(new AbstractMap.SimpleEntry<>(key, multichoiceMap.getOptions().get(key)));
+        }
+        return Optional.of(new MapField(values));
+    }
+
+    protected Optional<DataField> transformEnumerationMapField(com.netgrif.workflow.workflow.domain.DataField enumMap) {
+        String selectedKey = (String) enumMap.getValue();
+        return Optional.of(
+                new MapField(
+                        new AbstractMap.SimpleEntry<>(selectedKey, enumMap.getOptions().get(selectedKey))
+                )
+        );
+    }
+
+    protected Optional<DataField> transformMultichoiceField(com.netgrif.workflow.workflow.domain.DataField multichoiceField) {
+        Set values = (Set) multichoiceField.getValue();
+        return Optional.of(new TextField((String[]) values.stream().map(Object::toString).toArray(String[]::new)));
+    }
+
+    protected Optional<DataField> transformNumberField(com.netgrif.workflow.workflow.domain.DataField numberField) {
+        return Optional.of(new NumberField((Double) numberField.getValue()));
+    }
+
+    protected Optional<DataField> transformUserField(com.netgrif.workflow.workflow.domain.DataField userField) {
+        User user = (User) userField.getValue();
+        if (user == null)
+            return Optional.empty();
+        StringBuilder fullName = new StringBuilder();
+        if (user.getSurname() != null) {
+            fullName.append(user.getSurname());
+            fullName.append(" ");
+        }
+        if (user.getName() != null) {
+            fullName.append(user.getName());
+        }
+        return Optional.of(new UserField(user.getId(), user.getEmail(), fullName.toString()));
     }
 
     private Optional<DataField> transformDateField(LocalDateTime date) {
