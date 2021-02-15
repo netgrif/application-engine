@@ -68,6 +68,15 @@ public class UserService implements IUserService {
     }
 
     @Override
+    public AnonymousUser saveNewAnonymous(User user) {
+        addDefaultRole(user);
+        addDefaultAuthorities(user);
+
+        AnonymousUser savedUser = (AnonymousUser) userRepository.save(user);
+        return savedUser;
+    }
+
+    @Override
     public User update(User user, UpdateUserRequest updates) {
         if (updates.telNumber != null) {
             user.setTelNumber(updates.telNumber);
