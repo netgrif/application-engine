@@ -21,6 +21,8 @@ public interface IUserService {
 
     User saveNew(User user);
 
+    User saveNewAnonymous(User user);
+
     User update(User user, UpdateUserRequest updates);
 
     Member upsertGroupMember(User user);
