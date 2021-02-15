@@ -23,9 +23,9 @@ import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
+import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
+import org.springframework.data.elasticsearch.core.query.NativeSearchQuery;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
-import org.springframework.data.elasticsearch.core.query.SearchQuery;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -40,15 +40,19 @@ public class ElasticCaseService implements IElasticCaseService {
     private static final Logger log = LoggerFactory.getLogger(ElasticCaseService.class);
 
     private ElasticCaseRepository repository;
+
     private IWorkflowService workflowService;
-    private ElasticsearchTemplate template;
+
+    @Autowired
+    private ElasticsearchRestTemplate template;
+
     private Executor executors;
 
     @Autowired
     private IPetriNetService petriNetService;
 
     @Autowired
-    public ElasticCaseService(ElasticCaseRepository repository, ElasticsearchTemplate template, Executor executors) {
+    public ElasticCaseService(ElasticCaseRepository repository, ElasticsearchRestTemplate template, Executor executors) {
         this.repository = repository;
         this.template = template;
         this.executors = executors;
@@ -124,7 +128,7 @@ public class ElasticCaseService implements IElasticCaseService {
             throw new IllegalArgumentException("Request can not be null!");
         }
 
-        SearchQuery query = buildQuery(requests, user, pageable, locale, isIntersection);
+        NativeSearchQuery query = buildQuery(requests, user, pageable, locale, isIntersection);
         List<Case> casePage;
         long total;
         if (query != null) {
@@ -145,7 +149,7 @@ public class ElasticCaseService implements IElasticCaseService {
             throw new IllegalArgumentException("Request can not be null!");
         }
 
-        SearchQuery query = buildQuery(requests, user, new FullPageRequest(), locale, isIntersection);
+        NativeSearchQuery query = buildQuery(requests, user, new FullPageRequest(), locale, isIntersection);
         if (query != null) {
             return template.count(query, ElasticCase.class);
         } else {
@@ -153,7 +157,7 @@ public class ElasticCaseService implements IElasticCaseService {
         }
     }
 
-    private SearchQuery buildQuery(List<CaseSearchRequest> requests, LoggedUser user, Pageable pageable, Locale locale, Boolean isIntersection) {
+    private NativeSearchQuery buildQuery(List<CaseSearchRequest> requests, LoggedUser user, Pageable pageable, Locale locale, Boolean isIntersection) {
         List<BoolQueryBuilder> singleQueries = requests.stream().map(request -> buildSingleQuery(request, user, locale)).collect(Collectors.toList());
 
         if (isIntersection && !singleQueries.stream().allMatch(Objects::nonNull)) {

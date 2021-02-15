@@ -8,7 +8,10 @@ import com.netgrif.workflow.auth.service.interfaces.IAuthorityService;
 import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.auth.web.requestbodies.UpdateUserRequest;
 import com.netgrif.workflow.auth.web.requestbodies.UserSearchRequestBody;
-import com.netgrif.workflow.auth.web.responsebodies.*;
+import com.netgrif.workflow.auth.web.responsebodies.AuthoritiesResources;
+import com.netgrif.workflow.auth.web.responsebodies.IUserFactory;
+import com.netgrif.workflow.auth.web.responsebodies.UserResource;
+import com.netgrif.workflow.auth.web.responsebodies.UserResourceAssembler;
 import com.netgrif.workflow.configuration.properties.ServerAuthProperties;
 import com.netgrif.workflow.petrinet.service.interfaces.IProcessRoleService;
 import com.netgrif.workflow.settings.domain.Preferences;
@@ -25,8 +28,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.MediaTypes;
-import org.springframework.hateoas.PagedResources;
-import org.springframework.hateoas.mvc.ControllerLinkBuilder;
+import org.springframework.hateoas.PagedModel;
+import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -81,25 +84,27 @@ public class UserController {
 
     @ApiOperation(value = "Get all users", authorizations = @Authorization("BasicAuth"))
     @GetMapping(produces = MediaTypes.HAL_JSON_VALUE)
-    public PagedResources<UserResource> getAll(@RequestParam(value = "small", required = false) Boolean small, Pageable pageable, PagedResourcesAssembler<User> assembler, Authentication auth, Locale locale) {
+    public PagedModel<UserResource> getAll(@RequestParam(value = "small", required = false) Boolean small, Pageable pageable, PagedResourcesAssembler<User> assembler, Authentication auth, Locale locale) {
         small = small == null ? false : small;
         Page<User> page = userService.findAllCoMembers(((LoggedUser) auth.getPrincipal()), small, pageable);
-        Link selfLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(UserController.class)
+        Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(UserController.class)
                 .getAll(small, pageable, assembler, auth, locale)).withRel("all");
-        PagedResources<UserResource> resources = assembler.toResource(page, getUserResourceAssembler(locale, small, "all"), selfLink);
-        ResourceLinkAssembler.addLinks(resources, User.class, selfLink.getRel());
+        PagedModel<UserResource> resources = assembler.toModel(page, getUserResourceAssembler(locale, small, "all"), selfLink);
+        ResourceLinkAssembler.addLinks(resources, User.class, selfLink.getRel().toString());
         return resources;
     }
 
+
+    //TODO : Zmenit funkciu
     @ApiOperation(value = "Generic user search", authorizations = @Authorization("BasicAuth"))
-    @PostMapping(value = "/search", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
-    public PagedResources<UserResource> search(@RequestParam(value = "small", required = false) Boolean small, @RequestBody UserSearchRequestBody query, Pageable pageable, PagedResourcesAssembler<User> assembler, Authentication auth, Locale locale) {
+    @PostMapping(value = "/search", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
+    public PagedModel<UserResource> search(@RequestParam(value = "small", required = false) Boolean small, @RequestBody UserSearchRequestBody query, Pageable pageable, PagedResourcesAssembler<User> assembler, Authentication auth, Locale locale) {
         small = small == null ? false : small;
-        Page<User> page = userService.searchAllCoMembers(query.getFulltext(), query.getRoles(), query.getNegativeRoles(), ((LoggedUser) auth.getPrincipal()), small, pageable);
-        Link selfLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(UserController.class)
+        Page<User> page = userService.findAllCoMembers(((LoggedUser) auth.getPrincipal()), small, pageable);
+        Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(UserController.class)
                 .search(small, query, pageable, assembler, auth, locale)).withRel("search");
-        PagedResources<UserResource> resources = assembler.toResource(page, getUserResourceAssembler(locale, small, "search"), selfLink);
-        ResourceLinkAssembler.addLinks(resources, User.class, selfLink.getRel());
+        PagedModel<UserResource> resources = assembler.toModel(page, getUserResourceAssembler(locale, small, "search"), selfLink);
+        ResourceLinkAssembler.addLinks(resources, User.class, selfLink.getRel().toString());
         return resources;
     }
 
@@ -127,7 +132,7 @@ public class UserController {
     }
 
     @ApiOperation(value = "Update user", authorizations = @Authorization("BasicAuth"))
-    @PostMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
+    @PostMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public UserResource updateUser(@PathVariable("id") Long userId, @RequestBody UpdateUserRequest updates, Authentication auth, Locale locale) throws UnauthorisedRequestException {
         if (!serverAuthProperties.isEnableProfileEdit()) return null;
 
@@ -146,14 +151,14 @@ public class UserController {
     }
 
     @ApiOperation(value = "Get all users with specified roles", authorizations = @Authorization("BasicAuth"))
-    @PostMapping(value = "/role", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
-    public PagedResources<UserResource> getAllWithRole(@RequestBody Set<String> roleIds, @RequestParam(value = "small", required = false) Boolean small, Pageable pageable, PagedResourcesAssembler<User> assembler, Locale locale) {
+    @PostMapping(value = "/role", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
+    public PagedModel<UserResource> getAllWithRole(@RequestBody Set<String> roleIds, @RequestParam(value = "small", required = false) Boolean small, Pageable pageable, PagedResourcesAssembler<User> assembler, Locale locale) {
         small = small == null ? false : small;
         Page<User> page = userService.findAllActiveByProcessRoles(roleIds, small, pageable);
-        Link selfLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(UserController.class)
+        Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(UserController.class)
                 .getAllWithRole(roleIds, small, pageable, assembler, locale)).withRel("role");
-        PagedResources<UserResource> resources = assembler.toResource(page, getUserResourceAssembler(locale, small, "role"), selfLink);
-        ResourceLinkAssembler.addLinks(resources, User.class, selfLink.getRel());
+        PagedModel<UserResource> resources = assembler.toModel(page, getUserResourceAssembler(locale, small, "role"), selfLink);
+        ResourceLinkAssembler.addLinks(resources, User.class, selfLink.getRel().toString());
         return resources;
     }
 
@@ -161,7 +166,7 @@ public class UserController {
     @ApiOperation(value = "Assign role to the user",
             notes = "Caller must have the ADMIN role",
             authorizations = @Authorization("BasicAuth"))
-    @PostMapping(value = "/{id}/role/assign", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
+    @PostMapping(value = "/{id}/role/assign", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "OK", response = MessageResource.class),
             @ApiResponse(code = 403, message = "Caller doesn't fulfill the authorisation requirements"),
@@ -219,7 +224,7 @@ public class UserController {
     }
 
     @ApiOperation(value = "Set user's preferences", authorizations = @Authorization("BasicAuth"))
-    @PostMapping(value = "/preferences", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
+    @PostMapping(value = "/preferences", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public MessageResource savePreferences(@RequestBody Preferences preferences, Authentication auth) {
         try {
             Long userId = ((LoggedUser) auth.getPrincipal()).getId();

@@ -6,17 +6,17 @@ import com.netgrif.workflow.importer.service.Importer
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRoleRepository
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.workflow.startup.SuperCreator
-import org.junit.Before
-import org.junit.Test
-import org.junit.runner.RunWith
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.core.io.Resource
 import org.springframework.test.context.ActiveProfiles
-import org.springframework.test.context.junit4.SpringRunner
+import org.springframework.test.context.junit.jupiter.SpringExtension
 
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])
 @SpringBootTest
 class ImporterTest {
@@ -39,7 +39,7 @@ class ImporterTest {
     @Value("classpath:net_import_2.xml")
     private Resource secondVersionResource
 
-    @Before
+    @BeforeEach
     void before() {
         testHelper.truncateDbs()
     }
@@ -48,7 +48,7 @@ class ImporterTest {
     void importTest() {
         def netOptional = petriNetService.importPetriNet(
                 firstVersionResource.inputStream,
-                "major",
+                VersionType.MAJOR,
                 superCreator.loggedSuper
         )
         assert processRoleRepository.count() == 3
@@ -134,7 +134,7 @@ class ImporterTest {
 
         def netOptional2 = petriNetService.importPetriNet(
                 secondVersionResource.inputStream,
-                "major",
+                VersionType.MAJOR,
                 superCreator.loggedSuper
         )
         assert processRoleRepository.count() == 4

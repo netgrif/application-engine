@@ -3,14 +3,13 @@ package com.netgrif.workflow.workflow.web.responsebodies;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.netgrif.workflow.auth.web.responsebodies.User;
 import com.netgrif.workflow.elastic.domain.ElasticTask;
-import com.netgrif.workflow.petrinet.domain.events.EventType;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
+import com.netgrif.workflow.petrinet.domain.events.EventType;
 import com.netgrif.workflow.petrinet.domain.layout.TaskLayout;
 import lombok.Data;
 import org.bson.types.ObjectId;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;

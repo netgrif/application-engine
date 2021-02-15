@@ -6,11 +6,7 @@ import com.netgrif.workflow.workflow.domain.Case;
 import com.querydsl.core.types.Predicate;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @ConditionalOnProperty(value = "nae.group.default.enabled",
         havingValue = "true",

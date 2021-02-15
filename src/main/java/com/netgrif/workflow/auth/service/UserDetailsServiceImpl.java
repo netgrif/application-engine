@@ -6,9 +6,6 @@ import com.netgrif.workflow.auth.domain.UserState;
 import com.netgrif.workflow.auth.domain.repositories.UserRepository;
 import com.netgrif.workflow.auth.service.interfaces.ILoginAttemptService;
 import com.netgrif.workflow.event.events.user.UserLoginEvent;
-import com.netgrif.workflow.orgstructure.domain.Group;
-import com.netgrif.workflow.orgstructure.domain.Member;
-import com.netgrif.workflow.orgstructure.service.IMemberService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +19,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.stream.Collectors;
 
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
@@ -32,8 +28,8 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Autowired
     private UserRepository userRepository;
 
-    @Autowired
-    private IMemberService memberService;
+//    @Autowired
+//    private IMemberService memberService;
 
     @Autowired
     private ApplicationEventPublisher publisher;
@@ -54,7 +50,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         }
 
         LoggedUser loggedUser = getLoggedUser(email);
-        setGroups(loggedUser);
+//        setGroups(loggedUser);
 
         publisher.publishEvent(new UserLoginEvent(loggedUser));
 
@@ -76,12 +72,12 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         return user.transformToLoggedUser();
     }
 
-    private void setGroups(LoggedUser loggedUser) {
-        Member member = memberService.findByEmail(loggedUser.getUsername());
-        if (member != null) {
-            loggedUser.setGroups(member.getGroups().stream().map(Group::getId).collect(Collectors.toSet()));
-        }
-    }
+//    private void setGroups(LoggedUser loggedUser) {
+//        Member member = memberService.findByEmail(loggedUser.getUsername());
+//        if (member != null) {
+//            loggedUser.setGroups(member.getGroups().stream().map(Group::getId).collect(Collectors.toSet()));
+//        }
+//    }
 
     private String getClientIP() {
         String xfHeader = request.getHeader("X-Forwarded-For");

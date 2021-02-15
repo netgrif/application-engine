@@ -24,7 +24,8 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import static com.netgrif.workflow.workflow.web.responsebodies.MessageResource.*;
+import static com.netgrif.workflow.workflow.web.responsebodies.MessageResource.errorMessage;
+import static com.netgrif.workflow.workflow.web.responsebodies.MessageResource.successMessage;
 
 @RestController
 @RequestMapping("/api/admin")

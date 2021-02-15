@@ -3,25 +3,22 @@ package com.netgrif.workflow.workflow
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.netgrif.workflow.TestHelper
 import com.netgrif.workflow.WorkflowManagementSystemApplication
-import com.netgrif.workflow.auth.domain.LoggedUser
 import com.netgrif.workflow.petrinet.domain.PetriNet
+import com.netgrif.workflow.petrinet.domain.VersionType
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
-import com.netgrif.workflow.petrinet.web.requestbodies.UploadedFileMeta
 import com.netgrif.workflow.startup.ImportHelper
 import com.netgrif.workflow.startup.SuperCreator
 import com.netgrif.workflow.workflow.domain.Case
-import org.junit.Before
-import org.junit.Ignore
-import org.junit.Test
-import org.junit.runner.RunWith
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.MediaType
-import org.springframework.security.core.GrantedAuthority
 import org.springframework.test.context.ActiveProfiles
-import org.springframework.test.context.junit4.SpringRunner
+import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.web.context.WebApplicationContext
@@ -35,7 +32,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])
 @SpringBootTest(
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
@@ -64,13 +61,13 @@ class CaseSearchTest {
 
     private MockMvc mvc
 
-    @Before
+    @BeforeEach
     void setup() {
+        testHelper.truncateDbs()
         mvc = MockMvcBuilders
                 .webAppContextSetup(wac)
                 .apply(springSecurity())
                 .build()
-        testHelper.truncateDbs()
 
         PetriNet net = getNet()
 
@@ -121,7 +118,7 @@ class CaseSearchTest {
     PetriNet getNet() {
         def netOptional = petriNetService.importPetriNet(
                 new FileInputStream("src/test/resources/case_search_test.xml"),
-                "major",
+                VersionType.MAJOR,
                 superCreator.getLoggedSuper())
         assert netOptional.isPresent()
         return netOptional.get()
@@ -129,32 +126,32 @@ class CaseSearchTest {
 
     @Test
     void searchByAuthorEmail() {
-        performSearch("super@netgrif.com","Case2")
+        performSearch("super@netgrif.com", "Case2")
     }
 
     @Test
     void searchByNumberField() {
-        performSearch("25","Case2")
+        performSearch("25", "Case2")
     }
 
     @Test
     void searchByTextField() {
-        performSearch("Bratislava","Case2")
+        performSearch("Bratislava", "Case2")
     }
 
     @Test
     void searchByMoreValues() {
-        performSearch("Prdel","Case1")
+        performSearch("Prdel", "Case1")
     }
 
     @Test
     void searchByDate() {
-        performSearch("12.05.2018","Case3", false)
+        performSearch("12.05.2018", "Case3", false)
     }
 
     @Test
-    void searchByEnum(){
-        performSearch("value","Case3")
+    void searchByEnum() {
+        performSearch("value", "Case3")
     }
 
 
