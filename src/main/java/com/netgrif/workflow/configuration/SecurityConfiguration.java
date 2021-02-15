@@ -63,6 +63,9 @@ public class SecurityConfiguration extends AbstractSecurityConfiguration {
     private IProcessRoleService roleService;
 
     @Autowired
+    private IUserService userService;
+
+    @Autowired
     private SecurityConfigProperties properties;
 
     @Value("${nae.security.server-patterns}")
@@ -164,7 +167,7 @@ public class SecurityConfiguration extends AbstractSecurityConfiguration {
                     authority,
                     this.serverPatterns,
                     this.jwtService,
-                    this.roleService
+                    this.userService
                 );
     }
 }
