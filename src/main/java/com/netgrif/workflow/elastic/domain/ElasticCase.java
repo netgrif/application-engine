@@ -4,8 +4,6 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
-import com.netgrif.workflow.auth.domain.User;
-import com.netgrif.workflow.petrinet.domain.I18nString;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.TaskPair;
 import lombok.AllArgsConstructor;
@@ -17,17 +15,12 @@ import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 
 import java.sql.Timestamp;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.springframework.data.elasticsearch.annotations.FieldType.Keyword;
 
-@SuppressWarnings("OptionalIsPresent")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -78,6 +71,15 @@ public class ElasticCase {
     @Field(type = Keyword)
     private Set<String> enabledRoles;
 
+    /**
+     * Data that is stored in the elasticsearch database.
+     *
+     * Note that the dataSet attribute is NOT set when the object is created and must be set later.
+     *
+     * The {@link com.netgrif.workflow.elastic.service.interfaces.IElasticCaseMappingService IElasticCaseMappingService} can be used to create
+     * instances of this class from Case objects, that have the dataset populated.
+     * @param useCase the data object that should be turned into elasticsearch data object
+     */
     public ElasticCase(Case useCase) {
         stringId = useCase.getStringId();
         lastModified = Timestamp.valueOf(useCase.getLastModified()).getTime();
@@ -95,12 +97,6 @@ public class ElasticCase {
         enabledRoles = new HashSet<>(useCase.getEnabledRoles());
 
         dataSet = new HashMap<>();
-        for (String id : useCase.getImmediateDataFields()) {
-            Optional<DataField> parseValue = parseValue(useCase.getDataField(id));
-            if (parseValue.isPresent()) {
-                dataSet.put(id, parseValue.get());
-            }
-        }
     }
 
     public void update(ElasticCase useCase) {
@@ -111,65 +107,5 @@ public class ElasticCase {
         taskMongoIds = useCase.getTaskMongoIds();
         enabledRoles = useCase.getEnabledRoles();
         dataSet = useCase.getDataSet();
-    }
-
-    private Optional<DataField> parseValue(com.netgrif.workflow.workflow.domain.DataField dataField) {
-        // Set<I18nString>
-        if (dataField.getOptions() != null) {
-            if (dataField.getValue() instanceof Set) {
-                // Multichoice Map
-                List<Map.Entry<String, I18nString>> values = new ArrayList<>();
-                ((Set) dataField.getValue()).stream().forEach(key -> values.add(new AbstractMap.SimpleEntry<>((String) key, dataField.getOptions().get(key))));
-                return Optional.of(new MapField(values));
-            } else {
-                // Enumeration Map
-                return Optional.of(new MapField(new AbstractMap.SimpleEntry<>((String) dataField.getValue(), dataField.getOptions().get(dataField.getValue()))));
-            }
-        } else if (dataField.getValue() instanceof Set) {
-            if (dataField.getValue() == null)
-                return Optional.empty();
-            Set values = (Set) dataField.getValue();
-            return Optional.of(new TextField((String[]) values.stream().map(Object::toString).toArray(String[]::new)));
-        } else if (dataField.getValue() instanceof Number) {
-            return Optional.of(new NumberField((Double) dataField.getValue()));
-        } else if (dataField.getValue() instanceof User) {
-            User user = (User) dataField.getValue();
-            if (user == null)
-                return Optional.empty();
-            StringBuilder fullName = new StringBuilder();
-            if (user.getSurname() != null) {
-                fullName.append(user.getSurname());
-                fullName.append(" ");
-            }
-            if (user.getName() != null) {
-                fullName.append(user.getName());
-            }
-            return Optional.of(new UserField(user.getId(), user.getEmail(), fullName.toString()));
-        } else if (dataField.getValue() instanceof LocalDate) {
-            LocalDate date = (LocalDate) dataField.getValue();
-            return parseDateField(LocalDateTime.of(date, LocalTime.NOON));
-        } else if (dataField.getValue() instanceof LocalDateTime) {
-            return parseDateField((LocalDateTime) dataField.getValue());
-        } else if (dataField.getValue() instanceof Date) {
-            LocalDateTime date = ((Date) dataField.getValue()).toInstant()
-                    .atZone(ZoneId.systemDefault())
-                    .toLocalDateTime();
-            return parseDateField(date);
-        } else if (dataField.getValue() instanceof Boolean) {
-            return Optional.of(new BooleanField((Boolean) dataField.getValue()));
-        } else {
-            if (dataField.getValue() == null)
-                return Optional.empty();
-            String string = dataField.getValue().toString();
-            if (string == null)
-                return Optional.empty();
-            return Optional.of(new TextField(string));
-        }
-    }
-
-    private Optional<DataField> parseDateField(LocalDateTime date) {
-        if (date == null)
-            return Optional.empty();
-        return Optional.of(new DateField(date.format(DateTimeFormatter.BASIC_ISO_DATE), date));
     }
 }
