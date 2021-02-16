@@ -59,6 +59,8 @@ public interface IUserService {
 
     Page<User> searchAllCoMembers(String query, LoggedUser principal, Boolean small, Pageable pageable);
 
+    User removeRole(User user, String roleStringId);
+
     void deleteUser(User user);
 
     Page<User> searchAllCoMembers(String query, List<String> roles, List<String> negateRoleIds, LoggedUser principal, Boolean small, Pageable pageable);
