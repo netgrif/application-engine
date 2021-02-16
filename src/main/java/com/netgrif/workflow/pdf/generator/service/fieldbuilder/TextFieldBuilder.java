@@ -98,7 +98,9 @@ public class TextFieldBuilder extends FieldBuilder{
     }
 
     private String shortenFileName(String fileName) {
-        String[] split = fileName.split("-");
-        return split[split.length-1];
+        if (fileName.length() > 24) {
+            return fileName.substring(24, fileName.length() - 1);
+        }
+        return fileName;
     }
 }
