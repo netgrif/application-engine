@@ -3,6 +3,7 @@ package com.netgrif.workflow.petrinet.domain.dataset.logic.action
 import com.netgrif.workflow.AsyncRunner
 import com.netgrif.workflow.auth.domain.Author
 import com.netgrif.workflow.auth.domain.User
+import com.netgrif.workflow.auth.service.UserDetailsServiceImpl
 import com.netgrif.workflow.auth.service.interfaces.IRegistrationService
 import com.netgrif.workflow.auth.service.interfaces.IUserService
 import com.netgrif.workflow.auth.web.requestbodies.NewUserRequest
@@ -25,7 +26,7 @@ import com.netgrif.workflow.petrinet.domain.Transition
 import com.netgrif.workflow.petrinet.domain.dataset.*
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedField
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldsTree
-
+import com.netgrif.workflow.petrinet.domain.version.Version
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.workflow.startup.ImportHelper
 import com.netgrif.workflow.utils.FullPageRequest
@@ -102,6 +103,9 @@ class ActionDelegate {
 
     @Autowired
     IMailAttemptService mailAttemptService
+
+    @Autowired
+    UserDetailsServiceImpl userDetailsService
 
     /**
      * Reference of case and task in which current action is taking place.
@@ -537,8 +541,50 @@ class ActionDelegate {
         refs.find { it.transitionId == transitionId }.stringId
     }
 
-    User assignRole(String roleImportId, User user = userService.loggedUser) {
-        return userService.addRole(user, roleImportId)
+    User assignRole(String roleMongoId, User user = userService.loggedUser) { // userDetailsService.reloadSecurityContext(userService.getLoggedUser().transformToLoggedUser())
+        User actualUser = userService.addRole(user, roleMongoId)
+        userDetailsService.reloadSecurityContext(actualUser.transformToLoggedUser())
+        return actualUser
+    }
+
+    User assignRole(String roleId, String netId, User user = userService.loggedUser) {
+        List<PetriNet> nets = petriNetService.getByIdentifier(netId)
+        nets.forEach({net -> user = assignRole(roleId, net, user)})
+        return user
+    }
+
+    User assignRole(String roleId, PetriNet net, User user = userService.loggedUser) {
+        User actualUser = userService.addRole(user, net.roles.values().find { role -> role.importId == roleId}.stringId)
+        userDetailsService.reloadSecurityContext(actualUser.transformToLoggedUser())
+        return actualUser
+    }
+
+    User assignRole(String roleId, String netId, Version version, User user = userService.loggedUser) {
+        PetriNet net = petriNetService.getPetriNet(netId, version)
+        return assignRole(roleId, net, user)
+    }
+
+    User removeRole(String roleMongoId, User user = userService.loggedUser) {
+        User actualUser = userService.removeRole(user, roleMongoId)
+        userDetailsService.reloadSecurityContext(actualUser.transformToLoggedUser())
+        return actualUser
+    }
+
+    User removeRole(String roleId, String netId, User user = userService.loggedUser) {
+        List<PetriNet> nets = petriNetService.getByIdentifier(netId)
+        nets.forEach({net -> user = removeRole(roleId, net, user)})
+        return user
+    }
+
+    User removeRole(String roleId, PetriNet net, User user = userService.loggedUser) {
+        User actualUser = userService.removeRole(user, net.roles.values().find { role -> role.importId == roleId}.stringId)
+        userDetailsService.reloadSecurityContext(actualUser.transformToLoggedUser())
+        return actualUser
+    }
+
+    User removeRole(String roleId, String netId, Version version, User user = userService.loggedUser) {
+        PetriNet net = petriNetService.getPetriNet(netId, version)
+        return removeRole(roleId, net, user)
     }
 
     def setData(Task task, Map dataSet) {
