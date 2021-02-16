@@ -6,6 +6,7 @@ import com.netgrif.workflow.elastic.domain.*;
 import com.netgrif.workflow.elastic.service.interfaces.IElasticCaseMappingService;
 import com.netgrif.workflow.petrinet.domain.I18nString;
 import com.netgrif.workflow.workflow.domain.Case;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -15,8 +16,11 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
+@Slf4j
 @Service
 public class ElasticCaseMappingService implements IElasticCaseMappingService {
+
+
     @Override
     public ElasticCase transform(Case useCase) {
         ElasticCase transformedCase = new ElasticCase(useCase);
@@ -48,17 +52,19 @@ public class ElasticCaseMappingService implements IElasticCaseMappingService {
         } else if (dataField.getValue() instanceof User) {
             return this.transformUserField(dataField);
         } else if (dataField.getValue() instanceof LocalDate) {
-            LocalDate date = (LocalDate) dataField.getValue();
-            return transformDateField(LocalDateTime.of(date, LocalTime.NOON));
+            return this.transformDateField(dataField);
         } else if (dataField.getValue() instanceof LocalDateTime) {
-            return transformDateField((LocalDateTime) dataField.getValue());
+            return this.transformDateTimeField(dataField);
         } else if (dataField.getValue() instanceof Date) {
+            log.warn("DataField with Date instance value was found! DateFields should use LocalDate instances, DateTimeFields should use LocalDateTime instances! Converting the value to a LocalDateTime instance...");
             LocalDateTime date = ((Date) dataField.getValue()).toInstant()
                     .atZone(ZoneId.systemDefault())
                     .toLocalDateTime();
-            return transformDateField(date);
+            return this.formatDateField(date);
         } else if (dataField.getValue() instanceof Boolean) {
-            return Optional.of(new BooleanField((Boolean) dataField.getValue()));
+            return this.transformBooleanField(dataField);
+        } else if (dataField.getValue() instanceof I18nString) {
+            return this.transformEnumerationField(dataField);
         } else {
             if (dataField.getValue() == null)
                 return Optional.empty();
@@ -88,7 +94,20 @@ public class ElasticCaseMappingService implements IElasticCaseMappingService {
 
     protected Optional<DataField> transformMultichoiceField(com.netgrif.workflow.workflow.domain.DataField multichoiceField) {
         Set values = (Set) multichoiceField.getValue();
-        return Optional.of(new TextField((String[]) values.stream().map(Object::toString).toArray(String[]::new)));
+        List<String> translations = new ArrayList<>();
+        values.forEach(i18n -> translations.addAll(this.collectTranslations((I18nString) i18n)));
+        return Optional.of(new TextField(translations.toArray(new String[0])));
+    }
+
+    protected Optional<DataField> transformEnumerationField(com.netgrif.workflow.workflow.domain.DataField enumField) {
+        return Optional.of(new TextField(this.collectTranslations((I18nString) enumField.getValue()).toArray(new String[0])));
+    }
+
+    protected List<String> collectTranslations(I18nString i18nString) {
+        List<String> translations = new ArrayList<>();
+        translations.add(i18nString.getDefaultValue());
+        translations.addAll(i18nString.getTranslations().values());
+        return translations;
     }
 
     protected Optional<DataField> transformNumberField(com.netgrif.workflow.workflow.domain.DataField numberField) {
@@ -110,9 +129,22 @@ public class ElasticCaseMappingService implements IElasticCaseMappingService {
         return Optional.of(new UserField(user.getId(), user.getEmail(), fullName.toString()));
     }
 
-    private Optional<DataField> transformDateField(LocalDateTime date) {
+    protected Optional<DataField> transformDateField(com.netgrif.workflow.workflow.domain.DataField dateField) {
+        LocalDate date = (LocalDate) dateField.getValue();
+        return formatDateField(LocalDateTime.of(date, LocalTime.NOON));
+    }
+
+    protected Optional<DataField> transformDateTimeField(com.netgrif.workflow.workflow.domain.DataField dateTimeField) {
+        return formatDateField((LocalDateTime) dateTimeField.getValue());
+    }
+
+    private Optional<DataField> formatDateField(LocalDateTime date) {
         if (date == null)
             return Optional.empty();
         return Optional.of(new DateField(date.format(DateTimeFormatter.BASIC_ISO_DATE), date));
+    }
+
+    protected Optional<DataField> transformBooleanField(com.netgrif.workflow.workflow.domain.DataField booleanField) {
+        return Optional.of(new BooleanField((Boolean) booleanField.getValue()));
     }
 }
