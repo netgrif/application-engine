@@ -276,7 +276,7 @@ public class UserService implements IUserService {
 
     @Override
     public LoggedUser getAnonymousLogged() {
-        if (SecurityContextHolder.getContext().getAuthentication().getPrincipal().equals("anonymousUser")) {
+        if (SecurityContextHolder.getContext().getAuthentication().getPrincipal().equals(UserProperties.ANONYMOUS_AUTH_KEY)) {
             getLoggedUser().transformToLoggedUser();
         }
         return (LoggedUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
