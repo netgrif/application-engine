@@ -25,13 +25,12 @@ public class MapField extends TextField {
     }
 
     public MapField(List<Map.Entry<String, I18nString>> valuePairs) {
-        super(new String[0]);
+        super(new String[valuePairs.size()]);
         this.keyValue = new String[valuePairs.size()];
-        String[] values = new String[valuePairs.size()];
         for (int i = 0; i < valuePairs.size(); i++) {
             keyValue[i] = valuePairs.get(i).getKey();
-            values[i] = valuePairs.get(i).getValue().toString();
+            super.textValue[i] = valuePairs.get(i).getValue().toString();
+            super.fulltextValue[i] = valuePairs.get(i).getValue().toString();
         }
-        this.textValue = values;
     }
 }
