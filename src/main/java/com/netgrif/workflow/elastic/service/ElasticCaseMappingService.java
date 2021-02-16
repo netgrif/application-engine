@@ -65,13 +65,15 @@ public class ElasticCaseMappingService implements IElasticCaseMappingService {
             return this.transformBooleanField(dataField);
         } else if (dataField.getValue() instanceof I18nString) {
             return this.transformEnumerationField(dataField);
+        } else if (dataField.getValue() instanceof String) {
+            return this.transformTextField(dataField);
         } else {
             if (dataField.getValue() == null)
                 return Optional.empty();
             String string = dataField.getValue().toString();
             if (string == null)
                 return Optional.empty();
-            return Optional.of(new TextField(string));
+            return this.transformOtherFields(dataField);
         }
     }
 
@@ -146,5 +148,17 @@ public class ElasticCaseMappingService implements IElasticCaseMappingService {
 
     protected Optional<DataField> transformBooleanField(com.netgrif.workflow.workflow.domain.DataField booleanField) {
         return Optional.of(new BooleanField((Boolean) booleanField.getValue()));
+    }
+
+    protected Optional<DataField> transformTextField(com.netgrif.workflow.workflow.domain.DataField textField) {
+        if (textField.getValue() == null) {
+            return Optional.empty();
+        }
+        return Optional.of(new TextField((String) textField.getValue()));
+    }
+
+    protected Optional<DataField> transformOtherFields(com.netgrif.workflow.workflow.domain.DataField otherField) {
+        log.warn("Fields with value of type " + otherField.getValue().getClass().getCanonicalName() + " is not supported for indexation by default. Indexing the toString() representation...");
+        return Optional.of(new TextField(otherField.getValue().toString()));
     }
 }
