@@ -7,8 +7,9 @@ import com.netgrif.workflow.elastic.domain.ElasticCaseRepository
 import com.netgrif.workflow.elastic.domain.ElasticTask
 import com.netgrif.workflow.elastic.service.interfaces.IElasticCaseService
 import com.netgrif.workflow.elastic.web.requestbodies.CaseSearchRequest
-import com.netgrif.workflow.importer.service.Importer
+import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.workflow.startup.ImportHelper
+import com.netgrif.workflow.startup.SuperCreator
 import com.netgrif.workflow.workflow.domain.Case
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService
 import org.junit.Before
@@ -42,9 +43,6 @@ class DataSearchRequestTest {
     public static final String PROCESS_INITIALS = "TST"
 
     @Autowired
-    private Importer importer
-
-    @Autowired
     private WebApplicationContext wac
 
     @Autowired
@@ -68,20 +66,27 @@ class DataSearchRequestTest {
     @Autowired
     private IElasticCaseService searchService
 
+    @Autowired
+    private IPetriNetService petriNetService
+
+    @Autowired
+    private SuperCreator superCreator
+
     private Map<String, String> testCases
 
     @Before
     void before() {
         template.deleteIndex(ElasticCase.class)
         template.createIndex(ElasticCase.class)
+        template.putMapping(ElasticCase.class)
+
         template.deleteIndex(ElasticTask.class)
         template.createIndex(ElasticTask.class)
-        template.putMapping(ElasticCase.class)
         template.putMapping(ElasticTask.class)
 
         repository.deleteAll()
 
-        def net = importer.importPetriNet(new File("src/test/resources/all_data.xml"))
+        def net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/all_data.xml"), "major", superCreator.getLoggedSuper())
         assert net.isPresent()
 
         def users = userService.findAll(true)
@@ -128,7 +133,7 @@ class DataSearchRequestTest {
 
             log.info(String.format("Testing %s", searchRequest.getKey()))
 
-            Page<Case> result = searchService.search([request] as List, mockService.mockLoggedUser(), PageRequest.of(0, 100), false)
+            Page<Case> result = searchService.search([request] as List, mockService.mockLoggedUser(), PageRequest.of(0, 100), null, false)
             assert result.size() == 1
         }
     }
