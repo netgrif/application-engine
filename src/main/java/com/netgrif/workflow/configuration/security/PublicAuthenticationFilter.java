@@ -96,11 +96,13 @@ public class PublicAuthenticationFilter extends OncePerRequestFilter {
     }
 
     private void resolveClaims(Map<String, Object> claims, HttpServletRequest request) {
+        LoggedUser loggedUser;
         if (claims.containsKey("user")) {
-            claims.put("user", userService.findByEmail((String) ((LinkedHashMap)claims.get("user")).get("email"), false).transformToLoggedUser());
+            loggedUser = userService.findByEmail((String)((LinkedHashMap)claims.get("user")).get("email"), false).transformToLoggedUser();
         } else {
-            claims.put("user", createAnonymousUser(request));
+           loggedUser = createAnonymousUser(request);
         }
+        claims.put("user", loggedUser);
         claims.put("authorities", this.anonymousRole);
     }
 
@@ -109,15 +111,12 @@ public class PublicAuthenticationFilter extends OncePerRequestFilter {
 
         AnonymousUser anonymousUser = (AnonymousUser) this.userService.findByEmail(hash + "@nae.com", false);
 
-        if (anonymousUser != null) {
-            anonymousUser.transformToLoggedUser();
-        } else {
+        if (anonymousUser == null) {
             anonymousUser = new AnonymousUser(hash + "@nae.com",
                     "",
                     "User",
                     "Anonymous"
             );
-            anonymousUser.setAnonymous(true);
             anonymousUser.setState(UserState.ACTIVE);
             userService.saveNewAnonymous(anonymousUser);
         }
