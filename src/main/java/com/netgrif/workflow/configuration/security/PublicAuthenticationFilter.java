@@ -8,6 +8,7 @@ import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.configuration.security.jwt.IJwtService;
 import io.jsonwebtoken.ExpiredJwtException;
 import lombok.extern.slf4j.Slf4j;
+import org.bson.types.ObjectId;
 import org.springframework.security.authentication.AnonymousAuthenticationProvider;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationDetailsSource;
@@ -107,7 +108,7 @@ public class PublicAuthenticationFilter extends OncePerRequestFilter {
     }
 
     private LoggedUser createAnonymousUser(HttpServletRequest request) {
-        long hash = UUID.fromString(request.getSession().getId()).getMostSignificantBits() & Long.MAX_VALUE;
+        String hash = new ObjectId().toString();
 
         AnonymousUser anonymousUser = (AnonymousUser) this.userService.findByEmail(hash + "@nae.com", false);
 

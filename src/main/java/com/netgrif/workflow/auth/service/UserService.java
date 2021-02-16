@@ -68,7 +68,7 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public AnonymousUser saveNewAnonymous(User user) {
+    public AnonymousUser saveNewAnonymous(AnonymousUser user) {
         addDefaultRole(user);
         addDefaultAuthorities(user);
 
