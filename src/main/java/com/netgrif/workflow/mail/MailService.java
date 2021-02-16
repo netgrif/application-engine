@@ -77,7 +77,7 @@ public class MailService implements IMailService {
         model.put(EXPIRATION, registrationService.generateExpirationDate().format(formatter));
         model.put(SERVER, getServerURL());
 
-        MailDraft mailDraft = MailDraft.builder(mailFrom, recipients)
+        MailDraft mailDraft = MailDraft.builder(mailFrom, recipients).subject(EmailType.REGISTRATION.getSubject())
                 .body(configuration.getTemplate(EmailType.REGISTRATION.template).toString()).model(model).build();
         MimeMessage email = buildEmail(mailDraft);
         mailSender.send(email);
@@ -95,7 +95,7 @@ public class MailService implements IMailService {
         model.put(EXPIRATION, registrationService.generateExpirationDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
         model.put(SERVER, getServerURL());
 
-        MailDraft mailDraft = MailDraft.builder(mailFrom, Collections.singletonList(user.getEmail()))
+        MailDraft mailDraft = MailDraft.builder(mailFrom, Collections.singletonList(user.getEmail())).subject(EmailType.PASSWORD_RESET.getSubject())
                 .body(configuration.getTemplate(EmailType.PASSWORD_RESET.template).toString()).model(model).build();
         MimeMessage email = buildEmail(mailDraft);
         mailSender.send(email);
