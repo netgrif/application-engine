@@ -2,6 +2,7 @@ package com.netgrif.workflow.elastic.service;
 
 
 import com.netgrif.workflow.auth.domain.User;
+import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.elastic.domain.*;
 import com.netgrif.workflow.elastic.service.interfaces.IElasticCaseMappingService;
 import com.netgrif.workflow.petrinet.domain.I18nString;
@@ -9,6 +10,7 @@ import com.netgrif.workflow.petrinet.domain.dataset.FileFieldValue;
 import com.netgrif.workflow.petrinet.domain.dataset.FileListFieldValue;
 import com.netgrif.workflow.workflow.domain.Case;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -22,6 +24,8 @@ import java.util.*;
 @Service
 public class ElasticCaseMappingService implements IElasticCaseMappingService {
 
+    @Autowired
+    private IUserService userService;
 
     @Override
     public ElasticCase transform(Case useCase) {
@@ -72,6 +76,22 @@ public class ElasticCaseMappingService implements IElasticCaseMappingService {
             return this.transformFileField(dataField);
         } else if (dataField.getValue() instanceof FileListFieldValue) {
             return this.transformFileListField(dataField);
+        } else if (dataField.getValue() instanceof List) {
+            if (((List<?>) dataField.getValue()).isEmpty()) {
+                return Optional.empty();
+            }
+            List<?> listValue = (List<?>) dataField.getValue();
+            for (Object o : listValue) {
+                if (o == null)
+                    continue;
+                if (o instanceof Long) {
+                    return this.transformUserListField(dataField);
+                } else {
+                    log.debug("Mapping field with List value but not Long elements. Probably case-/taskRef. Handling as other field...");
+                    return this.transformOtherFields(dataField);
+                }
+            }
+            return Optional.empty();
         } else {
             if (dataField.getValue() == null)
                 return Optional.empty();
@@ -84,7 +104,7 @@ public class ElasticCaseMappingService implements IElasticCaseMappingService {
 
     protected Optional<DataField> transformMultichoiceMapField(com.netgrif.workflow.workflow.domain.DataField multichoiceMap) {
         List<Map.Entry<String, I18nString>> values = new ArrayList<>();
-        for(String key : (Set<String>) multichoiceMap.getValue()) {
+        for (String key : (Set<String>) multichoiceMap.getValue()) {
             values.add(new AbstractMap.SimpleEntry<>(key, multichoiceMap.getOptions().get(key)));
         }
         return Optional.of(new MapField(values));
@@ -125,6 +145,16 @@ public class ElasticCaseMappingService implements IElasticCaseMappingService {
         User user = (User) userField.getValue();
         if (user == null)
             return Optional.empty();
+        return Optional.of(new UserField(this.transformUserValue(user)));
+    }
+
+    protected Optional<DataField> transformUserListField(com.netgrif.workflow.workflow.domain.DataField userListField) {
+        List<Long> userIds = (List<Long>) userListField.getValue();
+        List<User> users = this.userService.findAllByIds(new HashSet<>(userIds), true);
+        return Optional.of(new UserField(users.stream().map(this::transformUserValue).toArray(UserField.UserMappingData[]::new)));
+    }
+
+    private UserField.UserMappingData transformUserValue(User user) {
         StringBuilder fullName = new StringBuilder();
         if (user.getSurname() != null) {
             fullName.append(user.getSurname());
@@ -133,7 +163,7 @@ public class ElasticCaseMappingService implements IElasticCaseMappingService {
         if (user.getName() != null) {
             fullName.append(user.getName());
         }
-        return Optional.of(new UserField(user.getId(), user.getEmail(), fullName.toString()));
+        return new UserField.UserMappingData(user.getId(), user.getEmail(), fullName.toString());
     }
 
     protected Optional<DataField> transformDateField(com.netgrif.workflow.workflow.domain.DataField dateField) {

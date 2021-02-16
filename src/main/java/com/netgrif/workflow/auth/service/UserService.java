@@ -236,6 +236,15 @@ public class UserService implements IUserService {
     }
 
     @Override
+    public List<User> findAllByIds(Set<Long> ids, boolean small) {
+        List<User> users = userRepository.findAllByIdIn(ids);
+        if (!small) {
+            users.forEach(this::loadProcessRoles);
+        }
+        return users;
+    }
+
+    @Override
     public void assignAuthority(Long userId, Long authorityId) {
         Optional<User> user = userRepository.findById(userId);
         Optional<Authority> authority = authorityRepository.findById(authorityId);
