@@ -6,6 +6,7 @@ import com.netgrif.workflow.elastic.domain.*;
 import com.netgrif.workflow.elastic.service.interfaces.IElasticCaseMappingService;
 import com.netgrif.workflow.petrinet.domain.I18nString;
 import com.netgrif.workflow.petrinet.domain.dataset.FileFieldValue;
+import com.netgrif.workflow.petrinet.domain.dataset.FileListFieldValue;
 import com.netgrif.workflow.workflow.domain.Case;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -69,6 +70,8 @@ public class ElasticCaseMappingService implements IElasticCaseMappingService {
             return this.transformTextField(dataField);
         } else if (dataField.getValue() instanceof FileFieldValue) {
             return this.transformFileField(dataField);
+        } else if (dataField.getValue() instanceof FileListFieldValue) {
+            return this.transformFileListField(dataField);
         } else {
             if (dataField.getValue() == null)
                 return Optional.empty();
@@ -161,6 +164,10 @@ public class ElasticCaseMappingService implements IElasticCaseMappingService {
 
     protected Optional<DataField> transformFileField(com.netgrif.workflow.workflow.domain.DataField fileField) {
         return Optional.of(new FileField((FileFieldValue) fileField.getValue()));
+    }
+
+    protected Optional<DataField> transformFileListField(com.netgrif.workflow.workflow.domain.DataField fileListField) {
+        return Optional.of(new FileField(((FileListFieldValue) fileListField.getValue()).getNamesPaths().toArray(new FileFieldValue[0])));
     }
 
     protected Optional<DataField> transformOtherFields(com.netgrif.workflow.workflow.domain.DataField otherField) {
