@@ -1,5 +1,6 @@
 package com.netgrif.workflow.auth.service.interfaces;
 
+import com.netgrif.workflow.auth.domain.AnonymousUser;
 import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.auth.web.requestbodies.UpdateUserRequest;
@@ -21,7 +22,7 @@ public interface IUserService {
 
     User saveNew(User user);
 
-    User saveNewAnonymous(User user);
+    AnonymousUser saveNewAnonymous(AnonymousUser user);
 
     User update(User user, UpdateUserRequest updates);
 
