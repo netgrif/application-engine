@@ -43,9 +43,9 @@
     <data type="enumeration" immediate="true">
         <id>enumeration</id>
         <title>Enumeration</title>
-        <values>Alice</values>
-        <values>Bob</values>
-        <values>Carol</values>
+        <values name="alice">Alice</values>
+        <values name="bob">Bob</values>
+        <values name="carol">Carol</values>
         <init>Bob</init>
     </data>
     <data type="enumeration" immediate="true">
@@ -74,9 +74,9 @@
     <data type="multichoice" immediate="true">
         <id>multichoice</id>
         <title>Multichoice</title>
-        <values>Alice</values>
-        <values>Bob</values>
-        <values>Carol</values>
+        <values name="alice">Alice</values>
+        <values name="bob">Bob</values>
+        <values name="carol">Carol</values>
         <init>Alice,Bob</init>
     </data>
     <data type="multichoice" immediate="true">
@@ -119,11 +119,53 @@
         <init>01.01.2019 20:00</init>
     </data>
 
+    <data type="enumeration_map" immediate="true">
+        <id>enumeration_map</id>
+        <title>Enumeration map</title>
+        <options>
+            <option key="alice" name="alice">Alice</option>
+            <option key="bob" name="bob">Bob</option>
+            <option key="carol" name="carol">Carol</option>
+        </options>
+        <init>bob</init>
+    </data>
+
+    <data type="multichoice_map" immediate="true">
+        <id>multichoice_map</id>
+        <title>Multichoice map</title>
+        <options>
+            <option key="alice" name="alice">Alice</option>
+            <option key="bob" name="bob">Bob</option>
+            <option key="carol" name="carol">Carol</option>
+        </options>
+        <init>alice,bob</init>
+    </data>
+
+    <data type="fileList" immediate="true">
+        <id>fileList</id>
+        <title>File list</title>
+        <init></init>
+    </data>
+
+    <data type="userList" immediate="true">
+        <id>userList</id>
+        <title>User list</title>
+        <init></init>
+    </data>
+
     <data type="button">
         <id>button</id>
         <title>Button</title>
         <placeholder>Push</placeholder>
     </data>
+
+    <!-- I18NS -->
+    <i18n locale="sk">
+        <i18nString name="alice">Alica</i18nString>
+        <i18nString name="bob">Bobek</i18nString>
+        <i18nString name="carol">Karla</i18nString>
+    </i18n>
+
     <!-- TRANSITIONS -->
     <transition>
         <id>1</id>
