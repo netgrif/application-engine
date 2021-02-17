@@ -183,6 +183,9 @@ public class Importer {
         if (logic == null || roleId == null) {
             return;
         }
+        if (logic.isView() != null && !logic.isView()) {
+            net.addNegativeViewRole(roleId);
+        }
 
         net.addPermission(roleId, roleFactory.getProcessPermissions(logic));
     }
@@ -552,6 +555,9 @@ public class Importer {
             return;
         }
 
+        if (logic.isView() != null && !logic.isView()) {
+            transition.addNegativeViewRole(roleId);
+        }
         transition.addRole(roleId, roleFactory.getPermissions(logic));
     }
 
