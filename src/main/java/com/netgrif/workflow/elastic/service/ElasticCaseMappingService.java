@@ -174,12 +174,12 @@ public class ElasticCaseMappingService implements IElasticCaseMappingService {
 
     private UserField.UserMappingData transformUserValue(User user) {
         StringBuilder fullName = new StringBuilder();
-        if (user.getSurname() != null) {
-            fullName.append(user.getSurname());
-            fullName.append(" ");
-        }
         if (user.getName() != null) {
             fullName.append(user.getName());
+            fullName.append(" ");
+        }
+        if (user.getSurname() != null) {
+            fullName.append(user.getSurname());
         }
         return new UserField.UserMappingData(user.getId(), user.getEmail(), fullName.toString());
     }
