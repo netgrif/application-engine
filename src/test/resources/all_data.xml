@@ -77,7 +77,7 @@
         <values name="alice">Alice</values>
         <values name="bob">Bob</values>
         <values name="carol">Carol</values>
-        <init>Alice,Bob</init>
+        <init>Carol</init>
     </data>
     <data type="multichoice" immediate="true">
         <id>multichoice_list</id>
@@ -138,7 +138,7 @@
             <option key="bob" name="bob">Bob</option>
             <option key="carol" name="carol">Carol</option>
         </options>
-        <init>alice,bob</init>
+        <init>carol</init>
     </data>
 
     <data type="fileList" immediate="true">
