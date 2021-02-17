@@ -122,12 +122,30 @@ public class ElasticCaseMappingService implements IElasticCaseMappingService {
     protected Optional<DataField> transformMultichoiceField(com.netgrif.workflow.workflow.domain.DataField multichoiceField) {
         Set values = (Set) multichoiceField.getValue();
         List<String> translations = new ArrayList<>();
-        values.forEach(i18n -> translations.addAll(this.collectTranslations((I18nString) i18n)));
+        values.forEach(value -> {
+            if (value instanceof I18nString) {
+                translations.addAll(this.collectTranslations((I18nString) value));
+            } else if (value instanceof String) {
+                translations.add((String) value);
+            } else {
+                // TODO vyhodit exception?
+                log.error("Multichoice field has value of illegal type! Expected: I18nString, Found: " + value.getClass().getCanonicalName());
+            }
+        });
         return Optional.of(new TextField(translations.toArray(new String[0])));
     }
 
     protected Optional<DataField> transformEnumerationField(com.netgrif.workflow.workflow.domain.DataField enumField) {
-        return Optional.of(new TextField(this.collectTranslations((I18nString) enumField.getValue()).toArray(new String[0])));
+        Object value = enumField.getValue();
+        if (value instanceof I18nString) {
+            return Optional.of(new TextField(this.collectTranslations((I18nString) value).toArray(new String[0])));
+        } else if (value instanceof String) {
+            return Optional.of(new TextField((String) value));
+        } else {
+            // TODO vyhodit exception?
+            log.error("Enumeration field has value of illegal type! Expected: I18nString, Found: " + value.getClass().getCanonicalName());
+            return Optional.empty();
+        }
     }
 
     protected List<String> collectTranslations(I18nString i18nString) {

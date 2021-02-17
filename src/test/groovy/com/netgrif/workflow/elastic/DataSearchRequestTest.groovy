@@ -7,6 +7,8 @@ import com.netgrif.workflow.elastic.domain.ElasticCaseRepository
 import com.netgrif.workflow.elastic.domain.ElasticTask
 import com.netgrif.workflow.elastic.service.interfaces.IElasticCaseService
 import com.netgrif.workflow.elastic.web.requestbodies.CaseSearchRequest
+import com.netgrif.workflow.petrinet.domain.dataset.FileFieldValue
+import com.netgrif.workflow.petrinet.domain.dataset.FileListFieldValue
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.workflow.startup.ImportHelper
 import com.netgrif.workflow.startup.SuperCreator
@@ -90,20 +92,30 @@ class DataSearchRequestTest {
         assert net.isPresent()
 
         def users = userService.findAll(true)
-        assert users.size() > 0
-        def testUser = users[0]
-        // saving authorities / roles crashes the workflowService
-        testUser.userProcessRoles = []
-        testUser.authorities = []
+        assert users.size() >= 2
+        def testUser1 = users[0]
+        def testUser2 = users[1]
+        // saving authorities / roles crashes the workflowService (on case save)
+        testUser1.userProcessRoles = []
+        testUser1.authorities = []
+        testUser2.userProcessRoles = []
+        testUser2.authorities = []
 
         LocalDate date = LocalDate.of(2020, 7, 25);
         Case _case = importHelper.createCase("correct", net.get())
         _case.dataSet["number"].value = 7.0 as Double
         _case.dataSet["boolean"].value = true
         _case.dataSet["text"].value = "hello world" as String
-        _case.dataSet["user"].value = testUser
+        _case.dataSet["user"].value = testUser1
         _case.dataSet["date"].value = date
         _case.dataSet["datetime"].value = date.atTime(13, 37)
+        _case.dataSet["enumeration"].value = _case.dataSet["enumeration"].choices.find({ it.defaultValue == "Alice" })
+        _case.dataSet["multichoice"].value = _case.dataSet["enumeration"].choices.findAll({ it.defaultValue == "Alice" || it.defaultValue == "Bob"})
+        _case.dataSet["enumeration_map"].value = "alice"
+        _case.dataSet["multichoice_map"].value = ["alice", "bob"]
+        _case.dataSet["file"].value = FileFieldValue.fromString("singlefile.txt")
+        _case.dataSet["fileList"].value = FileListFieldValue.fromString("multifile1.txt,multifile2.pdf")
+        _case.dataSet["userList"].value = [testUser1.id, testUser2.id]
         workflowService.save(_case)
 
         10.times {
@@ -118,7 +130,7 @@ class DataSearchRequestTest {
             ("boolean.booleanValue" as String) : "true" as String,
             ("text" as String) : "hello world"  as String,
             ("text.textValue.keyword"  as String) : "hello world"  as String,
-            ("user.userIdValue" as String) : "${testUser.getId()}"  as String,
+            ("user.userIdValue" as String) : "${testUser1.getId()}"  as String,
             ("date.timestampValue" as String) : "${Timestamp.valueOf(LocalDateTime.of(date, LocalTime.NOON)).getTime()}"  as String,
             ("datetime.timestampValue" as String) : "${Timestamp.valueOf(date.atTime(13, 37)).getTime()}"  as String
         ]
