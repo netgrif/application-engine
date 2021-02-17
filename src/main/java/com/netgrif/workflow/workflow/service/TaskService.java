@@ -750,6 +750,7 @@ public class TaskService implements ITaskService {
                 task.addRole(entry.getKey(), entry.getValue());
             }
         }
+        transition.getNegativeViewRoles().forEach((roleId) -> task.addNegativeViewRole(roleId));
 
         for (Map.Entry<String, Map<String, Boolean>> entry : transition.getUserRefs().entrySet()) {
             task.addUserRef(entry.getKey(), entry.getValue());
