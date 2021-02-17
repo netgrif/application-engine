@@ -130,9 +130,56 @@ class DataSearchRequestTest {
             ("boolean.booleanValue" as String) : "true" as String,
             ("text" as String) : "hello world"  as String,
             ("text.textValue.keyword"  as String) : "hello world"  as String,
+            ("user" as String) : "${testUser1.fullName} ${testUser1.email}"  as String,
+            ("user.emailValue" as String) : "${testUser1.email}"  as String,
+            ("user.fullNameValue" as String) : "${testUser1.fullName}"  as String,
             ("user.userIdValue" as String) : "${testUser1.getId()}"  as String,
             ("date.timestampValue" as String) : "${Timestamp.valueOf(LocalDateTime.of(date, LocalTime.NOON)).getTime()}"  as String,
-            ("datetime.timestampValue" as String) : "${Timestamp.valueOf(date.atTime(13, 37)).getTime()}"  as String
+            ("datetime.timestampValue" as String) : "${Timestamp.valueOf(date.atTime(13, 37)).getTime()}"  as String,
+            ("enumeration" as String) : "Alice"  as String,
+            ("enumeration" as String) : "Alica"  as String,
+            ("enumeration.textValue.keyword" as String) : "Alice"  as String,
+            ("enumeration.textValue.keyword" as String) : "Alica"  as String,
+            ("multichoice" as String) : "Alice"  as String,
+            ("multichoice" as String) : "Alica"  as String,
+            ("multichoice" as String) : "Bob"  as String,
+            ("multichoice" as String) : "Bobek"  as String,
+            ("multichoice.textValue.keyword" as String) : "Alice"  as String,
+            ("multichoice.textValue.keyword" as String) : "Alica"  as String,
+            ("multichoice.textValue.keyword" as String) : "Bob"  as String,
+            ("multichoice.textValue.keyword" as String) : "Bobek"  as String,
+            ("enumeration_map" as String) : "Alice"  as String,
+            ("enumeration_map" as String) : "Alica"  as String,
+            ("enumeration_map.textValue.keyword" as String) : "Alice"  as String,
+            ("enumeration_map.textValue.keyword" as String) : "Alica"  as String,
+            ("enumeration_map.keyValue" as String) : "alice"  as String,
+            ("multichoice_map" as String) : "Alice"  as String,
+            ("multichoice_map" as String) : "Alica"  as String,
+            ("multichoice_map" as String) : "Bob"  as String,
+            ("multichoice_map" as String) : "Bobek"  as String,
+            ("multichoice_map.textValue.keyword" as String) : "Alice"  as String,
+            ("multichoice_map.textValue.keyword" as String) : "Alica"  as String,
+            ("multichoice_map.textValue.keyword" as String) : "Bob"  as String,
+            ("multichoice_map.textValue.keyword" as String) : "Bobek"  as String,
+            ("multichoice_map.keyValue" as String) : "alice"  as String,
+            ("multichoice_map.keyValue" as String) : "bob"  as String,
+            ("file" as String) : "singlefile.txt"  as String,
+            ("file.fileNameValue.keyword" as String) : "singlefile"  as String,
+            ("file.fileExtensionValue.keyword" as String) : "txt"  as String,
+            ("fileList" as String) : "multifile1.txt"  as String,
+            ("fileList" as String) : "multifile2.pdf"  as String,
+            ("fileList.fileNameValue.keyword" as String) : "multifile1"  as String,
+            ("fileList.fileNameValue.keyword" as String) : "multifile2"  as String,
+            ("fileList.fileExtensionValue.keyword" as String) : "txt"  as String,
+            ("fileList.fileExtensionValue.keyword" as String) : "pdf"  as String,
+            ("userList" as String) : "${testUser1.fullName} ${testUser1.email}"  as String,
+            ("userList" as String) : "${testUser2.fullName} ${testUser2.email}"  as String,
+            ("userList.emailValue" as String) : "${testUser1.email}"  as String,
+            ("userList.emailValue" as String) : "${testUser2.email}"  as String,
+            ("userList.fullNameValue" as String) : "${testUser1.fullName}"  as String,
+            ("userList.fullNameValue" as String) : "${testUser2.fullName}"  as String,
+            ("userList.userIdValue" as String) : "${testUser1.getId()}"  as String,
+            ("userList.userIdValue" as String) : "${testUser2.getId()}"  as String,
         ]
     }
 
@@ -143,7 +190,7 @@ class DataSearchRequestTest {
             request.data = new HashMap<>()
             request.data.put(searchRequest.getKey(), searchRequest.getValue())
 
-            log.info(String.format("Testing %s", searchRequest.getKey()))
+            log.info(String.format("Testing %s == %s", searchRequest.getKey(), searchRequest.getValue()))
 
             Page<Case> result = searchService.search([request] as List, mockService.mockLoggedUser(), PageRequest.of(0, 100), null, false)
             assert result.size() == 1
