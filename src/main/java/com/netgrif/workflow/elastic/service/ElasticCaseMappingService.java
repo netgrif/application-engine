@@ -103,9 +103,9 @@ public class ElasticCaseMappingService implements IElasticCaseMappingService {
     }
 
     protected Optional<DataField> transformMultichoiceMapField(com.netgrif.workflow.workflow.domain.DataField multichoiceMap) {
-        List<Map.Entry<String, I18nString>> values = new ArrayList<>();
+        List<Map.Entry<String, Collection<String>>> values = new ArrayList<>();
         for (String key : (Set<String>) multichoiceMap.getValue()) {
-            values.add(new AbstractMap.SimpleEntry<>(key, multichoiceMap.getOptions().get(key)));
+            values.add(new AbstractMap.SimpleEntry<>(key, collectTranslations(multichoiceMap.getOptions().get(key))));
         }
         return Optional.of(new MapField(values));
     }
@@ -114,7 +114,7 @@ public class ElasticCaseMappingService implements IElasticCaseMappingService {
         String selectedKey = (String) enumMap.getValue();
         return Optional.of(
                 new MapField(
-                        new AbstractMap.SimpleEntry<>(selectedKey, enumMap.getOptions().get(selectedKey))
+                        new AbstractMap.SimpleEntry<>(selectedKey, collectTranslations(enumMap.getOptions().get(selectedKey)))
                 )
         );
     }
