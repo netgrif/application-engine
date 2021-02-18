@@ -204,7 +204,8 @@ public class ElasticCaseMappingService implements IElasticCaseMappingService {
             return formatDateField(LocalDateTime.of(date, LocalTime.NOON));
         } else if (dateField.getValue() instanceof Date) {
             log.warn(String.format("DateFields should have LocalDate values! DateField (%s) with Date value found! Value will be converted for indexation.", netField.getImportId()));
-            return this.transformDateValueField(dateField);
+            LocalDateTime transformed = this.transformDateValueField(dateField);
+            return formatDateField(LocalDateTime.of(transformed.toLocalDate(), LocalTime.NOON));
         } else {
             // TODO throw error?
             log.error(String.format("Unsupported DateField value type (%s)! Skipping indexation...", dateField.getValue().getClass().getCanonicalName()));
@@ -217,7 +218,7 @@ public class ElasticCaseMappingService implements IElasticCaseMappingService {
             return formatDateField((LocalDateTime) dateTimeField.getValue());
         } else if (dateTimeField.getValue() instanceof Date) {
             log.warn(String.format("DateTimeFields should have LocalDateTime values! DateField (%s) with Date value found! Value will be converted for indexation.", netField.getImportId()));
-            return this.transformDateValueField(dateTimeField);
+            return formatDateField(this.transformDateValueField(dateTimeField));
         } else {
             // TODO throw error?
             log.error(String.format("Unsupported DateTimeField value type (%s)! Skipping indexation...", dateTimeField.getValue().getClass().getCanonicalName()));
@@ -225,11 +226,10 @@ public class ElasticCaseMappingService implements IElasticCaseMappingService {
         }
     }
 
-    private Optional<DataField> transformDateValueField(com.netgrif.workflow.workflow.domain.DataField dateValueField) {
-        LocalDateTime date = ((Date) dateValueField.getValue()).toInstant()
+    private LocalDateTime transformDateValueField(com.netgrif.workflow.workflow.domain.DataField dateValueField) {
+        return ((Date) dateValueField.getValue()).toInstant()
                 .atZone(ZoneId.systemDefault())
                 .toLocalDateTime();
-        return this.formatDateField(date);
     }
 
     private Optional<DataField> formatDateField(LocalDateTime date) {
