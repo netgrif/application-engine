@@ -159,6 +159,33 @@
         <placeholder>Push</placeholder>
     </data>
 
+    <data type="text">
+        <id>testActionTrigger</id>
+        <title>Test Action Trigger</title>
+    </data>
+
+    <data type="enumeration_map" immediate="true">
+        <id>enumeration_map_changed</id>
+        <title>Enumeration map changed</title>
+        <options>
+            <option key="alice" name="alice">Alice</option>
+            <option key="bob" name="bob">Bob</option>
+            <option key="carol" name="carol">Carol</option>
+        </options>
+        <init>bob</init>
+    </data>
+
+    <data type="multichoice_map" immediate="true">
+        <id>multichoice_map_changed</id>
+        <title>Multichoice map changed</title>
+        <options>
+            <option key="alice" name="alice">Alice</option>
+            <option key="bob" name="bob">Bob</option>
+            <option key="carol" name="carol">Carol</option>
+        </options>
+        <init>carol</init>
+    </data>
+
     <!-- I18NS -->
     <i18n locale="sk">
         <i18nString name="alice">Alica</i18nString>
@@ -555,5 +582,50 @@
                 </logic>
             </dataRef>
 		</dataGroup>
+    </transition>
+    <transition>
+        <id>2</id>
+        <x>500</x>
+        <y>300</y>
+        <cols>6</cols>
+        <label>Test Action trigger</label>
+        <assignPolicy>auto</assignPolicy>
+        <dataRef>
+            <id>testActionTrigger</id>
+            <logic>
+                <behavior>visible</behavior>
+                <action trigger="set">
+                    enumMap: f.enumeration_map_changed,
+                    multiMap: f.multichoice_map_changed;
+
+                    def optionD = new com.netgrif.workflow.petrinet.domain.I18nString("David");
+                    optionD.addTranslation("sk", "Dávid");
+                    def optionE = new com.netgrif.workflow.petrinet.domain.I18nString("Eve");
+                    optionE.addTranslation("sk", "Eva");
+                    def optionF = new com.netgrif.workflow.petrinet.domain.I18nString("Felix");
+                    optionF.addTranslation("sk", "Félix");
+
+                    change enumMap options {
+                        ["david": optionD,
+                         "eve": optionE,
+                         "felix": optionF]
+                    }
+
+                    change enumMap value {
+                        "eve"
+                    }
+
+                    change multiMap options {
+                        ["david": optionD,
+                         "eve": optionE,
+                         "felix": optionF]
+                    }
+
+                    change multiMap value {
+                        ["eve", "felix"]
+                    }
+                </action>
+            </logic>
+        </dataRef>
     </transition>
 </document>
