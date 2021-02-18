@@ -14,6 +14,10 @@ import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.workflow.startup.ImportHelper
 import com.netgrif.workflow.startup.SuperCreator
 import com.netgrif.workflow.workflow.domain.Case
+import com.netgrif.workflow.workflow.domain.QTask
+import com.netgrif.workflow.workflow.domain.Task
+import com.netgrif.workflow.workflow.service.interfaces.IDataService
+import com.netgrif.workflow.workflow.service.interfaces.ITaskService
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService
 import org.junit.Before
 import org.junit.Test
@@ -75,6 +79,12 @@ class DataSearchRequestTest {
     @Autowired
     private SuperCreator superCreator
 
+    @Autowired
+    private ITaskService taskService
+
+    @Autowired
+    private IDataService dataService
+
     private ArrayList<Map.Entry<String, String>> testCases
 
     @Before
@@ -118,6 +128,10 @@ class DataSearchRequestTest {
         _case.dataSet["fileList"].value = FileListFieldValue.fromString("multifile1.txt,multifile2.pdf")
         _case.dataSet["userList"].value = [testUser1.id, testUser2.id]
         workflowService.save(_case)
+
+        Task actionTrigger = taskService.searchOne(QTask.task.caseId.eq(_case.stringId).and(QTask.task.transitionId.eq("2")));
+        assert actionTrigger != null
+        dataService.setData(actionTrigger, ImportHelper.populateDataset(["testActionTrigger": ["value":"random value", "type": "text"]]))
 
         10.times {
             _case = importHelper.createCase("wrong${it}", net.get())
@@ -181,6 +195,21 @@ class DataSearchRequestTest {
                 new AbstractMap.SimpleEntry<String, String>("userList.fullNameValue.keyword" as String, "${testUser2.fullName}" as String),
                 new AbstractMap.SimpleEntry<String, String>("userList.userIdValue" as String, "${testUser1.getId()}" as String),
                 new AbstractMap.SimpleEntry<String, String>("userList.userIdValue" as String, "${testUser2.getId()}" as String),
+                new AbstractMap.SimpleEntry<String, String>("enumeration_map_changed" as String, "Eve" as String),
+                new AbstractMap.SimpleEntry<String, String>("enumeration_map_changed" as String, "Eva" as String),
+                new AbstractMap.SimpleEntry<String, String>("enumeration_map_changed.textValue.keyword" as String, "Eve" as String),
+                new AbstractMap.SimpleEntry<String, String>("enumeration_map_changed.textValue.keyword" as String, "Eva" as String),
+                new AbstractMap.SimpleEntry<String, String>("enumeration_map_changed.keyValue" as String, "eve" as String),
+                new AbstractMap.SimpleEntry<String, String>("multichoice_map_changed" as String, "Eve" as String),
+                new AbstractMap.SimpleEntry<String, String>("multichoice_map_changed" as String, "Eva" as String),
+                new AbstractMap.SimpleEntry<String, String>("multichoice_map_changed" as String, "Felix" as String),
+                new AbstractMap.SimpleEntry<String, String>("multichoice_map_changed" as String, "Félix" as String),
+                new AbstractMap.SimpleEntry<String, String>("multichoice_map_changed.textValue.keyword" as String, "Eve" as String),
+                new AbstractMap.SimpleEntry<String, String>("multichoice_map_changed.textValue.keyword" as String, "Eva" as String),
+                new AbstractMap.SimpleEntry<String, String>("multichoice_map_changed.textValue.keyword" as String, "Felix" as String),
+                new AbstractMap.SimpleEntry<String, String>("multichoice_map_changed.textValue.keyword" as String, "Félix" as String),
+                new AbstractMap.SimpleEntry<String, String>("multichoice_map_changed.keyValue" as String, "eve" as String),
+                new AbstractMap.SimpleEntry<String, String>("multichoice_map_changed.keyValue" as String, "felix" as String),
         ]
     }
 
