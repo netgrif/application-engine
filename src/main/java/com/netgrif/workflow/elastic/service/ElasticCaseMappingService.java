@@ -57,7 +57,7 @@ public class ElasticCaseMappingService implements IElasticCaseMappingService {
         } else if (netField instanceof MultichoiceMapField) {
             return this.transformMultichoiceMapField(caseField, (MultichoiceMapField) netField);
         } else if (netField instanceof MultichoiceField) {
-            return this.transformMultichoiceField(caseField);
+            return this.transformMultichoiceField(caseField, (MultichoiceField) netField);
         } else if (netField instanceof com.netgrif.workflow.petrinet.domain.dataset.NumberField) {
             return this.transformNumberField(caseField);
         } else if (netField instanceof com.netgrif.workflow.petrinet.domain.dataset.UserField) {
@@ -87,9 +87,14 @@ public class ElasticCaseMappingService implements IElasticCaseMappingService {
     }
 
     protected Optional<DataField> transformMultichoiceMapField(com.netgrif.workflow.workflow.domain.DataField multichoiceMap, MultichoiceMapField netField) {
+        Optional<Set> optValues = this.getMultichoiceValue(multichoiceMap, netField);
+        if (!optValues.isPresent()) {
+            return Optional.empty();
+        }
+        Set mapValues = optValues.get();
         Map<String, I18nString> options = this.getFieldOptions(multichoiceMap, netField);
         List<Map.Entry<String, Collection<String>>> values = new ArrayList<>();
-        for (String key : (Set<String>) multichoiceMap.getValue()) {
+        for (String key : (Set<String>) mapValues) {
             values.add(new AbstractMap.SimpleEntry<>(key, collectTranslations(options.get(key))));
         }
         return Optional.of(new MapField(values));
@@ -108,11 +113,13 @@ public class ElasticCaseMappingService implements IElasticCaseMappingService {
         return netField.getOptions();
     }
 
-    protected Optional<DataField> transformMultichoiceField(com.netgrif.workflow.workflow.domain.DataField multichoiceField) {
-        if (multichoiceField.getValue() == null) {
+    protected Optional<DataField> transformMultichoiceField(com.netgrif.workflow.workflow.domain.DataField multichoiceField, MultichoiceField netField) {
+        Optional<Set> optValues = this.getMultichoiceValue(multichoiceField, netField);
+        if (!optValues.isPresent()) {
             return Optional.empty();
         }
-        Set values = (Set) multichoiceField.getValue();
+        Set values = optValues.get();
+
         List<String> translations = new ArrayList<>();
         values.forEach(value -> {
             if (value instanceof I18nString) {
@@ -121,10 +128,25 @@ public class ElasticCaseMappingService implements IElasticCaseMappingService {
                 translations.add((String) value);
             } else {
                 // TODO vyhodit exception?
-                log.error("Multichoice field has value of illegal type! Expected: I18nString, Found: " + value.getClass().getCanonicalName());
+                log.error("MultichoiceField has element value of illegal type! Expected: I18nString, Found: " + value.getClass().getCanonicalName());
             }
         });
         return Optional.of(new TextField(translations.toArray(new String[0])));
+    }
+
+    private Optional<Set> getMultichoiceValue(com.netgrif.workflow.workflow.domain.DataField multichoice, Field netField) {
+        if (multichoice.getValue() instanceof Set) {
+            return Optional.of((Set) multichoice.getValue());
+        } else if (multichoice.getValue() instanceof Collection) {
+            log.warn(String.format("Multichoice field should have Set values! DateField (%s) with %s value found! Value will be converted for indexation.", netField.getImportId(), multichoice.getValue().getClass().getCanonicalName()));
+            Set values = new HashSet();
+            values.addAll((Collection) multichoice.getValue());
+            return Optional.of(values);
+        } else {
+            // TODO error?
+            log.error("Multichoice field has value of illegal type! Expected: Set, Found: " + multichoice.getValue().getClass().getCanonicalName());
+            return Optional.empty();
+        }
     }
 
     protected Optional<DataField> transformEnumerationField(com.netgrif.workflow.workflow.domain.DataField enumField) {
