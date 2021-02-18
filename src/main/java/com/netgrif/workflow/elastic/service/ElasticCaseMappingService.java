@@ -4,10 +4,15 @@ package com.netgrif.workflow.elastic.service;
 import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.elastic.domain.*;
+import com.netgrif.workflow.elastic.domain.BooleanField;
+import com.netgrif.workflow.elastic.domain.DateField;
+import com.netgrif.workflow.elastic.domain.FileField;
+import com.netgrif.workflow.elastic.domain.NumberField;
+import com.netgrif.workflow.elastic.domain.TextField;
+import com.netgrif.workflow.elastic.domain.UserField;
 import com.netgrif.workflow.elastic.service.interfaces.IElasticCaseMappingService;
 import com.netgrif.workflow.petrinet.domain.I18nString;
-import com.netgrif.workflow.petrinet.domain.dataset.FileFieldValue;
-import com.netgrif.workflow.petrinet.domain.dataset.FileListFieldValue;
+import com.netgrif.workflow.petrinet.domain.dataset.*;
 import com.netgrif.workflow.workflow.domain.Case;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,73 +41,52 @@ public class ElasticCaseMappingService implements IElasticCaseMappingService {
 
     protected void populateDataSet(ElasticCase transformedCase, Case useCase) {
         for (String id : useCase.getImmediateDataFields()) {
-            Optional<DataField> parsedValue = this.transformDataField(useCase.getDataField(id));
+            Optional<DataField> parsedValue = this.transformDataField(id, useCase);
             parsedValue.ifPresent(dataField -> transformedCase.getDataSet().put(id, dataField));
         }
     }
 
-    protected Optional<DataField> transformDataField(com.netgrif.workflow.workflow.domain.DataField dataField) {
-        if (dataField.getOptions() != null) {
-            if (dataField.getValue() instanceof Set) {
-                return this.transformMultichoiceMapField(dataField);
-            } else {
-                return this.transformEnumerationMapField(dataField);
-            }
-        } else if (dataField.getValue() instanceof Set) {
-            if (dataField.getValue() == null)
-                return Optional.empty();
-            return this.transformMultichoiceField(dataField);
-        } else if (dataField.getValue() instanceof Number) {
-            return this.transformNumberField(dataField);
-        } else if (dataField.getValue() instanceof User) {
-            return this.transformUserField(dataField);
-        } else if (dataField.getValue() instanceof LocalDate) {
-            return this.transformDateField(dataField);
-        } else if (dataField.getValue() instanceof LocalDateTime) {
-            return this.transformDateTimeField(dataField);
-        } else if (dataField.getValue() instanceof Date) {
-            log.warn("DataField with Date instance value was found! DateFields should use LocalDate instances, DateTimeFields should use LocalDateTime instances! Converting the value to a LocalDateTime instance...");
-            LocalDateTime date = ((Date) dataField.getValue()).toInstant()
-                    .atZone(ZoneId.systemDefault())
-                    .toLocalDateTime();
-            return this.formatDateField(date);
-        } else if (dataField.getValue() instanceof Boolean) {
-            return this.transformBooleanField(dataField);
-        } else if (dataField.getValue() instanceof I18nString) {
-            return this.transformEnumerationField(dataField);
-        } else if (dataField.getValue() instanceof String) {
-            return this.transformTextField(dataField);
-        } else if (dataField.getValue() instanceof FileFieldValue) {
-            return this.transformFileField(dataField);
-        } else if (dataField.getValue() instanceof FileListFieldValue) {
-            return this.transformFileListField(dataField);
-        } else if (dataField.getValue() instanceof List) {
-            if (((List<?>) dataField.getValue()).isEmpty()) {
-                return Optional.empty();
-            }
-            List<?> listValue = (List<?>) dataField.getValue();
-            for (Object o : listValue) {
-                if (o == null)
-                    continue;
-                if (o instanceof Long) {
-                    return this.transformUserListField(dataField);
-                } else {
-                    log.debug("Mapping field with List value but not Long elements. Probably case-/taskRef. Handling as other field...");
-                    return this.transformOtherFields(dataField);
-                }
-            }
+    protected Optional<DataField> transformDataField(String fieldId, Case useCase) {
+        Field netField = useCase.getField(fieldId);
+        com.netgrif.workflow.workflow.domain.DataField caseField = useCase.getDataField(fieldId);
+
+        if (caseField.getValue() == null) {
             return Optional.empty();
+        } else if (netField instanceof EnumerationMapField) {
+            return this.transformEnumerationMapField(caseField, (EnumerationMapField) netField);
+        } else if (netField instanceof MultichoiceMapField) {
+            return this.transformMultichoiceMapField(caseField, (MultichoiceMapField) netField);
+        } else if (netField instanceof MultichoiceField) {
+            return this.transformMultichoiceField(caseField);
+        } else if (netField instanceof com.netgrif.workflow.petrinet.domain.dataset.NumberField) {
+            return this.transformNumberField(caseField);
+        } else if (netField instanceof com.netgrif.workflow.petrinet.domain.dataset.UserField) {
+            return this.transformUserField(caseField);
+        } else if (netField instanceof com.netgrif.workflow.petrinet.domain.dataset.DateField) {
+            return this.transformDateField(caseField, (com.netgrif.workflow.petrinet.domain.dataset.DateField) netField);
+        } else if (netField instanceof DateTimeField) {
+            return this.transformDateTimeField(caseField, (DateTimeField) netField);
+        } else if (netField instanceof com.netgrif.workflow.petrinet.domain.dataset.BooleanField) {
+            return this.transformBooleanField(caseField);
+        } else if (netField instanceof EnumerationField) {
+            return this.transformEnumerationField(caseField);
+        } else if (netField instanceof com.netgrif.workflow.petrinet.domain.dataset.TextField) {
+            return this.transformTextField(caseField);
+        } else if (netField instanceof com.netgrif.workflow.petrinet.domain.dataset.FileField) {
+            return this.transformFileField(caseField);
+        } else if (netField instanceof FileListField) {
+            return this.transformFileListField(caseField);
+        } else if (netField instanceof UserListField) {
+            return this.transformUserListField(caseField);
         } else {
-            if (dataField.getValue() == null)
-                return Optional.empty();
-            String string = dataField.getValue().toString();
+            String string = caseField.getValue().toString();
             if (string == null)
                 return Optional.empty();
-            return this.transformOtherFields(dataField);
+            return this.transformOtherFields(caseField, netField);
         }
     }
 
-    protected Optional<DataField> transformMultichoiceMapField(com.netgrif.workflow.workflow.domain.DataField multichoiceMap) {
+    protected Optional<DataField> transformMultichoiceMapField(com.netgrif.workflow.workflow.domain.DataField multichoiceMap, MultichoiceMapField netField) {
         List<Map.Entry<String, Collection<String>>> values = new ArrayList<>();
         for (String key : (Set<String>) multichoiceMap.getValue()) {
             values.add(new AbstractMap.SimpleEntry<>(key, collectTranslations(multichoiceMap.getOptions().get(key))));
@@ -110,7 +94,7 @@ public class ElasticCaseMappingService implements IElasticCaseMappingService {
         return Optional.of(new MapField(values));
     }
 
-    protected Optional<DataField> transformEnumerationMapField(com.netgrif.workflow.workflow.domain.DataField enumMap) {
+    protected Optional<DataField> transformEnumerationMapField(com.netgrif.workflow.workflow.domain.DataField enumMap, EnumerationMapField netField) {
         String selectedKey = (String) enumMap.getValue();
         return Optional.of(
                 new MapField(
@@ -120,6 +104,9 @@ public class ElasticCaseMappingService implements IElasticCaseMappingService {
     }
 
     protected Optional<DataField> transformMultichoiceField(com.netgrif.workflow.workflow.domain.DataField multichoiceField) {
+        if (multichoiceField.getValue() == null) {
+            return Optional.empty();
+        }
         Set values = (Set) multichoiceField.getValue();
         List<String> translations = new ArrayList<>();
         values.forEach(value -> {
@@ -184,13 +171,38 @@ public class ElasticCaseMappingService implements IElasticCaseMappingService {
         return new UserField.UserMappingData(user.getId(), user.getEmail(), fullName.toString());
     }
 
-    protected Optional<DataField> transformDateField(com.netgrif.workflow.workflow.domain.DataField dateField) {
-        LocalDate date = (LocalDate) dateField.getValue();
-        return formatDateField(LocalDateTime.of(date, LocalTime.NOON));
+    protected Optional<DataField> transformDateField(com.netgrif.workflow.workflow.domain.DataField dateField, com.netgrif.workflow.petrinet.domain.dataset.DateField netField) {
+        if (dateField.getValue() instanceof LocalDate) {
+            LocalDate date = (LocalDate) dateField.getValue();
+            return formatDateField(LocalDateTime.of(date, LocalTime.NOON));
+        } else if (dateField.getValue() instanceof Date) {
+            log.warn(String.format("DateFields should have LocalDate values! DateField (%s) with Date value found! Value will be converted for indexation.", netField.getImportId()));
+            return this.transformDateValueField(dateField);
+        } else {
+            // TODO throw error?
+            log.error(String.format("Unsupported DateField value type (%s)! Skipping indexation...", dateField.getValue().getClass().getCanonicalName()));
+            return Optional.empty();
+        }
     }
 
-    protected Optional<DataField> transformDateTimeField(com.netgrif.workflow.workflow.domain.DataField dateTimeField) {
-        return formatDateField((LocalDateTime) dateTimeField.getValue());
+    protected Optional<DataField> transformDateTimeField(com.netgrif.workflow.workflow.domain.DataField dateTimeField, DateTimeField netField) {
+        if (dateTimeField.getValue() instanceof LocalDateTime) {
+            return formatDateField((LocalDateTime) dateTimeField.getValue());
+        } else if (dateTimeField.getValue() instanceof Date) {
+            log.warn(String.format("DateTimeFields should have LocalDateTime values! DateField (%s) with Date value found! Value will be converted for indexation.", netField.getImportId()));
+            return this.transformDateValueField(dateTimeField);
+        } else {
+            // TODO throw error?
+            log.error(String.format("Unsupported DateTimeField value type (%s)! Skipping indexation...", dateTimeField.getValue().getClass().getCanonicalName()));
+            return Optional.empty();
+        }
+    }
+
+    private Optional<DataField> transformDateValueField(com.netgrif.workflow.workflow.domain.DataField dateValueField) {
+        LocalDateTime date = ((Date) dateValueField.getValue()).toInstant()
+                .atZone(ZoneId.systemDefault())
+                .toLocalDateTime();
+        return this.formatDateField(date);
     }
 
     private Optional<DataField> formatDateField(LocalDateTime date) {
@@ -218,8 +230,8 @@ public class ElasticCaseMappingService implements IElasticCaseMappingService {
         return Optional.of(new FileField(((FileListFieldValue) fileListField.getValue()).getNamesPaths().toArray(new FileFieldValue[0])));
     }
 
-    protected Optional<DataField> transformOtherFields(com.netgrif.workflow.workflow.domain.DataField otherField) {
-        log.warn("Fields with value of type " + otherField.getValue().getClass().getCanonicalName() + " is not supported for indexation by default. Indexing the toString() representation...");
+    protected Optional<DataField> transformOtherFields(com.netgrif.workflow.workflow.domain.DataField otherField, Field netField) {
+        log.warn("Field of type " + netField.getClass().getCanonicalName() + " is not supported for indexation by default. Indexing the toString() representation of its value...");
         return Optional.of(new TextField(otherField.getValue().toString()));
     }
 }
