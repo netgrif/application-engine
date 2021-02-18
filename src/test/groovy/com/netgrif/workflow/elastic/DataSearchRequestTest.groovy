@@ -111,9 +111,9 @@ class DataSearchRequestTest {
         _case.dataSet["date"].value = date
         _case.dataSet["datetime"].value = date.atTime(13, 37)
         _case.dataSet["enumeration"].value = (_case.petriNet.dataSet["enumeration"] as ChoiceField).choices.find({ it.defaultValue == "Alice" })
-        _case.dataSet["multichoice"].value = (_case.petriNet.dataSet["multichoice"] as ChoiceField).choices.findAll({ it.defaultValue == "Alice" || it.defaultValue == "Bob" })
+        _case.dataSet["multichoice"].value = (_case.petriNet.dataSet["multichoice"] as ChoiceField).choices.findAll({ it.defaultValue == "Alice" || it.defaultValue == "Bob" }).toSet()
         _case.dataSet["enumeration_map"].value = "alice"
-        _case.dataSet["multichoice_map"].value = ["alice", "bob"]
+        _case.dataSet["multichoice_map"].value = ["alice", "bob"].toSet()
         _case.dataSet["file"].value = FileFieldValue.fromString("singlefile.txt")
         _case.dataSet["fileList"].value = FileListFieldValue.fromString("multifile1.txt,multifile2.pdf")
         _case.dataSet["userList"].value = [testUser1.id, testUser2.id]
