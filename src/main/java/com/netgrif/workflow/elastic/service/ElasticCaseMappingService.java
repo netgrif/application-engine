@@ -87,20 +87,25 @@ public class ElasticCaseMappingService implements IElasticCaseMappingService {
     }
 
     protected Optional<DataField> transformMultichoiceMapField(com.netgrif.workflow.workflow.domain.DataField multichoiceMap, MultichoiceMapField netField) {
+        Map<String, I18nString> options = this.getFieldOptions(multichoiceMap, netField);
         List<Map.Entry<String, Collection<String>>> values = new ArrayList<>();
         for (String key : (Set<String>) multichoiceMap.getValue()) {
-            values.add(new AbstractMap.SimpleEntry<>(key, collectTranslations(multichoiceMap.getOptions().get(key))));
+            values.add(new AbstractMap.SimpleEntry<>(key, collectTranslations(options.get(key))));
         }
         return Optional.of(new MapField(values));
     }
 
     protected Optional<DataField> transformEnumerationMapField(com.netgrif.workflow.workflow.domain.DataField enumMap, EnumerationMapField netField) {
+        Map<String, I18nString> options = this.getFieldOptions(enumMap, netField);
         String selectedKey = (String) enumMap.getValue();
-        return Optional.of(
-                new MapField(
-                        new AbstractMap.SimpleEntry<>(selectedKey, collectTranslations(enumMap.getOptions().get(selectedKey)))
-                )
-        );
+        return Optional.of(new MapField(new AbstractMap.SimpleEntry<>(selectedKey, collectTranslations(options.get(selectedKey)))));
+    }
+
+    private Map<String, I18nString> getFieldOptions(com.netgrif.workflow.workflow.domain.DataField map, MapOptionsField<I18nString, ?> netField) {
+        if (map.getOptions() != null) {
+            return map.getOptions();
+        }
+        return netField.getOptions();
     }
 
     protected Optional<DataField> transformMultichoiceField(com.netgrif.workflow.workflow.domain.DataField multichoiceField) {
