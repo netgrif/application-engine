@@ -138,7 +138,7 @@ public class MailService implements IMailService {
             Template template = new Template("mailTemplate", new StringReader(draft.getBody()), configuration);
             helper.setText(FreeMarkerTemplateUtils.processTemplateIntoString(template, draft.getModel()), true);
         } else {
-            helper.setText(draft.getBody());
+            helper.setText(draft.getBody(), draft.isHtml());
         }
 
         draft.getAttachments().forEach((s, inputStream) -> {
