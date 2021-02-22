@@ -1,9 +1,6 @@
 package com.netgrif.workflow.configuration.security;
 
-import com.netgrif.workflow.auth.domain.AnonymousUser;
-import com.netgrif.workflow.auth.domain.Authority;
-import com.netgrif.workflow.auth.domain.LoggedUser;
-import com.netgrif.workflow.auth.domain.UserState;
+import com.netgrif.workflow.auth.domain.*;
 import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.configuration.security.jwt.IJwtService;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -97,12 +94,14 @@ public class PublicAuthenticationFilter extends OncePerRequestFilter {
     }
 
     private void resolveClaims(Map<String, Object> claims, HttpServletRequest request) {
-        LoggedUser loggedUser;
+        LoggedUser loggedUser = createAnonymousUser(request);
+
         if (claims.containsKey("user")) {
-            loggedUser = userService.findByEmail((String)((LinkedHashMap)claims.get("user")).get("email"), false).transformToLoggedUser();
-        } else {
-           loggedUser = createAnonymousUser(request);
+            User user = userService.findByEmail((String)((LinkedHashMap)claims.get("user")).get("email"), false);
+            if (user != null)
+                loggedUser = user.transformToLoggedUser();
         }
+
         claims.put("user", loggedUser);
         claims.put("authorities", this.anonymousRole);
     }
