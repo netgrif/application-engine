@@ -394,6 +394,7 @@ public class PetriNet extends PetriNetObject {
         clone.setProcessEvents(this.processEvents);
         clone.setPermissions(this.permissions);
         clone.setUserRefs(this.userRefs);
+        this.getNegativeViewRoles().forEach(clone::addNegativeViewRole);
         return clone;
     }
 }
