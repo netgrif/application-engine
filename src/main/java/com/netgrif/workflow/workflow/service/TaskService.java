@@ -5,7 +5,9 @@ import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.elastic.domain.ElasticTask;
 import com.netgrif.workflow.elastic.service.interfaces.IElasticTaskService;
+import com.netgrif.workflow.petrinet.domain.dataset.TaskField;
 import com.netgrif.workflow.petrinet.domain.events.EventType;
+import com.netgrif.workflow.workflow.domain.TaskPair;
 import com.netgrif.workflow.workflow.web.requestbodies.TaskSearchRequest;
 import com.netgrif.workflow.event.events.task.*;
 import com.netgrif.workflow.petrinet.domain.*;
@@ -764,11 +766,22 @@ public class TaskService implements ITaskService {
         Task savedTask = save(task);
 
         useCase.addTask(savedTask);
+        resolveTaskRefs(useCase);
         useCase = workflowService.save(useCase);
 
         publisher.publishEvent(new CreateTaskEvent(savedTask, useCase));
 
         return savedTask;
+    }
+
+    private void resolveTaskRefs(Case useCase) {
+        useCase.getPetriNet().getDataSet().forEach((key, field) -> {
+            if (field instanceof TaskField && ((TaskField) field).getDefaultValue() != null && !((TaskField) field).getDefaultValue().isEmpty()) {
+                Optional<TaskPair> taskPairOptional = useCase.getTasks().stream().filter(t ->
+                        t.getTransition().equals(((TaskField) field).getDefaultValue().get(0))).findFirst();
+                taskPairOptional.ifPresent(taskPair -> useCase.getDataField(key).setValue(Collections.singletonList(taskPair.getTask())));
+            }
+        });
     }
 
     private Page<Task> loadUsers(Page<Task> tasks) {
