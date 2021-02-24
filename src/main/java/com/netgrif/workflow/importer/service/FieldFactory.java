@@ -9,6 +9,9 @@ import com.netgrif.workflow.petrinet.domain.dataset.*;
 import com.netgrif.workflow.petrinet.domain.views.View;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.DataField;
+import com.netgrif.workflow.workflow.domain.TaskPair;
+import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDate;
@@ -21,6 +24,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @org.springframework.stereotype.Component
+@Slf4j
 public final class FieldFactory {
 
     @Autowired
@@ -116,7 +120,7 @@ public final class FieldFactory {
             }
         }
         if (data.getInit() != null && !data.getInit().isEmpty() && field instanceof FieldWithDefault) {
-            setFieldDefaultValue((FieldWithDefault) field, data.getInit().get(0));
+            setFieldDefaultValue((FieldWithDefault) field, data.getInit().get(0), importer);
         }
 
         if (data.getFormat() != null) {
@@ -250,7 +254,7 @@ public final class FieldFactory {
         }
     }
 
-    private void setFieldDefaultValue(FieldWithDefault field, String defaultValue) {
+    private void setFieldDefaultValue(FieldWithDefault field, String defaultValue, Importer importer) {
         switch (field.getType()) {
             case DATETIME:
                 field.setDefaultValue(parseDateTime(defaultValue));
@@ -275,6 +279,12 @@ public final class FieldFactory {
                 break;
             case FILELIST:
                 ((FileListField) field).setDefaultValue(defaultValue);
+                break;
+            case TASK_REF:
+                if (importer.getDocument().getTransition().stream().anyMatch(t -> t.getId().equals(defaultValue)))
+                    ((TaskField) field).setDefaultValue(defaultValue);
+                else
+                    log.warn("There is no transition with id [" + defaultValue + "]");
                 break;
             default:
                 field.setDefaultValue(defaultValue);
