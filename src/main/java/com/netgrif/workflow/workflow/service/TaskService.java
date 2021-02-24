@@ -767,22 +767,11 @@ public class TaskService implements ITaskService {
         Task savedTask = save(task);
 
         useCase.addTask(savedTask);
-        resolveTaskRefs(useCase);
         useCase = workflowService.save(useCase);
 
         publisher.publishEvent(new CreateTaskEvent(savedTask, useCase));
 
         return savedTask;
-    }
-
-    private void resolveTaskRefs(Case useCase) {
-        useCase.getPetriNet().getDataSet().forEach((key, field) -> {
-            if (field instanceof TaskField && ((TaskField) field).getDefaultValue() != null && !((TaskField) field).getDefaultValue().isEmpty()) {
-                Optional<TaskPair> taskPairOptional = useCase.getTasks().stream().filter(t ->
-                        t.getTransition().equals(((TaskField) field).getDefaultValue().get(0))).findFirst();
-                taskPairOptional.ifPresent(taskPair -> useCase.getDataField(key).setValue(Collections.singletonList(taskPair.getTask())));
-            }
-        });
     }
 
     private Page<Task> loadUsers(Page<Task> tasks) {
