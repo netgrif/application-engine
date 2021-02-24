@@ -1,5 +1,6 @@
 package com.netgrif.workflow.configuration.security;
 
+import com.netgrif.workflow.auth.service.UserService;
 import com.netgrif.workflow.auth.domain.*;
 import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.configuration.security.jwt.IJwtService;
@@ -60,7 +61,7 @@ public class PublicAuthenticationFilter extends OncePerRequestFilter {
 
     private void authenticate(HttpServletRequest request, String jwtToken){
         AnonymousAuthenticationToken authRequest = new AnonymousAuthenticationToken(
-                "anonymousUser",
+                UserProperties.ANONYMOUS_AUTH_KEY,
                 jwtService.getLoggedUser(jwtToken, this.anonymousRole),
                 Collections.singleton(this.anonymousRole)
         );
