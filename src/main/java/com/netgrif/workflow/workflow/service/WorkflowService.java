@@ -369,8 +369,11 @@ public class WorkflowService implements IWorkflowService {
                 Optional<TaskPair> taskPairOptional = useCase.getTasks().stream().filter(t ->
                         t.getTransition().equals(((TaskField) field).getDefaultValue().get(0))).findFirst();
                 taskPairOptional.ifPresent(taskPair -> useCase.getDataField(key).setValue(Collections.singletonList(taskPair.getTask())));
+            } else if (field instanceof TaskField && (((TaskField) field).getDefaultValue() == null || !((TaskField) field).getDefaultValue().isEmpty())) {
+                useCase.getDataField(key).setValue(new ArrayList<>());
             }
         });
+        save(useCase);
     }
 
     private void setImmediateDataFieldsReadOnly(Case useCase) {
