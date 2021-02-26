@@ -93,6 +93,9 @@ public class Importer {
     @Autowired
     private FileStorageConfiguration fileStorageConfiguration;
 
+    @Autowired
+    private ComponentFactory componentFactory;
+
     @Transactional
     public Optional<PetriNet> importPetriNet(InputStream xml) throws MissingPetriNetMetaDataException {
         try {
@@ -624,7 +627,7 @@ public class Importer {
         if((dataRef.getComponent()) == null)
             component = getField(dataRef.getId()).getComponent();
         else
-            component = new Component(dataRef.getComponent().getName(), ComponentFactory.buildPropertyMap(dataRef.getComponent().getProperty()));
+            component = componentFactory.buildComponent(dataRef.getComponent());
         transition.addDataSet(fieldId, null, null, null, component);
     }
 
