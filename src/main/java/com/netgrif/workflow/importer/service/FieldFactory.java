@@ -129,7 +129,7 @@ public final class FieldFactory {
         }
 
         if (data.getComponent() != null) {
-            Component component = componentFactory.buildComponent(data);
+            Component component = componentFactory.buildComponent(data.getComponent());
             field.setComponent(component);
         }
 
