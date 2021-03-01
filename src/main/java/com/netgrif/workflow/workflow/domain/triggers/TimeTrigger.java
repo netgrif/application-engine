@@ -18,9 +18,4 @@ public abstract class TimeTrigger extends Trigger {
         super();
         this.timeString = timeString;
     }
-
-    @Override
-    public Trigger clone() {
-        return new DelayTimeTrigger(timeString);
-    }
 }
