@@ -30,8 +30,6 @@ import static org.springframework.security.test.web.servlet.setup.SecurityMockMv
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
-
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles(["test"])
 @SpringBootTest(
@@ -164,7 +162,7 @@ class CaseSearchTest {
                 .with(csrf()))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(content().contentType("application/hal+json;charset=UTF-8"))
+                .andExpect(content().contentType("application/hal+json"))
                 .andExpect(content().string(containsString("_links")))
                 .andExpect(content().string(containsString("cases")))
                 .andExpect(content().string(containsString(expect)))
@@ -174,7 +172,8 @@ class CaseSearchTest {
 
     String buildRequestBody(String process, String fullText) {
         def map = [
-                "petriNet": [
+
+                "process": [
                         "identifier": process
                 ],
                 "fullText": fullText
@@ -184,3 +183,5 @@ class CaseSearchTest {
         return mapper.writeValueAsString(map)
     }
 }
+
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
