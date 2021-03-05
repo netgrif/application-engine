@@ -137,10 +137,7 @@ public class TaskService implements ITaskService {
         outcome.add(dataService.runActions(transition.getPostAssignActions(), useCase.getStringId(), task, transition));
         useCase = evaluateRules(useCase.getStringId(), task, EventType.ASSIGN, EventPhase.POST);
 
-        if(user instanceof AnonymousUser)
-            addTaskStateInformationToPublicEventOutcome(outcome, task, user);
-        else
-            addTaskStateInformationToEventOutcome(outcome, task);
+        addTaskStateInformationToEventOutcome(outcome, task);
 
         publisher.publishEvent(new UserAssignTaskEvent(user, task, useCase));
         log.info("[" + useCase.getStringId() + "]: Task [" + task.getTitle() + "] in case [" + useCase.getTitle() + "] assigned to [" + user.getEmail() + "]");
@@ -375,16 +372,6 @@ public class TaskService implements ITaskService {
         outcome.setTaskId(task.getStringId());
     }
 
-    protected void addTaskStateInformationToPublicEventOutcome(EventOutcome outcome, Task task, User user) {
-        Optional<Task> taskOptional = taskRepository.findById(task.getStringId());
-        if (!taskOptional.isPresent())
-            return;
-        if (user != null)
-            outcome.setAssignee(user);
-        outcome.setStartDate(task.getStartDate());
-        outcome.setFinishDate(task.getFinishDate());
-    }
-
     /**
      * Reloads all unassigned tasks of given case:
      * <table border="1">
@@ -580,8 +567,7 @@ public class TaskService implements ITaskService {
         com.querydsl.core.types.Predicate searchPredicate = searchService.buildQuery(requests, user, locale, isIntersection);
         if(searchPredicate != null) {
             Page<Task> page = taskRepository.findAll(searchPredicate, pageable);
-            if (!user.isAnonymous())
-                page = loadUsers(page);
+            page = loadUsers(page);
             page = dataService.setImmediateFields(page);
             return page;
         } else {
@@ -809,7 +795,7 @@ public class TaskService implements ITaskService {
 
     private void setUser(Task task) {
         if (task.getUserId() != null && userService.getAnonymousLogged().isAnonymous()){
-            task.setUser(userService.getAnonymousLogged().transformToAnonymousUser());
+            task.setUser((AnonymousUser) userService.findById(task.getUserId(), true));
         } else if (task.getUserId() != null)
             task.setUser(userService.findById(task.getUserId(), true));
     }
