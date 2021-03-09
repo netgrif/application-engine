@@ -2,10 +2,13 @@ package com.netgrif.workflow.workflow.web.responsebodies;
 
 import com.fasterxml.jackson.annotation.JsonRootName;
 import com.netgrif.workflow.auth.domain.Author;
+import com.netgrif.workflow.elastic.web.requestbodies.CaseSearchRequest;
+import com.netgrif.workflow.elastic.web.requestbodies.ElasticTaskSearchRequest;
 import com.netgrif.workflow.workflow.domain.MergeFilterOperation;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Locale;
 
 @Data
@@ -26,7 +29,9 @@ public class Filter {
 
     private String type;
 
-    private String query;
+    private List<CaseSearchRequest> caseFilterBodies;
+
+    private List<ElasticTaskSearchRequest> taskFilterBodies;
 
     private MergeFilterOperation mergeOperation;
 
@@ -37,9 +42,16 @@ public class Filter {
         this.visibility = filter.getVisibility();
         this.author = filter.getAuthor();
         this.created = filter.getCreated();
-        this.type = filter.getType();
-        this.query = filter.getQuery();
+        this.type = filter.getType().getStringType();
         this.mergeOperation = filter.getMergeOperation();
+        switch (filter.getType()) {
+            case CASE:
+                this.caseFilterBodies = filter.getCaseFilterBodies();
+                break;
+            case TASK:
+                this.taskFilterBodies = filter.getTaskFilterBodies();
+                break;
+        }
     }
 
 
