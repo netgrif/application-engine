@@ -3,6 +3,7 @@ package com.netgrif.workflow.workflow.web;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.auth.domain.User;
+import com.netgrif.workflow.auth.service.UserService;
 import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.petrinet.domain.DataGroup;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldByFileFieldContainer;
@@ -51,7 +52,7 @@ public class PublicTaskController extends AbstractTaskController {
 
     private final IDataService dataService;
 
-    private final IUserService userService;
+    final IUserService userService;
 
     public PublicTaskController(ITaskService taskService, IDataService dataService, IUserService userService) {
         super(taskService, dataService, null);
@@ -66,6 +67,7 @@ public class PublicTaskController extends AbstractTaskController {
         return this.taskService.findAllByCase(caseId, locale);
     }
 
+    @PreAuthorize("@taskAuthorizationService.canCallAssign(@userService.getAnonymousLogged(), #taskId)")
     @GetMapping(value = "/assign/{id}", produces = MediaTypes.HAL_JSON_VALUE)
     @ApiOperation(value = "Assign task", notes = "Caller must be able to perform the task, or must be an ADMIN")
     @ApiResponses({@ApiResponse(
@@ -81,6 +83,7 @@ public class PublicTaskController extends AbstractTaskController {
         return super.assign(loggedUser, taskId, locale);
     }
 
+    @PreAuthorize("@taskAuthorizationService.canCallFinish(@userService.getAnonymousLogged(), #taskId)")
     @GetMapping(value = "/finish/{id}", produces = MediaTypes.HAL_JSON_VALUE)
     @ApiOperation(value = "Finish task", notes = "Caller must be assigned to the task, or must be an ADMIN")
     @ApiResponses({@ApiResponse(
@@ -96,6 +99,7 @@ public class PublicTaskController extends AbstractTaskController {
         return super.finish(loggedUser, taskId, locale);
     }
 
+    @PreAuthorize("@taskAuthorizationService.canCallCancel(@userService.getAnonymousLogged(), #taskId)")
     @GetMapping(value = "/cancel/{id}", produces = MediaTypes.HAL_JSON_VALUE)
     @ApiOperation(value = "Cancel task", notes = "Caller must be assigned to the task, or must be an ADMIN")
     @ApiResponses({@ApiResponse(
@@ -117,6 +121,7 @@ public class PublicTaskController extends AbstractTaskController {
         return super.getData(taskId, locale);
     }
 
+    @PreAuthorize("@taskAuthorizationService.canCallSaveData(@userService.getAnonymousLogged(), #taskId)")
     @PostMapping(value = "/{id}/data", consumes = "application/json;charset=UTF-8", produces = "application/json;charset=UTF-8")
     @ApiOperation(value = "Set task data", notes = "Caller must be assigned to the task, or must be an ADMIN")
     @ApiResponses({@ApiResponse(
@@ -131,6 +136,7 @@ public class PublicTaskController extends AbstractTaskController {
         return super.setData(taskId, dataBody);
     }
 
+    @PreAuthorize("@taskAuthorizationService.canCallSaveFile(@userService.getAnonymousLogged(), #taskId)")
     @ApiOperation(value = "Upload file into the task",
             notes = "Caller must be assigned to the task, or must be an ADMIN")
     @RequestMapping(value = "/{id}/file/{field}", method = RequestMethod.POST, produces = MediaTypes.HAL_JSON_VALUE)
@@ -165,6 +171,7 @@ public class PublicTaskController extends AbstractTaskController {
         return super.getFilePreview(taskId, fieldId);
     }
 
+    @PreAuthorize("@taskAuthorizationService.canCallSaveFile(@userService.getAnonymousLogged(), #taskId)")
     @ApiOperation(value = "Upload multiple files into the task",
             notes = "Caller must be assigned to the task, or must be an ADMIN")
     @RequestMapping(value = "/{id}/files/{field}", method = RequestMethod.POST, produces = MediaTypes.HAL_JSON_VALUE)
@@ -199,6 +206,6 @@ public class PublicTaskController extends AbstractTaskController {
     @ApiOperation(value = "Generic task search on Mongo database")
     @PostMapping(value = "/search", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public PagedResources<LocalisedTaskResource> search(Pageable pageable, @RequestBody SingleTaskSearchRequestAsList searchBody, @RequestParam(defaultValue = "OR") MergeFilterOperation operation, PagedResourcesAssembler<com.netgrif.workflow.workflow.domain.Task> assembler, Locale locale) {
-        return super.search(userService.getAnonymousLogged(), pageable, searchBody, operation, assembler, locale);
+        return super.searchPublic(userService.getAnonymousLogged(), pageable, searchBody, operation, assembler, locale);
     }
 }

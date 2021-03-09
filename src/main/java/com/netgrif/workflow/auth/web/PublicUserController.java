@@ -1,13 +1,11 @@
 package com.netgrif.workflow.auth.web;
 
-import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.auth.web.requestbodies.UserSearchRequestBody;
 import com.netgrif.workflow.auth.web.responsebodies.IUserFactory;
 import com.netgrif.workflow.auth.web.responsebodies.UserResource;
 import com.netgrif.workflow.auth.web.responsebodies.UserResourceAssembler;
-import com.netgrif.workflow.workflow.web.PublicAbstractController;
 import com.netgrif.workflow.workflow.web.responsebodies.ResourceLinkAssembler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -23,7 +21,6 @@ import org.springframework.hateoas.MediaTypes;
 import org.springframework.hateoas.PagedResources;
 import org.springframework.hateoas.mvc.ControllerLinkBuilder;
 import org.springframework.http.MediaType;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Provider;
