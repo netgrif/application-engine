@@ -52,7 +52,7 @@ public interface IWorkflowService {
 
     long count(Map<String, Object> request, LoggedUser user, Locale locale);
 
-//    List<Case> getCaseFieldChoices(Pageable pageable, String caseId, String fieldId);
+//    List<Case> getCaseFi  eldChoices(Pageable pageable, String caseId, String fieldId);
 
     boolean removeTasksFromCase(Iterable<? extends Task> tasks, String caseId);
 
