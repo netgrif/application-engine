@@ -224,7 +224,7 @@ public class NextGroupService implements INextGroupService {
                 .map(s -> Long.parseLong(s.toString()))
                 .collect(Collectors.toSet());
         users.remove(user.getId());
-        users.remove(userService.getLoggedOrSystem().getId());
+        users.remove(userService.getSystem().getId());
         return users;
     }
 
