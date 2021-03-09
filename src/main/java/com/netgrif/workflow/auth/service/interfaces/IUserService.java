@@ -22,7 +22,6 @@ public interface IUserService {
 
     User update(User user, UpdateUserRequest updates);
 
-//    Member upsertGroupMember(User user);
 
     User findById(Long id, boolean small);
 
@@ -56,9 +55,9 @@ public interface IUserService {
 
     User addRole(User user, String roleStringId);
 
-//    Page<User> searchAllCoMembers(String query, LoggedUser principal, Boolean small, Pageable pageable);
+    Page<User> searchAllCoMembers(String query, LoggedUser principal, Boolean small, Pageable pageable);
 
     void deleteUser(User user);
 
-//    Page<User> searchAllCoMembers(String query, List<String> roles, List<String> negateRoleIds, LoggedUser principal, Boolean small, Pageable pageable);
+    Page<User> searchAllCoMembers(String query, List<String> roles, List<String> negateRoleIds, LoggedUser principal, Boolean small, Pageable pageable);
 }

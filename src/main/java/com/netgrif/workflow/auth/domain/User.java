@@ -88,11 +88,6 @@ public class User {
     @Setter
     private Set<ProcessRole> processRoles;
 
-//    @Transient
-//    @Getter
-//    @Setter
-//    private Set<Group> groups;
-
     @Transient
     @Getter
     @Setter
@@ -104,7 +99,6 @@ public class User {
     private boolean anonymous;
 
     public User() {
-//        groups = new HashSet<>();
         authorities = new HashSet<>();
         nextGroups = new HashSet<>();
         userProcessRoles = new HashSet<>();
@@ -152,9 +146,9 @@ public class User {
         return name + " " + surname;
     }
 
-//    public void addGroup(Group group) {
-//        this.groups.add(group);
-//    }
+    public void addGroup(String group) {
+        this.nextGroups.add(group);
+    }
 
     public LoggedUser transformToLoggedUser() {
         LoggedUser loggedUser = new LoggedUser(this.getId(), this.getEmail(), this.getPassword(), this.getAuthorities());
@@ -162,9 +156,8 @@ public class User {
         loggedUser.setAnonymous(this.anonymous);
         if (!this.getUserProcessRoles().isEmpty())
             loggedUser.parseProcessRoles(this.getUserProcessRoles());
-//        if (!this.getGroups().isEmpty())
-//            loggedUser.parseGroups(this.getGroups());
-
+        if (!this.getNextGroups().isEmpty())
+            loggedUser.getGroups();
         return loggedUser;
     }
 
@@ -183,7 +176,7 @@ public class User {
                 ", authorities=" + authorities +
                 ", userProcessRoles=" + userProcessRoles +
                 ", processRoles=" + processRoles +
-//                ", groups=" + groups +
+                ", groups=" + nextGroups +
                 '}';
     }
 

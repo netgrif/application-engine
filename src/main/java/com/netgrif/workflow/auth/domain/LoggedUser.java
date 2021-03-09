@@ -1,6 +1,5 @@
 package com.netgrif.workflow.auth.domain;
 
-//import com.netgrif.workflow.orgstructure.domain.Group;
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRole;
 import lombok.Getter;
 import lombok.Setter;
@@ -26,7 +25,7 @@ public class LoggedUser extends org.springframework.security.core.userdetails.Us
 
     @Getter
     @Setter
-    private Set<Long> groups;
+    private Set<String> groups;
 
     @Getter
     @Setter
@@ -43,9 +42,6 @@ public class LoggedUser extends org.springframework.security.core.userdetails.Us
         this.groups = new HashSet<>();
     }
 
-//    public void parseGroups(Iterable<Group> groups) {
-//        groups.forEach(org -> this.groups.add(org.getId()));
-//    }
 
     public void parseProcessRoles(Set<UserProcessRole> processRoles) {
         processRoles.forEach(role -> this.processRoles.add(role.getRoleId()));
@@ -68,7 +64,7 @@ public class LoggedUser extends org.springframework.security.core.userdetails.Us
         user.setPassword(getPassword());
         user.setState(UserState.ACTIVE);
         user.setAuthorities(getAuthorities().stream().map(a -> (Authority) a).collect(Collectors.toSet()));
-//        user.setGroups(groups.stream().map(Group::new).collect(Collectors.toSet()));
+        user.setNextGroups(groups.stream().map(String::new).collect(Collectors.toSet()));
         user.setProcessRoles(processRoles.stream().map(roleId -> {
             ProcessRole role = new ProcessRole();
             role.set_id(roleId);

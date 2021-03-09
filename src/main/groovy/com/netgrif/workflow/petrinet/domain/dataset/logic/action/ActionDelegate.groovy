@@ -12,11 +12,7 @@ import com.netgrif.workflow.mail.domain.SimpleMailDraft
 import com.netgrif.workflow.mail.domain.TypedMailDraft
 import com.netgrif.workflow.mail.interfaces.IMailAttemptService
 import com.netgrif.workflow.mail.interfaces.IMailService
-//import com.netgrif.workflow.orgstructure.domain.Group
-//import com.netgrif.workflow.orgstructure.domain.Member
 import com.netgrif.workflow.orgstructure.groups.interfaces.INextGroupService
-//import com.netgrif.workflow.orgstructure.service.GroupService
-//import com.netgrif.workflow.orgstructure.service.MemberService
 import com.netgrif.workflow.pdf.generator.config.PdfResource
 import com.netgrif.workflow.pdf.generator.service.interfaces.IPdfGenerator
 import com.netgrif.workflow.petrinet.domain.I18nString
@@ -81,12 +77,6 @@ class ActionDelegate {
 
     @Autowired
     AsyncRunner async
-//
-//    @Autowired
-//    GroupService groupService
-//
-//    @Autowired
-//    MemberService memberService
 
     @Autowired
     IPdfGenerator pdfGenerator

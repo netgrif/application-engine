@@ -4,9 +4,7 @@ import com.netgrif.workflow.auth.domain.*
 import com.netgrif.workflow.auth.service.interfaces.IAuthorityService
 import com.netgrif.workflow.auth.service.interfaces.IUserProcessRoleService
 import com.netgrif.workflow.auth.service.interfaces.IUserService
-//import com.netgrif.workflow.orgstructure.domain.Member
-//import com.netgrif.workflow.orgstructure.service.IGroupService
-//import com.netgrif.workflow.orgstructure.service.IMemberService
+import com.netgrif.workflow.orgstructure.groups.interfaces.INextGroupService
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -28,19 +26,14 @@ class SuperCreator extends AbstractOrderedCommandLineRunner {
 
     @Autowired
     private IUserService userService
-//
-//    @Autowired
-//    private IMemberService memberService
-//
-//    @Autowired
-//    private IGroupService groupService
+
+    @Autowired
+    private INextGroupService groupService
 
     @Value('${admin.password}')
     private String superAdminPassword
 
     private User superUser
-//
-//    private Member superMember
 
     @Override
     void run(String... strings) {
@@ -62,30 +55,28 @@ class SuperCreator extends AbstractOrderedCommandLineRunner {
                     state: UserState.ACTIVE,
                     authorities: [adminAuthority, systemAuthority] as Set<Authority>,
                     userProcessRoles: userProcessRoleService.findAll() as Set<UserProcessRole>))
-//            this.superMember = memberService.findByEmail(this.superUser.email)
             log.info("Super user created")
         } else {
             log.info("Super user detected")
             this.superUser = superUser
-//            this.superMember = memberService.findByEmail(this.superUser.email)
         }
 
         return this.superUser
     }
-//TODO: Groupy
+
     void setAllToSuperUser() {
-//        setAllGroups()
+        setAllGroups()
         setAllProcessRoles()
         setAllAuthorities()
         log.info("Super user updated")
     }
 
-//    void setAllGroups() {
-//        groupService.findAll().each {
-//            it.addMember(superMember)
-//        }
-//        memberService.save(superMember)
-//    }
+
+    void setAllGroups() {
+        groupService.findAllGroups().each {
+            groupService.addUser(superUser, it)
+        }
+    }
 
     void setAllProcessRoles() {
         superUser.setUserProcessRoles(userProcessRoleService.findAll() as Set<UserProcessRole>)
