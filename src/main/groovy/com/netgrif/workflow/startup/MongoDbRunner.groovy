@@ -41,7 +41,5 @@ class MongoDbRunner extends AbstractOrderedCommandLineRunner {
             log.info("Dropping Mongo database ${host}:${port}/${name}")
             mongoTemplate.getDb().drop()
         }
-
-        repository.save(new Filter(title: new I18nString("title"), description: new I18nString("desc")))
     }
 }
