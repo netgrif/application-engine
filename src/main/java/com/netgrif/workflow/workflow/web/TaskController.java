@@ -55,17 +55,8 @@ public class TaskController extends AbstractTaskController {
 
     public static final Logger log = LoggerFactory.getLogger(TaskController.class);
 
-    private ITaskService taskService;
-
-    private IDataService dataService;
-
-    private IElasticTaskService searchService;
-
     public TaskController(ITaskService taskService, IDataService dataService, IElasticTaskService searchService) {
         super(taskService, dataService, searchService);
-        this.taskService = taskService;
-        this.dataService = dataService;
-        this.searchService = searchService;
     }
 
     @Override
