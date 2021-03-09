@@ -1,10 +1,12 @@
 package com.netgrif.workflow.workflow.service;
 
 
+import com.netgrif.workflow.auth.domain.Author;
 import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.auth.domain.throwable.UnauthorisedRequestException;
 import com.netgrif.workflow.petrinet.domain.I18nString;
 import com.netgrif.workflow.workflow.domain.Filter;
+import com.netgrif.workflow.workflow.domain.FilterType;
 import com.netgrif.workflow.workflow.domain.MergeFilterOperation;
 import com.netgrif.workflow.workflow.domain.repositories.FilterRepository;
 import com.netgrif.workflow.workflow.service.interfaces.IFilterService;
@@ -45,14 +47,19 @@ public class FilterService implements IFilterService {
 
     @Override
     public Filter saveFilter(CreateFilterBody newFilterBody, MergeFilterOperation operation, LoggedUser user) {
-        Filter filter = new Filter();
-        filter.setAuthor(user.transformToAuthor());
-        filter.setTitle(new I18nString(newFilterBody.getTitle()));
-        filter.setDescription(new I18nString(newFilterBody.getDescription()));
-        filter.setType(newFilterBody.getType());
-        filter.setVisibility(newFilterBody.getVisibility());
-        filter.setMergeOperation(operation);
-        filter.setQuery(newFilterBody.getQuery());
+        Filter filter;
+        Author author = user.transformToAuthor();
+        I18nString title = new I18nString(newFilterBody.getTitle());
+        I18nString desc = new I18nString(newFilterBody.getDescription());
+        FilterType type = FilterType.resolveType(newFilterBody.getType());
+        // TODO visibility
+        if (type == FilterType.CASE && newFilterBody.getCaseFilterBodies() != null) {
+            filter = Filter.createCaseFilter(title, desc, Filter.VISIBILITY_PUBLIC, author, newFilterBody.getMergeOperator(), newFilterBody.getCaseFilterBodies());
+        } else if (type == FilterType.TASK && newFilterBody.getTaskFilterBodies() != null) {
+            filter = Filter.createTaskFilter(title, desc, Filter.VISIBILITY_PUBLIC, author, newFilterBody.getMergeOperator(), newFilterBody.getTaskFilterBodies());
+        } else {
+            throw new IllegalArgumentException("Filter type must be either 'Task' or 'Case' and the corresponding filter bodies must be defined!");
+        }
 
         return repository.save(filter);
     }
