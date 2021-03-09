@@ -188,7 +188,7 @@ public class TaskService implements ITaskService {
             throw new IllegalArgumentException("Task with id=" + taskId + " is not assigned to any user.");
         }
         // TODO: 14. 4. 2017 replace with @PreAuthorize
-        if (!task.getUserId().equals(loggedUser.getId())) {
+        if (!task.getUserId().equals(loggedUser.getId()) && !loggedUser.isAnonymous()) {
             throw new IllegalArgumentException("User that is not assigned tried to finish task");
         }
 
@@ -794,9 +794,7 @@ public class TaskService implements ITaskService {
     }
 
     private void setUser(Task task) {
-        if (task.getUserId() != null && userService.getAnonymousLogged().isAnonymous()){
-            task.setUser((AnonymousUser) userService.findById(task.getUserId(), true));
-        } else if (task.getUserId() != null)
+        if (task.getUserId() != null)
             task.setUser(userService.findById(task.getUserId(), true));
     }
 }
