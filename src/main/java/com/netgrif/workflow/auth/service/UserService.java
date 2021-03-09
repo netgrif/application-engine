@@ -44,9 +44,6 @@ public class UserService implements IUserService {
     @Autowired
     private IUserProcessRoleService userProcessRoleService;
 
-//    @Autowired
-//    private IMemberService memberService;
-
     @Autowired
     private INextGroupService groupService;
 
@@ -59,8 +56,6 @@ public class UserService implements IUserService {
         User savedUser = userRepository.save(user);
         groupService.createGroup(user);
         groupService.addUserToDefaultGroup(user);
-//        savedUser.setGroups(user.getGroups());
-//        upsertGroupMember(savedUser);
         publisher.publishEvent(new UserRegistrationEvent(savedUser));
         return savedUser;
     }
@@ -82,15 +77,6 @@ public class UserService implements IUserService {
         user = userRepository.save(user);
         return user;
     }
-
-//    @Override
-//    public Member upsertGroupMember(User user) {
-//        Member member = memberService.findByEmail(user.getEmail());
-//        if (member == null)
-//            member = new Member(user.getId(), user.getName(), user.getSurname(), user.getEmail());
-//        member.setGroups(user.getGroups());
-//        return memberService.save(member);
-//    }
 
     @Override
     public void encodeUserPassword(User user) {
@@ -133,7 +119,7 @@ public class UserService implements IUserService {
     public User findById(Long id, boolean small) {
         Optional<User> user = userRepository.findById(id);
         if (!user.isPresent())
-            throw new IllegalArgumentException("Could not find user with id ["+id+"]");
+            throw new IllegalArgumentException("Could not find user with id [" + id + "]");
         if (!small) {
             loadGroups(user.get());
             return loadProcessRoles(user.get());
@@ -158,53 +144,48 @@ public class UserService implements IUserService {
         return users;
     }
 
-// TODO: NEEXISTUJE
     @Override
     public Page<User> findAllCoMembers(LoggedUser loggedUser, boolean small, Pageable pageable) {
-        // TODO: 8/27/18 make all pageable
-//        Set<Long> members = memberService.findAllCoMembersIds(loggedUser.getEmail());
-//        members.add(loggedUser.getId());
-        Page<User> users = userRepository.findAll(pageable);
+        Set<Long> members = groupService.getAllCoMembers(loggedUser.transformToUser());
+        members.add(loggedUser.getId());
+        Page<User> users = userRepository.findAllByIdInAndState(members, UserState.ACTIVE, pageable);
         if (!small)
             users.forEach(this::loadProcessRoles);
         return users;
     }
-// TODO: NEEXISTUJE
 
-//    @Override
-//    public Page<User> searchAllCoMembers(String query, LoggedUser loggedUser, Boolean small, Pageable pageable) {
-//        Set<Long> members = memberService.findAllCoMembersIds(loggedUser.getEmail());
-//        members.add(loggedUser.getId());
-//
-//        Page<User> users = userRepository.findAll(buildPredicate(members, query), pageable);
-//        if (!small)
-//            users.forEach(this::loadProcessRoles);
-//        return users;
-//    }
+    @Override
+    public Page<User> searchAllCoMembers(String query, LoggedUser loggedUser, Boolean small, Pageable pageable) {
+        Set<Long> members = groupService.getAllCoMembers(loggedUser.transformToUser());
+        members.add(loggedUser.getId());
 
-// TODO: NEEXISTUJE
+        Page<User> users = userRepository.findAll(buildPredicate(members, query), pageable);
+        if (!small)
+            users.forEach(this::loadProcessRoles);
+        return null;
+    }
 
-//    @Override
-//    public Page<User> searchAllCoMembers(String query, List<String> roleIds, List<String> negateRoleIds, LoggedUser loggedUser, Boolean small, Pageable pageable) {
-//        if ((roleIds == null || roleIds.isEmpty()) && (negateRoleIds == null || negateRoleIds.isEmpty()))
-//            return searchAllCoMembers(query, loggedUser, small, pageable);
-//
-//        if (negateRoleIds == null) {
-//            negateRoleIds = new ArrayList<>();
-//        }
-//
-//        Set<Long> members = memberService.findAllCoMembersIds(loggedUser.getEmail());
-//        members.add(loggedUser.getId());
-//        BooleanExpression predicate = buildPredicate(members, query);
-//        if (!(roleIds == null || roleIds.isEmpty())) {
-//            predicate = predicate.and(QUser.user.userProcessRoles.any().roleId.in(roleIds));
-//        }
-//        predicate = predicate.and(QUser.user.userProcessRoles.any().roleId.in(negateRoleIds).not());
-//        Page<User> users = userRepository.findAll(predicate, pageable);
-//        if (!small)
-//            users.forEach(this::loadProcessRoles);
-//        return users;
-//    }
+    @Override
+    public Page<User> searchAllCoMembers(String query, List<String> roleIds, List<String> negateRoleIds, LoggedUser loggedUser, Boolean small, Pageable pageable) {
+        if ((roleIds == null || roleIds.isEmpty()) && (negateRoleIds == null || negateRoleIds.isEmpty()))
+            return searchAllCoMembers(query, loggedUser, small, pageable);
+
+        if (negateRoleIds == null) {
+            negateRoleIds = new ArrayList<>();
+        }
+
+        Set<Long> members = groupService.getAllCoMembers(loggedUser.transformToUser());
+        members.add(loggedUser.getId());
+        BooleanExpression predicate = buildPredicate(members, query);
+        if (!(roleIds == null || roleIds.isEmpty())) {
+            predicate = predicate.and(QUser.user.userProcessRoles.any().roleId.in(roleIds));
+        }
+        predicate = predicate.and(QUser.user.userProcessRoles.any().roleId.in(negateRoleIds).not());
+        Page<User> users = userRepository.findAll(predicate, pageable);
+        if (!small)
+            users.forEach(this::loadProcessRoles);
+        return users;
+    }
 
     private BooleanExpression buildPredicate(Set<Long> members, String query) {
         BooleanExpression predicate = QUser.user
@@ -243,9 +224,9 @@ public class UserService implements IUserService {
         Optional<Authority> authority = authorityRepository.findById(authorityId);
 
         if (!user.isPresent())
-            throw new IllegalArgumentException("Could not find user with id ["+userId+"]");
+            throw new IllegalArgumentException("Could not find user with id [" + userId + "]");
         if (!authority.isPresent())
-            throw new IllegalArgumentException("Could not find authority with id ["+authorityId+"]");
+            throw new IllegalArgumentException("Could not find authority with id [" + authorityId + "]");
 
         user.get().addAuthority(authority.get());
         authority.get().addUser(user.get());
@@ -300,7 +281,7 @@ public class UserService implements IUserService {
         return user;
     }
 
-    private User loadGroups(User user){
+    private User loadGroups(User user) {
         if (user == null)
             return null;
         user.setNextGroups(this.groupService.getAllGroupsOfUser(user));

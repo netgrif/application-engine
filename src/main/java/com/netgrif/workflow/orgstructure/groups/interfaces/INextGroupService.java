@@ -52,4 +52,7 @@ public interface INextGroupService {
     String getGroupOwnerEmail(String groupId);
 
     Collection<String> getGroupsOwnerEmails(Collection<String> groupIds);
+
+    Set<Long> getAllCoMembers(User user);
+
 }

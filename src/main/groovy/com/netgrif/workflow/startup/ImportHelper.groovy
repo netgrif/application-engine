@@ -6,9 +6,7 @@ import com.netgrif.workflow.auth.domain.*
 import com.netgrif.workflow.auth.domain.repositories.UserProcessRoleRepository
 import com.netgrif.workflow.auth.service.interfaces.IAuthorityService
 import com.netgrif.workflow.auth.service.interfaces.IUserService
-//import com.netgrif.workflow.orgstructure.domain.Group
-//import com.netgrif.workflow.orgstructure.service.IGroupService
-//import com.netgrif.workflow.orgstructure.service.IMemberService
+import com.netgrif.workflow.orgstructure.groups.interfaces.INextGroupService
 import com.netgrif.workflow.petrinet.domain.PetriNet
 import com.netgrif.workflow.petrinet.domain.VersionType
 import com.netgrif.workflow.petrinet.domain.dataset.Field
@@ -79,35 +77,17 @@ class ImportHelper {
     @Autowired
     private SuperCreator superCreator
 
-//    @Autowired
-//    private IGroupService groupService
-//
-//    @Autowired
-//    private IMemberService memberService
-
     @Autowired
     private IDataService dataService
 
     @Autowired
     private IWorkflowService workflowService
 
+    @Autowired
+    private INextGroupService groupService;
+
     private final ClassLoader loader = ImportHelper.getClassLoader()
 
-//    @SuppressWarnings("GroovyAssignabilityCheck")
-//    Map<String, Group> createGroups(Map<String, String> groups) {
-//        HashMap<String, Group> groupsMap = new HashMap<>()
-//        groups.each { groupEntry ->
-//            groupsMap.put(groupEntry.key, createGroup(groupEntry.value))
-//        }
-//
-//        log.info("Created ${groupsMap.size()} groups")
-//        return groupsMap
-//    }
-
-//    Group createGroup(String name) {
-//        log.info("Creating Group $name")
-//        return groupService.save(new Group(name))
-//    }
 
     @SuppressWarnings("GroovyAssignabilityCheck")
     Map<String, Authority> createAuthorities(Map<String, String> authorities) {
