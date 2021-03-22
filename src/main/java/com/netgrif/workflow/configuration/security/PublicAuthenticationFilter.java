@@ -1,6 +1,5 @@
 package com.netgrif.workflow.configuration.security;
 
-import com.netgrif.workflow.auth.service.UserService;
 import com.netgrif.workflow.auth.domain.*;
 import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.configuration.security.jwt.IJwtService;
