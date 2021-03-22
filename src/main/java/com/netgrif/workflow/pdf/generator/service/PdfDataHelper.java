@@ -70,6 +70,8 @@ public class PdfDataHelper implements IPdfDataHelper {
 
     @Override
     public void setTaskId(Case useCase, Transition transition) {
+        if (transition.getLayout() != null && transition.getLayout().getCols() != null)
+            resource.setFormGridCols(transition.getLayout().getCols());
         QTask qTask = new QTask("task");
         this.taskId = taskService.searchOne(qTask.transitionId.eq(transition.getStringId()).and(qTask.caseId.eq(useCase.get_id().toString()))).getStringId();
     }
@@ -140,7 +142,6 @@ public class PdfDataHelper implements IPdfDataHelper {
             switch (field.getType()) {
                 case BUTTON:
                 case TASK_REF:
-                case FILE:
                     break;
                 case ENUMERATION_MAP:
                     pdfField = createEnumMapField(dataGroup, (LocalisedEnumerationMapField) field);
