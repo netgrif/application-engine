@@ -1,5 +1,5 @@
 <a name="https://netgrif.atlassian.net/projects/NAE/versions/10860/tab/release-report-all-issues"></a>
-## 5.1.0 - Black Zinc (3.3.2021) 
+## 5.1.0 - Black Zinc (3.3.2021)
 ### Bug fixes
 * [NAE-1169](https://netgrif.atlassian.net/browse/NAE-1169) - Chyba v TaskPanel
 * [NAE-1183](https://netgrif.atlassian.net/browse/NAE-1183) - Race condition pri prekliknuti z otvoreneho tasku na zatvoreny task
@@ -18,6 +18,39 @@
 * [NAE-1235](https://netgrif.atlassian.net/browse/NAE-1235) - MailDraft improvement
 * [NAE-1236](https://netgrif.atlassian.net/browse/NAE-1236) - Anonym user persistance
 * [NAE-1250](https://netgrif.atlassian.net/browse/NAE-1250) - TaskRef of the same case propagation
+
+### Features
+None
+
+<a name="https://netgrif.atlassian.net/projects/NAE/versions/10864/tab/release-report-all-issues"></a>
+## 5.0.3 - Aqua Copper (09.02.2021)
+### Bug fixes
+None
+
+### Improvements
+None
+
+### Features
+None
+
+<a name="https://netgrif.atlassian.net/projects/NAE/versions/10863/tab/release-report-all-issues"></a>
+## 5.0.2 - Navy Lead (07.02.2021)
+### Bug fixes
+None
+
+### Improvements
+None
+
+### Features
+None
+
+<a name="https://netgrif.atlassian.net/projects/NAE/versions/10861/tab/release-report-all-issues"></a>
+## 5.0.1 - Teal Brass (04.02.2021)
+### Bug fixes
+None
+
+### Improvements
+None
 
 ### Features
 None
