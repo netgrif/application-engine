@@ -9,8 +9,7 @@ import com.netgrif.workflow.auth.service.interfaces.IUserService
 import com.netgrif.workflow.auth.web.requestbodies.NewUserRequest
 import com.netgrif.workflow.configuration.ApplicationContextProvider
 import com.netgrif.workflow.importer.service.FieldFactory
-import com.netgrif.workflow.mail.domain.SimpleMailDraft
-import com.netgrif.workflow.mail.domain.TypedMailDraft
+import com.netgrif.workflow.mail.domain.MailDraft
 import com.netgrif.workflow.mail.interfaces.IMailAttemptService
 import com.netgrif.workflow.mail.interfaces.IMailService
 import com.netgrif.workflow.orgstructure.domain.Group
@@ -750,11 +749,7 @@ class ActionDelegate {
         change useCase.getField(fileFieldId) value {new FileFieldValue(filename, storagePath)}
     }
 
-    void sendMail(TypedMailDraft mailDraft){
-        mailService.sendMail(mailDraft)
-    }
-
-    void sendMail(SimpleMailDraft mailDraft){
+    void sendMail(MailDraft mailDraft){
         mailService.sendMail(mailDraft)
     }
 

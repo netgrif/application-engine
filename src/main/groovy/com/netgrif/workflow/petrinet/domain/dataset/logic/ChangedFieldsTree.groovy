@@ -93,8 +93,10 @@ class ChangedFieldsTree extends CaseChangedFields {
                     if (it.taskId != this.taskId) {
                         substituteTaskRefFieldBehavior(changedFields.value, it.transition, it.taskId, this.transitionId)
                     }
-                    String prefix = caseFields.key == this.caseId ? "" : it.taskId + "-"
-                    localChanges.put(prefix + changedFields.key, changedFields.value)
+                    if (caseFields.key == this.caseId) {
+                        localChanges.put(changedFields.key, changedFields.value)
+                    }
+                    localChanges.put(it.taskId + "-" + changedFields.key, changedFields.value)
                 }
             }
             mergeChanges(result, localChanges)
