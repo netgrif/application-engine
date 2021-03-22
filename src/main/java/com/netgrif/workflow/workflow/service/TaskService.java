@@ -580,8 +580,7 @@ public class TaskService implements ITaskService {
         com.querydsl.core.types.Predicate searchPredicate = searchService.buildQuery(requests, user, locale, isIntersection);
         if(searchPredicate != null) {
             Page<Task> page = taskRepository.findAll(searchPredicate, pageable);
-            if (!user.isAnonymous())
-                page = loadUsers(page);
+            page = loadUsers(page);
             page = dataService.setImmediateFields(page);
             return page;
         } else {
