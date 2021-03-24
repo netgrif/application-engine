@@ -299,6 +299,13 @@ public class UserService implements IUserService {
     }
 
     @Override
+    public User removeRole(User user, String roleStringId) {
+        UserProcessRole role = userProcessRoleService.findByRoleId(roleStringId);
+        user.removeProcessRole(role);
+        return userRepository.save(user);
+    }
+
+    @Override
     public void deleteUser(User user) {
         if (!userRepository.findById(user.getId()).isPresent())
             throw new IllegalArgumentException("Could not find user with id [" + user.getId() + "]");
