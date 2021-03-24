@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://modeler.netgrif.com/petriflow_schema.xsd">
+    <id>role_test</id>
+    <initials>IMP</initials>
+    <title>role_test</title>
+    <role>
+        <id>first</id>
+        <title>first</title>
+    </role>
+    <role>
+        <id>second</id>
+        <title>first</title>
+    </role>
+    <role>
+        <id>third</id>
+        <title>first</title>
+    </role>
+    <transition>
+        <id>3</id>
+        <x>379</x>
+        <y>273</y>
+        <label>Datagroups</label>
+    </transition>
+</document>

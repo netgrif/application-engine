@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
@@ -45,5 +46,18 @@ public class UserProcessRole {
     public UserProcessRole(String roleId, String netId) {
         this.roleId = roleId;
         this.netId = netId;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        UserProcessRole that = (UserProcessRole) o;
+        return Objects.equals(id, that.id) && Objects.equals(roleId, that.roleId) && Objects.equals(netId, that.netId);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, roleId, netId);
     }
 }
