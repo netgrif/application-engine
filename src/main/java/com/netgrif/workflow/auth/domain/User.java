@@ -145,6 +145,10 @@ public class User {
         userProcessRoles.add(role);
     }
 
+    public void removeProcessRole(UserProcessRole role) {
+        userProcessRoles.remove(role);
+    }
+
     public String getFullName() {
         return name + " " + surname;
     }
