@@ -1,5 +1,5 @@
 <a name="https://netgrif.atlassian.net/projects/NAE/versions/10860/tab/release-report-all-issues"></a>
-## 5.1.0 - Black Zinc (3.3.2021)
+## 5.1.0 - Black Zinc (25.3.2021)
 ### Bug fixes
 * [NAE-1169](https://netgrif.atlassian.net/browse/NAE-1169) - Chyba v TaskPanel
 * [NAE-1183](https://netgrif.atlassian.net/browse/NAE-1183) - Race condition pri prekliknuti z otvoreneho tasku na zatvoreny task
@@ -9,6 +9,8 @@
 * [NAE-1227](https://netgrif.atlassian.net/browse/NAE-1227) - Update loggedOrSystem
 * [NAE-1237](https://netgrif.atlassian.net/browse/NAE-1237) - Asynchronous search tests fail randomly
 * [NAE-1257](https://netgrif.atlassian.net/browse/NAE-1257) - Time trigger exact broken
+* [NAE-1270](https://netgrif.atlassian.net/browse/NAE-1270) - Nie je možné opätovné nahratie dokumentu po jeho zmazaní
+* [NAE-1275](https://netgrif.atlassian.net/browse/NAE-1275) - MultichoiceMap init value
 
 ### Improvement
 * [NAE-854](https://netgrif.atlassian.net/browse/NAE-854) - Refactor of the nae configuration file (nae.json)
@@ -18,6 +20,39 @@
 * [NAE-1235](https://netgrif.atlassian.net/browse/NAE-1235) - MailDraft improvement
 * [NAE-1236](https://netgrif.atlassian.net/browse/NAE-1236) - Anonym user persistance
 * [NAE-1250](https://netgrif.atlassian.net/browse/NAE-1250) - TaskRef of the same case propagation
+
+### Features
+None
+
+<a name="https://netgrif.atlassian.net/projects/NAE/versions/10873/tab/release-report-all-issues"></a>
+## 5.0.7 (01.03.2021)
+### Bug fixes
+* [NAE-1257](https://netgrif.atlassian.net/browse/NAE-1257) - Time trigger exact broken
+
+### Improvements
+None
+
+### Features
+None
+
+<a name="https://netgrif.atlassian.net/projects/NAE/versions/10871/tab/release-report-all-issues"></a>
+## 5.0.6 (24.02.2021)
+### Bug fixes
+None
+
+### Improvements
+* [NAE-1250](https://netgrif.atlassian.net/browse/NAE-1250) - TaskRef of the same case propagation
+
+### Features
+None
+
+<a name="https://netgrif.atlassian.net/projects/NAE/versions/10870/tab/release-report-all-issues"></a>
+## 5.0.5 (19.02.2021)
+### Bug fixes
+None
+
+### Improvements
+* [NAE-1244](https://netgrif.atlassian.net/browse/NAE-1244) - Add button to immediate on panel
 
 ### Features
 None
