@@ -1,32 +1,20 @@
 <a name="https://netgrif.atlassian.net/projects/NAE/versions/10860/tab/release-report-all-issues"></a>
 ## 5.1.0 - Black Zinc (25.3.2021)
 ### Bug fixes
-* [NAE-867](https://netgrif.atlassian.net/browse/NAE-867) - Search ignores process versions
-* [NAE-1169](https://netgrif.atlassian.net/browse/NAE-1169) - Chyba v TaskPanel
-* [NAE-1183](https://netgrif.atlassian.net/browse/NAE-1183) - Race condition pri prekliknuti z otvoreneho tasku na zatvoreny task
-* [NAE-1198](https://netgrif.atlassian.net/browse/NAE-1198) - Na assign tasku sa nedoťahujú nové dáta, ak už bol task predtým assignuty
-* [NAE-1200](https://netgrif.atlassian.net/browse/NAE-1200) - Table mode broken after load
 * [NAE-1216](https://netgrif.atlassian.net/browse/NAE-1216) - Nesprávne zobrazenie FileListFieldValue vo vygenerovanom PDF
 * [NAE-1227](https://netgrif.atlassian.net/browse/NAE-1227) - Update loggedOrSystem
-* [NAE-1237](https://netgrif.atlassian.net/browse/NAE-1237) - Asynchronous search tests fail randomly
 * [NAE-1257](https://netgrif.atlassian.net/browse/NAE-1257) - Time trigger exact broken
-* [NAE-1270](https://netgrif.atlassian.net/browse/NAE-1270) - Nie je možné opätovné nahratie dokumentu po jeho zmazaní
 * [NAE-1275](https://netgrif.atlassian.net/browse/NAE-1275) - MultichoiceMap init value
 
 ### Improvement
-* [NAE-1040](https://netgrif.atlassian.net/browse/NAE-1040) - SearchService with variable base filter
-* [NAE-1129](https://netgrif.atlassian.net/browse/NAE-1129) - Add trackBy to data field ngFor
-* [NAE-1158](https://netgrif.atlassian.net/browse/NAE-1158) - Refactor factory services
 * [NAE-1217](https://netgrif.atlassian.net/browse/NAE-1217) - Upload file-ov na public view
-* [NAE-1233](https://netgrif.atlassian.net/browse/NAE-1233) - Add textElipsis on taskView
-* [NAE-1234](https://netgrif.atlassian.net/browse/NAE-1234) - Prevent ENOENT error during library build
 * [NAE-1235](https://netgrif.atlassian.net/browse/NAE-1235) - MailDraft improvement
 * [NAE-1236](https://netgrif.atlassian.net/browse/NAE-1236) - Anonym user persistance
 * [NAE-1240](https://netgrif.atlassian.net/browse/NAE-1240) - Add remove role to Action Delegate
 * [NAE-1250](https://netgrif.atlassian.net/browse/NAE-1250) - TaskRef of the same case propagation
 
 ### Features
-* [NAE-1226](https://netgrif.atlassian.net/browse/NAE-1226) - Frontend starter app
+None
 
 <a name="https://netgrif.atlassian.net/projects/NAE/versions/10873/tab/release-report-all-issues"></a>
 ## 5.0.7 (01.03.2021)
@@ -56,7 +44,7 @@ None
 None
 
 ### Improvements
-* [NAE-1244](https://netgrif.atlassian.net/browse/NAE-1244) - Add button to immediate on panel
+None
 
 ### Features
 None
