@@ -1,11 +1,11 @@
 package com.netgrif.workflow.configuration.security;
 
-import com.netgrif.workflow.auth.domain.Authority;
-import com.netgrif.workflow.auth.domain.LoggedUser;
+import com.netgrif.workflow.auth.domain.*;
 import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.configuration.security.jwt.IJwtService;
-import com.netgrif.workflow.petrinet.service.interfaces.IProcessRoleService;
+import io.jsonwebtoken.ExpiredJwtException;
 import lombok.extern.slf4j.Slf4j;
+import org.bson.types.ObjectId;
 import org.springframework.security.authentication.AnonymousAuthenticationProvider;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationDetailsSource;
@@ -20,10 +20,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 @Slf4j
 public class PublicAuthenticationFilter extends OncePerRequestFilter {
@@ -37,22 +34,23 @@ public class PublicAuthenticationFilter extends OncePerRequestFilter {
     private final String[] anonymousAccessUrls;
 
     private final IJwtService jwtService;
-    private final IProcessRoleService roleService;
+    private final IUserService userService;
 
     public PublicAuthenticationFilter(ProviderManager authenticationManager, AnonymousAuthenticationProvider provider,
-                                      Authority anonymousRole, String[] urls, IJwtService jwtService, IProcessRoleService roleService) {
+                                      Authority anonymousRole, String[] urls, IJwtService jwtService,
+                                      IUserService userService) {
         this.authenticationManager = authenticationManager;
         this.authenticationManager.getProviders().add(provider);
         this.anonymousRole = anonymousRole;
         this.anonymousAccessUrls = urls;
         this.jwtService = jwtService;
-        this.roleService = roleService;
+        this.userService = userService;
     }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         if (isPublicApi(request.getRequestURI())) {
-            String jwtToken = resolveValidToken(request);
+            String jwtToken = resolveValidToken(request, response);
             authenticate(request, jwtToken);
             response.setHeader(JWT_HEADER_NAME, BEARER + jwtToken);
             log.info("Anonymous user was authenticated.");
@@ -62,7 +60,7 @@ public class PublicAuthenticationFilter extends OncePerRequestFilter {
 
     private void authenticate(HttpServletRequest request, String jwtToken){
         AnonymousAuthenticationToken authRequest = new AnonymousAuthenticationToken(
-                "anonymousUser",
+                UserProperties.ANONYMOUS_AUTH_KEY,
                 jwtService.getLoggedUser(jwtToken, this.anonymousRole),
                 Collections.singleton(this.anonymousRole)
         );
@@ -71,7 +69,7 @@ public class PublicAuthenticationFilter extends OncePerRequestFilter {
         SecurityContextHolder.getContext().setAuthentication(authResult);
     }
 
-    private String resolveValidToken(HttpServletRequest request) {
+    private String resolveValidToken(HttpServletRequest request, HttpServletResponse response) {
         Map<String, Object> claims = new HashMap<>();
         String jwtHeader = request.getHeader(JWT_HEADER_NAME);
         String jwtToken;
@@ -84,7 +82,10 @@ public class PublicAuthenticationFilter extends OncePerRequestFilter {
             jwtToken = jwtHeader.replace(BEARER, "");
         }
 
-        if (jwtService.isExpired(jwtToken)) {
+        try {
+            jwtService.isExpired(jwtToken);
+        } catch (ExpiredJwtException e) {
+            claims = e.getClaims();
             resolveClaims(claims, request);
             jwtToken = jwtService.tokenFrom(claims);
         }
@@ -93,21 +94,33 @@ public class PublicAuthenticationFilter extends OncePerRequestFilter {
     }
 
     private void resolveClaims(Map<String, Object> claims, HttpServletRequest request) {
-        claims.put("user", createAnonymousUser(request));
+        LoggedUser loggedUser = createAnonymousUser(request);
+
+        if (claims.containsKey("user")) {
+            User user = userService.findByEmail((String)((LinkedHashMap)claims.get("user")).get("email"), false);
+            if (user != null)
+                loggedUser = user.transformToLoggedUser();
+        }
+
+        claims.put("user", loggedUser);
         claims.put("authorities", this.anonymousRole);
     }
 
     private LoggedUser createAnonymousUser(HttpServletRequest request) {
-        long hash = UUID.fromString(request.getSession().getId()).getMostSignificantBits() & Long.MAX_VALUE;
-        LoggedUser user = new LoggedUser(hash,
-                request.getRemoteAddr(),
-                "",
-                Collections.singleton(this.anonymousRole)
-        );
-        user.setFullName("Anonymous " + user.getId().toString());
-        user.setAnonymous(true);
-        user.setProcessRoles(Collections.singleton(roleService.defaultRole().getStringId()));
-        return user;
+        String hash = new ObjectId().toString();
+
+        AnonymousUser anonymousUser = (AnonymousUser) this.userService.findByEmail(hash + "@nae.com", false);
+
+        if (anonymousUser == null) {
+            anonymousUser = new AnonymousUser(hash + "@nae.com",
+                    "",
+                    "User",
+                    "Anonymous"
+            );
+            anonymousUser.setState(UserState.ACTIVE);
+            userService.saveNewAnonymous(anonymousUser);
+        }
+        return anonymousUser.transformToLoggedUser();
     }
 
     private boolean isPublicApi(String path) {
