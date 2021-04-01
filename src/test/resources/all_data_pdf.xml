@@ -43,7 +43,7 @@
         <id>password_dataref</id>
         <title>Password from dataRef</title>
     </data>
-    <data type="text" immediate="true">
+    <data type="text">
         <id>text_area</id>
         <title>Text area</title>
         <init>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque vitae magna in libero semper
@@ -56,7 +56,7 @@
         </component>
     </data>
 
-    <data type="enumeration" immediate="true">
+    <data type="enumeration">
         <id>enumeration</id>
         <title>Enumeration</title>
         <values>Alice</values>
@@ -64,7 +64,7 @@
         <values>Carol</values>
         <init>Bob</init>
     </data>
-    <data type="enumeration" immediate="true">
+    <data type="enumeration">
         <id>enumeration_autocomplete</id>
         <title>Enumeration autocomplete</title>
         <values>Alice</values>
@@ -75,7 +75,7 @@
             <name>autocomplete</name>
         </component>
     </data>
-    <data type="enumeration" immediate="true">
+    <data type="enumeration">
         <id>enumeration_list</id>
         <title>Enumeration list</title>
         <values>Alice</values>
@@ -98,7 +98,7 @@
         <init>bo</init>
     </data>
 
-    <data type="multichoice" immediate="true">
+    <data type="multichoice">
         <id>multichoice</id>
         <title>Multichoice</title>
         <values>Alice</values>
@@ -106,8 +106,7 @@
         <values>Carol</values>
         <init>Alice,Bob</init>
     </data>
-
-    <data type="multichoice" immediate="true">
+    <data type="multichoice">
         <id>multichoice_list</id>
         <title>Multichoice list</title>
         <values>Alice</values>
@@ -130,16 +129,15 @@
         <init>al, ca</init>
     </data>
 
-    <data type="boolean" immediate="true">
+    <data type="boolean">
         <id>boolean</id>
         <title>Boolean</title>
         <placeholder>True</placeholder>
     </data>
 
-    <data type="date" immediate="true">
+    <data type="date">
         <id>date</id>
         <title>Date</title>
-        <init>01.01.2019</init>
     </data>
 
     <data type="taskRef">
@@ -147,7 +145,7 @@
         <title>Task Ref</title>
     </data>
 
-    <data type="file" immediate="true">
+    <data type="file">
         <id>file</id>
         <title>File</title>
         <action trigger="set">
@@ -165,18 +163,17 @@
         <title>File List</title>
     </data>
 
-    <data type="user" immediate="true">
+    <data type="user">
         <id>user</id>
         <title>User</title>
     </data>
 
-    <data type="dateTime" immediate="true">
+    <data type="dateTime">
         <id>datetime</id>
         <title>Datetime</title>
-        <init>01.01.2019 20:00</init>
     </data>
 
-    <data type="button" immediate="true">
+    <data type="button">
         <id>button</id>
         <title>Button</title>
         <placeholder>Push</placeholder>
