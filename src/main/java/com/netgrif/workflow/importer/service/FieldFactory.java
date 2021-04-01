@@ -150,7 +150,7 @@ public final class FieldFactory {
         }
         MultichoiceMapField field = new MultichoiceMapField(choices);
         if (init!= null && !init.isEmpty()) {
-            field.setDefaultValue(new HashSet<>(init));
+            field.setDefaultValue(new HashSet<String>(Arrays.stream(init.get(0).split(",")).collect(Collectors.toList())));
         }
         return field;
     }
