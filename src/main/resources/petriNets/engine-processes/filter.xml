@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://modeler.netgrif.com/petriflow_schema.xsd">
+	<id>filter</id>
+	<initials>FTR</initials>
+	<title>Filter</title>
+	<icon>filter_alt</icon>
+	<defaultRole>true</defaultRole>
+	<transitionRole>false</transitionRole>
+	<!-- TRANSACTIONS -->
+	<!-- ROLES -->
+	<!-- PROCESS ROLE REFS -->
+	<!-- PROCESS USER REFS -->
+	<!-- DATA -->
+	<data type="filter" immediate="true">
+		<id>filter</id>
+		<title></title>
+	</data>
+	<!-- I18NS -->
+	<!-- TRANSITIONS -->
+	<transition>
+		<id>t1</id>
+		<x>560</x>
+		<y>260</y>
+		<layout>
+			<offset>0</offset>
+		</layout>
+		<label>Create new filter</label>
+		<dataRef>
+			<id>filter</id>
+			<logic>
+				<behavior>editable</behavior>
+			</logic>
+		</dataRef>
+	</transition>
+	<!-- PLACES -->
+	<!-- ARCS -->
+</document>
