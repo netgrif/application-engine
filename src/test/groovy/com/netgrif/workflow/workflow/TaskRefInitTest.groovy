@@ -50,10 +50,12 @@ class TaskRefInitTest {
     @Test
     void testInitValue() {
         Case aCase = helper.createCase("Test task ref init", net)
-        Task task = taskService.searchOne(QTask.task.caseTitle.eq("Test task ref init") & QTask.task.transitionId.eq("t1"))
+        Task task1 = taskService.searchOne(QTask.task.caseTitle.eq("Test task ref init") & QTask.task.transitionId.eq("t1"))
+        Task task2 = taskService.searchOne(QTask.task.caseTitle.eq("Test task ref init") & QTask.task.transitionId.eq("t3"))
 
-        assert ((List<String>)aCase.dataSet.get("taskRef_0").value).contains(task.stringId)
+        assert ((List<String>)aCase.dataSet.get("taskRef_0").value).containsAll(Arrays.asList(task1.stringId, task2.stringId))
         assert ((List<String>)aCase.dataSet.get("taskRef_1").value).isEmpty()
-        assert ((List<String>)aCase.dataSet.get("taskRef_2").value).contains(task.stringId)
+        assert ((List<String>)aCase.dataSet.get("taskRef_2").value).contains(task1.stringId) & ((List<String>)aCase.dataSet.get("taskRef_2").value).size() == 1
+        assert ((List<String>)aCase.dataSet.get("taskRef_3").value).isEmpty()
     }
 }
