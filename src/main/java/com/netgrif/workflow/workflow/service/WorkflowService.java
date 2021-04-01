@@ -364,17 +364,14 @@ public class WorkflowService implements IWorkflowService {
     }
 
     private void resolveTaskRefs(Case useCase) {
-        useCase.getPetriNet().getDataSet().forEach((key, field) -> {
-            if (field instanceof TaskField && ((TaskField) field).getDefaultValue() != null && !((TaskField) field).getDefaultValue().isEmpty()) {
+        useCase.getPetriNet().getDataSet().values().stream().filter(f -> f instanceof TaskField).map(TaskField.class::cast).forEach(field -> {
+            useCase.getDataField(field.getStringId()).setValue(new ArrayList<>());
+            if (field.getDefaultValue() != null && !field.getDefaultValue().isEmpty()) {
                 List<TaskPair> taskPairList = useCase.getTasks().stream().filter(t ->
-                                (((TaskField) field).getDefaultValue().contains(t.getTransition()))).collect(Collectors.toList());
-                useCase.getDataField(key).setValue(new ArrayList<>());
-
+                                (field.getDefaultValue().contains(t.getTransition()))).collect(Collectors.toList());
                 if (!taskPairList.isEmpty()) {
-                    taskPairList.forEach(pair -> ((List<String>) useCase.getDataField(key).getValue()).add(pair.getTask()));
+                    taskPairList.forEach(pair -> ((List<String>) useCase.getDataField(field.getStringId()).getValue()).add(pair.getTask()));
                 }
-            } else if (field instanceof TaskField && (((TaskField) field).getDefaultValue() == null || !((TaskField) field).getDefaultValue().isEmpty())) {
-                useCase.getDataField(key).setValue(new ArrayList<>());
             }
         });
         save(useCase);
