@@ -1,8 +1,5 @@
 package com.netgrif.workflow.startup
 
-import com.netgrif.workflow.petrinet.domain.I18nString
-import com.netgrif.workflow.workflow.domain.Filter
-import com.netgrif.workflow.workflow.domain.repositories.FilterRepository
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -31,9 +28,6 @@ class MongoDbRunner extends AbstractOrderedCommandLineRunner {
 
     @Value('${spring.data.mongodb.drop}')
     private boolean dropDatabase
-
-    @Autowired
-    private FilterRepository repository
 
     @Override
     void run(String... strings) throws Exception {
