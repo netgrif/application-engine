@@ -366,9 +366,13 @@ public class WorkflowService implements IWorkflowService {
     private void resolveTaskRefs(Case useCase) {
         useCase.getPetriNet().getDataSet().forEach((key, field) -> {
             if (field instanceof TaskField && ((TaskField) field).getDefaultValue() != null && !((TaskField) field).getDefaultValue().isEmpty()) {
-                Optional<TaskPair> taskPairOptional = useCase.getTasks().stream().filter(t ->
-                        t.getTransition().equals(((TaskField) field).getDefaultValue().get(0))).findFirst();
-                taskPairOptional.ifPresent(taskPair -> useCase.getDataField(key).setValue(Collections.singletonList(taskPair.getTask())));
+                List<TaskPair> taskPairList = useCase.getTasks().stream().filter(t ->
+                                (((TaskField) field).getDefaultValue().contains(t.getTransition()))).collect(Collectors.toList());
+                useCase.getDataField(key).setValue(new ArrayList<>());
+
+                if (!taskPairList.isEmpty()) {
+                    taskPairList.forEach(pair -> ((List<String>) useCase.getDataField(key).getValue()).add(pair.getTask()));
+                }
             } else if (field instanceof TaskField && (((TaskField) field).getDefaultValue() == null || !((TaskField) field).getDefaultValue().isEmpty())) {
                 useCase.getDataField(key).setValue(new ArrayList<>());
             }
