@@ -87,6 +87,9 @@ public final class FieldFactory {
             case MULTICHOICE_MAP:
                 field = buildMultichoiceMapField(data.getOptions(), data.getInit(), importer);
                 break;
+            case FILTER:
+                field = buildFilterField(data);
+                break;
             default:
                 throw new IllegalArgumentException(data.getType() + " is not a valid Field type");
         }
@@ -233,6 +236,15 @@ public final class FieldFactory {
         FileListField fileListField = new FileListField();
         fileListField.setRemote(data.getRemote() != null);
         return fileListField;
+    }
+
+    private FilterField buildFilterField(Data data) {
+        AllowedNets nets = data.getAllowedNets();
+        if (nets == null) {
+            return new FilterField();
+        } else {
+            return new FilterField(new ArrayList<>(nets.getAllowedNet()));
+        }
     }
 
     private void setActions(Field field, Data data) {
