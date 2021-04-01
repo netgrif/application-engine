@@ -281,10 +281,7 @@ public final class FieldFactory {
                 ((FileListField) field).setDefaultValue(defaultValue);
                 break;
             case TASK_REF:
-                if (importer.getDocument().getTransition().stream().anyMatch(t -> t.getId().equals(defaultValue)))
-                    ((TaskField) field).setDefaultValue(defaultValue);
-                else
-                    log.warn("There is no transition with id [" + defaultValue + "]");
+                ((TaskField) field).setDefaultValue(parseTasRefInit(defaultValue, importer.getDocument().getTransition()));
                 break;
             default:
                 field.setDefaultValue(defaultValue);
@@ -553,4 +550,19 @@ public final class FieldFactory {
             ((CaseField) field).setAllowedNets(allowedNets);
         }
     }
+
+    private List<String> parseTasRefInit(String value, List<Transition> transitions) {
+        if (value == null) {
+            return new ArrayList<>();
+        }
+        String[] vls = value.split(",");
+        List<String> defaults = new ArrayList<>();
+        Arrays.stream(vls).forEach(s -> {
+            if (transitions.stream().noneMatch(t -> t.getId().equals(s)))
+                log.warn("There is no transition with id [" + s + "]");
+            defaults.add(s.trim());
+        });
+        return defaults;
+    }
+
 }
