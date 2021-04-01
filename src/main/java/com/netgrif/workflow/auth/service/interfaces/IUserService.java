@@ -1,5 +1,6 @@
 package com.netgrif.workflow.auth.service.interfaces;
 
+import com.netgrif.workflow.auth.domain.AnonymousUser;
 import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.auth.web.requestbodies.UpdateUserRequest;
@@ -20,6 +21,8 @@ public interface IUserService {
     User save(User user);
 
     User saveNew(User user);
+
+    AnonymousUser saveNewAnonymous(AnonymousUser user);
 
     User update(User user, UpdateUserRequest updates);
 
@@ -60,6 +63,8 @@ public interface IUserService {
     User addRole(User user, String roleStringId);
 
     Page<User> searchAllCoMembers(String query, LoggedUser principal, Boolean small, Pageable pageable);
+
+    User removeRole(User user, String roleStringId);
 
     void deleteUser(User user);
 
