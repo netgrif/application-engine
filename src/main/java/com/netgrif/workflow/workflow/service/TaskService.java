@@ -1,5 +1,6 @@
 package com.netgrif.workflow.workflow.service;
 
+import com.netgrif.workflow.auth.domain.AnonymousUser;
 import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.auth.service.interfaces.IUserService;
@@ -139,7 +140,7 @@ public class TaskService implements ITaskService {
         outcome.add(dataService.runActions(transition.getPostAssignActions(), useCase.getStringId(), task, transition));
         useCase = evaluateRules(useCase.getStringId(), task, EventType.ASSIGN, EventPhase.POST);
 
-        if(user.isAnonymous())
+        if(user instanceof AnonymousUser)
             addTaskStateInformationToPublicEventOutcome(outcome, task, user);
         else
             addTaskStateInformationToEventOutcome(outcome, task);
@@ -582,8 +583,7 @@ public class TaskService implements ITaskService {
         com.querydsl.core.types.Predicate searchPredicate = searchService.buildQuery(requests, user, locale, isIntersection);
         if(searchPredicate != null) {
             Page<Task> page = taskRepository.findAll(searchPredicate, pageable);
-            if (!user.isAnonymous())
-                page = loadUsers(page);
+            page = loadUsers(page);
             page = dataService.setImmediateFields(page);
             return page;
         } else {
