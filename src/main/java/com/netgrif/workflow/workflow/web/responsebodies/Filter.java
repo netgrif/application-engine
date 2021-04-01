@@ -5,7 +5,6 @@ import com.netgrif.workflow.auth.domain.Author;
 import com.netgrif.workflow.elastic.web.requestbodies.CaseSearchRequest;
 import com.netgrif.workflow.elastic.web.requestbodies.ElasticTaskSearchRequest;
 import com.netgrif.workflow.workflow.domain.MergeFilterOperation;
-import com.netgrif.workflow.workflow.web.requestbodies.filter.SearchMetadata;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -36,8 +35,6 @@ public class Filter {
 
     private MergeFilterOperation mergeOperation;
 
-    private SearchMetadata searchMetadata;
-
     public Filter(com.netgrif.workflow.workflow.domain.Filter filter, Locale locale) {
         this.stringId = filter.getStringId();
         this.title = filter.getTitle().getTranslation(locale);
@@ -47,7 +44,6 @@ public class Filter {
         this.created = filter.getCreated();
         this.type = filter.getType().getStringType();
         this.mergeOperation = filter.getMergeOperation();
-        this.searchMetadata = filter.getSearchMetadata();
         switch (filter.getType()) {
             case CASE:
                 this.caseFilterBodies = filter.getCaseFilterBodies();
@@ -57,4 +53,6 @@ public class Filter {
                 break;
         }
     }
+
+
 }
