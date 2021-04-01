@@ -4,7 +4,6 @@ import com.netgrif.workflow.auth.domain.Author;
 import com.netgrif.workflow.elastic.web.requestbodies.CaseSearchRequest;
 import com.netgrif.workflow.elastic.web.requestbodies.ElasticTaskSearchRequest;
 import com.netgrif.workflow.petrinet.domain.I18nString;
-import com.netgrif.workflow.workflow.web.requestbodies.filter.SearchMetadata;
 import lombok.Data;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
@@ -42,31 +41,28 @@ public class Filter {
 
     private List<ElasticTaskSearchRequest> taskFilterBodies;
 
-    private SearchMetadata searchMetadata;
-
-    private Filter(I18nString title, I18nString description, Integer visibility, Author author, MergeFilterOperation mergeOperation, SearchMetadata searchMetadata) {
+    private Filter(I18nString title, I18nString description, Integer visibility, Author author, MergeFilterOperation mergeOperation) {
         this.created = LocalDateTime.now();
         this.title = title;
         this.description = description;
         this.visibility = visibility;
         this.author = author;
         this.mergeOperation = mergeOperation;
-        this.searchMetadata = searchMetadata;
     }
 
     public String getStringId() {
         return this._id.toString();
     }
 
-    public static Filter createCaseFilter(I18nString title, I18nString description, Integer visibility, Author author, MergeFilterOperation mergeOperation, SearchMetadata searchMetadata, List<CaseSearchRequest> caseFilterBodies) {
-        Filter f = new Filter(title, description, visibility, author, mergeOperation, searchMetadata);
+    public static Filter createCaseFilter(I18nString title, I18nString description, Integer visibility, Author author, MergeFilterOperation mergeOperation, List<CaseSearchRequest> caseFilterBodies) {
+        Filter f = new Filter(title, description, visibility, author, mergeOperation);
         f.type = FilterType.CASE;
         f.caseFilterBodies = caseFilterBodies;
         return f;
     }
 
-    public static Filter createTaskFilter(I18nString title, I18nString description, Integer visibility, Author author, MergeFilterOperation mergeOperation, SearchMetadata searchMetadata, List<ElasticTaskSearchRequest> taskFilterBodies) {
-        Filter f = new Filter(title, description, visibility, author, mergeOperation, searchMetadata);
+    public static Filter createTaskFilter(I18nString title, I18nString description, Integer visibility, Author author, MergeFilterOperation mergeOperation, List<ElasticTaskSearchRequest> taskFilterBodies) {
+        Filter f = new Filter(title, description, visibility, author, mergeOperation);
         f.type = FilterType.TASK;
         f.taskFilterBodies = taskFilterBodies;
         return f;
