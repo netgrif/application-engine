@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://modeler.netgrif.com/petriflow_schema.xsd">
-	<id>new_model</id>
-	<initials>NEW</initials>
-	<title>New Model</title>
+	<id>taskref_init_test</id>
+	<initials>TIT</initials>
+	<title>Task ref init test net</title>
 	<defaultRole>true</defaultRole>
 	<transitionRole>false</transitionRole>
 	<!-- TRANSACTIONS -->
@@ -24,6 +24,10 @@
 		<id>taskRef_2</id>
 		<title/>
 		<init>t1,t2</init>
+	</data>
+	<data type="taskRef">
+		<id>taskRef_3</id>
+		<title/>
 	</data>
 	<!-- I18NS -->
 	<!-- TRANSITIONS -->
