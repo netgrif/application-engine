@@ -54,9 +54,9 @@ public class FilterService implements IFilterService {
         FilterType type = FilterType.resolveType(newFilterBody.getType());
         // TODO visibility
         if (type == FilterType.CASE && newFilterBody.getCaseFilterBodies() != null) {
-            filter = Filter.createCaseFilter(title, desc, Filter.VISIBILITY_PUBLIC, author, newFilterBody.getMergeOperator(), newFilterBody.getSearchMetadata(), newFilterBody.getCaseFilterBodies());
+            filter = Filter.createCaseFilter(title, desc, Filter.VISIBILITY_PUBLIC, author, newFilterBody.getMergeOperator(), newFilterBody.getCaseFilterBodies());
         } else if (type == FilterType.TASK && newFilterBody.getTaskFilterBodies() != null) {
-            filter = Filter.createTaskFilter(title, desc, Filter.VISIBILITY_PUBLIC, author, newFilterBody.getMergeOperator(), newFilterBody.getSearchMetadata(), newFilterBody.getTaskFilterBodies());
+            filter = Filter.createTaskFilter(title, desc, Filter.VISIBILITY_PUBLIC, author, newFilterBody.getMergeOperator(), newFilterBody.getTaskFilterBodies());
         } else {
             throw new IllegalArgumentException("Filter type must be either 'Task' or 'Case' and the corresponding filter bodies must be defined!");
         }
