@@ -1,0 +1,35 @@
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../main/resources/petriNets/petriflow_schema.xsd">
+    <id>static_dataset_test</id>
+    <title>Static dataset test</title>
+    <initials>SDT</initials>
+    <!-- ROLES -->
+    <data type="text">
+        <id>static_text</id>
+        <title>Static text</title>
+        <init>static value</init>
+        <static>true</static>
+    </data>
+    <data type="file">
+        <id>static_file</id>
+        <title>Static file</title>
+        <static>true</static>
+    </data>
+    <data type="text">
+        <id>regular_text</id>
+        <title>Regular text</title>
+        <init>regular value</init>
+    </data>
+    <data type="file">
+        <id>regular_file</id>
+        <title>Regular file</title>
+    </data>
+
+    <transition>
+        <id>1</id>
+        <x>379</x>
+        <y>273</y>
+        <label>Transition</label>
+    </transition>
+
+
+</document>

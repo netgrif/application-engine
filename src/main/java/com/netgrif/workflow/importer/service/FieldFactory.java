@@ -94,6 +94,8 @@ public final class FieldFactory {
         field.setName(importer.toI18NString(data.getTitle()));
         field.setImportId(data.getId());
         field.setImmediate(data.isImmediate());
+        field.setIsStatic(data.isStatic() != null && data.isStatic());
+
         if (data.getLength() != null) {
             field.setLength(data.getLength());
         }
@@ -116,7 +118,11 @@ public final class FieldFactory {
             }
         }
         if (data.getInit() != null && !data.getInit().isEmpty() && field instanceof FieldWithDefault) {
-            setFieldDefaultValue((FieldWithDefault) field, data.getInit().get(0));
+            FieldWithDefault fieldWithDefault = (FieldWithDefault) field;
+            setFieldDefaultValue(fieldWithDefault, data.getInit().get(0));
+            if (field.isStatic()) {
+                field.setValue(fieldWithDefault.getDefaultValue());
+            }
         }
 
         if (data.getFormat() != null) {
@@ -150,7 +156,7 @@ public final class FieldFactory {
         }
         MultichoiceMapField field = new MultichoiceMapField(choices);
         if (init!= null && !init.isEmpty()) {
-            field.setDefaultValue(new HashSet<String>(Arrays.stream(init.get(0).split(",")).collect(Collectors.toList())));
+            field.setDefaultValue(new HashSet<>(Arrays.stream(init.get(0).split(",")).collect(Collectors.toList())));
         }
         return field;
     }

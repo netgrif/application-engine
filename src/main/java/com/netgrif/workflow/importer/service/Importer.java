@@ -1,8 +1,6 @@
 package com.netgrif.workflow.importer.service;
 
 import com.netgrif.workflow.importer.model.*;
-import com.netgrif.workflow.importer.model.DataEventType;
-import com.netgrif.workflow.petrinet.domain.events.*;
 import com.netgrif.workflow.petrinet.domain.Component;
 import com.netgrif.workflow.petrinet.domain.DataGroup;
 import com.netgrif.workflow.petrinet.domain.Place;
@@ -16,6 +14,7 @@ import com.netgrif.workflow.petrinet.domain.dataset.logic.FieldLayout;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.FieldActionsRunner;
 import com.netgrif.workflow.petrinet.domain.events.CaseEventType;
+import com.netgrif.workflow.petrinet.domain.events.EventPhase;
 import com.netgrif.workflow.petrinet.domain.events.EventType;
 import com.netgrif.workflow.petrinet.domain.events.ProcessEventType;
 import com.netgrif.workflow.petrinet.domain.layout.DataGroupLayout;
@@ -339,8 +338,11 @@ public class Importer {
     @Transactional
     protected void createDataSet(Data importData) {
         Field field = fieldFactory.getField(importData, this);
-
-        net.addDataSetField(field);
+        if (field.isStatic()) {
+            net.addStaticDataSetField(field);
+        } else {
+            net.addDataSetField(field);
+        }
         fields.put(importData.getId(), field);
     }
 

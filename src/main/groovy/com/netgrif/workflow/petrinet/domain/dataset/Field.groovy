@@ -34,7 +34,6 @@ abstract class Field<T> extends Imported {
     @Transient
     private FieldLayout layout
 
-    @Transient
     private T value
 
     private Long order
@@ -55,6 +54,8 @@ abstract class Field<T> extends Imported {
     private Integer length
 
     private Component component
+
+    private boolean isStatic
 
     Field() {
         _id = new ObjectId()
@@ -154,6 +155,14 @@ abstract class Field<T> extends Imported {
 
     void setEvents(LinkedHashSet<DataEvent> events) {
         this.events = events
+    }
+
+    Boolean isStatic() {
+        return isStatic
+    }
+
+    void setIsStatic(boolean isStatic) {
+        this.isStatic = isStatic
     }
 
     void addEvents(Collection<DataEvent> dataEvents) {

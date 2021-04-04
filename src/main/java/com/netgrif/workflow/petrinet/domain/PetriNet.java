@@ -78,6 +78,11 @@ public class PetriNet extends PetriNetObject {
     @Setter
     private Map<String, Field> dataSet;
 
+    @org.springframework.data.mongodb.core.mapping.Field("staticDataset")
+    @Getter
+    @Setter
+    private Map<String, Field> staticDataSet;
+
     @org.springframework.data.mongodb.core.mapping.Field("roles")
     @DBRef
     @Getter
@@ -126,6 +131,7 @@ public class PetriNet extends PetriNetObject {
         transitions = new HashMap<>();
         arcs = new HashMap<>();
         dataSet = new LinkedHashMap<>();
+        staticDataSet = new LinkedHashMap<>();
         roles = new HashMap<>();
         transactions = new LinkedHashMap<>();
         processEvents = new LinkedHashMap<>();
@@ -175,6 +181,10 @@ public class PetriNet extends PetriNetObject {
 
     public void addDataSetField(Field field) {
         this.dataSet.put(field.getStringId(), field);
+    }
+
+    public void addStaticDataSetField(Field field) {
+        this.staticDataSet.put(field.getStringId(), field);
     }
 
     public boolean isNotInitialized() {

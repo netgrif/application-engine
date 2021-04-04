@@ -43,6 +43,7 @@
                 <xs:element ref="remote" minOccurs="0"/>
                 <xs:element ref="length" minOccurs="0"/>
                 <xs:element ref="allowedNets" minOccurs="0"/>
+                <xs:element ref="static" minOccurs="0"/>
             </xs:sequence>
             <xs:attribute type="data_type" name="type" use="required"/>
             <xs:attribute type="xs:boolean" name="immediate"/>
