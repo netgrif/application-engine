@@ -2,6 +2,7 @@ package com.netgrif.workflow.petrinet.domain.arcs;
 
 import com.netgrif.workflow.petrinet.domain.Place;
 import com.netgrif.workflow.petrinet.domain.Transition;
+import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.workflow.domain.DataField;
 import lombok.Data;
 
@@ -25,12 +26,20 @@ public class VariableArc extends Arc {
         this.multiplicity = fieldImportId;
     }
 
+    public void setField(Field field) {
+        setField(new DataField(field.getValue()));
+    }
+
+    public void setField(DataField field) {
+        this.field = field;
+    }
+
     @Override
     public boolean isExecutable() {
         if (source instanceof Transition)
             return true;
         if (field == null || field.getValue() == null)
-            throw new IllegalStateException("Field "+ fieldId + " has null value");
+            throw new IllegalStateException("Field " + fieldId + " has null value");
         double multiplicity = Double.parseDouble(field.getValue().toString());
         return ((Place) source).getTokens() >= multiplicity;
     }

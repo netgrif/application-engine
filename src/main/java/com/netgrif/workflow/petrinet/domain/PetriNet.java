@@ -216,6 +216,10 @@ public class PetriNet extends PetriNetObject {
         return Optional.ofNullable(dataSet.get(id));
     }
 
+    public Optional<Field> getStaticField(String id) {
+        return Optional.ofNullable(staticDataSet.get(id));
+    }
+
     public Place getPlace(String id) {
         return places.get(id);
     }
@@ -233,6 +237,7 @@ public class PetriNet extends PetriNetObject {
     }
 
     public void initializeTokens(Map<String, Integer> activePlaces) {
+        // TODO static places
         places.values().forEach(place -> place.setTokens(activePlaces.getOrDefault(place.getStringId(), 0)));
     }
 
@@ -244,12 +249,16 @@ public class PetriNet extends PetriNetObject {
                 .forEach(arc -> {
                     VariableArc varc = (VariableArc) arc;
                     String fieldId = varc.getFieldId();
-                    DataField field = dataSet.get(fieldId);
-                    varc.setField(field);
+                    if (dataSet.containsKey(fieldId)) {
+                        varc.setField(dataSet.get(fieldId));
+                    } else {
+                        varc.setField(staticDataSet.get(fieldId));
+                    }
                 });
     }
 
     public Map<String, Integer> getActivePlaces() {
+        // TODO static places
         Map<String, Integer> activePlaces = new HashMap<>();
         for (Place place : places.values()) {
             if (place.getTokens() > 0) {
@@ -379,6 +388,10 @@ public class PetriNet extends PetriNetObject {
         clone.setImportId(this.importId);
         clone.setObjectId(this._id);
         clone.setDataSet(this.dataSet.entrySet()
+                .stream()
+                .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone()))
+        );
+        clone.setStaticDataSet(this.staticDataSet.entrySet()
                 .stream()
                 .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone()))
         );

@@ -24,12 +24,70 @@
         <title>Regular file</title>
     </data>
 
+    <data type="number">
+        <id>2000</id>
+        <title>Static var arc value</title>
+        <init>5</init>
+        <static>true</static>
+    </data>
+    <data type="number">
+        <id>3000</id>
+        <title>Var arc value</title>
+        <init>10</init>
+    </data>
+
     <transition>
-        <id>1</id>
-        <x>379</x>
-        <y>273</y>
+        <id>transition</id>
+        <x>200</x>
+        <y>200</y>
         <label>Transition</label>
     </transition>
 
+    <place>
+        <id>place1</id>
+        <x>150</x>
+        <y>200</y>
+        <label>Place 1</label>
+        <tokens>1</tokens>
+        <static>false</static>
+    </place>
+    <place>
+        <id>place2</id>
+        <x>350</x>
+        <y>100</y>
+        <label>Place 2</label>
+        <tokens>0</tokens>
+        <static>false</static>
+    </place>
 
+      <place>
+        <id>place3</id>
+        <x>350</x>
+        <y>300</y>
+        <label>Place 3</label>
+        <tokens>0</tokens>
+        <static>false</static>
+    </place>
+
+    <arc>
+        <id>a1</id>
+        <type>regular</type>
+        <sourceId>place1</sourceId>
+        <destinationId>transition</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>a2</id>
+        <type>variable</type>
+        <sourceId>transition</sourceId>
+        <destinationId>place2</destinationId>
+        <multiplicity>2000</multiplicity>
+    </arc>
+    <arc>
+        <id>a3</id>
+        <type>variable</type>
+        <sourceId>transition</sourceId>
+        <destinationId>place3</destinationId>
+        <multiplicity>3000</multiplicity>
+    </arc>
 </document>

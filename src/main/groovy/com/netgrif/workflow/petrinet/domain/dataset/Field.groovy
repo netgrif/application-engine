@@ -268,6 +268,9 @@ abstract class Field<T> extends Imported {
         clone.format = this.format
         clone.length = this.length
         clone.component = this.component
+        if (isStatic()) {
+            clone.value = this.value
+        }
     }
 
     abstract Field clone()
