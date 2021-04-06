@@ -390,10 +390,8 @@
     <xs:element name="properties">
         <xs:complexType>
             <xs:sequence>
-                <xs:choice>
                     <xs:element ref="property" minOccurs="0" maxOccurs="unbounded"/>
                     <xs:element name="option_icons" type="icons" minOccurs="0"/>
-                </xs:choice>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
