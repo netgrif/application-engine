@@ -14,6 +14,8 @@
         <component>
             <name>icon</name>
             <properties>
+                <property key="arrow">true</property>
+                <property key="divider">true</property>
                 <option_icons>
                     <icon key="Krádež">home</icon>
                     <icon key="Poškodenie Zariadenia">nature</icon>
