@@ -9,10 +9,6 @@
     <caseName>New filter</caseName>
     <!-- TRANSACTIONS -->
     <!-- ROLES -->
-    <role>
-        <id>system</id>
-        <title>System</title>
-    </role>
     <!-- PROCESS ROLE REFS -->
     <!-- PROCESS USER REFS -->
     <!-- DATA -->
@@ -24,6 +20,10 @@
     <data type="enumeration_map" immediate="true">
         <id>filter_type</id>
         <title>Filter type</title>
+        <options>
+            <option key="Case">Case</option>
+            <option key="Task">Task</option>
+        </options>
     </data>
     <data type="text">
         <id>new_title</id>
@@ -140,12 +140,6 @@
             <offset>0</offset>
         </layout>
         <label>Set filter metadata</label>
-        <roleRef>
-            <id>system</id>
-            <logic>
-                <perform>true</perform>
-            </logic>
-        </roleRef>
         <dataGroup>
             <id>DataGroup_0</id>
             <layout>grid</layout>
