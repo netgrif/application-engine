@@ -34,8 +34,9 @@ public class Component {
         this.properties = properties;
     }
 
-    public Component(String name, List<Icon> optionIcons){
+    public Component(String name, Map<String, String> properties, List<Icon> optionIcons){
         this(name);
+        this.properties = properties;
         this.optionIcons = optionIcons;
     }
 }
