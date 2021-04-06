@@ -560,7 +560,7 @@ public final class FieldFactory {
         Arrays.stream(vls).forEach(s -> {
             if (transitions.stream().noneMatch(t -> t.getId().equals(s)))
                 log.warn("There is no transition with id [" + s + "]");
-            defaults.add(s.trim());
+            defaults.add(s);
         });
         return defaults;
     }
