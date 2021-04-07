@@ -309,6 +309,10 @@ public final class FieldFactory {
             resolveChoices((ChoiceField) field, useCase);
         if (field instanceof MapOptionsField)
             resolveMapOptions((MapOptionsField) field, useCase);
+        if (field instanceof FieldWithAllowedNets)
+            resolveAllowedNets((FieldWithAllowedNets) field, useCase);
+        if (field instanceof FilterField)
+            resolveFilterMetadata((FilterField) field, useCase);
         return field;
     }
 
@@ -324,6 +328,20 @@ public final class FieldFactory {
         if (options == null)
             return;
         field.setOptions(options);
+    }
+
+    private void resolveAllowedNets(FieldWithAllowedNets field, Case useCase) {
+        List<String> allowedNets = useCase.getDataField(field.getImportId()).getAllowedNets();
+        if (allowedNets == null)
+            return;
+        field.setAllowedNets(allowedNets);
+    }
+
+    private void resolveFilterMetadata(FilterField field, Case useCase) {
+        Object metadata = useCase.getDataField(field.getImportId()).getFilterMetadata();
+        if(metadata == null)
+            return;
+        field.setFilterMetadata(metadata);
     }
 
     public Field buildImmediateField(Case useCase, String fieldId) {
