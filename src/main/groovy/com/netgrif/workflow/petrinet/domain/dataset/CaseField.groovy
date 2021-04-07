@@ -3,12 +3,13 @@ package com.netgrif.workflow.petrinet.domain.dataset
 import org.springframework.data.mongodb.core.mapping.Document
 
 @Document
-class CaseField extends Field<List<String>> {
+class CaseField extends FieldWithDefault<List<String>> implements FieldWithAllowedNets {
 
     private List<String> allowedNets
 
     CaseField() {
         super()
+        super.defaultValue = new ArrayList()
         allowedNets = new ArrayList<>()
         this.value = new ArrayList<>()
     }
