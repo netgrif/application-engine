@@ -3,7 +3,7 @@ package com.netgrif.workflow.petrinet.domain.dataset
 import org.springframework.data.mongodb.core.mapping.Document
 
 @Document
-class FilterField extends FieldWithDefault<String> {
+class FilterField extends FieldWithDefault<String> implements FieldWithAllowedNets {
 
     private List<String> allowedNets
     /**
@@ -42,8 +42,16 @@ class FilterField extends FieldWithDefault<String> {
         return allowedNets
     }
 
-    void setAllowedNets(List<String> allowedNets) {
+    void setAllowedNets(Collection<String> allowedNets) {
         this.allowedNets.clear()
         this.allowedNets.addAll(allowedNets)
+    }
+
+    Object getFilterMetadata() {
+        return filterMetadata
+    }
+
+    void setFilterMetadata(Object filterMetadata) {
+        this.filterMetadata = filterMetadata
     }
 }
