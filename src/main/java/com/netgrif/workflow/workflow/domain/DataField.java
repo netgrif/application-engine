@@ -31,6 +31,9 @@ public class DataField {
     private Map<String, I18nString> options;
 
     @Getter
+    private Object filterMetadata;
+
+    @Getter
     @Setter
     @JsonIgnore
     private String encryption;
@@ -65,6 +68,11 @@ public class DataField {
 
     public void setAllowedNets(List<String> allowedNets) {
         this.allowedNets = allowedNets;
+        update();
+    }
+
+    public void setFilterMetadata(Object filterMetadata) {
+        this.filterMetadata = filterMetadata;
         update();
     }
 
