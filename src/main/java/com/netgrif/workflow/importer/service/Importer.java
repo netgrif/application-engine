@@ -52,7 +52,7 @@ public class Importer {
 
     public static final String FIELD_KEYWORD = "f";
     public static final String TRANSITION_KEYWORD = "t";
-
+    @Getter
     private Document document;
     private PetriNet net;
     private ProcessRole defaultRole;
