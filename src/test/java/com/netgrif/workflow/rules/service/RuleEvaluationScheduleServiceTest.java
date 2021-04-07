@@ -3,6 +3,7 @@ package com.netgrif.workflow.rules.service;
 import com.netgrif.workflow.TestHelper;
 import com.netgrif.workflow.WorkflowManagementSystemApplication;
 import com.netgrif.workflow.auth.domain.LoggedUser;
+import com.netgrif.workflow.importer.service.throwable.MissingIconKeyException;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.throwable.MissingPetriNetMetaDataException;
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
@@ -66,7 +67,7 @@ public class RuleEvaluationScheduleServiceTest {
     }
 
     @Test
-    public void testScheduledRule() throws IOException, MissingPetriNetMetaDataException, RuleEvaluationScheduleException, InterruptedException {
+    public void testScheduledRule() throws IOException, MissingPetriNetMetaDataException, RuleEvaluationScheduleException, InterruptedException, MissingIconKeyException {
         LoggedUser user = superCreator.getLoggedSuper();
         Optional<PetriNet> petriNetOptional = petriNetService.importPetriNet(new FileInputStream("src/test/resources/rule_engine_test.xml"), "major", user);
 
