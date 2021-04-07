@@ -6,6 +6,7 @@ import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.auth.domain.UserState;
 import com.netgrif.workflow.auth.domain.repositories.UserRepository;
 import com.netgrif.workflow.auth.service.interfaces.IAuthorityService;
+import com.netgrif.workflow.importer.service.throwable.MissingIconKeyException;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository;
 import com.netgrif.workflow.petrinet.domain.throwable.MissingPetriNetMetaDataException;
@@ -92,7 +93,7 @@ public class TaskServiceTest {
     }
 
     @Test
-    public void resetArcTest() throws TransitionNotExecutableException, MissingPetriNetMetaDataException, IOException {
+    public void resetArcTest() throws TransitionNotExecutableException, MissingPetriNetMetaDataException, IOException, MissingIconKeyException {
         PetriNet net = petriNetService.importPetriNet(new FileInputStream("src/test/resources/reset_inhibitor_test.xml"), "major", superCreator.getLoggedSuper()).get();
         LoggedUser loggedUser = mockLoggedUser();
         Case useCase = workflowService.createCase(net.getStringId(), "Reset test", "color", loggedUser);
