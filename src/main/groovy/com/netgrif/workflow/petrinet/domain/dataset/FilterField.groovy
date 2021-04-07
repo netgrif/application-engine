@@ -3,9 +3,8 @@ package com.netgrif.workflow.petrinet.domain.dataset
 import org.springframework.data.mongodb.core.mapping.Document
 
 @Document
-class FilterField extends FieldWithDefault<String> implements FieldWithAllowedNets {
+class FilterField extends FieldWithAllowedNets<String>  {
 
-    private List<String> allowedNets
     /**
      * Serialized information necessary for the restoration of the advanced search frontend GUI.
      *
@@ -19,8 +18,7 @@ class FilterField extends FieldWithDefault<String> implements FieldWithAllowedNe
     }
 
     FilterField(List<String> allowedNets) {
-        this()
-        this.setAllowedNets(allowedNets)
+        super(allowedNets)
     }
 
     @Override
@@ -32,19 +30,9 @@ class FilterField extends FieldWithDefault<String> implements FieldWithAllowedNe
     Field clone() {
         FilterField clone = new FilterField()
         super.clone(clone)
-        clone.allowedNets = new ArrayList<>(this.allowedNets)
         clone.filterMetadata = this.filterMetadata
 
         return clone
-    }
-
-    List<String> getAllowedNets() {
-        return allowedNets
-    }
-
-    void setAllowedNets(Collection<String> allowedNets) {
-        this.allowedNets.clear()
-        this.allowedNets.addAll(allowedNets)
     }
 
     Object getFilterMetadata() {
