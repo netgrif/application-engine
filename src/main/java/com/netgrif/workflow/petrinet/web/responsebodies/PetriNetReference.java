@@ -22,6 +22,7 @@ public class PetriNetReference extends Reference {
     private LocalDateTime createdDate;
     private Author author;
     private List<DataFieldReference> immediateData;
+    private List<StaticDataFieldReference> staticImmediateData;
 
 
     public PetriNetReference() {
@@ -52,5 +53,6 @@ public class PetriNetReference extends Reference {
         this.createdDate = net.getCreationDate();
         this.author = net.getAuthor();
         this.immediateData = net.getImmediateFields().stream().map(field -> new DataFieldReference(field, locale)).collect(Collectors.toList());
+        this.staticImmediateData = net.getStaticImmediateFields().stream().map(field -> new StaticDataFieldReference(field, locale)).collect(Collectors.toList());
     }
 }

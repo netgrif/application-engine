@@ -5,16 +5,14 @@ import com.netgrif.workflow.auth.service.interfaces.IUserProcessRoleService;
 import com.netgrif.workflow.event.events.model.UserImportModelEvent;
 import com.netgrif.workflow.importer.service.Importer;
 import com.netgrif.workflow.orgstructure.groups.interfaces.INextGroupService;
-import com.netgrif.workflow.petrinet.domain.DataFieldLogic;
-import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedField;
-import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action;
-import com.netgrif.workflow.petrinet.domain.dataset.logic.action.FieldActionsRunner;
-import com.netgrif.workflow.petrinet.domain.events.EventPhase;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.Transition;
 import com.netgrif.workflow.petrinet.domain.VersionType;
 import com.netgrif.workflow.petrinet.domain.arcs.VariableArc;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
+import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action;
+import com.netgrif.workflow.petrinet.domain.dataset.logic.action.FieldActionsRunner;
+import com.netgrif.workflow.petrinet.domain.events.EventPhase;
 import com.netgrif.workflow.petrinet.domain.repositories.PetriNetRepository;
 import com.netgrif.workflow.petrinet.domain.throwable.MissingPetriNetMetaDataException;
 import com.netgrif.workflow.petrinet.domain.version.Version;
@@ -25,7 +23,6 @@ import com.netgrif.workflow.petrinet.web.responsebodies.PetriNetReference;
 import com.netgrif.workflow.petrinet.web.responsebodies.TransitionReference;
 import com.netgrif.workflow.rules.domain.facts.NetImportedFact;
 import com.netgrif.workflow.rules.service.interfaces.IRuleEngine;
-import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.FileStorageConfiguration;
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
@@ -189,6 +186,7 @@ public class PetriNetService implements IPetriNetService {
     @Override
     public Optional<PetriNet> save(PetriNet petriNet) {
         initializeVariableArcs(petriNet);
+        cache.remove(petriNet.getObjectId());
 
         return Optional.of(repository.save(petriNet));
     }

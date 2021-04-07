@@ -280,7 +280,15 @@ public class PetriNet extends PetriNetObject {
     }
 
     public List<Field> getImmediateFields() {
-        return this.dataSet.values().stream().filter(Field::isImmediate).collect(Collectors.toList());
+        return collectImmediateFields(this.dataSet);
+    }
+
+    public List<Field> getStaticImmediateFields() {
+        return collectImmediateFields(this.staticDataSet);
+    }
+
+    private List<Field> collectImmediateFields(Map<String, Field> fields) {
+        return fields.values().stream().filter(Field::isImmediate).collect(Collectors.toList());
     }
 
     public boolean isDisplayableInAnyTransition(String fieldId) {
