@@ -459,14 +459,14 @@ class ActionDelegate {
         return workflowService.searchOne(predicate(qCase))
     }
 
-    Case createCase(String identifier, String title = null, String color = "", User author = userService.loggedOrSystem) {
+    Case createCase(String identifier, String title = null, String color = "", User author = userService.loggedOrSystem, Locale locale = LocaleContextHolder.getLocale()) {
         PetriNet net = petriNetService.getNewestVersionByIdentifier(identifier)
         if (net == null)
             throw new IllegalArgumentException("Petri net with identifier [$identifier] does not exist.")
-        return createCase(net, title ?: net.defaultCaseName.defaultValue, color, author)
+        return createCase(net, title ?: net.defaultCaseName.getTranslation(locale), color, author)
     }
 
-    Case createCase(PetriNet net, String title = net.defaultCaseName.defaultValue, String color = "", User author = userService.loggedOrSystem) {
+    Case createCase(PetriNet net, String title = net.defaultCaseName.getTranslation(locale), String color = "", User author = userService.loggedOrSystem, Locale locale = LocaleContextHolder.getLocale()) {
         return workflowService.createCase(net.stringId, title, color, author.transformToLoggedUser())
     }
 
