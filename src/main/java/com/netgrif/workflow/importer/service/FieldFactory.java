@@ -2,6 +2,7 @@ package com.netgrif.workflow.importer.service;
 
 import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.importer.model.*;
+import com.netgrif.workflow.importer.service.throwable.MissingIconKeyException;
 import com.netgrif.workflow.petrinet.domain.Component;
 import com.netgrif.workflow.petrinet.domain.Format;
 import com.netgrif.workflow.petrinet.domain.I18nString;
@@ -36,7 +37,7 @@ public final class FieldFactory {
     private IDataValidator dataValidator;
 
     // TODO: refactor this shit
-    Field getField(Data data, Importer importer) throws IllegalArgumentException {
+    Field getField(Data data, Importer importer) throws IllegalArgumentException, MissingIconKeyException {
         Field field;
         switch (data.getType()) {
             case TEXT:
@@ -129,7 +130,7 @@ public final class FieldFactory {
         }
 
         if (data.getComponent() != null) {
-            Component component = componentFactory.buildComponent(data);
+            Component component = componentFactory.buildComponent(data.getComponent(), importer, data);
             field.setComponent(component);
         }
 
