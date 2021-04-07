@@ -4,10 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.netgrif.workflow.auth.domain.Author;
 import com.netgrif.workflow.petrinet.domain.I18nString;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
-import com.netgrif.workflow.petrinet.domain.dataset.CaseField;
-import com.netgrif.workflow.petrinet.domain.dataset.Field;
-import com.netgrif.workflow.petrinet.domain.dataset.FieldWithDefault;
-import com.netgrif.workflow.petrinet.domain.dataset.UserField;
+import com.netgrif.workflow.petrinet.domain.dataset.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -183,9 +180,11 @@ public class Case {
             if (field instanceof UserField) {
                 this.dataSet.get(key).setChoices(((UserField) field).getRoles().stream().map(I18nString::new).collect(Collectors.toSet()));
             }
-            if (field instanceof CaseField) {
-                this.dataSet.get(key).setValue(new ArrayList<>());
-                this.dataSet.get(key).setAllowedNets(((CaseField) field).getAllowedNets());
+            if (field instanceof FieldWithAllowedNets) {
+                this.dataSet.get(key).setAllowedNets(((FieldWithAllowedNets) field).getAllowedNets());
+            }
+            if (field instanceof FilterField) {
+                this.dataSet.get(key).setFilterMetadata(((FilterField) field).getFilterMetadata());
             }
         });
     }
