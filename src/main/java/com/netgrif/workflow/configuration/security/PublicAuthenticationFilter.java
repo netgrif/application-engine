@@ -112,7 +112,7 @@ public class PublicAuthenticationFilter extends OncePerRequestFilter {
         AnonymousUser anonymousUser = (AnonymousUser) this.userService.findByEmail(hash + "@nae.com", false);
 
         if (anonymousUser == null) {
-            anonymousUser = new AnonymousUser(hash + "@nae.com",
+            anonymousUser = new AnonymousUser(hash + "@anonymous.nae",
                     "",
                     "User",
                     "Anonymous"
