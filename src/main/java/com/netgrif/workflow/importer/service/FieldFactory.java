@@ -2,6 +2,7 @@ package com.netgrif.workflow.importer.service;
 
 import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.importer.model.*;
+import com.netgrif.workflow.importer.service.throwable.MissingIconKeyException;
 import com.netgrif.workflow.petrinet.domain.Component;
 import com.netgrif.workflow.petrinet.domain.Format;
 import com.netgrif.workflow.petrinet.domain.I18nString;
@@ -9,6 +10,9 @@ import com.netgrif.workflow.petrinet.domain.dataset.*;
 import com.netgrif.workflow.petrinet.domain.views.View;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.DataField;
+import com.netgrif.workflow.workflow.domain.TaskPair;
+import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDate;
@@ -21,6 +25,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @org.springframework.stereotype.Component
+@Slf4j
 public final class FieldFactory {
 
     @Autowired
@@ -36,7 +41,7 @@ public final class FieldFactory {
     private IDataValidator dataValidator;
 
     // TODO: refactor this shit
-    Field getField(Data data, Importer importer) throws IllegalArgumentException {
+    Field getField(Data data, Importer importer) throws IllegalArgumentException, MissingIconKeyException {
         Field field;
         switch (data.getType()) {
             case TEXT:
@@ -119,7 +124,7 @@ public final class FieldFactory {
             }
         }
         if (data.getInit() != null && !data.getInit().isEmpty() && field instanceof FieldWithDefault) {
-            setFieldDefaultValue((FieldWithDefault) field, data.getInit().get(0));
+            setFieldDefaultValue((FieldWithDefault) field, data.getInit().get(0), importer);
         }
 
         if (data.getFormat() != null) {
@@ -132,7 +137,7 @@ public final class FieldFactory {
         }
 
         if (data.getComponent() != null) {
-            Component component = componentFactory.buildComponent(data);
+            Component component = componentFactory.buildComponent(data.getComponent(), importer, data);
             field.setComponent(component);
         }
 
@@ -262,7 +267,7 @@ public final class FieldFactory {
         }
     }
 
-    private void setFieldDefaultValue(FieldWithDefault field, String defaultValue) {
+    private void setFieldDefaultValue(FieldWithDefault field, String defaultValue, Importer importer) {
         switch (field.getType()) {
             case DATETIME:
                 field.setDefaultValue(parseDateTime(defaultValue));
@@ -287,6 +292,9 @@ public final class FieldFactory {
                 break;
             case FILELIST:
                 ((FileListField) field).setDefaultValue(defaultValue);
+                break;
+            case TASK_REF:
+                ((TaskField) field).setDefaultValue(parseTasRefInit(defaultValue, importer.getDocument().getTransition()));
                 break;
             default:
                 field.setDefaultValue(defaultValue);
@@ -573,4 +581,19 @@ public final class FieldFactory {
             ((CaseField) field).setAllowedNets(allowedNets);
         }
     }
+
+    private List<String> parseTasRefInit(String value, List<Transition> transitions) {
+        if (value == null) {
+            return new ArrayList<>();
+        }
+        String[] vls = value.split(",");
+        List<String> defaults = new ArrayList<>();
+        Arrays.stream(vls).forEach(s -> {
+            if (transitions.stream().noneMatch(t -> t.getId().equals(s)))
+                log.warn("There is no transition with id [" + s + "]");
+            defaults.add(s);
+        });
+        return defaults;
+    }
+
 }
