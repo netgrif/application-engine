@@ -338,7 +338,7 @@ public final class FieldFactory {
     }
 
     private void resolveFilterMetadata(FilterField field, Case useCase) {
-        Object metadata = useCase.getDataField(field.getImportId()).getFilterMetadata();
+        Map<String, Object> metadata = useCase.getDataField(field.getImportId()).getFilterMetadata();
         if(metadata == null)
             return;
         field.setFilterMetadata(metadata);
