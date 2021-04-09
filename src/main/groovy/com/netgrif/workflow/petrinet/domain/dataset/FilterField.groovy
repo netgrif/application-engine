@@ -10,7 +10,7 @@ class FilterField extends FieldWithAllowedNets<String>  {
      *
      * Backend shouldn't need to interact with this attribute
      */
-    private Object filterMetadata
+    private Map<String, Object> filterMetadata
 
     FilterField() {
         super()
@@ -35,11 +35,11 @@ class FilterField extends FieldWithAllowedNets<String>  {
         return clone
     }
 
-    Object getFilterMetadata() {
+    Map<String, Object> getFilterMetadata() {
         return filterMetadata
     }
 
-    void setFilterMetadata(Object filterMetadata) {
+    void setFilterMetadata(Map<String, Object> filterMetadata) {
         this.filterMetadata = filterMetadata
     }
 }

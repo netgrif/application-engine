@@ -917,23 +917,13 @@ public class DataService implements IDataService {
         return node.get("type").asText();
     }
 
-    private Object parseFilterMetadataValue(JsonNode jsonNode) {
+    private Map<String, Object> parseFilterMetadataValue(JsonNode jsonNode) {
         ObjectNode node = (ObjectNode) jsonNode;
         String fieldType = getFieldTypeFromNode(node);
         if (Objects.equals(fieldType, "filter")) {
-            ArrayNode rootNode = (ArrayNode) node.get("filterMetadata");
+            JsonNode filterMetadata = node.get("filterMetadata");
             ObjectMapper mapper = new ObjectMapper();
-            ArrayList<ArrayList<Object>> metadata = new ArrayList<>();
-            rootNode.forEach(innerJsonNode -> {
-                ArrayNode innerNode = (ArrayNode) innerJsonNode;
-                ArrayList<Object> innerMetadata = new ArrayList<>();
-                metadata.add(innerMetadata);
-                innerNode.forEach(objectJson -> {
-                    Map<String, Object> convertedObject = mapper.convertValue(objectJson, new TypeReference<Map<String, Object>>(){});
-                    innerMetadata.add(convertedObject);
-                });
-            });
-            return metadata;
+            return mapper.convertValue(filterMetadata, new TypeReference<Map<String, Object>>(){});
         }
         return null;
     }

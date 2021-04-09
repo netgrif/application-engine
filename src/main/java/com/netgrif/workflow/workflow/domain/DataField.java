@@ -31,7 +31,7 @@ public class DataField {
     private Map<String, I18nString> options;
 
     @Getter
-    private Object filterMetadata;
+    private Map<String, Object> filterMetadata;
 
     @Getter
     @Setter
@@ -71,7 +71,7 @@ public class DataField {
         update();
     }
 
-    public void setFilterMetadata(Object filterMetadata) {
+    public void setFilterMetadata(Map<String, Object> filterMetadata) {
         this.filterMetadata = filterMetadata;
         update();
     }
