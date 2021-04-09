@@ -190,7 +190,7 @@ public class TaskService implements ITaskService {
             throw new IllegalArgumentException("Task with id=" + taskId + " is not assigned to any user.");
         }
         // TODO: 14. 4. 2017 replace with @PreAuthorize
-        if (!task.getUserId().equals(loggedUser.getId())) {
+        if (!task.getUserId().equals(loggedUser.getId()) && !loggedUser.isAnonymous()) {
             throw new IllegalArgumentException("User that is not assigned tried to finish task");
         }
 
@@ -372,16 +372,6 @@ public class TaskService implements ITaskService {
         outcome.setStartDate(task.getStartDate());
         outcome.setFinishDate(task.getFinishDate());
         outcome.setTaskId(task.getStringId());
-    }
-
-    protected void addTaskStateInformationToPublicEventOutcome(EventOutcome outcome, Task task, User user) {
-        Optional<Task> taskOptional = taskRepository.findById(task.getStringId());
-        if (!taskOptional.isPresent())
-            return;
-        if (user != null)
-            outcome.setAssignee(user);
-        outcome.setStartDate(task.getStartDate());
-        outcome.setFinishDate(task.getFinishDate());
     }
 
     /**
@@ -806,9 +796,7 @@ public class TaskService implements ITaskService {
     }
 
     private void setUser(Task task) {
-        if (task.getUserId() != null && userService.getAnonymousLogged().isAnonymous()){
-            task.setUser(userService.getAnonymousLogged().transformToAnonymousUser());
-        } else if (task.getUserId() != null)
+        if (task.getUserId() != null)
             task.setUser(userService.findById(task.getUserId(), true));
     }
 }
