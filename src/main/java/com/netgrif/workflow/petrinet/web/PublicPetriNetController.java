@@ -6,13 +6,9 @@ import com.netgrif.workflow.petrinet.domain.version.StringToVersionConverter;
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.workflow.petrinet.service.interfaces.IProcessRoleService;
 import com.netgrif.workflow.petrinet.web.responsebodies.*;
-import com.netgrif.workflow.workflow.web.PublicAbstractController;
 import com.netgrif.workflow.petrinet.web.responsebodies.PetriNetReference;
 import com.netgrif.workflow.petrinet.web.responsebodies.PetriNetReferenceResource;
 import com.netgrif.workflow.petrinet.web.responsebodies.PetriNetReferenceResourceAssembler;
-import com.netgrif.workflow.petrinet.service.interfaces.IProcessRoleService;
-import com.netgrif.workflow.petrinet.web.responsebodies.*;
-import com.netgrif.workflow.workflow.web.PublicAbstractController;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,10 +19,6 @@ import org.springframework.hateoas.Link;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.hateoas.PagedResources;
 import org.springframework.hateoas.mvc.ControllerLinkBuilder;
-import org.springframework.http.MediaType;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
@@ -41,38 +33,40 @@ import static org.springframework.web.bind.annotation.RequestMethod.POST;
 @RestController
 @RequestMapping({"/api/public/petrinet"})
 @Slf4j
-public class PublicPetriNetController extends PublicAbstractController {
+public class PublicPetriNetController {
 
-    private final IPetriNetService service;
+    private final IPetriNetService petriNetService;
 
-    @Autowired
-    private IProcessRoleService roleService;
+    private final IProcessRoleService roleService;
+
+    private final IUserService userService;
 
     private final StringToVersionConverter converter;
 
-    public PublicPetriNetController(IPetriNetService service, IUserService userService, StringToVersionConverter converter) {
-        super(userService);
-        this.service = service;
+    public PublicPetriNetController(IPetriNetService petriNetService, IUserService userService, StringToVersionConverter converter, IProcessRoleService roleService) {
+        this.petriNetService = petriNetService;
         this.converter = converter;
+        this.userService = userService;
+        this.roleService = roleService;
     }
 
     @GetMapping(value = "/{id}", produces = MediaTypes.HAL_JSON_VALUE)
     @ApiOperation(value = "Get process by id")
     public PetriNetReferenceResource getOne(@PathVariable("id") String id, Locale locale) {
-        return new PetriNetReferenceResource(IPetriNetService.transformToReference(this.service.getPetriNet(decodeUrl(id)), locale));
+        return new PetriNetReferenceResource(IPetriNetService.transformToReference(this.petriNetService.getPetriNet(decodeUrl(id)), locale));
     }
 
     @ApiOperation(value = "Get process by identifier and version")
     @GetMapping(value = "/{identifier}/{version}", produces = MediaTypes.HAL_JSON_VALUE)
     @ResponseBody
     public PetriNetReferenceResource getOne(@PathVariable("identifier") String identifier, @PathVariable("version") String version, Locale locale) {
-        return new PetriNetReferenceResource(this.service.getReference(identifier, this.converter.convert(version), getAnonymous(), locale));
+        return new PetriNetReferenceResource(this.petriNetService.getReference(identifier, this.converter.convert(version), userService.getAnonymousLogged(), locale));
     }
 
     @ApiOperation(value = "Search processes")
     @RequestMapping(value = "/search", method = POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public PagedResources<PetriNetReferenceResource> searchPetriNets(@RequestBody Map<String, Object> criteria, Pageable pageable, PagedResourcesAssembler<PetriNetReference> assembler, Locale locale) {
-        Page<PetriNetReference> nets = service.search(criteria, getAnonymous(), pageable, locale);
+        Page<PetriNetReference> nets = petriNetService.search(criteria, userService.getAnonymousLogged(), pageable, locale);
         Link selfLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(PublicPetriNetController.class)
                 .searchPetriNets(criteria, pageable, assembler, locale)).withRel("search");
         PagedResources<PetriNetReferenceResource> resources = assembler.toResource(nets, new PetriNetReferenceResourceAssembler(), selfLink);
@@ -84,26 +78,26 @@ public class PublicPetriNetController extends PublicAbstractController {
     @RequestMapping(value = "/{netId}/roles", method = GET, produces = MediaTypes.HAL_JSON_VALUE)
     public ProcessRolesResource getRoles(@PathVariable("netId") String netId, Locale locale) {
         netId = decodeUrl(netId);
-        return new ProcessRolesResource(roleService.findAll(netId), service.getPetriNet(netId).getPermissions(), netId, locale);
+        return new ProcessRolesResource(roleService.findAll(netId), petriNetService.getPetriNet(netId).getPermissions(), netId, locale);
     }
 
     @ApiOperation(value = "Get transactions of process")
     @RequestMapping(value = "/{netId}/transactions", method = GET, produces = MediaTypes.HAL_JSON_VALUE)
     public TransactionsResource getTransactions(@PathVariable("netId") String netId, Locale locale) {
-        PetriNet net = service.getPetriNet(decodeUrl(netId));
+        PetriNet net = petriNetService.getPetriNet(decodeUrl(netId));
         return new TransactionsResource(net.getTransactions().values(), netId, locale);
     }
 
     @ApiOperation(value = "Get data fields of transitions")
     @RequestMapping(value = "/data", method = POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public DataFieldReferencesResource getDataFieldReferences(@RequestBody List<TransitionReference> referenceBody, Locale locale) {
-        return new DataFieldReferencesResource(service.getDataFieldReferences(referenceBody, locale));
+        return new DataFieldReferencesResource(petriNetService.getDataFieldReferences(referenceBody, locale));
     }
 
     @ApiOperation(value = "Get transitions of processes")
     @RequestMapping(value = "/transitions", method = GET, produces = MediaTypes.HAL_JSON_VALUE)
     public TransitionReferencesResource getTransitionReferences(@RequestParam List<String> ids, Locale locale) {
         ids.forEach(id -> id = decodeUrl(id));
-        return new TransitionReferencesResource(service.getTransitionReferences(ids, getAnonymous(), locale));
+        return new TransitionReferencesResource(petriNetService.getTransitionReferences(ids, userService.getAnonymousLogged(), locale));
     }
 }
