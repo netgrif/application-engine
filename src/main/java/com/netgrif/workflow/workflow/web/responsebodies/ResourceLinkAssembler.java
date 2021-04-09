@@ -8,6 +8,7 @@ import com.netgrif.workflow.workflow.web.TaskController;
 import com.netgrif.workflow.workflow.web.WorkflowController;
 import org.springframework.hateoas.PagedResources;
 import org.springframework.hateoas.mvc.ControllerLinkBuilder;
+import org.springframework.security.core.Authentication;
 
 public class ResourceLinkAssembler {
 
