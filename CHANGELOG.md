@@ -1,3 +1,16 @@
+<a name="https://netgrif.atlassian.net/projects/NAE/versions/10874/tab/release-report-all-issues"></a>
+## 5.1.1 (XX.04.2021)
+### Bug fixes
+* [NAE-1265](https://netgrif.atlassian.net/browse/NAE-1265) - Anonym user inconsistence
+
+### Improvements
+* [NAE-1248](https://netgrif.atlassian.net/browse/NAE-1248) - Icon enum
+* [NAE-1247](https://netgrif.atlassian.net/browse/NAE-1247) - Backend autocomplete enumeration
+* [NAE-1242](https://netgrif.atlassian.net/browse/NAE-1242) - TaskRef init valueNone
+
+### Features
+None
+
 <a name="https://netgrif.atlassian.net/projects/NAE/versions/10860/tab/release-report-all-issues"></a>
 ## 5.1.0 - Black Zinc (25.3.2021)
 ### Bug fixes
