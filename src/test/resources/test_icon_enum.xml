@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="../../main/resources/petriNets/petriflow_schema.xsd">
+    <id>test_icon_enum</id>
+    <title>Icon Enum Net</title>
+    <initials>IEN</initials>
+    <data type="enumeration">
+        <id>icon_enum</id>
+        <title/>
+        <values>Krádež</values>
+        <values>Poškodenie Zariadenia</values>
+        <values>Rozbitie skla</values>
+        <values>Vandalizmus</values>
+        <values>Živelná škoda</values>
+        <component>
+            <name>icon</name>
+            <properties>
+                <property key="arrow">true</property>
+                <property key="divider">true</property>
+                <option_icons>
+                    <icon key="Krádež">home</icon>
+                    <icon key="Poškodenie Zariadenia">nature</icon>
+                    <icon key="Rozbitie skla">home</icon>
+                    <icon key="Vandalizmus">nature</icon>
+                    <icon key="Živelná škoda">home</icon>
+                </option_icons>
+            </properties>
+        </component>
+    </data>
+    <data type="enumeration_map">
+        <id>icon_enum_map</id>
+        <title/>
+        <options>
+            <option key="1">Krádež</option>
+            <option key="2">Poškodenie Zariadenia</option>
+            <option key="3">Rozbitie skla</option>
+            <option key="4">Vandalizmus</option>
+            <option key="5">Živelná škoda</option>
+        </options>
+        <component>
+            <name>icon</name>
+            <properties>
+                <option_icons>
+                    <icon key="1">home</icon>
+                    <icon key="2">nature</icon>
+                    <icon key="3">home</icon>
+                    <icon key="4">nature</icon>
+                    <icon key="5">home</icon>
+                </option_icons>
+            </properties>
+        </component>
+    </data>
+
+    <transition>
+        <id>3</id>
+        <x>379</x>
+        <y>273</y>
+        <label>Enum Icon</label>
+        <assignPolicy>auto</assignPolicy>
+        <dataGroup>
+            <id>enum</id>
+            <title>Enum</title>
+            <stretch>false</stretch>
+            <dataRef>
+                <id>icon_enum</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>icon_enum_map</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+    </transition>
+</document>
