@@ -2,8 +2,8 @@ package com.netgrif.workflow.petrinet.domain.dataset
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.netgrif.workflow.petrinet.domain.I18nString
+import com.netgrif.workflow.petrinet.domain.dataset.logic.dynamicExpressions.DataExpressions
 import com.netgrif.workflow.petrinet.domain.dataset.logic.validation.Validation
-import org.springframework.data.annotation.Transient
 import org.springframework.data.mongodb.core.mapping.Document
 
 @Document
@@ -15,11 +15,11 @@ abstract class ValidableField<T> extends FieldWithDefault<T> {
         super()
     }
 
-    void addValidation(String validationRule,I18nString validationMessage){
-        Validation add = new Validation()
-        if(validationMessage == null) add = new Validation(validationRule)
-        else add = new Validation(validationRule,validationMessage)
-        if(validations == null){
+    void addValidation(String validationRule, I18nString validationMessage, boolean dynamic) {
+        Validation add
+        if (validationMessage == null) add = new Validation(validationRule)
+        else add = new Validation(validationRule, validationMessage, dynamic)
+        if (validations == null) {
             this.validations = new ArrayList<Validation>()
         }
         this.validations.add(add)
