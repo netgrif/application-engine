@@ -1,5 +1,5 @@
 <a name="https://netgrif.atlassian.net/projects/NAE/versions/10874/tab/release-report-all-issues"></a>
-## 5.1.1 (XX.04.2021)
+## 5.1.1 (12.04.2021)
 ### Bug fixes
 * [NAE-1265](https://netgrif.atlassian.net/browse/NAE-1265) - Anonym user inconsistence
 
