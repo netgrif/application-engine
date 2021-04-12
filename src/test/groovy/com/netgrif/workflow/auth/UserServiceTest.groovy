@@ -2,7 +2,6 @@ package com.netgrif.workflow.auth
 
 import com.netgrif.workflow.TestHelper
 import com.netgrif.workflow.auth.service.interfaces.IUserService
-import com.netgrif.workflow.petrinet.domain.PetriNet
 import com.netgrif.workflow.petrinet.domain.VersionType
 import com.netgrif.workflow.petrinet.service.interfaces.IProcessRoleService
 import com.netgrif.workflow.startup.ImportHelper
@@ -12,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit4.SpringRunner
-import sun.awt.X11.XSystemTrayPeer
 
 @RunWith(SpringRunner.class)
 @ActiveProfiles(["test"])
