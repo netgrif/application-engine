@@ -121,15 +121,23 @@ class ActionDelegate {
         this.useCase = useCase
         this.task = task
         this.actionsRunner = actionsRunner
-        action.fieldIds.each { name, id ->
-            set(name, fieldFactory.buildFieldWithoutValidation(useCase, id))
-        }
-        action.transitionIds.each { name, id ->
-            set(name, useCase.petriNet.transitions[id])
-        }
+        this.initFieldsMap(action.fieldIds)
+        this.initTransitionsMap(action.transitionIds)
         changedFieldsTree = ChangedFieldsTree.createNew(useCase ? useCase.stringId : "case",
                 task.isPresent() ? task.get().stringId : "task",
                 task.isPresent() ? task.get().transitionId : "trans")
+    }
+
+    def initFieldsMap(Map<String, String> fieldIds) {
+        fieldIds.each { name, id ->
+            set(name, fieldFactory.buildFieldWithoutValidation(useCase, id))
+        }
+    }
+
+    def initTransitionsMap(Map<String, String> transitionIds) {
+        transitionIds.each { name, id ->
+            set(name, useCase.petriNet.transitions[id])
+        }
     }
 
     def copyBehavior(Field field, Transition transition) {

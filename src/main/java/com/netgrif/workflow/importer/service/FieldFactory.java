@@ -7,11 +7,10 @@ import com.netgrif.workflow.petrinet.domain.Component;
 import com.netgrif.workflow.petrinet.domain.Format;
 import com.netgrif.workflow.petrinet.domain.I18nString;
 import com.netgrif.workflow.petrinet.domain.dataset.*;
+import com.netgrif.workflow.petrinet.domain.dataset.logic.dynamicExpressions.DataExpressions;
 import com.netgrif.workflow.petrinet.domain.views.View;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.DataField;
-import com.netgrif.workflow.workflow.domain.TaskPair;
-import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -39,6 +38,9 @@ public final class FieldFactory {
 
     @Autowired
     private IDataValidator dataValidator;
+
+    @Autowired
+    private DataExpressions dataExpressions;
 
     // TODO: refactor this shit
     Field getField(Data data, Importer importer) throws IllegalArgumentException, MissingIconKeyException {
@@ -111,13 +113,17 @@ public final class FieldFactory {
         if (data.getValid() != null && field instanceof ValidableField){
             List<String> list = data.getValid();
             for (String item : list) {
-                ((ValidableField) field).addValidation(item,null);
+                ((ValidableField) field).addValidation(item, null, dataExpressions.containsDynamicExpression(item));
             }
         }
         if (data.getValidations() != null && field instanceof ValidableField) {
             List<com.netgrif.workflow.importer.model.Validation> list = data.getValidations().getValidation();
             for (com.netgrif.workflow.importer.model.Validation item : list) {
-                ((ValidableField) field).addValidation(item.getExpression(), importer.toI18NString(item.getMessage()));
+                ((ValidableField) field).addValidation(
+                        item.getExpression(),
+                        importer.toI18NString(item.getMessage()),
+                        dataExpressions.containsDynamicExpression(item.getExpression()))
+                ;
             }
         }
         if (data.getInit() != null && !data.getInit().isEmpty() && field instanceof FieldWithDefault) {
@@ -305,7 +311,26 @@ public final class FieldFactory {
             resolveChoices((ChoiceField) field, useCase);
         if (field instanceof MapOptionsField)
             resolveMapOptions((MapOptionsField) field, useCase);
+        if (withValidation && field instanceof ValidableField)
+            field = resolveValidations((ValidableField) field, useCase);
         return field;
+    }
+
+    @SuppressWarnings({"all", "rawtypes", "unchecked"})
+    private ValidableField resolveValidations(ValidableField field, Case useCase) {
+        ValidableField cloned = (ValidableField) field.clone();
+        cloned.setValue(field.getValue()); // TODO: cloned?
+        List<com.netgrif.workflow.petrinet.domain.dataset.logic.validation.Validation> validations = useCase.getDataField(field.getImportId()).getValidations();
+        if (validations != null) {
+            cloned.setValidations(validations);
+        }
+        if (cloned.getValidations() == null) return cloned;
+
+        ((List<com.netgrif.workflow.petrinet.domain.dataset.logic.validation.Validation>) cloned.getValidations()).forEach(valid -> {
+            if (!valid.isDynamic()) return;
+            valid.setValidationRule(dataExpressions.compile(useCase, valid.getValidationRule()));
+        });
+        return cloned;
     }
 
     private void resolveChoices(ChoiceField field, Case useCase) {

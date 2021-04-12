@@ -53,7 +53,7 @@ class DateTimeField extends ValidableField<LocalDateTime> {
         DateTimeField clone = new DateTimeField()
         super.clone(clone)
 
-        clone.validations = this.validations
+        clone.validations = this.validations?.collect { it.clone() }
         clone.defaultValue = this.defaultValue
         return clone
     }
