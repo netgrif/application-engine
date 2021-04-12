@@ -81,7 +81,7 @@ class FileListField extends ValidableField<FileListFieldValue> {
         super.clone(clone)
 
         clone.remote = this.remote
-        clone.validations = this.validations
+        clone.validations = this.validations?.collect { it.clone() }
         clone.defaultValue = this.defaultValue
 
         return clone
