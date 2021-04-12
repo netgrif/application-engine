@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="petriflow_schema.xsd">
+	<id>test_autocomplete_dynamic</id>
+	<title>Autocomplete Dynamic Net</title>
+	<initials>ADN</initials>
+    <!-- ROLES -->
+    <!-- DATA -->
+    <data type="enumeration">
+        <id>autocomplete</id>
+        <title/>
+        <component>
+            <name>autocomplete_dynamic</name>
+        </component>
+        <action trigger="set">
+            <!-- @formatter:off -->
+            field: f.autocomplete;
+            change field choices {
+                return findCases { it.title.contains(field.value.toString()) }.collect({it.title})
+            }
+            <!-- @formatter:on -->
+        </action>
+    </data>
+    <!-- TRANSITIONS -->
+    <transition>
+        <id>3</id>
+        <x>379</x>
+        <y>273</y>
+        <label>Autocomplete</label>
+        <assignPolicy>auto</assignPolicy>
+        <dataGroup>
+            <id>auto</id>
+            <title>Autocomplete</title>
+            <stretch>false</stretch>
+            <dataRef>
+                <id>autocomplete</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+    </transition>
+</document>
