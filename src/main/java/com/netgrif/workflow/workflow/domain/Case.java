@@ -8,6 +8,7 @@ import com.netgrif.workflow.petrinet.domain.dataset.CaseField;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.petrinet.domain.dataset.FieldWithDefault;
 import com.netgrif.workflow.petrinet.domain.dataset.UserField;
+import com.netgrif.workflow.workflow.service.interfaces.IInitValueExpressionEvaluator;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -161,7 +162,6 @@ public class Case {
         this.petriNetObjectId = petriNet.getObjectId();
         this.petriNet = petriNet;
         this.activePlaces = activePlaces;
-        populateDataSet();
         this.immediateDataFields = petriNet.getImmediateFields().stream().map(Field::getStringId).collect(Collectors.toCollection(LinkedHashSet::new));
         visualId = generateVisualId();
         this.enabledRoles = petriNet.getRoles().keySet();
@@ -179,10 +179,17 @@ public class Case {
         return this.dataSet.get(field).hasDefinedBehavior(transition);
     }
 
-    private void populateDataSet() {
+    public void populateDataSet(IInitValueExpressionEvaluator initValueExpressionEvaluator) {
+        List<String> dynamicInitFieldsId = new ArrayList<>();
         petriNet.getDataSet().forEach((key, field) -> {
             if (field instanceof FieldWithDefault) {
-                this.dataSet.put(key, new DataField(((FieldWithDefault) field).getDefaultValue()));
+                FieldWithDefault fwd = (FieldWithDefault) field;
+                if (fwd.isDynamicDefaultValue()) {
+                    dynamicInitFieldsId.add(field.getImportId());
+                    this.dataSet.put(key, new DataField());
+                } else {
+                    this.dataSet.put(key, new DataField(fwd.getDefaultValue()));
+                }
             } else {
                 this.dataSet.put(key, new DataField());
             }
@@ -193,6 +200,11 @@ public class Case {
                 this.dataSet.get(key).setValue(new ArrayList<>());
                 this.dataSet.get(key).setAllowedNets(((CaseField) field).getAllowedNets());
             }
+        });
+        dynamicInitFieldsId.forEach(fieldId -> {
+            FieldWithDefault fwd = (FieldWithDefault) petriNet.getDataSet().get(fieldId);
+            Object value = initValueExpressionEvaluator.evaluate(this, fwd);
+            this.dataSet.get(fieldId).setValue(value);
         });
     }
 

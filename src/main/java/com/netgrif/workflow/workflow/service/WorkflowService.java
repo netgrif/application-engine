@@ -29,6 +29,7 @@ import com.netgrif.workflow.workflow.domain.DataField;
 import com.netgrif.workflow.workflow.domain.Task;
 import com.netgrif.workflow.workflow.domain.TaskPair;
 import com.netgrif.workflow.workflow.domain.repositories.CaseRepository;
+import com.netgrif.workflow.workflow.service.interfaces.IInitValueExpressionEvaluator;
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
 import com.querydsl.core.types.Predicate;
@@ -90,6 +91,9 @@ public class WorkflowService implements IWorkflowService {
 
     @Autowired
     private IUserService userService;
+
+    @Autowired
+    private IInitValueExpressionEvaluator initValueExpressionEvaluator;
 
     private IElasticCaseService elasticCaseService;
 
@@ -204,6 +208,7 @@ public class WorkflowService implements IWorkflowService {
     public Case createCase(String netId, String title, String color, LoggedUser user) {
         PetriNet petriNet = petriNetService.clone(new ObjectId(netId));
         Case useCase = new Case(title, petriNet, petriNet.getActivePlaces());
+        useCase.populateDataSet(initValueExpressionEvaluator);
         useCase.setProcessIdentifier(petriNet.getIdentifier());
         useCase.setColor(color);
         useCase.setAuthor(user.transformToAuthor());

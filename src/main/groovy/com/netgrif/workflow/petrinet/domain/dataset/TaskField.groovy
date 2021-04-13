@@ -14,7 +14,8 @@ class TaskField extends FieldWithDefault<List<String>> {
     Field clone() {
         TaskField clone = new TaskField()
         super.clone(clone)
-        clone.defaultValue = this.defaultValue;
+        clone.defaultValue = this.defaultValue
+        clone.initExpression = this.initExpression
         return clone
     }
 
