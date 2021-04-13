@@ -32,12 +32,13 @@
     <!-- I18NS -->
     <!-- TRANSITIONS -->
     <transition>
-        <id>t1</id>
+        <id>newFilter</id>
         <x>620</x>
         <y>260</y>
         <layout>
             <offset>0</offset>
         </layout>
+        <assignPolicy>auto</assignPolicy>
         <label>Create new filter</label>
         <dataGroup>
             <id>DataGroup_0</id>
@@ -88,6 +89,10 @@
                 </layout>
             </dataRef>
         </dataGroup>
+        <event type="finish">
+            <id></id>
+            <title>save</title>
+        </event>
     </transition>
     <transition>
         <id>t2</id>
@@ -219,13 +224,13 @@
         <id>a5</id>
         <type>regular</type>
         <sourceId>p3</sourceId>
-        <destinationId>t1</destinationId>
+        <destinationId>newFilter</destinationId>
         <multiplicity>1</multiplicity>
     </arc>
     <arc>
         <id>a6</id>
         <type>regular</type>
-        <sourceId>t1</sourceId>
+        <sourceId>newFilter</sourceId>
         <destinationId>p2</destinationId>
         <multiplicity>1</multiplicity>
     </arc>
