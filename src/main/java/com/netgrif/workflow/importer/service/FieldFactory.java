@@ -113,17 +113,13 @@ public final class FieldFactory {
         if (data.getValid() != null && field instanceof ValidableField){
             List<String> list = data.getValid();
             for (String item : list) {
-                ((ValidableField) field).addValidation(item, null, dataExpressions.containsDynamicExpression(item));
+                ((ValidableField) field).addValidation(item, null);
             }
         }
         if (data.getValidations() != null && field instanceof ValidableField) {
             List<com.netgrif.workflow.importer.model.Validation> list = data.getValidations().getValidation();
             for (com.netgrif.workflow.importer.model.Validation item : list) {
-                ((ValidableField) field).addValidation(
-                        item.getExpression(),
-                        importer.toI18NString(item.getMessage()),
-                        dataExpressions.containsDynamicExpression(item.getExpression()))
-                ;
+                ((ValidableField) field).addValidation(item.getExpression(), importer.toI18NString(item.getMessage()));
             }
         }
         if (data.getInit() != null && !data.getInit().isEmpty() && field instanceof FieldWithDefault) {
@@ -319,7 +315,7 @@ public final class FieldFactory {
     @SuppressWarnings({"all", "rawtypes", "unchecked"})
     private ValidableField resolveValidations(ValidableField field, Case useCase) {
         ValidableField cloned = (ValidableField) field.clone();
-        cloned.setValue(field.getValue()); // TODO: cloned?
+        cloned.setValue(field.getValue());
         List<com.netgrif.workflow.petrinet.domain.dataset.logic.validation.Validation> validations = useCase.getDataField(field.getImportId()).getValidations();
         if (validations != null) {
             cloned.setValidations(validations);

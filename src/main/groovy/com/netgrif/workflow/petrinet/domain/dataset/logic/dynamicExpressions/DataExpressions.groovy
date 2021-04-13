@@ -27,7 +27,7 @@ class DataExpressions {
         return expression
     }
 
-    boolean containsDynamicExpression(String expression) {
+    static boolean containsDynamicExpression(String expression) {
         Matcher matcher = EXPRESSION_REGEX.matcher(expression)
         return matcher.find()
     }
