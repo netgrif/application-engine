@@ -6,6 +6,7 @@ import org.springframework.data.mongodb.core.mapping.Document
 abstract class FieldWithDefault<T> extends Field<T> {
 
     protected T defaultValue
+    protected String initExpression
 
     FieldWithDefault() {
         super()
@@ -15,7 +16,20 @@ abstract class FieldWithDefault<T> extends Field<T> {
         return defaultValue
     }
 
+    String getExpression() {
+        return initExpression
+    }
+
     void setDefaultValue(T defaultValue) {
         this.defaultValue = defaultValue
     }
+
+    void setDynamicExpression(String expression) {
+        this.initExpression = expression
+    }
+
+    boolean isDynamicDefaultValue() {
+        return initExpression != null
+    }
+
 }

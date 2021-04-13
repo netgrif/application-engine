@@ -77,6 +77,7 @@ class MultichoiceField extends ChoiceField<Set<I18nString>> {
         super.clone(clone)
 
         clone.defaultValue = this.defaultValue
+        clone.initExpression = this.initExpression
         clone.choices = this.choices
 
         return clone
