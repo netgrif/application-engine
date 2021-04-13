@@ -24,6 +24,22 @@
         </validations>
     </data>
 
+    <data type="boolean">
+        <id>bool_switch</id>
+        <title>Switch</title>
+
+        <action trigger="set">
+            bool_switch: f.bool_switch,
+            number: f.number;
+
+            if (bool_switch.value) {
+                change number validations { "odd" }
+            } else {
+                change number validations { '''inrange ${min.value},${max.value}''' }
+            }
+        </action>
+    </data>
+
     <transition>
         <id>transition</id>
         <x>200</x>
@@ -44,6 +60,12 @@
         </dataRef>
         <dataRef>
             <id>number</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>bool_switch</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>
