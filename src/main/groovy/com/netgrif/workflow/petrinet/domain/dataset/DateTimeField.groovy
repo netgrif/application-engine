@@ -55,6 +55,7 @@ class DateTimeField extends ValidableField<LocalDateTime> {
 
         clone.validations = this.validations?.collect { it.clone() }
         clone.defaultValue = this.defaultValue
+        clone.initExpression = this.initExpression
         return clone
     }
 }

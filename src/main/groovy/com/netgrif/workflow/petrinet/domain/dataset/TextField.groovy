@@ -68,6 +68,7 @@ class TextField extends ValidableField<String> {
 
         clone.subType = this.subType
         clone.defaultValue = this.defaultValue
+        clone.initExpression = this.initExpression
         clone.validations = this.validations?.collect { it.clone() }
         return clone
     }
