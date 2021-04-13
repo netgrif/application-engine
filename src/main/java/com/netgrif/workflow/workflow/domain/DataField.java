@@ -78,6 +78,11 @@ public class DataField {
         update();
     }
 
+    public void setValidations(List<Validation> validations) {
+        this.validations = validations;
+        update();
+    }
+
     public ObjectNode applyBehavior(String transition, ObjectNode json) {
         behavior.get(transition).forEach(behav -> json.put(behav.toString(), true));
         return json;
