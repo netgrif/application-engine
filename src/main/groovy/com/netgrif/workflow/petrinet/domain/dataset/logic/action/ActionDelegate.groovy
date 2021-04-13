@@ -25,6 +25,8 @@ import com.netgrif.workflow.petrinet.domain.Transition
 import com.netgrif.workflow.petrinet.domain.dataset.*
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedField
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldsTree
+import com.netgrif.workflow.petrinet.domain.dataset.logic.dynamicExpressions.DataExpressions
+import com.netgrif.workflow.petrinet.domain.dataset.logic.validation.Validation
 import com.netgrif.workflow.petrinet.domain.version.Version
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.workflow.startup.ImportHelper
@@ -105,6 +107,9 @@ class ActionDelegate {
 
     @Autowired
     UserDetailsServiceImpl userDetailsService
+
+    @Autowired
+    DataExpressions dataExpressions
 
     /**
      * Reference of case and task in which current action is taking place.
@@ -240,6 +245,19 @@ class ActionDelegate {
         addAttributeToChangedField(field, "options", field.options.collectEntries {key, value -> [key, (value as I18nString).getTranslation(LocaleContextHolder.locale)]} )
     }
 
+    def saveChangedValidation(ValidableField field) {
+        useCase.dataSet.get(field.stringId).validations = field.validations
+        if (!changedFieldsTree.changedFields.containsKey(field.stringId)) {
+            putIntoChangedFields(field, new ChangedField(field.stringId))
+        }
+        List<Validation> compiled = field.validations.collect { it.clone() }
+        compiled.each {
+            if (!it.dynamic) return
+            it.validationRule = dataExpressions.compile(useCase, it.getValidationRule())
+        }
+        addAttributeToChangedField(field, "validations", compiled.collect { it.getLocalizedValidation(LocaleContextHolder.locale) })
+    }
+
     void putIntoChangedFields(Field field, ChangedField changedField) {
         putIntoChangedFields(field.stringId, changedField)
     }
@@ -361,7 +379,11 @@ class ActionDelegate {
                 field.setOptions(newOptions)
             }
             saveChangedOptions(field)
-        }]
+        },
+         validations: { cl ->
+             changeFieldValidations(field, cl)
+         }
+        ]
     }
 
     void changeFieldValue(Field field, def cl) {
@@ -387,6 +409,28 @@ class ActionDelegate {
             field.value = value
             saveChangedValue(field)
         }
+    }
+
+    void changeFieldValidations(Field field, def cl) {
+        def valid = cl()
+        if (!(field instanceof ValidableField) || valid == UNCHANGED_VALUE)
+            return
+        List<Validation> newValidations = []
+        if (valid != null) {
+            if (valid instanceof String) {
+                newValidations = [new Validation(valid as String)]
+            } else if (valid instanceof Validation) {
+                newValidations = [valid]
+            } else if (valid instanceof Collection) {
+                if (valid.every { it instanceof Validation }) {
+                    newValidations = valid
+                } else {
+                    newValidations = valid.collect { new Validation(it as String) }
+                }
+            }
+        }
+        field.validations = newValidations
+        saveChangedValidation(field)
     }
 
     def always = { return ALWAYS_GENERATE }
