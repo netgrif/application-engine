@@ -64,6 +64,7 @@ class EnumerationField extends ChoiceField<I18nString> {
 
         clone.choices = this.choices
         clone.defaultValue = this.defaultValue
+        clone.initExpression = this.initExpression
 
         return clone
     }
