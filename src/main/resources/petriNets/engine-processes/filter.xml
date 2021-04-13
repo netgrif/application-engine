@@ -92,6 +92,13 @@
         <event type="finish">
             <id></id>
             <title>save</title>
+            <actions phase="post">
+                <action>
+                    name: f.new_title;
+                    useCase.setTitle(name.value)
+                    workflowService.save(useCase)
+                </action>
+            </actions>
         </event>
     </transition>
     <transition>
