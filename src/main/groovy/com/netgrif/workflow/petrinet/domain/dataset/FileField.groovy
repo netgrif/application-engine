@@ -81,6 +81,7 @@ class FileField extends FieldWithDefault<FileFieldValue> {
 
         clone.remote = this.remote
         clone.defaultValue = this.defaultValue
+        clone.initExpression = this.initExpression
 
         return clone
     }

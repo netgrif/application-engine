@@ -25,7 +25,7 @@ import com.netgrif.workflow.petrinet.domain.Transition
 import com.netgrif.workflow.petrinet.domain.dataset.*
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedField
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldsTree
-import com.netgrif.workflow.petrinet.domain.dataset.logic.dynamicExpressions.DataExpressions
+import com.netgrif.workflow.petrinet.domain.dataset.logic.dynamicExpressions.DataValidationExpressions
 import com.netgrif.workflow.petrinet.domain.dataset.logic.validation.Validation
 import com.netgrif.workflow.petrinet.domain.version.Version
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
@@ -109,7 +109,7 @@ class ActionDelegate {
     UserDetailsServiceImpl userDetailsService
 
     @Autowired
-    DataExpressions dataExpressions
+    DataValidationExpressions dataExpressions
 
     /**
      * Reference of case and task in which current action is taking place.

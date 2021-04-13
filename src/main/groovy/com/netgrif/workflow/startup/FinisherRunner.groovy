@@ -30,6 +30,7 @@ class FinisherRunner extends AbstractOrderedCommandLineRunner {
     @Override
     void run(String... strings) throws Exception {
         superCreator.setAllToSuperUser()
-        helper.createNet("dynamic-validations/dynamic_validations.xml")
+        helper.createNet("dynamic-fields/dynamic_validations.xml")
+        helper.createNet("dynamic-fields/dynamic_init.xml")
     }
 }

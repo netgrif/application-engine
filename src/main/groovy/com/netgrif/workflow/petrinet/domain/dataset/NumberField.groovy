@@ -51,6 +51,7 @@ class NumberField extends ValidableField<Double> {
 
         clone.validations = this.validations?.collect { it.clone() }
         clone.defaultValue = this.defaultValue
+        clone.initExpression = this.initExpression
 
         return clone
     }

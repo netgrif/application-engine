@@ -1,11 +1,9 @@
 package com.netgrif.workflow.petrinet.domain.dataset.logic.validation
 
 import com.netgrif.workflow.petrinet.domain.I18nString
-import com.netgrif.workflow.petrinet.domain.dataset.logic.dynamicExpressions.DataExpressions
+import com.netgrif.workflow.petrinet.domain.dataset.logic.dynamicExpressions.DataValidationExpressions
 import com.querydsl.core.annotations.PropertyType
 import com.querydsl.core.annotations.QueryType
-
-import java.util.regex.Pattern
 
 class Validation {
 
@@ -20,7 +18,7 @@ class Validation {
     }
 
     Validation(String validationRule, I18nString validationMessage) {
-        this(validationRule, validationMessage, DataExpressions.containsDynamicExpression(validationRule))
+        this(validationRule, validationMessage, DataValidationExpressions.containsDynamicExpression(validationRule))
     }
 
     Validation(String validationRule, I18nString validationMessage, boolean dynamic) {
