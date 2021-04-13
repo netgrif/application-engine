@@ -34,6 +34,7 @@ class BooleanField extends ValidableField<Boolean> {
         BooleanField clone = new BooleanField()
         super.clone(clone)
         clone.defaultValue = this.defaultValue
+        clone.initExpression = this.initExpression
         clone.validations = this.validations?.collect { it.clone() }
         return clone
     }
