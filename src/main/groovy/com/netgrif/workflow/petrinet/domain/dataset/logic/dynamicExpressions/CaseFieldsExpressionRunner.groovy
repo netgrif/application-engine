@@ -15,7 +15,7 @@ abstract class CaseFieldsExpressionRunner {
     @Lookup("actionDelegate")
     abstract ActionDelegate getActionDelegate()
 
-    def run(Case useCase, String expression) {K
+    def run(Case useCase, String expression) {
         return run(useCase, useCase.getDataSet().keySet().collectEntries {[(it): (it)]} as Map<String, String>, expression)
     }
 
