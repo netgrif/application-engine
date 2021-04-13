@@ -300,7 +300,9 @@ public final class FieldFactory {
     }
 
     private Field buildField(Case useCase, String fieldId, boolean withValidation) {
-        Field field = useCase.getPetriNet().getDataSet().get(fieldId);
+        Field netField = useCase.getPetriNet().getDataSet().get(fieldId);
+        Field field = netField.clone();
+        field.setValue(netField.getValue());
 
         resolveDataValues(field, useCase, fieldId);
         if (field instanceof ChoiceField)
@@ -308,25 +310,22 @@ public final class FieldFactory {
         if (field instanceof MapOptionsField)
             resolveMapOptions((MapOptionsField) field, useCase);
         if (withValidation && field instanceof ValidableField)
-            field = resolveValidations((ValidableField) field, useCase);
+            resolveValidations((ValidableField) field, useCase);
         return field;
     }
 
     @SuppressWarnings({"all", "rawtypes", "unchecked"})
-    private ValidableField resolveValidations(ValidableField field, Case useCase) {
-        ValidableField cloned = (ValidableField) field.clone();
-        cloned.setValue(field.getValue());
+    private void resolveValidations(ValidableField field, Case useCase) {
         List<com.netgrif.workflow.petrinet.domain.dataset.logic.validation.Validation> validations = useCase.getDataField(field.getImportId()).getValidations();
         if (validations != null) {
-            cloned.setValidations(validations);
+            field.setValidations(validations);
         }
-        if (cloned.getValidations() == null) return cloned;
+        if (field.getValidations() == null) return;
 
-        ((List<com.netgrif.workflow.petrinet.domain.dataset.logic.validation.Validation>) cloned.getValidations()).forEach(valid -> {
+        ((List<com.netgrif.workflow.petrinet.domain.dataset.logic.validation.Validation>) field.getValidations()).forEach(valid -> {
             if (!valid.isDynamic()) return;
             valid.setValidationRule(dataExpressions.compile(useCase, valid.getValidationRule()));
         });
-        return cloned;
     }
 
     private void resolveChoices(ChoiceField field, Case useCase) {
