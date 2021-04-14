@@ -2,7 +2,7 @@ package com.netgrif.workflow.auth
 
 import com.netgrif.workflow.auth.domain.Authority
 import com.netgrif.workflow.auth.domain.User
-import com.netgrif.workflow.auth.domain.UserProcessRole
+
 import com.netgrif.workflow.auth.domain.UserState
 import com.netgrif.workflow.orgstructure.domain.Group
 import com.netgrif.workflow.startup.ImportHelper

@@ -48,8 +48,8 @@ public class LoggedUser extends org.springframework.security.core.userdetails.Us
         groups.forEach(org -> this.groups.add(org.getId()));
     }
 
-    public void parseProcessRoles(Set<UserProcessRole> processRoles) {
-        processRoles.forEach(role -> this.processRoles.add(role.getRoleId()));
+    public void parseProcessRoles(Set<ProcessRole> processRoles) {
+        processRoles.forEach(role -> this.processRoles.add(role.getStringId()));
     }
 
     public boolean isAdmin() {

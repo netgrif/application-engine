@@ -74,11 +74,6 @@ public class User {
 
     @Getter
     @Setter
-    private Set<UserProcessRole> userProcessRoles;
-
-    @Transient
-    @Getter
-    @Setter
     private Set<ProcessRole> processRoles;
 
     @Transient
@@ -95,7 +90,6 @@ public class User {
         groups = new HashSet<>();
         authorities = new HashSet<>();
         nextGroups = new HashSet<>();
-        userProcessRoles = new HashSet<>();
         processRoles = new HashSet<>();
     }
 
@@ -124,20 +118,20 @@ public class User {
 
     public User(ObjectNode json) {
         this(json.get("email").asText(), null, json.get("name").asText(), json.get("surname").asText());
-        ((ArrayNode) json.get("userProcessRoles"))
-                .forEach(node -> userProcessRoles.add(new UserProcessRole(node.get("roleId").asText())));
+        ((ArrayNode) json.get("processRoles"))
+                .forEach(node -> processRoles.add(new ProcessRole(node.get("_id").asText())));
     }
 
     public void addAuthority(Authority authority) {
         authorities.add(authority);
     }
 
-    public void addProcessRole(UserProcessRole role) {
-        userProcessRoles.add(role);
+    public void addProcessRole(ProcessRole role) {
+        processRoles.add(role);
     }
 
-    public void removeProcessRole(UserProcessRole role) {
-        userProcessRoles.remove(role);
+    public void removeProcessRole(ProcessRole role) {
+        processRoles.remove(role);
     }
 
     public String getFullName() {
@@ -157,8 +151,8 @@ public class User {
         LoggedUser loggedUser = new LoggedUser(this.get_id().toString(), this.getEmail(), this.getPassword(), this.getAuthorities());
         loggedUser.setFullName(this.getFullName());
         loggedUser.setAnonymous(false);
-        if (!this.getUserProcessRoles().isEmpty())
-            loggedUser.parseProcessRoles(this.getUserProcessRoles());
+        if (!this.getProcessRoles().isEmpty())
+            loggedUser.parseProcessRoles(this.getProcessRoles());
         if (!this.getGroups().isEmpty())
             loggedUser.parseGroups(this.getGroups());
 
@@ -178,7 +172,6 @@ public class User {
                 ", token='" + token + '\'' +
                 ", expirationDate=" + expirationDate +
                 ", authorities=" + authorities +
-                ", userProcessRoles=" + userProcessRoles +
                 ", processRoles=" + processRoles +
                 ", groups=" + groups +
                 '}';
