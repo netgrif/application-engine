@@ -8,7 +8,7 @@ public class UserRegistrationEvent extends UserEvent {
 
     public UserRegistrationEvent(User user) {
         super(new LoggedUser(
-                user.get_id(),
+                user.getStringId(),
                 user.getEmail(),
                 user.getPassword(),
                 user.getAuthorities()
