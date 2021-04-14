@@ -11,7 +11,7 @@ abstract class DataExpressions {
     /**
      * pattern for dynamic evaluation is ${code}
      */
-    protected static final Pattern EXPRESSION_REGEX = Pattern.compile("\\\$\\{(.*?)\\}")
+    protected static final Pattern EXPRESSION_REGEX = Pattern.compile("\\\$\\{((.|\n)[^\$]*)}")
 
     @Autowired
     protected CaseFieldsExpressionRunner expressionRunner

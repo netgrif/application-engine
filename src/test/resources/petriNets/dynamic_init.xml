@@ -1,0 +1,47 @@
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../main/resources/petriNets/petriflow_schema.xsd">
+    <id>dynamic_init</id>
+    <title>dynamic_init</title>
+    <defaultRole>true</defaultRole>
+    <initials>DVT</initials>
+    <!-- ROLES -->
+    <data type="text" immediate="true">
+        <id>text</id>
+        <title>Text</title>
+        <init>${userService.findByEmail("super@netgrif.com", true).name}</init>
+    </data>
+
+    <data type="number" immediate="true">
+        <id>number</id>
+        <title>number</title>
+        <init>${userService.findByEmail("super@netgrif.com", true).name.length()}</init>
+    </data>
+
+    <data type="date" immediate="true">
+        <id>date</id>
+        <title>date</title>
+        <init>${java.time.LocalDate.now()}</init>
+    </data>
+
+    <data type="dateTime" immediate="true">
+        <id>dateTime</id>
+        <title>dateTime</title>
+        <init>${java.time.LocalDateTime.now()}</init>
+    </data>
+
+    <data type="user" immediate="true">
+        <id>user</id>
+        <title>user</title>
+        <init>${
+            def user = userService.loggedOrSystem
+            return new com.netgrif.workflow.auth.domain.User(id: user.id, name: user.name, surname: user.surname, email: user.email)
+        }</init>
+    </data>
+
+    <transition>
+        <id>transition</id>
+        <x>0</x>
+        <y>0</y>
+        <label>whatever</label>
+    </transition>
+
+</document>
