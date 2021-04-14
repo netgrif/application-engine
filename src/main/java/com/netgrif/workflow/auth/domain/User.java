@@ -144,6 +144,11 @@ public class User {
         return name + " " + surname;
     }
 
+    @JsonIgnore
+    public String getStringId() {
+        return _id.toString();
+    }
+
     public void addGroup(Group group) {
         this.groups.add(group);
     }
@@ -181,7 +186,7 @@ public class User {
 
     public Author transformToAuthor() {
         Author author = new Author();
-        author.setId(this.get_id().toString());
+        author.setId(this.getStringId());
         author.setEmail(this.getEmail());
         author.setFullName(this.getFullName());
 

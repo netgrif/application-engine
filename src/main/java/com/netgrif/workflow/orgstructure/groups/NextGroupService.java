@@ -218,7 +218,7 @@ public class NextGroupService implements INextGroupService {
         }
         Set<String> userIds = groupCase.getDataSet().get(GROUP_MEMBERS_FIELD).getOptions().keySet();
         List<User> resultList = new ArrayList<>();
-        userIds.forEach(id -> resultList.add(userService.findById(Long.parseLong(id), true)));
+        userIds.forEach(id -> resultList.add(userService.findById(id, true)));
         return resultList;
     }
 
@@ -230,12 +230,12 @@ public class NextGroupService implements INextGroupService {
     }
 
     @Override
-    public Long getGroupOwnerId(String groupId) {
+    public String getGroupOwnerId(String groupId) {
         return this.getGroupOwnerId(this.findGroup(groupId));
     }
 
     @Override
-    public Collection<Long> getGroupsOwnerIds(Collection<String> groupIds) {
+    public Collection<String> getGroupsOwnerIds(Collection<String> groupIds) {
         return this.findByIds(groupIds).stream().map(this::getGroupOwnerId).collect(Collectors.toList());
     }
 
@@ -274,12 +274,12 @@ public class NextGroupService implements INextGroupService {
         return false;
     }
 
-    private Long getGroupOwnerId(Case groupCase) {
+    private String getGroupOwnerId(Case groupCase) {
         return groupCase.getAuthor().getId();
     }
 
     private Case findUserDefaultGroup(User author){
-        return workflowService.searchOne(QCase.case$.author.id.eq(author.get_id()).and(QCase.case$.title.eq(author.getFullName())));
+        return workflowService.searchOne(QCase.case$.author.id.eq(author.getStringId()).and(QCase.case$.title.eq(author.getFullName())));
     }
 
     private Task getGroupInitTask(Case groupCase){

@@ -185,7 +185,7 @@ public class WorkflowService implements IWorkflowService {
     public Case resolveUserRef(Case useCase) {
         useCase.getUsers().clear();
         useCase.getUserRefs().forEach((id, permission) -> {
-            List<Long> userIds = getExistingUsers((List<Long>) useCase.getDataSet().get(id).getValue());
+            List<String> userIds = getExistingUsers((List<String>) useCase.getDataSet().get(id).getValue());
             if (userIds != null && userIds.size() != 0) {
                 useCase.addUsers(new HashSet<>(userIds), permission);
             }
@@ -193,7 +193,7 @@ public class WorkflowService implements IWorkflowService {
         return repository.save(useCase);
     }
 
-    private List<Long> getExistingUsers(List<Long> userIds) {
+    private List<String> getExistingUsers(List<String> userIds) {
         if (userIds == null)
             return null;
         return userIds.stream().filter(userId -> userService.findById(userId, false) != null).collect(Collectors.toList());

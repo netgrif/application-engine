@@ -90,7 +90,7 @@ public class TaskSearchService extends MongoSearchService<Task> {
         return QTask.task.roles.containsKey(role);
     }
 
-    public Predicate usersQuery(Long userId) {
+    public Predicate usersQuery(String userId) {
         return QTask.task.users.containsKey(userId);
     }
 
@@ -156,7 +156,7 @@ public class TaskSearchService extends MongoSearchService<Task> {
         );
     }
 
-    public Predicate userQuery(Long userId) {
+    public Predicate userQuery(String userId) {
         return QTask.task.userId.eq(userId);
     }
 
