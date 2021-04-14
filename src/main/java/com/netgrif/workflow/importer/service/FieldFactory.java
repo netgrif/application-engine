@@ -576,9 +576,14 @@ public final class FieldFactory {
     }
 
     private void resolveAttributeValues(Field field, Case useCase, String fieldId) {
-        if (field.getType().equals(FieldType.CASE_REF)) {
-            List<String> allowedNets = new ArrayList<>(useCase.getDataSet().get(fieldId).getAllowedNets());
-            ((CaseField) field).setAllowedNets(allowedNets);
+        DataField dataField = useCase.getDataSet().get(fieldId);
+        if (field.getType().equals(FieldType.CASE_REF) || field.getType().equals(FieldType.FILTER)) {
+            List<String> allowedNets = new ArrayList<>(dataField.getAllowedNets());
+            ((FieldWithAllowedNets) field).setAllowedNets(allowedNets);
+        }
+        if (field.getType().equals(FieldType.FILTER)) {
+            Map<String, Object> filterMetadata = new HashMap<>(dataField.getFilterMetadata());
+            ((FilterField) field).setFilterMetadata(filterMetadata);
         }
     }
 
