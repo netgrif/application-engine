@@ -1,6 +1,5 @@
 package com.netgrif.workflow.elastic.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
@@ -64,7 +63,7 @@ public class ElasticCase {
 
     private Long creationDateSortable;
 
-    private Long author;
+    private String author;
 
     private String authorName;
 
@@ -133,7 +132,7 @@ public class ElasticCase {
             if (user.getName() != null) {
                 fullname.append(user.getName());
             }
-            return Optional.of(new DataField(String.valueOf(user.getId()), fullname.toString()));
+            return Optional.of(new DataField(String.valueOf(user.get_id()), fullname.toString()));
         } else if (dataField.getValue() instanceof LocalDate) {
             LocalDate date = (LocalDate) dataField.getValue();
             if (date == null)

@@ -13,6 +13,7 @@ import com.netgrif.workflow.orgstructure.service.IMemberService;
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRoleRepository;
 import com.netgrif.workflow.startup.SystemUserRunner;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
@@ -98,7 +99,7 @@ public class UserService implements IUserService {
     public Member upsertGroupMember(User user) {
         Member member = memberService.findByEmail(user.getEmail());
         if (member == null)
-            member = new Member(user.getId(), user.getName(), user.getSurname(), user.getEmail());
+            member = new Member(user.get_id().toString(), user.getName(), user.getSurname(), user.getEmail());
         member.setGroups(user.getGroups());
         return memberService.save(member);
     }
@@ -141,7 +142,7 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public User findById(Long id, boolean small) {
+    public User findById(String id, boolean small) {
         Optional<User> user = userRepository.findById(id);
         if (!user.isPresent())
             throw new IllegalArgumentException("Could not find user with id ["+id+"]");
@@ -172,8 +173,8 @@ public class UserService implements IUserService {
     @Override
     public Page<User> findAllCoMembers(LoggedUser loggedUser, boolean small, Pageable pageable) {
         // TODO: 8/27/18 make all pageable
-        Set<Long> members = memberService.findAllCoMembersIds(loggedUser.getEmail());
-        members.add(loggedUser.getId());
+        Set<String> members = memberService.findAllCoMembersIds(loggedUser.getEmail());
+        members.add(loggedUser.getId().toString());
         Page<User> users = userRepository.findAllByIdInAndState(members, UserState.ACTIVE, pageable);
         if (!small)
             users.forEach(this::loadProcessRoles);
@@ -182,10 +183,11 @@ public class UserService implements IUserService {
 
     @Override
     public Page<User> searchAllCoMembers(String query, LoggedUser loggedUser, Boolean small, Pageable pageable) {
-        Set<Long> members = memberService.findAllCoMembersIds(loggedUser.getEmail());
+        Set<String> members = memberService.findAllCoMembersIds(loggedUser.getEmail());
         members.add(loggedUser.getId());
 
-        Page<User> users = userRepository.findAll(buildPredicate(members, query), pageable);
+        Page<User> users = userRepository.findAll(buildPredicate(members.stream().map(ObjectId::new)
+                .collect(Collectors.toSet()), query), pageable);
         if (!small)
             users.forEach(this::loadProcessRoles);
         return users;
@@ -200,9 +202,9 @@ public class UserService implements IUserService {
             negateRoleIds = new ArrayList<>();
         }
 
-        Set<Long> members = memberService.findAllCoMembersIds(loggedUser.getEmail());
+        Set<String> members = memberService.findAllCoMembersIds(loggedUser.getEmail());
         members.add(loggedUser.getId());
-        BooleanExpression predicate = buildPredicate(members, query);
+        BooleanExpression predicate = buildPredicate(members.stream().map(ObjectId::new).collect(Collectors.toSet()), query);
         if (!(roleIds == null || roleIds.isEmpty())) {
             predicate = predicate.and(QUser.user.userProcessRoles.any().roleId.in(roleIds));
         }
@@ -213,9 +215,9 @@ public class UserService implements IUserService {
         return users;
     }
 
-    private BooleanExpression buildPredicate(Set<Long> members, String query) {
+    private BooleanExpression buildPredicate(Set<ObjectId> members, String query) {
         BooleanExpression predicate = QUser.user
-                .id.in(members)
+                ._id.in(members)
                 .and(QUser.user.state.eq(UserState.ACTIVE));
         for (String word : query.split(" ")) {
             predicate = predicate
@@ -245,7 +247,7 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void assignAuthority(Long userId, Long authorityId) {
+    public void assignAuthority(String userId, String authorityId) {
         Optional<User> user = userRepository.findById(userId);
         Optional<Authority> authority = authorityRepository.findById(authorityId);
 
@@ -307,8 +309,8 @@ public class UserService implements IUserService {
 
     @Override
     public void deleteUser(User user) {
-        if (!userRepository.findById(user.getId()).isPresent())
-            throw new IllegalArgumentException("Could not find user with id [" + user.getId() + "]");
+        if (!userRepository.findById(user.get_id().toString()).isPresent())
+            throw new IllegalArgumentException("Could not find user with id [" + user.get_id() + "]");
         userRepository.delete(user);
     }
 

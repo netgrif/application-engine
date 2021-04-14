@@ -7,8 +7,10 @@ import com.netgrif.workflow.orgstructure.domain.Group;
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRole;
 import lombok.Getter;
 import lombok.Setter;
+import org.bson.types.ObjectId;
 import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.NotBlank;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -16,21 +18,16 @@ import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
-@Entity
-@Table(name = "user")
-@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
+@Document
 public class User {
 
     public static final String UNKNOWN = "unknown";
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     @Getter
-    private Long id;
+    private ObjectId _id;
 
     @NotNull
-    @Email
-    @Column(unique = true)
     @Getter
     @Setter
     private String email;
@@ -49,13 +46,11 @@ public class User {
     private String password;
 
     @NotNull
-    @NotBlank
     @Getter
     @Setter
     private String name;
 
     @NotNull
-    @NotBlank
     @Getter
     @Setter
     private String surname;
@@ -73,14 +68,10 @@ public class User {
     @Setter
     private LocalDateTime expirationDate;
 
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "user_authorities", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "authority_id"))
     @Getter
     @Setter
     private Set<Authority> authorities;
 
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "user_process_roles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "user_process_role_id"))
     @Getter
     @Setter
     private Set<UserProcessRole> userProcessRoles;
@@ -108,14 +99,14 @@ public class User {
         processRoles = new HashSet<>();
     }
 
-    public User(Long id) {
+    public User(ObjectId id) {
         this();
-        this.id = id;
+        this._id = id;
         nextGroups = new HashSet<>();
     }
 
     public User(User user){
-        this.id = user.getId();
+        this._id = user.get_id();
         this.email = user.getEmail();
         this.surname = user.getSurname();
         this.name = user.getName();
@@ -158,7 +149,7 @@ public class User {
     }
 
     public LoggedUser transformToLoggedUser() {
-        LoggedUser loggedUser = new LoggedUser(this.getId(), this.getEmail(), this.getPassword(), this.getAuthorities());
+        LoggedUser loggedUser = new LoggedUser(this.get_id().toString(), this.getEmail(), this.getPassword(), this.getAuthorities());
         loggedUser.setFullName(this.getFullName());
         loggedUser.setAnonymous(false);
         if (!this.getUserProcessRoles().isEmpty())
@@ -172,7 +163,7 @@ public class User {
     @Override
     public String toString() {
         return "User{" +
-                "id=" + id +
+                "id=" + _id +
                 ", email='" + email + '\'' +
                 ", telNumber='" + telNumber + '\'' +
                 ", avatar='" + avatar + '\'' +
@@ -190,7 +181,7 @@ public class User {
 
     public Author transformToAuthor() {
         Author author = new Author();
-        author.setId(this.getId());
+        author.setId(this.get_id().toString());
         author.setEmail(this.getEmail());
         author.setFullName(this.getFullName());
 

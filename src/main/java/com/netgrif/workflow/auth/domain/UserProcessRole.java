@@ -3,20 +3,20 @@ package com.netgrif.workflow.auth.domain;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
+import org.bson.types.ObjectId;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.persistence.*;
 import java.util.Objects;
 import java.util.Set;
 
-@Entity
+@Document
 public class UserProcessRole {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     @Getter @Setter
-    private Long id;
+    private ObjectId _id;
 
-    @Column(unique = true)
     @Getter @Setter
     private String roleId;
 
@@ -24,8 +24,7 @@ public class UserProcessRole {
     private String netId;
 
     @JsonIgnore
-    @ManyToMany(mappedBy = "userProcessRoles")
-    private Set<User> users;
+    private Set<String> users;
 
     public UserProcessRole() {
     }
@@ -37,7 +36,7 @@ public class UserProcessRole {
     @Override
     public String toString() {
         return "UserProcessRole{" +
-                "id=" + id +
+                "id=" + _id +
                 ", roleId='" + roleId + '\'' +
                 ", netId='" + netId + '\'' +
                 '}';
@@ -53,11 +52,11 @@ public class UserProcessRole {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         UserProcessRole that = (UserProcessRole) o;
-        return Objects.equals(id, that.id) && Objects.equals(roleId, that.roleId) && Objects.equals(netId, that.netId);
+        return Objects.equals(_id, that._id) && Objects.equals(roleId, that.roleId) && Objects.equals(netId, that.netId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, roleId, netId);
+        return Objects.hash(_id, roleId, netId);
     }
 }

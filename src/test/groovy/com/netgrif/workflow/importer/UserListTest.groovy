@@ -19,12 +19,8 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit4.SpringRunner
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.Collections;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @SpringBootTest
@@ -69,12 +65,12 @@ class UserListTest {
 
         dataService.setData(task.stringId,  ImportHelper.populateDataset([
                 "users_1": [
-                        "value": [superCreator.getSuperUser().getId()],
+                        "value": [superCreator.getSuperUser().get_id()],
                         "type": "userList"
                 ]
         ]))
 
-        assert taskService.findById(task.stringId).users.get(superCreator.getSuperUser().getId())
-        assert caseRepository.findById(caseOpt.get().stringId).get().users.get(superCreator.getSuperUser().getId())
+        assert taskService.findById(task.stringId).users.get(superCreator.getSuperUser().get_id())
+        assert caseRepository.findById(caseOpt.get().stringId).get().users.get(superCreator.getSuperUser().get_id())
     }
 }
