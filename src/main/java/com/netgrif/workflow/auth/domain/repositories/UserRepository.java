@@ -27,9 +27,9 @@ public interface UserRepository extends MongoRepository<User, String>, QuerydslP
 
     List<User> findAllByStateAndExpirationDateBefore(UserState userState, LocalDateTime dateTime);
 
-    Page<User> findDistinctByStateAndUserProcessRoles_RoleIdIn(UserState state, List<String> roleId, Pageable pageable);
+    Page<User> findDistinctByStateAndProcessRoles__idIn(UserState state, List<String> roleId, Pageable pageable);
 
-    List<User> findAllByUserProcessRoles_RoleIdIn(List<String> roleId);
+    List<User> findAllByProcessRoles__idIn(List<String> roleId);
 
     List<User> removeAllByStateAndExpirationDateBefore(UserState state, LocalDateTime dateTime);
 

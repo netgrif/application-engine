@@ -3,7 +3,6 @@ package com.netgrif.workflow.workflow.web;
 import com.netgrif.workflow.MockService;
 import com.netgrif.workflow.auth.domain.Authority;
 import com.netgrif.workflow.auth.domain.User;
-import com.netgrif.workflow.auth.domain.UserProcessRole;
 import com.netgrif.workflow.auth.domain.UserState;
 import com.netgrif.workflow.auth.service.interfaces.IAuthorityService;
 import com.netgrif.workflow.importer.service.Importer;
