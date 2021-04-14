@@ -105,7 +105,7 @@ public class UserController {
 
     @ApiOperation(value = "Get user by id", authorizations = @Authorization("BasicAuth"))
     @GetMapping(value = "/{id}", produces = MediaTypes.HAL_JSON_VALUE)
-    public UserResource getUser(@PathVariable("id") Long userId, @RequestParam(value = "small", required = false) Boolean small, Locale locale) {
+    public UserResource getUser(@PathVariable("id") String userId, @RequestParam(value = "small", required = false) Boolean small, Locale locale) {
         small = small == null ? false : small;
         LoggedUser loggedUser = (LoggedUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (!loggedUser.isAdmin() && !Objects.equals(loggedUser.getId(), userId)){
@@ -128,7 +128,7 @@ public class UserController {
 
     @ApiOperation(value = "Update user", authorizations = @Authorization("BasicAuth"))
     @PostMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
-    public UserResource updateUser(@PathVariable("id") Long userId, @RequestBody UpdateUserRequest updates, Authentication auth, Locale locale) throws UnauthorisedRequestException {
+    public UserResource updateUser(@PathVariable("id") String userId, @RequestBody UpdateUserRequest updates, Authentication auth, Locale locale) throws UnauthorisedRequestException {
         if (!serverAuthProperties.isEnableProfileEdit()) return null;
 
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
@@ -166,7 +166,7 @@ public class UserController {
             @ApiResponse(code = 200, message = "OK", response = MessageResource.class),
             @ApiResponse(code = 403, message = "Caller doesn't fulfill the authorisation requirements"),
     })
-    public MessageResource assignRolesToUser(@PathVariable("id") Long userId, @RequestBody Set<String> roleIds, Authentication auth) {
+    public MessageResource assignRolesToUser(@PathVariable("id") String userId, @RequestBody Set<String> roleIds, Authentication auth) {
         try {
             processRoleService.assignRolesToUser(userId, roleIds, (LoggedUser) auth.getPrincipal());
             log.info("Process roles " + roleIds + " assigned to user " + userId);
@@ -199,16 +199,15 @@ public class UserController {
             @ApiResponse(code = 200, message = "OK", response = MessageResource.class),
             @ApiResponse(code = 403, message = "Caller doesn't fulfill the authorisation requirements"),
     })
-    public MessageResource assignAuthorityToUser(@PathVariable("id") Long userId, @RequestBody String authorityId) {
-        Long authority = authorityId != null ? Long.parseLong(authorityId) : null;
-        userService.assignAuthority(userId, authority);
-        return MessageResource.successMessage("Authority " + authority + " assigned to user " + userId);
+    public MessageResource assignAuthorityToUser(@PathVariable("id") String userId, @RequestBody String authorityId) {
+        userService.assignAuthority(userId, authorityId);
+        return MessageResource.successMessage("Authority " + authorityId + " assigned to user " + userId);
     }
 
     @ApiOperation(value = "Get user's preferences", authorizations = @Authorization("BasicAuth"))
     @GetMapping(value = "/preferences", produces = MediaTypes.HAL_JSON_VALUE)
     public PreferencesResource preferences(Authentication auth) {
-        Long userId = ((LoggedUser) auth.getPrincipal()).getId();
+        String userId = ((LoggedUser) auth.getPrincipal()).getId();
         Preferences preferences = preferencesService.get(userId);
 
         if (preferences == null) {
@@ -222,7 +221,7 @@ public class UserController {
     @PostMapping(value = "/preferences", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public MessageResource savePreferences(@RequestBody Preferences preferences, Authentication auth) {
         try {
-            Long userId = ((LoggedUser) auth.getPrincipal()).getId();
+            String userId = ((LoggedUser) auth.getPrincipal()).getId();
             preferences.setUserId(userId);
             preferencesService.save(preferences);
             return MessageResource.successMessage("User preferences saved");

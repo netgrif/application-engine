@@ -135,7 +135,7 @@ public class MongoSearchService<T> {
 
     protected Long resolveAuthorByEmail(String email) {
         User user = userService.findByEmail(email, true);
-        return user != null ? user.getId() : null;
+        return user != null ? user.get_id() : null;
     }
 
     public static String oid(String id) {

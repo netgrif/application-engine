@@ -132,7 +132,7 @@ class AssignActionTest {
         String roleIdInMainNet = mainNet.getRoles().find {it.value.name.defaultValue == "admin_main"}.key
 
         def content = JsonOutput.toJson([roleIdInMainNet])
-        String userId = Integer.toString(user.id as Integer)
+        String userId = Integer.toString(user._id as Integer)
 
         mvc.perform(post(ROLE_API.replace("{}", userId))
                 .accept(MediaType.APPLICATION_JSON, MediaType.TEXT_PLAIN)
