@@ -25,6 +25,15 @@
             <option key="Task">Task</option>
         </options>
     </data>
+    <data type="enumeration_map" immediate="true">
+        <id>visibility</id>
+        <title>Visibility</title>
+        <options>
+            <option key="public">Public</option>
+            <option key="private">Private</option>
+        </options>
+        <init>public</init>
+    </data>
     <data type="text">
         <id>new_title</id>
         <title>Filter name</title>
@@ -74,13 +83,28 @@
                 </layout>
             </dataRef>
             <dataRef>
-                <id>new_title</id>
+                <id>visibility</id>
                 <logic>
                     <behavior>editable</behavior>
                 </logic>
                 <layout>
                     <x>0</x>
                     <y>2</y>
+                    <rows>1</rows>
+                    <cols>4</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>new_title</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>3</y>
                     <rows>1</rows>
                     <cols>4</cols>
                     <offset>0</offset>

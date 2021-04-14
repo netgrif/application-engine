@@ -15,10 +15,12 @@ class FilterField extends FieldWithAllowedNets<String>  {
     FilterField() {
         super()
         allowedNets = new ArrayList<>()
+        filterMetadata = new HashMap<>()
     }
 
     FilterField(List<String> allowedNets) {
         super(allowedNets)
+        filterMetadata = new HashMap<>()
     }
 
     @Override
