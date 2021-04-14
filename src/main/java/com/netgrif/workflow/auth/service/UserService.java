@@ -99,7 +99,7 @@ public class UserService implements IUserService {
     public Member upsertGroupMember(User user) {
         Member member = memberService.findByEmail(user.getEmail());
         if (member == null)
-            member = new Member(user.get_id().toString(), user.getName(), user.getSurname(), user.getEmail());
+            member = new Member(user.getStringId(), user.getName(), user.getSurname(), user.getEmail());
         member.setGroups(user.getGroups());
         return memberService.save(member);
     }
@@ -174,8 +174,9 @@ public class UserService implements IUserService {
     public Page<User> findAllCoMembers(LoggedUser loggedUser, boolean small, Pageable pageable) {
         // TODO: 8/27/18 make all pageable
         Set<String> members = memberService.findAllCoMembersIds(loggedUser.getEmail());
-        members.add(loggedUser.getId().toString());
-        Page<User> users = userRepository.findAllByIdInAndState(members, UserState.ACTIVE, pageable);
+        members.add(loggedUser.getId());
+        Set<ObjectId> objMembers = members.stream().map(ObjectId::new).collect(Collectors.toSet());
+        Page<User> users = userRepository.findAllBy_idInAndState(objMembers, UserState.ACTIVE, pageable);
         if (!small)
             users.forEach(this::loadProcessRoles);
         return users;
@@ -309,7 +310,7 @@ public class UserService implements IUserService {
 
     @Override
     public void deleteUser(User user) {
-        if (!userRepository.findById(user.get_id().toString()).isPresent())
+        if (!userRepository.findById(user.getStringId()).isPresent())
             throw new IllegalArgumentException("Could not find user with id [" + user.get_id() + "]");
         userRepository.delete(user);
     }
