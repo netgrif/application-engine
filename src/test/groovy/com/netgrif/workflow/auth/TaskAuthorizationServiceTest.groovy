@@ -84,7 +84,7 @@ class TaskAuthorizationServiceTest {
                 [] as Group[],
                 [processRoles.get("role")] as UserProcessRole[])
 
-        userId = user.id
+        userId = user._id
         userWithRoleAuth = new UsernamePasswordAuthenticationToken(USER_WITH_ROLE_EMAIL, "password")
 
         importHelper.createUser(new User(name: "NoRole", surname: "User", email: USER_WITHOUT_ROLE_EMAIL, password: "password", state: UserState.ACTIVE),

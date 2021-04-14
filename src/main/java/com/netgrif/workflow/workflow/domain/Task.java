@@ -63,7 +63,7 @@ public class Task {
 
     @Indexed
     @Setter
-    private Long userId;
+    private String userId;
 
     @org.springframework.data.annotation.Transient
     @Getter @Setter
