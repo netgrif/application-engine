@@ -13,7 +13,7 @@ class DataExpressions {
     /**
      * pattern for dynamic evaluation is ${code}
      */
-    public static final Pattern EXPRESSION_REGEX = Pattern.compile("\\\$\\{(.*?)\\}")
+    public static final Pattern EXPRESSION_REGEX = Pattern.compile("\\\$\\{((.|\n)*?)}")
 
     @Autowired
     protected CaseFieldsExpressionRunner expressionRunner
