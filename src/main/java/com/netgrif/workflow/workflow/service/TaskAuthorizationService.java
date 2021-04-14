@@ -44,7 +44,7 @@ public class TaskAuthorizationService extends AbstractAuthorizationService imple
 
     @Override
     public boolean userHasUserListPermission(User user, Task task, RolePermission... permissions) {
-        Map<Long, Map<String, Boolean>> users = task.getUsers();
+        Map<String, Map<String, Boolean>> users = task.getUsers();
 
         if (!users.containsKey(user.get_id()))
             return false;
