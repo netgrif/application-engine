@@ -3,14 +3,15 @@ package com.netgrif.workflow.auth.service;
 import com.netgrif.workflow.auth.domain.*;
 import com.netgrif.workflow.auth.domain.repositories.AuthorityRepository;
 import com.netgrif.workflow.auth.domain.repositories.UserRepository;
-import com.netgrif.workflow.auth.service.interfaces.IUserProcessRoleService;
 import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.auth.web.requestbodies.UpdateUserRequest;
 import com.netgrif.workflow.event.events.user.UserRegistrationEvent;
 import com.netgrif.workflow.orgstructure.domain.Member;
 import com.netgrif.workflow.orgstructure.groups.interfaces.INextGroupService;
 import com.netgrif.workflow.orgstructure.service.IMemberService;
+import com.netgrif.workflow.petrinet.domain.roles.ProcessRole;
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRoleRepository;
+import com.netgrif.workflow.petrinet.service.interfaces.IProcessRoleService;
 import com.netgrif.workflow.startup.SystemUserRunner;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import org.bson.types.ObjectId;
@@ -36,16 +37,13 @@ public class UserService implements IUserService {
     private AuthorityRepository authorityRepository;
 
     @Autowired
-    private ProcessRoleRepository processRoleRepository;
+    private IProcessRoleService processRoleService;
 
     @Autowired
     private BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @Autowired
     private ApplicationEventPublisher publisher;
-
-    @Autowired
-    private IUserProcessRoleService userProcessRoleService;
 
     @Autowired
     private IMemberService memberService;
@@ -119,7 +117,7 @@ public class UserService implements IUserService {
 
     @Override
     public void addDefaultRole(User user) {
-        user.addProcessRole(userProcessRoleService.findDefault());
+        user.addProcessRole(processRoleService.defaultRole());
     }
 
     @Override
@@ -146,27 +144,27 @@ public class UserService implements IUserService {
         Optional<User> user = userRepository.findById(id);
         if (!user.isPresent())
             throw new IllegalArgumentException("Could not find user with id ["+id+"]");
-        if (!small) {
+        /*if (!small) {
             loadGroups(user.get());
             return loadProcessRoles(user.get());
-        }
+        }*/
         return user.get();
     }
 
     @Override
     public User findByEmail(String email, boolean small) {
         User user = userRepository.findByEmail(email);
-        if (!small) {
+        /*if (!small) {
             loadGroups(user);
             return loadProcessRoles(user);
-        }
+        }*/
         return user;
     }
 
     @Override
     public List<User> findAll(boolean small) {
         List<User> users = userRepository.findAll();
-        if (!small) users.forEach(this::loadProcessRoles);
+//        if (!small) users.forEach(this::loadProcessRoles);
         return users;
     }
 
@@ -177,8 +175,8 @@ public class UserService implements IUserService {
         members.add(loggedUser.getId());
         Set<ObjectId> objMembers = members.stream().map(ObjectId::new).collect(Collectors.toSet());
         Page<User> users = userRepository.findAllBy_idInAndState(objMembers, UserState.ACTIVE, pageable);
-        if (!small)
-            users.forEach(this::loadProcessRoles);
+        /*if (!small)
+            users.forEach(this::loadProcessRoles);*/
         return users;
     }
 
@@ -189,13 +187,13 @@ public class UserService implements IUserService {
 
         Page<User> users = userRepository.findAll(buildPredicate(members.stream().map(ObjectId::new)
                 .collect(Collectors.toSet()), query), pageable);
-        if (!small)
-            users.forEach(this::loadProcessRoles);
+        /*if (!small)
+            users.forEach(this::loadProcessRoles);*/
         return users;
     }
 
     @Override
-    public Page<User> searchAllCoMembers(String query, List<String> roleIds, List<String> negateRoleIds, LoggedUser loggedUser, Boolean small, Pageable pageable) {
+    public Page<User> searchAllCoMembers(String query, List<ObjectId> roleIds, List<ObjectId> negateRoleIds, LoggedUser loggedUser, Boolean small, Pageable pageable) {
         if ((roleIds == null || roleIds.isEmpty()) && (negateRoleIds == null || negateRoleIds.isEmpty()))
             return searchAllCoMembers(query, loggedUser, small, pageable);
 
@@ -207,12 +205,12 @@ public class UserService implements IUserService {
         members.add(loggedUser.getId());
         BooleanExpression predicate = buildPredicate(members.stream().map(ObjectId::new).collect(Collectors.toSet()), query);
         if (!(roleIds == null || roleIds.isEmpty())) {
-            predicate = predicate.and(QUser.user.userProcessRoles.any().roleId.in(roleIds));
+            predicate = predicate.and(QUser.user.processRoles.any()._id.in(roleIds));
         }
-        predicate = predicate.and(QUser.user.userProcessRoles.any().roleId.in(negateRoleIds).not());
+        predicate = predicate.and(QUser.user.processRoles.any()._id.in(negateRoleIds).not());
         Page<User> users = userRepository.findAll(predicate, pageable);
-        if (!small)
-            users.forEach(this::loadProcessRoles);
+        /*if (!small)
+            users.forEach(this::loadProcessRoles);*/
         return users;
     }
 
@@ -231,19 +229,19 @@ public class UserService implements IUserService {
 
     @Override
     public Page<User> findAllActiveByProcessRoles(Set<String> roleIds, boolean small, Pageable pageable) {
-        Page<User> users = userRepository.findDistinctByStateAndUserProcessRoles_RoleIdIn(UserState.ACTIVE, new ArrayList<>(roleIds), pageable);
-        if (!small) {
+        Page<User> users = userRepository.findDistinctByStateAndProcessRoles__idIn(UserState.ACTIVE, new ArrayList<>(roleIds), pageable);
+        /*if (!small) {
             users.forEach(this::loadProcessRoles);
-        }
+        }*/
         return users;
     }
 
     @Override
     public List<User> findAllByProcessRoles(Set<String> roleIds, boolean small) {
-        List<User> users = userRepository.findAllByUserProcessRoles_RoleIdIn(new ArrayList<>(roleIds));
-        if (!small) {
+        List<User> users = userRepository.findAllByProcessRoles__idIn(new ArrayList<>(roleIds));
+        /*if (!small) {
             users.forEach(this::loadProcessRoles);
-        }
+        }*/
         return users;
     }
 
@@ -296,14 +294,14 @@ public class UserService implements IUserService {
 
     @Override
     public User addRole(User user, String roleStringId) {
-        UserProcessRole role = userProcessRoleService.findByRoleId(roleStringId);
+        ProcessRole role = processRoleService.findById(roleStringId);
         user.addProcessRole(role);
         return userRepository.save(user);
     }
 
     @Override
     public User removeRole(User user, String roleStringId) {
-        UserProcessRole role = userProcessRoleService.findByRoleId(roleStringId);
+        ProcessRole role = processRoleService.findByImportId(roleStringId);
         user.removeProcessRole(role);
         return userRepository.save(user);
     }
@@ -315,13 +313,13 @@ public class UserService implements IUserService {
         userRepository.delete(user);
     }
 
-    private User loadProcessRoles(User user) {
+/*    private User loadProcessRoles(User user) {
         if (user == null)
             return null;
         user.setProcessRoles(processRoleRepository.findAllById(user.getUserProcessRoles()
                 .stream().map(UserProcessRole::getRoleId).collect(Collectors.toList())));
         return user;
-    }
+    }*/
 
     private User loadGroups(User user){
         if (user == null)

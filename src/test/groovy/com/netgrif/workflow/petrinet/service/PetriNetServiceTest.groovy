@@ -1,8 +1,7 @@
 package com.netgrif.workflow.petrinet.service
 
 import com.netgrif.workflow.TestHelper
-import com.netgrif.workflow.auth.domain.repositories.UserProcessRoleRepository
-import com.netgrif.workflow.auth.service.interfaces.IUserProcessRoleService
+
 import com.netgrif.workflow.auth.service.interfaces.IUserService
 import com.netgrif.workflow.ipc.TaskApiTest
 import com.netgrif.workflow.petrinet.domain.PetriNet

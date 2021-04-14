@@ -826,7 +826,7 @@ public class DataService implements IDataService {
                 user.setPassword(null);
                 user.setGroups(null);
                 user.setAuthorities(null);
-                user.setUserProcessRoles(null);
+//                user.setUserProcessRoles(null);
                 value = user;
                 break;
             case "number":

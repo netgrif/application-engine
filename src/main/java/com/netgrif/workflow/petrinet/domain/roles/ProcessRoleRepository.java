@@ -14,9 +14,13 @@ public interface ProcessRoleRepository extends MongoRepository<ProcessRole, Stri
 
     Set<ProcessRole> findAllBy_idIn(Set<String> ids);
 
+    ProcessRole findBy_id(String id);
+
     Set<ProcessRole> findAllByImportIdIn(Set<String> importIds);
 
     ProcessRole findByName_DefaultValue(String name);
+
+    ProcessRole findByImportId(String importId);
 
     void deleteAllBy_idIn(Collection<ObjectId> ids);
 }

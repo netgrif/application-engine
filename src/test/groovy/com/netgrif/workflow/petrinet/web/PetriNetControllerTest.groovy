@@ -3,7 +3,7 @@ package com.netgrif.workflow.petrinet.web
 import com.netgrif.workflow.TestHelper
 import com.netgrif.workflow.auth.domain.Authority
 import com.netgrif.workflow.auth.domain.User
-import com.netgrif.workflow.auth.domain.UserProcessRole
+
 import com.netgrif.workflow.auth.domain.UserState
 import com.netgrif.workflow.ipc.TaskApiTest
 import com.netgrif.workflow.orgstructure.domain.Group
