@@ -5,7 +5,7 @@ import com.netgrif.workflow.auth.web.responsebodies.UserResource
 import org.springframework.data.mongodb.core.mapping.Document
 
 @Document
-class UserField extends Field<User> {
+class UserField extends FieldWithDefault<User> {
 
     Set<String> roles
 
@@ -47,7 +47,8 @@ class UserField extends Field<User> {
         super.clone(clone)
 
         clone.roles = this.roles
-
+        clone.defaultValue = this.defaultValue
+        clone.initExpression = this.initExpression
         return clone
     }
 }
