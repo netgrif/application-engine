@@ -8,7 +8,7 @@ import com.netgrif.workflow.WorkflowManagementSystemApplication
 import com.netgrif.workflow.auth.domain.Authority
 import com.netgrif.workflow.orgstructure.domain.Group
 import com.netgrif.workflow.auth.domain.User
-import com.netgrif.workflow.auth.domain.UserProcessRole
+
 import com.netgrif.workflow.importer.service.Importer
 import com.netgrif.workflow.startup.SuperCreator
 import groovy.json.JsonOutput

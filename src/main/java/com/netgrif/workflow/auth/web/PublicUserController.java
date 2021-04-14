@@ -11,6 +11,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.Authorization;
 import lombok.extern.slf4j.Slf4j;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.domain.Page;
@@ -25,6 +26,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Provider;
 import java.util.Locale;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
@@ -64,8 +66,9 @@ public class PublicUserController {
     @ApiOperation(value = "Generic user search", authorizations = @Authorization("BasicAuth"))
     @PostMapping(value = "/search", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
     public PagedResources<UserResource> search(@RequestParam(value = "small", required = false) Boolean small, @RequestBody UserSearchRequestBody query, Pageable pageable, PagedResourcesAssembler<User> assembler, Locale locale) {
-        small = small == null ? false : small;
-        Page<User> page = userService.searchAllCoMembers(query.getFulltext(), query.getRoles(), query.getNegativeRoles(), userService.getAnonymousLogged(), small, pageable);
+        small = small != null && small;
+        Page<User> page = userService.searchAllCoMembers(query.getFulltext(), query.getRoles().stream().map(ObjectId::new).collect(Collectors.toList()),
+                query.getNegativeRoles().stream().map(ObjectId::new).collect(Collectors.toList()), userService.getAnonymousLogged(), small, pageable);
         Link selfLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(PublicUserController.class)
                 .search(small, query, pageable, assembler, locale)).withRel("search");
         PagedResources<UserResource> resources = assembler.toResource(page, getUserResourceAssembler(locale, small, "search"), selfLink);
