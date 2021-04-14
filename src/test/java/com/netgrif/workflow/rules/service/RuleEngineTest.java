@@ -244,7 +244,7 @@ public class RuleEngineTest {
         Task task = findTask(caze, TRANS_1);
         User user = superCreator.getLoggedSuper().transformToUser();
         taskService.assignTask(task, user);
-        taskService.delegateTask(user.transformToLoggedUser(), user.getId(), task.getStringId());
+        taskService.delegateTask(user.transformToLoggedUser(), user.get_id(), task.getStringId());
         caze = workflowService.findOne(caze.getStringId());
 
         assert caze.getDataSet().get("text_data").getValue().equals(TEXT_VALUE);

@@ -11,7 +11,7 @@ public interface IProcessRoleService {
 
     List<ProcessRole> saveAll(Iterable<ProcessRole> entities);
 
-    void assignRolesToUser(Long userId, Set<String> roleIds, LoggedUser user);
+    void assignRolesToUser(String userId, Set<String> roleIds, LoggedUser user);
 
     List<ProcessRole> findAll(String netId);
 

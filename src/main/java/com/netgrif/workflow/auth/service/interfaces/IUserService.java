@@ -28,7 +28,7 @@ public interface IUserService {
 
     Member upsertGroupMember(User user);
 
-    User findById(Long id, boolean small);
+    User findById(String id, boolean small);
 
     User findByEmail(String email, boolean small);
 
@@ -40,8 +40,6 @@ public interface IUserService {
 
     List<User> findAllByProcessRoles(Set<String> roleIds, boolean small);
 
-    void assignAuthority(Long userId, Long authorityId);
-
     void addDefaultRole(User user);
 
     void addDefaultAuthorities(User user);
@@ -49,6 +47,8 @@ public interface IUserService {
     void encodeUserPassword(User user);
 
     boolean stringMatchesUserPassword(User user, String passwordToCompare);
+
+    void assignAuthority(String userId, String authorityId);
 
     User getLoggedOrSystem();
 

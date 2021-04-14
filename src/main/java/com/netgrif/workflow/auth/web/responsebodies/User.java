@@ -9,7 +9,7 @@ import java.util.Set;
 @Data
 public class User {
 
-    private Long id;
+    private String id;
 
     private String email;
 
@@ -33,7 +33,7 @@ public class User {
     private Set<String> nextGroups;
 
     protected User(com.netgrif.workflow.auth.domain.User user) {
-        id = user.getId();
+        id = user.get_id().toString();
         email = user.getEmail();
         avatar = user.getAvatar();
         name = user.getName();
