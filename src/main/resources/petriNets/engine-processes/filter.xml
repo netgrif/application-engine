@@ -34,6 +34,10 @@
         </options>
         <init>public</init>
     </data>
+    <data type="text" immediate="true">
+        <id>origin_view_id</id>
+        <title>Origin ViewId</title>
+    </data>
     <data type="text">
         <id>new_title</id>
         <title>Filter name</title>
@@ -202,6 +206,21 @@
                 <layout>
                     <x>0</x>
                     <y>1</y>
+                    <rows>1</rows>
+                    <cols>4</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>origin_view_id</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+                <layout>
+                    <x>0</x>
+                    <y>2</y>
                     <rows>1</rows>
                     <cols>4</cols>
                     <offset>0</offset>
