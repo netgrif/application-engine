@@ -4,9 +4,12 @@ import com.netgrif.workflow.workflow.domain.Case
 import org.springframework.stereotype.Component
 
 import java.util.regex.Matcher
+import java.util.regex.Pattern
 
 @Component
 class InitDataExpressions extends DataExpressions {
+
+    protected static final Pattern EXPRESSION_REGEX = Pattern.compile("\\\$\\{((.|\n)*)}")
 
     def compile(Case useCase, String expression) {
         Matcher matcher = EXPRESSION_REGEX.matcher(expression)
@@ -17,4 +20,10 @@ class InitDataExpressions extends DataExpressions {
     def compileClean(Case useCase, String expression) {
         return compileClosure(useCase, expression)
     }
+
+    static boolean containsDynamicExpression(String expression) {
+        Matcher matcher = EXPRESSION_REGEX.matcher(expression)
+        return matcher.find()
+    }
+
 }
