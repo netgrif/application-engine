@@ -124,7 +124,7 @@ public final class FieldFactory {
             }
         }
         if (data.getInit() != null && !data.getInit().isEmpty() && field instanceof FieldWithDefault) {
-            setFieldDefaultValue((FieldWithDefault) field, data.getInit().get(0), importer);
+            setFieldDefaultValue((FieldWithDefault) field, data.getInit(), importer);
         }
 
         if (data.getFormat() != null) {
@@ -148,7 +148,7 @@ public final class FieldFactory {
         return field;
     }
 
-    private MultichoiceMapField buildMultichoiceMapField(Options options, List<String> init, Importer importer) {
+    private MultichoiceMapField buildMultichoiceMapField(Options options, List<Init> init, Importer importer) {
         Map<String, I18nString> choices;
         if (options == null) {
             choices = new LinkedHashMap<>();
@@ -158,37 +158,37 @@ public final class FieldFactory {
         }
         MultichoiceMapField field = new MultichoiceMapField(choices);
         if (init!= null && !init.isEmpty()) {
-            field.setDefaultValue(new HashSet<String>(Arrays.stream(init.get(0).split(",")).collect(Collectors.toList())));
+            field.setDefaultValue(new HashSet<String>(Arrays.stream(init.get(0).getValue().split(",")).collect(Collectors.toList())));
         }
         return field;
     }
 
-    private MultichoiceField buildMultichoiceField(List<I18NStringType> values, List<String> init, Importer importer) {
+    private MultichoiceField buildMultichoiceField(List<I18NStringType> values, List<Init> init, Importer importer) {
         List<I18nString> choices = values.stream()
                 .map(importer::toI18NString)
                 .collect(Collectors.toList());
         MultichoiceField field = new MultichoiceField(choices);
         if (init!= null && !init.isEmpty()) {
-            field.setDefaultValue(init.get(0));
+            field.setDefaultValue(init.get(0).getValue());
         }
 
         return field;
     }
 
-    private EnumerationField buildEnumerationField(List<I18NStringType> values, List<String> init, Importer importer) {
+    private EnumerationField buildEnumerationField(List<I18NStringType> values, List<Init> init, Importer importer) {
         List<I18nString> choices = values.stream()
                 .map(importer::toI18NString)
                 .collect(Collectors.toList());
 
         EnumerationField field = new EnumerationField(choices);
         if (init != null && !init.isEmpty()) {
-            field.setDefaultValue(init.get(0));
+            field.setDefaultValue(init.get(0).getValue());
         }
 
         return field;
     }
 
-    private EnumerationMapField buildEnumerationMapField(Options options, List<String> init, Importer importer) {
+    private EnumerationMapField buildEnumerationMapField(Options options, List<Init> init, Importer importer) {
         Map<String, I18nString> choices;
         if (options == null) {
             choices = new LinkedHashMap<>();
@@ -198,7 +198,7 @@ public final class FieldFactory {
         }
         EnumerationMapField field = new EnumerationMapField(choices);
         if (init!= null && !init.isEmpty()) {
-            field.setDefaultValue(init.get(0));
+            field.setDefaultValue(init.get(0).getValue());
         }
         return field;
     }
@@ -258,8 +258,9 @@ public final class FieldFactory {
         }
     }
 
-    private void setFieldDefaultValue(FieldWithDefault field, String defaultValue, Importer importer) {
-        if (InitDataExpressions.containsDynamicExpression(defaultValue)) {
+    private void setFieldDefaultValue(FieldWithDefault field, List<Init> init, Importer importer) {
+        String defaultValue = init.get(0).getValue();
+        if (init.get(0).isDynamic()) {
             field.setDynamicExpression(defaultValue);
             return;
         }
@@ -290,7 +291,7 @@ public final class FieldFactory {
                 ((FileListField) field).setDefaultValue(defaultValue);
                 break;
             case TASK_REF:
-                ((TaskField) field).setDefaultValue(parseTasRefInit(defaultValue, importer.getDocument().getTransition()));
+                field.setDefaultValue(parseTasRefInit(defaultValue, importer.getDocument().getTransition()));
                 break;
             default:
                 field.setDefaultValue(defaultValue);
