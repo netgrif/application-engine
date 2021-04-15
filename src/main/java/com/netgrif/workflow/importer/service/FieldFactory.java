@@ -8,6 +8,7 @@ import com.netgrif.workflow.petrinet.domain.Format;
 import com.netgrif.workflow.petrinet.domain.I18nString;
 import com.netgrif.workflow.petrinet.domain.dataset.*;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.dynamicExpressions.DataValidationExpressions;
+import com.netgrif.workflow.petrinet.domain.dataset.logic.dynamicExpressions.InitDataExpressions;
 import com.netgrif.workflow.petrinet.domain.views.View;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.DataField;
@@ -258,7 +259,7 @@ public final class FieldFactory {
     }
 
     private void setFieldDefaultValue(FieldWithDefault field, String defaultValue, Importer importer) {
-        if (DataValidationExpressions.containsDynamicExpression(defaultValue)) {
+        if (InitDataExpressions.containsDynamicExpression(defaultValue)) {
             field.setDynamicExpression(defaultValue);
             return;
         }
