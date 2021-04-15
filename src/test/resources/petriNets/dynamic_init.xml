@@ -7,34 +7,34 @@
     <data type="text" immediate="true">
         <id>text</id>
         <title>Text</title>
-        <init>${userService.findByEmail("super@netgrif.com", true).name}</init>
+        <init dynamic="true">userService.findByEmail("super@netgrif.com", true).name</init>
     </data>
 
     <data type="number" immediate="true">
         <id>number</id>
         <title>number</title>
-        <init>${userService.findByEmail("super@netgrif.com", true).name.length()}</init>
+        <init dynamic="true">userService.findByEmail("super@netgrif.com", true).name.length()</init>
     </data>
 
     <data type="date" immediate="true">
         <id>date</id>
         <title>date</title>
-        <init>${java.time.LocalDate.now()}</init>
+        <init dynamic="true">java.time.LocalDate.now()</init>
     </data>
 
     <data type="dateTime" immediate="true">
         <id>dateTime</id>
         <title>dateTime</title>
-        <init>${java.time.LocalDateTime.now()}</init>
+        <init dynamic="true">java.time.LocalDateTime.now()</init>
     </data>
 
     <data type="user" immediate="true">
         <id>user</id>
         <title>user</title>
-        <init>${
+        <init dynamic="true">
             def user = userService.loggedOrSystem
             return new com.netgrif.workflow.auth.domain.User(id: user.id, name: user.name, surname: user.surname, email: user.email)
-        }</init>
+        </init>
     </data>
 
     <transition>
