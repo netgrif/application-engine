@@ -324,7 +324,7 @@ public final class FieldFactory {
     private void resolveValidations(ValidableField field, Case useCase) {
         List<com.netgrif.workflow.petrinet.domain.dataset.logic.validation.Validation> validations = useCase.getDataField(field.getImportId()).getValidations();
         if (validations != null) {
-            field.setValidations(validations);
+            field.setValidations(validations.stream().map(it -> it.clone()).collect(Collectors.toList()));
         }
         if (field.getValidations() == null) return;
 
