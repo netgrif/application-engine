@@ -587,7 +587,15 @@
             </xs:sequence>
         </xs:complexType>
     </xs:element>
-    <xs:element name="init" type="xs:string"/>
+    <xs:element name="init">
+        <xs:complexType>
+            <xs:simpleContent>
+                <xs:extension base="xs:string">
+                    <xs:attribute name="dynamic" type="xs:boolean" default="false"/>
+                </xs:extension>
+            </xs:simpleContent>
+        </xs:complexType>
+    </xs:element>
     <xs:simpleType name="remoteType">
         <xs:restriction base="xs:string">
             <xs:maxLength value="0"/>
