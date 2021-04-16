@@ -25,7 +25,6 @@ import com.netgrif.workflow.petrinet.domain.Transition
 import com.netgrif.workflow.petrinet.domain.dataset.*
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedField
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldsTree
-import com.netgrif.workflow.petrinet.domain.dataset.logic.dynamicExpressions.DataValidationExpressions
 import com.netgrif.workflow.petrinet.domain.dataset.logic.validation.Validation
 import com.netgrif.workflow.petrinet.domain.version.Version
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
@@ -37,6 +36,7 @@ import com.netgrif.workflow.workflow.domain.QTask
 import com.netgrif.workflow.workflow.domain.Task
 import com.netgrif.workflow.workflow.service.TaskService
 import com.netgrif.workflow.workflow.service.interfaces.IDataService
+import com.netgrif.workflow.workflow.service.interfaces.IDataValidationExpressionEvaluator
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService
 import com.netgrif.workflow.workflow.web.responsebodies.MessageResource
 import com.netgrif.workflow.workflow.web.responsebodies.TaskReference
@@ -109,7 +109,7 @@ class ActionDelegate {
     UserDetailsServiceImpl userDetailsService
 
     @Autowired
-    DataValidationExpressions dataExpressions
+    IDataValidationExpressionEvaluator dataValidationExpressionEvaluator
 
     /**
      * Reference of case and task in which current action is taking place.
@@ -253,7 +253,7 @@ class ActionDelegate {
         List<Validation> compiled = field.validations.collect { it.clone() }
         compiled.each {
             if (!it.dynamic) return
-            it.validationRule = dataExpressions.compile(useCase, it.getValidationRule())
+            it.validationRule = dataValidationExpressionEvaluator.compile(useCase, it.getValidationRule())
         }
         addAttributeToChangedField(field, "validations", compiled.collect { it.getLocalizedValidation(LocaleContextHolder.locale) })
     }
@@ -914,6 +914,14 @@ class ActionDelegate {
             cases.forEach({ aCase -> aCase.setAuthor(Author.createAnonymizedAuthor()) })
 
         userService.deleteUser(user)
+    }
+
+    Validation validation(String rule, boolean dynamic = false) {
+        return validation(rule, null, dynamic)
+    }
+
+    Validation validation(String rule, I18nString message, boolean dynamic = false) {
+        return new Validation(rule, message, dynamic)
     }
 
 }
