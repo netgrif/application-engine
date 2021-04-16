@@ -2,8 +2,10 @@ package com.netgrif.workflow.petrinet.domain.dataset.logic.dynamicExpressions
 
 import com.netgrif.workflow.workflow.domain.Case
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.stereotype.Component
 
-abstract class DataExpressions {
+@Component
+class DataExpressions {
 
     @Autowired
     protected CaseFieldsExpressionRunner expressionRunner

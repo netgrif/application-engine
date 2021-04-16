@@ -14,10 +14,8 @@ abstract class ValidableField<T> extends FieldWithDefault<T> {
         super()
     }
 
-    void addValidation(String validationRule, I18nString validationMessage) {
-        Validation add
-        if (validationMessage == null) add = new Validation(validationRule)
-        else add = new Validation(validationRule, validationMessage)
+    void addValidation(String validationRule, I18nString validationMessage, boolean dynamic) {
+        Validation add = new Validation(validationRule, validationMessage, dynamic)
         if (validations == null) {
             this.validations = new ArrayList<Validation>()
         }

@@ -256,11 +256,13 @@
             <xs:enumeration value="variable"/>
         </xs:restriction>
     </xs:simpleType>
-    <xs:simpleType name="validation">
-        <xs:restriction base="xs:string">
-            <!--todo: depending on data type-->
-        </xs:restriction>
-    </xs:simpleType>
+    <xs:complexType name="valid">
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute name="dynamic" type="xs:boolean" default="false"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
     <xs:simpleType name="dataGroupAlignment">
         <xs:restriction base="xs:string">
             <xs:enumeration value="start"/>
@@ -571,7 +573,7 @@
         </xs:simpleContent>
     </xs:complexType>
     <xs:element name="placeholder" type="i18nStringType"/>
-    <xs:element name="valid" type="validation"/>
+    <xs:element name="valid" type="valid"/>
     <xs:element name="validations">
         <xs:complexType>
             <xs:sequence>
@@ -582,7 +584,7 @@
     <xs:element name="validation">
         <xs:complexType>
             <xs:sequence>
-                <xs:element name="expression" type="validation"/>
+                <xs:element name="expression" type="valid"/>
                 <xs:element name="message" type="i18nStringType"/>
             </xs:sequence>
         </xs:complexType>
