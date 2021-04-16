@@ -1,5 +1,5 @@
 <a name="https://netgrif.atlassian.net/projects/NAE/versions/10883/tab/release-report-all-issues"></a>
-## 5.1.2 (16.02.2021)
+## 5.1.2 (16.04.2021)
 ### Bug fixes
 None
 
