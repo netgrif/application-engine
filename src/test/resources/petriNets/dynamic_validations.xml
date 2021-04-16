@@ -18,7 +18,7 @@
         <title>Number</title>
         <validations>
             <validation>
-                <expression>inrange ${min.value as Integer},${max.value as Integer}</expression>
+                <expression dynamic="true">inrange ${min.value as Integer},${max.value as Integer}</expression>
                 <message>Number field validation message</message>
             </validation>
         </validations>
@@ -28,7 +28,7 @@
         <title>Text</title>
         <validations>
             <validation>
-                <expression>maxLength ${max.value as Integer}</expression>
+                <expression dynamic="true">maxLength ${max.value as Integer}</expression>
                 <message>Text field validation message</message>
             </validation>
         </validations>
@@ -38,7 +38,7 @@
         <title>Date</title>
         <validations>
             <validation>
-                <expression>between past,today-P${max.value as Integer}D</expression>
+                <expression dynamic="true">between past,today-P${max.value as Integer}D</expression>
                 <message>Date field validation message</message>
             </validation>
         </validations>
@@ -55,7 +55,7 @@
             if (number_valid_switch.value) {
                 change number validations { "odd" }
             } else {
-                change number validations { '''inrange ${min.value as Integer},${max.value as Integer}''' }
+                change number validations { new com.netgrif.workflow.petrinet.domain.dataset.logic.validation.Validation('''inrange ${min.value as Integer},${max.value as Integer}''', true) }
             }
         </action>
     </data>
@@ -71,7 +71,7 @@
             if (text_valid_switch.value) {
                 change text validations { "email" }
             } else {
-                change text validations { '''maxLength ${max.value as Integer}''' }
+                change text validations { new com.netgrif.workflow.petrinet.domain.dataset.logic.validation.Validation('''maxLength ${max.value as Integer}''', true) }
             }
         </action>
     </data>
