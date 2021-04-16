@@ -7,11 +7,10 @@ import com.netgrif.workflow.petrinet.domain.Component;
 import com.netgrif.workflow.petrinet.domain.Format;
 import com.netgrif.workflow.petrinet.domain.I18nString;
 import com.netgrif.workflow.petrinet.domain.dataset.*;
-import com.netgrif.workflow.petrinet.domain.dataset.logic.dynamicExpressions.DataValidationExpressions;
-import com.netgrif.workflow.petrinet.domain.dataset.logic.dynamicExpressions.InitDataExpressions;
 import com.netgrif.workflow.petrinet.domain.views.View;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.DataField;
+import com.netgrif.workflow.workflow.service.interfaces.IDataValidationExpressionEvaluator;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -41,7 +40,7 @@ public final class FieldFactory {
     private IDataValidator dataValidator;
 
     @Autowired
-    private DataValidationExpressions dataValidationExpressions;
+    private IDataValidationExpressionEvaluator dataValidationExpressionEvaluator;
 
     // TODO: refactor this shit
     Field getField(Data data, Importer importer) throws IllegalArgumentException, MissingIconKeyException {
@@ -331,7 +330,7 @@ public final class FieldFactory {
 
         ((List<com.netgrif.workflow.petrinet.domain.dataset.logic.validation.Validation>) field.getValidations()).forEach(valid -> {
             if (!valid.isDynamic()) return;
-            valid.setValidationRule(dataValidationExpressions.compile(useCase, valid.getValidationRule()));
+            valid.setValidationRule(dataValidationExpressionEvaluator.compile(useCase, valid.getValidationRule()));
         });
     }
 

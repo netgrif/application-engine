@@ -55,7 +55,7 @@
             if (number_valid_switch.value) {
                 change number validations { "odd" }
             } else {
-                change number validations { new com.netgrif.workflow.petrinet.domain.dataset.logic.validation.Validation('''inrange ${min.value as Integer},${max.value as Integer}''', true) }
+                change number validations { validation('''inrange ${min.value as Integer},${max.value as Integer}''', true) }
             }
         </action>
     </data>
@@ -71,7 +71,7 @@
             if (text_valid_switch.value) {
                 change text validations { "email" }
             } else {
-                change text validations { new com.netgrif.workflow.petrinet.domain.dataset.logic.validation.Validation('''maxLength ${max.value as Integer}''', true) }
+                change text validations { validation('''maxLength ${max.value as Integer}''', true) }
             }
         </action>
     </data>
