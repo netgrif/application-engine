@@ -111,15 +111,15 @@ public final class FieldFactory {
             field.setPlaceholder(importer.toI18NString(data.getPlaceholder()));
 
         if (data.getValid() != null && field instanceof ValidableField){
-            List<String> list = data.getValid();
-            for (String item : list) {
-                ((ValidableField) field).addValidation(item, null);
+            List<Valid> list = data.getValid();
+            for (Valid item : list) {
+                ((ValidableField) field).addValidation(item.getValue(), null, item.isDynamic());
             }
         }
         if (data.getValidations() != null && field instanceof ValidableField) {
             List<com.netgrif.workflow.importer.model.Validation> list = data.getValidations().getValidation();
             for (com.netgrif.workflow.importer.model.Validation item : list) {
-                ((ValidableField) field).addValidation(item.getExpression(), importer.toI18NString(item.getMessage()));
+                ((ValidableField) field).addValidation(item.getExpression().getValue(), importer.toI18NString(item.getMessage()), item.getExpression().isDynamic());
             }
         }
         if (data.getInit() != null && !data.getInit().isEmpty() && field instanceof FieldWithDefault) {
