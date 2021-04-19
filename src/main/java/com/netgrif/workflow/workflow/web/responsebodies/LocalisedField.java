@@ -6,9 +6,13 @@ import com.netgrif.workflow.petrinet.domain.Format;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.petrinet.domain.dataset.FieldType;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.FieldLayout;
+import com.netgrif.workflow.petrinet.domain.dataset.logic.validation.LocalizedValidation;
+import com.netgrif.workflow.petrinet.domain.dataset.logic.validation.Validation;
 import com.netgrif.workflow.petrinet.domain.views.View;
 import lombok.Data;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 @Data
@@ -40,10 +44,14 @@ public class LocalisedField {
 
     private Component component;
 
-    public LocalisedField() {
-    }
+    private List<LocalizedValidation> validations;
+
+    private Object defaultValue;
+
+    public LocalisedField() {}
 
     public LocalisedField(Field field, Locale locale) {
+        this();
         stringId = field.getStringId();
         type = field.getType();
         name = field.getTranslatedName(locale);
@@ -57,5 +65,15 @@ public class LocalisedField {
         view = field.getView();
         length = field.getLength();
         component = field.getComponent();
+        defaultValue = field.getDefaultValue();
+        validations = loadValidations(field, locale);
+    }
+
+    private List<LocalizedValidation> loadValidations(Field field, Locale locale) {
+        List<LocalizedValidation> locVal = new ArrayList<>();
+        if (field.getValidations() != null) {
+            field.getValidations().forEach(val -> locVal.add(((Validation) val).getLocalizedValidation(locale)));
+        }
+        return locVal;
     }
 }
