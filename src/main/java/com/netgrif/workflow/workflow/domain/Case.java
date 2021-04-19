@@ -6,7 +6,6 @@ import com.netgrif.workflow.petrinet.domain.I18nString;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.dataset.CaseField;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
-import com.netgrif.workflow.petrinet.domain.dataset.FieldWithDefault;
 import com.netgrif.workflow.petrinet.domain.dataset.UserField;
 import com.netgrif.workflow.workflow.service.interfaces.IInitValueExpressionEvaluator;
 import lombok.Builder;
@@ -182,16 +181,11 @@ public class Case {
     public void populateDataSet(IInitValueExpressionEvaluator initValueExpressionEvaluator) {
         List<String> dynamicInitFieldsId = new ArrayList<>();
         petriNet.getDataSet().forEach((key, field) -> {
-            if (field instanceof FieldWithDefault) {
-                FieldWithDefault fwd = (FieldWithDefault) field;
-                if (fwd.isDynamicDefaultValue()) {
-                    dynamicInitFieldsId.add(field.getImportId());
-                    this.dataSet.put(key, new DataField());
-                } else {
-                    this.dataSet.put(key, new DataField(fwd.getDefaultValue()));
-                }
-            } else {
+            if (field.isDynamicDefaultValue()) {
+                dynamicInitFieldsId.add(field.getImportId());
                 this.dataSet.put(key, new DataField());
+            } else {
+                this.dataSet.put(key, new DataField(field.getDefaultValue()));
             }
             if (field instanceof UserField) {
                 this.dataSet.get(key).setChoices(((UserField) field).getRoles().stream().map(I18nString::new).collect(Collectors.toSet()));
@@ -202,8 +196,8 @@ public class Case {
             }
         });
         dynamicInitFieldsId.forEach(fieldId -> {
-            FieldWithDefault fwd = (FieldWithDefault) petriNet.getDataSet().get(fieldId);
-            Object value = initValueExpressionEvaluator.evaluate(this, fwd);
+            Field field = petriNet.getDataSet().get(fieldId);
+            Object value = initValueExpressionEvaluator.evaluate(this, field);
             this.dataSet.get(fieldId).setValue(value);
         });
     }

@@ -110,20 +110,20 @@ public final class FieldFactory {
         if (data.getPlaceholder() != null)
             field.setPlaceholder(importer.toI18NString(data.getPlaceholder()));
 
-        if (data.getValid() != null && field instanceof ValidableField){
+        if (data.getValid() != null) {
             List<Valid> list = data.getValid();
             for (Valid item : list) {
-                ((ValidableField) field).addValidation(item.getValue(), null, item.isDynamic());
+                field.addValidation(item.getValue(), null, item.isDynamic());
             }
         }
-        if (data.getValidations() != null && field instanceof ValidableField) {
+        if (data.getValidations() != null) {
             List<com.netgrif.workflow.importer.model.Validation> list = data.getValidations().getValidation();
             for (com.netgrif.workflow.importer.model.Validation item : list) {
-                ((ValidableField) field).addValidation(item.getExpression().getValue(), importer.toI18NString(item.getMessage()), item.getExpression().isDynamic());
+                field.addValidation(item.getExpression().getValue(), importer.toI18NString(item.getMessage()), item.getExpression().isDynamic());
             }
         }
-        if (data.getInit() != null && !data.getInit().isEmpty() && field instanceof FieldWithDefault) {
-            setFieldDefaultValue((FieldWithDefault) field, data.getInit(), importer);
+        if (data.getInit() != null && !data.getInit().isEmpty()) {
+            setFieldDefaultValue(field, data.getInit(), importer);
         }
 
         if (data.getFormat() != null) {
@@ -257,7 +257,7 @@ public final class FieldFactory {
         }
     }
 
-    private void setFieldDefaultValue(FieldWithDefault field, List<Init> init, Importer importer) {
+    private void setFieldDefaultValue(Field field, List<Init> init, Importer importer) {
         String defaultValue = init.get(0).getValue();
         if (init.get(0).isDynamic()) {
             field.setDynamicExpression(defaultValue);
@@ -315,13 +315,13 @@ public final class FieldFactory {
             resolveChoices((ChoiceField) field, useCase);
         if (field instanceof MapOptionsField)
             resolveMapOptions((MapOptionsField) field, useCase);
-        if (withValidation && field instanceof ValidableField)
-            resolveValidations((ValidableField) field, useCase);
+        if (withValidation)
+            resolveValidations(field, useCase);
         return field;
     }
 
     @SuppressWarnings({"all", "rawtypes", "unchecked"})
-    private void resolveValidations(ValidableField field, Case useCase) {
+    private void resolveValidations(Field field, Case useCase) {
         List<com.netgrif.workflow.petrinet.domain.dataset.logic.validation.Validation> validations = useCase.getDataField(field.getImportId()).getValidations();
         if (validations != null) {
             field.setValidations(validations.stream().map(it -> it.clone()).collect(Collectors.toList()));
