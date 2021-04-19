@@ -120,7 +120,7 @@ public class VariableArcsTest {
         user = importHelper.createUser(user,
                 new Authority[]{authorityService.getOrCreate(Authority.user)},
                 new com.netgrif.workflow.orgstructure.domain.Group[]{importHelper.createGroup("VariableArcsTest")},
-                new UserProcessRole[]{});
+                new ProcessRole[]{});
 
         List<Arc> arcs = loaded.getArcs().values().stream().flatMap(List::stream).collect(Collectors.toList());
         assert arcs.size() > 0;

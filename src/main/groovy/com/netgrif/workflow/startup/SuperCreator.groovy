@@ -62,7 +62,8 @@ class SuperCreator extends AbstractOrderedCommandLineRunner {
                     email: "super@netgrif.com",
                     password: superAdminPassword,
                     state: UserState.ACTIVE,
-                    authorities: [adminAuthority, systemAuthority] as Set<Authority>))
+                    authorities: [adminAuthority, systemAuthority] as Set<Authority>,
+                    processRoles: processRoleService.findAll() as Set<ProcessRole>))
             this.superMember = memberService.findByEmail(this.superUser.email)
             log.info("Super user created")
         } else {

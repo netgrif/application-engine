@@ -10,6 +10,7 @@ import com.netgrif.workflow.auth.domain.repositories.UserRepository
 import com.netgrif.workflow.importer.service.Importer
 import com.netgrif.workflow.orgstructure.domain.Group
 import com.netgrif.workflow.petrinet.domain.PetriNet
+import com.netgrif.workflow.petrinet.domain.roles.ProcessRole
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRoleRepository
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.workflow.startup.ImportHelper
@@ -60,9 +61,6 @@ class RemoveActionTest {
     private UserRepository userRepository
 
     @Autowired
-    private UserProcessRoleRepository userProcessRoleRepository
-
-    @Autowired
     private ProcessRoleRepository processRoleRepository
 
     @Autowired
@@ -98,19 +96,16 @@ class RemoveActionTest {
         def org = importHelper.createGroup("test")
         def auths = importHelper.createAuthorities(["user": Authority.user, "admin": Authority.admin])
 
-        importHelper.createUserProcessRole(this.petriNet, "admin")
-        importHelper.createUserProcessRole(this.petriNet, "manager")
-
         importHelper.createUser(new User(name: "Test", surname: "Integration", email: USER_EMAIL, password: USER_PASSWORD, state: UserState.ACTIVE),
                 [auths.get("user")] as Authority[],
                 [org] as Group[],
-                [] as UserProcessRole[])
+                [] as ProcessRole[])
     }
 
     private void cleanDatabases() {
         template.db.drop()
         userRepository.deleteAll()
-        userProcessRoleRepository.deleteAll()
+        processRoleRepository.deleteAll()
     }
 
     @Test
@@ -133,12 +128,12 @@ class RemoveActionTest {
             .andExpect(status().isOk())
 
         User updatedUser = userRepository.findByEmail(USER_EMAIL)
-        Set<UserProcessRole> roles = updatedUser.getUserProcessRoles()
+        Set<ProcessRole> roles = updatedUser.getProcessRoles()
 
         String managerRoleId = processRoleRepository.findByName_DefaultValue("manager").stringId
 
-        assert roles.find {it.roleId == adminRoleId}
-        assert roles.find {it.roleId == managerRoleId}
+        assert roles.find {it.stringId == adminRoleId}
+        assert roles.find {it.stringId == managerRoleId}
 
         //On frontend user had two roles admin and manage, and admin was removed, so now to the backend
         //only manager role came, and as part of admin action, this one should get removed inside action

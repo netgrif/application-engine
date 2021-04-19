@@ -17,6 +17,8 @@ public interface IProcessRoleService {
 
     void assignRolesToUser(String userId, Set<String> roleIds, LoggedUser user);
 
+    List<ProcessRole> findAll();
+
     List<ProcessRole> findAll(String netId);
 
     ProcessRole defaultRole();
