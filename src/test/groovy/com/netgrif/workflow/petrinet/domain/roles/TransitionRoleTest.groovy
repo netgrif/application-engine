@@ -37,7 +37,7 @@ class TransitionRoleTest {
     private UserRepository userRepository
 
     @Autowired
-    private UserProcessRoleRepository roleRepository
+    private ProcessRoleRepository roleRepository
 
     @Autowired
     private SystemUserRunner systemUserRunner

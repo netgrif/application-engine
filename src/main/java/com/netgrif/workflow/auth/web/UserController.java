@@ -122,7 +122,7 @@ public class UserController {
     @ApiOperation(value = "Get logged user", authorizations = @Authorization("BasicAuth"))
     @GetMapping(value = "/me", produces = MediaTypes.HAL_JSON_VALUE)
     public UserResource getLoggedUser(@RequestParam(value = "small", required = false) Boolean small, Authentication auth, Locale locale) {
-        small = small == null ? false : small;
+        small = small != null && small;
         if (!small)
             return new UserResource(userResponseFactory.getUser(userService.findById(((LoggedUser) auth.getPrincipal()).getId(), false), locale), "profile");
         else

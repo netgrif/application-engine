@@ -89,17 +89,17 @@ class ProcessRoleTest {
         importHelper.createUser(new User(name: "Test", surname: "Integration", email: USER_EMAIL_VIEW, password: "password", state: UserState.ACTIVE),
                 [auths.get("user")] as Authority[],
                 [org] as Group[],
-                [processRoles.get("View")] as UserProcessRole[])
+                [processRoles.get("View")] as ProcessRole[])
 
         importHelper.createUser(new User(name: "Test", surname: "Integration", email: USER_EMAIL_PERFORM, password: "password", state: UserState.ACTIVE),
                 [auths.get("user")] as Authority[],
                 [org] as Group[],
-                [processRoles.get("Perform")] as UserProcessRole[])
+                [processRoles.get("Perform")] as ProcessRole[])
 
         importHelper.createUser(new User(name: "Test", surname: "Integration", email: USER_EMAIL_BOTH, password: "password", state: UserState.ACTIVE),
                 [auths.get("user")] as Authority[],
                 [org] as Group[],
-                [processRoles.get("View"), processRoles.get("Perform")] as UserProcessRole[])
+                [processRoles.get("View"), processRoles.get("Perform")] as ProcessRole[])
     }
 
     private String caseId

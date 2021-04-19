@@ -204,6 +204,11 @@ public class ProcessRoleService implements IProcessRoleService {
     }
 
     @Override
+    public List<ProcessRole> findAll() {
+        return processRoleRepository.findAll();
+    }
+
+    @Override
     public List<ProcessRole> findAll(String netId) {
         Optional<PetriNet> netOptional = netRepository.findById(netId);
         if (!netOptional.isPresent())
