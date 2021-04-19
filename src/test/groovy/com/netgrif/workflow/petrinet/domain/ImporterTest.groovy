@@ -30,8 +30,6 @@ class ImporterTest {
     @Autowired
     private ProcessRoleRepository processRoleRepository
     @Autowired
-    private UserProcessRoleRepository userProcessRoleRepository
-    @Autowired
     private TestHelper testHelper
 
     @Value("classpath:net_import_1.xml")
@@ -52,7 +50,6 @@ class ImporterTest {
                 superCreator.loggedSuper
         )
         assert processRoleRepository.count() == 3
-        assert userProcessRoleRepository.count() == 3
         assert netOptional.isPresent()
         def net = netOptional.get()
 
@@ -138,7 +135,6 @@ class ImporterTest {
                 superCreator.loggedSuper
         )
         assert processRoleRepository.count() == 4
-        assert userProcessRoleRepository.count() == 4
         assert netOptional2.isPresent()
         def net2 = netOptional2.get()
 

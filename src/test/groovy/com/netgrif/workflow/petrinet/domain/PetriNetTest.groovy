@@ -36,8 +36,6 @@ class PetriNetTest {
     @Autowired
     private ProcessRoleRepository processRoleRepository
     @Autowired
-    private UserProcessRoleRepository userProcessRoleRepository
-    @Autowired
     private TestHelper testHelper
 
     @Value("classpath:net_clone.xml")
@@ -70,7 +68,6 @@ class PetriNetTest {
 
         assert net.roles.size() == 2
         assert processRoleRepository.count() == 3
-        assert userProcessRoleRepository.count() == 3
     }
 
     @Test

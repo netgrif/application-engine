@@ -17,6 +17,7 @@ import com.netgrif.workflow.orgstructure.domain.Group
 import com.netgrif.workflow.orgstructure.domain.GroupRepository
 import com.netgrif.workflow.orgstructure.domain.Member
 import com.netgrif.workflow.orgstructure.domain.MemberRepository
+import com.netgrif.workflow.petrinet.domain.roles.ProcessRole
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.workflow.startup.ImportHelper
 import com.netgrif.workflow.startup.SuperCreator
@@ -79,7 +80,7 @@ class AuthenticationControllerTest {
     private GreenMail smtpServer
 
     private Group group
-    private Map<String, UserProcessRole> processRoles
+    private Map<String, ProcessRole> processRoles
 
     @Before
     void before() {
@@ -98,7 +99,7 @@ class AuthenticationControllerTest {
     @WithMockUser(roles = "ADMIN")
     void inviteTest() {
         controller.invite(new NewUserRequest(email: EMAIL, groups: [group.id], processRoles: processRoles.values().collect {
-            it.roleId
+            it.stringId
         }), null)
 
         MimeMessage[] messages = smtpServer.getReceivedMessages()
