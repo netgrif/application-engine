@@ -1,6 +1,6 @@
 package com.netgrif.workflow.petrinet.domain.dataset
 
-class FileListField extends ValidableField<FileListFieldValue> {
+class FileListField extends Field<FileListFieldValue> {
     private Boolean remote
 
     FileListField() {
@@ -12,11 +12,6 @@ class FileListField extends ValidableField<FileListFieldValue> {
         return FieldType.FILELIST
     }
 
-    @Override
-    void clearValue() {
-        super.clearValue()
-        setValue(getDefaultValue())
-    }
 
     @Override
     void setValue(FileListFieldValue value) {
@@ -79,11 +74,7 @@ class FileListField extends ValidableField<FileListFieldValue> {
     Field clone() {
         FileListField clone = new FileListField()
         super.clone(clone)
-
         clone.remote = this.remote
-        clone.validations = this.validations?.collect { it.clone() }
-        clone.defaultValue = this.defaultValue
-        clone.initExpression = this.initExpression
 
         return clone
     }

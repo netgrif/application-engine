@@ -65,19 +65,11 @@ class MultichoiceField extends ChoiceField<Set<I18nString>> {
         super.setValue(value)
     }
 
-    @Override
-    void clearValue() {
-        super.clearValue()
-        setValue(getDefaultValue())
-    }
 
     @Override
     Field clone() {
         MultichoiceField clone = new MultichoiceField()
         super.clone(clone)
-
-        clone.defaultValue = this.defaultValue
-        clone.initExpression = this.initExpression
         clone.choices = this.choices
 
         return clone

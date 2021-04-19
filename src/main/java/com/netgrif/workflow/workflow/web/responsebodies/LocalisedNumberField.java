@@ -6,18 +6,15 @@ import lombok.Data;
 import java.util.Locale;
 
 @Data
-public class LocalisedNumberField extends ValidableLocalisedField<NumberField> {
+public class LocalisedNumberField extends LocalisedField {
 
     private Double minValue;
 
     private Double maxValue;
 
-    private Object defaultValue;
-
     public LocalisedNumberField(NumberField field, Locale locale) {
         super(field, locale);
         this.minValue = field.getMinValue();
         this.maxValue = field.getMaxValue();
-        this.defaultValue = field.getDefaultValue();
     }
 }

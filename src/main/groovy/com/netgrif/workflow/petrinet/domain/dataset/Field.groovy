@@ -2,6 +2,7 @@ package com.netgrif.workflow.petrinet.domain.dataset
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.databind.node.ObjectNode
+import com.netgrif.workflow.petrinet.domain.dataset.logic.validation.Validation
 import com.netgrif.workflow.petrinet.domain.events.DataEvent
 import com.netgrif.workflow.petrinet.domain.Component
 import com.netgrif.workflow.petrinet.domain.Format
@@ -55,6 +56,12 @@ abstract class Field<T> extends Imported {
     private Integer length
 
     private Component component
+
+    protected T defaultValue
+
+    protected String initExpression
+
+    protected List<Validation> validations
 
     Field() {
         _id = new ObjectId()
@@ -184,7 +191,46 @@ abstract class Field<T> extends Imported {
         this.component = component
     }
 
-    void clearValue() {}
+    T getDefaultValue() {
+        return defaultValue
+    }
+
+    String getInitExpression() {
+        return initExpression
+    }
+
+    void setDefaultValue(T defaultValue) {
+        this.defaultValue = defaultValue
+    }
+
+    void setDynamicExpression(String expression) {
+        this.initExpression = expression
+    }
+
+    boolean isDynamicDefaultValue() {
+        return initExpression != null
+    }
+
+    void addValidation(String validationRule, I18nString validationMessage, boolean dynamic) {
+        Validation add = new Validation(validationRule, validationMessage, dynamic)
+        if (validations == null) {
+            this.validations = new ArrayList<Validation>()
+        }
+        this.validations.add(add)
+    }
+
+    List<Validation> getValidations() {
+        return validations
+    }
+
+    void setValidations(List<Validation> validations) {
+        this.validations = validations
+    }
+
+    void clearValue() {
+        setValue(getDefaultValue())
+    }
+
 //operators overloading
     T plus(final Field field) {
         return this.value + field.value
@@ -259,6 +305,9 @@ abstract class Field<T> extends Imported {
         clone.format = this.format
         clone.length = this.length
         clone.component = this.component
+        clone.validations = this.validations?.collect { it.clone() }
+        clone.defaultValue = this.defaultValue
+        clone.initExpression = this.initExpression
     }
 
     abstract Field clone()
