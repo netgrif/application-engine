@@ -2,7 +2,7 @@ package com.netgrif.workflow.petrinet.domain.dataset
 
 import com.netgrif.workflow.petrinet.domain.I18nString
 
-abstract class ChoiceField<T> extends FieldWithDefault<T> {
+abstract class ChoiceField<T> extends Field<T> {
 
     protected Set<I18nString> choices
 

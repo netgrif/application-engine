@@ -10,23 +10,13 @@ import java.util.Locale;
 import java.util.Set;
 
 @Data
-public class LocalisedEnumerationField extends LocalisedField {
-
-    private List<String> choices;
-
-    private Object defaultValue;
+public class LocalisedEnumerationField extends LocalisedChoiceField {
 
     public LocalisedEnumerationField(EnumerationField field, Locale locale) {
         super(field, locale);
-        this.choices = new LinkedList<>();
-        Set<I18nString> choices = field.getChoices();
-        for (I18nString choice : choices) {
-            this.choices.add(choice.getTranslation(locale));
-        }
-
         I18nString defaultI18n = field.getDefaultValue();
         if (defaultI18n != null)
-            this.defaultValue = defaultI18n.getTranslation(locale);
+            this.setDefaultValue(defaultI18n.getTranslation(locale));
 
         this.setValue(field.getTranslatedValue(locale));
     }

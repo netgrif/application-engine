@@ -245,7 +245,7 @@ class ActionDelegate {
         addAttributeToChangedField(field, "options", field.options.collectEntries {key, value -> [key, (value as I18nString).getTranslation(LocaleContextHolder.locale)]} )
     }
 
-    def saveChangedValidation(ValidableField field) {
+    def saveChangedValidation(Field field) {
         useCase.dataSet.get(field.stringId).validations = field.validations
         if (!changedFieldsTree.changedFields.containsKey(field.stringId)) {
             putIntoChangedFields(field, new ChangedField(field.stringId))
@@ -392,10 +392,7 @@ class ActionDelegate {
             return
         }
         if (value == null) {
-            if (field instanceof FieldWithDefault && field.defaultValue != useCase.dataSet.get(field.stringId).value) {
-                field.clearValue()
-                saveChangedValue(field)
-            } else if (!(field instanceof FieldWithDefault) && useCase.dataSet.get(field.stringId).value != null) {
+            if (field.defaultValue != useCase.dataSet.get(field.stringId).value || useCase.dataSet.get(field.stringId).value != null) {
                 field.clearValue()
                 saveChangedValue(field)
             }
@@ -413,7 +410,7 @@ class ActionDelegate {
 
     void changeFieldValidations(Field field, def cl) {
         def valid = cl()
-        if (!(field instanceof ValidableField) || valid == UNCHANGED_VALUE)
+        if (valid == UNCHANGED_VALUE)
             return
         List<Validation> newValidations = []
         if (valid != null) {

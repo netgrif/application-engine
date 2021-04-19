@@ -5,7 +5,7 @@ import org.springframework.data.annotation.Transient
 import java.time.LocalDateTime
 import java.time.ZoneId;
 
-class DateTimeField extends ValidableField<LocalDateTime> {
+class DateTimeField extends Field<LocalDateTime> {
 
     @Transient
     private String minDate
@@ -22,11 +22,6 @@ class DateTimeField extends ValidableField<LocalDateTime> {
         return FieldType.DATETIME
     }
 
-    @Override
-    void clearValue() {
-        super.clearValue()
-        setValue(getDefaultValue())
-    }
 
     void setValue(Date value) {
         this.value = value?.toInstant()?.atZone(ZoneId.systemDefault())?.toLocalDateTime()
@@ -52,10 +47,6 @@ class DateTimeField extends ValidableField<LocalDateTime> {
     Field clone() {
         DateTimeField clone = new DateTimeField()
         super.clone(clone)
-
-        clone.validations = this.validations?.collect { it.clone() }
-        clone.defaultValue = this.defaultValue
-        clone.initExpression = this.initExpression
         return clone
     }
 }

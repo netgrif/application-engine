@@ -44,11 +44,6 @@ class MultichoiceMapField extends MapOptionsField<I18nString, Set<String>> {
         super.setDefaultValue(defaultValue)
     }
 
-    @Override
-    void clearValue() {
-        super.clearValue()
-        setValue(getDefaultValue())
-    }
 
     @Override
     Field clone() {
