@@ -3,7 +3,7 @@ package com.netgrif.workflow.petrinet.domain.dataset
 import org.springframework.data.mongodb.core.mapping.Document
 
 @Document
-class TaskField extends FieldWithDefault<List<String>> {
+class TaskField extends Field<List<String>> {
 
     @Override
     FieldType getType() {
@@ -14,8 +14,6 @@ class TaskField extends FieldWithDefault<List<String>> {
     Field clone() {
         TaskField clone = new TaskField()
         super.clone(clone)
-        clone.defaultValue = this.defaultValue
-        clone.initExpression = this.initExpression
         return clone
     }
 

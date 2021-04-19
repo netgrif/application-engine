@@ -42,6 +42,37 @@
         <x>0</x>
         <y>0</y>
         <label>whatever</label>
+
+        <dataRef>
+            <id>text</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>number</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>date</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>dateTime</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>user</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
     </transition>
 
 </document>

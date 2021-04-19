@@ -1,6 +1,6 @@
 package com.netgrif.workflow.petrinet.domain.dataset
 
-class UserListField extends FieldWithDefault<List<Long>> {
+class UserListField extends Field<List<Long>> {
 
     UserListField(){
         super()
@@ -21,8 +21,6 @@ class UserListField extends FieldWithDefault<List<Long>> {
     Field clone() {
         UserListField clone = new UserListField()
         super.clone(clone)
-        clone.defaultValue = this.defaultValue
-        clone.initExpression = this.initExpression
         return clone
     }
 }

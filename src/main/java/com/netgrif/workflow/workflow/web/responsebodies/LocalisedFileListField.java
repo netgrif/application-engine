@@ -6,12 +6,9 @@ import lombok.Data;
 import java.util.Locale;
 
 @Data
-public class LocalisedFileListField extends ValidableLocalisedField<FileListField> {
-
-    private Object defaultValue;
+public class LocalisedFileListField extends LocalisedField {
 
     public LocalisedFileListField(FileListField field, Locale locale) {
         super(field, locale);
-        this.defaultValue = field.getDefaultValue();
     }
 }

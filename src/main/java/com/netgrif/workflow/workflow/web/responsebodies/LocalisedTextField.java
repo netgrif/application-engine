@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Locale;
 
 @Data
-public class LocalisedTextField extends ValidableLocalisedField<TextField> {
+public class LocalisedTextField extends LocalisedField {
 
     private String subType;
 
@@ -18,13 +18,10 @@ public class LocalisedTextField extends ValidableLocalisedField<TextField> {
 
     private String formatting;
 
-    private Object defaultValue;
-
     public LocalisedTextField(TextField field, Locale locale) {
         super(field, locale);
         this.subType = field.getSubType();
         this.maxLength = field.getMaxLength();
         this.formatting = field.getFormatting();
-        this.defaultValue = field.getDefaultValue();
     }
 }
