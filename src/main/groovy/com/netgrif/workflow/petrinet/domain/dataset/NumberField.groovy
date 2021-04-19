@@ -4,7 +4,7 @@ import org.springframework.data.annotation.Transient
 import org.springframework.data.mongodb.core.mapping.Document
 
 @Document
-class NumberField extends ValidableField<Double> {
+class NumberField extends Field<Double> {
 
     @Transient
     private Double minValue
@@ -14,7 +14,7 @@ class NumberField extends ValidableField<Double> {
 
     NumberField() {
         super()
-        super.superSetDefaultValue(0.0d)
+        super.setDefaultValue(0.0d)
     }
 
     @Override
@@ -22,11 +22,6 @@ class NumberField extends ValidableField<Double> {
         return FieldType.NUMBER
     }
 
-    @Override
-    void clearValue() {
-        super.clearValue()
-        setValue(getDefaultValue())
-    }
 
     Double getMinValue() {
         return minValue
@@ -48,10 +43,6 @@ class NumberField extends ValidableField<Double> {
     Field clone() {
         NumberField clone = new NumberField()
         super.clone(clone)
-
-        clone.validations = this.validations?.collect { it.clone() }
-        clone.defaultValue = this.defaultValue
-        clone.initExpression = this.initExpression
 
         return clone
     }
