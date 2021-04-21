@@ -49,10 +49,7 @@ class MultichoiceMapField extends MapOptionsField<I18nString, Set<String>> {
     Field clone() {
         MultichoiceMapField clone = new MultichoiceMapField()
         super.clone(clone)
-
         clone.options = options
-        clone.defaultValue = defaultValue
-
         return clone
     }
 }
