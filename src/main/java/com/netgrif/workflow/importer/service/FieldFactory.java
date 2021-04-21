@@ -260,7 +260,7 @@ public final class FieldFactory {
     private void setFieldDefaultValue(Field field, List<Init> init, Importer importer) {
         String defaultValue = init.get(0).getValue();
         if (init.get(0).isDynamic()) {
-            field.setDynamicExpression(defaultValue);
+            field.setInitExpression(defaultValue);
             return;
         }
 
