@@ -37,6 +37,7 @@ import com.netgrif.workflow.workflow.domain.Task
 import com.netgrif.workflow.workflow.service.TaskService
 import com.netgrif.workflow.workflow.service.interfaces.IDataService
 import com.netgrif.workflow.workflow.service.interfaces.IDataValidationExpressionEvaluator
+import com.netgrif.workflow.workflow.service.interfaces.IInitValueExpressionEvaluator
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService
 import com.netgrif.workflow.workflow.web.responsebodies.MessageResource
 import com.netgrif.workflow.workflow.web.responsebodies.TaskReference
@@ -111,6 +112,9 @@ class ActionDelegate {
     @Autowired
     IDataValidationExpressionEvaluator dataValidationExpressionEvaluator
 
+    @Autowired
+    IInitValueExpressionEvaluator initValueExpressionEvaluator
+
     /**
      * Reference of case and task in which current action is taking place.
      */
@@ -182,6 +186,23 @@ class ActionDelegate {
     }
 
     def unchanged = { return UNCHANGED_VALUE }
+
+    def initValueOfField = { Field field ->
+        if (!field.hasDefault()) {
+            return null
+        } else if (field.isDynamicDefaultValue()) {
+            return initValueExpressionEvaluator.evaluate(useCase, field)
+        }
+        return field.defaultValue
+    }
+
+    def getInit() {
+        return initValueOfField
+    }
+
+    def init(Field field) {
+        return initValueOfField(field)
+    }
 
     /**
      * Changes behavior of a given field on given transition if certain condition is being met.
@@ -388,15 +409,17 @@ class ActionDelegate {
 
     void changeFieldValue(Field field, def cl) {
         def value = cl()
-        if (value instanceof Closure && value() == UNCHANGED_VALUE) {
-            return
-        }
-        if (value == null) {
-            if (field.defaultValue != useCase.dataSet.get(field.stringId).value || useCase.dataSet.get(field.stringId).value != null) {
-                field.clearValue()
-                saveChangedValue(field)
+        if (value instanceof Closure) {
+            if (value == initValueOfField) {
+                value = initValueOfField(field)
+
+            } else if (value() == UNCHANGED_VALUE) {
+                return
             }
-            return
+        }
+        if (value == null && useCase.dataSet.get(field.stringId).value != null) {
+            field.clearValue()
+            saveChangedValue(field)
         }
         if (value != null) {
             if (field instanceof CaseField) {

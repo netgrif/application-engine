@@ -26,11 +26,6 @@ class UserField extends Field<User> {
         return FieldType.USER
     }
 
-    @Override
-    void clearValue() {
-        super.clearValue()
-        setValue(null)
-    }
 //TODO 20.6.2017 - call when get data fields values
     UserResource toResource() {
         if (this.value == null) return null
