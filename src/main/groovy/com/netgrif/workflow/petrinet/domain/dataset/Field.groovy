@@ -203,7 +203,7 @@ abstract class Field<T> extends Imported {
         this.defaultValue = defaultValue
     }
 
-    void setDynamicExpression(String expression) {
+    void setInitExpression(String expression) {
         this.initExpression = expression
     }
 
@@ -228,7 +228,11 @@ abstract class Field<T> extends Imported {
     }
 
     void clearValue() {
-        setValue(getDefaultValue())
+        setValue(null)
+    }
+
+    boolean hasDefault() {
+        return defaultValue != null || initExpression != null
     }
 
 //operators overloading
