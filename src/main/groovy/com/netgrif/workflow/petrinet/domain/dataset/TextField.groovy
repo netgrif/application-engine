@@ -60,9 +60,7 @@ class TextField extends Field<String> {
     Field clone() {
         TextField clone = new TextField()
         super.clone(clone)
-
         clone.subType = this.subType
-        clone.validations = this.validations?.collect { it.clone() }
         return clone
     }
 }

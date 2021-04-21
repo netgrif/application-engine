@@ -50,10 +50,7 @@ class EnumerationMapField extends MapOptionsField<I18nString, String> {
     Field clone() {
         EnumerationMapField clone = new EnumerationMapField()
         super.clone(clone)
-
         clone.options = options
-        clone.defaultValue = defaultValue
-
         return clone
     }
 }
