@@ -6,7 +6,9 @@ import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.elastic.domain.ElasticTask;
 import com.netgrif.workflow.elastic.service.interfaces.IElasticTaskService;
+import com.netgrif.workflow.petrinet.domain.dataset.TaskField;
 import com.netgrif.workflow.petrinet.domain.events.EventType;
+import com.netgrif.workflow.workflow.domain.TaskPair;
 import com.netgrif.workflow.workflow.web.requestbodies.TaskSearchRequest;
 import com.netgrif.workflow.event.events.task.*;
 import com.netgrif.workflow.petrinet.domain.*;
@@ -137,10 +139,7 @@ public class TaskService implements ITaskService {
         outcome.add(dataService.runActions(transition.getPostAssignActions(), useCase.getStringId(), task, transition));
         useCase = evaluateRules(useCase.getStringId(), task, EventType.ASSIGN, EventPhase.POST);
 
-        if(user instanceof AnonymousUser)
-            addTaskStateInformationToPublicEventOutcome(outcome, task, user);
-        else
-            addTaskStateInformationToEventOutcome(outcome, task);
+        addTaskStateInformationToEventOutcome(outcome, task);
 
         publisher.publishEvent(new UserAssignTaskEvent(user, task, useCase));
         log.info("[" + useCase.getStringId() + "]: Task [" + task.getTitle() + "] in case [" + useCase.getTitle() + "] assigned to [" + user.getEmail() + "]");
@@ -191,7 +190,7 @@ public class TaskService implements ITaskService {
             throw new IllegalArgumentException("Task with id=" + taskId + " is not assigned to any user.");
         }
         // TODO: 14. 4. 2017 replace with @PreAuthorize
-        if (!task.getUserId().equals(loggedUser.getId())) {
+        if (!task.getUserId().equals(loggedUser.getId()) && !loggedUser.isAnonymous()) {
             throw new IllegalArgumentException("User that is not assigned tried to finish task");
         }
 
@@ -373,16 +372,6 @@ public class TaskService implements ITaskService {
         outcome.setStartDate(task.getStartDate());
         outcome.setFinishDate(task.getFinishDate());
         outcome.setTaskId(task.getStringId());
-    }
-
-    protected void addTaskStateInformationToPublicEventOutcome(EventOutcome outcome, Task task, User user) {
-        Optional<Task> taskOptional = taskRepository.findById(task.getStringId());
-        if (!taskOptional.isPresent())
-            return;
-        if (user != null)
-            outcome.setAssignee(user);
-        outcome.setStartDate(task.getStartDate());
-        outcome.setFinishDate(task.getFinishDate());
     }
 
     /**
@@ -807,9 +796,7 @@ public class TaskService implements ITaskService {
     }
 
     private void setUser(Task task) {
-        if (task.getUserId() != null && userService.getAnonymousLogged().isAnonymous()){
-            task.setUser(userService.getAnonymousLogged().transformToAnonymousUser());
-        } else if (task.getUserId() != null)
+        if (task.getUserId() != null)
             task.setUser(userService.findById(task.getUserId(), true));
     }
 }
