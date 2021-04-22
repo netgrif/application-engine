@@ -56,6 +56,7 @@
         <i18nString name="filter_name">Názov filtra</i18nString>
         <i18nString name="create_new_filter">Vytvoriť nový filter</i18nString>
         <i18nString name="details">Podrobnosti</i18nString>
+        <i18nString name="save">Uložiť</i18nString>
     </i18n>
     <i18n locale="de">
         <i18nString name="process_title">Filter</i18nString>
@@ -71,6 +72,7 @@
         <i18nString name="filter_name">Filtername</i18nString>
         <i18nString name="create_new_filter">Neuer Filter erstellen</i18nString>
         <i18nString name="details">Details</i18nString>
+        <i18nString name="save">Speichern</i18nString>
     </i18n>
     <!-- TRANSITIONS -->
     <transition>
@@ -135,7 +137,7 @@
         </dataGroup>
         <event type="finish">
             <id></id>
-            <title>save</title>
+            <title name="save">Save</title>
             <actions phase="post">
                 <action>
                     name: f.new_title;
