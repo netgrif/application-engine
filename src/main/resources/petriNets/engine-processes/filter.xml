@@ -2,47 +2,76 @@
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://modeler.netgrif.com/petriflow_schema.xsd">
     <id>filter</id>
     <initials>FTR</initials>
-    <title>Filter</title>
+    <title name="process_title">Filter</title>
     <icon>filter_alt</icon>
     <defaultRole>true</defaultRole>
     <transitionRole>false</transitionRole>
-    <caseName>New filter</caseName>
+    <caseName name="case_name">New filter</caseName>
     <!-- TRANSACTIONS -->
     <!-- ROLES -->
     <!-- PROCESS ROLE REFS -->
     <!-- PROCESS USER REFS -->
     <!-- DATA -->
-    <!--  TODO: i18n  -->
     <data type="filter" immediate="true">
         <id>filter</id>
-        <title>Filter</title>
+        <title name="filter_field">Filter</title>
     </data>
     <data type="enumeration_map" immediate="true">
         <id>filter_type</id>
-        <title>Filter type</title>
+        <title name="filter_type">Filter type</title>
         <options>
-            <option key="Case">Case</option>
-            <option key="Task">Task</option>
+            <option key="Case" name="filter_type_case">Case filter</option>
+            <option key="Task" name="filter_type_task">Task filter</option>
         </options>
     </data>
     <data type="enumeration_map" immediate="true">
         <id>visibility</id>
-        <title>Visibility</title>
+        <title name="filter_visibility">Filter visibility</title>
         <options>
-            <option key="public">Public</option>
-            <option key="private">Private</option>
+            <option key="public" name="filter_visibility_public">Public</option>
+            <option key="private" name="filter_visibility_private">Private</option>
         </options>
         <init>public</init>
     </data>
     <data type="text" immediate="true">
         <id>origin_view_id</id>
-        <title>Origin ViewId</title>
+        <title name="origin_view_id">Origin ViewId</title>
     </data>
     <data type="text">
         <id>new_title</id>
-        <title>Filter name</title>
+        <title name="filter_name">Filter name</title>
     </data>
     <!-- I18NS -->
+    <i18n locale="sk">
+        <i18nString name="process_title">Filter</i18nString>
+        <i18nString name="case_name">Nový Filter</i18nString>
+        <i18nString name="filter_field">Filter</i18nString>
+        <i18nString name="filter_type">Druh filtra</i18nString>
+        <i18nString name="filter_type_case">Filter prípadov</i18nString>
+        <i18nString name="filter_type_task">Filter úloh</i18nString>
+        <i18nString name="filter_visibility">Viditeľnosť filtra</i18nString>
+        <i18nString name="filter_visibility_public">Verejný</i18nString>
+        <i18nString name="filter_visibility_private">Súkromný</i18nString>
+        <i18nString name="origin_view_id">ViewId pôvodu</i18nString>
+        <i18nString name="filter_name">Názov filtra</i18nString>
+        <i18nString name="create_new_filter">Vytvoriť nový filter</i18nString>
+        <i18nString name="details">Podrobnosti</i18nString>
+    </i18n>
+    <i18n locale="de">
+        <i18nString name="process_title">Filter</i18nString>
+        <i18nString name="case_name">Neuer Filter</i18nString>
+        <i18nString name="filter_field">Filter</i18nString>
+        <i18nString name="filter_type">Filtertyp</i18nString>
+        <i18nString name="filter_type_case">Fallfilter</i18nString>
+        <i18nString name="filter_type_task">Aufgabenfilter</i18nString>
+        <i18nString name="filter_visibility">Filter Sichtbarkeit</i18nString>
+        <i18nString name="filter_visibility_public">Öffentlich</i18nString>
+        <i18nString name="filter_visibility_private">Persönlich</i18nString>
+        <i18nString name="origin_view_id">Herkunft ViewId</i18nString>
+        <i18nString name="filter_name">Filtername</i18nString>
+        <i18nString name="create_new_filter">Neuer Filter erstellen</i18nString>
+        <i18nString name="details">Details</i18nString>
+    </i18n>
     <!-- TRANSITIONS -->
     <transition>
         <id>newFilter</id>
@@ -52,7 +81,7 @@
             <offset>0</offset>
         </layout>
         <assignPolicy>auto</assignPolicy>
-        <label>Create new filter</label>
+        <label name="create_new_filter">Create new filter</label>
         <dataGroup>
             <id>DataGroup_0</id>
             <layout>grid</layout>
@@ -72,9 +101,10 @@
                 </layout>
             </dataRef>
             <dataRef>
-                <id>filter_type</id>
+                <id>visibility</id>
                 <logic>
-                    <behavior>visible</behavior>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
                 </logic>
                 <layout>
                     <x>0</x>
@@ -87,28 +117,14 @@
                 </layout>
             </dataRef>
             <dataRef>
-                <id>visibility</id>
+                <id>new_title</id>
                 <logic>
                     <behavior>editable</behavior>
+                    <behavior>required</behavior>
                 </logic>
                 <layout>
                     <x>0</x>
                     <y>2</y>
-                    <rows>1</rows>
-                    <cols>4</cols>
-                    <offset>0</offset>
-                    <template>material</template>
-                    <appearance>outline</appearance>
-                </layout>
-            </dataRef>
-            <dataRef>
-                <id>new_title</id>
-                <logic>
-                    <behavior>editable</behavior>
-                </logic>
-                <layout>
-                    <x>0</x>
-                    <y>3</y>
                     <rows>1</rows>
                     <cols>4</cols>
                     <offset>0</offset>
@@ -136,7 +152,7 @@
         <layout>
             <offset>0</offset>
         </layout>
-        <label>View</label>
+        <label name="details">Details</label>
         <dataGroup>
             <id>DataGroup_0</id>
             <layout>grid</layout>
@@ -162,6 +178,21 @@
                 </logic>
                 <layout>
                     <x>0</x>
+                    <y>0</y>
+                    <rows>1</rows>
+                    <cols>1</cols>
+                    <offset>0</offset>
+                    <template>material</template>
+                    <appearance>outline</appearance>
+                </layout>
+            </dataRef>
+            <dataRef>
+                <id>visibility</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+                <layout>
+                    <x>1</x>
                     <y>0</y>
                     <rows>1</rows>
                     <cols>1</cols>
