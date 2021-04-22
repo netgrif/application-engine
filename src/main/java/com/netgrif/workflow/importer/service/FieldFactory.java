@@ -300,9 +300,7 @@ public final class FieldFactory {
     }
 
     private Field buildField(Case useCase, String fieldId, boolean withValidation) {
-        Field netField = useCase.getPetriNet().getDataSet().get(fieldId);
-        Field field = netField.clone();
-        field.setValue(netField.getValue());
+        Field field = useCase.getPetriNet().getDataSet().get(fieldId);
 
         resolveDataValues(field, useCase, fieldId);
         if (field instanceof ChoiceField)
@@ -324,7 +322,7 @@ public final class FieldFactory {
 
         ((List<com.netgrif.workflow.petrinet.domain.dataset.logic.validation.Validation>) field.getValidations()).forEach(valid -> {
             if (!valid.isDynamic()) return;
-            valid.setValidationRule(dataExpressions.compile(useCase, valid.getValidationRule()));
+            valid.setCompiledRule(dataExpressions.compile(useCase, valid.getValidationRule()));
         });
     }
 
