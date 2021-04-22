@@ -2,12 +2,20 @@ package com.netgrif.workflow.petrinet.domain.dataset.logic.action
 
 import com.netgrif.workflow.AsyncRunner
 import com.netgrif.workflow.auth.domain.Author
+import com.netgrif.workflow.auth.domain.LoggedUser
 import com.netgrif.workflow.auth.domain.User
 import com.netgrif.workflow.auth.service.UserDetailsServiceImpl
 import com.netgrif.workflow.auth.service.interfaces.IRegistrationService
 import com.netgrif.workflow.auth.service.interfaces.IUserService
 import com.netgrif.workflow.auth.web.requestbodies.NewUserRequest
 import com.netgrif.workflow.configuration.ApplicationContextProvider
+import com.netgrif.workflow.elastic.service.interfaces.IElasticCaseService
+import com.netgrif.workflow.elastic.service.interfaces.IElasticTaskService
+import com.netgrif.workflow.elastic.web.requestbodies.CaseSearchRequest
+import com.netgrif.workflow.elastic.web.requestbodies.ElasticTaskSearchRequest
+import com.netgrif.workflow.export.configuration.ExportConfiguration
+import com.netgrif.workflow.export.domain.ExportDataConfig
+import com.netgrif.workflow.export.service.interfaces.IExportHelperService
 import com.netgrif.workflow.importer.service.FieldFactory
 import com.netgrif.workflow.mail.domain.MailDraft
 import com.netgrif.workflow.mail.interfaces.IMailAttemptService
@@ -46,9 +54,11 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.i18n.LocaleContextHolder
 import org.springframework.core.io.ClassPathResource
 import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
 
 import java.util.stream.Collectors
+
 /**
  * ActionDelegate class contains Actions API methods.
  */
@@ -106,6 +116,17 @@ class ActionDelegate {
     @Autowired
     UserDetailsServiceImpl userDetailsService
 
+    @Autowired
+    IExportHelperService exportHelperService
+
+    @Autowired
+    IElasticCaseService elasticCaseService
+
+    @Autowired
+    IElasticTaskService elasticTaskService
+
+    @Autowired
+    ExportConfiguration exportConfiguration
     /**
      * Reference of case and task in which current action is taking place.
      */
@@ -864,4 +885,72 @@ class ActionDelegate {
         userService.deleteUser(user)
     }
 
+
+    File exportCasesToFile(Closure<Predicate> predicate, String pathName, ExportDataConfig config = null,
+                           Pageable pageable = PageRequest.of(0,exportConfiguration.getMongoPageSize())){
+        File exportFile = new File(pathName)
+        OutputStream out = exportCases(predicate, exportFile, config, pageable)
+        out.close()
+        return exportFile
+    }
+
+    OutputStream exportCases(Closure<Predicate> predicate, File outFile, ExportDataConfig config = null,
+                             Pageable pageable = PageRequest.of(0,exportConfiguration.getMongoPageSize())){
+        List<Case> exportCases = findCases(predicate, pageable)
+        return exportHelperService.fillCsvCaseData(outFile, exportCases, config)
+    }
+
+    File exportCasesToFile(List<CaseSearchRequest> requests, String pathName, ExportDataConfig config = null,
+                           LoggedUser user = userService.loggedOrSystem.transformToLoggedUser(),
+                           Pageable pageable = PageRequest.of(0,exportConfiguration.getElasticPageSize()),
+                           Locale locale = new Locale("sk", "SK"),
+                           Boolean isIntersection = false){
+        File exportFile = new File(pathName)
+        OutputStream out = exportCases(requests, exportFile, config, user, pageable, locale, isIntersection)
+        out.close()
+        return exportFile
+    }
+
+    OutputStream exportCases(List<CaseSearchRequest> requests, File outFile, ExportDataConfig config = null,
+                             LoggedUser user = userService.loggedOrSystem.transformToLoggedUser(),
+                             Pageable pageable = PageRequest.of(0,exportConfiguration.getElasticPageSize()),
+                             Locale locale = new Locale("sk", "SK"),
+                             Boolean isIntersection = false){
+        List<Case> exportCases = elasticCaseService.search(requests, user, pageable, locale, isIntersection).toList()
+        return exportHelperService.fillCsvCaseData(outFile, exportCases, config)
+    }
+
+    File exportTasksToFile(Closure<Predicate> predicate, String pathName, ExportDataConfig config = null,
+                           Pageable pageable = PageRequest.of(0,exportConfiguration.getMongoPageSize())){
+        File exportFile = new File(pathName)
+        OutputStream out = exportTasks(predicate,exportFile,config,pageable)
+        out.close()
+        return exportFile
+    }
+
+    OutputStream exportTasks(Closure<Predicate> predicate, File outFile, ExportDataConfig config = null
+                             , Pageable pageable = PageRequest.of(0,exportConfiguration.getMongoPageSize())){
+        List<Task> exportTasks = findTasks(predicate, pageable)
+        return exportHelperService.fillCsvTaskData(outFile,exportTasks,config)
+    }
+
+    File exportTasksToFile(List<ElasticTaskSearchRequest> requests, String pathName, ExportDataConfig config = null,
+                           LoggedUser user = userService.loggedOrSystem.transformToLoggedUser(),
+                           Pageable pageable = PageRequest.of(0,exportConfiguration.getElasticPageSize()),
+                           Locale locale = new Locale("sk", "SK"),
+                           Boolean isIntersection = false){
+        File exportFile = new File(pathName)
+        OutputStream out = exportTasks(requests, exportFile, config, user, pageable, locale, isIntersection)
+        out.close()
+        return exportFile
+    }
+
+    OutputStream exportTasks(List<ElasticTaskSearchRequest> requests, File outFile, ExportDataConfig config = null,
+                             LoggedUser user = userService.loggedOrSystem.transformToLoggedUser(),
+                             Pageable pageable = PageRequest.of(0,exportConfiguration.getElasticPageSize()),
+                             Locale locale = new Locale("sk", "SK"),
+                             Boolean isIntersection = false){
+        List<Task> exportTasks = elasticTaskService.search(requests, user, pageable, locale, isIntersection).toList()
+        return exportHelperService.fillCsvTaskData(outFile, exportTasks, config)
+    }
 }

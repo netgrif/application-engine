@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://modeler.netgrif.com/petriflow_schema.xsd">
+	<id>export_test</id>
+	<initials>EXT</initials>
+	<title>Export actions test</title>
+	<role>
+		<id>process_role</id>
+		<title>Process role</title>
+	</role>
+	<!-- TRANSACTIONS -->
+	<!-- ROLES -->
+	<!-- PROCESS ROLE REFS -->
+	<!-- PROCESS USER REFS -->
+	<!-- DATA -->
+	<data type="multichoice" immediate="true">
+		<id>immediate_multichoice</id>
+		<title>Multichoice</title>
+		<values>Alice</values>
+		<values>Bob</values>
+		<values>Carol</values>
+		<init>Alice,Bob</init>
+	</data>
+	<data type="text">
+		<id>text</id>
+		<title>Text</title>
+		<init>Lorem ipsum</init>
+	</data>
+	<data type="number" immediate="true">
+		<id>immediate_number</id>
+		<title>Number</title>
+		<init>10000</init>
+	</data>
+	<data type="text">
+		<id>no_export</id>
+		<title>No export</title>
+	</data>
+	<!-- I18NS -->
+	<!-- TRANSITIONS -->
+	<transition>
+		<id>t1</id>
+		<x>460</x>
+		<y>60</y>
+		<layout>
+			<offset>0</offset>
+		</layout>
+		<label>case_mongo_export</label>
+		<dataRef>
+			<id>immediate_multichoice</id>
+			<logic>
+				<behavior>editable</behavior>
+			</logic>
+		</dataRef>
+		<dataRef>
+			<id>text</id>
+			<logic>
+				<behavior>editable</behavior>
+			</logic>
+		</dataRef>
+		<dataRef>
+			<id>immediate_number</id>
+			<logic>
+				<behavior>editable</behavior>
+			</logic>
+		</dataRef>
+		<event type="assign">
+			<id>export</id>
+			<actions phase="post">
+				<action>
+					exportCasesToFile({it.processIdentifier.eq("export_test")} as Closure, "src/test/resources/csv/case_mongo_export.csv")
+				</action>
+			</actions>
+		</event>
+	</transition>
+	<transition>
+		<id>t2</id>
+		<x>460</x>
+		<y>140</y>
+		<layout>
+			<offset>0</offset>
+		</layout>
+		<label>case_elastic_export</label>
+		<dataRef>
+			<id>immediate_multichoice</id>
+			<logic>
+				<behavior>editable</behavior>
+			</logic>
+		</dataRef>
+		<dataRef>
+			<id>text</id>
+			<logic>
+				<behavior>editable</behavior>
+			</logic>
+		</dataRef>
+		<dataRef>
+			<id>immediate_number</id>
+			<logic>
+				<behavior>editable</behavior>
+			</logic>
+		</dataRef>
+		<event type="assign">
+			<id>export</id>
+			<actions phase="post">
+				<action>
+					def request = new com.netgrif.workflow.elastic.web.requestbodies.CaseSearchRequest()
+					request.process = [new com.netgrif.workflow.elastic.web.requestbodies.CaseSearchRequest.PetriNet("export_test")]
+					def config = new com.netgrif.workflow.export.domain.ExportDataConfig()
+					config.setDataToExport(["text"] as Set)
+					exportCasesToFile([request], "src/test/resources/csv/case_elastic_export.csv",config)
+				</action>
+			</actions>
+		</event>
+	</transition>
+	<transition>
+		<id>t3</id>
+		<x>460</x>
+		<y>220</y>
+		<layout>
+			<offset>0</offset>
+		</layout>
+		<label>task_mongo_export</label>
+		<dataRef>
+			<id>immediate_multichoice</id>
+			<logic>
+				<behavior>editable</behavior>
+			</logic>
+		</dataRef>
+		<dataRef>
+			<id>text</id>
+			<logic>
+				<behavior>editable</behavior>
+			</logic>
+		</dataRef>
+		<event type="assign">
+			<id>export</id>
+			<actions phase="post">
+				<action>
+					def processId = petriNetService.getNewestVersionByIdentifier("export_test").stringId
+					def config = new com.netgrif.workflow.export.domain.ExportDataConfig()
+					config.setDataToExport(["immediate_multichoice","immediate_number", "text"] as Set)
+					exportTasksToFile({it.processId.eq(processId) &amp; it.transitionId.eq("t3")},"src/test/resources/csv/task_mongo_export.csv", config)
+				</action>
+			</actions>
+		</event>
+	</transition>
+	<transition>
+		<id>t4</id>
+		<x>457</x>
+		<y>321</y>
+		<layout>
+			<offset>0</offset>
+		</layout>
+		<label>task_elastic_export</label>
+		<dataRef>
+			<id>immediate_multichoice</id>
+			<logic>
+				<behavior>editable</behavior>
+			</logic>
+		</dataRef>
+		<dataRef>
+			<id>text</id>
+			<logic>
+				<behavior>editable</behavior>
+			</logic>
+		</dataRef>
+		<dataRef>
+			<id>immediate_number</id>
+			<logic>
+				<behavior>editable</behavior>
+			</logic>
+		</dataRef>
+		<event type="assign">
+			<id>export</id>
+			<actions phase="post">
+				<action>
+					def processId = petriNetService.getNewestVersionByIdentifier("export_test").stringId
+					def taskRequest = new com.netgrif.workflow.elastic.web.requestbodies.ElasticTaskSearchRequest()
+					taskRequest.process = [new com.netgrif.workflow.workflow.web.requestbodies.taskSearch.PetriNet(processId)] as List
+					taskRequest.transitionId = ["t4"] as List
+					exportTasksToFile([taskRequest],"src/test/resources/csv/task_elastic_export.csv",null, userService.findByEmail("super@netgrif.com", false).transformToLoggedUser())
+				</action>
+			</actions>
+		</event>
+	</transition>
+	<!-- PLACES -->
+	<place>
+		<id>p1</id>
+		<x>260</x>
+		<y>180</y>
+		<label></label>
+		<tokens>1</tokens>
+		<static>false</static>
+	</place>
+	<!-- ARCS -->
+	<arc>
+		<id>a1</id>
+		<type>regular</type>
+		<sourceId>p1</sourceId>
+		<destinationId>t1</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a2</id>
+		<type>regular</type>
+		<sourceId>p1</sourceId>
+		<destinationId>t2</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a3</id>
+		<type>regular</type>
+		<sourceId>p1</sourceId>
+		<destinationId>t3</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+	<arc>
+		<id>a4</id>
+		<type>regular</type>
+		<sourceId>p1</sourceId>
+		<destinationId>t4</destinationId>
+		<multiplicity>1</multiplicity>
+	</arc>
+</document>
