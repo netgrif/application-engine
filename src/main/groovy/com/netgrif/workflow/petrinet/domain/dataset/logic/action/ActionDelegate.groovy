@@ -253,7 +253,7 @@ class ActionDelegate {
         List<Validation> compiled = field.validations.collect { it.clone() }
         compiled.each {
             if (!it.dynamic) return
-            it.validationRule = dataExpressions.compile(useCase, it.getValidationRule())
+            it.compiledRule = dataExpressions.compile(useCase, it.getValidationRule())
         }
         addAttributeToChangedField(field, "validations", compiled.collect { it.getLocalizedValidation(LocaleContextHolder.locale) })
     }
