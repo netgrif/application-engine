@@ -19,19 +19,21 @@ import java.util.Locale;
 @RestController
 @RequestMapping({"/api/public"})
 @Slf4j
-public class PublicWorkflowController extends PublicAbstractController {
+public class PublicWorkflowController {
 
     private final IWorkflowService workflowService;
 
+    private final IUserService userService;
+
     public PublicWorkflowController(IWorkflowService workflowService, IUserService userService) {
-        super(userService);
+        this.userService = userService;
         this.workflowService = workflowService;
     }
 
     @PostMapping(value = "/case", consumes = "application/json;charset=UTF-8", produces = MediaTypes.HAL_JSON_VALUE)
     @ApiOperation(value = "Create new case")
     public CaseResource createCase(@RequestBody CreateCaseBody body, Locale locale) {
-        LoggedUser loggedUser = getAnonymous();
+        LoggedUser loggedUser = userService.getAnonymousLogged();
         try {
             Case useCase = this.workflowService.createCase(body.netId, body.title, body.color, loggedUser, locale);
             return new CaseResource(useCase);
