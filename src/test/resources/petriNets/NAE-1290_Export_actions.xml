@@ -154,6 +154,7 @@
 			<id>immediate_multichoice</id>
 			<logic>
 				<behavior>editable</behavior>
+				<behavior>immediate</behavior>
 			</logic>
 		</dataRef>
 		<dataRef>
@@ -166,6 +167,7 @@
 			<id>immediate_number</id>
 			<logic>
 				<behavior>editable</behavior>
+				<behavior>immediate</behavior>
 			</logic>
 		</dataRef>
 		<event type="assign">
