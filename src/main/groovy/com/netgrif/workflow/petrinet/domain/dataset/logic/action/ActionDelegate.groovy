@@ -15,7 +15,7 @@ import com.netgrif.workflow.elastic.web.requestbodies.CaseSearchRequest
 import com.netgrif.workflow.elastic.web.requestbodies.ElasticTaskSearchRequest
 import com.netgrif.workflow.export.configuration.ExportConfiguration
 import com.netgrif.workflow.export.domain.ExportDataConfig
-import com.netgrif.workflow.export.service.interfaces.IExportHelperService
+import com.netgrif.workflow.export.service.interfaces.IExportService
 import com.netgrif.workflow.importer.service.FieldFactory
 import com.netgrif.workflow.mail.domain.MailDraft
 import com.netgrif.workflow.mail.interfaces.IMailAttemptService
@@ -117,7 +117,7 @@ class ActionDelegate {
     UserDetailsServiceImpl userDetailsService
 
     @Autowired
-    IExportHelperService exportHelperService
+    IExportService exportService
 
     @Autowired
     IElasticCaseService elasticCaseService
@@ -887,70 +887,66 @@ class ActionDelegate {
 
 
     File exportCasesToFile(Closure<Predicate> predicate, String pathName, ExportDataConfig config = null,
-                           Pageable pageable = PageRequest.of(0,exportConfiguration.getMongoPageSize())){
+                           int pageSize = exportConfiguration.getMongoPageSize()){
         File exportFile = new File(pathName)
-        OutputStream out = exportCases(predicate, exportFile, config, pageable)
+        OutputStream out = exportCases(predicate, exportFile, config, pageSize)
         out.close()
         return exportFile
     }
 
     OutputStream exportCases(Closure<Predicate> predicate, File outFile, ExportDataConfig config = null,
-                             Pageable pageable = PageRequest.of(0,exportConfiguration.getMongoPageSize())){
-        List<Case> exportCases = findCases(predicate, pageable)
-        return exportHelperService.fillCsvCaseData(outFile, exportCases, config)
+                             int pageSize = exportConfiguration.getMongoPageSize()){
+        return exportService.fillCsvCaseData(predicate, outFile, config, pageSize)
     }
 
     File exportCasesToFile(List<CaseSearchRequest> requests, String pathName, ExportDataConfig config = null,
                            LoggedUser user = userService.loggedOrSystem.transformToLoggedUser(),
-                           Pageable pageable = PageRequest.of(0,exportConfiguration.getElasticPageSize()),
-                           Locale locale = new Locale("sk", "SK"),
+                           int pageSize = exportConfiguration.getMongoPageSize(),
+                           Locale locale = LocaleContextHolder.getLocale(),
                            Boolean isIntersection = false){
         File exportFile = new File(pathName)
-        OutputStream out = exportCases(requests, exportFile, config, user, pageable, locale, isIntersection)
+        OutputStream out = exportCases(requests, exportFile, config, user, pageSize, locale, isIntersection)
         out.close()
         return exportFile
     }
 
     OutputStream exportCases(List<CaseSearchRequest> requests, File outFile, ExportDataConfig config = null,
                              LoggedUser user = userService.loggedOrSystem.transformToLoggedUser(),
-                             Pageable pageable = PageRequest.of(0,exportConfiguration.getElasticPageSize()),
-                             Locale locale = new Locale("sk", "SK"),
+                             int pageSize = exportConfiguration.getMongoPageSize(),
+                             Locale locale = LocaleContextHolder.getLocale(),
                              Boolean isIntersection = false){
-        List<Case> exportCases = elasticCaseService.search(requests, user, pageable, locale, isIntersection).toList()
-        return exportHelperService.fillCsvCaseData(outFile, exportCases, config)
+        return exportService.fillCsvCaseData(requests, outFile, config, user, pageSize, locale, isIntersection)
     }
 
     File exportTasksToFile(Closure<Predicate> predicate, String pathName, ExportDataConfig config = null,
-                           Pageable pageable = PageRequest.of(0,exportConfiguration.getMongoPageSize())){
+                           int pageSize = exportConfiguration.getMongoPageSize()){
         File exportFile = new File(pathName)
-        OutputStream out = exportTasks(predicate,exportFile,config,pageable)
+        OutputStream out = exportTasks(predicate,exportFile,config,pageSize)
         out.close()
         return exportFile
     }
 
     OutputStream exportTasks(Closure<Predicate> predicate, File outFile, ExportDataConfig config = null
-                             , Pageable pageable = PageRequest.of(0,exportConfiguration.getMongoPageSize())){
-        List<Task> exportTasks = findTasks(predicate, pageable)
-        return exportHelperService.fillCsvTaskData(outFile,exportTasks,config)
+                             , int pageSize = exportConfiguration.getMongoPageSize()){
+        return exportService.fillCsvTaskData(predicate, outFile, config, pageSize)
     }
 
     File exportTasksToFile(List<ElasticTaskSearchRequest> requests, String pathName, ExportDataConfig config = null,
                            LoggedUser user = userService.loggedOrSystem.transformToLoggedUser(),
-                           Pageable pageable = PageRequest.of(0,exportConfiguration.getElasticPageSize()),
-                           Locale locale = new Locale("sk", "SK"),
+                           int pageSize = exportConfiguration.getMongoPageSize(),
+                           Locale locale = LocaleContextHolder.getLocale(),
                            Boolean isIntersection = false){
         File exportFile = new File(pathName)
-        OutputStream out = exportTasks(requests, exportFile, config, user, pageable, locale, isIntersection)
+        OutputStream out = exportTasks(requests, exportFile, config, user, pageSize, locale, isIntersection)
         out.close()
         return exportFile
     }
 
     OutputStream exportTasks(List<ElasticTaskSearchRequest> requests, File outFile, ExportDataConfig config = null,
                              LoggedUser user = userService.loggedOrSystem.transformToLoggedUser(),
-                             Pageable pageable = PageRequest.of(0,exportConfiguration.getElasticPageSize()),
-                             Locale locale = new Locale("sk", "SK"),
+                             int pageSize = exportConfiguration.getMongoPageSize(),
+                             Locale locale = LocaleContextHolder.getLocale(),
                              Boolean isIntersection = false){
-        List<Task> exportTasks = elasticTaskService.search(requests, user, pageable, locale, isIntersection).toList()
-        return exportHelperService.fillCsvTaskData(outFile, exportTasks, config)
+        return exportService.fillCsvTaskData(requests, outFile, config, user, pageSize, locale, isIntersection)
     }
 }

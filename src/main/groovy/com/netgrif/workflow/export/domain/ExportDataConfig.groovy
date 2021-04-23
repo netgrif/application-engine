@@ -5,5 +5,5 @@ import lombok.Data
 @Data
 class ExportDataConfig {
 
-    Set<String> dataToExport
+    LinkedHashSet<String> dataToExport
 }
