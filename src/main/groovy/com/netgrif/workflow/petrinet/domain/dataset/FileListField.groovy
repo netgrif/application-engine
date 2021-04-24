@@ -37,6 +37,10 @@ class FileListField extends Field<FileListFieldValue> {
         this.setDefaultValue(FileListFieldValue.fromString(defaultValue))
     }
 
+    void setDefaultValue(List<String> defaultValues){
+        this.setDefaultValue(FileListFieldValue.fromList(defaultValues))
+    }
+
     void addValue(String fileName, String path) {
         if (this.getValue() == null || this.getValue().getNamesPaths() == null) {
             this.setValue(new FileListFieldValue())
