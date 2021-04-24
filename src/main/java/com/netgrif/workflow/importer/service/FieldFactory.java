@@ -65,7 +65,7 @@ public final class FieldFactory {
                 field = buildEnumerationField(data.getValues(), data.getInit(), importer);
                 break;
             case MULTICHOICE:
-                field = buildMultichoiceField(data.getValues(), data.getInit(), importer);
+                field = buildMultichoiceField(data.getValues(), resolveInits(data), importer);
                 break;
             case NUMBER:
                 field = new NumberField();
@@ -86,13 +86,13 @@ public final class FieldFactory {
                 field = new ButtonField();
                 break;
             case TASK_REF:
-                field = new TaskField();
+                field = buildTaskField(resolveInits(data), importer.getDocument().getTransition());
                 break;
             case ENUMERATION_MAP:
                 field = buildEnumerationMapField(data.getOptions(), data.getInit(), importer);
                 break;
             case MULTICHOICE_MAP:
-                field = buildMultichoiceMapField(data.getOptions(), data.getInit(), importer);
+                field = buildMultichoiceMapField(data.getOptions(), resolveInits(data), importer);
                 break;
             default:
                 throw new IllegalArgumentException(data.getType() + " is not a valid Field type");
@@ -122,7 +122,7 @@ public final class FieldFactory {
                 field.addValidation(item.getExpression().getValue(), importer.toI18NString(item.getMessage()), item.getExpression().isDynamic());
             }
         }
-        if (data.getInit() != null && !data.getInit().isEmpty()) {
+        if (field.getDefaultValue() == null && data.getInit() != null && !data.getInit().isEmpty()) {
             setFieldDefaultValue(field, data.getInit(), importer);
         }
 
@@ -147,7 +147,21 @@ public final class FieldFactory {
         return field;
     }
 
-    private MultichoiceMapField buildMultichoiceMapField(Options options, List<Init> init, Importer importer) {
+    private TaskField buildTaskField(List<String> defaultValues, List<Transition> transitions){
+        TaskField field = new TaskField();
+        List<String> defaults = new ArrayList<>();
+        if (defaultValues != null && !defaultValues.isEmpty()) {
+            defaultValues.forEach(s -> {
+                if (transitions.stream().noneMatch(t -> t.getId().equals(s)))
+                    log.warn("There is no transition with id [" + s + "]");
+                defaults.add(s);
+            });
+        }
+        field.setDefaultValue(defaults);
+        return field;
+    }
+
+    private MultichoiceMapField buildMultichoiceMapField(Options options, List<String> init, Importer importer) {
         Map<String, I18nString> choices;
         if (options == null) {
             choices = new LinkedHashMap<>();
@@ -156,8 +170,8 @@ public final class FieldFactory {
                     .collect(Collectors.toMap(Option::getKey, importer::toI18NString));
         }
         MultichoiceMapField field = new MultichoiceMapField(choices);
-        if (init!= null && !init.isEmpty()) {
-            field.setDefaultValue(new HashSet<String>(Arrays.stream(init.get(0).getValue().split(",")).collect(Collectors.toList())));
+        if (init != null && !init.isEmpty()) {
+            field.setDefaultValue(new HashSet<String>(init));
         }
         return field;
     }
@@ -168,26 +182,26 @@ public final class FieldFactory {
                 .collect(Collectors.toList());
         MultichoiceField field = new MultichoiceField(choices);
         if (init!= null && !init.isEmpty()) {
-            field.setDefaultValue(init.get(0).getValue());
+            field.setDefaultValues(init);
         }
 
         return field;
     }
 
-    private EnumerationField buildEnumerationField(List<I18NStringType> values, List<Init> init, Importer importer) {
+    private EnumerationField buildEnumerationField(List<I18NStringType> values, String init, Importer importer) {
         List<I18nString> choices = values.stream()
                 .map(importer::toI18NString)
                 .collect(Collectors.toList());
 
         EnumerationField field = new EnumerationField(choices);
-        if (init != null && !init.isEmpty()) {
-            field.setDefaultValue(init.get(0).getValue());
+        if (init != null && !init.equals("")) {
+            field.setDefaultValue(init);
         }
 
         return field;
     }
 
-    private EnumerationMapField buildEnumerationMapField(Options options, List<Init> init, Importer importer) {
+    private EnumerationMapField buildEnumerationMapField(Options options, String init, Importer importer) {
         Map<String, I18nString> choices;
         if (options == null) {
             choices = new LinkedHashMap<>();
@@ -197,7 +211,7 @@ public final class FieldFactory {
         }
         EnumerationMapField field = new EnumerationMapField(choices);
         if (init!= null && !init.isEmpty()) {
-            field.setDefaultValue(init.get(0).getValue());
+            field.setDefaultValue(init);
         }
         return field;
     }
@@ -239,6 +253,10 @@ public final class FieldFactory {
     private FileListField buildFileListField(Data data) {
         FileListField fileListField = new FileListField();
         fileListField.setRemote(data.getRemote() != null);
+        List<String> defaultValues = resolveInits(data);
+        if(defaultValues != null && !defaultValues.isEmpty()){
+            fileListField.setDefaultValue(defaultValues);
+        }
         return fileListField;
     }
 
@@ -277,20 +295,8 @@ public final class FieldFactory {
             case NUMBER:
                 field.setDefaultValue(Double.parseDouble(defaultValue));
                 break;
-            case MULTICHOICE_MAP:
-            case MULTICHOICE:
-                if (field.getDefaultValue() != null)
-                    break;
-                ((MultichoiceField) field).setDefaultValue(defaultValue);
-                break;
             case FILE:
                 ((FileField) field).setDefaultValue(defaultValue);
-                break;
-            case FILELIST:
-                ((FileListField) field).setDefaultValue(defaultValue);
-                break;
-            case TASK_REF:
-                field.setDefaultValue(parseTasRefInit(defaultValue, importer.getDocument().getTransition()));
                 break;
             default:
                 field.setDefaultValue(defaultValue);
@@ -576,18 +582,12 @@ public final class FieldFactory {
         }
     }
 
-    private List<String> parseTasRefInit(String value, List<Transition> transitions) {
-        if (value == null) {
-            return new ArrayList<>();
+    private List<String> resolveInits(Data data){
+        if(data.getInits() != null && data.getInits().getInit() != null){
+            return data.getInits().getInit();
         }
-        String[] vls = value.split(",");
-        List<String> defaults = new ArrayList<>();
-        Arrays.stream(vls).forEach(s -> {
-            if (transitions.stream().noneMatch(t -> t.getId().equals(s)))
-                log.warn("There is no transition with id [" + s + "]");
-            defaults.add(s);
-        });
-        return defaults;
+        if(data.getInit() != null) return Arrays.asList(data.getInit().split(","));
+        return Collections.emptyList();
     }
 
 }

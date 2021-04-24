@@ -27,7 +27,10 @@
                     <xs:element ref="valid" minOccurs="0" maxOccurs="unbounded"/>
                     <xs:element ref="validations" minOccurs="0"/>
                 </xs:choice>
-                <xs:element ref="init" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:choice>
+                    <xs:element ref="init" minOccurs="0"/>
+                    <xs:element ref="inits" minOccurs="0"/>
+                </xs:choice>
                 <xs:element ref="format" minOccurs="0"/>
                 <xs:choice>
                     <xs:element name="view" minOccurs="0" type="fieldView"/>
@@ -359,6 +362,13 @@
         <xs:complexType>
             <xs:sequence>
                 <xs:element ref="option" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="inits">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="init" minOccurs="0" maxOccurs="unbounded"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
