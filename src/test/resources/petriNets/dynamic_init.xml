@@ -37,6 +37,30 @@
         </init>
     </data>
 
+    <data type="multichoice">
+        <id>multichoice</id>
+        <title>multichoice</title>
+        <values>ABC</values>
+        <values>DEF</values>
+        <values>GHI</values>
+        <init dynamic="true">
+            ["ABC", "DEF"]
+        </init>
+    </data>
+
+    <data type="multichoice_map">
+        <id>multichoice_map</id>
+        <title>multichoice_map</title>
+        <options>
+            <option key="ABC">abc display</option>
+            <option key="DEF">def display</option>
+            <option key="GHI">ghi display</option>
+        </options>
+        <init dynamic="true">
+            ["ABC", "DEF"]
+        </init>
+    </data>
+
     <transition>
         <id>transition</id>
         <x>0</x>
