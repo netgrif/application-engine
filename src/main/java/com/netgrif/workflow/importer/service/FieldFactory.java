@@ -21,6 +21,7 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 @org.springframework.stereotype.Component
@@ -47,13 +48,13 @@ public final class FieldFactory {
         Field field;
         switch (data.getType()) {
             case TEXT:
-                field = buildTextField(data.getValues());
+                field = buildTextField(data);
                 break;
             case BOOLEAN:
-                field = new BooleanField();
+                field = buildBooleanField(data);
                 break;
             case DATE:
-                field = new DateField();
+                field = buildDateField(data);
                 break;
             case FILE:
                 field = buildFileField(data);
@@ -62,37 +63,37 @@ public final class FieldFactory {
                 field = buildFileListField(data);
                 break;
             case ENUMERATION:
-                field = buildEnumerationField(data.getValues(), data.getInit(), importer);
+                field = buildEnumerationField(data, importer);
                 break;
             case MULTICHOICE:
-                field = buildMultichoiceField(data.getValues(), resolveInits(data), importer);
+                field = buildMultichoiceField(data, importer);
                 break;
             case NUMBER:
-                field = new NumberField();
+                field = buildNumberField(data);
                 break;
             case USER:
                 field = buildUserField(data, importer);
                 break;
             case USER_LIST:
-                field = buildUserListField();
+                field = buildUserListField(data);
                 break;
             case CASE_REF:
                 field = buildCaseField(data);
                 break;
             case DATE_TIME:
-                field = new DateTimeField();
+                field = buildDateTimeField(data);
                 break;
             case BUTTON:
-                field = new ButtonField();
+                field = buildButtonField(data);
                 break;
             case TASK_REF:
-                field = buildTaskField(resolveInits(data), importer.getDocument().getTransition());
+                field = buildTaskField(data, importer.getDocument().getTransition());
                 break;
             case ENUMERATION_MAP:
-                field = buildEnumerationMapField(data.getOptions(), data.getInit(), importer);
+                field = buildEnumerationMapField(data, importer);
                 break;
             case MULTICHOICE_MAP:
-                field = buildMultichoiceMapField(data.getOptions(), resolveInits(data), importer);
+                field = buildMultichoiceMapField(data, importer);
                 break;
             default:
                 throw new IllegalArgumentException(data.getType() + " is not a valid Field type");
@@ -122,9 +123,6 @@ public final class FieldFactory {
                 field.addValidation(item.getExpression().getValue(), importer.toI18NString(item.getMessage()), item.getExpression().isDynamic());
             }
         }
-        if (field.getDefaultValue() == null && data.getInit() != null && !data.getInit().isEmpty()) {
-            setFieldDefaultValue(field, data.getInit(), importer);
-        }
 
         if (data.getFormat() != null) {
             Format format = formatFactory.buildFormat(data.getFormat());
@@ -147,116 +145,188 @@ public final class FieldFactory {
         return field;
     }
 
-    private TaskField buildTaskField(List<String> defaultValues, List<Transition> transitions){
+    private TaskField buildTaskField(Data data, List<Transition> transitions){
         TaskField field = new TaskField();
-        List<String> defaults = new ArrayList<>();
-        if (defaultValues != null && !defaultValues.isEmpty()) {
-            defaultValues.forEach(s -> {
-                if (transitions.stream().noneMatch(t -> t.getId().equals(s)))
-                    log.warn("There is no transition with id [" + s + "]");
-                defaults.add(s);
-            });
-        }
-        field.setDefaultValue(defaults);
+        setDefaultValues(field, data, defaultValues -> {
+            if (defaultValues != null && !defaultValues.isEmpty()) {
+                List<String> defaults = new ArrayList<>();
+                defaultValues.forEach(s -> {
+                    if (transitions.stream().noneMatch(t -> t.getId().equals(s)))
+                        log.warn("There is no transition with id [" + s + "]");
+                    defaults.add(s);
+                });
+                field.setDefaultValue(defaults);
+            }
+        });
         return field;
     }
 
-    private MultichoiceMapField buildMultichoiceMapField(Options options, List<String> init, Importer importer) {
+    private MultichoiceMapField buildMultichoiceMapField(Data data, Importer importer) {
         Map<String, I18nString> choices;
-        if (options == null) {
+        if (data.getOptions() == null) {
             choices = new LinkedHashMap<>();
         } else {
-            choices = options.getOption().stream()
+            choices = data.getOptions().getOption().stream()
                     .collect(Collectors.toMap(Option::getKey, importer::toI18NString));
         }
         MultichoiceMapField field = new MultichoiceMapField(choices);
-        if (init != null && !init.isEmpty()) {
-            field.setDefaultValue(new HashSet<String>(init));
-        }
+        setDefaultValues(field, data, init -> {
+            if (init != null && !init.isEmpty()) {
+                field.setDefaultValue(new HashSet<String>(init));
+            }
+        });
         return field;
     }
 
-    private MultichoiceField buildMultichoiceField(List<I18NStringType> values, List<Init> init, Importer importer) {
-        List<I18nString> choices = values.stream()
+    private MultichoiceField buildMultichoiceField(Data data, Importer importer) {
+        List<I18nString> choices = data.getValues().stream()
                 .map(importer::toI18NString)
                 .collect(Collectors.toList());
         MultichoiceField field = new MultichoiceField(choices);
-        if (init!= null && !init.isEmpty()) {
-            field.setDefaultValues(init);
-        }
-
+        setDefaultValues(field, data, init -> {
+            if (init != null && !init.isEmpty()) {
+               field.setDefaultValues(init);
+            }
+        });
         return field;
     }
 
-    private EnumerationField buildEnumerationField(List<I18NStringType> values, String init, Importer importer) {
-        List<I18nString> choices = values.stream()
+    private EnumerationField buildEnumerationField(Data data, Importer importer) {
+        List<I18nString> choices = data.getValues().stream()
                 .map(importer::toI18NString)
                 .collect(Collectors.toList());
 
         EnumerationField field = new EnumerationField(choices);
-        if (init != null && !init.equals("")) {
-            field.setDefaultValue(init);
-        }
-
+        setDefaultValue(field, data, init -> {
+            if (init != null && !init.equals("")) {
+                field.setDefaultValue(init);
+            }
+        });
         return field;
     }
 
-    private EnumerationMapField buildEnumerationMapField(Options options, String init, Importer importer) {
+    private EnumerationMapField buildEnumerationMapField(Data data, Importer importer) {
         Map<String, I18nString> choices;
-        if (options == null) {
+        if (data.getOptions() == null) {
             choices = new LinkedHashMap<>();
         } else {
-            choices = options.getOption().stream()
+            choices = data.getOptions().getOption().stream()
                     .collect(Collectors.toMap(Option::getKey, importer::toI18NString, (o1, o2) -> o1, LinkedHashMap::new));
         }
         EnumerationMapField field = new EnumerationMapField(choices);
-        if (init!= null && !init.isEmpty()) {
-            field.setDefaultValue(init);
-        }
+        setDefaultValue(field, data, init -> {
+            if (init != null && !init.isEmpty()) {
+                field.setDefaultValue(init);
+            }
+        });
         return field;
     }
 
-    private TextField buildTextField(List<I18NStringType> values) {
+    private TextField buildTextField(Data data) {
         String value = null;
+        List<I18NStringType> values = data.getValues();
         if (values != null && !values.isEmpty())
             value = values.get(0).getValue();
 
-        return new TextField(value);
+        TextField field = new TextField(value);
+        setDefaultValue(field, data, field::setDefaultValue);
+        return field;
+    }
+
+    private BooleanField buildBooleanField(Data data) {
+        BooleanField field = new BooleanField();
+        setDefaultValue(field, data, defaultValue -> {
+            if (defaultValue != null) {
+                field.setDefaultValue(Boolean.valueOf(defaultValue));
+            }
+        });
+        return field;
+    }
+
+    private DateField buildDateField(Data data) {
+        DateField field = new DateField();
+        setDefaultValue(field, data, defaultValue -> {
+            if (defaultValue != null) {
+                field.setDefaultValue(parseDate(defaultValue));
+            }
+        });
+        return field;
+    }
+
+    private NumberField buildNumberField(Data data) {
+        NumberField field = new NumberField();
+        setDefaultValue(field, data, defaultValue -> {
+            if (defaultValue != null) {
+                field.setDefaultValue(Double.parseDouble(defaultValue));
+            }
+        });
+        return field;
+    }
+
+    private ButtonField buildButtonField(Data data) {
+        ButtonField field = new ButtonField();
+        setDefaultValue(field, data, field::setDefaultValue);
+        return field;
+    }
+
+    private DateTimeField buildDateTimeField(Data data) {
+        DateTimeField field = new DateTimeField();
+        setDefaultValue(field, data, defaultValue -> field.setDefaultValue(parseDateTime(defaultValue)));
+        return field;
     }
 
     private CaseField buildCaseField(Data data) {
         AllowedNets nets = data.getAllowedNets();
+        CaseField field;
         if (nets == null) {
-            return new CaseField();
+            field = new CaseField();
         } else {
-            return new CaseField(new ArrayList<>(nets.getAllowedNet()));
+            field = new CaseField(new ArrayList<>(nets.getAllowedNet()));
         }
+        setDefaultValues(field, data, inits -> {
+            field.setDefaultValue(null);
+        });
+        return field;
     }
 
     private UserField buildUserField(Data data, Importer importer) {
         String[] roles = data.getValues().stream()
                 .map(value -> importer.getRoles().get(value.getValue()).getStringId())
                 .toArray(String[]::new);
-        return new UserField(roles);
+        UserField field = new UserField(roles);
+        setDefaultValues(field, data, inits -> {
+            field.setDefaultValue(null);
+        });
+        return field;
     }
 
-    private UserListField buildUserListField() {
-        return new UserListField();
+    private UserListField buildUserListField(Data data) {
+        UserListField field = new UserListField();
+        setDefaultValues(field, data, inits -> {
+            field.setDefaultValue(null);
+        });
+        return field;
     }
 
     private FileField buildFileField(Data data) {
         FileField fileField = new FileField();
         fileField.setRemote(data.getRemote() != null);
+        setDefaultValue(fileField, data, defaultValue -> {
+            if (defaultValue != null) {
+                fileField.setDefaultValue(defaultValue);
+            }
+        });
         return fileField;
     }
 
     private FileListField buildFileListField(Data data) {
         FileListField fileListField = new FileListField();
         fileListField.setRemote(data.getRemote() != null);
-        List<String> defaultValues = resolveInits(data);
-        if(defaultValues != null && !defaultValues.isEmpty()){
-            fileListField.setDefaultValue(defaultValues);
-        }
+        setDefaultValues(fileListField, data, defaultValues -> {
+            if (defaultValues != null && !defaultValues.isEmpty()){
+                fileListField.setDefaultValue(defaultValues);
+            }
+        });
         return fileListField;
     }
 
@@ -272,34 +342,6 @@ public final class FieldFactory {
             if (encryption == null)
                 encryption = "PBEWITHSHA256AND256BITAES-CBC-BC";
             field.setEncryption(encryption);
-        }
-    }
-
-    private void setFieldDefaultValue(Field field, List<Init> init, Importer importer) {
-        String defaultValue = init.get(0).getValue();
-        if (init.get(0).isDynamic()) {
-            field.setInitExpression(defaultValue);
-            return;
-        }
-
-        switch (field.getType()) {
-            case DATETIME:
-                field.setDefaultValue(parseDateTime(defaultValue));
-                break;
-            case DATE:
-                field.setDefaultValue(parseDate(defaultValue));
-                break;
-            case BOOLEAN:
-                field.setDefaultValue(Boolean.valueOf(defaultValue));
-                break;
-            case NUMBER:
-                field.setDefaultValue(Double.parseDouble(defaultValue));
-                break;
-            case FILE:
-                ((FileField) field).setDefaultValue(defaultValue);
-                break;
-            default:
-                field.setDefaultValue(defaultValue);
         }
     }
 
@@ -582,11 +624,46 @@ public final class FieldFactory {
         }
     }
 
-    private List<String> resolveInits(Data data){
-        if(data.getInits() != null && data.getInits().getInit() != null){
-            return data.getInits().getInit();
+    private <T> void setDefaultValue(Field<T> field, Data data, Consumer<String> setDefault) {
+        String initExpression = getInitExpression(data);
+        if (initExpression != null) {
+            field.setInitExpression(initExpression);
+        } else {
+            setDefault.accept(resolveInit(data));
         }
-        if(data.getInit() != null) return Arrays.asList(data.getInit().split(","));
+    }
+
+    private <T> void setDefaultValues(Field<T> field, Data data, Consumer<List<String>> setDefault) {
+        String initExpression = getInitExpression(data);
+        if (initExpression != null) {
+            field.setInitExpression(initExpression);
+        } else {
+            setDefault.accept(resolveInits(data));
+        }
+    }
+
+    private String getInitExpression(Data data) {
+        if (data.getInit() != null) {
+            if (data.getInit().isDynamic()) {
+                return data.getInit().getValue();
+            }
+        }
+        return null;
+    }
+
+    private String resolveInit(Data data) {
+        if (data.getInits() != null && data.getInits().getInit() != null) {
+            return data.getInits().getInit().get(0).getValue();
+        }
+        if (data.getInit() != null) return data.getInit().getValue();
+        return null;
+    }
+
+    private List<String> resolveInits(Data data) {
+        if (data.getInits() != null && data.getInits().getInit() != null) {
+            return data.getInits().getInit().stream().map(Init::getValue).collect(Collectors.toList());
+        }
+        if (data.getInit() != null) return Arrays.asList(data.getInit().getValue().split(","));
         return Collections.emptyList();
     }
 
