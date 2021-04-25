@@ -48,5 +48,7 @@ class DynamicDefaultValueTest {
         assert useCase.dataSet["date"].value != null
         assert useCase.dataSet["dateTime"].value != null
         assert (useCase.dataSet["user"].value as User) != null
+        assert (useCase.dataSet["multichoice"].value as List) == ["ABC", "DEF"]
+        assert (useCase.dataSet["multichoice_map"].value as List) == ["ABC", "DEF"]
     }
 }
