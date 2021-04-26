@@ -22,8 +22,6 @@
                 <xs:choice>
                     <xs:element ref="values" minOccurs="0" maxOccurs="unbounded"/>
                     <xs:element ref="options" minOccurs="0"/>
-                    <xs:element ref="dynamicValues" minOccurs="0"/>
-                    <xs:element ref="dynamicOptions" minOccurs="0"/>
                 </xs:choice>
                 <xs:choice>
                     <xs:element ref="valid" minOccurs="0" maxOccurs="unbounded"/>
@@ -146,6 +144,7 @@
         <xs:complexType>
             <xs:sequence>
                 <xs:element ref="i18nString" maxOccurs="unbounded" minOccurs="0"/>
+                <xs:element ref="i18nStringExpression" maxOccurs="unbounded" minOccurs="0"/>
             </xs:sequence>
             <xs:attribute name="locale"/>
         </xs:complexType>
@@ -263,9 +262,7 @@
     </xs:simpleType>
     <xs:complexType name="valid">
         <xs:simpleContent>
-            <xs:extension base="xs:string">
-                <xs:attribute name="dynamic" type="xs:boolean" default="false"/>
-            </xs:extension>
+            <xs:extension base="expression"/>
         </xs:simpleContent>
     </xs:complexType>
     <xs:simpleType name="dataGroupAlignment">
@@ -359,16 +356,15 @@
             <xs:length value="3"/>
         </xs:restriction>
     </xs:simpleType>
-    <xs:element name="values" type="i18nStringType"/>
-    <xs:element name="dynamicValues" type="xs:string"/>
+    <xs:element name="values" type="i18nStringTypeWithExpression"/>
     <xs:element name="options">
         <xs:complexType>
-            <xs:sequence>
+            <xs:choice>
                 <xs:element ref="option" minOccurs="0" maxOccurs="unbounded"/>
-            </xs:sequence>
+                <xs:element ref="init"/>
+            </xs:choice>
         </xs:complexType>
     </xs:element>
-    <xs:element name="dynamicOptions" type="xs:string"/>
     <xs:element name="inits">
         <xs:complexType>
             <xs:sequence>
@@ -376,6 +372,13 @@
             </xs:sequence>
         </xs:complexType>
     </xs:element>
+    <xs:complexType name="expression">
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute name="dynamic" type="xs:boolean" default="false"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
     <xs:complexType name="component">
         <xs:sequence>
             <xs:element name="name" type="xs:string"/>
@@ -606,9 +609,7 @@
     <xs:element name="init">
         <xs:complexType>
             <xs:simpleContent>
-                <xs:extension base="xs:string">
-                    <xs:attribute name="dynamic" type="xs:boolean" default="false"/>
-                </xs:extension>
+                <xs:extension base="expression"/>
             </xs:simpleContent>
         </xs:complexType>
     </xs:element>
@@ -651,6 +652,7 @@
     <xs:element name="defaultRole" type="xs:boolean" default="true"/>
     <xs:element name="transitionRole" type="xs:boolean" default="true"/>
     <xs:element name="i18nString" type="i18nStringType"/>
+    <xs:element name="i18nStringExpression" type="i18nStringTypeWithExpression"/>
     <xs:complexType name="i18nStringType">
         <xs:simpleContent>
             <xs:extension base="xs:string">
@@ -658,10 +660,17 @@
             </xs:extension>
         </xs:simpleContent>
     </xs:complexType>
+    <xs:complexType name="i18nStringTypeWithExpression">
+        <xs:simpleContent>
+            <xs:extension base="i18nStringType">
+                <xs:attribute name="dynamic" type="xs:boolean"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
     <xs:element name="assignPolicy" type="assignPolicyType"/>
     <xs:element name="dataFocusPolicy" type="dataFocusPolicyType"/>
     <xs:element name="finishPolicy" type="finishPolicyType"/>
-    <xs:element name="caseName" type="i18nStringType"/>
+    <xs:element name="caseName" type="i18nStringTypeWithExpression"/>
     <xs:element name="event">
         <xs:complexType>
             <xs:complexContent>
