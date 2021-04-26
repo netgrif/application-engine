@@ -22,6 +22,8 @@
                 <xs:choice>
                     <xs:element ref="values" minOccurs="0" maxOccurs="unbounded"/>
                     <xs:element ref="options" minOccurs="0"/>
+                    <xs:element ref="dynamicValues" minOccurs="0"/>
+                    <xs:element ref="dynamicOptions" minOccurs="0"/>
                 </xs:choice>
                 <xs:choice>
                     <xs:element ref="valid" minOccurs="0" maxOccurs="unbounded"/>
@@ -358,6 +360,7 @@
         </xs:restriction>
     </xs:simpleType>
     <xs:element name="values" type="i18nStringType"/>
+    <xs:element name="dynamicValues" type="xs:string"/>
     <xs:element name="options">
         <xs:complexType>
             <xs:sequence>
@@ -365,6 +368,7 @@
             </xs:sequence>
         </xs:complexType>
     </xs:element>
+    <xs:element name="dynamicOptions" type="xs:string"/>
     <xs:element name="inits">
         <xs:complexType>
             <xs:sequence>

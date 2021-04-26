@@ -1,0 +1,44 @@
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../main/resources/petriNets/petriflow_schema.xsd">
+    <id>dynamic_choices</id>
+    <title>dynamic_choices</title>
+    <defaultRole>true</defaultRole>
+    <initials>DVT</initials>
+    <!-- ROLES -->
+    <data type="enumeration">
+        <id>enumeration</id>
+        <title>enumeration</title>
+        <dynamicValues>
+            ["A", "B", "C"]
+        </dynamicValues>
+    </data>
+    <data type="enumeration_map">
+        <id>enumeration_map</id>
+        <title>enumeration_map</title>
+        <dynamicOptions>
+            ["a": "A", "b": "B"]
+        </dynamicOptions>
+    </data>
+    <data type="multichoice">
+        <id>multichoice</id>
+        <title>multichoice</title>
+        <dynamicValues>
+            ["A", "B", "C"]
+        </dynamicValues>
+    </data>
+    <data type="multichoice_map">
+        <id>multichoice_map</id>
+        <title>multichoice_map</title>
+       <dynamicOptions>
+            ["a": "A", "b": "B"]
+        </dynamicOptions>
+    </data>
+
+    <transition>
+        <id>transition</id>
+        <x>200</x>
+        <y>200</y>
+        <label>Transition</label>
+        <assignPolicy>auto</assignPolicy>
+    </transition>
+
+</document>
