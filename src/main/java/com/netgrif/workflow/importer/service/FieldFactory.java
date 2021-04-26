@@ -184,8 +184,9 @@ public final class FieldFactory {
     }
 
     private void setFieldChoices(ChoiceField<?> field, Data data, Importer importer) {
-        if (data.getDynamicValues() != null) {
-            field.setExpression(data.getDynamicValues());
+        if (data.getValues() != null) {
+            if (!data.getValues().isEmpty() && data.getValues().get(0).isDynamic())
+                field.setExpression(data.getValues().get(0).getValue());
         } else {
             List<I18nString> choices = data.getValues().stream()
                     .map(importer::toI18NString)
@@ -217,8 +218,8 @@ public final class FieldFactory {
     }
 
     private void setFieldOptions(MapOptionsField<I18nString, ?> field, Data data, Importer importer) {
-        if (data.getDynamicOptions() != null) {
-            field.setExpression(data.getDynamicOptions());
+        if (data.getOptions().getInit() != null) {
+            field.setExpression(data.getOptions().getInit().getValue());
             return;
         }
 
@@ -229,7 +230,7 @@ public final class FieldFactory {
 
     private TextField buildTextField(Data data) {
         String value = null;
-        List<I18NStringType> values = data.getValues();
+        List<I18NStringTypeWithExpression> values = data.getValues();
         if (values != null && !values.isEmpty())
             value = values.get(0).getValue();
 

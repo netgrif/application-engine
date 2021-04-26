@@ -7,30 +7,26 @@
     <data type="enumeration">
         <id>enumeration</id>
         <title>enumeration</title>
-        <dynamicValues>
-            ["A", "B", "C"]
-        </dynamicValues>
+        <values dynamic="true">["A", "B", "C"]</values>
     </data>
     <data type="enumeration_map">
         <id>enumeration_map</id>
         <title>enumeration_map</title>
-        <dynamicOptions>
-            ["a": "A", "b": "B"]
-        </dynamicOptions>
+        <options>
+            <init>["a": "A", "b": "B"]</init>
+        </options>
     </data>
     <data type="multichoice">
         <id>multichoice</id>
         <title>multichoice</title>
-        <dynamicValues>
-            ["A", "B", "C"]
-        </dynamicValues>
+        <values dynamic="true">["A", "B", "C"]</values>
     </data>
     <data type="multichoice_map">
         <id>multichoice_map</id>
         <title>multichoice_map</title>
-       <dynamicOptions>
-            ["a": "A", "b": "B"]
-        </dynamicOptions>
+        <options>
+            <init>["a": "A", "b": "B"]</init>
+        </options>
     </data>
 
     <transition>
