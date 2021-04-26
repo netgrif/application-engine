@@ -1,5 +1,6 @@
 package com.netgrif.workflow.workflow.service;
 
+import com.netgrif.workflow.auth.domain.AnonymousUser;
 import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.auth.service.interfaces.IUserService;
@@ -138,10 +139,7 @@ public class TaskService implements ITaskService {
         outcome.add(dataService.runActions(transition.getPostAssignActions(), useCase.getStringId(), task, transition));
         useCase = evaluateRules(useCase.getStringId(), task, EventType.ASSIGN, EventPhase.POST);
 
-        if(user.isAnonymous())
-            addTaskStateInformationToPublicEventOutcome(outcome, task, user);
-        else
-            addTaskStateInformationToEventOutcome(outcome, task);
+        addTaskStateInformationToEventOutcome(outcome, task);
 
         publisher.publishEvent(new UserAssignTaskEvent(user, task, useCase));
         log.info("[" + useCase.getStringId() + "]: Task [" + task.getTitle() + "] in case [" + useCase.getTitle() + "] assigned to [" + user.getEmail() + "]");
@@ -192,7 +190,7 @@ public class TaskService implements ITaskService {
             throw new IllegalArgumentException("Task with id=" + taskId + " is not assigned to any user.");
         }
         // TODO: 14. 4. 2017 replace with @PreAuthorize
-        if (!task.getUserId().equals(loggedUser.getId())) {
+        if (!task.getUserId().equals(loggedUser.getId()) && !loggedUser.isAnonymous()) {
             throw new IllegalArgumentException("User that is not assigned tried to finish task");
         }
 
@@ -374,16 +372,6 @@ public class TaskService implements ITaskService {
         outcome.setStartDate(task.getStartDate());
         outcome.setFinishDate(task.getFinishDate());
         outcome.setTaskId(task.getStringId());
-    }
-
-    protected void addTaskStateInformationToPublicEventOutcome(EventOutcome outcome, Task task, User user) {
-        Optional<Task> taskOptional = taskRepository.findById(task.getStringId());
-        if (!taskOptional.isPresent())
-            return;
-        if (user != null)
-            outcome.setAssignee(user);
-        outcome.setStartDate(task.getStartDate());
-        outcome.setFinishDate(task.getFinishDate());
     }
 
     /**
@@ -581,8 +569,7 @@ public class TaskService implements ITaskService {
         com.querydsl.core.types.Predicate searchPredicate = searchService.buildQuery(requests, user, locale, isIntersection);
         if(searchPredicate != null) {
             Page<Task> page = taskRepository.findAll(searchPredicate, pageable);
-            if (!user.isAnonymous())
-                page = loadUsers(page);
+            page = loadUsers(page);
             page = dataService.setImmediateFields(page);
             return page;
         } else {
@@ -809,9 +796,7 @@ public class TaskService implements ITaskService {
     }
 
     private void setUser(Task task) {
-        if (task.getUserId() != null && userService.getAnonymousLogged().isAnonymous()){
-            task.setUser(userService.getAnonymousLogged().transformToAnonymousUser());
-        } else if (task.getUserId() != null)
+        if (task.getUserId() != null)
             task.setUser(userService.findById(task.getUserId(), true));
     }
 }

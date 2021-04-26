@@ -2,6 +2,7 @@ package com.netgrif.workflow.importer.service;
 
 import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.importer.model.*;
+import com.netgrif.workflow.importer.service.throwable.MissingIconKeyException;
 import com.netgrif.workflow.petrinet.domain.Component;
 import com.netgrif.workflow.petrinet.domain.Format;
 import com.netgrif.workflow.petrinet.domain.I18nString;
@@ -40,7 +41,7 @@ public final class FieldFactory {
     private IDataValidator dataValidator;
 
     // TODO: refactor this shit
-    Field getField(Data data, Importer importer) throws IllegalArgumentException {
+    Field getField(Data data, Importer importer) throws IllegalArgumentException, MissingIconKeyException {
         Field field;
         switch (data.getType()) {
             case TEXT:
@@ -133,7 +134,7 @@ public final class FieldFactory {
         }
 
         if (data.getComponent() != null) {
-            Component component = componentFactory.buildComponent(data);
+            Component component = componentFactory.buildComponent(data.getComponent(), importer, data);
             field.setComponent(component);
         }
 
@@ -154,7 +155,7 @@ public final class FieldFactory {
         }
         MultichoiceMapField field = new MultichoiceMapField(choices);
         if (init!= null && !init.isEmpty()) {
-            field.setDefaultValue(new HashSet<>(init));
+            field.setDefaultValue(new HashSet<String>(Arrays.stream(init.get(0).split(",")).collect(Collectors.toList())));
         }
         return field;
     }
@@ -281,10 +282,7 @@ public final class FieldFactory {
                 ((FileListField) field).setDefaultValue(defaultValue);
                 break;
             case TASK_REF:
-                if (importer.getDocument().getTransition().stream().anyMatch(t -> t.getId().equals(defaultValue)))
-                    ((TaskField) field).setDefaultValue(defaultValue);
-                else
-                    log.warn("There is no transition with id [" + defaultValue + "]");
+                ((TaskField) field).setDefaultValue(parseTasRefInit(defaultValue, importer.getDocument().getTransition()));
                 break;
             default:
                 field.setDefaultValue(defaultValue);
@@ -553,4 +551,19 @@ public final class FieldFactory {
             ((CaseField) field).setAllowedNets(allowedNets);
         }
     }
+
+    private List<String> parseTasRefInit(String value, List<Transition> transitions) {
+        if (value == null) {
+            return new ArrayList<>();
+        }
+        String[] vls = value.split(",");
+        List<String> defaults = new ArrayList<>();
+        Arrays.stream(vls).forEach(s -> {
+            if (transitions.stream().noneMatch(t -> t.getId().equals(s)))
+                log.warn("There is no transition with id [" + s + "]");
+            defaults.add(s);
+        });
+        return defaults;
+    }
+
 }

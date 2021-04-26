@@ -18,7 +18,7 @@ class TaskField extends FieldWithDefault<List<String>> {
         return clone
     }
 
-    void setDefaultValue(String defaultValue) {
-        super.setDefaultValue(Collections.singletonList(defaultValue))
+    void setDefaultValue(List<String> defaultValue) {
+        super.setDefaultValue(defaultValue)
     }
 }
