@@ -222,6 +222,7 @@ public class ElasticTaskService implements IElasticTaskService {
         buildRoleQuery(request, userRoleQuery);
         buildNegativeViewRoleQuery(userRoleQuery, user);
         buildUsersQuery(request, userRoleQuery);
+        buildNegativeViewUsersQuery(userRoleQuery, user);
 
         query.filter(userRoleQuery);
     }
@@ -232,6 +233,12 @@ public class ElasticTaskService implements IElasticTaskService {
             negativeRoleQuery.should(termQuery("negativeViewRoles", roleId));
         }
 
+        query.mustNot(negativeRoleQuery);
+    }
+
+    private void buildNegativeViewUsersQuery(BoolQueryBuilder query, LoggedUser user) {
+        BoolQueryBuilder negativeRoleQuery = boolQuery();
+        negativeRoleQuery.should(termQuery("negativeViewUsers", user.getId()));
         query.mustNot(negativeRoleQuery);
     }
 
