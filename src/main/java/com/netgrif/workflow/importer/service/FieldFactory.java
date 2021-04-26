@@ -161,28 +161,9 @@ public final class FieldFactory {
         return field;
     }
 
-    private MultichoiceMapField buildMultichoiceMapField(Data data, Importer importer) {
-        Map<String, I18nString> choices;
-        if (data.getOptions() == null) {
-            choices = new LinkedHashMap<>();
-        } else {
-            choices = data.getOptions().getOption().stream()
-                    .collect(Collectors.toMap(Option::getKey, importer::toI18NString));
-        }
-        MultichoiceMapField field = new MultichoiceMapField(choices);
-        setDefaultValues(field, data, init -> {
-            if (init != null && !init.isEmpty()) {
-                field.setDefaultValue(new HashSet<String>(init));
-            }
-        });
-        return field;
-    }
-
     private MultichoiceField buildMultichoiceField(Data data, Importer importer) {
-        List<I18nString> choices = data.getValues().stream()
-                .map(importer::toI18NString)
-                .collect(Collectors.toList());
-        MultichoiceField field = new MultichoiceField(choices);
+        MultichoiceField field = new MultichoiceField();
+        setFieldChoices(field, data, importer);
         setDefaultValues(field, data, init -> {
             if (init != null && !init.isEmpty()) {
                field.setDefaultValues(init);
@@ -192,11 +173,8 @@ public final class FieldFactory {
     }
 
     private EnumerationField buildEnumerationField(Data data, Importer importer) {
-        List<I18nString> choices = data.getValues().stream()
-                .map(importer::toI18NString)
-                .collect(Collectors.toList());
-
-        EnumerationField field = new EnumerationField(choices);
+        EnumerationField field = new EnumerationField();
+        setFieldChoices(field, data, importer);
         setDefaultValue(field, data, init -> {
             if (init != null && !init.equals("")) {
                 field.setDefaultValue(init);
@@ -205,21 +183,48 @@ public final class FieldFactory {
         return field;
     }
 
-    private EnumerationMapField buildEnumerationMapField(Data data, Importer importer) {
-        Map<String, I18nString> choices;
-        if (data.getOptions() == null) {
-            choices = new LinkedHashMap<>();
+    private void setFieldChoices(ChoiceField<?> field, Data data, Importer importer) {
+        if (data.getDynamicValues() != null) {
+            field.setExpression(data.getDynamicValues());
         } else {
-            choices = data.getOptions().getOption().stream()
-                    .collect(Collectors.toMap(Option::getKey, importer::toI18NString, (o1, o2) -> o1, LinkedHashMap::new));
+            List<I18nString> choices = data.getValues().stream()
+                    .map(importer::toI18NString)
+                    .collect(Collectors.toList());
+            field.getChoices().addAll(choices);
         }
-        EnumerationMapField field = new EnumerationMapField(choices);
+    }
+
+    private MultichoiceMapField buildMultichoiceMapField(Data data, Importer importer) {
+        MultichoiceMapField field = new MultichoiceMapField();
+        setFieldOptions(field, data, importer);
+        setDefaultValues(field, data, init -> {
+            if (init != null && !init.isEmpty()) {
+                field.setDefaultValue(new HashSet<>(init));
+            }
+        });
+        return field;
+    }
+
+    private EnumerationMapField buildEnumerationMapField(Data data, Importer importer) {
+        EnumerationMapField field = new EnumerationMapField();
+        setFieldOptions(field, data, importer);
         setDefaultValue(field, data, init -> {
             if (init != null && !init.isEmpty()) {
                 field.setDefaultValue(init);
             }
         });
         return field;
+    }
+
+    private void setFieldOptions(MapOptionsField<I18nString, ?> field, Data data, Importer importer) {
+        if (data.getDynamicOptions() != null) {
+            field.setExpression(data.getDynamicOptions());
+            return;
+        }
+
+        Map<String, I18nString> choices = (data.getOptions() == null) ? new LinkedHashMap<>() : data.getOptions().getOption().stream()
+                    .collect(Collectors.toMap(Option::getKey, importer::toI18NString, (o1, o2) -> o1, LinkedHashMap::new));
+        field.setOptions(choices);
     }
 
     private TextField buildTextField(Data data) {
