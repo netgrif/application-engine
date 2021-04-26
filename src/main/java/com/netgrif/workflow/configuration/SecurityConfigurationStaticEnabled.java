@@ -50,6 +50,7 @@ public class SecurityConfigurationStaticEnabled extends AbstractSecurityConfigur
 //        @formatter:off
         http
             .httpBasic()
+                .authenticationEntryPoint(authenticationEntryPoint)
             .and()
             .authorizeRequests()
                 .antMatchers(getPatterns()).permitAll()
@@ -59,9 +60,6 @@ public class SecurityConfigurationStaticEnabled extends AbstractSecurityConfigur
                 .logoutUrl("/api/auth/logout")
                 .invalidateHttpSession(true)
                 .logoutSuccessHandler((new HttpStatusReturningLogoutSuccessHandler(HttpStatus.OK)))
-            .and()
-            .exceptionHandling()
-                .authenticationEntryPoint(authenticationEntryPoint)
             .and()
             .headers()
                 .frameOptions().disable()
