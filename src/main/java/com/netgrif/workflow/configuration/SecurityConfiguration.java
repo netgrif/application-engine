@@ -100,6 +100,7 @@ public class SecurityConfiguration extends AbstractSecurityConfiguration {
 //        @formatter:off
         http
             .httpBasic()
+                .authenticationEntryPoint(authenticationEntryPoint)
             .and()
                 .cors()
                 .and()
@@ -113,9 +114,6 @@ public class SecurityConfiguration extends AbstractSecurityConfiguration {
                 .logoutUrl("/api/auth/logout")
                 .invalidateHttpSession(true)
                 .logoutSuccessHandler((new HttpStatusReturningLogoutSuccessHandler(HttpStatus.OK)))
-            .and()
-            .exceptionHandling()
-                .authenticationEntryPoint(authenticationEntryPoint)
             .and()
             .headers()
                 .frameOptions().disable()

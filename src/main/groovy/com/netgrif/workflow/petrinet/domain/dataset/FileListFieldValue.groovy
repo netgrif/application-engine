@@ -16,6 +16,7 @@ class FileListFieldValue {
     }
 
     static FileListFieldValue fromString(String value) {
+        if(value == null) value = ""
         return buildValueFromParts(Arrays.asList(value.split(",")))
     }
 
