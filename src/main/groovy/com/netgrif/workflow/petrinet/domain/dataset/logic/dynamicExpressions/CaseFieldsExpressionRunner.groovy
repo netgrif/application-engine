@@ -2,8 +2,10 @@ package com.netgrif.workflow.petrinet.domain.dataset.logic.dynamicExpressions
 
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.ActionDelegate
 import com.netgrif.workflow.workflow.domain.Case
+import org.codehaus.groovy.control.CompilerConfiguration
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Lookup
 import org.springframework.stereotype.Component
 
@@ -11,6 +13,9 @@ import org.springframework.stereotype.Component
 abstract class CaseFieldsExpressionRunner {
 
     private static final Logger log = LoggerFactory.getLogger(CaseFieldsExpressionRunner.class)
+
+    @Autowired
+    private CompilerConfiguration configuration
 
     @Lookup("actionDelegate")
     abstract ActionDelegate getActionDelegate()
@@ -26,7 +31,7 @@ abstract class CaseFieldsExpressionRunner {
     }
 
     protected Closure getActionCode(Case useCase, Map<String, String> fields, String expression) {
-        def code = (Closure) new GroovyShell(this.class.getClassLoader()).evaluate("{-> ${expression}}")
+        def code = (Closure) new GroovyShell(this.class.getClassLoader(), configuration).evaluate("{-> ${expression}}")
         code.delegate = getClosureDelegate(useCase, fields)
         return code
     }
