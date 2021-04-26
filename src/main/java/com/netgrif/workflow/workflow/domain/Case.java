@@ -4,9 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.netgrif.workflow.auth.domain.Author;
 import com.netgrif.workflow.petrinet.domain.I18nString;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
-import com.netgrif.workflow.petrinet.domain.dataset.CaseField;
-import com.netgrif.workflow.petrinet.domain.dataset.Field;
-import com.netgrif.workflow.petrinet.domain.dataset.UserField;
+import com.netgrif.workflow.petrinet.domain.dataset.*;
 import com.netgrif.workflow.workflow.service.interfaces.IInitValueExpressionEvaluator;
 import lombok.Builder;
 import lombok.Getter;
@@ -179,10 +177,12 @@ public class Case {
     }
 
     public void populateDataSet(IInitValueExpressionEvaluator initValueExpressionEvaluator) {
-        List<String> dynamicInitFieldsId = new ArrayList<>();
+        List<Field<?>> dynamicInitFields = new LinkedList<>();
+        List<MapOptionsField<I18nString, ?>> dynamicOptionsFields = new LinkedList<>();
+        List<ChoiceField<?>> dynamicChoicesFields = new LinkedList<>();
         petriNet.getDataSet().forEach((key, field) -> {
             if (field.isDynamicDefaultValue()) {
-                dynamicInitFieldsId.add(field.getImportId());
+                dynamicInitFields.add(field);
                 this.dataSet.put(key, new DataField());
             } else {
                 this.dataSet.put(key, new DataField(field.getDefaultValue()));
@@ -194,12 +194,16 @@ public class Case {
                 this.dataSet.get(key).setValue(new ArrayList<>());
                 this.dataSet.get(key).setAllowedNets(((CaseField) field).getAllowedNets());
             }
+            if (field instanceof MapOptionsField && ((MapOptionsField) field).isDynamic()) {
+                dynamicOptionsFields.add((MapOptionsField<I18nString, ?>) field);
+            }
+            if (field instanceof ChoiceField && ((ChoiceField) field).isDynamic()) {
+                dynamicChoicesFields.add((ChoiceField<?>) field);
+            }
         });
-        dynamicInitFieldsId.forEach(fieldId -> {
-            Field field = petriNet.getDataSet().get(fieldId);
-            Object value = initValueExpressionEvaluator.evaluate(this, field);
-            this.dataSet.get(fieldId).setValue(value);
-        });
+        dynamicInitFields.forEach(field -> this.dataSet.get(field.getImportId()).setValue(initValueExpressionEvaluator.evaluate(this, field)));
+        dynamicChoicesFields.forEach(field -> this.dataSet.get(field.getImportId()).setChoices(initValueExpressionEvaluator.evaluateChoices(this, field)));
+        dynamicOptionsFields.forEach(field -> this.dataSet.get(field.getImportId()).setOptions(initValueExpressionEvaluator.evaluateOptions(this, field)));
     }
 
     private String generateVisualId() {

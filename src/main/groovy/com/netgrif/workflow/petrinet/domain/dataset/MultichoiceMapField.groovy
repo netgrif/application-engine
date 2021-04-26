@@ -50,6 +50,7 @@ class MultichoiceMapField extends MapOptionsField<I18nString, Set<String>> {
         MultichoiceMapField clone = new MultichoiceMapField()
         super.clone(clone)
         clone.options = options
+        clone.optionsExpression = optionsExpression
         return clone
     }
 }
