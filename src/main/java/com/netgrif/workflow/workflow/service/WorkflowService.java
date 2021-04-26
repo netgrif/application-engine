@@ -37,6 +37,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -199,6 +200,17 @@ public class WorkflowService implements IWorkflowService {
         return userIds.stream().filter(userId -> userService.findById(userId, false) != null).collect(Collectors.toList());
     }
 
+    @Override
+    public Case createCase(String netId, String title, String color, LoggedUser user, Locale locale) {
+        if (locale == null) {
+            locale = LocaleContextHolder.getLocale();
+        }
+        if (title == null) {
+            PetriNet petriNet = petriNetService.clone(new ObjectId(netId));
+            title = petriNet.getDefaultCaseName().getTranslation(locale);
+        }
+        return this.createCase(netId, title, color, user);
+    }
 
     @Override
     public Case createCase(String netId, String title, String color, LoggedUser user) {
@@ -364,13 +376,14 @@ public class WorkflowService implements IWorkflowService {
     }
 
     private void resolveTaskRefs(Case useCase) {
-        useCase.getPetriNet().getDataSet().forEach((key, field) -> {
-            if (field instanceof TaskField && ((TaskField) field).getDefaultValue() != null && !((TaskField) field).getDefaultValue().isEmpty()) {
-                Optional<TaskPair> taskPairOptional = useCase.getTasks().stream().filter(t ->
-                        t.getTransition().equals(((TaskField) field).getDefaultValue().get(0))).findFirst();
-                taskPairOptional.ifPresent(taskPair -> useCase.getDataField(key).setValue(Collections.singletonList(taskPair.getTask())));
-            } else if (field instanceof TaskField && (((TaskField) field).getDefaultValue() == null || !((TaskField) field).getDefaultValue().isEmpty())) {
-                useCase.getDataField(key).setValue(new ArrayList<>());
+        useCase.getPetriNet().getDataSet().values().stream().filter(f -> f instanceof TaskField).map(TaskField.class::cast).forEach(field -> {
+            useCase.getDataField(field.getStringId()).setValue(new ArrayList<>());
+            if (field.getDefaultValue() != null && !field.getDefaultValue().isEmpty()) {
+                List<TaskPair> taskPairList = useCase.getTasks().stream().filter(t ->
+                                (field.getDefaultValue().contains(t.getTransition()))).collect(Collectors.toList());
+                if (!taskPairList.isEmpty()) {
+                    taskPairList.forEach(pair -> ((List<String>) useCase.getDataField(field.getStringId()).getValue()).add(pair.getTask()));
+                }
             }
         });
         save(useCase);

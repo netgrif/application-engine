@@ -68,6 +68,15 @@ public class UserService implements IUserService {
     }
 
     @Override
+    public AnonymousUser saveNewAnonymous(AnonymousUser user) {
+        addDefaultRole(user);
+        addDefaultAuthorities(user);
+
+        AnonymousUser savedUser = (AnonymousUser) userRepository.save(user);
+        return savedUser;
+    }
+
+    @Override
     public User update(User user, UpdateUserRequest updates) {
         if (updates.telNumber != null) {
             user.setTelNumber(updates.telNumber);
@@ -286,6 +295,13 @@ public class UserService implements IUserService {
     public User addRole(User user, String roleStringId) {
         UserProcessRole role = userProcessRoleService.findByRoleId(roleStringId);
         user.addProcessRole(role);
+        return userRepository.save(user);
+    }
+
+    @Override
+    public User removeRole(User user, String roleStringId) {
+        UserProcessRole role = userProcessRoleService.findByRoleId(roleStringId);
+        user.removeProcessRole(role);
         return userRepository.save(user);
     }
 
