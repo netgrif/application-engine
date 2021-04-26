@@ -85,7 +85,7 @@ class MultichoiceField extends ChoiceField<Set<I18nString>> {
         MultichoiceField clone = new MultichoiceField()
         super.clone(clone)
         clone.choices = this.choices
-
+        clone.choicesExpression = this.choicesExpression
         return clone
     }
 }

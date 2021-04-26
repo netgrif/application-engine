@@ -56,7 +56,7 @@ class EnumerationField extends ChoiceField<I18nString> {
         EnumerationField clone = new EnumerationField()
         super.clone(clone)
         clone.choices = this.choices
-
+        clone.choicesExpression = this.choicesExpression
         return clone
     }
 }
