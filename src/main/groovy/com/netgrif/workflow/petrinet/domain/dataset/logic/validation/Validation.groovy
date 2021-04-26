@@ -15,7 +15,7 @@ class Validation {
 
     private I18nString validationMessage
 
-    private boolean dynamic
+    private Boolean dynamic
 
     Validation(String validationRule) {
         this(validationRule, null)
@@ -73,7 +73,7 @@ class Validation {
     }
 
     boolean isDynamic() {
-        return dynamic
+        return dynamic != null && dynamic
     }
 
     @Override
