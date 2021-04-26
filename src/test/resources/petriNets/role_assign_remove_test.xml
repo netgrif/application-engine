@@ -1,0 +1,54 @@
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../main/resources/petriNets/petriflow_schema.xsd">
+    <id>role_assign_remove_test</id>
+    <title>Role Assign And Remove</title>
+    <initials>RAR</initials>
+    <!-- ROLES -->
+    <role>
+        <id>first</id>
+        <title>first</title>
+    </role>
+    <role>
+        <id>second</id>
+        <title>second</title>
+    </role>
+    <role>
+        <id>third</id>
+        <title>third</title>
+    </role>
+    <role>
+        <id>fourth</id>
+        <title>fourth</title>
+    </role>
+    <caseEvents>
+        <event type="create">
+            <id>create</id>
+            <actions phase="post">
+                <action>
+                    PetriNet net = petriNetService.getPetriNet("role_assign_remove_test", new Version())
+                    assignRole(net.roles.values().find { role -> role.importId == "first"}.stringId)
+                    assignRole("second", "role_assign_remove_test")
+                    assignRole("third", net)
+                    assignRole("fourth", "role_assign_remove_test", new Version())
+                </action>
+            </actions>
+        </event>
+        <event type="delete">
+            <id>pdf</id>
+            <actions phase="post">
+                <action>
+                    PetriNet net = petriNetService.getPetriNet("role_assign_remove_test", new Version())
+                    removeRole(net.roles.values().find { role -> role.importId == "first"}.stringId)
+                    removeRole("second", "role_assign_remove_test")
+                    removeRole("third", net)
+                    removeRole("fourth", "role_assign_remove_test", new Version())
+                </action>
+            </actions>
+        </event>
+    </caseEvents>
+    <transition>
+        <id>3</id>
+        <x>379</x>
+        <y>273</y>
+        <label>Datagroups</label>
+    </transition>
+</document>

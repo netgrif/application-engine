@@ -8,19 +8,19 @@ services:
 #    depends_on:
 #      - engine
 
-  engine:
-    build:
-      context: ./
-      dockerfile: Dockerfile
-    image: engine:4.3.0
-    ports:
-      - 8080:8080
-    depends_on:
-      - docker-mysql
-      - docker-mongo
-      - docker-neo4j
-      - docker-elastic
-      - docker-redis
+#  engine:
+#    build:
+#      context: ./
+#      dockerfile: Dockerfile
+#    image: engine:4.3.0
+#    ports:
+#      - 8080:8080
+#    depends_on:
+#      - docker-mysql
+#      - docker-mongo
+#      - docker-neo4j
+#      - docker-elastic
+#      - docker-redis
 
   docker-mysql:
     image: mysql:5.7
@@ -31,32 +31,36 @@ services:
       - 3306:3306
     environment:
       MYSQL_ROOT_PASSWORD: secret
-      MYSQL_DATABASE: nae
+      MYSQL_DATABASE: nae_dev
       MYSQL_USER: netgrif_nae
       MYSQL_PASSWORD: netgrif_nae
 
   docker-mongo:
     image: mongo:4.2
-#    ports:
-#    - 27017:27017
-  #    environment:
-  #        MONGO_INITDB_ROOT_USERNAME: netgrif_nae
-  #        MONGO_INITDB_ROOT_PASSWORD: netgrif_nae
+    ports:
+    - 27017:27017
+#      environment:
+#          MONGO_INITDB_ROOT_USERNAME: netgrif_nae
+#          MONGO_INITDB_ROOT_PASSWORD: netgrif_nae
 
   docker-neo4j:
     image: neo4j:3.5
-#    ports:
-#      - 7474:7474
+    ports:
+      - 7474:7474
     environment:
       NEO4J_AUTH: none
 
 
   docker-elastic:
     image: elasticsearch:6.8.12
-#    ports:
-#      - 9300:9300
+    environment:
+      - cluster.name=elasticsearch
+      - http.host=0.0.0.0
+      - transport.host=0.0.0.0
+    ports:
+      - 9300:9300
 
   docker-redis:
     image: redis:5
-#    ports:
-#      - 6379:6379
+    ports:
+      - 6379:6379
