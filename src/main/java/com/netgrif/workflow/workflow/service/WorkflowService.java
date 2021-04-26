@@ -110,6 +110,7 @@ public class WorkflowService implements IWorkflowService {
         } catch (Exception e) {
             log.error("Indexing failed [" + useCase.getStringId() + "]", e);
         }
+        resolveUserRef(useCase);
         return useCase;
     }
 
@@ -182,9 +183,12 @@ public class WorkflowService implements IWorkflowService {
     @Override
     public Case resolveUserRef(Case useCase) {
         useCase.getUsers().clear();
+        useCase.getNegativeViewUsers().clear();
         useCase.getUserRefs().forEach((id, permission) -> {
             List<Long> userIds = getExistingUsers((List<Long>) useCase.getDataSet().get(id).getValue());
-            if (userIds != null && userIds.size() != 0) {
+            if (userIds != null && userIds.size() != 0 && permission.containsKey("view") && permission.containsValue(false)) {
+                useCase.getNegativeViewUsers().addAll(userIds);
+            } else if (userIds != null && userIds.size() != 0) {
                 useCase.addUsers(new HashSet<>(userIds), permission);
             }
         });
@@ -213,11 +217,7 @@ public class WorkflowService implements IWorkflowService {
                 .collect(Collectors.toMap(AbstractMap.SimpleEntry::getKey, AbstractMap.SimpleEntry::getValue))
         );
         useCase.addNegativeViewRoles(petriNet.getNegativeViewRoles());
-        useCase.setUserRefs(petriNet.getUserRefs().entrySet().stream()
-                .filter(role -> role.getValue().containsKey("delete"))
-                .map(role -> new AbstractMap.SimpleEntry<>(role.getKey(), Collections.singletonMap("delete", role.getValue().get("delete"))))
-                .collect(Collectors.toMap(AbstractMap.SimpleEntry::getKey, AbstractMap.SimpleEntry::getValue))
-        );
+        useCase.setUserRefs(petriNet.getUserRefs());
 
         runActions(petriNet.getPreCreateActions());
         ruleEngine.evaluateRules(useCase, new CaseCreatedFact(useCase.getStringId(), EventPhase.PRE));
