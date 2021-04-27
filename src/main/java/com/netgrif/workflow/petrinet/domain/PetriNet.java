@@ -5,6 +5,7 @@ import com.netgrif.workflow.petrinet.domain.arcs.Arc;
 import com.netgrif.workflow.petrinet.domain.arcs.VariableArc;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action;
+import com.netgrif.workflow.petrinet.domain.dataset.logic.action.runner.Expression;
 import com.netgrif.workflow.petrinet.domain.events.CaseEvent;
 import com.netgrif.workflow.petrinet.domain.events.CaseEventType;
 import com.netgrif.workflow.petrinet.domain.events.ProcessEvent;
@@ -36,6 +37,10 @@ public class PetriNet extends PetriNetObject {
     @Getter
     @Setter
     private I18nString defaultCaseName;
+
+    @Getter
+    @Setter
+    private Expression defaultCaseNameExpression;
 
     @Getter
     @Setter
@@ -347,6 +352,10 @@ public class PetriNet extends PetriNetObject {
         return new LinkedList<>();
     }
 
+    public boolean hasDynamicCaseName() {
+        return defaultCaseNameExpression != null;
+    }
+
     @Override
     public String getStringId() {
         return _id.toString();
@@ -358,6 +367,7 @@ public class PetriNet extends PetriNetObject {
         clone.setInitials(this.initials);
         clone.setTitle(this.title);
         clone.setDefaultCaseName(this.defaultCaseName);
+        clone.setDefaultCaseNameExpression(this.defaultCaseNameExpression);
         clone.setIcon(this.icon);
         clone.setCreationDate(this.creationDate);
         clone.setVersion(this.version);

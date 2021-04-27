@@ -46,8 +46,6 @@ public class LocalisedField {
 
     private List<LocalizedValidation> validations;
 
-    private Object defaultValue;
-
     public LocalisedField() {}
 
     public LocalisedField(Field field, Locale locale) {
@@ -65,7 +63,6 @@ public class LocalisedField {
         view = field.getView();
         length = field.getLength();
         component = field.getComponent();
-        defaultValue = field.getDefaultValue();
         validations = loadValidations(field, locale);
     }
 
