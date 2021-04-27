@@ -21,4 +21,9 @@ public class DelayTimeTrigger extends TimeTrigger {
         Duration delayFromNow = Duration.parse(timeString);
         startDate = LocalDateTime.now().plus(delayFromNow);
     }
+
+    @Override
+    public DelayTimeTrigger clone() {
+        return new DelayTimeTrigger(timeString);
+    }
 }

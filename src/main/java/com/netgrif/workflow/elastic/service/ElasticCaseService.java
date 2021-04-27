@@ -180,6 +180,7 @@ public class ElasticCaseService implements IElasticCaseService {
     private BoolQueryBuilder buildSingleQuery(CaseSearchRequest request, LoggedUser user, Locale locale) {
         BoolQueryBuilder query = boolQuery();
 
+        buildNegativeViewRoleQuery(query, user);
         buildPetriNetQuery(request, user, query);
         buildAuthorQuery(request, query);
         buildTaskQuery(request, query);
@@ -221,6 +222,16 @@ public class ElasticCaseService implements IElasticCaseService {
      * }
      * </pre>
      */
+
+    private void buildNegativeViewRoleQuery(BoolQueryBuilder query, LoggedUser user) {
+        BoolQueryBuilder negativeRoleQuery = boolQuery();
+        for (String roleId : user.getProcessRoles()) {
+            negativeRoleQuery.should(termQuery("negativeViewRoles", roleId));
+        }
+
+        query.mustNot(negativeRoleQuery);
+    }
+
     private void buildPetriNetQuery(CaseSearchRequest request, LoggedUser user, BoolQueryBuilder query) {
         if (request.process == null || request.process.isEmpty()) {
             return;
