@@ -5,6 +5,7 @@ import com.netgrif.workflow.petrinet.domain.DataGroup
 import com.netgrif.workflow.petrinet.domain.PetriNet
 import com.netgrif.workflow.petrinet.domain.VersionType
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldsTree
+import com.netgrif.workflow.petrinet.domain.dataset.logic.validation.DynamicValidation
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.workflow.startup.ImportHelper
 import com.netgrif.workflow.startup.SuperCreator
@@ -61,13 +62,13 @@ class DynamicValidationTest {
         Optional<PetriNet> optNet = petriNetService.importPetriNet(new FileInputStream("src/test/resources/petriNets/dynamic_validations.xml"), VersionType.MAJOR, superCreator.getLoggedSuper())
         Case useCase = importHelper.createCase("test", optNet.get())
         Map<String, Field> data = getData(useCase)
-        assert (data["number"] as ValidableField).validations[0].dynamic
+        assert (data["number"] as ValidableField).validations[0] instanceof DynamicValidation
         assert (data["number"] as ValidableField).validations[0].compiledRule == ("inrange ${useCase.dataSet["min"].value as Integer},${useCase.dataSet["max"].value as Integer}" as String)
 
-        assert (data["text"] as ValidableField).validations[0].dynamic
+        assert (data["text"] as ValidableField).validations[0] instanceof DynamicValidation
         assert (data["text"] as ValidableField).validations[0].compiledRule == ("maxLength ${useCase.dataSet["max"].value as Integer}" as String)
 
-        assert (data["date"] as ValidableField).validations[0].dynamic
+        assert (data["date"] as ValidableField).validations[0] instanceof DynamicValidation
         assert (data["date"] as ValidableField).validations[0].compiledRule == ("between past,today-P${useCase.dataSet["max"].value as Integer}D" as String)
 
         ChangedFieldsTree changes = setData(useCase, ["number_valid_switch": ["type": "boolean", "value": true],
@@ -80,10 +81,10 @@ class DynamicValidationTest {
         assert useCase.dataSet["text"].validations[0].validationRule == "email"
 
         data = getData(useCase)
-        assert !(data["number"] as ValidableField).validations[0].dynamic
+        assert !((data["number"] as ValidableField).validations[0] instanceof DynamicValidation)
         assert (data["number"] as ValidableField).validations[0].validationRule == "odd"
 
-        assert !(data["text"] as ValidableField).validations[0].dynamic
+        assert !((data["text"] as ValidableField).validations[0] instanceof DynamicValidation)
         assert (data["text"] as ValidableField).validations[0].validationRule == "email"
 
         changes = setData(useCase, ["number_valid_switch": ["type": "boolean", "value": false],
@@ -101,6 +102,9 @@ class DynamicValidationTest {
 
         assert useCase.dataSet["number"].validations[0].validationRule == '''inrange ${min.value as Integer},${max.value as Integer}'''
         assert useCase.dataSet["text"].validations[0].validationRule == '''maxLength ${max.value as Integer}'''
+
+        assert (useCase.dataSet["number"].validations[0] as DynamicValidation).expression.definition == '''"inrange ${min.value as Integer},${max.value as Integer}"'''
+        assert (useCase.dataSet["text"].validations[0] as DynamicValidation).expression.definition == '''"maxLength ${max.value as Integer}"'''
 
     }
 
