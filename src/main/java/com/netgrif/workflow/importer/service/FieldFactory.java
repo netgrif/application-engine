@@ -7,6 +7,8 @@ import com.netgrif.workflow.petrinet.domain.Component;
 import com.netgrif.workflow.petrinet.domain.Format;
 import com.netgrif.workflow.petrinet.domain.I18nString;
 import com.netgrif.workflow.petrinet.domain.dataset.*;
+import com.netgrif.workflow.petrinet.domain.dataset.logic.dynamicExpressions.DataExpressions;
+import com.netgrif.workflow.petrinet.domain.dataset.logic.validation.DynamicValidation;
 import com.netgrif.workflow.petrinet.domain.views.View;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.DataField;
@@ -114,13 +116,13 @@ public final class FieldFactory {
         if (data.getValid() != null) {
             List<Valid> list = data.getValid();
             for (Valid item : list) {
-                field.addValidation(item.getValue(), null, item.isDynamic());
+                field.addValidation(makeValidation(item.getValue(), null, item.isDynamic()));
             }
         }
         if (data.getValidations() != null) {
             List<com.netgrif.workflow.importer.model.Validation> list = data.getValidations().getValidation();
             for (com.netgrif.workflow.importer.model.Validation item : list) {
-                field.addValidation(item.getExpression().getValue(), importer.toI18NString(item.getMessage()), item.getExpression().isDynamic());
+                field.addValidation(makeValidation(item.getExpression().getValue(), importer.toI18NString(item.getMessage()), item.getExpression().isDynamic()));
             }
         }
 
@@ -143,6 +145,10 @@ public final class FieldFactory {
 
         dataValidator.checkDeprecatedAttributes(data);
         return field;
+    }
+
+    private com.netgrif.workflow.petrinet.domain.dataset.logic.validation.Validation makeValidation(String rule, I18nString message, boolean dynamic) {
+        return dynamic ? new DynamicValidation(rule, null) : new com.netgrif.workflow.petrinet.domain.dataset.logic.validation.Validation(rule, message);
     }
 
     private TaskField buildTaskField(Data data, List<Transition> transitions){
@@ -380,9 +386,9 @@ public final class FieldFactory {
         }
         if (field.getValidations() == null) return;
 
-        ((List<com.netgrif.workflow.petrinet.domain.dataset.logic.validation.Validation>) field.getValidations()).forEach(valid -> {
-            if (!valid.isDynamic()) return;
-            valid.setCompiledRule(dataValidationExpressionEvaluator.compile(useCase, valid.getValidationRule()));
+        ((List<com.netgrif.workflow.petrinet.domain.dataset.logic.validation.Validation>) field.getValidations()).stream()
+                .filter(it -> it instanceof DynamicValidation).map(it -> (DynamicValidation) it).forEach(valid -> {
+            valid.setCompiledRule(dataValidationExpressionEvaluator.compile(useCase, valid.getExpression()));
         });
     }
 
