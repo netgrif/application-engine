@@ -68,6 +68,15 @@ public class UserService implements IUserService {
     }
 
     @Override
+    public AnonymousUser saveNewAnonymous(AnonymousUser user) {
+        addDefaultRole(user);
+        addDefaultAuthorities(user);
+
+        AnonymousUser savedUser = (AnonymousUser) userRepository.save(user);
+        return savedUser;
+    }
+
+    @Override
     public User update(User user, UpdateUserRequest updates) {
         if (updates.telNumber != null) {
             user.setTelNumber(updates.telNumber);
@@ -277,11 +286,17 @@ public class UserService implements IUserService {
     @Override
     public User getLoggedUser() {
         LoggedUser loggedUser = (LoggedUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return findByEmail(loggedUser.getEmail(), false);
+        if (!loggedUser.isAnonymous()) {
+            return findByEmail(loggedUser.getEmail(), false);
+        }
+        return loggedUser.transformToAnonymousUser();
     }
 
     @Override
     public LoggedUser getAnonymousLogged() {
+        if (SecurityContextHolder.getContext().getAuthentication().getPrincipal().equals(UserProperties.ANONYMOUS_AUTH_KEY)) {
+            getLoggedUser().transformToLoggedUser();
+        }
         return (LoggedUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
 
@@ -289,6 +304,13 @@ public class UserService implements IUserService {
     public User addRole(User user, String roleStringId) {
         UserProcessRole role = userProcessRoleService.findByRoleId(roleStringId);
         user.addProcessRole(role);
+        return userRepository.save(user);
+    }
+
+    @Override
+    public User removeRole(User user, String roleStringId) {
+        UserProcessRole role = userProcessRoleService.findByRoleId(roleStringId);
+        user.removeProcessRole(role);
         return userRepository.save(user);
     }
 

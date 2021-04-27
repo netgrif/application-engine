@@ -87,6 +87,17 @@
         </component>
     </data>
 
+    <data type="enumeration_map" immediate="true">
+        <id>enumeration_map</id>
+        <title>Enumeration Map</title>
+        <options>
+            <option key="al">Alice</option>
+            <option key="bo">Bob</option>
+            <option key="ca">Carol</option>
+        </options>
+        <init>bo</init>
+    </data>
+
     <data type="multichoice" immediate="true">
         <id>multichoice</id>
         <title>Multichoice</title>
@@ -105,6 +116,17 @@
         <component>
             <name>list</name>
         </component>
+    </data>
+
+    <data type="multichoice_map" immediate="true">
+        <id>multichoice_map</id>
+        <title>Multichoice Map</title>
+        <options>
+            <option key="al">Alice</option>
+            <option key="bo">Bob</option>
+            <option key="ca">Carol</option>
+        </options>
+        <init>al, ca</init>
     </data>
 
     <data type="boolean" immediate="true">
@@ -137,6 +159,11 @@
         </action>
     </data>
 
+    <data type="fileList" immediate="true">
+        <id>fileList</id>
+        <title>File List</title>
+    </data>
+
     <data type="user" immediate="true">
         <id>user</id>
         <title>User</title>
@@ -161,7 +188,6 @@
         <id>1</id>
         <x>379</x>
         <y>273</y>
-		<cols>6</cols>
         <label>Task - editable</label>
         <assignPolicy>auto</assignPolicy>
         <dataGroup>
@@ -236,6 +262,12 @@
                     <behavior>editable</behavior>
                 </logic>
             </dataRef>
+            <dataRef>
+                <id>enumeration_map</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
         </dataGroup>
         <dataGroup>
             <id>multichoice</id>
@@ -249,6 +281,12 @@
             </dataRef>
             <dataRef>
                 <id>multichoice_list</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>multichoice_map</id>
                 <logic>
                     <behavior>editable</behavior>
                 </logic>
@@ -292,6 +330,12 @@
                     <behavior>editable</behavior>
                 </logic>
             </dataRef>
+            <dataRef>
+                <id>fileList</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
         </dataGroup>
         <dataGroup>
             <id>user</id>
@@ -312,6 +356,9 @@
                 <id>button</id>
                 <logic>
                     <behavior>editable</behavior>
+                    <action trigger="set">
+                        generatePDF("1","file")
+                    </action>
                 </logic>
             </dataRef>
         </dataGroup>
@@ -378,6 +425,12 @@
                     <behavior>visible</behavior>
                 </logic>
             </dataRef>
+            <dataRef>
+                <id>enumeration_map</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
         </dataGroup>
         <dataGroup>
             <id>multichoice</id>
@@ -391,6 +444,12 @@
             </dataRef>
             <dataRef>
                 <id>multichoice_list</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>multichoice_map</id>
                 <logic>
                     <behavior>visible</behavior>
                 </logic>
@@ -430,6 +489,12 @@
             <stretch>false</stretch>
             <dataRef>
                 <id>file</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>fileList</id>
                 <logic>
                     <behavior>visible</behavior>
                 </logic>
