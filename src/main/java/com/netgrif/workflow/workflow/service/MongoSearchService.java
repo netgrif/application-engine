@@ -2,6 +2,7 @@ package com.netgrif.workflow.workflow.service;
 
 import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.auth.service.interfaces.IUserService;
+import com.querydsl.core.BooleanBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Service;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -244,5 +246,24 @@ public class MongoSearchService<T> {
 //
 //        queryValue += val + "T00:00:00.000Z\"}";
         return queryValue;
+    }
+
+    protected BooleanBuilder constructPredicateTree(List<com.querydsl.core.types.Predicate> elementaryPredicates, BiFunction<BooleanBuilder, com.querydsl.core.types.Predicate, BooleanBuilder> nodeOperation) {
+        if (elementaryPredicates.size() == 0)
+            return new BooleanBuilder();
+
+        ArrayDeque<BooleanBuilder> subtrees = new ArrayDeque<>(elementaryPredicates.size() / 2 + elementaryPredicates.size() % 2);
+
+        for (Iterator<com.querydsl.core.types.Predicate> predicateIterator = elementaryPredicates.iterator(); predicateIterator.hasNext(); ) {
+            BooleanBuilder subtree = new BooleanBuilder(predicateIterator.next());
+            if (predicateIterator.hasNext())
+                nodeOperation.apply(subtree, predicateIterator.next());
+            subtrees.addFirst(subtree);
+        }
+
+        while (subtrees.size() != 1)
+            subtrees.addLast(nodeOperation.apply(subtrees.pollFirst(), subtrees.pollFirst()));
+
+        return subtrees.peekFirst();
     }
 }
