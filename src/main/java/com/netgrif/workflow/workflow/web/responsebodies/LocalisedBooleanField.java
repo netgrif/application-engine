@@ -8,8 +8,6 @@ import java.util.Locale;
 @Data
 public class LocalisedBooleanField extends LocalisedField {
 
-    private Boolean defaultValue;
-
     public LocalisedBooleanField(BooleanField field, Locale locale) {
         super(field, locale);
     }
