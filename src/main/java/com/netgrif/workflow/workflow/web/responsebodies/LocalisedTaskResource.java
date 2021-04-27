@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.mvc.ControllerLinkBuilder;
+import org.springframework.security.core.Authentication;
 
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
@@ -25,13 +26,13 @@ public class LocalisedTaskResource extends Resource<Task> {
         add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
                 .getOne(task.getStringId(), null)).withSelfRel());
         add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
-                .assign(null, task.getStringId(), null)).withRel("assign"));
+                .assign((Authentication) null, task.getStringId(), null)).withRel("assign"));
         add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
-                .delegate(null, task.getStringId(), null, null)).withRel("delegate"));
+                .delegate((Authentication) null, task.getStringId(), null, null)).withRel("delegate"));
         add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
-                .finish(null, task.getStringId(), null)).withRel("finish"));
+                .finish((Authentication) null, task.getStringId(), null)).withRel("finish"));
         add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
-                .cancel(null, task.getStringId(), null)).withRel("cancel"));
+                .cancel((Authentication) null, task.getStringId(), null)).withRel("cancel"));
         add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)
                 .getData(task.getStringId(), null)).withRel("data"));
         add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(TaskController.class)

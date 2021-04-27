@@ -363,7 +363,10 @@
     <xs:complexType name="component">
         <xs:sequence>
             <xs:element name="name" type="xs:string"/>
-            <xs:element ref="property" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:choice>
+                <xs:element ref="property" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:element ref="properties" />
+            </xs:choice>
         </xs:sequence>
     </xs:complexType>
     <xs:element name="option">
@@ -384,6 +387,33 @@
             </xs:simpleContent>
         </xs:complexType>
     </xs:element>
+    <xs:element name="properties">
+        <xs:complexType>
+            <xs:sequence>
+                    <xs:element ref="property" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element name="option_icons" type="icons" minOccurs="0"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="icons">
+        <xs:sequence>
+            <xs:element name="icon" type="icon" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="icon">
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute name="key"/>
+                <xs:attribute name="type" type="iconType"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+    <xs:simpleType name="iconType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="material"/>
+            <xs:enumeration value="svg"/>
+        </xs:restriction>
+    </xs:simpleType>
     <xs:element name="allowedNets">
         <xs:complexType>
             <xs:sequence>
@@ -419,6 +449,7 @@
             <xs:sequence>
                 <xs:element ref="create" minOccurs="0"/>
                 <xs:element ref="delete" minOccurs="0"/>
+                <xs:element ref="view" minOccurs="0"/>
                 <xs:element ref="action" minOccurs="0" maxOccurs="unbounded"/>
                 <xs:element ref="actionRef" minOccurs="0" maxOccurs="unbounded"/>
             </xs:sequence>
