@@ -11,14 +11,6 @@ public class LocalisedMultichoiceField extends LocalisedChoiceField {
 
     public LocalisedMultichoiceField(MultichoiceField field, Locale locale) {
         super(field, locale);
-        this.setDefaultValue(new LinkedList<String>());
-        Collection<I18nString> fieldDefaults = field.getDefaultValue();
-        if (fieldDefaults != null) {
-            for (I18nString fieldDefault : fieldDefaults) {
-                ((List<String>) this.getDefaultValue()).add(fieldDefault.getTranslation(locale));
-            }
-        }
-
         this.setValue(new LinkedList<>());
         Collection<I18nString> values = field.getValue();
         if (values != null) {

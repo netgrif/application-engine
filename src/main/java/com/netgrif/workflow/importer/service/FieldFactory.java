@@ -224,7 +224,7 @@ public final class FieldFactory {
     }
 
     private void setFieldOptions(MapOptionsField<I18nString, ?> field, Data data, Importer importer) {
-        if (data.getOptions().getInit() != null) {
+        if (data.getOptions() != null && data.getOptions().getInit() != null) {
             field.setExpression(new Expression(data.getOptions().getInit().getValue()));
             return;
         }

@@ -144,7 +144,6 @@
         <xs:complexType>
             <xs:sequence>
                 <xs:element ref="i18nString" maxOccurs="unbounded" minOccurs="0"/>
-                <xs:element ref="i18nStringExpression" maxOccurs="unbounded" minOccurs="0"/>
             </xs:sequence>
             <xs:attribute name="locale"/>
         </xs:complexType>
@@ -652,7 +651,6 @@
     <xs:element name="defaultRole" type="xs:boolean" default="true"/>
     <xs:element name="transitionRole" type="xs:boolean" default="true"/>
     <xs:element name="i18nString" type="i18nStringType"/>
-    <xs:element name="i18nStringExpression" type="i18nStringTypeWithExpression"/>
     <xs:complexType name="i18nStringType">
         <xs:simpleContent>
             <xs:extension base="xs:string">
