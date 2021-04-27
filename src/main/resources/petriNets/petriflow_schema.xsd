@@ -663,7 +663,7 @@
     <xs:complexType name="i18nStringTypeWithExpression">
         <xs:simpleContent>
             <xs:extension base="i18nStringType">
-                <xs:attribute name="dynamic" type="xs:boolean"/>
+                <xs:attribute name="dynamic" type="xs:boolean" default="false"/>
             </xs:extension>
         </xs:simpleContent>
     </xs:complexType>

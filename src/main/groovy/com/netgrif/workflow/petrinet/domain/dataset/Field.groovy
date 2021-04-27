@@ -2,6 +2,7 @@ package com.netgrif.workflow.petrinet.domain.dataset
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.databind.node.ObjectNode
+import com.netgrif.workflow.petrinet.domain.dataset.logic.action.runner.Expression
 import com.netgrif.workflow.petrinet.domain.dataset.logic.validation.Validation
 import com.netgrif.workflow.petrinet.domain.events.DataEvent
 import com.netgrif.workflow.petrinet.domain.Component
@@ -59,7 +60,7 @@ abstract class Field<T> extends Imported {
 
     protected T defaultValue
 
-    protected String initExpression
+    protected Expression initExpression
 
     protected List<Validation> validations
 
@@ -195,7 +196,7 @@ abstract class Field<T> extends Imported {
         return defaultValue
     }
 
-    String getInitExpression() {
+    Expression getInitExpression() {
         return initExpression
     }
 
@@ -203,7 +204,7 @@ abstract class Field<T> extends Imported {
         this.defaultValue = defaultValue
     }
 
-    void setInitExpression(String expression) {
+    void setInitExpression(Expression expression) {
         this.initExpression = expression
     }
 
@@ -211,12 +212,11 @@ abstract class Field<T> extends Imported {
         return initExpression != null
     }
 
-    void addValidation(String validationRule, I18nString validationMessage, boolean dynamic) {
-        Validation add = new Validation(validationRule, validationMessage, dynamic)
+    void addValidation(Validation validation) {
         if (validations == null) {
             this.validations = new ArrayList<Validation>()
         }
-        this.validations.add(add)
+        this.validations.add(validation)
     }
 
     List<Validation> getValidations() {
