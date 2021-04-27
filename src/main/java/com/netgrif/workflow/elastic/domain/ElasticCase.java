@@ -71,6 +71,9 @@ public class ElasticCase {
     @Field(type = Keyword)
     private Set<String> enabledRoles;
 
+    @Field(type = Keyword)
+    private Set<String> negativeViewRoles;
+
     /**
      * Data that is stored in the elasticsearch database.
      *
@@ -95,6 +98,7 @@ public class ElasticCase {
         taskIds = useCase.getTasks().stream().map(TaskPair::getTransition).collect(Collectors.toSet());
         taskMongoIds = useCase.getTasks().stream().map(TaskPair::getTask).collect(Collectors.toSet());
         enabledRoles = new HashSet<>(useCase.getEnabledRoles());
+        negativeViewRoles = new HashSet<>(useCase.getNegativeViewRoles());
 
         dataSet = new HashMap<>();
     }
@@ -106,6 +110,8 @@ public class ElasticCase {
         taskIds = useCase.getTaskIds();
         taskMongoIds = useCase.getTaskMongoIds();
         enabledRoles = useCase.getEnabledRoles();
+        negativeViewRoles = useCase.getNegativeViewRoles();
+
         dataSet = useCase.getDataSet();
     }
 }
