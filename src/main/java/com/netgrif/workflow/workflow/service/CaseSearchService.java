@@ -27,6 +27,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
 @Service
@@ -83,8 +84,18 @@ public class CaseSearchService extends MongoSearchService<Case> {
                 return null;
             }
         }
+        builder.andNot(buildNegativeRolesQueryConstraint(user));
 
         return builder;
+    }
+
+    protected Predicate buildNegativeRolesQueryConstraint(LoggedUser user) {
+        List<Predicate> roleConstraints = user.getProcessRoles().stream().map(this::roleNegativeQuery).collect(Collectors.toList());
+        return constructPredicateTree(roleConstraints, BooleanBuilder::or);
+    }
+
+    public Predicate roleNegativeQuery(String role) {
+        return QCase.case$.negativeViewRoles.contains(role);
     }
 
     public Predicate petriNet(Object query, LoggedUser user, Locale locale) {
