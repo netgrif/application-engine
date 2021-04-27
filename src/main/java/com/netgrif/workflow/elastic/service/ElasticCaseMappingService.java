@@ -138,7 +138,7 @@ public class ElasticCaseMappingService implements IElasticCaseMappingService {
         if (multichoice.getValue() instanceof Set) {
             return Optional.of((Set) multichoice.getValue());
         } else if (multichoice.getValue() instanceof Collection) {
-            log.warn(String.format("Multichoice field should have Set values! DateField (%s) with %s value found! Value will be converted for indexation.", netField.getImportId(), multichoice.getValue().getClass().getCanonicalName()));
+            log.warn(String.format("Multichoice field should have values of type Set! DateField (%s) with %s value found! Value will be converted for indexation.", netField.getImportId(), multichoice.getValue().getClass().getCanonicalName()));
             Set values = new HashSet();
             values.addAll((Collection) multichoice.getValue());
             return Optional.of(values);
