@@ -7,7 +7,7 @@ import com.netgrif.workflow.petrinet.domain.Component;
 import com.netgrif.workflow.petrinet.domain.Format;
 import com.netgrif.workflow.petrinet.domain.I18nString;
 import com.netgrif.workflow.petrinet.domain.dataset.*;
-import com.netgrif.workflow.petrinet.domain.dataset.logic.dynamicExpressions.DataExpressions;
+import com.netgrif.workflow.petrinet.domain.dataset.logic.action.runner.Expression;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.validation.DynamicValidation;
 import com.netgrif.workflow.petrinet.domain.views.View;
 import com.netgrif.workflow.workflow.domain.Case;
@@ -190,10 +190,10 @@ public final class FieldFactory {
     }
 
     private void setFieldChoices(ChoiceField<?> field, Data data, Importer importer) {
-        if (data.getValues() != null) {
-            if (!data.getValues().isEmpty() && data.getValues().get(0).isDynamic())
-                field.setExpression(data.getValues().get(0).getValue());
-        } else {
+        if (data.getValues() != null && !data.getValues().isEmpty() && data.getValues().get(0).isDynamic()) {
+            field.setExpression(new Expression(data.getValues().get(0).getValue()));
+
+        } else if (data.getValues() != null) {
             List<I18nString> choices = data.getValues().stream()
                     .map(importer::toI18NString)
                     .collect(Collectors.toList());
@@ -225,7 +225,7 @@ public final class FieldFactory {
 
     private void setFieldOptions(MapOptionsField<I18nString, ?> field, Data data, Importer importer) {
         if (data.getOptions().getInit() != null) {
-            field.setExpression(data.getOptions().getInit().getValue());
+            field.setExpression(new Expression(data.getOptions().getInit().getValue()));
             return;
         }
 
@@ -639,7 +639,7 @@ public final class FieldFactory {
     private <T> void setDefaultValue(Field<T> field, Data data, Consumer<String> setDefault) {
         String initExpression = getInitExpression(data);
         if (initExpression != null) {
-            field.setInitExpression(initExpression);
+            field.setInitExpression(new Expression(initExpression));
         } else {
             setDefault.accept(resolveInit(data));
         }
@@ -648,7 +648,7 @@ public final class FieldFactory {
     private <T> void setDefaultValues(Field<T> field, Data data, Consumer<List<String>> setDefault) {
         String initExpression = getInitExpression(data);
         if (initExpression != null) {
-            field.setInitExpression(initExpression);
+            field.setInitExpression(new Expression(initExpression));
         } else {
             setDefault.accept(resolveInits(data));
         }
