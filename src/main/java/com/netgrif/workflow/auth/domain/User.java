@@ -18,6 +18,7 @@ import java.util.Set;
 
 @Entity
 @Table(name = "user")
+@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 public class User {
 
     public static final String UNKNOWN = "unknown";
@@ -99,11 +100,6 @@ public class User {
     @Setter
     private Set<String> nextGroups;
 
-    @Transient
-    @Getter
-    @Setter
-    private boolean anonymous;
-
     public User() {
         groups = new HashSet<>();
         authorities = new HashSet<>();
@@ -149,6 +145,10 @@ public class User {
         userProcessRoles.add(role);
     }
 
+    public void removeProcessRole(UserProcessRole role) {
+        userProcessRoles.remove(role);
+    }
+
     public String getFullName() {
         return name + " " + surname;
     }
@@ -160,7 +160,7 @@ public class User {
     public LoggedUser transformToLoggedUser() {
         LoggedUser loggedUser = new LoggedUser(this.getId(), this.getEmail(), this.getPassword(), this.getAuthorities());
         loggedUser.setFullName(this.getFullName());
-        loggedUser.setAnonymous(this.anonymous);
+        loggedUser.setAnonymous(false);
         if (!this.getUserProcessRoles().isEmpty())
             loggedUser.parseProcessRoles(this.getUserProcessRoles());
         if (!this.getGroups().isEmpty())
