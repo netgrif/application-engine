@@ -18,5 +18,7 @@ public interface IInitValueExpressionEvaluator {
 
     Set<I18nString> evaluateChoices(Case useCase, ChoiceField<?> field);
 
+    I18nString evaluateCaseName(Case useCase, Expression expression);
+
     Object evaluate(Case useCase, Expression expression);
 }

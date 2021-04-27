@@ -154,8 +154,8 @@ public class Case {
         visualId = generateVisualId();
     }
 
-    public Case(String title, PetriNet petriNet, Map<String, Integer> activePlaces) {
-        this(title);
+    public Case(PetriNet petriNet, Map<String, Integer> activePlaces) {
+        this();
         this.petriNetObjectId = petriNet.getObjectId();
         this.petriNet = petriNet;
         this.activePlaces = activePlaces;
