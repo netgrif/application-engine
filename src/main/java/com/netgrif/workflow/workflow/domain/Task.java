@@ -83,6 +83,10 @@ public class Task {
 
     @Getter @Setter
     @Builder.Default
+    private List<String> negativeViewRoles = new LinkedList<>();
+
+    @Getter @Setter
+    @Builder.Default
     private Map<Long, Map<String, Boolean>> users = new HashMap<>();
 
     @Getter @Setter
@@ -171,6 +175,8 @@ public class Task {
         else
             roles.put(roleId, permissions);
     }
+
+    public void addNegativeViewRole(String roleId) { negativeViewRoles.add(roleId); }
 
     public void addUserRef(String userRefId, Map<String, Boolean> permissions) {
         userRefs.put(userRefId,permissions);
