@@ -17,6 +17,7 @@ class FileListFieldValue {
 
     static FileListFieldValue fromString(String value) {
         FileListFieldValue newVal = new FileListFieldValue()
+        if(value == null) value = ""
         String[] parts = value.split(",")
         for (String part : parts) {
             if (!part.contains(":"))
