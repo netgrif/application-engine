@@ -5,13 +5,13 @@ import com.netgrif.workflow.petrinet.domain.dataset.ChoiceField;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.petrinet.domain.dataset.MapOptionsField;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.runner.CaseFieldsExpressionRunner;
+import com.netgrif.workflow.petrinet.domain.dataset.logic.action.runner.Expression;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.service.interfaces.IInitValueExpressionEvaluator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
-import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -52,7 +52,7 @@ public class InitValueExpressionEvaluator implements IInitValueExpressionEvaluat
     }
 
     @Override
-    public Object evaluate(Case useCase, String expression) {
+    public Object evaluate(Case useCase, Expression expression) {
         return runner.run(useCase, expression);
     }
 }

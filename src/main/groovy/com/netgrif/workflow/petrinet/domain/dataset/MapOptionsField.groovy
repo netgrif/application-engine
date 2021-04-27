@@ -1,9 +1,11 @@
 package com.netgrif.workflow.petrinet.domain.dataset
 
+import com.netgrif.workflow.petrinet.domain.dataset.logic.action.runner.Expression
+
 abstract class MapOptionsField<T, U> extends Field<U> {
 
     protected Map<String, T> options
-    protected String optionsExpression
+    protected Expression optionsExpression
 
     MapOptionsField() {
         this(new HashMap<String, T>())
@@ -14,7 +16,7 @@ abstract class MapOptionsField<T, U> extends Field<U> {
         this.options = options
     }
 
-    MapOptionsField(String expression) {
+    MapOptionsField(Expression expression) {
         super()
         this.optionsExpression = expression
     }
@@ -27,11 +29,11 @@ abstract class MapOptionsField<T, U> extends Field<U> {
         this.options = options
     }
 
-    String getExpression() {
+    Expression getExpression() {
         return optionsExpression
     }
 
-    void setExpression(String expression) {
+    void setExpression(Expression expression) {
         this.optionsExpression = expression
     }
 

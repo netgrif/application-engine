@@ -4,6 +4,7 @@ import com.netgrif.workflow.petrinet.domain.I18nString;
 import com.netgrif.workflow.petrinet.domain.dataset.ChoiceField;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.petrinet.domain.dataset.MapOptionsField;
+import com.netgrif.workflow.petrinet.domain.dataset.logic.action.runner.Expression;
 import com.netgrif.workflow.workflow.domain.Case;
 
 import java.util.Map;
@@ -17,5 +18,5 @@ public interface IInitValueExpressionEvaluator {
 
     Set<I18nString> evaluateChoices(Case useCase, ChoiceField<?> field);
 
-    Object evaluate(Case useCase, String expression);
+    Object evaluate(Case useCase, Expression expression);
 }
