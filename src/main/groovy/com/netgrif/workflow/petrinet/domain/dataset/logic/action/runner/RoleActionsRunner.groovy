@@ -22,20 +22,11 @@ abstract class RoleActionsRunner {
     @Lookup("roleActionDelegate")
     abstract RoleActionDelegate getRoleActionDelegate()
 
-    private Map<String, Object> actionsCache = new HashMap<>()
-    private Map<String, Closure> actions = new HashMap<>()
-    private ImportCustomizer importCustomizer
+    @Autowired
     private CompilerConfiguration configuration
 
-    @Autowired
-    RoleActionsRunner(ActionsProperties actionsProperties) {
-        importCustomizer = new ImportCustomizer()
-        importCustomizer.addImports(actionsProperties.imports as String[])
-        importCustomizer.addStarImports(actionsProperties.starImports as String[])
-        importCustomizer.addStaticStars(actionsProperties.staticStarImports as String[])
-        configuration = new CompilerConfiguration()
-        configuration.addCompilationCustomizers(importCustomizer)
-    }
+    private Map<String, Object> actionsCache = new HashMap<>()
+    private Map<String, Closure> actions = new HashMap<>()
 
     void run(Action action, RoleContext roleContext) {
         if (!actionsCache)
