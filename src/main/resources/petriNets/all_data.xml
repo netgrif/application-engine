@@ -87,7 +87,7 @@
         </component>
     </data>
 
-    <data type="enumeration_map">
+    <data type="enumeration_map" immediate="true">
         <id>enumeration_map</id>
         <title>Enumeration Map</title>
         <options>
@@ -119,7 +119,7 @@
         </component>
     </data>
 
-    <data type="multichoice_map">
+    <data type="multichoice_map" immediate="true">
         <id>multichoice_map</id>
         <title>Multichoice Map</title>
         <options>
@@ -160,7 +160,7 @@
         </action>
     </data>
 
-    <data type="fileList">
+    <data type="fileList" immediate="true">
         <id>fileList</id>
         <title>File List</title>
     </data>
