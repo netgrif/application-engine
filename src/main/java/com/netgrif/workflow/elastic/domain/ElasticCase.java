@@ -1,6 +1,5 @@
 package com.netgrif.workflow.elastic.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
@@ -82,6 +81,9 @@ public class ElasticCase {
     @Field(type = Keyword)
     private Set<String> enabledRoles;
 
+    @Field(type = Keyword)
+    private Set<String> negativeViewRoles;
+
     public ElasticCase(Case useCase) {
         stringId = useCase.getStringId();
         lastModified = Timestamp.valueOf(useCase.getLastModified()).getTime();
@@ -98,6 +100,7 @@ public class ElasticCase {
         taskIds = useCase.getTasks().stream().map(TaskPair::getTransition).collect(Collectors.toSet());
         taskMongoIds = useCase.getTasks().stream().map(TaskPair::getTask).collect(Collectors.toSet());
         enabledRoles = new HashSet<>(useCase.getEnabledRoles());
+        negativeViewRoles = new HashSet<>(useCase.getNegativeViewRoles());
 
         dataSet = new HashMap<>();
         for (String id : useCase.getImmediateDataFields()) {
@@ -116,6 +119,8 @@ public class ElasticCase {
         taskIds = useCase.getTaskIds();
         taskMongoIds = useCase.getTaskMongoIds();
         enabledRoles = useCase.getEnabledRoles();
+        negativeViewRoles = useCase.getNegativeViewRoles();
+
         dataSet = useCase.getDataSet();
     }
 

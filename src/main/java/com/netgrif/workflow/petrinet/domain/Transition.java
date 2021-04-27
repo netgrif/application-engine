@@ -35,6 +35,9 @@ public class Transition extends Node {
     @Getter @Setter
     private Map<String, Map<String, Boolean>> roles;
 
+    @Getter @Setter
+    private List<String> negativeViewRoles;
+
     @Field("users")
     @Getter @Setter
     private Map<String, Map<String, Boolean>> userRefs;
@@ -76,6 +79,7 @@ public class Transition extends Node {
         roles = new HashMap<>();
         userRefs = new HashMap<>();
         triggers = new LinkedList<>();
+        negativeViewRoles = new LinkedList<>();
         dataGroups = new LinkedHashMap<>();
         assignPolicy = AssignPolicy.MANUAL;
         dataFocusPolicy = DataFocusPolicy.MANUAL;
@@ -108,6 +112,8 @@ public class Transition extends Node {
             roles.put(roleId, permissions);
         }
     }
+
+    public void addNegativeViewRole(String roleId) { negativeViewRoles.add(roleId); }
 
     public void addUserRef(String userRefId, Map<String, Boolean> permissions) {
         if (userRefs.containsKey(userRefId) && userRefs.get(userRefId) != null) {
