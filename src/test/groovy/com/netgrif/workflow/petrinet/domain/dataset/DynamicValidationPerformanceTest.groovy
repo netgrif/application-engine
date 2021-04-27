@@ -66,17 +66,12 @@ class DynamicValidationPerformanceTest {
         def aCase1 = importHelper.createCase("Case 1", optNet1.get())
         def aCase2 = importHelper.createCase("Case 2", optNet2.get())
 
-        LocalDateTime pre1 = LocalDateTime.now()
-        getData(aCase1)
-        LocalDateTime post1 = LocalDateTime.now()
-
-        LocalDateTime pre2 = LocalDateTime.now()
-        getData(aCase2)
-        LocalDateTime post2 = LocalDateTime.now()
-
-        DateTimeFormatter format = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss.SSS")
-        log.info("With dynamic validations: ${pre1.format(format)} - ${post1.format(format)} = ${ChronoUnit.MILLIS.between(pre1, post1)}ms")
-        log.info("With static validations: ${pre2.format(format)} - ${post2.format(format)} = ${ChronoUnit.MILLIS.between(pre2, post2)}ms")
+        run(aCase1, aCase2)
+        run(aCase1, aCase2)
+        run(aCase1, aCase2)
+        run(aCase1, aCase2)
+        run(aCase1, aCase2)
+        run(aCase1, aCase2)
     }
 
     Map<String, Field> getData(Case useCase) {
@@ -86,5 +81,19 @@ class DynamicValidationPerformanceTest {
 
     Task task(Case useCase) {
         return taskService.findOne(useCase.tasks.find { it.transition == "transition" }.task)
+    }
+
+    void run(Case first, Case second) {
+        LocalDateTime pre1 = LocalDateTime.now()
+        getData(first)
+        LocalDateTime post1 = LocalDateTime.now()
+
+        LocalDateTime pre2 = LocalDateTime.now()
+        getData(second)
+        LocalDateTime post2 = LocalDateTime.now()
+
+        DateTimeFormatter format = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss.SSS")
+        log.info("With dynamic validations: ${pre1.format(format)} - ${post1.format(format)} = ${ChronoUnit.MILLIS.between(pre1, post1)}ms")
+        log.info("With static validations: ${pre2.format(format)} - ${post2.format(format)} = ${ChronoUnit.MILLIS.between(pre2, post2)}ms")
     }
 }

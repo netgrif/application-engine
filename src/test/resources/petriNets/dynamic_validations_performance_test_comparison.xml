@@ -18,7 +18,7 @@
         <title>Number</title>
         <validations>
             <validation>
-                <expression dynamic="true">inrange 0,10</expression>
+                <expression>inrange 0,10</expression>
                 <message>Number field validation message</message>
             </validation>
         </validations>
@@ -28,7 +28,7 @@
         <title>Text</title>
         <validations>
             <validation>
-                <expression dynamic="true">maxLength 10</expression>
+                <expression>maxLength 10</expression>
                 <message>Text field validation message</message>
             </validation>
         </validations>
@@ -237,7 +237,7 @@
         <title>Date</title>
         <validations>
             <validation>
-                <expression dynamic="true">between past,today-P1D</expression>
+                <expression>between past,today-P1D</expression>
                 <message>Date field validation message</message>
             </validation>
         </validations>

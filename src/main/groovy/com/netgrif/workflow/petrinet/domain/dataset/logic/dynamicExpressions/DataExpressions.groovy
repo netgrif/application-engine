@@ -10,8 +10,8 @@ class DataExpressions {
     @Autowired
     protected CaseFieldsExpressionRunner expressionRunner
 
-    String compile(Case useCase, String expression) {
-        return expressionRunner.run(useCase, "\"$expression\"" as String)?.toString()
+    String compile(Case useCase, Expression expression) {
+        return expressionRunner.run(useCase, expression)?.toString()
     }
 
 }
