@@ -1,7 +1,7 @@
 package com.netgrif.workflow.petrinet.domain.dataset.logic.validation
 
 import com.netgrif.workflow.petrinet.domain.I18nString
-import com.netgrif.workflow.petrinet.domain.dataset.logic.dynamicExpressions.Expression
+import com.netgrif.workflow.petrinet.domain.dataset.logic.action.runner.Expression
 import org.springframework.data.annotation.Transient
 
 class DynamicValidation extends Validation {
