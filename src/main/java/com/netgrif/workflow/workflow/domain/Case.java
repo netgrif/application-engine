@@ -122,6 +122,10 @@ public class Case {
     @Setter
     private Map<String, Map<String, Boolean>> permissions;
 
+    @Getter
+    @Setter
+    private List<String> negativeViewRoles;
+
     @Getter @Setter
     @Builder.Default
     private Map<Long, Map<String, Boolean>> users = new HashMap<>();
@@ -140,6 +144,7 @@ public class Case {
         visualId = generateVisualId();
         enabledRoles = new HashSet<>();
         permissions = new HashMap<>();
+        negativeViewRoles = new LinkedList<>();
         users = new HashMap<>();
         userRefs = new HashMap<>();
     }
@@ -172,6 +177,8 @@ public class Case {
     public boolean hasFieldBehavior(String field, String transition) {
         return this.dataSet.get(field).hasDefinedBehavior(transition);
     }
+
+    public void addNegativeViewRoles(List<String> roleIds) { negativeViewRoles.addAll(roleIds); }
 
     private void populateDataSet() {
         petriNet.getDataSet().forEach((key, field) -> {

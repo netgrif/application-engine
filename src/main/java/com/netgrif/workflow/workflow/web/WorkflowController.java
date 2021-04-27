@@ -77,10 +77,10 @@ public class WorkflowController {
     @PreAuthorize("@workflowAuthorizationService.canCallCreate(#auth.getPrincipal(), #body.netId)")
     @ApiOperation(value = "Create new case", authorizations = @Authorization("BasicAuth"))
     @RequestMapping(value = "/case", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
-    public CaseResource createCase(@RequestBody CreateCaseBody body, Authentication auth) {
+    public CaseResource createCase(@RequestBody CreateCaseBody body, Authentication auth, Locale locale) {
         LoggedUser loggedUser = (LoggedUser) auth.getPrincipal();
         try {
-            Case useCase = workflowService.createCase(body.netId, body.title, body.color, loggedUser);
+            Case useCase = workflowService.createCase(body.netId, body.title, body.color, loggedUser, locale);
             return new CaseResource(useCase);
         } catch (Exception e) { // TODO: 5. 2. 2017 change to custom exception
             log.error("Creating case failed:",e);
