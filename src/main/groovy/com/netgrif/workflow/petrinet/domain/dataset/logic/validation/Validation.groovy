@@ -4,35 +4,18 @@ import com.netgrif.workflow.petrinet.domain.I18nString
 import com.querydsl.core.annotations.PropertyType
 import com.querydsl.core.annotations.QueryType
 
-import org.springframework.data.annotation.Transient
-
 class Validation {
 
-    @Transient
-    private String compiledRule
+    protected String validationRule
 
-    private String validationRule
-
-    private I18nString validationMessage
-
-    private Boolean dynamic
+    protected I18nString validationMessage
 
     Validation(String validationRule) {
         this(validationRule, null)
     }
 
-    Validation(String validationRule, boolean dynamic) {
-        this(validationRule, null, dynamic)
-    }
-
     Validation(String validationRule, I18nString validationMessage) {
-        this(validationRule, validationMessage, false)
-    }
-
-    Validation(String validationRule, I18nString validationMessage, boolean dynamic) {
         this()
-        this.dynamic = dynamic
-        this.compiledRule = validationRule
         this.validationRule = validationRule
         this.validationMessage = validationMessage
     }
@@ -40,7 +23,7 @@ class Validation {
     Validation() {}
 
     LocalizedValidation getLocalizedValidation(Locale locale) {
-        LocalizedValidation ret = new LocalizedValidation(this.compiledRule ?: this.validationRule, getTranslatedValidationMessage(locale))
+        LocalizedValidation ret = new LocalizedValidation(this.validationRule, getTranslatedValidationMessage(locale))
         return ret
     }
 
@@ -64,21 +47,9 @@ class Validation {
         this.validationRule = validationRule
     }
 
-    String getCompiledRule() {
-        return compiledRule
-    }
-
-    void setCompiledRule(String compiledRule) {
-        this.compiledRule = compiledRule
-    }
-
-    boolean isDynamic() {
-        return dynamic != null && dynamic
-    }
-
     @Override
     Validation clone() {
-        return new Validation(this.validationRule, this.validationMessage, this.dynamic)
+        return new Validation(this.validationRule, this.validationMessage)
     }
 
     @Override
