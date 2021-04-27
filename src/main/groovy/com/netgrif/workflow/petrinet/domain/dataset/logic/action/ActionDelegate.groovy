@@ -25,6 +25,8 @@ import com.netgrif.workflow.petrinet.domain.Transition
 import com.netgrif.workflow.petrinet.domain.dataset.*
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedField
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldsTree
+import com.netgrif.workflow.petrinet.domain.dataset.logic.dynamicExpressions.DataExpressions
+import com.netgrif.workflow.petrinet.domain.dataset.logic.validation.DynamicValidation
 import com.netgrif.workflow.petrinet.domain.dataset.logic.validation.Validation
 import com.netgrif.workflow.petrinet.domain.version.Version
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
@@ -272,9 +274,8 @@ class ActionDelegate {
             putIntoChangedFields(field, new ChangedField(field.stringId))
         }
         List<Validation> compiled = field.validations.collect { it.clone() }
-        compiled.each {
-            if (!it.dynamic) return
-            it.compiledRule = dataValidationExpressionEvaluator.compile(useCase, it.getValidationRule())
+        compiled.findAll { it instanceof DynamicValidation }.collect { (DynamicValidation) it }.each {
+            it.compiledRule = dataValidationExpressionEvaluator.compile(useCase, it.expression)
         }
         addAttributeToChangedField(field, "validations", compiled.collect { it.getLocalizedValidation(LocaleContextHolder.locale) })
     }
@@ -936,12 +937,12 @@ class ActionDelegate {
         userService.deleteUser(user)
     }
 
-    Validation validation(String rule, boolean dynamic = false) {
-        return validation(rule, null, dynamic)
+    Validation validation(String rule, I18nString message) {
+        return new Validation(rule, message)
     }
 
-    Validation validation(String rule, I18nString message, boolean dynamic = false) {
-        return new Validation(rule, message, dynamic)
+    DynamicValidation dynamicValidation(String rule, I18nString message) {
+        return new DynamicValidation(rule, message)
     }
 
 }
