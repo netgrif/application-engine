@@ -21,6 +21,7 @@ import org.springframework.test.context.junit4.SpringRunner
 class WorkflowServiceTest {
 
     public static final String NET_FILE = "case_search_test.xml"
+    public static final String CASE_LOCALE_NET_FILE = "create_case_locale.xml"
 
     @Autowired
     private ImportHelper importHelper
@@ -60,5 +61,19 @@ class WorkflowServiceTest {
         assert newCase.getImmediateData().size() == 5
     }
 
+    @Test
+    void createCaseWithLocale() {
+        def testNet = petriNetService.importPetriNet(stream(CASE_LOCALE_NET_FILE), "major", superCreator.getLoggedSuper())
+        assert testNet.isPresent()
+
+        def net = testNet.get()
+        Case aCase = workflowService.createCase(net.stringId, null, null, superCreator.getLoggedSuper(), new Locale('sk'))
+
+        assert aCase.title.equals("Slovenský preklad")
+
+        Case enCase = workflowService.createCase(net.stringId, null, null, superCreator.getLoggedSuper(), new Locale('en'))
+
+        assert enCase.title.equals("English translation")
+    }
 
 }

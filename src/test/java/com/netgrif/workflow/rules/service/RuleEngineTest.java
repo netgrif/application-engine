@@ -4,6 +4,7 @@ import com.netgrif.workflow.TestHelper;
 import com.netgrif.workflow.WorkflowManagementSystemApplication;
 import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.configuration.drools.RefreshableKieBase;
+import com.netgrif.workflow.importer.service.throwable.MissingIconKeyException;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.throwable.MissingPetriNetMetaDataException;
 import com.netgrif.workflow.petrinet.domain.throwable.TransitionNotExecutableException;
@@ -78,7 +79,7 @@ public class RuleEngineTest {
     }
 
     @Test
-    public void testNetImportRulePRE() throws IOException, MissingPetriNetMetaDataException {
+    public void testNetImportRulePRE() throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException {
         final String NET_TITLE_PRE = "PRE_TITLE";
         final String TEST_FIELD = "TEST_FIELD";
 
@@ -105,7 +106,7 @@ public class RuleEngineTest {
     }
 
     @Test
-    public void testNetImportRulePOST() throws IOException, MissingPetriNetMetaDataException {
+    public void testNetImportRulePOST() throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException {
         final String NET_TITLE_POST = "POST_TITLE";
         final String NEW_IDENTIFIER = "identifier";
 
@@ -140,7 +141,7 @@ public class RuleEngineTest {
     }
 
     @Test
-    public void testTransitionRules() throws IOException, MissingPetriNetMetaDataException, TransitionNotExecutableException {
+    public void testTransitionRules() throws IOException, MissingPetriNetMetaDataException, TransitionNotExecutableException, MissingIconKeyException {
         final String TRANS_1 = "2";
         final String TRANS_2 = "4";
         final String NEW_CASE_TITLE = "new case title";
@@ -215,7 +216,7 @@ public class RuleEngineTest {
     public static final String TRANS_1 = "2";
 
     @Test
-    public void testAssign() throws IOException, MissingPetriNetMetaDataException, TransitionNotExecutableException {
+    public void testAssign() throws IOException, MissingPetriNetMetaDataException, TransitionNotExecutableException, MissingIconKeyException {
         StoredRule rule = transitionRulePre(TRANS_1, "EventType.ASSIGN");
         StoredRule rule2 = transitionRulePost(TRANS_1, "EventType.ASSIGN");
 
@@ -232,7 +233,7 @@ public class RuleEngineTest {
     }
 
     @Test
-    public void testDelegate() throws IOException, MissingPetriNetMetaDataException, TransitionNotExecutableException {
+    public void testDelegate() throws IOException, MissingPetriNetMetaDataException, TransitionNotExecutableException, MissingIconKeyException {
         StoredRule rule = transitionRulePre(TRANS_1, "EventType.DELEGATE");
         StoredRule rule2 = transitionRulePost(TRANS_1, "EventType.DELEGATE");
 
@@ -251,7 +252,7 @@ public class RuleEngineTest {
     }
 
     @Test
-    public void testFinish() throws IOException, MissingPetriNetMetaDataException, TransitionNotExecutableException {
+    public void testFinish() throws IOException, MissingPetriNetMetaDataException, TransitionNotExecutableException, MissingIconKeyException {
         StoredRule rule = transitionRulePre(TRANS_1, "EventType.FINISH");
         StoredRule rule2 = transitionRulePost(TRANS_1, "EventType.FINISH");
 
@@ -270,7 +271,7 @@ public class RuleEngineTest {
     }
 
     @Test
-    public void testCancel() throws IOException, MissingPetriNetMetaDataException, TransitionNotExecutableException {
+    public void testCancel() throws IOException, MissingPetriNetMetaDataException, TransitionNotExecutableException, MissingIconKeyException {
         StoredRule rule = transitionRulePre(TRANS_1, "EventType.CANCEL");
         StoredRule rule2 = transitionRulePost(TRANS_1, "EventType.CANCEL");
 
@@ -290,7 +291,7 @@ public class RuleEngineTest {
     }
 
     @Test
-    public void testQueries() throws IOException, MissingPetriNetMetaDataException {
+    public void testQueries() throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException {
         String predicate = "$event: CaseCreatedFact(eventPhase == EventPhase.POST)";
         String then = "factRepository.save(com.netgrif.workflow.rules.service.RuleEngineTest.TestFact.instance($case.stringId, %d));";
         StoredRule rule0 = rule(predicate + " $case: Case(processIdentifier == \"rule_engine_test\", title == \"FAKE_TITLE\")", String.format(then, -2));
@@ -314,7 +315,7 @@ public class RuleEngineTest {
 
     @Test
     @Ignore
-    public void stressTest() throws IOException, MissingPetriNetMetaDataException {
+    public void stressTest() throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException {
         StoredRule rule = rule("$case: Case() \n $event: CaseCreatedFact(caseId == $case.stringId, eventPhase == EventPhase.POST)", "log.info($case.stringId)");
         IntStream.range(0, 10000).forEach(number -> {
             rule.set_id(new ObjectId());
@@ -353,7 +354,7 @@ public class RuleEngineTest {
                 .build();
     }
 
-    private Case newCase() throws IOException, MissingPetriNetMetaDataException {
+    private Case newCase() throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException {
         Optional<PetriNet> petriNetOptional = petriNetService.importPetriNet(new FileInputStream("src/test/resources/rule_engine_test.xml"), "major", superCreator.getLoggedSuper());
         return workflowService.createCase(petriNetOptional.get().getStringId(), "Original title", "original color", superCreator.getLoggedSuper());
     }

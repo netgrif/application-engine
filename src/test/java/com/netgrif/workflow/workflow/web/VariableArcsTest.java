@@ -7,6 +7,7 @@ import com.netgrif.workflow.auth.domain.UserProcessRole;
 import com.netgrif.workflow.auth.domain.UserState;
 import com.netgrif.workflow.auth.service.interfaces.IAuthorityService;
 import com.netgrif.workflow.importer.service.Importer;
+import com.netgrif.workflow.importer.service.throwable.MissingIconKeyException;
 import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.arcs.Arc;
 import com.netgrif.workflow.petrinet.domain.arcs.VariableArc;
@@ -105,7 +106,7 @@ public class VariableArcsTest {
     }
 
     @Test
-    public void importTest() throws TransitionNotExecutableException, MissingPetriNetMetaDataException, IOException {
+    public void importTest() throws TransitionNotExecutableException, MissingPetriNetMetaDataException, IOException, MissingIconKeyException {
         Optional<PetriNet> optionalNet = service.importPetriNet(new FileInputStream(NET_PATH), "major", superCreator.getLoggedSuper());
 
         assert optionalNet.isPresent();
