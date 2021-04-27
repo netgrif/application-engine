@@ -43,7 +43,7 @@ class DynamicChoicesTest {
     private CaseRepository caseRepository;
 
     @Before
-    public void before() {
+    void before() {
         testHelper.truncateDbs();
     }
 
@@ -57,8 +57,15 @@ class DynamicChoicesTest {
         def aCase = importHelper.createCase("Case", net)
 
         assert !aCase.dataSet["enumeration"].choices.empty
+        assert ["A", "B", "C"].every { str -> aCase.dataSet["enumeration"].choices.any { it.defaultValue == str } }
+
         assert !aCase.dataSet["enumeration_map"].options.isEmpty()
+        assert ["a": "A", "b": "B"].values().every { str -> aCase.dataSet["enumeration_map"].options.any { it.value.defaultValue == str } }
+
         assert !aCase.dataSet["multichoice"].choices.empty
+        assert ["A", "B", "C"].every { str -> aCase.dataSet["multichoice"].choices.any { it.defaultValue == str } }
+
         assert !aCase.dataSet["multichoice_map"].options.isEmpty()
+        assert ["a": "A", "b": "B"].values().every { str -> aCase.dataSet["multichoice_map"].options.any { it.value.defaultValue == str } }
     }
 }
