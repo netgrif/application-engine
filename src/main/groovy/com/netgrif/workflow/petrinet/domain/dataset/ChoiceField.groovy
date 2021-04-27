@@ -1,11 +1,12 @@
 package com.netgrif.workflow.petrinet.domain.dataset
 
 import com.netgrif.workflow.petrinet.domain.I18nString
+import com.netgrif.workflow.petrinet.domain.dataset.logic.action.runner.Expression
 
 abstract class ChoiceField<T> extends Field<T> {
 
     protected Set<I18nString> choices
-    protected String choicesExpression
+    protected Expression choicesExpression
 
     ChoiceField() {
         super()
@@ -18,7 +19,7 @@ abstract class ChoiceField<T> extends Field<T> {
             this.choices.addAll(values)
     }
 
-    ChoiceField(String expression) {
+    ChoiceField(Expression expression) {
         this()
         this.choicesExpression = expression
     }
@@ -31,11 +32,11 @@ abstract class ChoiceField<T> extends Field<T> {
         this.choices = choices
     }
 
-    String getExpression() {
+    Expression getExpression() {
         return choicesExpression
     }
 
-    void setExpression(String expression) {
+    void setExpression(Expression expression) {
         this.choicesExpression = expression
     }
 

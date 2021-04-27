@@ -1,4 +1,4 @@
-package com.netgrif.workflow.petrinet.domain.dataset.logic.dynamicExpressions
+package com.netgrif.workflow.petrinet.domain.dataset.logic.action.runner
 
 import com.querydsl.core.annotations.PropertyType
 import com.querydsl.core.annotations.QueryType

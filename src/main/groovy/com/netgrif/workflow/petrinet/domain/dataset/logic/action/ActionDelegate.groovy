@@ -25,7 +25,6 @@ import com.netgrif.workflow.petrinet.domain.Transition
 import com.netgrif.workflow.petrinet.domain.dataset.*
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedField
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldsTree
-import com.netgrif.workflow.petrinet.domain.dataset.logic.dynamicExpressions.DataExpressions
 import com.netgrif.workflow.petrinet.domain.dataset.logic.validation.DynamicValidation
 import com.netgrif.workflow.petrinet.domain.dataset.logic.validation.Validation
 import com.netgrif.workflow.petrinet.domain.version.Version
