@@ -42,6 +42,7 @@ public class RoleFactory {
 
         addCreate(permissions, roleLogic);
         addDelete(permissions, roleLogic);
+        addCaseView(permissions, roleLogic);
 
         return permissions;
     }
