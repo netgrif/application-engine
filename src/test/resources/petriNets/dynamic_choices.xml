@@ -35,6 +35,31 @@
         <y>200</y>
         <label>Transition</label>
         <assignPolicy>auto</assignPolicy>
+
+        <dataRef>
+            <id>enumeration</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>enumeration_map</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>multichoice</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>multichoice_map</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
     </transition>
 
 </document>
