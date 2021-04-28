@@ -71,6 +71,8 @@ public class ElasticTask {
 
     private Set<Long> users;
 
+    private Set<Long> negativeViewUsers;
+
     @Field(type = Keyword)
     private String icon;
 
@@ -99,6 +101,7 @@ public class ElasticTask {
         this.roles = task.getRoles().keySet();
         this.negativeViewRoles = new HashSet<>(task.getNegativeViewRoles());
         this.users = task.getUsers().keySet();
+        this.negativeViewUsers = new HashSet<>(task.getNegativeViewUsers());
     }
 
     public void update(ElasticTask task) {
@@ -112,5 +115,6 @@ public class ElasticTask {
         this.roles = task.getRoles();
         this.negativeViewRoles = task.getNegativeViewRoles();
         this.users = task.getUsers();
+        this.negativeViewUsers = task.getNegativeViewUsers();
     }
 }
