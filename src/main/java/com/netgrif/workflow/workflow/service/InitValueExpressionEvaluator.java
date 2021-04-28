@@ -11,9 +11,7 @@ import com.netgrif.workflow.workflow.service.interfaces.IInitValueExpressionEval
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Collection;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -35,7 +33,7 @@ public class InitValueExpressionEvaluator implements IInitValueExpressionEvaluat
         }
         Map<String, Object> map = (Map) result;
         if (map.values().stream().anyMatch(it -> !(it instanceof I18nString))) {
-            return map.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, it -> new I18nString(it.getValue().toString())));
+            return map.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, it -> new I18nString(it.getValue().toString()), (o1, o2) -> o1, LinkedHashMap::new));
         } else {
             return (Map<String, I18nString>) result;
         }
@@ -48,7 +46,7 @@ public class InitValueExpressionEvaluator implements IInitValueExpressionEvaluat
             throw new IllegalArgumentException("[" + useCase.getStringId() + "] Dynamic choices not an instance of Collection: " + field.getImportId());
         }
         Collection<Object> collection = (Collection) result;
-        return collection.stream().map(it -> (it instanceof I18nString) ? (I18nString) it : new I18nString(it.toString())).collect(Collectors.toSet());
+        return collection.stream().map(it -> (it instanceof I18nString) ? (I18nString) it : new I18nString(it.toString())).collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
     @Override
