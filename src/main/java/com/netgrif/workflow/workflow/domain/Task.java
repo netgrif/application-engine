@@ -94,6 +94,10 @@ public class Task {
     private Map<String, Map<String, Boolean>> userRefs = new HashMap<>();
 
     @Getter @Setter
+    @Builder.Default
+    private List<Long> negativeViewUsers = new LinkedList<>();
+
+    @Getter @Setter
     private LocalDateTime startDate;
 
     @Getter @Setter
