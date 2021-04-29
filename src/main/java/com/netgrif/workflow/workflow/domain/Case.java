@@ -131,6 +131,10 @@ public class Case {
     @Builder.Default
     private Map<String, Map<String, Boolean>> userRefs = new HashMap<>();
 
+    @Getter
+    @Setter
+    private List<Long> negativeViewUsers;
+
     public Case() {
         _id = new ObjectId();
         activePlaces = new HashMap<>();
@@ -144,6 +148,7 @@ public class Case {
         negativeViewRoles = new LinkedList<>();
         users = new HashMap<>();
         userRefs = new HashMap<>();
+        negativeViewUsers = new ArrayList<>();
     }
 
     public Case(String title) {
