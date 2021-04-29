@@ -268,6 +268,7 @@ abstract class Field<T> extends Imported {
         clone.format = this.format
         clone.length = this.length
         clone.component = this.component
+        clone.isStatic = this.isStatic
         if (isStatic()) {
             clone.value = this.value
         }

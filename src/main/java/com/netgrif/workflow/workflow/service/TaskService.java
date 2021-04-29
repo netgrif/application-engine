@@ -1,30 +1,26 @@
 package com.netgrif.workflow.workflow.service;
 
-import com.netgrif.workflow.auth.domain.AnonymousUser;
 import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.elastic.domain.ElasticTask;
 import com.netgrif.workflow.elastic.service.interfaces.IElasticTaskService;
-import com.netgrif.workflow.petrinet.domain.dataset.TaskField;
-import com.netgrif.workflow.petrinet.domain.events.EventType;
-import com.netgrif.workflow.workflow.domain.TaskPair;
-import com.netgrif.workflow.workflow.web.requestbodies.TaskSearchRequest;
 import com.netgrif.workflow.event.events.task.*;
 import com.netgrif.workflow.petrinet.domain.*;
 import com.netgrif.workflow.petrinet.domain.arcs.Arc;
 import com.netgrif.workflow.petrinet.domain.arcs.ArcOrderComparator;
 import com.netgrif.workflow.petrinet.domain.arcs.ResetArc;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
+import com.netgrif.workflow.petrinet.domain.events.EventPhase;
+import com.netgrif.workflow.petrinet.domain.events.EventType;
 import com.netgrif.workflow.petrinet.domain.roles.ProcessRole;
-import com.netgrif.workflow.petrinet.domain.roles.RolePermission;
 import com.netgrif.workflow.petrinet.domain.throwable.TransitionNotExecutableException;
 import com.netgrif.workflow.petrinet.service.interfaces.IProcessRoleService;
-import com.netgrif.workflow.petrinet.domain.events.EventPhase;
 import com.netgrif.workflow.rules.domain.facts.TransitionEventFact;
 import com.netgrif.workflow.rules.service.interfaces.IRuleEngine;
 import com.netgrif.workflow.utils.DateUtils;
 import com.netgrif.workflow.utils.FullPageRequest;
+import com.netgrif.workflow.workflow.domain.AbstractDataField;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.EventOutcome;
 import com.netgrif.workflow.workflow.domain.Task;
@@ -35,6 +31,7 @@ import com.netgrif.workflow.workflow.domain.triggers.Trigger;
 import com.netgrif.workflow.workflow.service.interfaces.IDataService;
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
+import com.netgrif.workflow.workflow.web.requestbodies.TaskSearchRequest;
 import com.netgrif.workflow.workflow.web.responsebodies.TaskReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -499,18 +496,21 @@ public class TaskService implements ITaskService {
     @Transactional
     void validateData(Transition transition, Case useCase) {
         for (Map.Entry<String, DataFieldLogic> entry : transition.getDataSet().entrySet()) {
-            if (!useCase.getDataField(entry.getKey()).isRequired(transition.getImportId()))
+            Field<?> field = useCase.getField(entry.getKey());
+            if (field == null) {
+                field = useCase.getStaticField(entry.getKey());
+            }
+            AbstractDataField dataField = field.isStatic() ? useCase.getStaticDataField(field.getStringId()) : useCase.getDataField(field.getStringId());
+            if (!dataField.isRequired(transition.getImportId()))
                 continue;
-            if (useCase.getDataField(entry.getKey()).isUndefined(transition.getImportId()) && !entry.getValue().isRequired())
+            if (dataField.isUndefined(transition.getImportId()) && !entry.getValue().isRequired())
                 continue;
 
             Object value = useCase.getDataSet().get(entry.getKey()).getValue();
             if (value == null) {
-                Field field = useCase.getField(entry.getKey());
                 throw new IllegalArgumentException("Field \"" + field.getName() + "\" has null value");
             }
             if (value instanceof String && ((String) value).isEmpty()) {
-                Field field = useCase.getField(entry.getKey());
                 throw new IllegalArgumentException("Field \"" + field.getName() + "\" has empty value");
             }
         }

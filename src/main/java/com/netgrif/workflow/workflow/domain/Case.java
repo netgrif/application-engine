@@ -83,6 +83,11 @@ public class Case {
     @JsonIgnore
     private LinkedHashMap<String, DataField> dataSet;
 
+    @Getter
+    @Setter
+    @JsonIgnore
+    private LinkedHashMap<String, StaticDataField> staticDataSet;
+
     /**
      * List of data fields importIds
      */
@@ -140,6 +145,7 @@ public class Case {
         _id = new ObjectId();
         activePlaces = new HashMap<>();
         dataSet = new LinkedHashMap<>();
+        staticDataSet = new LinkedHashMap<>();
         immediateDataFields = new LinkedHashSet<>();
         resetArcTokens = new HashMap<>();
         tasks = new HashSet<>();
@@ -162,6 +168,7 @@ public class Case {
         this.petriNet = petriNet;
         this.activePlaces = activePlaces;
         populateDataSet();
+        populateStaticDataSet();
         this.immediateDataFields = petriNet.getImmediateFields().stream().map(Field::getStringId).collect(Collectors.toCollection(LinkedHashSet::new));
         visualId = generateVisualId();
         this.enabledRoles = petriNet.getRoles().keySet();
@@ -179,6 +186,10 @@ public class Case {
         return this.dataSet.get(field).hasDefinedBehavior(transition);
     }
 
+    public boolean hasStaticFieldBehavior(String field, String transition) {
+        return this.staticDataSet.get(field).hasDefinedBehavior(transition);
+    }
+
     private void populateDataSet() {
         petriNet.getDataSet().forEach((key, field) -> {
             if (field instanceof FieldWithDefault) {
@@ -194,6 +205,10 @@ public class Case {
                 this.dataSet.get(key).setAllowedNets(((CaseField) field).getAllowedNets());
             }
         });
+    }
+
+    private void populateStaticDataSet() {
+        petriNet.getStaticDataSet().forEach((key, field) -> this.staticDataSet.put(key, new StaticDataField()));
     }
 
     private String generateVisualId() {
@@ -235,8 +250,16 @@ public class Case {
         return petriNet.getDataSet().get(id);
     }
 
+    public Field getStaticField(String id) {
+        return petriNet.getStaticDataSet().get(id);
+    }
+
     public DataField getDataField(String id) {
         return dataSet.get(id);
+    }
+
+    public StaticDataField getStaticDataField(String id) {
+        return staticDataSet.get(id);
     }
 
     public String getPetriNetId() {

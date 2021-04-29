@@ -29,10 +29,7 @@ import com.netgrif.workflow.petrinet.domain.version.Version
 import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService
 import com.netgrif.workflow.startup.ImportHelper
 import com.netgrif.workflow.utils.FullPageRequest
-import com.netgrif.workflow.workflow.domain.Case
-import com.netgrif.workflow.workflow.domain.QCase
-import com.netgrif.workflow.workflow.domain.QTask
-import com.netgrif.workflow.workflow.domain.Task
+import com.netgrif.workflow.workflow.domain.*
 import com.netgrif.workflow.workflow.service.TaskService
 import com.netgrif.workflow.workflow.service.interfaces.IDataService
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService
@@ -122,7 +119,11 @@ class ActionDelegate {
         this.task = task
         this.actionsRunner = actionsRunner
         action.fieldIds.each { name, id ->
-            set(name, fieldFactory.buildFieldWithoutValidation(useCase, id))
+            if (useCase.petriNet.dataSet[id]) {
+                set(name, fieldFactory.buildFieldWithoutValidation(useCase, id))
+            } else {
+                set(name, fieldFactory.buildStaticFieldWithoutValidation(useCase.petriNet, id))
+            }
         }
         action.transitionIds.each { name, id ->
             set(name, useCase.petriNet.transitions[id])
@@ -133,39 +134,44 @@ class ActionDelegate {
     }
 
     def copyBehavior(Field field, Transition transition) {
-        if (!useCase.hasFieldBehavior(field.stringId, transition.stringId)) {
-            useCase.dataSet.get(field.stringId).addBehavior(transition.stringId, transition.dataSet.get(field.stringId).behavior)
+        AbstractDataField dataField = getDataField(field)
+        if (!dataField.hasDefinedBehavior(transition.stringId)) {
+            dataField.addBehavior(transition.stringId, transition.dataSet.get(field.stringId).behavior)
         }
     }
 
     def visible = { Field field, Transition trans ->
         copyBehavior(field, trans)
-        useCase.dataSet.get(field.stringId).makeVisible(trans.stringId)
+        getDataField(field).makeVisible(trans.stringId)
     }
 
     def editable = { Field field, Transition trans ->
         copyBehavior(field, trans)
-        useCase.dataSet.get(field.stringId).makeEditable(trans.stringId)
+        getDataField(field).makeEditable(trans.stringId)
     }
 
     def required = { Field field, Transition trans ->
         copyBehavior(field, trans)
-        useCase.dataSet.get(field.stringId).makeRequired(trans.stringId)
+        getDataField(field).makeRequired(trans.stringId)
     }
 
     def optional = { Field field, Transition trans ->
         copyBehavior(field, trans)
-        useCase.dataSet.get(field.stringId).makeOptional(trans.stringId)
+        getDataField(field).makeOptional(trans.stringId)
     }
 
     def hidden = { Field field, Transition trans ->
         copyBehavior(field, trans)
-        useCase.dataSet.get(field.stringId).makeHidden(trans.stringId)
+        getDataField(field).makeHidden(trans.stringId)
     }
 
     def forbidden = { Field field, Transition trans ->
         copyBehavior(field, trans)
-        useCase.dataSet.get(field.stringId).makeForbidden(trans.stringId)
+        getDataField(field).makeForbidden(trans.stringId)
+    }
+
+    AbstractDataField getDataField(Field field) {
+        return field.isStatic() ? useCase.staticDataSet[field.stringId] : useCase.dataSet[field.stringId]
     }
 
     def unchanged = { return UNCHANGED_VALUE }
@@ -192,7 +198,7 @@ class ActionDelegate {
                     if (!changedFieldsTree.changedFields.containsKey(field.stringId)) {
                         putIntoChangedFields(field, new ChangedField(field.stringId))
                     }
-                    changedFieldsTree.addBehavior(field.stringId, useCase.dataSet.get(field.stringId).behavior)
+                    changedFieldsTree.addBehavior(field.stringId, getDataField(field).behavior)
                     addAttributeToChangedField(field, "type", field.type.name)
                 }
             }]

@@ -407,4 +407,15 @@ public class PetriNetService implements IPetriNetService {
         });
     }
 
+    @Override
+    public PetriNet saveStaticChanges(PetriNet petriNet) {
+        PetriNet actualNet = repository.findById(petriNet.getStringId()).orElseThrow(() -> new IllegalArgumentException("Net with ID " + petriNet.getStringId() + " not found"));
+        applyStaticChanges(actualNet, petriNet);
+        return save(actualNet).get();
+    }
+
+    protected void applyStaticChanges(PetriNet actual, PetriNet changed) {
+        changed.getStaticDataSet().forEach((fieldId, field) -> actual.getStaticDataSet().put(fieldId, field.clone()));
+    }
+
 }

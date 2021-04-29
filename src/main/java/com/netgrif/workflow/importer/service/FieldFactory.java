@@ -6,12 +6,11 @@ import com.netgrif.workflow.importer.service.throwable.MissingIconKeyException;
 import com.netgrif.workflow.petrinet.domain.Component;
 import com.netgrif.workflow.petrinet.domain.Format;
 import com.netgrif.workflow.petrinet.domain.I18nString;
+import com.netgrif.workflow.petrinet.domain.PetriNet;
 import com.netgrif.workflow.petrinet.domain.dataset.*;
 import com.netgrif.workflow.petrinet.domain.views.View;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.DataField;
-import com.netgrif.workflow.workflow.domain.TaskPair;
-import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -570,6 +569,16 @@ public final class FieldFactory {
             defaults.add(s);
         });
         return defaults;
+    }
+
+    public Field buildStaticFieldWithValidation(PetriNet net, String fieldId) {
+        Field field = net.getStaticField(fieldId).get();
+        return field.clone();
+    }
+
+    public Field buildStaticFieldWithoutValidation(PetriNet net, String fieldId) {
+        Field field = net.getStaticField(fieldId).get();
+        return field.clone();
     }
 
 }

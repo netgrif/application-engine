@@ -15,6 +15,8 @@ import com.netgrif.workflow.petrinet.domain.dataset.logic.*;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.FieldActionsRunner;
 import com.netgrif.workflow.petrinet.domain.events.EventPhase;
+import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
+import com.netgrif.workflow.workflow.domain.AbstractDataField;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.DataField;
 import com.netgrif.workflow.workflow.domain.Task;
@@ -66,6 +68,9 @@ public class DataService implements IDataService {
     private IUserService userService;
 
     @Autowired
+    private IPetriNetService petriNetService;
+
+    @Autowired
     private FieldFactory fieldFactory;
 
     @Autowired
@@ -89,37 +94,22 @@ public class DataService implements IDataService {
 
         Set<String> fieldsIds = transition.getDataSet().keySet();
         List<Field> dataSetFields = new ArrayList<>();
+        ChangedFieldsTree changes = ChangedFieldsTree.createNew(useCase.getStringId(), task);
 
         fieldsIds.forEach(fieldId -> {
-            if (isForbidden(fieldId, transition, useCase.getDataField(fieldId)))
+            Field netField = useCase.getPetriNet().getField(fieldId).orElseGet(() -> useCase.getPetriNet().getStaticField(fieldId).get());
+            if (isForbidden(fieldId, transition, netField.isStatic() ? useCase.getStaticDataField(fieldId) : useCase.getDataField(fieldId)))
                 return;
 
-            resolveDataEvents(useCase.getPetriNet().getField(fieldId).get(), Action.ActionTrigger.GET, EventPhase.PRE, useCase, task, transition);
-
-            if (useCase.hasFieldBehavior(fieldId, transition.getStringId())) {
-                if (useCase.getDataSet().get(fieldId).isDisplayable(transition.getStringId())) {
-                    Field field = fieldFactory.buildFieldWithValidation(useCase, fieldId);
-                    field.setBehavior(useCase.getDataSet().get(fieldId).applyBehavior(transition.getStringId()));
-                    if (transition.getDataSet().get(fieldId).layoutExist() && transition.getDataSet().get(fieldId).getLayout().layoutFilled()) {
-                        field.setLayout(transition.getDataSet().get(fieldId).getLayout().clone());
-                    }
-                    resolveComponents(field, transition);
-                    dataSetFields.add(field);
-                }
+            changes.mergeChangedFields(resolveDataEvents(netField, Action.ActionTrigger.GET, EventPhase.PRE, useCase, task, transition));
+            if (netField.isStatic()) {
+                buildStaticField(useCase, fieldId, transition).ifPresent(dataSetFields::add);
             } else {
-                if (transition.getDataSet().get(fieldId).isDisplayable()) {
-                    Field field = fieldFactory.buildFieldWithValidation(useCase, fieldId);
-                    field.setBehavior(transition.getDataSet().get(fieldId).applyBehavior());
-                    if (transition.getDataSet().get(fieldId).layoutExist() && transition.getDataSet().get(fieldId).getLayout().layoutFilled()) {
-                        field.setLayout(transition.getDataSet().get(fieldId).getLayout().clone());
-                    }
-                    resolveComponents(field, transition);
-                    dataSetFields.add(field);
-                }
+                buildField(useCase, fieldId, transition).ifPresent(dataSetFields::add);
             }
-            resolveDataEvents(useCase.getPetriNet().getField(fieldId).get(), Action.ActionTrigger.GET, EventPhase.POST, useCase, task, transition);
+            changes.mergeChangedFields(resolveDataEvents(netField, Action.ActionTrigger.GET, EventPhase.POST, useCase, task, transition));
         });
-
+        saveNetIfStaticFieldsChanged(useCase.getPetriNet(), changes);
         workflowService.save(useCase);
 
         dataSetFields.stream().filter(field -> field instanceof NumberField).forEach(field -> {
@@ -135,13 +125,59 @@ public class DataService implements IDataService {
         return dataSetFields;
     }
 
+    private void saveNetIfStaticFieldsChanged(PetriNet petriNet, ChangedFieldsTree changes) {
+        if (changes.getChangedFields().entrySet().stream().noneMatch(it -> petriNet.getStaticDataSet().containsKey(it.getKey())))
+            return;
+
+        petriNetService.saveStaticChanges(petriNet);
+    }
+
+    private Optional<Field> buildStaticField(Case useCase, String fieldId, Transition transition) {
+        if (useCase.hasStaticFieldBehavior(fieldId, transition.getStringId())) {
+            if (useCase.getStaticDataField(fieldId).isDisplayable(transition.getStringId())) {
+                Field field = fieldFactory.buildStaticFieldWithValidation(useCase.getPetriNet(), fieldId);
+                return Optional.of(buildField(field, transition,useCase.getStaticDataField(fieldId).applyBehavior(transition.getStringId())));
+            }
+        } else {
+            if (transition.getDataSet().get(fieldId).isDisplayable()) {
+                Field field = fieldFactory.buildStaticFieldWithValidation(useCase.getPetriNet(), fieldId);
+                return Optional.of(buildField(field, transition, transition.getDataSet().get(fieldId).applyBehavior()));
+            }
+        }
+        return Optional.empty();
+    }
+
+    private Optional<Field> buildField(Case useCase, String fieldId, Transition transition) {
+        if (useCase.hasFieldBehavior(fieldId, transition.getStringId())) {
+            if (useCase.getDataField(fieldId).isDisplayable(transition.getStringId())) {
+                Field field = fieldFactory.buildFieldWithValidation(useCase, fieldId);
+                return Optional.of(buildField(field, transition, useCase.getDataField(fieldId).applyBehavior(transition.getStringId())));
+            }
+        } else {
+            if (transition.getDataSet().get(fieldId).isDisplayable()) {
+                Field field = fieldFactory.buildFieldWithValidation(useCase, fieldId);
+                return Optional.of(buildField(field, transition, transition.getDataSet().get(fieldId).applyBehavior()));
+            }
+        }
+        return Optional.empty();
+    }
+
+    private Field buildField(Field field, Transition transition, ObjectNode behavior) {
+        field.setBehavior(behavior);
+        if (transition.getDataSet().get(field.getImportId()).layoutExist() && transition.getDataSet().get(field.getImportId()).getLayout().layoutFilled()) {
+            field.setLayout(transition.getDataSet().get(field.getImportId()).getLayout().clone());
+        }
+        resolveComponents(field, transition);
+        return field;
+    }
+
     private void resolveComponents(Field field, Transition transition){
         Component transitionComponent = transition.getDataSet().get(field.getImportId()).getComponent();
         if(transitionComponent != null)
             field.setComponent(transitionComponent);
     }
 
-    private boolean isForbidden(String fieldId, Transition transition, DataField dataField) {
+    private boolean isForbidden(String fieldId, Transition transition, AbstractDataField dataField) {
         if (dataField.getBehavior().containsKey(transition.getImportId())) {
             return dataField.isForbidden(transition.getImportId());
         } else {
@@ -225,7 +261,7 @@ public class DataService implements IDataService {
 
             List<Field> resources = new LinkedList<>();
             for (String dataFieldId : dataGroup.getData()) {
-                Field field = net.getDataSet().get(dataFieldId);
+                Field field = net.getField(dataFieldId).orElseGet(() -> useCase.getPetriNet().getStaticField(dataFieldId).get());
                 if (dataFieldMap.containsKey(dataFieldId)) {
                     Field resource = dataFieldMap.get(dataFieldId);
                     if (level != 0) resource.setImportId(taskId + "-" + resource.getImportId());
@@ -341,7 +377,9 @@ public class DataService implements IDataService {
             return null;
 
         workflowService.save(useCase);
-        field.setValue((FileListFieldValue) useCase.getFieldValue(field.getStringId()));
+        if (!field.isStatic()) {
+            field.setValue((FileListFieldValue) useCase.getFieldValue(field.getStringId()));
+        }
 
         Optional<FileFieldValue> fileField = field.getValue().getNamesPaths().stream().filter(namePath -> namePath.getName().equals(name)).findFirst();
         if (!fileField.isPresent() || fileField.get().getPath() == null) {
@@ -368,7 +406,9 @@ public class DataService implements IDataService {
             return null;
 
         workflowService.save(useCase);
-        field.setValue((FileFieldValue) useCase.getFieldValue(field.getStringId()));
+        if (!field.isStatic()) {
+            field.setValue((FileFieldValue) useCase.getFieldValue(field.getStringId()));
+        }
 
         try {
             if (forPreview) {
