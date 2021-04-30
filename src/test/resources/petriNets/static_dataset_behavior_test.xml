@@ -1,5 +1,5 @@
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../main/resources/petriNets/petriflow_schema.xsd">
-    <id>static_dataset_test</id>
+    <id>static_dataset_behavior_test</id>
     <title>Static dataset test</title>
     <initials>SDT</initials>
     <!-- ROLES -->
@@ -8,6 +8,12 @@
         <title>Static text</title>
         <init>static value</init>
         <static>true</static>
+    </data>
+
+    <data type="text">
+        <id>regular_text</id>
+        <title>Regular text</title>
+        <init>regular value</init>
     </data>
 
     <transition>
@@ -23,18 +29,65 @@
             </logic>
         </dataRef>
 
+        <dataRef>
+            <id>regular_text</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+
         <event type="finish">
             <id>finish</id>
 
             <actions phase="pre">
                 <action>
+                    regular_text: f.regular_text,
                     static_text: f.static_text,
                     transition: t.transition;
 
                     make static_text,hidden on transition when { true }
+                    make regular_text,hidden on transition when { true }
                 </action>
             </actions>
         </event>
     </transition>
+
+
+    <transition>
+        <id>transition2</id>
+        <x>200</x>
+        <y>200</y>
+        <label>Transition 2</label>
+
+        <dataRef>
+            <id>static_text</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+
+        <dataRef>
+            <id>regular_text</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+
+        <event type="finish">
+            <id>finish</id>
+
+            <actions phase="pre">
+                 <action>
+                     static_text: f.static_text,
+                     regular_text: f.regular_text;
+
+                     change static_text value { "STATIC" }
+                     change regular_text value { "REGULAR" }
+                 </action>
+            </actions>
+        </event>
+
+    </transition>
+
 
 </document>

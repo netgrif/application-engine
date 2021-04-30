@@ -7,6 +7,7 @@ import com.netgrif.workflow.petrinet.domain.Transition;
 import com.netgrif.workflow.petrinet.domain.VersionType;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedField;
+import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldsTree;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.workflow.petrinet.domain.version.Version;
 import com.netgrif.workflow.petrinet.domain.throwable.MissingPetriNetMetaDataException;
@@ -89,6 +90,10 @@ public interface IPetriNetService {
     void deletePetriNet(String id, LoggedUser loggedUser);
 
     void runActions(List<Action> actions, String netId);
+
+    void saveNetIfStaticFieldsChanged(PetriNet petriNet, ChangedFieldsTree changes);
+
+    void saveNetIfStaticFieldsChanged(PetriNet petriNet, Set<String> fieldIds);
 
     PetriNet saveStaticChanges(PetriNet petriNet);
 }

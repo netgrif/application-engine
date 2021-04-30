@@ -206,7 +206,7 @@ class ActionDelegate {
     }
 
     def saveChangedValue(Field field) {
-        useCase.dataSet.get(field.stringId).value = field.value
+        field.isStatic() ? (useCase.petriNet.staticDataSet[field.stringId].value = field.value) : (useCase.dataSet[field.stringId].value = field.value)
         if (!changedFieldsTree.changedFields.containsKey(field.stringId)) {
             putIntoChangedFields(field, new ChangedField(field.stringId))
         }
@@ -215,7 +215,7 @@ class ActionDelegate {
     }
 
     def saveChangedChoices(ChoiceField field) {
-        useCase.dataSet.get(field.stringId).choices = field.choices
+        field.isStatic() ? (useCase.petriNet.staticDataSet[field.stringId].choices = field.choices) : (useCase.dataSet[field.stringId].choices = field.choices)
         if (!changedFieldsTree.changedFields.containsKey(field.stringId)) {
             putIntoChangedFields(field, new ChangedField(field.stringId))
         }
@@ -223,7 +223,7 @@ class ActionDelegate {
     }
 
     def saveChangedAllowedNets(CaseField field) {
-        useCase.dataSet.get(field.stringId).allowedNets = field.allowedNets
+        field.isStatic() ? (useCase.petriNet.staticDataSet[field.stringId].allowedNets = field.allowedNets) : (useCase.dataSet[field.stringId].allowedNets = field.allowedNets)
         if (!changedFieldsTree.changedFields.containsKey(field.stringId)) {
             putIntoChangedFields(field, new ChangedField(field.stringId))
         }
@@ -231,7 +231,7 @@ class ActionDelegate {
     }
 
     def saveChangedOptions(MapOptionsField field) {
-        useCase.dataSet.get(field.stringId).options = field.options
+        field.isStatic() ? (useCase.petriNet.staticDataSet[field.stringId].options = field.options) : (useCase.dataSet[field.stringId].options = field.options)
         if (!changedFieldsTree.changedFields.containsKey(field.stringId)) {
             putIntoChangedFields(field, new ChangedField(field.stringId))
         }

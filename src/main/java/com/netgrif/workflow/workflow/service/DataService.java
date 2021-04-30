@@ -8,10 +8,13 @@ import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.event.events.usecase.SaveCaseDataEvent;
 import com.netgrif.workflow.importer.service.FieldFactory;
-import com.netgrif.workflow.petrinet.domain.*;
 import com.netgrif.workflow.petrinet.domain.Component;
+import com.netgrif.workflow.petrinet.domain.*;
 import com.netgrif.workflow.petrinet.domain.dataset.*;
-import com.netgrif.workflow.petrinet.domain.dataset.logic.*;
+import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedField;
+import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldByFileFieldContainer;
+import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldsTree;
+import com.netgrif.workflow.petrinet.domain.dataset.logic.FieldBehavior;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.FieldActionsRunner;
 import com.netgrif.workflow.petrinet.domain.events.EventPhase;
@@ -44,8 +47,9 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.URL;
-import java.util.*;
 import java.util.List;
+import java.util.*;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.LongStream;
 
@@ -109,7 +113,7 @@ public class DataService implements IDataService {
             }
             changes.mergeChangedFields(resolveDataEvents(netField, Action.ActionTrigger.GET, EventPhase.POST, useCase, task, transition));
         });
-        saveNetIfStaticFieldsChanged(useCase.getPetriNet(), changes);
+        petriNetService.saveNetIfStaticFieldsChanged(useCase.getPetriNet(), changes);
         workflowService.save(useCase);
 
         dataSetFields.stream().filter(field -> field instanceof NumberField).forEach(field -> {
@@ -125,18 +129,11 @@ public class DataService implements IDataService {
         return dataSetFields;
     }
 
-    private void saveNetIfStaticFieldsChanged(PetriNet petriNet, ChangedFieldsTree changes) {
-        if (changes.getChangedFields().entrySet().stream().noneMatch(it -> petriNet.getStaticDataSet().containsKey(it.getKey())))
-            return;
-
-        petriNetService.saveStaticChanges(petriNet);
-    }
-
     private Optional<Field> buildStaticField(Case useCase, String fieldId, Transition transition) {
         if (useCase.hasStaticFieldBehavior(fieldId, transition.getStringId())) {
             if (useCase.getStaticDataField(fieldId).isDisplayable(transition.getStringId())) {
                 Field field = fieldFactory.buildStaticFieldWithValidation(useCase.getPetriNet(), fieldId);
-                return Optional.of(buildField(field, transition,useCase.getStaticDataField(fieldId).applyBehavior(transition.getStringId())));
+                return Optional.of(buildField(field, transition, useCase.getStaticDataField(fieldId).applyBehavior(transition.getStringId())));
             }
         } else {
             if (transition.getDataSet().get(fieldId).isDisplayable()) {
@@ -198,23 +195,16 @@ public class DataService implements IDataService {
 
         log.info("[" + useCase.getStringId() + "]: Setting data of task " + task.getTransitionId() + " [" + task.getStringId() + "]");
 
+        Set<String> changedStaticFields = new HashSet<>();
         values.fields().forEachRemaining(entry -> {
-            DataField dataField = useCase.getDataSet().get(entry.getKey());
-            String fieldId = entry.getKey();
-            if (entry.getKey().startsWith(task.getStringId())) {
-                fieldId = fieldId.replace(task.getStringId() + "-", "");
-                dataField = useCase.getDataField(fieldId);
-            }
-            if (dataField != null) {
-                ChangedFieldsTree changedFieldsTreePre = resolveDataEvents(useCase.getPetriNet().getField(fieldId).get(),
-                        Action.ActionTrigger.SET, EventPhase.PRE, useCase, task, useCase.getPetriNet().getTransition(task.getTransitionId()));
-                changedFieldsTree.mergeChangedFields(changedFieldsTreePre);
-
-                dataField.setValue(parseFieldsValues(entry.getValue(), dataField));
-                ChangedFieldsTree changedFieldsTreePost = resolveDataEvents(useCase.getPetriNet().getField(fieldId).get(),
-                        Action.ActionTrigger.SET, EventPhase.POST, useCase, task, useCase.getPetriNet().getTransition(task.getTransitionId()));
-                changedFieldsTree.mergeChangedFields(changedFieldsTreePost);
-
+            Optional<Field> field = resolveFieldFromEntry(entry.getKey(), task, useCase.getPetriNet());
+            if (field.isPresent()) {
+                if (field.get().isStatic()) {
+                    changedStaticFields.add(field.get().getStringId());
+                    setStaticDataValue(useCase, task, field.get(), entry, changedFieldsTree);
+                } else {
+                    setDataValue(useCase, task, field.get(), entry, changedFieldsTree);
+                }
             } else try {
                 if (entry.getKey().contains("-")) {
                     TaskRefFieldWrapper decoded = decodeTaskRefFieldId(entry.getKey());
@@ -227,6 +217,8 @@ public class DataService implements IDataService {
             }
         });
         updateDataset(useCase);
+        changedStaticFields.addAll(changedFieldsTree.getChangedFields().keySet());
+        petriNetService.saveNetIfStaticFieldsChanged(useCase.getPetriNet(), changedStaticFields);
         taskService.resolveUserRef(useCase);
         workflowService.resolveUserRef(useCase);
         workflowService.save(useCase);
@@ -235,7 +227,37 @@ public class DataService implements IDataService {
         return changedFieldsTree;
     }
 
+    protected Optional<Field> resolveFieldFromEntry(String entryId, Task task, PetriNet net) {
+        Field field = net.getDataSet().containsKey(entryId) ? net.getDataSet().get(entryId) : net.getStaticDataSet().get(entryId);
+        if (entryId.startsWith(task.getStringId())) {
+            entryId = entryId.replace(task.getStringId() + "-", "");
+            field = net.getDataSet().containsKey(entryId) ? net.getDataSet().get(entryId) : net.getStaticDataSet().get(entryId);
+        }
+        return Optional.ofNullable(field);
+    }
 
+    protected void setDataValue(Case useCase, Task task, Field field, Map.Entry<String, JsonNode> entry, ChangedFieldsTree changedFieldsTree) {
+        setDataValueAndResolveEvents(useCase, task, changedFieldsTree, useCase.getPetriNet().getField(field.getStringId()).get(), (f) -> {
+            DataField dataField = useCase.getDataField(field.getStringId());
+            dataField.setValue(parseFieldsValues(entry.getValue(), dataField));
+        });
+    }
+
+    protected void setStaticDataValue(Case useCase, Task task, Field field, Map.Entry<String, JsonNode> entry, ChangedFieldsTree changedFieldsTree) {
+        setDataValueAndResolveEvents(useCase, task, changedFieldsTree, field, (f) -> {
+            f.setValue(parseFieldsValues(entry.getValue(), f instanceof CaseField ? ((CaseField) f).getAllowedNets() : null));
+        });
+    }
+
+    protected void setDataValueAndResolveEvents(Case useCase, Task task, ChangedFieldsTree changedFieldsTree, Field field, Consumer<Field> setValue) {
+        ChangedFieldsTree changedFieldsTreePre = resolveDataEvents(field,
+                Action.ActionTrigger.SET, EventPhase.PRE, useCase, task, useCase.getPetriNet().getTransition(task.getTransitionId()));
+        changedFieldsTree.mergeChangedFields(changedFieldsTreePre);
+        setValue.accept(field);
+        ChangedFieldsTree changedFieldsTreePost = resolveDataEvents(field,
+                Action.ActionTrigger.SET, EventPhase.POST, useCase, task, useCase.getPetriNet().getTransition(task.getTransitionId()));
+        changedFieldsTree.mergeChangedFields(changedFieldsTreePost);
+    }
 
     @Override
     public List<DataGroup> getDataGroups(String taskId, Locale locale) {
@@ -768,6 +790,7 @@ public class DataService implements IDataService {
             runEventActionsOnChanged(case$, task, transition, changedFields, changedFieldsTree.getChangedFields(), Action.ActionTrigger.SET,true);
         });
         workflowService.save(case$);
+        petriNetService.saveNetIfStaticFieldsChanged(case$.getPetriNet(), changedFields);
         return changedFields;
     }
 
@@ -815,6 +838,8 @@ public class DataService implements IDataService {
         newChangedField.forEach((s, changedField) -> {
             if ((changedField.getAttributes().containsKey("value") && changedField.getAttributes().get("value") != null) && recursive) {
                 Field field = useCase.getField(s);
+                if (field == null)
+                    field = useCase.getStaticField(s);
                 log.info("[" + useCase.getStringId() + "] " + useCase.getTitle() + ": Running actions on changed field " + s);
                 processDataEvents(field, trigger, EventPhase.PRE, useCase, task, changedFields, transition);
                 processDataEvents(field, trigger, EventPhase.POST, useCase, task, changedFields, transition);
@@ -823,6 +848,10 @@ public class DataService implements IDataService {
     }
 
     private Object parseFieldsValues(JsonNode jsonNode, DataField dataField) {
+        return parseFieldsValues(jsonNode, dataField.getAllowedNets());
+    }
+
+    private Object parseFieldsValues(JsonNode jsonNode, List<String> allowedNets) {
         ObjectNode node = (ObjectNode) jsonNode;
         Object value;
         switch (node.get("type").asText()) {
@@ -885,7 +914,7 @@ public class DataService implements IDataService {
                 break;
             case "caseRef":
                 List<String> list = parseListStringValues(node);
-                validateCaseRefValue(list, dataField.getAllowedNets());
+                validateCaseRefValue(list, allowedNets);
                 value = list;
                 break;
             case "taskRef":

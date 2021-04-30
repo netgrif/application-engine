@@ -11,6 +11,7 @@ import com.netgrif.workflow.petrinet.domain.Transition;
 import com.netgrif.workflow.petrinet.domain.VersionType;
 import com.netgrif.workflow.petrinet.domain.arcs.VariableArc;
 import com.netgrif.workflow.petrinet.domain.dataset.Field;
+import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldsTree;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.Action;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.action.FieldActionsRunner;
 import com.netgrif.workflow.petrinet.domain.events.EventPhase;
@@ -405,6 +406,18 @@ public class PetriNetService implements IPetriNetService {
         actions.forEach(action -> {
             actionsRunner.run(action, null);
         });
+    }
+
+    @Override
+    public void saveNetIfStaticFieldsChanged(PetriNet petriNet, ChangedFieldsTree changes) {
+        saveNetIfStaticFieldsChanged(petriNet, changes.getChangedFields().keySet());
+    }
+
+    @Override
+    public void saveNetIfStaticFieldsChanged(PetriNet petriNet, Set<String> fieldIds) {
+        if (fieldIds.stream().noneMatch(it -> petriNet.getStaticDataSet().containsKey(it)))
+            return;
+        saveStaticChanges(petriNet);
     }
 
     @Override

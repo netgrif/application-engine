@@ -503,6 +503,8 @@ public class WorkflowService implements IWorkflowService {
         newChangedField.forEach((s, changedField) -> {
             if ((changedField.getAttributes().containsKey("value") && changedField.getAttributes().get("value") != null) && recursive) {
                 Field field = useCase.getField(s);
+                if (field == null)
+                    field = useCase.getStaticField(s);
                 processDataEvents(field, trigger, EventPhase.PRE, useCase, changedFields);
                 processDataEvents(field, trigger, EventPhase.POST, useCase, changedFields);
             }
