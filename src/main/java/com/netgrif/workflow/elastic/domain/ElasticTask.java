@@ -13,6 +13,7 @@ import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Set;
 
 import static org.springframework.data.elasticsearch.annotations.FieldType.Keyword;
@@ -65,7 +66,12 @@ public class ElasticTask {
     @Field(type = Keyword)
     private Set<String> roles;
 
+    @Field(type = Keyword)
+    private Set<String> negativeViewRoles;
+
     private Set<Long> users;
+
+    private Set<Long> negativeViewUsers;
 
     @Field(type = Keyword)
     private String icon;
@@ -93,7 +99,9 @@ public class ElasticTask {
         this.userId = task.getUserId();
         this.startDate = task.getStartDate();
         this.roles = task.getRoles().keySet();
+        this.negativeViewRoles = new HashSet<>(task.getNegativeViewRoles());
         this.users = task.getUsers().keySet();
+        this.negativeViewUsers = new HashSet<>(task.getNegativeViewUsers());
     }
 
     public void update(ElasticTask task) {
@@ -105,6 +113,8 @@ public class ElasticTask {
         this.userId = task.getUserId();
         this.startDate = task.getStartDate();
         this.roles = task.getRoles();
+        this.negativeViewRoles = task.getNegativeViewRoles();
         this.users = task.getUsers();
+        this.negativeViewUsers = task.getNegativeViewUsers();
     }
 }

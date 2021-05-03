@@ -1,11 +1,16 @@
 package com.netgrif.workflow.auth.web;
 
+import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.auth.domain.User;
 import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.auth.web.requestbodies.UserSearchRequestBody;
 import com.netgrif.workflow.auth.web.responsebodies.IUserFactory;
 import com.netgrif.workflow.auth.web.responsebodies.UserResource;
 import com.netgrif.workflow.auth.web.responsebodies.UserResourceAssembler;
+import com.netgrif.workflow.settings.domain.Preferences;
+import com.netgrif.workflow.settings.service.IPreferencesService;
+import com.netgrif.workflow.settings.web.PreferencesResource;
+import com.netgrif.workflow.workflow.web.responsebodies.MessageResource;
 import com.netgrif.workflow.workflow.web.responsebodies.ResourceLinkAssembler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -21,6 +26,7 @@ import org.springframework.hateoas.MediaTypes;
 import org.springframework.hateoas.PagedResources;
 import org.springframework.hateoas.mvc.ControllerLinkBuilder;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Provider;
@@ -45,6 +51,9 @@ public class PublicUserController {
 
     @Autowired
     private IUserService userService;
+
+    @Autowired
+    private IPreferencesService preferencesService;
 
     public PublicUserController() {
     }
@@ -71,5 +80,32 @@ public class PublicUserController {
         PagedResources<UserResource> resources = assembler.toResource(page, getUserResourceAssembler(locale, small, "search"), selfLink);
         ResourceLinkAssembler.addLinks(resources, User.class, selfLink.getRel());
         return resources;
+    }
+
+    @ApiOperation(value = "Get user's preferences", authorizations = @Authorization("BasicAuth"))
+    @GetMapping(value = "/preferences", produces = MediaTypes.HAL_JSON_VALUE)
+    public PreferencesResource preferences() {
+        Long userId = userService.getAnonymousLogged().transformToAnonymousUser().getId();
+        Preferences preferences = preferencesService.get(userId);
+
+        if (preferences == null) {
+            preferences = new Preferences(userId);
+        }
+
+        return new PreferencesResource(preferences);
+    }
+
+    @ApiOperation(value = "Set user's preferences", authorizations = @Authorization("BasicAuth"))
+    @PostMapping(value = "/preferences", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaTypes.HAL_JSON_VALUE)
+    public MessageResource savePreferences(@RequestBody Preferences preferences) {
+        try {
+            Long userId = userService.getAnonymousLogged().transformToAnonymousUser().getId();
+            preferences.setUserId(userId);
+            preferencesService.save(preferences);
+            return MessageResource.successMessage("User preferences saved");
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return MessageResource.errorMessage("Saving user preferences failed");
+        }
     }
 }
