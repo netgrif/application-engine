@@ -4,6 +4,7 @@ package com.netgrif.workflow.workflow.web.responsebodies;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.web.WorkflowController;
 import com.netgrif.workflow.workflow.web.requestbodies.CreateCaseBody;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.mvc.ControllerLinkBuilder;
 
@@ -18,6 +19,6 @@ public class CaseResource extends Resource<Case>{
 
     private void buildLinks(){
         add(ControllerLinkBuilder.linkTo(ControllerLinkBuilder
-                .methodOn(WorkflowController.class).createCase(new CreateCaseBody(), null)).withRel("create"));
+                .methodOn(WorkflowController.class).createCase(new CreateCaseBody(), null, LocaleContextHolder.getLocale())).withRel("create"));
     }
 }

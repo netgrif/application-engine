@@ -2,7 +2,8 @@ package com.netgrif.workflow.petrinet.domain.roles;
 
 public enum ProcessRolePermission {
     CREATE("create"),
-    DELETE("delete");
+    DELETE("delete"),
+    VIEW("view");
 
     private String value;
 
