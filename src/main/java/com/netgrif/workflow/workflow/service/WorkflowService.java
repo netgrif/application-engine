@@ -37,6 +37,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -112,6 +113,7 @@ public class WorkflowService implements IWorkflowService {
         } catch (Exception e) {
             log.error("Indexing failed [" + useCase.getStringId() + "]", e);
         }
+        resolveUserRef(useCase);
         return useCase;
     }
 
@@ -184,9 +186,12 @@ public class WorkflowService implements IWorkflowService {
     @Override
     public Case resolveUserRef(Case useCase) {
         useCase.getUsers().clear();
+        useCase.getNegativeViewUsers().clear();
         useCase.getUserRefs().forEach((id, permission) -> {
             List<Long> userIds = getExistingUsers((List<Long>) useCase.getDataSet().get(id).getValue());
-            if (userIds != null && userIds.size() != 0) {
+            if (userIds != null && userIds.size() != 0 && permission.containsKey("view") && permission.containsValue(false)) {
+                useCase.getNegativeViewUsers().addAll(userIds);
+            } else if (userIds != null && userIds.size() != 0) {
                 useCase.addUsers(new HashSet<>(userIds), permission);
             }
         });
@@ -199,6 +204,17 @@ public class WorkflowService implements IWorkflowService {
         return userIds.stream().filter(userId -> userService.findById(userId, false) != null).collect(Collectors.toList());
     }
 
+    @Override
+    public Case createCase(String netId, String title, String color, LoggedUser user, Locale locale) {
+        if (locale == null) {
+            locale = LocaleContextHolder.getLocale();
+        }
+        if (title == null) {
+            PetriNet petriNet = petriNetService.clone(new ObjectId(netId));
+            title = petriNet.getDefaultCaseName().getTranslation(locale);
+        }
+        return this.createCase(netId, title, color, user);
+    }
 
     @Override
     public Case createCase(String netId, String title, String color, LoggedUser user) {
@@ -214,11 +230,8 @@ public class WorkflowService implements IWorkflowService {
                 .map(role -> new AbstractMap.SimpleEntry<>(role.getKey(), Collections.singletonMap("delete", role.getValue().get("delete"))))
                 .collect(Collectors.toMap(AbstractMap.SimpleEntry::getKey, AbstractMap.SimpleEntry::getValue))
         );
-        useCase.setUserRefs(petriNet.getUserRefs().entrySet().stream()
-                .filter(role -> role.getValue().containsKey("delete"))
-                .map(role -> new AbstractMap.SimpleEntry<>(role.getKey(), Collections.singletonMap("delete", role.getValue().get("delete"))))
-                .collect(Collectors.toMap(AbstractMap.SimpleEntry::getKey, AbstractMap.SimpleEntry::getValue))
-        );
+        useCase.addNegativeViewRoles(petriNet.getNegativeViewRoles());
+        useCase.setUserRefs(petriNet.getUserRefs());
 
         runActions(petriNet.getPreCreateActions());
         ruleEngine.evaluateRules(useCase, new CaseCreatedFact(useCase.getStringId(), EventPhase.PRE));
