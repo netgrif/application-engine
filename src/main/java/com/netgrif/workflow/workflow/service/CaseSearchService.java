@@ -27,6 +27,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
 @Service
@@ -83,8 +84,42 @@ public class CaseSearchService extends MongoSearchService<Case> {
                 return null;
             }
         }
+        BooleanBuilder negativeConstraints = new BooleanBuilder(buildNegativeRolesQueryConstraint(user));
+        negativeConstraints.or(buildNegativeViewUsersQueryConstraint(user));
+
+        BooleanBuilder userConstraints = new BooleanBuilder(buildViewUsersQueryConstraint(user));
+        userConstraints.orNot(negativeConstraints);
+
+        builder.and(userConstraints);
 
         return builder;
+    }
+
+    protected Predicate buildNegativeRolesQueryConstraint(LoggedUser user) {
+        List<Predicate> roleConstraints = user.getProcessRoles().stream().map(this::roleNegativeQuery).collect(Collectors.toList());
+        return constructPredicateTree(roleConstraints, BooleanBuilder::or);
+    }
+
+    public Predicate roleNegativeQuery(String role) {
+        return QCase.case$.negativeViewRoles.contains(role);
+    }
+
+    protected Predicate buildNegativeViewUsersQueryConstraint(LoggedUser user) {
+        Predicate roleConstraints = negativeViewUsersQuery(user.getId());
+        return constructPredicateTree(Collections.singletonList(roleConstraints), BooleanBuilder::or);
+    }
+
+    public Predicate negativeViewUsersQuery(Long userId) {
+        return QCase.case$.negativeViewUsers.contains(userId);
+    }
+
+    protected Predicate buildViewUsersQueryConstraint(LoggedUser user) {
+        Predicate roleConstraints = viewUsersQuery(user.getId());
+        return constructPredicateTree(Collections.singletonList(roleConstraints), BooleanBuilder::or);
+    }
+
+    public Predicate viewUsersQuery(Long userId) {
+        return QCase.case$.users.containsKey(userId);
     }
 
     public Predicate petriNet(Object query, LoggedUser user, Locale locale) {

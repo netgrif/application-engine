@@ -181,7 +181,7 @@ public class ElasticTaskService implements IElasticTaskService {
 
         BoolQueryBuilder query = boolQuery();
 
-        buildUsersRoleQuery(request, query);
+        buildUsersRoleQuery(request, query, user);
         buildCaseQuery(request, query);
         buildTitleQuery(request, query);
         buildUserQuery(request, query);
@@ -217,12 +217,29 @@ public class ElasticTaskService implements IElasticTaskService {
         }
     }
 
-    protected void buildUsersRoleQuery(ElasticTaskSearchRequest request, BoolQueryBuilder query){
+    protected void buildUsersRoleQuery(ElasticTaskSearchRequest request, BoolQueryBuilder query, LoggedUser user){
         BoolQueryBuilder userRoleQuery = boolQuery();
         buildRoleQuery(request, userRoleQuery);
+        buildNegativeViewRoleQuery(userRoleQuery, user);
         buildUsersQuery(request, userRoleQuery);
+        buildNegativeViewUsersQuery(userRoleQuery, user);
 
         query.filter(userRoleQuery);
+    }
+
+    private void buildNegativeViewRoleQuery(BoolQueryBuilder query, LoggedUser user) {
+        BoolQueryBuilder negativeRoleQuery = boolQuery();
+        for (String roleId : user.getProcessRoles()) {
+            negativeRoleQuery.should(termQuery("negativeViewRoles", roleId));
+        }
+
+        query.mustNot(negativeRoleQuery);
+    }
+
+    private void buildNegativeViewUsersQuery(BoolQueryBuilder query, LoggedUser user) {
+        BoolQueryBuilder negativeRoleQuery = boolQuery();
+        negativeRoleQuery.should(termQuery("negativeViewUsers", user.getId()));
+        query.mustNot(negativeRoleQuery);
     }
 
     /**
