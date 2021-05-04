@@ -33,6 +33,7 @@ public class RoleFactory {
         addDelegate(permissions, roleLogic);
         addCancel(permissions, roleLogic);
         addAssigned(permissions, roleLogic);
+        addView(permissions, roleLogic);
 
         return permissions;
     }
@@ -42,6 +43,7 @@ public class RoleFactory {
 
         addCreate(permissions, roleLogic);
         addDelete(permissions, roleLogic);
+        addCaseView(permissions, roleLogic);
 
         return permissions;
     }
