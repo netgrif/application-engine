@@ -3,7 +3,7 @@ package com.netgrif.workflow.workflow.web.responsebodies;
 import com.netgrif.workflow.auth.web.responsebodies.User;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedField;
 import com.netgrif.workflow.petrinet.domain.dataset.logic.ChangedFieldContainer;
-import com.netgrif.workflow.workflow.domain.EventOutcome;
+import com.netgrif.workflow.workflow.domain.eventoutcomes.EventOutcome;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -26,13 +26,13 @@ public class LocalisedEventOutcome extends ChangedFieldContainer {
     public static LocalisedEventOutcome successOutcome(EventOutcome outcome, Locale locale, String defaultSuccessMessage) {
         LocalisedEventOutcome result = new LocalisedEventOutcome();
 
-        outcome.getChangedFields().flatten(result);
-        result.startDate = outcome.getStartDate();
-        result.finishDate = outcome.getFinishDate();
+//        outcome.getChangedFields().flatten(result);
+//        result.startDate = outcome.getStartDate();
+//        result.finishDate = outcome.getFinishDate();
 
-        if (outcome.getAssignee() != null) {
-            result.assignee = User.createSmallUser(outcome.getAssignee());
-        }
+//        if (outcome.getAssignee() != null) {
+//            result.assignee = User.createSmallUser(outcome.getAssignee());
+//        }
 
         if (outcome.getMessage() != null) {
             result.success = outcome.getMessage().getTranslation(locale);

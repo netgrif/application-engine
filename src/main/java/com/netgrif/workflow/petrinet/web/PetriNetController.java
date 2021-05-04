@@ -10,6 +10,9 @@ import com.netgrif.workflow.petrinet.service.interfaces.IPetriNetService;
 import com.netgrif.workflow.petrinet.service.interfaces.IProcessRoleService;
 import com.netgrif.workflow.petrinet.web.responsebodies.*;
 import com.netgrif.workflow.workflow.domain.FileStorageConfiguration;
+import com.netgrif.workflow.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetOutcome;
+import com.netgrif.workflow.workflow.domain.eventoutcomes.petrinetoutcomes.PetriNetReferenceEventOutcome;
+import com.netgrif.workflow.workflow.domain.eventoutcomes.response.EventOutcomeWithMessageResource;
 import com.netgrif.workflow.workflow.web.responsebodies.MessageResource;
 import io.swagger.annotations.*;
 import org.slf4j.Logger;
@@ -68,12 +71,12 @@ public class PetriNetController {
             notes = "Caller must have the ADMIN role. Imports an entirely new process or a new version of an existing process.",
             authorizations = @Authorization("BasicAuth"))
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "OK", response = PetriNetReferenceWithMessageResource.class),
+            @ApiResponse(code = 200, message = "OK", response = EventOutcomeWithMessageResource.class),
             @ApiResponse(code = 400, message = "Process model is invalid", response = MessageResource.class),
             @ApiResponse(code = 403, message = "Caller doesn't fulfill the authorisation requirements")
     })
     @RequestMapping(value = "/import", method = POST, produces = MediaTypes.HAL_JSON_VALUE)
-    public PetriNetReferenceWithMessageResource importPetriNet(
+    public EventOutcomeWithMessageResource importPetriNet(
             @RequestParam(value = "file", required = true) MultipartFile multipartFile,
             @RequestParam(value = "meta", required = false) String releaseType,
             Authentication auth, Locale locale) throws MissingPetriNetMetaDataException, MissingIconKeyException {
@@ -84,12 +87,12 @@ public class PetriNetController {
             fout.write(multipartFile.getBytes());
             String release = releaseType == null ? "major" : releaseType;
 
-            Optional<PetriNet> newPetriNet = service.importPetriNet(new FileInputStream(file), release, (LoggedUser) auth.getPrincipal());
+            ImportPetriNetOutcome importPetriNetOutcome = service.importPetriNet(new FileInputStream(file), release, (LoggedUser) auth.getPrincipal());
             fout.close();
-            return PetriNetReferenceWithMessageResource.successMessage("Petri net " + multipartFile.getOriginalFilename() + " imported successfully", newPetriNet.get(), locale);
+            return EventOutcomeWithMessageResource.successMessage("Petri net " + multipartFile.getOriginalFilename() + " imported successfully", new PetriNetReferenceEventOutcome(importPetriNetOutcome.getNet(),locale));
         } catch (IOException e) {
             log.error("Importing Petri net failed: ", e);
-            return PetriNetReferenceWithMessageResource.errorMessage("IO error");
+            return EventOutcomeWithMessageResource.errorMessage("IO error while importing Petri net");
         }
     }
 
