@@ -1,0 +1,65 @@
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../main/resources/petriNets/petriflow_schema.xsd">
+    <id>dynamic_choices</id>
+    <title>dynamic_choices</title>
+    <defaultRole>true</defaultRole>
+    <initials>DVT</initials>
+    <!-- ROLES -->
+    <data type="enumeration">
+        <id>enumeration</id>
+        <title>enumeration</title>
+        <values dynamic="true">["A", "B", "C"]</values>
+    </data>
+    <data type="enumeration_map">
+        <id>enumeration_map</id>
+        <title>enumeration_map</title>
+        <options>
+            <init>["a": "A", "b": "B"]</init>
+        </options>
+    </data>
+    <data type="multichoice">
+        <id>multichoice</id>
+        <title>multichoice</title>
+        <values dynamic="true">["A", "B", "C"]</values>
+    </data>
+    <data type="multichoice_map">
+        <id>multichoice_map</id>
+        <title>multichoice_map</title>
+        <options>
+            <init>["a": "A", "b": "B"]</init>
+        </options>
+    </data>
+
+    <transition>
+        <id>transition</id>
+        <x>200</x>
+        <y>200</y>
+        <label>Transition</label>
+        <assignPolicy>auto</assignPolicy>
+
+        <dataRef>
+            <id>enumeration</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>enumeration_map</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>multichoice</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>multichoice_map</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+    </transition>
+
+</document>

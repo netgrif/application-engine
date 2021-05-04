@@ -29,6 +29,7 @@ import com.netgrif.workflow.workflow.domain.DataField;
 import com.netgrif.workflow.workflow.domain.Task;
 import com.netgrif.workflow.workflow.domain.TaskPair;
 import com.netgrif.workflow.workflow.domain.repositories.CaseRepository;
+import com.netgrif.workflow.workflow.service.interfaces.IInitValueExpressionEvaluator;
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
 import com.querydsl.core.types.Predicate;
@@ -91,6 +92,9 @@ public class WorkflowService implements IWorkflowService {
 
     @Autowired
     private IUserService userService;
+
+    @Autowired
+    private IInitValueExpressionEvaluator initValueExpressionEvaluator;
 
     private IElasticCaseService elasticCaseService;
 
@@ -210,16 +214,20 @@ public class WorkflowService implements IWorkflowService {
             locale = LocaleContextHolder.getLocale();
         }
         if (title == null) {
-            PetriNet petriNet = petriNetService.clone(new ObjectId(netId));
-            title = petriNet.getDefaultCaseName().getTranslation(locale);
+            return this.createCase(netId, resolveDefaultCaseTitle(netId, locale), color, user);
         }
         return this.createCase(netId, title, color, user);
     }
 
     @Override
     public Case createCase(String netId, String title, String color, LoggedUser user) {
+        return createCase(netId, (u) -> title, color, user);
+    }
+
+    public Case createCase(String netId, Function<Case, String> makeTitle, String color, LoggedUser user) {
         PetriNet petriNet = petriNetService.clone(new ObjectId(netId));
-        Case useCase = new Case(title, petriNet, petriNet.getActivePlaces());
+        Case useCase = new Case(petriNet, petriNet.getActivePlaces());
+        useCase.populateDataSet(initValueExpressionEvaluator);
         useCase.setProcessIdentifier(petriNet.getIdentifier());
         useCase.setColor(color);
         useCase.setAuthor(user.transformToAuthor());
@@ -231,14 +239,18 @@ public class WorkflowService implements IWorkflowService {
                 .collect(Collectors.toMap(AbstractMap.SimpleEntry::getKey, AbstractMap.SimpleEntry::getValue))
         );
         useCase.addNegativeViewRoles(petriNet.getNegativeViewRoles());
-        useCase.setUserRefs(petriNet.getUserRefs());
-
+        useCase.setUserRefs(petriNet.getUserRefs().entrySet().stream()
+                .filter(role -> role.getValue().containsKey("delete"))
+                .map(role -> new AbstractMap.SimpleEntry<>(role.getKey(), Collections.singletonMap("delete", role.getValue().get("delete"))))
+                .collect(Collectors.toMap(AbstractMap.SimpleEntry::getKey, AbstractMap.SimpleEntry::getValue))
+        );
+        useCase.setTitle(makeTitle.apply(useCase));
         runActions(petriNet.getPreCreateActions());
         ruleEngine.evaluateRules(useCase, new CaseCreatedFact(useCase.getStringId(), EventPhase.PRE));
         useCase = save(useCase);
 
         publisher.publishEvent(new CreateCaseEvent(useCase));
-        log.info("[" + useCase.getStringId() + "]: Case " + title + " created");
+        log.info("[" + useCase.getStringId() + "]: Case " + useCase.getTitle() + " created");
 
         useCase.getPetriNet().initializeVarArcs(useCase.getDataSet());
         taskService.reloadTasks(useCase);
@@ -251,6 +263,17 @@ public class WorkflowService implements IWorkflowService {
         useCase = save(useCase);
 
         return setImmediateDataFields(useCase);
+    }
+
+    protected Function<Case, String> resolveDefaultCaseTitle(String netId, Locale locale) {
+        PetriNet petriNet = petriNetService.clone(new ObjectId(netId));
+        Function<Case, String> makeTitle;
+        if (petriNet.hasDynamicCaseName()) {
+            makeTitle = (u) -> initValueExpressionEvaluator.evaluateCaseName(u, petriNet.getDefaultCaseNameExpression()).getTranslation(locale);
+        } else {
+            makeTitle = (u) -> petriNet.getDefaultCaseName().getTranslation(locale);
+        }
+        return makeTitle;
     }
 
     @Override
