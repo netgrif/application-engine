@@ -1,0 +1,102 @@
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../main/resources/petriNets/petriflow_schema.xsd">
+    <id>dynamic_init</id>
+    <title>dynamic_init</title>
+    <defaultRole>true</defaultRole>
+    <initials>DVT</initials>
+    <!-- ROLES -->
+    <data type="text" immediate="true">
+        <id>text</id>
+        <title>Text</title>
+        <init dynamic="true">userService.findByEmail("super@netgrif.com", true).name</init>
+    </data>
+
+    <data type="number" immediate="true">
+        <id>number</id>
+        <title>number</title>
+        <init dynamic="true">userService.findByEmail("super@netgrif.com", true).name.length()</init>
+    </data>
+
+    <data type="date" immediate="true">
+        <id>date</id>
+        <title>date</title>
+        <init dynamic="true">java.time.LocalDate.now()</init>
+    </data>
+
+    <data type="dateTime" immediate="true">
+        <id>dateTime</id>
+        <title>dateTime</title>
+        <init dynamic="true">java.time.LocalDateTime.now()</init>
+    </data>
+
+    <data type="user" immediate="true">
+        <id>user</id>
+        <title>user</title>
+        <init dynamic="true">
+            def user = userService.loggedOrSystem
+            return new com.netgrif.workflow.auth.domain.User(id: user.id, name: user.name, surname: user.surname, email: user.email)
+        </init>
+    </data>
+
+    <data type="multichoice">
+        <id>multichoice</id>
+        <title>multichoice</title>
+        <values>ABC</values>
+        <values>DEF</values>
+        <values>GHI</values>
+        <init dynamic="true">
+            ["ABC", "DEF"]
+        </init>
+    </data>
+
+    <data type="multichoice_map">
+        <id>multichoice_map</id>
+        <title>multichoice_map</title>
+        <options>
+            <option key="ABC">abc display</option>
+            <option key="DEF">def display</option>
+            <option key="GHI">ghi display</option>
+        </options>
+        <init dynamic="true">
+            ["ABC", "DEF"]
+        </init>
+    </data>
+
+    <transition>
+        <id>transition</id>
+        <x>0</x>
+        <y>0</y>
+        <label>whatever</label>
+
+        <dataRef>
+            <id>text</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>number</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>date</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>dateTime</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>user</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+    </transition>
+
+</document>
