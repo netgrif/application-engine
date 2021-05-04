@@ -44,6 +44,7 @@ public class TaskSearchService extends MongoSearchService<Task> {
         BooleanBuilder constraints = new BooleanBuilder(buildRolesQueryConstraint(user));
         constraints.andNot(buildNegativeRolesQueryConstraint(user));
         constraints.or(buildUserRefQueryConstraint(user));
+        constraints.andNot(buildNegativeViewUsersConstraint(user));
         builder.and(constraints);
         return builder;
     }
@@ -56,6 +57,11 @@ public class TaskSearchService extends MongoSearchService<Task> {
     protected Predicate buildRolesQueryConstraint(LoggedUser user) {
         List<Predicate> roleConstraints = user.getProcessRoles().stream().map(this::roleQuery).collect(Collectors.toList());
         return constructPredicateTree(roleConstraints, BooleanBuilder::or);
+    }
+
+    protected Predicate buildNegativeViewUsersConstraint(LoggedUser user) {
+        Predicate userConstraints = negativeViewUsersQuery(user.getId());
+        return constructPredicateTree(Collections.singletonList(userConstraints), BooleanBuilder::or);
     }
 
     protected Predicate buildNegativeRolesQueryConstraint(LoggedUser user) {
@@ -105,6 +111,9 @@ public class TaskSearchService extends MongoSearchService<Task> {
         return QTask.task.users.containsKey(userId);
     }
 
+    public Predicate negativeViewUsersQuery(Long userId) {
+        return QTask.task.negativeViewUsers.contains(userId);
+    }
 
     private void buildCaseQuery(TaskSearchRequest request, BooleanBuilder query) {
         if (request.useCase == null || request.useCase.isEmpty()) {
