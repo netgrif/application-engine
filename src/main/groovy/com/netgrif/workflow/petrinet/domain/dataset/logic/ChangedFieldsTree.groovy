@@ -24,6 +24,10 @@ class ChangedFieldsTree extends CaseChangedFields {
         return new ChangedFieldsTree(caseId, taskId, transitionId)
     }
 
+    static ChangedFieldsTree createNew(String caseId) {
+        return new ChangedFieldsTree(caseId, "task", "transition")
+    }
+
     void setPropagatedChanges(Map<String, CaseChangedFields> propagatedChanges) {
         this.propagatedChanges = propagatedChanges
     }

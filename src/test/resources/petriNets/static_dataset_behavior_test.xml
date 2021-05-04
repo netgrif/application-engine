@@ -16,6 +16,28 @@
         <init>regular value</init>
     </data>
 
+    <data type="file">
+        <id>static_file</id>
+        <title>Static file</title>
+        <static>true</static>
+    </data>
+
+    <data type="file">
+        <id>regular_file</id>
+        <title>Regular file</title>
+    </data>
+
+    <data type="fileList">
+        <id>static_file_list</id>
+        <title>Static file list</title>
+        <static>true</static>
+    </data>
+
+    <data type="fileList">
+        <id>regular_file_list</id>
+        <title>Regular file list</title>
+    </data>
+
     <transition>
         <id>transition</id>
         <x>200</x>
@@ -31,6 +53,31 @@
 
         <dataRef>
             <id>regular_text</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+
+        <dataRef>
+            <id>static_file</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>regular_file</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>static_file_list</id>
+            <logic>
+                <behavior>visible</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>regular_file_list</id>
             <logic>
                 <behavior>visible</behavior>
             </logic>
@@ -68,6 +115,31 @@
 
         <dataRef>
             <id>regular_text</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+
+        <dataRef>
+            <id>static_file</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>regular_file</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>static_file_list</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>regular_file_list</id>
             <logic>
                 <behavior>editable</behavior>
             </logic>

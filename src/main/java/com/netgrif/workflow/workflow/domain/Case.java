@@ -246,6 +246,14 @@ public class Case {
         return this.tasks.size() != sizeBeforeChange;
     }
 
+    public Field resolveFieldById(String fieldId) {
+        Field field = getField(fieldId);
+        if (field == null) {
+            return getStaticField(fieldId);
+        }
+        return field;
+    }
+
     public Field getField(String id) {
         return petriNet.getDataSet().get(id);
     }

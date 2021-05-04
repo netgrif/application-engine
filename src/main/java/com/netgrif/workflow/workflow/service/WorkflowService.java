@@ -500,11 +500,9 @@ public class WorkflowService implements IWorkflowService {
     }
 
     private void runEventActionsOnChanged(Case useCase, ChangedFieldsTree changedFields, Map<String, ChangedField> newChangedField, Action.ActionTrigger trigger, boolean recursive) {
-        newChangedField.forEach((s, changedField) -> {
+        newChangedField.forEach((id, changedField) -> {
             if ((changedField.getAttributes().containsKey("value") && changedField.getAttributes().get("value") != null) && recursive) {
-                Field field = useCase.getField(s);
-                if (field == null)
-                    field = useCase.getStaticField(s);
+                Field field = useCase.resolveFieldById(id);
                 processDataEvents(field, trigger, EventPhase.PRE, useCase, changedFields);
                 processDataEvents(field, trigger, EventPhase.POST, useCase, changedFields);
             }

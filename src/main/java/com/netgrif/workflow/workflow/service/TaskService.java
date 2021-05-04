@@ -496,10 +496,7 @@ public class TaskService implements ITaskService {
     @Transactional
     void validateData(Transition transition, Case useCase) {
         for (Map.Entry<String, DataFieldLogic> entry : transition.getDataSet().entrySet()) {
-            Field<?> field = useCase.getField(entry.getKey());
-            if (field == null) {
-                field = useCase.getStaticField(entry.getKey());
-            }
+            Field<?> field = useCase.resolveFieldById(entry.getKey());
             AbstractDataField dataField = field.isStatic() ? useCase.getStaticDataField(field.getStringId()) : useCase.getDataField(field.getStringId());
             if (!dataField.isRequired(transition.getImportId()))
                 continue;

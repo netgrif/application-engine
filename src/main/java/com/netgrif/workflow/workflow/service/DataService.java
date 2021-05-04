@@ -50,6 +50,8 @@ import java.net.URL;
 import java.util.List;
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.LongStream;
 
@@ -378,30 +380,30 @@ public class DataService implements IDataService {
     @Override
     public FileFieldInputStream getFileByCase(String caseId, Task task, String fieldId, boolean forPreview) {
         Case useCase = workflowService.findOne(caseId);
-        FileField field = (FileField) useCase.getPetriNet().getDataSet().get(fieldId);
+        FileField field = (FileField) useCase.resolveFieldById(fieldId);
         return getFile(useCase, task, field, forPreview);
     }
 
     @Override
     public FileFieldInputStream getFileByCaseAndName(String caseId, String fieldId, String name) {
         Case useCase = workflowService.findOne(caseId);
-        FileListField field = (FileListField) useCase.getPetriNet().getDataSet().get(fieldId);
+        FileListField field = (FileListField) useCase.resolveFieldById(fieldId);
         return getFileByName(useCase, field, name);
     }
 
     @Override
     public FileFieldInputStream getFileByName(Case useCase, FileListField field, String name) {
+        ChangedFieldsTree changedFields = ChangedFieldsTree.createNew(useCase.getStringId());
         field.getEvents().forEach(dataEvent -> {
-            dataEvent.getActions().get(EventPhase.PRE).forEach(action -> actionsRunner.run(action, useCase));
-            dataEvent.getActions().get(EventPhase.POST).forEach(action -> actionsRunner.run(action, useCase));
+            dataEvent.getActions().get(EventPhase.PRE).forEach(action -> changedFields.mergeChangedFields(actionsRunner.run(action, useCase)));
+            dataEvent.getActions().get(EventPhase.POST).forEach(action -> changedFields.mergeChangedFields(actionsRunner.run(action, useCase)));
         });
-        if (useCase.getDataSet().get(field.getStringId()).getValue() == null)
+        if (!isFieldValueFilled(field, useCase))
             return null;
 
+        petriNetService.saveNetIfStaticFieldsChanged(useCase.getPetriNet(), changedFields);
         workflowService.save(useCase);
-        if (!field.isStatic()) {
-            field.setValue((FileListFieldValue) useCase.getFieldValue(field.getStringId()));
-        }
+        setFieldValue(field, useCase);
 
         Optional<FileFieldValue> fileField = field.getValue().getNamesPaths().stream().filter(namePath -> namePath.getName().equals(name)).findFirst();
         if (!fileField.isPresent() || fileField.get().getPath() == null) {
@@ -420,17 +422,17 @@ public class DataService implements IDataService {
 
     @Override
     public FileFieldInputStream getFile(Case useCase, Task task, FileField field, boolean forPreview) {
+        ChangedFieldsTree changedFields = ChangedFieldsTree.createNew(useCase.getStringId(), task);
         field.getEvents().forEach(dataEvent -> {
-            dataEvent.getActions().get(EventPhase.PRE).forEach(action -> actionsRunner.run(action, useCase, Optional.ofNullable(task)));
-            dataEvent.getActions().get(EventPhase.POST).forEach(action -> actionsRunner.run(action, useCase, Optional.ofNullable(task)));
+            dataEvent.getActions().get(EventPhase.PRE).forEach(action -> changedFields.mergeChangedFields(actionsRunner.run(action, useCase, Optional.ofNullable(task))));
+            dataEvent.getActions().get(EventPhase.POST).forEach(action -> changedFields.mergeChangedFields(actionsRunner.run(action, useCase, Optional.ofNullable(task))));
         });
-        if (useCase.getFieldValue(field.getStringId()) == null)
+        if (!isFieldValueFilled(field, useCase))
             return null;
 
+        petriNetService.saveNetIfStaticFieldsChanged(useCase.getPetriNet(), changedFields);
         workflowService.save(useCase);
-        if (!field.isStatic()) {
-            field.setValue((FileFieldValue) useCase.getFieldValue(field.getStringId()));
-        }
+        setFieldValue(field, useCase);
 
         try {
             if (forPreview) {
@@ -509,6 +511,16 @@ public class DataService implements IDataService {
         return file;
     }
 
+    private boolean isFieldValueFilled(Field<?> field, Case useCase) {
+        return field.isStatic() ? (field.getValue() != null) : (useCase.getFieldValue(field.getImportId()) != null);
+    }
+
+    private <T> void setFieldValue(Field<T> field, Case useCase) {
+        if (!field.isStatic()) {
+            field.setValue((T) useCase.getFieldValue(field.getImportId()));
+        }
+    }
+
     @Override
     public InputStream download(String url) throws IOException {
         URL connection = new URL(url);
@@ -528,7 +540,8 @@ public class DataService implements IDataService {
             if (field.isRemote()) {
                 upload(useCase, field, multipartFile);
             } else {
-                if (!saveLocalFile(useCase, field, multipartFile))
+                if ((field.isStatic() && !saveLocalFile(useCase.getPetriNet(), field, multipartFile)) ||
+                        (!field.isStatic() && !saveLocalFile(useCase, field, multipartFile)))
                     return container;
             }
 
@@ -552,8 +565,10 @@ public class DataService implements IDataService {
             if (field.isRemote()) {
                 upload(useCase, field, multipartFiles);
             } else {
-                if (!saveLocalFiles(useCase, field, multipartFiles))
+                if ((field.isStatic() && !saveLocalFiles(useCase.getPetriNet(), field, multipartFiles)) ||
+                        (!field.isStatic() && !saveLocalFiles(useCase, field, multipartFiles))) {
                     return container;
+                }
             }
 
             return getChangedFieldByFileFieldContainer(fieldId, task, useCase, container);
@@ -575,15 +590,18 @@ public class DataService implements IDataService {
             log.debug("fieldId is not referenced through taskRef", e);
         }
 
-        ChangedFieldsTree changedFieldsPre = resolveDataEvents(useCase.getPetriNet().getField(fieldId).get(),Action.ActionTrigger.SET,
+        ChangedFieldsTree changedFieldsPre = resolveDataEvents(useCase.resolveFieldById(fieldId),Action.ActionTrigger.SET,
                 EventPhase.PRE, useCase, task, useCase.getPetriNet().getTransition(task.getTransitionId()));
-        ChangedFieldsTree changedFieldsPost = resolveDataEvents(useCase.getPetriNet().getField(fieldId).get(),Action.ActionTrigger.SET,
+        ChangedFieldsTree changedFieldsPost = resolveDataEvents(useCase.resolveFieldById(fieldId),Action.ActionTrigger.SET,
                 EventPhase.POST, useCase, task, useCase.getPetriNet().getTransition(task.getTransitionId()));
         changedFieldsPre.mergeChangedFields(changedFieldsPost);
 
         container.setIsSave(true);
         updateDataset(useCase);
         workflowService.save(useCase);
+        Set<String> changedFields = new HashSet<>(changedFieldsPre.getChangedFields().keySet());
+        changedFields.add(fieldId);
+        petriNetService.saveNetIfStaticFieldsChanged(useCase.getPetriNet(), changedFields);
         return resolveChangedFieldsByFileTree(changedFieldsPre, container, referencingTask, task);
     }
 
@@ -622,23 +640,33 @@ public class DataService implements IDataService {
         throw new IllegalArgumentException("fieldId is not referenced through taskRef");
     }
 
+    private boolean saveLocalFiles(PetriNet petriNet, FileListField field, MultipartFile[] multipartFiles) throws IOException {
+        saveLocalFiles(field, multipartFiles, (oneFile) -> field.getFilePath(petriNet.getStringId(), oneFile.getOriginalFilename()));
+        petriNet.getStaticDataSet().get(field.getStringId()).setValue(field.getValue());
+        return true;
+    }
+
     private boolean saveLocalFiles(Case useCase, FileListField field, MultipartFile[] multipartFiles) throws IOException {
+        saveLocalFiles(field, multipartFiles, (oneFile) -> field.getFilePath(useCase.getStringId(), oneFile.getOriginalFilename()));
+        useCase.getDataSet().get(field.getStringId()).setValue(field.getValue());
+        return true;
+    }
+
+    private void saveLocalFiles(FileListField field, MultipartFile[] multipartFiles, Function<MultipartFile, String> getPath) throws IOException {
         for (MultipartFile oneFile : multipartFiles) {
             if (field.getValue() != null && field.getValue().getNamesPaths() != null) {
                 Optional<FileFieldValue> fileField = field.getValue().getNamesPaths().stream().filter(namePath -> namePath.getName().equals(oneFile.getOriginalFilename())).findFirst();
                 if (fileField.isPresent()) {
-                    new File(field.getFilePath(useCase.getStringId(), oneFile.getOriginalFilename())).delete();
+                    new File(getPath.apply(oneFile)).delete();
                     field.getValue().getNamesPaths().remove(fileField.get());
                 }
             }
 
-            field.addValue(oneFile.getOriginalFilename(), field.getFilePath(useCase.getStringId(), oneFile.getOriginalFilename()));
-            File file = new File(field.getFilePath(useCase.getStringId(), oneFile.getOriginalFilename()));
+            field.addValue(oneFile.getOriginalFilename(), getPath.apply(oneFile));
+            File file = new File(getPath.apply(oneFile));
 
             writeFile(oneFile, file);
         }
-        useCase.getDataSet().get(field.getStringId()).setValue(field.getValue());
-        return true;
     }
 
     private boolean saveLocalFile(Case useCase, FileField field, MultipartFile multipartFile) throws IOException {
@@ -647,13 +675,28 @@ public class DataService implements IDataService {
             useCase.getDataSet().get(field.getStringId()).setValue(null);
         }
 
-        field.setValue(multipartFile.getOriginalFilename());
-        field.getValue().setPath(field.getFilePath(useCase.getStringId()));
-        File file = new File(field.getFilePath(useCase.getStringId()));
-        writeFile(multipartFile, file);
-
+        saveLocalFile(field, multipartFile, () -> field.getFilePath(useCase.getStringId()));
         useCase.getDataSet().get(field.getStringId()).setValue(field.getValue());
         return true;
+    }
+
+    private boolean saveLocalFile(PetriNet petriNet, FileField field, MultipartFile multipartFile) throws IOException {
+        if (petriNet.getStaticDataSet().get(field.getStringId()).getValue() != null) {
+            new File(field.getFilePath(petriNet.getStringId())).delete();
+            petriNet.getStaticDataSet().get(field.getStringId()).setValue(null);
+        }
+
+        saveLocalFile(field, multipartFile, () -> field.getFilePath(petriNet.getStringId()));
+        petriNet.getStaticDataSet().get(field.getStringId()).setValue(field.getValue());
+        return true;
+    }
+
+    private void saveLocalFile(FileField field, MultipartFile multipartFile, Supplier<String> getPath) throws IOException {
+        field.setValue(multipartFile.getOriginalFilename());
+        String path = getPath.get();
+        field.getValue().setPath(path);
+        File file = new File(path);
+        writeFile(multipartFile, file);
     }
 
     private void writeFile(MultipartFile multipartFile, File file) throws IOException {
@@ -690,18 +733,24 @@ public class DataService implements IDataService {
         FileField field = pair.getRight();
         Case useCase = pair.getLeft();
 
-        if (useCase.getDataSet().get(field.getStringId()).getValue() != null) {
+        if (isFieldValueFilled(field, useCase)) {
             if (field.isRemote()) {
                 deleteRemote(useCase, field);
             } else {
                 new File(field.getValue().getPath()).delete();
                 new File(field.getFilePreviewPath(useCase.getStringId())).delete();
             }
-            useCase.getDataSet().get(field.getStringId()).setValue(null);
+
+            if (field.isStatic()) {
+                field.clearValue();
+                petriNetService.saveStaticChanges(useCase.getPetriNet());
+            } else {
+                useCase.getDataSet().get(field.getStringId()).setValue(null);
+                updateDataset(useCase);
+                workflowService.save(useCase);
+            }
         }
 
-        updateDataset(useCase);
-        workflowService.save(useCase);
         return true;
     }
 
@@ -711,8 +760,8 @@ public class DataService implements IDataService {
         String parsedFieldId = wrapper.getFieldId();
 
         Case useCase = workflowService.findOne(task.getCaseId());
-        FileField field = (FileField) useCase.getPetriNet().getDataSet().get(parsedFieldId);
-        field.setValue((FileFieldValue) useCase.getDataField(field.getStringId()).getValue());
+        FileField field = (FileField) useCase.resolveFieldById(parsedFieldId);
+        setFieldValue(field, useCase);
 
         return new ImmutablePair<>(useCase, field);
     }
@@ -732,11 +781,16 @@ public class DataService implements IDataService {
                 new File(fileField.get().getPath()).delete();
                 field.getValue().getNamesPaths().remove(fileField.get());
             }
-            useCase.getDataSet().get(field.getStringId()).setValue(field.getValue());
-        }
 
-        updateDataset(useCase);
-        workflowService.save(useCase);
+            if (field.isStatic()) {
+                petriNetService.saveStaticChanges(useCase.getPetriNet());
+            } else {
+                useCase.getDataSet().get(field.getStringId()).setValue(field.getValue());
+                updateDataset(useCase);
+                workflowService.save(useCase);
+            }
+
+        }
         return true;
     }
 
@@ -746,8 +800,9 @@ public class DataService implements IDataService {
         String parsedFieldId = wrapper.getFieldId();
 
         Case useCase = workflowService.findOne(task.getCaseId());
-        FileListField field = (FileListField) useCase.getPetriNet().getDataSet().get(parsedFieldId);
-        field.setValue((FileListFieldValue) useCase.getDataField(field.getStringId()).getValue());
+        FileListField field = (FileListField) useCase.resolveFieldById(parsedFieldId);
+        setFieldValue(field, useCase);
+
         return new ImmutablePair<>(useCase, field);
     }
 
@@ -835,12 +890,10 @@ public class DataService implements IDataService {
     }
 
     private void runEventActionsOnChanged(Case useCase, Task task, Transition transition, ChangedFieldsTree changedFields, Map<String, ChangedField> newChangedField, Action.ActionTrigger trigger, boolean recursive) {
-        newChangedField.forEach((s, changedField) -> {
+        newChangedField.forEach((id, changedField) -> {
             if ((changedField.getAttributes().containsKey("value") && changedField.getAttributes().get("value") != null) && recursive) {
-                Field field = useCase.getField(s);
-                if (field == null)
-                    field = useCase.getStaticField(s);
-                log.info("[" + useCase.getStringId() + "] " + useCase.getTitle() + ": Running actions on changed field " + s);
+                Field field = useCase.resolveFieldById(id);
+                log.info("[" + useCase.getStringId() + "] " + useCase.getTitle() + ": Running actions on changed field " + id);
                 processDataEvents(field, trigger, EventPhase.PRE, useCase, task, changedFields, transition);
                 processDataEvents(field, trigger, EventPhase.POST, useCase, task, changedFields, transition);
             }
