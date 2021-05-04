@@ -3,6 +3,7 @@ package com.netgrif.workflow.importer.service;
 import com.netgrif.workflow.importer.model.*;
 import com.netgrif.workflow.importer.model.DataEventType;
 import com.netgrif.workflow.importer.service.throwable.MissingIconKeyException;
+import com.netgrif.workflow.petrinet.domain.dataset.logic.action.runner.Expression;
 import com.netgrif.workflow.petrinet.domain.events.*;
 import com.netgrif.workflow.petrinet.domain.Component;
 import com.netgrif.workflow.petrinet.domain.DataGroup;
@@ -174,7 +175,11 @@ public class Importer {
         resolveProcessEvents(document.getProcessEvents());
         resolveCaseEvents(document.getCaseEvents());
 
-        net.setDefaultCaseName(toI18NString(document.getCaseName()));
+        if (document.getCaseName() != null && document.getCaseName().isDynamic()) {
+            net.setDefaultCaseNameExpression(new Expression(document.getCaseName().getValue()));
+        } else {
+            net.setDefaultCaseName(toI18NString(document.getCaseName()));
+        }
 
         return Optional.of(net);
     }
