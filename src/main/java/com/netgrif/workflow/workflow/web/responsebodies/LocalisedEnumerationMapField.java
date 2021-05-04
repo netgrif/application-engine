@@ -6,11 +6,7 @@ import java.util.Locale;
 
 public class LocalisedEnumerationMapField extends LocalisedMapOptionsField<String> {
 
-    private Object defaultValue;
-
     public LocalisedEnumerationMapField(EnumerationMapField field, Locale locale) {
         super(field, locale);
-
-        this.defaultValue = field.getDefaultValue();
     }
 }
