@@ -18,6 +18,8 @@ import com.netgrif.workflow.petrinet.domain.events.EventPhase;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.DataField;
 import com.netgrif.workflow.workflow.domain.Task;
+import com.netgrif.workflow.workflow.domain.eventoutcomes.dataoutcomes.GetDataEventOutcome;
+import com.netgrif.workflow.workflow.domain.eventoutcomes.dataoutcomes.SetDataEventOutcome;
 import com.netgrif.workflow.workflow.service.interfaces.IDataService;
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
@@ -75,7 +77,7 @@ public class DataService implements IDataService {
     private int imageScale;
 
     @Override
-    public List<Field> getData(String taskId) {
+    public GetDataEventOutcome getData(String taskId) {
         Task task = taskService.findOne(taskId);
         Case useCase = workflowService.findOne(task.getCaseId());
 
@@ -83,7 +85,7 @@ public class DataService implements IDataService {
     }
 
     @Override
-    public List<Field> getData(Task task, Case useCase) {
+    public GetDataEventOutcome getData(Task task, Case useCase) {
         log.info("[" + useCase.getStringId() + "]: Getting data of task " + task.getTransitionId() + " [" + task.getStringId() + "]");
         Transition transition = useCase.getPetriNet().getTransition(task.getTransitionId());
 
@@ -132,7 +134,9 @@ public class DataService implements IDataService {
         LongStream.range(0L, dataSetFields.size())
                 .forEach(index -> dataSetFields.get((int) index).setOrder(index));
 
-        return dataSetFields;
+        GetDataEventOutcome outcome = new GetDataEventOutcome();
+        outcome.setData(dataSetFields);
+        return outcome;
     }
 
     private void resolveComponents(Field field, Transition transition){
@@ -150,13 +154,13 @@ public class DataService implements IDataService {
     }
 
     @Override
-    public ChangedFieldsTree setData(String taskId, ObjectNode values) {
+    public SetDataEventOutcome setData(String taskId, ObjectNode values) {
         Task task = taskService.findOne(taskId);
         return setData(task, values);
     }
 
     @Override
-    public ChangedFieldsTree setData(Task task, ObjectNode values) {
+    public SetDataEventOutcome setData(Task task, ObjectNode values) {
         Case useCase = workflowService.findOne(task.getCaseId());
         ChangedFieldsTree changedFieldsTree = ChangedFieldsTree.createNew(task.getCaseId(), task);
 
@@ -183,7 +187,7 @@ public class DataService implements IDataService {
                 if (entry.getKey().contains("-")) {
                     TaskRefFieldWrapper decoded = decodeTaskRefFieldId(entry.getKey());
                     Task referencedTask = taskService.findOne(decoded.getTaskId());
-                    ChangedFieldsTree taskRefChangedFields = setData(referencedTask, values);
+                    ChangedFieldsTree taskRefChangedFields = setData(referencedTask, values).getData();
                     changedFieldsTree.propagate(taskRefChangedFields);
                 }
             } catch (Exception e) {
@@ -195,8 +199,9 @@ public class DataService implements IDataService {
         workflowService.resolveUserRef(useCase);
         workflowService.save(useCase);
         publisher.publishEvent(new SaveCaseDataEvent(useCase, values, changedFieldsTree.getChangedFields().values()));
-
-        return changedFieldsTree;
+        SetDataEventOutcome outcome = new SetDataEventOutcome();
+        outcome.setData(changedFieldsTree);
+        return outcome;
     }
 
 
@@ -215,7 +220,7 @@ public class DataService implements IDataService {
         log.info("Getting groups of task " + taskId + " in case " + useCase.getTitle() + " level: " + level);
         List<DataGroup> resultDataGroups = new ArrayList<>();
 
-        List<Field> data = getData(taskId);
+        List<Field> data = getData(taskId).getData();
         Map<String, Field> dataFieldMap = data.stream().collect(Collectors.toMap(Field::getImportId, field -> field));
         List<DataGroup> dataGroups = transition.getDataGroups().values().stream().map(DataGroup::clone).collect(Collectors.toList());
         for (DataGroup dataGroup : dataGroups) {

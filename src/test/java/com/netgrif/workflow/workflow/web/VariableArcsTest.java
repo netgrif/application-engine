@@ -23,6 +23,8 @@ import com.netgrif.workflow.startup.SuperCreator;
 import com.netgrif.workflow.startup.SystemUserRunner;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.Task;
+import com.netgrif.workflow.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
+import com.netgrif.workflow.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetOutcome;
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
 import org.junit.Before;
@@ -107,10 +109,10 @@ public class VariableArcsTest {
 
     @Test
     public void importTest() throws TransitionNotExecutableException, MissingPetriNetMetaDataException, IOException, MissingIconKeyException {
-        Optional<PetriNet> optionalNet = service.importPetriNet(new FileInputStream(NET_PATH), "major", superCreator.getLoggedSuper());
+        ImportPetriNetOutcome outcome = service.importPetriNet(new FileInputStream(NET_PATH), "major", superCreator.getLoggedSuper());
 
-        assert optionalNet.isPresent();
-        PetriNet net = optionalNet.get();
+        assert outcome.getNet() != null;
+        PetriNet net = outcome.getNet();
         PetriNet loaded = service.getPetriNet(net.getStringId());
         User user = new User();
         user.setName("Test");
@@ -129,23 +131,23 @@ public class VariableArcsTest {
             assert ((VariableArc) arc).getFieldId() != null;
         });
 
-        Case useCase = workflowService.createCase(net.getStringId(), "VARTEST", "red", mock.mockLoggedUser());
+        CreateCaseEventOutcome caseOutcome = workflowService.createCase(net.getStringId(), "VARTEST", "red", mock.mockLoggedUser());
 
-        assert useCase.getPetriNet().getArcs()
+        assert caseOutcome.getACase().getPetriNet().getArcs()
                 .values()
                 .stream()
                 .flatMap(List::stream)
                 .filter(arc -> arc instanceof VariableArc)
                 .allMatch(arc -> ((VariableArc) arc).getField() != null);
 
-        Page<Task> tasks = taskService.findByCases(new PageRequest(0, 10), Collections.singletonList(useCase.getStringId()));
+        Page<Task> tasks = taskService.findByCases(new PageRequest(0, 10), Collections.singletonList(caseOutcome.getACase().getStringId()));
         assert tasks.getContent() != null && tasks.getContent().size() > 0;
 
         Task task = tasks.getContent().get(0);
         taskService.assignTask(user.transformToLoggedUser(), task.getStringId());
         taskService.finishTask(user.transformToLoggedUser(), task.getStringId());
 
-        useCase = workflowService.findOne(useCase.getStringId());
+        Case useCase = workflowService.findOne(caseOutcome.getACase().getStringId());
         Map<String, Integer> activePlaces = useCase.getActivePlaces();
 
         int sum = activePlaces.values().stream().mapToInt(Integer::intValue).sum();
