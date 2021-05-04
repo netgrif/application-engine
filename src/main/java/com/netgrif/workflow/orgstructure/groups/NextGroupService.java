@@ -15,6 +15,7 @@ import com.netgrif.workflow.startup.ImportHelper;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.QCase;
 import com.netgrif.workflow.workflow.domain.Task;
+import com.netgrif.workflow.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
 import com.netgrif.workflow.workflow.service.interfaces.IDataService;
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
@@ -96,10 +97,10 @@ public class NextGroupService implements INextGroupService {
             return null;
         }
         PetriNet orgGroupNet = petriNetService.getNewestVersionByIdentifier(GROUP_NET_IDENTIFIER);
-        Case groupCase = workflowService.createCase(orgGroupNet.getStringId(), title, "", author.transformToLoggedUser());
+        CreateCaseEventOutcome outcome = workflowService.createCase(orgGroupNet.getStringId(), title, "", author.transformToLoggedUser());
 
-        Map<String, Map<String,String>> taskData = getInitialGroupData(author, title, groupCase);
-        Task initTask = getGroupInitTask(groupCase);
+        Map<String, Map<String,String>> taskData = getInitialGroupData(author, title, outcome.getACase());
+        Task initTask = getGroupInitTask(outcome.getACase());
         dataService.setData(initTask.getStringId(), ImportHelper.populateDataset(taskData));
 
         try {
@@ -108,7 +109,7 @@ public class NextGroupService implements INextGroupService {
         } catch (TransitionNotExecutableException e) {
             log.error(e.getMessage());
         }
-        return groupCase;
+        return outcome.getACase();
     }
 
     @Override

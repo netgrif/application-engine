@@ -3,6 +3,8 @@ package com.netgrif.workflow.workflow.web;
 import com.netgrif.workflow.auth.domain.LoggedUser;
 import com.netgrif.workflow.auth.service.interfaces.IUserService;
 import com.netgrif.workflow.workflow.domain.Case;
+import com.netgrif.workflow.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
+import com.netgrif.workflow.workflow.domain.eventoutcomes.response.EventOutcomeWithMessageResource;
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
 import com.netgrif.workflow.workflow.web.requestbodies.CreateCaseBody;
 import com.netgrif.workflow.workflow.web.responsebodies.*;
@@ -32,26 +34,26 @@ public class PublicWorkflowController {
 
     @PostMapping(value = "/case", consumes = "application/json;charset=UTF-8", produces = MediaTypes.HAL_JSON_VALUE)
     @ApiOperation(value = "Create new case")
-    public CaseResource createCase(@RequestBody CreateCaseBody body, Locale locale) {
+    public EventOutcomeWithMessageResource createCase(@RequestBody CreateCaseBody body, Locale locale) {
         LoggedUser loggedUser = userService.getAnonymousLogged();
         try {
-            Case useCase = this.workflowService.createCase(body.netId, body.title, body.color, loggedUser, locale);
-            return new CaseResource(useCase);
+            CreateCaseEventOutcome outcome = this.workflowService.createCase(body.netId, body.title, body.color, loggedUser, locale);
+            return EventOutcomeWithMessageResource.successMessage("Case created succesfully", outcome);
         } catch (Exception e) {
             log.error("Creating case failed:" + e.getMessage(), e);
-            return null;
+            return EventOutcomeWithMessageResource.errorMessage("Creating case failed: " + e.getMessage());
         }
     }
 
     @GetMapping(value = "/case/{id}/data", produces = MediaTypes.HAL_JSON_VALUE)
     @ApiOperation(value = "Get all case data")
-    public DataFieldsResource getAllCaseData(@PathVariable("id") String caseId, Locale locale) {
+    public EventOutcomeWithMessageResource getAllCaseData(@PathVariable("id") String caseId, Locale locale) {
         try {
             caseId = URLDecoder.decode(caseId, StandardCharsets.UTF_8.name());
-            return new DataFieldsResource(this.workflowService.getData(caseId), locale);
+            return EventOutcomeWithMessageResource.successMessage("Getting all data of [" + caseId + "] succeeded",this.workflowService.getData(caseId));
         } catch (UnsupportedEncodingException e) {
             log.error("Getting all case data of [" + caseId + "] failed:" + e.getMessage(), e);
-            return new DataFieldsResource(new ArrayList<>(), locale);
+            return EventOutcomeWithMessageResource.errorMessage("Getting all case data of [" + caseId + "] failed:" + e.getMessage());
         }
     }
 }

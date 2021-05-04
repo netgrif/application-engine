@@ -16,6 +16,8 @@ import com.netgrif.workflow.rules.domain.facts.*;
 import com.netgrif.workflow.startup.SuperCreator;
 import com.netgrif.workflow.workflow.domain.Case;
 import com.netgrif.workflow.workflow.domain.Task;
+import com.netgrif.workflow.workflow.domain.eventoutcomes.caseoutcomes.CreateCaseEventOutcome;
+import com.netgrif.workflow.workflow.domain.eventoutcomes.petrinetoutcomes.ImportPetriNetOutcome;
 import com.netgrif.workflow.workflow.service.interfaces.ITaskService;
 import com.netgrif.workflow.workflow.service.interfaces.IWorkflowService;
 import org.bson.types.ObjectId;
@@ -94,14 +96,14 @@ public class RuleEngineTest {
                 .build();
         ruleRepository.save(rule);
 
-        Optional<PetriNet> petriNetOptional = petriNetService.importPetriNet(new FileInputStream("src/test/resources/rule_engine_test.xml"), "major", superCreator.getLoggedSuper());
+        ImportPetriNetOutcome outcome = petriNetService.importPetriNet(new FileInputStream("src/test/resources/rule_engine_test.xml"), "major", superCreator.getLoggedSuper());
 
-        assert petriNetOptional.isPresent();
-        assert petriNetOptional.get().getTitle().getDefaultValue().equals(NET_TITLE_PRE);
-        assert petriNetOptional.get().getDataSet().containsKey(TEST_FIELD);
-        assert petriNetOptional.get().getDataSet().get(TEST_FIELD) != null;
+        assert outcome.getNet() != null;
+        assert outcome.getNet().getTitle().getDefaultValue().equals(NET_TITLE_PRE);
+        assert outcome.getNet().getDataSet().containsKey(TEST_FIELD);
+        assert outcome.getNet().getDataSet().get(TEST_FIELD) != null;
 
-        List<Fact> facts = factRepository.findAll(QNetImportedFact.netImportedFact.netId.eq(petriNetOptional.get().getStringId()), PageRequest.of(0, 100)).getContent();
+        List<Fact> facts = factRepository.findAll(QNetImportedFact.netImportedFact.netId.eq(outcome.getNet().getStringId()), PageRequest.of(0, 100)).getContent();
         assert facts.size() == 1 && facts.get(0) instanceof NetImportedFact;
     }
 
@@ -131,13 +133,13 @@ public class RuleEngineTest {
 
         assert refreshableKieBase.shouldRefresh();
 
-        Optional<PetriNet> petriNetOptional = petriNetService.importPetriNet(new FileInputStream("src/test/resources/rule_engine_test.xml"), "major", superCreator.getLoggedSuper());
+        ImportPetriNetOutcome outcome = petriNetService.importPetriNet(new FileInputStream("src/test/resources/rule_engine_test.xml"), "major", superCreator.getLoggedSuper());
 
         assert !refreshableKieBase.shouldRefresh();
 
-        assert petriNetOptional.isPresent();
-        assert petriNetOptional.get().getTitle().getDefaultValue().equals(NET_TITLE_POST);
-        assert petriNetOptional.get().getIdentifier().equals(NEW_IDENTIFIER);
+        assert outcome != null;
+        assert outcome.getNet().getTitle().getDefaultValue().equals(NET_TITLE_POST);
+        assert outcome.getNet().getIdentifier().equals(NEW_IDENTIFIER);
     }
 
     @Test
@@ -148,8 +150,8 @@ public class RuleEngineTest {
         final String NEW_CASE_TITLE_2 = "new case title 2";
         final String TEXT_VALUE = "TEXT FIELD VALUE";
 
-        Optional<PetriNet> petriNetOptional = petriNetService.importPetriNet(new FileInputStream("src/test/resources/rule_engine_test.xml"), "major", superCreator.getLoggedSuper());
-        assert petriNetOptional.isPresent();
+        ImportPetriNetOutcome outcome = petriNetService.importPetriNet(new FileInputStream("src/test/resources/rule_engine_test.xml"), "major", superCreator.getLoggedSuper());
+        assert outcome != null;
 
         StoredRule rule = StoredRule.builder()
                 ._id(new ObjectId())
@@ -188,13 +190,13 @@ public class RuleEngineTest {
         ruleRepository.save(rule3);
         ruleRepository.save(rule4);
 
-        Case newCase = workflowService.createCase(petriNetOptional.get().getStringId(), "Original title", "original color", superCreator.getLoggedSuper());
-        assert newCase.getTitle().equals(NEW_CASE_TITLE);
+        CreateCaseEventOutcome caseOutcome = workflowService.createCase(outcome.getNet().getStringId(), "Original title", "original color", superCreator.getLoggedSuper());
+        assert caseOutcome.getACase().getTitle().equals(NEW_CASE_TITLE);
 
-        Task task = findTask(newCase, TRANS_1);
+        Task task = findTask(caseOutcome.getACase(), TRANS_1);
         taskService.assignTask(task, superCreator.getLoggedSuper().transformToUser());
         taskService.finishTask(task, superCreator.getLoggedSuper().transformToUser());
-        newCase = workflowService.findOne(newCase.getStringId());
+        Case newCase = workflowService.findOne(caseOutcome.getACase().getStringId());
         assert newCase.getTitle().equals(NEW_CASE_TITLE);
         assert !newCase.getColor().equals(NEW_CASE_TITLE_2);
 
@@ -355,8 +357,8 @@ public class RuleEngineTest {
     }
 
     private Case newCase() throws IOException, MissingPetriNetMetaDataException, MissingIconKeyException {
-        Optional<PetriNet> petriNetOptional = petriNetService.importPetriNet(new FileInputStream("src/test/resources/rule_engine_test.xml"), "major", superCreator.getLoggedSuper());
-        return workflowService.createCase(petriNetOptional.get().getStringId(), "Original title", "original color", superCreator.getLoggedSuper());
+        ImportPetriNetOutcome outcome = petriNetService.importPetriNet(new FileInputStream("src/test/resources/rule_engine_test.xml"), "major", superCreator.getLoggedSuper());
+        return workflowService.createCase(outcome.getNet().getStringId(), "Original title", "original color", superCreator.getLoggedSuper()).getACase();
     }
 
     private Task findTask(Case caze, String trans) {
