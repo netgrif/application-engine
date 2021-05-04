@@ -14,6 +14,7 @@ import org.springframework.data.mongodb.core.convert.MongoCustomConversions;
 import org.springframework.hateoas.RelProvider;
 import org.springframework.hateoas.config.EnableHypermediaSupport;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.oauth2.config.annotation.web.configuration.EnableOAuth2Client;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,6 +25,7 @@ import java.util.List;
 @EnableAspectJAutoProxy
 @SpringBootApplication
 @EnableMongoAuditing
+@EnableOAuth2Client
 public class WorkflowManagementSystemApplication {
 
     @Bean

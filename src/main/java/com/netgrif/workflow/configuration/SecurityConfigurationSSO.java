@@ -22,6 +22,14 @@ import org.springframework.security.authentication.AnonymousAuthenticationProvid
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserRequest;
+import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserService;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
+import org.springframework.security.oauth2.client.web.OAuth2AuthorizedClientRepository;
+import org.springframework.security.oauth2.client.web.reactive.function.client.ServletOAuth2AuthorizedClientExchangeFilterFunction;
+import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
+import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.header.writers.StaticHeadersWriter;
@@ -31,6 +39,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.HashSet;
 
@@ -121,9 +130,35 @@ public class SecurityConfigurationSSO extends AbstractSecurityConfiguration {
                 .frameOptions().disable()
                 .httpStrictTransportSecurity().includeSubDomains(true).maxAgeInSeconds(31536000)
                 .and()
-                .addHeaderWriter(new StaticHeadersWriter("X-Content-Security-Policy", "frame-src: 'none'"));
+                .addHeaderWriter(new StaticHeadersWriter("X-Content-Security-Policy", "frame-src: 'none'"))
+                .and()
+                .oauth2Login()
+//                .userInfoEndpoint()
+//                .oidcUserService(new CustomOidcUserServiceImpl())
+        ;
 //        @formatter:on
         setCsrf(http);
+    }
+
+//    public class CustomOidcUserServiceImpl implements OAuth2UserService<OidcUserRequest, OidcUser> {
+//
+//        private OidcUserService oidcUserService = new OidcUserService();
+//
+//        @Override
+//        public OidcUser loadUser(OidcUserRequest userRequest) throws OAuth2AuthenticationException {
+//            OidcUser oidcUser = oidcUserService.loadUser(userRequest);
+//            return oidcUser;
+//        }
+//    }
+
+    @Bean
+    WebClient webClient(ClientRegistrationRepository clientRegistrationRepository,
+                        OAuth2AuthorizedClientRepository authorizedClientRepository) {
+        ServletOAuth2AuthorizedClientExchangeFilterFunction oauth2 =
+                new ServletOAuth2AuthorizedClientExchangeFilterFunction(clientRegistrationRepository,
+                        authorizedClientRepository);
+        oauth2.setDefaultOAuth2AuthorizedClient(true);
+        return WebClient.builder().apply(oauth2.oauth2Configuration()).build();
     }
 
     @Override
